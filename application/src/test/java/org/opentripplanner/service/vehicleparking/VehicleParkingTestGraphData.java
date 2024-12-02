@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_parking;
+package org.opentripplanner.service.vehicleparking;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;

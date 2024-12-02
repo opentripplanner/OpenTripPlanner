@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 

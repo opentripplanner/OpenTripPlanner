@@ -107,7 +107,7 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
 
   private List<Route> getRoutes(DataFetchingEnvironment environment) {
     return getTransitService(environment)
-      .getAllRoutes()
+      .listRoutes()
       .stream()
       .filter(route -> route.getAgency().equals(getSource(environment)))
       .collect(Collectors.toList());

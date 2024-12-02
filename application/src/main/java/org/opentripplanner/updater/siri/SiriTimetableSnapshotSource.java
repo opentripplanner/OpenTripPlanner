@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.siri;
 
 import static java.lang.Boolean.TRUE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.EMPTY_STOP_POINT_REF;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
@@ -33,6 +34,7 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -80,7 +82,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     this.transitEditorService =
       new DefaultTransitService(timetableRepository, getTimetableSnapshotBuffer());
     this.tripPatternCache =
-      new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::getPatternForTrip);
+      new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::findPattern);
 
     timetableRepository.initTimetableSnapshotProvider(this);
   }
@@ -150,6 +152,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver
   ) {
+    for (var call : CallWrapper.of(journey)) {
+      if (StringUtils.hasNoValueOrNullAsString(call.getStopPointRef())) {
+        return UpdateError.result(null, EMPTY_STOP_POINT_REF, journey.getDataSource());
+      }
+    }
     boolean shouldAddNewTrip = false;
     try {
       shouldAddNewTrip = shouldAddNewTrip(journey, entityResolver);
@@ -238,7 +245,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     if (trip != null) {
       // Found exact match
-      pattern = transitEditorService.getPatternForTrip(trip);
+      pattern = transitEditorService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
       TripAndPattern tripAndPattern = fuzzyTripMatcher.match(
@@ -332,7 +339,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private boolean markScheduledTripAsDeleted(Trip trip, final LocalDate serviceDate) {
     boolean success = false;
 
-    final TripPattern pattern = transitEditorService.getPatternForTrip(trip);
+    final TripPattern pattern = transitEditorService.findPattern(trip);
 
     if (pattern != null) {
       // Mark scheduled trip times for this trip in this pattern as deleted

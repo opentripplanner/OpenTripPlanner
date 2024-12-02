@@ -46,7 +46,7 @@ public class LineType {
           .newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
-          .dataFetcher(environment -> TransitIdMapper.mapEntityIDToApi(environment.getSource()))
+          .dataFetcher(environment -> TransitIdMapper.mapEntityIDToApi(getSource(environment)))
           .build()
       )
       .field(
@@ -54,7 +54,7 @@ public class LineType {
           .newFieldDefinition()
           .name("authority")
           .type(authorityType)
-          .dataFetcher(environment -> (((Route) environment.getSource()).getAgency()))
+          .dataFetcher(environment -> (getSource(environment).getAgency()))
           .build()
       )
       .field(
@@ -62,7 +62,7 @@ public class LineType {
           .newFieldDefinition()
           .name("operator")
           .type(operatorType)
-          .dataFetcher(environment -> (((Route) environment.getSource()).getOperator()))
+          .dataFetcher(environment -> ((getSource(environment)).getOperator()))
           .build()
       )
       .field(
@@ -70,7 +70,7 @@ public class LineType {
           .newFieldDefinition()
           .name("branding")
           .type(brandingType)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getBranding())
+          .dataFetcher(environment -> (getSource(environment)).getBranding())
       )
       .field(
         GraphQLFieldDefinition
@@ -80,7 +80,7 @@ public class LineType {
           .description(
             "Publicly announced code for line, differentiating it from other lines for the same operator."
           )
-          .dataFetcher(environment -> (((Route) environment.getSource()).getShortName()))
+          .dataFetcher(environment -> ((getSource(environment)).getShortName()))
           .build()
       )
       .field(
@@ -88,7 +88,7 @@ public class LineType {
           .newFieldDefinition()
           .name("name")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getLongName())
+          .dataFetcher(environment -> (getSource(environment)).getLongName())
           .build()
       )
       .field(
@@ -96,7 +96,7 @@ public class LineType {
           .newFieldDefinition()
           .name("transportMode")
           .type(EnumTypes.TRANSPORT_MODE)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getMode())
+          .dataFetcher(environment -> (getSource(environment)).getMode())
           .build()
       )
       .field(
@@ -105,9 +105,7 @@ public class LineType {
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
           .dataFetcher(environment ->
-            TransmodelTransportSubmode.fromValue(
-              ((Route) environment.getSource()).getNetexSubmode()
-            )
+            TransmodelTransportSubmode.fromValue((getSource(environment)).getNetexSubmode())
           )
           .build()
       )
@@ -116,7 +114,7 @@ public class LineType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getDescription())
+          .dataFetcher(environment -> (getSource(environment)).getDescription())
           .build()
       )
       .field(
@@ -143,7 +141,7 @@ public class LineType {
           .name("journeyPatterns")
           .type(new GraphQLList(journeyPatternType))
           .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getPatternsForRoute(environment.getSource())
+            GqlUtil.getTransitService(environment).findPatterns(getSource(environment))
           )
           .build()
       )
@@ -155,7 +153,7 @@ public class LineType {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getPatternsForRoute(environment.getSource())
+              .findPatterns(getSource(environment))
               .stream()
               .map(TripPattern::getStops)
               .flatMap(Collection::stream)
@@ -172,7 +170,7 @@ public class LineType {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getPatternsForRoute(environment.getSource())
+              .findPatterns(getSource(environment))
               .stream()
               .flatMap(TripPattern::scheduledTripsAsStream)
               .distinct()
@@ -186,8 +184,8 @@ public class LineType {
           .name("notices")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
-            Route route = environment.getSource();
-            return GqlUtil.getTransitService(environment).getNoticesByEntity(route);
+            Route route = getSource(environment);
+            return GqlUtil.getTransitService(environment).findNotices(route);
           })
           .build()
       )
@@ -201,7 +199,7 @@ public class LineType {
             GqlUtil
               .getTransitService(environment)
               .getTransitAlertService()
-              .getRouteAlerts(((Route) environment.getSource()).getId())
+              .getRouteAlerts((getSource(environment)).getId())
           )
           .build()
       )
@@ -211,7 +209,7 @@ public class LineType {
           .name("flexibleLineType")
           .description("Type of flexible line, or null if line is not flexible.")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> ((Route) environment.getSource()).getFlexibleLineType())
+          .dataFetcher(environment -> (getSource(environment)).getFlexibleLineType())
           .build()
       )
       .field(
@@ -232,9 +230,13 @@ public class LineType {
           .name("groupOfLines")
           .description("Groups of lines that line is a part of.")
           .type(new GraphQLNonNull(new GraphQLList(groupOfLinesType)))
-          .dataFetcher(environment -> ((Route) environment.getSource()).getGroupsOfRoutes())
+          .dataFetcher(environment -> (getSource(environment)).getGroupsOfRoutes())
           .build()
       )
       .build();
+  }
+
+  private static Route getSource(DataFetchingEnvironment environment) {
+    return environment.getSource();
   }
 }

@@ -83,13 +83,13 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
     LocalDate serviceDate
   ) {
     TransitService transitService = getTransitService(environment);
-    TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
+    TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
     // no matching pattern found
     if (tripPattern == null) {
       return null;
     }
 
-    return transitService.getTimetableForTripPattern(tripPattern, serviceDate);
+    return transitService.findTimetable(tripPattern, serviceDate);
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

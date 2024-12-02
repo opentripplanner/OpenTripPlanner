@@ -381,7 +381,7 @@ public class TransitRouter {
   private IntStream listStopIndexes(FeedScopedId stopLocationId) {
     Collection<StopLocation> stops = serverContext
       .transitService()
-      .getStopOrChildStops(stopLocationId);
+      .findStopOrChildStops(stopLocationId);
 
     if (stops.isEmpty()) {
       throw new EntityNotFoundException(

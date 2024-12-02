@@ -68,7 +68,7 @@ public class AuthorityType {
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
             getTransitService(environment)
-              .getAllRoutes()
+              .listRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getAgency(), environment.getSource()))
               .collect(Collectors.toList())

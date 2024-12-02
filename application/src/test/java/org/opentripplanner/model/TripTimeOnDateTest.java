@@ -19,7 +19,7 @@ class TripTimeOnDateTest implements PlanTestConstants {
     var testModel = TimetableRepositoryForTest.of();
     var pattern = testModel.pattern(TransitMode.BUS).build();
     var trip = TimetableRepositoryForTest.trip("123").build();
-    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -37,7 +37,7 @@ class TripTimeOnDateTest implements PlanTestConstants {
     var testModel = TimetableRepositoryForTest.of();
     var pattern = testModel.pattern(TransitMode.BUS).build();
     var trip = TimetableRepositoryForTest.trip("123").build();
-    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     tripTimes.setRecorded(1);
