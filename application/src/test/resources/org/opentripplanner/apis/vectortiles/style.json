@@ -1,6 +1,16 @@
 {
   "name" : "OTP Debug Tiles",
   "sources" : {
+    "background-positron" : {
+      "id" : "background-positron",
+      "tiles" : [
+        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+      ],
+      "maxzoom" : 19,
+      "tileSize" : 256,
+      "attribution" : "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
+      "type" : "raster"
+    },
     "vectorSource" : {
       "id" : "vectorSource",
       "url" : "https://example.com",
@@ -15,16 +25,6 @@
       "tileSize" : 256,
       "attribution" : "© OpenStreetMap Contributors",
       "type" : "raster"
-    },
-    "background-carto" : {
-      "id" : "background-carto",
-      "tiles" : [
-        "https://{s}.basemaps.cartocdn.com/{z}/{x}/{y}"
-      ],
-      "maxzoom" : 19,
-      "tileSize" : 256,
-      "attribution" : "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
-      "type" : "raster"
     }
   },
   "layers" : [
@@ -38,10 +38,13 @@
       }
     },
     {
-      "id" : "background-carto",
+      "id" : "background-positron",
       "type" : "raster",
-      "source" : "background-carto",
+      "source" : "background-positron",
       "minzoom" : 0,
+      "layout" : {
+        "visibility" : "none"
+      },
       "metadata" : {
         "group" : "Other"
       }

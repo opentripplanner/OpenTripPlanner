@@ -46,7 +46,7 @@ public class DebugStyleSpec {
   );
   private static final TileSource POSITRON_BACKGROUND = new RasterSource(
     "background-positron",
-    List.of("https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}${r}.png"),
+    List.of("https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"),
     19,
     256,
     "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>"
