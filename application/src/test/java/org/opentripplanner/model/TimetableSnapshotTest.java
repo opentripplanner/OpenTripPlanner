@@ -536,11 +536,11 @@ public class TimetableSnapshotTest {
     resolver.clear(feedId);
     resolver.clear(feedId);
     resolver.clear(feedId);
-    resolver.commit(transitLayerUpdater, true);
+    assertTrue(resolver.commit(transitLayerUpdater, true).isEmpty());
 
     resolver.clear(feedId);
     resolver.clear(feedId);
-    resolver.commit(transitLayerUpdater, true);
+    assertTrue(resolver.commit(transitLayerUpdater, true).isEmpty());
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {

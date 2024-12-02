@@ -96,7 +96,7 @@ public class TimetableSnapshot {
    * include ones from the scheduled GTFS, as well as ones added by realtime messages and
    * tracked by the TripPatternCache. <p>
    * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
-   * least one update.<p>
+   * least one update, and those for which we had updates before but just recently cleared.<p>
    * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
    * when we're updating them. If an update will modify the timetable for a particular day, that
    * timetable is replicated before any modifications are applied to avoid affecting any previous
@@ -370,6 +370,32 @@ public class TimetableSnapshot {
     if (!force && !this.isDirty()) {
       return null;
     }
+
+    // update the transitLayer first, including the restored scheduled timetables
+    if (transitLayerUpdater != null) {
+      transitLayerUpdater.update(dirtyTimetables.values(), timetables);
+    }
+
+    this.dirtyTimetables.clear();
+    this.dirty = false;
+
+    // remove restored scheduled timetables (restored in clear()) from the snapshot
+    for (var entry : timetables.entrySet()) {
+      var pattern = entry.getKey();
+      var scheduledTimetable = pattern.getScheduledTimetable();
+      entry.setValue(
+        entry
+          .getValue()
+          .stream()
+          .filter(timetable ->
+            !timetable.equals(scheduledTimetable.copyForServiceDate(timetable.getServiceDate()))
+          )
+          .collect(ImmutableSortedSet.toImmutableSortedSet(new SortedTimetableComparator()))
+      );
+    }
+    timetables.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+
+    // publish the snapshot without the restored scheduled timetables
     TimetableSnapshot ret = new TimetableSnapshot(
       Map.copyOf(timetables),
       Map.copyOf(realTimeNewTripPatternsForModifiedTrips),
@@ -382,13 +408,6 @@ public class TimetableSnapshot {
       ImmutableSetMultimap.copyOf(patternsForStop),
       true
     );
-
-    if (transitLayerUpdater != null) {
-      transitLayerUpdater.update(dirtyTimetables.values(), timetables);
-    }
-
-    this.dirtyTimetables.clear();
-    this.dirty = false;
 
     return ret;
   }
@@ -562,15 +581,9 @@ public class TimetableSnapshot {
         var timetablesForPattern = entry.getValue();
         var scheduledTimetable = pattern.getScheduledTimetable();
 
-        // remove scheduled timetables from the entry
-        var updatedTimetables = timetablesForPattern
+        // restore updated timetables to scheduled timetables
+        var restoredTimetables = timetablesForPattern
           .stream()
-          .filter(timetable ->
-            !timetable.equals(scheduledTimetable.copyForServiceDate(timetable.getServiceDate()))
-          );
-
-        // then restore updated timetables to scheduled timetables
-        var restoredTimetables = updatedTimetables
           .map(timetable -> scheduledTimetable.copyForServiceDate(timetable.getServiceDate()))
           .collect(ImmutableSortedSet.toImmutableSortedSet(new SortedTimetableComparator()));
         dirty = dirty || !restoredTimetables.isEmpty();
