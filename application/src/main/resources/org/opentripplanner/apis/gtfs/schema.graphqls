@@ -2234,7 +2234,7 @@ type StopCall {
   realTime: CallRealTime
   "Scheduled arrival and departure times for this stop location."
   schedule: CallSchedule
-  "The stop where this arrival/departure happens"
+  "The stop where this arrival/departure happens."
   stopLocation: CallStopLocation!
 }
 
@@ -2495,7 +2495,7 @@ type TripOccupancy {
 
 "A trip on a specific service date."
 type TripOnServiceDate {
-  "Information related to trip's scheduled arrival to the final stop location. Can contain realtime information."
+  "Information related to trip's scheduled arrival to the final stop location. Can contain real-time information."
   end: StopCall!
   """
   The service date when the trip occurs.
@@ -2505,7 +2505,7 @@ type TripOnServiceDate {
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
   serviceDate: LocalDate!
-  "Information related to trip's scheduled departure from the first stop location. Can contain realtime information."
+  "Information related to trip's scheduled departure from the first stop location. Can contain real-time information."
   start: StopCall!
   "List of times when this trip arrives to or departs from a stop location and information related to the visit to the stop location."
   stopCalls: [StopCall!]!
