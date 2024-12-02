@@ -23,6 +23,8 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRealtimeState
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.apis.gtfs.model.CallRealTime;
+import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
@@ -67,8 +69,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
-import org.opentripplanner.transit.model.timetable.CallRealTimeEstimate;
-import org.opentripplanner.transit.model.timetable.CallTime;
+import org.opentripplanner.transit.model.timetable.EstimatedTime;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -144,6 +145,13 @@ public class GraphQLDataFetchers {
 
   /** Entity related to an alert */
   public interface GraphQLAlertEntity extends TypeResolver {}
+
+  /** Arrival and departure time (not relative to midnight). */
+  public interface GraphQLArrivalDepartureTime {
+    public DataFetcher<java.time.OffsetDateTime> arrival();
+
+    public DataFetcher<java.time.OffsetDateTime> departure();
+  }
 
   /** Bike park represents a location where bicycles can be parked. */
   public interface GraphQLBikePark {
@@ -242,28 +250,23 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> time();
   }
 
-  /**
-   * Call is a visit to a location (a stop or an area) in a trip on service date. It can contain
-   * exact arrival and departure times and/or a scheduled time window.
-   */
-  public interface GraphQLCall extends TypeResolver {}
+  /** Real-time estimates for arrival and departure times for a stop location. */
+  public interface GraphQLCallRealTime {
+    public DataFetcher<EstimatedTime> arrival();
 
-  /** Real-time estimates for an arrival or departure at a certain place. */
-  public interface GraphQLCallRealTimeEstimate {
-    public DataFetcher<java.time.Duration> delay();
-
-    public DataFetcher<java.time.OffsetDateTime> time();
+    public DataFetcher<EstimatedTime> departure();
   }
 
-  /**
-   * Timing of an arrival or a departure to or from a stop. May contain real-time information if
-   * available. This is used when there is a known scheduled time.
-   */
-  public interface GraphQLCallTime {
-    public DataFetcher<CallRealTimeEstimate> estimated();
-
-    public DataFetcher<java.time.OffsetDateTime> scheduledTime();
+  /** What is scheduled for a trip on a service date for a stop location. */
+  public interface GraphQLCallSchedule {
+    public DataFetcher<Object> time();
   }
+
+  /** Scheduled times for a trip on a service date for a stop location. */
+  public interface GraphQLCallScheduledTime extends TypeResolver {}
+
+  /** Location where a transit vehicle stops at. */
+  public interface GraphQLCallStopLocation extends TypeResolver {}
 
   /** Car park represents a location where cars can be parked. */
   public interface GraphQLCarPark {
@@ -383,6 +386,13 @@ public class GraphQLDataFetchers {
 
   public interface GraphQLEmissions {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
+  }
+
+  /** Real-time estimates for an arrival or departure at a certain place. */
+  public interface GraphQLEstimatedTime {
+    public DataFetcher<java.time.Duration> delay();
+
+    public DataFetcher<java.time.OffsetDateTime> time();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
@@ -1073,16 +1083,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> zoneId();
   }
 
-  /**
-   * Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-   * The times are exact (although can be changed by real-time updates), not time windows.
-   */
+  /** Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location. */
   public interface GraphQLStopCall {
-    public DataFetcher<CallTime> arrival();
+    public DataFetcher<CallRealTime> realTime();
 
-    public DataFetcher<CallTime> departure();
+    public DataFetcher<CallSchedule> schedule();
 
-    public DataFetcher<Object> stop();
+    public DataFetcher<Object> stopLocation();
   }
 
   public interface GraphQLStopGeometries {
@@ -1253,13 +1260,13 @@ public class GraphQLDataFetchers {
 
   /** A trip on a specific service date. */
   public interface GraphQLTripOnServiceDate {
-    public DataFetcher<Object> end();
+    public DataFetcher<TripTimeOnDate> end();
 
     public DataFetcher<java.time.LocalDate> serviceDate();
 
-    public DataFetcher<Object> start();
+    public DataFetcher<TripTimeOnDate> start();
 
-    public DataFetcher<Iterable<Object>> stopCalls();
+    public DataFetcher<Iterable<TripTimeOnDate>> stopCalls();
 
     public DataFetcher<Trip> trip();
   }

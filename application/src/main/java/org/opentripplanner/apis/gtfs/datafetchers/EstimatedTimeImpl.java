@@ -5,9 +5,9 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.transit.model.timetable.CallRealTimeEstimate;
+import org.opentripplanner.transit.model.timetable.EstimatedTime;
 
-public class CallRealTimeEstimateImpl implements GraphQLDataFetchers.GraphQLCallRealTimeEstimate {
+public class EstimatedTimeImpl implements GraphQLDataFetchers.GraphQLEstimatedTime {
 
   @Override
   public DataFetcher<Duration> delay() {
@@ -19,7 +19,7 @@ public class CallRealTimeEstimateImpl implements GraphQLDataFetchers.GraphQLCall
     return environment -> getSource(environment).time().toOffsetDateTime();
   }
 
-  private CallRealTimeEstimate getSource(DataFetchingEnvironment environment) {
+  private EstimatedTime getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

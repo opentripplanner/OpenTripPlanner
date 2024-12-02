@@ -7,43 +7,52 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.ZonedDateTime;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.apis.gtfs.model.ArrivalDepartureTime;
+import org.opentripplanner.apis.gtfs.model.CallRealTime;
+import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.model.timetable.CallTime;
+import org.opentripplanner.transit.model.timetable.EstimatedTime;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class StopCallImpl implements GraphQLDataFetchers.GraphQLStopCall {
 
   @Override
-  public DataFetcher<CallTime> arrival() {
+  public DataFetcher<CallRealTime> realTime() {
     return environment -> {
       var tripTime = getSource(environment);
-      var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledArrival());
-      if (scheduledTime == null) {
+      if (!tripTime.isRealtime()) {
         return null;
       }
-      return tripTime.isRealtime()
-        ? CallTime.of(scheduledTime, tripTime.getArrivalDelay())
-        : CallTime.ofStatic(scheduledTime);
+      var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
+      var estimatedArrival = scheduledArrival == null
+        ? null
+        : EstimatedTime.of(scheduledArrival, tripTime.getArrivalDelay());
+      var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
+      var estimatedDeparture = scheduledDeparture == null
+        ? null
+        : EstimatedTime.of(scheduledDeparture, tripTime.getDepartureDelay());
+      return new CallRealTime(estimatedArrival, estimatedDeparture);
     };
   }
 
   @Override
-  public DataFetcher<CallTime> departure() {
+  public DataFetcher<CallSchedule> schedule() {
     return environment -> {
       var tripTime = getSource(environment);
-      var scheduledTime = getZonedDateTime(environment, tripTime.getScheduledDeparture());
-      if (scheduledTime == null) {
-        return null;
-      }
-      return tripTime.isRealtime()
-        ? CallTime.of(scheduledTime, tripTime.getDepartureDelay())
-        : CallTime.ofStatic(scheduledTime);
+      var scheduledArrival = getZonedDateTime(environment, tripTime.getScheduledArrival());
+      var scheduledDeparture = getZonedDateTime(environment, tripTime.getScheduledDeparture());
+      return new CallSchedule(
+        new ArrivalDepartureTime(
+          scheduledArrival == null ? null : scheduledArrival.toOffsetDateTime(),
+          scheduledDeparture == null ? null : scheduledDeparture.toOffsetDateTime()
+        )
+      );
     };
   }
 
   @Override
-  public DataFetcher<Object> stop() {
+  public DataFetcher<Object> stopLocation() {
     return environment -> getSource(environment).getStop();
   }
 

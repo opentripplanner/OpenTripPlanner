@@ -8,7 +8,7 @@ import java.util.Objects;
  * Realtime information about a vehicle at a certain place. This is meant to be used in timetables
  * (not in transit legs).
  */
-public class CallRealTimeEstimate {
+public class EstimatedTime {
 
   private final ZonedDateTime time;
   private final Duration delay;
@@ -16,9 +16,14 @@ public class CallRealTimeEstimate {
   /**
    * @param delay Delay or "earliness" of a vehicle. Earliness is expressed as a negative number.
    */
-  public CallRealTimeEstimate(ZonedDateTime time, Duration delay) {
+  private EstimatedTime(ZonedDateTime time, Duration delay) {
     this.time = Objects.requireNonNull(time);
     this.delay = Objects.requireNonNull(delay);
+  }
+
+  public static EstimatedTime of(ZonedDateTime scheduledTime, int delaySecs) {
+    var delay = Duration.ofSeconds(delaySecs);
+    return new EstimatedTime(scheduledTime.minus(delay), delay);
   }
 
   public ZonedDateTime time() {

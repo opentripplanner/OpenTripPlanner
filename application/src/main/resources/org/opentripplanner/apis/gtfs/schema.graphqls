@@ -73,11 +73,11 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
-"""
-Call is a visit to a location (a stop or an area) in a trip on service date. It can contain
-exact arrival and departure times and/or a scheduled time window.
-"""
-union Call = StopCall
+"Scheduled times for a trip on a service date for a stop location."
+union CallScheduledTime = ArrivalDepartureTime
+
+"Location where a transit vehicle stops at."
+union CallStopLocation = Stop
 
 "Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
 union RentalPlace = RentalVehicle | VehicleRentalStation
@@ -170,6 +170,14 @@ type Alert implements Node {
   stop: Stop @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected stops.\nUse entities instead.")
   "Trip affected by the disruption"
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
+}
+
+"Arrival and departure time (not relative to midnight)."
+type ArrivalDepartureTime {
+  "Arrival time as an ISO-8601-formatted datetime."
+  arrival: OffsetDateTime
+  "Departure time as an ISO-8601-formatted datetime."
+  departure: OffsetDateTime
 }
 
 "Bike park represents a location where bicycles can be parked."
@@ -303,27 +311,18 @@ type BookingTime {
   time: String
 }
 
-"Real-time estimates for an arrival or departure at a certain place."
-type CallRealTimeEstimate {
-  """
-  The delay or "earliness" of the vehicle at a certain place. This estimate can change quite often.
-    
-  If the vehicle is early then this is a negative duration.
-  """
-  delay: Duration!
-  "The estimate for a call event (such as arrival or departure) at a certain place. This estimate can change quite often."
-  time: OffsetDateTime!
+"Real-time estimates for arrival and departure times for a stop location."
+type CallRealTime {
+  "Real-time estimates for the arrival."
+  arrival: EstimatedTime
+  "Real-time estimates for the departure."
+  departure: EstimatedTime
 }
 
-"""
-Timing of an arrival or a departure to or from a stop. May contain real-time information if
-available. This is used when there is a known scheduled time.
-"""
-type CallTime {
-  "The estimated time of the event. If no real-time information is available, this is null."
-  estimated: CallRealTimeEstimate
-  "The scheduled time of the event."
-  scheduledTime: OffsetDateTime
+"What is scheduled for a trip on a service date for a stop location."
+type CallSchedule {
+  "Scheduled time for a trip on a service date for a stop location."
+  time: CallScheduledTime
 }
 
 "Car park represents a location where cars can be parked."
@@ -483,6 +482,18 @@ type DepartureRow implements Node & PlaceInterface {
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
+}
+
+"Real-time estimates for an arrival or departure at a certain place."
+type EstimatedTime {
+  """
+  The delay or "earliness" of the vehicle at a certain place. This estimate can change quite often.
+    
+  If the vehicle is early then this is a negative duration.
+  """
+  delay: Duration!
+  "The estimate for a call event (such as arrival or departure) at a certain place. This estimate can change quite often."
+  time: OffsetDateTime!
 }
 
 "A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'."
@@ -2217,17 +2228,14 @@ type Stop implements Node & PlaceInterface {
   zoneId: String
 }
 
-"""
-Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop.
-The times are exact (although can be changed by real-time updates), not time windows.
-"""
+"Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location."
 type StopCall {
-  "Scheduled arrival time to the stop and a real-time estimate, if one exists."
-  arrival: CallTime
-  "Scheduled departure time from the stop and a real-time estimate, if one exists."
-  departure: CallTime
+  "Real-time estimates for arrival and departure times for this stop location."
+  realTime: CallRealTime
+  "Scheduled arrival and departure times for this stop location."
+  schedule: CallSchedule
   "The stop where this arrival/departure happens"
-  stop: Stop
+  stopLocation: CallStopLocation!
 }
 
 type StopGeometries {
@@ -2487,8 +2495,8 @@ type TripOccupancy {
 
 "A trip on a specific service date."
 type TripOnServiceDate {
-  "Information related to trip's scheduled arrival to the final stop. Can contain realtime information."
-  end: Call!
+  "Information related to trip's scheduled arrival to the final stop location. Can contain realtime information."
+  end: StopCall!
   """
   The service date when the trip occurs.
     
@@ -2497,10 +2505,10 @@ type TripOnServiceDate {
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
   """
   serviceDate: LocalDate!
-  "Information related to trip's scheduled departure from the first stop. Can contain realtime information."
-  start: Call!
-  "List of times when this trip arrives to or departs from a stop and information related to the stop"
-  stopCalls: [Call!]!
+  "Information related to trip's scheduled departure from the first stop location. Can contain realtime information."
+  start: StopCall!
+  "List of times when this trip arrives to or departs from a stop location and information related to the visit to the stop location."
+  stopCalls: [StopCall!]!
   "This trip on service date is an instance of this trip."
   trip: Trip
 }

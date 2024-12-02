@@ -63,7 +63,6 @@ config:
     TripOnServiceDate: org.opentripplanner.transit.model.timetable.TripOnServiceDate#TripOnServiceDate
     TripOnServiceDateConnection: graphql.relay.Connection#Connection<TripOnServiceDate>
     TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
-    CallTime: org.opentripplanner.transit.model.timetable.CallTime#CallTime
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
@@ -131,6 +130,8 @@ config:
     RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
     StopPosition: org.opentripplanner.apis.gtfs.model.StopPosition#StopPosition
     RealTimeEstimate: org.opentripplanner.model.plan.LegRealTimeEstimate#LegRealTimeEstimate
-    CallRealTimeEstimate: org.opentripplanner.transit.model.timetable.CallRealTimeEstimate#CallRealTimeEstimate
+    EstimatedTime: org.opentripplanner.transit.model.timetable.EstimatedTime#EstimatedTime
+    CallRealTime: org.opentripplanner.apis.gtfs.model.CallRealTime#CallRealTime
     RentalPlace: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
+    CallSchedule: org.opentripplanner.apis.gtfs.model.CallSchedule#CallSchedule
 

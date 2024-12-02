@@ -10,45 +10,67 @@
       node {
         serviceDate
         end {
-          ... on StopCall {
-            arrival {
-              estimated {
-                delay
-                time
+          schedule {
+            time {
+              ... on ArrivalDepartureTime {
+                arrival
               }
-              scheduledTime
+            }
+          }
+          realTime {
+            arrival {
+              delay
+              time
+            }
+          }
+          stopLocation {
+            ... on Stop {
+              gtfsId
             }
           }
         }
         start {
-          ... on StopCall {
-            departure {
-              estimated {
-                delay
-                time
+          schedule {
+            time {
+              ... on ArrivalDepartureTime {
+                departure
               }
-              scheduledTime
+            }
+          }
+          realTime {
+            departure {
+              delay
+              time
+            }
+          }
+          stopLocation {
+            ... on Stop {
+              gtfsId
             }
           }
         }
         stopCalls {
-          ... on StopCall {
-            stop {
-              gtfsId
-            }
-            arrival {
-              scheduledTime
-              estimated {
-                delay
-                time
+          schedule {
+            time {
+              ... on ArrivalDepartureTime {
+                arrival
+                departure
               }
+            }
+          }
+          realTime {
+            arrival {
+              delay
+              time
             }
             departure {
-              scheduledTime
-              estimated {
-                delay
-                time
-              }
+              delay
+              time
+            }
+          }
+          stopLocation {
+            ... on Stop {
+              gtfsId
             }
           }
         }

@@ -4,17 +4,17 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.transit.model.site.StopLocation;
 
-public class CallTypeResolver implements TypeResolver {
+public class CallStopLocationTypeResolver implements TypeResolver {
 
   @Override
   public GraphQLObjectType getType(TypeResolutionEnvironment environment) {
     Object o = environment.getObject();
     GraphQLSchema schema = environment.getSchema();
 
-    if (o instanceof TripTimeOnDate) {
-      return schema.getObjectType("StopCall");
+    if (o instanceof StopLocation) {
+      return schema.getObjectType("Stop");
     }
     return null;
   }

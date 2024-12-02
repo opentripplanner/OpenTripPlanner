@@ -31,15 +31,15 @@ import org.opentripplanner.apis.gtfs.datafetchers.BikeParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BikeRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingTimeImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.CallRealTimeEstimateImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.CallTimeImpl;
-import org.opentripplanner.apis.gtfs.datafetchers.CallTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.CallScheduledTimeTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.CallStopLocationTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.CarParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ContactInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CoordinatesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CurrencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DefaultFareProductImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.EstimatedTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FeedImpl;
@@ -135,7 +135,8 @@ class GtfsGraphQLIndex {
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
-        .type("Call", type -> type.typeResolver(new CallTypeResolver()))
+        .type("CallStopLocation", type -> type.typeResolver(new CallStopLocationTypeResolver()))
+        .type("CallScheduledTime", type -> type.typeResolver(new CallScheduledTimeTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
         .type(typeWiring.build(AlertImpl.class))
         .type(typeWiring.build(BikeParkImpl.class))
@@ -193,8 +194,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(TripOccupancyImpl.class))
         .type(typeWiring.build(LegTimeImpl.class))
         .type(typeWiring.build(RealTimeEstimateImpl.class))
-        .type(typeWiring.build(CallTimeImpl.class))
-        .type(typeWiring.build(CallRealTimeEstimateImpl.class))
+        .type(typeWiring.build(EstimatedTimeImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
