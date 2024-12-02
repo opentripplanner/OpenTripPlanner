@@ -4,7 +4,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import java.util.Collection;
 import java.util.Objects;
-import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;

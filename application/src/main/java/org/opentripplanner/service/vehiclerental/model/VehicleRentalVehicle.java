@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -22,7 +23,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public boolean isReserved = false;
   public boolean isDisabled = false;
   public Instant lastReported;
-  public Double currentRangeMeters;
+  public Distance currentRangeMeters;
   public VehicleRentalStation station;
   public String pricingPlanId;
   public Double currentFuelPercent;
@@ -139,7 +140,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     return currentFuelPercent;
   }
 
-  public Double getCurrentRangeMeters() {
+  public Distance getCurrentRangeMeters() {
     return currentRangeMeters;
   }
 }

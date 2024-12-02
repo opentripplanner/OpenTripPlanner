@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.model;
+package org.opentripplanner.transit.model.basic;
 
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 

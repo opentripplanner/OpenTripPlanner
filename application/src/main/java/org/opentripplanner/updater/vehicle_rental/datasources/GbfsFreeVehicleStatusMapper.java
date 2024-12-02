@@ -13,6 +13,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class GbfsFreeVehicleStatusMapper {
@@ -52,8 +53,10 @@ public class GbfsFreeVehicleStatusMapper {
         vehicle.getLastReported() != null
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
-      rentalVehicle.currentRangeMeters = vehicle.getCurrentRangeMeters();
       rentalVehicle.currentFuelPercent = vehicle.getCurrentFuelPercent();
+      Double currentRangeMeters = vehicle.getCurrentRangeMeters();
+      rentalVehicle.currentRangeMeters =
+        currentRangeMeters != null ? Distance.ofMeters(currentRangeMeters) : null;
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
