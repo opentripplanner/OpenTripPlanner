@@ -151,17 +151,17 @@ public final class RoutingBookingInfo {
         return this;
       }
       withLatestBookingTime(bookingInfo.getLatestBookingTime());
-      withMinimumBookingNotice(bookingInfo.getMinimumBookingNotice());
+      withMinimumBookingNotice(bookingInfo.getMinimumBookingNotice().orElse(null));
       return this;
     }
 
-    public Builder withLatestBookingTime(BookingTime latestBookingTime) {
+    public Builder withLatestBookingTime(@Nullable BookingTime latestBookingTime) {
       this.latestBookingTime =
         latestBookingTime == null ? NOT_SET : latestBookingTime.relativeTimeSeconds();
       return this;
     }
 
-    public Builder withMinimumBookingNotice(Duration minimumBookingNotice) {
+    public Builder withMinimumBookingNotice(@Nullable Duration minimumBookingNotice) {
       this.minimumBookingNotice =
         minimumBookingNotice == null ? NOT_SET : (int) minimumBookingNotice.toSeconds();
       return this;

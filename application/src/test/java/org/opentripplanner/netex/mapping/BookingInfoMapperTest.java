@@ -193,6 +193,6 @@ class BookingInfoMapperTest {
 
     BookingInfo bookingInfo = subject.map(stopPoint, null, null);
 
-    assertEquals(THIRTY_MINUTES, bookingInfo.getMinimumBookingNotice());
+    assertEquals(THIRTY_MINUTES, bookingInfo.getMinimumBookingNotice().get());
   }
 }
