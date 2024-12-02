@@ -38,14 +38,14 @@ import org.opentripplanner.utils.collection.ListUtils;
 public class DebugStyleSpec {
 
   private static final TileSource OSM_BACKGROUND = new RasterSource(
-    "background-osm",
+    "OSM Carto",
     List.of("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"),
     19,
     256,
     "© OpenStreetMap Contributors"
   );
   private static final TileSource POSITRON_BACKGROUND = new RasterSource(
-    "background-positron",
+    "Positron",
     List.of("https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"),
     19,
     256,
@@ -117,7 +117,7 @@ public class DebugStyleSpec {
       .stream()
       .map(l ->
         (TileSource) new RasterSource(
-          l.id(),
+          l.name(),
           List.of(l.templateUrl()),
           19,
           l.tileSize(),
@@ -146,7 +146,12 @@ public class DebugStyleSpec {
       .combine(BACKGROUND_LAYERS, extraLayers)
       .stream()
       .map(layer -> {
-        var builder = StyleBuilder.ofId(layer.id()).typeRaster().source(layer).minZoom(0);
+        var builder = StyleBuilder
+          .ofId(layer.id())
+          .displayName(layer.name())
+          .typeRaster()
+          .source(layer)
+          .minZoom(0);
         if (!layer.equals(OSM_BACKGROUND)) {
           builder.intiallyHidden();
         }

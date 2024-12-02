@@ -28,7 +28,14 @@ class DebugStyleSpecTest {
     var groupStops = new VectorSourceLayer(vectorSource, "stops");
     var edges = new VectorSourceLayer(vectorSource, "edges");
     var vertices = new VectorSourceLayer(vectorSource, "vertices");
-    var spec = DebugStyleSpec.build(regularStops, areaStops, groupStops, edges, vertices, List.of());
+    var spec = DebugStyleSpec.build(
+      regularStops,
+      areaStops,
+      groupStops,
+      edges,
+      vertices,
+      List.of()
+    );
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
     try {

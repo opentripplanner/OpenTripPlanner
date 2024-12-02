@@ -5,8 +5,4 @@ public record BackgroundTileLayer(
   String templateUrl,
   int tileSize,
   String attribution
-) {
-  public String id() {
-    return name.toLowerCase().replace("_", "-").replace(" ", "-");
-  }
-}
+) {}

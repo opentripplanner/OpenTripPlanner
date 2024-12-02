@@ -55,14 +55,17 @@ class LayerControl implements IControl {
     rasterLayers.forEach((layer) => {
       if (layer) {
         const option = document.createElement('option');
-        option.textContent = layer.id;
+        const meta = layer.metadata as { name: string };
+        option.textContent = meta.name;
         option.id = layer.id;
+        option.value = layer.id;
 
         select.appendChild(option);
       }
     });
-    select.onchange = (ev) => {
+    select.onchange = () => {
       const layerId = select.value;
+      console.log(select.value);
       const layer = map.getLayer(layerId);
       if (layer) {
         rasterLayers.forEach((l) => {
