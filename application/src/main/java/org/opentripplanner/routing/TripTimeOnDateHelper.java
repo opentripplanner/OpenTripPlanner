@@ -23,9 +23,9 @@ public class TripTimeOnDateHelper {
     Trip trip,
     LocalDate serviceDate
   ) {
-    TripPattern pattern = transitService.getPatternForTrip(trip, serviceDate);
+    TripPattern pattern = transitService.findPattern(trip, serviceDate);
 
-    Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
+    Timetable timetable = transitService.findTimetable(pattern, serviceDate);
 
     // If realtime moved pattern back to original trip, fetch it instead
     if (timetable.getTripIndex(trip.getId()) == -1) {
@@ -33,8 +33,8 @@ public class TripTimeOnDateHelper {
         "Trip {} not found in realtime pattern. This should not happen, and indicates a bug.",
         trip
       );
-      pattern = transitService.getPatternForTrip(trip);
-      timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
+      pattern = transitService.findPattern(trip);
+      timetable = transitService.findTimetable(pattern, serviceDate);
     }
 
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes

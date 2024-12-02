@@ -19,12 +19,13 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingGroup;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -90,9 +91,8 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void vehicleParkingGroupGeometryTest() {
-    Graph graph = new Graph();
-    VehicleParkingService service = graph.getVehicleParkingService();
-    service.updateVehicleParking(List.of(vehicleParking), List.of());
+    var repository = new DefaultVehicleParkingRepository();
+    repository.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
       """
@@ -116,7 +116,7 @@ public class VehicleParkingGroupsLayerTest {
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
     var builder = new VehicleParkingGroupsLayerBuilderWithPublicGeometry(
-      graph,
+      new DefaultVehicleParkingService(repository),
       tiles.layers().get(0),
       Locale.US
     );
@@ -171,11 +171,11 @@ public class VehicleParkingGroupsLayerTest {
     extends VehicleParkingGroupsLayerBuilder {
 
     public VehicleParkingGroupsLayerBuilderWithPublicGeometry(
-      Graph graph,
+      VehicleParkingService service,
       LayerParameters<VectorTilesResource.LayerType> layerParameters,
       Locale locale
     ) {
-      super(graph, layerParameters, locale);
+      super(service, layerParameters, locale);
     }
 
     @Override

@@ -1,8 +1,37 @@
 import { Form } from 'react-bootstrap';
-import { COORDINATE_PRECISION } from './constants.ts';
-import { Location } from '../../gql/graphql.ts';
+import { toString, parseLocation } from '../../util/locationConverter.ts';
+import { Location, TripQueryVariables } from '../../gql/graphql.ts';
+import { useCallback, useEffect, useState } from 'react';
 
-export function LocationInputField({ location, id, label }: { location: Location; id: string; label: string }) {
+interface Props {
+  id: string;
+  label: string;
+  tripQueryVariables: TripQueryVariables;
+  setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
+  locationFieldKey: 'from' | 'to';
+}
+
+export function LocationInputField({ id, label, tripQueryVariables, setTripQueryVariables, locationFieldKey }: Props) {
+  const [value, setValue] = useState('');
+
+  useEffect(() => {
+    const initialLocation: Location = tripQueryVariables[locationFieldKey];
+
+    setValue(toString(initialLocation) || '');
+  }, [tripQueryVariables, locationFieldKey]);
+
+  const onLocationChange = useCallback(
+    (value: string) => {
+      const newLocation = parseLocation(value) || {};
+
+      setTripQueryVariables({
+        ...tripQueryVariables,
+        [locationFieldKey]: newLocation,
+      });
+    },
+    [tripQueryVariables, setTripQueryVariables, locationFieldKey],
+  );
+
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor={id}>
@@ -14,16 +43,13 @@ export function LocationInputField({ location, id, label }: { location: Location
         size="sm"
         placeholder="[Click in map]"
         className="input-medium"
-        // Intentionally empty for now, but needed because of
-        // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
-        onChange={() => {}}
-        value={
-          location.coordinates
-            ? `${location.coordinates?.latitude.toPrecision(
-                COORDINATE_PRECISION,
-              )} ${location.coordinates?.longitude.toPrecision(COORDINATE_PRECISION)}`
-            : ''
-        }
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+        onBlur={(event) => {
+          onLocationChange(event.target.value);
+        }}
+        value={value}
       />
     </Form.Group>
   );

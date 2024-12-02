@@ -79,7 +79,7 @@ public class FeedImpl implements GraphQLDataFetchers.GraphQLFeed {
   private List<Agency> getAgencies(DataFetchingEnvironment environment) {
     String id = getSource(environment);
     return getTransitService(environment)
-      .getAgencies()
+      .listAgencies()
       .stream()
       .filter(agency -> agency.getId().getFeedId().equals(id))
       .collect(Collectors.toList());

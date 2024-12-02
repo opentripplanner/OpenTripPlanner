@@ -38,12 +38,12 @@ to have the same access properties.
 
 ![](images/nothruisland.png)  
 *Some regular (gray colored) streets are blocked behind access restricted (red colored) connections. Walk routing to them fails because it would be considered as pass through traffic.
-The image on the right shows that pruning added walk nothrough restricition to those streets, and routing works again.*
+The image on the right shows that pruning added walk nothrough restriction to those streets, and routing works again.*
 
 ## Pruning algorithm
 
 Pruning analyses the three traverse modes - walk, bike and car - separately. For example, a resting area by a motorway may include some walking paths, but the only way to get there is
-to use car. Therefore, it represents a disconnected 'island' when considering the walk mode. Pruning does not erase disconnected graph geometry as long as it
+to use a car. Therefore, it represents a disconnected 'island' when considering the walk mode. Pruning does not erase disconnected graph geometry as long as it
 can be reached using any of the traverse modes. Instead, pruning removes traversal permission for each disconnected mode from the island.
 
 Pruning uses four parameters and some heuristics to decide if a disconnected sub graph is a real island to be retained, or a harmful data error:

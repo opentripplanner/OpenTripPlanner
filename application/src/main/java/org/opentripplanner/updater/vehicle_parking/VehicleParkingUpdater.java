@@ -12,10 +12,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -45,20 +45,20 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   private WriteToGraphCallback saveResultOnGraph;
   private final VertexLinker linker;
 
-  private final VehicleParkingService vehicleParkingService;
+  private final VehicleParkingRepository parkingRepository;
 
   public VehicleParkingUpdater(
     VehicleParkingUpdaterParameters parameters,
     DataSource<VehicleParking> source,
     VertexLinker vertexLinker,
-    VehicleParkingService vehicleParkingService
+    VehicleParkingRepository parkingRepository
   ) {
     super(parameters);
     this.source = source;
     // Creation of network linker library will not modify the graph
     this.linker = vertexLinker;
     // Adding a vehicle parking station service needs a graph writer runnable
-    this.vehicleParkingService = vehicleParkingService;
+    this.parkingRepository = parkingRepository;
 
     LOG.info("Creating vehicle-parking updater running every {}: {}", pollingPeriod(), source);
   }
@@ -155,7 +155,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         tempEdgesByPark.put(updatedVehicleParking, disposableEdgeCollectionsForVertex);
       }
 
-      vehicleParkingService.updateVehicleParking(toAdd, toRemove);
+      parkingRepository.updateVehicleParking(toAdd, toRemove);
 
       oldVehicleParkings.removeAll(toRemove);
       oldVehicleParkings.addAll(toAdd);

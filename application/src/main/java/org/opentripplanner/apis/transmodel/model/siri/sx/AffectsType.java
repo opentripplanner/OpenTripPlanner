@@ -72,7 +72,7 @@ public class AffectsType {
           .type(lineType)
           .dataFetcher(environment -> {
             var routeId = environment.<EntitySelector.Route>getSource().routeId();
-            return GqlUtil.getTransitService(environment).getRouteForId(routeId);
+            return GqlUtil.getTransitService(environment).getRoute(routeId);
           })
           .build()
       )
@@ -88,7 +88,7 @@ public class AffectsType {
           .type(serviceJourneyType)
           .dataFetcher(environment -> {
             var tripId = environment.<EntitySelector.Trip>getSource().tripId();
-            return GqlUtil.getTransitService(environment).getTripForId(tripId);
+            return GqlUtil.getTransitService(environment).getTrip(tripId);
           })
           .build()
       )
@@ -109,7 +109,7 @@ public class AffectsType {
             EntitySelector.Trip entitySelector = environment.getSource();
             return GqlUtil
               .getTransitService(environment)
-              .getTripOnServiceDateForTripAndDay(
+              .getTripOnServiceDate(
                 new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
               );
           })
@@ -149,7 +149,7 @@ public class AffectsType {
           .type(lineType)
           .dataFetcher(environment -> {
             var routeId = environment.<EntitySelector.StopAndRoute>getSource().routeId();
-            return GqlUtil.getTransitService(environment).getRouteForId(routeId);
+            return GqlUtil.getTransitService(environment).getRoute(routeId);
           })
           .build()
       )
@@ -196,7 +196,7 @@ public class AffectsType {
           .type(serviceJourneyType)
           .dataFetcher(environment -> {
             var tripId = environment.<EntitySelector.StopAndTrip>getSource().tripId();
-            return GqlUtil.getTransitService(environment).getTripForId(tripId);
+            return GqlUtil.getTransitService(environment).getTrip(tripId);
           })
           .build()
       )
@@ -219,7 +219,7 @@ public class AffectsType {
             EntitySelector.StopAndTrip entitySelector = environment.getSource();
             return GqlUtil
               .getTransitService(environment)
-              .getTripOnServiceDateForTripAndDay(
+              .getTripOnServiceDate(
                 new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
               );
           })

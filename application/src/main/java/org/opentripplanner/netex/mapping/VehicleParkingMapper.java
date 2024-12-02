@@ -9,8 +9,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.rutebanken.netex.model.Parking;
 import org.rutebanken.netex.model.ParkingVehicleEnumeration;
 

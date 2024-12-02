@@ -27,8 +27,8 @@ public class BookingInfoMapper {
       BookingMethodMapper.mapBookingMethods(info.bookingMethods()),
       BookingTimeMapper.mapBookingTime(info.getEarliestBookingTime()),
       BookingTimeMapper.mapBookingTime(info.getLatestBookingTime()),
-      info.getMinimumBookingNotice(),
-      info.getMaximumBookingNotice(),
+      info.getMinimumBookingNotice().orElse(null),
+      info.getMaximumBookingNotice().orElse(null),
       info.getMessage(),
       isPickup ? info.getPickupMessage() : null,
       !isPickup ? info.getDropOffMessage() : null

@@ -22,6 +22,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,43 +76,44 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
     final Map<String, RentalVehicleType> vehicleTypes = getVehicleTypes(system);
 
     List<VehicleRentalPlace> stations = new LinkedList<>();
-
-    // Both station information and status are required for all systems using stations
-    GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
-    GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
-    if (stationInformation != null && stationStatus != null) {
-      // Index all the station status entries on their station ID.
-      Map<String, GBFSStation> statusLookup = stationStatus
-        .getData()
-        .getStations()
-        .stream()
-        .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
-      GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(
-        statusLookup,
-        vehicleTypes
-      );
-      GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(
-        system,
-        vehicleTypes,
-        params.allowKeepingRentedVehicleAtDestination(),
-        params.overloadingAllowed()
-      );
-
-      // Iterate over all known stations, and if we have any status information add it to those station objects.
-      stations.addAll(
-        stationInformation
+    if (params.allowRentalType(RentalPickupType.STATION)) {
+      // Both station information and status are required for all systems using stations
+      GBFSStationInformation stationInformation = loader.getFeed(GBFSStationInformation.class);
+      GBFSStationStatus stationStatus = loader.getFeed(GBFSStationStatus.class);
+      if (stationInformation != null && stationStatus != null) {
+        // Index all the station status entries on their station ID.
+        Map<String, GBFSStation> statusLookup = stationStatus
           .getData()
           .getStations()
           .stream()
-          .map(stationInformationMapper::mapStationInformation)
-          .filter(Objects::nonNull)
-          .peek(stationStatusMapper::fillStationStatus)
-          .toList()
-      );
+          .collect(Collectors.toMap(GBFSStation::getStationId, Function.identity()));
+        GbfsStationStatusMapper stationStatusMapper = new GbfsStationStatusMapper(
+          statusLookup,
+          vehicleTypes
+        );
+        GbfsStationInformationMapper stationInformationMapper = new GbfsStationInformationMapper(
+          system,
+          vehicleTypes,
+          params.allowKeepingRentedVehicleAtDestination(),
+          params.overloadingAllowed()
+        );
+
+        // Iterate over all known stations, and if we have any status information add it to those station objects.
+        stations.addAll(
+          stationInformation
+            .getData()
+            .getStations()
+            .stream()
+            .map(stationInformationMapper::mapStationInformation)
+            .filter(Objects::nonNull)
+            .peek(stationStatusMapper::fillStationStatus)
+            .toList()
+        );
+      }
     }
 
     // Append the floating bike stations.
-    if (OTPFeature.FloatingBike.isOn()) {
+    if (OTPFeature.FloatingBike.isOn() && params.allowRentalType(RentalPickupType.FREE_FLOATING)) {
       GBFSFreeBikeStatus freeBikeStatus = loader.getFeed(GBFSFreeBikeStatus.class);
       if (freeBikeStatus != null) {
         GbfsFreeVehicleStatusMapper freeVehicleStatusMapper = new GbfsFreeVehicleStatusMapper(

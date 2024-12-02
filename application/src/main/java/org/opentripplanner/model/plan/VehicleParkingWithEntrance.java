@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 
 public class VehicleParkingWithEntrance {
 

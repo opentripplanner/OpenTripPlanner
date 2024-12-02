@@ -10,7 +10,7 @@ import org.opentripplanner.ext.vehicleparking.parkapi.BicycleParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.CarParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.updater.spi.DataSource;
 
 /**

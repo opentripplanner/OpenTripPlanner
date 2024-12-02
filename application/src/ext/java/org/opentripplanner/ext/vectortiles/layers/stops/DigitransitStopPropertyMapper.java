@@ -61,7 +61,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
   protected static String getRoutes(TransitService transitService, RegularStop stop) {
     try {
       var objects = transitService
-        .getRoutesForStop(stop)
+        .findRoutes(stop)
         .stream()
         .map(route -> {
           var routeObject = OBJECT_MAPPER.createObjectNode();
@@ -76,7 +76,7 @@ public class DigitransitStopPropertyMapper extends PropertyMapper<RegularStop> {
   }
 
   protected static String getType(TransitService transitService, RegularStop stop) {
-    Collection<TripPattern> patternsForStop = transitService.getPatternsForStop(stop);
+    Collection<TripPattern> patternsForStop = transitService.findPatterns(stop);
 
     return patternsForStop
       .stream()

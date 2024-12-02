@@ -152,7 +152,7 @@ public class TransfersReport {
     if (p instanceof TripTransferPoint tp) {
       var trip = tp.getTrip();
       var route = trip.getRoute();
-      var ptn = transitService.getPatternForTrip(trip);
+      var ptn = transitService.findPattern(trip);
       r.operator = getName(trip.getOperator());
       r.type = "Trip";
       r.entityId = trip.getId().getId();
@@ -162,7 +162,7 @@ public class TransfersReport {
       addLocation(r, ptn, stop, trip, boarding);
     } else if (p instanceof RouteStopTransferPoint rp) {
       var route = rp.getRoute();
-      var ptn = transitService.getPatternsForRoute(route).stream().findFirst().orElse(null);
+      var ptn = transitService.findPatterns(route).stream().findFirst().orElse(null);
       r.operator = getName(route.getOperator());
       r.type = "Route";
       r.entityId = route.getId().getId();

@@ -80,7 +80,7 @@ public class OtpProjectInfo implements Serializable {
    * dev-2.x}
    */
   public String getVersionString() {
-    String format = "version: %s, ser.ver.id: %s, commit: %s, branch: %s";
+    String format = "Version: %s, ser.ver.id: %s, commit: %s, branch: %s";
     return String.format(
       format,
       version.version,
@@ -91,8 +91,8 @@ public class OtpProjectInfo implements Serializable {
   }
 
   /**
-   * This method compare the maven project version, an return {@code true} if both are the same. Two
-   * different SNAPSHOT versions are considered the same - work in progress.
+   * This method compares the maven project version, and return {@code true} if both are the same.
+   * Two different SNAPSHOT versions are considered the same version - they are work in progress.
    */
   public boolean sameVersion(OtpProjectInfo other) {
     return this.version.sameVersion(other.version);
@@ -100,8 +100,8 @@ public class OtpProjectInfo implements Serializable {
 
   /**
    * The OTP Serialization version id is used to determine if OTP and a serialized blob(Graph.obj)
-   * of the otp internal model are compatible. This filed is writen into the Graph.obj file header
-   * and checked when loading the graph later.
+   * of the otp internal model are compatible. This field is written into the <em>Graph.obj</em>
+   * file header and checked when loading the graph later.
    */
   public String getOtpSerializationVersionId() {
     return graphFileHeaderInfo.otpSerializationVersionId();

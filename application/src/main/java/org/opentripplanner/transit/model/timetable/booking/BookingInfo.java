@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.timetable.booking;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -99,14 +100,12 @@ public class BookingInfo implements Serializable {
     return latestBookingTime;
   }
 
-  @Nullable
-  public Duration getMinimumBookingNotice() {
-    return minimumBookingNotice;
+  public Optional<Duration> getMinimumBookingNotice() {
+    return Optional.ofNullable(minimumBookingNotice);
   }
 
-  @Nullable
-  public Duration getMaximumBookingNotice() {
-    return maximumBookingNotice;
+  public Optional<Duration> getMaximumBookingNotice() {
+    return Optional.ofNullable(maximumBookingNotice);
   }
 
   @Nullable

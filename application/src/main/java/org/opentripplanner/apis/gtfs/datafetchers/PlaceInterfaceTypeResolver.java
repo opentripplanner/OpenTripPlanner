@@ -5,7 +5,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.site.RegularStop;

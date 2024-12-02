@@ -25,6 +25,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -79,11 +80,13 @@ public class SerializedGraphObject implements Serializable {
   private final int routingTripPatternCounter;
   public final EmissionsDataModel emissionsDataModel;
   public final StreetLimitationParameters streetLimitationParameters;
+  public final VehicleParkingRepository parkingRepository;
 
   public SerializedGraphObject(
     Graph graph,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
+    VehicleParkingRepository parkingRepository,
     BuildConfig buildConfig,
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
@@ -95,6 +98,7 @@ public class SerializedGraphObject implements Serializable {
     this.edges = graph.getEdges();
     this.timetableRepository = timetableRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
+    this.parkingRepository = parkingRepository;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;

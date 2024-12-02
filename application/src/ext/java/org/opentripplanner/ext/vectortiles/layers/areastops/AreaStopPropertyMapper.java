@@ -28,7 +28,7 @@ public class AreaStopPropertyMapper extends PropertyMapper<AreaStop> {
   }
 
   protected static AreaStopPropertyMapper create(TransitService transitService, Locale locale) {
-    return new AreaStopPropertyMapper(transitService::getRoutesForStop, locale);
+    return new AreaStopPropertyMapper(transitService::findRoutes, locale);
   }
 
   @Override

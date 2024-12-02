@@ -48,7 +48,7 @@ public class PatternAtStop {
     );
     return new PatternAtStop(
       transitService.getRegularStop(stopId),
-      transitService.getTripPatternForId(patternId)
+      transitService.getTripPattern(patternId)
     );
   }
 
@@ -70,7 +70,7 @@ public class PatternAtStop {
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture
   ) {
-    return transitService.stopTimesForPatternAtStop(
+    return transitService.findTripTimeOnDate(
       stop,
       pattern,
       startTime,

@@ -1,27 +1,27 @@
 {
-  "data" : {
-    "nearest" : {
-      "edges" : [
+  "data": {
+    "nearest": {
+      "edges": [
         {
-          "node" : {
-            "place" : {
-              "id" : "U3RvcDpGOkE",
-              "gtfsId" : "F:A",
-              "parentStation" : null
+          "node": {
+            "place": {
+              "id": "U3RvcDpGOkE",
+              "gtfsId": "F:A",
+              "parentStation": null
             }
           }
         },
         {
-          "node" : {
-            "place" : {
-              "stationId" : "Network-1:FooStation"
+          "node": {
+            "place": {
+              "stationId": "Network-1:FooStation"
             }
           }
         },
         {
-          "node" : {
-            "place" : {
-              "vehicleId" : "Network-1:free-floating-bicycle"
+          "node": {
+            "place": {
+              "vehicleId": "Network-1:free-floating-bicycle"
             }
           }
         }

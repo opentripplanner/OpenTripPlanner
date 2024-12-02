@@ -73,7 +73,7 @@ public class GtfsRealtimeTripUpdateSource {
         if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
       }
     } catch (Exception e) {
-      LOG.error("Failed to parse GTFS-RT feed from {}", url, e);
+      LOG.error("Failed to process GTFS-RT TripUpdates feed from {}", url, e);
     }
     return updates;
   }

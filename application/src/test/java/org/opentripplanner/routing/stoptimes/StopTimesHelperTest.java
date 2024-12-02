@@ -33,8 +33,8 @@ class StopTimesHelperTest {
     transitService = new DefaultTransitService(timetableRepository);
     feedId = timetableRepository.getFeedIds().iterator().next();
     stopId = new FeedScopedId(feedId, "J");
-    var originalPattern = transitService.getPatternForTrip(
-      transitService.getTripForId(new FeedScopedId(feedId, "5.1"))
+    var originalPattern = transitService.findPattern(
+      transitService.getTrip(new FeedScopedId(feedId, "5.1"))
     );
     var tt = originalPattern.getScheduledTimetable();
     var newTripTimes = tt.getTripTimes(0).copyScheduledTimes();

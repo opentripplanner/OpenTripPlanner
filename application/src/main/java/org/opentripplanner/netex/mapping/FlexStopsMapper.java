@@ -140,7 +140,7 @@ class FlexStopsMapper {
     List<RegularStop> stops = stopsSpatialIndex
       .query(geometry.getEnvelopeInternal())
       .stream()
-      .filter(stop -> flexibleStopTransitMode == stop.getGtfsVehicleType())
+      .filter(stop -> flexibleStopTransitMode == stop.getVehicleType())
       .filter(stop -> geometry.contains(stop.getGeometry()))
       .toList();
 

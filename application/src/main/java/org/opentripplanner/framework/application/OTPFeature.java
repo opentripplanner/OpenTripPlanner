@@ -18,6 +18,17 @@ public enum OTPFeature {
   APIBikeRental(true, false, "Enable the bike rental endpoint."),
   APIServerInfo(true, false, "Enable the server info endpoint."),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
+  IncludeEmptyRailStopsInTransfers(
+    false,
+    false,
+    """
+      Turning this on guarantees that Rail stops without scheduled departures still get included
+      when generating transfers using `ConsiderPatternsForDirectTransfers`. It is common for stops
+      to be assign at real-time for Rail. Turning this on will help to avoid dropping transfers which
+      are needed, when the stop is in use later. Turning this on, if
+      ConsiderPatternsForDirectTransfers is off has no effect.
+      """
+  ),
   ConsiderPatternsForDirectTransfers(
     true,
     false,

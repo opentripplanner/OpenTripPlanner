@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.smoovebikerental;
 
+import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -12,7 +14,8 @@ public record SmooveBikeRentalDataSourceParameters(
   String url,
   String network,
   boolean overloadingAllowed,
-  HttpHeaders httpHeaders
+  HttpHeaders httpHeaders,
+  Set<RentalPickupType> rentalPickupTypes
 )
   implements VehicleRentalDataSourceParameters {
   /**
@@ -28,5 +31,10 @@ public record SmooveBikeRentalDataSourceParameters(
   @Override
   public VehicleRentalSourceType sourceType() {
     return VehicleRentalSourceType.SMOOVE;
+  }
+
+  @Override
+  public boolean allowRentalType(RentalPickupType rentalPickupType) {
+    return rentalPickupTypes.contains(rentalPickupType);
   }
 }

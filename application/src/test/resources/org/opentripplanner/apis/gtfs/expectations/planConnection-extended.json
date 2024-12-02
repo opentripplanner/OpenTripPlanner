@@ -1,359 +1,359 @@
 {
-  "data" : {
-    "planConnection" : {
-      "searchDateTime" : "2023-01-27T21:08:35+01:00",
-      "routingErrors" : [ ],
-      "pageInfo" : {
-        "hasNextPage" : false,
-        "hasPreviousPage" : false,
-        "startCursor" : null,
-        "endCursor" : null,
-        "searchWindowUsed" : null
+  "data": {
+    "planConnection": {
+      "searchDateTime": "2023-01-27T21:08:35+01:00",
+      "routingErrors": [],
+      "pageInfo": {
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": null,
+        "endCursor": null,
+        "searchWindowUsed": null
       },
-      "edges" : [
+      "edges": [
         {
-          "cursor" : "NoCursor",
-          "node" : {
-            "start" : "2020-02-02T11:00:00Z",
-            "end" : "2020-02-02T12:00:00Z",
-            "startTime" : 1580641200000,
-            "endTime" : 1580644800000,
-            "generalizedCost" : 4072,
-            "accessibilityScore" : 0.5,
-            "emissionsPerPerson" : {
-              "co2" : 123.0
+          "cursor": "NoCursor",
+          "node": {
+            "start": "2020-02-02T11:00:00Z",
+            "end": "2020-02-02T12:00:00Z",
+            "startTime": 1580641200000,
+            "endTime": 1580644800000,
+            "generalizedCost": 4072,
+            "accessibilityScore": 0.5,
+            "emissionsPerPerson": {
+              "co2": 123.0
             },
-            "numberOfTransfers" : 1,
-            "walkDistance" : 28.0,
-            "walkTime" : 20,
-            "legs" : [
+            "numberOfTransfers": 1,
+            "walkDistance": 28.0,
+            "walkTime": 20,
+            "legs": [
               {
-                "mode" : "WALK",
-                "start" : {
-                  "scheduledTime" : "2020-02-02T11:00:00Z",
-                  "estimated" : null
+                "mode": "WALK",
+                "start": {
+                  "scheduledTime": "2020-02-02T11:00:00Z",
+                  "estimated": null
                 },
-                "end" : {
-                  "scheduledTime" : "2020-02-02T11:00:20Z",
-                  "estimated" : null
+                "end": {
+                  "scheduledTime": "2020-02-02T11:00:20Z",
+                  "estimated": null
                 },
-                "from" : {
-                  "name" : "A",
-                  "lat" : 5.0,
-                  "lon" : 8.0,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:00:00Z",
-                    "estimated" : null
+                "from": {
+                  "name": "A",
+                  "lat": 5.0,
+                  "lon": 8.0,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:00:00Z",
+                    "estimated": null
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:00:00Z",
-                    "estimated" : null
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:00:00Z",
+                    "estimated": null
                   },
-                  "departureTime" : 1580641200000,
-                  "arrivalTime" : 1580641200000
+                  "departureTime": 1580641200000,
+                  "arrivalTime": 1580641200000
                 },
-                "to" : {
-                  "name" : "B",
-                  "lat" : 6.0,
-                  "lon" : 8.5,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:00:20Z",
-                    "estimated" : null
+                "to": {
+                  "name": "B",
+                  "lat": 6.0,
+                  "lon": 8.5,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:00:20Z",
+                    "estimated": null
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:00:20Z",
-                    "estimated" : null
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:00:20Z",
+                    "estimated": null
                   },
-                  "departureTime" : 1580641220000,
-                  "arrivalTime" : 1580641220000
+                  "departureTime": 1580641220000,
+                  "arrivalTime": 1580641220000
                 },
-                "startTime" : 1580641200000,
-                "endTime" : 1580641220000,
-                "generalizedCost" : 40,
-                "headsign" : null,
-                "trip" : null,
-                "intermediatePlaces" : null,
-                "alerts" : [ ],
-                "rideHailingEstimate" : null,
-                "accessibilityScore" : null,
-                "id" : null,
-                "realtimeState" : null
+                "startTime": 1580641200000,
+                "endTime": 1580641220000,
+                "generalizedCost": 40,
+                "headsign": null,
+                "trip": null,
+                "intermediatePlaces": null,
+                "alerts": [],
+                "rideHailingEstimate": null,
+                "accessibilityScore": null,
+                "id": null,
+                "realtimeState": null
               },
               {
-                "mode" : "BUS",
-                "start" : {
-                  "scheduledTime" : "2020-02-02T10:51:00Z",
-                  "estimated" : {
-                    "time" : "2020-02-02T11:01:00Z",
-                    "delay" : "PT10M"
+                "mode": "BUS",
+                "start": {
+                  "scheduledTime": "2020-02-02T10:51:00Z",
+                  "estimated": {
+                    "time": "2020-02-02T11:01:00Z",
+                    "delay": "PT10M"
                   }
                 },
-                "end" : {
-                  "scheduledTime" : "2020-02-02T11:05:00Z",
-                  "estimated" : {
-                    "time" : "2020-02-02T11:15:00Z",
-                    "delay" : "PT10M"
+                "end": {
+                  "scheduledTime": "2020-02-02T11:05:00Z",
+                  "estimated": {
+                    "time": "2020-02-02T11:15:00Z",
+                    "delay": "PT10M"
                   }
                 },
-                "from" : {
-                  "name" : "B",
-                  "lat" : 6.0,
-                  "lon" : 8.5,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T10:51:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:01:00Z"
+                "from": {
+                  "name": "B",
+                  "lat": 6.0,
+                  "lon": 8.5,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T10:51:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:01:00Z"
                     }
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T10:51:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:01:00Z"
+                  "departure": {
+                    "scheduledTime": "2020-02-02T10:51:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:01:00Z"
                     }
                   },
-                  "departureTime" : 1580641260000,
-                  "arrivalTime" : 1580641260000
+                  "departureTime": 1580641260000,
+                  "arrivalTime": 1580641260000
                 },
-                "to" : {
-                  "name" : "C",
-                  "lat" : 7.0,
-                  "lon" : 9.0,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:05:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:15:00Z"
+                "to": {
+                  "name": "C",
+                  "lat": 7.0,
+                  "lon": 9.0,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:05:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:15:00Z"
                     }
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:05:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:15:00Z"
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:05:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:15:00Z"
                     }
                   },
-                  "departureTime" : 1580642100000,
-                  "arrivalTime" : 1580642100000
+                  "departureTime": 1580642100000,
+                  "arrivalTime": 1580642100000
                 },
-                "startTime" : 1580641260000,
-                "endTime" : 1580642100000,
-                "generalizedCost" : 992,
-                "headsign" : "Headsign at boarding (stop index 5)",
-                "trip" : {
-                  "tripHeadsign" : "Trip headsign 122"
+                "startTime": 1580641260000,
+                "endTime": 1580642100000,
+                "generalizedCost": 992,
+                "headsign": "Headsign at boarding (stop index 5)",
+                "trip": {
+                  "tripHeadsign": "Trip headsign 122"
                 },
-                "intermediatePlaces" : [
+                "intermediatePlaces": [
                   {
-                    "arrival" : {
-                      "scheduledTime" : "2020-02-02T11:01:00Z",
-                      "estimated" : {
-                        "time" : "2020-02-02T11:11:00Z",
-                        "delay" : "PT10M"
+                    "arrival": {
+                      "scheduledTime": "2020-02-02T11:01:00Z",
+                      "estimated": {
+                        "time": "2020-02-02T11:11:00Z",
+                        "delay": "PT10M"
                       }
                     },
-                    "departure" : {
-                      "scheduledTime" : "2020-02-02T11:01:00Z",
-                      "estimated" : {
-                        "time" : "2020-02-02T11:11:00Z",
-                        "delay" : "PT10M"
+                    "departure": {
+                      "scheduledTime": "2020-02-02T11:01:00Z",
+                      "estimated": {
+                        "time": "2020-02-02T11:11:00Z",
+                        "delay": "PT10M"
                       }
                     },
-                    "stop" : {
-                      "name" : "B"
+                    "stop": {
+                      "name": "B"
                     }
                   }
                 ],
-                "alerts" : [ ],
-                "rideHailingEstimate" : null,
-                "accessibilityScore" : null,
-                "id" : "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6MTIyAAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QgADRjpDAAA=",
-                "realtimeState" : "UPDATED"
+                "alerts": [],
+                "rideHailingEstimate": null,
+                "accessibilityScore": null,
+                "id": "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6MTIyAAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QgADRjpDAAA=",
+                "realtimeState": "UPDATED"
               },
               {
-                "mode" : "RAIL",
-                "start" : {
-                  "scheduledTime" : "2020-02-02T11:20:00Z",
-                  "estimated" : {
-                    "time" : "2020-02-02T11:30:00Z",
-                    "delay" : "PT10M"
+                "mode": "RAIL",
+                "start": {
+                  "scheduledTime": "2020-02-02T11:20:00Z",
+                  "estimated": {
+                    "time": "2020-02-02T11:30:00Z",
+                    "delay": "PT10M"
                   }
                 },
-                "end" : {
-                  "scheduledTime" : "2020-02-02T11:40:00Z",
-                  "estimated" : {
-                    "time" : "2020-02-02T11:50:00Z",
-                    "delay" : "PT10M"
+                "end": {
+                  "scheduledTime": "2020-02-02T11:40:00Z",
+                  "estimated": {
+                    "time": "2020-02-02T11:50:00Z",
+                    "delay": "PT10M"
                   }
                 },
-                "from" : {
-                  "name" : "C",
-                  "lat" : 7.0,
-                  "lon" : 9.0,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:20:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:30:00Z"
+                "from": {
+                  "name": "C",
+                  "lat": 7.0,
+                  "lon": 9.0,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:20:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:30:00Z"
                     }
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:20:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:30:00Z"
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:20:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:30:00Z"
                     }
                   },
-                  "departureTime" : 1580643000000,
-                  "arrivalTime" : 1580643000000
+                  "departureTime": 1580643000000,
+                  "arrivalTime": 1580643000000
                 },
-                "to" : {
-                  "name" : "D",
-                  "lat" : 8.0,
-                  "lon" : 9.5,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:40:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:50:00Z"
+                "to": {
+                  "name": "D",
+                  "lat": 8.0,
+                  "lon": 9.5,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:40:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:50:00Z"
                     }
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:40:00Z",
-                    "estimated" : {
-                      "delay" : "PT10M",
-                      "time" : "2020-02-02T11:50:00Z"
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:40:00Z",
+                    "estimated": {
+                      "delay": "PT10M",
+                      "time": "2020-02-02T11:50:00Z"
                     }
                   },
-                  "departureTime" : 1580644200000,
-                  "arrivalTime" : 1580644200000
+                  "departureTime": 1580644200000,
+                  "arrivalTime": 1580644200000
                 },
-                "startTime" : 1580643000000,
-                "endTime" : 1580644200000,
-                "generalizedCost" : 2040,
-                "headsign" : "Headsign at boarding (stop index 5)",
-                "trip" : {
-                  "tripHeadsign" : "Trip headsign 439"
+                "startTime": 1580643000000,
+                "endTime": 1580644200000,
+                "generalizedCost": 2040,
+                "headsign": "Headsign at boarding (stop index 5)",
+                "trip": {
+                  "tripHeadsign": "Trip headsign 439"
                 },
-                "intermediatePlaces" : [
+                "intermediatePlaces": [
                   {
-                    "arrival" : {
-                      "scheduledTime" : "2020-02-02T11:30:00Z",
-                      "estimated" : {
-                        "time" : "2020-02-02T11:40:00Z",
-                        "delay" : "PT10M"
+                    "arrival": {
+                      "scheduledTime": "2020-02-02T11:30:00Z",
+                      "estimated": {
+                        "time": "2020-02-02T11:40:00Z",
+                        "delay": "PT10M"
                       }
                     },
-                    "departure" : {
-                      "scheduledTime" : "2020-02-02T11:30:00Z",
-                      "estimated" : {
-                        "time" : "2020-02-02T11:40:00Z",
-                        "delay" : "PT10M"
+                    "departure": {
+                      "scheduledTime": "2020-02-02T11:30:00Z",
+                      "estimated": {
+                        "time": "2020-02-02T11:40:00Z",
+                        "delay": "PT10M"
                       }
                     },
-                    "stop" : {
-                      "name" : "C"
+                    "stop": {
+                      "name": "C"
                     }
                   }
                 ],
-                "alerts" : [
+                "alerts": [
                   {
-                    "id" : "QWxlcnQ6Rjphbi1hbGVydA",
-                    "alertHeaderText" : "A header",
-                    "alertDescriptionText" : "A description",
-                    "alertEffect" : "REDUCED_SERVICE",
-                    "alertCause" : "MAINTENANCE",
-                    "alertSeverityLevel" : "SEVERE",
-                    "alertUrl" : "https://example.com",
-                    "effectiveStartDate" : 1676459008,
-                    "effectiveEndDate" : 1676545408,
-                    "entities" : [
+                    "id": "QWxlcnQ6Rjphbi1hbGVydA",
+                    "alertHeaderText": "A header",
+                    "alertDescriptionText": "A description",
+                    "alertEffect": "REDUCED_SERVICE",
+                    "alertCause": "MAINTENANCE",
+                    "alertSeverityLevel": "SEVERE",
+                    "alertUrl": "https://example.com",
+                    "effectiveStartDate": 1676459008,
+                    "effectiveEndDate": 1676545408,
+                    "entities": [
                       {
-                        "name" : "A",
-                        "gtfsId" : "F:A",
-                        "lat" : 5.0,
-                        "lon" : 8.0
+                        "name": "A",
+                        "gtfsId": "F:A",
+                        "lat": 5.0,
+                        "lon": 8.0
                       }
                     ]
                   }
                 ],
-                "rideHailingEstimate" : null,
-                "accessibilityScore" : null,
-                "id" : "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6NDM5AAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QwADRjpEAAA=",
-                "realtimeState" : "UPDATED"
+                "rideHailingEstimate": null,
+                "accessibilityScore": null,
+                "id": "rO0ABXdBABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjMABUY6NDM5AAoyMDIwLTAyLTAyAAAABQAAAAcAA0Y6QwADRjpEAAA=",
+                "realtimeState": "UPDATED"
               },
               {
-                "mode" : "CAR",
-                "start" : {
-                  "scheduledTime" : "2020-02-02T11:50:00Z",
-                  "estimated" : null
+                "mode": "CAR",
+                "start": {
+                  "scheduledTime": "2020-02-02T11:50:00Z",
+                  "estimated": null
                 },
-                "end" : {
-                  "scheduledTime" : "2020-02-02T12:00:00Z",
-                  "estimated" : null
+                "end": {
+                  "scheduledTime": "2020-02-02T12:00:00Z",
+                  "estimated": null
                 },
-                "from" : {
-                  "name" : "D",
-                  "lat" : 8.0,
-                  "lon" : 9.5,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:50:00Z",
-                    "estimated" : null
+                "from": {
+                  "name": "D",
+                  "lat": 8.0,
+                  "lon": 9.5,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:50:00Z",
+                    "estimated": null
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:50:00Z",
-                    "estimated" : null
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:50:00Z",
+                    "estimated": null
                   },
-                  "departureTime" : 1580644200000,
-                  "arrivalTime" : 1580644200000
+                  "departureTime": 1580644200000,
+                  "arrivalTime": 1580644200000
                 },
-                "to" : {
-                  "name" : "E",
-                  "lat" : 9.0,
-                  "lon" : 10.0,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T12:00:00Z",
-                    "estimated" : null
+                "to": {
+                  "name": "E",
+                  "lat": 9.0,
+                  "lon": 10.0,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T12:00:00Z",
+                    "estimated": null
                   },
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T12:00:00Z",
-                    "estimated" : null
+                  "departure": {
+                    "scheduledTime": "2020-02-02T12:00:00Z",
+                    "estimated": null
                   },
-                  "departureTime" : 1580644800000,
-                  "arrivalTime" : 1580644800000
+                  "departureTime": 1580644800000,
+                  "arrivalTime": 1580644800000
                 },
-                "startTime" : 1580644200000,
-                "endTime" : 1580644800000,
-                "generalizedCost" : 1000,
-                "headsign" : null,
-                "trip" : null,
-                "intermediatePlaces" : null,
-                "alerts" : [ ],
-                "rideHailingEstimate" : {
-                  "provider" : {
-                    "id" : "uber"
+                "startTime": 1580644200000,
+                "endTime": 1580644800000,
+                "generalizedCost": 1000,
+                "headsign": null,
+                "trip": null,
+                "intermediatePlaces": null,
+                "alerts": [],
+                "rideHailingEstimate": {
+                  "provider": {
+                    "id": "uber"
                   },
-                  "productName" : "UberX",
-                  "minPrice" : {
-                    "currency" : {
-                      "code" : "EUR",
-                      "digits" : 2
+                  "productName": "UberX",
+                  "minPrice": {
+                    "currency": {
+                      "code": "EUR",
+                      "digits": 2
                     },
-                    "amount" : 10.0
+                    "amount": 10.0
                   },
-                  "maxPrice" : {
-                    "currency" : {
-                      "code" : "EUR",
-                      "digits" : 2
+                  "maxPrice": {
+                    "currency": {
+                      "code": "EUR",
+                      "digits": 2
                     },
-                    "amount" : 20.0
+                    "amount": 20.0
                   },
-                  "arrival" : "PT10M"
+                  "arrival": "PT10M"
                 },
-                "accessibilityScore" : null,
-                "id" : null,
-                "realtimeState" : null
+                "accessibilityScore": null,
+                "id": null,
+                "realtimeState": null
               }
             ]
           }

@@ -67,7 +67,7 @@ public class TransitLayerMapper {
 
     LOG.info("Mapping transitLayer from TimetableRepository...");
 
-    Collection<TripPattern> allTripPatterns = transitService.getAllTripPatterns();
+    Collection<TripPattern> allTripPatterns = transitService.listTripPatterns();
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
@@ -109,7 +109,7 @@ public class TransitLayerMapper {
       transitService.getServiceCodesRunningForDate()
     );
 
-    Set<LocalDate> allServiceDates = transitService.getAllServiceCodes();
+    Set<LocalDate> allServiceDates = transitService.listServiceDates();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 

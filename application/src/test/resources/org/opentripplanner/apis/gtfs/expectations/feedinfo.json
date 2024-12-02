@@ -1,16 +1,16 @@
 {
-  "data" : {
-    "feeds" : [
+  "data": {
+    "feeds": [
       {
-        "agencies" : [
+        "agencies": [
           {
-            "name" : "speedtransit",
-            "url" : "www.otp-foo.bar"
+            "name": "speedtransit",
+            "url": "www.otp-foo.bar"
           }
         ],
-        "publisher" : {
-          "name" : "publisher",
-          "url" : "www.z.org"
+        "publisher": {
+          "name": "publisher",
+          "url": "www.z.org"
         }
       }
     ]

@@ -40,7 +40,7 @@ public class StationsLayerBuilder extends LayerBuilder<Station> {
 
   protected List<Geometry> getGeometries(Envelope query) {
     return transitService
-      .getStations()
+      .listStations()
       .stream()
       .map(station -> {
         Coordinate coordinate = station.getCoordinate().asJtsCoordinate();

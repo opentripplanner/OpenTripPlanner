@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.flex.trip;
 
-import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import java.io.Serializable;
@@ -35,7 +34,7 @@ public class ScheduledDeviatedTrip
   ScheduledDeviatedTrip(ScheduledDeviatedTripBuilder builder) {
     super(builder);
     List<StopTime> stopTimes = builder.stopTimes();
-    if (!isScheduledFlexTrip(stopTimes)) {
+    if (!isScheduledDeviatedFlexTrip(stopTimes)) {
       throw new IllegalArgumentException("Incompatible stopTimes for scheduled flex trip");
     }
 
@@ -55,12 +54,10 @@ public class ScheduledDeviatedTrip
     return new ScheduledDeviatedTripBuilder(id);
   }
 
-  public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof RegularStop);
-    Predicate<StopTime> notContinuousStop = stopTime ->
-      stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
+  public static boolean isScheduledDeviatedFlexTrip(List<StopTime> stopTimes) {
+    Predicate<StopTime> notFixedStop = Predicate.not(st -> st.getStop() instanceof RegularStop);
     return (
-      stopTimes.stream().anyMatch(notStopType) && stopTimes.stream().allMatch(notContinuousStop)
+      stopTimes.stream().anyMatch(notFixedStop) && stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlexWindow)
     );
   }
 

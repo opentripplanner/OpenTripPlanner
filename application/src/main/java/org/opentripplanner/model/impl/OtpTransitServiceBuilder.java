@@ -26,7 +26,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
