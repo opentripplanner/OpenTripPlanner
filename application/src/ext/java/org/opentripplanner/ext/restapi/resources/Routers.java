@@ -66,6 +66,7 @@ public class Routers {
         serverContext.graph(),
         serverContext.transitService(),
         serverContext.vehicleRentalService(),
+        serverContext.vehicleParkingService(),
         serverContext.worldEnvelopeService().envelope().orElseThrow()
       );
     } catch (GraphNotFoundException e) {

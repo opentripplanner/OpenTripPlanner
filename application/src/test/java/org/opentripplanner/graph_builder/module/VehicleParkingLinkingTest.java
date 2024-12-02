@@ -9,8 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
+import org.opentripplanner.service.vehicleparking.VehicleParkingTestGraphData;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -169,13 +170,13 @@ public class VehicleParkingLinkingTest {
       )
       .build();
 
-    var vehicleParkingService = graph.getVehicleParkingService();
+    var vehicleParkingService = new DefaultVehicleParkingRepository();
     vehicleParkingService.updateVehicleParking(List.of(vehicleParking), List.of());
     helper.linkVehicleParkingToGraph(vehicleParking);
 
     graph.remove(A);
 
-    TestStreetLinkerModule.link(graph, timetableRepository);
+    TestStreetLinkerModule.link(graph, vehicleParkingService, timetableRepository);
 
     assertEquals(0, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
 
@@ -183,6 +184,6 @@ public class VehicleParkingLinkingTest {
     assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
 
     assertEquals(0, graph.getEdgesOfType(StreetVehicleParkingLink.class).size());
-    assertEquals(0, vehicleParkingService.getVehicleParkings().count());
+    assertEquals(0, vehicleParkingService.listVehicleParkings().size());
   }
 }

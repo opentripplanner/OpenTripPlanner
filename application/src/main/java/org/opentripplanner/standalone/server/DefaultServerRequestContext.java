@@ -21,6 +21,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
@@ -47,6 +48,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final WorldEnvelopeService worldEnvelopeService;
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
+  private final VehicleParkingService vehicleParkingService;
   private final EmissionsService emissionsService;
 
   @Nullable
@@ -73,6 +75,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
     @Nullable EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     List<RideHailingService> rideHailingServices,
@@ -90,6 +93,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.tileRendererManager = tileRendererManager;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleRentalService = vehicleRentalService;
+    this.vehicleParkingService = vehicleParkingService;
     this.flexParameters = flexParameters;
     this.traverseVisitor = traverseVisitor;
     this.routeRequestDefaults = routeRequestDefaults;
@@ -117,6 +121,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
     @Nullable EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     FlexParameters flexParameters,
@@ -138,6 +143,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
+      vehicleParkingService,
       emissionsService,
       sorlandsbanenService,
       rideHailingServices,
@@ -199,6 +205,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VehicleRentalService vehicleRentalService() {
     return vehicleRentalService;
+  }
+
+  @Override
+  public VehicleParkingService vehicleParkingService() {
+    return vehicleParkingService;
   }
 
   @Override

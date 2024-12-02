@@ -178,7 +178,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   public DataFetcher<Iterable<TripPattern>> patterns() {
     return environment -> {
       final TransitService transitService = getTransitService(environment);
-      var patterns = transitService.getPatternsForRoute(getSource(environment));
+      var patterns = transitService.findPatterns(getSource(environment));
 
       var args = new GraphQLTypes.GraphQLRoutePatternsArgs(environment.getArguments());
 
@@ -231,7 +231,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   private Iterable<Object> getStops(DataFetchingEnvironment environment) {
     return getTransitService(environment)
-      .getPatternsForRoute(getSource(environment))
+      .findPatterns(getSource(environment))
       .stream()
       .map(TripPattern::getStops)
       .flatMap(Collection::stream)
@@ -240,7 +240,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   private Iterable<Trip> getTrips(DataFetchingEnvironment environment) {
     return getTransitService(environment)
-      .getPatternsForRoute(getSource(environment))
+      .findPatterns(getSource(environment))
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toSet());

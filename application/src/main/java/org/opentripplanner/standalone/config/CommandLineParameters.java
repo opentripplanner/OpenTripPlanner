@@ -201,6 +201,21 @@ public class CommandLineParameters {
     return load || (serve && doBuildTransit());
   }
 
+  public String logTaskInfo() {
+    var mainCommands = new ArrayList<String>();
+    if (doBuildStreet() & doBuildTransit()) {
+      mainCommands.add("Build Street & Transit Graph");
+    } else if (doBuildStreet()) {
+      mainCommands.add("Build Street Graph");
+    } else if (doBuildTransit()) {
+      mainCommands.add("Build Transit Graph");
+    }
+    if (doServe()) {
+      mainCommands.add("Run Server");
+    }
+    return String.join(", ", mainCommands);
+  }
+
   /**
    * @param port a port that we plan to bind to
    * @throws ParameterException if that port is not available

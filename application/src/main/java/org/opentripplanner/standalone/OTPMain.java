@@ -52,7 +52,7 @@ public class OTPMain {
     try {
       Thread.currentThread().setName("main");
       CommandLineParameters params = parseAndValidateCmdLine(args);
-      OtpStartupInfo.logInfo();
+      OtpStartupInfo.logInfo(params.logTaskInfo());
       startOTPServer(params);
     } catch (OtpAppException ae) {
       LOG.error(ae.getMessage(), ae);
@@ -152,6 +152,7 @@ public class OTPMain {
         app.graph(),
         app.timetableRepository(),
         app.worldEnvelopeRepository(),
+        app.vehicleParkingRepository(),
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),

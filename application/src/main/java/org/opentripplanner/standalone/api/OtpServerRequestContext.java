@@ -23,6 +23,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -95,6 +96,8 @@ public interface OtpServerRequestContext {
   RealtimeVehicleService realtimeVehicleService();
 
   VehicleRentalService vehicleRentalService();
+
+  VehicleParkingService vehicleParkingService();
 
   TransitTuningParameters transitTuningParameters();
 

@@ -1,163 +1,163 @@
 {
-  "data" : {
-    "planConnection" : {
-      "edges" : [
+  "data": {
+    "planConnection": {
+      "edges": [
         {
-          "node" : {
-            "legs" : [
+          "node": {
+            "legs": [
               {
-                "mode" : "WALK",
-                "from" : {
-                  "name" : "A",
-                  "lat" : 5.0,
-                  "lon" : 8.0
+                "mode": "WALK",
+                "from": {
+                  "name": "A",
+                  "lat": 5.0,
+                  "lon": 8.0
                 },
-                "to" : {
-                  "name" : "B",
-                  "lat" : 6.0,
-                  "lon" : 8.5
+                "to": {
+                  "name": "B",
+                  "lat": 6.0,
+                  "lon": 8.5
                 },
-                "generalizedCost" : 40,
-                "fareProducts" : [ ]
+                "generalizedCost": 40,
+                "fareProducts": []
               },
               {
-                "mode" : "BUS",
-                "from" : {
-                  "name" : "B",
-                  "lat" : 6.0,
-                  "lon" : 8.5
+                "mode": "BUS",
+                "from": {
+                  "name": "B",
+                  "lat": 6.0,
+                  "lon": 8.5
                 },
-                "to" : {
-                  "name" : "C",
-                  "lat" : 7.0,
-                  "lon" : 9.0
+                "to": {
+                  "name": "C",
+                  "lat": 7.0,
+                  "lon": 9.0
                 },
-                "generalizedCost" : 992,
-                "fareProducts" : [
+                "generalizedCost": 992,
+                "fareProducts": [
                   {
-                    "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
-                    "product" : {
-                      "id" : "F:day-pass",
-                      "name" : "day-pass",
-                      "__typename" : "DefaultFareProduct",
-                      "price" : {
-                        "currency" : {
-                          "digits" : 2,
-                          "code" : "EUR"
+                    "id": "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
+                    "product": {
+                      "id": "F:day-pass",
+                      "name": "day-pass",
+                      "__typename": "DefaultFareProduct",
+                      "price": {
+                        "currency": {
+                          "digits": 2,
+                          "code": "EUR"
                         },
-                        "amount" : 10.0
+                        "amount": 10.0
                       },
-                      "riderCategory" : {
-                        "id" : "F:senior-citizens",
-                        "name" : "Senior citizens"
+                      "riderCategory": {
+                        "id": "F:senior-citizens",
+                        "name": "Senior citizens"
                       },
-                      "medium" : {
-                        "id" : "F:oyster",
-                        "name" : "TfL Oyster Card"
+                      "medium": {
+                        "id": "F:oyster",
+                        "name": "TfL Oyster Card"
                       }
                     }
                   },
                   {
-                    "id" : "09bb5f2b-6af9-3355-8b5d-5e93a27ce280",
-                    "product" : {
-                      "id" : "F:single-ticket",
-                      "name" : "single-ticket",
-                      "__typename" : "DefaultFareProduct",
-                      "price" : {
-                        "currency" : {
-                          "digits" : 2,
-                          "code" : "EUR"
+                    "id": "09bb5f2b-6af9-3355-8b5d-5e93a27ce280",
+                    "product": {
+                      "id": "F:single-ticket",
+                      "name": "single-ticket",
+                      "__typename": "DefaultFareProduct",
+                      "price": {
+                        "currency": {
+                          "digits": 2,
+                          "code": "EUR"
                         },
-                        "amount" : 10.0
+                        "amount": 10.0
                       },
-                      "riderCategory" : {
-                        "id" : "F:senior-citizens",
-                        "name" : "Senior citizens"
+                      "riderCategory": {
+                        "id": "F:senior-citizens",
+                        "name": "Senior citizens"
                       },
-                      "medium" : {
-                        "id" : "F:oyster",
-                        "name" : "TfL Oyster Card"
+                      "medium": {
+                        "id": "F:oyster",
+                        "name": "TfL Oyster Card"
                       }
                     }
                   }
                 ]
               },
               {
-                "mode" : "RAIL",
-                "from" : {
-                  "name" : "C",
-                  "lat" : 7.0,
-                  "lon" : 9.0
+                "mode": "RAIL",
+                "from": {
+                  "name": "C",
+                  "lat": 7.0,
+                  "lon": 9.0
                 },
-                "to" : {
-                  "name" : "D",
-                  "lat" : 8.0,
-                  "lon" : 9.5
+                "to": {
+                  "name": "D",
+                  "lat": 8.0,
+                  "lon": 9.5
                 },
-                "generalizedCost" : 2040,
-                "fareProducts" : [
+                "generalizedCost": 2040,
+                "fareProducts": [
                   {
-                    "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
-                    "product" : {
-                      "id" : "F:day-pass",
-                      "name" : "day-pass",
-                      "__typename" : "DefaultFareProduct",
-                      "price" : {
-                        "currency" : {
-                          "digits" : 2,
-                          "code" : "EUR"
+                    "id": "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
+                    "product": {
+                      "id": "F:day-pass",
+                      "name": "day-pass",
+                      "__typename": "DefaultFareProduct",
+                      "price": {
+                        "currency": {
+                          "digits": 2,
+                          "code": "EUR"
                         },
-                        "amount" : 10.0
+                        "amount": 10.0
                       },
-                      "riderCategory" : {
-                        "id" : "F:senior-citizens",
-                        "name" : "Senior citizens"
+                      "riderCategory": {
+                        "id": "F:senior-citizens",
+                        "name": "Senior citizens"
                       },
-                      "medium" : {
-                        "id" : "F:oyster",
-                        "name" : "TfL Oyster Card"
+                      "medium": {
+                        "id": "F:oyster",
+                        "name": "TfL Oyster Card"
                       }
                     }
                   },
                   {
-                    "id" : "46190ddd-93b0-3136-adb7-a18394f8b0ef",
-                    "product" : {
-                      "id" : "F:single-ticket",
-                      "name" : "single-ticket",
-                      "__typename" : "DefaultFareProduct",
-                      "price" : {
-                        "currency" : {
-                          "digits" : 2,
-                          "code" : "EUR"
+                    "id": "46190ddd-93b0-3136-adb7-a18394f8b0ef",
+                    "product": {
+                      "id": "F:single-ticket",
+                      "name": "single-ticket",
+                      "__typename": "DefaultFareProduct",
+                      "price": {
+                        "currency": {
+                          "digits": 2,
+                          "code": "EUR"
                         },
-                        "amount" : 10.0
+                        "amount": 10.0
                       },
-                      "riderCategory" : {
-                        "id" : "F:senior-citizens",
-                        "name" : "Senior citizens"
+                      "riderCategory": {
+                        "id": "F:senior-citizens",
+                        "name": "Senior citizens"
                       },
-                      "medium" : {
-                        "id" : "F:oyster",
-                        "name" : "TfL Oyster Card"
+                      "medium": {
+                        "id": "F:oyster",
+                        "name": "TfL Oyster Card"
                       }
                     }
                   }
                 ]
               },
               {
-                "mode" : "CAR",
-                "from" : {
-                  "name" : "D",
-                  "lat" : 8.0,
-                  "lon" : 9.5
+                "mode": "CAR",
+                "from": {
+                  "name": "D",
+                  "lat": 8.0,
+                  "lon": 9.5
                 },
-                "to" : {
-                  "name" : "E",
-                  "lat" : 9.0,
-                  "lon" : 10.0
+                "to": {
+                  "name": "E",
+                  "lat": 9.0,
+                  "lon": 10.0
                 },
-                "generalizedCost" : 1000,
-                "fareProducts" : [ ]
+                "generalizedCost": 1000,
+                "fareProducts": []
               }
             ]
           }

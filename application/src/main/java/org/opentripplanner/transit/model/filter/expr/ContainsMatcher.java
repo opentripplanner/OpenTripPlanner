@@ -50,6 +50,6 @@ public class ContainsMatcher<S, T> implements Matcher<S> {
 
   @Override
   public String toString() {
-    return "ContainsMatcher: " + relationshipName + ": " + valueMatcher.toString();
+    return "ContainsMatcher: " + relationshipName + ": " + valueMatcher;
   }
 }

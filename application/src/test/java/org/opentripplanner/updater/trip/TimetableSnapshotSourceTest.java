@@ -61,7 +61,7 @@ public class TimetableSnapshotSourceTest {
     timetableRepository = model.timetableRepository();
     transitService = new DefaultTransitService(timetableRepository);
 
-    feedId = transitService.getFeedIds().stream().findFirst().get();
+    feedId = transitService.listFeedIds().stream().findFirst().get();
   }
 
   @Test
@@ -206,8 +206,8 @@ public class TimetableSnapshotSourceTest {
     // Original trip pattern
     {
       final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
-      final Trip trip = transitService.getTripForId(tripId);
-      final TripPattern originalTripPattern = transitService.getPatternForTrip(trip);
+      final Trip trip = transitService.getTrip(tripId);
+      final TripPattern originalTripPattern = transitService.findPattern(trip);
 
       final Timetable originalTimetableForToday = snapshot.resolve(
         originalTripPattern,

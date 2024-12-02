@@ -12,9 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -46,7 +47,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void updateCarAvailability() {
-    var service = buildParkingService(VehicleParkingSpaces.builder().carSpaces(10).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.builder().carSpaces(10).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(DEFAULT_UPDATE),
@@ -55,7 +56,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     runUpdaterOnce(updater);
 
-    var updated = service.getVehicleParkings().toList().getFirst();
+    var updated = List.copyOf(service.listVehicleParkings()).getFirst();
     assertEquals(ID, updated.getId());
     assertEquals(8, updated.getAvailability().getCarSpaces());
     assertNull(updated.getAvailability().getBicycleSpaces());
@@ -63,7 +64,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void updateBicycleAvailability() {
-    var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(DEFAULT_UPDATE),
@@ -72,7 +73,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     runUpdaterOnce(updater);
 
-    var updated = service.getVehicleParkings().toList().getFirst();
+    var updated = List.copyOf(service.listVehicleParkings()).getFirst();
     assertEquals(ID, updated.getId());
     assertEquals(8, updated.getAvailability().getBicycleSpaces());
     assertNull(updated.getAvailability().getCarSpaces());
@@ -80,7 +81,7 @@ class VehicleParkingAvailabilityUpdaterTest {
 
   @Test
   void notFound() {
-    var service = buildParkingService(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
+    var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
       new StubDatasource(new AvailabiltyUpdate(id("not-found"), 100)),
@@ -89,21 +90,21 @@ class VehicleParkingAvailabilityUpdaterTest {
 
     runUpdaterOnce(updater);
 
-    var updated = service.getVehicleParkings().toList().getFirst();
+    var updated = List.copyOf(service.listVehicleParkings()).getFirst();
     assertEquals(ID, updated.getId());
     assertNull(updated.getAvailability());
   }
 
-  private static VehicleParkingService buildParkingService(VehicleParkingSpaces capacity) {
-    var service = new VehicleParkingService();
+  private static VehicleParkingRepository buildParkingRepository(VehicleParkingSpaces capacity) {
+    var repo = new DefaultVehicleParkingRepository();
 
     var parking = parkingBuilder()
       .carPlaces(capacity.getCarSpaces() != null)
       .bicyclePlaces(capacity.getBicycleSpaces() != null)
       .capacity(capacity)
       .build();
-    service.updateVehicleParking(List.of(parking), List.of());
-    return service;
+    repo.updateVehicleParking(List.of(parking), List.of());
+    return repo;
   }
 
   private static VehicleParking.VehicleParkingBuilder parkingBuilder() {

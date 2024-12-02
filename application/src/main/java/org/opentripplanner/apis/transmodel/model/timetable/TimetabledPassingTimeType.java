@@ -170,7 +170,7 @@ public class TimetabledPassingTimeType {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
             return GqlUtil
               .getTransitService(environment)
-              .getNoticesByEntity(tripTimeOnDate.getStopTimeKey());
+              .findNotices(tripTimeOnDate.getStopTimeKey());
           })
           .build()
       )

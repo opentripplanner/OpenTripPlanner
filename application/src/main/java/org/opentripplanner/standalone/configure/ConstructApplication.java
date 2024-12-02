@@ -19,6 +19,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -75,6 +77,7 @@ public class ConstructApplication {
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
     EmissionsDataModel emissionsDataModel,
+    VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters
   ) {
@@ -93,6 +96,7 @@ public class ConstructApplication {
         .timetableRepository(timetableRepository)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .vehicleParkingRepository(vehicleParkingRepository)
         .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
@@ -127,6 +131,7 @@ public class ConstructApplication {
       graph(),
       timetableRepository(),
       factory.worldEnvelopeRepository(),
+      factory.vehicleParkingRepository(),
       factory.emissionsDataModel(),
       factory.stopConsolidationRepository(),
       factory.streetLimitationParameters(),
@@ -163,6 +168,7 @@ public class ConstructApplication {
       graph(),
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
+      vehicleParkingRepository(),
       timetableRepository(),
       routerConfig().updaterConfig()
     );
@@ -264,6 +270,14 @@ public class ConstructApplication {
 
   public VehicleRentalRepository vehicleRentalRepository() {
     return factory.vehicleRentalRepository();
+  }
+
+  public VehicleParkingService vehicleParkingService() {
+    return factory.vehicleParkingService();
+  }
+
+  public VehicleParkingRepository vehicleParkingRepository() {
+    return factory.vehicleParkingRepository();
   }
 
   public Graph graph() {

@@ -90,8 +90,8 @@ class DelayedTest implements RealtimeTestConstants {
 
     var snapshot = env.getTimetableSnapshot();
 
-    var trip2 = env.getTransitService().getTripForId(id(TRIP_2_ID));
-    var originalTripPattern = env.getTransitService().getPatternForTrip(trip2);
+    var trip2 = env.getTransitService().getTrip(id(TRIP_2_ID));
+    var originalTripPattern = env.getTransitService().findPattern(trip2);
 
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);

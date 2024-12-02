@@ -56,7 +56,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
 
     Route route = ROUTE_1;
-    int numPatternForRoute = env.getTransitService().getPatternsForRoute(route).size();
+    int numPatternForRoute = env.getTransitService().findPatterns(route).size();
 
     String newJourneyId = "newJourney";
     var updates = createValidAddedJourney(env).buildEstimatedTimetableDeliveries();
@@ -71,18 +71,16 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     );
     FeedScopedId tripId = id(newJourneyId);
     TransitService transitService = env.getTransitService();
-    Trip trip = transitService.getTripForId(tripId);
+    Trip trip = transitService.getTrip(tripId);
     assertNotNull(trip);
-    assertNotNull(transitService.getPatternForTrip(trip));
-    assertNotNull(transitService.getTripOnServiceDateById(tripId));
+    assertNotNull(transitService.findPattern(trip));
+    assertNotNull(transitService.getTripOnServiceDate(tripId));
     assertNotNull(
-      transitService.getTripOnServiceDateForTripAndDay(
-        new TripIdAndServiceDate(tripId, SERVICE_DATE)
-      )
+      transitService.getTripOnServiceDate(new TripIdAndServiceDate(tripId, SERVICE_DATE))
     );
     assertEquals(
       numPatternForRoute + 1,
-      transitService.getPatternsForRoute(route).size(),
+      transitService.findPatterns(route).size(),
       "The added trip should use a new pattern for this route"
     );
   }
@@ -97,7 +95,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       .withLineRef(newRouteRef)
       .buildEstimatedTimetableDeliveries();
 
-    int numRoutes = env.getTransitService().getAllRoutes().size();
+    int numRoutes = env.getTransitService().listRoutes().size();
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
@@ -107,11 +105,11 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
       env.getScheduledTimetable("newJourney")
     );
     TransitService transitService = env.getTransitService();
-    assertEquals(numRoutes + 1, transitService.getAllRoutes().size());
+    assertEquals(numRoutes + 1, transitService.listRoutes().size());
     FeedScopedId newRouteId = id(newRouteRef);
-    Route newRoute = transitService.getRouteForId(newRouteId);
+    Route newRoute = transitService.getRoute(newRouteId);
     assertNotNull(newRoute);
-    assertEquals(1, transitService.getPatternsForRoute(newRoute).size());
+    assertEquals(1, transitService.findPatterns(newRoute).size());
   }
 
   @Test
@@ -120,13 +118,13 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
     var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
     var updates = createValidAddedJourney(env).buildEstimatedTimetableDeliveries();
 
-    int numTrips = env.getTransitService().getAllTrips().size();
+    int numTrips = env.getTransitService().listTrips().size();
     var result1 = env.applyEstimatedTimetable(updates);
     assertEquals(1, result1.successful());
-    assertEquals(numTrips + 1, env.getTransitService().getAllTrips().size());
+    assertEquals(numTrips + 1, env.getTransitService().listTrips().size());
     var result2 = env.applyEstimatedTimetable(updates);
     assertEquals(1, result2.successful());
-    assertEquals(numTrips + 1, env.getTransitService().getAllTrips().size());
+    assertEquals(numTrips + 1, env.getTransitService().listTrips().size());
   }
 
   @Test

@@ -123,7 +123,7 @@ public class OtpTransitServiceImplTest {
   }
 
   @Test
-  public void testGetAllTrips() {
+  public void testListTrips() {
     Collection<Trip> trips = subject.getAllTrips();
 
     assertEquals(34, trips.size());

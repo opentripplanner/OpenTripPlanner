@@ -133,8 +133,8 @@ class SkippedTest implements RealtimeTestConstants {
     RealtimeTestEnvironment env,
     String tripId
   ) {
-    var trip = env.getTransitService().getTripForId(id(tripId));
-    var originalTripPattern = env.getTransitService().getPatternForTrip(trip);
+    var trip = env.getTransitService().getTrip(id(tripId));
+    var originalTripPattern = env.getTransitService().findPattern(trip);
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -176,8 +176,8 @@ class SkippedTest implements RealtimeTestConstants {
   }
 
   private static void assertNewTripTimesIsUpdated(RealtimeTestEnvironment env, String tripId) {
-    var trip = env.getTransitService().getTripForId(id(tripId));
-    var originalTripPattern = env.getTransitService().getPatternForTrip(trip);
+    var trip = env.getTransitService().getTrip(id(tripId));
+    var originalTripPattern = env.getTransitService().findPattern(trip);
     var snapshot = env.getTimetableSnapshot();
     var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { request } from 'graphql-request';
-import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
+import { Location, QueryType, TripQueryVariables } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
 import { query } from '../static/query/tripQuery.tsx';
 
@@ -22,10 +22,14 @@ export const useTripQuery: TripQueryHook = (variables) => {
       } else {
         if (variables) {
           setLoading(true);
-          if (pageCursor) {
-            setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as QueryType);
-          } else {
-            setData((await request(getApiUrl(), query, variables)) as QueryType);
+          try {
+            if (pageCursor) {
+              setData((await request(getApiUrl(), query, { ...variables, pageCursor })) as QueryType);
+            } else {
+              setData((await request(getApiUrl(), query, variables)) as QueryType);
+            }
+          } catch (e) {
+            console.error('Error at useTripQuery', e);
           }
           setLoading(false);
         } else {
@@ -37,10 +41,14 @@ export const useTripQuery: TripQueryHook = (variables) => {
   );
 
   useEffect(() => {
-    if (variables?.from.coordinates && variables?.to.coordinates) {
+    if (validLocation(variables?.from) && validLocation(variables?.to)) {
       callback();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variables?.from, variables?.to]);
   return [data, loading, callback];
 };
+
+function validLocation(location: Location | undefined) {
+  return location && (location.coordinates || location.place);
+}

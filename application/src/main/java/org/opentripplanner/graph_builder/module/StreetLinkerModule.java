@@ -11,8 +11,9 @@ import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
@@ -27,7 +28,6 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -49,17 +49,20 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private static final TraverseModeSet CAR_ONLY = new TraverseModeSet(TraverseMode.CAR);
   private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
   private final Graph graph;
+  private final VehicleParkingRepository parkingRepository;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
   private final Boolean addExtraEdgesToAreas;
 
   public StreetLinkerModule(
     Graph graph,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
     boolean addExtraEdgesToAreas
   ) {
     this.graph = graph;
+    this.parkingRepository = parkingRepository;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
@@ -311,8 +314,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       }
     }
     if (!vehicleParkingToRemove.isEmpty()) {
-      var vehicleParkingService = graph.getVehicleParkingService();
-      vehicleParkingService.updateVehicleParking(List.of(), vehicleParkingToRemove);
+      parkingRepository.updateVehicleParking(List.of(), vehicleParkingToRemove);
     }
   }
 

@@ -119,7 +119,7 @@ public class PlaceAtDistanceType {
 
     List<PlaceAtDistance> res = new ArrayList<>();
 
-    MultiModalStation multiModalStation = transitService.getMultiModalStationForStation(stopPlace);
+    MultiModalStation multiModalStation = transitService.findMultiModalStation(stopPlace);
 
     if (
       "child".equals(multiModalMode) || "all".equals(multiModalMode) || multiModalStation == null

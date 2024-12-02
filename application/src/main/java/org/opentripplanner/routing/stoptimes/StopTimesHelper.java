@@ -59,7 +59,7 @@ public class StopTimesHelper {
     List<StopTimesInPattern> result = new ArrayList<>();
 
     // Fetch all patterns, including those from realtime sources
-    Collection<TripPattern> patterns = transitService.getPatternsForStop(stop, true);
+    Collection<TripPattern> patterns = transitService.findPatterns(stop, true);
 
     for (TripPattern pattern : patterns) {
       Queue<TripTimeOnDate> pq = listTripTimeOnDatesForPatternAtStop(
@@ -101,9 +101,9 @@ public class StopTimesHelper {
       .asStartOfService(serviceDate, transitService.getTimeZone())
       .toInstant();
 
-    for (TripPattern pattern : transitService.getPatternsForStop(stop, true)) {
+    for (TripPattern pattern : transitService.findPatterns(stop, true)) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
-      Timetable tt = transitService.getTimetableForTripPattern(pattern, serviceDate);
+      Timetable tt = transitService.findTimetable(pattern, serviceDate);
       List<StopLocation> stops = pattern.getStops();
       for (int i = 0; i < stops.size(); i++) {
         StopLocation currStop = stops.get(i);
@@ -225,7 +225,7 @@ public class StopTimesHelper {
 
     // Loop through all possible days
     for (LocalDate serviceDate : serviceDates) {
-      Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
+      Timetable timetable = transitService.findTimetable(pattern, serviceDate);
       ZonedDateTime midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
       int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
         midnight,
@@ -291,7 +291,7 @@ public class StopTimesHelper {
     TripPattern pattern,
     TransitService transitService
   ) {
-    final TripPattern replacement = transitService.getNewTripPatternForModifiedTrip(
+    final TripPattern replacement = transitService.findNewTripPatternForModifiedTrip(
       trip.getId(),
       serviceDate
     );

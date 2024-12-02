@@ -166,7 +166,7 @@ public class JourneyPatternType {
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
             TripPattern tripPattern = environment.getSource();
-            return GqlUtil.getTransitService(environment).getNoticesByEntity(tripPattern);
+            return GqlUtil.getTransitService(environment).findNotices(tripPattern);
           })
           .build()
       )

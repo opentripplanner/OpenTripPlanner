@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.basic.TransitMode.RAIL;
@@ -16,6 +17,7 @@ import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -82,7 +84,7 @@ class DefaultTransitServiceTest {
     service =
       new DefaultTransitService(timetableRepository) {
         @Override
-        public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
+        public Collection<TripPattern> findPatterns(StopLocation stop) {
           if (stop.equals(STOP_B)) {
             return List.of(FERRY_PATTERN, FERRY_PATTERN, RAIL_PATTERN, RAIL_PATTERN, RAIL_PATTERN);
           } else {
@@ -94,31 +96,36 @@ class DefaultTransitServiceTest {
 
   @Test
   void modeFromGtfsVehicleType() {
-    var modes = service.getModesOfStopLocation(STOP_A);
+    var modes = service.findTransitModes(STOP_A);
     assertEquals(List.of(TRAM), modes);
   }
 
   @Test
   void modeFromPatterns() {
-    var modes = service.getModesOfStopLocation(STOP_B);
+    var modes = service.findTransitModes(STOP_B);
     assertEquals(List.of(RAIL, FERRY), modes);
   }
 
   @Test
   void stationModes() {
-    var modes = service.getModesOfStopLocationsGroup(STATION);
+    var modes = service.findTransitModes(STATION);
     assertEquals(List.of(RAIL, FERRY, TRAM), modes);
   }
 
   @Test
   void getPatternForStopsWithoutRealTime() {
-    Collection<TripPattern> patternsForStop = service.getPatternsForStop(STOP_B, false);
+    Collection<TripPattern> patternsForStop = service.findPatterns(STOP_B, false);
     assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN), patternsForStop);
   }
 
   @Test
   void getPatternForStopsWithRealTime() {
-    Collection<TripPattern> patternsForStop = service.getPatternsForStop(STOP_B, true);
+    Collection<TripPattern> patternsForStop = service.findPatterns(STOP_B, true);
     assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN, REAL_TIME_PATTERN), patternsForStop);
+  }
+
+  @Test
+  void containsTrip() {
+    assertFalse(service.containsTrip(new FeedScopedId("x", "x")));
   }
 }

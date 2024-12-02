@@ -161,8 +161,8 @@ public class SiriFuzzyTripMatcher {
   }
 
   private void initCache(TransitService index) {
-    for (Trip trip : index.getAllTrips()) {
-      TripPattern tripPattern = index.getPatternForTrip(trip);
+    for (Trip trip : index.listTrips()) {
+      TripPattern tripPattern = index.findPattern(trip);
 
       if (tripPattern == null) {
         continue;
@@ -288,7 +288,7 @@ public class SiriFuzzyTripMatcher {
       );
       TripPattern tripPattern = newTripPatternForModifiedTrip != null
         ? newTripPatternForModifiedTrip
-        : transitService.getPatternForTrip(trip);
+        : transitService.findPattern(trip);
 
       var firstStop = tripPattern.firstStop();
       var lastStop = tripPattern.lastStop();

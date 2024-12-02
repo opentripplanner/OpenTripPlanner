@@ -88,7 +88,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
       lastTimestamp = feedTimestamp;
     } catch (Exception e) {
-      LOG.error("Error reading gtfs-realtime feed from " + url, e);
+      LOG.error("Failed to process GTFS-RT Alerts feed from {}", url, e);
     }
   }
 }

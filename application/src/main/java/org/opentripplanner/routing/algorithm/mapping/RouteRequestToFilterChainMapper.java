@@ -86,7 +86,7 @@ public class RouteRequestToFilterChainMapper {
       )
       .withTransitAlerts(
         context.transitService().getTransitAlertService(),
-        context.transitService()::getMultiModalStationForStation
+        context.transitService()::findMultiModalStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)

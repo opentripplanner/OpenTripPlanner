@@ -135,16 +135,16 @@ class LuceneIndexTest {
         .build();
 
       @Override
-      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
-        if (stop.getGtfsVehicleType() != null) {
-          return List.of(stop.getGtfsVehicleType());
+      public List<TransitMode> findTransitModes(StopLocation stop) {
+        if (stop.getVehicleType() != null) {
+          return List.of(stop.getVehicleType());
         } else {
           return List.copyOf(modes.get(stop));
         }
       }
 
       @Override
-      public Agency getAgencyForId(FeedScopedId id) {
+      public Agency getAgency(FeedScopedId id) {
         if (id.equals(BVG.getId())) {
           return BVG;
         }
@@ -152,7 +152,7 @@ class LuceneIndexTest {
       }
 
       @Override
-      public Set<Route> getRoutesForStop(StopLocation stop) {
+      public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(TimetableRepositoryForTest.route("route1").withAgency(BVG).build());
       }
 

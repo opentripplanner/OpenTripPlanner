@@ -226,7 +226,7 @@ class AddedTripBuilder {
     // but in case of trip cancellation, OTP will fall back to scheduled trip times
     // therefore they must be valid
     tripTimes.validateNonIncreasingTimes();
-    tripTimes.setServiceCode(transitService.getServiceCodeForId(trip.getServiceId()));
+    tripTimes.setServiceCode(transitService.getServiceCode(trip.getServiceId()));
 
     TripPattern pattern = TripPattern
       .of(getTripPatternId.apply(trip))
@@ -315,7 +315,7 @@ class AddedTripBuilder {
   @Nullable
   private Agency resolveAgency() {
     return transitService
-      .getAllRoutes()
+      .listRoutes()
       .stream()
       .filter(r -> r != null && r.getOperator() != null && r.getOperator().equals(operator))
       .findFirst()

@@ -16,8 +16,8 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
@@ -28,10 +28,10 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
     ),
     entry(MapperType.Digitransit, DigitransitVehicleParkingPropertyMapper::create)
   );
-  private final Graph graph;
+  private final VehicleParkingService service;
 
   public VehicleParkingsLayerBuilder(
-    Graph graph,
+    VehicleParkingService service,
     LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
@@ -40,14 +40,13 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
-    this.graph = graph;
+    this.service = service;
   }
 
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
-    return graph
-      .getVehicleParkingService()
-      .getVehicleParkings()
+    return service
+      .listVehicleParkings().stream()
       .map(vehicleParking -> {
         Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);

@@ -62,6 +62,8 @@ class LayerControl implements IControl {
             }
           }
         });
+      // initialize clickable layers (initially stops)
+      this.updateInteractiveLayerIds(map);
     });
 
     return this.container;

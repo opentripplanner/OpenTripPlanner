@@ -41,9 +41,9 @@ public class GraphReportBuilder {
       new StreetStats(edgeTypes, vertexTypes),
       new TransitStats(
         stopCounts,
-        transitService.getAllTrips().size(),
-        transitService.getAllTripPatterns().size(),
-        transitService.getAllRoutes().size(),
+        transitService.listTrips().size(),
+        transitService.listTripPatterns().size(),
+        transitService.listRoutes().size(),
         constrainedTransferCounts
       )
     );

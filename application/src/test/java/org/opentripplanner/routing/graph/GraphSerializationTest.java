@@ -23,6 +23,8 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -67,7 +69,14 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var weRepo = new DefaultWorldEnvelopeRepository();
     var emissionsDataModel = new EmissionsDataModel();
-    testRoundTrip(model.graph(), model.timetableRepository(), weRepo, emissionsDataModel);
+    var parkingRepository = new DefaultVehicleParkingRepository();
+    testRoundTrip(
+      model.graph(),
+      model.timetableRepository(),
+      weRepo,
+      parkingRepository,
+      emissionsDataModel
+    );
   }
 
   /**
@@ -78,10 +87,12 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
     var emissionsDataModel = new EmissionsDataModel();
+    var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
       model.timetableRepository(),
       worldEnvelopeRepository,
+      parkingRepository,
       emissionsDataModel
     );
   }
@@ -182,6 +193,7 @@ public class GraphSerializationTest {
     Graph originalGraph,
     TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
+    VehicleParkingRepository vehicleParkingRepository,
     EmissionsDataModel emissionsDataModel
   ) throws Exception {
     // Now round-trip the graph through serialization.
@@ -192,6 +204,7 @@ public class GraphSerializationTest {
       originalGraph,
       originalTimetableRepository,
       worldEnvelopeRepository,
+      vehicleParkingRepository,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),
