@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.basic;
 
+import java.util.Objects;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 public class Distance {
@@ -27,6 +28,20 @@ public class Distance {
     return this.meters;
   }
 
+  /**
+   * Is this distance greater than the one passed in
+   */
+  public boolean greaterThan(Distance distance) {
+    return this.meters > distance.meters;
+  }
+
+  /**
+   * Is this distance less than the one passed in
+   */
+  public boolean lessThan(Distance distance) {
+    return this.meters < distance.meters;
+  }
+
   @Override
   public boolean equals(Object other) {
     if (other instanceof Distance distance) {
@@ -34,6 +49,11 @@ public class Distance {
     } else {
       return false;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(meters, 31);
   }
 
   @Override
