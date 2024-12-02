@@ -41,6 +41,15 @@ public class DebugUiConfig implements Serializable {
     this.additionalBackgroundLayers =
       root
         .of("additionalBackgroundLayers")
+        .since(V2_7)
+        .summary("Additional background raster map layers.")
+        .description(
+          """
+          Add additional background layers that will appear in the Debug UI as one of the choices.
+          
+          Current only raster tile layers are supported.
+          """
+        )
         .asObjects(
           List.of(),
           node ->
@@ -48,24 +57,23 @@ public class DebugUiConfig implements Serializable {
               node
                 .of("name")
                 .since(V2_7)
-                .summary(
-                  "Used in the url to fetch tiles, and as the layer name in the vector tiles."
-                )
+                .summary("Name to appear in the layer selector.")
                 .asString(),
               node
                 .of("templateUrl")
                 .since(V2_7)
-                .summary("Maximum zoom levels the layer is active for.")
+                .summary(
+                  """
+                The [Maplibre-compatible template URL](https://maplibre.org/maplibre-native/ios/api/tile-url-templates.html) 
+                for the raster layer, for example `https://examples.com/tiles/{z}/{x}/{y}.png`.
+                """
+                )
                 .asString(),
-              node
-                .of("tileSize")
-                .since(V2_7)
-                .summary("Minimum zoom levels the layer is active for.")
-                .asInt(256),
+              node.of("tileSize").since(V2_7).summary("Size of the tile in pixels.").asInt(256),
               node
                 .of("attribution")
                 .since(V2_7)
-                .summary("Minimum zoom levels the layer is active for.")
+                .summary("Attribution for the map data.")
                 .asString("© OpenTripPlanner")
             )
         );

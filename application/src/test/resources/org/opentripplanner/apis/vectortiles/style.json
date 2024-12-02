@@ -4,7 +4,7 @@
     "positron": {
       "name": "Positron",
       "tiles": [
-        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png"
+        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png"
       ],
       "maxzoom": 19,
       "tileSize": 256,
