@@ -534,8 +534,11 @@ public class TimetableSnapshotTest {
     resolver.commit(transitLayerUpdater, true);
 
     resolver.clear(feedId);
+    resolver.clear(feedId);
+    resolver.clear(feedId);
     resolver.commit(transitLayerUpdater, true);
 
+    resolver.clear(feedId);
     resolver.clear(feedId);
     resolver.commit(transitLayerUpdater, true);
   }
