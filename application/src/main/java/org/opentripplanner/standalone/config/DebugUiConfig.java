@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,12 +58,12 @@ public class DebugUiConfig implements Serializable {
                 .summary("Maximum zoom levels the layer is active for.")
                 .asString(),
               node
-                .of("minZoom")
-                .since(V2_0)
+                .of("tileSize")
+                .since(V2_7)
                 .summary("Minimum zoom levels the layer is active for.")
                 .asInt(256),
               node
-                .of("minZoom")
+                .of("attribution")
                 .since(V2_7)
                 .summary("Minimum zoom levels the layer is active for.")
                 .asString("© OpenTripPlanner")

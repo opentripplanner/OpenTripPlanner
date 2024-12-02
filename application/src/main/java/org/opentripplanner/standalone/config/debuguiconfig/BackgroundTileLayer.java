@@ -6,7 +6,7 @@ public record BackgroundTileLayer(
   int tileSize,
   String attribution
 ) {
-  public String name() {
+  public String id() {
     return name.toLowerCase().replace("_", "-").replace(" ", "-");
   }
 }

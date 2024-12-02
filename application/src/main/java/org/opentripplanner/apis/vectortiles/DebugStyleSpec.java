@@ -117,7 +117,7 @@ public class DebugStyleSpec {
       .stream()
       .map(l ->
         (TileSource) new RasterSource(
-          l.name(),
+          l.id(),
           List.of(l.templateUrl()),
           19,
           l.tileSize(),
