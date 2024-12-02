@@ -46,7 +46,7 @@ class LayerControl implements IControl {
     const select = document.createElement('select');
     this.container.appendChild(select);
 
-    let rasterLayers = map
+    const rasterLayers = map
       .getLayersOrder()
       .map((l) => map.getLayer(l))
       .filter((layer) => !!layer)
