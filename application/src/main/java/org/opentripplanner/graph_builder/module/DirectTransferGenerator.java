@@ -101,7 +101,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .stream()
       .map(StopLocation::getId)
       .map(graph::getStopVertexForStopId)
-      .filter(TransitStopVertex.class::isInstance) // filter out null values if no TransitStopVertex is found for ID
+      // filter out null values if no TransitStopVertex is found for ID
+      .filter(TransitStopVertex.class::isInstance)
       .collect(Collectors.toSet());
 
     ProgressTracker progress = ProgressTracker.track(
