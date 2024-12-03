@@ -212,7 +212,7 @@ class WalkableAreaBuilder {
       // or those linked to ways
       HashSet<OsmNode> visibilityNodes = new HashSet<>();
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
-      HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
+      HashSet<Vertex> platformLinkingVertices = new HashSet<>();
       // we need to accumulate visibility points from all contained areas
       // inside this ring, but only for shared nodes; we don't care about
       // convexity, which we'll handle for the grouped area only.
@@ -340,7 +340,7 @@ class WalkableAreaBuilder {
           continue;
         }
         i = (int) Math.floor(sum_i);
-        IntersectionVertex startEndpoint = vertexBuilder.getVertexForOsmNode(nodeI, areaEntity);
+        Vertex startEndpoint = vertexBuilder.getVertexForOsmNode(nodeI, areaEntity);
         if (startingNodes.contains(nodeI)) {
           startingVertices.add(startEndpoint);
         }
@@ -355,7 +355,7 @@ class WalkableAreaBuilder {
           NodeEdge edge = new NodeEdge(nodeI, nodeJ);
           if (alreadyAddedEdges.contains(edge)) continue;
 
-          IntersectionVertex endEndpoint = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
+          Vertex endEndpoint = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
 
           Coordinate[] coordinates = new Coordinate[] {
             startEndpoint.getCoordinate(),
@@ -463,15 +463,15 @@ class WalkableAreaBuilder {
       return Set.of();
     }
     alreadyAddedEdges.add(nodeEdge);
-    IntersectionVertex startEndpoint = vertexBuilder.getVertexForOsmNode(node, area.parent);
-    IntersectionVertex endEndpoint = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
+    Vertex startEndpoint = vertexBuilder.getVertexForOsmNode(node, area.parent);
+    Vertex endEndpoint = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
 
     return createSegments(startEndpoint, endEndpoint, List.of(area), edgeList);
   }
 
   private Set<AreaEdge> createSegments(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    Vertex startEndpoint,
+    Vertex endEndpoint,
     Collection<Area> areas,
     AreaEdgeList edgeList
   ) {

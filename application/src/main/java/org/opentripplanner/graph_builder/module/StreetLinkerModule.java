@@ -20,14 +20,12 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -170,10 +168,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       );
   }
 
-  private static List<Edge> createStopLinkEdges(
-    TransitStopVertex vertex,
-    StreetVertex streetVertex
-  ) {
+  private static List<Edge> createStopLinkEdges(TransitStopVertex vertex, Vertex streetVertex) {
     return List.of(
       StreetTransitStopLink.createStreetTransitStopLink(vertex, streetVertex),
       StreetTransitStopLink.createStreetTransitStopLink(streetVertex, vertex)
@@ -230,6 +225,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private void linkTransitEntrances(Graph graph) {
     LOG.info("Linking transit entrances to graph...");
     for (TransitEntranceVertex tEntrance : graph.getVerticesOfType(TransitEntranceVertex.class)) {
+      if (tEntrance.isConnectedToGraph()) {
+        continue;
+      }
       graph
         .getLinker()
         .linkVertexPermanently(
@@ -252,7 +250,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   private void linkStationCentroids(Graph graph) {
-    BiFunction<Vertex, StreetVertex, List<Edge>> stationAndStreetVertexLinker = (
+    BiFunction<Vertex, Vertex, List<Edge>> stationAndStreetVertexLinker = (
         theStation,
         streetVertex
       ) ->

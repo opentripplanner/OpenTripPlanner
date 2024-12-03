@@ -31,7 +31,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -295,8 +294,8 @@ public class OsmModule implements GraphBuilderModule {
         lastLevel = level;
       }
 
-      IntersectionVertex startEndpoint = null;
-      IntersectionVertex endEndpoint = null;
+      Vertex startEndpoint = null;
+      Vertex endEndpoint = null;
 
       ArrayList<Coordinate> segmentCoordinates = new ArrayList<>();
 
@@ -465,8 +464,8 @@ public class OsmModule implements GraphBuilderModule {
    * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
    */
   private StreetEdgePair getEdgesForStreet(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    Vertex startEndpoint,
+    Vertex endEndpoint,
     OsmWay way,
     int index,
     StreetTraversalPermission permissions,
@@ -519,8 +518,8 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private StreetEdge getEdgeForStreet(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    Vertex startEndpoint,
+    Vertex endEndpoint,
     OsmWay way,
     int index,
     double length,

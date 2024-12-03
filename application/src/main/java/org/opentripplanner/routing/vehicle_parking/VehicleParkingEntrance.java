@@ -5,7 +5,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -23,14 +23,14 @@ public class VehicleParkingEntrance implements Serializable {
   // If this entrance should be linked to walk/bike accessible streets
   private final boolean walkAccessible;
   // Used to explicitly specify the intersection to link to instead of using (x, y)
-  private transient StreetVertex vertex;
+  private transient Vertex vertex;
 
   VehicleParkingEntrance(
     VehicleParking vehicleParking,
     FeedScopedId entranceId,
     WgsCoordinate coordinate,
     I18NString name,
-    StreetVertex vertex,
+    Vertex vertex,
     boolean carAccessible,
     boolean walkAccessible
   ) {
@@ -64,7 +64,7 @@ public class VehicleParkingEntrance implements Serializable {
     return name;
   }
 
-  public StreetVertex getVertex() {
+  public Vertex getVertex() {
     return vertex;
   }
 
@@ -120,7 +120,7 @@ public class VehicleParkingEntrance implements Serializable {
     private FeedScopedId entranceId;
     private WgsCoordinate coordinate;
     private I18NString name;
-    private StreetVertex vertex;
+    private Vertex vertex;
     private boolean carAccessible;
     private boolean walkAccessible;
 
@@ -146,7 +146,7 @@ public class VehicleParkingEntrance implements Serializable {
       return this;
     }
 
-    public VehicleParkingEntranceBuilder vertex(StreetVertex vertex) {
+    public VehicleParkingEntranceBuilder vertex(Vertex vertex) {
       this.vertex = vertex;
       return this;
     }

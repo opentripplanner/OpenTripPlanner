@@ -1,23 +1,23 @@
 package org.opentripplanner.street.model.edge;
 
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This represents the connection between a street vertex and a transit station centroid vertex
  */
 public class StreetStationCentroidLink extends FreeEdge {
 
-  private StreetStationCentroidLink(StreetVertex fromv, StationCentroidVertex tov) {
+  private StreetStationCentroidLink(Vertex fromv, StationCentroidVertex tov) {
     super(fromv, tov);
   }
 
-  private StreetStationCentroidLink(StationCentroidVertex fromv, StreetVertex tov) {
+  private StreetStationCentroidLink(StationCentroidVertex fromv, Vertex tov) {
     super(fromv, tov);
   }
 
   public static StreetStationCentroidLink createStreetStationLink(
-    StreetVertex fromv,
+    Vertex fromv,
     StationCentroidVertex tov
   ) {
     return connectToGraph(new StreetStationCentroidLink(fromv, tov));
@@ -25,7 +25,7 @@ public class StreetStationCentroidLink extends FreeEdge {
 
   public static StreetStationCentroidLink createStreetStationLink(
     StationCentroidVertex fromv,
-    StreetVertex tov
+    Vertex tov
   ) {
     return connectToGraph(new StreetStationCentroidLink(fromv, tov));
   }

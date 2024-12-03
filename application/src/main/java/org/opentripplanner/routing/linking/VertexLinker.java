@@ -26,9 +26,7 @@ import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
@@ -96,7 +94,7 @@ public class VertexLinker {
     Vertex vertex,
     TraverseModeSet traverseModes,
     LinkingDirection direction,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    BiFunction<Vertex, Vertex, List<Edge>> edgeFunction
   ) {
     link(vertex, traverseModes, direction, Scope.PERMANENT, edgeFunction);
   }
@@ -105,7 +103,7 @@ public class VertexLinker {
     Vertex vertex,
     TraverseModeSet traverseModes,
     LinkingDirection direction,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    BiFunction<Vertex, Vertex, List<Edge>> edgeFunction
   ) {
     return link(vertex, traverseModes, direction, Scope.REALTIME, edgeFunction);
   }
@@ -114,7 +112,7 @@ public class VertexLinker {
     Vertex vertex,
     TraverseModeSet traverseModes,
     LinkingDirection direction,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    BiFunction<Vertex, Vertex, List<Edge>> edgeFunction
   ) {
     return link(vertex, traverseModes, direction, Scope.REQUEST, edgeFunction);
   }
@@ -181,14 +179,14 @@ public class VertexLinker {
     TraverseModeSet traverseModes,
     LinkingDirection direction,
     Scope scope,
-    BiFunction<Vertex, StreetVertex, List<Edge>> edgeFunction
+    BiFunction<Vertex, Vertex, List<Edge>> edgeFunction
   ) {
     DisposableEdgeCollection tempEdges = (scope != Scope.PERMANENT)
       ? new DisposableEdgeCollection(graph, scope)
       : null;
 
     try {
-      Set<StreetVertex> streetVertices = linkToStreetEdges(
+      Set<Vertex> streetVertices = linkToStreetEdges(
         vertex,
         traverseModes,
         direction,
@@ -208,7 +206,7 @@ public class VertexLinker {
           );
       }
 
-      for (StreetVertex streetVertex : streetVertices) {
+      for (Vertex streetVertex : streetVertices) {
         List<Edge> edges = edgeFunction.apply(vertex, streetVertex);
         if (tempEdges != null) {
           for (Edge edge : edges) {
@@ -226,7 +224,7 @@ public class VertexLinker {
     return tempEdges;
   }
 
-  private Set<StreetVertex> linkToStreetEdges(
+  private Set<Vertex> linkToStreetEdges(
     Vertex vertex,
     TraverseModeSet traverseModes,
     LinkingDirection direction,
@@ -329,7 +327,7 @@ public class VertexLinker {
   }
 
   /** Split the edge if necessary return the closest vertex */
-  private StreetVertex link(
+  private Vertex link(
     Vertex vertex,
     StreetEdge edge,
     double xScale,
@@ -345,7 +343,7 @@ public class VertexLinker {
     LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xScale, vertex.getLat()));
     double length = SphericalDistanceLibrary.length(orig);
 
-    IntersectionVertex start = null;
+    Vertex start = null;
     boolean snapped = true;
 
     // if we're very close to one end of the line or the other, or endwise, don't bother to split,
@@ -356,19 +354,19 @@ public class VertexLinker {
       ll.getSegmentIndex() == 0 &&
       (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)
     ) {
-      start = (IntersectionVertex) edge.getFromVertex();
+      start = (Vertex) edge.getFromVertex();
     }
     // -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
     // past the last point
     else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
-      start = (IntersectionVertex) edge.getToVertex();
+      start = (Vertex) edge.getToVertex();
     }
     // nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
     else if (
       ll.getSegmentIndex() == orig.getNumPoints() - 2 &&
       (ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
     ) {
-      start = (IntersectionVertex) edge.getToVertex();
+      start = (Vertex) edge.getToVertex();
     } else {
       snapped = false;
       boolean split = true;
@@ -380,7 +378,7 @@ public class VertexLinker {
           if (!linkedAreas.add(ael)) {
             return null;
           }
-          if (vertex instanceof IntersectionVertex iv) {
+          if (vertex instanceof Vertex iv) {
             start = iv;
           } else {
             start = splitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
@@ -522,7 +520,7 @@ public class VertexLinker {
   /**
    * Link a new vertex permanently with area geometry
    */
-  public void addPermanentAreaVertex(IntersectionVertex newVertex, AreaEdgeList edgeList) {
+  public void addPermanentAreaVertex(Vertex newVertex, AreaEdgeList edgeList) {
     addAreaVertex(newVertex, edgeList, Scope.PERMANENT, null);
   }
 
@@ -532,7 +530,7 @@ public class VertexLinker {
    */
 
   public void addAreaVertex(
-    IntersectionVertex newVertex,
+    Vertex newVertex,
     AreaEdgeList edgeList,
     Scope scope,
     DisposableEdgeCollection tempEdges
@@ -556,7 +554,7 @@ public class VertexLinker {
     int i = 0;
     float sum_i = 0;
 
-    for (IntersectionVertex v : edgeList.visibilityVertices()) {
+    for (Vertex v : edgeList.visibilityVertices()) {
       sum_i += skip_ratio;
       if (Math.floor(sum_i) < i + 1) {
         continue;
@@ -581,7 +579,7 @@ public class VertexLinker {
     // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
     // area calculation to be done after stop linking
     if (added == 0) {
-      for (IntersectionVertex v : edgeList.visibilityVertices()) {
+      for (Vertex v : edgeList.visibilityVertices()) {
         createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
       }
     }
@@ -611,8 +609,8 @@ public class VertexLinker {
   }
 
   private void createSegments(
-    IntersectionVertex from,
-    IntersectionVertex to,
+    Vertex from,
+    Vertex to,
     AreaEdgeList ael,
     List<NamedArea> areas,
     Scope scope,

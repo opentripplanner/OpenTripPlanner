@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * Contains the logic for extracting escalators out of OSM data
  */
 class EscalatorProcessor {
 
-  private final Map<Long, IntersectionVertex> intersectionNodes;
+  private final Map<Long, Vertex> intersectionNodes;
 
-  public EscalatorProcessor(Map<Long, IntersectionVertex> intersectionNodes) {
+  public EscalatorProcessor(Map<Long, Vertex> intersectionNodes) {
     this.intersectionNodes = intersectionNodes;
   }
 

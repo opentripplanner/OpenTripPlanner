@@ -28,7 +28,7 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
@@ -626,7 +626,7 @@ public class StreetEdge
     SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
     StreetEdgeBuilder<?> seb1 = new StreetEdgeBuilder<>()
-      .withFromVertex((StreetVertex) fromv)
+      .withFromVertex(fromv)
       .withToVertex(v)
       .withGeometry(geoms.beginning())
       .withName(name)
@@ -635,7 +635,7 @@ public class StreetEdge
 
     StreetEdgeBuilder<?> seb2 = new StreetEdgeBuilder<>()
       .withFromVertex(v)
-      .withToVertex((StreetVertex) tov)
+      .withToVertex(tov)
       .withGeometry(geoms.ending())
       .withName(name)
       .withPermission(permission)
@@ -712,7 +712,7 @@ public class StreetEdge
     if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
       var seb1 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
-        .withFromVertex((StreetVertex) fromv)
+        .withFromVertex(fromv)
         .withToVertex(v)
         .withGeometry(geoms.beginning())
         .withName(name)
@@ -726,7 +726,7 @@ public class StreetEdge
       var seb2 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex(v)
-        .withToVertex((StreetVertex) tov)
+        .withToVertex(tov)
         .withGeometry(geoms.ending())
         .withName(name)
         .withBack(isBack());
@@ -745,7 +745,7 @@ public class StreetEdge
     return splitEdges;
   }
 
-  public Optional<Edge> createPartialEdge(StreetVertex from, StreetVertex to) {
+  public Optional<Edge> createPartialEdge(Vertex from, Vertex to) {
     LineString parent = getGeometry();
     LineString head = GeometryUtils.getInteriorSegment(
       parent,

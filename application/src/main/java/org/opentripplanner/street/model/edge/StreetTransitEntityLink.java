@@ -5,7 +5,10 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.StationCentroidVertex;
+import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
@@ -20,13 +23,13 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   static final int STEL_TRAVERSE_COST = 1;
 
-  private final T transitEntityVertex;
+  private final Vertex transitEntityVertex;
 
   private final Accessibility wheelchairAccessibility;
 
   protected StreetTransitEntityLink(
-    StreetVertex fromv,
-    T tov,
+    Vertex fromv,
+    TransitEntranceVertex tov,
     Accessibility wheelchairAccessibility
   ) {
     super(fromv, tov);
@@ -35,8 +38,68 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   }
 
   protected StreetTransitEntityLink(
-    T fromv,
-    StreetVertex tov,
+    TransitEntranceVertex fromv,
+    Vertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
+    super(fromv, tov);
+    this.transitEntityVertex = fromv;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
+  protected StreetTransitEntityLink(
+    Vertex fromv,
+    VehicleParkingEntranceVertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
+    super(fromv, tov);
+    this.transitEntityVertex = tov;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
+  protected StreetTransitEntityLink(
+    VehicleParkingEntranceVertex fromv,
+    Vertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
+    super(fromv, tov);
+    this.transitEntityVertex = fromv;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
+  protected StreetTransitEntityLink(
+    Vertex fromv,
+    TransitStopVertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
+    super(fromv, tov);
+    this.transitEntityVertex = tov;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
+  protected StreetTransitEntityLink(
+    TransitStopVertex fromv,
+    Vertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
+    super(fromv, tov);
+    this.transitEntityVertex = fromv;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
+  protected StreetTransitEntityLink(
+    Vertex fromv,
+    StationCentroidVertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
+    super(fromv, tov);
+    this.transitEntityVertex = tov;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+  }
+
+  protected StreetTransitEntityLink(
+    StationCentroidVertex fromv,
+    Vertex tov,
     Accessibility wheelchairAccessibility
   ) {
     super(fromv, tov);
@@ -159,7 +222,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   protected abstract int getStreetToStopTime();
 
-  protected T getTransitEntityVertex() {
+  protected Vertex getTransitEntityVertex() {
     return transitEntityVertex;
   }
 

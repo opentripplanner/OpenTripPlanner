@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This represents the connection between a street vertex and a transit vertex where going from the
@@ -9,16 +9,16 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
  */
 public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
-  private StreetTransitStopLink(StreetVertex fromv, TransitStopVertex tov) {
+  private StreetTransitStopLink(Vertex fromv, TransitStopVertex tov) {
     super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
-  private StreetTransitStopLink(TransitStopVertex fromv, StreetVertex tov) {
+  private StreetTransitStopLink(TransitStopVertex fromv, Vertex tov) {
     super(fromv, tov, fromv.getWheelchairAccessibility());
   }
 
   public static StreetTransitStopLink createStreetTransitStopLink(
-    StreetVertex fromv,
+    Vertex fromv,
     TransitStopVertex tov
   ) {
     return connectToGraph(new StreetTransitStopLink(fromv, tov));
@@ -26,14 +26,14 @@ public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVe
 
   public static StreetTransitStopLink createStreetTransitStopLink(
     TransitStopVertex fromv,
-    StreetVertex tov
+    Vertex tov
   ) {
     return connectToGraph(new StreetTransitStopLink(fromv, tov));
   }
 
   protected int getStreetToStopTime() {
-    return getTransitEntityVertex().hasPathways()
+    return ((TransitStopVertex) getTransitEntityVertex()).hasPathways()
       ? 0
-      : getTransitEntityVertex().getStreetToStopTime();
+      : ((TransitStopVertex) getTransitEntityVertex()).getStreetToStopTime();
   }
 }

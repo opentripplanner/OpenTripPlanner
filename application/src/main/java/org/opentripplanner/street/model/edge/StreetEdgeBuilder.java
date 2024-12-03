@@ -15,7 +15,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.utils.lang.BitSetUtils;
 
@@ -26,8 +26,8 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
   public static final float DEFAULT_WALK_SAFETY_FACTOR = 1.0f;
   private static final float DEFAULT_BICYCLE_SAFETY_FACTOR = 1.0f;
 
-  private StreetVertex from;
-  private StreetVertex to;
+  private Vertex from;
+  private Vertex to;
   private LineString geometry;
   private I18NString name;
   private int millimeterLength;
@@ -48,8 +48,8 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
   }
 
   public StreetEdgeBuilder(StreetEdge original) {
-    this.from = (StreetVertex) original.getFromVertex();
-    this.to = (StreetVertex) original.getToVertex();
+    this.from = original.getFromVertex();
+    this.to = original.getToVertex();
     this.geometry = original.getGeometry();
     this.name = original.getName();
     this.millimeterLength = original.getMillimeterLength();
@@ -65,20 +65,20 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
     return Edge.connectToGraph(new StreetEdge(this));
   }
 
-  public StreetVertex fromVertex() {
+  public Vertex fromVertex() {
     return from;
   }
 
-  public B withFromVertex(StreetVertex from) {
+  public B withFromVertex(Vertex from) {
     this.from = from;
     return instance();
   }
 
-  public StreetVertex toVertex() {
+  public Vertex toVertex() {
     return to;
   }
 
-  public B withToVertex(StreetVertex to) {
+  public B withToVertex(Vertex to) {
     this.to = to;
     return instance();
   }

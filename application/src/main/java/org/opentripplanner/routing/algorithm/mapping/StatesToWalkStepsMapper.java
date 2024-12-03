@@ -25,13 +25,10 @@ import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
-import org.opentripplanner.street.model.vertex.StationEntranceVertex;
+import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.Entrance;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.
@@ -179,7 +176,7 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
-    } else if (backState.getVertex() instanceof StationEntranceVertex) {
+    } else if (backState.getVertex() instanceof TransitEntranceVertex) {
       addStep(createStationEntranceWalkStep(backState, forwardState, edge));
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
@@ -533,20 +530,9 @@ public class StatesToWalkStepsMapper {
     // since the doors might be between or inside stations.
     step.withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION);
 
-    StationEntranceVertex vertex = (StationEntranceVertex) backState.getVertex();
+    TransitEntranceVertex vertex = (TransitEntranceVertex) backState.getVertex();
 
-    FeedScopedId entranceId = new FeedScopedId("osm", vertex.getId());
-
-    Entrance entrance = Entrance
-      .of(entranceId)
-      .withCode(vertex.getCode())
-      .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
-      .withWheelchairAccessibility(
-        vertex.isAccessible() ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE
-      )
-      .build();
-
-    step.withEntrance(entrance);
+    step.withEntrance(vertex.getEntrance());
     return step;
   }
 

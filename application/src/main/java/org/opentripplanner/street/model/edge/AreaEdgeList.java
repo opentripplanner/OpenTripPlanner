@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
  * This is a representation of a set of contiguous OSM areas, used for various tasks related to edge
@@ -19,8 +19,8 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
  */
 public class AreaEdgeList implements Serializable {
 
-  private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
-  private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
+  private static final Set<Vertex> EMPTY_SET = Set.of();
+  private Set<Vertex> visibilityVertices = EMPTY_SET;
 
   // these are all of the original edges of the area, whether
   // or not there are corresponding OSM edges. It is used as part of a hack
@@ -59,14 +59,14 @@ public class AreaEdgeList implements Serializable {
   /**
    * Returns the list of visibility vertices.
    */
-  public Set<IntersectionVertex> visibilityVertices() {
+  public Set<Vertex> visibilityVertices() {
     return visibilityVertices;
   }
 
   /**
    * Add a visibility vertex to this edge.
    */
-  public void addVisibilityVertex(IntersectionVertex toBeAdded) {
+  public void addVisibilityVertex(Vertex toBeAdded) {
     Objects.requireNonNull(toBeAdded);
     synchronized (this) {
       if (visibilityVertices == EMPTY_SET) {

@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -15,7 +19,10 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +42,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   private transient Edge[] outgoing = new Edge[0];
   private RentalRestrictionExtension rentalRestrictions = RentalRestrictionExtension.NO_RESTRICTION;
+  private static final Set<AreaStop> EMPTY_SET = Set.of();
+  private Set<AreaStop> areaStops = EMPTY_SET;
 
   /* CONSTRUCTORS */
 
@@ -111,6 +120,25 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   public int getDegreeIn() {
     return incoming.length;
+  }
+
+  /**
+   * Does the vertex have an outgoing edge that allows driving.
+   */
+  public boolean isConnectedToDriveableEdge() {
+    return this.getOutgoing()
+      .stream()
+      .anyMatch(edge ->
+        edge instanceof StreetEdge && ((StreetEdge) edge).getPermission().allows(TraverseMode.CAR)
+      );
+  }
+
+  public boolean isConnectedToWalkingEdge() {
+    return this.getOutgoing()
+      .stream()
+      .anyMatch(edge ->
+        edge instanceof StreetEdge && ((StreetEdge) edge).getPermission().allows(TraverseMode.WALK)
+      );
   }
 
   /** Get the longitude of the vertex */
@@ -225,6 +253,10 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return rentalRestrictions.traversalBanned(currentState);
   }
 
+  public Accessibility getWheelchairAccessibility() {
+    return Accessibility.NO_INFORMATION;
+  }
+
   public void addRentalRestriction(RentalRestrictionExtension ext) {
     rentalRestrictions = rentalRestrictions.add(ext);
   }
@@ -301,5 +333,29 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     in.defaultReadObject();
     this.incoming = new Edge[0];
     this.outgoing = new Edge[0];
+  }
+
+  /**
+   * Returns the list of area stops that this vertex is inside of.
+   */
+  public Set<AreaStop> areaStops() {
+    return areaStops;
+  }
+
+  /**
+   * Add a collection of area stops to this vertex.
+   */
+  public void addAreaStops(Collection<AreaStop> toBeAdded) {
+    Objects.requireNonNull(toBeAdded);
+    synchronized (this) {
+      if (areaStops == EMPTY_SET) {
+        areaStops = Set.copyOf(toBeAdded);
+      } else {
+        areaStops =
+          Stream
+            .concat(areaStops.stream(), toBeAdded.stream())
+            .collect(Collectors.toUnmodifiableSet());
+      }
+    }
   }
 }

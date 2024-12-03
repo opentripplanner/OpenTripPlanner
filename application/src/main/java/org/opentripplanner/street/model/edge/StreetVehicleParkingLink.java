@@ -5,8 +5,8 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
@@ -18,18 +18,18 @@ public class StreetVehicleParkingLink extends Edge {
 
   private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 
-  private StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
+  private StreetVehicleParkingLink(Vertex fromv, VehicleParkingEntranceVertex tov) {
     super(fromv, tov);
     vehicleParkingEntranceVertex = tov;
   }
 
-  private StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
+  private StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, Vertex tov) {
     super(fromv, tov);
     vehicleParkingEntranceVertex = fromv;
   }
 
   public static StreetVehicleParkingLink createStreetVehicleParkingLink(
-    StreetVertex fromv,
+    Vertex fromv,
     VehicleParkingEntranceVertex tov
   ) {
     return connectToGraph(new StreetVehicleParkingLink(fromv, tov));
@@ -37,7 +37,7 @@ public class StreetVehicleParkingLink extends Edge {
 
   public static StreetVehicleParkingLink createStreetVehicleParkingLink(
     VehicleParkingEntranceVertex fromv,
-    StreetVertex tov
+    Vertex tov
   ) {
     return connectToGraph(new StreetVehicleParkingLink(fromv, tov));
   }

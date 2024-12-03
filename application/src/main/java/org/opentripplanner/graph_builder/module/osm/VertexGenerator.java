@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
@@ -15,10 +16,13 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.Entrance;
 
 /**
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
@@ -28,7 +32,7 @@ class VertexGenerator {
 
   private static final String nodeLabelFormat = "osm:node:%d";
 
-  private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
+  private final Map<Long, Vertex> intersectionNodes = new HashMap<>();
 
   private final HashMap<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
   private final OsmDatabase osmdb;
@@ -58,11 +62,11 @@ class VertexGenerator {
    * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
-  IntersectionVertex getVertexForOsmNode(OsmNode node, OsmWithTags way) {
+  Vertex getVertexForOsmNode(OsmNode node, OsmWithTags way) {
     // If the node should be decomposed to multiple levels,
     // use the numeric level because it is unique, the human level may not be (although
     // it will likely lead to some head-scratching if it is not).
-    IntersectionVertex iv = null;
+    Vertex iv = null;
     if (node.isMultiLevel()) {
       // make a separate node for every level
       return recordLevel(node, way);
@@ -106,7 +110,18 @@ class VertexGenerator {
         String ref = node.getTag("ref");
 
         boolean accessible = node.isTag("wheelchair", "yes");
-        iv = vertexFactory.stationEntrance(nid, coordinate, ref, accessible);
+
+        FeedScopedId id = new FeedScopedId("osm", Long.toString(nid));
+        Entrance entrance = Entrance
+          .of(id)
+          .withCoordinate(new WgsCoordinate(coordinate))
+          .withCode(ref)
+          .withWheelchairAccessibility(
+            accessible ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE
+          )
+          .build();
+
+        iv = vertexFactory.transitEntrance(entrance);
       }
 
       if (iv == null) {
@@ -161,7 +176,7 @@ class VertexGenerator {
   /**
    * Track OSM nodes that will become graph vertices because they appear in multiple OSM ways
    */
-  Map<Long, IntersectionVertex> intersectionNodes() {
+  Map<Long, Vertex> intersectionNodes() {
     return intersectionNodes;
   }
 

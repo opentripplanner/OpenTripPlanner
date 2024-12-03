@@ -36,4 +36,8 @@ public class TransitEntranceVertex extends StationElementVertex {
   public StationElement getStationElement() {
     return this.entrance;
   }
+
+  public boolean isConnectedToGraph() {
+    return getDegreeOut() + getDegreeIn() > 0;
+  }
 }

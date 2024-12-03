@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 
 public class AreaEdgeBuilder extends StreetEdgeBuilder<AreaEdgeBuilder> {
 
@@ -12,13 +12,13 @@ public class AreaEdgeBuilder extends StreetEdgeBuilder<AreaEdgeBuilder> {
   }
 
   @Override
-  public IntersectionVertex fromVertex() {
-    return (IntersectionVertex) super.fromVertex();
+  public Vertex fromVertex() {
+    return super.fromVertex();
   }
 
   @Override
-  public IntersectionVertex toVertex() {
-    return (IntersectionVertex) super.toVertex();
+  public Vertex toVertex() {
+    return super.toVertex();
   }
 
   public AreaEdgeList area() {

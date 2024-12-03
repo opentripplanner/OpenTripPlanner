@@ -22,7 +22,6 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
@@ -154,7 +153,7 @@ class ElevatorProcessor {
   private static void createElevatorVertices(
     Graph graph,
     ArrayList<Vertex> onboardVertices,
-    IntersectionVertex sourceVertex,
+    Vertex sourceVertex,
     String label,
     String levelName
   ) {

@@ -30,8 +30,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -44,14 +44,14 @@ class ParkingProcessor {
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
   private final DataImportIssueStore issueStore;
   private final OsmOpeningHoursParser osmOpeningHoursParser;
-  private final BiFunction<OsmNode, OsmWithTags, IntersectionVertex> getVertexForOsmNode;
+  private final BiFunction<OsmNode, OsmWithTags, Vertex> getVertexForOsmNode;
   private final VertexFactory vertexFactory;
   private final VehicleParkingHelper vehicleParkingHelper;
 
   public ParkingProcessor(
     Graph graph,
     DataImportIssueStore issueStore,
-    BiFunction<OsmNode, OsmWithTags, IntersectionVertex> getVertexForOsmNode
+    BiFunction<OsmNode, OsmWithTags, Vertex> getVertexForOsmNode
   ) {
     this.issueStore = issueStore;
     this.getVertexForOsmNode = getVertexForOsmNode;
@@ -475,4 +475,4 @@ class ParkingProcessor {
   }
 }
 
-record VertexAndName(I18NString name, IntersectionVertex vertex) {}
+record VertexAndName(I18NString name, Vertex vertex) {}

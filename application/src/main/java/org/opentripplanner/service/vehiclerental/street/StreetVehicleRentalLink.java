@@ -2,7 +2,7 @@ package org.opentripplanner.service.vehiclerental.street;
 
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
@@ -13,18 +13,18 @@ public class StreetVehicleRentalLink extends Edge {
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
-  private StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
+  private StreetVehicleRentalLink(Vertex fromv, VehicleRentalPlaceVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = tov;
   }
 
-  private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
+  private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, Vertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = fromv;
   }
 
   public static StreetVehicleRentalLink createStreetVehicleRentalLink(
-    StreetVertex fromv,
+    Vertex fromv,
     VehicleRentalPlaceVertex tov
   ) {
     return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
@@ -32,7 +32,7 @@ public class StreetVehicleRentalLink extends Edge {
 
   public static StreetVehicleRentalLink createStreetVehicleRentalLink(
     VehicleRentalPlaceVertex fromv,
-    StreetVertex tov
+    Vertex tov
   ) {
     return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
   }

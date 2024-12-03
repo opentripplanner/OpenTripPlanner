@@ -39,7 +39,6 @@ import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
@@ -118,8 +117,8 @@ public abstract class GraphRoutingTest {
     }
 
     public StreetEdgeBuilder<?> streetBuilder(
-      StreetVertex from,
-      StreetVertex to,
+      Vertex from,
+      Vertex to,
       int length,
       StreetTraversalPermission permissions
     ) {
@@ -138,13 +137,13 @@ public abstract class GraphRoutingTest {
     /**
      * Create a street with all permissions in both directions
      */
-    public List<StreetEdge> biStreet(StreetVertex from, StreetVertex to, int length) {
+    public List<StreetEdge> biStreet(Vertex from, Vertex to, int length) {
       return street(from, to, length, StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
     }
 
     public StreetEdge street(
-      StreetVertex from,
-      StreetVertex to,
+      Vertex from,
+      Vertex to,
       int length,
       StreetTraversalPermission permissions
     ) {
@@ -152,8 +151,8 @@ public abstract class GraphRoutingTest {
     }
 
     public List<StreetEdge> street(
-      StreetVertex from,
-      StreetVertex to,
+      Vertex from,
+      Vertex to,
       int length,
       StreetTraversalPermission forwardPermissions,
       StreetTraversalPermission reversePermissions
@@ -300,39 +299,39 @@ public abstract class GraphRoutingTest {
       return vertexFactory.stationCentroid(station);
     }
 
-    public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
+    public StreetTransitEntranceLink link(Vertex from, TransitEntranceVertex to) {
       return StreetTransitEntranceLink.createStreetTransitEntranceLink(from, to);
     }
 
-    public StreetTransitEntranceLink link(TransitEntranceVertex from, StreetVertex to) {
+    public StreetTransitEntranceLink link(TransitEntranceVertex from, Vertex to) {
       return StreetTransitEntranceLink.createStreetTransitEntranceLink(from, to);
     }
 
-    public List<StreetTransitEntranceLink> biLink(StreetVertex from, TransitEntranceVertex to) {
+    public List<StreetTransitEntranceLink> biLink(Vertex from, TransitEntranceVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 
-    public StreetTransitStopLink link(StreetVertex from, TransitStopVertex to) {
+    public StreetTransitStopLink link(Vertex from, TransitStopVertex to) {
       return StreetTransitStopLink.createStreetTransitStopLink(from, to);
     }
 
-    public StreetTransitStopLink link(TransitStopVertex from, StreetVertex to) {
+    public StreetTransitStopLink link(TransitStopVertex from, Vertex to) {
       return StreetTransitStopLink.createStreetTransitStopLink(from, to);
     }
 
-    public List<StreetTransitStopLink> biLink(StreetVertex from, TransitStopVertex to) {
+    public List<StreetTransitStopLink> biLink(Vertex from, TransitStopVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 
-    public StreetStationCentroidLink link(StreetVertex from, StationCentroidVertex to) {
+    public StreetStationCentroidLink link(Vertex from, StationCentroidVertex to) {
       return StreetStationCentroidLink.createStreetStationLink(from, to);
     }
 
-    public StreetStationCentroidLink link(StationCentroidVertex from, StreetVertex to) {
+    public StreetStationCentroidLink link(StationCentroidVertex from, Vertex to) {
       return StreetStationCentroidLink.createStreetStationLink(from, to);
     }
 
-    public List<StreetStationCentroidLink> biLink(StreetVertex from, StationCentroidVertex to) {
+    public List<StreetStationCentroidLink> biLink(Vertex from, StationCentroidVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 
@@ -367,11 +366,11 @@ public abstract class GraphRoutingTest {
       );
     }
 
-    public TemporaryFreeEdge link(TemporaryVertex from, StreetVertex to) {
+    public TemporaryFreeEdge link(TemporaryVertex from, Vertex to) {
       return TemporaryFreeEdge.createTemporaryFreeEdge(from, to);
     }
 
-    public TemporaryFreeEdge link(StreetVertex from, TemporaryVertex to) {
+    public TemporaryFreeEdge link(Vertex from, TemporaryVertex to) {
       return TemporaryFreeEdge.createTemporaryFreeEdge(from, to);
     }
 
@@ -420,15 +419,15 @@ public abstract class GraphRoutingTest {
       return vehicleRentalStation(id, latitude, longitude, TEST_VEHICLE_RENTAL_NETWORK);
     }
 
-    public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalPlaceVertex to) {
+    public StreetVehicleRentalLink link(Vertex from, VehicleRentalPlaceVertex to) {
       return StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
     }
 
-    public StreetVehicleRentalLink link(VehicleRentalPlaceVertex from, StreetVertex to) {
+    public StreetVehicleRentalLink link(VehicleRentalPlaceVertex from, Vertex to) {
       return StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
     }
 
-    public List<StreetVehicleRentalLink> biLink(StreetVertex from, VehicleRentalPlaceVertex to) {
+    public List<StreetVehicleRentalLink> biLink(Vertex from, VehicleRentalPlaceVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 
@@ -472,7 +471,7 @@ public abstract class GraphRoutingTest {
     }
 
     public VehicleParking.VehicleParkingEntranceCreator vehicleParkingEntrance(
-      StreetVertex streetVertex,
+      Vertex streetVertex,
       String id,
       boolean carAccessible,
       boolean walkAccessible
@@ -487,18 +486,15 @@ public abstract class GraphRoutingTest {
           .walkAccessible(walkAccessible);
     }
 
-    public StreetVehicleParkingLink link(StreetVertex from, VehicleParkingEntranceVertex to) {
+    public StreetVehicleParkingLink link(Vertex from, VehicleParkingEntranceVertex to) {
       return StreetVehicleParkingLink.createStreetVehicleParkingLink(from, to);
     }
 
-    public StreetVehicleParkingLink link(VehicleParkingEntranceVertex from, StreetVertex to) {
+    public StreetVehicleParkingLink link(VehicleParkingEntranceVertex from, Vertex to) {
       return StreetVehicleParkingLink.createStreetVehicleParkingLink(from, to);
     }
 
-    public List<StreetVehicleParkingLink> biLink(
-      StreetVertex from,
-      VehicleParkingEntranceVertex to
-    ) {
+    public List<StreetVehicleParkingLink> biLink(Vertex from, VehicleParkingEntranceVertex to) {
       return List.of(link(from, to), link(to, from));
     }
 

@@ -22,8 +22,8 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -182,7 +182,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     return false;
   }
 
-  private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
+  private StreetEdge linkBoardingLocationToStreetNetwork(Vertex from, Vertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
     return new StreetEdgeBuilder<>()
       .withFromVertex(from)
