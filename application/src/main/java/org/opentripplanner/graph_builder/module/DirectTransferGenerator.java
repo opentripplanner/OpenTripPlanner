@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -172,6 +173,20 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
+    for (StreetMode mode : transferRequests
+      .stream()
+      .map(transferProfile -> transferProfile.journey().transfer().mode())
+      .collect(Collectors.toSet())) {
+      LOG.info(
+        "Created {} transfers for mode {}.",
+        transfersByStop
+          .values()
+          .stream()
+          .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
+          .count(),
+        mode
+      );
+    }
   }
 
   /**
