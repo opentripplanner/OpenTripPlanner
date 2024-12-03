@@ -13,7 +13,7 @@ import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 
 public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkingAndGroup> {
 
@@ -21,10 +21,10 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
     VehicleParkingGroupsLayerBuilder.MapperType.Digitransit,
     DigitransitVehicleParkingGroupPropertyMapper::create
   );
-  private final Graph graph;
+  private final VehicleParkingService service;
 
   public VehicleParkingGroupsLayerBuilder(
-    Graph graph,
+    VehicleParkingService service,
     LayerParameters<VectorTilesResource.LayerType> layerParameters,
     Locale locale
   ) {
@@ -33,14 +33,13 @@ public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkin
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
-    this.graph = graph;
+    this.service = service;
   }
 
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
-    return graph
-      .getVehicleParkingService()
-      .getVehicleParkingGroups()
+    return service
+      .listVehicleParkingGroups()
       .asMap()
       .entrySet()
       .stream()

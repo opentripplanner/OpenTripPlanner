@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_parking;
+package org.opentripplanner.service.vehicleparking.model;
 
 /**
  * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they

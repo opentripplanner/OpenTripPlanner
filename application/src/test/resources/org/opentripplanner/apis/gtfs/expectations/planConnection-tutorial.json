@@ -1,127 +1,127 @@
 {
-  "data" : {
-    "planConnection" : {
-      "edges" : [
+  "data": {
+    "planConnection": {
+      "edges": [
         {
-          "node" : {
-            "start" : "2020-02-02T11:00:00Z",
-            "end" : "2020-02-02T12:00:00Z",
-            "legs" : [
+          "node": {
+            "start": "2020-02-02T11:00:00Z",
+            "end": "2020-02-02T12:00:00Z",
+            "legs": [
               {
-                "mode" : "WALK",
-                "from" : {
-                  "name" : "A",
-                  "lat" : 5.0,
-                  "lon" : 8.0,
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:00:00Z",
-                    "estimated" : null
+                "mode": "WALK",
+                "from": {
+                  "name": "A",
+                  "lat": 5.0,
+                  "lon": 8.0,
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:00:00Z",
+                    "estimated": null
                   }
                 },
-                "to" : {
-                  "name" : "B",
-                  "lat" : 6.0,
-                  "lon" : 8.5,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:00:20Z",
-                    "estimated" : null
+                "to": {
+                  "name": "B",
+                  "lat": 6.0,
+                  "lon": 8.5,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:00:20Z",
+                    "estimated": null
                   }
                 },
-                "route" : null,
-                "legGeometry" : null
+                "route": null,
+                "legGeometry": null
               },
               {
-                "mode" : "BUS",
-                "from" : {
-                  "name" : "B",
-                  "lat" : 6.0,
-                  "lon" : 8.5,
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T10:51:00Z",
-                    "estimated" : {
-                      "time" : "2020-02-02T11:01:00Z",
-                      "delay" : "PT10M"
+                "mode": "BUS",
+                "from": {
+                  "name": "B",
+                  "lat": 6.0,
+                  "lon": 8.5,
+                  "departure": {
+                    "scheduledTime": "2020-02-02T10:51:00Z",
+                    "estimated": {
+                      "time": "2020-02-02T11:01:00Z",
+                      "delay": "PT10M"
                     }
                   }
                 },
-                "to" : {
-                  "name" : "C",
-                  "lat" : 7.0,
-                  "lon" : 9.0,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:05:00Z",
-                    "estimated" : {
-                      "time" : "2020-02-02T11:15:00Z",
-                      "delay" : "PT10M"
+                "to": {
+                  "name": "C",
+                  "lat": 7.0,
+                  "lon": 9.0,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:05:00Z",
+                    "estimated": {
+                      "time": "2020-02-02T11:15:00Z",
+                      "delay": "PT10M"
                     }
                   }
                 },
-                "route" : {
-                  "gtfsId" : "F:BUS",
-                  "longName" : "Long name for BUS",
-                  "shortName" : "RBUS"
+                "route": {
+                  "gtfsId": "F:BUS",
+                  "longName": "Long name for BUS",
+                  "shortName": "RBUS"
                 },
-                "legGeometry" : {
-                  "points" : "_{rc@_d{r@????_ibE_t`B"
+                "legGeometry": {
+                  "points": "_{rc@_d{r@????_ibE_t`B"
                 }
               },
               {
-                "mode" : "RAIL",
-                "from" : {
-                  "name" : "C",
-                  "lat" : 7.0,
-                  "lon" : 9.0,
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:20:00Z",
-                    "estimated" : {
-                      "time" : "2020-02-02T11:30:00Z",
-                      "delay" : "PT10M"
+                "mode": "RAIL",
+                "from": {
+                  "name": "C",
+                  "lat": 7.0,
+                  "lon": 9.0,
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:20:00Z",
+                    "estimated": {
+                      "time": "2020-02-02T11:30:00Z",
+                      "delay": "PT10M"
                     }
                   }
                 },
-                "to" : {
-                  "name" : "D",
-                  "lat" : 8.0,
-                  "lon" : 9.5,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T11:40:00Z",
-                    "estimated" : {
-                      "time" : "2020-02-02T11:50:00Z",
-                      "delay" : "PT10M"
+                "to": {
+                  "name": "D",
+                  "lat": 8.0,
+                  "lon": 9.5,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T11:40:00Z",
+                    "estimated": {
+                      "time": "2020-02-02T11:50:00Z",
+                      "delay": "PT10M"
                     }
                   }
                 },
-                "route" : {
-                  "gtfsId" : "F:2",
-                  "longName" : null,
-                  "shortName" : "R2"
+                "route": {
+                  "gtfsId": "F:2",
+                  "longName": null,
+                  "shortName": "R2"
                 },
-                "legGeometry" : {
-                  "points" : "_evi@_y|u@????_ibE_t`B"
+                "legGeometry": {
+                  "points": "_evi@_y|u@????_ibE_t`B"
                 }
               },
               {
-                "mode" : "CAR",
-                "from" : {
-                  "name" : "D",
-                  "lat" : 8.0,
-                  "lon" : 9.5,
-                  "departure" : {
-                    "scheduledTime" : "2020-02-02T11:50:00Z",
-                    "estimated" : null
+                "mode": "CAR",
+                "from": {
+                  "name": "D",
+                  "lat": 8.0,
+                  "lon": 9.5,
+                  "departure": {
+                    "scheduledTime": "2020-02-02T11:50:00Z",
+                    "estimated": null
                   }
                 },
-                "to" : {
-                  "name" : "E",
-                  "lat" : 9.0,
-                  "lon" : 10.0,
-                  "arrival" : {
-                    "scheduledTime" : "2020-02-02T12:00:00Z",
-                    "estimated" : null
+                "to": {
+                  "name": "E",
+                  "lat": 9.0,
+                  "lon": 10.0,
+                  "arrival": {
+                    "scheduledTime": "2020-02-02T12:00:00Z",
+                    "estimated": null
                   }
                 },
-                "route" : null,
-                "legGeometry" : null
+                "route": null,
+                "legGeometry": null
               }
             ]
           }

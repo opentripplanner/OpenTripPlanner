@@ -44,7 +44,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
           "type",
           childStops
             .stream()
-            .flatMap(stop -> transitService.getPatternsForStop(stop).stream())
+            .flatMap(stop -> transitService.findPatterns(stop).stream())
             .map(tripPattern -> tripPattern.getMode().name())
             .distinct()
             .collect(Collectors.joining(","))
@@ -60,7 +60,7 @@ public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
           OBJECT_MAPPER.writeValueAsString(
             childStops
               .stream()
-              .flatMap(stop -> transitService.getRoutesForStop(stop).stream())
+              .flatMap(stop -> transitService.findRoutes(stop).stream())
               .distinct()
               .map(route -> {
                 var obj = OBJECT_MAPPER.createObjectNode();

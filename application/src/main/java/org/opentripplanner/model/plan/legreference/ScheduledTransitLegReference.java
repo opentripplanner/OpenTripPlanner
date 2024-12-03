@@ -69,7 +69,7 @@ public record ScheduledTransitLegReference(
     Trip trip;
     TripOnServiceDate tripOnServiceDate = null;
     if (tripOnServiceDateId != null) {
-      tripOnServiceDate = transitService.getTripOnServiceDateById(tripOnServiceDateId);
+      tripOnServiceDate = transitService.getTripOnServiceDate(tripOnServiceDateId);
       if (tripOnServiceDate == null) {
         LOG.info(
           "Invalid transit leg reference: trip on service date '{}' not found",
@@ -87,14 +87,14 @@ public record ScheduledTransitLegReference(
       }
       trip = tripOnServiceDate.getTrip();
     } else {
-      trip = transitService.getTripForId(tripId);
+      trip = transitService.getTrip(tripId);
       if (trip == null) {
         LOG.info("Invalid transit leg reference: trip '{}' not found", tripId);
         return null;
       }
     }
 
-    TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
+    TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
     if (tripPattern == null) {
       LOG.info(
         "Invalid transit leg reference: trip pattern not found for trip '{}' and service date {} ",
@@ -130,7 +130,7 @@ public record ScheduledTransitLegReference(
       return null;
     }
 
-    Timetable timetable = transitService.getTimetableForTripPattern(tripPattern, serviceDate);
+    Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
     TripTimes tripTimes = timetable.getTripTimes(trip);
 
     if (tripTimes == null) {
@@ -177,7 +177,7 @@ public record ScheduledTransitLegReference(
 
     new AlertToLegMapper(
       transitService.getTransitAlertService(),
-      transitService::getMultiModalStationForStation
+      transitService::findMultiModalStation
     )
       .addTransitAlertsToLeg(leg, false);
 

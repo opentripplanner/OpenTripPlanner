@@ -23,11 +23,11 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -86,9 +86,8 @@ public class VehicleParkingsLayerTest {
 
   @Test
   public void vehicleParkingGeometryTest() {
-    Graph graph = new Graph();
-    VehicleParkingService service = graph.getVehicleParkingService();
-    service.updateVehicleParking(List.of(vehicleParking), List.of());
+    var repo = new DefaultVehicleParkingRepository();
+    repo.updateVehicleParking(List.of(vehicleParking), List.of());
 
     var config =
       """
@@ -111,7 +110,7 @@ public class VehicleParkingsLayerTest {
     var nodeAdapter = newNodeAdapterForTest(config);
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
-    var builder = new VehicleParkingsLayerBuilder(graph, tiles.layers().getFirst(), Locale.US);
+    var builder = new VehicleParkingsLayerBuilder(new DefaultVehicleParkingService(repo), tiles.layers().getFirst(), Locale.US);
 
     List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 

@@ -375,7 +375,7 @@ public class AffectsMapper {
     FeedScopedId id = new FeedScopedId(feedId, siriStopId);
     if (transitService.getRegularStop(id) != null) {
       return id;
-    } else if (transitService.getStationById(id) != null) {
+    } else if (transitService.getStation(id) != null) {
       return id;
     }
 
