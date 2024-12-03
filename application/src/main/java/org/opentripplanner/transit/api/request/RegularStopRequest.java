@@ -6,18 +6,18 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * A request for {@link RegularStop}s.
- *
+ * <p/>
  * This request is used to retrieve {@link RegularStop}s that match the provided criteria.
  */
 public class RegularStopRequest {
 
   private final Envelope envelope;
-  private final List<String> feedIds;
+  private final String feedId;
   private final boolean filterByInUse;
 
-  protected RegularStopRequest(Envelope envelope, List<String> feedIds, boolean filterByInUse) {
+  protected RegularStopRequest(Envelope envelope, String feedId, boolean filterByInUse) {
     this.envelope = envelope;
-    this.feedIds = feedIds;
+    this.feedId = feedId;
     this.filterByInUse = filterByInUse;
   }
 
@@ -29,8 +29,8 @@ public class RegularStopRequest {
     return envelope;
   }
 
-  public List<String> feedIds() {
-    return feedIds;
+  public String feedId() {
+    return feedId;
   }
 
   public boolean filterByInUse() {

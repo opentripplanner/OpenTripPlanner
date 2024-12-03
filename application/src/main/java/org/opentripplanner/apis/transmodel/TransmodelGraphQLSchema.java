@@ -694,7 +694,7 @@ public class TransmodelGraphQLSchema {
             RegularStopRequest regularStopRequest = RegularStopRequest
               .of()
               .withEnvelope(envelope)
-              .withFeeds(List.of(authority))
+              .withFeed(authority)
               .filterByInUse(filterInUse)
               .build();
 

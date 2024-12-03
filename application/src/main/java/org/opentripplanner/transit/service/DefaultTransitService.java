@@ -698,7 +698,7 @@ public class DefaultTransitService implements TransitEditorService {
 
     Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
       request,
-      stop -> !getPatternsForStop(stop, true).isEmpty()
+      stop -> !findPatterns(stop, true).isEmpty()
     );
     return stops.stream().filter(matcher::match).toList();
   }

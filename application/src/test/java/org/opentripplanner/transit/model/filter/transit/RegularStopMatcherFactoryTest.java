@@ -28,7 +28,7 @@ class RegularStopMatcherFactoryTest {
 
   @Test
   void testFeedIds() {
-    var matcher = RegularStopMatcherFactory.feedIds("feedId");
+    var matcher = RegularStopMatcherFactory.feedId("feedId");
     assertTrue(matcher.match(stop1));
     assertFalse(matcher.match(stop2));
   }

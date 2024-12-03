@@ -1,12 +1,11 @@
 package org.opentripplanner.transit.api.request;
 
-import java.util.List;
 import org.locationtech.jts.geom.Envelope;
 
 public class RegularStopRequestBuilder {
 
   private Envelope envelope;
-  private List<String> feedIds;
+  private String feedId;
   private boolean filterByInUse;
 
   protected RegularStopRequestBuilder() {}
@@ -16,8 +15,8 @@ public class RegularStopRequestBuilder {
     return this;
   }
 
-  public RegularStopRequestBuilder withFeeds(List<String> feedIds) {
-    this.feedIds = feedIds;
+  public RegularStopRequestBuilder withFeed(String feedId) {
+    this.feedId = feedId;
     return this;
   }
 
@@ -27,6 +26,6 @@ public class RegularStopRequestBuilder {
   }
 
   public RegularStopRequest build() {
-    return new RegularStopRequest(envelope, feedIds, filterByInUse);
+    return new RegularStopRequest(envelope, feedId, filterByInUse);
   }
 }
