@@ -52,7 +52,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   private final List<RouteRequest> transferRequests;
   private final Map<StreetMode, TransferParameters> transferParametersForMode;
-  private final DurationForEnum<StreetMode> carsAllowedStopMaxTransferDurationsForMode;
   private final Graph graph;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
@@ -69,7 +68,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
-    this.carsAllowedStopMaxTransferDurationsForMode = DurationForEnum.of(StreetMode.class).build();
     this.transferParametersForMode = Collections.emptyMap();
   }
 
@@ -79,7 +77,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     DataImportIssueStore issueStore,
     Duration radiusByDuration,
     List<RouteRequest> transferRequests,
-    DurationForEnum<StreetMode> carsAllowedStopMaxTransferDurationsForMode,
     Map<StreetMode, TransferParameters> transferParametersForMode
   ) {
     this.graph = graph;
@@ -87,7 +84,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.radiusByDuration = radiusByDuration;
     this.transferRequests = transferRequests;
-    this.carsAllowedStopMaxTransferDurationsForMode = carsAllowedStopMaxTransferDurationsForMode;
     this.transferParametersForMode = transferParametersForMode;
   }
 
@@ -153,6 +149,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             )
           );
         }
+      } else {
+        filteredTransferRequests.add(transferProfile);
+        nearbyStopFinders.put(mode, createNearbyStopFinder(radiusByDuration, Set.of()));
       }
     }
 

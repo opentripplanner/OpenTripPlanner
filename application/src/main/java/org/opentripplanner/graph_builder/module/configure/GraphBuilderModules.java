@@ -238,7 +238,6 @@ public class GraphBuilderModules {
       issueStore,
       config.maxTransferDuration,
       config.transferRequests,
-      config.carsAllowedStopMaxTransferDurationsForMode,
       config.transferParametersForMode
     );
   }

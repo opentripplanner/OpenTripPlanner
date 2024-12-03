@@ -9,8 +9,10 @@ import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -289,14 +291,19 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
+    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
+    transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60));
+    transferParametersBuilder.withDisableDefaultTransfers(true);
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.CAR, transferParametersBuilder.build());
+
     new DirectTransferGenerator(
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofMinutes(60)).build(),
-      Collections.emptyMap()
+      transferParametersForMode
     )
       .buildGraph();
 
@@ -319,14 +326,19 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
+    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
+    transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofSeconds(10));
+    transferParametersBuilder.withDisableDefaultTransfers(true);
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.CAR, transferParametersBuilder.build());
+
     new DirectTransferGenerator(
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofSeconds(10)).build(),
-      Collections.emptyMap()
+      transferParametersForMode
     )
       .buildGraph();
 
@@ -351,14 +363,19 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
+    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
+    transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(60));
+    transferParametersBuilder.withDisableDefaultTransfers(true);
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.CAR, transferParametersBuilder.build());
+
     new DirectTransferGenerator(
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofMinutes(60)).build(),
-      Collections.emptyMap()
+      transferParametersForMode
     )
       .buildGraph();
 
@@ -385,14 +402,19 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
+    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
+    transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(120));
+    transferParametersBuilder.withDisableDefaultTransfers(true);
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.BIKE, transferParametersBuilder.build());
+
     new DirectTransferGenerator(
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
       Duration.ofSeconds(30),
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.BIKE, Duration.ofSeconds(120)).build(),
-      Collections.emptyMap()
+      transferParametersForMode
     )
       .buildGraph();
 
@@ -418,14 +440,19 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
+    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
+    transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofSeconds(120));
+    transferParametersBuilder.withDisableDefaultTransfers(true);
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.CAR, transferParametersBuilder.build());
+
     new DirectTransferGenerator(
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
       Duration.ofSeconds(30),
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofSeconds(120)).build(),
-      Collections.emptyMap()
+      transferParametersForMode
     )
       .buildGraph();
 

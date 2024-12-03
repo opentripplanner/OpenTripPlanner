@@ -37,7 +37,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.fares.FareServiceFactory;
-import org.opentripplanner.standalone.config.buildconfig.CarsAllowedStopMaxTransferDurationsForMode;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.IslandPruningConfig;
@@ -158,7 +157,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final Duration maxTransferDuration;
   public final Map<StreetMode, TransferParameters> transferParametersForMode;
-  public final DurationForEnum<StreetMode> carsAllowedStopMaxTransferDurationsForMode;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
 
@@ -296,11 +294,6 @@ all of the elevation values in the street edges.
         )
         .asDuration(Duration.ofMinutes(30));
     transferParametersForMode = TransferConfig.map(root, "transfers");
-    carsAllowedStopMaxTransferDurationsForMode =
-      CarsAllowedStopMaxTransferDurationsForMode.map(
-        root,
-        "carsAllowedStopMaxTransferDurationsForMode"
-      );
     maxStopToShapeSnapDistance =
       root
         .of("maxStopToShapeSnapDistance")
