@@ -445,7 +445,9 @@ performance will be better.
 
 The default values are
 
+- `car` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
+- `car-pickup` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-hailing` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `flexible` = (timePenalty: 10m + 1.30 t, costFactor: 1.30)
