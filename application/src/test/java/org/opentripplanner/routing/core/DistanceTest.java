@@ -10,33 +10,33 @@ import org.opentripplanner.transit.model.basic.Distance;
 
 public class DistanceTest {
 
-  private static final Distance oneThousandFiveHundredMeters = Distance.ofMeters(1500d);
-  private static final Distance onePointFiveKilometers = Distance.ofKilometers(1.5d);
-  private static final Distance twoKilometers = Distance.ofKilometers(2d);
-  private static final Distance oneHundredMeters = Distance.ofMeters(100d);
-  private static final Distance pointOneKilometer = Distance.ofKilometers(0.1d);
-  private static final Distance oneHundredPointFiveMeters = Distance.ofMeters(100.5d);
+  private static final Distance ONE_THOUSAND_FIVE_HUNDRED_METERS = Distance.ofMeters(1500d);
+  private static final Distance ONE_POINT_FIVE_KILOMETERS = Distance.ofKilometers(1.5d);
+  private static final Distance TWO_KILOMETERS = Distance.ofKilometers(2d);
+  private static final Distance ONE_HUNDRED_METERS = Distance.ofMeters(100d);
+  private static final Distance POINT_ONE_KILOMETER = Distance.ofKilometers(0.1d);
+  private static final Distance ONE_HUNDRED_POINT_FIVE_METERS = Distance.ofMeters(100.5d);
 
   @Test
   void equals() {
-    assertEquals(oneThousandFiveHundredMeters, onePointFiveKilometers);
-    assertEquals(pointOneKilometer, oneHundredMeters);
-    assertNotEquals(oneHundredPointFiveMeters, oneHundredMeters);
-    assertNotEquals(twoKilometers, onePointFiveKilometers);
+    assertEquals(ONE_THOUSAND_FIVE_HUNDRED_METERS, ONE_POINT_FIVE_KILOMETERS);
+    assertEquals(POINT_ONE_KILOMETER, ONE_HUNDRED_METERS);
+    assertNotEquals(ONE_HUNDRED_POINT_FIVE_METERS, ONE_HUNDRED_METERS);
+    assertNotEquals(TWO_KILOMETERS, ONE_POINT_FIVE_KILOMETERS);
   }
 
   @Test
   void greaterThan() {
-    assertTrue(oneHundredPointFiveMeters.greaterThan(oneHundredMeters));
-    assertTrue(twoKilometers.greaterThan(oneThousandFiveHundredMeters));
-    assertFalse(oneThousandFiveHundredMeters.greaterThan(onePointFiveKilometers));
+    assertTrue(ONE_HUNDRED_POINT_FIVE_METERS.greaterThan(ONE_HUNDRED_METERS));
+    assertTrue(TWO_KILOMETERS.greaterThan(ONE_THOUSAND_FIVE_HUNDRED_METERS));
+    assertFalse(ONE_THOUSAND_FIVE_HUNDRED_METERS.greaterThan(ONE_POINT_FIVE_KILOMETERS));
   }
 
   @Test
   void lessThan() {
-    assertTrue(oneThousandFiveHundredMeters.lessThan(twoKilometers));
-    assertTrue(pointOneKilometer.lessThan(oneHundredPointFiveMeters));
-    assertFalse(oneHundredPointFiveMeters.lessThan(oneHundredMeters));
+    assertTrue(ONE_THOUSAND_FIVE_HUNDRED_METERS.lessThan(TWO_KILOMETERS));
+    assertTrue(POINT_ONE_KILOMETER.lessThan(ONE_HUNDRED_POINT_FIVE_METERS));
+    assertFalse(ONE_HUNDRED_POINT_FIVE_METERS.lessThan(ONE_HUNDRED_METERS));
   }
 
   @Test
