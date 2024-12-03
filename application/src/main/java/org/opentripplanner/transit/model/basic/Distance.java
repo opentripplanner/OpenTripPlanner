@@ -24,8 +24,8 @@ public class Distance {
   }
 
   /** Returns the distance in meters */
-  public double toMeters() {
-    return this.meters;
+  public int toMeters() {
+    return (int) Math.round(this.meters);
   }
 
   /**

@@ -26,6 +26,8 @@
         networkId
         url
       }
+      currentFuelPercent
+      currentRangeMeters
     }
     ... on VehicleRentalStation {
       stationId

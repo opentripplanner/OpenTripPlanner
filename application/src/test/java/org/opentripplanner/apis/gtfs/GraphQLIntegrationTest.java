@@ -133,8 +133,15 @@ class GraphQLIntegrationTest {
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
-  private static final VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+  private static final VehicleRentalVehicle RENTAL_VEHICLE_1 = new TestFreeFloatingRentalVehicleBuilder()
     .withSystem("Network-1", "https://foo.bar")
+    .build();
+
+  private static final VehicleRentalVehicle RENTAL_VEHICLE_2 = new TestFreeFloatingRentalVehicleBuilder()
+    .withSystem("Network-2", "https://foo.bar.baz")
+    .withNetwork("Network-2")
+    .withCurrentRangeMeters(null)
+    .withCurrentFuelPercent(null)
     .build();
 
   static final Graph GRAPH = new Graph();
@@ -344,7 +351,8 @@ class GraphQLIntegrationTest {
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
     defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
-    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE);
+    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
+    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
 
     context =
       new GraphQLRequestContext(
@@ -511,7 +519,7 @@ class GraphQLIntegrationTest {
       return List.of(
         new PlaceAtDistance(stop, 0),
         new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
-        new PlaceAtDistance(RENTAL_VEHICLE, 50)
+        new PlaceAtDistance(RENTAL_VEHICLE_1, 50)
       );
     }
   };

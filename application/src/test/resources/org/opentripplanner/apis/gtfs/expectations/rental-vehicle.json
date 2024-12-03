@@ -17,7 +17,7 @@
         "url": "https://foo.bar"
       },
       "currentFuelPercent": 0.5,
-      "currentRangeMeters": 5500.0
+      "currentRangeMeters": 5501
     }
   }
 }

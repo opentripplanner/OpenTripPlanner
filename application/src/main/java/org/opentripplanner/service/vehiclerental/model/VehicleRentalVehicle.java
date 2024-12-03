@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Distance;
@@ -140,7 +141,18 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     return currentFuelPercent;
   }
 
-  public Distance getCurrentRangeMeters() {
-    return currentRangeMeters;
+  public Integer getCurrentRangeMeters() {
+    if (this.currentRangeMeters == null) {
+      return null;
+    }
+    return this.currentRangeMeters.toMeters();
+  }
+
+  public void setCurrentRangeMeters(@Nullable Double currentRangeMeters) {
+    if (currentRangeMeters != null) {
+      this.currentRangeMeters = Distance.ofMeters(currentRangeMeters);
+    } else {
+      this.currentRangeMeters = null;
+    }
   }
 }

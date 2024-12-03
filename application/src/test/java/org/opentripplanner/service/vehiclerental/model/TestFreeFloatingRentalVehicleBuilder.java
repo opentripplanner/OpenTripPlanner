@@ -11,13 +11,14 @@ public class TestFreeFloatingRentalVehicleBuilder {
   public static final double DEFAULT_LATITUDE = 47.520;
   public static final double DEFAULT_LONGITUDE = 19.01;
   public static final double DEFAULT_CURRENT_FUEL_PERCENT = 0.5;
-  public static final double DEFAULT_CURRENT_RANGE_METERS = 5500;
+  public static final double DEFAULT_CURRENT_RANGE_METERS = 5500.7;
 
   private double latitude = DEFAULT_LATITUDE;
   private double longitude = DEFAULT_LONGITUDE;
-  private double currentFuelPercent = DEFAULT_CURRENT_FUEL_PERCENT;
-  private double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
+  private Double currentFuelPercent = DEFAULT_CURRENT_FUEL_PERCENT;
+  private Double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
   private VehicleRentalSystem system = null;
+  private String network = NETWORK_1;
 
   private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
 
@@ -35,13 +36,18 @@ public class TestFreeFloatingRentalVehicleBuilder {
     return this;
   }
 
-  public TestFreeFloatingRentalVehicleBuilder withCurrentFuelPercent(double currentFuelPercent) {
+  public TestFreeFloatingRentalVehicleBuilder withCurrentFuelPercent(Double currentFuelPercent) {
     this.currentFuelPercent = currentFuelPercent;
     return this;
   }
 
-  public TestFreeFloatingRentalVehicleBuilder withCurrentRangeMeters(double currentRangeMeters) {
+  public TestFreeFloatingRentalVehicleBuilder withCurrentRangeMeters(Double currentRangeMeters) {
     this.currentRangeMeters = currentRangeMeters;
+    return this;
+  }
+
+  public TestFreeFloatingRentalVehicleBuilder withNetwork(String network) {
+    this.network = network;
     return this;
   }
 
@@ -94,14 +100,14 @@ public class TestFreeFloatingRentalVehicleBuilder {
   public VehicleRentalVehicle build() {
     var vehicle = new VehicleRentalVehicle();
     var stationName = "free-floating-" + vehicleType.formFactor.name().toLowerCase();
-    vehicle.id = new FeedScopedId(NETWORK_1, stationName);
+    vehicle.id = new FeedScopedId(this.network, stationName);
     vehicle.name = new NonLocalizedString(stationName);
     vehicle.latitude = latitude;
     vehicle.longitude = longitude;
     vehicle.vehicleType = vehicleType;
     vehicle.system = system;
     vehicle.currentFuelPercent = currentFuelPercent;
-    vehicle.currentRangeMeters = Distance.ofMeters(currentRangeMeters);
+    vehicle.setCurrentRangeMeters(currentRangeMeters);
     return vehicle;
   }
 }

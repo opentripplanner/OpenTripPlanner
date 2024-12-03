@@ -76,7 +76,29 @@
         "rentalNetwork": {
           "networkId": "Network-1",
           "url": "https://foo.bar"
-        }
+        },
+        "currentFuelPercent": 0.5,
+        "currentRangeMeters": 5501
+      },
+      {
+        "__typename": "RentalVehicle",
+        "vehicleId": "Network-2:free-floating-bicycle",
+        "name": "free-floating-bicycle",
+        "allowPickupNow": true,
+        "lon": 19.01,
+        "lat": 47.52,
+        "rentalUris": null,
+        "operative": true,
+        "vehicleType": {
+          "formFactor": "BICYCLE",
+          "propulsionType": "HUMAN"
+        },
+        "rentalNetwork": {
+          "networkId": "Network-2",
+          "url": "https://foo.bar.baz"
+        },
+        "currentFuelPercent": null,
+        "currentRangeMeters": null
       }
     ]
   }

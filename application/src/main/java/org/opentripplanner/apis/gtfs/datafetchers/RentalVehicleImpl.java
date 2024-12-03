@@ -22,11 +22,9 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   }
 
   @Override
-  public DataFetcher<Double> currentRangeMeters() {
+  public DataFetcher<Integer> currentRangeMeters() {
     return environment ->
-      getSource(environment).getCurrentRangeMeters() != null
-        ? getSource(environment).getCurrentRangeMeters().toMeters()
-        : null;
+      getSource(environment).getCurrentRangeMeters();
   }
 
   @Override

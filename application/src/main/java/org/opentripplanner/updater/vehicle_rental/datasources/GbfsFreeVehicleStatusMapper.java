@@ -54,9 +54,7 @@ public class GbfsFreeVehicleStatusMapper {
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
       rentalVehicle.currentFuelPercent = vehicle.getCurrentFuelPercent();
-      Double currentRangeMeters = vehicle.getCurrentRangeMeters();
-      rentalVehicle.currentRangeMeters =
-        currentRangeMeters != null ? Distance.ofMeters(currentRangeMeters) : null;
+      rentalVehicle.setCurrentRangeMeters(vehicle.getCurrentRangeMeters());
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
