@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
@@ -23,6 +24,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.emissions.EmissionsConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
+import org.opentripplanner.graph_builder.module.TransferParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
@@ -42,6 +44,7 @@ import org.opentripplanner.standalone.config.buildconfig.IslandPruningConfig;
 import org.opentripplanner.standalone.config.buildconfig.NetexConfig;
 import org.opentripplanner.standalone.config.buildconfig.OsmConfig;
 import org.opentripplanner.standalone.config.buildconfig.S3BucketConfig;
+import org.opentripplanner.standalone.config.buildconfig.TransferConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransferRequestConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
@@ -154,6 +157,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final IslandPruningConfig islandPruning;
 
   public final Duration maxTransferDuration;
+  public final Map<StreetMode, TransferParameters> transferParametersForMode;
   public final DurationForEnum<StreetMode> carsAllowedStopMaxTransferDurationsForMode;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
@@ -291,11 +295,11 @@ all of the elevation values in the street edges.
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
         .asDuration(Duration.ofMinutes(30));
+    transferParametersForMode = TransferConfig.map(root, "transfers");
     carsAllowedStopMaxTransferDurationsForMode =
       CarsAllowedStopMaxTransferDurationsForMode.map(
         root,
-        "carsAllowedStopMaxTransferDurationsForMode",
-        maxTransferDuration
+        "carsAllowedStopMaxTransferDurationsForMode"
       );
     maxStopToShapeSnapDistance =
       root

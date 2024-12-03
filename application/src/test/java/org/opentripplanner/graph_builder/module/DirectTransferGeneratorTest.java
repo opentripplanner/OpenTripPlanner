@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -294,7 +295,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofMinutes(60)).build()
+      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofMinutes(60)).build(),
+      Collections.emptyMap()
     )
       .buildGraph();
 
@@ -323,7 +325,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofSeconds(10)).build()
+      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofSeconds(10)).build(),
+      Collections.emptyMap()
     )
       .buildGraph();
 
@@ -354,7 +357,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofMinutes(60)).build()
+      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofMinutes(60)).build(),
+      Collections.emptyMap()
     )
       .buildGraph();
 
@@ -387,7 +391,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       Duration.ofSeconds(30),
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.BIKE, Duration.ofSeconds(120)).build()
+      DurationForEnum.of(StreetMode.class).with(StreetMode.BIKE, Duration.ofSeconds(120)).build(),
+      Collections.emptyMap()
     )
       .buildGraph();
 
@@ -419,7 +424,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       Duration.ofSeconds(30),
       transferRequests,
-      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofSeconds(120)).build()
+      DurationForEnum.of(StreetMode.class).with(StreetMode.CAR, Duration.ofSeconds(120)).build(),
+      Collections.emptyMap()
     )
       .buildGraph();
 

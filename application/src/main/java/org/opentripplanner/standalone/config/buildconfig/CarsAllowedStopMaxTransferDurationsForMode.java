@@ -10,11 +10,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class CarsAllowedStopMaxTransferDurationsForMode {
 
-  public static DurationForEnum<StreetMode> map(
-    NodeAdapter root,
-    String parameterName,
-    Duration maxTransferDuration
-  ) {
+  public static DurationForEnum<StreetMode> map(NodeAdapter root, String parameterName) {
     Map<StreetMode, Duration> values = root
       .of(parameterName)
       .since(V2_7)
