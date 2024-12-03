@@ -103,7 +103,8 @@ public class OsmTagMapper {
     props.setProperties("highway=trunk", withModes(CAR).bicycleSafety(7.47));
     props.setProperties("highway=motorway", withModes(CAR).bicycleSafety(8));
 
-    // Do not walk on "moottoriliikennetie"/"Kraftfahrstrasse"
+    // Do not walk on "moottoriliikennetie"/"Kraftfahrstrasse"/"Limited access road"
+    // https://en.wikipedia.org/wiki/Limited-access_road
     props.setProperties(new ExactMatchSpecifier("motorroad=yes"), withModes(CAR));
 
     /* cycleway=lane */
