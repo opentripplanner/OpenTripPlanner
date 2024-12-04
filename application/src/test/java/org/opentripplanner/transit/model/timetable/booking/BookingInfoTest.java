@@ -58,7 +58,7 @@ class BookingInfoTest {
       .build();
 
     assertNull(subject.getLatestBookingTime());
-    assertEquals(minimumBookingNotice, subject.getMinimumBookingNotice());
+    assertEquals(minimumBookingNotice, subject.getMinimumBookingNotice().get());
 
     assertEquals(
       "BookingInfo{bookingMethods: [CALL_DRIVER], minimumBookingNotice: 45m}",
