@@ -7,6 +7,7 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TripUpdateBuilder {
@@ -45,6 +46,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       null
     );
   }
@@ -57,6 +59,7 @@ public class TripUpdateBuilder {
       delay,
       delay,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       null
     );
   }
@@ -69,12 +72,39 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      pickDrop,
+      null
+    );
+  }
+
+  public TripUpdateBuilder addStopTime(
+    String stopId,
+    int minutes,
+    StopTimeUpdate.StopTimeProperties.DropOffPickupType pickDrop
+  ) {
+    return addStopTime(
+      stopId,
+      minutes,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       pickDrop
     );
   }
 
   public TripUpdateBuilder addDelayedStopTime(int stopSequence, int delay) {
-    return addStopTime(null, -1, stopSequence, delay, delay, DEFAULT_SCHEDULE_RELATIONSHIP, null);
+    return addStopTime(
+      null,
+      -1,
+      stopSequence,
+      delay,
+      delay,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null
+    );
   }
 
   public TripUpdateBuilder addDelayedStopTime(
@@ -89,6 +119,7 @@ public class TripUpdateBuilder {
       arrivalDelay,
       departureDelay,
       DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
       null
     );
   }
@@ -104,6 +135,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.NO_DATA,
+      null,
       null
     );
   }
@@ -119,6 +151,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null,
       null
     );
   }
@@ -131,6 +164,7 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null,
       null
     );
   }
@@ -143,7 +177,8 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
-      pickDrop
+      pickDrop,
+      null
     );
   }
 
@@ -157,13 +192,14 @@ public class TripUpdateBuilder {
   }
 
   private TripUpdateBuilder addStopTime(
-    String stopId,
+    @Nullable String stopId,
     int minutes,
     int stopSequence,
     int arrivalDelay,
     int departureDelay,
     StopTimeUpdate.ScheduleRelationship scheduleRelationShip,
-    DropOffPickupType pickDrop
+    @Nullable DropOffPickupType pickDrop,
+    @Nullable StopTimeUpdate.StopTimeProperties.DropOffPickupType gtfsPickDrop
   ) {
     final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationShip);
@@ -176,14 +212,20 @@ public class TripUpdateBuilder {
       stopTimeUpdateBuilder.setStopSequence(stopSequence);
     }
 
-    if (pickDrop != null) {
+    if (pickDrop != null || gtfsPickDrop != null) {
       var stopTimePropsBuilder = stopTimeUpdateBuilder.getStopTimePropertiesBuilder();
-      var b = MfdzRealtimeExtensions.StopTimePropertiesExtension.newBuilder();
-      b.setDropoffType(pickDrop);
-      b.setPickupType(pickDrop);
 
-      var ext = b.build();
-      stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
+      if (gtfsPickDrop != null) {
+        stopTimePropsBuilder.setDropOffType(gtfsPickDrop);
+        stopTimePropsBuilder.setPickupType(gtfsPickDrop);
+      }
+      if (pickDrop != null) {
+        var b = MfdzRealtimeExtensions.StopTimePropertiesExtension.newBuilder();
+        b.setDropoffType(pickDrop);
+        b.setPickupType(pickDrop);
+        var ext = b.build();
+        stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
+      }
     }
 
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();

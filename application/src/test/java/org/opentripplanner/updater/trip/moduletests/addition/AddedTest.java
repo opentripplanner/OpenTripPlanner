@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.trip.moduletests.addition;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
-import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
+import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -49,7 +49,11 @@ class AddedTest implements RealtimeTestConstants {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
-      .addStopTime(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
+      .addStopTime(
+        STOP_B1_ID,
+        40,
+        GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType.COORDINATE_WITH_DRIVER
+      )
       .addStopTime(STOP_B1_ID, 55, DropOffPickupType.NONE)
       .build();
 

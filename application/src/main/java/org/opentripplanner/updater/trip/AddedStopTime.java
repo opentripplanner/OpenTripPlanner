@@ -23,44 +23,58 @@ final class AddedStopTime {
 
   PickDrop pickup() {
     return getPickDrop(
+      getStopTimeProperties()
+        .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
+        .orElse(null),
       getStopTimePropertiesExtension()
-        .map(MfdzRealtimeExtensions.StopTimePropertiesExtension::getPickupType)
+        .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
         .orElse(null)
     );
   }
 
   PickDrop dropOff() {
     return getPickDrop(
+      getStopTimeProperties()
+        .map(properties -> properties.hasDropOffType() ? properties.getDropOffType() : null)
+        .orElse(null),
       getStopTimePropertiesExtension()
-        .map(MfdzRealtimeExtensions.StopTimePropertiesExtension::getDropoffType)
+        .map(properties -> properties.hasDropoffType() ? properties.getDropoffType() : null)
         .orElse(null)
     );
   }
 
   private PickDrop getPickDrop(
+    @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType dropOffPickupType,
     @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
   ) {
     if (isSkipped()) {
       return PickDrop.CANCELLED;
     }
 
-    if (extensionDropOffPickup == null) {
-      return toPickDrop(stopTimeUpdate.getScheduleRelationship());
+    if (dropOffPickupType != null) {
+      return PickDropMapper.map(dropOffPickupType.getNumber());
     }
 
-    return PickDropMapper.map(extensionDropOffPickup.getNumber());
+    if (extensionDropOffPickup != null) {
+      return PickDropMapper.map(extensionDropOffPickup.getNumber());
+    }
+
+    return PickDrop.SCHEDULED;
+  }
+
+  private Optional<GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties> getStopTimeProperties() {
+    return stopTimeUpdate.hasStopTimeProperties()
+      ? Optional.of(stopTimeUpdate.getStopTimeProperties())
+      : Optional.empty();
   }
 
   private Optional<MfdzRealtimeExtensions.StopTimePropertiesExtension> getStopTimePropertiesExtension() {
-    return stopTimeUpdate
-        .getStopTimeProperties()
-        .hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
-      ? Optional.of(
-        stopTimeUpdate
-          .getStopTimeProperties()
-          .getExtension(MfdzRealtimeExtensions.stopTimeProperties)
-      )
-      : Optional.empty();
+    return getStopTimeProperties()
+      .map(stopTimeProperties ->
+        stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
+          ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)
+          : null
+      );
   }
 
   OptionalLong arrivalTime() {
@@ -108,14 +122,5 @@ final class AddedStopTime {
 
   Optional<String> stopId() {
     return stopTimeUpdate.hasStopId() ? Optional.of(stopTimeUpdate.getStopId()) : Optional.empty();
-  }
-
-  private static PickDrop toPickDrop(
-    GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship
-  ) {
-    return switch (scheduleRelationship) {
-      case SCHEDULED, NO_DATA, UNSCHEDULED -> PickDrop.SCHEDULED;
-      case SKIPPED -> PickDrop.CANCELLED;
-    };
   }
 }
