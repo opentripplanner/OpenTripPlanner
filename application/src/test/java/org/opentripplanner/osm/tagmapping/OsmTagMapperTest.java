@@ -7,6 +7,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -197,6 +198,8 @@ class OsmTagMapperTest {
     final WayPropertySet wps = wayProperySet();
     var way = way("highway", "corridor");
     assertEquals("corridor", wps.getCreativeNameForWay(way).toString());
+    assertEquals("Korridor", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
+    assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(Locale.of("FI")));
   }
 
   public OsmWithTags way(String key, String value) {
