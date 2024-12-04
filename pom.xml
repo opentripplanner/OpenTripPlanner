@@ -94,13 +94,24 @@
     </distributionManagement>
 
     <modules>
-        <module>application</module>
-        <module>gtfs-realtime-protobuf</module>
         <module>utils</module>
         <module>raptor</module>
+        <module>gtfs-realtime-protobuf</module>
+        <module>application</module>
+        <module>shaded-jar</module>
     </modules>
 
+
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -143,6 +154,7 @@
                         <configuration>
                             <classesDirectory>${basedir}/doc/javadoc</classesDirectory>
                             <classifier>javadoc</classifier>
+                            <skipIfEmpty>true</skipIfEmpty>
                         </configuration>
                     </execution>
                 </executions>
