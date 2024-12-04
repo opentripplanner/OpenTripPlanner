@@ -22,7 +22,6 @@ import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -111,7 +110,6 @@ public class Graph implements Serializable {
   //  static variable in CompactElevationProfile in SerializedGraphObject
   private double distanceBetweenElevationSamples;
 
-  private final VehicleParkingService vehicleParkingService = new VehicleParkingService();
   private FareService fareService;
 
   /**
@@ -360,10 +358,6 @@ public class Graph implements Serializable {
   public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
     this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
-  }
-
-  public VehicleParkingService getVehicleParkingService() {
-    return vehicleParkingService;
   }
 
   public FareService getFareService() {

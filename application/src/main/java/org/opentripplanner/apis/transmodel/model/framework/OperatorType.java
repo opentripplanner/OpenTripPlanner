@@ -52,7 +52,7 @@ public class OperatorType {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getAllRoutes()
+              .listRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getOperator(), environment.getSource()))
               .collect(Collectors.toList())
@@ -68,7 +68,7 @@ public class OperatorType {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getAllTrips()
+              .listTrips()
               .stream()
               .filter(trip -> Objects.equals(trip.getOperator(), environment.getSource()))
               .collect(Collectors.toList())

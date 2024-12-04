@@ -109,7 +109,7 @@ public class VectorTilesResource {
   private List<FeedInfo> getFeedInfos() {
     return serverContext
       .transitService()
-      .getFeedIds()
+      .listFeedIds()
       .stream()
       .map(serverContext.transitService()::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))
@@ -140,12 +140,12 @@ public class VectorTilesResource {
         layerParameters
       );
       case VehicleParking -> new VehicleParkingsLayerBuilder(
-        context.graph(),
+        context.vehicleParkingService(),
         layerParameters,
         locale
       );
       case VehicleParkingGroup -> new VehicleParkingGroupsLayerBuilder(
-        context.graph(),
+        context.vehicleParkingService(),
         layerParameters,
         locale
       );

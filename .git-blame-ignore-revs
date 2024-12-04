@@ -12,3 +12,6 @@
 
 # Make OTP a multi-module project
 ead33ffe280dd7caf72cae5ff7a41542e8427636
+
+# json file reformatting with prettier
+c287575df6798810a69fafc54c8c4e1867b71367

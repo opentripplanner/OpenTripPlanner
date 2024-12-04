@@ -67,7 +67,7 @@ public class DefaultRealtimeVehicleService
 
   @Override
   public OccupancyStatus getVehicleOccupancyStatus(Trip trip) {
-    return getOccupancyStatus(trip.getId(), transitService.getPatternForTrip(trip));
+    return getOccupancyStatus(trip.getId(), transitService.findPattern(trip));
   }
 
   /**
