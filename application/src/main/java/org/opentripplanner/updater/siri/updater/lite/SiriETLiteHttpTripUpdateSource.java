@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.siri.updater.light;
+package org.opentripplanner.updater.siri.updater.lite;
 
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.siri.updater.light;
+package org.opentripplanner.updater.siri.updater.lite;
 
 import java.net.URI;
 import java.time.Duration;
