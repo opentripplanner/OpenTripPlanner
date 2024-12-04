@@ -58,11 +58,11 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     return new RealtimeTestEnvironment(sourceType, timetableRepository);
   }
 
-  private Trip createTrip(TripInput tripInput) {
+  void createTrip(TripInput tripInput) {
     var trip = Trip
       .of(id(tripInput.id()))
       .withRoute(tripInput.route())
-      .withHeadsign(I18NString.of("Headsign of %s".formatted(tripInput.id())))
+      .withHeadsign(tripInput.headsign() == null ? null : I18NString.of(tripInput.headsign()))
       .withServiceId(SERVICE_ID)
       .build();
 
@@ -99,8 +99,6 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       .build();
 
     timetableRepository.addTripPattern(pattern.getId(), pattern);
-
-    return trip;
   }
 
   private static StopTime createStopTime(

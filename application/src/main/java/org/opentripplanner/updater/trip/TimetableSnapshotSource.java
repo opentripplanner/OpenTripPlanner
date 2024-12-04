@@ -727,11 +727,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       tripBuilder.withServiceId(serviceIds.iterator().next());
     }
 
-    if (tripUpdate.hasTripProperties()) {
-      var tripProperties = tripUpdate.getTripProperties();
-      if (tripProperties.hasTripHeadsign()) {
-        tripBuilder.withHeadsign(new NonLocalizedString(tripProperties.getTripHeadsign()));
-      }
+    var tripHeadsign = getTripHeadsign(tripUpdate);
+    if (tripHeadsign != null) {
+      tripBuilder.withHeadsign(new NonLocalizedString(tripHeadsign));
     }
 
     return addTripToGraphAndBuffer(
@@ -741,8 +739,20 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stops,
       serviceDate,
       RealTimeState.ADDED,
-      !routeExists
+      !routeExists,
+      tripHeadsign
     );
+  }
+
+  @Nullable
+  private static String getTripHeadsign(TripUpdate tripUpdate) {
+    if (tripUpdate.hasTripProperties()) {
+      var tripProperties = tripUpdate.getTripProperties();
+      if (tripProperties.hasTripHeadsign()) {
+        return tripProperties.getTripHeadsign();
+      }
+    }
+    return null;
   }
 
   private Route createRoute(TripDescriptor tripDescriptor, FeedScopedId tripId) {
@@ -826,7 +836,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     final List<StopLocation> stops,
     final LocalDate serviceDate,
     final RealTimeState realTimeState,
-    final boolean isAddedRoute
+    final boolean isAddedRoute,
+    @Nullable final String tripHeadsign
   ) {
     // Preconditions
     Objects.requireNonNull(stops);
@@ -888,7 +899,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stopTime.setDropOffType(added.dropOff());
       added
         .stopHeadsign()
-        .ifPresent(headsign -> stopTime.setStopHeadsign(new NonLocalizedString(headsign)));
+        .ifPresentOrElse(
+          headsign -> stopTime.setStopHeadsign(new NonLocalizedString(headsign)),
+          () -> {
+            if (tripHeadsign != null) {
+              stopTime.setStopHeadsign(new NonLocalizedString(tripHeadsign));
+            }
+          }
+        );
       // Add stop time to list
       stopTimes.add(stopTime);
     }
@@ -1164,7 +1182,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       stops,
       serviceDate,
       RealTimeState.MODIFIED,
-      false
+      false,
+      getTripHeadsign(tripUpdate)
     );
   }
 
