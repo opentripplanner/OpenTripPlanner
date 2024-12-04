@@ -104,7 +104,11 @@ final class AddedStopTime {
   }
 
   private int getDelay(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
-    return stopTimeEvent.hasDelay() ? stopTimeEvent.getDelay() : 0;
+    return stopTimeEvent.hasDelay()
+      ? stopTimeEvent.getDelay()
+      : stopTimeEvent.hasScheduledTime()
+        ? (int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime())
+        : 0;
   }
 
   boolean isSkipped() {

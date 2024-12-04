@@ -61,7 +61,8 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -75,11 +76,12 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null,
       null,
-      headsign
+      headsign,
+      NO_VALUE
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, int minutes, int delay) {
+  public TripUpdateBuilder addStopTimeWithDelay(String stopId, int minutes, int delay) {
     return addStopTime(
       stopId,
       minutes,
@@ -89,7 +91,27 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null,
       null,
-      null
+      null,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addStopTimeWithScheduled(
+    String stopId,
+    int minutes,
+    int scheduledMinutes
+  ) {
+    return addStopTime(
+      stopId,
+      minutes,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null,
+      null,
+      scheduledMinutes
     );
   }
 
@@ -103,7 +125,8 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       pickDrop,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -121,7 +144,8 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null,
       pickDrop,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -135,7 +159,8 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -153,7 +178,8 @@ public class TripUpdateBuilder {
       DEFAULT_SCHEDULE_RELATIONSHIP,
       null,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -170,7 +196,8 @@ public class TripUpdateBuilder {
       StopTimeUpdate.ScheduleRelationship.NO_DATA,
       null,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -187,7 +214,8 @@ public class TripUpdateBuilder {
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
       null,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -201,7 +229,8 @@ public class TripUpdateBuilder {
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
       null,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -215,7 +244,8 @@ public class TripUpdateBuilder {
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
       pickDrop,
       null,
-      null
+      null,
+      NO_VALUE
     );
   }
 
@@ -237,7 +267,8 @@ public class TripUpdateBuilder {
     StopTimeUpdate.ScheduleRelationship scheduleRelationShip,
     @Nullable DropOffPickupType pickDrop,
     @Nullable StopTimeUpdate.StopTimeProperties.DropOffPickupType gtfsPickDrop,
-    @Nullable String headsign
+    @Nullable String headsign,
+    int scheduledMinutes
   ) {
     final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationShip);
@@ -277,6 +308,12 @@ public class TripUpdateBuilder {
       var epochSeconds = midnight.plusHours(8).plusMinutes(minutes).toEpochSecond();
       arrivalBuilder.setTime(epochSeconds);
       departureBuilder.setTime(epochSeconds);
+    }
+
+    if (scheduledMinutes > NO_VALUE) {
+      var epochSeconds = midnight.plusHours(8).plusMinutes(scheduledMinutes).toEpochSecond();
+      arrivalBuilder.setScheduledTime(epochSeconds);
+      departureBuilder.setScheduledTime(epochSeconds);
     }
 
     if (arrivalDelay != NO_DELAY) {

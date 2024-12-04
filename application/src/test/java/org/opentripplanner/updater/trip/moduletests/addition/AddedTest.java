@@ -175,8 +175,8 @@ class AddedTest implements RealtimeTestConstants {
     // C1: scheduled 08:55:00
     builder
       .addStopTime(STOP_A1_ID, 30)
-      .addStopTime(STOP_B1_ID, 45, 300)
-      .addStopTime(STOP_C1_ID, 55);
+      .addStopTimeWithDelay(STOP_B1_ID, 45, 300)
+      .addStopTimeWithScheduled(STOP_C1_ID, 55, 54);
 
     var tripUpdate = builder.build();
     env.applyTripUpdate(tripUpdate);
@@ -191,6 +191,8 @@ class AddedTest implements RealtimeTestConstants {
     assertEquals(30600, tripTimes.getDepartureTime(0)); // 08:30:00
     assertEquals(300, tripTimes.getArrivalDelay(1));
     assertEquals(31500, tripTimes.getArrivalTime(1)); // 08:45:00
+    assertEquals(60, tripTimes.getArrivalDelay(2));
+    assertEquals(32100, tripTimes.getArrivalTime(2)); // 08:55:00
   }
 
   private TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
