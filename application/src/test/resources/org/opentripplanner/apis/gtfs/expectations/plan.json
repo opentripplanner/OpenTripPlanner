@@ -1,69 +1,69 @@
 {
-  "data" : {
-    "plan" : {
-      "itineraries" : [
+  "data": {
+    "plan": {
+      "itineraries": [
         {
-          "start" : "2020-02-02T11:00:00Z",
-          "end" : "2020-02-02T12:00:00Z",
-          "legs" : [
+          "start": "2020-02-02T11:00:00Z",
+          "end": "2020-02-02T12:00:00Z",
+          "legs": [
             {
-              "mode" : "WALK",
-              "start" : {
-                "scheduledTime" : "2020-02-02T11:00:00Z"
+              "mode": "WALK",
+              "start": {
+                "scheduledTime": "2020-02-02T11:00:00Z"
               },
-              "end" : {
-                "scheduledTime" : "2020-02-02T11:00:20Z"
+              "end": {
+                "scheduledTime": "2020-02-02T11:00:20Z"
               },
-              "from" : {
-                "name" : "A"
+              "from": {
+                "name": "A"
               },
-              "to" : {
-                "name" : "B"
+              "to": {
+                "name": "B"
               }
             },
             {
-              "mode" : "BUS",
-              "start" : {
-                "scheduledTime" : "2020-02-02T10:51:00Z"
+              "mode": "BUS",
+              "start": {
+                "scheduledTime": "2020-02-02T10:51:00Z"
               },
-              "end" : {
-                "scheduledTime" : "2020-02-02T11:05:00Z"
+              "end": {
+                "scheduledTime": "2020-02-02T11:05:00Z"
               },
-              "from" : {
-                "name" : "B"
+              "from": {
+                "name": "B"
               },
-              "to" : {
-                "name" : "C"
+              "to": {
+                "name": "C"
               }
             },
             {
-              "mode" : "RAIL",
-              "start" : {
-                "scheduledTime" : "2020-02-02T11:20:00Z"
+              "mode": "RAIL",
+              "start": {
+                "scheduledTime": "2020-02-02T11:20:00Z"
               },
-              "end" : {
-                "scheduledTime" : "2020-02-02T11:40:00Z"
+              "end": {
+                "scheduledTime": "2020-02-02T11:40:00Z"
               },
-              "from" : {
-                "name" : "C"
+              "from": {
+                "name": "C"
               },
-              "to" : {
-                "name" : "D"
+              "to": {
+                "name": "D"
               }
             },
             {
-              "mode" : "CAR",
-              "start" : {
-                "scheduledTime" : "2020-02-02T11:50:00Z"
+              "mode": "CAR",
+              "start": {
+                "scheduledTime": "2020-02-02T11:50:00Z"
               },
-              "end" : {
-                "scheduledTime" : "2020-02-02T12:00:00Z"
+              "end": {
+                "scheduledTime": "2020-02-02T12:00:00Z"
               },
-              "from" : {
-                "name" : "D"
+              "from": {
+                "name": "D"
               },
-              "to" : {
-                "name" : "E"
+              "to": {
+                "name": "E"
               }
             }
           ]

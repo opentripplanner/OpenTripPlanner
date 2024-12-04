@@ -150,8 +150,8 @@ public class TripMapperTest {
 
   private static Stream<Arguments> provideOffsetAndFactor() {
     return Stream.of(
-      Arguments.of(1.5d, 60d, 1.5d, Duration.ofHours(1)),
-      Arguments.of(null, 120d, 1d, Duration.ofHours(2)),
+      Arguments.of(1.5d, 60d, 1.5d, Duration.ofMinutes(1)),
+      Arguments.of(null, 120d, 1d, Duration.ofMinutes(2)),
       Arguments.of(1.5d, null, 1.5d, Duration.ZERO)
     );
   }

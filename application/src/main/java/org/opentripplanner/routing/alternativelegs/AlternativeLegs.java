@@ -104,7 +104,7 @@ public class AlternativeLegs {
 
     return origins
       .stream()
-      .flatMap(stop -> transitService.getPatternsForStop(stop, true).stream())
+      .flatMap(stop -> transitService.findPatterns(stop, true).stream())
       .filter(tripPattern -> tripPattern.getStops().stream().anyMatch(destinations::contains))
       .filter(tripPatternPredicate)
       .distinct()
@@ -150,7 +150,7 @@ public class AlternativeLegs {
     var serviceDates = List.of(originalDate.minusDays(1), originalDate, originalDate.plusDays(1));
 
     for (LocalDate serviceDate : serviceDates) {
-      Timetable timetable = transitService.getTimetableForTripPattern(pattern, serviceDate);
+      Timetable timetable = transitService.findTimetable(pattern, serviceDate);
       ZonedDateTime midnight = ServiceDateUtils.asStartOfService(
         serviceDate,
         transitService.getTimeZone()
@@ -229,7 +229,7 @@ public class AlternativeLegs {
       tripTimes.getArrivalTime(alightingPosition)
     );
 
-    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateForTripAndDay(
+    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDate(
       new TripIdAndServiceDate(tripTimeOnDate.getTrip().getId(), tripTimeOnDate.getServiceDay())
     );
 

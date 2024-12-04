@@ -166,7 +166,7 @@ public class GraphInspectorVectorTileResource {
   private List<FeedInfo> feedInfos() {
     return serverContext
       .transitService()
-      .getFeedIds()
+      .listFeedIds()
       .stream()
       .map(serverContext.transitService()::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))

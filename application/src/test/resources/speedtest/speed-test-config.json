@@ -2,9 +2,9 @@
   // Run all test-cases on the given date
   "testDate": "2009-12-17",
   "feedId": "1",
-  "ignoreStreetResults" : true,
+  "ignoreStreetResults": true,
   "routingDefaults": {
-    "itineraryFilters" : {
+    "itineraryFilters": {
       // We do not want the filter chain to remove itineraries
       "debug": "LIST_ALL"
     }

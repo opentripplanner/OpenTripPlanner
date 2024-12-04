@@ -69,7 +69,7 @@ public class PtSituationElementType {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getAgencyForId(
+              .getAgency(
                 ((TransitAlert) environment.getSource()).entities()
                   .stream()
                   .filter(EntitySelector.Agency.class::isInstance)
@@ -94,7 +94,7 @@ public class PtSituationElementType {
               .filter(EntitySelector.Route.class::isInstance)
               .map(EntitySelector.Route.class::cast)
               .map(EntitySelector.Route::routeId)
-              .map(transitService::getRouteForId)
+              .map(transitService::getRoute)
               .collect(Collectors.toList());
           })
           .build()
@@ -112,7 +112,7 @@ public class PtSituationElementType {
               .filter(EntitySelector.Trip.class::isInstance)
               .map(EntitySelector.Trip.class::cast)
               .map(EntitySelector.Trip::tripId)
-              .map(transitService::getTripForId)
+              .map(transitService::getTrip)
               .collect(Collectors.toList());
           })
           .build()
@@ -149,13 +149,10 @@ public class PtSituationElementType {
               .filter(EntitySelector.Stop.class::isInstance)
               .map(EntitySelector.Stop.class::cast)
               .map(EntitySelector.Stop::stopId)
-              .map(transitService::getStationById)
+              .map(transitService::getStation)
               .filter(Objects::nonNull)
               .map(station ->
-                new MonoOrMultiModalStation(
-                  station,
-                  transitService.getMultiModalStationForStation(station)
-                )
+                new MonoOrMultiModalStation(station, transitService.findMultiModalStation(station))
               )
               .toList();
           })
@@ -361,7 +358,7 @@ public class PtSituationElementType {
             }
             return GqlUtil
               .getTransitService(environment)
-              .getAgencies()
+              .listAgencies()
               .stream()
               .filter(agency -> agency.getId().getFeedId().equals(feedId))
               .filter(agency -> agency.getId().getId().startsWith(codespace))

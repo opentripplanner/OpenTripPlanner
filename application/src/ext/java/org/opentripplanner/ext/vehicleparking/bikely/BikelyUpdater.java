@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.bikely;
 
-import static org.opentripplanner.routing.vehicle_parking.VehicleParkingState.OPERATIONAL;
+import static org.opentripplanner.service.vehicleparking.model.VehicleParkingState.OPERATIONAL;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,9 +17,9 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.LocalizedMoney;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

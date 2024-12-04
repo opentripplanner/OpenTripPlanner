@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.vehicle_parking;
+package org.opentripplanner.service.vehicleparking.model;
 
 import java.util.Objects;
 import javax.annotation.Nullable;

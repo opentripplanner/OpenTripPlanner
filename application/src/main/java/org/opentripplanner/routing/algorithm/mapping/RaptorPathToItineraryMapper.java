@@ -280,7 +280,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       tripSchedule.getOriginalTripTimes().getTrip().getId(),
       tripSchedule.getServiceDate()
     );
-    return transitService.getTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
+    return transitService.getTripOnServiceDate(tripIdAndServiceDate);
   }
 
   private boolean isFree(EgressPathLeg<T> egressPathLeg) {

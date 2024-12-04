@@ -24,13 +24,13 @@
     "graphql-request": "7.1.2",
     "maplibre-gl": "4.7.1",
     "react": "18.3.1",
-    "react-bootstrap": "2.10.5",
+    "react-bootstrap": "2.10.6",
     "react-dom": "18.3.1",
     "react-map-gl": "7.1.7"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.3",
-    "@graphql-codegen/client-preset": "4.5.0",
+    "@graphql-codegen/client-preset": "4.5.1",
     "@graphql-codegen/introspection": "4.0.3",
     "@parcel/watcher": "2.5.0",
     "@testing-library/react": "16.0.1",
@@ -38,19 +38,19 @@
     "@types/react-dom": "18.3.1",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
-    "@vitejs/plugin-react": "4.3.3",
-    "@vitest/coverage-v8": "2.1.5",
+    "@vitejs/plugin-react": "4.3.4",
+    "@vitest/coverage-v8": "2.1.8",
     "eslint": "8.57.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.2",
     "eslint-plugin-react-hooks": "5.0.0",
-    "eslint-plugin-react-refresh": "0.4.14",
+    "eslint-plugin-react-refresh": "0.4.16",
     "jsdom": "25.0.1",
-    "prettier": "3.3.3",
-    "typescript": "5.6.3",
-    "vite": "5.4.11",
-    "vitest": "2.1.5"
+    "prettier": "3.4.1",
+    "typescript": "5.7.2",
+    "vite": "6.0.2",
+    "vitest": "2.1.8"
   }
 }

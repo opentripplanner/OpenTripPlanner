@@ -1,125 +1,125 @@
 {
-  "data" : {
-    "stops" : [
+  "data": {
+    "stops": [
       {
-        "gtfsId" : "F:A",
-        "lat" : 5.0,
-        "lon" : 8.0,
-        "name" : "A",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:A",
+        "lat": 5.0,
+        "lon": 8.0,
+        "name": "A",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:B",
-        "lat" : 6.0,
-        "lon" : 8.5,
-        "name" : "B",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:B",
+        "lat": 6.0,
+        "lon": 8.5,
+        "name": "B",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:C",
-        "lat" : 7.0,
-        "lon" : 9.0,
-        "name" : "C",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:C",
+        "lat": 7.0,
+        "lon": 9.0,
+        "name": "C",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:D",
-        "lat" : 8.0,
-        "lon" : 9.5,
-        "name" : "D",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:D",
+        "lat": 8.0,
+        "lon": 9.5,
+        "name": "D",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:E",
-        "lat" : 9.0,
-        "lon" : 10.0,
-        "name" : "E",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:E",
+        "lat": 9.0,
+        "lon": 10.0,
+        "name": "E",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:F",
-        "lat" : 9.0,
-        "lon" : 10.5,
-        "name" : "F",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:F",
+        "lat": 9.0,
+        "lon": 10.5,
+        "name": "F",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:G",
-        "lat" : 9.5,
-        "lon" : 11.0,
-        "name" : "G",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:G",
+        "lat": 9.5,
+        "lon": 11.0,
+        "name": "G",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       },
       {
-        "gtfsId" : "F:H",
-        "lat" : 10.0,
-        "lon" : 11.5,
-        "name" : "H",
-        "vehicleMode" : "BUS",
-        "allRoutes" : [
+        "gtfsId": "F:H",
+        "lat": 10.0,
+        "lon": 11.5,
+        "name": "H",
+        "vehicleMode": "BUS",
+        "allRoutes": [
           {
-            "gtfsId" : "F:a-route",
-            "longName" : null,
-            "shortName" : "Ra-route"
+            "gtfsId": "F:a-route",
+            "longName": null,
+            "shortName": "Ra-route"
           }
         ],
-        "routesWithinRange" : [ ]
+        "routesWithinRange": []
       }
     ]
   }

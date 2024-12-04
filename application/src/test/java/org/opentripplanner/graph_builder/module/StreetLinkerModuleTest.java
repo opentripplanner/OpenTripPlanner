@@ -18,6 +18,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -170,7 +171,14 @@ class StreetLinkerModuleTest {
       graph.addVertex(stopVertex);
       graph.hasStreets = true;
 
-      module = new StreetLinkerModule(graph, timetableRepository, DataImportIssueStore.NOOP, false);
+      module =
+        new StreetLinkerModule(
+          graph,
+          new DefaultVehicleParkingRepository(),
+          timetableRepository,
+          DataImportIssueStore.NOOP,
+          false
+        );
 
       assertFalse(stopVertex.isConnectedToGraph());
       assertTrue(stopVertex.getIncoming().isEmpty());
