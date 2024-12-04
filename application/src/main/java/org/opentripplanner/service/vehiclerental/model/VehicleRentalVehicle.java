@@ -141,18 +141,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     return currentFuelPercent;
   }
 
-  public Integer getCurrentRange() {
-    if (this.currentRange == null) {
-      return null;
-    }
-    return this.currentRange.toMeters();
-  }
-
-  public void setCurrentRange(@Nullable Double currentRange) {
-    if (currentRange != null) {
-      this.currentRange = Distance.ofMeters(currentRange);
-    } else {
-      this.currentRange = null;
-    }
+  public Distance getCurrentRange() {
+    return this.currentRange;
   }
 }
