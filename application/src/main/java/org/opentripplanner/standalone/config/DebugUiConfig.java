@@ -77,7 +77,7 @@ public class DebugUiConfig {
             )
         );
 
-    if (logUnusedParams && LOG.isWarnEnabled()) {
+    if (logUnusedParams) {
       root.logAllWarnings(LOG::warn);
     }
   }
