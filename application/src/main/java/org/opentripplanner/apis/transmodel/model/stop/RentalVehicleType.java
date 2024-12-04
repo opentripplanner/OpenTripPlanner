@@ -70,9 +70,7 @@ public class RentalVehicleType {
           .newFieldDefinition()
           .name("currentRangeMeters")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment ->
-            ((VehicleRentalVehicle) environment.getSource()).currentRangeMeters
-          )
+          .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).currentRange)
           .build()
       )
       .build();

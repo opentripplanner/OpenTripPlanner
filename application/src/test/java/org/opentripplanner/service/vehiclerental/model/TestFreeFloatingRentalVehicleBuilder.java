@@ -2,7 +2,6 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TestFreeFloatingRentalVehicleBuilder {
@@ -107,7 +106,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
     vehicle.vehicleType = vehicleType;
     vehicle.system = system;
     vehicle.currentFuelPercent = currentFuelPercent;
-    vehicle.setCurrentRangeMeters(currentRangeMeters);
+    vehicle.setCurrentRange(currentRangeMeters);
     return vehicle;
   }
 }

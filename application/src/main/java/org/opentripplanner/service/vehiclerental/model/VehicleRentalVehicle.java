@@ -24,7 +24,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public boolean isReserved = false;
   public boolean isDisabled = false;
   public Instant lastReported;
-  public Distance currentRangeMeters;
+  public Distance currentRange;
   public VehicleRentalStation station;
   public String pricingPlanId;
   public Double currentFuelPercent;
@@ -141,18 +141,18 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     return currentFuelPercent;
   }
 
-  public Integer getCurrentRangeMeters() {
-    if (this.currentRangeMeters == null) {
+  public Integer getCurrentRange() {
+    if (this.currentRange == null) {
       return null;
     }
-    return this.currentRangeMeters.toMeters();
+    return this.currentRange.toMeters();
   }
 
-  public void setCurrentRangeMeters(@Nullable Double currentRangeMeters) {
-    if (currentRangeMeters != null) {
-      this.currentRangeMeters = Distance.ofMeters(currentRangeMeters);
+  public void setCurrentRange(@Nullable Double currentRange) {
+    if (currentRange != null) {
+      this.currentRange = Distance.ofMeters(currentRange);
     } else {
-      this.currentRangeMeters = null;
+      this.currentRange = null;
     }
   }
 }
