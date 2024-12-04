@@ -51,10 +51,10 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, int minutes) {
+  public TripUpdateBuilder addStopTime(String stopId, int secondsFromMidnight) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -66,10 +66,10 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, int minutes, String headsign) {
+  public TripUpdateBuilder addStopTime(String stopId, int secondsFromMidnight, String headsign) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -81,10 +81,10 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTimeWithDelay(String stopId, int minutes, int delay) {
+  public TripUpdateBuilder addStopTimeWithDelay(String stopId, int secondsFromMidnight, int delay) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       delay,
       delay,
@@ -98,12 +98,12 @@ public class TripUpdateBuilder {
 
   public TripUpdateBuilder addStopTimeWithScheduled(
     String stopId,
-    int minutes,
-    int scheduledMinutes
+    int secondsFromMidnight,
+    int scheduledSeconds
   ) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -111,14 +111,18 @@ public class TripUpdateBuilder {
       null,
       null,
       null,
-      scheduledMinutes
+      scheduledSeconds
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, int minutes, DropOffPickupType pickDrop) {
+  public TripUpdateBuilder addStopTime(
+    String stopId,
+    int secondsFromMidnight,
+    DropOffPickupType pickDrop
+  ) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -132,12 +136,12 @@ public class TripUpdateBuilder {
 
   public TripUpdateBuilder addStopTime(
     String stopId,
-    int minutes,
+    int secondsFromMidnight,
     StopTimeUpdate.StopTimeProperties.DropOffPickupType pickDrop
   ) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -219,10 +223,10 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addSkippedStop(String stopId, int minutes) {
+  public TripUpdateBuilder addSkippedStop(String stopId, int secondsFromMidnight) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -234,10 +238,14 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addSkippedStop(String stopId, int minutes, DropOffPickupType pickDrop) {
+  public TripUpdateBuilder addSkippedStop(
+    String stopId,
+    int secondsFromMidnight,
+    DropOffPickupType pickDrop
+  ) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
@@ -260,7 +268,7 @@ public class TripUpdateBuilder {
 
   private TripUpdateBuilder addStopTime(
     @Nullable String stopId,
-    int minutes,
+    int secondsFromMidnight,
     int stopSequence,
     int arrivalDelay,
     int departureDelay,
@@ -268,7 +276,7 @@ public class TripUpdateBuilder {
     @Nullable DropOffPickupType pickDrop,
     @Nullable StopTimeUpdate.StopTimeProperties.DropOffPickupType gtfsPickDrop,
     @Nullable String headsign,
-    int scheduledMinutes
+    int scheduledSeconds
   ) {
     final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationShip);
@@ -304,14 +312,14 @@ public class TripUpdateBuilder {
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
 
-    if (minutes > NO_VALUE) {
-      var epochSeconds = midnight.plusHours(8).plusMinutes(minutes).toEpochSecond();
+    if (secondsFromMidnight > NO_VALUE) {
+      var epochSeconds = midnight.plusSeconds(secondsFromMidnight).toEpochSecond();
       arrivalBuilder.setTime(epochSeconds);
       departureBuilder.setTime(epochSeconds);
     }
 
-    if (scheduledMinutes > NO_VALUE) {
-      var epochSeconds = midnight.plusHours(8).plusMinutes(scheduledMinutes).toEpochSecond();
+    if (scheduledSeconds > NO_VALUE) {
+      var epochSeconds = midnight.plusSeconds(scheduledSeconds).toEpochSecond();
       arrivalBuilder.setScheduledTime(epochSeconds);
       departureBuilder.setScheduledTime(epochSeconds);
     }

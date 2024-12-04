@@ -173,13 +173,10 @@ class AddedTest implements RealtimeTestConstants {
     var env = RealtimeTestEnvironment.gtfs().build();
     var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
 
-    // A1: scheduled 08:30:00
-    // B1: scheduled 08:40:00, delay 300 seconds (actual 08:45:00)
-    // C1: scheduled 08:55:00
     builder
-      .addStopTime(STOP_A1_ID, 30)
-      .addStopTimeWithDelay(STOP_B1_ID, 45, 300)
-      .addStopTimeWithScheduled(STOP_C1_ID, 55, 54);
+      .addStopTime(STOP_A1_ID, 10000)
+      .addStopTimeWithDelay(STOP_B1_ID, 11300, 300)
+      .addStopTimeWithScheduled(STOP_C1_ID, 12500, 12000);
 
     var tripUpdate = builder.build();
     env.applyTripUpdate(tripUpdate);
@@ -191,11 +188,11 @@ class AddedTest implements RealtimeTestConstants {
     var forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
     var tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
     assertEquals(0, tripTimes.getDepartureDelay(0));
-    assertEquals(30600, tripTimes.getDepartureTime(0)); // 08:30:00
+    assertEquals(10000, tripTimes.getDepartureTime(0));
     assertEquals(300, tripTimes.getArrivalDelay(1));
-    assertEquals(31500, tripTimes.getArrivalTime(1)); // 08:45:00
-    assertEquals(60, tripTimes.getArrivalDelay(2));
-    assertEquals(32100, tripTimes.getArrivalTime(2)); // 08:55:00
+    assertEquals(11300, tripTimes.getArrivalTime(1));
+    assertEquals(500, tripTimes.getArrivalDelay(2));
+    assertEquals(12500, tripTimes.getArrivalTime(2));
   }
 
   private static TripPattern assertAddedTrip(String tripId, RealtimeTestEnvironment env) {
