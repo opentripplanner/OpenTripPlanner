@@ -10,14 +10,8 @@ import static org.opentripplanner.updater.trip.moduletests.addition.AddedTest.as
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
@@ -51,35 +45,33 @@ public class ReplacementTest implements RealtimeTestConstants {
     env.applyTripUpdate(tripUpdate);
 
     // THEN
-    final TripPattern tripPattern = assertAddedTrip(TRIP_1_ID, env, RealTimeState.MODIFIED);
     var snapshot = env.getTimetableSnapshot();
-    var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
-    var forTodayAddedTripIndex = forToday.getTripIndex(TRIP_1_ID);
-    var tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
-    final FeedScopedId tripId = TimetableRepositoryForTest.id(TRIP_1_ID);
+    var tripId = TimetableRepositoryForTest.id(TRIP_1_ID);
+
+    var transitService = env.getTransitService();
+    // We do not support trip headsign by service date
+    // TODO: I currently have no idea how TripOnServiceDate will behave, and will need to revisit this after #5393 is merged
+    assertEquals(
+      I18NString.of("Original Headsign"),
+      transitService.getTrip(TimetableRepositoryForTest.id(TRIP_1_ID)).getHeadsign()
+    );
 
     // Original trip pattern
-    TransitService transitService = env.getTransitService();
     {
-      final Trip trip = transitService.getTrip(tripId);
-      final TripPattern originalTripPattern = transitService.findPattern(trip);
+      var trip = transitService.getTrip(tripId);
+      var originalTripPattern = transitService.findPattern(trip);
 
-      final Timetable originalTimetableForToday = snapshot.resolve(
-        originalTripPattern,
-        SERVICE_DATE
-      );
-      final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+      var originalTimetableForToday = snapshot.resolve(originalTripPattern, SERVICE_DATE);
+      var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
       assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 
-      final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(
-        TRIP_1_ID
-      );
+      var originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(TRIP_1_ID);
       assertTrue(
         originalTripIndexScheduled > -1,
         "Original trip should be found in scheduled time table"
       );
-      final TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
+      var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
         originalTripIndexScheduled
       );
       assertFalse(
@@ -88,12 +80,12 @@ public class ReplacementTest implements RealtimeTestConstants {
       );
       assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
 
-      final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(TRIP_1_ID);
+      var originalTripIndexForToday = originalTimetableForToday.getTripIndex(TRIP_1_ID);
       assertTrue(
         originalTripIndexForToday > -1,
         "Original trip should be found in time table for service date"
       );
-      final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
+      var originalTripTimesForToday = originalTimetableForToday.getTripTimes(
         originalTripIndexForToday
       );
       assertTrue(
@@ -101,49 +93,40 @@ public class ReplacementTest implements RealtimeTestConstants {
         "Original trip times should be deleted in time table for service date"
       );
       assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
+      assertEquals(I18NString.of("Original Headsign"), originalTripTimesScheduled.getHeadsign(0));
+      assertEquals(I18NString.of("Original Headsign"), originalTripTimesScheduled.getHeadsign(1));
+      assertEquals(I18NString.of("Original Headsign"), originalTripTimesForToday.getHeadsign(0));
+      assertEquals(I18NString.of("Original Headsign"), originalTripTimesForToday.getHeadsign(1));
     }
 
     // New trip pattern
     {
-      final TripPattern newTripPattern = snapshot.getNewTripPatternForModifiedTrip(
-        tripId,
-        SERVICE_DATE
-      );
+      assertAddedTrip(TRIP_1_ID, env, RealTimeState.MODIFIED);
+      var newTripPattern = snapshot.getNewTripPatternForModifiedTrip(tripId, SERVICE_DATE);
       assertNotNull(newTripPattern, "New trip pattern should be found");
 
-      final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
-      final Timetable newTimetableScheduled = snapshot.resolve(newTripPattern, null);
+      var newTimetableForToday = snapshot.resolve(newTripPattern, SERVICE_DATE);
+      var newTimetableScheduled = snapshot.resolve(newTripPattern, null);
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
 
-      final int newTimetableForTodayModifiedTripIndex = newTimetableForToday.getTripIndex(
-        TRIP_1_ID
-      );
+      var newTimetableForTodayModifiedTripIndex = newTimetableForToday.getTripIndex(TRIP_1_ID);
       assertTrue(
         newTimetableForTodayModifiedTripIndex > -1,
         "New trip should be found in time table for service date"
       );
-      assertEquals(
-        RealTimeState.MODIFIED,
-        newTimetableForToday.getTripTimes(newTimetableForTodayModifiedTripIndex).getRealTimeState()
-      );
+      var tripTimes = newTimetableForToday.getTripTimes(newTimetableForTodayModifiedTripIndex);
+      assertEquals(RealTimeState.MODIFIED, tripTimes.getRealTimeState());
 
       assertEquals(
         -1,
         newTimetableScheduled.getTripIndex(TRIP_1_ID),
         "New trip should not be found in scheduled time table"
       );
+
+      assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(0));
+      assertEquals(I18NString.of("Changed Headsign"), tripTimes.getHeadsign(1));
+      assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(2));
     }
-
-
-    // We do not support trip headsign by service date
-    // TODO: I currently have no idea how TripOnServiceDate will behave, and will need to revisit this after #5393 is merged
-    assertEquals(
-      I18NString.of("Original Headsign"),
-      transitService.getTrip(TimetableRepositoryForTest.id(TRIP_1_ID)).getHeadsign()
-    );
-    assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(0));
-    assertEquals(I18NString.of("Changed Headsign"), tripTimes.getHeadsign(1));
-    assertEquals(I18NString.of("New Headsign"), tripTimes.getHeadsign(2));
   }
 }
