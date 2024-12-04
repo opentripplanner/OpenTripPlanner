@@ -1875,7 +1875,7 @@ type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
   "Fuel or battery power remaining in the vehicle. Expressed from 0 to 1."
-  currentFuelPercent: Float
+  currentFuelPercent: Ratio
   "Range in meters that the vehicle can travel with the current charge or fuel."
   currentRangeMeters: Int
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
