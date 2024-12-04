@@ -295,7 +295,7 @@ public class EstimatedCallType {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getTripOnServiceDateForTripAndDay(
+              .getTripOnServiceDate(
                 new TripIdAndServiceDate(
                   environment.<TripTimeOnDate>getSource().getTrip().getId(),
                   environment.<TripTimeOnDate>getSource().getServiceDay()
@@ -321,7 +321,7 @@ public class EstimatedCallType {
             TripTimeOnDate tripTimeOnDate = environment.getSource();
             return GqlUtil
               .getTransitService(environment)
-              .getNoticesByEntity(tripTimeOnDate.getStopTimeKey());
+              .findNotices(tripTimeOnDate.getStopTimeKey());
           })
           .build()
       )

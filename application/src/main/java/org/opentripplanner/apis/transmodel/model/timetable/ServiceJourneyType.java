@@ -168,7 +168,7 @@ public class ServiceJourneyType {
             "ServiceJourney is not included in the scheduled data, null is returned."
           )
           .type(journeyPatternType)
-          .dataFetcher(env -> GqlUtil.getTransitService(env).getPatternForTrip(trip(env)))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).findPattern(trip(env)))
           .build()
       )
       .field(
@@ -201,7 +201,7 @@ public class ServiceJourneyType {
             Integer last = environment.getArgument("last");
 
             TransitService transitService = GqlUtil.getTransitService(environment);
-            TripPattern tripPattern = transitService.getPatternForTrip(trip(environment));
+            TripPattern tripPattern = transitService.findPattern(trip(environment));
 
             if (tripPattern == null) {
               return List.of();
@@ -237,7 +237,7 @@ public class ServiceJourneyType {
           )
           .dataFetcher(env -> {
             Trip trip = trip(env);
-            TripPattern tripPattern = GqlUtil.getTransitService(env).getPatternForTrip(trip);
+            TripPattern tripPattern = GqlUtil.getTransitService(env).findPattern(trip);
             if (tripPattern == null) {
               return List.of();
             }
@@ -288,7 +288,7 @@ public class ServiceJourneyType {
           .dataFetcher(environment -> {
             TripPattern tripPattern = GqlUtil
               .getTransitService(environment)
-              .getPatternForTrip(trip(environment));
+              .findPattern(trip(environment));
             if (tripPattern == null) {
               return null;
             }
@@ -307,7 +307,7 @@ public class ServiceJourneyType {
           .newFieldDefinition()
           .name("notices")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
-          .dataFetcher(env -> GqlUtil.getTransitService(env).getNoticesByEntity(trip(env)))
+          .dataFetcher(env -> GqlUtil.getTransitService(env).findNotices(trip(env)))
           .build()
       )
       .field(

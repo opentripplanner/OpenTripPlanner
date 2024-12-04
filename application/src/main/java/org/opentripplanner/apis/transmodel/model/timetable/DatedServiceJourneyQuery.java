@@ -14,6 +14,7 @@ import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
+import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequestBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -34,7 +35,7 @@ public class DatedServiceJourneyQuery {
       .dataFetcher(environment -> {
         FeedScopedId id = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
 
-        return GqlUtil.getTransitService(environment).getTripOnServiceDateById(id);
+        return GqlUtil.getTransitService(environment).getTripOnServiceDate(id);
       })
       .build();
   }
@@ -94,33 +95,53 @@ public class DatedServiceJourneyQuery {
       )
       .dataFetcher(environment -> {
         // The null safety checks are not needed here - they are taken care of by the request
-        // object, but reuse let's use the mapping method and leave this improvement until all APIs
+        // object, but let's use the mapping method and leave this improvement until all APIs
         // are pushing this check into the domain request.
-        var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
-        var lines = mapIDsToDomainNullSafe(environment.getArgument("lines"));
-        var serviceJourneys = mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"));
-        var replacementFor = mapIDsToDomainNullSafe(environment.getArgument("replacementFor"));
-        var privateCodes = environment.<List<String>>getArgument("privateCodes");
-        var operatingDays = environment.<List<LocalDate>>getArgument("operatingDays");
-        var alterations = environment.<List<TripAlteration>>getArgument("alterations");
+        var authorities = FilterValues.ofEmptyIsEverything(
+          "authorities",
+          mapIDsToDomainNullSafe(environment.getArgument("authorities"))
+        );
+        var lines = FilterValues.ofEmptyIsEverything(
+          "lines",
+          mapIDsToDomainNullSafe(environment.getArgument("lines"))
+        );
+        var serviceJourneys = FilterValues.ofEmptyIsEverything(
+          "serviceJourneys",
+          mapIDsToDomainNullSafe(environment.getArgument("serviceJourneys"))
+        );
+        var replacementFor = FilterValues.ofEmptyIsEverything(
+          "replacementFor",
+          mapIDsToDomainNullSafe(environment.getArgument("replacementFor"))
+        );
+        var privateCodes = FilterValues.ofEmptyIsEverything(
+          "privateCodes",
+          environment.<List<String>>getArgument("privateCodes")
+        );
+        var operatingDays = FilterValues.ofRequired(
+          "operatingDays",
+          environment.<List<LocalDate>>getArgument("operatingDays")
+        );
+        var alterations = FilterValues.ofEmptyIsEverything(
+          "alterations",
+          environment.<List<TripAlteration>>getArgument("alterations")
+        );
 
         TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
-          .of()
-          .withOperatingDays(operatingDays)
-          .withAuthorities(authorities)
-          .withLines(lines)
+          .of(operatingDays)
+          .withAgencies(authorities)
+          .withRoutes(lines)
           .withServiceJourneys(serviceJourneys)
           .withReplacementFor(replacementFor);
 
         tripOnServiceDateRequestBuilder =
-          tripOnServiceDateRequestBuilder.withPrivateCodes(privateCodes);
+          tripOnServiceDateRequestBuilder.withNetexInternalPlanningCodes(privateCodes);
 
         tripOnServiceDateRequestBuilder =
           tripOnServiceDateRequestBuilder.withAlterations(alterations);
 
         return GqlUtil
           .getTransitService(environment)
-          .getTripOnServiceDates(tripOnServiceDateRequestBuilder.build());
+          .findTripsOnServiceDate(tripOnServiceDateRequestBuilder.build());
       })
       .build();
   }

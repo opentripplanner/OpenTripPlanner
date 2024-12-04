@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import java.time.LocalDate;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -25,6 +26,12 @@ public interface TransitEditorService extends TransitService {
   void addTransitMode(TransitMode mode);
 
   FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
+
+  /**
+   * Return the trip for the given id, not including trips created in real time.
+   */
+  @Nullable
+  Trip getScheduledTrip(FeedScopedId id);
 
   /**
    * Set the original, immutable, transit layer,

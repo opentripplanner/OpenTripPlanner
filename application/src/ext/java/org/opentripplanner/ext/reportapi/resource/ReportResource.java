@@ -49,7 +49,7 @@ public class ReportResource {
   @Produces(MediaType.TEXT_PLAIN)
   public String getTransitGroupPriorities() {
     return TransitGroupPriorityReport.build(
-      transitService.getAllTripPatterns(),
+      transitService.listTripPatterns(),
       defaultRequest.journey().transit()
     );
   }

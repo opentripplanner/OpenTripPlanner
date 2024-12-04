@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -63,6 +64,7 @@ public class GraphBuilder implements Runnable {
     Graph graph,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
+    VehicleParkingRepository vehicleParkingService,
     @Nullable EmissionsDataModel emissionsDataModel,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
@@ -82,6 +84,7 @@ public class GraphBuilder implements Runnable {
       .graph(graph)
       .timetableRepository(timetableRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
+      .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .dataSources(dataSources)

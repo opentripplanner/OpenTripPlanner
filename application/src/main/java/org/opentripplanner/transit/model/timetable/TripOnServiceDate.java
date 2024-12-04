@@ -45,10 +45,6 @@ public class TripOnServiceDate
     return replacementFor;
   }
 
-  public TripIdAndServiceDate getTripIdAndServiceDate() {
-    return new TripIdAndServiceDate(trip.getId(), serviceDate);
-  }
-
   @Override
   public boolean sameAs(TripOnServiceDate other) {
     return (
