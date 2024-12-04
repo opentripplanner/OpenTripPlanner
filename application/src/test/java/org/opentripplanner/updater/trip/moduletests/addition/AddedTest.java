@@ -134,7 +134,7 @@ class AddedTest implements RealtimeTestConstants {
   @Test
   public void addedTripWithSkippedStop() {
     var env = RealtimeTestEnvironment.gtfs().build();
-    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
+    var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE, "A loop");
     builder
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
@@ -157,6 +157,7 @@ class AddedTest implements RealtimeTestConstants {
     var forToday = snapshot.resolve(tripPattern, SERVICE_DATE);
     var forTodayAddedTripIndex = forToday.getTripIndex(ADDED_TRIP_ID);
     var tripTimes = forToday.getTripTimes(forTodayAddedTripIndex);
+    assertEquals(new NonLocalizedString("A loop"), tripTimes.getHeadsign(0));
     assertFalse(tripTimes.isCancelledStop(0));
     assertTrue(tripTimes.isCancelledStop(1));
     assertTrue(tripTimes.isCancelledStop(2));

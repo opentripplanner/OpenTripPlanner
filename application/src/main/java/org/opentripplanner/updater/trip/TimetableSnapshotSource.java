@@ -726,6 +726,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Just use first service id of set
       tripBuilder.withServiceId(serviceIds.iterator().next());
     }
+
+    if (tripUpdate.hasTripProperties()) {
+      var tripProperties = tripUpdate.getTripProperties();
+      if (tripProperties.hasTripHeadsign()) {
+        tripBuilder.withHeadsign(new NonLocalizedString(tripProperties.getTripHeadsign()));
+      }
+    }
+
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
       tripUpdate.getVehicle(),
