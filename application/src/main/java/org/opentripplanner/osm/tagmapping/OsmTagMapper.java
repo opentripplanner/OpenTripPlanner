@@ -14,7 +14,6 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
-import org.opentripplanner.osm.wayproperty.specifier.Condition;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -103,6 +102,10 @@ public class OsmTagMapper {
 
     props.setProperties("highway=trunk", withModes(CAR).bicycleSafety(7.47));
     props.setProperties("highway=motorway", withModes(CAR).bicycleSafety(8));
+
+    // Do not walk on "moottoriliikennetie"/"Kraftfahrstrasse"/"Limited access road"
+    // https://en.wikipedia.org/wiki/Limited-access_road
+    props.setProperties(new ExactMatchSpecifier("motorroad=yes"), withModes(CAR));
 
     /* cycleway=lane */
     props.setProperties(

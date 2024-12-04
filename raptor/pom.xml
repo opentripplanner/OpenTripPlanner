@@ -9,7 +9,7 @@
         <version>2.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>otp-raptor</artifactId>
+    <artifactId>raptor</artifactId>
     <name>OpenTripPlanner - Raptor</name>
 
     <dependencies>
@@ -17,7 +17,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>otp-utils</artifactId>
+            <artifactId>utils</artifactId>
             <version>${project.version}</version>
         </dependency>
 

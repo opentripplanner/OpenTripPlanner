@@ -24,8 +24,11 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
         {formatDistance(leg.distance)}, {formatDuration(leg.duration)}
       </div>
       <InterchangeInfo leg={leg} />
-      <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} /> -{' '}
-      <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />
+      <LegTime
+        aimedTime={leg.aimedStartTime}
+        expectedTime={leg.expectedStartTime}
+        hasRealtime={leg.realtime}
+      /> - <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />
       <div className="mode">
         <b>{leg.mode}</b>{' '}
         {leg.line && (
