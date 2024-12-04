@@ -35,9 +35,9 @@ public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
   public void run(RealTimeUpdateContext context) {
     RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       feedId,
-      context.transitService()::getTripForId,
-      context.transitService()::getPatternForTrip,
-      context.transitService()::getPatternForTrip,
+      context.transitService()::getTrip,
+      context.transitService()::findPattern,
+      context.transitService()::findPattern,
       realtimeVehicleRepository,
       context.transitService().getTimeZone(),
       fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,

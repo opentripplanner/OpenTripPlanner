@@ -166,7 +166,7 @@ public class DatedServiceJourneyType {
   private static TripPattern tripPattern(DataFetchingEnvironment env) {
     TransitService transitService = GqlUtil.getTransitService(env);
     TripOnServiceDate tripOnServiceDate = tripOnServiceDate(env);
-    return transitService.getPatternForTrip(
+    return transitService.findPattern(
       tripOnServiceDate.getTrip(),
       tripOnServiceDate.getServiceDate()
     );

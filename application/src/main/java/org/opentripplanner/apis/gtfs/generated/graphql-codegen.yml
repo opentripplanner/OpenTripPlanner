@@ -43,7 +43,7 @@ config:
     AlertCauseType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseType#GraphQLAlertCauseType
     AlertEffectType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType#GraphQLAlertEffectType
     AlertSeverityLevelType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType#GraphQLAlertSeverityLevelType
-    BikePark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
+    BikePark: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
     BikeRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     VehicleRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalStation#VehicleRentalStation
@@ -55,7 +55,7 @@ config:
     BikesAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed#GraphQLBikesAllowed
     BookingInfo: org.opentripplanner.transit.model.timetable.booking.BookingInfo#BookingInfo
     BookingTime: org.opentripplanner.transit.model.timetable.booking.BookingTime#BookingTime
-    CarPark: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
+    CarPark: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
@@ -104,9 +104,9 @@ config:
     Trip: org.opentripplanner.transit.model.timetable.Trip#Trip
     TripOccupancy: org.opentripplanner.apis.gtfs.model.TripOccupancy#TripOccupancy
     Unknown: org.opentripplanner.apis.gtfs.model.UnknownModel#UnknownModel
-    VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
-    VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
-    VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
+    VehicleParking: org.opentripplanner.service.vehicleparking.model.VehicleParking#VehicleParking
+    VehicleParkingSpaces: org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces#VehicleParkingSpaces
+    VehicleParkingState: org.opentripplanner.service.vehicleparking.model.VehicleParkingState#VehicleParkingState
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
     VehiclePosition: org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle#RealtimeVehicle

@@ -2,6 +2,8 @@ package org.opentripplanner.osm.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
+import static org.opentripplanner.street.model.StreetTraversalPermission.CAR;
 import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
@@ -12,15 +14,16 @@ import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
+import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
-public class FinlandMapperTest {
+class FinlandMapperTest {
 
   private WayPropertySet wps;
   private OsmTagMapper mapper;
   static float epsilon = 0.01f;
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     this.wps = new WayPropertySet();
     this.mapper = new FinlandMapper();
     this.mapper.populateProperties(this.wps);
@@ -30,7 +33,7 @@ public class FinlandMapperTest {
    * Test that bike and walk safety factors are calculated accurately
    */
   @Test
-  public void testSafety() {
+  void testSafety() {
     OsmWithTags primaryWay = new OsmWithTags();
     primaryWay.addTag("highway", "primary");
     primaryWay.addTag("oneway", "no");
@@ -141,7 +144,7 @@ public class FinlandMapperTest {
   }
 
   @Test
-  public void testSafetyWithMixins() {
+  void testSafetyWithMixins() {
     OsmWithTags wayWithMixins = new OsmWithTags();
     // highway=service has no custom bicycle or walk safety
     wayWithMixins.addTag("highway", "unclassified");
@@ -179,7 +182,7 @@ public class FinlandMapperTest {
   }
 
   @Test
-  public void testTagMapping() {
+  void testTagMapping() {
     OsmWithTags way;
     WayProperties wayData;
 
@@ -206,7 +209,7 @@ public class FinlandMapperTest {
    * Test that biking is not allowed in footway areas and transit platforms
    */
   @Test
-  public void testArea() {
+  void testArea() {
     OsmWithTags way;
     WayProperties wayData;
 
@@ -227,10 +230,21 @@ public class FinlandMapperTest {
   }
 
   @Test
-  public void serviceNoThroughTraffic() {
+  void serviceNoThroughTraffic() {
     var way = new OsmWay();
     way.addTag("highway", "residential");
     way.addTag("service", "driveway");
     assertTrue(mapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(way));
+  }
+
+  @Test
+  void motorroad() {
+    OsmTagMapper osmTagMapper = new FinlandMapper();
+    WayPropertySet wps = new WayPropertySet();
+    osmTagMapper.populateProperties(wps);
+    var way = WayTestData.carTunnel();
+    assertEquals(ALL, wps.getDataForWay(way).getPermission());
+    way.addTag("motorroad", "yes");
+    assertEquals(CAR, wps.getDataForWay(way).getPermission());
   }
 }

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.api.request.preference.filter;
 
 import java.util.Collections;
 import java.util.Set;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 /**
  * A set of conditions that can be used to check if a parking facility should be included/excluded
