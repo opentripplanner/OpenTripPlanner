@@ -28,20 +28,6 @@ public class Distance {
     return (int) Math.round(this.meters);
   }
 
-  /**
-   * Is this distance greater than the one passed in
-   */
-  public boolean greaterThan(Distance distance) {
-    return this.meters > distance.meters;
-  }
-
-  /**
-   * Is this distance less than the one passed in
-   */
-  public boolean lessThan(Distance distance) {
-    return this.meters < distance.meters;
-  }
-
   @Override
   public boolean equals(Object other) {
     if (other instanceof Distance distance) {
