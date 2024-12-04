@@ -145,8 +145,9 @@
     {
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackageNames": [
-        "com.google.dagger:",
-        "com.fasterxml.jackson"
+        "com.google.dagger:{/,}**",
+        "com.fasterxml.jackson:{/,}**",
+        "com.fasterxml.jackson.datatype::{/,}**"
       ],
       "minimumReleaseAge": "1 week"
     },

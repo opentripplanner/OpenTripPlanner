@@ -16,7 +16,7 @@ public class PatternByDateFilterUtil {
   ) {
     return new PatternByServiceDatesFilter(
       new LocalDateRange(range.getGraphQLStart(), range.getGraphQLEnd()),
-      transitService::getPatternsForRoute,
+      transitService::findPatterns,
       trip -> transitService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId())
     );
   }
