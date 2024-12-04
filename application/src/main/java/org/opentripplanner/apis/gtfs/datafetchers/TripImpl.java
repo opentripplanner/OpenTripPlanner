@@ -331,7 +331,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   private TripPattern getTripPattern(DataFetchingEnvironment environment) {
-    return getTransitService(environment).getPatternForTrip(environment.getSource());
+    return getTransitService(environment).findPattern(environment.getSource());
   }
 
   private TripPattern getTripPattern(
@@ -340,7 +340,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   ) {
     return date == null
       ? getTripPattern(environment)
-      : getTransitService(environment).getPatternForTrip(environment.getSource(), date);
+      : getTransitService(environment).findPattern(environment.getSource(), date);
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
