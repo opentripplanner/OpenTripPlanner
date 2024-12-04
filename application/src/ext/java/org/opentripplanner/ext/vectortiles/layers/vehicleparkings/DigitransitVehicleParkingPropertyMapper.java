@@ -7,7 +7,7 @@ import java.util.Locale;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class DigitransitVehicleParkingPropertyMapper extends PropertyMapper<VehicleParking> {
 

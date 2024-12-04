@@ -1,5 +1,5 @@
 {
-  "dataOverlay" : {
+  "dataOverlay": {
     "fileName": "graphs/data-file.nc4",
     "latitudeVariable": "lat",
     "longitudeVariable": "lon",

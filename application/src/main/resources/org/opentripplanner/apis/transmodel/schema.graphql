@@ -734,15 +734,15 @@ type QueryType {
   serverInfo: ServerInfo! @timingData
   "Get a single service journey based on its id"
   serviceJourney(id: String!): ServiceJourney @timingData
-  "Get all service journeys"
+  "Get all _service journeys_"
   serviceJourneys(
-    "Set of ids of active dates to fetch serviceJourneys for."
+    "Set of _operating days_ to fetch _service journeys_ for."
     activeDates: [Date],
-    "Set of ids of authorities to fetch serviceJourneys for."
+    "Set of ids of _authorities_ to fetch _service journeys_ for."
     authorities: [String],
-    "Set of ids of lines to fetch serviceJourneys for."
+    "Set of ids of _lines_ to fetch _service journeys_ for."
     lines: [ID],
-    "Set of ids of private codes to fetch serviceJourneys for."
+    "Set of ids of _private codes_ to fetch _service journeys_ for."
     privateCodes: [String]
   ): [ServiceJourney]! @timingData
   "Get a single situation based on its situationNumber"

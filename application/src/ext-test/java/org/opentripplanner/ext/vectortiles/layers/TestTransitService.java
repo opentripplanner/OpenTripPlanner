@@ -15,7 +15,7 @@ public class TestTransitService extends DefaultTransitService {
   }
 
   @Override
-  public Set<Route> getRoutesForStop(StopLocation stop) {
+  public Set<Route> findRoutes(StopLocation stop) {
     return Set.of(
       TimetableRepositoryForTest.route("1").withMode(TransitMode.RAIL).withGtfsType(100).build()
     );
