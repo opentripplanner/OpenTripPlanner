@@ -46,7 +46,7 @@ public class DebugUiConfig {
           """
           Add additional background layers that will appear in the Debug UI as one of the choices.
           
-          Current only raster tile layers are supported.
+          Currently only raster tile layers are supported.
           """
         )
         .asObjects(
