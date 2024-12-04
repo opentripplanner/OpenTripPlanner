@@ -15,6 +15,6 @@ echo $JAR_VERSION
 # Create a deployment folder, and a folder for the branch.
 mkdir deploy
 # Add the JAR file.
-cp application/target/*-shaded.jar deploy/otp-$JAR_VERSION.jar
-cp application/target/*-shaded.jar deploy/otp-latest-$BRANCH.jar
+cp shaded-jar/target/*-shaded.jar deploy/otp-$JAR_VERSION.jar
+cp shaded-jar/target/*-shaded.jar deploy/otp-latest-$BRANCH.jar
 
