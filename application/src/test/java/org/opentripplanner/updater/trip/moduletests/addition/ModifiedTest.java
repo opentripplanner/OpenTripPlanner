@@ -17,7 +17,7 @@ import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-public class ReplacementTest implements RealtimeTestConstants {
+public class ModifiedTest implements RealtimeTestConstants {
 
   @Test
   void modifiedTrip() {
