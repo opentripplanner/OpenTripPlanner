@@ -35,9 +35,9 @@ public interface UpdatersParameters {
 
   List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters();
 
-  List<SiriETLiteUpdaterParameters> getSiriETLightUpdaterParameters();
+  List<SiriETLiteUpdaterParameters> getSiriETLiteUpdaterParameters();
 
-  List<SiriSXLiteUpdaterParameters> getSiriSXLightUpdaterParameters();
+  List<SiriSXLiteUpdaterParameters> getSiriSXLiteUpdaterParameters();
 
   List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters();
 

@@ -189,12 +189,12 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriETLiteUpdaterParameters> getSiriETLightUpdaterParameters() {
+  public List<SiriETLiteUpdaterParameters> getSiriETLiteUpdaterParameters() {
     return getParameters(SIRI_ET_LITE);
   }
 
   @Override
-  public List<SiriSXLiteUpdaterParameters> getSiriSXLightUpdaterParameters() {
+  public List<SiriSXLiteUpdaterParameters> getSiriSXLiteUpdaterParameters() {
     return getParameters(SIRI_SX_LITE);
   }
 

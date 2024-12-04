@@ -196,7 +196,7 @@ public class UpdaterConfigurator {
         )
       );
     }
-    for (var configItem : updatersParameters.getSiriETLightUpdaterParameters()) {
+    for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
       updaters.add(
         new SiriETUpdater(
           configItem,
@@ -218,7 +218,7 @@ public class UpdaterConfigurator {
         )
       );
     }
-    for (var configItem : updatersParameters.getSiriSXLightUpdaterParameters()) {
+    for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
       updaters.add(
         new SiriSXUpdater(
           configItem,
