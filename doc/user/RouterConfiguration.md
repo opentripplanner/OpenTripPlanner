@@ -877,13 +877,13 @@ Used to group requests when monitoring OTP.
       "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
     },
     {
-      "type" : "siri-et-light",
+      "type" : "siri-et-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/estimated-timetable/xml",
       "fuzzyTripMatching" : true
     },
     {
-      "type" : "siri-sx-light",
+      "type" : "siri-sx-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/situation-exchange/xml"
     }

@@ -5,7 +5,7 @@ import java.time.Duration;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
-public record SiriSXLightUpdaterParameters(
+public record SiriSXLiteUpdaterParameters(
   String configRef,
   String feedId,
   URI uri,

@@ -161,9 +161,9 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- siri-sx-updater END -->
 
-### SIRI-ET Light
+### SIRI-ET Lite
 
-SIRI Light is [not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
+SIRI Lite is [not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
 [specified](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri),
 but this updater supports the following definition: 
 
@@ -171,12 +171,12 @@ Fetching XML-formatted SIRI messages as single GET request rather than the more 
 flow. This means that the XML feed must contain all updates for all trips, just like it is the case 
 for GTFS-RT TripUpdates.
 
-<!-- siri-et-light BEGIN -->
+<!-- siri-et-lite BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
 | Config Parameter           |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-et-light"     |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| type = "siri-et-lite"      |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | feedId                     |     `string`    | The ID of the feed to apply the updates to.                                | *Required* |               |  2.7  |
 | frequency                  |    `duration`   | How often the updates should be retrieved.                                 | *Optional* | `"PT1M"`      |  2.7  |
 | fuzzyTripMatching          |    `boolean`    | If the fuzzy trip matcher should be used to match trips.                   | *Optional* | `false`       |  2.7  |
@@ -218,7 +218,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 {
   "updaters" : [
     {
-      "type" : "siri-et-light",
+      "type" : "siri-et-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/estimated-timetable/xml",
       "fuzzyTripMatching" : true
@@ -227,19 +227,19 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 }
 ```
 
-<!-- siri-et-light END -->
+<!-- siri-et-lite END -->
 
-### SIRI-SX Light
+### SIRI-SX Lite
 
-This updater follows the same definition of SIRI Light as the SIRI-ET one: it downloads the entire
+This updater follows the same definition of SIRI Lite as the SIRI-ET one: it downloads the entire
 feed in a single HTTP GET request.
 
-<!-- siri-sx-light BEGIN -->
+<!-- siri-sx-lite BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
 | Config Parameter                 |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-sx-light"           |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| type = "siri-sx-lite"            |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | [earlyStart](#u__16__earlyStart) |    `duration`   | This value is subtracted from the actual validity defined in the message.  | *Optional* | `"PT0S"`      |  2.0  |
 | feedId                           |     `string`    | The ID of the feed to apply the updates to.                                | *Required* |               |  2.7  |
 | frequency                        |    `duration`   | How often the updates should be retrieved.                                 | *Optional* | `"PT1M"`      |  2.7  |
@@ -292,7 +292,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 {
   "updaters" : [
     {
-      "type" : "siri-sx-light",
+      "type" : "siri-sx-lite",
       "feedId" : "sta",
       "url" : "https://example.com/siri-lite/situation-exchange/xml"
     }
@@ -300,7 +300,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 }
 ```
 
-<!-- siri-sx-light END -->
+<!-- siri-sx-lite END -->
 
 
 ## Changelog

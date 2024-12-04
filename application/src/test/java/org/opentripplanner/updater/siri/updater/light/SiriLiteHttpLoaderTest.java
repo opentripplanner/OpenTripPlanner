@@ -9,14 +9,14 @@ import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 
-class SiriLightHttpLoaderTest {
+class SiriLiteHttpLoaderTest {
 
   private static final Duration ONE_MIN = Duration.ofMinutes(1);
 
   @Test
   void test() {
     var uri = ResourceLoader.of(this).uri("siri-sx.xml");
-    var loader = new SiriLightHttpLoader(uri, ONE_MIN, HttpHeaders.empty());
+    var loader = new SiriLiteHttpLoader(uri, ONE_MIN, HttpHeaders.empty());
     var siri = loader.fetchETFeed("OTP");
     var delivery = siri.get().getServiceDelivery().getSituationExchangeDeliveries().getFirst();
     var element = delivery.getSituations().getPtSituationElements().getFirst();

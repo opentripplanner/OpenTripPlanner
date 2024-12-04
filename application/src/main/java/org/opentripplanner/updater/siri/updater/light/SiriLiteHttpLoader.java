@@ -16,15 +16,15 @@ import uk.org.siri.siri20.Siri;
  * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP via a single request
  * that contains all updates.
  */
-public class SiriLightHttpLoader implements SiriLoader {
+public class SiriLiteHttpLoader implements SiriLoader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SiriLightHttpLoader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriLiteHttpLoader.class);
   private final HttpHeaders headers;
   private final URI uri;
   private final Duration timeout;
   private final OtpHttpClient otpHttpClient;
 
-  public SiriLightHttpLoader(URI uri, Duration timeout, HttpHeaders headers) {
+  public SiriLiteHttpLoader(URI uri, Duration timeout, HttpHeaders headers) {
     this.uri = uri;
     this.timeout = timeout;
     this.headers = HttpHeaders.of().acceptApplicationXML().add(headers).build();

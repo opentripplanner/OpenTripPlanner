@@ -32,8 +32,8 @@ public class SiriConfigDocTest {
   private static final Set<String> INCLUDE_UPDATERS = Set.of(
     "siri-et-updater",
     "siri-sx-updater",
-    "siri-et-light",
-    "siri-sx-light"
+    "siri-et-lite",
+    "siri-sx-lite"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();

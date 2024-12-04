@@ -25,9 +25,9 @@ To enable the SIRI updater you need to add it to the `updaters` section of the `
 
 <!-- INSERT: siri-sx-updater -->
 
-### SIRI-ET Light
+### SIRI-ET Lite
 
-SIRI Light is [not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
+SIRI Lite is [not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
 [specified](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri),
 but this updater supports the following definition: 
 
@@ -35,14 +35,14 @@ Fetching XML-formatted SIRI messages as single GET request rather than the more 
 flow. This means that the XML feed must contain all updates for all trips, just like it is the case 
 for GTFS-RT TripUpdates.
 
-<!-- INSERT: siri-et-light -->
+<!-- INSERT: siri-et-lite -->
 
-### SIRI-SX Light
+### SIRI-SX Lite
 
-This updater follows the same definition of SIRI Light as the SIRI-ET one: it downloads the entire
+This updater follows the same definition of SIRI Lite as the SIRI-ET one: it downloads the entire
 feed in a single HTTP GET request.
 
-<!-- INSERT: siri-sx-light -->
+<!-- INSERT: siri-sx-lite -->
 
 
 ## Changelog

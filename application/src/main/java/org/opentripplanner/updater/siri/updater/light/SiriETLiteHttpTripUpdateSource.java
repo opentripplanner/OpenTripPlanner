@@ -19,9 +19,9 @@ import uk.org.siri.siri20.Siri;
 /**
  * SIRI Light downloads periodically all messages as a single GET request.
  */
-public class SiriETLightHttpTripUpdateSource implements EstimatedTimetableSource {
+public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SiriETLightHttpTripUpdateSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriETLiteHttpTripUpdateSource.class);
   /**
    * The framework code requires a requestor ref but in SIRI Light this is not used.
    */
@@ -31,7 +31,7 @@ public class SiriETLightHttpTripUpdateSource implements EstimatedTimetableSource
 
   private final SiriLoader siriLoader;
 
-  public SiriETLightHttpTripUpdateSource(Parameters parameters) {
+  public SiriETLiteHttpTripUpdateSource(Parameters parameters) {
     this.parameters = parameters;
 
     this.siriLoader = createLoader(parameters);
@@ -73,7 +73,7 @@ public class SiriETLightHttpTripUpdateSource implements EstimatedTimetableSource
     }
     // Fallback to default loader
     else {
-      return new SiriLightHttpLoader(
+      return new SiriLiteHttpLoader(
         parameters.uri(),
         parameters.timeout(),
         parameters.httpRequestHeaders()
