@@ -4,7 +4,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import java.io.Serializable;
 import java.util.List;
 import org.opentripplanner.standalone.config.debuguiconfig.BackgroundTileLayer;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -14,7 +13,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is an object representation of the 'debug-ui-config.json'.
  */
-public class DebugUiConfig implements Serializable {
+public class DebugUiConfig {
 
   private static final Logger LOG = LoggerFactory.getLogger(DebugUiConfig.class);
 
