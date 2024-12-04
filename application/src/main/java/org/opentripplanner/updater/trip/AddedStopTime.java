@@ -123,4 +123,13 @@ final class AddedStopTime {
   Optional<String> stopId() {
     return stopTimeUpdate.hasStopId() ? Optional.of(stopTimeUpdate.getStopId()) : Optional.empty();
   }
+
+  Optional<String> stopHeadsign() {
+    return (
+        stopTimeUpdate.hasStopTimeProperties() &&
+        stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
+      )
+      ? Optional.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign())
+      : Optional.empty();
+  }
 }

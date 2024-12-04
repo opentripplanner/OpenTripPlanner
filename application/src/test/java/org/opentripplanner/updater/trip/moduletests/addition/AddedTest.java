@@ -13,6 +13,7 @@ import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -138,7 +139,8 @@ class AddedTest implements RealtimeTestConstants {
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addSkippedStop(STOP_B1_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
       .addSkippedStop(STOP_C1_ID, 48)
-      .addStopTime(STOP_D1_ID, 55);
+      .addStopTime(STOP_D1_ID, 55, "A (non-stop)")
+      .addStopTime(STOP_A1_ID, 60);
     var tripUpdate = builder.build();
 
     env.applyTripUpdate(tripUpdate);
@@ -159,6 +161,7 @@ class AddedTest implements RealtimeTestConstants {
     assertTrue(tripTimes.isCancelledStop(1));
     assertTrue(tripTimes.isCancelledStop(2));
     assertFalse(tripTimes.isCancelledStop(3));
+    assertEquals(new NonLocalizedString("A (non-stop)"), tripTimes.getHeadsign(3));
   }
 
   @Test

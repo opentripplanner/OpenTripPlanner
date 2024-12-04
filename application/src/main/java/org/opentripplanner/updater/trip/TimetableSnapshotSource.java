@@ -878,6 +878,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       added.stopSequence().ifPresent(stopTime::setStopSequence);
       stopTime.setPickupType(added.pickup());
       stopTime.setDropOffType(added.dropOff());
+      added
+        .stopHeadsign()
+        .ifPresent(headsign -> stopTime.setStopHeadsign(new NonLocalizedString(headsign)));
       // Add stop time to list
       stopTimes.add(stopTime);
     }
