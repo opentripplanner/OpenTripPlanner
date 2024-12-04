@@ -184,9 +184,7 @@ class OsmTagMapperTest {
   @ParameterizedTest
   @MethodSource("roadCases")
   void motorroad(OsmWithTags way) {
-    OsmTagMapper osmTagMapper = new OsmTagMapper();
-    WayPropertySet wps = new WayPropertySet();
-    osmTagMapper.populateProperties(wps);
+    final WayPropertySet wps = wayProperySet();
 
     assertEquals(ALL, wps.getDataForWay(way).getPermission());
 
@@ -194,9 +192,23 @@ class OsmTagMapperTest {
     assertEquals(CAR, wps.getDataForWay(way).getPermission());
   }
 
+  @Test
+  void corridorName() {
+    final WayPropertySet wps = wayProperySet();
+    var way = way("highway", "corridor");
+    assertEquals("corridor", wps.getCreativeNameForWay(way).toString());
+  }
+
   public OsmWithTags way(String key, String value) {
     var way = new OsmWithTags();
     way.addTag(key, value);
     return way;
+  }
+
+  private static WayPropertySet wayProperySet() {
+    OsmTagMapper osmTagMapper = new OsmTagMapper();
+    WayPropertySet wps = new WayPropertySet();
+    osmTagMapper.populateProperties(wps);
+    return wps;
   }
 }
