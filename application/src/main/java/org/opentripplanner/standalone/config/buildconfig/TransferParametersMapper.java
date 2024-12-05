@@ -12,21 +12,30 @@ public class TransferParametersMapper {
     builder.withMaxTransferDuration(
       c
         .of("maxTransferDuration")
-        .summary("")
+        .summary("This overwrites the `maxTransferDuration` for the given mode.")
         .since(V2_7)
         .asDuration(TransferParameters.DEFAULT_MAX_TRANSFER_DURATION)
     );
     builder.withCarsAllowedStopMaxTransferDuration(
       c
         .of("carsAllowedStopMaxTransferDuration")
-        .summary("")
+        .summary(
+          "This is used for specifying a `maxTransferDuration` value to use with transfers between stops that have trips with cars."
+        )
+        .description(
+          """
+This parameter configures additional transfers to be calculated for the specified mode only between stops that have trips with cars.
+The transfers are calculated for the mode in a range based on the given duration.
+By default, these transfers are not calculated for the specified mode.
+"""
+        )
         .since(V2_7)
         .asDuration(TransferParameters.DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION)
     );
     builder.withDisableDefaultTransfers(
       c
         .of("disableDefaultTransfers")
-        .summary("")
+        .summary("This disables default transfer calculations.")
         .since(V2_7)
         .asBoolean(TransferParameters.DEFAULT_DISABLE_DEFAULT_TRANSFERS)
     );

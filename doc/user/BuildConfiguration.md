@@ -91,7 +91,7 @@ Sections follow that describe particular settings in more depth.
 |    [osmTagMapping](#od_osmTagMapping)                                    |        `enum`        | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                              |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
 | [transferRequests](RouteRequest.md)                                      |      `object[]`      | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
-| [transfers](#transfers)                                                  | `enum map of object` | Configures properties for transfer calculations.                                                                                                               | *Optional* |                                   |  2.7  |
+| [transfers](#transfers)                                                  | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
 | [transitFeeds](#transitFeeds)                                            |      `object[]`      | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
 |    { object }                                                            |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
 |       type = "gtfs"                                                      |        `enum`        | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
@@ -959,7 +959,27 @@ The named set of mapping rules applied when parsing OSM tags.
 **Path:** /   
 **Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
 
-Configures properties for transfer calculations.
+Configures mode-specific properties for transfer calculations.
+
+This field enables configuring mode-specific parameters for transfer calculations.
+To configure mode-specific parameters, the modes should also be used in the `transferRequests` field in the build config.
+
+**Example**
+
+// build-config.json
+{
+  "transfers": {
+    "CAR": {
+      "disableDefaultTransfers": true,
+      "carsAllowedStopMaxTransferDuration": "3h"
+    },
+    "BIKE": {
+      "maxTransferDuration": "30m",
+      "carsAllowedStopMaxTransferDuration": "3h"
+    }
+  }
+}
+
 
 <h3 id="transitFeeds">transitFeeds</h3>
 

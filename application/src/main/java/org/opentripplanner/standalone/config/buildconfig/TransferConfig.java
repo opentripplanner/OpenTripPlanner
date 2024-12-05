@@ -14,7 +14,29 @@ public class TransferConfig {
     return root
       .of(parameterName)
       .since(V2_7)
-      .summary("Configures properties for transfer calculations.")
+      .summary("Configures mode-specific properties for transfer calculations.")
+      .description(
+        """
+This field enables configuring mode-specific parameters for transfer calculations.
+To configure mode-specific parameters, the modes should also be used in the `transferRequests` field in the build config.
+
+**Example**
+
+// build-config.json
+{
+  "transfers": {
+    "CAR": {
+      "disableDefaultTransfers": true,
+      "carsAllowedStopMaxTransferDuration": "3h"
+    },
+    "BIKE": {
+      "maxTransferDuration": "30m",
+      "carsAllowedStopMaxTransferDuration": "3h"
+    }
+  }
+}
+"""
+      )
       .asEnumMap(StreetMode.class, TransferParametersMapper::map, new EnumMap<>(StreetMode.class));
   }
 }
