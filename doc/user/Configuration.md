@@ -168,7 +168,8 @@ directory. Relative paths are not supported.
 
 To allow both files (the configuration file and the injected file) to be valid JSON files, a special
 case is supported. If the include file directive is quoted, then the quotes are removed, if the 
-text inserted is valid JSON (starts with `{` and ends with `}`). 
+text inserted is valid JSON object (starts with `{` and ends with `}`) or valid JSON array
+(starts with `[` and ends with `]`). 
 
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
