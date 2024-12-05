@@ -82,6 +82,12 @@ class TransitPreferencesTest {
   }
 
   @Test
+  void isRelaxTransitGroupPrioritySet() {
+    assertTrue(subject.isRelaxTransitGroupPrioritySet());
+    assertFalse(TransitPreferences.DEFAULT.isRelaxTransitGroupPrioritySet());
+  }
+
+  @Test
   void ignoreRealtimeUpdates() {
     assertFalse(TransitPreferences.DEFAULT.ignoreRealtimeUpdates());
     assertTrue(subject.ignoreRealtimeUpdates());

@@ -48,11 +48,11 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
@@ -503,6 +503,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> pickupType();
 
+    public DataFetcher<Iterable<Leg>> previousLegs();
+
     public DataFetcher<Boolean> realTime();
 
     public DataFetcher<GraphQLRealtimeState> realtimeState();
@@ -832,6 +834,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<VehicleRentalStation>> vehicleRentalStations();
 
+    public DataFetcher<Iterable<VehicleRentalPlace>> vehicleRentalsByBbox();
+
     public DataFetcher<Object> viewer();
   }
 
@@ -841,6 +845,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<java.time.OffsetDateTime> time();
   }
+
+  /** Rental place union that represents either a VehicleRentalStation or a RentalVehicle */
+  public interface GraphQLRentalPlace extends TypeResolver {}
 
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
   public interface GraphQLRentalVehicle {
@@ -1094,6 +1101,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Object> stop();
 
     public DataFetcher<Integer> stopPosition();
+
+    public DataFetcher<Integer> stopPositionInPattern();
 
     public DataFetcher<Boolean> timepoint();
 

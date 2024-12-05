@@ -13,6 +13,7 @@
         scheduledArrival
         scheduledDeparture
         stopPosition
+        stopPositionInPattern
         realtimeState
         pickupType
         dropoffType

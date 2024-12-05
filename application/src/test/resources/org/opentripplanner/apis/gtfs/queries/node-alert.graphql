@@ -1,0 +1,10 @@
+{
+  node(id: "QWxlcnQ6Rjpuby1oZWFkZXI") {
+    id
+    ... on Alert {
+      alertHeaderText
+      alertDescriptionText
+      alertUrl
+    }
+  }
+}

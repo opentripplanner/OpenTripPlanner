@@ -5,7 +5,7 @@ import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.restapi.mapping.ModeMapper;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.transit.service.TransitService;
@@ -34,16 +34,15 @@ public class ApiRouterInfo {
     Graph graph,
     TransitService transitService,
     VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
     WorldEnvelope envelope
   ) {
-    VehicleParkingService vehicleParkingService = graph.getVehicleParkingService();
-
     this.routerId = routerId;
     this.polygon = graph.getConvexHull();
     this.buildTime = Date.from(graph.buildTime);
     this.transitServiceStarts = transitService.getTransitServiceStarts().toEpochSecond();
     this.transitServiceEnds = transitService.getTransitServiceEnds().toEpochSecond();
-    this.transitModes = ModeMapper.mapToApi(transitService.getTransitModes());
+    this.transitModes = ModeMapper.mapToApi(transitService.listTransitModes());
     this.envelope = envelope;
     this.hasBikeSharing = mapHasBikeSharing(vehicleRentalService);
     this.hasBikePark = mapHasBikePark(vehicleParkingService);
@@ -51,7 +50,7 @@ public class ApiRouterInfo {
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
     this.travelOptions =
-      ApiTravelOptionsMaker.makeOptions(graph, vehicleRentalService, transitService);
+      ApiTravelOptionsMaker.makeOptions(graph, vehicleRentalService, vehicleParkingService, transitService);
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {
@@ -67,21 +66,21 @@ public class ApiRouterInfo {
     if (service == null) {
       return false;
     }
-    return service.getBikeParks().findAny().isPresent();
+    return service.listBikeParks().stream().findAny().isPresent();
   }
 
   public boolean mapHasCarPark(VehicleParkingService service) {
     if (service == null) {
       return false;
     }
-    return service.getCarParks().findAny().isPresent();
+    return service.listCarParks().stream().findAny().isPresent();
   }
 
   public boolean mapHasVehicleParking(VehicleParkingService service) {
     if (service == null) {
       return false;
     }
-    return service.getVehicleParkings().findAny().isPresent();
+    return service.listVehicleParkings().stream().findAny().isPresent();
   }
 
   public double getLowerLeftLatitude() {

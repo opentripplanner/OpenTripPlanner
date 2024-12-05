@@ -13,13 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRequestTransferCache;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
@@ -62,16 +62,16 @@ public class TransitLayerMapper {
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
-    List<List<Transfer>> transferByStopIndex;
+    List<List<Transfer>> transfersByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
     LOG.info("Mapping transitLayer from TimetableRepository...");
 
-    Collection<TripPattern> allTripPatterns = transitService.getAllTripPatterns();
+    Collection<TripPattern> allTripPatterns = transitService.listTripPatterns();
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transferByStopIndex = mapTransfers(siteRepository, transitService);
+    transfersByStopIndex = mapTransfers(siteRepository, transitService);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -86,7 +86,7 @@ public class TransitLayerMapper {
 
     return new TransitLayer(
       tripPatternsByStopByDate,
-      transferByStopIndex,
+      transfersByStopIndex,
       transitService.getTransferService(),
       siteRepository,
       transferCache,
@@ -109,7 +109,7 @@ public class TransitLayerMapper {
       transitService.getServiceCodesRunningForDate()
     );
 
-    Set<LocalDate> allServiceDates = transitService.getAllServiceCodes();
+    Set<LocalDate> allServiceDates = transitService.listServiceDates();
 
     List<TripPatternForDate> tripPatternForDates = Collections.synchronizedList(new ArrayList<>());
 

@@ -6,7 +6,7 @@ import org.opentripplanner.osm.wayproperty.WayPropertySet;
 /**
  * OSM way properties for optimizing distance (not traveling time) in routing.
  */
-class ConstantSpeedFinlandMapper implements OsmTagMapper {
+class ConstantSpeedFinlandMapper extends FinlandMapper {
 
   private float speed;
 
@@ -23,8 +23,7 @@ class ConstantSpeedFinlandMapper implements OsmTagMapper {
   @Override
   public void populateProperties(WayPropertySet props) {
     props.setCarSpeed("highway=*", speed);
-    // Read the rest from the default set
-    new FinlandMapper().populateProperties(props);
+    super.populateProperties(props);
     props.maxPossibleCarSpeed = speed;
   }
 

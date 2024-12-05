@@ -22,6 +22,9 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.configure.VehicleParkingServiceModule;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.configure.VehicleRentalRepositoryModule;
@@ -54,6 +57,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RealtimeVehicleRepositoryModule.class,
     VehicleRentalServiceModule.class,
     VehicleRentalRepositoryModule.class,
+    VehicleParkingServiceModule.class,
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
@@ -75,6 +79,8 @@ public interface ConstructApplicationFactory {
   RealtimeVehicleService realtimeVehicleService();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
+  VehicleParkingRepository vehicleParkingRepository();
+  VehicleParkingService vehicleParkingService();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
@@ -120,6 +126,9 @@ public interface ConstructApplicationFactory {
     Builder stopConsolidationRepository(
       @Nullable StopConsolidationRepository stopConsolidationRepository
     );
+
+    @BindsInstance
+    Builder vehicleParkingRepository(VehicleParkingRepository parkingRepository);
 
     @BindsInstance
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);

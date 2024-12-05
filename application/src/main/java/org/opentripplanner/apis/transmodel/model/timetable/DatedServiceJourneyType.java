@@ -125,14 +125,16 @@ public class DatedServiceJourneyType {
 
             if (first != null && last != null) {
               throw new AssertException("Both first and last can't be defined simultaneously.");
-            } else if (first != null) {
-              if (first > stops.size()) {
-                return stops.subList(0, first);
-              }
-            } else if (last != null) {
-              if (last > stops.size()) {
-                return stops.subList(stops.size() - last, stops.size());
-              }
+            }
+
+            if ((first != null && first < 0) || (last != null && last < 0)) {
+              throw new AssertException("first and last must be positive integers.");
+            }
+
+            if (first != null && first < stops.size()) {
+              return stops.subList(0, first);
+            } else if (last != null && last < stops.size()) {
+              return stops.subList(stops.size() - last, stops.size());
             }
             return stops;
           })
@@ -164,7 +166,7 @@ public class DatedServiceJourneyType {
   private static TripPattern tripPattern(DataFetchingEnvironment env) {
     TransitService transitService = GqlUtil.getTransitService(env);
     TripOnServiceDate tripOnServiceDate = tripOnServiceDate(env);
-    return transitService.getPatternForTrip(
+    return transitService.findPattern(
       tripOnServiceDate.getTrip(),
       tripOnServiceDate.getServiceDate()
     );

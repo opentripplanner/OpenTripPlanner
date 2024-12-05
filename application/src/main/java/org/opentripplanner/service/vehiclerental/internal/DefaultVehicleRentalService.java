@@ -119,4 +119,23 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       .filter(VehicleRentalStation.class::isInstance)
       .map(VehicleRentalStation.class::cast);
   }
+
+  @Override
+  public List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(
+    double minLon,
+    double minLat,
+    double maxLon,
+    double maxLat
+  ) {
+    Envelope envelope = new Envelope(
+      new Coordinate(minLon, minLat),
+      new Coordinate(maxLon, maxLat)
+    );
+
+    Stream<VehicleRentalPlace> vehicleRentalPlaceStream = getVehicleRentalPlaces()
+      .stream()
+      .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())));
+
+    return vehicleRentalPlaceStream.toList();
+  }
 }

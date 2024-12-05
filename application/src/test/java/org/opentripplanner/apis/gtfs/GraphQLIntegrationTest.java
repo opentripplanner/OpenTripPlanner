@@ -68,9 +68,12 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -117,7 +120,7 @@ class GraphQLIntegrationTest {
     .toList();
   private static final Route ROUTE = TimetableRepositoryForTest.route("a-route").build();
 
-  private static VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
+  private static final VehicleRentalStation VEHICLE_RENTAL_STATION = new TestVehicleRentalStationBuilder()
     .withVehicles(10)
     .withSpaces(10)
     .withVehicleTypeBicycle(5, 7)
@@ -125,7 +128,7 @@ class GraphQLIntegrationTest {
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
-  private static VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+  private static final VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
@@ -140,22 +143,21 @@ class GraphQLIntegrationTest {
   private static GraphQLRequestContext context;
 
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
+  private static final VehicleParkingRepository parkingRepository = new DefaultVehicleParkingRepository();
 
   @BeforeAll
   static void setup() {
-    GRAPH
-      .getVehicleParkingService()
-      .updateVehicleParking(
-        List.of(
-          VehicleParking
-            .builder()
-            .id(id("parking-1"))
-            .coordinate(WgsCoordinate.GREENWICH)
-            .name(NonLocalizedString.ofNullable("parking"))
-            .build()
-        ),
-        List.of()
-      );
+    parkingRepository.updateVehicleParking(
+      List.of(
+        VehicleParking
+          .builder()
+          .id(id("parking-1"))
+          .coordinate(WgsCoordinate.GREENWICH)
+          .name(NonLocalizedString.ofNullable("parking"))
+          .build()
+      ),
+      List.of()
+    );
 
     var siteRepository = TEST_MODEL.siteRepositoryBuilder();
     STOP_LOCATIONS.forEach(siteRepository::withRegularStop);
@@ -166,7 +168,7 @@ class GraphQLIntegrationTest {
       .trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
       .build();
-    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
     final TripPattern pattern = TEST_MODEL
       .pattern(BUS)
@@ -210,7 +212,7 @@ class GraphQLIntegrationTest {
       );
 
       @Override
-      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+      public List<TransitMode> findTransitModes(StopLocation stop) {
         return List.of(BUS, FERRY);
       }
 
@@ -220,7 +222,7 @@ class GraphQLIntegrationTest {
       }
 
       @Override
-      public Set<Route> getRoutesForStop(StopLocation stop) {
+      public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(ROUTE);
       }
     };
@@ -315,8 +317,8 @@ class GraphQLIntegrationTest {
         new TestRoutingService(List.of(i1)),
         transitService,
         new DefaultFareService(),
-        GRAPH.getVehicleParkingService(),
         defaultVehicleRentalService,
+        new DefaultVehicleParkingService(parkingRepository),
         realtimeVehicleService,
         finder,
         new RouteRequest()

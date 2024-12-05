@@ -5,6 +5,7 @@ import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFind
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
@@ -127,8 +127,19 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       HashMultimap.create()
     );
 
-    List<RouteRequest> defaultTransferRequests = new ArrayList<RouteRequest>();
-    List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<RouteRequest>();
+    List<RouteRequest> defaultTransferRequests = new ArrayList<>();
+    List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<>();
+    List<RouteRequest> flexTransferRequests = new ArrayList<>();
+    // Flex transfer requests only use the WALK mode.
+    if (OTPFeature.FlexRouting.isOn()) {
+      flexTransferRequests.addAll(
+        transferRequests
+          .stream()
+          .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
+          .toList()
+      );
+    }
+
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
     HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinders = new HashMap<>();
     /* These are used for calculating transfers only between carsAllowedStops. */
@@ -185,7 +196,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        for (RouteRequest transferProfile : defaultTransferRequests) {
+       /*  for (RouteRequest transferProfile : defaultTransferRequests) {
           StreetMode mode = transferProfile.journey().transfer().mode();
           findNearbyStops(
             defaultNearbyStopFinders.get(mode),
@@ -209,11 +220,49 @@ public class DirectTransferGenerator implements GraphBuilderModule {
               }
               if (sd.stop instanceof RegularStop) {
                 continue;
-              }
+              } */
+        
+        // Calculate default transfers.
+        for (RouteRequest transferProfile : transferRequests) {
+          StreetMode mode = transferProfile.journey().transfer().mode();
+          findNearbyStops(
+            defaultNearbyStopFinders.get(mode),
+            ts0,
+            transferProfile,
+            stop,
+            distinctTransfers,
+            mode
+          );
+        }
+        // Calculate flex transfers if flex routing is enabled.
+        for (RouteRequest transferProfile : flexTransferRequests) {
+          StreetMode mode = transferProfile.journey().transfer().mode();
+          // This code is for finding transfers from AreaStops to Stops, transfers
+          // from Stops to AreaStops and between Stops are already covered above.
+          for (NearbyStop sd : defaultNearbyStopFinders.get(mode).findNearbyStops(
+            ts0,
+            transferProfile,
+            transferProfile.journey().transfer(),
+            true
+          )) {
+            // Skip the origin stop, loop transfers are not needed.
+            if (sd.stop == stop) {
+              continue;
+            }
+            if (sd.stop instanceof RegularStop) {
+              continue;
+            }
+            // The TransferKey and PathTransfer are created differently for flex routing.
+            TransferKey transferKey = new TransferKey(sd.stop, stop, sd.edges);
+            PathTransfer pathTransfer = distinctTransfers.get(transferKey);
+            if (pathTransfer == null) {
+              EnumSet<StreetMode> modes = EnumSet.of(mode);
               distinctTransfers.put(
-                new TransferKey(sd.stop, stop, sd.edges),
-                new PathTransfer(sd.stop, stop, sd.distance, sd.edges)
+                transferKey,
+                new PathTransfer(sd.stop, stop, sd.distance, sd.edges, modes)
               );
+            } else {
+              pathTransfer.addMode(mode);
             }
           }
         }
@@ -227,7 +276,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
               ts0,
               transferProfile,
               stop,
-              distinctTransfers
+              distinctTransfers,
+              mode
             );
           }
         }
@@ -260,6 +310,20 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
+    for (StreetMode mode : transferRequests
+      .stream()
+      .map(transferProfile -> transferProfile.journey().transfer().mode())
+      .collect(Collectors.toSet())) {
+      LOG.info(
+        "Created {} transfers for mode {}.",
+        transfersByStop
+          .values()
+          .stream()
+          .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
+          .count(),
+        mode
+      );
+    }
   }
 
   /**
@@ -295,7 +359,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     TransitStopVertex ts0,
     RouteRequest transferProfile,
     RegularStop stop,
-    Map<TransferKey, PathTransfer> distinctTransfers
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    StreetMode mode
   ) {
     for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
       ts0,
@@ -310,10 +375,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       if (sd.stop.transfersNotAllowed()) {
         continue;
       }
-      distinctTransfers.put(
-        new TransferKey(stop, sd.stop, sd.edges),
-        new PathTransfer(stop, sd.stop, sd.distance, sd.edges)
-      );
+      TransferKey transferKey = new TransferKey(stop, sd.stop, sd.edges);
+      PathTransfer pathTransfer = distinctTransfers.get(transferKey);
+      if (pathTransfer == null) {
+        EnumSet<StreetMode> modes = EnumSet.of(mode);
+        distinctTransfers.put(
+          transferKey,
+          new PathTransfer(stop, sd.stop, sd.distance, sd.edges, modes)
+        );
+      } else {
+        pathTransfer.addMode(mode);
+      }
     }
   }
 

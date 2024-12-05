@@ -257,6 +257,61 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   }
 
   @Test
+  public void testPathTransfersWithModesForMultipleRequestsWithPatterns() {
+    var reqWalk = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.WALK);
+
+    var reqBike = new RouteRequest();
+    reqBike.journey().transfer().setMode(StreetMode.BIKE);
+
+    var transferRequests = List.of(reqWalk, reqBike);
+
+    TestOtpModel model = model(true);
+    var graph = model.graph();
+    graph.hasStreets = true;
+    var timetableRepository = model.timetableRepository();
+
+    new DirectTransferGenerator(
+      graph,
+      timetableRepository,
+      DataImportIssueStore.NOOP,
+      MAX_TRANSFER_DURATION,
+      transferRequests
+    )
+      .buildGraph();
+
+    var walkTransfers = timetableRepository
+      .getAllPathTransfers()
+      .stream()
+      .filter(pathTransfer -> pathTransfer.getModes().contains(StreetMode.WALK))
+      .toList();
+    var bikeTransfers = timetableRepository
+      .getAllPathTransfers()
+      .stream()
+      .filter(pathTransfer -> pathTransfer.getModes().contains(StreetMode.BIKE))
+      .toList();
+    var carTransfers = timetableRepository
+      .getAllPathTransfers()
+      .stream()
+      .filter(pathTransfer -> pathTransfer.getModes().contains(StreetMode.CAR))
+      .toList();
+
+    assertTransfers(
+      walkTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 100, List.of(V11, V21), S21)
+    );
+    assertTransfers(
+      bikeTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 110, List.of(V11, V22), S22)
+    );
+    assertTransfers(carTransfers);
+  }
+
+  @Test
   public void testTransferOnIsolatedStations() {
     var otpModel = model(true, false, true, false);
     var graph = otpModel.graph();
