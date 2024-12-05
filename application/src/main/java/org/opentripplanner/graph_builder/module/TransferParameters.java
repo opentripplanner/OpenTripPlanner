@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.time.Duration;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public record TransferParameters(
   Duration maxTransferDuration,
@@ -17,6 +18,15 @@ public record TransferParameters(
       builder.carsAllowedStopMaxTransferDuration,
       builder.disableDefaultTransfers
     );
+  }
+
+  public String toString() {
+    return ToStringBuilder
+      .of(getClass())
+      .addDuration("maxTransferDuration", maxTransferDuration)
+      .addDuration("carsAllowedStopMaxTransferDuration", carsAllowedStopMaxTransferDuration)
+      .addBool("disableDefaultTransfers", disableDefaultTransfers)
+      .toString();
   }
 
   public static class Builder {

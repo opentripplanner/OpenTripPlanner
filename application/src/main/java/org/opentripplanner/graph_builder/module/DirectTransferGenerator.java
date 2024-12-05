@@ -102,6 +102,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .filter(TransitStopVertex.class::isInstance)
       .collect(Collectors.toSet());
 
+    LOG.info("Creating transfers based on requests:");
+    transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
+    if (transferParametersForMode.isEmpty()) {
+      LOG.info("No mode-specific transfer configurations provided.");
+    } else {
+      LOG.info("Using transfer configurations for modes:");
+      transferParametersForMode.forEach((mode, transferParameters) ->
+        LOG.info(mode + ": " + transferParameters)
+      );
+    }
+
     ProgressTracker progress = ProgressTracker.track(
       "Create transfer edges for stops",
       1000,
