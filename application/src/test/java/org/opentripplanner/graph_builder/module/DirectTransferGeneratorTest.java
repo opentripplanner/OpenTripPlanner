@@ -404,7 +404,6 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
     TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
     transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofMinutes(120));
-    transferParametersBuilder.withDisableDefaultTransfers(true);
     Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
     transferParametersForMode.put(StreetMode.BIKE, transferParametersBuilder.build());
 
