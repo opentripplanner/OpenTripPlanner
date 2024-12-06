@@ -100,10 +100,18 @@ public class TransitStopVertex extends StationElementVertex {
     return getDegreeOut() + getDegreeIn() > 0;
   }
 
+  /**
+   * Determines if this vertex is linked (via a {@link StreetTransitEntityLink}) to a drivable edge
+   * in the street network.
+   */
   public boolean isLinkedToDrivableEdge() {
     return isLinkedToEdgeWhichAllows(CAR);
   }
 
+  /**
+   * Determines if this vertex is linked (via a {@link StreetTransitEntityLink}) to a walkable edge
+   * in the street network.
+   */
   public boolean isLinkedToWalkableEdge() {
     return isLinkedToEdgeWhichAllows(WALK);
   }
