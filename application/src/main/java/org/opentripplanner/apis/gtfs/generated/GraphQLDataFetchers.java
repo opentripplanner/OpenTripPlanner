@@ -221,9 +221,13 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<BookingTime> latestBookingTime();
 
+    public DataFetcher<java.time.Duration> maximumBookingNotice();
+
     public DataFetcher<Long> maximumBookingNoticeSeconds();
 
     public DataFetcher<String> message();
+
+    public DataFetcher<java.time.Duration> minimumBookingNotice();
 
     public DataFetcher<Long> minimumBookingNoticeSeconds();
 
