@@ -1,9 +1,14 @@
 package org.opentripplanner.street.model.vertex;
 
+import static org.opentripplanner.street.search.TraverseMode.CAR;
+import static org.opentripplanner.street.search.TraverseMode.WALK;
+
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
+import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -93,5 +98,26 @@ public class TransitStopVertex extends StationElementVertex {
    */
   public boolean isConnectedToGraph() {
     return getDegreeOut() + getDegreeIn() > 0;
+  }
+
+  public boolean isLinkedToDrivableEdge() {
+    return isLinkedToEdgeWhichAllows(CAR);
+  }
+
+  public boolean isLinkedToWalkableEdge() {
+    return isLinkedToEdgeWhichAllows(WALK);
+  }
+
+  private boolean isLinkedToEdgeWhichAllows(TraverseMode traverseMode) {
+    return getOutgoing()
+      .stream()
+      .anyMatch(edge ->
+        edge instanceof StreetTransitEntityLink<?> link &&
+        link
+          .getToVertex()
+          .getOutgoingStreetEdges()
+          .stream()
+          .anyMatch(se -> se.canTraverse(traverseMode))
+      );
   }
 }
