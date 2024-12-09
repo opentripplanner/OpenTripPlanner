@@ -35,6 +35,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
@@ -431,6 +432,14 @@ public class TimetableRepository implements Serializable {
   /** Pre-generated transfers between all stops. */
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return transfersByStop.get(stop);
+  }
+
+  public Collection<PathTransfer> getTransfersByMode(StreetMode mode) {
+    return transfersByStop
+      .values()
+      .stream()
+      .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
+      .toList();
   }
 
   public SiteRepository getSiteRepository() {

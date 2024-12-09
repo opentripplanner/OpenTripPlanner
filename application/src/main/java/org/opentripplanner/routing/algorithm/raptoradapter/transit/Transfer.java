@@ -75,7 +75,7 @@ public class Transfer {
   }
 
   public EnumSet<StreetMode> getModes() {
-    return modes;
+    return modes.clone();
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {

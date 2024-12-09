@@ -135,19 +135,21 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             TransferKey transferKey = new TransferKey(stop, sd.stop, sd.edges);
             PathTransfer pathTransfer = distinctTransfers.get(transferKey);
             if (pathTransfer == null) {
-              EnumSet<StreetMode> modes = EnumSet.of(mode);
+              // If the PathTransfer can't be found, it is created.
               distinctTransfers.put(
                 transferKey,
-                new PathTransfer(stop, sd.stop, sd.distance, sd.edges, modes)
+                new PathTransfer(stop, sd.stop, sd.distance, sd.edges, EnumSet.of(mode))
               );
             } else {
-              pathTransfer.addMode(mode);
+              // If the PathTransfer is found, a new PathTransfer with the added mode is created.
+              distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
             }
           }
         }
         // Calculate flex transfers if flex routing is enabled.
         for (RouteRequest transferProfile : flexTransferRequests) {
-          StreetMode mode = transferProfile.journey().transfer().mode();
+          // Flex transfer requests only use the WALK mode.
+          StreetMode mode = StreetMode.WALK;
           // This code is for finding transfers from AreaStops to Stops, transfers
           // from Stops to AreaStops and between Stops are already covered above.
           for (NearbyStop sd : nearbyStopFinder.findNearbyStops(
@@ -167,13 +169,14 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             TransferKey transferKey = new TransferKey(sd.stop, stop, sd.edges);
             PathTransfer pathTransfer = distinctTransfers.get(transferKey);
             if (pathTransfer == null) {
-              EnumSet<StreetMode> modes = EnumSet.of(mode);
+              // If the PathTransfer can't be found, it is created.
               distinctTransfers.put(
                 transferKey,
-                new PathTransfer(sd.stop, stop, sd.distance, sd.edges, modes)
+                new PathTransfer(sd.stop, stop, sd.distance, sd.edges, EnumSet.of(mode))
               );
             } else {
-              pathTransfer.addMode(mode);
+              // If the PathTransfer is found, a new PathTransfer with the added mode is created.
+              distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
             }
           }
         }
@@ -209,7 +212,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     for (StreetMode mode : transferRequests
       .stream()
       .map(transferProfile -> transferProfile.journey().transfer().mode())
-      .collect(Collectors.toSet())) {
+      .distinct()
+      .toList()) {
       LOG.info(
         "Created {} transfers for mode {}.",
         transfersByStop
