@@ -299,7 +299,7 @@ public class OsmWithTags {
   }
 
   /**
-   * Gets a tag's value, assumes it is an OSM wiki spesified duration, parses and returns it.
+   * Gets a tag's value, assumes it is an OSM wiki specified duration, parses and returns it.
    * If parsing fails, calls the error handler.
    *
    * @param key
