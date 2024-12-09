@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
@@ -35,27 +36,33 @@ public class RaptorTransferIndex {
       reversedTransfers.add(new ArrayList<>());
     }
 
+    IntStream
+      .range(0, transfersByStopIndex.size())
+      .parallel()
+      .forEach(fromStop -> {
+        // The transfers are filtered so that there is only one possible directional transfer
+        // for a stop pair.
+        var transfers = transfersByStopIndex
+          .get(fromStop)
+          .stream()
+          .flatMap(s -> s.asRaptorTransfer(request).stream())
+          .collect(
+            toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
+          )
+          .values();
+
+        // forwardTransfers is not modified here, and no two threads will access the same element
+        // in it, so this is still thread safe.
+        forwardTransfers.get(fromStop).addAll(transfers);
+      });
+
     for (int fromStop = 0; fromStop < transfersByStopIndex.size(); fromStop++) {
-      // The transfers are filtered so that there is only one possible directional transfer
-      // for a stop pair.
-      var transfers = transfersByStopIndex
-        .get(fromStop)
-        .stream()
-        .flatMap(s -> s.asRaptorTransfer(request).stream())
-        .collect(
-          toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
-        )
-        .values();
-
-      forwardTransfers.get(fromStop).addAll(transfers);
-
-      for (RaptorTransfer forwardTransfer : transfers) {
+      for (var forwardTransfer : forwardTransfers.get(fromStop)) {
         reversedTransfers
           .get(forwardTransfer.stop())
           .add(DefaultRaptorTransfer.reverseOf(fromStop, forwardTransfer));
       }
     }
-
     return new RaptorTransferIndex(forwardTransfers, reversedTransfers);
   }
 
