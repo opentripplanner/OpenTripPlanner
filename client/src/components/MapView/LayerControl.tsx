@@ -65,7 +65,6 @@ class LayerControl implements IControl {
     });
     select.onchange = () => {
       const layerId = select.value;
-      console.log(select.value);
       const layer = map.getLayer(layerId);
       if (layer) {
         rasterLayers.forEach((l) => {
