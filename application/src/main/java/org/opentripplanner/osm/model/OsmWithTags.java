@@ -259,13 +259,13 @@ public class OsmWithTags {
          * and less than 60.
          */
         switch (colonCount) {
-          case 0: /* case "m" */
+          case 0:/* case "m" */
             minutes = Long.parseLong(duration);
             if (minutes >= 0) {
               return Duration.ofMinutes(minutes);
             }
             break;
-          case 1: /* case "h:mm" */
+          case 1:/* case "h:mm" */
             i = duration.indexOf(':');
             hours = Long.parseLong(duration.substring(0, i));
             minutes = Long.parseLong(duration.substring(i + 1));
@@ -273,7 +273,7 @@ public class OsmWithTags {
               return Duration.ofHours(hours).plusMinutes(minutes);
             }
             break;
-          default: /* case "h:mm:ss" */
+          default:/* case "h:mm:ss" */
             i = duration.indexOf(':');
             j = duration.indexOf(':', i + 1);
             hours = Long.parseLong(duration.substring(0, i));
