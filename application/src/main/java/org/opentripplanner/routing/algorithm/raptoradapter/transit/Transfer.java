@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -33,20 +35,20 @@ public class Transfer {
 
   private final List<Edge> edges;
 
-  private final EnumSet<StreetMode> modes;
+  private final ImmutableSet<StreetMode> modes;
 
   public Transfer(int toStop, List<Edge> edges, EnumSet<StreetMode> modes) {
     this.toStop = toStop;
     this.edges = edges;
     this.distanceMeters = (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
-    this.modes = modes;
+    this.modes = Sets.immutableEnumSet(modes);
   }
 
   public Transfer(int toStopIndex, int distanceMeters, EnumSet<StreetMode> modes) {
     this.toStop = toStopIndex;
     this.distanceMeters = distanceMeters;
     this.edges = null;
-    this.modes = modes;
+    this.modes = Sets.immutableEnumSet(modes);
   }
 
   public List<Coordinate> getCoordinates() {
@@ -74,8 +76,8 @@ public class Transfer {
     return edges;
   }
 
-  public EnumSet<StreetMode> getModes() {
-    return modes.clone();
+  public ImmutableSet<StreetMode> getModes() {
+    return modes;
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
