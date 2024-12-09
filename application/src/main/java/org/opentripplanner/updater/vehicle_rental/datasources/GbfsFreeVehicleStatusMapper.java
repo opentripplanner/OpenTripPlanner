@@ -2,12 +2,14 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import static java.util.Objects.requireNonNullElse;
 
+import graphql.schema.CoercingParseValueException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
+import org.opentripplanner.apis.gtfs.GraphQLScalars;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -16,8 +18,12 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GbfsFreeVehicleStatusMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
 
   private final VehicleRentalSystem system;
 
@@ -54,12 +60,28 @@ public class GbfsFreeVehicleStatusMapper {
         vehicle.getLastReported() != null
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
-      RentalVehicleFuel fuel = new RentalVehicleFuel(
-        vehicle.getCurrentFuelPercent(),
-        vehicle.getCurrentRangeMeters() != null
-          ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
-          : null
-      );
+      Double fuelPercent = null;
+      if (vehicle.getCurrentFuelPercent() != null) {
+        try {
+          fuelPercent =
+            (Double) GraphQLScalars.RATIO_SCALAR
+              .getCoercing()
+              .parseValue(vehicle.getCurrentFuelPercent());
+        } catch (CoercingParseValueException e) {
+          LOG.warn(
+            "Current fuel percent: {} - {}",
+            vehicle.getCurrentFuelPercent(),
+            e.getMessage()
+          );
+        }
+      }
+      rentalVehicle.fuel =
+        new RentalVehicleFuel(
+          fuelPercent,
+          vehicle.getCurrentRangeMeters() != null
+            ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
+            : null
+        );
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
