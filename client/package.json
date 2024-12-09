@@ -33,7 +33,7 @@
     "@graphql-codegen/client-preset": "4.5.1",
     "@graphql-codegen/introspection": "4.0.3",
     "@parcel/watcher": "2.5.0",
-    "@testing-library/react": "16.0.1",
+    "@testing-library/react": "16.1.0",
     "@types/react": "19.0.1",
     "@types/react-dom": "19.0.1",
     "@typescript-eslint/eslint-plugin": "7.18.0",
