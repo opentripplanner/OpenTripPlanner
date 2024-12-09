@@ -17,13 +17,13 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
 
 /**
- * SIRI Light downloads periodically all messages as a single GET request.
+ * SIRI Lite downloads periodically all messages as a single GET request.
  */
 public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETLiteHttpTripUpdateSource.class);
   /**
-   * The framework code requires a requestor ref but in SIRI Light this is not used.
+   * The framework code requires a requestor ref but in SIRI Lite this is not used.
    */
   private static final String DUMMY_REQUESTOR_REF = "OpenTripPlanner";
 
