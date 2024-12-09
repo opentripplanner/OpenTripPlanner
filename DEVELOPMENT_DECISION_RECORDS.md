@@ -107,5 +107,4 @@ Prefer immutable types over mutable. Use builders where appropriate. See
 ## GraphQL Best Practices - API Design
 
 [Follow best practices for designing GraphQL APIs. Our APIs are used by hundreds of clients
-(web-pages/apps/services) and need to be backwards compatible.](
-doc/dev/decisionrecords/APIGraphQLDesign.md)
+(web-pages/apps/services) and need to be backwards compatible.](doc/dev/decisionrecords/APIGraphQLDesign.md)
