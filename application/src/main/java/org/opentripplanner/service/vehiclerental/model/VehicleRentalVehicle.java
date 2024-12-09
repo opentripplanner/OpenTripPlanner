@@ -2,10 +2,8 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -24,10 +22,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public boolean isReserved = false;
   public boolean isDisabled = false;
   public Instant lastReported;
-  public Distance currentRange;
   public VehicleRentalStation station;
   public String pricingPlanId;
-  public Double currentFuelPercent;
+  public RentalVehicleFuel fuel;
 
   @Override
   public FeedScopedId getId() {
@@ -137,11 +134,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
     return system;
   }
 
-  public Double getCurrentFuelPercent() {
-    return currentFuelPercent;
-  }
-
-  public Distance getCurrentRange() {
-    return this.currentRange;
+  public RentalVehicleFuel getFuel() {
+    return fuel;
   }
 }

@@ -77,8 +77,10 @@
           "networkId": "Network-1",
           "url": "https://foo.bar"
         },
-        "currentFuelPercent": 0.5,
-        "currentRangeMeters": 5501
+        "fuel": {
+          "percent": 0.5,
+          "range": 5501
+        }
       },
       {
         "__typename": "RentalVehicle",
@@ -97,8 +99,10 @@
           "networkId": "Network-2",
           "url": "https://foo.bar.baz"
         },
-        "currentFuelPercent": null,
-        "currentRangeMeters": null
+        "fuel": {
+          "percent": null,
+          "range": null
+        }
       }
     ]
   }

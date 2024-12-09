@@ -1874,10 +1874,8 @@ type RealTimeEstimate {
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
-  "Fuel or battery power remaining in the vehicle. Expressed from 0 to 1."
-  currentFuelPercent: Ratio
-  "Range in meters that the vehicle can travel with the current charge or fuel."
-  currentRangeMeters: Int
+  "Fuel or battery status of the rental vehicle"
+  fuel: RentalVehicleFuel
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   "Latitude of the vehicle (WGS 84)"
@@ -1905,6 +1903,14 @@ type RentalVehicleEntityCounts {
   byType: [RentalVehicleTypeCount!]!
   "The total number of entities (e.g. vehicles, spaces)."
   total: Int!
+}
+
+"Rental vehicle fuel represent the current status of the battery or fuel of a rental vehicle"
+type RentalVehicleFuel {
+  "Fuel or battery power remaining in the vehicle. Expressed from 0 to 1."
+  percent: Ratio
+  "Range in meters that the vehicle can travel with the current charge or fuel."
+  range: Int
 }
 
 type RentalVehicleType {

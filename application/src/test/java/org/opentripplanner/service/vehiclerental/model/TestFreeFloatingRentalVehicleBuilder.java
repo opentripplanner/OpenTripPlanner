@@ -85,6 +85,23 @@ public class TestFreeFloatingRentalVehicleBuilder {
     return buildVehicleType(RentalFormFactor.CAR);
   }
 
+  public VehicleRentalVehicle build() {
+    var vehicle = new VehicleRentalVehicle();
+    var stationName = "free-floating-" + vehicleType.formFactor.name().toLowerCase();
+    vehicle.id = new FeedScopedId(this.network, stationName);
+    vehicle.name = new NonLocalizedString(stationName);
+    vehicle.latitude = latitude;
+    vehicle.longitude = longitude;
+    vehicle.vehicleType = vehicleType;
+    vehicle.system = system;
+    vehicle.fuel =
+      new RentalVehicleFuel(
+        currentFuelPercent,
+        currentRangeMeters != null ? Distance.ofMeters(currentRangeMeters) : null
+      );
+    return vehicle;
+  }
+
   private TestFreeFloatingRentalVehicleBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
     this.vehicleType =
       new RentalVehicleType(
@@ -95,20 +112,5 @@ public class TestFreeFloatingRentalVehicleBuilder {
         100000d
       );
     return this;
-  }
-
-  public VehicleRentalVehicle build() {
-    var vehicle = new VehicleRentalVehicle();
-    var stationName = "free-floating-" + vehicleType.formFactor.name().toLowerCase();
-    vehicle.id = new FeedScopedId(this.network, stationName);
-    vehicle.name = new NonLocalizedString(stationName);
-    vehicle.latitude = latitude;
-    vehicle.longitude = longitude;
-    vehicle.vehicleType = vehicleType;
-    vehicle.system = system;
-    vehicle.currentFuelPercent = currentFuelPercent;
-    vehicle.currentRange =
-      currentRangeMeters != null ? Distance.ofMeters(currentRangeMeters) : null;
-    return vehicle;
   }
 }

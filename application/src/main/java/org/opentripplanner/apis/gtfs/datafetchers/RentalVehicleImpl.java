@@ -4,6 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
@@ -17,16 +18,8 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   }
 
   @Override
-  public DataFetcher<Double> currentFuelPercent() {
-    return environment -> getSource(environment).getCurrentFuelPercent();
-  }
-
-  @Override
-  public DataFetcher<Integer> currentRangeMeters() {
-    return environment ->
-      getSource(environment).getCurrentRange() != null
-        ? getSource(environment).getCurrentRange().toMeters()
-        : null;
+  public DataFetcher<RentalVehicleFuel> fuel() {
+    return environment -> getSource(environment).getFuel();
   }
 
   @Override

@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
@@ -53,11 +54,12 @@ public class GbfsFreeVehicleStatusMapper {
         vehicle.getLastReported() != null
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
-      rentalVehicle.currentFuelPercent = vehicle.getCurrentFuelPercent();
-      rentalVehicle.currentRange =
+      RentalVehicleFuel fuel = new RentalVehicleFuel(
+        vehicle.getCurrentFuelPercent(),
         vehicle.getCurrentRangeMeters() != null
           ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
-          : null;
+          : null
+      );
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
