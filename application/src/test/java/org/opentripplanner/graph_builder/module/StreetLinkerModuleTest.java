@@ -122,14 +122,23 @@ class StreetLinkerModuleTest {
       // stop is used by a flex trip, needs to be linked to both the walk and car edge,
       // also linked to the boarding location
       assertThat(model.stopVertex().getOutgoing()).hasSize(3);
+
+      // while the order of the link doesn't matter, it _is_ deterministic.
+      // first we have the link to the boarding location where the passengers are expected
+      // to wait.
       var links = model.outgoingLinks();
       assertInstanceOf(BoardingLocationToStopLink.class, links.getFirst());
+
+      // the second link is the link to the walkable street network. this is not really necessary
+      // because the boarding location is walkable. this will be refactored away in the future.
       var linkToWalk = links.get(1);
       SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
 
       assertTrue(walkSplit.isConnectedToWalkingEdge());
       assertFalse(walkSplit.isConnectedToDriveableEdge());
 
+      // lastly we have the link to the drivable street network because vehicles also need to
+      // reach the stop if it's part of a flex trip.
       var linkToCar = links.getLast();
       SplitterVertex carSplit = (SplitterVertex) linkToCar.getToVertex();
 

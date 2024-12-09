@@ -129,8 +129,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   /**
    * Determines if a given transit stop vertex is already linked to the street network, taking into
-   * account that flex stop need special linking to both a walkable and drivable edge. For example,
-   * the {@link OsmBoardingLocationsModule}, which runs before this one, links stops often to
+   * account that flex stops need special linking to both a walkable and drivable edge. For example,
+   * the {@link OsmBoardingLocationsModule}, which runs before this one, often links stops to
    * walkable edges only.
    *
    * @param stopVertex The transit stop vertex to be checked.
