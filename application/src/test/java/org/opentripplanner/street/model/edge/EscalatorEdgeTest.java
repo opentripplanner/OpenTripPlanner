@@ -31,7 +31,9 @@ class EscalatorEdgeTest {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, null);
     var req = StreetSearchRequest
       .of()
-      .withPreferences(p -> p.withWalk(w -> w.withEscalatorReluctance(escalatorReluctance)))
+      .withPreferences(p ->
+        p.withWalk(w -> w.withEscalator(escalator -> escalator.withReluctance(escalatorReluctance)))
+      )
       .withMode(StreetMode.WALK);
 
     var res = edge.traverse(new State(from, req.build()))[0];

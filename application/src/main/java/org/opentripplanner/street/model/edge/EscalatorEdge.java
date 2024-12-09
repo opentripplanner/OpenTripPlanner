@@ -31,11 +31,11 @@ public class EscalatorEdge extends Edge {
       var s1 = s0.edit(this);
       double time;
       if (duration == null) {
-        time = getDistanceMeters() / s0.getPreferences().walk().escalatorSpeed();
+        time = getDistanceMeters() / s0.getPreferences().walk().escalator().speed();
       } else {
         time = duration.toSeconds();
       }
-      s1.incrementWeight(s0.getPreferences().walk().escalatorReluctance() * time);
+      s1.incrementWeight(s0.getPreferences().walk().escalator().reluctance() * time);
       s1.incrementTimeInSeconds((int) Math.round(time));
       s1.incrementWalkDistance(getDistanceMeters());
       return s1.makeStateArray();

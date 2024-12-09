@@ -325,7 +325,7 @@ public class OsmWithTagsTest {
     var way = new OsmWithTags();
     var key = "duration";
     way.addTag(key, value);
-    var duration = way.getTagAsDuration(key, i -> {});
+    var duration = way.getTagValueAsDuration(key, i -> {});
     assertEquals(expected, duration);
   }
 }

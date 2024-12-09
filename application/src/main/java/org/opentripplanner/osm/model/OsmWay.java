@@ -3,13 +3,11 @@ package org.opentripplanner.osm.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.time.Duration;
-import java.time.format.DateTimeParseException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.utils.time.DurationUtils;
 
 public class OsmWay extends OsmWithTags {
 
@@ -136,7 +134,7 @@ public class OsmWay extends OsmWithTags {
   }
 
   public Optional<Duration> getDuration(Consumer<String> errorHandler) {
-    return getTagAsDuration("duration", errorHandler);
+    return getTagValueAsDuration("duration", errorHandler);
   }
 
   public boolean isForwardEscalator() {

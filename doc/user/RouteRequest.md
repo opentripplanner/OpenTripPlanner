@@ -155,13 +155,14 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [routes](#rd_unpreferred_routes)                                                                          |   `feed-scoped-id[]`   | The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`                                                                 | *Optional* |                  |  2.2  |
 | walk                                                                                                         |        `object`        | Walking preferences.                                                                                                                                     | *Optional* |                  |  2.5  |
 |    boardCost                                                                                                 |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking.                       | *Optional* | `600`            |  2.0  |
-|    escalatorReluctance                                                                                       |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                                 | *Optional* | `1.5`            |  2.4  |
-|    [escalatorSpeed](#rd_walk_escalatorSpeed)                                                                 |        `double`        | How fast does an escalator move horizontally?                                                                                                            | *Optional* | `0.45`           |  2.7  |
 |    [reluctance](#rd_walk_reluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                             | *Optional* | `2.0`            |  2.0  |
 |    [safetyFactor](#rd_walk_safetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                            | *Optional* | `1.0`            |  2.2  |
 |    speed                                                                                                     |        `double`        | The user's walking speed in meters/second.                                                                                                               | *Optional* | `1.33`           |  2.0  |
 |    stairsReluctance                                                                                          |        `double`        | Used instead of walkReluctance for stairs.                                                                                                               | *Optional* | `2.0`            |  2.0  |
 |    [stairsTimeFactor](#rd_walk_stairsTimeFactor)                                                             |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                                              | *Optional* | `3.0`            |  2.1  |
+|    escalator                                                                                                 |        `object`        | Escalator preferences.                                                                                                                                   | *Optional* |                  |  2.7  |
+|       reluctance                                                                                             |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                                 | *Optional* | `1.5`            |  2.4  |
+|       [speed](#rd_walk_escalator_speed)                                                                      |        `double`        | How fast does an escalator move horizontally?                                                                                                            | *Optional* | `0.45`           |  2.7  |
 | wheelchairAccessibility                                                                                      |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                                         | *Optional* |                  |  2.2  |
 |    enabled                                                                                                   |        `boolean`       | Enable wheelchair accessibility.                                                                                                                         | *Optional* | `false`          |  2.0  |
 |    inaccessibleStreetReluctance                                                                              |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                                           | *Optional* | `25.0`           |  2.2  |
@@ -1072,15 +1073,6 @@ The ids of the routes that incur an extra cost when being used. Format: `FeedId:
 
 How much cost is added is configured in `unpreferredCost`.
 
-<h3 id="rd_walk_escalatorSpeed">escalatorSpeed</h3>
-
-**Since version:** `2.7` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.45`   
-**Path:** /routingDefaults/walk 
-
-How fast does an escalator move horizontally?
-
-Horizontal speed of escalator in m/s.
-
 <h3 id="rd_walk_reluctance">reluctance</h3>
 
 **Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
@@ -1114,6 +1106,15 @@ How much more time does it take to walk a flight of stairs compared to walking a
 Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking
 speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
 
+
+<h3 id="rd_walk_escalator_speed">speed</h3>
+
+**Since version:** `2.7` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.45`   
+**Path:** /routingDefaults/walk/escalator 
+
+How fast does an escalator move horizontally?
+
+Horizontal speed of escalator in m/s.
 
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
@@ -1224,8 +1225,10 @@ include stairs as a last result.
       "reluctance" : 4.0,
       "stairsReluctance" : 1.65,
       "boardCost" : 600,
-      "escalatorReluctance" : 1.5,
-      "escalatorSpeed" : 0.45
+      "escalator" : {
+        "reluctance" : 1.5,
+        "speed" : 0.45
+      }
     },
     "waitReluctance" : 1.0,
     "otherThanPreferredRoutesPenalty" : 300,

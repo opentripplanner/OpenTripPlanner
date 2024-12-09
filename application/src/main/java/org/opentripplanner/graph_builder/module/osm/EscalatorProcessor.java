@@ -45,8 +45,8 @@ class EscalatorProcessor {
       issueStore.add(
         Issue.issue(
           "InvalidDuration",
-          "Duration for osm node %d is not a valid duration: '%s'; it's replaced with 'Optional.empty()' (unknown).",
-          escalatorWay.getId(),
+          "Duration for osm node {} is not a valid duration: '{}'; the value is ignored.",
+          escalatorWay.url(),
           v
         )
       )
@@ -59,7 +59,7 @@ class EscalatorProcessor {
           Issue.issue(
             "InvalidDuration",
             "Duration for osm node {} makes implied speed {} be outside acceptable range.",
-            escalatorWay.getId(),
+            escalatorWay.url(),
             speed
           )
         );
