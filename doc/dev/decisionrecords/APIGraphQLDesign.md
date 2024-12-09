@@ -13,7 +13,7 @@ stops, trips and routes. Very often OTP has a _finite_ list of entities in memor
 
 ## Refetching
 
-We often use `type(id)` format queries for fetching or refetching an entities or value objects of type by id. Additionally,
+We often use `type(id)` format queries for fetching or refetching entities or value objects of type by id. Additionally,
 the GTFS GraphQL API has a node interface and query for refetching objects which follow the
 [GraphQL Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm). We should not use the
 node interface or query for non-entities (such as Itineraries and Legs) which do not always have an ID and/or which IDs are not
