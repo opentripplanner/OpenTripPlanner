@@ -14,9 +14,14 @@ public class EscalatorPreferences implements Serializable {
   private final double reluctance;
   private final double speed;
 
+  /* Using the angle of 30 degrees and a speed of 0.5 m/s gives a horizontal component
+   * of approx. 0.43 m/s. This is typical of short escalators like those in shopping
+   * malls. */
+  private static final double HORIZONTAL_SPEED = 0.45;
+
   private EscalatorPreferences() {
     this.reluctance = 1.5;
-    this.speed = 0.45;
+    this.speed = HORIZONTAL_SPEED;
   }
 
   private EscalatorPreferences(Builder builder) {
