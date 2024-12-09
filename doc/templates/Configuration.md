@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # Configuring OpenTripPlanner
@@ -41,9 +41,9 @@ default behavior of scanning the base directory for input files. Scanning is ove
 independently for each file type, and can point to remote cloud storage with arbitrary URIs.
 See [the storage section](Configuration.md#Storage) for further details.
 
-## Three Scopes of Configuration
+## Four scopes of configuration
 
-OTP is configured via three configuration JSON files which are read from the directory specified on
+OTP is configured via four configuration JSON files which are read from the directory specified on
 its command line. We try to provide sensible defaults for every option, so all three of these files
 are optional, as are all the options within each file. Each configuration file corresponds to
 options that are relevant at a particular phase of OTP usage.
@@ -51,7 +51,8 @@ options that are relevant at a particular phase of OTP usage.
 Options and parameters that are taken into account during the graph building process will be "baked
 into" the graph, and cannot be changed later in a running server. These are specified
 in `build-config.json`. Other details of OTP operation can be modified without rebuilding the graph.
-These run-time configuration options are found in `router-config.json`. Finally, `otp-config.json`
+These run-time configuration options are found in `router-config.json`. If you want to configure
+the built-in debug UI add `debug-ui-config.json`. Finally, `otp-config.json`
 contains simple switches that enable or disable system-wide features.
 
 ## Configuration types
@@ -146,7 +147,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.5.0 of OTP:
+Here is an example including variable substitution, assuming version 2.6.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -170,7 +171,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.5.0.obj"
+          "source": "netex-v2.6.0.obj"
         }
       ]
 } 

@@ -1,0 +1,42 @@
+{
+  "data": {
+    "alerts": [
+      {
+        "id": "QWxlcnQ6RjpuZWl0aGVyLWhlYWRlci1ub3ItZGVzY3JpcHRpb24",
+        "headerDefault": "",
+        "headerDe": "",
+        "descriptionDefault": "",
+        "descriptionDe": "",
+        "urlDefault": null,
+        "urlDe": null
+      },
+      {
+        "id": "QWxlcnQ6Rjpuby1oZWFkZXI",
+        "headerDefault": "Second string",
+        "headerDe": "Zweite Zeichenabfolge",
+        "descriptionDefault": "Second string",
+        "descriptionDe": "Zweite Zeichenabfolge",
+        "urlDefault": null,
+        "urlDe": null
+      },
+      {
+        "id": "QWxlcnQ6Rjphbi1hbGVydA",
+        "headerDefault": "A header",
+        "headerDe": "A header",
+        "descriptionDefault": "A description",
+        "descriptionDe": "A description",
+        "urlDefault": "https://example.com",
+        "urlDe": "https://example.com"
+      },
+      {
+        "id": "QWxlcnQ6Rjpuby1kZXNjcmlwdGlvbg",
+        "headerDefault": "First string",
+        "headerDe": "Erste Zeichenabfolge",
+        "descriptionDefault": "First string",
+        "descriptionDe": "Erste Zeichenabfolge",
+        "urlDefault": null,
+        "urlDe": null
+      }
+    ]
+  }
+}

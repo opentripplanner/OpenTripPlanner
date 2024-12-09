@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { graphql } from '../gql';
-import { request } from 'graphql-request'; // eslint-disable-line import/no-unresolved
+import { request } from 'graphql-request';
 import { QueryType } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
 
@@ -13,6 +13,7 @@ const query = graphql(`
       routerConfigVersion
       gitCommit
       gitBranch
+      internalTransitModelTimeZone
     }
   }
 `);

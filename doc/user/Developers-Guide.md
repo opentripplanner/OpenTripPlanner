@@ -56,7 +56,7 @@ There are several ways to get involved:
 * Join the [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) and the 
   [user mailing list](http://groups.google.com/group/opentripplanner-users).
 
-* Fix typos and improve the documentation within the `/docs` directory of the project (details
+* Fix typos and improve the documentation within the `/doc/user` directory of the project (details
   below).
 
 * [File a bug or new feature request](http://github.com/openplans/OpenTripPlanner/issues/new).
@@ -106,16 +106,6 @@ standards:
 2. Strip out any unneeded information by using the `osmium filter-tags` as describe
    in [Preparing OSM](Preparing-OSM.md)
 
-### Code Comments
-
-As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new
-methods, classes, and fields should include comments explaining what they are for and any other
-pertinent information. For Java code, the comments should use the
-[JavaDoc conventions](http://java.sun.com/j2se/javadoc/writingdoccomments). It is best to provide
-comments that not only explain *what* you did but also *why you did it* while providing some
-context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
-`@param` annotations with no description.
-
 ### Itinerary and API Snapshot Tests
 
 To test the itinerary generation, and the API there are snapshot test which save the result of the
@@ -133,7 +123,7 @@ control to be applied to documentation as well as program source code. All pull 
 how OTP is used or configured should include changes to the documentation alongside code
 modifications.
 
-The documentation files are in Markdown format and are in the `/docs` directory under the root of
+The documentation files are in Markdown format and are in the `/doc/user` directory under the root of
 the project. On every push to the `dev-2.x` branch the documentation will be rebuilt and deployed as
 static pages to our subdomain of [Github Pages](https://github.com/opentripplanner/docs). 
 MkDocs is a Python program and should run on any major platform. 
@@ -143,7 +133,7 @@ how to generate a live local preview of the documentation while you're writing i
 In short:
 
 ```
-$ pip install -r docs/requirements.txt
+$ pip install -r doc/user/requirements.txt
 $ mkdocs serve
 ```
 
@@ -205,7 +195,8 @@ so they are a bit easier to maintain that way. The primary audience is also acti
 that have the code checked out locally.
 
  - [Architecture](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/ARCHITECTURE.md) 
- - [Code Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/CODE_CONVENTIONS.md)
+ - [Code Style](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/dev/decisionrecords/Codestyle.md)
+ - [Naming Conventions](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/doc/dev/decisionrecords/NamingConventions.md)
  - [Development Decision Records](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/DEVELOPMENT_DECISION_RECORDS.md)
 
 

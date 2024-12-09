@@ -2,7 +2,7 @@
   NOTE! Part of this document is generated. Make sure you edit the template, not the generated doc.
 
    - Template directory is:  /doc/templates
-   - Generated directory is: /docs 
+   - Generated directory is: /doc/user 
 -->
 
 # Router configuration
@@ -14,7 +14,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 
 Certain settings can be provided on the command line, when starting OpenTripPlanner. See
 the `CommandLineParameters` class
-for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
+for [a full list of arguments](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/CommandLineParameters.java)
 .
 
 ## Routing defaults
@@ -237,7 +237,7 @@ few percents.
 Split a travel search in smaller jobs and run them in parallel to improve performance.
 
 Use this parameter to set the total number of executable threads available across all searches.
-Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0,
+Multiple searches can run in parallel - this parameter has no effect with regard to that. If 0,
 no extra threads are started and the search is done in one thread.
 
 
@@ -295,7 +295,7 @@ In addition there is an upper bound on the calculation of the search window:
 
 Upper limit for the search-window calculation.
 
-Long search windows consumes a lot of resources and may take a long time. Use this parameter to
+Long search windows consume a lot of resources and may take a long time. Use this parameter to
 tune the desired maximum search time.
 
 This is the parameter that affects the response time most, the downside is that a search is only
@@ -777,12 +777,6 @@ Used to group requests when monitoring OTP.
         "X-Bikely-Token" : "${BIKELY_TOKEN}",
         "Authorization" : "${BIKELY_AUTHORIZATION}"
       }
-    },
-    {
-      "type" : "vehicle-parking",
-      "feedId" : "noi",
-      "sourceType" : "noi-open-data-hub",
-      "url" : "https://parking.otp.opendatahub.com/parking/all.json"
     },
     {
       "type" : "stop-time-updater",

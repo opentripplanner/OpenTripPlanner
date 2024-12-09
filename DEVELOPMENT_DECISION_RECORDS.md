@@ -16,7 +16,13 @@ tests. Expect to include some code cleanup as part of all PRs.
 ## Follow-Naming-Conventions
 
 Use established terminology from GTFS, NeTEx or the existing OTP code. Make sure the code is easy
-to read and understand. [Follow naming conventions](CODE_CONVENTIONS.md#naming-conventions) . 
+to read and understand. [Follow naming conventions](doc/dev/decisionrecords/NamingConventions.md#naming-conventions) . 
+
+
+## Do Analysis-and-design if needed
+
+Be prepared to provide [analyses and/or design documentation](doc/dev/decisionrecords/AnalysesAndDesign.md)
+if a task is complex, changes the core model and/or the main APIs.
 
 
 ## Write-Code-Documentation - Use JavaDoc
@@ -32,7 +38,7 @@ notes on `private` members and as inline comments.
 
 **See also**
  - [Developers-Guide &gt; Code comments](doc/user/Developers-Guide.md#code-comments).
- - [Codestyle &gt; Javadoc Guidlines](doc/dev/decisionrecords/Codestyle.md#javadoc-guidlines) - JavaDoc checklist
+ - [Codestyle &gt; Javadoc Guidelines](doc/dev/decisionrecords/Codestyle.md#javadoc-guidlines) - JavaDoc checklist
 
 
 ## Document-Config-and-APIs

@@ -38,6 +38,8 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=trunk_link; cycleway=opposite_track`           | `ALL`                    | forward: 2.06 <br> back: 0.85 |             |
 | `highway=trunk; bicycle=designated`                     | `ALL`                    | 7.25                          |             |
 | `highway=trunk_link; bicycle=designated`                | `ALL`                    | 2.0                           |             |
+| `indoor=area`                                           | `PEDESTRIAN`             |                               |             |
+| `indoor=corridor`                                       | `PEDESTRIAN`             |                               |             |
 | `mtb:scale=3`                                           | `NONE`                   |                               |             |
 | `mtb:scale=4`                                           | `NONE`                   |                               |             |
 | `mtb:scale=5`                                           | `NONE`                   |                               |             |
@@ -75,6 +77,7 @@ Lower safety values make an OSM way more desirable and higher values less desira
 | `highway=motorway_link`                                 | `CAR`                    | 2.06                          |             |
 | `highway=trunk`                                         | `CAR`                    | 7.47                          |             |
 | `highway=motorway`                                      | `CAR`                    | 8.0                           |             |
+| `motorroad=yes`                                         | `CAR`                    |                               |             |
 | `present(highway); cycleway=lane`                       | `PEDESTRIAN_AND_BICYCLE` | 0.87                          |             |
 | `highway=service; cycleway=lane`                        | `ALL`                    | 0.77                          |             |
 | `highway=residential; cycleway=lane`                    | `ALL`                    | 0.77                          |             |

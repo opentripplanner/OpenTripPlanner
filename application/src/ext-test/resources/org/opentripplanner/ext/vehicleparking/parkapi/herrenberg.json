@@ -1,0 +1,397 @@
+{
+  "data_source": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze",
+  "last_downloaded": "2022-12-08T16:08:21.870905",
+  "last_updated": "2022-12-08T16:08:21.870905",
+  "lots": [
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Aischbachstraße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.596319,
+        "lng": 8.865461
+      },
+      "total": 58,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1016",
+      "opening_hours": "Mo - Su 08:00-17:00",
+      "notes": {
+        "de": "Parken mit Parkscheibe"
+      }
+    },
+    {
+      "id": "ac230e00-2cea-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Parkhaus",
+      "address": "71083 Herrenberg",
+      "name": "Altstadtgarage",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.593768,
+        "lng": 8.872705
+      },
+      "total": 97,
+      "url": "https://stadtwerke.herrenberg.de/oepnv-parken/parken/sicher-und-zentral-parken/parkhaeuser-und-parkgebuehren/altstadtgarage/",
+      "fee_hours": "Mo-Fr 08:00-20:00; Sa 08:00-14:00; PH off",
+      "notes": {},
+      "free": 62
+    },
+    {
+      "id": "946955a0-a5bb-11ea-8d72-81c79f744047",
+      "id:disabled": "8344f5f0-3025-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Oberer Graben",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.59502,
+        "lng": 8.87029
+      },
+      "total": 24,
+      "total:disabled": 1,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1002",
+      "opening_hours": "Mo - Su 00:00-24:00; PH 00:00-24:00",
+      "notes": {},
+      "free": 8,
+      "free:disabled": 1
+    },
+    {
+      "id": "5c4224c0-0a0e-11ea-9bc9-896973774264",
+      "id:disabled": "c08d81e0-3023-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Unterer Graben",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.59518,
+        "lng": 8.86898
+      },
+      "total": 39,
+      "total:disabled": 2,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1002",
+      "opening_hours": "Mo,We,Th,Fr,Su 00:00-24:00; Tu,Sa 00:00-02:00, 14:30-24:00; PH 00:00-24:00",
+      "notes": {},
+      "free": 15,
+      "free:disabled": 1
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Kurzzeitparkplätze Bahnhofstraße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.593634,
+        "lng": 8.863247
+      },
+      "total": 47,
+      "url": "https://stadtwerke.herrenberg.de/oepnv-parken/parken/sicher-und-zentral-parken/parkhaeuser-und-parkgebuehren/kurzzeitparkplaetze-bahnhofstrasse/",
+      "fee_hours": "Mo-Fr 08:00-20:00; Sa 08:00-14:00; PH off",
+      "notes": {}
+    },
+    {
+      "lot_type": "Park-Ride",
+      "address": "71083 Herrenberg",
+      "name": "P+R Bahnhofstraße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.59309,
+        "lng": 8.86126
+      },
+      "total": 122,
+      "url": "https://www.dbbahnpark.de/standorte/karte/parkplatz-bahnhof-herrenberg/",
+      "notes": {}
+    },
+    {
+      "id": "8f6e3300-2cec-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Tiefgarage",
+      "address": "71083 Herrenberg",
+      "name": "Bronntor",
+      "forecast": false,
+      "state": "few",
+      "coords": {
+        "lat": 48.596636,
+        "lng": 8.867949
+      },
+      "total": 90,
+      "url": "https://stadtwerke.herrenberg.de/oepnv-parken/parken/sicher-und-zentral-parken/parkhaeuser-und-parkgebuehren/bronntor-tiefgarage/",
+      "fee_hours": "Mo-Fr 08:00-20:00; Sa 08:00-14:00; PH off",
+      "opening_hours": "Mo-Fr 07:30-22:00; Sa 07:30-18:00; PH off",
+      "notes": {},
+      "free": 3
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Gültsteiner Straße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.594364,
+        "lng": 8.871189
+      },
+      "total": 69,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1022",
+      "notes": {}
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Hasenplatz",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.594601,
+        "lng": 8.872216
+      },
+      "total": 20,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1021",
+      "notes": {}
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Horber Straße/Nagolder Straße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.595168,
+        "lng": 8.866325
+      },
+      "total": 36,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1017",
+      "notes": {}
+    },
+    {
+      "id": "ff4bb360-2ceb-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Parkhaus",
+      "address": "71083 Herrenberg",
+      "name": "Nufringer Tor",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.597865,
+        "lng": 8.870266
+      },
+      "total": 242,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1012",
+      "notes": {},
+      "free": 142
+    },
+    {
+      "lot_type": "Park-Ride",
+      "address": "71083 Herrenberg",
+      "name": "P+R Kalkofenstraße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.59403,
+        "lng": 8.8615
+      },
+      "total": 398,
+      "url": "https://stadtwerke.herrenberg.de/oepnv-parken/parken/sicher-und-zentral-parken/parkhaeuser-und-parkgebuehren/p-r-parkhaus/",
+      "fee_hours": "Mo-Fr 08:00-20:00; Sa 08:00-14:00; PH off",
+      "notes": {}
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "Ecke Seestraße",
+      "name": "Stadthalle",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.599227,
+        "lng": 8.869871
+      },
+      "total": 211,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1006",
+      "notes": {}
+    },
+    {
+      "id": "2fa0dbe0-2ceb-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Volksbank",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.59435,
+        "lng": 8.869386
+      },
+      "total": 47,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1020",
+      "notes": {},
+      "free": 20
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Wilhelmstraße",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.595431,
+        "lng": 8.874739
+      },
+      "total": 18,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1023",
+      "notes": {}
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Viehversteigerungshalle",
+      "forecast": false,
+      "state": "closed",
+      "coords": {
+        "lat": 48.59946,
+        "lng": 8.86822
+      },
+      "total": 95,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Service/Parkplaetze/Parkplatz?view=publish&item=parkingLocation&id=1025",
+      "notes": {
+        "de": "Derzeit wegen Bauarbeiten gesperrt bis voraussichtlich Frühjahr 2022.",
+        "en": "Currently closed due tu construction works until spring 2022."
+      }
+    },
+    {
+      "id": "c455d080-fcb1-11e9-9a2d-876c1a6b66b2",
+      "lot_type": "Wohnmobilparkplatz",
+      "address": "71083 Herrenberg",
+      "name": "Wohnmobilhafen Herrenberg",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.59019,
+        "lng": 8.87751
+      },
+      "total": 10,
+      "url": "https://www.herrenberg.de/de/Stadtleben/Erlebnis-Herrenberg/Tourismus-Gaeste/uebernachten/Wohnmobilstellplaetze",
+      "notes": {},
+      "free": 6
+    },
+    {
+      "lot_type": "Park-Carpool",
+      "address": "Parkplatz bei der Autobahnmeisterei",
+      "name": "Parken + Mitfahren A81/B296 (Derzeit wg. Bauarbeiten gesperrt)",
+      "forecast": false,
+      "state": "closed",
+      "coords": {
+        "lat": 48.5807,
+        "lng": 8.9022
+      },
+      "total": 10,
+      "url": "https://rp.baden-wuerttemberg.de/rps/Abt4/Seiten/pressemitteilung.aspx?rid=3035",
+      "notes": {
+        "de": "Derzeit wegen Bauarbeiten gesperrt bis voraussichtlich Frühjahr 2022.",
+        "en": "Currently closed due tu construction works until spring 2022."
+      }
+    },
+    {
+      "lot_type": "Park-Carpool",
+      "address": "Parkplatz südl. Ohmstraße Gültstein",
+      "name": "Parken + Mitfahren A81 Herrenberg/Gültstein (Ersatzfläche)",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.57867,
+        "lng": 8.89462
+      },
+      "total": 50,
+      "url": "https://rp.baden-wuerttemberg.de/rps/Abt4/Seiten/pressemitteilung.aspx?rid=3035",
+      "notes": {}
+    },
+    {
+      "id": "5251cba0-3019-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Barrierefreier-Parkplatz",
+      "address": "Marktplatz",
+      "name": "Marktplatz - Parkplatz für Menschen mit Behinderung",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.59642,
+        "lng": 8.87042
+      },
+      "total:disabled": 1,
+      "notes": {},
+      "free:disabled": 1
+    },
+    {
+      "id": "e4de7700-3025-11eb-93e4-7f8bf428cc7a",
+      "lot_type": "Barrierefreier-Parkplatz",
+      "address": "Stuttgarter Straße",
+      "name": "Stuttgarter Straße - Parkplatz für Menschen mit Behinderung",
+      "forecast": false,
+      "state": "many",
+      "coords": {
+        "lat": 48.59799,
+        "lng": 8.87116
+      },
+      "total:disabled": 1,
+      "notes": {},
+      "free:disabled": 1
+    },
+    {
+      "lot_type": "Barrierefreier-Parkplatz",
+      "address": "Oberamt",
+      "name": "Oberamt - Parkplatz für Menschen mit Behinderung",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.5963798,
+        "lng": 8.8705467
+      },
+      "total:disabled": 1,
+      "notes": {}
+    },
+    {
+      "lot_type": "Barrierefreier-Parkplatz",
+      "address": "Spitalgasse 15",
+      "name": "Spitalgasse - Parkplatz für Menschen mit Behinderung",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.5954687,
+        "lng": 8.8700008
+      },
+      "total:disabled": 1,
+      "notes": {}
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "Längenholz, 71083 Herrenberg",
+      "name": "Naturfreibad",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.589261,
+        "lng": 8.877723
+      },
+      "total": 100,
+      "url": "https://naturfreibad.herrenberg.de/startseite/",
+      "notes": {
+        "de": "Beim Kauf einer Jahres- oder Saisonkarte für die Herrenberger Bäder, erhalten Sie eine Parkberechtigung für diese Parkmöglichkeiten. Durch die Parkberechtigung fallen keine Parkgebühren an. Für Parkplatznutzer dieser Parkplätze, die keine Parkberechtigung besitzen, fallen Parkgebühren an."
+      }
+    },
+    {
+      "lot_type": "Parkplatz",
+      "address": "Längenholz, 71083 Herrenberg",
+      "name": "Hallenbad",
+      "forecast": false,
+      "state": "nodata",
+      "coords": {
+        "lat": 48.590382,
+        "lng": 8.875758
+      },
+      "total": 80,
+      "url": "https://naturfreibad.herrenberg.de/startseite/",
+      "notes": {
+        "de": "Beim Kauf einer Jahres- oder Saisonkarte für die Herrenberger Bäder, erhalten Sie eine Parkberechtigung für diese Parkmöglichkeiten. Durch die Parkberechtigung fallen keine Parkgebühren an. Für Parkplatznutzer dieser Parkplätze, die keine Parkberechtigung besitzen, fallen Parkgebühren an."
+      }
+    }
+  ]
+}

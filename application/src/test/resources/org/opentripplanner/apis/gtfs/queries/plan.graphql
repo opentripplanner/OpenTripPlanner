@@ -1,0 +1,45 @@
+{
+  plan(
+    from: { lat: 52.3092, lon: 13.0291 }
+    to: { lat: 52.5147, lon: 13.3927 }
+    date: "2023-02-15"
+    time: "11:37"
+    parking: {
+      unpreferredCost: 555
+      preferred: [{ not: [{ tags: ["a", "b", "c"] }] }]
+      filters: [{ select: [{ tags: ["e"] }] }]
+    }
+    transportModes: [{ mode: CAR, qualifier: HAIL }]
+    via: [
+      { passThrough: { label: "via1", stopLocationIds: ["F:BUS"] } }
+      {
+        visit: {
+          label: "via2"
+          stopLocationIds: ["F:RAIL"]
+          minimumWaitTime: "1h"
+        }
+      }
+    ]
+  ) {
+    itineraries {
+      start
+      end
+      legs {
+        mode
+        start {
+          scheduledTime
+        }
+        end {
+          scheduledTime
+        }
+        from {
+          name
+        }
+        to {
+          name
+        }
+        mode
+      }
+    }
+  }
+}
