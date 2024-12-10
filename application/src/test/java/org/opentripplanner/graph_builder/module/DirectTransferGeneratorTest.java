@@ -280,21 +280,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
-    var walkTransfers = timetableRepository
-      .getAllPathTransfers()
-      .stream()
-      .filter(pathTransfer -> pathTransfer.getModes().contains(StreetMode.WALK))
-      .toList();
-    var bikeTransfers = timetableRepository
-      .getAllPathTransfers()
-      .stream()
-      .filter(pathTransfer -> pathTransfer.getModes().contains(StreetMode.BIKE))
-      .toList();
-    var carTransfers = timetableRepository
-      .getAllPathTransfers()
-      .stream()
-      .filter(pathTransfer -> pathTransfer.getModes().contains(StreetMode.CAR))
-      .toList();
+    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
+    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
 
     assertTransfers(
       walkTransfers,
@@ -434,14 +422,31 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
+    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
+    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+
     assertTransfers(
-      timetableRepository.getAllPathTransfers(),
+      walkTransfers,
       tr(S0, 100, List.of(V0, V11), S11),
       tr(S0, 100, List.of(V0, V21), S21),
-      tr(S0, 200, List.of(V0, V12), S12),
       tr(S11, 100, List.of(V11, V21), S21),
-      tr(S11, 110, List.of(V11, V22), S22),
+      tr(S0, 200, List.of(V0, V12), S12),
       tr(S11, 100, List.of(V11, V12), S12)
+    );
+    assertTransfers(
+      bikeTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 110, List.of(V11, V22), S22),
+      tr(S0, 200, List.of(V0, V12), S12),
+      tr(S11, 100, List.of(V11, V12), S12)
+    );
+    assertTransfers(
+      carTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 200, List.of(V0, V12), S12),
+      tr(S0, 100, List.of(V0, V21), S21)
     );
   }
 
@@ -516,6 +521,110 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       tr(S0, 100, List.of(V0, V21), S21),
       tr(S11, 110, List.of(V11, V22), S22)
     );
+  }
+
+  @Test
+  public void testDisableDefaultTransfersForMode() {
+    var reqWalk = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.WALK);
+
+    var reqBike = new RouteRequest();
+    reqBike.journey().transfer().setMode(StreetMode.BIKE);
+
+    var reqCar = new RouteRequest();
+    reqCar.journey().transfer().setMode(StreetMode.CAR);
+
+    var transferRequests = List.of(reqWalk, reqBike, reqCar);
+
+    var otpModel = model(true, false, false, true);
+    var graph = otpModel.graph();
+    graph.hasStreets = true;
+    var timetableRepository = otpModel.timetableRepository();
+
+    TransferParameters.Builder transferParametersBuilderBike = new TransferParameters.Builder();
+    transferParametersBuilderBike.withDisableDefaultTransfers(true);
+    TransferParameters.Builder transferParametersBuilderCar = new TransferParameters.Builder();
+    transferParametersBuilderCar.withDisableDefaultTransfers(true);
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.BIKE, transferParametersBuilderBike.build());
+    transferParametersForMode.put(StreetMode.CAR, transferParametersBuilderCar.build());
+
+    new DirectTransferGenerator(
+      graph,
+      timetableRepository,
+      DataImportIssueStore.NOOP,
+      MAX_TRANSFER_DURATION,
+      transferRequests,
+      transferParametersForMode
+    )
+      .buildGraph();
+
+    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
+    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+
+    assertTransfers(
+      walkTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 100, List.of(V11, V21), S21),
+      tr(S0, 200, List.of(V0, V12), S12),
+      tr(S11, 100, List.of(V11, V12), S12)
+    );
+    assertTransfers(bikeTransfers);
+    assertTransfers(carTransfers);
+  }
+
+  @Test
+  public void testMaxTransferDurationForMode() {
+    var reqWalk = new RouteRequest();
+    reqWalk.journey().transfer().setMode(StreetMode.WALK);
+
+    var reqBike = new RouteRequest();
+    reqBike.journey().transfer().setMode(StreetMode.BIKE);
+
+    var transferRequests = List.of(reqWalk, reqBike);
+
+    var otpModel = model(true, false, false, true);
+    var graph = otpModel.graph();
+    graph.hasStreets = true;
+    var timetableRepository = otpModel.timetableRepository();
+
+    TransferParameters.Builder transferParametersBuilderWalk = new TransferParameters.Builder();
+    transferParametersBuilderWalk.withMaxTransferDuration(Duration.ofSeconds(100));
+    TransferParameters.Builder transferParametersBuilderBike = new TransferParameters.Builder();
+    transferParametersBuilderBike.withMaxTransferDuration(Duration.ofSeconds(21));
+    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
+    transferParametersForMode.put(StreetMode.WALK, transferParametersBuilderWalk.build());
+    transferParametersForMode.put(StreetMode.BIKE, transferParametersBuilderBike.build());
+
+    new DirectTransferGenerator(
+      graph,
+      timetableRepository,
+      DataImportIssueStore.NOOP,
+      MAX_TRANSFER_DURATION,
+      transferRequests,
+      transferParametersForMode
+    )
+      .buildGraph();
+
+    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
+    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+
+    assertTransfers(
+      walkTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21),
+      tr(S11, 100, List.of(V11, V21), S21),
+      tr(S11, 100, List.of(V11, V12), S12)
+    );
+    assertTransfers(
+      bikeTransfers,
+      tr(S0, 100, List.of(V0, V11), S11),
+      tr(S0, 100, List.of(V0, V21), S21)
+    );
+    assertTransfers(carTransfers);
   }
 
   private TestOtpModel model(boolean addPatterns) {

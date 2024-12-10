@@ -145,7 +145,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       StreetMode mode = transferProfile.journey().transfer().mode();
       TransferParameters transferParameters = transferParametersForMode.get(mode);
       if (transferParameters != null) {
-        // Disable normal transfer calculations if disableDefaultTransfers is set in the build config.
+        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
         if (!transferParameters.disableDefaultTransfers()) {
           defaultTransferRequests.add(transferProfile);
           // Set mode-specific maxTransferDuration, if it is set in the build config.
