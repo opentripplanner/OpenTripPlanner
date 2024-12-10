@@ -398,28 +398,11 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
 
-    var longName = routeLongName.toString().replaceAll(" ", "");
-
-    Map<FareType, Money> fares = OrcaFaresData.washingtonStateFerriesFares.get(longName);
-    // WSF doesn't support transfers so we only care about cash fares.
-    FareType wsfFareType;
-    if (fareType == FareType.electronicRegular) {
-      wsfFareType = FareType.regular;
-    } else if (fareType == FareType.electronicSenior) {
-      wsfFareType = FareType.senior;
-    } else if (fareType == FareType.electronicYouth) {
-      wsfFareType = FareType.youth;
-    } else if (fareType == FareType.electronicSpecial) {
-      wsfFareType = FareType.regular;
-    } else {
-      wsfFareType = fareType;
-    }
-    // WSF is free in one direction on each route
-    // If a fare is not found in the map, we can assume it's free.
-    // Route long name is reversed for the reverse direction on a single WSF route
-    return (fares != null && fares.get(wsfFareType) != null)
-      ? fares.get(wsfFareType)
-      : Money.ZERO_USD;
+    return switch (fareType) {
+      case youth, electronicYouth -> Money.ZERO_USD;
+      case regular, electronicRegular, electronicSpecial -> defaultFare;
+      case senior, electronicSenior -> defaultFare.half().roundDownToNearestFiveCents();
+    };
   }
 
   /**
