@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Agency;
 
 public class OrcaFareService extends DefaultFareService {
 
@@ -401,7 +400,7 @@ public class OrcaFareService extends DefaultFareService {
     return switch (fareType) {
       case youth, electronicYouth -> Money.ZERO_USD;
       case regular, electronicRegular, electronicSpecial -> defaultFare;
-      case senior, electronicSenior -> defaultFare.half().roundDownToNearestFiveCents();
+      case senior, electronicSenior -> defaultFare.half().roundDownToNearestFiveMinorUnits();
     };
   }
 
