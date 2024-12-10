@@ -692,8 +692,7 @@ public class TransmodelGraphQLSchema {
             var filterInUse = environment.<Boolean>getArgument("filterByInUse");
 
             RegularStopRequest regularStopRequest = RegularStopRequest
-              .of()
-              .withEnvelope(envelope)
+              .of(envelope)
               .withFeed(authority)
               .filterByInUse(filterInUse)
               .build();

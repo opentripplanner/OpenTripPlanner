@@ -31,8 +31,8 @@ public class RegularStopMatcherFactory {
   ) {
     ExpressionBuilder<RegularStop> expr = ExpressionBuilder.of();
 
-    if (request.feedId() != null) {
-      expr.matches(feedId(request.feedId()));
+    if (request.agency() != null) {
+      expr.matches(agency(request.agency()));
     }
     if (request.filterByInUse()) {
       expr.matches(inUseMatcher(inUseProvider));
@@ -40,8 +40,8 @@ public class RegularStopMatcherFactory {
     return expr.build();
   }
 
-  static Matcher<RegularStop> feedId(String feedId) {
-    return new EqualityMatcher<>("feedId", feedId, stop -> stop.getId().getFeedId());
+  static Matcher<RegularStop> agency(String agency) {
+    return new EqualityMatcher<>("agency", agency, stop -> stop.getId().getFeedId());
   }
 
   static Matcher<RegularStop> inUseMatcher(Predicate<RegularStop> inUseProvider) {

@@ -5,18 +5,15 @@ import org.locationtech.jts.geom.Envelope;
 public class RegularStopRequestBuilder {
 
   private Envelope envelope;
-  private String feedId;
-  private boolean filterByInUse;
+  private String agency;
+  private boolean filterByInUse = false;
 
-  protected RegularStopRequestBuilder() {}
-
-  public RegularStopRequestBuilder withEnvelope(Envelope envelope) {
+  protected RegularStopRequestBuilder(Envelope envelope) {
     this.envelope = envelope;
-    return this;
   }
 
-  public RegularStopRequestBuilder withFeed(String feedId) {
-    this.feedId = feedId;
+  public RegularStopRequestBuilder withFeed(String agency) {
+    this.agency = agency;
     return this;
   }
 
@@ -26,6 +23,6 @@ public class RegularStopRequestBuilder {
   }
 
   public RegularStopRequest build() {
-    return new RegularStopRequest(envelope, feedId, filterByInUse);
+    return new RegularStopRequest(envelope, agency, filterByInUse);
   }
 }

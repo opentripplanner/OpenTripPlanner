@@ -12,17 +12,17 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class RegularStopRequest {
 
   private final Envelope envelope;
-  private final String feedId;
+  private final String agency;
   private final boolean filterByInUse;
 
-  protected RegularStopRequest(Envelope envelope, String feedId, boolean filterByInUse) {
+  protected RegularStopRequest(Envelope envelope, String agency, boolean filterByInUse) {
     this.envelope = envelope;
-    this.feedId = feedId;
+    this.agency = agency;
     this.filterByInUse = filterByInUse;
   }
 
-  public static RegularStopRequestBuilder of() {
-    return new RegularStopRequestBuilder();
+  public static RegularStopRequestBuilder of(Envelope envelope) {
+    return new RegularStopRequestBuilder(envelope);
   }
 
   public Envelope envelope() {
@@ -30,8 +30,8 @@ public class RegularStopRequest {
   }
 
   @Nullable
-  public String feedId() {
-    return feedId;
+  public String agency() {
+    return agency;
   }
 
   public boolean filterByInUse() {
