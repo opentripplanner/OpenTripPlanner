@@ -2,9 +2,11 @@ package org.opentripplanner.apis.transmodel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.idl.SchemaPrinter;
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -136,6 +138,12 @@ public class TransmodelAPI {
       maxNumberOfResultFields,
       getTagsFromHeaders(headers)
     );
+  }
+
+  @GET
+  @Path("schema.graphql")
+  public Response getGraphQLSchema() {
+    return Response.ok().encoding("UTF-8").entity(new SchemaPrinter().print(schema)).build();
   }
 
   private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {
