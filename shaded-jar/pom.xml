@@ -77,14 +77,6 @@
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <!-- shadedClassifierName>shaded</shadedClassifierName -->
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
-                      We have eliminated most Jersey auto-scanning, but there is still some need for include
-                      filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
-                    <!-- This roughly halves the size of the OTP JAR, bringing it down to around 20 MB.
-                      <minimizeJar>true</minimizeJar>
-                      <filters> <filter> <artifact>com.sun.jersey:*</artifact> <includes> <include>**</include>
-                      </includes> </filter> <filter> <artifact>org.opentripplanner:*</artifact>
-                      <includes> <include>**</include> </includes> </filter> </filters> -->
                     <transformers>
                         <transformer
                                 implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
