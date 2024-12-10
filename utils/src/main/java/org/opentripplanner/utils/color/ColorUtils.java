@@ -13,7 +13,6 @@ public final class ColorUtils {
   public static double computeLuminance(Color color) {
     //gets float of RED, GREEN, BLUE in range 0...1
     float[] colorComponents = color.getRGBColorComponents(null);
-    //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
     double r = linearizeColorComponent(colorComponents[0]);
     double g = linearizeColorComponent(colorComponents[1]);
     double b = linearizeColorComponent(colorComponents[2]);
