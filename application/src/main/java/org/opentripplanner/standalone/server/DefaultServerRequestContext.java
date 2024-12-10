@@ -111,6 +111,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
+    this.debugUiConfig = debugUiConfig;
+    this.fareService = fareService;
   }
 
   /**
@@ -160,8 +162,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       flexParameters,
       traverseVisitor,
       luceneIndex,
-      fareService,
-      debugUiConfig
+      debugUiConfig,
+      fareService
     );
   }
 
