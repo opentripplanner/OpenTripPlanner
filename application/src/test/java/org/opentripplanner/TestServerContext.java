@@ -22,6 +22,7 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRe
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
@@ -68,6 +69,7 @@ public class TestServerContext {
       createStreetLimitationParametersService(),
       null,
       null,
+      DebugUiConfig.DEFAULT,
       fareService
     );
     creatTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());

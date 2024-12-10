@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.TriangleOptimizationConfig.mapOptimizationTriangle;
@@ -25,6 +26,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
+import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -736,6 +738,32 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
     }
   }
 
+  private static void mapEscalatorPreferences(
+    NodeAdapter root,
+    EscalatorPreferences.Builder escalator
+  ) {
+    var dft = escalator.original();
+    NodeAdapter c = root.of("escalator").since(V2_7).summary("Escalator preferences.").asObject();
+    escalator
+      .withReluctance(
+        c
+          .of("reluctance")
+          .since(V2_4)
+          .summary(
+            "A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time"
+          )
+          .asDouble(dft.reluctance())
+      )
+      .withSpeed(
+        c
+          .of("speed")
+          .since(V2_7)
+          .summary("How fast does an escalator move horizontally?")
+          .description("Horizontal speed of escalator in m/s.")
+          .asDouble(dft.speed())
+      );
+  }
+
   private static void mapWalkPreferences(NodeAdapter root, WalkPreferences.Builder walk) {
     var dft = walk.original();
     NodeAdapter c = root.of("walk").since(V2_5).summary("Walking preferences.").asObject();
@@ -809,14 +837,6 @@ high values.
           )
           .asDouble(dft.safetyFactor())
       )
-      .withEscalatorReluctance(
-        c
-          .of("escalatorReluctance")
-          .since(V2_4)
-          .summary(
-            "A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time"
-          )
-          .asDouble(dft.escalatorReluctance())
-      );
+      .withEscalator(escalator -> mapEscalatorPreferences(c, escalator));
   }
 }

@@ -27,6 +27,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -58,6 +59,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final LuceneIndex luceneIndex;
+  private final DebugUiConfig debugUiConfig;
   private final FareService fareService;
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
@@ -86,6 +88,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     FlexParameters flexParameters,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable LuceneIndex luceneIndex,
+    DebugUiConfig debugUiConfig,
     FareService fareService
   ) {
     this.graph = graph;
@@ -108,7 +111,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
-    this.fareService = fareService;
   }
 
   /**
@@ -134,6 +136,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable LuceneIndex luceneIndex,
+    DebugUiConfig debugUiConfig,
     FareService fareService
   ) {
     return new DefaultServerRequestContext(
@@ -157,7 +160,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       flexParameters,
       traverseVisitor,
       luceneIndex,
-      fareService
+      fareService,
+      debugUiConfig
     );
   }
 
@@ -266,6 +270,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VectorTileConfig vectorTileConfig() {
     return vectorTileConfig;
+  }
+
+  @Override
+  public DebugUiConfig debugUiConfig() {
+    return debugUiConfig;
   }
 
   @Nullable

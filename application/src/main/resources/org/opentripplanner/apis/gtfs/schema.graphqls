@@ -279,12 +279,16 @@ type BookingInfo {
   earliestBookingTime: BookingTime
   "When is the latest time the service can be booked"
   latestBookingTime: BookingTime
+  "Maximum duration before travel to make the request."
+  maximumBookingNotice: Duration
   "Maximum number of seconds before travel to make the request"
-  maximumBookingNoticeSeconds: Long
+  maximumBookingNoticeSeconds: Long @deprecated(reason : "Use `maximumBookingNotice`")
   "A general message for those booking the service"
   message: String
+  "Minimum duration before travel to make the request"
+  minimumBookingNotice: Duration
   "Minimum number of seconds before travel to make the request"
-  minimumBookingNoticeSeconds: Long
+  minimumBookingNoticeSeconds: Long @deprecated(reason : "Use `minimumBookingNotice`")
   "A message specific to the pick up"
   pickupMessage: String
 }

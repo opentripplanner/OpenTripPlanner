@@ -30,6 +30,7 @@ import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -132,6 +133,7 @@ public class SpeedTest {
         TestServerContext.createStreetLimitationParametersService(),
         null,
         null,
+        DebugUiConfig.DEFAULT,
         new DefaultFareService()
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now

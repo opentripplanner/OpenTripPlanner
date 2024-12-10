@@ -84,9 +84,6 @@ class FinlandMapper extends OsmTagMapper {
     // Don't recommend walking in trunk road tunnels
     props.setProperties("highway=trunk;tunnel=yes", withModes(CAR).bicycleSafety(7.47));
 
-    // Do not walk on "moottoriliikennetie"
-    props.setProperties("motorroad=yes", withModes(CAR).bicycleSafety(7.47));
-
     // Remove informal and private roads
     props.setProperties("highway=*;informal=yes", withModes(NONE));
     props.setProperties("highway=service;access=private", withModes(NONE));

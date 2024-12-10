@@ -54,6 +54,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix problem with relaxed-generalized-cost-at-destination [#6255](https://github.com/opentripplanner/OpenTripPlanner/pull/6255)
 - Reject SIRI-ET updates with empty StopPointRefs [#6266](https://github.com/opentripplanner/OpenTripPlanner/pull/6266)
 - Allow GTFS fuzzy trip matching even when trip descriptor has an id [#6250](https://github.com/opentripplanner/OpenTripPlanner/pull/6250)
+- Make `motorroad=yes` car-only [#6288](https://github.com/opentripplanner/OpenTripPlanner/pull/6288)
+- Add decision record for analysis and design documentation [#6281](https://github.com/opentripplanner/OpenTripPlanner/pull/6281)
+- Switch GTFS flex `safe_duration_offset` back to seconds [#6298](https://github.com/opentripplanner/OpenTripPlanner/pull/6298)
+- Remove unused GtfsGraphQlApiRentalStationFuzzyMatching feature [#6282](https://github.com/opentripplanner/OpenTripPlanner/pull/6282)
+- Make debug UI background layers configurable with new file `debug-ui-config.json` [#6295](https://github.com/opentripplanner/OpenTripPlanner/pull/6295)
+- Better escalator duration control: specific duration from OSM duration tag, default speed from build-config.json [#6268](https://github.com/opentripplanner/OpenTripPlanner/pull/6268)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
