@@ -39,7 +39,7 @@ public class OrcaFareService extends DefaultFareService {
   public static final String PIERCE_COUNTY_TRANSIT_AGENCY_ID = "3";
   public static final String SKAGIT_TRANSIT_AGENCY_ID = "e0e4541a-2714-487b-b30c-f5c6cb4a310f";
   public static final String SEATTLE_STREET_CAR_AGENCY_ID = "23";
-  public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "WSF";
+  public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "95";
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
   public static final String WHATCOM_AGENCY_ID = "14";
   public static final int ROUTE_TYPE_FERRY = 4;
