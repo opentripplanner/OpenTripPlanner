@@ -33,6 +33,15 @@ import org.slf4j.LoggerFactory;
 @Produces(MediaType.APPLICATION_JSON)
 public class TransmodelAPI {
 
+  // Note, the blank line at the end is intended
+  private static final String SCHEMA_DOC_HEADER =
+    """
+# THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
+# This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
+# OTP configured default-values injected.
+
+""";
+
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
   private static GraphQLSchema schema;
@@ -143,7 +152,8 @@ public class TransmodelAPI {
   @GET
   @Path("schema.graphql")
   public Response getGraphQLSchema() {
-    return Response.ok().encoding("UTF-8").entity(new SchemaPrinter().print(schema)).build();
+    var text = SCHEMA_DOC_HEADER + new SchemaPrinter().print(schema);
+    return Response.ok().encoding("UTF-8").entity(text).build();
   }
 
   private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {
