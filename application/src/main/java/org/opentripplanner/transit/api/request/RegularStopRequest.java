@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.api.request;
 
-import java.util.List;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -29,6 +29,7 @@ public class RegularStopRequest {
     return envelope;
   }
 
+  @Nullable
   public String feedId() {
     return feedId;
   }

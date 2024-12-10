@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.api.model;
 
-import com.beust.jcommander.internal.Nullable;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
