@@ -97,7 +97,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(this.getClass())
+      .of(SiriSXUpdater.class)
       .addStr("url", url)
       .addDuration("frequency", pollingPeriod())
       .toString();
