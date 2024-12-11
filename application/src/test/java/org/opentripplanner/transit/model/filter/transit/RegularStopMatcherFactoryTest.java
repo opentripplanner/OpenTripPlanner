@@ -17,12 +17,12 @@ class RegularStopMatcherFactoryTest {
   static void setup() {
     stop1 =
       RegularStop
-        .of(new FeedScopedId("feedId", "stopId"), new AtomicInteger()::getAndIncrement)
+        .of(new FeedScopedId("agency", "stopId"), new AtomicInteger()::getAndIncrement)
         .build();
 
     stop2 =
       RegularStop
-        .of(new FeedScopedId("otherFeedId", "otherStopId"), new AtomicInteger()::getAndIncrement)
+        .of(new FeedScopedId("otherAgency", "otherStopId"), new AtomicInteger()::getAndIncrement)
         .build();
   }
 
@@ -36,7 +36,7 @@ class RegularStopMatcherFactoryTest {
   @Test
   void testInUseMatcher() {
     var matcher = RegularStopMatcherFactory.inUseMatcher(stop ->
-      stop.getId().getFeedId().equals("feedId")
+      stop.getId().getFeedId().equals("agency")
     );
     assertTrue(matcher.match(stop1));
     assertFalse(matcher.match(stop2));
