@@ -78,7 +78,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(this.getClass()).addStr("url", url).toString();
+    return ToStringBuilder.of(SiriETHttpTripUpdateSource.class).addStr("url", url).toString();
   }
 
   private static SiriLoader createLoader(String url, Parameters parameters) {
