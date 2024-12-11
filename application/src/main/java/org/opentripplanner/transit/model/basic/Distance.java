@@ -9,17 +9,29 @@ public class Distance {
   private final double meters;
 
   /** Returns a Distance object representing the given number of meters */
-  public Distance(double value) {
-    this.meters = value;
+  public Distance(double distanceInMeters) {
+    if (distanceInMeters < 0) {
+      throw new IllegalArgumentException("Distance cannot be negative");
+    }
+
+    this.meters = distanceInMeters;
   }
 
   /** Returns a Distance object representing the given number of meters */
   public static Distance ofMeters(double value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Distance cannot be negative");
+    }
+
     return new Distance(value);
   }
 
   /** Returns a Distance object representing the given number of kilometers */
   public static Distance ofKilometers(double value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Distance cannot be negative");
+    }
+
     return new Distance(value * METERS_PER_KM);
   }
 

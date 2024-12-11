@@ -75,12 +75,23 @@ public class GbfsFreeVehicleStatusMapper {
           );
         }
       }
+      Distance rangeMeters = null;
+      try {
+        rangeMeters = vehicle.getCurrentRangeMeters() != null
+          ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
+          : null;
+      } catch (IllegalArgumentException e) {
+        LOG.warn(e.getMessage());
+        // if the propulsion type has an engine current_range_meters is required
+        if (vehicle.getVehicleTypeId() != null
+          && vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType != RentalVehicleType.PropulsionType.HUMAN) {
+          return null;
+        }
+      }
       rentalVehicle.fuel =
         new RentalVehicleFuel(
           fuelPercent,
-          vehicle.getCurrentRangeMeters() != null
-            ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
-            : null
+          rangeMeters
         );
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
