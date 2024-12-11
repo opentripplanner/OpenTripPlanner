@@ -153,7 +153,7 @@ public class Money implements Comparable<Money>, Serializable {
    */
   public Money roundDownToNearestFiveMinorUnits() {
     int rounded = (this.minorUnitAmount() / 5) * 5;
-    return new Money(Money.USD, rounded);
+    return new Money(currency, rounded);
   }
 
   /**
