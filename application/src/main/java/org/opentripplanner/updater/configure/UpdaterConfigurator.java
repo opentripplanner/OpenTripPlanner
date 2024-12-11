@@ -23,6 +23,7 @@ import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.updater.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.updater.siri.updater.SiriETUpdater;
 import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
+import org.opentripplanner.updater.siri.updater.SiriLoaderFactory;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
 import org.opentripplanner.updater.siri.updater.lite.SiriETLiteHttpTripUpdateSource;
@@ -191,7 +192,10 @@ public class UpdaterConfigurator {
         new SiriETUpdater(
           configItem,
           provideSiriTimetableSnapshot(),
-          new SiriETHttpTripUpdateSource(configItem.sourceParameters()),
+          new SiriETHttpTripUpdateSource(
+            configItem.sourceParameters(),
+            SiriLoaderFactory.createLoader(configItem)
+          ),
           TripUpdateMetrics.streaming(configItem)
         )
       );
@@ -201,7 +205,10 @@ public class UpdaterConfigurator {
         new SiriETUpdater(
           configItem,
           provideSiriTimetableSnapshot(),
-          new SiriETLiteHttpTripUpdateSource(configItem.sourceParameters()),
+          new SiriETLiteHttpTripUpdateSource(
+            configItem.sourceParameters(),
+            SiriLoaderFactory.createLoader(configItem)
+          ),
           TripUpdateMetrics.batch(configItem)
         )
       );

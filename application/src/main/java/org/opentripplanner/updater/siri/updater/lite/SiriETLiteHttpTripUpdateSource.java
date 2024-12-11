@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.util.Optional;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.siri.updater.EstimatedTimetableSource;
-import org.opentripplanner.updater.siri.updater.SiriFileLoader;
 import org.opentripplanner.updater.siri.updater.SiriLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
@@ -31,10 +30,9 @@ public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource 
 
   private final SiriLoader siriLoader;
 
-  public SiriETLiteHttpTripUpdateSource(Parameters parameters) {
+  public SiriETLiteHttpTripUpdateSource(Parameters parameters, SiriLoader siriLoader) {
     this.parameters = parameters;
-
-    this.siriLoader = createLoader(parameters);
+    this.siriLoader = siriLoader;
   }
 
   @Override
@@ -64,21 +62,6 @@ public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource 
       .addStr("feedId", parameters.feedId())
       .addStr("uri", parameters.uri().toString())
       .toString();
-  }
-
-  private static SiriLoader createLoader(Parameters parameters) {
-    // Load real-time updates from a file.
-    if (SiriFileLoader.matchesUrl(parameters.uri().toString())) {
-      return new SiriFileLoader(parameters.uri().toString());
-    }
-    // Fallback to default loader
-    else {
-      return new SiriLiteHttpLoader(
-        parameters.uri(),
-        parameters.timeout(),
-        parameters.httpRequestHeaders()
-      );
-    }
   }
 
   public interface Parameters {

@@ -31,7 +31,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private UpdateIncrementality updateIncrementality = FULL_DATASET;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
-  public SiriETHttpTripUpdateSource(Parameters parameters) {
+  public SiriETHttpTripUpdateSource(Parameters parameters, SiriLoader siriLoader) {
     this.url = parameters.url();
 
     this.requestorRef =
@@ -39,7 +39,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
         ? "otp-" + UUID.randomUUID()
         : parameters.requestorRef();
 
-    this.siriLoader = createLoader(url, parameters);
+    this.siriLoader = siriLoader;
   }
 
   @Override
@@ -79,22 +79,6 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   @Override
   public String toString() {
     return ToStringBuilder.of(SiriETHttpTripUpdateSource.class).addStr("url", url).toString();
-  }
-
-  private static SiriLoader createLoader(String url, Parameters parameters) {
-    // Load real-time updates from a file.
-    if (SiriFileLoader.matchesUrl(url)) {
-      return new SiriFileLoader(url);
-    }
-    // Fallback to default loader
-    else {
-      return new SiriHttpLoader(
-        url,
-        parameters.timeout(),
-        parameters.httpRequestHeaders(),
-        parameters.previewInterval()
-      );
-    }
   }
 
   public interface Parameters {
