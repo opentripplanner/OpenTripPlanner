@@ -14,7 +14,7 @@ public record SiriSXLiteUpdaterParameters(
   Duration timeout,
   HttpHeaders requestHeaders
 )
-  implements SiriSXUpdater.SiriSXUpdaterParameters {
+  implements SiriSXUpdater.Parameters {
   @Override
   public String requestorRef() {
     return "OpenTripPlanner";

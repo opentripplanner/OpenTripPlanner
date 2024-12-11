@@ -47,7 +47,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private final OtpRetry retry;
 
   public SiriSXUpdater(
-    SiriSXUpdaterParameters config,
+    Parameters config,
     TimetableRepository timetableRepository,
     SiriLoader siriLoader
   ) {
@@ -208,8 +208,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     requestorRef = originalRequestorRef + "-retry-" + retryCount;
   }
 
-  public interface SiriSXUpdaterParameters
-    extends PollingGraphUpdaterParameters, UrlUpdaterParameters {
+  public interface Parameters extends PollingGraphUpdaterParameters, UrlUpdaterParameters {
     String requestorRef();
 
     boolean blockReadinessUntilInitialized();
