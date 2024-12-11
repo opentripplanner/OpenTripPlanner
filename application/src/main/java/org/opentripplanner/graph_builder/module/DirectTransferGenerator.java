@@ -209,21 +209,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       nTransfersTotal,
       nLinkedStops
     );
-    for (StreetMode mode : transferRequests
+    transferRequests
       .stream()
       .map(transferProfile -> transferProfile.journey().transfer().mode())
       .distinct()
-      .toList()) {
-      LOG.info(
-        "Created {} transfers for mode {}.",
-        transfersByStop
-          .values()
-          .stream()
-          .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
-          .count(),
-        mode
+      .forEach(mode ->
+        LOG.info(
+          "Created {} transfers for mode {}.",
+          timetableRepository.getTransfersByMode(mode).size(),
+          mode
+        )
       );
-    }
   }
 
   /**
