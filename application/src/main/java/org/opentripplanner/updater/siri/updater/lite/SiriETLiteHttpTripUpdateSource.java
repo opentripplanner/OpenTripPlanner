@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
 
 /**
- * SIRI Lite downloads periodically all messages as a single GET request.
+ * SIRI Lite periodically downloads all messages as a single GET request.
  */
 public class SiriETLiteHttpTripUpdateSource implements EstimatedTimetableSource {
 
