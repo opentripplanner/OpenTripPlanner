@@ -149,7 +149,7 @@ public class Money implements Comparable<Money>, Serializable {
 
   /**
    * Returns the instance rounded down to the nearest multiple of 5 cents
-   * So $0.25 becomes $0.10
+   * So $0.14 becomes $0.10
    */
   public Money roundDownToNearestFiveMinorUnits() {
     int rounded = (this.minorUnitAmount() / 5) * 5;
