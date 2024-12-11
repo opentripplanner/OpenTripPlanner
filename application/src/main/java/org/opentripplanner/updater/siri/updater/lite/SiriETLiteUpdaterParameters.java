@@ -14,7 +14,7 @@ public record SiriETLiteUpdaterParameters(
   boolean fuzzyTripMatching,
   HttpHeaders httpRequestHeaders
 )
-  implements SiriETUpdater.SiriETUpdaterParameters, SiriETLiteHttpTripUpdateSource.Parameters {
+  implements SiriETUpdater.Parameters, SiriETLiteHttpTripUpdateSource.Parameters {
   public SiriETLiteHttpTripUpdateSource.Parameters sourceParameters() {
     return this;
   }

@@ -40,7 +40,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETUpdater(
-    SiriETUpdaterParameters config,
+    Parameters config,
     SiriTimetableSnapshotSource timetableSnapshotSource,
     EstimatedTimetableSource source,
     Consumer<UpdateResult> metricsConsumer
@@ -105,8 +105,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
       .toString();
   }
 
-  public interface SiriETUpdaterParameters
-    extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
+  public interface Parameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
     boolean blockReadinessUntilInitialized();
 
     boolean fuzzyTripMatching();
