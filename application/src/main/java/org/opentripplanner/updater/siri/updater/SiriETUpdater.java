@@ -99,7 +99,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(this.getClass())
+      .of(SiriETUpdater.class)
       .addStr("source", updateSource.toString())
       .addDuration("frequency", pollingPeriod())
       .toString();
