@@ -54,8 +54,7 @@ public class OrcaFareServiceTest {
 
   private static final Money ONE_DOLLAR = usDollars(1f);
   private static final Money TWO_DOLLARS = usDollars(2);
-  private static final Money FERRY_FARE = usDollars(6.50f);
-  private static final Money HALF_FERRY_FARE = usDollars(3.25f);
+  private static final Money HALF_FERRY_FARE = usDollars(1.75f);
   private static final Money ORCA_SPECIAL_FARE = usDollars(1.00f);
   public static final Money VASHON_WATER_TAXI_CASH_FARE = usDollars(6.75f);
   public static final Money WEST_SEATTLE_WATER_TAXI_CASH_FARE = usDollars(5.75f);
@@ -219,24 +218,24 @@ public class OrcaFareServiceTest {
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 121),
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 150, "Fauntleroy-VashonIsland")
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3).plus(FERRY_FARE));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(5));
     calculateFare(
       rides,
       FareType.senior,
-      ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE).plus(usDollars(0.5f))
+      ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE.times(2)).plus(usDollars(0.5f))
     );
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     // We don't get any fares for the skagit transit leg below here because they don't accept ORCA (electronic)
-    calculateFare(rides, FareType.electronicSpecial, ONE_DOLLAR.plus(ONE_DOLLAR).plus(FERRY_FARE));
+    calculateFare(rides, FareType.electronicSpecial, ONE_DOLLAR.plus(ONE_DOLLAR).plus(DEFAULT_TEST_RIDE_PRICE.times(2)));
     calculateFare(
       rides,
       FareType.electronicRegular,
-      DEFAULT_TEST_RIDE_PRICE.times(2).plus(FERRY_FARE)
+      DEFAULT_TEST_RIDE_PRICE.times(4)
     );
     calculateFare(
       rides,
       FareType.electronicSenior,
-      ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE)
+      ONE_DOLLAR.plus(ONE_DOLLAR).plus(HALF_FERRY_FARE.times(2))
     );
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
   }
@@ -326,11 +325,11 @@ public class OrcaFareServiceTest {
     List<Leg> rides = List.of(
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 0, "Point Defiance - Tahlequah")
     );
-    calculateFare(rides, regular, FERRY_FARE);
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
     calculateFare(rides, FareType.senior, HALF_FERRY_FARE);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, FERRY_FARE);
-    calculateFare(rides, FareType.electronicRegular, FERRY_FARE);
+    calculateFare(rides, FareType.electronicSpecial, DEFAULT_TEST_RIDE_PRICE);
+    calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
     calculateFare(rides, FareType.electronicSenior, HALF_FERRY_FARE);
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
