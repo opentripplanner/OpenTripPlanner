@@ -51,7 +51,7 @@ public class Distance {
 
   @Override
   public int hashCode() {
-    return Objects.hash(meters, 31);
+    return Objects.hash(meters, "Distance");
   }
 
   @Override

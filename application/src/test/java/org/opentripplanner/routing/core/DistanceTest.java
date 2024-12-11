@@ -24,7 +24,7 @@ public class DistanceTest {
   }
 
   @Test
-  void equalsHashCode() {
+  void testHashCode() {
     assertEquals(Distance.ofMeters(5d).hashCode(), Distance.ofMeters(5d).hashCode());
     assertNotEquals(Distance.ofMeters(5d).hashCode(), Double.valueOf(5d).hashCode());
   }
