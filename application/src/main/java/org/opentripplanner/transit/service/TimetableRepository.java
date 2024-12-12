@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -434,7 +435,7 @@ public class TimetableRepository implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  public Collection<PathTransfer> getTransfersByMode(StreetMode mode) {
+  public List<PathTransfer> getTransfersByMode(StreetMode mode) {
     return transfersByStop
       .values()
       .stream()
