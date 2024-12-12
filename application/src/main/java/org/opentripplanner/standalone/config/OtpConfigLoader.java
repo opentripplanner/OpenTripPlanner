@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.DEBUG_UI_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
@@ -103,6 +104,14 @@ public class OtpConfigLoader {
       return RouterConfig.DEFAULT;
     }
     return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
+  }
+
+  public DebugUiConfig loadDebugUiConfig() {
+    JsonNode node = loadFromFile(DEBUG_UI_CONFIG_FILENAME);
+    if (node.isMissingNode()) {
+      return DebugUiConfig.DEFAULT;
+    }
+    return new DebugUiConfig(node, DEBUG_UI_CONFIG_FILENAME, true);
   }
 
   private static void logConfigVersion(String configVersion, String filename) {

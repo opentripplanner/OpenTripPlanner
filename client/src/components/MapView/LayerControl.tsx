@@ -26,47 +26,90 @@ class LayerControl implements IControl {
     this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-select';
 
     map.on('load', () => {
-      // clean on
+      // clean on rerender
       while (this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
       }
 
-      const title = document.createElement('h4');
-      title.textContent = 'Debug layers';
-      this.container.appendChild(title);
-
-      const groups: Record<string, HTMLDivElement> = {};
-      map
-        .getLayersOrder()
-        .map((l) => map.getLayer(l))
-        .filter((layer) => !!layer)
-        .filter((layer) => this.layerInteractive(layer))
-        .reverse()
-        .forEach((layer) => {
-          if (layer) {
-            const meta: { group: string } = layer.metadata as { group: string };
-
-            let groupName: string = 'Misc';
-            if (meta.group) {
-              groupName = meta.group;
-            }
-
-            const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
-
-            if (groups[groupName]) {
-              groups[groupName]?.appendChild(layerDiv);
-            } else {
-              const groupDiv = this.buildGroupDiv(groupName, layerDiv);
-              groups[groupName] = groupDiv;
-              this.container.appendChild(groupDiv);
-            }
-          }
-        });
-      // initialize clickable layers (initially stops)
-      this.updateInteractiveLayerIds(map);
+      this.buildBackgroundLayers(map);
+      this.buildDebugLayers(map);
     });
 
     return this.container;
+  }
+
+  private buildBackgroundLayers(map: Map) {
+    const title = document.createElement('h4');
+    title.textContent = 'Background';
+    this.container.appendChild(title);
+
+    const select = document.createElement('select');
+    this.container.appendChild(select);
+
+    const rasterLayers = map
+      .getLayersOrder()
+      .map((l) => map.getLayer(l))
+      .filter((layer) => !!layer)
+      .filter((layer) => layer?.type == 'raster');
+
+    rasterLayers.forEach((layer) => {
+      if (layer) {
+        const option = document.createElement('option');
+        const meta = layer.metadata as { name: string };
+        option.textContent = meta.name;
+        option.id = layer.id;
+        option.value = layer.id;
+
+        select.appendChild(option);
+      }
+    });
+    select.onchange = () => {
+      const layerId = select.value;
+      const layer = map.getLayer(layerId);
+      if (layer) {
+        rasterLayers.forEach((l) => {
+          map.setLayoutProperty(l?.id, 'visibility', 'none');
+        });
+
+        map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      }
+    };
+  }
+
+  private buildDebugLayers(map: Map) {
+    const title = document.createElement('h4');
+    title.textContent = 'Debug layers';
+    this.container.appendChild(title);
+
+    const groups: Record<string, HTMLDivElement> = {};
+    map
+      .getLayersOrder()
+      .map((l) => map.getLayer(l))
+      .filter((layer) => !!layer)
+      .filter((layer) => this.layerInteractive(layer))
+      .reverse()
+      .forEach((layer) => {
+        if (layer) {
+          const meta: { group: string } = layer.metadata as { group: string };
+
+          let groupName: string = 'Misc';
+          if (meta.group) {
+            groupName = meta.group;
+          }
+
+          const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
+
+          if (groups[groupName]) {
+            groups[groupName]?.appendChild(layerDiv);
+          } else {
+            const groupDiv = this.buildGroupDiv(groupName, layerDiv);
+            groups[groupName] = groupDiv;
+            this.container.appendChild(groupDiv);
+          }
+        }
+      });
+    // initialize clickable layers (initially stops)
+    this.updateInteractiveLayerIds(map);
   }
 
   private updateInteractiveLayerIds(map: Map) {

@@ -147,7 +147,8 @@ public class GraphInspectorVectorTileResource {
       AREA_STOPS.toVectorSourceLayer(stopsSource),
       GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
-      VERTICES.toVectorSourceLayer(streetSource)
+      VERTICES.toVectorSourceLayer(streetSource),
+      serverContext.debugUiConfig().additionalBackgroundLayers()
     );
   }
 

@@ -42,7 +42,7 @@ class StatesToWalkStepsMapperTest {
     var walkSteps = buildWalkSteps(builder);
     assertEquals(2, walkSteps.size());
     var enter = walkSteps.get(1);
-    assertEquals(enter.getRelativeDirection(), ENTER_STATION);
+    assertEquals(ENTER_STATION, enter.getRelativeDirection());
   }
 
   @Test
@@ -54,7 +54,7 @@ class StatesToWalkStepsMapperTest {
     var walkSteps = buildWalkSteps(builder);
     assertEquals(3, walkSteps.size());
     var enter = walkSteps.get(2);
-    assertEquals(enter.getRelativeDirection(), EXIT_STATION);
+    assertEquals(EXIT_STATION, enter.getRelativeDirection());
   }
 
   @Test
@@ -64,7 +64,7 @@ class StatesToWalkStepsMapperTest {
     var walkSteps = buildWalkSteps(builder);
     assertEquals(2, walkSteps.size());
     var step = walkSteps.get(1);
-    assertEquals(step.getRelativeDirection(), FOLLOW_SIGNS);
+    assertEquals(FOLLOW_SIGNS, step.getRelativeDirection());
     assertEquals(sign, step.getDirectionText().toString());
   }
 

@@ -92,6 +92,12 @@ class MoneyTest {
   }
 
   @Test
+  void roundDownToNearestFiveMinorUnits() {
+    assertEquals(Money.usDollars(0.1f), Money.usDollars(0.11f).roundDownToNearestFiveMinorUnits());
+    assertEquals(Money.usDollars(0.5f), Money.usDollars(0.54f).roundDownToNearestFiveMinorUnits());
+  }
+
+  @Test
   void greaterThan() {
     assertTrue(twoDollars.greaterThan(oneDollar));
     assertFalse(oneDollar.greaterThan(oneDollar));

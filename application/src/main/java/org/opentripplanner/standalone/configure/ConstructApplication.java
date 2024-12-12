@@ -27,6 +27,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.GrizzlyServer;
@@ -298,6 +299,10 @@ public class ConstructApplication {
 
   public BuildConfig buildConfig() {
     return factory.config().buildConfig();
+  }
+
+  public DebugUiConfig debugUiConfig() {
+    return factory.config().debugUiConfig();
   }
 
   public RaptorConfig<TripSchedule> raptorConfig() {

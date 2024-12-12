@@ -49,16 +49,29 @@ public class ConfigModel {
    */
   private RouterConfig routerConfig;
 
-  public ConfigModel(OtpConfig otpConfig, BuildConfig buildConfig, RouterConfig routerConfig) {
+  private final DebugUiConfig debugUiConfig;
+
+  public ConfigModel(
+    OtpConfig otpConfig,
+    BuildConfig buildConfig,
+    RouterConfig routerConfig,
+    DebugUiConfig debugUiConfig
+  ) {
     this.otpConfig = otpConfig;
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
+    this.debugUiConfig = debugUiConfig;
 
     initializeOtpFeatures(otpConfig);
   }
 
   public ConfigModel(OtpConfigLoader loader) {
-    this(loader.loadOtpConfig(), loader.loadBuildConfig(), loader.loadRouterConfig());
+    this(
+      loader.loadOtpConfig(),
+      loader.loadBuildConfig(),
+      loader.loadRouterConfig(),
+      loader.loadDebugUiConfig()
+    );
   }
 
   public void updateConfigFromSerializedGraph(BuildConfig buildConfig, RouterConfig routerConfig) {
@@ -102,6 +115,10 @@ public class ConfigModel {
     return routerConfig;
   }
 
+  public DebugUiConfig debugUiConfig() {
+    return debugUiConfig;
+  }
+
   public static void initializeOtpFeatures(OtpConfig otpConfig) {
     OTPFeature.enableFeatures(otpConfig.otpFeatures);
     OTPFeature.logFeatureSetup();
@@ -117,7 +134,8 @@ public class ConfigModel {
       (
         otpConfig.hasUnknownParameters() ||
         buildConfig.hasUnknownParameters() ||
-        routerConfig.hasUnknownParameters()
+        routerConfig.hasUnknownParameters() ||
+        debugUiConfig.hasUnknownParameters()
       )
     ) {
       throw new OtpAppException(

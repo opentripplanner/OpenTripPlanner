@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.utils.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -29,7 +30,7 @@ public final class WalkPreferences implements Serializable {
   private final double stairsTimeFactor;
   private final double safetyFactor;
 
-  private final double escalatorReluctance;
+  private final EscalatorPreferences escalator;
 
   private WalkPreferences() {
     this.speed = 1.33;
@@ -38,7 +39,7 @@ public final class WalkPreferences implements Serializable {
     this.stairsReluctance = 2.0;
     this.stairsTimeFactor = 3.0;
     this.safetyFactor = 1.0;
-    this.escalatorReluctance = 1.5;
+    this.escalator = EscalatorPreferences.DEFAULT;
   }
 
   private WalkPreferences(Builder builder) {
@@ -48,7 +49,7 @@ public final class WalkPreferences implements Serializable {
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
     this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
     this.safetyFactor = Units.reluctance(builder.safetyFactor);
-    this.escalatorReluctance = Units.reluctance(builder.escalatorReluctance);
+    this.escalator = builder.escalator;
   }
 
   public static Builder of() {
@@ -108,6 +109,10 @@ public final class WalkPreferences implements Serializable {
     return safetyFactor;
   }
 
+  public EscalatorPreferences escalator() {
+    return escalator;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -120,7 +125,7 @@ public final class WalkPreferences implements Serializable {
       doubleEquals(that.stairsReluctance, stairsReluctance) &&
       doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
       doubleEquals(that.safetyFactor, safetyFactor) &&
-      doubleEquals(that.escalatorReluctance, escalatorReluctance)
+      escalator.equals(that.escalator)
     );
   }
 
@@ -133,7 +138,7 @@ public final class WalkPreferences implements Serializable {
       stairsReluctance,
       stairsTimeFactor,
       safetyFactor,
-      escalatorReluctance
+      escalator
     );
   }
 
@@ -147,12 +152,8 @@ public final class WalkPreferences implements Serializable {
       .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
       .addNum("stairsTimeFactor", stairsTimeFactor, DEFAULT.stairsTimeFactor)
       .addNum("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
-      .addNum("escalatorReluctance", escalatorReluctance, DEFAULT.escalatorReluctance)
+      .addObj("escalator", escalator, DEFAULT.escalator)
       .toString();
-  }
-
-  public double escalatorReluctance() {
-    return escalatorReluctance;
   }
 
   public static class Builder {
@@ -165,7 +166,7 @@ public final class WalkPreferences implements Serializable {
     private double stairsTimeFactor;
     private double safetyFactor;
 
-    private double escalatorReluctance;
+    private EscalatorPreferences escalator;
 
     public Builder(WalkPreferences original) {
       this.original = original;
@@ -175,7 +176,7 @@ public final class WalkPreferences implements Serializable {
       this.stairsReluctance = original.stairsReluctance;
       this.stairsTimeFactor = original.stairsTimeFactor;
       this.safetyFactor = original.safetyFactor;
-      this.escalatorReluctance = original.escalatorReluctance;
+      this.escalator = original.escalator;
     }
 
     public WalkPreferences original() {
@@ -242,12 +243,12 @@ public final class WalkPreferences implements Serializable {
       return this;
     }
 
-    public double escalatorReluctance() {
-      return escalatorReluctance;
+    public EscalatorPreferences escalator() {
+      return escalator;
     }
 
-    public Builder withEscalatorReluctance(double escalatorReluctance) {
-      this.escalatorReluctance = escalatorReluctance;
+    public Builder withEscalator(Consumer<EscalatorPreferences.Builder> body) {
+      this.escalator = ifNotNull(this.escalator, original.escalator).copyOf().apply(body).build();
       return this;
     }
 

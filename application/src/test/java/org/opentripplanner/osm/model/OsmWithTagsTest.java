@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -297,5 +299,33 @@ public class OsmWithTagsTest {
     way.addTag(key, value);
     var maybeInt = way.parseIntOrBoolean(key, i -> {});
     assertEquals(expected, maybeInt);
+  }
+
+  private static List<Arguments> parseTagAsDurationCases() {
+    return List.of(
+      Arguments.of("00:11", Optional.of(Duration.ofMinutes(11))),
+      Arguments.of("11", Optional.of(Duration.ofMinutes(11))),
+      Arguments.of("1:22:33", Optional.of(Duration.ofHours(1).plusMinutes(22).plusSeconds(33))),
+      Arguments.of("82", Optional.of(Duration.ofMinutes(82))),
+      Arguments.of("25:00", Optional.of(Duration.ofHours(25))),
+      Arguments.of("25:00:00", Optional.of(Duration.ofHours(25))),
+      Arguments.of("22:60", Optional.empty()),
+      Arguments.of("10:61:40", Optional.empty()),
+      Arguments.of("10:59:60", Optional.empty()),
+      Arguments.of("1:12:34", Optional.of(Duration.ofHours(1).plusMinutes(12).plusSeconds(34))),
+      Arguments.of("1:2:34", Optional.empty()),
+      Arguments.of("1:12:3", Optional.empty()),
+      Arguments.of("1:2", Optional.empty())
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("parseTagAsDurationCases")
+  void parseTagAsDuration(String value, Optional<Duration> expected) {
+    var way = new OsmWithTags();
+    var key = "duration";
+    way.addTag(key, value);
+    var duration = way.getTagValueAsDuration(key, i -> {});
+    assertEquals(expected, duration);
   }
 }

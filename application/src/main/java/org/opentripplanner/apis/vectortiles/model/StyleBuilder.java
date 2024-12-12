@@ -30,7 +30,7 @@ public class StyleBuilder {
   private final Map<String, Object> layout = new LinkedHashMap<>();
   private final Map<String, Object> metadata = new LinkedHashMap<>();
   private final Map<String, Object> line = new LinkedHashMap<>();
-  private List<? extends Object> filter = List.of();
+  private List<?> filter = List.of();
 
   public static StyleBuilder ofId(String id) {
     return new StyleBuilder(id);
@@ -117,6 +117,14 @@ public class StyleBuilder {
    */
   public StyleBuilder group(String group) {
     metadata.put("group", group);
+    return this;
+  }
+
+  /**
+   * A nice human-readable name for the layer.
+   */
+  public StyleBuilder displayName(String name) {
+    metadata.put("name", name);
     return this;
   }
 

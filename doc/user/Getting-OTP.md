@@ -65,7 +65,7 @@ OTP. If all goes well you should see a success message like the following:
 ```
 
 This build process should produce a JAR file called `otp-x.y.z-shaded.jar` in the
-`application/target/` directory which contains all the compiled OTP classes and their dependencies
+`shaded-jar/target/` directory which contains all the compiled OTP classes and their dependencies
 (the external libraries they use). The shell script called 'otp' in the root of the cloned repository
 will start the main class of that JAR file under a Java virtual machine, so after the Maven build
 completes you should be able to run `./otp --help` and see an OTP help message including command line

@@ -5,6 +5,7 @@ import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
@@ -27,7 +28,14 @@ class DebugStyleSpecTest {
     var groupStops = new VectorSourceLayer(vectorSource, "stops");
     var edges = new VectorSourceLayer(vectorSource, "edges");
     var vertices = new VectorSourceLayer(vectorSource, "vertices");
-    var spec = DebugStyleSpec.build(regularStops, areaStops, groupStops, edges, vertices);
+    var spec = DebugStyleSpec.build(
+      regularStops,
+      areaStops,
+      groupStops,
+      edges,
+      vertices,
+      List.of()
+    );
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
     try {
