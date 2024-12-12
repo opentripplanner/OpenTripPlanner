@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.IntStream;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
@@ -36,25 +37,26 @@ public class RaptorTransferIndex {
       reversedTransfers.add(new ArrayList<>());
     }
 
-    IntStream
-      .range(0, transfersByStopIndex.size())
-      .parallel()
-      .forEach(fromStop -> {
-        // The transfers are filtered so that there is only one possible directional transfer
-        // for a stop pair.
-        var transfers = transfersByStopIndex
-          .get(fromStop)
-          .stream()
-          .flatMap(s -> s.asRaptorTransfer(request).stream())
-          .collect(
-            toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
-          )
-          .values();
+    var stopIndices = IntStream.range(0, transfersByStopIndex.size());
+    if (OTPFeature.ParallelRouting.isOn()) {
+      stopIndices = stopIndices.parallel();
+    }
+    stopIndices.forEach(fromStop -> {
+      // The transfers are filtered so that there is only one possible directional transfer
+      // for a stop pair.
+      var transfers = transfersByStopIndex
+        .get(fromStop)
+        .stream()
+        .flatMap(s -> s.asRaptorTransfer(request).stream())
+        .collect(
+          toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
+        )
+        .values();
 
-        // forwardTransfers is not modified here, and no two threads will access the same element
-        // in it, so this is still thread safe.
-        forwardTransfers.get(fromStop).addAll(transfers);
-      });
+      // forwardTransfers is not modified here, and no two threads will access the same element
+      // in it, so this is still thread safe.
+      forwardTransfers.get(fromStop).addAll(transfers);
+    });
 
     for (int fromStop = 0; fromStop < transfersByStopIndex.size(); fromStop++) {
       for (var forwardTransfer : forwardTransfers.get(fromStop)) {
