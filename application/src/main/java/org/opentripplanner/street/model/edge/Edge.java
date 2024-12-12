@@ -152,7 +152,7 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    * Returns false if the field reflects the real world name, like "Fifth Avenue",
    * "Hauptstraße" or "Øvre Holmegate".
    */
-  public boolean hasBogusName() {
+  public boolean nameIsDerived() {
     return false;
   }
 
