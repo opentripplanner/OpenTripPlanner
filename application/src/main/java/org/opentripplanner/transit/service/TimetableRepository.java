@@ -435,7 +435,7 @@ public class TimetableRepository implements Serializable {
     return transfersByStop.get(stop);
   }
 
-  public List<PathTransfer> getTransfersByMode(StreetMode mode) {
+  public List<PathTransfer> findTransfers(StreetMode mode) {
     return transfersByStop
       .values()
       .stream()

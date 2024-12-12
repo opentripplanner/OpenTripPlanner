@@ -216,7 +216,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       .forEach(mode ->
         LOG.info(
           "Created {} transfers for mode {}.",
-          timetableRepository.getTransfersByMode(mode).size(),
+          timetableRepository.findTransfers(mode).size(),
           mode
         )
       );

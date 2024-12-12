@@ -30,7 +30,7 @@ public class FlexIndex {
 
   public FlexIndex(TimetableRepository timetableRepository) {
     // Flex transfers should only use WALK mode transfers.
-    for (PathTransfer transfer : timetableRepository.getTransfersByMode(StreetMode.WALK)) {
+    for (PathTransfer transfer : timetableRepository.findTransfers(StreetMode.WALK)) {
       transfersToStop.put(transfer.to, transfer);
       transfersFromStop.put(transfer.from, transfer);
     }
