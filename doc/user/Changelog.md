@@ -60,6 +60,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove unused GtfsGraphQlApiRentalStationFuzzyMatching feature [#6282](https://github.com/opentripplanner/OpenTripPlanner/pull/6282)
 - Make debug UI background layers configurable with new file `debug-ui-config.json` [#6295](https://github.com/opentripplanner/OpenTripPlanner/pull/6295)
 - Better escalator duration control: specific duration from OSM duration tag, default speed from build-config.json [#6268](https://github.com/opentripplanner/OpenTripPlanner/pull/6268)
+- Detect JSON array in addition to JSON objects when including a file in the config. [#6307](https://github.com/opentripplanner/OpenTripPlanner/pull/6307)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
