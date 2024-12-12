@@ -6,7 +6,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -35,10 +34,6 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   private final Consumer<UpdateResult> recordMetrics;
 
   /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
-  /**
    * Set only if we should attempt to match the trip_id from other data in TripDescriptor
    */
   private final boolean fuzzyTripMatching;
@@ -64,11 +59,6 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     );
   }
 
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
-
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
    * applies those updates to the graph.
@@ -90,7 +80,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         feedId,
         recordMetrics
       );
-      processGraphUpdaterResult(saveResultOnGraph.execute(runnable));
+      updateGraph(runnable);
     }
   }
 

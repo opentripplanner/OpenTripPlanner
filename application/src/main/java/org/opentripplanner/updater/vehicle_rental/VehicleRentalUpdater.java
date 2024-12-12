@@ -31,7 +31,6 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.logging.Throttle;
@@ -53,8 +52,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private final VehicleRentalDatasource source;
   private final String nameForLogging;
-
-  private WriteToGraphCallback saveResultOnGraph;
 
   private Map<StreetEdge, RentalRestrictionExtension> latestModifiedEdges = Map.of();
   private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
@@ -110,11 +107,6 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
-
-  @Override
   public String toString() {
     return ToStringBuilder.of(VehicleRentalUpdater.class).addObj("source", source).toString();
   }
@@ -139,7 +131,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       stations,
       geofencingZones
     );
-    processGraphUpdaterResult(saveResultOnGraph.execute(graphWriterRunnable));
+    updateGraph(graphWriterRunnable);
   }
 
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {

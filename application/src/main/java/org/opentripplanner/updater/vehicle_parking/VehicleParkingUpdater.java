@@ -27,7 +27,6 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,6 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   private final Map<VehicleParking, List<DisposableEdgeCollection>> tempEdgesByPark = new HashMap<>();
   private final DataSource<VehicleParking> source;
   private final List<VehicleParking> oldVehicleParkings = new ArrayList<>();
-  private WriteToGraphCallback saveResultOnGraph;
   private final VertexLinker linker;
 
   private final VehicleParkingRepository parkingRepository;
@@ -65,11 +63,6 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
-
-  @Override
   protected void runPolling() throws InterruptedException, ExecutionException {
     LOG.debug("Updating vehicle parkings from {}", source);
     if (!source.update()) {
@@ -82,7 +75,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     VehicleParkingGraphWriterRunnable graphWriterRunnable = new VehicleParkingGraphWriterRunnable(
       vehicleParkings
     );
-    processGraphUpdaterResult(saveResultOnGraph.execute(graphWriterRunnable));
+    updateGraph(graphWriterRunnable);
   }
 
   private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {

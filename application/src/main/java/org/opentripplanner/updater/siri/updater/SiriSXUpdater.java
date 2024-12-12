@@ -13,7 +13,6 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
@@ -33,7 +32,6 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   // TODO RT_AB: Document why SiriAlertsUpdateHandler is a separate instance that persists across
   //  many graph update operations.
   private final SiriAlertsUpdateHandler updateHandler;
-  private WriteToGraphCallback writeToGraphCallback;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
   private String requestorRef;
   /**
@@ -76,11 +74,6 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       pollingPeriod(),
       url
     );
-  }
-
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.writeToGraphCallback = writeToGraphCallback;
   }
 
   public TransitAlertService getTransitAlertService() {
@@ -141,7 +134,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
           // All that said, out of all the update types, Alerts (and SIRI SX) are probably the ones
           // that would be most tolerant of non-versioned application-wide storage since they don't
           // participate in routing and are tacked on to already-completed routing responses.
-          writeToGraphCallback.execute(context -> {
+          saveResultOnGraph.execute(context -> {
             updateHandler.update(serviceDelivery, context);
             if (markPrimed) {
               primed = true;

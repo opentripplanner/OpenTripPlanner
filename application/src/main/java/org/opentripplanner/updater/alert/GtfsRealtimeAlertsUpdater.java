@@ -27,7 +27,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   private final TransitAlertService transitAlertService;
   private final HttpHeaders headers;
   private final OtpHttpClient otpHttpClient;
-  private WriteToGraphCallback saveResultOnGraph;
   private Long lastTimestamp = Long.MIN_VALUE;
 
   public GtfsRealtimeAlertsUpdater(
@@ -47,11 +46,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     this.updateHandler.setTransitAlertService(transitAlertService);
     this.otpHttpClient = new OtpHttpClientFactory().create(LOG);
     LOG.info("Creating real-time alert updater running every {}: {}", pollingPeriod(), url);
-  }
-
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   public TransitAlertService getTransitAlertService() {
@@ -82,11 +76,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     }
 
     // Handle update in graph writer runnable
-    processGraphUpdaterResult(
-      saveResultOnGraph.execute(context ->
-        updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher())
-      )
-    );
+    updateGraph(context -> updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher()));
 
     lastTimestamp = feedTimestamp;
   }
