@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class RaptorTransferIndex {
@@ -29,6 +30,7 @@ public class RaptorTransferIndex {
   ) {
     var forwardTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
     var reversedTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
+    StreetMode mode = request.mode();
 
     for (int i = 0; i < transfersByStopIndex.size(); i++) {
       forwardTransfers.add(new ArrayList<>());
@@ -41,6 +43,7 @@ public class RaptorTransferIndex {
       var transfers = transfersByStopIndex
         .get(fromStop)
         .stream()
+        .filter(transfer -> transfer.getModes().contains(mode))
         .flatMap(s -> s.asRaptorTransfer(request).stream())
         .collect(
           toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
