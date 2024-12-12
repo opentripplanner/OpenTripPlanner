@@ -1,28 +1,52 @@
 {
   "name": "OTP Debug Tiles",
   "sources": {
-    "background": {
-      "id": "background",
-      "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+    "positron": {
+      "name": "Positron",
+      "tiles": [
+        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png"
+      ],
       "maxzoom": 19,
       "tileSize": 256,
-      "attribution": "© OpenStreetMap Contributors",
+      "attribution": "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
       "type": "raster"
     },
     "vectorSource": {
       "id": "vectorSource",
       "url": "https://example.com",
       "type": "vector"
+    },
+    "osm-carto": {
+      "name": "OSM Carto",
+      "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      "maxzoom": 19,
+      "tileSize": 256,
+      "attribution": "© OpenStreetMap Contributors",
+      "type": "raster"
     }
   },
   "layers": [
     {
-      "id": "background",
+      "id": "osm-carto",
       "type": "raster",
-      "source": "background",
+      "source": "osm-carto",
       "minzoom": 0,
       "metadata": {
-        "group": "Other"
+        "group": "Other",
+        "name": "OSM Carto"
+      }
+    },
+    {
+      "id": "positron",
+      "type": "raster",
+      "source": "positron",
+      "minzoom": 0,
+      "layout": {
+        "visibility": "none"
+      },
+      "metadata": {
+        "group": "Other",
+        "name": "Positron"
       }
     },
     {

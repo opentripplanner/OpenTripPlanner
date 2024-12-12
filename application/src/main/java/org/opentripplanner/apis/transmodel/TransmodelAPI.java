@@ -2,9 +2,11 @@ package org.opentripplanner.apis.transmodel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.idl.SchemaPrinter;
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -30,6 +32,15 @@ import org.slf4j.LoggerFactory;
 @Path("/transmodel/v3")
 @Produces(MediaType.APPLICATION_JSON)
 public class TransmodelAPI {
+
+  // Note, the blank line at the end is intended
+  private static final String SCHEMA_DOC_HEADER =
+    """
+# THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
+# This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
+# OTP configured default-values injected.
+
+""";
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
@@ -136,6 +147,13 @@ public class TransmodelAPI {
       maxNumberOfResultFields,
       getTagsFromHeaders(headers)
     );
+  }
+
+  @GET
+  @Path("schema.graphql")
+  public Response getGraphQLSchema() {
+    var text = SCHEMA_DOC_HEADER + new SchemaPrinter().print(schema);
+    return Response.ok().encoding("UTF-8").entity(text).build();
   }
 
   private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {

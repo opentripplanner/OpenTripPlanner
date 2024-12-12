@@ -110,3 +110,7 @@ Prefer immutable types over mutable. Use builders where appropriate. See
 [Avoid using records if you cannot encapsulate it properly](doc/dev/decisionrecords/RecordsPOJOsBuilders.md#records)
 
 
+## GraphQL Best Practices - API Design
+
+[Follow best practices for designing GraphQL APIs. Our APIs need to be backwards compatible as they are used
+by hundreds of clients (web-pages/apps/services).](doc/dev/decisionrecords/APIGraphQLDesign.md)

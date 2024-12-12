@@ -1,0 +1,9 @@
+{
+  "additionalBackgroundLayers": [
+    {
+      "name": "TriMet aerial photos",
+      "templateUrl": "https://maps.trimet.org/wms/reflect?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.1.0&request=GetMap&srs=EPSG:3857&width=256&height=256&layers=aerials",
+      "attribution": "© TriMet"
+    }
+  ]
+}

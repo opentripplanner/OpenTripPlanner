@@ -33,14 +33,10 @@ public abstract class SiriAzureUpdaterConfig {
         .asString(null)
     );
     parameters.setTopicName(
-      c.of("topic").since(V2_2).summary("Service Bus topic to connect to.").asString(null)
+      c.of("topic").since(V2_2).summary("Service Bus topic to connect to.").asString()
     );
     parameters.setFeedId(
-      c
-        .of("feedId")
-        .since(V2_2)
-        .summary("The ID of the feed to apply the updates to.")
-        .asString(null)
+      c.of("feedId").since(V2_2).summary("The ID of the feed to apply the updates to.").asString()
     );
     parameters.setAutoDeleteOnIdle(
       c

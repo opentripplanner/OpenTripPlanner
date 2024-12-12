@@ -26,6 +26,7 @@ import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
@@ -126,6 +127,8 @@ public interface OtpServerRequestContext {
   FlexParameters flexParameters();
 
   VectorTileConfig vectorTileConfig();
+
+  DebugUiConfig debugUiConfig();
 
   /* Sandbox modules */
 

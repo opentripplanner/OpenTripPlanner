@@ -149,7 +149,8 @@
         "com.fasterxml.jackson:{/,}**",
         "com.fasterxml.jackson.datatype::{/,}**"
       ],
-      "minimumReleaseAge": "1 week"
+      "minimumReleaseAge": "1 week",
+      "schedule": "on the 13th through 14th day of the month"
     },
     {
       "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",

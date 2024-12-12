@@ -50,11 +50,6 @@ public enum OTPFeature {
   ),
   FloatingBike(true, false, "Enable floating bike routing."),
   GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
-  GtfsGraphQlApiRentalStationFuzzyMatching(
-    false,
-    false,
-    "Does vehicleRentalStation query also allow ids that are not feed scoped."
-  ),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will

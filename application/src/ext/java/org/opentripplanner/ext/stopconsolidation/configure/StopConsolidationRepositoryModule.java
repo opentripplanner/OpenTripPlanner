@@ -2,7 +2,6 @@ package org.opentripplanner.ext.stopconsolidation.configure;
 
 import dagger.Binds;
 import dagger.Module;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 
@@ -13,6 +12,5 @@ import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidati
 @Module
 public interface StopConsolidationRepositoryModule {
   @Binds
-  @Nullable
-  StopConsolidationRepository bindRepository(@Nullable DefaultStopConsolidationRepository repo);
+  StopConsolidationRepository bindRepository(DefaultStopConsolidationRepository repo);
 }

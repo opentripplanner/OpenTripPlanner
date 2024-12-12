@@ -88,7 +88,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     var secondEqual = WalkPreferences
@@ -97,7 +97,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     assertEqualsAndHashCode(firstEqual, secondEqual);
@@ -110,7 +110,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     assertNotEqualsAndHashCode(firstEqual, differentSpeedPreferences);
@@ -123,7 +123,7 @@ class WalkPreferencesTest {
       .withReluctance(notSameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     assertNotEqualsAndHashCode(firstEqual, differentReluctancePreferences);
@@ -136,7 +136,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(notSameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     assertNotEqualsAndHashCode(firstEqual, differentStairsReluctancePreferences);
@@ -149,7 +149,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(notSameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     assertNotEqualsAndHashCode(firstEqual, differentSafetyFactorPreferences);
@@ -162,7 +162,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(notSameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(notSameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
     assertNotEqualsAndHashCode(firstEqual, differentEscalatorReluctancePreferences);
@@ -175,7 +175,7 @@ class WalkPreferencesTest {
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
       .withSafetyFactor(sameSafetyFactor)
-      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(notSameBoardCost)
       .build();
     assertNotEqualsAndHashCode(firstEqual, differentBoardCostPreferences);

@@ -95,10 +95,12 @@ public class IncludeFileDirective {
       String directive = entry.getKey();
       String fileText = loadFile(entry.getValue(), directive, source);
 
-      // If the insert text is a legal JSON object "[white-space]{ ... }[white-space]", then
+      // If the insert text is a legal JSON object or array, then
       // ignore the optional quotes matched by the directive pattern
       var json = fileText.trim();
-      if (json.startsWith("{") && json.endsWith("}")) {
+      if (
+        (json.startsWith("{") && json.endsWith("}")) || (json.startsWith("[") && json.endsWith("]"))
+      ) {
         text = text.replace(entry.getKey(), fileText);
       } else {
         // Add back quotes if matched part of directive pattern

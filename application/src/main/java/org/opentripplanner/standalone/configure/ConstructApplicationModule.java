@@ -20,6 +20,7 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -32,6 +33,7 @@ public class ConstructApplicationModule {
   @Provides
   OtpServerRequestContext providesServerContext(
     RouterConfig routerConfig,
+    DebugUiConfig debugUiConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitService transitService,
@@ -69,7 +71,8 @@ public class ConstructApplicationModule {
       stopConsolidationService,
       streetLimitationParametersService,
       traverseVisitor,
-      luceneIndex
+      luceneIndex,
+      debugUiConfig
     );
   }
 
