@@ -3,6 +3,7 @@ package org.opentripplanner.updater.spi;
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +115,9 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
   protected final void updateGraph(GraphWriterRunnable task)
     throws ExecutionException, InterruptedException {
-    saveResultOnGraph.execute(task).get();
+    var result = saveResultOnGraph.execute(task);
+    if (OTPFeature.WaitForGraphUpdateInPollingUpdaters.isOn()) {
+      result.get();
+    }
   }
 }
