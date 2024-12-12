@@ -25,9 +25,16 @@ public class RaptorTransferIndex {
     this.reversedTransfers = reversedTransfers.stream().map(List::copyOf).toArray(List[]::new);
   }
 
+  /**
+   * Create an index to be put into the transfer cache
+   *
+   * @param isRuntimeRequest true if the request originates from the client during the runtime,
+   *                         false if the request comes from transferCacheRequests in router-config.json
+   */
   public static RaptorTransferIndex create(
     List<List<Transfer>> transfersByStopIndex,
-    StreetSearchRequest request
+    StreetSearchRequest request,
+    boolean isRuntimeRequest
   ) {
     var forwardTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
     var reversedTransfers = new ArrayList<List<RaptorTransfer>>(transfersByStopIndex.size());
@@ -38,7 +45,9 @@ public class RaptorTransferIndex {
     }
 
     var stopIndices = IntStream.range(0, transfersByStopIndex.size());
-    if (OTPFeature.ParallelRouting.isOn()) {
+    // we want to always parallelize the cache building during the startup
+    // and only parallelize during runtime requests if the feature flag is on
+    if (!isRuntimeRequest || OTPFeature.ParallelRouting.isOn()) {
       stopIndices = stopIndices.parallel();
     }
     stopIndices.forEach(fromStop -> {
