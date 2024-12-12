@@ -78,7 +78,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         fuzzyTripMatching,
         updates
       );
-      saveResultOnGraph.execute(runnable).get();
+      processGraphUpdaterResult(saveResultOnGraph.execute(runnable));
     }
   }
 

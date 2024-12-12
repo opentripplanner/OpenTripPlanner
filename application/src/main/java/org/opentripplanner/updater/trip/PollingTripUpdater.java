@@ -90,7 +90,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
         feedId,
         recordMetrics
       );
-      saveResultOnGraph.execute(runnable).get();
+      processGraphUpdaterResult(saveResultOnGraph.execute(runnable));
     }
   }
 

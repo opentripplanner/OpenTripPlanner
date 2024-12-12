@@ -82,7 +82,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     VehicleParkingGraphWriterRunnable graphWriterRunnable = new VehicleParkingGraphWriterRunnable(
       vehicleParkings
     );
-    saveResultOnGraph.execute(graphWriterRunnable).get();
+    processGraphUpdaterResult(saveResultOnGraph.execute(graphWriterRunnable));
   }
 
   private class VehicleParkingGraphWriterRunnable implements GraphWriterRunnable {

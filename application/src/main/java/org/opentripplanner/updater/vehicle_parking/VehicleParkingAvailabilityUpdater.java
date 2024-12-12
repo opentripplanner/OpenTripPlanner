@@ -55,7 +55,7 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
       var updates = source.getUpdates();
 
       var graphWriterRunnable = new AvailabilityUpdater(updates);
-      saveResultOnGraph.execute(graphWriterRunnable).get();
+      processGraphUpdaterResult(saveResultOnGraph.execute(graphWriterRunnable));
     }
   }
 

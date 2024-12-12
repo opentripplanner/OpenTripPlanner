@@ -139,7 +139,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       stations,
       geofencingZones
     );
-    saveResultOnGraph.execute(graphWriterRunnable).get();
+    processGraphUpdaterResult(saveResultOnGraph.execute(graphWriterRunnable));
   }
 
   private class VehicleRentalGraphWriterRunnable implements GraphWriterRunnable {

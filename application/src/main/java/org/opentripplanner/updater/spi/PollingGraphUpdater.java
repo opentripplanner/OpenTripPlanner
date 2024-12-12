@@ -2,6 +2,8 @@ package org.opentripplanner.updater.spi;
 
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,4 +102,9 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
    * with pauses in between. The length of the pause is defined in the preference frequency.
    */
   protected abstract void runPolling() throws Exception;
+
+  protected void processGraphUpdaterResult(Future<?> result)
+    throws ExecutionException, InterruptedException {
+    result.get();
+  }
 }

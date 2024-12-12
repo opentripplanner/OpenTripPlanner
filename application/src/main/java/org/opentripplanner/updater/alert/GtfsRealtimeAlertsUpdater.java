@@ -82,9 +82,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     }
 
     // Handle update in graph writer runnable
-    saveResultOnGraph
-      .execute(context -> updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher()))
-      .get();
+    processGraphUpdaterResult(
+      saveResultOnGraph.execute(context ->
+        updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher())
+      )
+    );
 
     lastTimestamp = feedTimestamp;
   }
