@@ -99,7 +99,7 @@ public class IncludeFileDirective {
       // ignore the optional quotes matched by the directive pattern
       var json = fileText.trim();
       if (
-        json.startsWith("{") && json.endsWith("}") || json.startsWith("[") && json.endsWith("]")
+        (json.startsWith("{") && json.endsWith("}")) || (json.startsWith("[") && json.endsWith("]"))
       ) {
         text = text.replace(entry.getKey(), fileText);
       } else {
