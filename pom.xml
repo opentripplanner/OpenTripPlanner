@@ -98,7 +98,7 @@
         <module>raptor</module>
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
-        <module>shaded-jar</module>
+        <module>otp-shaded</module>
     </modules>
 
 
@@ -109,6 +109,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>3.6.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.hubspot.maven.plugins</groupId>
+                    <artifactId>prettier-maven-plugin</artifactId>
+                    <version>${plugin.prettier.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -290,7 +295,6 @@
             <plugin>
                 <groupId>com.hubspot.maven.plugins</groupId>
                 <artifactId>prettier-maven-plugin</artifactId>
-                <version>${plugin.prettier.version}</version>
                 <configuration>
                     <skip>${plugin.prettier.skip}</skip>
                     <prettierJavaVersion>2.0.0</prettierJavaVersion>
