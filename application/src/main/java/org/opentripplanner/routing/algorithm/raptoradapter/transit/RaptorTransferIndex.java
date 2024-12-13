@@ -33,7 +33,6 @@ public class RaptorTransferIndex {
     StreetMode mode = request.mode();
 
     for (int i = 0; i < transfersByStopIndex.size(); i++) {
-      forwardTransfers.add(new ArrayList<>());
       reversedTransfers.add(new ArrayList<>());
     }
 
@@ -43,14 +42,14 @@ public class RaptorTransferIndex {
       var transfers = transfersByStopIndex
         .get(fromStop)
         .stream()
-        .filter(transfer -> transfer.getModes().contains(mode))
+        .filter(transfer -> transfer.allowsMode(mode))
         .flatMap(s -> s.asRaptorTransfer(request).stream())
         .collect(
           toMap(RaptorTransfer::stop, Function.identity(), (a, b) -> a.c1() < b.c1() ? a : b)
         )
         .values();
 
-      forwardTransfers.get(fromStop).addAll(transfers);
+      forwardTransfers.add(new ArrayList<>(transfers));
 
       for (RaptorTransfer forwardTransfer : transfers) {
         reversedTransfers
