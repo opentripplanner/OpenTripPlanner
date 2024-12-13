@@ -20,20 +20,16 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.siri.updater.SiriETHttpTripUpdateSource;
-import org.opentripplanner.updater.siri.updater.SiriETUpdater;
 import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
-import org.opentripplanner.updater.siri.updater.SiriLoaderFactory;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
+import org.opentripplanner.updater.siri.updater.configure.SiriUpdaterModule;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
-import org.opentripplanner.updater.siri.updater.lite.SiriETLiteHttpTripUpdateSource;
 import org.opentripplanner.updater.siri.updater.lite.SiriLiteHttpLoader;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
-import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
@@ -189,54 +185,22 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
       updaters.add(
-        new SiriETUpdater(
-          configItem,
-          provideSiriTimetableSnapshot(),
-          new SiriETHttpTripUpdateSource(
-            configItem.sourceParameters(),
-            SiriLoaderFactory.createLoader(configItem)
-          ),
-          TripUpdateMetrics.streaming(configItem)
-        )
+        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
       );
     }
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
       updaters.add(
-        new SiriETUpdater(
-          configItem,
-          provideSiriTimetableSnapshot(),
-          new SiriETLiteHttpTripUpdateSource(
-            configItem.sourceParameters(),
-            SiriLoaderFactory.createLoader(configItem)
-          ),
-          TripUpdateMetrics.batch(configItem)
-        )
+        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
       );
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
       updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(
-        new SiriSXUpdater(
-          configItem,
-          timetableRepository,
-          new SiriHttpLoader(configItem.url(), configItem.timeout(), configItem.requestHeaders())
-        )
-      );
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
-      updaters.add(
-        new SiriSXUpdater(
-          configItem,
-          timetableRepository,
-          new SiriLiteHttpLoader(
-            configItem.uri(),
-            configItem.timeout(),
-            configItem.requestHeaders()
-          )
-        )
-      );
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));

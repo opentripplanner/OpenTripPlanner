@@ -3,8 +3,6 @@ package org.opentripplanner.updater.siri.updater;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.siri.updater.lite.SiriETLiteHttpTripUpdateSource;
-import org.opentripplanner.updater.siri.updater.lite.SiriETLiteUpdaterParameters;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
