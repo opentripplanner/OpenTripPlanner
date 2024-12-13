@@ -435,6 +435,7 @@ public class TimetableRepository implements Serializable {
     return transfersByStop.get(stop);
   }
 
+  /** Pre-generated transfers between all stops filtered based on the modes in the PathTransfer's mode field. */
   public List<PathTransfer> findTransfers(StreetMode mode) {
     return transfersByStop
       .values()

@@ -60,6 +60,7 @@ public class PathTransfer implements Serializable {
     return EnumSet.copyOf(modes);
   }
 
+  /** Create a new PathTransfer based on the current one with the mode added to the valid modes. */
   public PathTransfer withAddedMode(StreetMode mode) {
     EnumSet<StreetMode> newModes = EnumSet.copyOf(modes);
     newModes.add(mode);
