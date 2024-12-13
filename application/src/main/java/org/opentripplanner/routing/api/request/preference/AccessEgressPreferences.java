@@ -147,19 +147,19 @@ public final class AccessEgressPreferences implements Serializable {
   }
 
   private static TimeAndCostPenaltyForEnum<StreetMode> createDefaultCarPenalty() {
-    var penaltyrBuilder = TimeAndCostPenaltyForEnum.of(StreetMode.class);
+    var penaltyBuilder = TimeAndCostPenaltyForEnum.of(StreetMode.class);
 
     var flexDefaultPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(10), 1.3f), 1.3);
-    penaltyrBuilder.with(StreetMode.FLEXIBLE, flexDefaultPenalty);
+    penaltyBuilder.with(StreetMode.FLEXIBLE, flexDefaultPenalty);
 
     // Add penalty to all car variants with access and/or egress.
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
     for (var it : StreetMode.values()) {
       if (it.includesDriving() && (it.accessAllowed() || it.egressAllowed())) {
-        penaltyrBuilder.with(it, carPenalty);
+        penaltyBuilder.with(it, carPenalty);
       }
     }
 
-    return penaltyrBuilder.build();
+    return penaltyBuilder.build();
   }
 }
