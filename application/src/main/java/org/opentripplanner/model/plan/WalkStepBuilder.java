@@ -44,7 +44,7 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public WalkStepBuilder withBogusName(boolean nameIsDerived) {
+  public WalkStepBuilder withNameIsDerived(boolean nameIsDerived) {
     this.nameIsDerived = nameIsDerived;
     return this;
   }
