@@ -75,6 +75,7 @@ public class Transfer {
     return edges;
   }
 
+  /** Check if the given mode is a valid mode for the transfer. */
   public boolean allowsMode(StreetMode mode) {
     return modes.contains(mode);
   }
