@@ -24,7 +24,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.transit.api.request.RegularStopRequest;
+import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -267,7 +267,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<RegularStop> findRegularStops(Envelope envelope);
+  Collection<RegularStop> findRegularStopsByBoundingBox(Envelope envelope);
 
   Collection<AreaStop> findAreaStops(Envelope envelope);
 
@@ -327,10 +327,13 @@ public interface TransitService {
   boolean containsTrip(FeedScopedId id);
 
   /**
-   * Returns a list of RegularStops that match the filtering defined in the request.
+   * Returns a list of RegularStops that lay within a bounding box and match the other criteria in
+   * the request object.
    *
-   * @param request - A {@link RegularStopRequest} object with filtering defined.
+   * @param request - A {@link FindRegularStopsByBoundingBoxRequest} object with filtering defined.
    * @return - A list of {@link RegularStop}s
    */
-  Collection<RegularStop> findRegularStops(RegularStopRequest request);
+  Collection<RegularStop> findRegularStopsByBoundingBox(
+    FindRegularStopsByBoundingBoxRequest request
+  );
 }

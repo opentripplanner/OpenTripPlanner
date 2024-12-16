@@ -749,7 +749,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       );
 
       Stream<RegularStop> stopStream = getTransitService(environment)
-        .findRegularStops(envelope)
+        .findRegularStopsByBoundingBox(envelope)
         .stream();
 
       if (args.getGraphQLFeeds() != null) {

@@ -34,7 +34,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
-import org.opentripplanner.transit.api.request.RegularStopRequest;
+import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -684,13 +684,15 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<RegularStop> findRegularStops(Envelope envelope) {
+  public Collection<RegularStop> findRegularStopsByBoundingBox(Envelope envelope) {
     OTPRequestTimeoutException.checkForTimeout();
     return timetableRepository.getSiteRepository().findRegularStops(envelope);
   }
 
   @Override
-  public Collection<RegularStop> findRegularStops(RegularStopRequest request) {
+  public Collection<RegularStop> findRegularStopsByBoundingBox(
+    FindRegularStopsByBoundingBoxRequest request
+  ) {
     OTPRequestTimeoutException.checkForTimeout();
     Collection<RegularStop> stops = timetableRepository
       .getSiteRepository()

@@ -116,7 +116,7 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.api.request.RegularStopRequest;
+import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -663,7 +663,9 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("authority")
-              .description("The ID of the authority to fetch stops for.")
+              .deprecate(
+                "This is the Transmodel namespace or the GTFS feedID - avoid using this. Request a new field if necessary."
+              )
               .type(Scalars.GraphQLString)
               .build()
           )
@@ -673,7 +675,7 @@ public class TransmodelGraphQLSchema {
               .name("filterByInUse")
               .description("If true only quays with at least one visiting line are included.")
               .type(Scalars.GraphQLBoolean)
-              .defaultValue(Boolean.FALSE)
+              .defaultValueProgrammatic(Boolean.FALSE)
               .build()
           )
           .dataFetcher(environment -> {
@@ -691,13 +693,15 @@ public class TransmodelGraphQLSchema {
             var authority = environment.<String>getArgument("authority");
             var filterInUse = environment.<Boolean>getArgument("filterByInUse");
 
-            RegularStopRequest regularStopRequest = RegularStopRequest
+            FindRegularStopsByBoundingBoxRequest findRegularStopsByBoundingBoxRequest = FindRegularStopsByBoundingBoxRequest
               .of(envelope)
-              .withFeed(authority)
+              .withFeedId(authority)
               .filterByInUse(filterInUse)
               .build();
 
-            return GqlUtil.getTransitService(environment).findRegularStops(regularStopRequest);
+            return GqlUtil
+              .getTransitService(environment)
+              .findRegularStopsByBoundingBox(findRegularStopsByBoundingBoxRequest);
           })
           .build()
       )
