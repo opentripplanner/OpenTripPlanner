@@ -64,6 +64,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use WCAG recommendation to fill in GTFS route text color if it is missing [#6308](https://github.com/opentripplanner/OpenTripPlanner/pull/6308)
 - Rename `otp-shaded-jar` artifact and fix deployment to Maven Central [#6331](https://github.com/opentripplanner/OpenTripPlanner/pull/6331)
 - Add query for cancelled trips to GTFS GraphQL API [#5393](https://github.com/opentripplanner/OpenTripPlanner/pull/5393)
+- Enable mode-specific transfers by storing mode information in transfers [#6293](https://github.com/opentripplanner/OpenTripPlanner/pull/6293)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
