@@ -18,7 +18,7 @@ export function DepartureArrivalSelect({
   return (
     <Form.Group>
       <Form.Label column="sm" htmlFor="departureArrivalSelect">
-        Departure/Arrival
+
       </Form.Label>
       <Form.Select
         size="sm"

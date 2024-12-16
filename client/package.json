@@ -14,6 +14,8 @@
     "preview": "vite preview",
     "prebuild": "npm run codegen && npm run lint && npm run check-format",
     "predev": "npm run codegen",
+    "codegen-preprocess": "graphql-codegen --config codegen-preprocess.ts",
+    "precodegen": "npm run codegen-preprocess",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {

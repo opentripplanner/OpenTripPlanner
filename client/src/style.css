@@ -1,39 +1,65 @@
-.app {
-  min-width: 810px;
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: 1fr 2fr;
+  height: 100vh;
+  gap: 0;
 }
+
+.box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-section {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.input-section {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.trip-section {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+.map-section {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
 .navbar-brand {
   color: #4078bc;
   margin-top: 20px;
   margin-right: 14px;
+  font-size: 2rem;
 }
 
 @media (min-width: 1895px) {
-  .top-content {
-    height: 75px;
-  }
-
   .below-content {
-    height: calc(100vh - 75px);
+    height: calc(100vh - 175px);
   }
 }
 
 @media (max-width: 1896px) {
-  .top-content {
-    height: 150px;
-  }
-
   .below-content {
-    height: calc(100vh - 150px);
+    height: calc(100vh - 175px);
   }
 }
 
-@media (max-width: 1120px) {
-  .top-content {
-    height: 200px;
-  }
-
+@media (max-width: 1250px) {
   .below-content {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 250px);
+  }
+}
+
+@media (max-width: 900px) {
+  .below-content {
+    height: calc(100vh - 325px);
   }
 }
 
@@ -48,6 +74,10 @@
   flex-wrap: wrap;
   justify-content: space-between;
   margin-right: 1rem;
+}
+
+.search-bar input.input-tiny {
+  max-width: 50px;
 }
 
 .search-bar input.input-small {
@@ -73,12 +103,26 @@
   margin: 30px 0 auto 0;
 }
 
-.search-bar .swap-from-to img {
+.swap-from-to img {
   width: 15px;
 }
 
+.logo-container {
+  width: 265px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-container .details {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+  text-align: left;
+}
+
 .itinerary-list-container {
-  width: 36rem;
+  font-size: 12px;
+  width: 100%;
   overflow-y: auto;
 }
 
@@ -196,4 +240,121 @@
 
 .maplibregl-ctrl-group.layer-select div.layer {
   margin-left: 17px;
+}
+
+.right-menu-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background-color: #f4f4f4;
+  overflow-x: hidden;
+  transition: 0.3s;
+  padding-top: 60px;
+  box-shadow: none;
+}
+
+.right-menu-container.open {
+  width: 250px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.left-menu-container {
+  position: absolute;
+  top: 0;
+  left: 0; /* Align to the left side */
+  width: 0;
+  height: 100%;
+  background-color: #f4f4f4;
+  overflow-x: hidden;
+  transition: 0.3s; /* Smooth transition for width */
+  padding-top: 60px;
+  box-shadow: none;
+}
+
+.left-menu-container.open {
+  width: 250px; /* Expand the sidebar when open */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Shadow on the right of the sidebar */
+}
+
+.sidebar-button.right {
+  position: absolute;
+  right: 0px; /* Default position when sidebar is closed */
+  background: #ccc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  transition:
+    right 0.3s,
+    background-color 0.2s; /* Smooth transitions */
+}
+
+.sidebar-button.right.open {
+  right: 270px; /* Shifted position when sidebar is open */
+}
+
+.sidebar-button.left {
+  position: absolute;
+  left: 0px; /* Default position when sidebar is closed */
+  background: #ccc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  transition:
+    right 0.3s,
+    background-color 0.2s; /* Smooth transitions */
+}
+
+.sidebar-button.left.open {
+  left: 270px; /* Shifted position when sidebar is open */
+}
+
+.sidebar-button.active {
+  background: #fff;
+}
+
+.sidebar-button:hover {
+  background: #4078bc; /* Slightly darker when hovered */
+}
+
+.sidebar-button.active:hover {
+  background: #fff;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.default-tooltip-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.default-tooltip-icon {
+  font-size: 14px;
+  color: #888;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.default-tooltip-icon:hover {
+  background-color: #e6e6e6;
 }

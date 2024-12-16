@@ -6,16 +6,17 @@ import {
   MapMouseEvent,
   NavigationControl,
   VectorTileSource,
+  MapRef,
 } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
 import { LegLines } from './LegLines.tsx';
 import { useMapDoubleClick } from './useMapDoubleClick.ts';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
-import DebugLayerControl from './LayerControl.tsx';
+import RightMenu from './RightMenu.tsx';
 
 const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
 
@@ -65,7 +66,7 @@ export function MapView({
       map.fitBounds(source.bounds, { maxDuration: 50, linear: true });
     }
   };
-
+  const mapRef = useRef<MapRef>(null); // Create a ref for MapRef
   return (
     <div className="map-container below-content">
       <Map
@@ -88,6 +89,7 @@ export function MapView({
         touchPitch={false}
         dragRotate={false}
         onLoad={panToWorldEnvelopeIfRequired}
+        ref={mapRef}
       >
         <NavigationControl position="top-left" />
         <NavigationMarkers
@@ -96,7 +98,11 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
-        <DebugLayerControl position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} />
+        <RightMenu
+          position="top-right"
+          setInteractiveLayerIds={setInteractiveLayerIds}
+          mapRef={mapRef?.current}
+        />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}
