@@ -7,7 +7,6 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;

@@ -5,7 +5,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
@@ -30,9 +29,7 @@ public class FlexIndex {
 
   public FlexIndex(TimetableRepository timetableRepository) {
     // Flex transfers should only use WALK mode transfers.
-    StreetMode mode = StreetMode.WALK;
-    List<PathTransfer> filteredPathTransfers = timetableRepository.getAllPathTransfers().stream().filter(pathTransfer -> pathTransfer.getModes().contains(mode)).toList();
-    for (PathTransfer transfer : filteredPathTransfers) {
+    for (PathTransfer transfer : timetableRepository.findTransfers(StreetMode.WALK)) {
       transfersToStop.put(transfer.to, transfer);
       transfersFromStop.put(transfer.from, transfer);
     }

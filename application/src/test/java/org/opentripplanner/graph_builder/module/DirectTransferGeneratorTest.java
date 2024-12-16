@@ -280,9 +280,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
-    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
-    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
-    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+    var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+    var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
     assertTransfers(
       walkTransfers,
@@ -422,9 +422,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
-    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
-    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
-    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+    var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+    var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
     assertTransfers(
       walkTransfers,
@@ -559,9 +559,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
-    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
-    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
-    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+    var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+    var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
     assertTransfers(
       walkTransfers,
@@ -608,9 +608,9 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
-    var walkTransfers = timetableRepository.getTransfersByMode(StreetMode.WALK);
-    var bikeTransfers = timetableRepository.getTransfersByMode(StreetMode.BIKE);
-    var carTransfers = timetableRepository.getTransfersByMode(StreetMode.CAR);
+    var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
+    var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
+    var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
 
     assertTransfers(
       walkTransfers,

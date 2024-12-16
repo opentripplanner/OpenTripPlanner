@@ -37,7 +37,6 @@ import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -71,6 +70,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -195,7 +195,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     };
   }
 
-  // TODO
+  /**
+   * @deprecated Replaced by {@link #canceledTrips()}.
+   */
+  @Deprecated
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes() {
     return environment -> null;
@@ -832,6 +835,14 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   }
 
   @Override
+  public DataFetcher<Connection<TripOnServiceDate>> canceledTrips() {
+    return environment -> {
+      var trips = getTransitService(environment).listCanceledTrips();
+      return new SimpleListConnection<>(trips).get(environment);
+    };
+  }
+
+  @Override
   public DataFetcher<VehicleParking> vehicleParking() {
     return environment -> {
       var args = new GraphQLTypes.GraphQLQueryTypeVehicleParkingArgs(environment.getArguments());
@@ -893,11 +904,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       return vehicleRentalStationService
         .getVehicleRentalStations()
         .stream()
-        .filter(vehicleRentalStation ->
-          OTPFeature.GtfsGraphQlApiRentalStationFuzzyMatching.isOn()
-            ? stationIdFuzzyMatches(vehicleRentalStation, id)
-            : stationIdMatches(vehicleRentalStation, id)
-        )
+        .filter(vehicleRentalStation -> stationIdMatches(vehicleRentalStation, id))
         .findAny()
         .orElse(null);
     };
@@ -966,21 +973,6 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
    */
   private boolean stationIdMatches(VehicleRentalStation station, String feedScopedId) {
     return station.getId().toString().equals(feedScopedId);
-  }
-
-  /**
-   * This matches station's feedScopedId to the given string if the string is feed scoped (i.e
-   * contains a `:` separator) or only matches the station's id without the feed to the given
-   * string. This approach can lead to a random station matching the criteria if there are multiple
-   * stations with the same id in different feeds.
-   * <p>
-   * TODO this can be potentially removed after a while, only used by Digitransit as of now.
-   */
-  private boolean stationIdFuzzyMatches(VehicleRentalStation station, String idWithoutFeed) {
-    if (idWithoutFeed != null && idWithoutFeed.contains(":")) {
-      return stationIdMatches(station, idWithoutFeed);
-    }
-    return station.getId().getId().equals(idWithoutFeed);
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

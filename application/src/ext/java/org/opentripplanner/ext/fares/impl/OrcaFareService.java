@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Agency;
 
 public class OrcaFareService extends DefaultFareService {
 
@@ -39,7 +38,7 @@ public class OrcaFareService extends DefaultFareService {
   public static final String PIERCE_COUNTY_TRANSIT_AGENCY_ID = "3";
   public static final String SKAGIT_TRANSIT_AGENCY_ID = "e0e4541a-2714-487b-b30c-f5c6cb4a310f";
   public static final String SEATTLE_STREET_CAR_AGENCY_ID = "23";
-  public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "WSF";
+  public static final String WASHINGTON_STATE_FERRIES_AGENCY_ID = "95";
   public static final String KITSAP_TRANSIT_AGENCY_ID = "kt";
   public static final String WHATCOM_AGENCY_ID = "14";
   public static final int ROUTE_TYPE_FERRY = 4;
@@ -398,28 +397,11 @@ public class OrcaFareService extends DefaultFareService {
       return defaultFare;
     }
 
-    var longName = routeLongName.toString().replaceAll(" ", "");
-
-    Map<FareType, Money> fares = OrcaFaresData.washingtonStateFerriesFares.get(longName);
-    // WSF doesn't support transfers so we only care about cash fares.
-    FareType wsfFareType;
-    if (fareType == FareType.electronicRegular) {
-      wsfFareType = FareType.regular;
-    } else if (fareType == FareType.electronicSenior) {
-      wsfFareType = FareType.senior;
-    } else if (fareType == FareType.electronicYouth) {
-      wsfFareType = FareType.youth;
-    } else if (fareType == FareType.electronicSpecial) {
-      wsfFareType = FareType.regular;
-    } else {
-      wsfFareType = fareType;
-    }
-    // WSF is free in one direction on each route
-    // If a fare is not found in the map, we can assume it's free.
-    // Route long name is reversed for the reverse direction on a single WSF route
-    return (fares != null && fares.get(wsfFareType) != null)
-      ? fares.get(wsfFareType)
-      : Money.ZERO_USD;
+    return switch (fareType) {
+      case youth, electronicYouth -> Money.ZERO_USD;
+      case regular, electronicRegular, electronicSpecial -> defaultFare;
+      case senior, electronicSenior -> defaultFare.half().roundDownToNearestFiveMinorUnits();
+    };
   }
 
   /**

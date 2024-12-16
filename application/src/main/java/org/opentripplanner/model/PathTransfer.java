@@ -28,7 +28,7 @@ public class PathTransfer implements Serializable {
 
   private final List<Edge> edges;
 
-  private EnumSet<StreetMode> modes;
+  private final EnumSet<StreetMode> modes;
 
   public PathTransfer(
     StopLocation from,
@@ -53,15 +53,18 @@ public class PathTransfer implements Serializable {
   }
 
   public List<Edge> getEdges() {
-    return this.edges;
+    return edges;
   }
 
   public EnumSet<StreetMode> getModes() {
-    return this.modes;
+    return EnumSet.copyOf(modes);
   }
 
-  public boolean addMode(StreetMode mode) {
-    return this.modes.add(mode);
+  /** Create a new PathTransfer based on the current one with the mode added to the valid modes. */
+  public PathTransfer withAddedMode(StreetMode mode) {
+    EnumSet<StreetMode> newModes = EnumSet.copyOf(modes);
+    newModes.add(mode);
+    return new PathTransfer(from, to, distanceMeters, edges, newModes);
   }
 
   @Override
