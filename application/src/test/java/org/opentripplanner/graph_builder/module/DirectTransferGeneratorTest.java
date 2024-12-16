@@ -247,39 +247,6 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     )
       .buildGraph();
 
-    assertTransfers(
-      timetableRepository.getAllPathTransfers(),
-      tr(S0, 100, List.of(V0, V11), S11),
-      tr(S0, 100, List.of(V0, V21), S21),
-      tr(S11, 100, List.of(V11, V21), S21),
-      tr(S11, 110, List.of(V11, V22), S22)
-    );
-  }
-
-  @Test
-  public void testPathTransfersWithModesForMultipleRequestsWithPatterns() {
-    var reqWalk = new RouteRequest();
-    reqWalk.journey().transfer().setMode(StreetMode.WALK);
-
-    var reqBike = new RouteRequest();
-    reqBike.journey().transfer().setMode(StreetMode.BIKE);
-
-    var transferRequests = List.of(reqWalk, reqBike);
-
-    TestOtpModel model = model(true);
-    var graph = model.graph();
-    graph.hasStreets = true;
-    var timetableRepository = model.timetableRepository();
-
-    new DirectTransferGenerator(
-      graph,
-      timetableRepository,
-      DataImportIssueStore.NOOP,
-      MAX_TRANSFER_DURATION,
-      transferRequests
-    )
-      .buildGraph();
-
     var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
     var carTransfers = timetableRepository.findTransfers(StreetMode.CAR);
