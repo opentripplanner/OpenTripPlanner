@@ -140,55 +140,16 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<>();
     List<RouteRequest> flexTransferRequests = new ArrayList<>();
 
-    // Parse transfer parameters.
-    for (RouteRequest transferProfile : transferRequests) {
-      StreetMode mode = transferProfile.journey().transfer().mode();
-      TransferParameters transferParameters = transferParametersForMode.get(mode);
-      if (transferParameters != null) {
-        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
-        if (!transferParameters.disableDefaultTransfers()) {
-          defaultTransferRequests.add(transferProfile);
-          // Set mode-specific maxTransferDuration, if it is set in the build config.
-          Duration maxTransferDuration = transferParameters.maxTransferDuration();
-          if (maxTransferDuration != Duration.ZERO) {
-            defaultNearbyStopFinders.put(
-              mode,
-              createNearbyStopFinder(maxTransferDuration, Set.of())
-            );
-          } else {
-            defaultNearbyStopFinders.put(mode, nearbyStopFinder);
-          }
-        }
-        // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
-        Duration carsAllowedStopMaxTransferDuration = transferParameters.carsAllowedStopMaxTransferDuration();
-        if (carsAllowedStopMaxTransferDuration != Duration.ZERO) {
-          carsAllowedStopTransferRequests.add(transferProfile);
-          carsAllowedStopNearbyStopFinders.put(
-            mode,
-            createNearbyStopFinder(
-              carsAllowedStopMaxTransferDuration,
-              Collections.<Vertex>unmodifiableSet(carsAllowedStops)
-            )
-          );
-        }
-      } else {
-        defaultTransferRequests.add(transferProfile);
-        defaultNearbyStopFinders.put(mode, nearbyStopFinder);
-      }
-    }
-
-    // Flex transfer requests only use the WALK mode.
-    if (OTPFeature.FlexRouting.isOn()) {
-      flexTransferRequests.addAll(
-        transferRequests
-          .stream()
-          .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
-          .toList()
-      );
-      if (!defaultNearbyStopFinders.containsKey(StreetMode.WALK)) {
-        defaultNearbyStopFinders.put(StreetMode.WALK, nearbyStopFinder);
-      }
-    }
+    // Parse the transfer configuration from the parameters given in the build config.
+    parseTransferParameters(
+      defaultTransferRequests,
+      carsAllowedStopTransferRequests,
+      flexTransferRequests,
+      defaultNearbyStopFinders,
+      carsAllowedStopNearbyStopFinders,
+      nearbyStopFinder,
+      carsAllowedStops
+    );
 
     stops
       .stream()
@@ -329,6 +290,63 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       return new PatternConsideringNearbyStopFinder(transitService, finder);
     } else {
       return finder;
+    }
+  }
+
+  private void parseTransferParameters(
+    List<RouteRequest> defaultTransferRequests,
+    List<RouteRequest> carsAllowedStopTransferRequests,
+    List<RouteRequest> flexTransferRequests,
+    HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinders,
+    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinders,
+    NearbyStopFinder nearbyStopFinder,
+    Set<TransitStopVertex> carsAllowedStops
+  ) {
+    for (RouteRequest transferProfile : transferRequests) {
+      StreetMode mode = transferProfile.journey().transfer().mode();
+      TransferParameters transferParameters = transferParametersForMode.get(mode);
+      if (transferParameters != null) {
+        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
+        // WALK mode transfers can not be disabled. For example, flex transfers need them.
+        if (!transferParameters.disableDefaultTransfers() || mode == StreetMode.WALK) {
+          defaultTransferRequests.add(transferProfile);
+          // Set mode-specific maxTransferDuration, if it is set in the build config.
+          Duration maxTransferDuration = transferParameters.maxTransferDuration();
+          if (maxTransferDuration != Duration.ZERO) {
+            defaultNearbyStopFinders.put(
+              mode,
+              createNearbyStopFinder(maxTransferDuration, Set.of())
+            );
+          } else {
+            defaultNearbyStopFinders.put(mode, nearbyStopFinder);
+          }
+        }
+        // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
+        Duration carsAllowedStopMaxTransferDuration = transferParameters.carsAllowedStopMaxTransferDuration();
+        if (carsAllowedStopMaxTransferDuration != Duration.ZERO) {
+          carsAllowedStopTransferRequests.add(transferProfile);
+          carsAllowedStopNearbyStopFinders.put(
+            mode,
+            createNearbyStopFinder(
+              carsAllowedStopMaxTransferDuration,
+              Collections.<Vertex>unmodifiableSet(carsAllowedStops)
+            )
+          );
+        }
+      } else {
+        defaultTransferRequests.add(transferProfile);
+        defaultNearbyStopFinders.put(mode, nearbyStopFinder);
+      }
+    }
+
+    // Flex transfer requests only use the WALK mode.
+    if (OTPFeature.FlexRouting.isOn()) {
+      flexTransferRequests.addAll(
+        transferRequests
+          .stream()
+          .filter(transferProfile -> transferProfile.journey().transfer().mode() == StreetMode.WALK)
+          .toList()
+      );
     }
   }
 
