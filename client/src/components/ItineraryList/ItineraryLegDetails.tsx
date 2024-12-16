@@ -21,7 +21,7 @@ export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean
   return (
     <div className="itinerary-leg-details">
       <div className="times">
-        {formatDistance(leg.distance)}, {formatDuration(leg.duration)}
+        {formatDistance(leg.distance)}, {formatDuration(leg.duration)}, ${leg.generalizedCost}
       </div>
       <InterchangeInfo leg={leg} />
       <LegTime

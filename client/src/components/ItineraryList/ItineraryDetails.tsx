@@ -10,6 +10,10 @@ export function ItineraryDetails({ tripPattern }: { tripPattern: TripPattern }) 
       {tripPattern.legs.map((leg, i) => (
         <ItineraryLegDetails key={leg.id ? leg.id : `noid_${i}`} leg={leg} isLast={i === tripPattern.legs.length - 1} />
       ))}
+
+      <div className="generalized-cost">
+        Generalized cost: ${tripPattern.generalizedCost}
+      </div>
     </div>
   );
 }
