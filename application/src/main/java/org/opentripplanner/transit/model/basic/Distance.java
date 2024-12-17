@@ -18,7 +18,7 @@ public class Distance {
   }
 
   /** Returns a Distance object representing the given number of meters */
-  public static Distance ofMeters(double value) {
+  public static Distance ofMeters(double value) throws IllegalArgumentException {
     if (value < 0) {
       throw new IllegalArgumentException("Distance cannot be negative");
     }

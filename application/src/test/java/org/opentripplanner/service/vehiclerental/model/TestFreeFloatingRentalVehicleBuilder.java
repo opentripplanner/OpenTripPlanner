@@ -1,8 +1,10 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Distance;
+import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TestFreeFloatingRentalVehicleBuilder {
@@ -15,7 +17,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
 
   private double latitude = DEFAULT_LATITUDE;
   private double longitude = DEFAULT_LONGITUDE;
-  private Double currentFuelPercent = DEFAULT_CURRENT_FUEL_PERCENT;
+  private Ratio currentFuelPercent = new Ratio(DEFAULT_CURRENT_FUEL_PERCENT);
   private Double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
   private VehicleRentalSystem system = null;
   private String network = NETWORK_1;
@@ -36,8 +38,14 @@ public class TestFreeFloatingRentalVehicleBuilder {
     return this;
   }
 
-  public TestFreeFloatingRentalVehicleBuilder withCurrentFuelPercent(Double currentFuelPercent) {
-    this.currentFuelPercent = currentFuelPercent;
+  public TestFreeFloatingRentalVehicleBuilder withCurrentFuelPercent(
+    @Nullable Double currentFuelPercent
+  ) {
+    if (currentFuelPercent == null) {
+      this.currentFuelPercent = null;
+    } else {
+      this.currentFuelPercent = new Ratio(currentFuelPercent);
+    }
     return this;
   }
 

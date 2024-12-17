@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehiclerental.model;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.basic.Distance;
+import org.opentripplanner.transit.model.basic.Ratio;
 
 /**
  * Contains information about the current battery or fuel status.
@@ -16,7 +17,7 @@ public class RentalVehicleFuel {
    * May be {@code null}.
    */
   @Nullable
-  public final Double percent;
+  public final Ratio percent;
 
   /**
    * Distance that the vehicle can travel with the current charge or fuel.
@@ -26,14 +27,14 @@ public class RentalVehicleFuel {
   @Nullable
   public final Distance range;
 
-  public RentalVehicleFuel(@Nullable Double fuelPercent, @Nullable Distance range) {
+  public RentalVehicleFuel(@Nullable Ratio fuelPercent, @Nullable Distance range) {
     this.percent = fuelPercent;
     this.range = range;
   }
 
   @Nullable
   public Double getPercent() {
-    return percent;
+    return this.percent != null ? this.percent.ratio : null;
   }
 
   @Nullable

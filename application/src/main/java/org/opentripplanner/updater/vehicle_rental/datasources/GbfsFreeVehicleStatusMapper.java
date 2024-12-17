@@ -17,6 +17,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Distance;
+import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,39 +61,38 @@ public class GbfsFreeVehicleStatusMapper {
         vehicle.getLastReported() != null
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
-      Double fuelPercent = null;
-      if (vehicle.getCurrentFuelPercent() != null) {
-        try {
-          fuelPercent =
-            (Double) GraphQLScalars.RATIO_SCALAR
-              .getCoercing()
-              .parseValue(vehicle.getCurrentFuelPercent());
-        } catch (CoercingParseValueException e) {
-          LOG.warn(
-            "Current fuel percent: {} - {}",
-            vehicle.getCurrentFuelPercent(),
-            e.getMessage()
-          );
-        }
-      }
+      Ratio fuelPercent = null;
+      try {
+        fuelPercent = new Ratio(vehicle.getCurrentFuelPercent());
+      } catch (IllegalArgumentException e) {
+        LOG.warn(
+          "Current fuel percent value not valid: {} - {}",
+          vehicle.getCurrentFuelPercent(),
+          e.getMessage()
+        );
+      } catch (NullPointerException e) {}
       Distance rangeMeters = null;
       try {
-        rangeMeters = vehicle.getCurrentRangeMeters() != null
-          ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
-          : null;
+        rangeMeters =
+          vehicle.getCurrentRangeMeters() != null
+            ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
+            : null;
       } catch (IllegalArgumentException e) {
-        LOG.warn(e.getMessage());
+        LOG.warn(
+          "Current range meter value not valid: {} - {}",
+          vehicle.getCurrentRangeMeters(),
+          e.getMessage()
+        );
         // if the propulsion type has an engine current_range_meters is required
-        if (vehicle.getVehicleTypeId() != null
-          && vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType != RentalVehicleType.PropulsionType.HUMAN) {
+        if (
+          vehicle.getVehicleTypeId() != null &&
+          vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType !=
+          RentalVehicleType.PropulsionType.HUMAN
+        ) {
           return null;
         }
       }
-      rentalVehicle.fuel =
-        new RentalVehicleFuel(
-          fuelPercent,
-          rangeMeters
-        );
+      rentalVehicle.fuel = new RentalVehicleFuel(fuelPercent, rangeMeters);
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {

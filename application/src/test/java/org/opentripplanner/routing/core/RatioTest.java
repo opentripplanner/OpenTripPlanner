@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -24,8 +24,8 @@ public class RatioTest {
 
   @Test
   void invalidRatios() {
-    assertThrows(IllegalArgumentException.class ,() -> new Ratio(TOO_HIGH));
-    assertThrows(IllegalArgumentException.class ,() -> new Ratio(TOO_LOW));
+    assertThrows(IllegalArgumentException.class, () -> new Ratio(TOO_HIGH));
+    assertThrows(IllegalArgumentException.class, () -> new Ratio(TOO_LOW));
   }
 
   @Test
