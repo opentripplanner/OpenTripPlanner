@@ -83,14 +83,12 @@ public class GbfsFreeVehicleStatusMapper {
           vehicle.getCurrentRangeMeters(),
           e.getMessage()
         );
-        // if the propulsion type has an engine current_range_meters is required
-        if (
-          vehicle.getVehicleTypeId() != null &&
-          vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType !=
-          RentalVehicleType.PropulsionType.HUMAN
-        ) {
-          return null;
-        }
+      }
+      // if the propulsion type has an engine current_range_meters is required
+      if (vehicle.getVehicleTypeId() != null
+        && vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType != RentalVehicleType.PropulsionType.HUMAN
+        && rangeMeters == null) {
+        return null;
       }
       rentalVehicle.fuel = new RentalVehicleFuel(fuelPercent, rangeMeters);
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
