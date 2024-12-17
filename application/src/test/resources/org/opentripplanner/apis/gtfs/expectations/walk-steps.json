@@ -24,7 +24,7 @@
                   {
                     "streetName": "entrance",
                     "area": false,
-                    "relativeDirection": "ENTER_OR_EXIT_STATION",
+                    "relativeDirection": "CONTINUE",
                     "absoluteDirection": null,
                     "feature": {
                       "__typename": "Entrance",
