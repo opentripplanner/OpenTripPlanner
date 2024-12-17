@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertImpl;
@@ -87,6 +88,7 @@ import org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandl
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,14 +96,12 @@ class GtfsGraphQLIndex {
 
   static final Logger LOG = LoggerFactory.getLogger(GtfsGraphQLIndex.class);
 
-  private static final GraphQLSchema indexSchema = buildSchema();
-
-  protected static GraphQLSchema buildSchema() {
+  protected static GraphQLSchema buildSchema(@Nullable RoutingPreferences defaultPreferences) {
     try {
       URL url = Objects.requireNonNull(GtfsGraphQLIndex.class.getResource("schema.graphqls"));
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
-      RuntimeWiring runtimeWiring = RuntimeWiring
+      RuntimeWiring.Builder runtimeWiringBuilder = RuntimeWiring
         .newRuntimeWiring()
         .scalar(GraphQLScalars.DURATION_SCALAR)
         .scalar(GraphQLScalars.POLYLINE_SCALAR)
@@ -180,10 +180,14 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(CurrencyImpl.class))
         .type(typeWiring.build(FareProductUseImpl.class))
         .type(typeWiring.build(DefaultFareProductImpl.class))
-        .type(typeWiring.build(TripOccupancyImpl.class))
-        .build();
+        .type(typeWiring.build(TripOccupancyImpl.class));
+
+      if (defaultPreferences != null) {
+        runtimeWiringBuilder.directiveWiring(new DefaultValueDirectiveWiring(defaultPreferences));
+      }
+
       SchemaGenerator schemaGenerator = new SchemaGenerator();
-      return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
+      return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiringBuilder.build());
     } catch (Exception e) {
       LOG.error("Unable to build GTFS GraphQL Schema", e);
     }
@@ -210,7 +214,7 @@ class GtfsGraphQLIndex {
     }
 
     GraphQL graphQL = GraphQL
-      .newGraphQL(indexSchema)
+      .newGraphQL(buildSchema(requestContext.defaultRouteRequest().preferences()))
       .instrumentation(instrumentation)
       .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
       .build();
