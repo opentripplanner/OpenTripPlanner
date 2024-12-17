@@ -145,14 +145,16 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    */
   public abstract I18NString getName();
 
-  // TODO Add comments about what a "bogus name" is.
-  public boolean hasBogusName() {
+  /**
+   * Returns true if this edge has a generated name that is derived from its properties,
+   * like "path", "stairs" or "tunnel".
+   * <p>
+   * Returns false if the field reflects the real world name, like "Fifth Avenue",
+   * "Hauptstraße" or "Øvre Holmegate".
+   */
+  public boolean nameIsDerived() {
     return false;
   }
-
-  // The next few functions used to live in EdgeNarrative, which has now been
-  // removed
-  // @author mattwigway
 
   public LineString getGeometry() {
     return null;

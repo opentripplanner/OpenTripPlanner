@@ -35,6 +35,7 @@ export const query = graphql(`
         expectedStartTime
         duration
         distance
+        generalizedCost
         legs {
           id
           mode
@@ -45,6 +46,7 @@ export const query = graphql(`
           realtime
           distance
           duration
+          generalizedCost
           fromPlace {
             name
             quay {

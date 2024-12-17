@@ -133,6 +133,14 @@ public class StringUtils {
   }
 
   /**
+   * Create a URL-friendly "slug" version of the string, so "Entur Routebanken" becomes
+   * "entur-routebanken".
+   */
+  public static String slugify(String input) {
+    return input.toLowerCase().replace('_', '-').replaceAll("\\s+", "-");
+  }
+
+  /**
    * Detects unprintable control characters like newlines, tabs and invisible whitespace
    * like 'ZERO WIDTH SPACE' (U+200B) that don't have an immediate visual representation.
    * <p>
