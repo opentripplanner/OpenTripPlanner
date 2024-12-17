@@ -2259,9 +2259,8 @@ type StopGeometries {
 
 type StopInPattern {
   "NULL means that the stop is cancelled from the pattern."
-  dropoffType: PickupDropoffType
+  dropOffType: PickupDropoffType
   indexInPattern: Int!
-  pattern: Pattern!
   "NULL means that the stop is cancelled from the pattern."
   pickupType: PickupDropoffType
   stop: Stop!

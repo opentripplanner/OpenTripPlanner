@@ -48,21 +48,15 @@ public class StopInPatternModelTest {
   @Test
   public void fromPatternAndIndex() {
     assertEquals(
-      new StopInPatternModel(STOP_A, PATTERN, 0, PickDrop.SCHEDULED, PickDrop.NONE),
+      new StopInPatternModel(STOP_A, 0, PickDrop.SCHEDULED, PickDrop.NONE),
       StopInPatternModel.fromPatternAndIndex(PATTERN, 0)
     );
     assertEquals(
-      new StopInPatternModel(
-        STOP_B,
-        PATTERN,
-        1,
-        PickDrop.CALL_AGENCY,
-        PickDrop.COORDINATE_WITH_DRIVER
-      ),
+      new StopInPatternModel(STOP_B, 1, PickDrop.CALL_AGENCY, PickDrop.COORDINATE_WITH_DRIVER),
       StopInPatternModel.fromPatternAndIndex(PATTERN, 1)
     );
     assertEquals(
-      new StopInPatternModel(STOP_C, PATTERN, 2, PickDrop.NONE, PickDrop.SCHEDULED),
+      new StopInPatternModel(STOP_C, 2, PickDrop.NONE, PickDrop.SCHEDULED),
       StopInPatternModel.fromPatternAndIndex(PATTERN, 2)
     );
   }

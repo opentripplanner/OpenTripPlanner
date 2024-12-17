@@ -6,23 +6,17 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.model.StopInPatternModel;
-import org.opentripplanner.transit.model.network.TripPattern;
 
 public class StopInPatternImpl implements GraphQLDataFetchers.GraphQLStopInPattern {
 
   @Override
-  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> dropoffType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> dropOffType() {
     return environment -> PickDropMapper.map(getSource(environment).dropoffType());
   }
 
   @Override
   public DataFetcher<Integer> indexInPattern() {
     return environment -> getSource(environment).indexInPattern();
-  }
-
-  @Override
-  public DataFetcher<TripPattern> pattern() {
-    return environment -> getSource(environment).pattern();
   }
 
   @Override
