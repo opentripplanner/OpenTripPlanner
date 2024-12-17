@@ -78,7 +78,7 @@ class RegularStopTest {
     assertEquals(WHEELCHAIR_ACCESSIBILITY, copy.getWheelchairAccessibility());
     // TODO inconsistent naming
     assertEquals(NETEX_SUBMODE, copy.getNetexVehicleSubmode());
-    assertEquals(VEHICLE_TYPE, copy.getGtfsVehicleType());
+    assertEquals(VEHICLE_TYPE, copy.getVehicleType());
     assertEquals(TIME_ZONE, copy.getTimeZone());
     assertEquals(PLATFORM_CODE, copy.getPlatformCode());
   }

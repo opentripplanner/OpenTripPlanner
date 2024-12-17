@@ -7,7 +7,8 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * Class for holding data about a certain trip on a certain day. Essentially a DatedServiceJourney.
+ * Class for holding data about a certain trip on a certain day. Essentially a DatedServiceJourney
+ * or an instance of a generic trip on a certain service date.
  */
 public class TripOnServiceDate
   extends AbstractTransitEntity<TripOnServiceDate, TripOnServiceDateBuilder> {
@@ -43,10 +44,6 @@ public class TripOnServiceDate
 
   public List<TripOnServiceDate> getReplacementFor() {
     return replacementFor;
-  }
-
-  public TripIdAndServiceDate getTripIdAndServiceDate() {
-    return new TripIdAndServiceDate(trip.getId(), serviceDate);
   }
 
   @Override

@@ -24,9 +24,9 @@ import org.opentripplanner.osm.OsmOpeningHoursParser;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
@@ -312,7 +312,7 @@ class ParkingProcessor {
     );
   }
 
-  private VehicleParking createVehicleParkingObjectFromOsmEntity(
+  VehicleParking createVehicleParkingObjectFromOsmEntity(
     boolean isCarParkAndRide,
     Coordinate coordinate,
     OsmWithTags entity,
@@ -421,7 +421,7 @@ class ParkingProcessor {
   }
 
   private OptionalInt parseCapacity(OsmWithTags element, String capacityTag) {
-    return element.getTagAsInt(
+    return element.parseIntOrBoolean(
       capacityTag,
       v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
     );

@@ -31,12 +31,15 @@ import org.opentripplanner.apis.gtfs.datafetchers.BikeParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BikeRentalStationImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.BookingTimeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.CallScheduledTimeTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.CallStopLocationTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.CarParkImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ContactInfoImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CoordinatesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CurrencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DefaultFareProductImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.EstimatedTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.EntranceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
@@ -44,6 +47,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.FeedImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.GeometryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.ItineraryImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.LegImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.LegTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.MoneyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.NodeTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.OpeningHoursImpl;
@@ -53,6 +57,8 @@ import org.opentripplanner.apis.gtfs.datafetchers.PlaceInterfaceTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.PlanConnectionImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.PlanImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.QueryTypeImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.RealTimeEstimateImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.RentalPlaceTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RideHailingEstimateImpl;
@@ -60,6 +66,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.RouteImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RoutingErrorImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StepFeatureTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.StopCallImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopOnRouteImpl;
@@ -72,6 +79,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.TicketTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.TranslatedStringImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.TripImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.TripOccupancyImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.TripOnServiceDateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.UnknownImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.VehiclePositionImpl;
@@ -125,9 +133,12 @@ class GtfsGraphQLIndex {
         )
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))
+        .type("RentalPlace", type -> type.typeResolver(new RentalPlaceTypeResolver()))
         .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type("FareProduct", type -> type.typeResolver(new FareProductTypeResolver()))
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
+        .type("CallStopLocation", type -> type.typeResolver(new CallStopLocationTypeResolver()))
+        .type("CallScheduledTime", type -> type.typeResolver(new CallScheduledTimeTypeResolver()))
         .type("StepFeature", type -> type.typeResolver(new StepFeatureTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
         .type(typeWiring.build(AlertImpl.class))
@@ -181,7 +192,12 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(CurrencyImpl.class))
         .type(typeWiring.build(FareProductUseImpl.class))
         .type(typeWiring.build(DefaultFareProductImpl.class))
+        .type(typeWiring.build(TripOnServiceDateImpl.class))
+        .type(typeWiring.build(StopCallImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class))
+        .type(typeWiring.build(LegTimeImpl.class))
+        .type(typeWiring.build(RealTimeEstimateImpl.class))
+        .type(typeWiring.build(EstimatedTimeImpl.class))
         .type(typeWiring.build(EntranceImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();

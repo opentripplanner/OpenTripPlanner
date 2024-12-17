@@ -16,9 +16,11 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -31,12 +33,14 @@ public class ConstructApplicationModule {
   @Provides
   OtpServerRequestContext providesServerContext(
     RouterConfig routerConfig,
+    DebugUiConfig debugUiConfig,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitService transitService,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
+    VehicleParkingService vehicleParkingService,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
@@ -59,6 +63,7 @@ public class ConstructApplicationModule {
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
+      vehicleParkingService,
       emissionsService,
       sorlandsbanenService,
       routerConfig.flexParameters(),
@@ -66,7 +71,8 @@ public class ConstructApplicationModule {
       stopConsolidationService,
       streetLimitationParametersService,
       traverseVisitor,
-      luceneIndex
+      luceneIndex,
+      debugUiConfig
     );
   }
 

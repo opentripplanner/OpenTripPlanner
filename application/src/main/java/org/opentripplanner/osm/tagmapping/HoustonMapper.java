@@ -14,7 +14,7 @@ import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
  * 1. In Houston we want to disallow usage of downtown pedestrian tunnel system.
  */
 
-class HoustonMapper implements OsmTagMapper {
+class HoustonMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -26,11 +26,9 @@ class HoustonMapper implements OsmTagMapper {
       new ExactMatchSpecifier("highway=footway;layer=-1;tunnel=yes;indoor=yes"),
       withModes(NONE)
     );
-
     // Max speed limit in Texas is 38 m/s ~= 85 mph ~= 137 kph
     props.maxPossibleCarSpeed = 38f;
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 }

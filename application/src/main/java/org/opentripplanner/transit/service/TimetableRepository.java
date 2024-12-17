@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +36,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
@@ -166,10 +168,9 @@ public class TimetableRepository implements Serializable {
    */
   public void index() {
     if (index == null) {
-      LOG.info("Index transit model...");
-      // the transit model indexing updates the site repository index (flex stops added to the stop index)
+      LOG.info("Index timetable repository...");
       this.index = new TimetableRepositoryIndex(this);
-      LOG.info("Index transit model complete.");
+      LOG.info("Index timetable repository complete.");
     }
   }
 
@@ -432,6 +433,15 @@ public class TimetableRepository implements Serializable {
   /** Pre-generated transfers between all stops. */
   public Collection<PathTransfer> getTransfersByStop(StopLocation stop) {
     return transfersByStop.get(stop);
+  }
+
+  /** Pre-generated transfers between all stops filtered based on the modes in the PathTransfer. */
+  public List<PathTransfer> findTransfers(StreetMode mode) {
+    return transfersByStop
+      .values()
+      .stream()
+      .filter(pathTransfer -> pathTransfer.getModes().contains(mode))
+      .toList();
   }
 
   public SiteRepository getSiteRepository() {

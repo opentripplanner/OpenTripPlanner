@@ -6,7 +6,7 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class BikeParkType {
 

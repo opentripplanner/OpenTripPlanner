@@ -10,15 +10,15 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
+import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTime;
+import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -28,6 +28,7 @@ import org.opentripplanner.model.plan.legreference.LegReferenceSerializer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
+import org.opentripplanner.routing.alternativelegs.NavigationDirection;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -66,12 +67,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<String> dropoffType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> dropoffType() {
     return environment -> {
       if (getSource(environment).getAlightRule() == null) {
-        return PickDrop.SCHEDULED.name();
+        return GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       }
-      return getSource(environment).getAlightRule().name();
+      return PickDropMapper.map(getSource(environment).getAlightRule());
     };
   }
 
@@ -81,7 +82,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<LegTime> end() {
+  public DataFetcher<LegCallTime> end() {
     return environment -> getSource(environment).end();
   }
 
@@ -177,18 +178,18 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<String> pickupType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> pickupType() {
     return environment -> {
       if (getSource(environment).getBoardRule() == null) {
-        return PickDrop.SCHEDULED.name();
+        return GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       }
-      return getSource(environment).getBoardRule().name();
+      return PickDropMapper.map(getSource(environment).getBoardRule());
     };
   }
 
   @Override
   public DataFetcher<Boolean> realTime() {
-    return environment -> getSource(environment).getRealTime();
+    return environment -> getSource(environment).isRealTimeUpdated();
   }
 
   @Override
@@ -227,7 +228,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<LegTime> start() {
+  public DataFetcher<LegCallTime> start() {
     return environment -> getSource(environment).start();
   }
 
@@ -276,7 +277,16 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<Iterable<Leg>> previousLegs() {
+    return alternativeLegs(NavigationDirection.PREVIOUS);
+  }
+
+  @Override
   public DataFetcher<Iterable<Leg>> nextLegs() {
+    return alternativeLegs(NavigationDirection.NEXT);
+  }
+
+  private DataFetcher<Iterable<Leg>> alternativeLegs(NavigationDirection direction) {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
         var args = new GraphQLTypes.GraphQLLegNextLegsArgs(environment.getArguments());
@@ -311,7 +321,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
             environment.getSource(),
             numberOfLegs,
             environment.<GraphQLRequestContext>getContext().transitService(),
-            false,
+            direction,
             AlternativeLegsFilter.NO_FILTER,
             limitToExactOriginStop,
             limitToExactDestinationStop

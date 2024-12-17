@@ -4,6 +4,7 @@ import { IControl, Map, TypedStyleLayer } from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
+  setInteractiveLayerIds: (interactiveLayerIds: string[]) => void;
 };
 
 /**
@@ -15,51 +16,111 @@ type LayerControlProps = {
 class LayerControl implements IControl {
   private readonly container: HTMLDivElement = document.createElement('div');
 
+  private readonly setInteractiveLayerIds: (interactiveLayerIds: string[]) => void;
+
+  constructor(setInteractiveLayerIds: (interactiveLayerIds: string[]) => void) {
+    this.setInteractiveLayerIds = setInteractiveLayerIds;
+  }
+
   onAdd(map: Map) {
     this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-select';
 
     map.on('load', () => {
-      // clean on
+      // clean on rerender
       while (this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
       }
 
-      const title = document.createElement('h4');
-      title.textContent = 'Debug layers';
-      this.container.appendChild(title);
-
-      const groups: Record<string, HTMLDivElement> = {};
-      map
-        .getLayersOrder()
-        .map((l) => map.getLayer(l))
-        .filter((s) => s?.type !== 'raster')
-        // the polylines of the routing result are put in map layers called jsx-1, jsx-2...
-        // we don't want them to show up in the debug layer selector
-        .filter((s) => !s?.id.startsWith('jsx'))
-        .reverse()
-        .forEach((layer) => {
-          if (layer) {
-            const meta: { group: string } = layer.metadata as { group: string };
-
-            let groupName: string = 'Misc';
-            if (meta.group) {
-              groupName = meta.group;
-            }
-
-            const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
-
-            if (groups[groupName]) {
-              groups[groupName]?.appendChild(layerDiv);
-            } else {
-              const groupDiv = this.buildGroupDiv(groupName, layerDiv);
-              groups[groupName] = groupDiv;
-              this.container.appendChild(groupDiv);
-            }
-          }
-        });
+      this.buildBackgroundLayers(map);
+      this.buildDebugLayers(map);
     });
 
     return this.container;
+  }
+
+  private buildBackgroundLayers(map: Map) {
+    const title = document.createElement('h4');
+    title.textContent = 'Background';
+    this.container.appendChild(title);
+
+    const select = document.createElement('select');
+    this.container.appendChild(select);
+
+    const rasterLayers = map
+      .getLayersOrder()
+      .map((l) => map.getLayer(l))
+      .filter((layer) => !!layer)
+      .filter((layer) => layer?.type == 'raster');
+
+    rasterLayers.forEach((layer) => {
+      if (layer) {
+        const option = document.createElement('option');
+        const meta = layer.metadata as { name: string };
+        option.textContent = meta.name;
+        option.id = layer.id;
+        option.value = layer.id;
+
+        select.appendChild(option);
+      }
+    });
+    select.onchange = () => {
+      const layerId = select.value;
+      const layer = map.getLayer(layerId);
+      if (layer) {
+        rasterLayers.forEach((l) => {
+          map.setLayoutProperty(l?.id, 'visibility', 'none');
+        });
+
+        map.setLayoutProperty(layer.id, 'visibility', 'visible');
+      }
+    };
+  }
+
+  private buildDebugLayers(map: Map) {
+    const title = document.createElement('h4');
+    title.textContent = 'Debug layers';
+    this.container.appendChild(title);
+
+    const groups: Record<string, HTMLDivElement> = {};
+    map
+      .getLayersOrder()
+      .map((l) => map.getLayer(l))
+      .filter((layer) => !!layer)
+      .filter((layer) => this.layerInteractive(layer))
+      .reverse()
+      .forEach((layer) => {
+        if (layer) {
+          const meta: { group: string } = layer.metadata as { group: string };
+
+          let groupName: string = 'Misc';
+          if (meta.group) {
+            groupName = meta.group;
+          }
+
+          const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
+
+          if (groups[groupName]) {
+            groups[groupName]?.appendChild(layerDiv);
+          } else {
+            const groupDiv = this.buildGroupDiv(groupName, layerDiv);
+            groups[groupName] = groupDiv;
+            this.container.appendChild(groupDiv);
+          }
+        }
+      });
+    // initialize clickable layers (initially stops)
+    this.updateInteractiveLayerIds(map);
+  }
+
+  private updateInteractiveLayerIds(map: Map) {
+    const visibleInteractiveLayerIds = map
+      .getLayersOrder()
+      .map((l) => map.getLayer(l))
+      .filter((layer) => !!layer)
+      .filter((layer) => this.layerVisible(map, layer) && this.layerInteractive(layer))
+      .map((layer) => layer.id);
+
+    this.setInteractiveLayerIds(visibleInteractiveLayerIds);
   }
 
   private buildLayerDiv(layer: TypedStyleLayer, map: Map) {
@@ -77,6 +138,7 @@ class LayerControl implements IControl {
       } else {
         map.setLayoutProperty(layer.id, 'visibility', 'none');
       }
+      this.updateInteractiveLayerIds(map);
     };
     input.checked = this.layerVisible(map, layer);
     input.className = 'layer';
@@ -118,13 +180,19 @@ class LayerControl implements IControl {
     return map.getLayoutProperty(layer.id, 'visibility') !== 'none';
   }
 
+  private layerInteractive(layer: { id: string; type: string }) {
+    // the polylines of the routing result are put in map layers called jsx-1, jsx-2...
+    // we don't want them to show up in the debug layer selector
+    return layer?.type !== 'raster' && !layer?.id.startsWith('jsx');
+  }
+
   onRemove() {
     this.container.parentNode?.removeChild(this.container);
   }
 }
 
 export default function DebugLayerControl(props: LayerControlProps) {
-  useControl(() => new LayerControl(), {
+  useControl(() => new LayerControl(props.setInteractiveLayerIds), {
     position: props.position,
   });
 

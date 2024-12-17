@@ -65,7 +65,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
    * never included in plans.
    */
   @Override
-  public boolean hasBogusName() {
+  public boolean nameIsDerived() {
     return true;
   }
 

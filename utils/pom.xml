@@ -9,7 +9,7 @@
         <version>2.7.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>otp-utils</artifactId>
+    <artifactId>utils</artifactId>
     <name>OpenTripPlanner - Utils</name>
 
     <dependencies>

@@ -18,7 +18,7 @@ public class WalkStepBuilder {
   private final Set<StreetNote> streetNotes = new HashSet<>();
   private I18NString directionText;
   private WgsCoordinate startLocation;
-  private boolean bogusName = false;
+  private boolean nameIsDerived = false;
   private double angle;
   private boolean walkingBike = false;
   private boolean area = false;
@@ -46,8 +46,8 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public WalkStepBuilder withBogusName(boolean bogusName) {
-    this.bogusName = bogusName;
+  public WalkStepBuilder withNameIsDerived(boolean nameIsDerived) {
+    this.nameIsDerived = nameIsDerived;
     return this;
   }
 
@@ -147,8 +147,11 @@ public class WalkStepBuilder {
     return directionText;
   }
 
-  public boolean bogusName() {
-    return bogusName;
+  /**
+   * @see Edge#nameIsDerived()
+   */
+  public boolean nameIsDerived() {
+    return nameIsDerived;
   }
 
   public RelativeDirection relativeDirection() {
@@ -165,7 +168,7 @@ public class WalkStepBuilder {
       exit,
       entrance,
       elevationProfile,
-      bogusName,
+      nameIsDerived,
       walkingBike,
       area,
       stayOn,

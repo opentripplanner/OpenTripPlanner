@@ -1,23 +1,23 @@
 {
-  "data" : {
-    "planConnection" : {
-      "edges" : [
+  "data": {
+    "planConnection": {
+      "edges": [
         {
-          "node" : {
-            "legs" : [
+          "node": {
+            "legs": [
               {
-                "steps" : [
+                "steps": [
                   {
-                    "streetName" : "street",
-                    "area" : false,
-                    "relativeDirection" : "DEPART",
+                    "streetName": "street",
+                    "area": false,
+                    "relativeDirection": "DEPART",
                     "absoluteDirection" : "NORTHEAST",
                     "feature" : null
                   },
                   {
-                    "streetName" : "elevator",
-                    "area" : false,
-                    "relativeDirection" : "ELEVATOR",
+                    "streetName": "elevator",
+                    "area": false,
+                    "relativeDirection": "ELEVATOR",
                     "absoluteDirection" : null,
                     "feature" : null
 
@@ -37,13 +37,13 @@
                 ]
               },
               {
-                "steps" : [ ]
+                "steps": []
               },
               {
-                "steps" : [ ]
+                "steps": []
               },
               {
-                "steps" : [ ]
+                "steps": []
               }
             ]
           }

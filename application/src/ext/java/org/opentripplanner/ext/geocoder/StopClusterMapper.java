@@ -121,7 +121,7 @@ class StopClusterMapper {
       .stream()
       .collect(
         Collectors.groupingBy(sl ->
-          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
+          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate10m())
         )
       )
       .values()
@@ -174,7 +174,7 @@ class StopClusterMapper {
   }
 
   private List<Agency> agenciesForStopLocation(StopLocation stop) {
-    return transitService.getRoutesForStop(stop).stream().map(Route::getAgency).distinct().toList();
+    return transitService.findRoutes(stop).stream().map(Route::getAgency).distinct().toList();
   }
 
   private List<Agency> agenciesForStopLocationsGroup(StopLocationsGroup group) {
@@ -190,7 +190,7 @@ class StopClusterMapper {
     var loc = transitService.getStopLocation(id);
     if (loc != null) {
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
-      var modes = transitService.getModesOfStopLocation(loc).stream().map(Enum::name).toList();
+      var modes = transitService.findTransitModes(loc).stream().map(Enum::name).toList();
       var agencies = agenciesForStopLocation(loc)
         .stream()
         .map(StopClusterMapper::toAgency)
@@ -209,7 +209,7 @@ class StopClusterMapper {
       var group = transitService.getStopLocationsGroup(id);
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
       var modes = transitService
-        .getModesOfStopLocationsGroup(group)
+        .findTransitModes(group)
         .stream()
         .map(Enum::name)
         .toList();

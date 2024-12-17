@@ -2,16 +2,20 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
-import org.opentripplanner.street.search.state.StateEditor;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.utils.logging.Throttle;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -30,16 +34,20 @@ public class Transfer {
 
   private final List<Edge> edges;
 
-  public Transfer(int toStop, List<Edge> edges) {
+  private final Set<StreetMode> modes;
+
+  public Transfer(int toStop, List<Edge> edges, EnumSet<StreetMode> modes) {
     this.toStop = toStop;
     this.edges = edges;
     this.distanceMeters = (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    this.modes = Collections.unmodifiableSet(modes);
   }
 
-  public Transfer(int toStopIndex, int distanceMeters) {
+  public Transfer(int toStopIndex, int distanceMeters, EnumSet<StreetMode> modes) {
     this.toStop = toStopIndex;
     this.distanceMeters = distanceMeters;
     this.edges = null;
+    this.modes = Collections.unmodifiableSet(modes);
   }
 
   public List<Coordinate> getCoordinates() {
@@ -67,6 +75,11 @@ public class Transfer {
     return edges;
   }
 
+  /** Check if the given mode is a valid mode for the transfer. */
+  public boolean allowsMode(StreetMode mode) {
+    return modes.contains(mode);
+  }
+
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
@@ -84,10 +97,8 @@ public class Transfer {
       );
     }
 
-    StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
-    se.setTimeSeconds(0);
-
-    var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
+    var initialStates = State.getInitialStates(Set.of(edges.getFirst().getFromVertex()), request);
+    var state = EdgeTraverser.traverseEdges(initialStates, edges);
 
     return state.map(s ->
       new DefaultRaptorTransfer(

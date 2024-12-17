@@ -23,11 +23,13 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -98,6 +100,7 @@ public class SpeedTest {
       graph,
       new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
+      new DefaultVehicleParkingRepository(),
       timetableRepository,
       config.updatersConfig
     );
@@ -120,6 +123,7 @@ public class SpeedTest {
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
+        TestServerContext.createVehicleParkingService(),
         TestServerContext.createEmissionsService(),
         null,
         config.flexConfig,
@@ -127,7 +131,8 @@ public class SpeedTest {
         null,
         TestServerContext.createStreetLimitationParametersService(),
         null,
-        null
+        null,
+        DebugUiConfig.DEFAULT
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
     // we do it manually here
@@ -144,7 +149,7 @@ public class SpeedTest {
 
   public static void main(String[] args) {
     try {
-      OtpStartupInfo.logInfo();
+      OtpStartupInfo.logInfo("Run Speed Test");
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
       var config = SpeedTestConfig.config(opts.rootDir());
@@ -336,8 +341,8 @@ public class SpeedTest {
   private void updateTimersWithGlobalCounters() {
     final var transitService = serverContext.transitService();
     timer.globalCount("transitdata_stops", transitService.listStopLocations().size());
-    timer.globalCount("transitdata_patterns", transitService.getAllTripPatterns().size());
-    timer.globalCount("transitdata_trips", transitService.getAllTrips().size());
+    timer.globalCount("transitdata_patterns", transitService.listTripPatterns().size());
+    timer.globalCount("transitdata_trips", transitService.listTrips().size());
 
     // we want to get the numbers after the garbage collection
     forceGCToAvoidGCLater();

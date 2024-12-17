@@ -147,7 +147,8 @@ public class GraphInspectorVectorTileResource {
       AREA_STOPS.toVectorSourceLayer(stopsSource),
       GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
-      VERTICES.toVectorSourceLayer(streetSource)
+      VERTICES.toVectorSourceLayer(streetSource),
+      serverContext.debugUiConfig().additionalBackgroundLayers()
     );
   }
 
@@ -166,7 +167,7 @@ public class GraphInspectorVectorTileResource {
   private List<FeedInfo> feedInfos() {
     return serverContext
       .transitService()
-      .getFeedIds()
+      .listFeedIds()
       .stream()
       .map(serverContext.transitService()::getFeedInfo)
       .filter(Predicate.not(Objects::isNull))

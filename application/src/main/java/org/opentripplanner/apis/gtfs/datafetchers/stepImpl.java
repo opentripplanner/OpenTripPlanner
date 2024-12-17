@@ -36,7 +36,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<Boolean> bogusName() {
-    return environment -> getSource(environment).getBogusName();
+    return environment -> getSource(environment).nameIsDerived();
   }
 
   @Override

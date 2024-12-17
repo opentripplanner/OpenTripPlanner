@@ -8,6 +8,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import java.util.Set;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -23,9 +24,16 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  *
  * @author juusokor
  * @see OsmTagMapper
- * @see DefaultMapper
  */
-class FinlandMapper implements OsmTagMapper {
+class FinlandMapper extends OsmTagMapper {
+
+  private static final Set<String> NOTHROUGH_DRIVING_TAGS = Set.of(
+    "parking_aisle",
+    "driveway",
+    "alley",
+    "emergency_access",
+    "drive-through"
+  );
 
   @Override
   public void populateProperties(WayPropertySet props) {
@@ -75,9 +83,6 @@ class FinlandMapper implements OsmTagMapper {
 
     // Don't recommend walking in trunk road tunnels
     props.setProperties("highway=trunk;tunnel=yes", withModes(CAR).bicycleSafety(7.47));
-
-    // Do not walk on "moottoriliikennetie"
-    props.setProperties("motorroad=yes", withModes(CAR).bicycleSafety(7.47));
 
     // Remove informal and private roads
     props.setProperties("highway=*;informal=yes", withModes(NONE));
@@ -203,12 +208,11 @@ class FinlandMapper implements OsmTagMapper {
     // ~= 16 kph
     props.setCarSpeed("highway=track", 4.5f);
 
-    // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    super.populateProperties(props);
   }
 
   @Override
-  public boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String bicycle = way.getTag("bicycle");
     return (
       isVehicleThroughTrafficExplicitlyDisallowed(way) ||
@@ -217,8 +221,16 @@ class FinlandMapper implements OsmTagMapper {
   }
 
   @Override
-  public boolean isWalkNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
+  }
+
+  @Override
+  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+    if (super.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
+      return true;
+    }
+    return way.isOneOfTags("service", NOTHROUGH_DRIVING_TAGS);
   }
 }

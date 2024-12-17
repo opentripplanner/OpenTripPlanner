@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.Duration;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
@@ -30,8 +31,14 @@ public class BookingInfoImpl implements GraphQLDataFetchers.GraphQLBookingInfo {
   }
 
   @Override
+  public DataFetcher<Duration> maximumBookingNotice() {
+    return env -> getSource(env).getMaximumBookingNotice().orElse(null);
+  }
+
+  @Override
   public DataFetcher<Long> maximumBookingNoticeSeconds() {
-    return environment -> getSource(environment).getMaximumBookingNotice().toSeconds();
+    return environment ->
+      getSource(environment).getMaximumBookingNotice().map(Duration::toSeconds).orElse(null);
   }
 
   @Override
@@ -40,8 +47,14 @@ public class BookingInfoImpl implements GraphQLDataFetchers.GraphQLBookingInfo {
   }
 
   @Override
+  public DataFetcher<Duration> minimumBookingNotice() {
+    return env -> getSource(env).getMinimumBookingNotice().orElse(null);
+  }
+
+  @Override
   public DataFetcher<Long> minimumBookingNoticeSeconds() {
-    return environment -> getSource(environment).getMinimumBookingNotice().toSeconds();
+    return environment ->
+      getSource(environment).getMinimumBookingNotice().map(Duration::toSeconds).orElse(null);
   }
 
   @Override
