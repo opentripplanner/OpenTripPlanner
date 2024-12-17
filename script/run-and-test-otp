@@ -58,6 +58,7 @@ fi
 # is not working as expected.
 OTP_LOG=target/otp.log
 RESPONSE_FILE=target/response.json
+SHADED_TARGET=otp-shaded/target
 
 
 if [ "$1" != "--skipCompile" ] && [ "$1" != "-c" ]; then
@@ -66,8 +67,8 @@ if [ "$1" != "--skipCompile" ] && [ "$1" != "-c" ]; then
 fi
 
 echo "Start OTP, output: $OTP_LOG"
-mv target/otp-*-shaded.jar target/otp-shaded.jar
-java -Xmx16G -jar target/otp-shaded.jar ${DATA_DIR}  --build --save --serve > ${OTP_LOG} &
+mv ${SHADED_TARGET}/otp-shaded-*.jar ${SHADED_TARGET}/otp-shaded.jar
+java -Xmx16G -jar ${SHADED_TARGET}/otp-shaded.jar ${DATA_DIR}  --build --save --serve > ${OTP_LOG} &
 OTP_PID=$!
 
 tail -F ${OTP_LOG} &

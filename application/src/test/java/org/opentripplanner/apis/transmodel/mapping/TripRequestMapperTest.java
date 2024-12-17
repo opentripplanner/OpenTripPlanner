@@ -52,6 +52,7 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -154,7 +155,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
           null,
           new DefaultStreetLimitationParametersService(new StreetLimitationParameters()),
           null,
-          null
+          null,
+          DebugUiConfig.DEFAULT
         ),
         null,
         transitService

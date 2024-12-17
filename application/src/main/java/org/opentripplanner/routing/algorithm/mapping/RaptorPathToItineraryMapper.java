@@ -126,7 +126,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           legs.addAll(
             mapTransferLeg(
               pathLeg.asTransferLeg(),
-              transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+              StreetModeToTransferTraverseModeMapper.map(transferMode)
             )
           );
         }
