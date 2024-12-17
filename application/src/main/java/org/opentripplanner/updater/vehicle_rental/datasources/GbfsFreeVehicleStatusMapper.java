@@ -2,14 +2,12 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import static java.util.Objects.requireNonNullElse;
 
-import graphql.schema.CoercingParseValueException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
-import org.opentripplanner.apis.gtfs.GraphQLScalars;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -87,6 +85,7 @@ public class GbfsFreeVehicleStatusMapper {
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&
+        vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
         vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType !=
         RentalVehicleType.PropulsionType.HUMAN &&
         rangeMeters == null
