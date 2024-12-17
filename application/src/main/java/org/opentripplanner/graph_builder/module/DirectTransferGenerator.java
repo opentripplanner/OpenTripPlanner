@@ -303,7 +303,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       finder = new StraightLineNearbyStopFinder(transitService, radiusByDuration);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      finder = new StreetNearbyStopFinder(radiusByDuration, 0, null, Set.of());
+      finder = new StreetNearbyStopFinder(radiusByDuration, 0, null);
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
