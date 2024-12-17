@@ -32,7 +32,7 @@ class StreetEdgeBuilderTest {
   private static final float WALK_SAFETY_FACTOR = 0.5f;
   private static final float BICYCLE_SAFETY_FACTOR = 0.4f;
   private static final boolean SLOPE_OVERRIDE = false;
-  private static final boolean BOGUS_NAME = true;
+  private static final boolean NAME_IS_DERIVED = true;
   private static final boolean BICYCLE_NO_THRU_TRAFFIC = true;
   private static final boolean MOTOR_VEHICLE_NO_THRU_TRAFFIC = true;
   private static final boolean WALK_NO_THRU_TRAFFIC = true;
@@ -82,7 +82,7 @@ class StreetEdgeBuilderTest {
       .withBack(BACK)
       .withStairs(STAIRS)
       .withSlopeOverride(SLOPE_OVERRIDE)
-      .withBogusName(BOGUS_NAME)
+      .withBogusName(NAME_IS_DERIVED)
       .withWalkNoThruTraffic(WALK_NO_THRU_TRAFFIC)
       .withBicycleNoThruTraffic(BICYCLE_NO_THRU_TRAFFIC)
       .withMotorVehicleNoThruTraffic(MOTOR_VEHICLE_NO_THRU_TRAFFIC)
@@ -100,7 +100,7 @@ class StreetEdgeBuilderTest {
     assertEquals(WALK_SAFETY_FACTOR, streetEdge.getWalkSafetyFactor());
     assertEquals(BICYCLE_SAFETY_FACTOR, streetEdge.getBicycleSafetyFactor());
     assertEquals(SLOPE_OVERRIDE, streetEdge.isSlopeOverride());
-    assertEquals(BOGUS_NAME, streetEdge.hasBogusName());
+    assertEquals(NAME_IS_DERIVED, streetEdge.nameIsDerived());
     assertEquals(WALK_NO_THRU_TRAFFIC, streetEdge.isWalkNoThruTraffic());
     assertEquals(BICYCLE_NO_THRU_TRAFFIC, streetEdge.isBicycleNoThruTraffic());
     assertEquals(MOTOR_VEHICLE_NO_THRU_TRAFFIC, streetEdge.isMotorVehicleNoThruTraffic());

@@ -46,6 +46,17 @@ public class IncludeFileDirectiveTest {
   }
 
   @Test
+  void includeFileWithQuotesAndJsonArrayInput() throws IOException {
+    savePartialFile(json("\t [\n  'foo', 'bar' \n  ]\n"));
+    String result = IncludeFileDirective.includeFileDirective(
+      CONFIG_DIR,
+      json("{ 'key' : '${includeFile:" + PART_FILE_NAME + "}'}"),
+      PART_FILE_NAME
+    );
+    assertEquals(json("{ 'key' : \t [\n  'foo', 'bar' \n  ]\n}"), result);
+  }
+
+  @Test
   void includeFileWithQuotesWithNoJsonInput() throws IOException {
     savePartialFile("value");
     String result = IncludeFileDirective.includeFileDirective(

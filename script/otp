@@ -3,6 +3,6 @@
 # Standalone OTP can build a graph, run an OTP API server,
 # or any combination of these.
 
-JAR_FILE="$(dirname $0)/target/${project.build.finalName}-shaded.jar"
+JAR_FILE="$(dirname $0)/../otp-shaded/target/otp-shaded-2.7.0-SNAPSHOT.jar"
 
 java -Xmx8G -jar "${JAR_FILE}" "$@"
