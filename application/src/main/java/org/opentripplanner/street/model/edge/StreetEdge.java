@@ -9,9 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -58,7 +55,10 @@ public class StreetEdge
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
-  static final int HASBOGUSNAME_FLAG_INDEX = 2;
+  /**
+   * @see Edge#nameIsDerived()
+   */
+  static final int NAME_IS_DERIVED_FLAG_INDEX = 2;
   static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
   static final int STAIRS_FLAG_INDEX = 4;
   static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
@@ -82,14 +82,14 @@ public class StreetEdge
 
   /**
    * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
+   * factor of 2.0 will be considered in terms of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
   private float bicycleSafetyFactor;
 
   /**
    * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
+   * factor of 2.0 will be considered in terms of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
   private float walkSafetyFactor;
@@ -446,14 +446,23 @@ public class StreetEdge
     return this.name;
   }
 
+  /**
+   * Update the name of the edge after it has been constructed. This method also sets the nameIsDerived
+   * property to false, indicating to the code that maps from edges to steps that this is a real
+   * street name.
+   * @see Edge#nameIsDerived()
+   */
   public void setName(I18NString name) {
     this.name = name;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
   }
 
-  public boolean hasBogusName() {
-    return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
+  @Override
+  public boolean nameIsDerived() {
+    return BitSetUtils.get(flags, NAME_IS_DERIVED_FLAG_INDEX);
   }
 
+  @Override
   public LineString getGeometry() {
     return CompactLineStringUtils.uncompactLineString(
       fromv.getLon(),
