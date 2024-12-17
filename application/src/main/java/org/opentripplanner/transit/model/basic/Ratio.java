@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.basic;
 import java.util.Objects;
 
 public class Ratio {
+
   public final Double ratio;
 
   public Ratio(Double ratio) throws IllegalArgumentException {

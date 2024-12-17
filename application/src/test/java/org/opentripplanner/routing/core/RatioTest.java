@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.basic.Ratio;
 
 public class RatioTest {
+
   private static final Double HALF = 0.5d;
   private static final Double ZERO = 0d;
   private static final Double ONE = 1d;
