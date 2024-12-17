@@ -1,14 +1,14 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import static org.opentripplanner.apis.gtfs.GraphQLUtils.stopTimeToInt;
+
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -16,7 +16,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<Integer> arrivalDelay() {
-    return environment -> missingValueToNull(getSource(environment).getArrivalDelay());
+    return environment -> stopTimeToInt(getSource(environment).getArrivalDelay());
   }
 
   @Override
@@ -25,8 +25,8 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
-  public DataFetcher<String> dropoffType() {
-    return environment -> getGraphqlPickDrop(getSource(environment).getDropoffType());
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> dropoffType() {
+    return environment -> PickDropMapper.map(getSource(environment).getDropoffType());
   }
 
   @Override
@@ -36,8 +36,8 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
-  public DataFetcher<String> pickupType() {
-    return environment -> getGraphqlPickDrop(getSource(environment).getPickupType());
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> pickupType() {
+    return environment -> PickDropMapper.map(getSource(environment).getPickupType());
   }
 
   @Override
@@ -47,12 +47,12 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<Integer> realtimeArrival() {
-    return environment -> missingValueToNull(getSource(environment).getRealtimeArrival());
+    return environment -> stopTimeToInt(getSource(environment).getRealtimeArrival());
   }
 
   @Override
   public DataFetcher<Integer> realtimeDeparture() {
-    return environment -> missingValueToNull(getSource(environment).getRealtimeDeparture());
+    return environment -> stopTimeToInt(getSource(environment).getRealtimeDeparture());
   }
 
   @Override
@@ -65,12 +65,12 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<Integer> scheduledArrival() {
-    return environment -> missingValueToNull(getSource(environment).getScheduledArrival());
+    return environment -> stopTimeToInt(getSource(environment).getScheduledArrival());
   }
 
   @Override
   public DataFetcher<Integer> scheduledDeparture() {
-    return environment -> missingValueToNull(getSource(environment).getScheduledDeparture());
+    return environment -> stopTimeToInt(getSource(environment).getScheduledDeparture());
   }
 
   @Override
@@ -103,30 +103,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
     return environment -> getSource(environment).getTrip();
   }
 
-  @Nullable
-  static String getGraphqlPickDrop(PickDrop pickDrop) {
-    return switch (pickDrop) {
-      case SCHEDULED -> "SCHEDULED";
-      case NONE -> "NONE";
-      case CALL_AGENCY -> "CALL_AGENCY";
-      case COORDINATE_WITH_DRIVER -> "COORDINATE_WITH_DRIVER";
-      case CANCELLED -> null;
-    };
-  }
-
   private TripTimeOnDate getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
-  }
-
-  /**
-   * Generally the missing values are removed during the graph build. However, for flex trips they
-   * are not and have to be converted to null here.
-   */
-  private Integer missingValueToNull(int value) {
-    if (value == StopTime.MISSING_VALUE) {
-      return null;
-    } else {
-      return value;
-    }
   }
 }

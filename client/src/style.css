@@ -181,6 +181,10 @@
   margin-left: 6px;
 }
 
+.maplibregl-ctrl-group.layer-select select {
+  margin-bottom: 14px;
+}
+
 .maplibregl-ctrl-group.layer-select h4 {
   font-size: 17px;
 }

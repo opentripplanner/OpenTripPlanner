@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -271,6 +272,21 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Trip getScheduledTrip(FeedScopedId id) {
     return this.timetableRepositoryIndex.getTripForId(id);
+  }
+
+  /**
+   * TODO This only supports realtime cancelled trips for now.
+   */
+  @Override
+  public List<TripOnServiceDate> listCanceledTrips() {
+    OTPRequestTimeoutException.checkForTimeout();
+    var timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return List.of();
+    }
+    List<TripOnServiceDate> canceledTrips = timetableSnapshot.listCanceledTrips();
+    canceledTrips.sort(new TripOnServiceDateComparator());
+    return canceledTrips;
   }
 
   @Override
@@ -762,5 +778,33 @@ public class DefaultTransitService implements TransitEditorService {
       .stream()
       .sorted(Map.Entry.<T, Long>comparingByValue().reversed())
       .map(Map.Entry::getKey);
+  }
+
+  private int getDepartureTime(TripOnServiceDate trip) {
+    var pattern = findPattern(trip.getTrip());
+    var timetable = timetableSnapshot.resolve(pattern, trip.getServiceDate());
+    return timetable.getTripTimes(trip.getTrip()).getDepartureTime(0);
+  }
+
+  private class TripOnServiceDateComparator implements Comparator<TripOnServiceDate> {
+
+    @Override
+    public int compare(TripOnServiceDate t1, TripOnServiceDate t2) {
+      if (t1.getServiceDate().isBefore(t2.getServiceDate())) {
+        return -1;
+      } else if (t2.getServiceDate().isBefore(t1.getServiceDate())) {
+        return 1;
+      }
+      var departure1 = getDepartureTime(t1);
+      var departure2 = getDepartureTime(t2);
+      if (departure1 < departure2) {
+        return -1;
+      } else if (departure1 > departure2) {
+        return 1;
+      } else {
+        // identical departure day and time, so sort by unique feedscope id
+        return t1.getTrip().getId().compareTo(t2.getTrip().getId());
+      }
+    }
   }
 }

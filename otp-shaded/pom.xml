@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>otp-root</artifactId>
+        <version>2.7.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>otp-shaded</artifactId>
+    <name>OpenTripPlanner - Shaded Jar</name>
+
+    <properties>
+        <skipShadeJar>false</skipShadeJar>
+    </properties>
+
+    <dependencies>
+        <!-- project dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>application</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!--
+                We want to create a standalone jar that can be run on the command line. Java does
+                not really allow this - you cannot place jars inside of jars. You must either
+                provide all the dependency jars to the user (usually lib/ under the directory
+                containing the runnable jar) or explode all the jars and repackage them into a
+                single jar. The problem is that while class files are nicely organized into the
+                package namespace and should not collide, the META-INF directories of the jars will
+                collide. Maven's standard assembly plugin does not account for this and will just
+                clobber metadata. This then causes runtime errors, particularly with Spring.
+                Instead, we use the shade plugin which has transformers that will for example
+                append files of the same name rather than overwrite them in the combined JAR.
+                -->
+                <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <skip>${skipShadeJar}</skip>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <!-- exclude signatures from merged JAR to avoid invalid signature messages -->
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Main-Class>org.opentripplanner.standalone.OTPMain</Main-Class>
+                                <!-- The ImageIO lines allow some image reader plugins to work
+                                     https://stackoverflow.com/questions/7051603/jai-vendorname-null#18495658 -->
+                                <Specification-Title>Java Advanced Imaging Image I/O
+                                    Tools
+                                </Specification-Title>
+                                <Specification-Version>1.1</Specification-Version>
+                                <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
+                                <Implementation-Title>com.sun.media.imageio</Implementation-Title>
+                                <Implementation-Version>1.1</Implementation-Version>
+                                <Implementation-Vendor>Sun Microsystems, Inc.
+                                </Implementation-Vendor>
+                                <Extension-Name>com.sun.media.imageio</Extension-Name>
+                            </manifestEntries>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>build-shaded-jar</id>
+                        <goals><goal>shade</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <!--
+            DISABLED PLUGINS
+
+
+            Turn off default plugins for package type jar. These plugins will normally run fine
+            even when there is no source, but print warnings in the Maven console log.
+
+            An alternative approach is to set "pom" as package-type and use the
+            build-helper-maven-plugin to attach the shaded jar as the main artifact. This also
+            has side effects. The biggest problem is that the published "pom.xml" does not indicate
+            that the main artifact is a jar file - it has package type pom.
+            -->
+
+            <!--
+            We would like to skip generating an empty jar file, but the maven-shade-plugin
+            fails if we set "skipIfEmpty=true". Not sure if this is a bug or if the
+            maven-shade-plugin needs the generated files/maven meta info from the jar plugin.
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <skipIfEmpty>true</skipIfEmpty>
+                </configuration>
+            </plugin>
+            -->
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

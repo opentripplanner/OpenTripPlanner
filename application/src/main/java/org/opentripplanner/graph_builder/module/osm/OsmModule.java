@@ -259,7 +259,10 @@ public class OsmModule implements GraphBuilderModule {
     long wayCount = osmdb.getWays().size();
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
-    var escalatorProcessor = new EscalatorProcessor(vertexGenerator.intersectionNodes());
+    var escalatorProcessor = new EscalatorProcessor(
+      vertexGenerator.intersectionNodes(),
+      issueStore
+    );
 
     WAY:for (OsmWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
