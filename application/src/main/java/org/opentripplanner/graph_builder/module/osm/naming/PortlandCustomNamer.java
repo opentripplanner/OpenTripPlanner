@@ -76,7 +76,7 @@ public class PortlandCustomNamer implements EdgeNamer {
     edgePair
       .asIterable()
       .forEach(edge -> {
-        if (!edge.hasBogusName()) {
+        if (!edge.nameIsDerived()) {
           return; // this edge already has a real name so there is nothing to do
         }
         if (isHighwayLink) {
@@ -149,7 +149,7 @@ public class PortlandCustomNamer implements EdgeNamer {
       return null;
     }
     for (StreetEdge out : e.getToVertex().getOutgoingStreetEdges()) {
-      if (out.hasBogusName()) {
+      if (out.nameIsDerived()) {
         String name = nameAccordingToDestination(out, maxDepth - 1);
         if (name == null) {
           continue;
@@ -170,7 +170,7 @@ public class PortlandCustomNamer implements EdgeNamer {
       return null;
     }
     for (StreetEdge in : e.getFromVertex().getIncomingStreetEdges()) {
-      if (in.hasBogusName()) {
+      if (in.nameIsDerived()) {
         String name = nameAccordingToOrigin(in, maxDepth - 1);
         if (name == null) {
           continue;

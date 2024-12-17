@@ -1,0 +1,83 @@
+{
+  canceledTrips(first: 2) {
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    edges {
+      node {
+        serviceDate
+        end {
+          schedule {
+            time {
+              ... on ArrivalDepartureTime {
+                arrival
+              }
+            }
+          }
+          realTime {
+            arrival {
+              delay
+              time
+            }
+          }
+          stopLocation {
+            ... on Stop {
+              gtfsId
+            }
+          }
+        }
+        start {
+          schedule {
+            time {
+              ... on ArrivalDepartureTime {
+                departure
+              }
+            }
+          }
+          realTime {
+            departure {
+              delay
+              time
+            }
+          }
+          stopLocation {
+            ... on Stop {
+              gtfsId
+            }
+          }
+        }
+        stopCalls {
+          schedule {
+            time {
+              ... on ArrivalDepartureTime {
+                arrival
+                departure
+              }
+            }
+          }
+          realTime {
+            arrival {
+              delay
+              time
+            }
+            departure {
+              delay
+              time
+            }
+          }
+          stopLocation {
+            ... on Stop {
+              gtfsId
+            }
+          }
+        }
+        trip {
+          gtfsId
+        }
+      }
+    }
+  }
+}
