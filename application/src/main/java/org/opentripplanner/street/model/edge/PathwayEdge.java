@@ -167,7 +167,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   @Override
-  public boolean hasBogusName() {
+  public boolean nameIsDerived() {
     return signpostedAs == null;
   }
 
