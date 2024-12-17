@@ -50,23 +50,6 @@ class DefaultTransitServiceTest {
 
   private static final FeedScopedId SERVICE_ID = new FeedScopedId("FEED", "SERVICE");
   private static final int SERVICE_CODE = 0;
-  private static final Trip TRIP = TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build();
-  private static final Trip ADDED_TRIP = TimetableRepositoryForTest
-    .trip("REAL_TIME_ADDED_TRIP")
-    .withServiceId(SERVICE_ID)
-    .build();
-  private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = ScheduledTripTimes
-    .of()
-    .withTrip(TRIP)
-    .withArrivalTimes(new int[] { 0, 1 })
-    .withDepartureTimes(new int[] { 0, 1 })
-    .withServiceCode(SERVICE_CODE)
-    .build();
-
-  private static final TripPattern RAIL_PATTERN = TEST_MODEL
-    .pattern(RAIL)
-    .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(SCHEDULED_TRIP_TIMES))
-    .build();
   private static final TripPattern FERRY_PATTERN = TEST_MODEL.pattern(FERRY).build();
   private static final TripPattern BUS_PATTERN = TEST_MODEL.pattern(BUS).build();
 
@@ -86,6 +69,23 @@ class DefaultTransitServiceTest {
     .withHeadsign(I18NString.of("Trip Headsign"))
     .withServiceId(CALENDAR_ID)
     .build();
+  private static final Trip ADDED_TRIP = TimetableRepositoryForTest
+    .trip("REAL_TIME_ADDED_TRIP")
+    .withServiceId(CALENDAR_ID)
+    .build();
+  private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = ScheduledTripTimes
+    .of()
+    .withTrip(TRIP)
+    .withArrivalTimes(new int[] { 0, 1 })
+    .withDepartureTimes(new int[] { 0, 1 })
+    .withServiceCode(SERVICE_CODE)
+    .build();
+
+  private static final TripPattern RAIL_PATTERN = TEST_MODEL
+    .pattern(RAIL)
+    .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(SCHEDULED_TRIP_TIMES))
+    .build();
+
   private static final int DELAY = 120;
   private static final RealTimeTripTimes REALTIME_TRIP_TIMES = SCHEDULED_TRIP_TIMES.copyScheduledTimes();
   private static final RealTimeTripTimes ADDED_TRIP_TIMES = RealTimeTripTimes.of(
@@ -128,7 +128,10 @@ class DefaultTransitServiceTest {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     var firstDate = LocalDate.of(2024, 8, 8);
     var secondDate = LocalDate.of(2024, 8, 9);
-    calendarServiceData.putServiceDatesForServiceId(CALENDAR_ID, List.of(firstDate, secondDate));
+    calendarServiceData.putServiceDatesForServiceId(
+      CALENDAR_ID,
+      List.of(firstDate, secondDate, SERVICE_DATE)
+    );
     transitModel.getServiceCodes().put(CALENDAR_ID, 0);
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
 
@@ -146,7 +149,7 @@ class DefaultTransitServiceTest {
     RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
       ScheduledTripTimes
         .of()
-        .withTrip(TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build())
+        .withTrip(TimetableRepositoryForTest.trip("123").build())
         .withDepartureTimes(new int[] { 0, 1 })
         .build()
     );
