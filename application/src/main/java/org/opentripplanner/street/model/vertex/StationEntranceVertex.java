@@ -37,5 +37,4 @@ public class StationEntranceVertex extends OsmVertex {
       .addStr("code", code)
       .toString();
   }
-
 }

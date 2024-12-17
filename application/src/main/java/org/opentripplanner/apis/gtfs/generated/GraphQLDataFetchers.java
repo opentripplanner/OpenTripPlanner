@@ -392,13 +392,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
   }
 
-  /** Real-time estimates for an arrival or departure at a certain place. */
-  public interface GraphQLEstimatedTime {
-    public DataFetcher<java.time.Duration> delay();
-
-    public DataFetcher<java.time.OffsetDateTime> time();
-  }
-
   /** Station entrance or exit, originating from OSM or GTFS data. */
   public interface GraphQLEntrance {
     public DataFetcher<String> code();
@@ -408,6 +401,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> name();
 
     public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
+  }
+
+  /** Real-time estimates for an arrival or departure at a certain place. */
+  public interface GraphQLEstimatedTime {
+    public DataFetcher<java.time.Duration> delay();
+
+    public DataFetcher<java.time.OffsetDateTime> time();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
@@ -1035,6 +1035,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<GraphQLInputField> inputField();
   }
 
+  /** A feature for a step */
   public interface GraphQLStepFeature extends TypeResolver {}
 
   /**

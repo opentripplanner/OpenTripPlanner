@@ -4334,7 +4334,6 @@ public class GraphQLTypes {
     CONTINUE,
     DEPART,
     ELEVATOR,
-    ENTER_OR_EXIT_STATION,
     ENTER_STATION,
     EXIT_STATION,
     FOLLOW_SIGNS,

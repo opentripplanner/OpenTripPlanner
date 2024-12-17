@@ -491,18 +491,6 @@ type Emissions {
   co2: Grams
 }
 
-"Real-time estimates for an arrival or departure at a certain place."
-type EstimatedTime {
-  """
-  The delay or "earliness" of the vehicle at a certain place. This estimate can change quite often.
-
-  If the vehicle is early then this is a negative duration.
-  """
-  delay: Duration!
-  "The estimate for a call event (such as arrival or departure) at a certain place. This estimate can change quite often."
-  time: OffsetDateTime!
-}
-
 "Station entrance or exit, originating from OSM or GTFS data."
 type Entrance {
   "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
@@ -513,6 +501,18 @@ type Entrance {
   name: String
   "Whether the entrance or exit is accessible by wheelchair"
   wheelchairAccessible: WheelchairBoarding
+}
+
+"Real-time estimates for an arrival or departure at a certain place."
+type EstimatedTime {
+  """
+  The delay or "earliness" of the vehicle at a certain place. This estimate can change quite often.
+  
+  If the vehicle is early then this is a negative duration.
+  """
+  delay: Duration!
+  "The estimate for a call event (such as arrival or departure) at a certain place. This estimate can change quite often."
+  time: OffsetDateTime!
 }
 
 "A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'."
@@ -2359,7 +2359,7 @@ type Stoptime {
   """
   The position of the stop in the pattern. This is required to start from 0 and be consecutive along
   the pattern, up to n-1 for a pattern with n stops.
-
+  
   The purpose of this field is to identify the position of the stop within the pattern so it can be
   cross-referenced between different trips on the same pattern, as stopPosition can be different
   between trips even within the same pattern.
@@ -2518,7 +2518,7 @@ type TripOnServiceDate {
   end: StopCall!
   """
   The service date when the trip occurs.
-
+  
   **Note**: A service date is a technical term useful for transit planning purposes and might not
     correspond to a how a passenger thinks of a calendar date. For example, a night bus running
     on Sunday morning at 1am to 3am, might have the previous Saturday's service date.

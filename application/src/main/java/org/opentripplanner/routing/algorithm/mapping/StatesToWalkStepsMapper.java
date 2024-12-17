@@ -530,9 +530,7 @@ public class StatesToWalkStepsMapper {
       .of(vertex.id())
       .withCode(vertex.code())
       .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
-      .withWheelchairAccessibility(
-        vertex.wheelchairAccessibility()
-      )
+      .withWheelchairAccessibility(vertex.wheelchairAccessibility())
       .build();
 
     // don't care what came before or comes after
