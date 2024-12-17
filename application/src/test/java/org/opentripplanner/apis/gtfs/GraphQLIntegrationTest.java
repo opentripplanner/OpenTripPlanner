@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner._support.time.ZoneIds.BERLIN;
 import static org.opentripplanner.model.plan.PlanTestConstants.D10m;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_01;
@@ -39,14 +40,16 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.RealTimeTripUpdate;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
@@ -177,12 +180,21 @@ class GraphQLIntegrationTest {
     var siteRepository = siteRepositoryBuilder.build();
     var timetableRepository = new TimetableRepository(siteRepository, DEDUPLICATOR);
 
+    var cal_id = TimetableRepositoryForTest.id("CAL_1");
     var trip = TimetableRepositoryForTest
       .trip("123")
       .withHeadsign(I18NString.of("Trip Headsign"))
+      .withServiceId(cal_id)
       .build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
+    var trip2 = TimetableRepositoryForTest
+      .trip("321Canceled")
+      .withHeadsign(I18NString.of("Trip Headsign"))
+      .withServiceId(cal_id)
+      .build();
+    var stopTimes2 = TEST_MODEL.stopTimesEvery5Minutes(3, trip2, "11:30");
+    var tripTimes2 = TripTimesFactory.tripTimes(trip2, stopTimes2, DEDUPLICATOR);
 
     var calendar = new CalendarServiceData();
     FeedScopedId serviceId = calendar.getOrCreateServiceIdForDate(SERVICE_DATE);
@@ -196,6 +208,7 @@ class GraphQLIntegrationTest {
       .withScheduledTimeTableBuilder(builder ->
         builder
           .addTripTimes(tripTimes)
+          .addTripTimes(tripTimes2)
           .addTripTimes(
             TripTimesFactory.tripTimes(
               tripToBeReplaced,
@@ -219,7 +232,7 @@ class GraphQLIntegrationTest {
       .build();
     timetableRepository.addAgency(agency);
 
-    timetableRepository.initTimeZone(ZoneIds.BERLIN);
+    timetableRepository.initTimeZone(BERLIN);
     timetableRepository.index();
     var routes = Arrays
       .stream(TransitMode.values())
@@ -307,6 +320,24 @@ class GraphQLIntegrationTest {
       }
     };
     routes.forEach(transitService::addRoutes);
+
+    // Crate a calendar (needed for testing cancelled trips)
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var firstDate = LocalDate.of(2024, 8, 8);
+    var secondDate = LocalDate.of(2024, 8, 9);
+    calendarServiceData.putServiceDatesForServiceId(cal_id, List.of(firstDate, secondDate));
+    timetableRepository.getServiceCodes().put(cal_id, 0);
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    tripTimes2.cancelTrip();
+    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+
+    var snapshot = timetableSnapshot.commit();
+    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdgeBuilder;
@@ -17,6 +18,8 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -43,7 +46,7 @@ public class StreetEdgeTest {
   private StreetSearchRequest proto;
 
   @BeforeEach
-  public void before() {
+  void before() {
     v0 = intersectionVertex("maple_0th", 0.0, 0.0); // label, X, Y
     v1 = intersectionVertex("maple_1st", 2.0, 2.0);
     v2 = intersectionVertex("maple_2nd", 2.0, 1.0);
@@ -64,9 +67,9 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testInAndOutAngles() {
+  void testInAndOutAngles() {
     // An edge heading straight West
-    StreetEdge e1 = streetEdge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+    StreetEdge e1 = streetEdge(v1, v2, 1.0, ALL);
 
     // Edge has same first and last angle.
     assertEquals(90, e1.getInAngle());
@@ -77,7 +80,7 @@ public class StreetEdgeTest {
     StreetVertex v = intersectionVertex("test2", 2.0, 2.0);
 
     // Second edge, heading straight North
-    StreetEdge e2 = streetEdge(u, v, 1.0, StreetTraversalPermission.ALL);
+    StreetEdge e2 = streetEdge(u, v, 1.0, ALL);
 
     // 180 degrees could be expressed as 180 or -180. Our implementation happens to use -180.
     assertEquals(180, Math.abs(e2.getInAngle()));
@@ -85,10 +88,8 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testTraverseAsPedestrian() {
-    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, StreetTraversalPermission.ALL)
-      .withCarSpeed(10.0f)
-      .buildAndConnect();
+  void testTraverseAsPedestrian() {
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(10.0f).buildAndConnect();
 
     StreetSearchRequest options = StreetSearchRequest
       .copyOf(proto)
@@ -106,10 +107,8 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testTraverseAsCar() {
-    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, StreetTraversalPermission.ALL)
-      .withCarSpeed(10.0f)
-      .buildAndConnect();
+  void testTraverseAsCar() {
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, ALL).withCarSpeed(10.0f).buildAndConnect();
 
     State s0 = new State(v1, StreetSearchRequest.copyOf(proto).withMode(StreetMode.CAR).build());
     State s1 = e1.traverse(s0)[0];
@@ -122,8 +121,8 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testModeSetCanTraverse() {
-    StreetEdge e = streetEdge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+  void testModeSetCanTraverse() {
+    StreetEdge e = streetEdge(v1, v2, 1.0, ALL);
 
     TraverseModeSet modes = TraverseModeSet.allModes();
     assertTrue(e.canTraverse(modes));
@@ -146,7 +145,7 @@ public class StreetEdgeTest {
    * correctly during turn cost computation. 4. Traffic light wait time is taken into account.
    */
   @Test
-  public void testTraverseModeSwitchBike() {
+  void testTraverseModeSwitchBike() {
     var vWithTrafficLight = new LabelledIntersectionVertex("maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
     StreetEdge e1 = streetEdge(
@@ -183,7 +182,7 @@ public class StreetEdgeTest {
    * the bike walking speed on the walking speed. 4. Traffic light wait time is taken into account.
    */
   @Test
-  public void testTraverseModeSwitchWalk() {
+  void testTraverseModeSwitchWalk() {
     var vWithTrafficLight = new LabelledIntersectionVertex("maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(
       v0,
@@ -214,7 +213,7 @@ public class StreetEdgeTest {
    * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
    */
   @Test
-  public void testBikeSwitch() {
+  void testBikeSwitch() {
     StreetEdge e0 = streetEdge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
     StreetEdge e1 = streetEdge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
     StreetEdge e2 = streetEdge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
@@ -271,9 +270,9 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testTurnRestriction() {
-    StreetEdge e0 = streetEdge(v0, v1, 50.0, StreetTraversalPermission.ALL);
-    StreetEdge e1 = streetEdge(v1, v2, 18.4, StreetTraversalPermission.ALL);
+  void testTurnRestriction() {
+    StreetEdge e0 = streetEdge(v0, v1, 50.0, ALL);
+    StreetEdge e1 = streetEdge(v1, v2, 18.4, ALL);
     StreetSearchRequestBuilder streetSearchRequestBuilder = StreetSearchRequest.copyOf(proto);
     streetSearchRequestBuilder.withArriveBy(true);
     StreetSearchRequest request = streetSearchRequestBuilder.withMode(StreetMode.WALK).build();
@@ -285,13 +284,13 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testElevationProfile() {
+  void testElevationProfile() {
     var elevationProfile = new PackedCoordinateSequence.Double(
       new double[] { 0, 10, 50, 12 },
       2,
       0
     );
-    var edge = streetEdge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+    var edge = streetEdge(v0, v1, 50.0, ALL);
     StreetElevationExtensionBuilder
       .of(edge)
       .withElevationProfile(elevationProfile)
@@ -306,7 +305,7 @@ public class StreetEdgeTest {
   }
 
   @Test
-  public void testBikeOptimizeTriangle() {
+  void testBikeOptimizeTriangle() {
     // This test does not depend on the setup method - and can probably be simplified
 
     Coordinate c1 = new Coordinate(-122.575033, 45.456773);
@@ -326,7 +325,7 @@ public class StreetEdgeTest {
       .withGeometry(geometry)
       .withName("Test Lane")
       .withMeterLength(length)
-      .withPermission(StreetTraversalPermission.ALL)
+      .withPermission(ALL)
       .withBack(false)
       // a safe street
       .withBicycleSafetyFactor(0.74f)
@@ -399,5 +398,26 @@ public class StreetEdgeTest {
     result = testStreet.traverse(startState)[0];
     double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;
     assertEquals(expectedWeight, result.getWeight(), DELTA);
+  }
+
+  @Test
+  void setName() {
+    var path = I18NString.of("path");
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(v0)
+      .withToVertex(v1)
+      .withPermission(ALL)
+      .withGeometry(GeometryUtils.makeLineString(v0.getCoordinate(), v1.getCoordinate()))
+      .withName(path)
+      .withBogusName(true)
+      .buildAndConnect();
+
+    assertEquals(path, edge.getName());
+    assertTrue(edge.nameIsDerived());
+
+    var mainStreet = I18NString.of("Main Street");
+    edge.setName(mainStreet);
+    assertEquals(mainStreet, edge.getName());
+    assertFalse(edge.nameIsDerived());
   }
 }
