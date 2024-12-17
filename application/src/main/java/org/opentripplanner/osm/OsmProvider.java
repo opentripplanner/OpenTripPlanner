@@ -1,11 +1,11 @@
 package org.opentripplanner.osm;
 
+import crosby.binary.file.BlockInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneId;
-import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;

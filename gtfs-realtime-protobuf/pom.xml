@@ -11,10 +11,15 @@
     <artifactId>gtfs-realtime-protobuf</artifactId>
     <name>OpenTripPlanner - GTFS Realtime (protobuf)</name>
 
+    <properties>
+        <protobuf.version>4.28.3</protobuf.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -46,7 +51,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.22.0:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
                 </configuration>
             </plugin>
         </plugins>
