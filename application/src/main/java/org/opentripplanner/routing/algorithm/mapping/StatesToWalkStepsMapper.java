@@ -30,7 +30,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Entrance;
 
 /**
@@ -179,8 +178,8 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
-    } else if (backState.getVertex() instanceof StationEntranceVertex) {
-      addStep(createStationEntranceWalkStep(backState, forwardState, edge));
+    } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
+      addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
       createAndSaveStep(backState, forwardState, pwe.signpostedAs().get(), FOLLOW_SIGNS, edge);
@@ -525,29 +524,23 @@ public class StatesToWalkStepsMapper {
   private WalkStepBuilder createStationEntranceWalkStep(
     State backState,
     State forwardState,
-    Edge edge
+    StationEntranceVertex vertex
   ) {
-    // don't care what came before or comes after
-    var step = createWalkStep(forwardState, backState);
-    // There is not a way to definitively determine if a user is entering or exiting the station,
-    // since the doors might be between or inside stations.
-    step.withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION);
-
-    StationEntranceVertex vertex = (StationEntranceVertex) backState.getVertex();
-
-    FeedScopedId entranceId = new FeedScopedId("osm", vertex.getId());
-
     Entrance entrance = Entrance
-      .of(entranceId)
-      .withCode(vertex.getCode())
+      .of(vertex.id())
+      .withCode(vertex.code())
       .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
       .withWheelchairAccessibility(
-        vertex.isAccessible() ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE
+        vertex.wheelchairAccessibility()
       )
       .build();
 
-    step.withEntrance(entrance);
-    return step;
+    // don't care what came before or comes after
+    return createWalkStep(forwardState, backState)
+      // There is not a way to definitively determine if a user is entering or exiting the station,
+      // since the doors might be between or inside stations.
+      .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+      .withEntrance(entrance);
   }
 
   private void createAndSaveStep(

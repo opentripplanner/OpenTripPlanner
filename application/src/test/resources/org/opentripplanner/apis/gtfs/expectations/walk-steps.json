@@ -11,22 +11,21 @@
                     "streetName": "street",
                     "area": false,
                     "relativeDirection": "DEPART",
-                    "absoluteDirection" : "NORTHEAST",
-                    "feature" : null
+                    "absoluteDirection": "NORTHEAST",
+                    "feature": null
                   },
                   {
                     "streetName": "elevator",
                     "area": false,
                     "relativeDirection": "ELEVATOR",
-                    "absoluteDirection" : null,
-                    "feature" : null
-
+                    "absoluteDirection": null,
+                    "feature": null
                   },
                   {
-                    "streetName" : "entrance",
-                    "area" : false,
-                    "relativeDirection" : "ENTER_OR_EXIT_STATION",
-                    "absoluteDirection" : null,
+                    "streetName": "entrance",
+                    "area": false,
+                    "relativeDirection": "ENTER_OR_EXIT_STATION",
+                    "absoluteDirection": null,
                     "feature": {
                       "__typename": "Entrance",
                       "code": "A",
