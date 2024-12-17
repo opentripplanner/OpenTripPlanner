@@ -26,6 +26,7 @@ import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
@@ -57,6 +58,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final StopConsolidationService stopConsolidationService;
   private final StreetLimitationParametersService streetLimitationParametersService;
   private final LuceneIndex luceneIndex;
+  private final DebugUiConfig debugUiConfig;
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
 
@@ -83,7 +85,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     FlexParameters flexParameters,
     @Nullable TraverseVisitor traverseVisitor,
-    @Nullable LuceneIndex luceneIndex
+    @Nullable LuceneIndex luceneIndex,
+    DebugUiConfig debugUiConfig
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -105,6 +108,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
+    this.debugUiConfig = debugUiConfig;
   }
 
   /**
@@ -129,7 +133,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor traverseVisitor,
-    @Nullable LuceneIndex luceneIndex
+    @Nullable LuceneIndex luceneIndex,
+    DebugUiConfig debugUiConfig
   ) {
     return new DefaultServerRequestContext(
       graph,
@@ -151,7 +156,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       streetLimitationParametersService,
       flexParameters,
       traverseVisitor,
-      luceneIndex
+      luceneIndex,
+      debugUiConfig
     );
   }
 
@@ -260,6 +266,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VectorTileConfig vectorTileConfig() {
     return vectorTileConfig;
+  }
+
+  @Override
+  public DebugUiConfig debugUiConfig() {
+    return debugUiConfig;
   }
 
   @Nullable

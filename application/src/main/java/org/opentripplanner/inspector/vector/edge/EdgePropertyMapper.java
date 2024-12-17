@@ -22,7 +22,10 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
     List<KeyValue> properties =
       switch (input) {
         case StreetEdge e -> mapStreetEdge(e);
-        case EscalatorEdge e -> List.of(kv("distance", e.getDistanceMeters()));
+        case EscalatorEdge e -> List.of(
+          kv("distance", e.getDistanceMeters()),
+          kv("duration", e.getDuration().map(d -> d.toString()).orElse(null))
+        );
         default -> List.of();
       };
     return ListUtils.combine(baseProps, properties);
@@ -35,7 +38,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       kv("noThruTraffic", noThruTrafficAsString(se)),
       kv("wheelchairAccessible", se.isWheelchairAccessible())
     );
-    if (se.hasBogusName()) {
+    if (se.nameIsDerived()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
     } else {
       props.addFirst(kv("name", se.getName().toString()));

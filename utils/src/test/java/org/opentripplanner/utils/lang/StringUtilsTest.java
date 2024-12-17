@@ -100,4 +100,10 @@ class StringUtilsTest {
   void noInvisibleChars(String input) {
     assertFalse(StringUtils.containsInvisibleCharacters(input));
   }
+
+  @ParameterizedTest
+  @ValueSource(strings = { "AAA Bbb", "aAa bbb", "aaa bbb", "aaa   bbb", "AAA_BBB" })
+  void slugify(String input) {
+    assertEquals("aaa-bbb", StringUtils.slugify(input));
+  }
 }

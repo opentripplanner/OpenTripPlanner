@@ -232,7 +232,7 @@ Releases are performed off the master branch, and are tagged with git annotated 
 
 OpenTripPlanner is currently configured such that builds including releases upload JAR files to
 GitHub Packages. This is not the most convenient place for end users to find and download the files.
-Therefore we also attach a stand-alone "shaded" JAR to the GitHub tag/release page, and have
+Therefore, we also attach a stand-alone "shaded" JAR to the GitHub tag/release page. We have
 historically also uploaded Maven artifacts to Maven Central including compiled and source code JARs
 as well as the "shaded" JAR containing all dependencies, allowing stand-alone usage. This release
 process is handled by the Sonatype Nexus Staging plugin, which is no longer configured in the

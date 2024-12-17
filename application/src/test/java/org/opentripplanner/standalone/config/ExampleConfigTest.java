@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.DEBUG_UI_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
@@ -58,6 +59,17 @@ public class ExampleConfigTest {
   @ParameterizedTest(name = "Check validity of {0}")
   void otpConfig(Path filename) {
     testConfig(filename, nodeAdapter -> new OtpConfig(nodeAdapter, true));
+  }
+
+  @FilePatternSource(
+    pattern = {
+      "doc/user/examples/**/" + DEBUG_UI_CONFIG_FILENAME,
+      "application/src/test/resources/standalone/config/" + DEBUG_UI_CONFIG_FILENAME,
+    }
+  )
+  @ParameterizedTest(name = "Check validity of {0}")
+  void debugUiConfig(Path filename) {
+    testConfig(filename, nodeAdapter -> new DebugUiConfig(nodeAdapter, true));
   }
 
   @FilePatternSource(
