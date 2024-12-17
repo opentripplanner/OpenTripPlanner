@@ -496,21 +496,4 @@ public class Timetable implements Serializable {
     }
     return copyOf().withServiceDate(date).build();
   }
-
-  @Override
-  public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
-    Timetable timetable = (Timetable) o;
-    return (
-      Objects.equals(pattern, timetable.pattern) &&
-      Objects.equals(tripTimes, timetable.tripTimes) &&
-      Objects.equals(frequencyEntries, timetable.frequencyEntries) &&
-      Objects.equals(serviceDate, timetable.serviceDate)
-    );
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(pattern, tripTimes, frequencyEntries, serviceDate);
-  }
 }
