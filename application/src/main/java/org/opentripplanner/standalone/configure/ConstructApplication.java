@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -64,6 +65,11 @@ public class ConstructApplication {
 
   private final CommandLineParameters cli;
   private final GraphBuilderDataSources graphBuilderDataSources;
+  /**
+   * The OSM Info is injected into the graph-builder, but not the web-server; Hence not part of
+   * the application context.
+   */
+  private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private final ConstructApplicationFactory factory;
 
   /**
@@ -72,6 +78,7 @@ public class ConstructApplication {
   ConstructApplication(
     CommandLineParameters cli,
     Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
@@ -84,6 +91,7 @@ public class ConstructApplication {
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
+    this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
 
     // We create the optional GraphVisualizer here, because it would be significant more complex to
     // use Dagger DI to do it - passing in a parameter to enable it or not.
@@ -130,7 +138,8 @@ public class ConstructApplication {
       buildConfig(),
       graphBuilderDataSources,
       graph(),
-      timetableRepository(),
+      osmInfoGraphBuildRepository,
+      factory.timetableRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
       factory.emissionsDataModel(),
@@ -259,6 +268,10 @@ public class ConstructApplication {
 
   public DataImportIssueSummary dataImportIssueSummary() {
     return factory.dataImportIssueSummary();
+  }
+
+  public OsmInfoGraphBuildRepository osmInfoGraphBuildRepository() {
+    return osmInfoGraphBuildRepository;
   }
 
   public StopConsolidationRepository stopConsolidationRepository() {

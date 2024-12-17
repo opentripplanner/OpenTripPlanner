@@ -13,6 +13,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -55,14 +56,20 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private final Graph graph;
 
+  private final OsmInfoGraphBuildService osmInfoGraphBuildService;
   private final TimetableRepository timetableRepository;
   private final VertexFactory vertexFactory;
 
   private VertexLinker linker;
 
   @Inject
-  public OsmBoardingLocationsModule(Graph graph, TimetableRepository timetableRepository) {
+  public OsmBoardingLocationsModule(
+    Graph graph,
+    OsmInfoGraphBuildService osmInfoGraphBuildService,
+    TimetableRepository timetableRepository
+  ) {
     this.graph = graph;
+    this.osmInfoGraphBuildService = osmInfoGraphBuildService;
     this.timetableRepository = timetableRepository;
     this.vertexFactory = new VertexFactory(graph);
   }
