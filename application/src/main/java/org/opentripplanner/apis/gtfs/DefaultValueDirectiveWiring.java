@@ -5,7 +5,6 @@ import graphql.language.Value;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.idl.SchemaDirectiveWiring;
 import graphql.schema.idl.SchemaDirectiveWiringEnvironment;
-import java.util.List;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
@@ -21,24 +20,18 @@ public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
     SchemaDirectiveWiringEnvironment<GraphQLInputObjectField> environment
   ) {
     GraphQLInputObjectField field = environment.getElement();
-    if (field.hasAppliedDirective("defaultValue")) {
-      String valueKey = environment
-        .getAppliedDirective("defaultValue")
-        .getArgument("valueKey")
-        .getValue();
-      return field.transform(builder ->
-        builder
-          .defaultValueLiteral(getDefaultValueForKey(valueKey))
-          .replaceDirectives(List.of(field.getDirective("defaultValue")))
-          .build()
-      );
+    var parentName = environment.getNodeParentTree().toList().get(1).getName();
+    var key = parentName + "_" + field.getName();
+    var defaultValue = getDefaultValueForKey(key);
+    if (defaultValue != null) {
+      return field.transform(builder -> builder.defaultValueLiteral(defaultValue).build());
     }
     return field;
   }
 
   private Value getDefaultValueForKey(String key) {
     switch (key) {
-      case "bicycleBoardCost":
+      case "BicyclePreferencesInput_boardCost":
         return IntValue.of(defaultPreferences.bike().boardCost());
       default:
         return null;
