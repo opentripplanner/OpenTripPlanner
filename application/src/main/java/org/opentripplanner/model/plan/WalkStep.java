@@ -130,15 +130,15 @@ public final class WalkStep {
   /**
    * When exiting a highway or traffic circle, the exit name/number.
    */
-  public String isHighwayExit() {
-    return exit;
+  public Optional<String> highwayExit() {
+    return exit.describeConstable();
   }
 
   /**
    * Get information about a subway station entrance or exit.
    */
-  public Entrance getEntrance() {
-    return entrance;
+  public Optional<Entrance> entrance() {
+    return Optional.ofNullable(entrance);
   }
 
   /**

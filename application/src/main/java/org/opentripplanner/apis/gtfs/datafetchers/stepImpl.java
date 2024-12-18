@@ -7,7 +7,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.apis.gtfs.mapping.StreetNoteMapper;
 import org.opentripplanner.model.plan.ElevationProfile.Step;
-import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
@@ -51,18 +50,12 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<String> exit() {
-    return environment -> getSource(environment).isHighwayExit();
+    return environment -> getSource(environment).highwayExit().orElse(null);
   }
 
   @Override
   public DataFetcher<Object> feature() {
-    return environment -> {
-      WalkStep source = getSource(environment);
-      if (source.getRelativeDirection() == RelativeDirection.ENTER_OR_EXIT_STATION) {
-        return source.getEntrance();
-      }
-      return null;
-    };
+    return environment -> getSource(environment).entrance().orElse(null);
   }
 
   @Override
