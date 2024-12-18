@@ -43,7 +43,26 @@ public class SiriUpdaterModule {
     return new SiriSXUpdater(params, timetableRepository, createLoader(params));
   }
 
+  private static EstimatedTimetableSource createSource(SiriETUpdater.Parameters params) {
+    return switch (params) {
+      case SiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
+        p.sourceParameters(),
+        createLoader(params)
+      );
+      case SiriETLiteUpdaterParameters p -> new SiriETLiteHttpTripUpdateSource(
+        p.sourceParameters(),
+        createLoader(params)
+      );
+      default -> throw new IllegalArgumentException("Unexpected value: " + params);
+    };
+  }
+
   private static SiriLoader createLoader(SiriSXUpdater.Parameters params) {
+    // Load real-time updates from a file.
+    if (SiriFileLoader.matchesUrl(params.url())) {
+      return new SiriFileLoader(params.url());
+    }
+    // Fallback to default loader
     return switch (params) {
       case SiriSXUpdaterParameters p -> new SiriHttpLoader(
         p.url(),
@@ -54,20 +73,6 @@ public class SiriUpdaterModule {
         p.uri(),
         p.timeout(),
         p.requestHeaders()
-      );
-      default -> throw new IllegalArgumentException("Unexpected value: " + params);
-    };
-  }
-
-  private static EstimatedTimetableSource createSource(SiriETUpdater.Parameters params) {
-    return switch (params) {
-      case SiriETUpdaterParameters p -> new SiriETHttpTripUpdateSource(
-        p.sourceParameters(),
-        createLoader(params)
-      );
-      case SiriETLiteUpdaterParameters p -> new SiriETLiteHttpTripUpdateSource(
-        p.sourceParameters(),
-        createLoader(params)
       );
       default -> throw new IllegalArgumentException("Unexpected value: " + params);
     };
