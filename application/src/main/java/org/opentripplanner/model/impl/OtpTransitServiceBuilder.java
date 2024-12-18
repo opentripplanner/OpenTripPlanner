@@ -280,6 +280,13 @@ public class OtpTransitServiceBuilder {
     return vehicleParkings;
   }
 
+  /**
+   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   */
+  public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints() {
+    return stopsByScheduledStopPoints;
+  }
+
   public OtpTransitService build() {
     return new OtpTransitServiceImpl(this);
   }
@@ -317,10 +324,6 @@ public class OtpTransitServiceBuilder {
     }
     removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
-  }
-
-  public Map<FeedScopedId, RegularStop> getStopsByScheduledStopPoints() {
-    return stopsByScheduledStopPoints;
   }
 
   /**

@@ -455,9 +455,26 @@ public class TimetableRepository implements Serializable {
     tripPatternForId.put(id, tripPattern);
   }
 
-  public void addScheduledStopPointMapping(FeedScopedId scheduledStopPointRef, FeedScopedId stopId) {
-    var stop = Objects.requireNonNull(siteRepository.getRegularStop(stopId));
-    stopsByScheduledStopPointRefs.put(scheduledStopPointRef, stop);
+  public void addScheduledStopPointMapping(Map<FeedScopedId, RegularStop> mapping) {
+    stopsByScheduledStopPointRefs.putAll(mapping);
+  }
+
+  /**
+   * Return the stop that is associated with the NeTEx concept of a scheduled stop point.
+   * <p>
+   * The scheduled stop point which is a "location-independent" stop that schedule systems provide
+   * which in turn can be later be resolved to an actual stop.
+   * <p>
+   * This way two schedule systems can use their own IDs for scheduled stop points but the stop (the
+   * actual physical infrastructure) is the same.
+   * <p>
+   * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's stopPointRef
+   * but the specs are unclear and the reality on the ground very mixed.
+   *
+   * @link <a href="https://public.3.basecamp.com/p/TcEEP5WrNZJPBxrJU9GAjint">NeTEx Basecamp discussion</a>
+   */
+  public Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint) {
+    return Optional.ofNullable(stopsByScheduledStopPointRefs.get(scheduledStopPoint));
   }
 
   /**

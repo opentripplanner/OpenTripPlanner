@@ -536,7 +536,8 @@ public class NetexMapper {
       var sspid = idFactory.createId(id);
       var stopId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
       var stop = Objects.requireNonNull(transitBuilder.getStops().get(stopId));
-      transitBuilder.getStopsByScheduledStopPoints().put(sspid, stop);
+      System.out.printf("%s -> %s%n", sspid, stopId);
+      transitBuilder.stopsByScheduledStopPoints().put(sspid, stop);
     });
   }
 
