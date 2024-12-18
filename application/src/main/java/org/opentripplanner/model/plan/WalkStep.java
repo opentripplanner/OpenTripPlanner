@@ -44,7 +44,7 @@ public final class WalkStep {
   private final double angle;
   private final boolean walkingBike;
 
-  private final String exit;
+  private final String highwayExit;
   private final Entrance entrance;
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
@@ -57,7 +57,7 @@ public final class WalkStep {
     AbsoluteDirection absoluteDirection,
     I18NString directionText,
     Set<StreetNote> streetNotes,
-    String exit,
+    String highwayExit,
     Entrance entrance,
     ElevationProfile elevationProfile,
     boolean nameIsDerived,
@@ -78,7 +78,7 @@ public final class WalkStep {
     this.angle = DoubleUtils.roundTo2Decimals(angle);
     this.walkingBike = walkingBike;
     this.area = area;
-    this.exit = exit;
+    this.highwayExit = highwayExit;
     this.entrance = entrance;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
@@ -131,7 +131,7 @@ public final class WalkStep {
    * When exiting a highway or traffic circle, the exit name/number.
    */
   public Optional<String> highwayExit() {
-    return exit.describeConstable();
+    return Optional.ofNullable(highwayExit);
   }
 
   /**
