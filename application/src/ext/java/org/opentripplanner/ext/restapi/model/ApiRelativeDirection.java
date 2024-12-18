@@ -21,6 +21,5 @@ public enum ApiRelativeDirection {
   UTURN_RIGHT,
   ENTER_STATION,
   EXIT_STATION,
-  ENTER_OR_EXIT_STATION,
   FOLLOW_SIGNS,
 }

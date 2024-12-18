@@ -49,7 +49,6 @@ public record OsmExtractParameters(
     return timeZone;
   }
 
-  @Nullable
   public boolean includeOsmSubwayEntrances() {
     return includeOsmSubwayEntrances;
   }
