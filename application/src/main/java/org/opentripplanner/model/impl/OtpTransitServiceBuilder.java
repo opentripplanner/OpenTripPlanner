@@ -122,6 +122,8 @@ public class OtpTransitServiceBuilder {
 
   private final List<VehicleParking> vehicleParkings = new ArrayList<>();
 
+  private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints = new HashMap<>();
+
   private final DataImportIssueStore issueStore;
 
   public OtpTransitServiceBuilder(SiteRepository siteRepository, DataImportIssueStore issueStore) {
@@ -317,6 +319,10 @@ public class OtpTransitServiceBuilder {
     LOG.info("Limiting transit service days to time period complete.");
   }
 
+  public Map<FeedScopedId, RegularStop> getStopsByScheduledStopPoints() {
+    return stopsByScheduledStopPoints;
+  }
+
   /**
    * Find all serviceIds in both CalendarServices and CalendarServiceDates.
    */
@@ -449,7 +455,7 @@ public class OtpTransitServiceBuilder {
   }
 
   /**
-   * Return {@code true} if the the point is a trip-transfer-point and the trip reference is
+   * Return {@code true} if the point is a trip-transfer-point and the trip reference is
    * missing.
    */
   private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {

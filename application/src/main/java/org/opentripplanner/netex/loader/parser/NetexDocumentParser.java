@@ -69,24 +69,24 @@ public class NetexDocumentParser {
   }
 
   private void parseCommonFrame(Common_VersionFrameStructure value) {
-    if (value instanceof ResourceFrame) {
-      parse((ResourceFrame) value, new ResourceFrameParser());
-    } else if (value instanceof ServiceCalendarFrame) {
-      parse((ServiceCalendarFrame) value, new ServiceCalendarFrameParser());
-    } else if (value instanceof TimetableFrame) {
-      parse((TimetableFrame) value, new TimeTableFrameParser());
-    } else if (value instanceof ServiceFrame) {
-      parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
-    } else if (value instanceof SiteFrame) {
-      parse((SiteFrame) value, new SiteFrameParser(ignoredFeatures));
-    } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame) {
-      parse((FareFrame) value, new FareFrameParser());
-    } else if (value instanceof CompositeFrame) {
+    if (value instanceof ResourceFrame frame) {
+      parse(frame, new ResourceFrameParser());
+    } else if (value instanceof ServiceCalendarFrame frame) {
+      parse(frame, new ServiceCalendarFrameParser());
+    } else if (value instanceof TimetableFrame frame) {
+      parse(frame, new TimeTableFrameParser());
+    } else if (value instanceof ServiceFrame frame) {
+      parse(frame, new ServiceFrameParser(netexIndex.flexibleStopPlaceById));
+    } else if (value instanceof SiteFrame frame) {
+      parse(frame, new SiteFrameParser(ignoredFeatures));
+    } else if (!ignoredFeatures.contains(FARE_FRAME) && value instanceof FareFrame fareFrame) {
+      parse(fareFrame, new FareFrameParser());
+    } else if (value instanceof CompositeFrame frame) {
       // We recursively parse composite frames and content until there
       // is no more nested frames - this is accepting documents which
       // are not withing the specification, but we leave this for the
       // document schema validation - not a OTP responsibility
-      parseCompositeFrame((CompositeFrame) value);
+      parseCompositeFrame(frame);
     } else if (value instanceof GeneralFrame || value instanceof InfrastructureFrame) {
       NetexParser.informOnElementIntentionallySkipped(LOG, value);
     } else {

@@ -202,10 +202,13 @@ public class NetexMapper {
     mapTripPatterns(serviceIds);
     mapNoticeAssignments();
 
+    mapScheduledStopPointsToQuays();
     mapVehicleParkings();
 
     addEntriesToGroupMapperForPostProcessingLater();
   }
+
+
 
   /* PRIVATE METHODS */
 
@@ -526,6 +529,15 @@ public class NetexMapper {
         currentNetexIndex.getServiceJourneyInterchangeById().localValues()
       );
     }
+  }
+
+  private void mapScheduledStopPointsToQuays() {
+    currentNetexIndex.getQuayIdByStopPointRef().localKeys().forEach(id -> {
+      var sspid = idFactory.createId(id);
+      var stopId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
+      var stop = Objects.requireNonNull(transitBuilder.getStops().get(stopId));
+      transitBuilder.getStopsByScheduledStopPoints().put(sspid, stop);
+    });
   }
 
   private void mapVehicleParkings() {

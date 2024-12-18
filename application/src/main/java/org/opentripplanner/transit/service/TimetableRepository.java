@@ -150,6 +150,8 @@ public class TimetableRepository implements Serializable {
 
   private transient TransitAlertService transitAlertService;
 
+  private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
+
   @Inject
   public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
     this.siteRepository = Objects.requireNonNull(siteRepository);
@@ -451,6 +453,11 @@ public class TimetableRepository implements Serializable {
   public void addTripPattern(FeedScopedId id, TripPattern tripPattern) {
     invalidateIndex();
     tripPatternForId.put(id, tripPattern);
+  }
+
+  public void addScheduledStopPointMapping(FeedScopedId scheduledStopPointRef, FeedScopedId stopId) {
+    var stop = Objects.requireNonNull(siteRepository.getRegularStop(stopId));
+    stopsByScheduledStopPointRefs.put(scheduledStopPointRef, stop);
   }
 
   /**
