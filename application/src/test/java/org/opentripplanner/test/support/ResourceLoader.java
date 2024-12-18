@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -46,7 +47,12 @@ public class ResourceLoader {
    */
   public File file(String path) {
     URL resource = url(path);
-    var file = new File(resource.getFile());
+    File file;
+    try {
+      file = new File(new URI(resource.toString()));
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
     assertTrue(
       file.exists(),
       "File '%s' not found on file system.".formatted(file.getAbsolutePath())
