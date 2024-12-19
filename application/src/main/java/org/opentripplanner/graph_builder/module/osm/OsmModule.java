@@ -26,6 +26,8 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.model.OsmWayReferences;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -55,7 +57,10 @@ public class OsmModule implements GraphBuilderModule {
    */
   private final List<OsmProvider> providers;
   private final Graph graph;
+  // TODO: Use this to store edge stop references
+  private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private final VehicleParkingRepository parkingRepository;
+
   private final DataImportIssueStore issueStore;
   private final OsmProcessingParameters params;
   private final SafetyValueNormalizer normalizer;
@@ -66,36 +71,40 @@ public class OsmModule implements GraphBuilderModule {
   OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
-    VehicleParkingRepository parkingService,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore,
     StreetLimitationParameters streetLimitationParameters,
     OsmProcessingParameters params
   ) {
     this.providers = List.copyOf(providers);
     this.graph = graph;
+    this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
+    this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
     this.params = params;
     this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
-    this.parkingRepository = parkingService;
   }
 
   public static OsmModuleBuilder of(
     Collection<OsmProvider> providers,
     Graph graph,
-    VehicleParkingRepository service
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    VehicleParkingRepository vehicleParkingRepository
   ) {
-    return new OsmModuleBuilder(providers, graph, service);
+    return new OsmModuleBuilder(providers, graph, osmInfoGraphBuildRepository, vehicleParkingRepository);
   }
 
   public static OsmModuleBuilder of(
     OsmProvider provider,
     Graph graph,
-    VehicleParkingRepository service
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    VehicleParkingRepository vehicleParkingRepository
   ) {
-    return of(List.of(provider), graph, service);
+    return of(List.of(provider), graph, osmInfoGraphBuildRepository, vehicleParkingRepository);
   }
 
   @Override
@@ -413,6 +422,8 @@ public class OsmModule implements GraphBuilderModule {
           StreetEdge street = streets.main();
           StreetEdge backStreet = streets.back();
           normalizer.applyWayProperties(street, backStreet, wayData, way);
+
+          osmInfoGraphBuildRepository.addReferences(street, new OsmWayReferences(List.of(street.toString())));
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
           startNode = endNode;

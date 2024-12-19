@@ -14,6 +14,8 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -83,8 +85,10 @@ class OsmBoardingLocationsModuleTest {
       Set.of(floatingBusVertex.getStop().getId().getId()),
       new NonLocalizedString("bus stop not connected to street network")
     );
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var vehicleParkingRepository = new DefaultVehicleParkingRepository();
     var osmModule = OsmModule
-      .of(provider, graph, new DefaultVehicleParkingRepository())
+      .of(provider, graph, osmInfoRepository, vehicleParkingRepository)
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();
@@ -107,7 +111,8 @@ class OsmBoardingLocationsModuleTest {
     assertEquals(0, platformVertex.getIncoming().size());
     assertEquals(0, platformVertex.getOutgoing().size());
 
-    new OsmBoardingLocationsModule(graph, timetableRepository).buildGraph();
+    var osmService = new DefaultOsmInfoGraphBuildService(osmInfoRepository);
+    new OsmBoardingLocationsModule(graph, osmService, timetableRepository).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
     assertEquals(5, boardingLocations.size()); // 3 nodes connected to the street network, plus one "floating" and one area centroid created by the module
