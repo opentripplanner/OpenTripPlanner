@@ -327,9 +327,6 @@ public interface TransitService {
   /**
    * Returns a list of RegularStops that lay within a bounding box and match the other criteria in
    * the request object.
-   *
-   * @param request - A {@link FindRegularStopsByBoundingBoxRequest} object with filtering defined.
-   * @return - A list of {@link RegularStop}s
    */
   Collection<RegularStop> findRegularStopsByBoundingBox(
     FindRegularStopsByBoundingBoxRequest request
