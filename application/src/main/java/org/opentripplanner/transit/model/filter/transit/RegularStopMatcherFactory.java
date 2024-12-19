@@ -21,9 +21,6 @@ public class RegularStopMatcherFactory {
    * and {@link inUseProvider}. The {@link inUseProvider} is used to determine if a {@link RegularStop} is
    * in use. Typically the inUseProvider is a function that checks if the {@link RegularStop} is in
    * a set of used stops.
-   * @param request - {@link FindRegularStopsByBoundingBoxRequest} to filter {@link RegularStop} objects.
-   * @param inUseProvider - {@link Predicate} to determine if a {@link RegularStop} is in use.
-   * @return - {@link Matcher} for {@link RegularStop} objects.
    */
   public static Matcher<RegularStop> of(
     FindRegularStopsByBoundingBoxRequest request,
