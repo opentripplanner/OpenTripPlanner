@@ -42,16 +42,6 @@ class OsmBoardingLocationsModuleTest {
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
-  File file = ResourceLoader
-    .of(OsmBoardingLocationsModuleTest.class)
-    .file("herrenberg-minimal.osm.pbf");
-  RegularStop platform = testModel
-    .stop("de:08115:4512:4:101")
-    .withCoordinate(48.59328, 8.86128)
-    .build();
-  RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
-  RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
-
   static Stream<Arguments> testCases() {
     return Stream.of(
       Arguments.of(
@@ -70,6 +60,16 @@ class OsmBoardingLocationsModuleTest {
   )
   @MethodSource("testCases")
   void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
+    File file = ResourceLoader
+      .of(OsmBoardingLocationsModuleTest.class)
+      .file("herrenberg-minimal.osm.pbf");
+    RegularStop platform = testModel
+      .stop("de:08115:4512:4:101")
+      .withCoordinate(48.59328, 8.86128)
+      .build();
+    RegularStop busStop = testModel.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
+    RegularStop floatingBusStop = testModel.stop("floating-bus-stop", 48.59417, 8.86464).build();
+    
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
@@ -146,13 +146,13 @@ class OsmBoardingLocationsModuleTest {
 
     assertEquals(1, platformCentroids.size());
 
-    var platform = platformCentroids.get(0);
+    var platformCentroid = platformCentroids.get(0);
 
-    assertConnections(platform, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
+    assertConnections(platformCentroid, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
 
     assertEquals(
       linkedVertices,
-      platform
+      platformCentroid
         .getOutgoingStreetEdges()
         .stream()
         .map(Edge::getToVertex)
@@ -162,7 +162,7 @@ class OsmBoardingLocationsModuleTest {
 
     assertEquals(
       linkedVertices,
-      platform
+      platformCentroid
         .getIncomingStreetEdges()
         .stream()
         .map(Edge::getFromVertex)
