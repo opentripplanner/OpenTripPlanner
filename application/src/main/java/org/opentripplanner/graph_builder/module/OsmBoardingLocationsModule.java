@@ -115,7 +115,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index) {
     var stop = ts.getStop();
     var stopCode = stop.getCode();
-    var stopId = stop.getId().getId();
     Envelope envelope = new Envelope(ts.getCoordinate());
 
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
@@ -151,17 +150,19 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     var nearbyEdges = new HashMap<Platform, List<Edge>>();
 
     for (var edge : index.getEdgesForEnvelope(envelope)) {
-      osmInfoGraphBuildService.findPlatform(edge).ifPresent(platform -> {
-        if (matchesReference(stop, platform.references())) {
-          if (!nearbyEdges.containsKey(platform)) {
-            var list = new ArrayList<Edge>();
-            list.add(edge);
-            nearbyEdges.put(platform, list);
-          } else {
-            nearbyEdges.get(platform).add(edge);
+      osmInfoGraphBuildService
+        .findPlatform(edge)
+        .ifPresent(platform -> {
+          if (matchesReference(stop, platform.references())) {
+            if (!nearbyEdges.containsKey(platform)) {
+              var list = new ArrayList<Edge>();
+              list.add(edge);
+              nearbyEdges.put(platform, list);
+            } else {
+              nearbyEdges.get(platform).add(edge);
+            }
           }
-        }
-      });
+        });
     }
 
     for (var platformEdgeList : nearbyEdges.entrySet()) {

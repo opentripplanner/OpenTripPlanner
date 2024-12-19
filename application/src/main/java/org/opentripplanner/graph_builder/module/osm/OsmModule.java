@@ -92,7 +92,12 @@ public class OsmModule implements GraphBuilderModule {
     OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     VehicleParkingRepository vehicleParkingRepository
   ) {
-    return new OsmModuleBuilder(providers, graph, osmInfoGraphBuildRepository, vehicleParkingRepository);
+    return new OsmModuleBuilder(
+      providers,
+      graph,
+      osmInfoGraphBuildRepository,
+      vehicleParkingRepository
+    );
   }
 
   public static OsmModuleBuilder of(
