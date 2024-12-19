@@ -1,7 +1,7 @@
 package org.opentripplanner.service.osminfo;
 
 import java.util.Optional;
-import org.opentripplanner.service.osminfo.model.OsmWayReferences;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -16,7 +16,10 @@ import org.opentripplanner.street.model.edge.Edge;
  */
 public interface OsmInfoGraphBuildService {
   /**
-   * TODO Add doc
+   * Find the platform the given edge is part of.
+   * <p>
+   * TODO: This service currently only stores linear platforms, but area platforms and
+   * node platforms should be supported as well.
    */
-  Optional<OsmWayReferences> findReferences(Edge edge);
+  Optional<Platform> findPlatform(Edge edge);
 }

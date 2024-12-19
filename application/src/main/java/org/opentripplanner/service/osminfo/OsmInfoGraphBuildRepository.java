@@ -2,7 +2,7 @@ package org.opentripplanner.service.osminfo;
 
 import java.io.Serializable;
 import java.util.Optional;
-import org.opentripplanner.service.osminfo.model.OsmWayReferences;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -12,12 +12,12 @@ import org.opentripplanner.street.model.edge.Edge;
  */
 public interface OsmInfoGraphBuildRepository extends Serializable {
   /**
-   * TODO Add doc
+   * Associate the edge with a platform
    */
-  void addReferences(Edge edge, OsmWayReferences info);
+  void addPlatform(Edge edge, Platform platform);
 
   /**
-   * TODO Add doc
+   * Find the platform the edge belongs to
    */
-  Optional<OsmWayReferences> findReferences(Edge edge);
+  Optional<Platform> findPlatform(Edge edge);
 }

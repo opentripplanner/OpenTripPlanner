@@ -27,13 +27,11 @@ import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
-import org.opentripplanner.service.osminfo.model.OsmWayReferences;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.LinearPlatform;
-import org.opentripplanner.street.model.edge.LinearPlatformEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
@@ -57,7 +55,6 @@ public class OsmModule implements GraphBuilderModule {
    */
   private final List<OsmProvider> providers;
   private final Graph graph;
-  // TODO: Use this to store edge stop references
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private final VehicleParkingRepository parkingRepository;
 
@@ -355,7 +352,7 @@ public class OsmModule implements GraphBuilderModule {
          * We split segments at intersections, self-intersections, nodes with ele tags, and transit stops;
          * the only processing we do on other nodes is to accumulate their geometry
          */
-        if (segmentCoordinates.size() == 0) {
+        if (segmentCoordinates.isEmpty()) {
           segmentCoordinates.add(osmStartNode.getCoordinate());
         }
 
@@ -413,8 +410,7 @@ public class OsmModule implements GraphBuilderModule {
             way,
             i,
             permissions,
-            geometry,
-            platform
+            geometry
           );
 
           params.edgeNamer().recordEdges(way, streets);
@@ -423,7 +419,10 @@ public class OsmModule implements GraphBuilderModule {
           StreetEdge backStreet = streets.back();
           normalizer.applyWayProperties(street, backStreet, wayData, way);
 
-          osmInfoGraphBuildRepository.addReferences(street, new OsmWayReferences(List.of(street.toString())));
+          platform.ifPresent(plat -> {
+            osmInfoGraphBuildRepository.addPlatform(street, plat);
+            osmInfoGraphBuildRepository.addPlatform(backStreet, plat);
+          });
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
           startNode = endNode;
@@ -439,7 +438,7 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  private Optional<LinearPlatform> getPlatform(OsmWay way) {
+  private Optional<Platform> getPlatform(OsmWay way) {
     if (way.isBoardingLocation()) {
       var nodeRefs = way.getNodeRefs();
       var size = nodeRefs.size();
@@ -455,7 +454,7 @@ public class OsmModule implements GraphBuilderModule {
       var references = way.getMultiTagValues(params.boardingAreaRefTags());
 
       return Optional.of(
-        new LinearPlatform(
+        new Platform(
           params.edgeNamer().getNameForWay(way, "platform " + way.getId()),
           geometry,
           references
@@ -523,8 +522,7 @@ public class OsmModule implements GraphBuilderModule {
     OsmWay way,
     int index,
     StreetTraversalPermission permissions,
-    LineString geometry,
-    Optional<LinearPlatform> platform
+    LineString geometry
   ) {
     // No point in returning edges that can't be traversed by anyone.
     if (permissions.allowsNothing()) {
@@ -550,8 +548,7 @@ public class OsmModule implements GraphBuilderModule {
           length,
           permissionsFront,
           geometry,
-          false,
-          platform
+          false
         );
     }
     if (permissionsBack.allowsAnything()) {
@@ -564,8 +561,7 @@ public class OsmModule implements GraphBuilderModule {
           length,
           permissionsBack,
           backGeometry,
-          true,
-          platform
+          true
         );
     }
     if (street != null && backStreet != null) {
@@ -582,19 +578,14 @@ public class OsmModule implements GraphBuilderModule {
     double length,
     StreetTraversalPermission permissions,
     LineString geometry,
-    boolean back,
-    Optional<LinearPlatform> platform
+    boolean back
   ) {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getNameForWay(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-    var seb = platform
-      .<StreetEdgeBuilder<?>>map(p -> new LinearPlatformEdgeBuilder().withPlatform(p))
-      .orElse(new StreetEdgeBuilder<>());
-
-    seb
+    StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(startEndpoint)
       .withToVertex(endEndpoint)
       .withGeometry(geometry)

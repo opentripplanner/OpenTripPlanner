@@ -2,9 +2,9 @@ package org.opentripplanner.graph_builder.module;
 
 import jakarta.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -18,12 +18,11 @@ import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinearPlatform;
-import org.opentripplanner.street.model.edge.LinearPlatformEdge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -149,25 +148,24 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     // if the boarding location is a non-area way we are finding the vertex representing the
     // center of the way, splitting if needed
-    var nearbyLinearPlatformEdges = new HashMap<LinearPlatform, List<LinearPlatformEdge>>();
+    var nearbyEdges = new HashMap<Platform, List<Edge>>();
 
     for (var edge : index.getEdgesForEnvelope(envelope)) {
-      if (edge instanceof LinearPlatformEdge platformEdge) {
-        var platform = platformEdge.platform;
+      osmInfoGraphBuildService.findPlatform(edge).ifPresent(platform -> {
         if (matchesReference(stop, platform.references())) {
-          if (!nearbyLinearPlatformEdges.containsKey(platform)) {
-            var list = new ArrayList<LinearPlatformEdge>();
-            list.add(platformEdge);
-            nearbyLinearPlatformEdges.put(platform, list);
+          if (!nearbyEdges.containsKey(platform)) {
+            var list = new ArrayList<Edge>();
+            list.add(edge);
+            nearbyEdges.put(platform, list);
           } else {
-            nearbyLinearPlatformEdges.get(platform).add(platformEdge);
+            nearbyEdges.get(platform).add(edge);
           }
         }
-      }
+      });
     }
 
-    for (var platformEdgeList : nearbyLinearPlatformEdges.entrySet()) {
-      LinearPlatform platform = platformEdgeList.getKey();
+    for (var platformEdgeList : nearbyEdges.entrySet()) {
+      Platform platform = platformEdgeList.getKey();
       var name = platform.name();
       var label = "platform-centroid/%s".formatted(stop.getId().toString());
       var centroid = platform.geometry().getCentroid();
@@ -269,7 +267,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     );
   }
 
-  private boolean matchesReference(StationElement<?, ?> stop, Set<String> references) {
+  private boolean matchesReference(StationElement<?, ?> stop, Collection<String> references) {
     var stopCode = stop.getCode();
     var stopId = stop.getId().getId();
 

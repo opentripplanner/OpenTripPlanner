@@ -4,7 +4,7 @@ import jakarta.inject.Inject;
 import java.util.Optional;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
-import org.opentripplanner.service.osminfo.model.OsmWayReferences;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.edge.Edge;
 
 public class DefaultOsmInfoGraphBuildService implements OsmInfoGraphBuildService {
@@ -17,8 +17,8 @@ public class DefaultOsmInfoGraphBuildService implements OsmInfoGraphBuildService
   }
 
   @Override
-  public Optional<OsmWayReferences> findReferences(Edge edge) {
-    return repository.findReferences(edge);
+  public Optional<Platform> findPlatform(Edge edge) {
+    return repository.findPlatform(edge);
   }
 
   @Override
