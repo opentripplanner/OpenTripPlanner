@@ -19,7 +19,7 @@ public class FindRegularStopsByBoundingBoxRequest {
 
   private final boolean filterByInUse;
 
-  protected FindRegularStopsByBoundingBoxRequest(
+ FindRegularStopsByBoundingBoxRequest(
     Envelope envelope,
     @Nullable String feedId,
     boolean filterByInUse
