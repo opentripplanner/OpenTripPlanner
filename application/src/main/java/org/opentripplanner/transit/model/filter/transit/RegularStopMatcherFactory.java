@@ -17,8 +17,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class RegularStopMatcherFactory {
 
   /**
-   * Creates a matcher that filters {@link RegularStop} objects with the provided {@link FindRegularStopsByBoundingBoxRequest}
-   * and {@link Predicate}. The {@link Predicate} is used to determine if a {@link RegularStop} is
+   * Creates a matcher that filters {@link RegularStop} objects with the provided {@code request}
+   * and {@link inUseProvider}. The {@link inUseProvider} is used to determine if a {@link RegularStop} is
    * in use. Typically the inUseProvider is a function that checks if the {@link RegularStop} is in
    * a set of used stops.
    * @param request - {@link FindRegularStopsByBoundingBoxRequest} to filter {@link RegularStop} objects.
