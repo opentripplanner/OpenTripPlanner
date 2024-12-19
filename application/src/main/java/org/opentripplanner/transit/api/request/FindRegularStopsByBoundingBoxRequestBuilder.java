@@ -12,7 +12,7 @@ public class FindRegularStopsByBoundingBoxRequestBuilder {
 
   private boolean filterByInUse = false;
 
- FindRegularStopsByBoundingBoxRequestBuilder(Envelope envelope) {
+  FindRegularStopsByBoundingBoxRequestBuilder(Envelope envelope) {
     this.envelope = envelope;
   }
 

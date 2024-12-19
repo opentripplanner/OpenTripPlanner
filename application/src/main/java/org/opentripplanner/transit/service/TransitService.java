@@ -283,6 +283,7 @@ public interface TransitService {
    * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
    */
   List<TransitMode> findTransitModes(StopLocationsGroup station);
+
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
@@ -303,15 +304,12 @@ public interface TransitService {
   Map<LocalDate, TIntSet> getServiceCodesRunningForDate();
 
   /**
-   * Returns a list of TripOnServiceDates that match the filtering defined in the request.
-   *
-   * @param request - A {@link TripOnServiceDateRequest} object with filtering defined.
-   * @return - A list of {@link TripOnServiceDate}s
+   * Returns a list of {@link TripOnServiceDate}s that match the filtering defined in the request.
    */
   List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request);
 
   /**
-   * Returns a list of Trips that match the filtering defined in the request.
+   * Returns a list of {@link Trip}s that match the filtering defined in the request.
    *
    */
   List<Trip> getTrips(TripRequest request);
@@ -325,8 +323,8 @@ public interface TransitService {
   boolean containsTrip(FeedScopedId id);
 
   /**
-   * Returns a list of RegularStops that lay within a bounding box and match the other criteria in
-   * the request object.
+   * Returns a list of {@link RegularStop}s that lay within a bounding box and match the other criteria
+   * in the request object.
    */
   Collection<RegularStop> findRegularStopsByBoundingBox(
     FindRegularStopsByBoundingBoxRequest request
