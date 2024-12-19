@@ -37,17 +37,6 @@ public class TripUpdateBuilder {
     this.midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
   }
 
-  public TripUpdateBuilder(
-    String routeId,
-    String tripId,
-    LocalDate serviceDate,
-    GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship,
-    ZoneId zoneId
-  ) {
-    this(tripId, serviceDate, scheduleRelationship, zoneId);
-    tripDescriptorBuilder.setRouteId(routeId);
-  }
-
   public TripUpdateBuilder addStopTime(String stopId, int secondsFromMidnight) {
     return addStopTime(
       stopId,

@@ -118,7 +118,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Constructor to allow tests to provide their own clock, not using system time.
    */
-  public TimetableSnapshotSource(
+  TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
     TimetableRepository timetableRepository,
     Supplier<LocalDate> localDateNow

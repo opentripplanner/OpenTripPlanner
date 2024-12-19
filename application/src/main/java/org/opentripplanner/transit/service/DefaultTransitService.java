@@ -99,6 +99,7 @@ public class DefaultTransitService implements TransitEditorService {
     this.timetableSnapshot = timetableSnapshotBuffer;
   }
 
+  @Override
   public Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip) {
     TripPattern tripPattern = findPattern(trip);
     if (tripPattern == null) {
@@ -109,6 +110,7 @@ public class DefaultTransitService implements TransitEditorService {
     );
   }
 
+  @Override
   public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
     TripPattern pattern = findPattern(trip, serviceDate);
 
