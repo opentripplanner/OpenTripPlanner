@@ -313,8 +313,6 @@ public interface TransitService {
   /**
    * Returns a list of Trips that match the filtering defined in the request.
    *
-   * @param request - A {@link TripRequest} object with filtering defined.
-   * @return - A list of {@link Trip}s
    */
   List<Trip> getTrips(TripRequest request);
 
