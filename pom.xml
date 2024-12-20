@@ -145,6 +145,7 @@
                                  our dependencies specify a module name. -->
                             <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
                             <OTP-Serialization-Version-Id>${otp.serialization.version.id}</OTP-Serialization-Version-Id>
+                            <SCM-Revision>${git.commit.id}</SCM-Revision>
                         </manifestEntries>
                     </archive>
                 </configuration>
