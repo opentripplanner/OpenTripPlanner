@@ -16,7 +16,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -34,7 +33,6 @@ import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPWebApplication;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -162,7 +160,10 @@ public class ConstructApplication {
     enableRequestTraceLogging();
     createMetricsLogging();
 
-    creatTransitLayerForRaptor(timetableRepository(), routerConfig().transitTuningConfig());
+    createTransitLayerForRaptor(
+      timetableRepository(),
+      routerConfig().transitTuningConfig()
+    );
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
@@ -171,6 +172,7 @@ public class ConstructApplication {
       vehicleRentalRepository(),
       vehicleParkingRepository(),
       timetableRepository(),
+      factory.timetableSnapshotManager(),
       routerConfig().updaterConfig()
     );
 
@@ -207,7 +209,7 @@ public class ConstructApplication {
   /**
    * Create transit layer for Raptor routing. Here we map the scheduled timetables.
    */
-  public static void creatTransitLayerForRaptor(
+  public static void createTransitLayerForRaptor(
     TimetableRepository timetableRepository,
     TransitTuningParameters tuningParameters
   ) {
@@ -222,9 +224,6 @@ public class ConstructApplication {
     );
     timetableRepository.setRealtimeTransitLayer(
       new TransitLayer(timetableRepository.getTransitLayer())
-    );
-    timetableRepository.setTransitLayerUpdater(
-      new TransitLayerUpdater(new DefaultTransitService(timetableRepository))
     );
   }
 

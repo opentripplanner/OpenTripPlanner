@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.configure;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +30,7 @@ import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
@@ -53,8 +55,7 @@ public class UpdaterConfigurator {
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final VehicleParkingRepository parkingRepository;
-  private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
-  private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
+  private final TimetableSnapshotManager snapshotManager;
 
   private UpdaterConfigurator(
     Graph graph,
@@ -62,6 +63,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
@@ -70,6 +72,7 @@ public class UpdaterConfigurator {
     this.timetableRepository = timetableRepository;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
+    this.snapshotManager = snapshotManager;
   }
 
   public static void configure(
@@ -78,6 +81,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
@@ -86,6 +90,7 @@ public class UpdaterConfigurator {
       vehicleRentalRepository,
       parkingRepository,
       timetableRepository,
+      snapshotManager,
       updatersParameters
     )
       .configure();
@@ -103,18 +108,13 @@ public class UpdaterConfigurator {
       )
     );
 
-    TimetableSnapshot timetableSnapshotBuffer = null;
-    if (siriTimetableSnapshotSource != null) {
-      timetableSnapshotBuffer = siriTimetableSnapshotSource.getTimetableSnapshotBuffer();
-    } else if (gtfsTimetableSnapshotSource != null) {
-      timetableSnapshotBuffer = gtfsTimetableSnapshotSource.getTimetableSnapshotBuffer();
-    }
+    TimetableSnapshot timetableSnapshotBuffer = snapshotManager.getTimetableSnapshotBuffer();
     GraphUpdaterManager updaterManager = new GraphUpdaterManager(
       new DefaultRealTimeUpdateContext(graph, timetableRepository, timetableSnapshotBuffer),
       updaters
     );
 
-    configureTimetableSnapshotFlush(updaterManager);
+    configureTimetableSnapshotFlush(updaterManager, snapshotManager);
 
     updaterManager.startUpdaters();
 
@@ -235,42 +235,30 @@ public class UpdaterConfigurator {
   }
 
   private SiriTimetableSnapshotSource provideSiriTimetableSnapshot() {
-    if (siriTimetableSnapshotSource == null) {
-      this.siriTimetableSnapshotSource =
-        new SiriTimetableSnapshotSource(
-          updatersParameters.timetableSnapshotParameters(),
-          timetableRepository
+        return new SiriTimetableSnapshotSource(
+          timetableRepository, snapshotManager
         );
-    }
 
-    return siriTimetableSnapshotSource;
   }
 
   private TimetableSnapshotSource provideGtfsTimetableSnapshot() {
-    if (gtfsTimetableSnapshotSource == null) {
-      this.gtfsTimetableSnapshotSource =
-        new TimetableSnapshotSource(
-          updatersParameters.timetableSnapshotParameters(),
-          timetableRepository
+        return new TimetableSnapshotSource(
+          timetableRepository,snapshotManager, () -> LocalDate.now(timetableRepository.getTimeZone())
         );
-    }
-    return gtfsTimetableSnapshotSource;
   }
 
   /**
    * If SIRI or GTFS real-time updaters are in use, configure a periodic flush of the timetable
    * snapshot.
    */
-  private void configureTimetableSnapshotFlush(GraphUpdaterManager updaterManager) {
-    if (siriTimetableSnapshotSource != null || gtfsTimetableSnapshotSource != null) {
+  private void configureTimetableSnapshotFlush(GraphUpdaterManager updaterManager, TimetableSnapshotManager snapshotManager) {
       updaterManager
         .getScheduler()
         .scheduleWithFixedDelay(
-          new TimetableSnapshotFlush(siriTimetableSnapshotSource, gtfsTimetableSnapshotSource),
+          new TimetableSnapshotFlush(snapshotManager),
           0,
           updatersParameters.timetableSnapshotParameters().maxSnapshotFrequency().toSeconds(),
           TimeUnit.SECONDS
         );
-    }
   }
 }

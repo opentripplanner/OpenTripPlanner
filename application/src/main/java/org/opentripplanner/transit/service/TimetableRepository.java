@@ -28,8 +28,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
@@ -54,7 +52,9 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -113,15 +113,6 @@ public class TimetableRepository implements Serializable {
   private transient TransitLayer transitLayer;
 
   /**
-   * This updater applies realtime changes queued up for the next TimetableSnapshot such that
-   * this TimetableRepository.realtimeSnapshot remains aligned with the service represented in
-   * (this TimetableRepository instance + that next TimetableSnapshot). This is a way of keeping the
-   * TransitLayer up to date without repeatedly deriving it from scratch every few seconds. The
-   * same incremental changes are applied to both sets of data and they are published together.
-   */
-  private transient TransitLayerUpdater transitLayerUpdater;
-
-  /**
    * An optionally present second TransitLayer representing the contents of this TimetableRepository plus
    * the results of realtime updates in the latest TimetableSnapshot.
    */
@@ -132,7 +123,6 @@ public class TimetableRepository implements Serializable {
   private final CalendarServiceData calendarServiceData = new CalendarServiceData();
 
   private transient TimetableRepositoryIndex index;
-  private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
   private ZoneId timeZone = null;
   private boolean timeZoneExplicitlySet = false;
 
@@ -172,24 +162,6 @@ public class TimetableRepository implements Serializable {
       this.index = new TimetableRepositoryIndex(this);
       LOG.info("Index timetable repository complete.");
     }
-  }
-
-  @Nullable
-  public TimetableSnapshot getTimetableSnapshot() {
-    return timetableSnapshotProvider == null
-      ? null
-      : timetableSnapshotProvider.getTimetableSnapshot();
-  }
-
-  public void initTimetableSnapshotProvider(TimetableSnapshotProvider timetableSnapshotProvider) {
-    if (this.timetableSnapshotProvider != null) {
-      throw new IllegalArgumentException(
-        "We support only one timetableSnapshotSource, there are two implementation; one for " +
-        "GTFS and one for Netex/Siri. They need to be refactored to work together. This cast " +
-        "will fail if updaters try setup both."
-      );
-    }
-    this.timetableSnapshotProvider = timetableSnapshotProvider;
   }
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
@@ -234,7 +206,7 @@ public class TimetableRepository implements Serializable {
     transitModes.add(mode);
   }
 
-  /** List of transit modes that are availible in GTFS data used in this graph **/
+  /** List of transit modes that are available in GTFS data used in this graph **/
   public HashSet<TransitMode> getTransitModes() {
     return transitModes;
   }
@@ -479,10 +451,6 @@ public class TimetableRepository implements Serializable {
     return updaterManager;
   }
 
-  public TransitLayerUpdater getTransitLayerUpdater() {
-    return transitLayerUpdater;
-  }
-
   public Deduplicator getDeduplicator() {
     return deduplicator;
   }
@@ -506,10 +474,6 @@ public class TimetableRepository implements Serializable {
 
   private void updateHasTransit(boolean hasTransit) {
     this.hasTransit = this.hasTransit || hasTransit;
-  }
-
-  public void setTransitLayerUpdater(TransitLayerUpdater transitLayerUpdater) {
-    this.transitLayerUpdater = transitLayerUpdater;
   }
 
   /**

@@ -63,6 +63,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterStatus;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.utils.collection.CollectionsView;
 
 /**
@@ -533,9 +534,6 @@ public class DefaultTransitService implements TransitEditorService {
    */
   @Nullable
   private TimetableSnapshot lazyGetTimeTableSnapShot() {
-    if (this.timetableSnapshot == null) {
-      timetableSnapshot = timetableRepository.getTimetableSnapshot();
-    }
     return this.timetableSnapshot;
   }
 
@@ -652,11 +650,6 @@ public class DefaultTransitService implements TransitEditorService {
   public TransitLayer getRealtimeTransitLayer() {
     OTPRequestTimeoutException.checkForTimeout();
     return this.timetableRepository.getRealtimeTransitLayer();
-  }
-
-  @Override
-  public void setTransitLayer(TransitLayer transitLayer) {
-    this.timetableRepository.setTransitLayer(transitLayer);
   }
 
   @Override

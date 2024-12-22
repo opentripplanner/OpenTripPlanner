@@ -26,6 +26,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -283,9 +284,9 @@ public class TimetableSnapshotSourceTest {
 
   private TimetableSnapshotSource defaultUpdater() {
     return new TimetableSnapshotSource(
-      new TimetableSnapshotSourceParameters(Duration.ZERO, true),
       timetableRepository,
-      () -> SERVICE_DATE
+     new TimetableSnapshotManager(new TransitLayerUpdater(new DefaultTransitService(timetableRepository)), TimetableSnapshotSourceParameters.DEFAULT,
+      () -> SERVICE_DATE), () -> SERVICE_DATE
     );
   }
 }

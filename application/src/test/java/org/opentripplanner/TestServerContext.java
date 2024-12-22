@@ -1,6 +1,6 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
 
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
@@ -69,7 +69,10 @@ public class TestServerContext {
       null,
       DebugUiConfig.DEFAULT
     );
-    creatTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
+    createTransitLayerForRaptor(
+      timetableRepository,
+      routerConfig.transitTuningConfig()
+    );
     return context;
   }
 

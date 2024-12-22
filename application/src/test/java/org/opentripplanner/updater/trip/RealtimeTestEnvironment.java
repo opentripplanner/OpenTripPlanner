@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -43,6 +44,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   );
 
   public final TimetableRepository timetableRepository;
+  public final TimetableSnapshotManager snapshotManager;
   private final SiriTimetableSnapshotSource siriSource;
   private final TimetableSnapshotSource gtfsSource;
   private final DateTimeHelper dateTimeHelper;
@@ -71,14 +73,15 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
+    snapshotManager = new TimetableSnapshotManager(new TransitLayerUpdater(new DefaultTransitService(timetableRepository)), TimetableSnapshotSourceParameters.DEFAULT, () -> SERVICE_DATE);
     // SIRI and GTFS-RT cannot be registered with the transit model at the same time
     // we are actively refactoring to remove this restriction
     // for the time being you cannot run a SIRI and GTFS-RT test at the same time
     if (sourceType == SourceType.SIRI) {
-      siriSource = new SiriTimetableSnapshotSource(PARAMETERS, timetableRepository);
+      siriSource = new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
       gtfsSource = null;
     } else {
-      gtfsSource = new TimetableSnapshotSource(PARAMETERS, timetableRepository);
+      gtfsSource = new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
       siriSource = null;
     }
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
@@ -220,7 +223,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
         new DefaultRealTimeUpdateContext(
           new Graph(),
           timetableRepository,
-          siriSource.getTimetableSnapshotBuffer()
+          snapshotManager.getTimetableSnapshotBuffer()
         )
       );
     commitTimetableSnapshot();

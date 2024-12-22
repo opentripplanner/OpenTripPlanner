@@ -260,7 +260,6 @@ class GraphQLIntegrationTest {
     timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
 
     var snapshot = timetableSnapshot.commit();
-    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)

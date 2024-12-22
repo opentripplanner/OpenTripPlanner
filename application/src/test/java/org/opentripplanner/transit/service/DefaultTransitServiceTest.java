@@ -106,7 +106,6 @@ class DefaultTransitServiceTest {
     timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));
 
     var snapshot = timetableSnapshot.commit();
-    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     service =
       new DefaultTransitService(timetableRepository) {

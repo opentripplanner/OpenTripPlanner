@@ -27,6 +27,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -44,6 +45,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 
@@ -210,10 +212,8 @@ public abstract class GtfsTest {
     serverContext = TestServerContext.createServerContext(graph, timetableRepository);
     timetableSnapshotSource =
       new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT
-          .withPurgeExpiredData(true)
-          .withMaxSnapshotFrequency(Duration.ZERO),
-        timetableRepository
+        timetableRepository,
+        null, null
       );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);

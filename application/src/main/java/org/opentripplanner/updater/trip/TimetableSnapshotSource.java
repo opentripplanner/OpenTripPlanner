@@ -107,38 +107,22 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private final TimetableSnapshotManager snapshotManager;
   private final Supplier<LocalDate> localDateNow;
-
-  public TimetableSnapshotSource(
-    TimetableSnapshotSourceParameters parameters,
-    TimetableRepository timetableRepository
-  ) {
-    this(parameters, timetableRepository, () -> LocalDate.now(timetableRepository.getTimeZone()));
-  }
-
   /**
    * Constructor is package local to allow unit-tests to provide their own clock, not using system
    * time.
    */
-  TimetableSnapshotSource(
-    TimetableSnapshotSourceParameters parameters,
+  public TimetableSnapshotSource(
     TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
     Supplier<LocalDate> localDateNow
   ) {
-    this.snapshotManager =
-      new TimetableSnapshotManager(
-        timetableRepository.getTransitLayerUpdater(),
-        parameters,
-        localDateNow
-      );
+    this.snapshotManager = snapshotManager;
     this.timeZone = timetableRepository.getTimeZone();
+    this.localDateNow = localDateNow;
     this.transitEditorService =
       new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshotBuffer());
     this.deduplicator = timetableRepository.getDeduplicator();
     this.serviceCodes = timetableRepository.getServiceCodes();
-    this.localDateNow = localDateNow;
-
-    // Inject this into the transit model
-    timetableRepository.initTimetableSnapshotProvider(this);
   }
 
   /**
