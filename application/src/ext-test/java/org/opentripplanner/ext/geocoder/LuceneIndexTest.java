@@ -128,7 +128,7 @@ class LuceneIndexTest {
       .forEach(siteRepository::withStation);
     var timetableRepository = new TimetableRepository(siteRepository.build(), new Deduplicator());
     timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository, null) {
+    var transitService = new DefaultTransitService(timetableRepository) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap
         .<StopLocation, TransitMode>builder()
         .putAll(WESTHAFEN, FERRY, BUS)

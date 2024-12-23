@@ -228,7 +228,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * enabled.
    */
   private NearbyStopFinder createNearbyStopFinder() {
-    var transitService = new DefaultTransitService(timetableRepository, null);
+    var transitService = new DefaultTransitService(timetableRepository);
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(

@@ -66,10 +66,7 @@ class RouteRequestMapperTest {
     Graph graph = new Graph();
     var timetableRepository = new TimetableRepository();
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(
-      timetableRepository,
-      null
-    );
+    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     CONTEXT =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),

@@ -65,7 +65,7 @@ public class RealtimeStopsLayerTest {
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.initTimeZone(ZoneIds.HELSINKI);
     timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository, null) {
+    var transitService = new DefaultTransitService(timetableRepository) {
       final TransitAlertService alertService = new TransitAlertServiceImpl(timetableRepository);
 
       @Override

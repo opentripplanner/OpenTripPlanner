@@ -92,7 +92,7 @@ class RealtimeResolverTest {
 
     var model = new TimetableRepository();
     model.index();
-    var transitService = new DefaultTransitService(model, null);
+    var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
     RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
@@ -183,7 +183,7 @@ class RealtimeResolverTest {
     );
     timetableRepository.index();
 
-    return new DefaultTransitService(timetableRepository, null) {
+    return new DefaultTransitService(timetableRepository) {
       final TransitAlertService alertService = new TransitAlertServiceImpl(timetableRepository);
 
       @Override

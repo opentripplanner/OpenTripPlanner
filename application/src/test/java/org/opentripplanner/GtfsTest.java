@@ -211,7 +211,16 @@ public abstract class GtfsTest {
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
     serverContext = TestServerContext.createServerContext(graph, timetableRepository);
-    timetableSnapshotSource = new TimetableSnapshotSource(timetableRepository, new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now), LocalDate::now);
+    timetableSnapshotSource =
+      new TimetableSnapshotSource(
+        timetableRepository,
+        new TimetableSnapshotManager(
+          null,
+          TimetableSnapshotSourceParameters.DEFAULT,
+          LocalDate::now
+        ),
+        LocalDate::now
+      );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());

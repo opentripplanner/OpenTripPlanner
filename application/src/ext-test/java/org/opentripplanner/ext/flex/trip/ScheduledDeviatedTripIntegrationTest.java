@@ -102,7 +102,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     var router = new FlexRouter(
       graph,
-      new DefaultTransitService(timetableRepository, null),
+      new DefaultTransitService(timetableRepository),
       FlexParameters.defaultValues(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       null,

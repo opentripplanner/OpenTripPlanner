@@ -41,7 +41,7 @@ class StopClusterMapperTest {
     repo.addGroups(List.of(new ConsolidatedStopGroup(STOP_A.getId(), List.of(STOP_B.getId()))));
 
     var service = new DefaultStopConsolidationService(repo, TIMETABLE_REPOSITORY);
-    var mapper = new StopClusterMapper(new DefaultTransitService(TIMETABLE_REPOSITORY, null), service);
+    var mapper = new StopClusterMapper(new DefaultTransitService(TIMETABLE_REPOSITORY), service);
 
     var clusters = mapper.generateStopClusters(LOCATIONS, List.of());
 
