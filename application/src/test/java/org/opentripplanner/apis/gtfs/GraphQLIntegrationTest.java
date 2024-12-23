@@ -206,7 +206,28 @@ class GraphQLIntegrationTest {
     timetableRepository.addAgency(agency);
 
     timetableRepository.initTimeZone(BERLIN);
+
+    // Create a calendar (needed for testing cancelled trips)
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var firstDate = LocalDate.of(2024, 8, 8);
+    var secondDate = LocalDate.of(2024, 8, 9);
+    calendarServiceData.putServiceDatesForServiceId(cal_id, List.of(firstDate, secondDate));
+    timetableRepository.getServiceCodes().put(cal_id, 0);
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
+
     timetableRepository.index();
+
+
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    tripTimes2.cancelTrip();
+    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+
+    var snapshot = timetableSnapshot.commit();
+
     var routes = Arrays
       .stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
@@ -222,7 +243,7 @@ class GraphQLIntegrationTest {
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
-    TransitEditorService transitService = new DefaultTransitService(timetableRepository) {
+    TransitEditorService transitService = new DefaultTransitService(timetableRepository, snapshot) {
       private final TransitAlertService alertService = new TransitAlertServiceImpl(
         timetableRepository
       );
@@ -242,24 +263,9 @@ class GraphQLIntegrationTest {
         return Set.of(ROUTE);
       }
     };
+
     routes.forEach(transitService::addRoutes);
 
-    // Crate a calendar (needed for testing cancelled trips)
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    var firstDate = LocalDate.of(2024, 8, 8);
-    var secondDate = LocalDate.of(2024, 8, 9);
-    calendarServiceData.putServiceDatesForServiceId(cal_id, List.of(firstDate, secondDate));
-    timetableRepository.getServiceCodes().put(cal_id, 0);
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    tripTimes2.cancelTrip();
-    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
-
-    var snapshot = timetableSnapshot.commit();
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
