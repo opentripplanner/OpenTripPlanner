@@ -10,6 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
@@ -22,19 +23,25 @@ public abstract class TransitModule {
 
   @Provides
   @Singleton
-  public static TimetableSnapshotManager timetableSnapshotManager(TransitLayerUpdater transitLayerUpdater, ConfigModel config) {
-    return new TimetableSnapshotManager(transitLayerUpdater, config.routerConfig().updaterConfig().timetableSnapshotParameters(), () -> LocalDate.now());
+  public static TimetableSnapshotManager timetableSnapshotManager(
+    TransitLayerUpdater transitLayerUpdater,
+    ConfigModel config
+  ) {
+    return new TimetableSnapshotManager(
+      transitLayerUpdater,
+      config.routerConfig().updaterConfig().timetableSnapshotParameters(),
+      () -> LocalDate.now()
+    );
   }
 
   @Provides
   @Singleton
-  public static TransitLayerUpdater transitLayerUpdater(DefaultTransitService service) {
-    return new TransitLayerUpdater(service);
+  public static TransitLayerUpdater transitLayerUpdater(TimetableRepository timetableRepository) {
+    return new TransitLayerUpdater(timetableRepository);
   }
 
   @Provides
   public static TimetableSnapshot timetableSnapshot(TimetableSnapshotManager manager) {
     return manager.getTimetableSnapshot();
   }
-
 }

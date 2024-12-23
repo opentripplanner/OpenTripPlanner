@@ -11,7 +11,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 public class TestTransitService extends DefaultTransitService {
 
   public TestTransitService(TimetableRepository timetableRepository) {
-    super(timetableRepository);
+    super(timetableRepository, null);
   }
 
   @Override

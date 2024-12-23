@@ -106,7 +106,11 @@ public class SpeedTest {
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
-      new TimetableSnapshotManager(new TransitLayerUpdater(new DefaultTransitService(timetableRepository)), TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now),
+      new TimetableSnapshotManager(
+        new TransitLayerUpdater(timetableRepository),
+        TimetableSnapshotSourceParameters.DEFAULT,
+        LocalDate::now
+      ),
       config.updatersConfig
     );
     if (timetableRepository.getUpdaterManager() != null) {
@@ -141,10 +145,7 @@ public class SpeedTest {
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    createTransitLayerForRaptor(
-      timetableRepository,
-      config.transitRoutingParams
-    );
+    createTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
 
     initializeTransferCache(config.transitRoutingParams, timetableRepository);
 

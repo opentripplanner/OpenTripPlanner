@@ -49,7 +49,7 @@ public class TransitLayerMapper {
   private final SiteRepository siteRepository;
 
   private TransitLayerMapper(TimetableRepository timetableRepository) {
-    this.transitService = new DefaultTransitService(timetableRepository);
+    this.transitService = new DefaultTransitService(timetableRepository, null);
     this.siteRepository = timetableRepository.getSiteRepository();
   }
 

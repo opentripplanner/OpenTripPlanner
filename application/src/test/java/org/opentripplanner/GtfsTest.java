@@ -210,11 +210,7 @@ public abstract class GtfsTest {
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
     serverContext = TestServerContext.createServerContext(graph, timetableRepository);
-    timetableSnapshotSource =
-      new TimetableSnapshotSource(
-        timetableRepository,
-        null, null
-      );
+    timetableSnapshotSource = new TimetableSnapshotSource(timetableRepository, null, null);
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());

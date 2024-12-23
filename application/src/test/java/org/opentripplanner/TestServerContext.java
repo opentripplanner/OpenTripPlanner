@@ -69,10 +69,7 @@ public class TestServerContext {
       null,
       DebugUiConfig.DEFAULT
     );
-    createTransitLayerForRaptor(
-      timetableRepository,
-      routerConfig.transitTuningConfig()
-    );
+    createTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
     return context;
   }
 

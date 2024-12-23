@@ -56,7 +56,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       .withRegularStop(testModel.stop("stop1").build());
     var timetableRepository = new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
-    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
+    final DefaultTransitService transitService = new DefaultTransitService(timetableRepository, null);
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),

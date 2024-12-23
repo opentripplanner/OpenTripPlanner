@@ -77,7 +77,7 @@ public class LuceneIndex implements Serializable {
     TimetableRepository timetableRepository,
     StopConsolidationService stopConsolidationService
   ) {
-    this(new DefaultTransitService(timetableRepository), stopConsolidationService);
+    this(new DefaultTransitService(timetableRepository, null), stopConsolidationService);
   }
 
   /**

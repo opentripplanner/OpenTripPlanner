@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -44,7 +43,7 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
  * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
-public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
+public class SiriTimetableSnapshotSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
@@ -121,11 +120,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LOG.debug("message contains {} trip updates", updates.size());
 
     return UpdateResult.ofResults(results);
-  }
-
-  @Override
-  public TimetableSnapshot getTimetableSnapshot() {
-    return snapshotManager.getTimetableSnapshot();
   }
 
   private Result<UpdateSuccess, UpdateError> apply(

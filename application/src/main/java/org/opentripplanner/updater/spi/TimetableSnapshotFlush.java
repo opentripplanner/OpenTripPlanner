@@ -17,8 +17,7 @@ public class TimetableSnapshotFlush implements Runnable {
 
   private final TimetableSnapshotManager snapshotManager;
 
-  public TimetableSnapshotFlush(
-    TimetableSnapshotManager snapshotManager) {
+  public TimetableSnapshotFlush(TimetableSnapshotManager snapshotManager) {
     this.snapshotManager = snapshotManager;
   }
 

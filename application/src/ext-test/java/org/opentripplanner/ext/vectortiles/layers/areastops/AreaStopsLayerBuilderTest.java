@@ -64,7 +64,7 @@ class AreaStopsLayerBuilderTest {
     timetableRepository.index();
 
     var subject = new AreaStopsLayerBuilder(
-      new DefaultTransitService(timetableRepository),
+      new DefaultTransitService(timetableRepository, null),
       LAYER_CONFIG,
       Locale.ENGLISH
     );

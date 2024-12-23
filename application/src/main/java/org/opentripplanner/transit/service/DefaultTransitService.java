@@ -63,7 +63,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.updater.GraphUpdaterStatus;
-import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.utils.collection.CollectionsView;
 
 /**
@@ -81,20 +80,20 @@ public class DefaultTransitService implements TransitEditorService {
   /**
    * This should only be accessed through the getTimetableSnapshot method.
    */
-  private TimetableSnapshot timetableSnapshot;
+  private final TimetableSnapshot timetableSnapshot;
 
-  @Inject
   public DefaultTransitService(TimetableRepository timetableRepository) {
-    this.timetableRepository = timetableRepository;
-    this.timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
+    this(timetableRepository, null);
   }
 
+  @Inject
   public DefaultTransitService(
     TimetableRepository timetableRepository,
-    TimetableSnapshot timetableSnapshotBuffer
+    @Nullable TimetableSnapshot timetableSnapshot
   ) {
-    this(timetableRepository);
-    this.timetableSnapshot = timetableSnapshotBuffer;
+    this.timetableRepository = timetableRepository;
+    this.timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
+    this.timetableSnapshot = timetableSnapshot;
   }
 
   @Override

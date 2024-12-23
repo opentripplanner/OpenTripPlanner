@@ -222,7 +222,7 @@ class GraphQLIntegrationTest {
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
-    TransitEditorService transitService = new DefaultTransitService(timetableRepository) {
+    TransitEditorService transitService = new DefaultTransitService(timetableRepository, null) {
       private final TransitAlertService alertService = new TransitAlertServiceImpl(
         timetableRepository
       );

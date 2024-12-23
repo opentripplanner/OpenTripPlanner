@@ -160,10 +160,7 @@ public class ConstructApplication {
     enableRequestTraceLogging();
     createMetricsLogging();
 
-    createTransitLayerForRaptor(
-      timetableRepository(),
-      routerConfig().transitTuningConfig()
-    );
+    createTransitLayerForRaptor(timetableRepository(), routerConfig().transitTuningConfig());
 
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(

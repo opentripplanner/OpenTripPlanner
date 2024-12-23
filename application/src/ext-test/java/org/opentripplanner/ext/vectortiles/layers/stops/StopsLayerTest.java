@@ -83,7 +83,7 @@ public class StopsLayerTest {
     var deduplicator = new Deduplicator();
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     timetableRepository.index();
-    var transitService = new DefaultTransitService(timetableRepository);
+    var transitService = new DefaultTransitService(timetableRepository, null);
 
     DigitransitStopPropertyMapper mapper = DigitransitStopPropertyMapper.create(
       transitService,

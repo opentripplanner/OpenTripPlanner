@@ -73,7 +73,12 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
-    snapshotManager = new TimetableSnapshotManager(new TransitLayerUpdater(new DefaultTransitService(timetableRepository)), TimetableSnapshotSourceParameters.DEFAULT, () -> SERVICE_DATE);
+    snapshotManager =
+      new TimetableSnapshotManager(
+        new TransitLayerUpdater(timetableRepository),
+        TimetableSnapshotSourceParameters.DEFAULT,
+        () -> SERVICE_DATE
+      );
     // SIRI and GTFS-RT cannot be registered with the transit model at the same time
     // we are actively refactoring to remove this restriction
     // for the time being you cannot run a SIRI and GTFS-RT test at the same time
@@ -81,7 +86,8 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
       siriSource = new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
       gtfsSource = null;
     } else {
-      gtfsSource = new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
+      gtfsSource =
+        new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
       siriSource = null;
     }
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
@@ -139,11 +145,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
-    if (siriSource != null) {
-      return siriSource.getTimetableSnapshot();
-    } else {
-      return gtfsSource.getTimetableSnapshot();
-    }
+    return snapshotManager.getTimetableSnapshot();
   }
 
   public String getRealtimeTimetable(String tripId) {

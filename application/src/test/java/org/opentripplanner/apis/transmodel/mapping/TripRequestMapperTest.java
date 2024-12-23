@@ -116,7 +116,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       DataImportIssueStore.NOOP
     );
     timetableRepository.index();
-    transitService = new DefaultTransitService(timetableRepository);
+    transitService = new DefaultTransitService(timetableRepository, null);
   }
 
   @BeforeEach

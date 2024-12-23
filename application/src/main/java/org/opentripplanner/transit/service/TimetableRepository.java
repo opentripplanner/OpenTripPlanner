@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFI
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -528,6 +529,10 @@ public class TimetableRepository implements Serializable {
   @Nullable
   TimetableRepositoryIndex getTimetableRepositoryIndex() {
     return index;
+  }
+
+  public  Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+    return Collections.unmodifiableMap(index.getServiceCodesRunningForDate());
   }
 
   public boolean isIndexed() {

@@ -235,30 +235,32 @@ public class UpdaterConfigurator {
   }
 
   private SiriTimetableSnapshotSource provideSiriTimetableSnapshot() {
-        return new SiriTimetableSnapshotSource(
-          timetableRepository, snapshotManager
-        );
-
+    return new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
   }
 
   private TimetableSnapshotSource provideGtfsTimetableSnapshot() {
-        return new TimetableSnapshotSource(
-          timetableRepository,snapshotManager, () -> LocalDate.now(timetableRepository.getTimeZone())
-        );
+    return new TimetableSnapshotSource(
+      timetableRepository,
+      snapshotManager,
+      () -> LocalDate.now(timetableRepository.getTimeZone())
+    );
   }
 
   /**
    * If SIRI or GTFS real-time updaters are in use, configure a periodic flush of the timetable
    * snapshot.
    */
-  private void configureTimetableSnapshotFlush(GraphUpdaterManager updaterManager, TimetableSnapshotManager snapshotManager) {
-      updaterManager
-        .getScheduler()
-        .scheduleWithFixedDelay(
-          new TimetableSnapshotFlush(snapshotManager),
-          0,
-          updatersParameters.timetableSnapshotParameters().maxSnapshotFrequency().toSeconds(),
-          TimeUnit.SECONDS
-        );
+  private void configureTimetableSnapshotFlush(
+    GraphUpdaterManager updaterManager,
+    TimetableSnapshotManager snapshotManager
+  ) {
+    updaterManager
+      .getScheduler()
+      .scheduleWithFixedDelay(
+        new TimetableSnapshotFlush(snapshotManager),
+        0,
+        updatersParameters.timetableSnapshotParameters().maxSnapshotFrequency().toSeconds(),
+        TimeUnit.SECONDS
+      );
   }
 }

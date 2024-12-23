@@ -1,12 +1,10 @@
 package org.opentripplanner.updater.trip;
 
-import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.CANCELED;
 import static com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
@@ -16,14 +14,12 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
@@ -42,19 +38,13 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 public class TimetableSnapshotSourceTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.parse("2009-02-01");
-  private static final TripUpdate CANCELLATION = new TripUpdateBuilder(
-    "1.1",
-    SERVICE_DATE,
-    CANCELED,
-    ZoneIds.NEW_YORK
-  )
-    .build();
   private TimetableRepository timetableRepository;
   private TransitService transitService;
 
   private final GtfsRealtimeFuzzyTripMatcher TRIP_MATCHER_NOOP = null;
 
   private String feedId;
+  private TimetableSnapshotManager snapshotManager;
 
   @BeforeEach
   public void setUp() {
@@ -63,23 +53,12 @@ public class TimetableSnapshotSourceTest {
     transitService = new DefaultTransitService(timetableRepository);
 
     feedId = transitService.listFeedIds().stream().findFirst().get();
-  }
-
-  @Test
-  public void testGetSnapshot() {
-    var updater = defaultUpdater();
-
-    updater.applyTripUpdates(
-      TRIP_MATCHER_NOOP,
-      REQUIRED_NO_DATA,
-      DIFFERENTIAL,
-      List.of(CANCELLATION),
-      feedId
-    );
-
-    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
-    assertNotNull(snapshot);
-    assertSame(snapshot, updater.getTimetableSnapshot());
+    snapshotManager =
+      new TimetableSnapshotManager(
+        new TransitLayerUpdater(timetableRepository),
+        TimetableSnapshotSourceParameters.DEFAULT,
+        () -> SERVICE_DATE
+      );
   }
 
   @Test
@@ -202,7 +181,7 @@ public class TimetableSnapshotSourceTest {
     updater.flushBuffer();
 
     // THEN
-    final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+    final TimetableSnapshot snapshot = snapshotManager.getTimetableSnapshot();
 
     // Original trip pattern
     {
@@ -283,10 +262,6 @@ public class TimetableSnapshotSourceTest {
   }
 
   private TimetableSnapshotSource defaultUpdater() {
-    return new TimetableSnapshotSource(
-      timetableRepository,
-     new TimetableSnapshotManager(new TransitLayerUpdater(new DefaultTransitService(timetableRepository)), TimetableSnapshotSourceParameters.DEFAULT,
-      () -> SERVICE_DATE), () -> SERVICE_DATE
-    );
+    return new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
   }
 }
