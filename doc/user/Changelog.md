@@ -67,6 +67,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Enable mode-specific transfers by storing mode information in transfers [#6293](https://github.com/opentripplanner/OpenTripPlanner/pull/6293)
 - Add default penalty to all car API modes [#6302](https://github.com/opentripplanner/OpenTripPlanner/pull/6302)
 - Make flex linking work together with boarding locations [#6311](https://github.com/opentripplanner/OpenTripPlanner/pull/6311)
+- Add fallback name for corridors [#6303](https://github.com/opentripplanner/OpenTripPlanner/pull/6303)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
