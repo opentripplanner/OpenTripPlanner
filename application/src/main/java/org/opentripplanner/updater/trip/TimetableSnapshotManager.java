@@ -61,7 +61,7 @@ public final class TimetableSnapshotManager {
    *                     considered 'today'. This is useful for unit testing.
    */
   public TimetableSnapshotManager(
-    TransitLayerUpdater transitLayerUpdater,
+    @Nullable TransitLayerUpdater transitLayerUpdater,
     TimetableSnapshotSourceParameters parameters,
     Supplier<LocalDate> localDateNow
   ) {

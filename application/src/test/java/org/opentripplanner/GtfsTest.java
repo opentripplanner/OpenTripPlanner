@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -210,7 +211,7 @@ public abstract class GtfsTest {
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
     serverContext = TestServerContext.createServerContext(graph, timetableRepository);
-    timetableSnapshotSource = new TimetableSnapshotSource(timetableRepository, null, null);
+    timetableSnapshotSource = new TimetableSnapshotSource(timetableRepository, new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now), LocalDate::now);
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());

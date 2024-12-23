@@ -71,7 +71,9 @@ public class TransitLayerUpdater {
 
     // Make a shallow copy of the realtime transit layer. Only the objects that are copied will be
     // changed during this update process.
-    TransitLayer realtimeTransitLayer = new TransitLayer(timetableRepository.getRealtimeTransitLayer());
+    TransitLayer realtimeTransitLayer = new TransitLayer(
+      timetableRepository.getRealtimeTransitLayer()
+    );
 
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
     TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(

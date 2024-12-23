@@ -75,7 +75,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.timetableRepository.index();
     snapshotManager =
       new TimetableSnapshotManager(
-        new TransitLayerUpdater(timetableRepository),
+        null,
         TimetableSnapshotSourceParameters.DEFAULT,
         () -> SERVICE_DATE
       );

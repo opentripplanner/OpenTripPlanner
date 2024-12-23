@@ -175,6 +175,7 @@ public class TimetableRepository implements Serializable {
   }
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
+  @Nullable
   public TransitLayer getRealtimeTransitLayer() {
     return realtimeTransitLayer.get();
   }
@@ -531,7 +532,7 @@ public class TimetableRepository implements Serializable {
     return index;
   }
 
-  public  Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
     return Collections.unmodifiableMap(index.getServiceCodesRunningForDate());
   }
 
