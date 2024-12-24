@@ -7,7 +7,6 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,27 +40,11 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   private final TimetableSnapshotSource gtfsSource;
   private final DateTimeHelper dateTimeHelper;
 
-  enum SourceType {
-    GTFS_RT,
-    SIRI,
+  public static RealtimeTestEnvironmentBuilder of() {
+    return new RealtimeTestEnvironmentBuilder();
   }
 
-  /**
-   * Siri and GTFS-RT cannot be run at the same time, so you need to decide.
-   */
-  public static RealtimeTestEnvironmentBuilder siri() {
-    return new RealtimeTestEnvironmentBuilder().withSourceType(SourceType.SIRI);
-  }
-
-  /**
-   * Siri and GTFS-RT cannot be run at the same time, so you need to decide.
-   */
-  public static RealtimeTestEnvironmentBuilder gtfs() {
-    return new RealtimeTestEnvironmentBuilder().withSourceType(SourceType.GTFS_RT);
-  }
-
-  RealtimeTestEnvironment(SourceType sourceType, TimetableRepository timetableRepository) {
-    Objects.requireNonNull(sourceType);
+  RealtimeTestEnvironment(TimetableRepository timetableRepository) {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
@@ -71,17 +54,9 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
         TimetableSnapshotSourceParameters.PUBLISH_IMMEDIATELY,
         () -> SERVICE_DATE
       );
-    // SIRI and GTFS-RT cannot be registered with the transit model at the same time
-    // we are actively refactoring to remove this restriction
-    // for the time being you cannot run a SIRI and GTFS-RT test at the same time
-    if (sourceType == SourceType.SIRI) {
-      siriSource = new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
-      gtfsSource = null;
-    } else {
-      gtfsSource =
-        new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
-      siriSource = null;
-    }
+    siriSource = new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
+    gtfsSource =
+      new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
   }
 

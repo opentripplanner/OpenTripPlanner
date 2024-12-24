@@ -36,7 +36,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testCancelTrip() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
 
@@ -53,7 +53,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddJourneyWithExistingRoute() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     Route route = ROUTE_1;
     int numPatternForRoute = env.getTransitService().findPatterns(route).size();
@@ -88,7 +88,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   @Test
   void testAddJourneyWithNewRoute() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     String newRouteRef = "new route ref";
     var updates = createValidAddedJourney(env)
@@ -115,7 +115,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   @Test
   void testAddJourneyMultipleTimes() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
     var updates = createValidAddedJourney(env).buildEstimatedTimetableDeliveries();
 
     int numTrips = env.getTransitService().listTrips().size();
@@ -130,7 +130,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   @Test
   void testAddedJourneyWithInvalidScheduledData() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     // Create an extra journey with invalid planned data (travel back in time)
     // and valid real time data
@@ -155,7 +155,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testAddedJourneyWithUnresolvableAgency() {
-    var env = RealtimeTestEnvironment.siri().build();
+    var env = RealtimeTestEnvironment.of().build();
 
     // Create an extra journey with unknown line and operator
     var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
@@ -179,7 +179,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testReplaceJourney() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode("newJourney")
@@ -212,7 +212,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -231,7 +231,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
@@ -248,7 +248,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);
@@ -261,7 +261,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatching() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
@@ -275,7 +275,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->
@@ -300,7 +300,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuay() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -321,7 +321,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testCancelStop() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_2_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_2_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_2_ID)
@@ -349,7 +349,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   @Test
   @Disabled("Not supported yet")
   void testAddStop() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -380,7 +380,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testNotMonitored() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withMonitored(false)
@@ -393,7 +393,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testReplaceJourneyWithoutEstimatedVehicleJourneyCode() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef("newJourney")
@@ -418,7 +418,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testNegativeHopTime() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -438,7 +438,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
 
   @Test
   void testNegativeDwellTime() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_2_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_2_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_2_ID)
@@ -463,7 +463,7 @@ class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
   @Test
   @Disabled("Not supported yet")
   void testExtraUnknownStop() {
-    var env = RealtimeTestEnvironment.siri().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
