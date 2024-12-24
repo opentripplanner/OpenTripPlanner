@@ -221,7 +221,6 @@ class GraphQLIntegrationTest {
 
     timetableRepository.index();
 
-
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
     tripTimes2.cancelTrip();
     timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
@@ -265,7 +264,6 @@ class GraphQLIntegrationTest {
     };
 
     routes.forEach(transitService::addRoutes);
-
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)

@@ -7,6 +7,7 @@ import java.util.List;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -36,10 +37,18 @@ public class TestServerContext {
 
   private TestServerContext() {}
 
-  /** Create a context for unit testing, using the default RouteRequest. */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository
+  ) {
+    return createServerContext(graph, timetableRepository, null);
+  }
+
+  /** Create a context for unit testing, using the default RouteRequest. */
+  public static OtpServerRequestContext createServerContext(
+    Graph graph,
+    TimetableRepository timetableRepository,
+    TimetableSnapshot snapshot
   ) {
     timetableRepository.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
@@ -52,7 +61,7 @@ public class TestServerContext {
         RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
       ),
       graph,
-      new DefaultTransitService(timetableRepository),
+      new DefaultTransitService(timetableRepository, snapshot),
       Metrics.globalRegistry,
       routerConfig.vectorTileConfig(),
       createWorldEnvelopeService(),

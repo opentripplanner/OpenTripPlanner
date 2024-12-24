@@ -82,6 +82,9 @@ public class DefaultTransitService implements TransitEditorService {
    */
   private final TimetableSnapshot timetableSnapshot;
 
+  /**
+   * Create a service without a real-time snapshot (and therefore without any real-time data).
+   */
   public DefaultTransitService(TimetableRepository timetableRepository) {
     this(timetableRepository, null);
   }

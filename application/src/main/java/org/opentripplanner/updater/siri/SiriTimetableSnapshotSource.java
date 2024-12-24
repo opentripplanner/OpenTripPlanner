@@ -334,11 +334,4 @@ public class SiriTimetableSnapshotSource {
 
     return success;
   }
-
-  /**
-   * Flush pending changes in the timetable snapshot buffer and publish a new snapshot.
-   */
-  public void flushBuffer() {
-    snapshotManager.purgeAndCommit();
-  }
 }

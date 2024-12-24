@@ -178,7 +178,7 @@ public class TimetableSnapshotSourceTest {
       List.of(tripUpdate),
       feedId
     );
-    updater.flushBuffer();
+    snapshotManager.purgeAndCommit();
 
     // THEN
     final TimetableSnapshot snapshot = snapshotManager.getTimetableSnapshot();

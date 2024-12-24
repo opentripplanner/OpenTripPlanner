@@ -13,6 +13,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,7 +29,6 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -210,17 +210,13 @@ public abstract class GtfsTest {
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
-    serverContext = TestServerContext.createServerContext(graph, timetableRepository);
+    var snapshotManager = new TimetableSnapshotManager(
+      null,
+      TimetableSnapshotSourceParameters.PUBLISH_IMMEDIATELY,
+      LocalDate::now
+    );
     timetableSnapshotSource =
-      new TimetableSnapshotSource(
-        timetableRepository,
-        new TimetableSnapshotManager(
-          null,
-          TimetableSnapshotSourceParameters.DEFAULT,
-          LocalDate::now
-        ),
-        LocalDate::now
-      );
+      new TimetableSnapshotSource(timetableRepository, snapshotManager, LocalDate::now);
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
@@ -240,8 +236,14 @@ public abstract class GtfsTest {
         updates,
         feedId.getId()
       );
-      timetableSnapshotSource.flushBuffer();
       alertsUpdateHandler.update(feedMessage, null);
-    } catch (Exception exception) {}
+    } catch (FileNotFoundException exception) {}
+    snapshotManager.purgeAndCommit();
+    serverContext =
+      TestServerContext.createServerContext(
+        graph,
+        timetableRepository,
+        snapshotManager.getTimetableSnapshot()
+      );
   }
 }

@@ -106,11 +106,7 @@ public class SpeedTest {
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
-      new TimetableSnapshotManager(
-        new TransitLayerUpdater(timetableRepository),
-        TimetableSnapshotSourceParameters.DEFAULT,
-        LocalDate::now
-      ),
+      new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now),
       config.updatersConfig
     );
     if (timetableRepository.getUpdaterManager() != null) {

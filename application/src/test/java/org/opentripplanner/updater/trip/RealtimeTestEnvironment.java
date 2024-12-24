@@ -5,13 +5,11 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
 
 import com.google.transit.realtime.GtfsRealtime;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -36,12 +34,6 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  * It is however a goal to change that and then these two can be combined.
  */
 public final class RealtimeTestEnvironment implements RealtimeTestConstants {
-
-  // static constants
-  private static final TimetableSnapshotSourceParameters PARAMETERS = new TimetableSnapshotSourceParameters(
-    Duration.ZERO,
-    false
-  );
 
   public final TimetableRepository timetableRepository;
   public final TimetableSnapshotManager snapshotManager;
@@ -73,10 +65,10 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
-    snapshotManager =
+    this.snapshotManager =
       new TimetableSnapshotManager(
         null,
-        TimetableSnapshotSourceParameters.DEFAULT,
+        TimetableSnapshotSourceParameters.PUBLISH_IMMEDIATELY,
         () -> SERVICE_DATE
       );
     // SIRI and GTFS-RT cannot be registered with the transit model at the same time
@@ -97,7 +89,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
    * Returns a new fresh TransitService
    */
   public TransitService getTransitService() {
-    return new DefaultTransitService(timetableRepository);
+    return new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshot());
   }
 
   /**
@@ -199,7 +191,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     List<GtfsRealtime.TripUpdate> updates,
     UpdateIncrementality incrementality
   ) {
-    Objects.requireNonNull(gtfsSource, "Test environment is configured for SIRI only");
     UpdateResult updateResult = gtfsSource.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
@@ -217,7 +208,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     List<EstimatedTimetableDeliveryStructure> updates,
     boolean fuzzyMatching
   ) {
-    Objects.requireNonNull(siriSource, "Test environment is configured for GTFS-RT only");
     UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching)
       .applyUpdate(
         updates,
@@ -233,11 +223,6 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   private void commitTimetableSnapshot() {
-    if (siriSource != null) {
-      siriSource.flushBuffer();
-    }
-    if (gtfsSource != null) {
-      gtfsSource.flushBuffer();
-    }
+    snapshotManager.purgeAndCommit();
   }
 }

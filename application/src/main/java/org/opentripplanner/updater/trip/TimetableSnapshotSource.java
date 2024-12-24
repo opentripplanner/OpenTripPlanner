@@ -1210,8 +1210,4 @@ public class TimetableSnapshotSource {
     CANCEL,
     DELETE,
   }
-
-  public void flushBuffer() {
-    snapshotManager.purgeAndCommit();
-  }
 }
