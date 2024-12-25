@@ -77,10 +77,6 @@ import org.slf4j.LoggerFactory;
  * At this point the TimetableRepository is not often read directly. Many requests will look at the
  * TransitLayer rather than the TimetableRepository it's derived from. Both are often accessed via the
  * TransitService rather than directly reading the fields of TimetableRepository or TransitLayer.
- *
- * TODO RT_AB: consider renaming. By some definitions this is not really the model, but a top-level
- *   object grouping together instances of model classes with things that operate on and map those
- *   instances.
  */
 public class TimetableRepository implements Serializable {
 
@@ -189,7 +185,9 @@ public class TimetableRepository implements Serializable {
     return transferService;
   }
 
-  // Check to see if we have transit information for a given date
+  /**
+   * Returns true if this repository contains any transit data at the given instant.
+   */
   public boolean transitFeedCovers(Instant time) {
     return (
       !time.isBefore(this.transitServiceStarts.toInstant()) &&
@@ -229,11 +227,11 @@ public class TimetableRepository implements Serializable {
 
   /**
    * Get or create a serviceId for a given date. This method is used when a new trip is added from a
-   * realtime data update. It make sure the date is in the existing transit service period.
+   * realtime data update. It makes sure the date is in the existing transit service period.
    * <p>
    *
    * @param serviceDate service date for the added service id
-   * @return service-id for date if it exist or is created. If the given service date is outside the
+   * @return service-id for date if it exists or is created. If the given service date is outside the
    * service period {@code null} is returned.
    */
   @Nullable
