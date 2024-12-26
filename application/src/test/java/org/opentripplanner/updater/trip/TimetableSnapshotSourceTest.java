@@ -55,7 +55,7 @@ public class TimetableSnapshotSourceTest {
     feedId = transitService.listFeedIds().stream().findFirst().get();
     snapshotManager =
       new TimetableSnapshotManager(
-        new TransitLayerUpdater(timetableRepository),
+        null,
         TimetableSnapshotSourceParameters.DEFAULT,
         () -> SERVICE_DATE
       );
