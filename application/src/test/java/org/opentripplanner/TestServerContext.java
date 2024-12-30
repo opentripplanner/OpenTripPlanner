@@ -61,6 +61,7 @@ public class TestServerContext {
       createVehicleParkingService(),
       createEmissionsService(),
       null,
+      null,
       routerConfig.flexParameters(),
       List.of(),
       null,

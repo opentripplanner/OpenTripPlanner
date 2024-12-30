@@ -4,6 +4,8 @@ import dagger.BindsInstance;
 import dagger.Component;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.service.SchemaService;
+import org.opentripplanner.apis.gtfs.service.configure.SchemaServiceModule;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -17,6 +19,7 @@ import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServ
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -62,6 +65,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
     SorlandsbanenNorwayModule.class,
+    SchemaServiceModule.class,
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
@@ -103,6 +107,9 @@ public interface ConstructApplicationFactory {
   SorlandsbanenNorwayService enturSorlandsbanenService();
 
   @Nullable
+  SchemaService schemaService();
+
+  @Nullable
   LuceneIndex luceneIndex();
 
   @Component.Builder
@@ -135,6 +142,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
+
+    @BindsInstance
+    Builder schemaService(RoutingPreferences defaultRoutingPreferences);
 
     @BindsInstance
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);

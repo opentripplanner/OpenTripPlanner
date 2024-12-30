@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.gtfs;
 
+import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
@@ -17,6 +18,7 @@ public record GraphQLRequestContext(
   VehicleRentalService vehicleRentalService,
   VehicleParkingService vehicleParkingService,
   RealtimeVehicleService realTimeVehicleService,
+  SchemaService schemaService,
   GraphFinder graphFinder,
   RouteRequest defaultRouteRequest
 ) {
@@ -28,6 +30,7 @@ public record GraphQLRequestContext(
       context.vehicleRentalService(),
       context.vehicleParkingService(),
       context.realtimeVehicleService(),
+      context.schemaService(),
       context.graphFinder(),
       context.defaultRouteRequest()
     );

@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -53,6 +54,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final EmissionsService emissionsService;
 
   @Nullable
+  private final SchemaService schemaService;
+
+  @Nullable
   private final SorlandsbanenNorwayService sorlandsbanenService;
 
   private final StopConsolidationService stopConsolidationService;
@@ -80,6 +84,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleParkingService vehicleParkingService,
     @Nullable EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    @Nullable SchemaService schemaService,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
@@ -105,6 +110,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
     this.sorlandsbanenService = sorlandsbanenService;
+    this.schemaService = schemaService;
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
@@ -128,6 +134,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleParkingService vehicleParkingService,
     @Nullable EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    @Nullable SchemaService schemaService,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
@@ -151,6 +158,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       vehicleParkingService,
       emissionsService,
       sorlandsbanenService,
+      schemaService,
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,
@@ -231,6 +239,12 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public List<RideHailingService> rideHailingServices() {
     return rideHailingServices;
+  }
+
+  @Nullable
+  @Override
+  public SchemaService schemaService() {
+    return schemaService;
   }
 
   @Override

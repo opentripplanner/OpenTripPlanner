@@ -36,6 +36,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -312,6 +313,7 @@ class GraphQLIntegrationTest {
     defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE);
 
+    var routeRequest = new RouteRequest();
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
@@ -320,8 +322,9 @@ class GraphQLIntegrationTest {
         defaultVehicleRentalService,
         new DefaultVehicleParkingService(parkingRepository),
         realtimeVehicleService,
+        new SchemaService(SchemaFactory.createSchema(routeRequest.preferences())),
         finder,
-        new RouteRequest()
+        routeRequest
       );
   }
 

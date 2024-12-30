@@ -24,8 +24,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -57,6 +59,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     var timetableRepository = new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
+    var routeRequest = new RouteRequest();
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),
@@ -65,8 +68,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
         new DefaultVehicleRentalService(),
         new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
         new DefaultRealtimeVehicleService(transitService),
+        new SchemaService(SchemaFactory.createSchema(routeRequest.preferences())),
         GraphFinder.getInstance(graph, transitService::findRegularStops),
-        new RouteRequest()
+        routeRequest
       );
   }
 

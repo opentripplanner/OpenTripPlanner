@@ -20,7 +20,7 @@ public class GraphQLIndexTest {
 
   @Test
   public void build() {
-    var schema = GtfsGraphQLIndex.buildSchema(new RoutingPreferences());
+    var schema = SchemaFactory.createSchema(new RoutingPreferences());
     assertNotNull(schema);
   }
 
@@ -28,12 +28,12 @@ public class GraphQLIndexTest {
   @ParameterizedTest(name = "\"{0}\" must be a an async fetcher")
   void asyncDataFetchers(String fieldName) {
     OTPFeature.AsyncGraphQLFetchers.testOn(() -> {
-      var schema = GtfsGraphQLIndex.buildSchema(new RoutingPreferences());
+      var schema = SchemaFactory.createSchema(new RoutingPreferences());
       var fetcher = getQueryType(fieldName, schema);
       assertSame(fetcher.getClass(), AsyncDataFetcher.class);
     });
     OTPFeature.AsyncGraphQLFetchers.testOff(() -> {
-      var schema = GtfsGraphQLIndex.buildSchema(new RoutingPreferences());
+      var schema = SchemaFactory.createSchema(new RoutingPreferences());
       var fetcher = getQueryType(fieldName, schema);
       assertNotSame(fetcher.getClass(), AsyncDataFetcher.class);
     });

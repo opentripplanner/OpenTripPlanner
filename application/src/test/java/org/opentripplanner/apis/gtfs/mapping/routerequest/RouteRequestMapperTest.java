@@ -23,7 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
+import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -67,6 +69,7 @@ class RouteRequestMapperTest {
     var timetableRepository = new TimetableRepository();
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
+    var routeRequest = new RouteRequest();
     CONTEXT =
       new GraphQLRequestContext(
         new TestRoutingService(List.of()),
@@ -75,8 +78,9 @@ class RouteRequestMapperTest {
         new DefaultVehicleRentalService(),
         new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
         new DefaultRealtimeVehicleService(transitService),
+        new SchemaService(SchemaFactory.createSchema(routeRequest.preferences())),
         GraphFinder.getInstance(graph, transitService::findRegularStops),
-        new RouteRequest()
+        routeRequest
       );
   }
 
