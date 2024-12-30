@@ -20,7 +20,8 @@ public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
     SchemaDirectiveWiringEnvironment<GraphQLInputObjectField> environment
   ) {
     GraphQLInputObjectField field = environment.getElement();
-    var parentName = environment.getNodeParentTree().toList().get(1).getName();
+    // Input object fields always have a parent
+    var parentName = environment.getNodeParentTree().getParentInfo().get().getNode().getName();
     var key = parentName + "_" + field.getName();
     var defaultValue = getDefaultValueForKey(key);
     if (defaultValue != null) {
