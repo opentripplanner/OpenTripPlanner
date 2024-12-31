@@ -87,7 +87,8 @@ public class SchemaFactory {
   static final Logger LOG = LoggerFactory.getLogger(SchemaFactory.class);
 
   /**
-   * @param defaultRouteRequest used to inject defaults into the schema. Doesn't inject any defaults if preferences are not provided.
+   * @param defaultRouteRequest used to inject defaults into the schema. Doesn't inject any defaults
+   *                            if the request is not provided.
    */
   @Nullable
   public static GraphQLSchema createSchema(@Nullable RouteRequest defaultRouteRequest) {
