@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class GraphQLIndexTest {
 
   @Test
   public void build() {
-    var schema = SchemaFactory.createSchema(new RoutingPreferences());
+    var schema = SchemaFactory.createSchema(new RouteRequest());
     assertNotNull(schema);
   }
 
@@ -28,12 +28,12 @@ public class GraphQLIndexTest {
   @ParameterizedTest(name = "\"{0}\" must be a an async fetcher")
   void asyncDataFetchers(String fieldName) {
     OTPFeature.AsyncGraphQLFetchers.testOn(() -> {
-      var schema = SchemaFactory.createSchema(new RoutingPreferences());
+      var schema = SchemaFactory.createSchema(new RouteRequest());
       var fetcher = getQueryType(fieldName, schema);
       assertSame(fetcher.getClass(), AsyncDataFetcher.class);
     });
     OTPFeature.AsyncGraphQLFetchers.testOff(() -> {
-      var schema = SchemaFactory.createSchema(new RoutingPreferences());
+      var schema = SchemaFactory.createSchema(new RouteRequest());
       var fetcher = getQueryType(fieldName, schema);
       assertNotSame(fetcher.getClass(), AsyncDataFetcher.class);
     });

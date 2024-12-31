@@ -68,7 +68,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stopAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,10 +80,10 @@ public class SchemaFactory {
   static final Logger LOG = LoggerFactory.getLogger(SchemaFactory.class);
 
   /**
-   * @param defaultPreferences used to inject defaults into the schema. Doesn't inject any defaults if preferences are not provided.
+   * @param defaultRouteRequest used to inject defaults into the schema. Doesn't inject any defaults if preferences are not provided.
    */
   @Nullable
-  public static GraphQLSchema createSchema(@Nullable RoutingPreferences defaultPreferences) {
+  public static GraphQLSchema createSchema(@Nullable RouteRequest defaultRouteRequest) {
     try {
       URL url = Objects.requireNonNull(SchemaFactory.class.getResource("schema.graphqls"));
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
@@ -169,8 +169,8 @@ public class SchemaFactory {
         .type(typeWiring.build(DefaultFareProductImpl.class))
         .type(typeWiring.build(TripOccupancyImpl.class));
 
-      if (defaultPreferences != null) {
-        runtimeWiringBuilder.directiveWiring(new DefaultValueDirectiveWiring(defaultPreferences));
+      if (defaultRouteRequest != null) {
+        runtimeWiringBuilder.directiveWiring(new DefaultValueDirectiveWiring(defaultRouteRequest));
       }
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();

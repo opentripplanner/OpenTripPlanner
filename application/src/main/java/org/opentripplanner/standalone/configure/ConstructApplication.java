@@ -102,7 +102,7 @@ public class ConstructApplication {
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
         .streetLimitationParameters(streetLimitationParameters)
-        .schemaService(config.routerConfig().routingRequestDefaults().preferences())
+        .schemaService(config.routerConfig().routingRequestDefaults())
         .build();
   }
 

@@ -19,7 +19,7 @@ import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServ
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -144,7 +144,7 @@ public interface ConstructApplicationFactory {
     Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
 
     @BindsInstance
-    Builder schemaService(RoutingPreferences defaultRoutingPreferences);
+    Builder schemaService(RouteRequest defaultRouteRequest);
 
     @BindsInstance
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);

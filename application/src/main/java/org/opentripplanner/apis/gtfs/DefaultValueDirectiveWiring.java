@@ -5,14 +5,14 @@ import graphql.language.Value;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.idl.SchemaDirectiveWiring;
 import graphql.schema.idl.SchemaDirectiveWiringEnvironment;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
 
-  private final RoutingPreferences defaultPreferences;
+  private final RouteRequest defaultRouteRequest;
 
-  public DefaultValueDirectiveWiring(RoutingPreferences defaultPreferences) {
-    this.defaultPreferences = defaultPreferences;
+  public DefaultValueDirectiveWiring(RouteRequest defaultRouteRequest) {
+    this.defaultRouteRequest = defaultRouteRequest;
   }
 
   @Override
@@ -31,9 +31,10 @@ public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
   }
 
   private Value getDefaultValueForKey(String key) {
+    var preferences = defaultRouteRequest.preferences();
     switch (key) {
       case "BicyclePreferencesInput_boardCost":
-        return IntValue.of(defaultPreferences.bike().boardCost());
+        return IntValue.of(preferences.bike().boardCost());
       default:
         return null;
     }

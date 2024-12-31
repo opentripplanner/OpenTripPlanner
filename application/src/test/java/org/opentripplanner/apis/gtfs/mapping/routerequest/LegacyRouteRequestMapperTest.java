@@ -68,7 +68,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
         new DefaultVehicleRentalService(),
         new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
         new DefaultRealtimeVehicleService(transitService),
-        new SchemaService(SchemaFactory.createSchema(routeRequest.preferences())),
+        new SchemaService(SchemaFactory.createSchema(routeRequest)),
         GraphFinder.getInstance(graph, transitService::findRegularStops),
         routeRequest
       );
