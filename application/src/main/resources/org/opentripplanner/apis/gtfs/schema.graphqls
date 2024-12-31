@@ -1636,8 +1636,8 @@ type QueryType {
     preferences: PlanPreferencesInput,
     """
     Duration of the search window. This either starts at the defined earliest departure
-    time or ends at the latest arrival time. If this is not provided, a reasonable
-    search window is automatically generated. When searching for earlier or later itineraries
+    time or ends at the latest arrival time. If this is not provided or the value is set as null,
+    a reasonable search window is automatically generated. When searching for earlier or later itineraries
     with paging, this search window is no longer used and the new window will be based
     on how many suggestions were returned in the previous search. The new search window can be
     shorter or longer than the original search window. Note, itineraries are returned faster

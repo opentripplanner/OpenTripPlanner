@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs;
 
 import graphql.language.IntValue;
+import graphql.language.StringValue;
 import graphql.language.Value;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
@@ -46,6 +47,10 @@ public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
     switch (key) {
       case "planConnection_first":
         return IntValue.of(defaultRouteRequest.numItineraries());
+      case "planConnection_searchWindow":
+        return defaultRouteRequest.searchWindow() != null
+          ? StringValue.of(defaultRouteRequest.searchWindow().toString())
+          : null;
       case "BicyclePreferencesInput_boardCost":
         return IntValue.of(preferences.bike().boardCost());
       default:
