@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.gtfs;
 
+import graphql.language.BooleanValue;
+import graphql.language.FloatValue;
 import graphql.language.IntValue;
 import graphql.language.StringValue;
 import graphql.language.Value;
@@ -51,8 +53,81 @@ public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
         return defaultRouteRequest.searchWindow() != null
           ? StringValue.of(defaultRouteRequest.searchWindow().toString())
           : null;
+      case "AlightPreferencesInput_slack":
+        return StringValue.of(preferences.transit().alightSlack().defaultValue().toString());
+      case "BicycleParkingPreferencesInput_unpreferredCost":
+        return IntValue.of(
+          preferences.bike().parking().unpreferredVehicleParkingTagCost().toSeconds()
+        );
       case "BicyclePreferencesInput_boardCost":
         return IntValue.of(preferences.bike().boardCost());
+      case "BicyclePreferencesInput_reluctance":
+        return FloatValue.of(preferences.bike().reluctance());
+      case "BicyclePreferencesInput_speed":
+        return FloatValue.of(preferences.bike().speed());
+      case "BicycleWalkPreferencesCostInput_mountDismountCost":
+        return IntValue.of(preferences.bike().walking().mountDismountCost().toSeconds());
+      case "BicycleWalkPreferencesCostInput_reluctance":
+        return FloatValue.of(preferences.bike().walking().reluctance());
+      case "BicycleWalkPreferencesInput_mountDismountTime":
+        return StringValue.of(preferences.bike().walking().mountDismountTime().toString());
+      case "BicycleWalkPreferencesInput_speed":
+        return FloatValue.of(preferences.bike().walking().speed());
+      case "BoardPreferencesInput_slack":
+        return StringValue.of(preferences.transit().boardSlack().defaultValue().toString());
+      case "BoardPreferencesInput_waitReluctance":
+        return FloatValue.of(preferences.transfer().waitReluctance());
+      case "CarParkingPreferencesInput_unpreferredCost":
+        return IntValue.of(
+          preferences.car().parking().unpreferredVehicleParkingTagCost().toSeconds()
+        );
+      case "CarPreferencesInput_reluctance":
+        return FloatValue.of(preferences.car().reluctance());
+      case "DestinationBicyclePolicyInput_allowKeeping":
+        return BooleanValue.of(
+          preferences.bike().rental().allowArrivingInRentedVehicleAtDestination()
+        );
+      case "DestinationBicyclePolicyInput_keepingCost":
+        return IntValue.of(
+          preferences.bike().rental().arrivingInRentalVehicleAtDestinationCost().toSeconds()
+        );
+      case "DestinationScooterPolicyInput_allowKeeping":
+        return BooleanValue.of(
+          preferences.scooter().rental().allowArrivingInRentedVehicleAtDestination()
+        );
+      case "DestinationScooterPolicyInput_keepingCost":
+        return IntValue.of(
+          preferences.scooter().rental().arrivingInRentalVehicleAtDestinationCost().toSeconds()
+        );
+      case "ScooterPreferencesInput_reluctance":
+        return FloatValue.of(preferences.scooter().reluctance());
+      case "ScooterPreferencesInput_speed":
+        return FloatValue.of(preferences.scooter().speed());
+      case "TimetablePreferencesInput_excludeRealTimeUpdates":
+        return BooleanValue.of(preferences.transit().ignoreRealtimeUpdates());
+      case "TimetablePreferencesInput_includePlannedCancellations":
+        return BooleanValue.of(preferences.transit().includePlannedCancellations());
+      case "TimetablePreferencesInput_includeRealTimeCancellations":
+        return BooleanValue.of(preferences.transit().includeRealtimeCancellations());
+      case "TransferPreferencesInput_cost":
+        return IntValue.of(preferences.transfer().cost());
+      case "TransferPreferencesInput_maximumAdditionalTransfers":
+        return IntValue.of(preferences.transfer().maxAdditionalTransfers());
+      case "TransferPreferencesInput_maximumTransfers":
+        // Max transfers are wrong in the internal model but fixed in the API mapping
+        return IntValue.of(preferences.transfer().maxTransfers() - 1);
+      case "TransferPreferencesInput_slack":
+        return StringValue.of(preferences.transfer().slack().toString());
+      case "WalkPreferencesInput_boardCost":
+        return IntValue.of(preferences.walk().boardCost());
+      case "WalkPreferencesInput_reluctance":
+        return FloatValue.of(preferences.walk().reluctance());
+      case "WalkPreferencesInput_safetyFactor":
+        return FloatValue.of(preferences.walk().safetyFactor());
+      case "WalkPreferencesInput_speed":
+        return FloatValue.of(preferences.walk().speed());
+      case "WheelchairPreferencesInput_enabled":
+        return BooleanValue.of(defaultRouteRequest.wheelchair());
       default:
         return null;
     }
