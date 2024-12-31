@@ -1,13 +1,18 @@
 package org.opentripplanner.apis.gtfs;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+import graphql.language.FloatValue;
+import graphql.language.IntValue;
+import graphql.language.Value;
 import graphql.schema.AsyncDataFetcher;
 import graphql.schema.DataFetcher;
 import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import org.junit.jupiter.api.Test;
@@ -19,9 +24,47 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 public class SchemaFactoryTest {
 
   @Test
-  public void createSchema() {
+  void createSchema() {
     var schema = SchemaFactory.createSchema(new RouteRequest());
     assertNotNull(schema);
+  }
+
+  @Test
+  void testDefaultValueInjection() {
+    var routeRequest = new RouteRequest();
+    double walkSpeed = 15;
+    routeRequest.withPreferences(preferences ->
+      preferences.withWalk(walk -> walk.withSpeed(walkSpeed))
+    );
+    var maxTransfers = 2;
+    routeRequest.withPreferences(preferences ->
+      preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1))
+    );
+    var numItineraries = 63;
+    routeRequest.setNumItineraries(numItineraries);
+    var schema = SchemaFactory.createSchema(routeRequest);
+    assertNotNull(schema);
+
+    var defaultSpeed = (FloatValue) getDefaultValueForField(
+      schema,
+      "WalkPreferencesInput",
+      "speed"
+    );
+    assertEquals(walkSpeed, defaultSpeed.getValue().doubleValue(), 0.01f);
+
+    var defaultMaxTransfers = (IntValue) getDefaultValueForField(
+      schema,
+      "TransferPreferencesInput",
+      "maximumTransfers"
+    );
+    assertEquals(maxTransfers, defaultMaxTransfers.getValue().intValue());
+
+    var defaultNumberOfItineraries = (IntValue) getDefaultValueForArgument(
+      schema,
+      "planConnection",
+      "first"
+    );
+    assertEquals(numItineraries, defaultNumberOfItineraries.getValue().intValue());
   }
 
   @ValueSource(strings = { "plan", "nearest" })
@@ -50,5 +93,23 @@ public class SchemaFactoryTest {
           .type(GraphQLObjectType.newObject().name(fieldName).build())
           .build()
       );
+  }
+
+  private static Value getDefaultValueForField(
+    GraphQLSchema schema,
+    String inputObjectName,
+    String fieldName
+  ) {
+    GraphQLInputObjectType inputObject = schema.getTypeAs(inputObjectName);
+    return (Value) inputObject.getField(fieldName).getInputFieldDefaultValue().getValue();
+  }
+
+  private static Value getDefaultValueForArgument(
+    GraphQLSchema schema,
+    String queryName,
+    String argumentName
+  ) {
+    var query = schema.getQueryType().getField(queryName);
+    return (Value) query.getArgument(argumentName).getArgumentDefaultValue().getValue();
   }
 }
