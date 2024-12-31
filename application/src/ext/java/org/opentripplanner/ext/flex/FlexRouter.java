@@ -192,7 +192,7 @@ public class FlexRouter {
 
     @Override
     public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
-      return transitService.findPathTransfers(stop);
+      return transitService.getFlexIndex().getTransfersFromStop(stop);
     }
 
     @Override

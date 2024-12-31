@@ -62,6 +62,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Better escalator duration control: specific duration from OSM duration tag, default speed from build-config.json [#6268](https://github.com/opentripplanner/OpenTripPlanner/pull/6268)
 - Detect JSON array in addition to JSON objects when including a file in the config. [#6307](https://github.com/opentripplanner/OpenTripPlanner/pull/6307)
 - Use WCAG recommendation to fill in GTFS route text color if it is missing [#6308](https://github.com/opentripplanner/OpenTripPlanner/pull/6308)
+- Rename `otp-shaded-jar` artifact and fix deployment to Maven Central [#6331](https://github.com/opentripplanner/OpenTripPlanner/pull/6331)
+- Add query for cancelled trips to GTFS GraphQL API [#5393](https://github.com/opentripplanner/OpenTripPlanner/pull/5393)
+- Enable mode-specific transfers by storing mode information in transfers [#6293](https://github.com/opentripplanner/OpenTripPlanner/pull/6293)
+- Add default penalty to all car API modes [#6302](https://github.com/opentripplanner/OpenTripPlanner/pull/6302)
+- Make flex linking work together with boarding locations [#6311](https://github.com/opentripplanner/OpenTripPlanner/pull/6311)
+- Add fallback name for corridors [#6303](https://github.com/opentripplanner/OpenTripPlanner/pull/6303)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)

@@ -430,7 +430,7 @@ public class StatesToWalkStepsMapper {
     return !(
       current.directionText().toString() != null &&
       !(java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens)) &&
-      (!current.bogusName() || !edge.hasBogusName())
+      (!current.nameIsDerived() || !edge.nameIsDerived())
     );
   }
 
@@ -525,7 +525,7 @@ public class StatesToWalkStepsMapper {
     addStep(
       createWalkStep(forwardState, backState)
         .withDirectionText(name)
-        .withBogusName(false)
+        .withNameIsDerived(false)
         .withDirections(lastAngle, DirectionUtils.getFirstAngle(edge.getGeometry()), false)
         .withRelativeDirection(direction)
         .addDistance(edge.getDistanceMeters())
@@ -543,7 +543,7 @@ public class StatesToWalkStepsMapper {
       .builder()
       .withDirectionText(en.getName())
       .withStartLocation(new WgsCoordinate(backState.getVertex().getCoordinate()))
-      .withBogusName(en.hasBogusName())
+      .withNameIsDerived(en.nameIsDerived())
       .withAngle(DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry()))
       .withWalkingBike(forwardState.isBackWalkingBike())
       .withArea(forwardState.getBackEdge() instanceof AreaEdge)

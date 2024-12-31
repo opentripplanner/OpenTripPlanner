@@ -2469,6 +2469,55 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLQueryTypeCanceledTripsArgs {
+
+    private String after;
+    private String before;
+    private Integer first;
+    private Integer last;
+
+    public GraphQLQueryTypeCanceledTripsArgs(Map<String, Object> args) {
+      if (args != null) {
+        this.after = (String) args.get("after");
+        this.before = (String) args.get("before");
+        this.first = (Integer) args.get("first");
+        this.last = (Integer) args.get("last");
+      }
+    }
+
+    public String getGraphQLAfter() {
+      return this.after;
+    }
+
+    public String getGraphQLBefore() {
+      return this.before;
+    }
+
+    public Integer getGraphQLFirst() {
+      return this.first;
+    }
+
+    public Integer getGraphQLLast() {
+      return this.last;
+    }
+
+    public void setGraphQLAfter(String after) {
+      this.after = after;
+    }
+
+    public void setGraphQLBefore(String before) {
+      this.before = before;
+    }
+
+    public void setGraphQLFirst(Integer first) {
+      this.first = first;
+    }
+
+    public void setGraphQLLast(Integer last) {
+      this.last = last;
+    }
+  }
+
   public static class GraphQLQueryTypeCancelledTripTimesArgs {
 
     private List<String> feeds;
