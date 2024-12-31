@@ -16,10 +16,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
-public class GraphQLIndexTest {
+public class SchemaFactoryTest {
 
   @Test
-  public void build() {
+  public void createSchema() {
     var schema = SchemaFactory.createSchema(new RouteRequest());
     assertNotNull(schema);
   }
