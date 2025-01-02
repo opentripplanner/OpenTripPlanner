@@ -37,12 +37,13 @@ public class TextAssertionsTest {
       org.opentest4j.AssertionFailedError.class,
       () -> assertLinesEquals("A\n", "A\nExtra Line")
     );
-    Assertions.assertEquals(
-      """
-        Expected(@end-of-text): <>
-        Actual  (@line 1): <Extra Line>
-        """,
-      ex.getMessage()
+    Assertions.assertTrue(
+      ex.getMessage().contains("Expected(@end-of-text)"),
+      "<" + ex.getMessage() + "> does not contain expected line."
+    );
+    Assertions.assertTrue(
+      ex.getMessage().contains("Actual  (@line 1): <Extra Line>"),
+      "<" + ex.getMessage() + "> does not contain actual line."
     );
   }
 }

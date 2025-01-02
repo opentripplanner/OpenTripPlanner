@@ -40,6 +40,7 @@ type QueryType {
 enum AEnum {
   E1
   E2
+  E3 @deprecated(reason: "REPLACE")
 }
 
 # Add doc to scalar
@@ -49,4 +50,5 @@ scalar Duration
 input InputType {
   a: String
   b: String
+  c: String @deprecated(reason: "REPLACE")
 }

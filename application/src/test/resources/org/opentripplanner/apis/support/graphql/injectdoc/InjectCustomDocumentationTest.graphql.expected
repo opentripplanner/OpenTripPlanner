@@ -80,6 +80,7 @@ enum AEnum {
   "AEnum.E1.description"
   E1
   E2 @deprecated(reason : "AEnum.E2.deprecated")
+  E3 @deprecated(reason : "REPLACE")
 }
 
 "Duration.description"
@@ -90,4 +91,5 @@ input InputType {
   "InputType.a.description"
   a: String
   b: String @deprecated(reason : "InputType.b.deprecated")
+  c: String @deprecated(reason : "REPLACE")
 }

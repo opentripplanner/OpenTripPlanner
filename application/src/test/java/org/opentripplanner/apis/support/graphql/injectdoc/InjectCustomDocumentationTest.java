@@ -34,12 +34,11 @@ import org.opentripplanner._support.text.TextAssertions;
 class InjectCustomDocumentationTest {
 
   private GraphQLSchema schema;
-  private String sdl;
   private String sdlExpected;
 
   @BeforeEach
   void setUp() throws IOException {
-    sdl = loadSchemaResource(".graphql");
+    var sdl = loadSchemaResource(".graphql");
     sdlExpected = loadSchemaResource(".graphql.expected");
 
     var parser = new SchemaParser();
@@ -88,10 +87,12 @@ class InjectCustomDocumentationTest {
         "AEnum.description",
         "AEnum.E1.description",
         "AEnum.E2.deprecated",
+        "AEnum.E3.deprecated",
         "Duration.description",
         "InputType.description",
         "InputType.a.description",
-        "InputType.b.deprecated"
+        "InputType.b.deprecated",
+        "InputType.c.deprecated"
       )
       .collect(Collectors.toMap(e -> e, e -> e));
   }
@@ -103,11 +104,7 @@ class InjectCustomDocumentationTest {
     var visitor = new InjectCustomDocumentation(customDocumentation);
     var newSchema = SchemaTransformer.transformSchema(schema, visitor);
     var p = new SchemaPrinter();
-    var result = p
-      .print(newSchema)
-      // Some editors like IntelliJ remove space characters at the end of a
-      // line, so we do the same here to avoid false positive results.
-      .replaceAll(" +\\n", "\n");
+    var result = p.print(newSchema);
 
     var missingValues = texts
       .values()
@@ -118,13 +115,19 @@ class InjectCustomDocumentationTest {
 
     // There is a bug in the Java GraphQL API, existing deprecated
     // doc is not updated or replaced.
-    var expected = List.of("BType.a.deprecated", "CType.b.deprecated.append");
+    var expected = List.of(
+      "AEnum.E3.deprecated",
+      "BType.a.deprecated",
+      "CType.b.deprecated.append",
+      "InputType.c.deprecated"
+    );
 
     assertEquals(expected, missingValues);
 
     TextAssertions.assertLinesEquals(sdlExpected, result);
   }
 
+  @SuppressWarnings("DataFlowIssue")
   String loadSchemaResource(String suffix) throws IOException {
     var cl = getClass();
     var name = cl.getName().replace('.', '/') + suffix;
