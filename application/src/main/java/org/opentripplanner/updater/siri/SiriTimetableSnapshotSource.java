@@ -16,7 +16,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -48,7 +47,7 @@ public class SiriTimetableSnapshotSource {
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
   /**
-   * Use a id generator to generate TripPattern ids for new TripPatterns created by RealTime
+   * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
    */
   private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
@@ -79,9 +78,7 @@ public class SiriTimetableSnapshotSource {
   }
 
   /**
-   * Method to apply a trip update list to the most recent version of the timetable snapshot.
-   * FIXME RT_AB: TripUpdate is the GTFS term, and these SIRI ETs are never converted into that
-   *              same internal model.
+   * Method to apply estimated timetables to the most recent version of the timetable snapshot.
    *
    * @param incrementality  the incrementality of the update, for example if updates represent all
    *                        updates that are active right now, i.e. all previous updates should be
