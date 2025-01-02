@@ -7,9 +7,12 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
   ENTUR;
 
   private static final String TYPE_DOC =
-    "List of available custom documentation profiles. " +
-    "The default should be used in most cases. A profile may be used to deprecate part of the " +
-    "API in case it is not supported.";
+    """
+    List of available custom documentation profiles. A profile is used to inject custom
+    documentation like type and field description or a deprecated reason.
+    
+    Currently, ONLY the Transmodel API support this feature.
+    """;
 
   @Override
   public String typeDescription() {
