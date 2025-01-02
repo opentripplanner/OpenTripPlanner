@@ -3535,15 +3535,29 @@ enum RealtimeState {
   UPDATED
 }
 
-"Actions to take relative to the current position when engaging a walking/driving step."
+"""
+A direction that is not absolute but rather fuzzy and context-dependent.
+It provides the passenger with information what they should do in this step depending on where they
+were in the previous one.
+"""
 enum RelativeDirection {
   CIRCLE_CLOCKWISE
   CIRCLE_COUNTERCLOCKWISE
+  """
+  Moving straight ahead in one of these cases
+    
+    - Passing through a crossing or intersection.
+    - Passing through a station entrance or exit when it is not know whether the passenger is
+      entering or exiting. If known then entrance information is in the `step.entity` field.
+  """
   CONTINUE
   DEPART
   ELEVATOR
+  "Entering a public transport station. If known then entrance information is in the `step.entity` field."
   ENTER_STATION
+  "Exiting a public transport station. If known then entrance information is in the `step.entity` field."
   EXIT_STATION
+  "Follow the signs indicating a specific location like \"platform 1\" or \"exit B\"."
   FOLLOW_SIGNS
   HARD_LEFT
   HARD_RIGHT
