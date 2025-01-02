@@ -1,0 +1,10 @@
+{
+  "data": {
+    "vehicleParkings": [
+      {
+        "name": "parking",
+        "vehicleParkingId": "F:parking-1"
+      }
+    ]
+  }
+}

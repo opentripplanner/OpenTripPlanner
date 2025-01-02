@@ -1,0 +1,19 @@
+{
+  "updaters": [
+    {
+      "type": "siri-sx-updater",
+      "frequency": "1m",
+      "url": "https://api.entur.io/realtime/v1/services",
+      "feedId": "NO",
+      "blockReadinessUntilInitialized": true
+    },
+    {
+      "type": "siri-et-updater",
+      "frequency": "1m",
+      "previewInterval": "1h30m",
+      "url": "https://api.entur.io/realtime/v1/services",
+      "feedId": "NO",
+      "blockReadinessUntilInitialized": true
+    }
+  ]
+}

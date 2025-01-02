@@ -29,8 +29,8 @@ jobs:
         run: |
           # add a line above the one which contains AUTOMATIC_CHANGELOG_PLACEHOLDER
           ITEM="${TITLE} [#${NUMBER}](${URL})"
-          TEMP_FILE=docs/Changelog.generated.md
-          FILE=docs/Changelog.md
+          TEMP_FILE=doc/user/Changelog.generated.md
+          FILE=doc/user/Changelog.md
           awk "/CHANGELOG_PLACEHOLDER/{print \"- $ITEM\"}1" $FILE > $TEMP_FILE
           mv $TEMP_FILE $FILE
           git add $FILE

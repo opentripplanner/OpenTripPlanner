@@ -1,0 +1,11 @@
+{
+  alerts {
+    id
+    headerDefault: alertHeaderText
+    headerDe: alertHeaderText(language: "de")
+    descriptionDefault: alertDescriptionText
+    descriptionDe: alertDescriptionText(language: "de")
+    urlDefault: alertUrl
+    urlDe: alertUrl(language: "de")
+  }
+}

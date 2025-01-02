@@ -1,8 +1,9 @@
 import { TripPattern } from '../../gql/graphql.ts';
 import { TIME_BOX_WIDTH, useHeaderContentStyleCalculations } from './useHeaderContentStyleCalculations.ts';
 import { ItineraryHeaderLegContent } from './ItineraryHeaderLegContent.tsx';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { formatTime } from '../../util/formatTime.ts';
+import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
 
 export function ItineraryHeaderContent({
   tripPattern,
@@ -24,14 +25,16 @@ export function ItineraryHeaderContent({
     latestEndTime,
   );
 
+  const timeZone = useContext(TimeZoneContext);
+
   const formattedStartTime = useMemo(
-    () => formatTime(tripPattern.expectedStartTime, 'short'),
-    [tripPattern.expectedStartTime],
+    () => formatTime(tripPattern.expectedStartTime, timeZone, 'short'),
+    [tripPattern.expectedStartTime, timeZone],
   );
 
   const formattedEndTime = useMemo(
-    () => formatTime(tripPattern.expectedEndTime, 'short'),
-    [tripPattern.expectedEndTime],
+    () => formatTime(tripPattern.expectedEndTime, timeZone, 'short'),
+    [tripPattern.expectedEndTime, timeZone],
   );
 
   return (
@@ -45,6 +48,7 @@ export function ItineraryHeaderContent({
         }}
       />
       <div
+        title={tripPattern.expectedStartTime}
         className="itinerary-header-itinerary-time"
         style={{
           left: `${leftPx - TIME_BOX_WIDTH}px`,
@@ -65,6 +69,7 @@ export function ItineraryHeaderContent({
       ))}
 
       <div
+        title={tripPattern.expectedEndTime}
         className="itinerary-header-itinerary-time"
         style={{
           left: `${leftPx + widthPx + 2}px`,

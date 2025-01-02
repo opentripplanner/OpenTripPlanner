@@ -1,18 +1,20 @@
 /**
  * textColor can be black or white. White for dark colors and black for light colors.
- * Calculated based on luminance formula:
- * sqrt( 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
+ * Calculated according to WCAG 2.1
  */
 export function generateTextColor(hexColor: string) {
   const color = decodeColor(hexColor);
 
-  //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
-  const newRed = 0.299 * Math.pow(color[0] / 255.0, 2.0);
-  const newGreen = 0.587 * Math.pow(color[1] / 255.0, 2.0);
-  const newBlue = 0.114 * Math.pow(color[2] / 255.0, 2.0);
-  const luminance = Math.sqrt(newRed + newGreen + newBlue);
+  function linearizeColorComponent(srgb: number) {
+    return srgb <= 0.04045 ? srgb / 12.92 : Math.pow((srgb + 0.055) / 1.055, 2.4);
+  }
 
-  if (luminance > 0.66) {
+  const r = linearizeColorComponent(color[0] / 255.0);
+  const g = linearizeColorComponent(color[1] / 255.0);
+  const b = linearizeColorComponent(color[2] / 255.0);
+  const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+  if (luminance > 0.179) {
     return '#000';
   } else {
     return '#fff';

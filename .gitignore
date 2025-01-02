@@ -29,8 +29,9 @@ o_o_standalone_config_IncludeFileDirectiveTest_part.json
 .venv/
 _site/
 build/
+!/application/src/build/
 dist/
-docs/_build/
+doc/user/_build/
 gen-java/
 gen-javabean/
 gen-py/

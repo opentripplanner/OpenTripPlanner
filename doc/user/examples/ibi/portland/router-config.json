@@ -1,0 +1,126 @@
+{
+  "routingDefaults": {
+    "maxJourneyDuration": "6h",
+    "boardSlack": "0s",
+    "alightSlack": "0s",
+    "transferSlack": "3m",
+    "waitReluctance": 0.9,
+    "walk": {
+      "reluctance": 1.75,
+      "stairsReluctance": 1.65
+    },
+    "numItineraries": 3,
+    "geoidElevation": true,
+    "streetRoutingTimeout": "7s"
+  },
+  "transit": {
+    "maxNumberOfTransfers": 4
+  },
+  "updaters": [
+    {
+      "type": "real-time-alerts",
+      "frequency": "1m",
+      "earlyStartSec": 864000,
+      "url": "http://trimet.org/transweb/ws/V1/FeedSpecAlerts/includeFuture/true/suppressSystemWideAlerts/true/",
+      "feedId": "TriMet"
+    },
+    {
+      "type": "stop-time-updater",
+      "frequency": "30s",
+      "url": "https://trimet.org/transweb/ws/V1/TripUpdate",
+      "feedId": "TriMet"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequency": "92s",
+      "sourceType": "gbfs",
+      "url": "https://gbfs.biketownpdx.com/gbfs"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequency": "90s",
+      "network": "BIRD",
+      "sourceType": "gbfs",
+      "url": "https://mds.bird.co/gbfs/v2/public/portland.gbfs",
+      "geofencingZones": "true"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequency": "91s",
+      "network": "LIME",
+      "sourceType": "gbfs",
+      "url": "https://data.lime.bike/api/partners/v2/gbfs/portland"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequency": "93s",
+      "network": "SPIN",
+      "sourceType": "gbfs",
+      "url": "https://gbfs.spin.pm/api/gbfs/v2/portland"
+    }
+  ],
+  "vectorTiles": {
+    "basePath": "/rtp/routers/default/vectorTiles",
+    "attribution": "<a href='https://trimet.org/mod'>Regional Partners</a>",
+    "layers": [
+      {
+        "name": "stops",
+        "type": "Stop",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600,
+        "filter": "sunday-to-sunday-service-week"
+      },
+      {
+        "name": "areaStops",
+        "type": "AreaStop",
+        "mapper": "OTPRR",
+        "maxZoom": 30,
+        "minZoom":  8,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "stations",
+        "type": "Station",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 2,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "rentalVehicles",
+        "type": "VehicleRentalVehicle",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 2,
+        "cacheMaxSeconds": 60
+      },
+      {
+        "name": "rentalStations",
+        "type": "VehicleRentalStation",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 2,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "vehicleParking",
+        "type": "VehicleParking",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 10,
+        "cacheMaxSeconds": 60,
+        "expansionFactor": 0.25
+      }
+    ]
+  },
+  "rideHailingServices": [
+    {
+      "type": "uber-car-hailing",
+      "clientId": "${UBER_CLIENT_ID}",
+      "clientSecret": "${UBER_CLIENT_SECRET}",
+      "wheelchairAccessibleProductId": "8ddc7ce4-67d1-4ac4-8b56-205bd6a6314e"
+    }
+  ]
+}

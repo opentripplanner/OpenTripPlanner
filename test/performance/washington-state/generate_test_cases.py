@@ -18,14 +18,6 @@ locations= [
         "name": "Des Moines"
     },
     {
-        "coordinates":  "47.340218616,-122.2246170043",
-        "name": "North Auburn"
-    },
-    {
-        "coordinates":  "47.31322426310727,-122.336540222167",
-        "name": "Federal Way"
-    },
-    {
         "coordinates":  "47.571024,-122.3877811",
         "name": "West Seattle"
     },
@@ -47,19 +39,19 @@ locations= [
     },
 ]
 
-failing_cases = [16, 64, 70, 82, 88, 120, 128, 130, 132, 134, 136, 138, 146, 152, 154, 158, 164, 172]
+failing_cases = []
 
 rows = []
 
 modes = [
     {
-        "mode": "TRANSIT|WALK",
-        "category": "transit",
+        "mode": "FLEX_DIRECT|WALK",
+        "category": "flex-direct",
         "window": ""
     },
     {
         "mode": "FLEX_ACCESS|FLEX_EGRESS|TRANSIT",
-        "category": "flex",
+        "category": "flex-and-transit",
         "window": "6h"
     }
 ]
