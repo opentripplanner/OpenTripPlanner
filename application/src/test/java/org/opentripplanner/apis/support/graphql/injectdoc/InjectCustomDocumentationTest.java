@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner._support.text.TextAssertions;
 
 /**
  * This test read in a schema file, inject documentation and convert the
@@ -120,7 +121,8 @@ class InjectCustomDocumentationTest {
     var expected = List.of("BType.a.deprecated", "CType.b.deprecated.append");
 
     assertEquals(expected, missingValues);
-    assertEquals(sdlExpected, result);
+
+    TextAssertions.assertLinesEquals(sdlExpected, result);
   }
 
   String loadSchemaResource(String suffix) throws IOException {
