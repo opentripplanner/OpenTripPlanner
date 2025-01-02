@@ -35,6 +35,7 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -169,7 +170,7 @@ public class ConstructApplication {
       vehicleRentalRepository(),
       vehicleParkingRepository(),
       timetableRepository(),
-      factory.timetableSnapshotManager(),
+      snapshotManager(),
       routerConfig().updaterConfig()
     );
 
@@ -267,6 +268,10 @@ public class ConstructApplication {
 
   public VehicleRentalRepository vehicleRentalRepository() {
     return factory.vehicleRentalRepository();
+  }
+
+  private TimetableSnapshotManager snapshotManager() {
+    return factory.timetableSnapshotManager();
   }
 
   public VehicleParkingService vehicleParkingService() {
