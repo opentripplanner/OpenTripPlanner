@@ -22,7 +22,7 @@
     "bootstrap": "5.3.3",
     "graphql": "16.10.0",
     "graphql-request": "7.1.2",
-    "maplibre-gl": "4.7.1",
+    "maplibre-gl": "5.0.0",
     "react": "19.0.0",
     "react-bootstrap": "2.10.7",
     "react-dom": "19.0.0",
