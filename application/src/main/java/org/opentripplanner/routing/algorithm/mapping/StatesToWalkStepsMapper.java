@@ -29,7 +29,6 @@ import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.Entrance;
 
 /**

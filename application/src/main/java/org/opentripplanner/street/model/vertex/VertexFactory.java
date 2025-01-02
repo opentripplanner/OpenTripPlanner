@@ -11,6 +11,7 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.PathwayNode;
@@ -98,9 +99,11 @@ public class VertexFactory {
     long nid,
     Coordinate coordinate,
     String code,
-    boolean accessible
+    Accessibility wheelchairAccessibility
   ) {
-    return addToGraph(new StationEntranceVertex(coordinate.x, coordinate.y, nid, code, accessible));
+    return addToGraph(
+      new StationEntranceVertex(coordinate.x, coordinate.y, nid, code, wheelchairAccessibility)
+    );
   }
 
   public OsmVertex osm(

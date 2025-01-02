@@ -13,18 +13,18 @@ public class StationEntranceVertex extends OsmVertex {
 
   private static final String FEED_ID = "osm";
   private final String code;
-  private final boolean wheelchairAccessible;
+  private final Accessibility wheelchairAccessibility;
 
   public StationEntranceVertex(
     double lat,
     double lon,
     long nodeId,
     String code,
-    boolean wheelchairAccessible
+    Accessibility wheelchairAccessibility
   ) {
     super(lat, lon, nodeId);
     this.code = code;
-    this.wheelchairAccessible = wheelchairAccessible;
+    this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
   /**
@@ -44,7 +44,7 @@ public class StationEntranceVertex extends OsmVertex {
   }
 
   public Accessibility wheelchairAccessibility() {
-    return wheelchairAccessible ? Accessibility.POSSIBLE : Accessibility.NOT_POSSIBLE;
+    return wheelchairAccessibility;
   }
 
   @Override
