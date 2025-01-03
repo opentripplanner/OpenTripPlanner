@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.RequestSource;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -37,10 +36,9 @@ public class RaptorRequestTransferCache {
 
   public void put(List<List<Transfer>> transfersByStopIndex, RouteRequest request) {
     final CacheKey cacheKey = new CacheKey(transfersByStopIndex, request);
-    final RaptorTransferIndex raptorTransferIndex = RaptorTransferIndex.create(
+    final RaptorTransferIndex raptorTransferIndex = RaptorTransferIndex.createInitialSetup(
       transfersByStopIndex,
-      cacheKey.request,
-      RequestSource.CONFIG
+      cacheKey.request
     );
 
     LOG.info("Initializing cache with request: {}", cacheKey.options);
@@ -60,10 +58,9 @@ public class RaptorRequestTransferCache {
       @Override
       public RaptorTransferIndex load(CacheKey cacheKey) {
         LOG.info("Adding runtime request to cache: {}", cacheKey.options);
-        return RaptorTransferIndex.create(
+        return RaptorTransferIndex.createRequestScope(
           cacheKey.transfersByStopIndex,
-          cacheKey.request,
-          RequestSource.RUNTIME
+          cacheKey.request
         );
       }
     };
