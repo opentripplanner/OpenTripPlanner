@@ -7,44 +7,60 @@ import graphql.language.StringValue;
 import graphql.language.Value;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLInputObjectField;
-import graphql.schema.idl.SchemaDirectiveWiring;
-import graphql.schema.idl.SchemaDirectiveWiringEnvironment;
+import graphql.schema.GraphQLNamedSchemaElement;
+import graphql.schema.GraphQLSchemaElement;
+import graphql.schema.GraphQLTypeVisitor;
+import graphql.schema.GraphQLTypeVisitorStub;
+import graphql.util.TraversalControl;
+import graphql.util.TraverserContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
-public class DefaultValueDirectiveWiring implements SchemaDirectiveWiring {
+public class DefaultValueInjector extends GraphQLTypeVisitorStub implements GraphQLTypeVisitor {
 
   private final RouteRequest defaultRouteRequest;
 
-  public DefaultValueDirectiveWiring(RouteRequest defaultRouteRequest) {
+  public DefaultValueInjector(RouteRequest defaultRouteRequest) {
     this.defaultRouteRequest = defaultRouteRequest;
   }
 
   @Override
-  public GraphQLArgument onArgument(SchemaDirectiveWiringEnvironment<GraphQLArgument> environment) {
-    GraphQLArgument argument = environment.getElement();
-    var defaultValue = getDefaultValueForSchemaObject(environment);
+  public TraversalControl visitGraphQLArgument(
+    GraphQLArgument argument,
+    TraverserContext<GraphQLSchemaElement> context
+  ) {
+    var defaultValue = getDefaultValueForSchemaObject(context, argument.getName());
     if (defaultValue != null) {
-      return argument.transform(builder -> builder.defaultValueLiteral(defaultValue).build());
+      return changeNode(
+        context,
+        argument.transform(builder -> builder.defaultValueLiteral(defaultValue).build())
+      );
     }
-    return argument;
+    return TraversalControl.CONTINUE;
   }
 
   @Override
-  public GraphQLInputObjectField onInputObjectField(
-    SchemaDirectiveWiringEnvironment<GraphQLInputObjectField> environment
+  public TraversalControl visitGraphQLInputObjectField(
+    GraphQLInputObjectField field,
+    TraverserContext<GraphQLSchemaElement> context
   ) {
-    GraphQLInputObjectField field = environment.getElement();
-    var defaultValue = getDefaultValueForSchemaObject(environment);
+    var defaultValue = getDefaultValueForSchemaObject(context, field.getName());
     if (defaultValue != null) {
-      return field.transform(builder -> builder.defaultValueLiteral(defaultValue).build());
+      return changeNode(
+        context,
+        field.transform(builder -> builder.defaultValueLiteral(defaultValue).build())
+      );
     }
-    return field;
+    return TraversalControl.CONTINUE;
   }
 
-  private Value getDefaultValueForSchemaObject(SchemaDirectiveWiringEnvironment<?> environment) {
+  private Value getDefaultValueForSchemaObject(
+    TraverserContext<GraphQLSchemaElement> context,
+    String name
+  ) {
     // Arguments and input fields always have a parent
-    var parentName = environment.getNodeParentTree().getParentInfo().get().getNode().getName();
-    var key = parentName + "_" + environment.getElement().getName();
+    var parent = (GraphQLNamedSchemaElement) context.getParentNode();
+    var parentName = parent.getName();
+    var key = parentName + "_" + name;
     var preferences = defaultRouteRequest.preferences();
     switch (key) {
       case "planConnection_first":

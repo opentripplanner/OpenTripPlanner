@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import graphql.scalars.ExtendedScalars;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.SchemaTransformer;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
@@ -96,7 +97,7 @@ public class SchemaFactory {
       URL url = Objects.requireNonNull(SchemaFactory.class.getResource("schema.graphqls"));
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
-      RuntimeWiring.Builder runtimeWiringBuilder = RuntimeWiring
+      RuntimeWiring runtimeWiring = RuntimeWiring
         .newRuntimeWiring()
         .scalar(GraphQLScalars.DURATION_SCALAR)
         .scalar(GraphQLScalars.POLYLINE_SCALAR)
@@ -182,14 +183,14 @@ public class SchemaFactory {
         .type(typeWiring.build(TripOccupancyImpl.class))
         .type(typeWiring.build(LegTimeImpl.class))
         .type(typeWiring.build(RealTimeEstimateImpl.class))
-        .type(typeWiring.build(EstimatedTimeImpl.class));
-
-      if (defaultRouteRequest != null) {
-        runtimeWiringBuilder.directiveWiring(new DefaultValueDirectiveWiring(defaultRouteRequest));
-      }
+        .type(typeWiring.build(EstimatedTimeImpl.class))
+        .build();
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();
-      return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiringBuilder.build());
+      var schema = schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
+      return defaultRouteRequest != null
+        ? SchemaTransformer.transformSchema(schema, new DefaultValueInjector(defaultRouteRequest))
+        : schema;
     } catch (Exception e) {
       LOG.error("Unable to build GTFS GraphQL Schema", e);
     }
