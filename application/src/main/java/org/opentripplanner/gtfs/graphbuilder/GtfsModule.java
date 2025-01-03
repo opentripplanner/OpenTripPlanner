@@ -28,7 +28,6 @@ import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopArea;
 import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
@@ -68,7 +67,6 @@ public class GtfsModule implements GraphBuilderModule {
     FareTransferRule.class,
     RiderCategory.class,
     FareMedium.class,
-    StopArea.class,
     StopAreaElement.class,
     Area.class
   );
