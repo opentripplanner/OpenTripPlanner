@@ -1,7 +1,7 @@
 CURL:=curl -L -\# --fail --create-dirs
 
 otp.jar:
-	cp ../shaded-jar/target/otp-*-SNAPSHOT-shaded.jar otp.jar
+	cp ../otp-shaded/target/otp-shaded-*-SNAPSHOT.jar otp.jar
 
 atlanta/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/33.654066160697056,-84.759521484375,33.994611584814606,-84.30976867675781.pbf -o $@
