@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
