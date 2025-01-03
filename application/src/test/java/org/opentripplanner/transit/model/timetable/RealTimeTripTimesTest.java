@@ -402,6 +402,17 @@ class RealTimeTripTimesTest {
     assertFalse(updatedTripTimesA.isNoDataStop(2));
   }
 
+  @Test
+  public void testRealTimeUpdated() {
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
+    updatedTripTimesA.setRealTimeState(RealTimeState.UPDATED);
+    assertTrue(updatedTripTimesA.isRealTimeUpdated(1));
+    updatedTripTimesA.setNoData(1);
+    assertTrue(updatedTripTimesA.isRealTimeUpdated(0));
+    assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
+  }
+
   @Nested
   class GtfsStopSequence {
 

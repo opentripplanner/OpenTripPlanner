@@ -126,9 +126,10 @@ public class QualifiedModeSet implements Serializable {
             mBuilder.withEgressMode(StreetMode.CAR_HAILING);
             mBuilder.withDirectMode(StreetMode.WALK);
           } else {
-            mBuilder.withAccessMode(StreetMode.WALK);
-            mBuilder.withTransferMode(StreetMode.WALK);
-            mBuilder.withEgressMode(StreetMode.WALK);
+            // This is necessary for transfer calculations.
+            mBuilder.withAccessMode(StreetMode.CAR);
+            mBuilder.withTransferMode(StreetMode.CAR);
+            mBuilder.withEgressMode(StreetMode.CAR);
             mBuilder.withDirectMode(StreetMode.CAR);
           }
         }

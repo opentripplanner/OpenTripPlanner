@@ -2,12 +2,15 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -31,16 +34,20 @@ public class Transfer {
 
   private final List<Edge> edges;
 
-  public Transfer(int toStop, List<Edge> edges) {
+  private final Set<StreetMode> modes;
+
+  public Transfer(int toStop, List<Edge> edges, EnumSet<StreetMode> modes) {
     this.toStop = toStop;
     this.edges = edges;
     this.distanceMeters = (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    this.modes = Collections.unmodifiableSet(modes);
   }
 
-  public Transfer(int toStopIndex, int distanceMeters) {
+  public Transfer(int toStopIndex, int distanceMeters, EnumSet<StreetMode> modes) {
     this.toStop = toStopIndex;
     this.distanceMeters = distanceMeters;
     this.edges = null;
+    this.modes = Collections.unmodifiableSet(modes);
   }
 
   public List<Coordinate> getCoordinates() {
@@ -66,6 +73,11 @@ public class Transfer {
 
   public List<Edge> getEdges() {
     return edges;
+  }
+
+  /** Check if the given mode is a valid mode for the transfer. */
+  public boolean allowsMode(StreetMode mode) {
+    return modes.contains(mode);
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {

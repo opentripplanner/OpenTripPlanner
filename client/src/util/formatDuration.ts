@@ -10,22 +10,16 @@ export function formatDuration(seconds: number) {
 
   let formatted = '';
 
-  if (hrs === 1) {
-    formatted = `${formatted}${hrs} hr `;
-  } else if (hrs > 1) {
-    formatted = `${formatted}${hrs} hrs `;
+  if (hrs > 0) {
+    formatted = `${formatted}${hrs}h `;
   }
 
-  if (mins === 1) {
-    formatted = `${formatted}${mins} min `;
-  } else if (mins > 1) {
-    formatted = `${formatted}${mins} mins `;
+  if (mins > 0) {
+    formatted = `${formatted}${mins}min `;
   }
 
-  if (secs === 1) {
-    formatted = `${formatted}${secs} sec `;
-  } else if (secs > 1) {
-    formatted = `${formatted}${secs} secs `;
+  if (secs > 1) {
+    formatted = `${formatted}${secs}s`;
   }
 
   return formatted;

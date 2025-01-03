@@ -46,7 +46,12 @@ public class ResourceLoader {
    */
   public File file(String path) {
     URL resource = url(path);
-    var file = new File(resource.getFile());
+    File file;
+    try {
+      file = new File(new URI(resource.toString()));
+    } catch (URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
     assertTrue(
       file.exists(),
       "File '%s' not found on file system.".formatted(file.getAbsolutePath())

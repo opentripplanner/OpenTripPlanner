@@ -17,7 +17,7 @@ public class WalkStepTest {
     WalkStepBuilder builder = new WalkStepBuilder()
       .withDirectionText(new NonLocalizedString("Any"))
       .withStartLocation(new WgsCoordinate(3.0, 4.0))
-      .withBogusName(false)
+      .withNameIsDerived(false)
       .withAngle(0.0)
       .withWalkingBike(false)
       .withArea(false);

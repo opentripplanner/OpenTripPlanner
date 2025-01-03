@@ -191,6 +191,13 @@ public final class RealTimeTripTimes implements TripTimes {
     return isStopRealTimeStates(stop, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
+  public boolean isRealTimeUpdated(int stop) {
+    return (
+      realTimeState != RealTimeState.SCHEDULED &&
+      !isStopRealTimeStates(stop, StopRealTimeState.NO_DATA)
+    );
+  }
+
   public void setOccupancyStatus(int stop, OccupancyStatus occupancyStatus) {
     prepareForRealTimeUpdates();
     this.occupancyStatus[stop] = occupancyStatus;

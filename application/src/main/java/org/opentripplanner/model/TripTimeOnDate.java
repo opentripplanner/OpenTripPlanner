@@ -89,6 +89,38 @@ public class TripTimeOnDate {
     return out;
   }
 
+  /**
+   * Get first stop TripTimeOnDate from Timetable.
+   */
+  public static TripTimeOnDate firstFromTripTimes(
+    Timetable table,
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight
+  ) {
+    TripTimes times = table.getTripTimes(trip);
+    return new TripTimeOnDate(times, 0, table.getPattern(), serviceDate, midnight);
+  }
+
+  /**
+   * Get last stop TripTimeOnDate from Timetable.
+   */
+  public static TripTimeOnDate lastFromTripTimes(
+    Timetable table,
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight
+  ) {
+    TripTimes times = table.getTripTimes(trip);
+    return new TripTimeOnDate(
+      times,
+      times.getNumStops() - 1,
+      table.getPattern(),
+      serviceDate,
+      midnight
+    );
+  }
+
   public static Comparator<TripTimeOnDate> compareByDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
   }
@@ -140,14 +172,14 @@ public class TripTimeOnDate {
    * Returns the actual arrival time if available. Otherwise -1 is returned.
    */
   public int getActualArrival() {
-    return tripTimes.isRecordedStop(stopIndex) ? tripTimes.getArrivalTime(stopIndex) : UNDEFINED;
+    return isRecordedStop() ? tripTimes.getArrivalTime(stopIndex) : UNDEFINED;
   }
 
   /**
    * Returns the actual departure time if available. Otherwise -1 is returned.
    */
   public int getActualDeparture() {
-    return tripTimes.isRecordedStop(stopIndex) ? tripTimes.getDepartureTime(stopIndex) : UNDEFINED;
+    return isRecordedStop() ? tripTimes.getDepartureTime(stopIndex) : UNDEFINED;
   }
 
   public int getArrivalDelay() {
@@ -188,6 +220,14 @@ public class TripTimeOnDate {
 
   public boolean isNoDataStop() {
     return tripTimes.isNoDataStop(stopIndex);
+  }
+
+  /**
+   * Is the real-time time a recorded time (i.e. has the vehicle already passed the stop).
+   * This information is currently only available from SIRI feeds.
+   */
+  public boolean isRecordedStop() {
+    return tripTimes.isRecordedStop(stopIndex);
   }
 
   public RealTimeState getRealTimeState() {

@@ -1,0 +1,119 @@
+{
+  "data": {
+    "canceledTrips": {
+      "pageInfo": {
+        "hasNextPage": false,
+        "hasPreviousPage": false,
+        "startCursor": "c2ltcGxlLWN1cnNvcjA=",
+        "endCursor": "c2ltcGxlLWN1cnNvcjA="
+      },
+      "edges": [
+        {
+          "node": {
+            "serviceDate": "2024-08-09",
+            "end": {
+              "schedule": {
+                "time": {
+                  "arrival": "2024-08-09T11:40:00+02:00"
+                }
+              },
+              "realTime": {
+                "arrival": {
+                  "delay": "PT0S",
+                  "time": "2024-08-09T11:40:00+02:00"
+                }
+              },
+              "stopLocation": {
+                "gtfsId": "F:Stop_2"
+              }
+            },
+            "start": {
+              "schedule": {
+                "time": {
+                  "departure": "2024-08-09T11:30:00+02:00"
+                }
+              },
+              "realTime": {
+                "departure": {
+                  "delay": "PT0S",
+                  "time": "2024-08-09T11:30:00+02:00"
+                }
+              },
+              "stopLocation": {
+                "gtfsId": "F:Stop_0"
+              }
+            },
+            "stopCalls": [
+              {
+                "schedule": {
+                  "time": {
+                    "arrival": "2024-08-09T11:30:00+02:00",
+                    "departure": "2024-08-09T11:30:00+02:00"
+                  }
+                },
+                "realTime": {
+                  "arrival": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:30:00+02:00"
+                  },
+                  "departure": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:30:00+02:00"
+                  }
+                },
+                "stopLocation": {
+                  "gtfsId": "F:Stop_0"
+                }
+              },
+              {
+                "schedule": {
+                  "time": {
+                    "arrival": "2024-08-09T11:35:00+02:00",
+                    "departure": "2024-08-09T11:35:00+02:00"
+                  }
+                },
+                "realTime": {
+                  "arrival": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:35:00+02:00"
+                  },
+                  "departure": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:35:00+02:00"
+                  }
+                },
+                "stopLocation": {
+                  "gtfsId": "F:Stop_1"
+                }
+              },
+              {
+                "schedule": {
+                  "time": {
+                    "arrival": "2024-08-09T11:40:00+02:00",
+                    "departure": "2024-08-09T11:40:00+02:00"
+                  }
+                },
+                "realTime": {
+                  "arrival": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:40:00+02:00"
+                  },
+                  "departure": {
+                    "delay": "PT0S",
+                    "time": "2024-08-09T11:40:00+02:00"
+                  }
+                },
+                "stopLocation": {
+                  "gtfsId": "F:Stop_2"
+                }
+              }
+            ],
+            "trip": {
+              "gtfsId": "F:321Canceled"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

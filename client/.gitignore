@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+output
 
 # Editor directories and files
 .vscode/*
@@ -28,3 +29,4 @@ src/gql/
 
 # Vite cache folder
 .vite/
+

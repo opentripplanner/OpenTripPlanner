@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -18,6 +19,8 @@ public class FlexIndex {
 
   private final Multimap<StopLocation, PathTransfer> transfersToStop = ArrayListMultimap.create();
 
+  private final Multimap<StopLocation, PathTransfer> transfersFromStop = ArrayListMultimap.create();
+
   private final Multimap<StopLocation, FlexTrip<?, ?>> flexTripsByStop = HashMultimap.create();
 
   private final Map<FeedScopedId, Route> routeById = new HashMap<>();
@@ -25,8 +28,10 @@ public class FlexIndex {
   private final Map<FeedScopedId, FlexTrip<?, ?>> tripById = new HashMap<>();
 
   public FlexIndex(TimetableRepository timetableRepository) {
-    for (PathTransfer transfer : timetableRepository.getAllPathTransfers()) {
+    // Flex transfers should only use WALK mode transfers.
+    for (PathTransfer transfer : timetableRepository.findTransfers(StreetMode.WALK)) {
       transfersToStop.put(transfer.to, transfer);
+      transfersFromStop.put(transfer.from, transfer);
     }
     for (FlexTrip<?, ?> flexTrip : timetableRepository.getAllFlexTrips()) {
       routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
@@ -45,6 +50,10 @@ public class FlexIndex {
 
   public Collection<PathTransfer> getTransfersToStop(StopLocation stopLocation) {
     return transfersToStop.get(stopLocation);
+  }
+
+  public Collection<PathTransfer> getTransfersFromStop(StopLocation stopLocation) {
+    return transfersFromStop.get(stopLocation);
   }
 
   public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {

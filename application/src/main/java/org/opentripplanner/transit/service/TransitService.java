@@ -157,6 +157,11 @@ public interface TransitService {
   Collection<Trip> listTrips();
 
   /**
+   * List all canceled trips.
+   */
+  List<TripOnServiceDate> listCanceledTrips();
+
+  /**
    * Return all routes, including those created by real-time updates.
    */
   Collection<Route> listRoutes();

@@ -209,12 +209,12 @@ public interface Leg {
   /**
    * The time (including realtime information) when the leg starts.
    */
-  LegTime start();
+  LegCallTime start();
 
   /**
    * The time (including realtime information) when the leg ends.
    */
-  LegTime end();
+  LegCallTime end();
 
   /**
    * The date and time this leg begins.
@@ -245,7 +245,7 @@ public interface Leg {
   /**
    * Whether there is real-time data about this Leg
    */
-  default boolean getRealTime() {
+  default boolean isRealTimeUpdated() {
     return false;
   }
 

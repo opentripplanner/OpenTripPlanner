@@ -55,7 +55,10 @@ public class StreetEdge
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
-  static final int HASBOGUSNAME_FLAG_INDEX = 2;
+  /**
+   * @see Edge#nameIsDerived()
+   */
+  static final int NAME_IS_DERIVED_FLAG_INDEX = 2;
   static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
   static final int STAIRS_FLAG_INDEX = 4;
   static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
@@ -444,20 +447,22 @@ public class StreetEdge
   }
 
   /**
-   * Update the name of the edge after it has been constructed. This method also sets the bogusName
+   * Update the name of the edge after it has been constructed. This method also sets the nameIsDerived
    * property to false, indicating to the code that maps from edges to steps that this is a real
    * street name.
-   * @see Edge#hasBogusName()
+   * @see Edge#nameIsDerived()
    */
   public void setName(I18NString name) {
     this.name = name;
-    this.flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, false);
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
   }
 
-  public boolean hasBogusName() {
-    return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
+  @Override
+  public boolean nameIsDerived() {
+    return BitSetUtils.get(flags, NAME_IS_DERIVED_FLAG_INDEX);
   }
 
+  @Override
   public LineString getGeometry() {
     return CompactLineStringUtils.uncompactLineString(
       fromv.getLon(),

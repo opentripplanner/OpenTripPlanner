@@ -6,7 +6,7 @@ export const getApiUrl = () => {
     // e.g. if it is a relative path
     new URL(endpoint);
     return endpoint;
-  } catch (e) {
+  } catch (_) {
     return `${window.location.origin}${endpoint}`;
   }
 };

@@ -70,6 +70,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -194,7 +195,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     };
   }
 
-  // TODO
+  /**
+   * @deprecated Replaced by {@link #canceledTrips()}.
+   */
+  @Deprecated
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes() {
     return environment -> null;
@@ -827,6 +831,14 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       return tripStream.toList();
+    };
+  }
+
+  @Override
+  public DataFetcher<Connection<TripOnServiceDate>> canceledTrips() {
+    return environment -> {
+      var trips = getTransitService(environment).listCanceledTrips();
+      return new SimpleListConnection<>(trips).get(environment);
     };
   }
 

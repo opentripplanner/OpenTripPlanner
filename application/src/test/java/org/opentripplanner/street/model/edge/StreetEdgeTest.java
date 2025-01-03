@@ -413,11 +413,11 @@ public class StreetEdgeTest {
       .buildAndConnect();
 
     assertEquals(path, edge.getName());
-    assertTrue(edge.hasBogusName());
+    assertTrue(edge.nameIsDerived());
 
     var mainStreet = I18NString.of("Main Street");
     edge.setName(mainStreet);
     assertEquals(mainStreet, edge.getName());
-    assertFalse(edge.hasBogusName());
+    assertFalse(edge.nameIsDerived());
   }
 }
