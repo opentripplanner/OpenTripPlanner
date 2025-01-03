@@ -22,7 +22,7 @@ public class PathwayEdgeRenderer implements EdgeVertexRenderer {
 
     StringBuilder sb = new StringBuilder();
 
-    if (!pwe.hasBogusName()) {
+    if (!pwe.nameIsDerived()) {
       sb.append("name=").append(pwe.getName()).append(", ");
     }
 

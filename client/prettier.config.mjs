@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   "trailingComma": "all",
   "tabWidth": 2,
   "semi": true,
@@ -6,3 +6,5 @@ module.exports = {
   "printWidth": 120,
   "bracketSpacing": true
 }
+
+export default config;

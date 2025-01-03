@@ -204,7 +204,7 @@ public class LegType {
           .name("realtime")
           .description("Whether there is real-time data about this leg")
           .type(new GraphQLNonNull(Scalars.GraphQLBoolean))
-          .dataFetcher(env -> leg(env).getRealTime())
+          .dataFetcher(env -> leg(env).isRealTimeUpdated())
           .build()
       )
       .field(

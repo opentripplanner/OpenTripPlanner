@@ -38,7 +38,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       kv("noThruTraffic", noThruTrafficAsString(se)),
       kv("wheelchairAccessible", se.isWheelchairAccessible())
     );
-    if (se.hasBogusName()) {
+    if (se.nameIsDerived()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));
     } else {
       props.addFirst(kv("name", se.getName().toString()));

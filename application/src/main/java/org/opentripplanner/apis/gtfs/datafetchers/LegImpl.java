@@ -10,15 +10,15 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
+import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
 import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTime;
+import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -67,12 +67,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<String> dropoffType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> dropoffType() {
     return environment -> {
       if (getSource(environment).getAlightRule() == null) {
-        return PickDrop.SCHEDULED.name();
+        return GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       }
-      return getSource(environment).getAlightRule().name();
+      return PickDropMapper.map(getSource(environment).getAlightRule());
     };
   }
 
@@ -82,7 +82,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<LegTime> end() {
+  public DataFetcher<LegCallTime> end() {
     return environment -> getSource(environment).end();
   }
 
@@ -178,18 +178,18 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<String> pickupType() {
+  public DataFetcher<GraphQLTypes.GraphQLPickupDropoffType> pickupType() {
     return environment -> {
       if (getSource(environment).getBoardRule() == null) {
-        return PickDrop.SCHEDULED.name();
+        return GraphQLTypes.GraphQLPickupDropoffType.SCHEDULED;
       }
-      return getSource(environment).getBoardRule().name();
+      return PickDropMapper.map(getSource(environment).getBoardRule());
     };
   }
 
   @Override
   public DataFetcher<Boolean> realTime() {
-    return environment -> getSource(environment).getRealTime();
+    return environment -> getSource(environment).isRealTimeUpdated();
   }
 
   @Override
@@ -228,7 +228,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<LegTime> start() {
+  public DataFetcher<LegCallTime> start() {
     return environment -> getSource(environment).start();
   }
 

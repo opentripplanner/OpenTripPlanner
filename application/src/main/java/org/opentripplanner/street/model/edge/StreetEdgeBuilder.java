@@ -3,8 +3,8 @@ package org.opentripplanner.street.model.edge;
 import static org.opentripplanner.street.model.edge.StreetEdge.BACK_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.BICYCLE_NOTHRUTRAFFIC;
 import static org.opentripplanner.street.model.edge.StreetEdge.CLASS_LINK;
-import static org.opentripplanner.street.model.edge.StreetEdge.HASBOGUSNAME_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.MOTOR_VEHICLE_NOTHRUTRAFFIC;
+import static org.opentripplanner.street.model.edge.StreetEdge.NAME_IS_DERIVED_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.ROUNDABOUT_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.SLOPEOVERRIDE_FLAG_INDEX;
 import static org.opentripplanner.street.model.edge.StreetEdge.STAIRS_FLAG_INDEX;
@@ -175,7 +175,7 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
   }
 
   public B withBogusName(boolean hasBogusName) {
-    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
+    flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, hasBogusName);
     return instance();
   }
 

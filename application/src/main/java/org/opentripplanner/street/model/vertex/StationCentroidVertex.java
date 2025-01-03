@@ -20,7 +20,6 @@ public class StationCentroidVertex extends Vertex {
     return this.station;
   }
 
-  @Nonnull
   @Override
   public I18NString getName() {
     return station.getName();

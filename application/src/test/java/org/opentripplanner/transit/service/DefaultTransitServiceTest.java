@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -25,6 +28,8 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class DefaultTransitServiceTest {
 
@@ -52,6 +57,13 @@ class DefaultTransitServiceTest {
     .withCreatedByRealtimeUpdater(true)
     .build();
 
+  static FeedScopedId CALENDAR_ID = TimetableRepositoryForTest.id("CAL_1");
+  static Trip TRIP = TimetableRepositoryForTest
+    .trip("123")
+    .withHeadsign(I18NString.of("Trip Headsign"))
+    .withServiceId(CALENDAR_ID)
+    .build();
+
   @BeforeAll
   static void setup() {
     var siteRepository = TEST_MODEL
@@ -61,25 +73,40 @@ class DefaultTransitServiceTest {
       .withStation(STATION)
       .build();
 
+    var deduplicator = new Deduplicator();
+    var transitModel = new TimetableRepository(siteRepository, deduplicator);
+    var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
+    var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator);
+    canceledTripTimes.cancelTrip();
+    transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+
+    // Crate a calendar (needed for testing cancelled trips)
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var firstDate = LocalDate.of(2024, 8, 8);
+    var secondDate = LocalDate.of(2024, 8, 9);
+    calendarServiceData.putServiceDatesForServiceId(CALENDAR_ID, List.of(firstDate, secondDate));
+    transitModel.getServiceCodes().put(CALENDAR_ID, 0);
+    transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
+
+    transitModel.index();
     var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
     timetableRepository.index();
 
-    timetableRepository.initTimetableSnapshotProvider(() -> {
-      TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-      RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
-        ScheduledTripTimes
-          .of()
-          .withTrip(TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build())
-          .withDepartureTimes(new int[] { 0, 1 })
-          .build()
-      );
-      timetableSnapshot.update(
-        new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, LocalDate.now())
-      );
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
+      ScheduledTripTimes
+        .of()
+        .withTrip(TimetableRepositoryForTest.trip("REAL_TIME_TRIP").build())
+        .withDepartureTimes(new int[] { 0, 1 })
+        .build()
+    );
+    timetableSnapshot.update(new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, firstDate));
+    timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, firstDate));
+    timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));
 
-      return timetableSnapshot.commit();
-    });
+    var snapshot = timetableSnapshot.commit();
+    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     service =
       new DefaultTransitService(timetableRepository) {
@@ -122,6 +149,12 @@ class DefaultTransitServiceTest {
   void getPatternForStopsWithRealTime() {
     Collection<TripPattern> patternsForStop = service.findPatterns(STOP_B, true);
     assertEquals(Set.of(FERRY_PATTERN, RAIL_PATTERN, REAL_TIME_PATTERN), patternsForStop);
+  }
+
+  @Test
+  void listCanceledTrips() {
+    var canceledTrips = service.listCanceledTrips();
+    assertEquals("[TripOnServiceDate{F:123}, TripOnServiceDate{F:123}]", canceledTrips.toString());
   }
 
   @Test

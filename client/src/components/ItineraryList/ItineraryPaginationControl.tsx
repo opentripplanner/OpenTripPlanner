@@ -18,7 +18,9 @@ export function ItineraryPaginationControl({
         size="sm"
         disabled={!previousPageCursor || loading}
         onClick={() => {
-          previousPageCursor && onPagination(previousPageCursor);
+          if (previousPageCursor) {
+            onPagination(previousPageCursor);
+          }
         }}
       >
         Previous page
@@ -28,7 +30,9 @@ export function ItineraryPaginationControl({
         size="sm"
         disabled={!nextPageCursor || loading}
         onClick={() => {
-          nextPageCursor && onPagination(nextPageCursor);
+          if (nextPageCursor) {
+            onPagination(nextPageCursor);
+          }
         }}
       >
         Next page

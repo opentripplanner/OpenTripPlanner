@@ -76,7 +76,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
    * @author mattwigway
    */
   @Override
-  public boolean hasBogusName() {
+  public boolean nameIsDerived() {
     return false;
   }
 

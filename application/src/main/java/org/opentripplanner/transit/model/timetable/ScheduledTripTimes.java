@@ -241,6 +241,11 @@ public final class ScheduledTripTimes implements TripTimes {
   }
 
   @Override
+  public boolean isRealTimeUpdated(int stop) {
+    return false;
+  }
+
+  @Override
   public I18NString getTripHeadsign() {
     return trip.getHeadsign();
   }

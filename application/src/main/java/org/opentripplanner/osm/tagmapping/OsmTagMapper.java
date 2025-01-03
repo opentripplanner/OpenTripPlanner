@@ -624,7 +624,7 @@ public class OsmTagMapper {
     props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
   }
 
-  public void populateNotesAndNames(WayPropertySet props) {
+  static void populateNotesAndNames(WayPropertySet props) {
     /* and the notes */
     // TODO: The curly brackets in the string below mean that the CreativeNamer should substitute in OSM tag values.
     // However they are not taken into account when passed to the translation function.
@@ -667,6 +667,7 @@ public class OsmTagMapper {
     props.createNames("highway=footway", "name.pedestrian_path");
     props.createNames("highway=bridleway", "name.bridleway");
     props.createNames("highway=footway;bicycle=no", "name.pedestrian_path");
+    props.createNames("highway=corridor", "name.corridor");
 
     // Platforms
     props.createNames("otp:route_ref=*", "name.otp_route_ref");

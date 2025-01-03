@@ -62,7 +62,7 @@ public class TransitLayerMapper {
 
   private TransitLayer map(TransitTuningParameters tuningParameters) {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
-    List<List<Transfer>> transferByStopIndex;
+    List<List<Transfer>> transfersByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
     LOG.info("Mapping transitLayer from TimetableRepository...");
@@ -71,7 +71,7 @@ public class TransitLayerMapper {
 
     tripPatternsByStopByDate = mapTripPatterns(allTripPatterns);
 
-    transferByStopIndex = mapTransfers(siteRepository, transitService);
+    transfersByStopIndex = mapTransfers(siteRepository, transitService);
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
@@ -86,7 +86,7 @@ public class TransitLayerMapper {
 
     return new TransitLayer(
       tripPatternsByStopByDate,
-      transferByStopIndex,
+      transfersByStopIndex,
       transitService.getTransferService(),
       siteRepository,
       transferCache,
