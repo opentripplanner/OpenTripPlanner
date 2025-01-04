@@ -13,11 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -192,6 +194,9 @@ public class SpeedTest {
     }
 
     updateTimersWithGlobalCounters();
+
+    timeTransferCacheComputation();
+
     printProfileStatistics();
     saveTestCasesToResultFile();
     System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
@@ -333,6 +338,18 @@ public class SpeedTest {
     for (var p : opts.profiles()) {
       tcIO.writeResultsToFile(p, currentTestCases);
     }
+  }
+
+  private void timeTransferCacheComputation() {
+    IntStream
+      .of(1, 2, 3, 4, 5, 6, 7)
+      .forEach(reluctance -> {
+        RouteRequest routeRequest = new RouteRequest();
+        routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
+        timer.transferCacheTimer.record(() ->
+          timetableRepository.getTransitLayer().initTransferCacheForRequest(routeRequest)
+        );
+      });
   }
 
   /**
