@@ -346,7 +346,6 @@ public class SpeedTest {
    * Measure how long it takes to compute the transfer cache.
    */
   private void measureTransferCacheComputation() {
-    System.out.println("Measuring transfer cache computation");
     IntStream
       .of(1, 2, 3, 4, 5, 6, 7)
       .forEach(reluctance -> {
