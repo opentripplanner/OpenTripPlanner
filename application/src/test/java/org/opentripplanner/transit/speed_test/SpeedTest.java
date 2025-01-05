@@ -346,8 +346,9 @@ public class SpeedTest {
       .forEach(reluctance -> {
         RouteRequest routeRequest = new RouteRequest();
         routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
-        timer.transferCacheTimer.record(() ->
-          timetableRepository.getTransitLayer().initTransferCacheForRequest(routeRequest)
+        timer.recordTimer(
+          "transfer_cache_computation",
+          () -> timetableRepository.getTransitLayer().initTransferCacheForRequest(routeRequest)
         );
       });
   }

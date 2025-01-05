@@ -139,6 +139,15 @@ public class SpeedTestTimer {
     }
   }
 
+  public void recordTimer(String meterName, Runnable runnable) {
+    if (uploadRegistry != null) {
+      registry.add(uploadRegistry);
+      var timer = registry.timer(meterName);
+      timer.record(runnable);
+      registry.remove(uploadRegistry);
+    }
+  }
+
   /**
    * Calculate the total time mean for the given timer. If the timer is not
    * found {@link #NOT_AVAILABLE} is returned. This can be the case in unit tests,
