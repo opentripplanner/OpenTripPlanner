@@ -193,9 +193,11 @@ public class SpeedTest {
       }
     }
 
+    measureTransferCacheComputation();
+
     updateTimersWithGlobalCounters();
 
-    timeTransferCacheComputation();
+    timer.finishUp();
 
     printProfileStatistics();
     saveTestCasesToResultFile();
@@ -340,7 +342,11 @@ public class SpeedTest {
     }
   }
 
-  private void timeTransferCacheComputation() {
+  /**
+   * Measure how long it takes to compute the transfer cache.
+   */
+  private void measureTransferCacheComputation() {
+    System.out.println("Measuring transfer cache computation");
     IntStream
       .of(1, 2, 3, 4, 5, 6, 7)
       .forEach(reluctance -> {
@@ -370,7 +376,6 @@ public class SpeedTest {
     timer.globalCount("jvm_max_memory", runtime.maxMemory());
     timer.globalCount("jvm_total_memory", runtime.totalMemory());
     timer.globalCount("jvm_used_memory", runtime.totalMemory() - runtime.freeMemory());
-    timer.finishUp();
   }
 
   /**
