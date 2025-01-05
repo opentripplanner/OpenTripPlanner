@@ -40,8 +40,6 @@ public class SpeedTestTimer {
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
 
-  public final Timer transferCacheTimer = registry.timer("transfer_cache_computation");
-
   private boolean groupResultByTestCaseCategory = false;
 
   public static int nanosToMillisecond(long nanos) {
