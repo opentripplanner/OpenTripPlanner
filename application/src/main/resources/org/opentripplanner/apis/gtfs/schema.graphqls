@@ -3548,14 +3548,26 @@ enum RelativeDirection {
     
     - Passing through a crossing or intersection.
     - Passing through a station entrance or exit when it is not know whether the passenger is
-      entering or exiting. If known then entrance information is in the `step.entity` field.
+      entering or exiting. If it _is_ known then `ENTER_STATION`/`EXIT_STATION` is used.
+
+  If available, entrance information is in the `step.feature` field.
   """
   CONTINUE
   DEPART
   ELEVATOR
-  "Entering a public transport station. If known then entrance information is in the `step.entity` field."
+  """
+  Entering a public transport station. If it's not known if the passenger is entering or exiting
+  then `CONTINUE` is used.
+
+  If available, entrance information is in the `step.feature` field.
+  """
   ENTER_STATION
-  "Exiting a public transport station. If known then entrance information is in the `step.entity` field."
+  """
+  Exiting a public transport station. If it's not known if the passenger is entering or exiting
+  then `CONTINUE` is used.
+
+  If available then entrance information is in the `step.feature` field.
+  """
   EXIT_STATION
   "Follow the signs indicating a specific location like \"platform 1\" or \"exit B\"."
   FOLLOW_SIGNS
