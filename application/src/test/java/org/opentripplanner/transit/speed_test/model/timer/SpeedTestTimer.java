@@ -137,6 +137,9 @@ public class SpeedTestTimer {
     }
   }
 
+  /**
+   * Execute the runnable and record its runtime in the meter name passed in.
+   */
   public void recordTimer(String meterName, Runnable runnable) {
     if (uploadRegistry != null) {
       registry.add(uploadRegistry);
