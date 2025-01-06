@@ -7,6 +7,7 @@ import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
@@ -160,7 +161,7 @@ public class StatesToWalkStepsMapper {
       return;
     } else if (edge instanceof StreetTransitEntranceLink link) {
       var direction = relativeDirectionForTransitLink(link);
-      createAndSaveStep(backState, forwardState, link.getName(), direction, edge);
+      createAndSaveStep(backState, forwardState, link.getName(), direction, edge, link.entrance());
       return;
     }
 
@@ -181,7 +182,14 @@ public class StatesToWalkStepsMapper {
       addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
       return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
-      createAndSaveStep(backState, forwardState, pwe.signpostedAs().get(), FOLLOW_SIGNS, edge);
+      createAndSaveStep(
+        backState,
+        forwardState,
+        pwe.signpostedAs().get(),
+        FOLLOW_SIGNS,
+        edge,
+        null
+      );
       return;
     }
 
@@ -545,7 +553,8 @@ public class StatesToWalkStepsMapper {
     State forwardState,
     I18NString name,
     RelativeDirection direction,
-    Edge edge
+    Edge edge,
+    @Nullable Entrance entrance
   ) {
     addStep(
       createWalkStep(forwardState, backState)
@@ -553,6 +562,7 @@ public class StatesToWalkStepsMapper {
         .withNameIsDerived(false)
         .withDirections(lastAngle, DirectionUtils.getFirstAngle(edge.getGeometry()), false)
         .withRelativeDirection(direction)
+        .withEntrance(entrance)
         .addDistance(edge.getDistanceMeters())
     );
 

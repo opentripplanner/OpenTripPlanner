@@ -76,7 +76,7 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public WalkStepBuilder withEntrance(Entrance entrance) {
+  public WalkStepBuilder withEntrance(@Nullable Entrance entrance) {
     this.entrance = entrance;
     return this;
   }
