@@ -13,6 +13,9 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
@@ -38,12 +41,15 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
    * Global retry counter used to create a new unique requestorRef after each retry.
    */
   private int retryCount = 0;
-  private final SiriHttpLoader siriHttpLoader;
+  private final SiriLoader siriHttpLoader;
   private final OtpRetry retry;
 
-  public SiriSXUpdater(SiriSXUpdaterParameters config, TimetableRepository timetableRepository) {
+  public SiriSXUpdater(
+    Parameters config,
+    TimetableRepository timetableRepository,
+    SiriLoader siriLoader
+  ) {
     super(config);
-    // TODO: add options to choose different patch services
     this.url = config.url();
     this.requestorRef = config.requestorRef();
 
@@ -57,7 +63,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     this.transitAlertService = new TransitAlertServiceImpl(timetableRepository);
     this.updateHandler =
       new SiriAlertsUpdateHandler(config.feedId(), transitAlertService, config.earlyStart());
-    siriHttpLoader = new SiriHttpLoader(url, config.timeout(), config.requestHeaders());
+    siriHttpLoader = siriLoader;
 
     retry =
       new OtpRetryBuilder()
@@ -69,24 +75,25 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         .withOnRetry(this::updateRequestorRef)
         .build();
 
-    LOG.info(
-      "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
-      pollingPeriod(),
-      url
-    );
+    LOG.info("Creating SIRI-SX updater running every {}: {}", pollingPeriod(), url);
   }
 
   public TransitAlertService getTransitAlertService() {
     return transitAlertService;
   }
 
-  public String toString() {
-    return "SiriSXUpdater (" + url + ")";
-  }
-
   @Override
   protected void runPolling() throws InterruptedException {
     retry.execute(this::updateSiri);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(SiriSXUpdater.class)
+      .addStr("url", url)
+      .addDuration("frequency", pollingPeriod())
+      .toString();
   }
 
   /**
@@ -192,5 +199,13 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private void updateRequestorRef() {
     retryCount++;
     requestorRef = originalRequestorRef + "-retry-" + retryCount;
+  }
+
+  public interface Parameters extends PollingGraphUpdaterParameters, UrlUpdaterParameters {
+    String requestorRef();
+
+    boolean blockReadinessUntilInitialized();
+
+    Duration earlyStart();
   }
 }
