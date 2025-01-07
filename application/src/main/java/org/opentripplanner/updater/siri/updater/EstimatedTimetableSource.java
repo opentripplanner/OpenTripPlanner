@@ -23,6 +23,4 @@ public interface EstimatedTimetableSource {
    * {@link UpdateIncrementality}
    */
   UpdateIncrementality incrementalityOfLastUpdates();
-
-  String getFeedId();
 }
