@@ -22,6 +22,7 @@ To configure mode-specific parameters, the modes should also be used in the `tra
 
 **Example**
 
+```JSON
 // build-config.json
 {
   "transfers": {
@@ -35,6 +36,7 @@ To configure mode-specific parameters, the modes should also be used in the `tra
     }
   }
 }
+```
 """
       )
       .asEnumMap(StreetMode.class, TransferParametersMapper::map, new EnumMap<>(StreetMode.class));
