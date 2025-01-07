@@ -25,7 +25,7 @@ To configure mode-specific parameters, the modes should also be used in the `tra
 ```JSON
 // build-config.json
 {
-  "transfers": {
+  "transferParameters": {
     "CAR": {
       "disableDefaultTransfers": true,
       "carsAllowedStopMaxTransferDuration": "3h"
