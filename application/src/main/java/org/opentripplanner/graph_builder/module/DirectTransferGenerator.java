@@ -310,13 +310,29 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     /* These are used for calculating transfers only between carsAllowedStops. */
     HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode = new HashMap<>();
 
+    // Check that the mode specified in transferParameters can also be found in transferRequests.
+    for (StreetMode mode : transferParametersForMode.keySet()) {
+      if (
+        !transferRequests
+          .stream()
+          .anyMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
+      ) {
+        throw new IllegalArgumentException(
+          String.format("Mode %s is used in transferParameters but not in transferRequests", mode)
+        );
+      }
+    }
+
     for (RouteRequest transferProfile : transferRequests) {
       StreetMode mode = transferProfile.journey().transfer().mode();
       TransferParameters transferParameters = transferParametersForMode.get(mode);
       if (transferParameters != null) {
-        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
         // WALK mode transfers can not be disabled. For example, flex transfers need them.
-        if (!transferParameters.disableDefaultTransfers() || mode == StreetMode.WALK) {
+        if (transferParameters.disableDefaultTransfers() && mode == StreetMode.WALK) {
+          throw new IllegalArgumentException("WALK mode transfers can not be disabled");
+        }
+        // Disable normal transfer calculations for the specific mode, if disableDefaultTransfers is set in the build config.
+        if (!transferParameters.disableDefaultTransfers()) {
           defaultTransferRequests.add(transferProfile);
           // Set mode-specific maxTransferDuration, if it is set in the build config.
           Duration maxTransferDuration = transferParameters.maxTransferDuration();

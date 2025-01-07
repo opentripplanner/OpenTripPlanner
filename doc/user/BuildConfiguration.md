@@ -90,8 +90,8 @@ Sections follow that describe particular settings in more depth.
 | osmDefaults                                                              |       `object`       | Default properties for OpenStreetMap feeds.                                                                                                                    | *Optional* |                                   |  2.2  |
 |    [osmTagMapping](#od_osmTagMapping)                                    |        `enum`        | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                              |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
+| [transferParameters](#transferParameters)                                | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
 | [transferRequests](RouteRequest.md)                                      |      `object[]`      | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
-| [transfers](#transfers)                                                  | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
 | [transitFeeds](#transitFeeds)                                            |      `object[]`      | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
 |    { object }                                                            |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
 |       type = "gtfs"                                                      |        `enum`        | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
@@ -953,7 +953,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 The named set of mapping rules applied when parsing OSM tags.
 
-<h3 id="transfers">transfers</h3>
+<h3 id="transferParameters">transferParameters</h3>
 
 **Since version:** `2.7` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
 **Path:** /   

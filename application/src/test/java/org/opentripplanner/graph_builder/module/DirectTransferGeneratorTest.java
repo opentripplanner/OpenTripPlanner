@@ -466,19 +466,12 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     graph.hasStreets = true;
     var timetableRepository = otpModel.timetableRepository();
 
-    TransferParameters.Builder transferParametersBuilder = new TransferParameters.Builder();
-    transferParametersBuilder.withCarsAllowedStopMaxTransferDuration(Duration.ofSeconds(120));
-    transferParametersBuilder.withDisableDefaultTransfers(true);
-    Map<StreetMode, TransferParameters> transferParametersForMode = new HashMap<>();
-    transferParametersForMode.put(StreetMode.CAR, transferParametersBuilder.build());
-
     new DirectTransferGenerator(
       graph,
       timetableRepository,
       DataImportIssueStore.NOOP,
       Duration.ofSeconds(30),
-      transferRequests,
-      transferParametersForMode
+      transferRequests
     )
       .buildGraph();
 

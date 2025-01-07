@@ -293,7 +293,7 @@ all of the elevation values in the street edges.
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
         .asDuration(Duration.ofMinutes(30));
-    transferParametersForMode = TransferConfig.map(root, "transfers");
+    transferParametersForMode = TransferConfig.map(root, "transferParameters");
     maxStopToShapeSnapDistance =
       root
         .of("maxStopToShapeSnapDistance")
