@@ -12,7 +12,7 @@ public class TransferParametersMapper {
     builder.withMaxTransferDuration(
       c
         .of("maxTransferDuration")
-        .summary("This overwrites the `maxTransferDuration` for the given mode.")
+        .summary("This overwrites the default `maxTransferDuration` for the given mode.")
         .since(V2_7)
         .asDuration(TransferParameters.DEFAULT_MAX_TRANSFER_DURATION)
     );
@@ -20,7 +20,7 @@ public class TransferParametersMapper {
       c
         .of("carsAllowedStopMaxTransferDuration")
         .summary(
-          "This is used for specifying a `maxTransferDuration` value to use with transfers between stops that have trips with cars."
+          "This is used for specifying a `maxTransferDuration` value to use with transfers between stops which are visited by trips that allow cars."
         )
         .description(
           """
