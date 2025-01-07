@@ -94,9 +94,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
     /* The linker will use streets if they are available, or straight-line distance otherwise. */
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(defaultMaxTransferDuration);
-    HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinders = new HashMap<>();
+    HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinderForMode = new HashMap<>();
     /* These are used for calculating transfers only between carsAllowedStops. */
-    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinders = new HashMap<>();
+    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode = new HashMap<>();
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
     Set<StopLocation> carsAllowedStops = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
@@ -135,8 +135,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       defaultTransferRequests,
       carsAllowedStopTransferRequests,
       flexTransferRequests,
-      defaultNearbyStopFinders,
-      carsAllowedStopNearbyStopFinders,
+      defaultNearbyStopFinderForMode,
+      carsAllowedStopNearbyStopFinderForMode,
       nearbyStopFinder
     );
 
@@ -158,7 +158,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         // Calculate default transfers.
         for (RouteRequest transferProfile : defaultTransferRequests) {
           StreetMode mode = transferProfile.journey().transfer().mode();
-          for (NearbyStop sd : defaultNearbyStopFinders
+          for (NearbyStop sd : defaultNearbyStopFinderForMode
             .get(mode)
             .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false)) {
             // Skip the origin stop, loop transfers are not needed.
@@ -188,7 +188,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           StreetMode mode = StreetMode.WALK;
           // This code is for finding transfers from AreaStops to Stops, transfers
           // from Stops to AreaStops and between Stops are already covered above.
-          for (NearbyStop sd : defaultNearbyStopFinders
+          for (NearbyStop sd : defaultNearbyStopFinderForMode
             .get(mode)
             .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), true)) {
             // Skip the origin stop, loop transfers are not needed.
@@ -217,7 +217,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         if (carsAllowedStops.contains(stop)) {
           for (RouteRequest transferProfile : carsAllowedStopTransferRequests) {
             StreetMode mode = transferProfile.journey().transfer().mode();
-            for (NearbyStop sd : carsAllowedStopNearbyStopFinders
+            for (NearbyStop sd : carsAllowedStopNearbyStopFinderForMode
               .get(mode)
               .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false)) {
               // Skip the origin stop, loop transfers are not needed.
@@ -317,8 +317,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     List<RouteRequest> defaultTransferRequests,
     List<RouteRequest> carsAllowedStopTransferRequests,
     List<RouteRequest> flexTransferRequests,
-    HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinders,
-    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinders,
+    HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinderForMode,
+    HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode,
     NearbyStopFinder nearbyStopFinder
   ) {
     for (RouteRequest transferProfile : transferRequests) {
@@ -332,23 +332,23 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           // Set mode-specific maxTransferDuration, if it is set in the build config.
           Duration maxTransferDuration = transferParameters.maxTransferDuration();
           if (maxTransferDuration != Duration.ZERO) {
-            defaultNearbyStopFinders.put(mode, createNearbyStopFinder(maxTransferDuration));
+            defaultNearbyStopFinderForMode.put(mode, createNearbyStopFinder(maxTransferDuration));
           } else {
-            defaultNearbyStopFinders.put(mode, nearbyStopFinder);
+            defaultNearbyStopFinderForMode.put(mode, nearbyStopFinder);
           }
         }
         // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
         Duration carsAllowedStopMaxTransferDuration = transferParameters.carsAllowedStopMaxTransferDuration();
         if (carsAllowedStopMaxTransferDuration != Duration.ZERO) {
           carsAllowedStopTransferRequests.add(transferProfile);
-          carsAllowedStopNearbyStopFinders.put(
+          carsAllowedStopNearbyStopFinderForMode.put(
             mode,
             createNearbyStopFinder(carsAllowedStopMaxTransferDuration)
           );
         }
       } else {
         defaultTransferRequests.add(transferProfile);
-        defaultNearbyStopFinders.put(mode, nearbyStopFinder);
+        defaultNearbyStopFinderForMode.put(mode, nearbyStopFinder);
       }
     }
 
