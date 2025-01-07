@@ -4,14 +4,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
@@ -27,7 +25,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -56,6 +53,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
 
+  /**
+   * Constructor used in tests. This initializes transferParametersForMode as an empty map.
+   */
   public DirectTransferGenerator(
     Graph graph,
     TimetableRepository timetableRepository,
@@ -68,7 +68,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.defaultMaxTransferDuration = defaultMaxTransferDuration;
     this.transferRequests = transferRequests;
-    this.transferParametersForMode = Collections.emptyMap();
+    this.transferParametersForMode = Map.of();
   }
 
   public DirectTransferGenerator(
@@ -155,18 +155,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             if (sd.stop.transfersNotAllowed()) {
               continue;
             }
-            TransferKey transferKey = new TransferKey(stop, sd.stop, sd.edges);
-            PathTransfer pathTransfer = distinctTransfers.get(transferKey);
-            if (pathTransfer == null) {
-              // If the PathTransfer can't be found, it is created.
-              distinctTransfers.put(
-                transferKey,
-                new PathTransfer(stop, sd.stop, sd.distance, sd.edges, EnumSet.of(mode))
-              );
-            } else {
-              // If the PathTransfer is found, a new PathTransfer with the added mode is created.
-              distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
-            }
+            createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
           }
         }
         // Calculate flex transfers if flex routing is enabled.
@@ -187,18 +176,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
               continue;
             }
             // The TransferKey and PathTransfer are created differently for flex routing.
-            TransferKey transferKey = new TransferKey(sd.stop, stop, sd.edges);
-            PathTransfer pathTransfer = distinctTransfers.get(transferKey);
-            if (pathTransfer == null) {
-              // If the PathTransfer can't be found, it is created.
-              distinctTransfers.put(
-                transferKey,
-                new PathTransfer(sd.stop, stop, sd.distance, sd.edges, EnumSet.of(mode))
-              );
-            } else {
-              // If the PathTransfer is found, a new PathTransfer with the added mode is created.
-              distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
-            }
+            createPathTransfer(sd.stop, stop, sd, distinctTransfers, mode);
           }
         }
         // Calculate transfers between stops that are visited by trips that allow cars, if configured.
@@ -220,18 +198,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
               if (!carsAllowedStops.contains(sd.stop)) {
                 continue;
               }
-              TransferKey transferKey = new TransferKey(stop, sd.stop, sd.edges);
-              PathTransfer pathTransfer = distinctTransfers.get(transferKey);
-              if (pathTransfer == null) {
-                // If the PathTransfer can't be found, it is created.
-                distinctTransfers.put(
-                  transferKey,
-                  new PathTransfer(stop, sd.stop, sd.distance, sd.edges, EnumSet.of(mode))
-                );
-              } else {
-                // If the PathTransfer is found, a new PathTransfer with the added mode is created.
-                distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
-              }
+              createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
             }
           }
         }
@@ -302,6 +269,30 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
   }
 
+  private void createPathTransfer(
+    StopLocation from,
+    StopLocation to,
+    NearbyStop sd,
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    StreetMode mode
+  ) {
+    TransferKey transferKey = new TransferKey(from, to, sd.edges);
+    PathTransfer pathTransfer = distinctTransfers.get(transferKey);
+    if (pathTransfer == null) {
+      // If the PathTransfer can't be found, it is created.
+      distinctTransfers.put(
+        transferKey,
+        new PathTransfer(from, to, sd.distance, sd.edges, EnumSet.of(mode))
+      );
+    } else {
+      // If the PathTransfer is found, a new PathTransfer with the added mode is created.
+      distinctTransfers.put(transferKey, pathTransfer.withAddedMode(mode));
+    }
+  }
+
+  /**
+   * This method parses the given transfer parameters into a transfer configuration and checks for invalid input.
+   */
   private TransferConfiguration parseTransferParameters(NearbyStopFinder nearbyStopFinder) {
     List<RouteRequest> defaultTransferRequests = new ArrayList<>();
     List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<>();
