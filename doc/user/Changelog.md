@@ -69,6 +69,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make flex linking work together with boarding locations [#6311](https://github.com/opentripplanner/OpenTripPlanner/pull/6311)
 - Add fallback name for corridors [#6303](https://github.com/opentripplanner/OpenTripPlanner/pull/6303)
 - Implement SIRI Lite [#6284](https://github.com/opentripplanner/OpenTripPlanner/pull/6284)
+- Add a matcher API for filters in the transit service used for regularStop lookup [#6234](https://github.com/opentripplanner/OpenTripPlanner/pull/6234)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
