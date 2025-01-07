@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class Ratio {
 
-  public final Double ratio;
+  private final Double ratio;
 
-  public Ratio(Double ratio) throws IllegalArgumentException {
+  public Ratio(Double ratio) {
     if (ratio < 0d || ratio > 1d) {
       throw new IllegalArgumentException("Ratio must be in range [0,1]");
     }
@@ -25,11 +25,15 @@ public class Ratio {
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.ratio, "Ratio");
+    return Objects.hash(this.ratio);
   }
 
   @Override
   public String toString() {
     return this.ratio.toString();
+  }
+
+  public Double asDouble() {
+    return ratio;
   }
 }

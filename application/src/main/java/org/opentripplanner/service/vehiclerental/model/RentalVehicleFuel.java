@@ -11,19 +11,9 @@ import org.opentripplanner.transit.model.basic.Ratio;
  */
 public class RentalVehicleFuel {
 
-  /**
-   * Current fuel percentage, expressed from 0 to 1.
-   * <p>
-   * May be {@code null}.
-   */
   @Nullable
   public final Ratio percent;
 
-  /**
-   * Distance that the vehicle can travel with the current charge or fuel.
-   * <p>
-   * May be {@code null}.
-   */
   @Nullable
   public final Distance range;
 
@@ -34,7 +24,7 @@ public class RentalVehicleFuel {
 
   @Nullable
   public Double getPercent() {
-    return this.percent != null ? this.percent.ratio : null;
+    return this.percent != null ? this.percent.asDouble() : null;
   }
 
   @Nullable
