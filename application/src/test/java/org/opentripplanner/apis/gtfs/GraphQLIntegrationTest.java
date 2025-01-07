@@ -66,7 +66,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -138,8 +137,6 @@ class GraphQLIntegrationTest {
   private static final VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
     .withSystem("Network-1", "https://foo.bar")
     .build();
-
-  static final Graph GRAPH = new Graph();
 
   static final Instant ALERT_START_TIME = OffsetDateTime
     .parse("2023-02-15T12:03:28+01:00")

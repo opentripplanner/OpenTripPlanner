@@ -28,7 +28,7 @@
                     "absoluteDirection": null,
                     "feature": {
                       "__typename": "Entrance",
-                      "code": "A",
+                      "publicCode": "A",
                       "entranceId": "osm:123",
                       "wheelchairAccessible": "POSSIBLE"
                     }

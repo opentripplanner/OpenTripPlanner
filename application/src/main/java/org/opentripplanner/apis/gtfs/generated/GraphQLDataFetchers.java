@@ -394,11 +394,11 @@ public class GraphQLDataFetchers {
 
   /** Station entrance or exit, originating from OSM or GTFS data. */
   public interface GraphQLEntrance {
-    public DataFetcher<String> code();
-
     public DataFetcher<String> entranceId();
 
     public DataFetcher<String> name();
+
+    public DataFetcher<String> publicCode();
 
     public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
   }

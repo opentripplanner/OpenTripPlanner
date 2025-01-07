@@ -23,7 +23,7 @@
             feature {
               __typename
               ... on Entrance {
-                code
+                publicCode
                 entranceId
                 wheelchairAccessible
               }

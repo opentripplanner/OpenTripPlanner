@@ -493,12 +493,12 @@ type Emissions {
 
 "Station entrance or exit, originating from OSM or GTFS data."
 type Entrance {
-  "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
-  code: String
   "ID of the entrance in the format of `FeedId:EntranceId`. If the `FeedId` is `osm`, the entrance originates from OSM data."
   entranceId: String!
   "Name of the entrance or exit."
   name: String
+  "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
+  publicCode: String
   "Whether the entrance or exit is accessible by wheelchair"
   wheelchairAccessible: WheelchairBoarding
 }
@@ -3557,14 +3557,14 @@ enum RelativeDirection {
   """
   Entering a public transport station. If it's not known if the passenger is entering or exiting
   then `CONTINUE` is used.
-  
+    
   More information about the entrance is in the `step.feature` field.
   """
   ENTER_STATION
   """
   Exiting a public transport station. If it's not known if the passenger is entering or exiting
   then `CONTINUE` is used.
-  
+    
   More information about the entrance is in the `step.feature` field.
   """
   EXIT_STATION

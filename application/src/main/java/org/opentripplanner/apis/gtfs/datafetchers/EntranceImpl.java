@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.site.Entrance;
 public class EntranceImpl implements GraphQLDataFetchers.GraphQLEntrance {
 
   @Override
-  public DataFetcher<String> code() {
+  public DataFetcher<String> publicCode() {
     return environment -> {
       Entrance entrance = environment.getSource();
       return entrance.getCode();
