@@ -15,6 +15,10 @@ import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
+/**
+ * GraphQL type visitor that injects default values to input fields and query arguments from code
+ * and configuration.
+ */
 public class DefaultValueInjector extends GraphQLTypeVisitorStub implements GraphQLTypeVisitor {
 
   private final RouteRequest defaultRouteRequest;
