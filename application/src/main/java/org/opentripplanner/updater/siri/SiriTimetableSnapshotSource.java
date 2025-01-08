@@ -188,7 +188,7 @@ public class SiriTimetableSnapshotSource {
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
-    return snapshotManager.getTimetableSnapshot().resolve(tripPattern, serviceDate);
+    return snapshotManager.getTimetableSnapshotBuffer().resolve(tripPattern, serviceDate);
   }
 
   private Result<TripUpdate, UpdateError> handleModifiedTrip(

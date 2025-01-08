@@ -536,6 +536,9 @@ public class TimetableRepository implements Serializable {
     return index;
   }
 
+  /**
+   * For all dates in the system get the service codes that run on it.
+   */
   public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
     return Collections.unmodifiableMap(index.getServiceCodesRunningForDate());
   }
