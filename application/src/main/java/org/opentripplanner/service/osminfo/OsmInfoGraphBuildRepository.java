@@ -6,7 +6,7 @@ import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
- * Store OSM data used during graph build, but after the OSM Graph Builder is done.
+ * Store OSM data used during graph build, but discard it after it is complete.
  * <p>
  * This is a repository to support the {@link OsmInfoGraphBuildService}.
  */
