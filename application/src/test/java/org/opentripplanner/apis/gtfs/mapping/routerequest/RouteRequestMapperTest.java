@@ -79,7 +79,7 @@ class RouteRequestMapperTest {
         new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
         new DefaultRealtimeVehicleService(transitService),
         new SchemaService(SchemaFactory.createSchemaWithDefaultInjection(routeRequest)),
-        GraphFinder.getInstance(graph, transitService::findRegularStops),
+        GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
         routeRequest
       );
   }
