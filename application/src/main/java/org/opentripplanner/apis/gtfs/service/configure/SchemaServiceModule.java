@@ -21,7 +21,7 @@ public class SchemaServiceModule {
   @Singleton
   public SchemaService provideSchemaService(RouteRequest defaultRouteRequest) {
     return OTPFeature.GtfsGraphQlApi.isOn()
-      ? new SchemaService(SchemaFactory.createSchema(defaultRouteRequest))
+      ? new SchemaService(SchemaFactory.createSchemaWithDefaultInjection(defaultRouteRequest))
       : null;
   }
 }

@@ -356,7 +356,7 @@ class GraphQLIntegrationTest {
         defaultVehicleRentalService,
         new DefaultVehicleParkingService(parkingRepository),
         realtimeVehicleService,
-        new SchemaService(SchemaFactory.createSchema(routeRequest)),
+        new SchemaService(SchemaFactory.createSchemaWithDefaultInjection(routeRequest)),
         finder,
         routeRequest
       );

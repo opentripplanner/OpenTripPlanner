@@ -9,7 +9,6 @@ import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 import java.net.URL;
 import java.util.Objects;
-import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertImpl;
@@ -89,10 +88,24 @@ public class SchemaFactory {
   static final Logger LOG = LoggerFactory.getLogger(SchemaFactory.class);
 
   /**
-   * @param defaultRouteRequest used to inject defaults into the schema. Doesn't inject any defaults
-   *                            if the request is not provided.
+   * Creates schema from schema file and injects default values from code/configuration.
+   *
+   * @param defaultRouteRequest used to inject defaults into the schema.
    */
-  public static GraphQLSchema createSchema(@Nullable RouteRequest defaultRouteRequest) {
+  public static GraphQLSchema createSchemaWithDefaultInjection(RouteRequest defaultRouteRequest) {
+    var originalSchema = createSchema();
+    return SchemaTransformer.transformSchema(
+      originalSchema,
+      new DefaultValueInjector(defaultRouteRequest)
+    );
+  }
+
+  /**
+   * Creates schema from schema file without injecting default values from code/configuration. This
+   * is meant for formatting the schema without editing it or for testing without default
+   * injection.
+   */
+  public static GraphQLSchema createSchema() {
     try {
       URL url = Objects.requireNonNull(SchemaFactory.class.getResource("schema.graphqls"));
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
@@ -187,10 +200,7 @@ public class SchemaFactory {
         .build();
 
       SchemaGenerator schemaGenerator = new SchemaGenerator();
-      var schema = schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
-      return defaultRouteRequest != null
-        ? SchemaTransformer.transformSchema(schema, new DefaultValueInjector(defaultRouteRequest))
-        : schema;
+      return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
     } catch (Exception e) {
       LOG.error("Unable to build GTFS GraphQL Schema", e);
       throw new OtpAppException("Unable to build GTFS GraphQL Schema: " + e.getMessage());
