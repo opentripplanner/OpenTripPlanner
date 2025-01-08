@@ -28,7 +28,8 @@
     "react": "18.3.1",
     "react-bootstrap": "2.10.5",
     "react-dom": "18.3.1",
-    "react-map-gl": "7.1.7"
+    "react-map-gl": "7.1.7",
+    "react-select": "5.9.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.3",

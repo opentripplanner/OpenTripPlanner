@@ -31,55 +31,47 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
   const target = useRef(null);
 
   return (
-
-      <>
-
-      <div className="search-bar top-content" style={{display: 'flex'}}>
-        <div className="logo-container box" style={{display: 'flex'}}>
+    <>
+      <div className="search-bar top-content" style={{ display: 'flex' }}>
+        <div className="logo-container box" style={{ display: 'flex' }}>
           <Navbar.Brand onClick={() => setShowServerInfo((v) => !v)}>
             <div ref={target}>
-              <img alt="" src={logo} width="30" height="30"
-                   className="d-inline-block align-top"/> OTP Debug
-              {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target}/>}
+              <img alt="" src={logo} width="30" height="30" className="d-inline-block align-top" /> OTP Debug
+              {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target} />}
             </div>
           </Navbar.Brand>
         </div>
-        <div style={{flex: '1', display: 'flex', flexWrap: 'wrap'}} className="box">
-          <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField"/>
-          <SwapLocationsButton tripQueryVariables={tripQueryVariables}
-                               setTripQueryVariables={setTripQueryVariables}/>
-          <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField"/>
-          <DepartureArrivalSelect tripQueryVariables={tripQueryVariables}
-                                  setTripQueryVariables={setTripQueryVariables}/>
-          <DateTimeInputField tripQueryVariables={tripQueryVariables}
-                              setTripQueryVariables={setTripQueryVariables}/>
-          <NumTripPatternsInput tripQueryVariables={tripQueryVariables}
-                                setTripQueryVariables={setTripQueryVariables}/>
-          <SearchWindowInput tripQueryVariables={tripQueryVariables}
-                             setTripQueryVariables={setTripQueryVariables}/>
-          <AccessSelect tripQueryVariables={tripQueryVariables}
-                        setTripQueryVariables={setTripQueryVariables}/>
-          <TransitModeSelect tripQueryVariables={tripQueryVariables}
-                             setTripQueryVariables={setTripQueryVariables}/>
-          <EgressSelect tripQueryVariables={tripQueryVariables}
-                        setTripQueryVariables={setTripQueryVariables}/>
-          <DirectModeSelect tripQueryVariables={tripQueryVariables}
-                            setTripQueryVariables={setTripQueryVariables}/>
+        <div style={{ flex: '1', display: 'flex', flexWrap: 'wrap' }} className="box">
+          <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField" />
+          <SwapLocationsButton tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField" />
+          <DepartureArrivalSelect
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
+          />
+          <DateTimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <NumTripPatternsInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <AccessSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <TransitModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <EgressSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+          <DirectModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
           <ItineraryFilterDebugSelect
-              tripQueryVariables={tripQueryVariables}
-              setTripQueryVariables={setTripQueryVariables}/>
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
+          />
           <WheelchairAccessibleCheckBox
-              tripQueryVariables={tripQueryVariables}
-              setTripQueryVariables={setTripQueryVariables}/>
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
+          />
 
           <div className="search-bar-route-button-wrapper">
             <ButtonGroup>
               <Button variant="primary" onClick={() => onRoute()} disabled={loading}>
                 {loading && (
-                    <>
-                      <Spinner as="span" animation="border" size="sm" role="status"
-                               aria-hidden="true"/>{' '}
-                    </>
+                  <>
+                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
+                  </>
                 )}
                 Route
               </Button>
@@ -88,6 +80,6 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
           </div>
         </div>
       </div>
-      </>
+    </>
   );
 }

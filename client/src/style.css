@@ -12,30 +12,8 @@
   align-items: center;
 }
 
-.logo-section {
-  grid-column: 1 / 2;
-  grid-row: 1 / 2;
-}
-
-.input-section {
-  grid-column: 2 / 3;
-  grid-row: 1 / 2;
-}
-
-.trip-section {
-  grid-column: 1 / 2;
-  grid-row: 2 / 3;
-}
-
-.map-section {
-  grid-column: 2 / 3;
-  grid-row: 2 / 3;
-}
-
 .navbar-brand {
   color: #4078bc;
-  margin-top: 20px;
-  margin-right: 14px;
   font-size: 2rem;
 }
 
@@ -103,12 +81,17 @@
   margin: 30px 0 auto 0;
 }
 
+.input-family {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .swap-from-to img {
   width: 15px;
 }
 
 .logo-container {
-  width: 265px;
   display: flex;
   flex-direction: column;
 }
@@ -120,13 +103,19 @@
   text-align: left;
 }
 
-.itinerary-list-container {
+.logo-image {
+  margin-right: 2px;
+}
+
+.left-pane-container {
   font-size: 12px;
   width: 100%;
   overflow-y: auto;
+  min-width: 300px;
 }
 
-.itinerary-list-container .time-zone-info {
+
+.left-pane-container .time-zone-info {
   margin: 10px 20px;
   font-size: 12px;
   text-align: right;
@@ -260,27 +249,9 @@
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
 }
 
-.left-menu-container {
-  position: absolute;
-  top: 0;
-  left: 0; /* Align to the left side */
-  width: 0;
-  height: 100%;
-  background-color: #f4f4f4;
-  overflow-x: hidden;
-  transition: 0.3s; /* Smooth transition for width */
-  padding-top: 60px;
-  box-shadow: none;
-}
-
-.left-menu-container.open {
-  width: 250px; /* Expand the sidebar when open */
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Shadow on the right of the sidebar */
-}
-
 .sidebar-button.right {
   position: absolute;
-  right: 0px; /* Default position when sidebar is closed */
+  right: 0; /* Default position when sidebar is closed */
   background: #ccc;
   color: white;
   border: none;
@@ -294,24 +265,6 @@
 
 .sidebar-button.right.open {
   right: 270px; /* Shifted position when sidebar is open */
-}
-
-.sidebar-button.left {
-  position: absolute;
-  left: 0px; /* Default position when sidebar is closed */
-  background: #ccc;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 10px;
-  cursor: pointer;
-  transition:
-    right 0.3s,
-    background-color 0.2s; /* Smooth transitions */
-}
-
-.sidebar-button.left.open {
-  left: 270px; /* Shifted position when sidebar is open */
 }
 
 .sidebar-button.active {
@@ -342,19 +295,139 @@ input[type='number'] {
   cursor: pointer;
 }
 
-.default-tooltip-icon {
-  font-size: 14px;
-  color: #888;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f9f9f9;
+.pagination-controls {
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
-.default-tooltip-icon:hover {
-  background-color: #e6e6e6;
+.default-tooltip-icon {
+  width: 10px;
+  height: 10px;
+}
+.argument-label {
+  padding-right: 2px;
+}
+
+/* Sidebar Container */
+.sidebar-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-top: black 1px solid;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  background-color: #f7f7f7;
+  border-right: 1px solid #ccc;
+}
+
+/* Sidebar Buttons */
+.sidebar-button {
+  cursor: pointer;
+  padding: 5px;
+  text-align: center;
+  border-radius: 8px;
+  margin: 5px 0;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-button:hover {
+  background-color: #e0e0e0;
+}
+
+.sidebar-button.active {
+  background-color: #ddd;
+  font-weight: bold;
+}
+
+/* Content Area */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  margin: 5px;
+}
+
+.panel-header {
+  font-size: 24px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.argument-list {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.argument-list button {
+  font-size: 13px;
+  padding: 5px 10px;
+  margin: 5px 0;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.argument-list button:hover {
+  background-color: #0056b3; /* Darker on hover */
+}
+
+
+.argument-list input[type="text"],
+.argument-list input[type="number"],
+.argument-list input[type="datetime-local"],
+select {
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #ccc; /* Bottom border only */
+  background: none;
+  box-sizing: border-box;
+}
+
+.argument-list input[type="text"],
+.argument-list input[type="number"] {
+  width: 50px;
+}
+.argument-list input[type="datetime-local"] {
+  width: 140px;
+}
+
+.remove-argument {
+  margin-left: 2px;
+  color: red;
+  cursor: pointer;
+}
+
+.reset-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  /* The transform ensures the button is vertically centered
+     if your header has a fixed height or if text is multiline. */
+}
+
+.panel-header button {
+  font-size: 13px;
+  padding: 5px 10px;
+  margin: 5px 0;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.panel-header button:hover {
+  background-color: #0056b3; /* Darker on hover */
 }

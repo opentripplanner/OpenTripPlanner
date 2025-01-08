@@ -28,20 +28,20 @@ export function InputFieldsSection({
 }: InputFieldsSectionProps) {
   return (
     <div className="box input-group search-bar">
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="input-family">
         <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField" />
         <SwapLocationsButton tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField" />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="input-family">
         <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <DateTimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="input-family">
         <NumTripPatternsInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
       </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div className="input-family">
         <AccessSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <TransitModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <EgressSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />

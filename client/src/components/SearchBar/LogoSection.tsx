@@ -13,19 +13,18 @@ export function LogoSection({ serverInfo }: LogoSectionProps) {
   const target = useRef(null);
 
   return (
-      <div className="logo-container box" style={{display: 'flex'}}>
-          <Navbar.Brand onClick={() => setShowServerInfo((v) => !v)}>
-              <div ref={target}>
-                  <img alt="" src={logo} width="30" height="30"
-                       className="d-inline-block align-top"/>
-                  OTP Debug
-                  {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target}/>}
-              </div>
-          </Navbar.Brand>
-          <div className="details">
-              <div>Version: {serverInfo?.version}</div>
-              <div>Time zone: {serverInfo?.internalTransitModelTimeZone}</div>
-          </div>
+    <div className="logo-container box" style={{ display: 'flex' }}>
+      <Navbar.Brand onClick={() => setShowServerInfo((v) => !v)}>
+        <div ref={target}>
+          <img alt="" src={logo} width="50" height="50" className="logo-image" />
+          OTP Debug
+          {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target} />}
+        </div>
+      </Navbar.Brand>
+      <div className="details">
+        <div>Version: {serverInfo?.version}</div>
+        <div>Time zone: {serverInfo?.internalTransitModelTimeZone}</div>
       </div>
+    </div>
   );
 }

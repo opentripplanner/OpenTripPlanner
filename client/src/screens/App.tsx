@@ -7,6 +7,9 @@ import { useTripQueryVariables } from '../hooks/useTripQueryVariables.ts';
 import { TimeZoneContext } from '../hooks/TimeZoneContext.ts';
 import { LogoSection } from '../components/SearchBar/LogoSection.tsx';
 import { InputFieldsSection } from '../components/SearchBar/InputFieldsSection.tsx';
+import TripQueryArguments from '../components/SearchInput/TripQueryArguments.tsx';
+import Sidebar from '../components/SearchInput/Sidebar.tsx';
+import ViewArgumentsRaw from "../components/SearchInput/ViewArgumentsRaw.tsx";
 
 export function App() {
   const serverInfo = useServerInfo();
@@ -31,15 +34,20 @@ export function App() {
             ></InputFieldsSection>
           </div>
           <div className="box trip-section">
-            <ItineraryListContainer
-              tripQueryResult={tripQueryResult}
-              selectedTripPatternIndex={selectedTripPatternIndex}
-              setSelectedTripPatternIndex={setSelectedTripPatternIndex}
-              tripQueryVariables={tripQueryVariables}
-              setTripQueryVariables={setTripQueryVariables}
-              pageResults={callback}
-              loading={loading}
-            />
+            <Sidebar>
+              <ItineraryListContainer
+                tripQueryResult={tripQueryResult}
+                selectedTripPatternIndex={selectedTripPatternIndex}
+                setSelectedTripPatternIndex={setSelectedTripPatternIndex}
+                pageResults={callback}
+                loading={loading}
+              ></ItineraryListContainer>
+              <TripQueryArguments
+                tripQueryVariables={tripQueryVariables}
+                setTripQueryVariables={setTripQueryVariables}
+              ></TripQueryArguments>
+              <ViewArgumentsRaw tripQueryVariables={tripQueryVariables}></ViewArgumentsRaw>
+            </Sidebar>
           </div>
           <div className="box map-section">
             <MapView

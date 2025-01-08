@@ -8,6 +8,7 @@ import {
   VectorTileSource,
   MapRef,
 } from 'react-map-gl/maplibre';
+import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -66,10 +67,25 @@ export function MapView({
       map.fitBounds(source.bounds, { maxDuration: 50, linear: true });
     }
   };
+
+  const onLoad = (e: MapEvent) => {
+    const map = e.target;
+    map.addControl(new maplibregl.AttributionControl(), 'bottom-left');
+  };
+
+  function handleMapLoad(e: MapEvent) {
+    // 1) Call your existing function
+    panToWorldEnvelopeIfRequired(e);
+
+    // 2) Add the native MapLibre attribution control
+    onLoad(e);
+  }
+  
   const mapRef = useRef<MapRef>(null); // Create a ref for MapRef
   return (
     <div className="map-container below-content">
       <Map
+        attributionControl={false}
         // @ts-ignore
         mapLib={import('maplibre-gl')}
         // @ts-ignore
@@ -88,7 +104,7 @@ export function MapView({
         // disable pitching and rotating the map
         touchPitch={false}
         dragRotate={false}
-        onLoad={panToWorldEnvelopeIfRequired}
+        onLoad={handleMapLoad}
         ref={mapRef}
       >
         <NavigationControl position="top-left" />
@@ -98,11 +114,8 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
-        <RightMenu
-          position="top-right"
-          setInteractiveLayerIds={setInteractiveLayerIds}
-          mapRef={mapRef?.current}
-        />
+
+        <RightMenu position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} mapRef={mapRef?.current} />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}

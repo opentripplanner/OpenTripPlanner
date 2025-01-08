@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const {
   isScalarType,
   isInputObjectType,
@@ -55,12 +53,14 @@ function resolveType(type, schema = new Set()) {
       }
 
       const fieldType = field.type;
+      const isList = isListType(fieldType); // Detect if the field is a list
       const fieldDefaultValue = field.defaultValue !== undefined ? field.defaultValue : null;
 
       // Include defaultValue consistently, setting it to null if not defined
       fieldTypes[fieldName] = {
         type: resolveType(fieldType, schema),
-        defaultValue: fieldDefaultValue
+        defaultValue: fieldDefaultValue,
+        isList, // Explicitly indicate if it's a list
       };
     });
     return { type: 'InputObject', name: namedType.name, fields: fieldTypes };
@@ -74,8 +74,8 @@ function resolveType(type, schema = new Set()) {
 /**
  * Plugin to generate a JSON file with all arguments from a specified query,
  * excluding deprecated arguments based on deprecationReason,
- * and including their types and default values,
- * breaking down complex types into primitives.
+ * and including their types, default values,
+ * and whether they support multiple selection.
  */
 const generateTripArgsJsonPlugin = async (schema) => {
   try {
@@ -105,16 +105,19 @@ const generateTripArgsJsonPlugin = async (schema) => {
       const argName = arg.name;
       const argType = resolveType(arg.type, schema);
       const argDefaultValue = arg.defaultValue !== undefined ? arg.defaultValue : null;
+      const isList = isListType(arg.type); // Detect if the argument is a list
 
       // Consistent representation for enum types
       if (argDefaultValue !== null) {
         argsJson[argName] = {
           type: argType,
           defaultValue: argDefaultValue,
+          isList, // Explicitly indicate if it's a list
         };
       } else {
         argsJson[argName] = {
           type: argType,
+          isList, // Explicitly indicate if it's a list
         };
       }
     });
