@@ -92,7 +92,6 @@ public class SchemaFactory {
    * @param defaultRouteRequest used to inject defaults into the schema. Doesn't inject any defaults
    *                            if the request is not provided.
    */
-  @Nullable
   public static GraphQLSchema createSchema(@Nullable RouteRequest defaultRouteRequest) {
     try {
       URL url = Objects.requireNonNull(SchemaFactory.class.getResource("schema.graphqls"));
