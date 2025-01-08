@@ -227,6 +227,11 @@ public class VertexLinker {
     return tempEdges;
   }
 
+  /**
+   * Link a boarding location vertex to specific street edges.
+   * <p>
+   * This is used if a platform is mapped as a linear way, where the given edges form the platform.
+   */
   public Set<StreetVertex> linkToSpecificStreetEdgesPermanently(
     Vertex vertex,
     TraverseModeSet traverseModes,
