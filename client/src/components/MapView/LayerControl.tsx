@@ -122,16 +122,11 @@ const LayerControl: React.FC<LayerControlProps> = ({
     return (
         <div
             style={{
-                position: 'absolute',
-                // You can use position props if you like, or just pick a corner manually:
-                top: 10,
-                left: 10,
-                zIndex: 9999,
-                background: '#fff',
-                borderRadius: '4px',
+                display: 'flex',
+                flexDirection: 'column',
                 padding: '10px',
                 width: '250px',
-                maxHeight: '40vh',
+                borderRadius: '4px',
                 overflowY: 'auto',
             }}
         >
