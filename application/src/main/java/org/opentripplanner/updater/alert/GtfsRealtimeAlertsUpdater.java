@@ -62,7 +62,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     final FeedMessage feed = otpHttpClient.getAndMap(
       URI.create(url),
       this.headers.asMap(),
-      FeedMessage.PARSER::parseFrom
+      FeedMessage::parseFrom
     );
 
     long feedTimestamp = feed.getHeader().getTimestamp();

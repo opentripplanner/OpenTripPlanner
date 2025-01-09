@@ -312,9 +312,9 @@
         </dependency>
         <!-- OpenStreetMap protobuf (PBF) definitions and parser -->
         <dependency>
-            <groupId>org.openstreetmap.osmosis</groupId>
-            <artifactId>osmosis-osm-binary</artifactId>
-            <version>0.48.3</version>
+            <groupId>org.openstreetmap.pbf</groupId>
+            <artifactId>osmpbf</artifactId>
+            <version>1.6.0</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
