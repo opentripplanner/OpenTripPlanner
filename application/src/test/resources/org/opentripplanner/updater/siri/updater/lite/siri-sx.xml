@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Siri version="2.0" xmlns="http://www.siri.org.uk/siri">
+    <ServiceDelivery>
+        <ResponseTimestamp>2024-11-27T11:48:04.308988Z</ResponseTimestamp>
+        <ProducerRef>DDIP-M</ProducerRef>
+        <SituationExchangeDelivery xmlns="http://www.siri.org.uk/siri">
+            <ResponseTimestamp>2024-11-27T11:48:04.308988Z</ResponseTimestamp>
+            <Situations>
+                <PtSituationElement>
+                    <CreationTime>2024-10-04T13:11:34.547+02:00</CreationTime>
+                    <ParticipantRef>STA</ParticipantRef>
+                    <SituationNumber>2024-3443167</SituationNumber>
+                    <Version>6</Version>
+                    <Source>
+                        <SourceType>directReport</SourceType>
+                    </Source>
+                    <Progress>published</Progress>
+                    <ValidityPeriod>
+                        <StartTime>2024-10-04T13:08:00+02:00</StartTime>
+                        <EndTime>2024-11-30T13:08:00+01:00</EndTime>
+                    </ValidityPeriod>
+                    <PublicationWindow>
+                        <StartTime>2024-10-04T00:00:00+02:00</StartTime>
+                        <EndTime>2024-11-30T23:59:00+01:00</EndTime>
+                    </PublicationWindow>
+                    <AlertCause>routeBlockage</AlertCause>
+                    <ReasonName xml:lang="de">Hindernis auf Strecke</ReasonName>
+                    <ReasonName xml:lang="en">Obstacle on the route</ReasonName>
+                    <ReasonName xml:lang="it">Ostacolo sul percorso</ReasonName>
+                    <ReasonName xml:lang="lad">Ostacul su la via</ReasonName>
+                    <Priority>3</Priority>
+                    <ScopeType>line</ScopeType>
+                    <Language>de</Language>
+                    <Summary xml:lang="de">Straßen-/Streckenhindernis</Summary>
+                    <Summary xml:lang="en">The busroute: 120 obstacle on the track</Summary>
+                    <Summary xml:lang="it">120 Linea 120 . Ostacolo su strada/pista</Summary>
+                    <Affects>
+                        <Networks>
+                            <AffectedNetwork>
+                                <AffectedLine>
+                                    <LineRef>it:apb:Line:80120_.24a</LineRef>
+                                    <PublishedLineName>120</PublishedLineName>
+                                    <Direction>
+                                        <DirectionRef>28554</DirectionRef>
+                                        <DirectionName>Salorno, Autostazione</DirectionName>
+                                    </Direction>
+                                </AffectedLine>
+                            </AffectedNetwork>
+                        </Networks>
+                    </Affects>
+                    <Consequences>
+                        <Consequence>
+                            <Period>
+                                <StartTime>2024-10-04T13:08:00+02:00</StartTime>
+                                <EndTime>2024-11-30T13:08:00+01:00</EndTime>
+                            </Period>
+                            <Condition>tripCancellation</Condition>
+                            <Severity>normal</Severity>
+                            <Affects>
+                                <Networks>
+                                    <AffectedNetwork>
+                                        <AffectedLine>
+                                            <LineRef>it:apb:Line:80120_.24a</LineRef>
+                                            <PublishedLineName>120</PublishedLineName>
+                                            <Direction>
+                                                <DirectionRef>28554</DirectionRef>
+                                                <DirectionName>Salorno, Autostazione</DirectionName>
+                                            </Direction>
+                                        </AffectedLine>
+                                    </AffectedNetwork>
+                                </Networks>
+                            </Affects>
+                            <Blocking/>
+                        </Consequence>
+                    </Consequences>
+                    <PublishingActions>
+                        <PublishingAction>
+                            <PublishAtScope>
+                                <ScopeType>line</ScopeType>
+                                <Affects>
+                                    <Networks>
+                                        <AffectedNetwork>
+                                            <AffectedLine>
+                                                <LineRef>it:apb:Line:80120_.24a</LineRef>
+                                                <PublishedLineName>120</PublishedLineName>
+                                                <Direction>
+                                                    <DirectionRef>28554</DirectionRef>
+                                                    <DirectionName>Salorno, Autostazione
+                                                    </DirectionName>
+                                                </Direction>
+                                            </AffectedLine>
+                                        </AffectedNetwork>
+                                    </Networks>
+                                </Affects>
+                            </PublishAtScope>
+                            <PassengerInformationAction>
+                                <ActionStatus>published</ActionStatus>
+                                <ActionRef>2024-3443167</ActionRef>
+                                <RecordedAtTime>2024-10-04T13:11:34.547+02:00</RecordedAtTime>
+                                <Version>6</Version>
+                                <SourceRef>ControlCenter</SourceRef>
+                                <OwnerRef>STA</OwnerRef>
+                                <Perspective>general</Perspective>
+                                <ActionPriority>3</ActionPriority>
+                                <TextualContent>
+                                    <TextualContentSize>L</TextualContentSize>
+                                    <SummaryContent>
+                                        <SummaryText xml:lang="de">Straßen-/Streckenhindernis
+                                        </SummaryText>
+                                        <SummaryText xml:lang="en">The busroute: 120 obstacle on the
+                                            track
+                                        </SummaryText>
+                                        <SummaryText xml:lang="it">120 Linea 120 . Ostacolo su
+                                            strada/pista
+                                        </SummaryText>
+                                    </SummaryContent>
+                                    <ReasonContent>
+                                        <ReasonText xml:lang="de">Hindernis auf Strecke</ReasonText>
+                                        <ReasonText xml:lang="en">Obstacle on the route</ReasonText>
+                                        <ReasonText xml:lang="it">Ostacolo sul percorso</ReasonText>
+                                        <ReasonText xml:lang="lad">Ostacul su la via</ReasonText>
+                                    </ReasonContent>
+                                    <ConsequenceContent>
+                                        <ConsequenceText xml:lang="de">Freitext</ConsequenceText>
+                                        <ConsequenceText xml:lang="en">Free text</ConsequenceText>
+                                        <ConsequenceText xml:lang="it">Testo libero
+                                        </ConsequenceText>
+                                    </ConsequenceContent>
+                                    <RecommendationContent>
+                                        <RecommendationText xml:lang="de">Umsteigen auf andere
+                                            Linie
+                                        </RecommendationText>
+                                        <RecommendationText xml:lang="en">Change to another line
+                                        </RecommendationText>
+                                        <RecommendationText xml:lang="it">Cambiare linea
+                                        </RecommendationText>
+                                    </RecommendationContent>
+                                    <DurationContent>
+                                        <DurationText xml:lang="de">Dauer der Beeinträchtigung bis
+                                            vsl. 2024-11-30 13:08:00
+                                        </DurationText>
+                                    </DurationContent>
+                                    <RemarkContent/>
+                                </TextualContent>
+                                <TextualContent>
+                                    <TextualContentSize>M</TextualContentSize>
+                                    <SummaryContent>
+                                        <SummaryText xml:lang="de">Straßen-/Streckenhindernis
+                                        </SummaryText>
+                                        <SummaryText xml:lang="en">The busroute: 120 obstacle on the
+                                            track
+                                        </SummaryText>
+                                        <SummaryText xml:lang="it">120 Linea 120 . Ostacolo su
+                                            strada/pista
+                                        </SummaryText>
+                                    </SummaryContent>
+                                    <ReasonContent>
+                                        <ReasonText xml:lang="de">Hindernis auf Strecke</ReasonText>
+                                        <ReasonText xml:lang="en">Obstacle on the route</ReasonText>
+                                        <ReasonText xml:lang="it">Ostacolo sul percorso</ReasonText>
+                                        <ReasonText xml:lang="lad">Ostacul su la via</ReasonText>
+                                    </ReasonContent>
+                                    <ConsequenceContent>
+                                        <ConsequenceText xml:lang="de">Freitext</ConsequenceText>
+                                        <ConsequenceText xml:lang="en">Free text</ConsequenceText>
+                                        <ConsequenceText xml:lang="it">Testo libero
+                                        </ConsequenceText>
+                                    </ConsequenceContent>
+                                    <RecommendationContent>
+                                        <RecommendationText xml:lang="de">Umsteigen auf andere
+                                            Linie
+                                        </RecommendationText>
+                                        <RecommendationText xml:lang="en">Change to another line
+                                        </RecommendationText>
+                                        <RecommendationText xml:lang="it">Cambiare linea
+                                        </RecommendationText>
+                                    </RecommendationContent>
+                                    <DurationContent>
+                                        <DurationText xml:lang="de">Dauer der Beeinträchtigung bis
+                                            vsl. 2024-11-30 13:08:00
+                                        </DurationText>
+                                    </DurationContent>
+                                    <RemarkContent/>
+                                </TextualContent>
+                                <TextualContent>
+                                    <TextualContentSize>S</TextualContentSize>
+                                    <SummaryContent>
+                                        <SummaryText xml:lang="de">Straßen-/Streckenhindernis
+                                        </SummaryText>
+                                        <SummaryText xml:lang="en">The busroute: 120 obstacle on the
+                                            track
+                                        </SummaryText>
+                                        <SummaryText xml:lang="it">120 Linea 120 . Ostacolo su
+                                            strada/pista
+                                        </SummaryText>
+                                    </SummaryContent>
+                                    <ReasonContent>
+                                        <ReasonText xml:lang="de">Hindernis auf Strecke</ReasonText>
+                                        <ReasonText xml:lang="en">Obstacle on the route</ReasonText>
+                                        <ReasonText xml:lang="it">Ostacolo sul percorso</ReasonText>
+                                        <ReasonText xml:lang="lad">Ostacul su la via</ReasonText>
+                                    </ReasonContent>
+                                    <DescriptionContent>
+                                        <DescriptionText xml:lang="de">Aufgrund Stand: 04.10.2024 -
+                                            30.11.2024 ; 13:08
+                                        </DescriptionText>
+                                        <DescriptionText xml:lang="en">Due to Update: 04.10.2024 ;
+                                            13:08
+                                        </DescriptionText>
+                                        <DescriptionText xml:lang="it">A causa di Aggiornamento:
+                                            04.10.2024 ; 13:08
+                                        </DescriptionText>
+                                    </DescriptionContent>
+                                    <ConsequenceContent>
+                                        <ConsequenceText xml:lang="de">Freitext</ConsequenceText>
+                                        <ConsequenceText xml:lang="en">Free text</ConsequenceText>
+                                        <ConsequenceText xml:lang="it">Testo libero
+                                        </ConsequenceText>
+                                    </ConsequenceContent>
+                                    <RecommendationContent>
+                                        <RecommendationText xml:lang="de">Umsteigen auf andere
+                                            Linie
+                                        </RecommendationText>
+                                        <RecommendationText xml:lang="en">Change to another line
+                                        </RecommendationText>
+                                        <RecommendationText xml:lang="it">Cambiare linea
+                                        </RecommendationText>
+                                    </RecommendationContent>
+                                    <DurationContent>
+                                        <DurationText xml:lang="de">Dauer der Beeinträchtigung bis
+                                            vsl. 2024-11-30 13:08:00
+                                        </DurationText>
+                                    </DurationContent>
+                                    <RemarkContent/>
+                                </TextualContent>
+                            </PassengerInformationAction>
+                        </PublishingAction>
+                    </PublishingActions>
+                </PtSituationElement>
+            </Situations>
+        </SituationExchangeDelivery>
+    </ServiceDelivery>
+</Siri>
