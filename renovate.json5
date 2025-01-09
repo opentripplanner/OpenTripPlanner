@@ -101,7 +101,8 @@
         "com.google.cloud:libraries-bom",
         "com.google.guava:guava",
         "io.micrometer:micrometer-registry-prometheus",
-        "io.micrometer:micrometer-registry-influx"
+        "io.micrometer:micrometer-registry-influx",
+        "com.google.protobuf:protobuf-java"
       ],
       "schedule": "on the 7th through 8th day of the month"
     },
