@@ -143,6 +143,15 @@
       "schedule": "on the 4th day of the month"
     },
     {
+      "groupName": "Low-risk dependencies (patch)",
+      "matchUpdateTypes": ["patch"],
+      "schedule": ["on the 27th day of the month"],
+      "reviewers": ["testower"],
+      "matchPackageNames": [
+        "org.glassfish.jersey.{/,}**",
+      ]
+    },
+    {
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackageNames": [
         "com.google.dagger:{/,}**",
