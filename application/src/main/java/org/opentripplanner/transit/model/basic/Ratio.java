@@ -1,6 +1,9 @@
 package org.opentripplanner.transit.model.basic;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 /**
  * Represents a ratio within the range [0, 1].
@@ -11,12 +14,39 @@ public class Ratio {
 
   private final Double ratio;
 
-  public Ratio(Double ratio) {
-    if (ratio < 0d || ratio > 1d) {
-      throw new IllegalArgumentException("Ratio must be in range [0,1]");
-    }
-
+  private Ratio(double ratio) {
     this.ratio = ratio;
+  }
+
+  /**
+   * This method is similar to {@link #of(double, Consumer)}, but throws an
+   * {@link IllegalArgumentException} if the ratio is not valid.
+   */
+  public static Ratio of(double ratio) {
+    return of(
+      ratio,
+      errMsg -> {
+        throw new IllegalArgumentException(errMsg);
+      }
+    )
+      .orElseThrow();
+  }
+
+  public static Optional<Ratio> of(double ratio, Consumer<String> validationErrorHandler) {
+    if (ratio >= 0d && ratio <= 1d) {
+      return Optional.of(new Ratio(ratio));
+    }
+    else {
+      validationErrorHandler.accept("Ratio must be in range [0,1], but was: " + ratio);
+      return Optional.empty();
+    }
+  }
+
+  public static Optional<Ratio> ofBoxed(@Nullable Double ratio, Consumer<String> validationErrorHandler) {
+    if (ratio == null) {
+      return Optional.empty();
+    }
+    return of(ratio, validationErrorHandler);
   }
 
   @Override

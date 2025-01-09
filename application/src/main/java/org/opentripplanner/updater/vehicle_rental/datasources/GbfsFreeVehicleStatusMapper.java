@@ -17,12 +17,14 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GbfsFreeVehicleStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
+  private static final Throttle FUEL_PERCENT_LOG_THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
@@ -59,18 +61,17 @@ public class GbfsFreeVehicleStatusMapper {
         vehicle.getLastReported() != null
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
-      Ratio fuelPercent = null;
-      try {
-        if (vehicle.getCurrentFuelPercent() != null) {
-          fuelPercent = new Ratio(vehicle.getCurrentFuelPercent());
-        }
-      } catch (IllegalArgumentException e) {
-        LOG.warn(
-          "Current fuel percent value not valid: {} - {}",
+
+      var fuelRatio = Ratio
+        .ofBoxed(
           vehicle.getCurrentFuelPercent(),
-          e.getMessage()
-        );
-      }
+          validationErrorMessage ->
+            FUEL_PERCENT_LOG_THROTTLE.throttle(() ->
+              LOG.warn("'currentFuelPercent' is not valid. Details: " + validationErrorMessage)
+            )
+        )
+        .orElse(null);
+
       Distance rangeMeters = null;
       try {
         rangeMeters =
@@ -94,7 +95,7 @@ public class GbfsFreeVehicleStatusMapper {
       ) {
         return null;
       }
-      rentalVehicle.fuel = new RentalVehicleFuel(fuelPercent, rangeMeters);
+      rentalVehicle.fuel = new RentalVehicleFuel(fuelRatio, rangeMeters);
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
