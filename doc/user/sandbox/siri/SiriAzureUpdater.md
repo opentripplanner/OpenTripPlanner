@@ -1,6 +1,6 @@
-# Siri Azure Updater
+# SIRI Azure Updater
 
-This is a sandbox extension developed by Skånetrafiken that allows OTP to fetch Siri ET & SX messages 
+This is a sandbox extension developed by Skånetrafiken that allows OTP to fetch SIRI ET & SX messages 
 through *Azure Service Bus*.
 It also enables OTP to download historical data from en HTTP endpoint on startup.
 
@@ -17,7 +17,7 @@ Documentation available [here](../../examples/skanetrafiken/Readme.md).
 
 To enable the SIRI updater you need to add it to the updaters section of the `router-config.json`.
 
-### Siri Azure ET Updater
+### SIRI Azure ET Updater
 
 <!-- siri-azure-et-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -28,12 +28,12 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 | [authenticationType](#u__11__authenticationType)           |   `enum`   | Which authentication type to use                                 | *Optional* | `"sharedaccesskey"` |  2.5  |
 | autoDeleteOnIdle                                           | `duration` | The time after which an inactive subscription is removed.        | *Optional* | `"PT1H"`            |  2.5  |
 | [customMidnight](#u__11__customMidnight)                   |  `integer` | Time on which time breaks into new day.                          | *Optional* | `0`                 |  2.2  |
-| feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                      | *Optional* |                     |  2.2  |
+| feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                      | *Required* |                     |  2.2  |
 | [fullyQualifiedNamespace](#u__11__fullyQualifiedNamespace) |  `string`  | Service Bus fully qualified namespace used for authentication.   | *Optional* |                     |  2.5  |
 | fuzzyTripMatching                                          |  `boolean` | Whether to apply fuzzyTripMatching on the updates                | *Optional* | `false`             |  2.2  |
 | prefetchCount                                              |  `integer` | The number of messages to fetch from the subscription at a time. | *Optional* | `10`                |  2.5  |
 | [servicebus-url](#u__11__servicebus_url)                   |  `string`  | Service Bus connection used for authentication.                  | *Optional* |                     |  2.2  |
-| topic                                                      |  `string`  | Service Bus topic to connect to.                                 | *Optional* |                     |  2.2  |
+| topic                                                      |  `string`  | Service Bus topic to connect to.                                 | *Required* |                     |  2.2  |
 | history                                                    |  `object`  | Configuration for fetching historical data on startup            | *Optional* |                     |  2.2  |
 |    fromDateTime                                            |  `string`  | Datetime boundary for historical data                            | *Optional* | `"-P1D"`            |  2.2  |
 |    timeout                                                 |  `integer` | Timeout in milliseconds                                          | *Optional* | `300000`            |   na  |
@@ -105,7 +105,7 @@ Has to be present for authenticationMethod SharedAccessKey. This should be Prima
 
 <!-- siri-azure-et-updater END -->
 
-### Siri Azure SX Updater
+### SIRI Azure SX Updater
 
 <!-- siri-azure-sx-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -116,12 +116,12 @@ Has to be present for authenticationMethod SharedAccessKey. This should be Prima
 | [authenticationType](#u__10__authenticationType)           |   `enum`   | Which authentication type to use                                 | *Optional* | `"sharedaccesskey"` |  2.5  |
 | autoDeleteOnIdle                                           | `duration` | The time after which an inactive subscription is removed.        | *Optional* | `"PT1H"`            |  2.5  |
 | [customMidnight](#u__10__customMidnight)                   |  `integer` | Time on which time breaks into new day.                          | *Optional* | `0`                 |  2.2  |
-| feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                      | *Optional* |                     |  2.2  |
+| feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                      | *Required* |                     |  2.2  |
 | [fullyQualifiedNamespace](#u__10__fullyQualifiedNamespace) |  `string`  | Service Bus fully qualified namespace used for authentication.   | *Optional* |                     |  2.5  |
 | fuzzyTripMatching                                          |  `boolean` | Whether to apply fuzzyTripMatching on the updates                | *Optional* | `false`             |  2.2  |
 | prefetchCount                                              |  `integer` | The number of messages to fetch from the subscription at a time. | *Optional* | `10`                |  2.5  |
 | [servicebus-url](#u__10__servicebus_url)                   |  `string`  | Service Bus connection used for authentication.                  | *Optional* |                     |  2.2  |
-| topic                                                      |  `string`  | Service Bus topic to connect to.                                 | *Optional* |                     |  2.2  |
+| topic                                                      |  `string`  | Service Bus topic to connect to.                                 | *Required* |                     |  2.2  |
 | history                                                    |  `object`  | Configuration for fetching historical data on startup            | *Optional* |                     |  2.2  |
 |    fromDateTime                                            |  `string`  | Datetime boundary for historical data.                           | *Optional* | `"-P1D"`            |  2.2  |
 |    timeout                                                 |  `integer` | Timeout in milliseconds                                          | *Optional* | `300000`            |   na  |

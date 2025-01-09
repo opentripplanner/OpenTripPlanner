@@ -2,13 +2,13 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -55,7 +55,10 @@ public class StreetEdge
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
   static final int ROUNDABOUT_FLAG_INDEX = 1;
-  static final int HASBOGUSNAME_FLAG_INDEX = 2;
+  /**
+   * @see Edge#nameIsDerived()
+   */
+  static final int NAME_IS_DERIVED_FLAG_INDEX = 2;
   static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
   static final int STAIRS_FLAG_INDEX = 4;
   static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
@@ -79,14 +82,14 @@ public class StreetEdge
 
   /**
    * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
+   * factor of 2.0 will be considered in terms of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
   private float bicycleSafetyFactor;
 
   /**
    * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety
-   * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
+   * factor of 2.0 will be considered in terms of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
   private float walkSafetyFactor;
@@ -443,14 +446,23 @@ public class StreetEdge
     return this.name;
   }
 
+  /**
+   * Update the name of the edge after it has been constructed. This method also sets the nameIsDerived
+   * property to false, indicating to the code that maps from edges to steps that this is a real
+   * street name.
+   * @see Edge#nameIsDerived()
+   */
   public void setName(I18NString name) {
     this.name = name;
+    this.flags = BitSetUtils.set(flags, NAME_IS_DERIVED_FLAG_INDEX, false);
   }
 
-  public boolean hasBogusName() {
-    return BitSetUtils.get(flags, HASBOGUSNAME_FLAG_INDEX);
+  @Override
+  public boolean nameIsDerived() {
+    return BitSetUtils.get(flags, NAME_IS_DERIVED_FLAG_INDEX);
   }
 
+  @Override
   public LineString getGeometry() {
     return CompactLineStringUtils.uncompactLineString(
       fromv.getLon(),
@@ -977,6 +989,47 @@ public class StreetEdge
   }
 
   /**
+   * Helper method for {@link #splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching}.
+   * Create a single new state, exiting a no-drop-off zone, in reverse, and continuing
+   * on a rental vehicle in the known network, or an unknown network if network is null,
+   * unless the known network is not accepted by the provided {@link RoutingPreferences}.
+   * @param s0 The parent state (i.e. the following state, as we are in reverse)
+   * @param network Network id, or null if unknown
+   * @param preferences Active {@link RoutingPreferences}
+   * @return Newly generated {@link State}, or null if the state would have been forbidden.
+   */
+  private State createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
+    State s0,
+    String network,
+    RoutingPreferences preferences
+  ) {
+    var edit = doTraverse(s0, TraverseMode.WALK, false);
+    if (edit != null) {
+      edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
+      if (network != null) {
+        edit.resetStartedInNoDropOffZone();
+      }
+      State state = edit.makeState();
+      if (state != null && network != null) {
+        var rentalPreferences = preferences.rental(state.currentMode());
+        var allowedNetworks = rentalPreferences.allowedNetworks();
+        var bannedNetworks = rentalPreferences.bannedNetworks();
+        if (allowedNetworks.isEmpty()) {
+          if (bannedNetworks.contains(network)) {
+            return null;
+          }
+        } else {
+          if (!allowedNetworks.contains(network)) {
+            return null;
+          }
+        }
+      }
+      return state;
+    }
+    return null;
+  }
+
+  /**
    * A very special case: an arriveBy rental search has started in a no-drop-off zone
    * we don't know yet which rental network we will end up using.
    * <p>
@@ -987,24 +1040,8 @@ public class StreetEdge
    * zone applies to where we pick up a vehicle with a specific network.
    */
   private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
-    var networks = Stream.concat(
-      // null is a special rental network that speculatively assumes that you can take any vehicle
-      // you have to check in the rental edge if this has search has been started in a no-drop off zone
-      Stream.of((String) null),
-      tov.rentalRestrictions().noDropOffNetworks().stream()
-    );
-
-    var states = networks.map(network -> {
-      var edit = doTraverse(s0, TraverseMode.WALK, false);
-      if (edit != null) {
-        edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
-        if (network != null) {
-          edit.resetStartedInNoDropOffZone();
-        }
-        return edit.makeState();
-      }
-      return null;
-    });
+    var preferences = s0.getRequest().preferences();
+    var states = new ArrayList<State>();
 
     // Also include a state which continues walking, because the vehicle rental states are
     // speculation. It is possible that the rental states don't end up at the target at all
@@ -1012,10 +1049,29 @@ public class StreetEdge
     // the rental possibility is simply more expensive than walking.
     StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
     if (walking != null) {
-      var forkState = walking.makeState();
-      states = Stream.concat(Stream.of(forkState), states);
+      states.add(walking.makeState());
     }
-    return State.ofStream(states);
+
+    boolean hasNetworkStates = false;
+    for (var network : tov.rentalRestrictions().noDropOffNetworks()) {
+      var state = createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(
+        s0,
+        network,
+        preferences
+      );
+      if (state != null) {
+        states.add(state);
+        hasNetworkStates = true;
+      }
+    }
+    if (hasNetworkStates) {
+      // null is a special rental network that speculatively assumes that you can take any vehicle
+      // you have to check in the rental edge if this has search has been started in a no-drop off zone
+      states.add(
+        createStateAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0, null, preferences)
+      );
+    }
+    return states.toArray(State[]::new);
   }
 
   /**

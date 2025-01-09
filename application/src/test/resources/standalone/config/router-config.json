@@ -75,7 +75,10 @@
       "reluctance": 4.0,
       "stairsReluctance": 1.65,
       "boardCost": 600,
-      "escalatorReluctance": 1.5
+      "escalator": {
+        "reluctance": 1.5,
+        "speed": 0.45
+      }
     },
     "waitReluctance": 1.0,
     "otherThanPreferredRoutesPenalty": 300,
@@ -119,12 +122,8 @@
     "geoidElevation": false,
     "maxJourneyDuration": "36h",
     "unpreferred": {
-      "agencies": [
-        "HSL:123"
-      ],
-      "routes": [
-        "HSL:456"
-      ]
+      "agencies": ["HSL:123"],
+      "routes": ["HSL:456"]
     },
     "unpreferredCost": "10m + 2.0 x",
     "streetRoutingTimeout": "5s",
@@ -320,9 +319,7 @@
       "headers": {
         "Cache-Control": "max-age=604800"
       },
-      "tags": [
-        "source:parkapi"
-      ]
+      "tags": ["source:parkapi"]
     },
     {
       "type": "vehicle-parking",
@@ -362,9 +359,7 @@
         "Header-Name": "Header-Value"
       },
       "fuzzyTripMatching": false,
-      "features": [
-        "position"
-      ]
+      "features": ["position"]
     },
     // Siri-ET over HTTP
     {
@@ -404,8 +399,8 @@
     {
       "type": "siri-azure-et-updater",
       "topic": "some_topic",
-      "authenticationType":  "SharedAccessKey",
-      "fullyQualifiedNamespace":  "fully_qualified_namespace",
+      "authenticationType": "SharedAccessKey",
+      "fullyQualifiedNamespace": "fully_qualified_namespace",
       "servicebus-url": "service_bus_url",
       "feedId": "feed_id",
       "customMidnight": 4,
@@ -439,6 +434,17 @@
       "feedId": "parking",
       "sourceType": "siri-fm",
       "url": "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
+    },
+    {
+      "type": "siri-et-lite",
+      "feedId": "sta",
+      "url": "https://example.com/siri-lite/estimated-timetable/xml",
+      "fuzzyTripMatching": true
+    },
+    {
+      "type": "siri-sx-lite",
+      "feedId": "sta",
+      "url": "https://example.com/siri-lite/situation-exchange/xml"
     }
   ],
   "rideHailingServices": [
@@ -454,4 +460,3 @@
     }
   ]
 }
-

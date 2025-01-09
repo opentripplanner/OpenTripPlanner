@@ -7,11 +7,11 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVertexType;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.StopPosition.PositionAtStop;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.plan.LegTime;
+import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
@@ -19,7 +19,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Override
-  public DataFetcher<LegTime> arrival() {
+  public DataFetcher<LegCallTime> arrival() {
     return environment -> getSource(environment).arrival;
   }
 
@@ -58,7 +58,7 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Deprecated
   @Override
-  public DataFetcher<LegTime> departure() {
+  public DataFetcher<LegCallTime> departure() {
     return environment -> getSource(environment).departure;
   }
 

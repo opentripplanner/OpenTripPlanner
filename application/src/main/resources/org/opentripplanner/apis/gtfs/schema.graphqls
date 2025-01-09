@@ -73,6 +73,15 @@ interface PlaceInterface {
 "Entity related to an alert"
 union AlertEntity = Agency | Pattern | Route | RouteType | Stop | StopOnRoute | StopOnTrip | Trip | Unknown
 
+"Scheduled times for a trip on a service date for a stop location."
+union CallScheduledTime = ArrivalDepartureTime
+
+"Location where a transit vehicle stops at."
+union CallStopLocation = Stop
+
+"Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
+union RentalPlace = RentalVehicle | VehicleRentalStation
+
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -161,6 +170,14 @@ type Alert implements Node {
   stop: Stop @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected stops.\nUse entities instead.")
   "Trip affected by the disruption"
   trip: Trip @deprecated(reason : "Alert can have multiple affected entities now instead of there being duplicate alerts\nfor different entities. This will return only one of the affected trips.\nUse entities instead.")
+}
+
+"Arrival and departure time (not relative to midnight)."
+type ArrivalDepartureTime {
+  "Arrival time as an ISO-8601-formatted datetime."
+  arrival: OffsetDateTime
+  "Departure time as an ISO-8601-formatted datetime."
+  departure: OffsetDateTime
 }
 
 "Bike park represents a location where bicycles can be parked."
@@ -276,12 +293,16 @@ type BookingInfo {
   earliestBookingTime: BookingTime
   "When is the latest time the service can be booked"
   latestBookingTime: BookingTime
+  "Maximum duration before travel to make the request."
+  maximumBookingNotice: Duration
   "Maximum number of seconds before travel to make the request"
-  maximumBookingNoticeSeconds: Long
+  maximumBookingNoticeSeconds: Long @deprecated(reason : "Use `maximumBookingNotice`")
   "A general message for those booking the service"
   message: String
+  "Minimum duration before travel to make the request"
+  minimumBookingNotice: Duration
   "Minimum number of seconds before travel to make the request"
-  minimumBookingNoticeSeconds: Long
+  minimumBookingNoticeSeconds: Long @deprecated(reason : "Use `minimumBookingNotice`")
   "A message specific to the pick up"
   pickupMessage: String
 }
@@ -292,6 +313,20 @@ type BookingTime {
   daysPrior: Int
   "Time of the booking"
   time: String
+}
+
+"Real-time estimates for arrival and departure times for a stop location."
+type CallRealTime {
+  "Real-time estimates for the arrival."
+  arrival: EstimatedTime
+  "Real-time estimates for the departure."
+  departure: EstimatedTime
+}
+
+"What is scheduled for a trip on a service date for a stop location."
+type CallSchedule {
+  "Scheduled time for a trip on a service date for a stop location."
+  time: CallScheduledTime
 }
 
 "Car park represents a location where cars can be parked."
@@ -451,6 +486,18 @@ type DepartureRow implements Node & PlaceInterface {
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
+}
+
+"Real-time estimates for an arrival or departure at a certain place."
+type EstimatedTime {
+  """
+  The delay or "earliness" of the vehicle at a certain place. This estimate can change quite often.
+    
+  If the vehicle is early then this is a negative duration.
+  """
+  delay: Duration!
+  "The estimate for a call event (such as arrival or departure) at a certain place. This estimate can change quite often."
+  time: OffsetDateTime!
 }
 
 "A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'."
@@ -1127,31 +1174,60 @@ type QueryType {
     """
     ids: [String]
   ): [BikeRentalStation] @deprecated(reason : "Use rentalVehicles or vehicleRentalStations instead")
-  "Get cancelled TripTimes."
+  """
+  Get pages of canceled trips. Planned cancellations are not currently supported. Limiting the number of
+  returned trips with either `first` or `last` is highly recommended since the number of returned trips
+  can be really high when there is a strike affecting the transit services, for example. Follows the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  canceledTrips(
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `first` parameter.
+    """
+    after: String,
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `last` parameter.
+    """
+    before: String,
+    """
+    Limits how many trips are returned. This parameter is part of the
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and can be used together with
+    the `after` parameter.
+    """
+    first: Int,
+    """
+    This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+    and should be used together with the `before` parameter.
+    """
+    last: Int
+  ): TripOnServiceDateConnection
+  "Get canceled TripTimes."
   cancelledTripTimes(
     "Feed feedIds (e.g. [\"HSL\"])."
     feeds: [String],
     """
-    Only cancelled trip times that have last stop arrival time at maxArrivalTime
+    Only canceled trip times that have last stop arrival time at maxArrivalTime
     or before are returned. Format: seconds since midnight of maxDate.
     """
     maxArrivalTime: Int,
-    "Only cancelled trip times scheduled to run on maxDate or before are returned. Format: \"2019-12-23\" or \"20191223\"."
+    "Only canceled trip times scheduled to run on maxDate or before are returned. Format: \"2019-12-23\" or \"20191223\"."
     maxDate: String,
     """
-    Only cancelled trip times that have first stop departure time at
+    Only canceled trip times that have first stop departure time at
     maxDepartureTime or before are returned. Format: seconds since midnight of maxDate.
     """
     maxDepartureTime: Int,
     """
-    Only cancelled trip times that have last stop arrival time at minArrivalTime
+    Only canceled trip times that have last stop arrival time at minArrivalTime
     or after are returned. Format: seconds since midnight of minDate.
     """
     minArrivalTime: Int,
-    "Only cancelled trip times scheduled to run on minDate or after are returned. Format: \"2019-12-23\" or \"20191223\"."
+    "Only canceled trip times scheduled to run on minDate or after are returned. Format: \"2019-12-23\" or \"20191223\"."
     minDate: String,
     """
-    Only cancelled trip times that have first stop departure time at
+    Only canceled trip times that have first stop departure time at
     minDepartureTime or after are returned. Format: seconds since midnight of minDate.
     """
     minDepartureTime: Int,
@@ -1161,7 +1237,7 @@ type QueryType {
     routes: [String],
     "Trip gtfsIds (e.g. [\"HSL:1098_20190405_Ma_2_1455\"])."
     trips: [String]
-  ): [Stoptime]
+  ): [Stoptime] @deprecated(reason : "`cancelledTripTimes` is not implemented. Use `canceledTrips` instead.")
   "Get a single car park based on its ID, i.e. value of field `carParkId`"
   carPark(id: String!): CarPark @deprecated(reason : "carPark is deprecated. Use vehicleParking instead.")
   "Get all car parks"
@@ -1768,6 +1844,17 @@ type QueryType {
     """
     ids: [String]
   ): [VehicleRentalStation]
+  "Get all rental vehicles within the specified bounding box"
+  vehicleRentalsByBbox(
+    "Northern bound of the bounding box"
+    maximumLatitude: CoordinateValue!,
+    "Eastern bound of the bounding box"
+    maximumLongitude: CoordinateValue!,
+    "Southern bound of the bounding box"
+    minimumLatitude: CoordinateValue!,
+    "Western bound of the bounding box"
+    minimumLongitude: CoordinateValue!
+  ): [RentalPlace!]!
   "Needed until https://github.com/facebook/relay/issues/112 is resolved"
   viewer: QueryType
 }
@@ -2145,6 +2232,16 @@ type Stop implements Node & PlaceInterface {
   zoneId: String
 }
 
+"Stop call represents the time when a specific trip on a specific date arrives to and/or departs from a specific stop location."
+type StopCall {
+  "Real-time estimates for arrival and departure times for this stop location."
+  realTime: CallRealTime
+  "Scheduled arrival and departure times for this stop location."
+  schedule: CallSchedule
+  "The stop where this arrival/departure happens."
+  stopLocation: CallStopLocation!
+}
+
 type StopGeometries {
   "Representation of the stop geometries as GeoJSON (https://geojson.org/)"
   geoJson: GeoJson
@@ -2398,6 +2495,60 @@ available for a trip. Historic data might not be available.
 type TripOccupancy {
   "Occupancy information mapped to a limited set of descriptive states."
   occupancyStatus: OccupancyStatus
+}
+
+"A trip on a specific service date."
+type TripOnServiceDate {
+  "Information related to trip's scheduled arrival to the final stop location. Can contain real-time information."
+  end: StopCall!
+  """
+  The service date when the trip occurs.
+    
+  **Note**: A service date is a technical term useful for transit planning purposes and might not
+    correspond to a how a passenger thinks of a calendar date. For example, a night bus running
+    on Sunday morning at 1am to 3am, might have the previous Saturday's service date.
+  """
+  serviceDate: LocalDate!
+  "Information related to trip's scheduled departure from the first stop location. Can contain real-time information."
+  start: StopCall!
+  "List of times when this trip arrives to or departs from a stop location and information related to the visit to the stop location."
+  stopCalls: [StopCall!]!
+  "This trip on service date is an instance of this trip."
+  trip: Trip
+}
+
+"""
+A connection to a list of trips on service dates that follows
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type TripOnServiceDateConnection {
+  """
+  Edges which contain the trips. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  edges: [TripOnServiceDateEdge]
+  """
+  Contains cursors to fetch more pages of trips.
+  Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge for TripOnServiceDate connection. Part of the
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type TripOnServiceDateEdge {
+  """
+  The cursor of the edge. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  cursor: String!
+  """
+  Trip on a service date as a node. Part of the
+  [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+  """
+  node: TripOnServiceDate
 }
 
 "This is used for alert entities that we don't explicitly handle or they are missing."
@@ -2817,7 +2968,7 @@ enum AlertSeverityLevelType {
   INFO
   """
   Severe alerts are used when a significant part of public transport services is
-  affected, for example: All train services are cancelled due to technical problems.
+  affected, for example: All train services are canceled due to technical problems.
   """
   SEVERE
   "Severity of alert is unknown"
@@ -4321,21 +4472,21 @@ input TimetablePreferencesInput {
   When false, real-time updates are considered during the routing.
   In practice, when this option is set as true, some of the suggestions might not be
   realistic as the transfers could be invalid due to delays,
-  trips can be cancelled or stops can be skipped.
+  trips can be canceled or stops can be skipped.
   """
   excludeRealTimeUpdates: Boolean
   """
-  When true, departures that have been cancelled ahead of time will be
+  When true, departures that have been canceled ahead of time will be
   included during the routing. This means that an itinerary can include
-  a cancelled departure while some other alternative that contains no cancellations
+  a canceled departure while some other alternative that contains no cancellations
   could be filtered out as the alternative containing a cancellation would normally
   be better.
   """
   includePlannedCancellations: Boolean
   """
-  When true, departures that have been cancelled through a real-time feed will be
+  When true, departures that have been canceled through a real-time feed will be
   included during the routing. This means that an itinerary can include
-  a cancelled departure while some other alternative that contains no cancellations
+  a canceled departure while some other alternative that contains no cancellations
   could be filtered out as the alternative containing a cancellation would normally
   be better. This option can't be set to true while `includeRealTimeUpdates` is false.
   """

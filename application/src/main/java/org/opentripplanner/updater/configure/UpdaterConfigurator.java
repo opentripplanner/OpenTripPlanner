@@ -12,6 +12,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
@@ -19,9 +20,11 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.siri.updater.SiriETUpdater;
+import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
+import org.opentripplanner.updater.siri.updater.configure.SiriUpdaterModule;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
+import org.opentripplanner.updater.siri.updater.lite.SiriLiteHttpLoader;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
@@ -49,6 +52,7 @@ public class UpdaterConfigurator {
   private final UpdatersParameters updatersParameters;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
+  private final VehicleParkingRepository parkingRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
@@ -56,6 +60,7 @@ public class UpdaterConfigurator {
     Graph graph,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     UpdatersParameters updatersParameters
   ) {
@@ -64,12 +69,14 @@ public class UpdaterConfigurator {
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.timetableRepository = timetableRepository;
     this.updatersParameters = updatersParameters;
+    this.parkingRepository = parkingRepository;
   }
 
   public static void configure(
     Graph graph,
     RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
+    VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     UpdatersParameters updatersParameters
   ) {
@@ -77,6 +84,7 @@ public class UpdaterConfigurator {
       graph,
       realtimeVehicleRepository,
       vehicleRentalRepository,
+      parkingRepository,
       timetableRepository,
       updatersParameters
     )
@@ -176,13 +184,23 @@ public class UpdaterConfigurator {
       updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(new SiriETUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(
+        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
+      );
+    }
+    for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
+      updaters.add(
+        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
+      );
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
       updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(new SiriSXUpdater(configItem, timetableRepository));
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
+    }
+    for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));
@@ -195,22 +213,13 @@ public class UpdaterConfigurator {
             openingHoursCalendarService
           );
           updaters.add(
-            new VehicleParkingUpdater(
-              configItem,
-              source,
-              graph.getLinker(),
-              graph.getVehicleParkingService()
-            )
+            new VehicleParkingUpdater(configItem, source, graph.getLinker(), parkingRepository)
           );
         }
         case AVAILABILITY_ONLY -> {
           var source = AvailabilityDatasourceFactory.create(configItem);
           updaters.add(
-            new VehicleParkingAvailabilityUpdater(
-              configItem,
-              source,
-              graph.getVehicleParkingService()
-            )
+            new VehicleParkingAvailabilityUpdater(configItem, source, parkingRepository)
           );
         }
       }

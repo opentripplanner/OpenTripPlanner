@@ -93,7 +93,7 @@ public class IndexAPI {
   @GET
   @Path("/feeds")
   public Collection<String> getFeeds() {
-    return transitService().getFeedIds();
+    return transitService().listFeedIds();
   }
 
   @GET
@@ -108,7 +108,7 @@ public class IndexAPI {
   @Path("/agencies/{feedId}")
   public Collection<ApiAgency> getAgencies(@PathParam("feedId") String feedId) {
     Collection<Agency> agencies = transitService()
-      .getAgencies()
+      .listAgencies()
       .stream()
       .filter(agency -> agency.getId().getFeedId().equals(feedId))
       .collect(Collectors.toList());
@@ -138,7 +138,7 @@ public class IndexAPI {
     var agency = agency(feedId, agencyId);
 
     Collection<Route> routes = transitService()
-      .getAllRoutes()
+      .listRoutes()
       .stream()
       .filter(r -> r.getAgency() == agency)
       .collect(Collectors.toList());
@@ -200,7 +200,7 @@ public class IndexAPI {
 
       radius = Math.min(radius, MAX_STOP_SEARCH_RADIUS);
 
-      return new DirectGraphFinder(serverContext.transitService()::findRegularStops)
+      return new DirectGraphFinder(serverContext.transitService()::findRegularStopsByBoundingBox)
         .findClosestStops(new Coordinate(lon, lat), radius)
         .stream()
         .map(it -> StopMapper.mapToApiShort(it.stop, it.distance))
@@ -221,10 +221,9 @@ public class IndexAPI {
         new Coordinate(maxLon, maxLat)
       );
 
-      var stops = transitService().findRegularStops(envelope);
+      var stops = transitService().findRegularStopsByBoundingBox(envelope);
       return stops
         .stream()
-        .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
         .map(StopMapper::mapToApiShort)
         .toList();
     }
@@ -235,7 +234,7 @@ public class IndexAPI {
   public List<ApiRouteShort> getRoutesForStop(@PathParam("stopId") String stopId) {
     var stop = stop(stopId);
     return transitService()
-      .getPatternsForStop(stop)
+      .findPatterns(stop)
       .stream()
       .map(TripPattern::getRoute)
       .map(RouteMapper::mapToApiShort)
@@ -247,7 +246,7 @@ public class IndexAPI {
   public List<ApiPatternShort> getPatternsForStop(@PathParam("stopId") String stopId) {
     var stop = stop(stopId);
     return transitService()
-      .getPatternsForStop(stop)
+      .findPatterns(stop)
       .stream()
       .map(TripPatternMapper::mapToApiShort)
       .collect(Collectors.toList());
@@ -275,7 +274,7 @@ public class IndexAPI {
       : Instant.ofEpochSecond(startTimeSeconds);
 
     return transitService()
-      .stopTimesForStop(
+      .findStopTimesInPattern(
         stop(stopIdString),
         startTime,
         Duration.ofSeconds(timeRange),
@@ -303,7 +302,7 @@ public class IndexAPI {
     var stop = stop(stopId);
     var serviceDate = parseServiceDate("date", date);
     List<StopTimesInPattern> stopTimes = transitService()
-      .getStopTimesForStop(
+      .findStopTimesInPattern(
         stop,
         serviceDate,
         omitNonPickups ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
@@ -322,7 +321,7 @@ public class IndexAPI {
 
     // get the transfers for the stop
     return transitService()
-      .getTransfersByStop(stop)
+      .findPathTransfers(stop)
       .stream()
       .map(TransferMapper::mapToApi)
       .collect(Collectors.toList());
@@ -344,7 +343,7 @@ public class IndexAPI {
   @GET
   @Path("/routes")
   public List<ApiRouteShort> getRoutes(@QueryParam("hasStop") List<String> stopIds) {
-    Collection<Route> routes = transitService().getAllRoutes();
+    Collection<Route> routes = transitService().listRoutes();
     // Filter routes to include only those that pass through all given stops
     if (stopIds != null) {
       // Protective copy, we are going to calculate the intersection destructively
@@ -352,7 +351,7 @@ public class IndexAPI {
       for (String stopId : stopIds) {
         var stop = stop(stopId);
         Set<Route> routesHere = new HashSet<>();
-        for (TripPattern pattern : transitService().getPatternsForStop(stop)) {
+        for (TripPattern pattern : transitService().findPatterns(stop)) {
           routesHere.add(pattern.getRoute());
         }
         routes.retainAll(routesHere);
@@ -372,7 +371,7 @@ public class IndexAPI {
   @GET
   @Path("/routes/{routeId}/patterns")
   public List<ApiPatternShort> getPatternsForRoute(@PathParam("routeId") String routeId) {
-    Collection<TripPattern> patterns = transitService().getPatternsForRoute(route(routeId));
+    Collection<TripPattern> patterns = transitService().findPatterns(route(routeId));
     return TripPatternMapper.mapToApiShort(patterns);
   }
 
@@ -383,7 +382,7 @@ public class IndexAPI {
     var route = route(routeId);
 
     Set<StopLocation> stops = new HashSet<>();
-    Collection<TripPattern> patterns = transitService().getPatternsForRoute(route);
+    Collection<TripPattern> patterns = transitService().findPatterns(route);
     for (TripPattern pattern : patterns) {
       stops.addAll(pattern.getStops());
     }
@@ -396,7 +395,7 @@ public class IndexAPI {
   public List<ApiTripShort> getTripsForRoute(@PathParam("routeId") String routeId) {
     var route = route(routeId);
 
-    var patterns = transitService().getPatternsForRoute(route);
+    var patterns = transitService().findPatterns(route);
     return patterns
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
@@ -445,7 +444,7 @@ public class IndexAPI {
     var pattern = tripPattern(trip);
     // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
     var table = transitService()
-      .getTimetableForTripPattern(pattern, LocalDate.now(transitService().getTimeZone()));
+      .findTimetable(pattern, LocalDate.now(transitService().getTimeZone()));
     var tripTimesOnDate = TripTimeOnDate.fromTripTimes(table, trip);
     return TripTimeMapper.mapToApi(tripTimesOnDate);
   }
@@ -472,7 +471,7 @@ public class IndexAPI {
   @GET
   @Path("/patterns")
   public List<ApiPatternShort> getPatterns() {
-    Collection<TripPattern> patterns = transitService().getAllTripPatterns();
+    Collection<TripPattern> patterns = transitService().listTripPatterns();
     return TripPatternMapper.mapToApiShort(patterns);
   }
 
@@ -589,7 +588,7 @@ public class IndexAPI {
   }
 
   private Agency agency(String feedId, String agencyId) {
-    var agency = transitService().getAgencyForId(new FeedScopedId(feedId, agencyId));
+    var agency = transitService().getAgency(new FeedScopedId(feedId, agencyId));
     if (agency == null) {
       throw notFoundException("Agency", "feedId: " + feedId + ", agencyId: " + agencyId);
     }
@@ -602,18 +601,18 @@ public class IndexAPI {
   }
 
   private Route route(String routeId) {
-    var route = transitService().getRouteForId(createId("routeId", routeId));
+    var route = transitService().getRoute(createId("routeId", routeId));
     return validateExist("Route", route, "routeId", routeId);
   }
 
   private Trip trip(String tripId) {
-    var trip = transitService().getTripForId(createId("tripId", tripId));
+    var trip = transitService().getTrip(createId("tripId", tripId));
     return validateExist("Trip", trip, "tripId", tripId);
   }
 
   private TripPattern tripPattern(String tripPatternId) {
     var id = createId("patternId", tripPatternId);
-    var pattern = transitService().getTripPatternForId(id);
+    var pattern = transitService().getTripPattern(id);
     return validateExist("TripPattern", pattern, "patternId", tripPatternId);
   }
 
@@ -622,7 +621,7 @@ public class IndexAPI {
   }
 
   private TripPattern tripPattern(Trip trip) {
-    var pattern = transitService().getPatternForTrip(trip);
+    var pattern = transitService().findPattern(trip);
     return validateExist("TripPattern", pattern, "trip", trip.getId());
   }
 

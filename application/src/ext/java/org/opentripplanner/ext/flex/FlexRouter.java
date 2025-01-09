@@ -192,7 +192,7 @@ public class FlexRouter {
 
     @Override
     public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
-      return transitService.getTransfersByStop(stop);
+      return transitService.getFlexIndex().getTransfersFromStop(stop);
     }
 
     @Override
@@ -207,7 +207,7 @@ public class FlexRouter {
 
     @Override
     public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
-      int serviceCode = transitService.getServiceCodeForId(trip.getTrip().getServiceId());
+      int serviceCode = transitService.getServiceCode(trip.getTrip().getServiceId());
       return date.isTripServiceRunning(serviceCode);
     }
   }

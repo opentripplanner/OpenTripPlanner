@@ -14,8 +14,8 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.VehicleParkingService;
+import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
@@ -36,13 +36,13 @@ public class ParkAndRideResource {
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.vehicleParkingService = serverContext.graph().getVehicleParkingService();
+    this.vehicleParkingService = serverContext.vehicleParkingService();
 
     // TODO OTP2 - Why are we using the DirectGraphFinder here, not just
     //           - serverContext.graphFinder(). This needs at least a comment!
     //           - This can be replaced with a search done with the SiteRepository
     //           - if we have a radius search there.
-    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStops);
+    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStopsByBoundingBox);
   }
 
   /** Envelopes are in latitude, longitude format */
@@ -73,7 +73,8 @@ public class ParkAndRideResource {
     }
 
     var prs = vehicleParkingService
-      .getCarParks()
+      .listCarParks()
+      .stream()
       .filter(lot -> envelope.contains(lot.getCoordinate().asJtsCoordinate()))
       .filter(lot -> hasTransitStopsNearby(maxTransitDistance, lot))
       .map(ParkAndRideInfo::ofVehicleParking)

@@ -1,6 +1,8 @@
 package org.opentripplanner.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
@@ -17,7 +19,7 @@ class TripTimeOnDateTest implements PlanTestConstants {
     var testModel = TimetableRepositoryForTest.of();
     var pattern = testModel.pattern(TransitMode.BUS).build();
     var trip = TimetableRepositoryForTest.trip("123").build();
-    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -28,5 +30,24 @@ class TripTimeOnDateTest implements PlanTestConstants {
 
     var departure = LocalTime.ofSecondOfDay(subject.getScheduledDeparture());
     assertEquals(LocalTime.of(11, 10), departure);
+  }
+
+  @Test
+  void isRecordedStop() {
+    var testModel = TimetableRepositoryForTest.of();
+    var pattern = testModel.pattern(TransitMode.BUS).build();
+    var trip = TimetableRepositoryForTest.trip("123").build();
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "11:00");
+
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
+    tripTimes.setRecorded(1);
+
+    var subject = new TripTimeOnDate(tripTimes, 0, pattern);
+
+    assertFalse(subject.isRecordedStop());
+
+    subject = new TripTimeOnDate(tripTimes, 1, pattern);
+
+    assertTrue(subject.isRecordedStop());
   }
 }

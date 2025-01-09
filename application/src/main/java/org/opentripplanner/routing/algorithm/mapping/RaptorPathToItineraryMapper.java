@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -38,8 +39,8 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
@@ -125,7 +126,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           legs.addAll(
             mapTransferLeg(
               pathLeg.asTransferLeg(),
-              transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+              StreetModeToTransferTraverseModeMapper.map(transferMode)
             )
           );
         }
@@ -279,7 +280,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       tripSchedule.getOriginalTripTimes().getTrip().getId(),
       tripSchedule.getServiceDate()
     );
-    return transitService.getTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
+    return transitService.getTripOnServiceDate(tripIdAndServiceDate);
   }
 
   private boolean isFree(EgressPathLeg<T> egressPathLeg) {
@@ -360,24 +361,15 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .build()
       );
     } else {
-      StateEditor se = new StateEditor(edges.get(0).getFromVertex(), transferStreetRequest);
-      se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
-
-      State s = se.makeState();
-      ArrayList<State> transferStates = new ArrayList<>();
-      transferStates.add(s);
-      for (Edge e : edges) {
-        var states = e.traverse(s);
-        if (State.isEmpty(states)) {
-          s = null;
-        } else {
-          transferStates.add(states[0]);
-          s = states[0];
-        }
-      }
-
-      State[] states = transferStates.toArray(new State[0]);
-      var graphPath = new GraphPath<>(states[states.length - 1]);
+      var legTransferSearchRequest = transferStreetRequest
+        .copyOf(createZonedDateTime(pathLeg.fromTime()).toInstant())
+        .build();
+      var initialStates = State.getInitialStates(
+        Set.of(edges.getFirst().getFromVertex()),
+        legTransferSearchRequest
+      );
+      var state = EdgeTraverser.traverseEdges(initialStates, edges);
+      var graphPath = new GraphPath<>(state.get());
 
       Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 

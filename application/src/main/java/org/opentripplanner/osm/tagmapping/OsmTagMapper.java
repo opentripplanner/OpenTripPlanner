@@ -14,7 +14,6 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
-import org.opentripplanner.osm.wayproperty.specifier.Condition;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.LogicalOrSpecifier;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -103,6 +102,10 @@ public class OsmTagMapper {
 
     props.setProperties("highway=trunk", withModes(CAR).bicycleSafety(7.47));
     props.setProperties("highway=motorway", withModes(CAR).bicycleSafety(8));
+
+    // Do not walk on "moottoriliikennetie"/"Kraftfahrstrasse"/"Limited access road"
+    // https://en.wikipedia.org/wiki/Limited-access_road
+    props.setProperties(new ExactMatchSpecifier("motorroad=yes"), withModes(CAR));
 
     /* cycleway=lane */
     props.setProperties(
@@ -621,7 +624,7 @@ public class OsmTagMapper {
     props.setSlopeOverride(new BestMatchSpecifier("indoor=yes"), true);
   }
 
-  public void populateNotesAndNames(WayPropertySet props) {
+  static void populateNotesAndNames(WayPropertySet props) {
     /* and the notes */
     // TODO: The curly brackets in the string below mean that the CreativeNamer should substitute in OSM tag values.
     // However they are not taken into account when passed to the translation function.
@@ -664,6 +667,7 @@ public class OsmTagMapper {
     props.createNames("highway=footway", "name.pedestrian_path");
     props.createNames("highway=bridleway", "name.bridleway");
     props.createNames("highway=footway;bicycle=no", "name.pedestrian_path");
+    props.createNames("highway=corridor", "name.corridor");
 
     // Platforms
     props.createNames("otp:route_ref=*", "name.otp_route_ref");
@@ -768,7 +772,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for bicycle is not allowed.
    */
-  public boolean isBicycleNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String bicycle = way.getTag("bicycle");
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
@@ -780,7 +784,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for walk is not allowed.
    */
-  public boolean isWalkNoThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
     String foot = way.getTag("foot");
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);

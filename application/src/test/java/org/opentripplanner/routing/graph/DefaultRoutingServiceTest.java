@@ -56,11 +56,11 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     }
 
     /* Agencies */
-    String feedId = transitService.getFeedIds().iterator().next();
+    String feedId = transitService.listFeedIds().iterator().next();
     Agency agency;
-    agency = transitService.getAgencyForId(new FeedScopedId(feedId, "azerty"));
+    agency = transitService.getAgency(new FeedScopedId(feedId, "azerty"));
     assertNull(agency);
-    agency = transitService.getAgencyForId(new FeedScopedId(feedId, "agency"));
+    agency = transitService.getAgency(new FeedScopedId(feedId, "agency"));
     assertEquals(feedId + ":" + "agency", agency.getId().toString());
     assertEquals("Fake Agency", agency.getName());
 
@@ -79,18 +79,18 @@ public class DefaultRoutingServiceTest extends GtfsTest {
    */
   @Test
   public void testPatternsCoherent() {
-    for (Trip trip : transitService.getAllTrips()) {
-      TripPattern pattern = transitService.getPatternForTrip(trip);
+    for (Trip trip : transitService.listTrips()) {
+      TripPattern pattern = transitService.findPattern(trip);
       assertTrue(pattern.scheduledTripsAsStream().anyMatch(t -> t.equals(trip)));
     }
     /* This one depends on a feed where each TripPattern appears on only one route. */
-    for (Route route : transitService.getAllRoutes()) {
-      for (TripPattern pattern : transitService.getPatternsForRoute(route)) {
+    for (Route route : transitService.listRoutes()) {
+      for (TripPattern pattern : transitService.findPatterns(route)) {
         assertEquals(pattern.getRoute(), route);
       }
     }
     for (var stop : transitService.listStopLocations()) {
-      for (TripPattern pattern : transitService.getPatternsForStop(stop)) {
+      for (TripPattern pattern : transitService.findPatterns(stop)) {
         int stopPos = pattern.findStopPosition(stop);
         assertTrue(stopPos >= 0, "Stop position exist");
       }
@@ -99,7 +99,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
 
   @Test
   public void testSpatialIndex() {
-    String feedId = transitService.getFeedIds().iterator().next();
+    String feedId = transitService.listFeedIds().iterator().next();
     FeedScopedId idJ = new FeedScopedId(feedId, "J");
     var stopJ = transitService.getRegularStop(idJ);
     FeedScopedId idL = new FeedScopedId(feedId, "L");
@@ -115,7 +115,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<RegularStop> stops = transitService.findRegularStops(env);
+    Collection<RegularStop> stops = transitService.findRegularStopsByBoundingBox(env);
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));

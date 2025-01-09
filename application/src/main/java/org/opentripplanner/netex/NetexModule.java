@@ -13,7 +13,8 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -29,6 +30,7 @@ public class NetexModule implements GraphBuilderModule {
 
   private final Graph graph;
   private final TimetableRepository timetableRepository;
+  private final VehicleParkingRepository parkingRepository;
   private final DataImportIssueStore issueStore;
 
   /**
@@ -42,6 +44,7 @@ public class NetexModule implements GraphBuilderModule {
   public NetexModule(
     Graph graph,
     TimetableRepository timetableRepository,
+    VehicleParkingRepository parkingRepository,
     DataImportIssueStore issueStore,
     int subwayAccessTime,
     ServiceDateInterval transitPeriodLimit,
@@ -49,6 +52,7 @@ public class NetexModule implements GraphBuilderModule {
   ) {
     this.graph = graph;
     this.timetableRepository = timetableRepository;
+    this.parkingRepository = parkingRepository;
     this.issueStore = issueStore;
     this.subwayAccessTime = subwayAccessTime;
     this.transitPeriodLimit = transitPeriodLimit;
@@ -103,7 +107,7 @@ public class NetexModule implements GraphBuilderModule {
         timetableRepository.validateTimeZones();
 
         var lots = transitBuilder.vehicleParkings();
-        graph.getVehicleParkingService().updateVehicleParking(lots, List.of());
+        parkingRepository.updateVehicleParking(lots, List.of());
         var linker = new VehicleParkingHelper(graph);
         lots.forEach(linker::linkVehicleParkingToGraph);
       }

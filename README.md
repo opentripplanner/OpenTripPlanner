@@ -31,10 +31,11 @@ We run a speed test (included in the code) to measure the performance for every 
 
 ## Repository layout
 
-The main Java server code is in `application/src/main/`. OTP also includes a Javascript client based on the
-MapLibre mapping library in `client/src/`. This client is now used for testing, with most major
-deployments building custom clients from reusable components. The Maven build produces a unified ("shaded")
-JAR file at `application/target/otp-VERSION.jar` containing all necessary code and dependencies to run OpenTripPlanner.
+The main Java server code is in `application/src/main/`. OTP also includes a Javascript client 
+based on the MapLibre mapping library in `client/src/`. This client is now used for testing, with
+most major deployments building custom clients from reusable components. The Maven build produces a
+unified ("shaded") JAR file at `otp-shaded/target/otp-shaded-VERSION.jar` containing all necessary
+code and dependencies to run OpenTripPlanner.
 
 Additional information and instructions are available in
 the [main documentation](http://docs.opentripplanner.org/en/dev-2.x/), including a
@@ -59,7 +60,11 @@ the world.
 
 ## Getting in touch
 
-The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) where most of the core developers are. Bug reports may be filed via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). The OpenTripPlanner [mailing list](http://groups.google.com/group/opentripplanner-users) is used almost exclusively for project announcements. The mailing list and issue tracker are not intended for support questions or discussions. Please use the chat for this purpose. Other details of [project governance](http://docs.opentripplanner.org/en/dev-2.x/Governance/) can be found in the main documentation.
+The fastest way to get help is to use our [Gitter chat room](https://gitter.im/opentripplanner/OpenTripPlanner) where most of the core developers
+are. Bug reports may be filed via the Github [issue tracker](https://github.com/openplans/OpenTripPlanner/issues). The OpenTripPlanner [mailing list](http://groups.google.com/group/opentripplanner-users)
+is used almost exclusively for project announcements. The mailing list and issue tracker are not
+intended for support questions or discussions. Please use the chat for this purpose. Other details
+of [project governance](http://docs.opentripplanner.org/en/dev-2.x/Governance/) can be found in the main documentation.
 
 ## OTP Ecosystem
 

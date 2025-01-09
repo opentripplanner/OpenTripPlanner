@@ -38,4 +38,14 @@ public interface VehicleRentalService {
     double maxLon,
     double maxLat
   );
+
+  /**
+   * Gets all vehicle rental places inside an envelope.
+   */
+  List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(
+    double minLon,
+    double minLat,
+    double maxLon,
+    double maxLat
+  );
 }

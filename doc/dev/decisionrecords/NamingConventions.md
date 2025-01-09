@@ -42,11 +42,16 @@ Here is a list of common prefixes used and what to expect.
 | `findStop(Criteria criteria) : Optional<Stop>`        | Find one or zero stops; return `Optional`.                                    |
 | `findStops(Criteria criteria) : List/Stream<Stop>`    | Find 0, 1, or many stops; return a Collection or Stream (List is preferred).  |
 | `listStops() : List/Stream<Stop>`                     | List ALL stops in context; return a Collection or Stream (List is preferred). |
-| `withStop(Stop stop) : Builder`                       | Set Stop in builder, replacing existing value; return `this` builder.         |
 | `initStop(Stop stop) : void`                          | Set property _once_; a second call throws an exception.                       |
+| `createStop(String name, ...) : Stop`                 | Factory methods for creating objects should start with `create` prefix.       |
+|                                                       | See (Builder Conventions)[RecordsPOJOsBuilders.md#builder-conventions] for creating objects with builders. |
 | `addStop(Stop stop) : void/Builder`                   | Add a Stop to a collection of Stops.                                          |
 | `addStops(Collection<Stop> stops) : void/Builder`     | Add set of Stops to existing set.                                             |
 | `withBike(Consumer<BikePref.Builder> body) : Builder` | For nested builders, use lambdas.                                             |
+| `withStop(Stop stop) : Builder`                       | Set Stop in builder, replacing existing value; return `this` builder.         |
+| `of(FeedScopedId id) : Builder`                       | Create new builder instance from  `Stop` class.                               |
+| `copyOf() : Builder`                                  | Initialize a new builder instance from `Stop` instance with identical values. |
+| `build() : Stop`                                      | Finish building stop with a builder.                                          |
 
 These prefixes are also "allowed" but not preferred; they have some kind of negative "force" to
 them.
@@ -72,3 +77,14 @@ trip = Trip.of(id).withName("The Express").build();
 // Modify and existing stop
 stop = stop.copyOf().withPrivateCode("TEX").build();
 ```
+
+## Referencing Established OTP Terminology in Documentation
+
+Use emphasis ("_dated service journey_") in markdown documentation, in API, and configuration
+documentation. In this kind of documentation we usually talk about the concept, not the implementing
+class. Use CamleCase (eg. TripOnServiceDate) if you need to reference the class.
+
+Use hyphen ("dated-service-journey") in plain text and JavaDoc. In JavaDoc we also use
+{@link TripOnServiceDate} the first time we mention a class. Note that sometimes we want to talk
+about the concept (dated-service-journey) and sometimes we reference a class 
+({@link DatedServiceJourney}).

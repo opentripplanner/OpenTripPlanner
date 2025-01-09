@@ -19,6 +19,12 @@ Use established terminology from GTFS, NeTEx or the existing OTP code. Make sure
 to read and understand. [Follow naming conventions](doc/dev/decisionrecords/NamingConventions.md#naming-conventions) . 
 
 
+## Do Analysis-and-design if needed
+
+Be prepared to provide [analyses and/or design documentation](doc/dev/decisionrecords/AnalysesAndDesign.md)
+if a task is complex, changes the core model and/or the main APIs.
+
+
 ## Write-Code-Documentation - Use JavaDoc
 
 Document the business intention and decisions in the relevant code. Do not repeat the logic
@@ -104,3 +110,7 @@ Prefer immutable types over mutable. Use builders where appropriate. See
 [Avoid using records if you cannot encapsulate it properly](doc/dev/decisionrecords/RecordsPOJOsBuilders.md#records)
 
 
+## GraphQL Best Practices - API Design
+
+[Follow best practices for designing GraphQL APIs. Our APIs need to be backwards compatible as they are used
+by hundreds of clients (web-pages/apps/services).](doc/dev/decisionrecords/APIGraphQLDesign.md)
