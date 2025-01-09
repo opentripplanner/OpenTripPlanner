@@ -21,7 +21,7 @@ public class TripRequestBuilder {
     List.of()
   );
 
-  protected TripRequestBuilder() {}
+  TripRequestBuilder() {}
 
   public TripRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
     this.agencies = agencies;
