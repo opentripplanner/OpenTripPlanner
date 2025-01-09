@@ -60,7 +60,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private final TripOnServiceDate tripOnServiceDate;
-  private double distanceMeters;
+  private final double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
   private List<FareProductUse> fareProducts = List.of();
@@ -93,7 +93,8 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
+    this.distanceMeters =
+      DoubleUtils.roundTo2Decimals(getDistanceFromCoordinates(transitLegCoordinates));
     this.directDistanceMeters =
       getDistanceFromCoordinates(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
@@ -230,11 +231,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public double getDistanceMeters() {
     return distanceMeters;
-  }
-
-  /** Only for testing purposes */
-  protected void setDistanceMeters(double distanceMeters) {
-    this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
   }
 
   public double getDirectDistanceMeters() {
@@ -377,11 +373,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void addAlert(TransitAlert alert) {
-    transitAlerts.add(alert);
-  }
-
-  @Override
   public void setFareProducts(List<FareProductUse> products) {
     this.fareProducts = List.copyOf(products);
   }
@@ -430,6 +421,11 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .toString();
+  }
+
+  @
+  public ScheduledTransitLegBuilder copy() {
+    return new ScheduledTransitLegBuilder<>(this);
   }
 
   /**

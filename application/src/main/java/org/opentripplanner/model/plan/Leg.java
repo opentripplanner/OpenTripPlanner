@@ -485,10 +485,6 @@ public interface Leg {
     return null;
   }
 
-  default void addAlert(TransitAlert alert) {
-    throw new UnsupportedOperationException();
-  }
-
   default Leg withTimeShift(Duration duration) {
     throw new UnsupportedOperationException();
   }

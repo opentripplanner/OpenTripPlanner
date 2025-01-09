@@ -11,6 +11,7 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -132,5 +133,10 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
    */
   public List<Leg> originalLegs() {
     return List.of(first, second);
+  }
+
+  @Override
+  public ScheduledTransitLegBuilder copy() {
+    throw new IllegalStateException();
   }
 }
