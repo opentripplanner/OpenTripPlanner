@@ -23,7 +23,7 @@ public class TripOnServiceDateRequest {
   private final FilterValues<String> netexInternalPlanningCodes;
   private final FilterValues<TripAlteration> alterations;
 
-  protected TripOnServiceDateRequest(
+  TripOnServiceDateRequest(
     RequiredFilterValues<LocalDate> serviceDates,
     FilterValues<FeedScopedId> agencies,
     FilterValues<FeedScopedId> routes,
@@ -41,7 +41,7 @@ public class TripOnServiceDateRequest {
     this.alterations = alterations;
   }
 
-  public static TripOnServiceDateRequestBuilder of(RequiredFilterValues serviceDates) {
+  public static TripOnServiceDateRequestBuilder of(RequiredFilterValues<LocalDate> serviceDates) {
     return new TripOnServiceDateRequestBuilder(serviceDates);
   }
 
