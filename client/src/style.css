@@ -113,6 +113,12 @@
   font-size: 11px;
 }
 
+.accordion-body .generalized-cost {
+  font-size: 11px;
+  text-align: end;
+  margin-right: 9px;
+}
+
 .itinerary-leg-details .mode {
   margin-top: 2px;
 }

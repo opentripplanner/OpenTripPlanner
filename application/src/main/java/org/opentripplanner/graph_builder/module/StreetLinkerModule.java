@@ -103,7 +103,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         continue;
       }
       // check if stop is already linked, to allow multiple idempotent linking cycles
-      if (tStop.isConnectedToGraph()) {
+      if (isAlreadyLinked(tStop, stopLocationsUsedForFlexTrips)) {
         continue;
       }
 
@@ -125,6 +125,26 @@ public class StreetLinkerModule implements GraphBuilderModule {
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
+  }
+
+  /**
+   * Determines if a given transit stop vertex is already linked to the street network, taking into
+   * account that flex stops need special linking to both a walkable and drivable edge. For example,
+   * the {@link OsmBoardingLocationsModule}, which runs before this one, often links stops to
+   * walkable edges only.
+   *
+   * @param stopVertex The transit stop vertex to be checked.
+   * @param stopLocationsUsedForFlexTrips A set of stop locations that are used for flexible trips.
+   */
+  private static boolean isAlreadyLinked(
+    TransitStopVertex stopVertex,
+    Set<StopLocation> stopLocationsUsedForFlexTrips
+  ) {
+    if (stopLocationsUsedForFlexTrips.contains(stopVertex.getStop())) {
+      return stopVertex.isLinkedToDrivableEdge() && stopVertex.isLinkedToWalkableEdge();
+    } else {
+      return stopVertex.isConnectedToGraph();
+    }
   }
 
   /**
