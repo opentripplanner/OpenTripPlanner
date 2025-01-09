@@ -61,14 +61,16 @@ public class GbfsFreeVehicleStatusMapper {
           : null;
       Ratio fuelPercent = null;
       try {
-        fuelPercent = new Ratio(vehicle.getCurrentFuelPercent());
+        if (vehicle.getCurrentFuelPercent() != null) {
+          fuelPercent = new Ratio(vehicle.getCurrentFuelPercent());
+        }
       } catch (IllegalArgumentException e) {
         LOG.warn(
           "Current fuel percent value not valid: {} - {}",
           vehicle.getCurrentFuelPercent(),
           e.getMessage()
         );
-      } catch (NullPointerException e) {}
+      }
       Distance rangeMeters = null;
       try {
         rangeMeters =
