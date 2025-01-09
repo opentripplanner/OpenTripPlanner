@@ -22,6 +22,11 @@ public class ExpressionBuilder<T> {
     return new ExpressionBuilder<>();
   }
 
+  public ExpressionBuilder<T> matches(Matcher<T> matcher) {
+    matchers.add(matcher);
+    return this;
+  }
+
   public <V> ExpressionBuilder<T> atLeastOneMatch(
     FilterValues<V> filterValues,
     Function<V, Matcher<T>> matcherProvider
