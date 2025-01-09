@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -18,11 +19,6 @@ import uk.org.siri.siri20.Siri;
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
-
-  /**
-   * Feed id that is used to match trip ids in the TripUpdates
-   */
-  private final String feedId;
 
   private final String url;
 
@@ -35,8 +31,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private UpdateIncrementality updateIncrementality = FULL_DATASET;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
-  public SiriETHttpTripUpdateSource(Parameters parameters) {
-    this.feedId = parameters.feedId();
+  public SiriETHttpTripUpdateSource(Parameters parameters, SiriLoader siriLoader) {
     this.url = parameters.url();
 
     this.requestorRef =
@@ -44,7 +39,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
         ? "otp-" + UUID.randomUUID()
         : parameters.requestorRef();
 
-    this.siriLoader = createLoader(url, parameters);
+    this.siriLoader = siriLoader;
   }
 
   @Override
@@ -82,28 +77,8 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   }
 
   @Override
-  public String getFeedId() {
-    return this.feedId;
-  }
-
   public String toString() {
-    return "SiriETHttpTripUpdateSource(" + url + ")";
-  }
-
-  private static SiriLoader createLoader(String url, Parameters parameters) {
-    // Load real-time updates from a file.
-    if (SiriFileLoader.matchesUrl(url)) {
-      return new SiriFileLoader(url);
-    }
-    // Fallback to default loader
-    else {
-      return new SiriHttpLoader(
-        url,
-        parameters.timeout(),
-        parameters.httpRequestHeaders(),
-        parameters.previewInterval()
-      );
-    }
+    return ToStringBuilder.of(SiriETHttpTripUpdateSource.class).addStr("url", url).toString();
   }
 
   public interface Parameters {
