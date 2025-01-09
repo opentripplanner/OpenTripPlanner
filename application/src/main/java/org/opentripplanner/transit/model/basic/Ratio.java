@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.model.basic;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.utils.lang.DoubleUtils;
 
 /**
  * Represents a ratio within the range [0, 1].
@@ -12,10 +12,10 @@ import javax.annotation.Nullable;
  */
 public class Ratio {
 
-  private final Double ratio;
+  private final double ratio;
 
   private Ratio(double ratio) {
-    this.ratio = ratio;
+    this.ratio = DoubleUtils.roundTo3Decimals(ratio);
   }
 
   /**
@@ -35,14 +35,16 @@ public class Ratio {
   public static Optional<Ratio> of(double ratio, Consumer<String> validationErrorHandler) {
     if (ratio >= 0d && ratio <= 1d) {
       return Optional.of(new Ratio(ratio));
-    }
-    else {
+    } else {
       validationErrorHandler.accept("Ratio must be in range [0,1], but was: " + ratio);
       return Optional.empty();
     }
   }
 
-  public static Optional<Ratio> ofBoxed(@Nullable Double ratio, Consumer<String> validationErrorHandler) {
+  public static Optional<Ratio> ofBoxed(
+    @Nullable Double ratio,
+    Consumer<String> validationErrorHandler
+  ) {
     if (ratio == null) {
       return Optional.empty();
     }
@@ -50,25 +52,25 @@ public class Ratio {
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (other instanceof Ratio ratio) {
-      return ratio.ratio == this.ratio;
-    } else {
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    var other = (Ratio) o;
+    return Double.compare(ratio, other.ratio) == 0;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.ratio);
+    return Double.hashCode(ratio);
   }
 
   @Override
   public String toString() {
-    return this.ratio.toString();
+    return Double.toString(ratio);
   }
 
-  public Double asDouble() {
+  public double asDouble() {
     return ratio;
   }
 }
