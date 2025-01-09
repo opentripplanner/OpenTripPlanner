@@ -2,6 +2,11 @@ package org.opentripplanner.transit.model.basic;
 
 import java.util.Objects;
 
+/**
+ * Represents a ratio within the range [0, 1].
+ * The class ensures that the ratio value, represented as a double,
+ * falls withing the specified range.
+ */
 public class Ratio {
 
   private final Double ratio;
