@@ -1,4 +1,4 @@
-# Siri-ET Google PubSub Updater
+# SIRI-ET Google PubSub Updater
 
 Support for consuming SIRI-ET messages over a Google Cloud PubSub subscription.
 Similarly to the SIRI-ET HTTP updater, this updater is developed to support the Nordic SIRI profile
@@ -23,7 +23,7 @@ the [Norwegian SIRI profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pa
 To enable the SIRI-ET Google PubSub updater you need to add it to the updaters section
 of the `router-config.json`.
 
-### Siri-ET via Google PubSub
+### SIRI-ET via Google PubSub
 
 <!-- INSERT: siri-et-google-pubsub-updater -->
 

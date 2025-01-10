@@ -12,7 +12,7 @@ Different countries are currently using different incompatible "profiles" of NeT
 underway to converge on a single European standard profile. This is based in large part on the
 Nordic profile used by Entur.
 
-The Nordic profile is the only profile that has been thoroughly tested in production in OTP and is 
+The Nordic profile is the only one that has been thoroughly tested in production in OTP and is 
 used in Norway, Finland and Sweden.
 
 ### EPIP
@@ -22,7 +22,7 @@ is an attempt to unify other country profiles and support in OTP is adequate, bu
 to tell how much of EPIP is supported since it is a very large profile. The current status
 of the support is tracked on [Github](https://github.com/opentripplanner/OpenTripPlanner/issues/3640).
 
-Sometimes it is difficult to tell if a file conforms to EPIP so to find out, you can run the following
+Sometimes it is not easy to figure out if a file conforms to EPIP so to find out, you can run the following
 commands:
 
 ```

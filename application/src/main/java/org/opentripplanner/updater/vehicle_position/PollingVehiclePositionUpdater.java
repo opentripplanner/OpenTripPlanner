@@ -3,11 +3,11 @@ package org.opentripplanner.updater.vehicle_position;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +27,6 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   private final GtfsRealtimeHttpVehiclePositionSource vehiclePositionSource;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
 
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  private WriteToGraphCallback saveResultOnGraph;
   private final String feedId;
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final boolean fuzzyTripMatching;
@@ -54,17 +50,12 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     );
   }
 
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
-
   /**
    * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
    * applies those updates to the graph.
    */
   @Override
-  public void runPolling() {
+  public void runPolling() throws InterruptedException, ExecutionException {
     // Get update lists from update source
     List<VehiclePosition> updates = vehiclePositionSource.getPositions();
 
@@ -77,7 +68,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         fuzzyTripMatching,
         updates
       );
-      saveResultOnGraph.execute(runnable);
+      updateGraph(runnable);
     }
   }
 

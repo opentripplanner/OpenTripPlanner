@@ -92,6 +92,12 @@ public enum OTPFeature {
     false,
     "Whether the @async annotation in the GraphQL schema should lead to the fetch being executed asynchronously. This allows batch or alias queries to run in parallel at the cost of consuming extra threads."
   ),
+  WaitForGraphUpdateInPollingUpdaters(
+    true,
+    false,
+    "Make all polling updaters wait for graph updates to complete before finishing. " +
+    "If this is not enabled, the updaters will finish after submitting the task to update the graph."
+  ),
   Co2Emissions(false, true, "Enable the emissions sandbox module."),
   DataOverlay(
     false,

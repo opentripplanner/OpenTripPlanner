@@ -32,7 +32,7 @@ This has the following consequences
 
     - It makes real-time trip updates referencing a stop id much more complicated and in many cases 
       impossible to resolve. 
-      You can only reference a stop by its sequence, which only works in GTFS-RT, not Siri.
+      You can only reference a stop by its sequence, which only works in GTFS-RT, not SIRI.
     - Fare calculation and transfers are unlikely to work as expected.
 
 

@@ -1,34 +1,49 @@
-# Siri Updater
+# SIRI Updaters
 
-Support for consuming SIRI ET and SX messages. The updater is developed to support the Nordic
-SIRI profile which is a subset of the SIRI specification.
+Support for consuming SIRI ET and SX messages via HTTPS. The updaters aim to support the [Nordic
+and EPIP SIRI profiles](../../features-explained/Netex-Siri-Compatibility.md) which 
+are subsets of the SIRI specification.
+
+For more documentation about the Norwegian profile and data, go to
+the [Entur Real-Time Data](https://developer.entur.org/pages-real-time-intro) documentation and
+the [Norwegian SIRI profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/637370420/Norwegian+SIRI+profile).
 
 ## Contact Info
 
 - Lasse Tyrihjell, Entur, Norway
-
-## Documentation
-
-This updater consumes SIRI real time information. It is developed by Entur and supports the Nordic
-Profile for SIRI. It should be possible to develop it further to support a broader set of the SIRI
-specification.
-
-For more documentation goto
-the [Entur Real-Time Data](https://developer.entur.org/pages-real-time-intro) documentation and
-the [Norwegian SIRI profile](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/637370420/Norwegian+SIRI+profile)
-.
+- Leonard Ehrenfried, Germany
 
 ## Configuration
 
-To enable the SIRI updater you need to add it to the updaters section of the `router-config.json`.
+To enable the SIRI updater you need to add it to the `updaters` section of the `router-config.json`.
 
-### Siri-ET via HTTPS
+### SIRI-ET Request/Response via HTTPS
 
 <!-- INSERT: siri-et-updater -->
 
-### Siri-SX via HTTPS
+### SIRI-SX Request/Response via HTTPS
 
 <!-- INSERT: siri-sx-updater -->
+
+### SIRI-ET Lite
+
+SIRI Lite is [not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
+[specified](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri),
+but this updater supports the following definition: 
+
+Fetching XML-formatted SIRI messages as single GET request rather than the more common request/response 
+flow. This means that the XML feed must contain all updates for all trips, just like it is the case 
+for GTFS-RT TripUpdates.
+
+<!-- INSERT: siri-et-lite -->
+
+### SIRI-SX Lite
+
+This updater follows the same definition of SIRI Lite as the SIRI-ET one: it downloads the entire
+feed in a single HTTP GET request.
+
+<!-- INSERT: siri-sx-lite -->
+
 
 ## Changelog
 

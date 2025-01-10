@@ -35,7 +35,9 @@ public class UpdaterConfigDocTest {
     "vehicle-parking",
     "siri-et-updater",
     "siri-et-google-pubsub-updater",
-    "siri-sx-updater"
+    "siri-sx-updater",
+    "siri-et-lite",
+    "siri-sx-lite"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();

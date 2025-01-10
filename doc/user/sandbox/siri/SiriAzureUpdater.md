@@ -1,6 +1,6 @@
-# Siri Azure Updater
+# SIRI Azure Updater
 
-This is a sandbox extension developed by Skånetrafiken that allows OTP to fetch Siri ET & SX messages 
+This is a sandbox extension developed by Skånetrafiken that allows OTP to fetch SIRI ET & SX messages 
 through *Azure Service Bus*.
 It also enables OTP to download historical data from en HTTP endpoint on startup.
 
@@ -17,7 +17,7 @@ Documentation available [here](../../examples/skanetrafiken/Readme.md).
 
 To enable the SIRI updater you need to add it to the updaters section of the `router-config.json`.
 
-### Siri Azure ET Updater
+### SIRI Azure ET Updater
 
 <!-- siri-azure-et-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -105,7 +105,7 @@ Has to be present for authenticationMethod SharedAccessKey. This should be Prima
 
 <!-- siri-azure-et-updater END -->
 
-### Siri Azure SX Updater
+### SIRI Azure SX Updater
 
 <!-- siri-azure-sx-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->

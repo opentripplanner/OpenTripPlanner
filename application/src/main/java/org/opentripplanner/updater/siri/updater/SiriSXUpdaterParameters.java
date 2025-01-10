@@ -2,7 +2,6 @@ package org.opentripplanner.updater.siri.updater;
 
 import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
-import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record SiriSXUpdaterParameters(
   String configRef,
@@ -15,4 +14,4 @@ public record SiriSXUpdaterParameters(
   boolean blockReadinessUntilInitialized,
   HttpHeaders requestHeaders
 )
-  implements PollingGraphUpdaterParameters {}
+  implements SiriSXUpdater.Parameters {}

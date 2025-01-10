@@ -115,7 +115,7 @@ public class DefaultRoutingServiceTest extends GtfsTest {
       SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
       SphericalDistanceLibrary.metersToDegrees(100)
     );
-    Collection<RegularStop> stops = transitService.findRegularStops(env);
+    Collection<RegularStop> stops = transitService.findRegularStopsByBoundingBox(env);
     assertTrue(stops.contains(stopJ));
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));

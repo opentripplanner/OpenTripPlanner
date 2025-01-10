@@ -221,7 +221,7 @@ public abstract class GtfsTest {
 
     try {
       InputStream inputStream = new FileInputStream(gtfsRealTime);
-      FeedMessage feedMessage = FeedMessage.PARSER.parseFrom(inputStream);
+      FeedMessage feedMessage = FeedMessage.parseFrom(inputStream);
       List<FeedEntity> feedEntityList = feedMessage.getEntityList();
       List<TripUpdate> updates = new ArrayList<>(feedEntityList.size());
       for (FeedEntity feedEntity : feedEntityList) {

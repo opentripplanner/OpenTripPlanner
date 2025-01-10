@@ -183,7 +183,7 @@ public class GraphInspectorVectorTileResource {
       case RegularStop -> new StopLayerBuilder<>(
         layerParameters,
         locale,
-        e -> context.transitService().findRegularStops(e)
+        e -> context.transitService().findRegularStopsByBoundingBox(e)
       );
       case AreaStop -> new StopLayerBuilder<>(
         layerParameters,
