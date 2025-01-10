@@ -5,6 +5,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
+import org.opentripplanner.apis.transmodel.mapping.RelativeDirectionMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.WalkStep;
@@ -31,7 +32,9 @@ public class PathGuidanceType {
           .name("relativeDirection")
           .description("The relative direction of this step.")
           .type(EnumTypes.RELATIVE_DIRECTION)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getRelativeDirection())
+          .dataFetcher(environment ->
+            RelativeDirectionMapper.map(((WalkStep) environment.getSource()).getRelativeDirection())
+          )
           .build()
       )
       .field(
