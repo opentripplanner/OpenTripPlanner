@@ -221,7 +221,7 @@ public class EnumTypes {
 
   public static final GraphQLEnumType OCCUPANCY_STATUS = createFromDocumentedEnum(
     "OccupancyStatus",
-    List.<DocumentedEnumMapping<OccupancyStatus>>of(
+    List.of(
       map("noData", OccupancyStatus.NO_DATA_AVAILABLE),
       map("empty", OccupancyStatus.EMPTY),
       map("manySeatsAvailable", OccupancyStatus.MANY_SEATS_AVAILABLE),
