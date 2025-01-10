@@ -340,7 +340,7 @@ public class ConstructApplication {
   private void initializeSchema() {
     if (OTPFeature.GtfsGraphQlApi.isOn()) {
       LOG.info("Initializing schema for the GTFS GraphQL API.");
-      // Initializing the schema service singleton (server shuts down if there is an issue)
+      // Initializing the schema singleton (server shuts down if there is an issue)
       factory.schema();
     }
   }
