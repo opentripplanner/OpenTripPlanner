@@ -15,8 +15,9 @@ public class CaseInsensitiveStringPrefixMatcher<T> implements Matcher<T> {
 
   /**
    * @param typeName The typeName appears in the toString for easier debugging.
-   * @param value
-   * @param valueProvider
+   * @param value - The String that may be a prefix.
+   * @param valueProvider - A function that maps the entity being matched to the String being
+   *                      checked for a prefix match.
    */
   public CaseInsensitiveStringPrefixMatcher(
     String typeName,
