@@ -42,7 +42,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.apis.transmodel.mapping.PlaceMapper;
@@ -117,10 +116,10 @@ import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
+import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
@@ -1090,24 +1089,42 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("lines")
-          .description("Get all lines")
+          .description("Get all _lines_")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .argument(
             GraphQLArgument
               .newArgument()
               .name("ids")
+              .description(
+                "Set of ids of _lines_ to fetch. If this is set, no other filters can be set."
+              )
               .type(new GraphQLList(Scalars.GraphQLID))
               .build()
           )
-          .argument(GraphQLArgument.newArgument().name("name").type(Scalars.GraphQLString).build())
           .argument(
-            GraphQLArgument.newArgument().name("publicCode").type(Scalars.GraphQLString).build()
+            GraphQLArgument
+              .newArgument()
+              .name("name")
+              .description(
+                "Prefix of the _name_ of the _line_ to fetch. This filter is case insensitive."
+              )
+              .type(Scalars.GraphQLString)
+              .build()
+          )
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("publicCode")
+              .description("_Public code_ of the _line_ to fetch.")
+              .type(Scalars.GraphQLString)
+              .build()
           )
           .argument(
             GraphQLArgument
               .newArgument()
               .name("publicCodes")
+              .description("Set of _public codes_ to fetch _lines_ for.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
@@ -1115,6 +1132,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("transportModes")
+              .description("Set of _transport modes_ to fetch _lines_ for.")
               .type(new GraphQLList(TRANSPORT_MODE))
               .build()
           )
@@ -1122,7 +1140,7 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("authorities")
-              .description("Set of ids of authorities to fetch lines for.")
+              .description("Set of ids of _authorities_ to fetch _lines_ for.")
               .type(new GraphQLList(Scalars.GraphQLString))
               .build()
           )
@@ -1130,83 +1148,57 @@ public class TransmodelGraphQLSchema {
             GraphQLArgument
               .newArgument()
               .name("flexibleOnly")
-              .description("Filter by lines containing flexible / on demand serviceJourneys only.")
+              .description(
+                "Filter by _lines_ containing flexible / on demand _service journey_ only."
+              )
               .type(Scalars.GraphQLBoolean)
-              .defaultValue(false)
+              .defaultValueProgrammatic(false)
               .build()
           )
           .dataFetcher(environment -> {
-            if ((environment.getArgument("ids") instanceof List)) {
-              if (
-                environment
-                  .getArguments()
-                  .entrySet()
-                  .stream()
-                  .filter(it ->
-                    it.getValue() != null &&
-                    !(it.getKey().equals("flexibleOnly") && it.getValue().equals(false))
-                  )
-                  .count() !=
-                1
-              ) {
+            if (environment.containsArgument("ids")) {
+              var ids = mapIDsToDomainNullSafe(environment.getArgument("ids"));
+              Boolean flexibleOnly = environment.getArgument("flexibleOnly");
+              int numberOfArgsPassed = environment.getArguments().size();
+              // Since flexibleOnly has a default, it is always passed so we compare against 2 instead
+              // of 1, and check if the value has been set.
+              boolean moreThanOneArgPassed =
+                numberOfArgsPassed > 2 ||
+                (numberOfArgsPassed == 2 && Boolean.TRUE.equals(flexibleOnly));
+
+              if (moreThanOneArgPassed) {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
               }
-              return ((List<String>) environment.getArgument("ids")).stream()
-                .map(TransitIdMapper::mapIDToDomain)
-                .map(id -> {
-                  return GqlUtil.getTransitService(environment).getRoute(id);
-                })
-                .collect(Collectors.toList());
+              return GqlUtil.getTransitService(environment).getRoutes(ids);
             }
-            Stream<Route> stream = GqlUtil.getTransitService(environment).listRoutes().stream();
 
-            if ((boolean) environment.getArgument("flexibleOnly")) {
-              Collection<Route> flexRoutes = GqlUtil
-                .getTransitService(environment)
-                .getFlexIndex()
-                .getAllFlexRoutes();
-              stream = stream.filter(flexRoutes::contains);
-            }
-            if (environment.getArgument("name") != null) {
-              stream =
-                stream
-                  .filter(route -> route.getLongName() != null)
-                  .filter(route ->
-                    route
-                      .getLongName()
-                      .toString()
-                      .toLowerCase()
-                      .startsWith(((String) environment.getArgument("name")).toLowerCase())
-                  );
-            }
-            if (environment.getArgument("publicCode") != null) {
-              stream =
-                stream
-                  .filter(route -> route.getShortName() != null)
-                  .filter(route ->
-                    route.getShortName().equals(environment.getArgument("publicCode"))
-                  );
-            }
-            if (environment.getArgument("publicCodes") instanceof List) {
-              Set<String> publicCodes = Set.copyOf(environment.getArgument("publicCodes"));
-              stream =
-                stream
-                  .filter(route -> route.getShortName() != null)
-                  .filter(route -> publicCodes.contains(route.getShortName()));
-            }
-            if (environment.getArgument("transportModes") != null) {
-              Set<TransitMode> modes = Set.copyOf(environment.getArgument("transportModes"));
-              stream = stream.filter(route -> modes.contains(route.getMode()));
-            }
-            if ((environment.getArgument("authorities") instanceof Collection)) {
-              Collection<String> authorityIds = environment.getArgument("authorities");
-              stream =
-                stream.filter(route ->
-                  route.getAgency() != null &&
-                  authorityIds.contains(route.getAgency().getId().getId())
-                );
-            }
-            return stream.collect(Collectors.toList());
+            var name = environment.<String>getArgument("name");
+            var publicCode = environment.<String>getArgument("publicCode");
+            var publicCodes = FilterValues.ofEmptyIsEverything(
+              "publicCodes",
+              environment.<List<String>>getArgument("publicCodes")
+            );
+            var transportModes = FilterValues.ofEmptyIsEverything(
+              "transportModes",
+              environment.<List<TransitMode>>getArgument("transportModes")
+            );
+            var authorities = FilterValues.ofEmptyIsEverything(
+              "authorities",
+              environment.<List<String>>getArgument("authorities")
+            );
+            boolean flexibleOnly = Boolean.TRUE.equals(environment.getArgument("flexibleOnly"));
+
+            FindRoutesRequest findRoutesRequest = FindRoutesRequest
+              .of()
+              .withLongName(name)
+              .withShortName(publicCode)
+              .withShortNames(publicCodes)
+              .withTransitModes(transportModes)
+              .withAgencies(authorities)
+              .withFlexibleOnly(flexibleOnly)
+              .build();
+
+            return GqlUtil.getTransitService(environment).findRoutes(findRoutesRequest);
           })
           .build()
       )
