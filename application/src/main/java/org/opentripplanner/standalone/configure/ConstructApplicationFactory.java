@@ -2,10 +2,10 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.service.SchemaService;
-import org.opentripplanner.apis.gtfs.service.configure.SchemaServiceModule;
+import org.opentripplanner.apis.gtfs.configure.SchemaModule;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -65,7 +65,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
     SorlandsbanenNorwayModule.class,
-    SchemaServiceModule.class,
+    SchemaModule.class,
     StopConsolidationServiceModule.class,
     InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
@@ -107,7 +107,7 @@ public interface ConstructApplicationFactory {
   SorlandsbanenNorwayService enturSorlandsbanenService();
 
   @Nullable
-  SchemaService schemaService();
+  GraphQLSchema schema();
 
   @Nullable
   LuceneIndex luceneIndex();
@@ -144,7 +144,7 @@ public interface ConstructApplicationFactory {
     Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
 
     @BindsInstance
-    Builder schemaService(RouteRequest defaultRouteRequest);
+    Builder schema(RouteRequest defaultRouteRequest);
 
     @BindsInstance
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);

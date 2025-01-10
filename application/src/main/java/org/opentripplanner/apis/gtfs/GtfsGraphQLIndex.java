@@ -43,7 +43,7 @@ class GtfsGraphQLIndex {
     }
 
     GraphQL graphQL = GraphQL
-      .newGraphQL(requestContext.schemaService().schema())
+      .newGraphQL(requestContext.schema())
       .instrumentation(instrumentation)
       .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
       .build();

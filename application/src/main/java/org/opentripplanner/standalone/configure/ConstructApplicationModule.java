@@ -2,10 +2,10 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -48,7 +48,7 @@ public class ConstructApplicationModule {
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    @Nullable SchemaService schemaService,
+    @Nullable GraphQLSchema schema,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex
   ) {
@@ -68,7 +68,7 @@ public class ConstructApplicationModule {
       vehicleParkingService,
       emissionsService,
       sorlandsbanenService,
-      schemaService,
+      schema,
       routerConfig.flexParameters(),
       rideHailingServices,
       stopConsolidationService,

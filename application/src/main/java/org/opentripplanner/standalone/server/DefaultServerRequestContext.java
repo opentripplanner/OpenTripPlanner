@@ -1,10 +1,10 @@
 package org.opentripplanner.standalone.server;
 
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -54,7 +54,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final EmissionsService emissionsService;
 
   @Nullable
-  private final SchemaService schemaService;
+  private final GraphQLSchema schema;
 
   @Nullable
   private final SorlandsbanenNorwayService sorlandsbanenService;
@@ -84,7 +84,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleParkingService vehicleParkingService,
     @Nullable EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    @Nullable SchemaService schemaService,
+    @Nullable GraphQLSchema schema,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
@@ -110,7 +110,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.emissionsService = emissionsService;
     this.sorlandsbanenService = sorlandsbanenService;
-    this.schemaService = schemaService;
+    this.schema = schema;
     this.stopConsolidationService = stopConsolidationService;
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.luceneIndex = luceneIndex;
@@ -134,7 +134,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleParkingService vehicleParkingService,
     @Nullable EmissionsService emissionsService,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    @Nullable SchemaService schemaService,
+    @Nullable GraphQLSchema schema,
     FlexParameters flexParameters,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
@@ -158,7 +158,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       vehicleParkingService,
       emissionsService,
       sorlandsbanenService,
-      schemaService,
+      schema,
       rideHailingServices,
       stopConsolidationService,
       streetLimitationParametersService,
@@ -243,8 +243,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Nullable
   @Override
-  public SchemaService schemaService() {
-    return schemaService;
+  public GraphQLSchema schema() {
+    return schema;
   }
 
   @Override

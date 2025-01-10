@@ -102,7 +102,7 @@ public class ConstructApplication {
         .dataImportIssueSummary(issueSummary)
         .stopConsolidationRepository(stopConsolidationRepository)
         .streetLimitationParameters(streetLimitationParameters)
-        .schemaService(config.routerConfig().routingRequestDefaults())
+        .schema(config.routerConfig().routingRequestDefaults())
         .build();
   }
 
@@ -341,7 +341,7 @@ public class ConstructApplication {
     if (OTPFeature.GtfsGraphQlApi.isOn()) {
       LOG.info("Initializing schema for the GTFS GraphQL API.");
       // Initializing the schema service singleton (server shuts down if there is an issue)
-      factory.schemaService();
+      factory.schema();
     }
   }
 }

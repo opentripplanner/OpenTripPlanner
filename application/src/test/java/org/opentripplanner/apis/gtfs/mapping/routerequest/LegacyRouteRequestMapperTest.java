@@ -27,7 +27,6 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -68,7 +67,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
         new DefaultVehicleRentalService(),
         new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
         new DefaultRealtimeVehicleService(transitService),
-        new SchemaService(SchemaFactory.createSchemaWithDefaultInjection(routeRequest)),
+        SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
         GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
         routeRequest
       );

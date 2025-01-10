@@ -1,10 +1,10 @@
 package org.opentripplanner.standalone.api;
 
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.service.SchemaService;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.emissions.EmissionsService;
@@ -156,5 +156,5 @@ public interface OtpServerRequestContext {
   SorlandsbanenNorwayService sorlandsbanenService();
 
   @Nullable
-  SchemaService schemaService();
+  GraphQLSchema schema();
 }
