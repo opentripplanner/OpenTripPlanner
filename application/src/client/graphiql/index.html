@@ -174,16 +174,18 @@ query TransmodelExampleQuery {
     window.location.reload();
   };
 
-  function graphQLFetcher(graphQLParams) {
+  function graphQLFetcher(query, { headers }) {
+    const defaultHeaders = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    }
+    const mergedHeaders = Object.assign({}, defaultHeaders, headers);
     return fetch(
             urls[apiFlavor],
             {
               method: 'post',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(graphQLParams),
+              headers: mergedHeaders,
+              body: JSON.stringify(query),
               credentials: 'omit',
             },
     ).then(function (response) {
