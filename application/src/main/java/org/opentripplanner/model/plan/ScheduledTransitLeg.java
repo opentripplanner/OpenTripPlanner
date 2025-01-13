@@ -98,6 +98,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       getDistanceFromCoordinates(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
       );
+    this.transitAlerts.addAll(builder.alerts());
   }
 
   public ZoneId getZoneId() {

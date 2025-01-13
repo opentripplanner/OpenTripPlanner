@@ -38,7 +38,7 @@ To reduce graph size, only data for northern part of Denmark is used.
 ## Real-time
 
 The **Azure Service Bus** is used to propagate SIRI SX and ET real-time messages to OTP.
-This is solved through Siri Azure updaters that Skånetrafiken had implemented in OTP. There are
+This is solved through SIRI Azure updaters that Skånetrafiken had implemented in OTP. There are
 separate updaters for SIRI SX and ET.
 Those updaters are used to provide data for Swedish traffic (NeTEx). Right now, there is no
 connection to any real-time source for danish traffic (GTFS data).
@@ -77,7 +77,7 @@ Those two parameters are used to define time boundaries for the messages.
 
 Both endpoints generate XML response which is an SIRI object containing SX or ET messages. Messages
 are
-formatted according to Siri Nordic Profile.
+formatted according to SIRI Nordic Profile.
 Since in SIRI ET standard each messages contains all necessary data, Skånetrafikens implementation
 of the
 endpoint returns only the last message

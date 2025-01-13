@@ -23,10 +23,10 @@ jobs:
             sleep: 15
           - name: houston
             sleep: 30
-          #- name: denver
-          #  sleep: 15
-          - name: septa
+          - name: denver
             sleep: 15
+          #- name: septa
+          #  sleep: 15
           - name: portland
             # have to sleep longer since computing geofencing zones takes a while
             sleep: 125

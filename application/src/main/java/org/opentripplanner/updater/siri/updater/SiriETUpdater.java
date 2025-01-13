@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
-import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -28,42 +30,30 @@ public class SiriETUpdater extends PollingGraphUpdater {
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  protected WriteToGraphCallback saveResultOnGraph;
 
   private final EstimatedTimetableHandler estimatedTimetableHandler;
 
-  private final Consumer<UpdateResult> recordMetrics;
+  private final Consumer<UpdateResult> metricsConsumer;
 
   public SiriETUpdater(
-    SiriETUpdaterParameters config,
-    SiriTimetableSnapshotSource timetableSnapshotSource
+    Parameters config,
+    SiriTimetableSnapshotSource timetableSnapshotSource,
+    EstimatedTimetableSource source,
+    Consumer<UpdateResult> metricsConsumer
   ) {
     super(config);
-    // Create update streamer from preferences
     this.feedId = config.feedId();
 
-    this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
+    this.updateSource = source;
 
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
-    LOG.info(
-      "Creating stop time updater (SIRI ET) running every {} seconds : {}",
-      pollingPeriod(),
-      updateSource
-    );
+    LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
     estimatedTimetableHandler =
       new EstimatedTimetableHandler(timetableSnapshotSource, config.fuzzyTripMatching(), feedId);
 
-    recordMetrics = TripUpdateMetrics.streaming(config);
-  }
-
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
+    this.metricsConsumer = metricsConsumer;
   }
 
   /**
@@ -87,7 +77,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
           saveResultOnGraph.execute(context -> {
             var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
-            recordMetrics.accept(result);
+            metricsConsumer.accept(result);
             if (markPrimed) {
               primed = true;
             }
@@ -97,8 +87,20 @@ public class SiriETUpdater extends PollingGraphUpdater {
     } while (moreData);
   }
 
+  @Override
   public String toString() {
-    String s = (updateSource == null) ? "NONE" : updateSource.toString();
-    return "Polling SIRI ET updater with update source = " + s;
+    return ToStringBuilder
+      .of(SiriETUpdater.class)
+      .addStr("source", updateSource.toString())
+      .addDuration("frequency", pollingPeriod())
+      .toString();
+  }
+
+  public interface Parameters extends UrlUpdaterParameters, PollingGraphUpdaterParameters {
+    String url();
+
+    boolean blockReadinessUntilInitialized();
+
+    boolean fuzzyTripMatching();
   }
 }

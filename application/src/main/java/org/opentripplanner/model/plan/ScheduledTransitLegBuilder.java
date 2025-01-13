@@ -3,7 +3,10 @@ package org.opentripplanner.model.plan;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -23,6 +26,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private ConstrainedTransfer transferToNextLeg;
   private int generalizedCost;
   private Float accessibilityScore;
+  private Set<TransitAlert> alerts = new HashSet<>();
 
   public ScheduledTransitLegBuilder() {}
 
@@ -40,6 +44,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     generalizedCost = original.getGeneralizedCost();
     accessibilityScore = original.accessibilityScore();
     zoneId = original.getZoneId();
+    alerts = original.getTransitAlerts();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -157,6 +162,10 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
   public Float accessibilityScore() {
     return accessibilityScore;
+  }
+
+  public Set<TransitAlert> alerts() {
+    return alerts;
   }
 
   public ScheduledTransitLeg build() {

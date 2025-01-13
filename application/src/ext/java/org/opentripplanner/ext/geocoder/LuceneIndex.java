@@ -18,7 +18,7 @@ import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.PostingsFormat;
-import org.apache.lucene.codecs.lucene912.Lucene912Codec;
+import org.apache.lucene.codecs.lucene101.Lucene101Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StoredField;
@@ -34,7 +34,7 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.suggest.document.Completion912PostingsFormat;
+import org.apache.lucene.search.suggest.document.Completion101PostingsFormat;
 import org.apache.lucene.search.suggest.document.CompletionAnalyzer;
 import org.apache.lucene.search.suggest.document.ContextQuery;
 import org.apache.lucene.search.suggest.document.ContextSuggestField;
@@ -203,8 +203,8 @@ public class LuceneIndex implements Serializable {
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
     IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-    Codec filterCodec = new Lucene912Codec() {
-      final PostingsFormat postingsFormat = new Completion912PostingsFormat();
+    Codec filterCodec = new Lucene101Codec() {
+      final PostingsFormat postingsFormat = new Completion101PostingsFormat();
 
       @Override
       public PostingsFormat getPostingsFormatForField(String field) {
@@ -285,7 +285,7 @@ public class LuceneIndex implements Serializable {
           .stream(topDocs.scoreDocs)
           .map(scoreDoc -> {
             try {
-              return searcher.doc(scoreDoc.doc);
+              return searcher.storedFields().document(scoreDoc.doc);
             } catch (IOException e) {
               throw new RuntimeException(e);
             }
@@ -330,7 +330,7 @@ public class LuceneIndex implements Serializable {
           .stream(topDocs.scoreDocs)
           .map(scoreDoc -> {
             try {
-              return searcher.doc(scoreDoc.doc);
+              return searcher.storedFields().document(scoreDoc.doc);
             } catch (IOException e) {
               throw new RuntimeException(e);
             }

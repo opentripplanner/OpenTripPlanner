@@ -17,7 +17,7 @@ public class TripRequest {
   private final FilterValues<String> netexInternalPlanningCodes;
   private final FilterValues<LocalDate> serviceDates;
 
-  protected TripRequest(
+  TripRequest(
     FilterValues<FeedScopedId> agencies,
     FilterValues<FeedScopedId> routes,
     FilterValues<String> netexInternalPlanningCodes,

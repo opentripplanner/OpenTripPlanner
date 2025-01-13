@@ -702,7 +702,7 @@ type QueryType {
   quays(ids: [String], name: String): [Quay]! @timingData
   "Get all quays within the specified bounding box"
   quaysByBbox(
-    authority: String,
+    authority: String @deprecated(reason : "This is the Transmodel namespace or the GTFS feedID - avoid using this. Request a new field if necessary."),
     "If true only quays with at least one visiting line are included."
     filterByInUse: Boolean = false,
     maximumLatitude: Float!,

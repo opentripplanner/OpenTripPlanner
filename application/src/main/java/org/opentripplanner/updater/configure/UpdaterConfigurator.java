@@ -20,9 +20,11 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.siri.updater.SiriETUpdater;
+import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
+import org.opentripplanner.updater.siri.updater.configure.SiriUpdaterModule;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
+import org.opentripplanner.updater.siri.updater.lite.SiriLiteHttpLoader;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
@@ -182,13 +184,23 @@ public class UpdaterConfigurator {
       updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(new SiriETUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(
+        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
+      );
+    }
+    for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
+      updaters.add(
+        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
+      );
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
       updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
-      updaters.add(new SiriSXUpdater(configItem, timetableRepository));
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
+    }
+    for (var configItem : updatersParameters.getSiriSXLiteUpdaterParameters()) {
+      updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));

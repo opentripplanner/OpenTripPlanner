@@ -30,9 +30,9 @@ public class TripOnServiceDateRequestBuilder {
     "alterations",
     List.of()
   );
-  private RequiredFilterValues<LocalDate> serviceDates;
+  private final RequiredFilterValues<LocalDate> serviceDates;
 
-  protected TripOnServiceDateRequestBuilder(RequiredFilterValues serviceDates) {
+  TripOnServiceDateRequestBuilder(RequiredFilterValues<LocalDate> serviceDates) {
     this.serviceDates = serviceDates;
   }
 

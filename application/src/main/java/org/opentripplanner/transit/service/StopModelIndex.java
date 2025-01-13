@@ -71,10 +71,17 @@ class SiteRepositoryIndex {
   }
 
   /**
-   * Find a regular stop in the spatial index
+   * Find a regular stop in the spatial index, where the stop is inside of the passed Envelope.
+   *
+   * @param envelope - The {@link Envelope} to search for stops in.
+   * @return A collection of {@link RegularStop}s that are inside of the passed envelope.
    */
   Collection<RegularStop> findRegularStops(Envelope envelope) {
-    return regularStopSpatialIndex.query(envelope);
+    return regularStopSpatialIndex
+      .query(envelope)
+      .stream()
+      .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
+      .toList();
   }
 
   MultiModalStation getMultiModalStationForStation(Station station) {

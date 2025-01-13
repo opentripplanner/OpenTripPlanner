@@ -8,7 +8,9 @@ import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_AZURE_ET_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_AZURE_SX_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_GOOGLE_PUBSUB_UPDATER;
+import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_LITE;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_UPDATER;
+import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_SX_LITE;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_SX_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.STOP_TIME_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_PARKING;
@@ -30,7 +32,9 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.GtfsRealtimeA
 import org.opentripplanner.standalone.config.routerconfig.updaters.MqttGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETLiteUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
+import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXLiteUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
@@ -44,6 +48,8 @@ import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
+import org.opentripplanner.updater.siri.updater.lite.SiriETLiteUpdaterParameters;
+import org.opentripplanner.updater.siri.updater.lite.SiriSXLiteUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -183,6 +189,16 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
+  public List<SiriETLiteUpdaterParameters> getSiriETLiteUpdaterParameters() {
+    return getParameters(SIRI_ET_LITE);
+  }
+
+  @Override
+  public List<SiriSXLiteUpdaterParameters> getSiriSXLiteUpdaterParameters() {
+    return getParameters(SIRI_SX_LITE);
+  }
+
+  @Override
   public List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters() {
     return getParameters(MQTT_GTFS_RT_UPDATER);
   }
@@ -218,8 +234,10 @@ public class UpdatersConfig implements UpdatersParameters {
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
+    SIRI_ET_LITE(SiriETLiteUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),
+    SIRI_SX_LITE(SiriSXLiteUpdaterConfig::create),
     SIRI_AZURE_ET_UPDATER(SiriAzureETUpdaterConfig::create),
     SIRI_AZURE_SX_UPDATER(SiriAzureSXUpdaterConfig::create);
 

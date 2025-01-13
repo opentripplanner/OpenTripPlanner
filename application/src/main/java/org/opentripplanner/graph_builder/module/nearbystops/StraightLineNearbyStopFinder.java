@@ -22,7 +22,7 @@ public class StraightLineNearbyStopFinder implements NearbyStopFinder {
     // We need to accommodate straight line distance (in meters) but when streets are present we
     // use an earliest arrival search, which optimizes on time. Ideally we'd specify in meters,
     // but we don't have much of a choice here. Use the default walking speed to convert.
-    this.directGraphFinder = new DirectGraphFinder(transitService::findRegularStops);
+    this.directGraphFinder = new DirectGraphFinder(transitService::findRegularStopsByBoundingBox);
   }
 
   /**

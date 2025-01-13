@@ -91,7 +91,7 @@ nav:
     - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'
     - Accessibility: 'Accessibility.md'
-    - NeTex and Siri compatibility: 'features-explained/Netex-Siri-Compatibility.md'
+    - NeTEx and SIRI compatibility: 'features-explained/Netex-Siri-Compatibility.md'
     - "Travel Time Analysis": 'Analysis.md'
     - "Logging": "Logging.md"
 - Development:
