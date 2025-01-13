@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 /**
- * This is GraphQL visitor witch inject custom documentation on types and fields.
+ * This is GraphQL visitor which injects custom documentation on types and fields.
  */
 public class InjectCustomDocumentation
   extends GraphQLTypeVisitorStub

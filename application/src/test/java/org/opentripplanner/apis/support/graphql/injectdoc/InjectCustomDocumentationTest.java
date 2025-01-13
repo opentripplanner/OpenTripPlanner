@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.text.TextAssertions;
 
 /**
- * This test read in a schema file, inject documentation and convert the
+ * This test reads in a schema file, injects documentation and convert the
  * new schema to an SDL text string. The result is then compared to the
  * "expected" SDL file. The input and expected files are found in the
  * resources - with the same name as this test.

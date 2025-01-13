@@ -29,7 +29,7 @@ public class CustomDocumentation {
   private final Map<String, String> textMap;
 
   /**
-   * Pacakge local to be unit-testable
+   * Package local to be unit-testable
    */
   CustomDocumentation(Map<String, String> textMap) {
     this.textMap = textMap;
