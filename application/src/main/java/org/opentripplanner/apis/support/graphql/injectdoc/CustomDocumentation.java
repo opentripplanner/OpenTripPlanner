@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.support.graphql.injectdoc;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -142,7 +144,7 @@ public class CustomDocumentation {
         throw new OtpAppException("Resource not found: %s", resource);
       }
       var props = new Properties();
-      props.load(input);
+      props.load(new InputStreamReader(input, StandardCharsets.UTF_8));
       Map<String, String> map = new HashMap<>();
 
       for (String key : props.stringPropertyNames()) {
