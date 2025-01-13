@@ -101,11 +101,10 @@ public class GqlUtil {
   }
 
   /**
-   * Null-safe handling of a collection of arguments of type T.
-   * Returns an empty collection if the collection is null.
-   * If the collection contains null elements, they are ignored.
+   * Null-safe handling of a collection of type T. Returns an empty list if the collection is null.
+   * Null elements are filtered out.
    */
-  public static <T> List<T> mapArgCollectionNullSafe(@Nullable Collection<T> args) {
+  public static <T> List<T> toListNullSafe(@Nullable Collection<T> args) {
     if (args == null) {
       return List.of();
     }
