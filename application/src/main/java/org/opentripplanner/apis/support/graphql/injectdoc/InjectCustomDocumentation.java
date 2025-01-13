@@ -158,15 +158,15 @@ public class InjectCustomDocumentation
     var fieldName = field.getName();
     var typeName = parent.getName();
 
-    Optional<T> f1 = customDocumentation
+    Optional<T> withDescription = customDocumentation
       .fieldDescription(typeName, fieldName, field.getDescription())
       .map(doc -> setDescription.apply(field, doc));
 
-    Optional<T> f2 = customDocumentation
+    Optional<T> withDeprecated = customDocumentation
       .fieldDeprecatedReason(typeName, fieldName, originalDeprecatedReason)
-      .map(doc -> setDeprecatedReason.apply(f1.orElse(field), doc));
+      .map(doc -> setDeprecatedReason.apply(withDescription.orElse(field), doc));
 
-    f2.or(() -> f1).ifPresent(f -> changeNode(context, f));
+    withDeprecated.or(() -> withDescription).ifPresent(f -> changeNode(context, f));
 
     return CONTINUE;
   }
