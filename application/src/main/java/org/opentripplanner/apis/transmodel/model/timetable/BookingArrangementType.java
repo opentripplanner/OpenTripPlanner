@@ -109,7 +109,7 @@ public class BookingArrangementType {
           .type(EnumTypes.PURCHASE_WHEN)
           .dataFetcher(environment -> {
             BookingInfo bookingInfo = bookingInfo(environment);
-            if (bookingInfo.getMinimumBookingNotice() != null) {
+            if (bookingInfo.getMinimumBookingNotice().isPresent()) {
               return null;
             }
             BookingTime latestBookingTime = bookingInfo.getLatestBookingTime();
