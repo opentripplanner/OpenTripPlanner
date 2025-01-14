@@ -28,6 +28,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private int generalizedCost;
   private Float accessibilityScore;
   private Set<TransitAlert> alerts = new HashSet<>();
+  private double distanceMeters;
 
   public ScheduledTransitLegBuilder() {}
 
@@ -46,6 +47,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     accessibilityScore = original.accessibilityScore();
     zoneId = original.getZoneId();
     alerts = original.getTransitAlerts();
+    distanceMeters = original.getDistanceMeters();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -172,6 +174,15 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
   public Set<TransitAlert> alerts() {
     return alerts;
+  }
+
+  public B withDistance(double distance) {
+    this.distanceMeters = distance;
+    return instance();
+  }
+
+  public double distanceMeters() {
+    return distanceMeters;
   }
 
   public ScheduledTransitLeg build() {

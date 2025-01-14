@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.ext.flex.FlexibleTransitLegBuilder;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
@@ -246,7 +247,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       flexPath
     );
 
-    FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
+    FlexibleTransitLeg leg = new FlexibleTransitLegBuilder()
+      .withFlexTripEdge(edge)
+      .withStartTime(newTime(start))
+      .withEndTime(newTime(end))
+      .withGeneralizedCost(legCost)
+      .build();
 
     legs.add(leg);
     c1 += legCost;
@@ -507,6 +513,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     ScheduledTransitLeg leg;
 
+    var distance = speed(trip.getMode()) * (end - start);
+
     if (headwaySecs != null) {
       leg =
         new FrequencyTransitLegBuilder()
@@ -535,10 +543,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
           .withZoneId(UTC)
           .withTransferFromPreviousLeg(transferFromPreviousLeg)
           .withGeneralizedCost(legCost)
+          .withDistance(distance)
           .build();
     }
-
-    leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
 
     legs.add(leg);
     c1 += legCost;

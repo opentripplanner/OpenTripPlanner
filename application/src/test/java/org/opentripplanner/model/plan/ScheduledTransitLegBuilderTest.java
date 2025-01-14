@@ -1,6 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
@@ -48,9 +47,8 @@ class ScheduledTransitLegBuilderTest {
       .withTripPattern(pattern)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(1)
+      .withAlerts(Set.of(ALERT))
       .build();
-
-    leg.addAlert(ALERT);
 
     var newLeg = new ScheduledTransitLegBuilder<>(leg);
 

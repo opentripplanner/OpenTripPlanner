@@ -17,6 +17,4 @@ public interface TransitLeg extends Leg {
   default boolean hasSameMode(Leg other) {
     return other instanceof TransitLeg trLeg && getMode().equals(trLeg.getMode());
   }
-
-  ScheduledTransitLegBuilder copy();
 }

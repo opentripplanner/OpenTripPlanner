@@ -5,12 +5,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -21,7 +19,6 @@ import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.utils.collection.CollectionUtils;
 
 /**
  * This class is responsible for finding and adding transit alerts to individual transit legs.
@@ -46,9 +43,9 @@ public class AlertToLegMapper {
    * @param isFirstLeg Whether the leg is a first leg of the itinerary. This affects the matched
    *                   stop condition.
    */
-  public Leg addTransitAlertsToLeg(Leg leg, boolean isFirstLeg) {
+  public Leg filterAlertsByTime(Leg leg, boolean isFirstLeg) {
     // Alert alerts are only relevant for transit legs
-    if (leg instanceof TransitLeg tLeg) {
+    if (leg instanceof TransitLeg) {
       ZonedDateTime legStartTime = leg.getStartTime();
       ZonedDateTime legEndTime = leg.getEndTime();
       StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
@@ -57,6 +54,8 @@ public class AlertToLegMapper {
       FeedScopedId routeId = leg.getRoute().getId();
       FeedScopedId tripId = leg.getTrip().getId();
       LocalDate serviceDate = leg.getServiceDate();
+
+      var totalAlerts = new ArrayList<TransitAlert>();
 
       if (fromStop instanceof RegularStop stop) {
         Set<StopCondition> stopConditions = isFirstLeg
@@ -71,7 +70,7 @@ public class AlertToLegMapper {
             id -> transitAlertService.getStopAlerts(id, stopConditions)
           )
         );
-        addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+        totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
       }
       if (toStop instanceof RegularStop stop) {
         Set<StopCondition> stopConditions = StopCondition.ARRIVING;
@@ -83,7 +82,7 @@ public class AlertToLegMapper {
             id -> transitAlertService.getStopAlerts(id, stopConditions)
           )
         );
-        addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+        totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
       }
 
       if (leg.getIntermediateStops() != null) {
@@ -106,7 +105,7 @@ public class AlertToLegMapper {
             ZonedDateTime stopArrival = visit.arrival.scheduledTime();
             ZonedDateTime stopDeparture = visit.departure.scheduledTime();
 
-            addTransitAlertsToLeg(leg, alerts, stopArrival, stopDeparture);
+            totalAlerts.addAll(filterAlertsByTime(alerts, stopArrival, stopDeparture));
           }
         }
       }
@@ -115,51 +114,38 @@ public class AlertToLegMapper {
 
       // trips
       alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
-      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
       // route
       alerts = transitAlertService.getRouteAlerts(leg.getRoute().getId());
-      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
       // agency
       alerts = transitAlertService.getAgencyAlerts(leg.getAgency().getId());
-      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
       // Filter alerts when there are multiple timePeriods for each alert
-      leg
-        .getTransitAlerts()
-        .removeIf(alert ->
+        totalAlerts.removeIf(alert ->
           !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
         );
+      return leg;
     } else {
       return leg;
     }
   }
 
   /**
-   * Add alerts for the leg, if they are valid for the duration of the leg.
+   * Filter alerts if they are valid for the duration of the leg.
    */
-  private static Leg addTransitAlertsToLeg(
-    Leg leg,
+  private static List<TransitAlert> filterAlertsByTime(
     Collection<TransitAlert> alerts,
     ZonedDateTime fromTime,
     ZonedDateTime toTime
   ) {
-    if (CollectionUtils.isEmpty(alerts)) {
-      return leg;
-    } else {
-      var activeAlerts = alerts
-        .stream()
-        .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
-        .toList();
-      return switch (leg) {
-        case ScheduledTransitLeg l -> l.copy().withAlerts(alerts).build();
-        case FlexibleTransitLeg l -> {
-          activeAlerts.forEach(l::addAlert);
-          yield l;
-        }
-        case Leg l -> leg;
-      };
+    return alerts
+      .stream()
+      .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
+      .toList();
     }
   }
 

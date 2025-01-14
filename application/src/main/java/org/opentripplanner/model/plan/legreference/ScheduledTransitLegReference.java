@@ -175,13 +175,11 @@ public record ScheduledTransitLegReference(
       .withGeneralizedCost(0)
       .build();
 
-    new AlertToLegMapper(
+    return (ScheduledTransitLeg) new AlertToLegMapper(
       transitService.getTransitAlertService(),
       transitService::findMultiModalStation
     )
       .addTransitAlertsToLeg(leg, false);
-
-    return leg;
   }
 
   /**

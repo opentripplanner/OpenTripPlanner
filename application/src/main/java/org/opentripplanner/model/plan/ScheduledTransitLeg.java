@@ -423,7 +423,6 @@ public class ScheduledTransitLeg implements TransitLeg {
       .toString();
   }
 
-  @
   public ScheduledTransitLegBuilder copy() {
     return new ScheduledTransitLegBuilder<>(this);
   }

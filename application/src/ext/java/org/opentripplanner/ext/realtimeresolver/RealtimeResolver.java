@@ -54,13 +54,12 @@ public class RealtimeResolver {
     ScheduledTransitLeg reference,
     ScheduledTransitLeg original
   ) {
-    var leg = new ScheduledTransitLegBuilder<>(reference)
+    return new ScheduledTransitLegBuilder<>(reference)
       .withTransferFromPreviousLeg(original.getTransferFromPrevLeg())
       .withTransferToNextLeg(original.getTransferToNextLeg())
       .withGeneralizedCost(original.getGeneralizedCost())
       .withAccessibilityScore(original.accessibilityScore())
+      .withAlerts(reference.getTransitAlerts())
       .build();
-    reference.getTransitAlerts().forEach(leg::addAlert);
-    return leg;
   }
 }

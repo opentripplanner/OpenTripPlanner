@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
@@ -15,6 +16,7 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -41,23 +43,19 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   private final ZonedDateTime endTime;
 
-  private final Set<TransitAlert> transitAlerts = new HashSet<>();
+  private final Set<TransitAlert> transitAlerts;
 
   private final int generalizedCost;
   private List<FareProductUse> fareProducts;
 
-  public FlexibleTransitLeg(
-    FlexTripEdge flexTripEdge,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    int generalizedCost
+  FlexibleTransitLeg(
+    FlexibleTransitLegBuilder builder
   ) {
-    this.edge = flexTripEdge;
-
-    this.startTime = startTime;
-    this.endTime = endTime;
-
-    this.generalizedCost = generalizedCost;
+    this.edge = Objects.requireNonNull(builder.flexTripEdge());
+    this.startTime = Objects.requireNonNull(builder.startTime());
+    this.endTime = Objects.requireNonNull(builder.endTime());
+    this.transitAlerts = Set.copyOf(builder.transitAlerts());
+    this.generalizedCost = builder.generalizedCost();
   }
 
   @Override
@@ -100,6 +98,8 @@ public class FlexibleTransitLeg implements TransitLeg {
   public TransitMode getMode() {
     return getTrip().getMode();
   }
+
+
 
   @Override
   public ZonedDateTime getStartTime() {
@@ -202,12 +202,7 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    FlexibleTransitLeg copy = new FlexibleTransitLeg(
-      edge,
-      startTime.plus(duration),
-      endTime.plus(duration),
-      generalizedCost
-    );
+    FlexibleTransitLeg copy = new FlexibleTransitLegBuilder().withFlexTripEdge(edge).withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).withGeneralizedCost(generalizedCost).build();
 
     for (TransitAlert alert : transitAlerts) {
       copy.addAlert(alert);
@@ -224,6 +219,10 @@ public class FlexibleTransitLeg implements TransitLeg {
   @Override
   public List<FareProductUse> fareProducts() {
     return fareProducts;
+  }
+
+  public FlexibleTransitLegBuilder copy() {
+    return new FlexibleTransitLegBuilder(this);
   }
 
   /**
@@ -252,5 +251,9 @@ public class FlexibleTransitLeg implements TransitLeg {
       .addObj("pickupBookingInfo", getPickupBookingInfo())
       .addObj("dropOffBookingInfo", getDropOffBookingInfo())
       .toString();
+  }
+
+  public FlexTripEdge flexTripEdge() {
+    return edge;
   }
 }

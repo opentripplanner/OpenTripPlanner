@@ -312,7 +312,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    railLeg.addAlert(alert);
+    railLeg = railLeg.copy().withAlerts(Set.of(alert)).build();
 
     var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);

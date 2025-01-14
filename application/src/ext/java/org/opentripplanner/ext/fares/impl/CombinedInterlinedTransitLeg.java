@@ -135,8 +135,4 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     return List.of(first, second);
   }
 
-  @Override
-  public ScheduledTransitLegBuilder copy() {
-    throw new IllegalStateException();
-  }
 }
