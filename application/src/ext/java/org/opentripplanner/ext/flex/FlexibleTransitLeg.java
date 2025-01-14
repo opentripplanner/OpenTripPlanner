@@ -196,19 +196,9 @@ public class FlexibleTransitLeg implements TransitLeg {
     return generalizedCost;
   }
 
-  public void addAlert(TransitAlert alert) {
-    transitAlerts.add(alert);
-  }
-
   @Override
   public Leg withTimeShift(Duration duration) {
-    FlexibleTransitLeg copy = new FlexibleTransitLegBuilder().withFlexTripEdge(edge).withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).withGeneralizedCost(generalizedCost).build();
-
-    for (TransitAlert alert : transitAlerts) {
-      copy.addAlert(alert);
-    }
-
-    return copy;
+    return new FlexibleTransitLegBuilder().withFlexTripEdge(edge).withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).withGeneralizedCost(generalizedCost).build();
   }
 
   @Override

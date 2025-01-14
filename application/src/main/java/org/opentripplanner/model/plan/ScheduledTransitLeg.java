@@ -36,6 +36,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -384,6 +385,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   @Nullable
+  @Sandbox
   public Float accessibilityScore() {
     return accessibilityScore;
   }

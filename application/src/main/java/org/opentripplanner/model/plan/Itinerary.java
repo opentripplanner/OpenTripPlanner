@@ -727,6 +727,10 @@ public class Itinerary implements ItinerarySortKey {
     return buf.toString();
   }
 
+  public void mapLegs(Function<Leg, Leg> mapper) {
+    legs = legs.stream().map(mapper).toList();
+  }
+
   private static int penaltyCost(TimeAndCost penalty) {
     return penalty.cost().toSeconds();
   }

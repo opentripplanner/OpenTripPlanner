@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -22,12 +22,14 @@ public class DecorateTransitAlert implements ItineraryDecorator {
 
   @Override
   public void decorate(Itinerary itinerary) {
-    boolean firstLeg = true;
-    for (Leg leg : itinerary.getLegs()) {
+    final var firstLeg = new AtomicBoolean(true);
+    itinerary.mapLegs(leg -> {
       if (leg.isTransitLeg()) {
-        alertToLegMapper.addTransitAlertToLegs(leg, firstLeg);
-        firstLeg = false;
+        firstLeg.set(false);
+        return alertToLegMapper.addTransitAlertToLegs(leg, firstLeg.get());
+      } else {
+        return leg;
       }
-    }
+    });
   }
 }

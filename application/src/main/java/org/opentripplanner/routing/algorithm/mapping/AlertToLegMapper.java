@@ -8,7 +8,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -121,7 +123,11 @@ public class AlertToLegMapper {
       !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
     );
 
-    return leg;
+    return switch (leg) {
+      case ScheduledTransitLeg l -> l.copy().withAlerts(totalAlerts).build();
+      case FlexibleTransitLeg l -> l.copy().withAlerts(totalAlerts).build();
+      case Leg l -> l;
+    };
   }
 
   /**
