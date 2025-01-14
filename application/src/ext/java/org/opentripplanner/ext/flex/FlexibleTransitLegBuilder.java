@@ -25,10 +25,9 @@ public class FlexibleTransitLegBuilder {
     startTime = original.getStartTime();
     endTime = original.getEndTime();
     generalizedCost = original.getGeneralizedCost();
-    transitAlerts = new HashSet<>(original.getTransitAlerts());
-    fareProducts = new ArrayList<>(original.fareProducts());
+    transitAlerts = original.getTransitAlerts();
+    fareProducts = original.fareProducts();
   }
-
 
   public FlexibleTransitLegBuilder withFlexTripEdge(FlexTripEdge flexTripEdge) {
     this.flexTripEdge = flexTripEdge;
@@ -75,7 +74,7 @@ public class FlexibleTransitLegBuilder {
   }
 
   public FlexibleTransitLegBuilder withFareProducts(List<FareProductUse> allUses) {
-    this.fareProducts = allUses;
+    this.fareProducts = List.copyOf(allUses);
     return this;
   }
 
@@ -86,7 +85,5 @@ public class FlexibleTransitLegBuilder {
   public FlexibleTransitLeg build() {
     return new FlexibleTransitLeg(this);
   }
-
-
 
 }

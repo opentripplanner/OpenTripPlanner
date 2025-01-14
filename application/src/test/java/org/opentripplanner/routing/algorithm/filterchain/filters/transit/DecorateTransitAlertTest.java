@@ -15,15 +15,15 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
 
-class TransitAlertFilterTest implements PlanTestConstants {
+class DecorateTransitAlertTest implements PlanTestConstants {
 
   private static final FeedScopedId ID = new FeedScopedId("FEED", "ALERT");
 
   @Test
   void testRoute() {
-    final var transitAlertService = buildService(TransitAlert
-      .of(ID)
-      .addEntity(new EntitySelector.Route(BUS_ROUTE.getId())));
+    final var transitAlertService = buildService(
+      TransitAlert.of(ID).addEntity(new EntitySelector.Route(BUS_ROUTE.getId()))
+    );
 
     var decorator = new DecorateTransitAlert(transitAlertService, ignore -> null);
 
@@ -43,9 +43,9 @@ class TransitAlertFilterTest implements PlanTestConstants {
 
   @Test
   void testStop() {
-    final var transitAlertService = buildService(TransitAlert
-      .of(ID)
-      .addEntity(new EntitySelector.Stop(E.stop.getId())));
+    final var transitAlertService = buildService(
+      TransitAlert.of(ID).addEntity(new EntitySelector.Stop(E.stop.getId()))
+    );
 
     var decorator = new DecorateTransitAlert(transitAlertService, ignore -> null);
 
@@ -56,17 +56,12 @@ class TransitAlertFilterTest implements PlanTestConstants {
     // Then: expect correct alerts to be added
     assertEquals(1, i1.getLegs().getFirst().getTransitAlerts().size());
     assertEquals(ID, i1.getLegs().getFirst().getTransitAlerts().iterator().next().getId());
-
   }
 
   private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {
     var transitAlertService = new TransitAlertServiceImpl(new TimetableRepository());
     transitAlertService.setAlerts(
-      List.of(
-        builder
-          .addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED))
-          .build()
-      )
+      List.of(builder.addTimePeriod(new TimePeriod(0, TimePeriod.OPEN_ENDED)).build())
     );
     return transitAlertService;
   }

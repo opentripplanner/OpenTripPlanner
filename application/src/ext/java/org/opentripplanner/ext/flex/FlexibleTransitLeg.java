@@ -52,9 +52,9 @@ public class FlexibleTransitLeg implements TransitLeg {
     this.edge = Objects.requireNonNull(builder.flexTripEdge());
     this.startTime = Objects.requireNonNull(builder.startTime());
     this.endTime = Objects.requireNonNull(builder.endTime());
-    this.transitAlerts = Set.copyOf(builder.alerts());
     this.generalizedCost = builder.generalizedCost();
-    this.fareProducts = builder.fareProducts();
+    this.transitAlerts = Set.copyOf(builder.alerts());
+    this.fareProducts = List.copyOf(builder.fareProducts());
   }
 
   @Override
