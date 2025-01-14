@@ -179,7 +179,7 @@ public record ScheduledTransitLegReference(
       transitService.getTransitAlertService(),
       transitService::findMultiModalStation
     )
-      .addTransitAlertToLegs(leg, false);
+      .copyLegWithAlerts(leg, false);
   }
 
   /**

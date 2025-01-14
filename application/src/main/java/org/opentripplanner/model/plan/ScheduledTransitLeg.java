@@ -6,7 +6,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -52,7 +51,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final LineString legGeometry;
-  private final Set<TransitAlert> transitAlerts = new HashSet<>();
+  private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
   protected final Integer boardStopPosInPattern;
@@ -94,13 +93,14 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    this.distanceMeters =
-      DoubleUtils.roundTo2Decimals(getDistanceFromCoordinates(transitLegCoordinates));
+    this.distanceMeters = builder.overrideDistanceMeters().orElseGet(
+      () -> DoubleUtils.roundTo2Decimals(getDistanceFromCoordinates(transitLegCoordinates))
+    );
     this.directDistanceMeters =
       getDistanceFromCoordinates(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
       );
-    this.transitAlerts.addAll(builder.alerts());
+    this.transitAlerts = Set.copyOf(builder.alerts());
   }
 
   public ZoneId getZoneId() {

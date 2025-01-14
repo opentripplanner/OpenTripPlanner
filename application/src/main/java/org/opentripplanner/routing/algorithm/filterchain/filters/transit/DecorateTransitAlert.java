@@ -26,7 +26,7 @@ public class DecorateTransitAlert implements ItineraryDecorator {
     itinerary.mapLegs(leg -> {
       if (leg.isTransitLeg()) {
         firstLeg.set(false);
-        return alertToLegMapper.addTransitAlertToLegs(leg, firstLeg.get());
+        return alertToLegMapper.copyLegWithAlerts(leg, firstLeg.get());
       } else {
         return leg;
       }

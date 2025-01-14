@@ -5,6 +5,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.OptionalDouble;
 import java.util.Set;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -28,7 +29,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private int generalizedCost;
   private Float accessibilityScore;
   private Set<TransitAlert> alerts = new HashSet<>();
-  private double distanceMeters;
+  private Double overrideDistanceMeters;
 
   public ScheduledTransitLegBuilder() {}
 
@@ -47,7 +48,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     accessibilityScore = original.accessibilityScore();
     zoneId = original.getZoneId();
     alerts = original.getTransitAlerts();
-    distanceMeters = original.getDistanceMeters();
+    overrideDistanceMeters = original.getDistanceMeters();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -176,13 +177,21 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return alerts;
   }
 
-  public B withDistance(double distance) {
-    this.distanceMeters = distance;
+  public B withOverrideDistanceMeters(double distance) {
+    this.overrideDistanceMeters = distance;
     return instance();
   }
 
-  public double distanceMeters() {
-    return distanceMeters;
+  /**
+   * If set returns the overridden {@code distanceMeters}. This is generally only useful in tests
+   * since the distance is based off the leg geometry.
+   */
+  public OptionalDouble overrideDistanceMeters() {
+    if(overrideDistanceMeters == null) {
+      return OptionalDouble.empty();
+    } else {
+      return OptionalDouble.of(overrideDistanceMeters);
+    }
   }
 
   public ScheduledTransitLeg build() {
