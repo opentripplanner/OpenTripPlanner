@@ -9,6 +9,7 @@ import static org.opentripplanner.apis.transmodel.model.EnumTypes.FILTER_PLACE_T
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar;
+import static org.opentripplanner.apis.transmodel.support.GqlUtil.toListNullSafe;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -1310,11 +1311,11 @@ public class TransmodelGraphQLSchema {
             );
             var privateCodes = FilterValues.ofEmptyIsEverything(
               "privateCodes",
-              environment.<List<String>>getArgument("privateCodes")
+              toListNullSafe(environment.<List<String>>getArgument("privateCodes"))
             );
             var activeServiceDates = FilterValues.ofEmptyIsEverything(
               "activeDates",
-              environment.<List<LocalDate>>getArgument("activeDates")
+              toListNullSafe(environment.<List<LocalDate>>getArgument("activeDates"))
             );
 
             TripRequest tripRequest = TripRequest
