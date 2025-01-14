@@ -152,8 +152,8 @@ public class SpeedTest {
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
       var config = SpeedTestConfig.config(opts.rootDir());
-      loadOtpFeatures(opts);
-      var model = loadGraph(opts.rootDir(), config.graph);
+      SetupHelper.loadOtpFeatures(opts);
+      var model = SetupHelper.loadGraph(opts.rootDir(), config.graph);
       var timetableRepository = model.timetableRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
@@ -268,27 +268,6 @@ public class SpeedTest {
   }
 
   /* setup helper methods */
-
-  private static void loadOtpFeatures(SpeedTestCmdLineOpts opts) {
-    ConfigModel.initializeOtpFeatures(new OtpConfigLoader(opts.rootDir()).loadOtpConfig());
-  }
-
-  private static LoadModel loadGraph(File baseDir, URI path) {
-    File file = path == null
-      ? OtpDataStore.graphFile(baseDir)
-      : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
-    SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(file);
-    Graph graph = serializedGraphObject.graph;
-
-    if (graph == null) {
-      throw new IllegalStateException();
-    }
-
-    TimetableRepository timetableRepository = serializedGraphObject.timetableRepository;
-    timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
-    return new LoadModel(graph, timetableRepository, serializedGraphObject.buildConfig);
-  }
 
   private void initProfileStatistics() {
     for (SpeedTestProfile key : opts.profiles()) {
