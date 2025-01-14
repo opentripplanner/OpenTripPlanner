@@ -309,7 +309,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           .anyMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
       ) {
         throw new IllegalArgumentException(
-          String.format("Mode %s is used in transferParametersForMode but not in transferRequests", mode)
+          String.format(
+            "Mode %s is used in transferParametersForMode but not in transferRequests",
+            mode
+          )
         );
       }
     }

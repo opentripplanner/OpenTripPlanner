@@ -290,7 +290,7 @@ all of the elevation values in the street edges.
         .of("maxTransferDuration")
         .since(V2_1)
         .summary(
-          "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
+          "Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph."
         )
         .asDuration(Duration.ofMinutes(30));
     transferParametersForMode = TransferConfig.map(root, "transferParametersForMode");

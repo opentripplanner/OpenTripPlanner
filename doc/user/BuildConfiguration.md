@@ -32,7 +32,7 @@ Sections follow that describe particular settings in more depth.
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
 | maxElevationPropagationMeters                                            |       `integer`      | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                |       `double`       | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
-| maxTransferDuration                                                      |      `duration`      | Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph.                                              | *Optional* | `"PT30M"`                         |  2.1  |
+| maxTransferDuration                                                      |      `duration`      | Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph.                                               | *Optional* | `"PT30M"`                         |  2.1  |
 | [multiThreadElevationCalculations](#multiThreadElevationCalculations)    |       `boolean`      | Configuring multi-threading during elevation calculations.                                                                                                     | *Optional* | `false`                           |  2.0  |
 | [osmCacheDataInMem](#osmCacheDataInMem)                                  |       `boolean`      | If OSM data should be cached in memory during processing.                                                                                                      | *Optional* | `false`                           |  2.0  |
 | [osmNaming](#osmNaming)                                                  |        `enum`        | A custom OSM namer to use.                                                                                                                                     | *Optional* | `"default"`                       |  1.5  |
@@ -90,7 +90,7 @@ Sections follow that describe particular settings in more depth.
 | osmDefaults                                                              |       `object`       | Default properties for OpenStreetMap feeds.                                                                                                                    | *Optional* |                                   |  2.2  |
 |    [osmTagMapping](#od_osmTagMapping)                                    |        `enum`        | The named set of mapping rules applied when parsing OSM tags.                                                                                                  | *Optional* | `"default"`                       |  2.2  |
 |    timeZone                                                              |      `time-zone`     | The timezone used to resolve opening hours in OSM data.                                                                                                        | *Optional* |                                   |  2.2  |
-| [transferParameters](#transferParameters)                                | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
+| [transferParametersForMode](#transferParametersForMode)                  | `enum map of object` | Configures mode-specific properties for transfer calculations.                                                                                                 | *Optional* |                                   |  2.7  |
 | [transferRequests](RouteRequest.md)                                      |      `object[]`      | Routing requests to use for pre-calculating stop-to-stop transfers.                                                                                            | *Optional* |                                   |  2.1  |
 | [transitFeeds](#transitFeeds)                                            |      `object[]`      | Scan for transit data files                                                                                                                                    | *Optional* |                                   |  2.2  |
 |    { object }                                                            |       `object`       | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
@@ -953,7 +953,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 The named set of mapping rules applied when parsing OSM tags.
 
-<h3 id="transferParameters">transferParameters</h3>
+<h3 id="transferParametersForMode">transferParametersForMode</h3>
 
 **Since version:** `2.7` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
 **Path:** /   
@@ -969,7 +969,7 @@ To configure mode-specific parameters, the modes should also be used in the `tra
 ```JSON
 // build-config.json
 {
-  "transferParameters": {
+  "transferParametersForMode": {
     "CAR": {
       "disableDefaultTransfers": true,
       "carsAllowedStopMaxTransferDuration": "3h"
