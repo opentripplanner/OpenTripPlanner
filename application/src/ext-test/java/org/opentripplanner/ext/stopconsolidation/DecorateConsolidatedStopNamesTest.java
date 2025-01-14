@@ -7,6 +7,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
@@ -25,7 +26,7 @@ import org.opentripplanner.transit.model.basic.Money;
 
 class DecorateConsolidatedStopNamesTest {
 
-  private static final FareProduct fp = new FareProduct(
+  private static final FareProduct FP = new FareProduct(
     id("fp"),
     "fare product",
     Money.euros(10.00f),
@@ -33,8 +34,8 @@ class DecorateConsolidatedStopNamesTest {
     null,
     null
   );
-  private static final List<FareProductUse> fpu = List.of(
-    new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)
+  private static final List<FareProductUse> FPU = List.of(
+    new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", FP)
   );
   private static final List<ConsolidatedStopGroup> GROUPS = List.of(
     new ConsolidatedStopGroup(STOP_C.getId(), List.of(STOP_D.getId()))
@@ -52,7 +53,12 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    itinerary.getLegs().getFirst().setFareProducts(fpu);
+    var first = (ScheduledTransitLeg)itinerary.getLegs().getFirst();
+    var withFp = first.copy().withFareProducts(FPU).build();
+    var legs = new ArrayList<>(itinerary.getLegs());
+    legs.set(0, withFp);
+
+    itinerary.setLegs(legs);
 
     filter.decorate(itinerary);
 
@@ -61,7 +67,7 @@ class DecorateConsolidatedStopNamesTest {
     assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
 
     // Check that the fares were carried over
-    assertEquals(fpu, updatedLeg.fareProducts());
+    assertEquals(FPU, updatedLeg.fareProducts());
   }
 
   @Test

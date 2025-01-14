@@ -63,7 +63,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
-  private List<FareProductUse> fareProducts = List.of();
+  private final List<FareProductUse> fareProducts;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     this.tripTimes = builder.tripTimes();
@@ -104,6 +104,7 @@ public class ScheduledTransitLeg implements TransitLeg {
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
       );
     this.transitAlerts = Set.copyOf(builder.alerts());
+    this.fareProducts = List.copyOf(builder.fareProducts());
   }
 
   public ZoneId getZoneId() {
@@ -374,11 +375,6 @@ public class ScheduledTransitLeg implements TransitLeg {
       tripPattern.getStops().get(alightStopPosInPattern).getId(),
       tripOnServiceDate == null ? null : tripOnServiceDate.getId()
     );
-  }
-
-  @Override
-  public void setFareProducts(List<FareProductUse> products) {
-    this.fareProducts = List.copyOf(products);
   }
 
   @Override

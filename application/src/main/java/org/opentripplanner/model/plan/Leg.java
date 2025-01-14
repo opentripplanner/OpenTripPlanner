@@ -501,13 +501,6 @@ public interface Leg {
   }
 
   /**
-   * Set {@link FareProductUse} for this leg. Their use-id can identify them across several
-   * legs.
-   */
-  @Sandbox
-  void setFareProducts(List<FareProductUse> products);
-
-  /**
    * Get the {@link FareProductUse} for this leg.
    */
   @Sandbox

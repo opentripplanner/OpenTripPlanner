@@ -121,9 +121,6 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void setFareProducts(List<FareProductUse> products) {}
-
-  @Override
   public List<FareProductUse> fareProducts() {
     return List.of();
   }

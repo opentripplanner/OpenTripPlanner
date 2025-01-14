@@ -1,12 +1,13 @@
 package org.opentripplanner.ext.flex;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 public class FlexibleTransitLegBuilder {
@@ -15,6 +16,7 @@ public class FlexibleTransitLegBuilder {
   private ZonedDateTime endTime;
   private int generalizedCost;
   private Set<TransitAlert> transitAlerts = new HashSet<>();
+  private List<FareProductUse> fareProducts = new ArrayList<>();
 
   public FlexibleTransitLegBuilder() {}
 
@@ -23,7 +25,8 @@ public class FlexibleTransitLegBuilder {
     startTime = original.getStartTime();
     endTime = original.getEndTime();
     generalizedCost = original.getGeneralizedCost();
-    transitAlerts = new LinkedHashSet<>(original.getTransitAlerts());
+    transitAlerts = new HashSet<>(original.getTransitAlerts());
+    fareProducts = new ArrayList<>(original.fareProducts());
   }
 
 
@@ -67,13 +70,23 @@ public class FlexibleTransitLegBuilder {
     return this;
   }
 
-  public Set<TransitAlert> transitAlerts() {
+  public Set<TransitAlert> alerts() {
     return transitAlerts;
+  }
+
+  public FlexibleTransitLegBuilder withFareProducts(List<FareProductUse> allUses) {
+    this.fareProducts = allUses;
+    return this;
+  }
+
+  public List<FareProductUse> fareProducts() {
+    return fareProducts;
   }
 
   public FlexibleTransitLeg build() {
     return new FlexibleTransitLeg(this);
   }
+
 
 
 }

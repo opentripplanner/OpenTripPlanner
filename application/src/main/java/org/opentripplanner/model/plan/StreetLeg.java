@@ -176,11 +176,6 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public void setFareProducts(List<FareProductUse> products) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public List<FareProductUse> fareProducts() {
     return List.of();
   }

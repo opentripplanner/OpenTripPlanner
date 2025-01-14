@@ -3,7 +3,6 @@ package org.opentripplanner.ext.flex;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -16,7 +15,6 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -46,7 +44,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts;
 
   private final int generalizedCost;
-  private List<FareProductUse> fareProducts;
+  private final List<FareProductUse> fareProducts;
 
   FlexibleTransitLeg(
     FlexibleTransitLegBuilder builder
@@ -54,8 +52,9 @@ public class FlexibleTransitLeg implements TransitLeg {
     this.edge = Objects.requireNonNull(builder.flexTripEdge());
     this.startTime = Objects.requireNonNull(builder.startTime());
     this.endTime = Objects.requireNonNull(builder.endTime());
-    this.transitAlerts = Set.copyOf(builder.transitAlerts());
+    this.transitAlerts = Set.copyOf(builder.alerts());
     this.generalizedCost = builder.generalizedCost();
+    this.fareProducts = builder.fareProducts();
   }
 
   @Override
@@ -199,11 +198,6 @@ public class FlexibleTransitLeg implements TransitLeg {
   @Override
   public Leg withTimeShift(Duration duration) {
     return new FlexibleTransitLegBuilder().withFlexTripEdge(edge).withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).withGeneralizedCost(generalizedCost).build();
-  }
-
-  @Override
-  public void setFareProducts(List<FareProductUse> products) {
-    this.fareProducts = List.copyOf(products);
   }
 
   @Override

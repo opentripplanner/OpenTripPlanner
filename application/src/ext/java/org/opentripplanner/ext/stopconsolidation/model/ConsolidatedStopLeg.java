@@ -15,7 +15,6 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
     super(new ScheduledTransitLegBuilder<>(original));
     this.from = Objects.requireNonNull(from);
     this.to = Objects.requireNonNull(to);
-    this.setFareProducts(original.fareProducts());
   }
 
   @Override
