@@ -28,13 +28,13 @@ public class TransferCacheTest {
       var timetableRepository = model.timetableRepository();
       var buildConfig = model.buildConfig();
 
-      var timer = new SpeedTestTimer();
-
-      assertTestDateHasData(timetableRepository, config, buildConfig);
-
       // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
       // we do it manually here
       creatTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
+
+      assertTestDateHasData(timetableRepository, config, buildConfig);
+
+      var timer = new SpeedTestTimer();
 
       measureTransferCacheComputation(timer, timetableRepository);
 
