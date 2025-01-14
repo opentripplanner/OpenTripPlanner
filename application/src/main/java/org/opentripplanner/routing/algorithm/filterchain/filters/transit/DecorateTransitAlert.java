@@ -25,7 +25,7 @@ public class DecorateTransitAlert implements ItineraryDecorator {
     boolean firstLeg = true;
     for (Leg leg : itinerary.getLegs()) {
       if (leg.isTransitLeg()) {
-        alertToLegMapper.addTransitAlertsToLeg(leg, firstLeg);
+        alertToLegMapper.addTransitAlertToLegs(leg, firstLeg);
         firstLeg = false;
       }
     }

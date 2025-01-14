@@ -43,7 +43,7 @@ public class AlertToLegMapper {
    * @param isFirstLeg Whether the leg is a first leg of the itinerary. This affects the matched
    *                   stop condition.
    */
-  public Leg filterAlertsByTime(Leg leg, boolean isFirstLeg) {
+  public Leg addTransitAlertToLegs(Leg leg, boolean isFirstLeg) {
     // Alert alerts are only relevant for transit legs
     if (leg instanceof TransitLeg) {
       ZonedDateTime legStartTime = leg.getStartTime();
@@ -125,9 +125,9 @@ public class AlertToLegMapper {
       totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
       // Filter alerts when there are multiple timePeriods for each alert
-        totalAlerts.removeIf(alert ->
-          !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
-        );
+      totalAlerts.removeIf(alert ->
+        !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
+      );
       return leg;
     } else {
       return leg;
@@ -146,7 +146,6 @@ public class AlertToLegMapper {
       .stream()
       .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
       .toList();
-    }
   }
 
   private Collection<TransitAlert> getAlertsForStopAndRoute(
