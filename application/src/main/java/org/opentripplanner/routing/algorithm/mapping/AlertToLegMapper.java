@@ -45,93 +45,83 @@ public class AlertToLegMapper {
    */
   public Leg addTransitAlertToLegs(Leg leg, boolean isFirstLeg) {
     // Alert alerts are only relevant for transit legs
-    if (leg instanceof TransitLeg) {
-      ZonedDateTime legStartTime = leg.getStartTime();
-      ZonedDateTime legEndTime = leg.getEndTime();
-      StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
-      StopLocation toStop = leg.getTo() == null ? null : leg.getTo().stop;
-
-      FeedScopedId routeId = leg.getRoute().getId();
-      FeedScopedId tripId = leg.getTrip().getId();
-      LocalDate serviceDate = leg.getServiceDate();
-
-      var totalAlerts = new ArrayList<TransitAlert>();
-
-      if (fromStop instanceof RegularStop stop) {
-        Set<StopCondition> stopConditions = isFirstLeg
-          ? StopCondition.FIRST_DEPARTURE
-          : StopCondition.DEPARTURE;
-
-        Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
-        alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
-        alerts.addAll(
-          getAlertsForRelatedStops(
-            stop,
-            id -> transitAlertService.getStopAlerts(id, stopConditions)
-          )
-        );
-        totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
-      }
-      if (toStop instanceof RegularStop stop) {
-        Set<StopCondition> stopConditions = StopCondition.ARRIVING;
-        Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
-        alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
-        alerts.addAll(
-          getAlertsForRelatedStops(
-            stop,
-            id -> transitAlertService.getStopAlerts(id, stopConditions)
-          )
-        );
-        totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
-      }
-
-      if (leg.getIntermediateStops() != null) {
-        Set<StopCondition> stopConditions = StopCondition.PASSING;
-        for (StopArrival visit : leg.getIntermediateStops()) {
-          if (visit.place.stop instanceof RegularStop stop) {
-            Collection<TransitAlert> alerts = getAlertsForStopAndRoute(
-              stop,
-              routeId,
-              stopConditions
-            );
-            alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
-            alerts.addAll(
-              getAlertsForRelatedStops(
-                stop,
-                id -> transitAlertService.getStopAlerts(id, stopConditions)
-              )
-            );
-
-            ZonedDateTime stopArrival = visit.arrival.scheduledTime();
-            ZonedDateTime stopDeparture = visit.departure.scheduledTime();
-
-            totalAlerts.addAll(filterAlertsByTime(alerts, stopArrival, stopDeparture));
-          }
-        }
-      }
-
-      Collection<TransitAlert> alerts;
-
-      // trips
-      alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
-      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
-
-      // route
-      alerts = transitAlertService.getRouteAlerts(leg.getRoute().getId());
-      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
-
-      // agency
-      alerts = transitAlertService.getAgencyAlerts(leg.getAgency().getId());
-      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
-
-      // Filter alerts when there are multiple timePeriods for each alert
-      totalAlerts.removeIf(alert ->
-        !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
-      );
-      return leg;
-    } else {
+    if (!leg.isTransitLeg()) {
       return leg;
     }
+    ZonedDateTime legStartTime = leg.getStartTime();
+    ZonedDateTime legEndTime = leg.getEndTime();
+    StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
+    StopLocation toStop = leg.getTo() == null ? null : leg.getTo().stop;
+
+    FeedScopedId routeId = leg.getRoute().getId();
+    FeedScopedId tripId = leg.getTrip().getId();
+    LocalDate serviceDate = leg.getServiceDate();
+
+    var totalAlerts = new ArrayList<TransitAlert>();
+
+    if (fromStop instanceof RegularStop stop) {
+      Set<StopCondition> stopConditions = isFirstLeg
+        ? StopCondition.FIRST_DEPARTURE
+        : StopCondition.DEPARTURE;
+
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
+      alerts.addAll(
+        getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
+      );
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
+    }
+    if (toStop instanceof RegularStop stop) {
+      Set<StopCondition> stopConditions = StopCondition.ARRIVING;
+      Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+      alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
+      alerts.addAll(
+        getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
+      );
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
+    }
+
+    if (leg.getIntermediateStops() != null) {
+      Set<StopCondition> stopConditions = StopCondition.PASSING;
+      for (StopArrival visit : leg.getIntermediateStops()) {
+        if (visit.place.stop instanceof RegularStop stop) {
+          Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
+          alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
+          alerts.addAll(
+            getAlertsForRelatedStops(
+              stop,
+              id -> transitAlertService.getStopAlerts(id, stopConditions)
+            )
+          );
+
+          ZonedDateTime stopArrival = visit.arrival.scheduledTime();
+          ZonedDateTime stopDeparture = visit.departure.scheduledTime();
+
+          totalAlerts.addAll(filterAlertsByTime(alerts, stopArrival, stopDeparture));
+        }
+      }
+    }
+
+    Collection<TransitAlert> alerts;
+
+    // trips
+    alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
+    totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
+
+    // route
+    alerts = transitAlertService.getRouteAlerts(leg.getRoute().getId());
+    totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
+
+    // agency
+    alerts = transitAlertService.getAgencyAlerts(leg.getAgency().getId());
+    totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
+
+    // Filter alerts when there are multiple timePeriods for each alert
+    totalAlerts.removeIf(alert ->
+      !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
+    );
+
+    return leg;
   }
 
   /**
