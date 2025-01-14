@@ -93,9 +93,12 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    this.distanceMeters = builder.overrideDistanceMeters().orElseGet(
-      () -> DoubleUtils.roundTo2Decimals(getDistanceFromCoordinates(transitLegCoordinates))
-    );
+    this.distanceMeters =
+      builder
+        .overrideDistanceMeters()
+        .orElseGet(() ->
+          DoubleUtils.roundTo2Decimals(getDistanceFromCoordinates(transitLegCoordinates))
+        );
     this.directDistanceMeters =
       getDistanceFromCoordinates(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())

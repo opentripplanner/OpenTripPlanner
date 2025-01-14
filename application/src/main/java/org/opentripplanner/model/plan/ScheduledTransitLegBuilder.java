@@ -187,7 +187,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
    * since the distance is based off the leg geometry.
    */
   public OptionalDouble overrideDistanceMeters() {
-    if(overrideDistanceMeters == null) {
+    if (overrideDistanceMeters == null) {
       return OptionalDouble.empty();
     } else {
       return OptionalDouble.of(overrideDistanceMeters);
