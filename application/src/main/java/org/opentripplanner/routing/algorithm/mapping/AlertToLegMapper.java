@@ -12,6 +12,7 @@ import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -44,7 +45,7 @@ public class AlertToLegMapper {
    * @param isFirstLeg Whether the leg is a first leg of the itinerary. This affects the matched
    *                   stop condition.
    */
-  public Leg copyLegWithAlerts(Leg leg, boolean isFirstLeg) {
+  public TransitLeg copyLegWithAlerts(TransitLeg leg, boolean isFirstLeg) {
     // Alert alerts are only relevant for transit legs
     if (!leg.isTransitLeg()) {
       return leg;
@@ -125,7 +126,7 @@ public class AlertToLegMapper {
     return switch (leg) {
       case ScheduledTransitLeg l -> l.copy().withAlerts(totalAlerts).build();
       case FlexibleTransitLeg l -> l.copy().withAlerts(totalAlerts).build();
-      case Leg l -> l;
+      default -> leg;
     };
   }
 
