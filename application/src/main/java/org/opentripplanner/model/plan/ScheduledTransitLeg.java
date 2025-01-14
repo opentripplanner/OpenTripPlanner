@@ -435,7 +435,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     return tripTimes.getTrip();
   }
 
-  private List<Coordinate> extractTransitLegCoordinates(
+  private static List<Coordinate> extractTransitLegCoordinates(
     TripPattern tripPattern,
     int boardStopIndexInPattern,
     int alightStopIndexInPattern
@@ -451,7 +451,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     return transitLegCoordinates;
   }
 
-  private double getDistanceFromCoordinates(List<Coordinate> coordinates) {
+  private static double getDistanceFromCoordinates(List<Coordinate> coordinates) {
     double distance = 0;
     for (int i = 1; i < coordinates.size(); i++) {
       distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
