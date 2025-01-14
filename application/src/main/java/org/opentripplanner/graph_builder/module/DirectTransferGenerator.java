@@ -301,7 +301,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     /* These are used for calculating transfers only between carsAllowedStops. */
     HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode = new HashMap<>();
 
-    // Check that the mode specified in transferParameters can also be found in transferRequests.
+    // Check that the mode specified in transferParametersForMode can also be found in transferRequests.
     for (StreetMode mode : transferParametersForMode.keySet()) {
       if (
         !transferRequests
@@ -309,7 +309,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           .anyMatch(transferProfile -> transferProfile.journey().transfer().mode() == mode)
       ) {
         throw new IllegalArgumentException(
-          String.format("Mode %s is used in transferParameters but not in transferRequests", mode)
+          String.format("Mode %s is used in transferParametersForMode but not in transferRequests", mode)
         );
       }
     }
