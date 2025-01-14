@@ -3,13 +3,16 @@ package org.opentripplanner.graph_builder.module;
 import java.time.Duration;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
+/**
+ * Mode-specific parameters for transfers.
+ */
 public record TransferParameters(
   Duration maxTransferDuration,
   Duration carsAllowedStopMaxTransferDuration,
   boolean disableDefaultTransfers
 ) {
-  public static final Duration DEFAULT_MAX_TRANSFER_DURATION = Duration.ZERO;
-  public static final Duration DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION = Duration.ZERO;
+  public static final Duration DEFAULT_MAX_TRANSFER_DURATION = null;
+  public static final Duration DEFAULT_CARS_ALLOWED_STOP_MAX_TRANSFER_DURATION = null;
   public static final boolean DEFAULT_DISABLE_DEFAULT_TRANSFERS = false;
 
   TransferParameters(Builder builder) {

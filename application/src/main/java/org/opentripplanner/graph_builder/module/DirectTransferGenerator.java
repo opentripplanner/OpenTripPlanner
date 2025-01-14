@@ -327,7 +327,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           defaultTransferRequests.add(transferProfile);
           // Set mode-specific maxTransferDuration, if it is set in the build config.
           Duration maxTransferDuration = transferParameters.maxTransferDuration();
-          if (maxTransferDuration != Duration.ZERO) {
+          if (maxTransferDuration != null) {
             defaultNearbyStopFinderForMode.put(mode, createNearbyStopFinder(maxTransferDuration));
           } else {
             defaultNearbyStopFinderForMode.put(mode, nearbyStopFinder);
@@ -335,7 +335,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         }
         // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
         Duration carsAllowedStopMaxTransferDuration = transferParameters.carsAllowedStopMaxTransferDuration();
-        if (carsAllowedStopMaxTransferDuration != Duration.ZERO) {
+        if (carsAllowedStopMaxTransferDuration != null) {
           carsAllowedStopTransferRequests.add(transferProfile);
           carsAllowedStopNearbyStopFinderForMode.put(
             mode,
