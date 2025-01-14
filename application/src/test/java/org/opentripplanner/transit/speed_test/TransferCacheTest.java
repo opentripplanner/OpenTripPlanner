@@ -28,17 +28,17 @@ public class TransferCacheTest {
       var timetableRepository = model.timetableRepository();
       var buildConfig = model.buildConfig();
 
+      var timer = new SpeedTestTimer();
+      timer.setUp(false);
+
       // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
       // we do it manually here
       creatTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
 
       assertTestDateHasData(timetableRepository, config, buildConfig);
 
-      var timer = new SpeedTestTimer();
-
       measureTransferCacheComputation(timer, timetableRepository);
 
-      timer.setUp(false);
       timer.finishUp();
     } catch (OtpAppException ae) {
       System.err.println(ae.getMessage());
