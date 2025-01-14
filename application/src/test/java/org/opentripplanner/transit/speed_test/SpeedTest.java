@@ -13,13 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.IntStream;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -29,7 +27,6 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
@@ -193,8 +190,6 @@ public class SpeedTest {
       }
     }
 
-    measureTransferCacheComputation();
-
     updateTimersWithGlobalCounters();
 
     timer.finishUp();
@@ -343,22 +338,6 @@ public class SpeedTest {
   }
 
   /**
-   * Measure how long it takes to compute the transfer cache.
-   */
-  private void measureTransferCacheComputation() {
-    IntStream
-      .of(1, 2, 3, 4, 5, 6, 7)
-      .forEach(reluctance -> {
-        RouteRequest routeRequest = new RouteRequest();
-        routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
-        timer.recordTimer(
-          "transfer_cache_computation",
-          () -> timetableRepository.getTransitLayer().initTransferCacheForRequest(routeRequest)
-        );
-      });
-  }
-
-  /**
    * Add "static" transit statistics and JVM memory usages to the "timers" logging.
    */
   private void updateTimersWithGlobalCounters() {
@@ -390,8 +369,4 @@ public class SpeedTest {
     }
     return stream.limit(opts.numOfItineraries()).toList();
   }
-
-  /* inline classes */
-
-  record LoadModel(Graph graph, TimetableRepository timetableRepository, BuildConfig buildConfig) {}
 }
