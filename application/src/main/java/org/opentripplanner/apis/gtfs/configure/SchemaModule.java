@@ -4,6 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -19,6 +20,7 @@ public class SchemaModule {
 
   @Provides
   @Singleton
+  @Nullable
   public GraphQLSchema provideSchema(RouteRequest defaultRouteRequest) {
     return OTPFeature.GtfsGraphQlApi.isOn()
       ? SchemaFactory.createSchemaWithDefaultInjection(defaultRouteRequest)
