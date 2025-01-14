@@ -13,6 +13,9 @@ import graphql.schema.GraphQLTypeVisitor;
 import graphql.schema.GraphQLTypeVisitorStub;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
+import java.util.HashMap;
+import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
@@ -21,10 +24,10 @@ import org.opentripplanner.routing.api.request.RouteRequest;
  */
 public class DefaultValueInjector extends GraphQLTypeVisitorStub implements GraphQLTypeVisitor {
 
-  private final RouteRequest defaultRouteRequest;
+  private final Map<String, Value> defaultForKey;
 
   public DefaultValueInjector(RouteRequest defaultRouteRequest) {
-    this.defaultRouteRequest = defaultRouteRequest;
+    this.defaultForKey = createDefaultMapping(defaultRouteRequest);
   }
 
   @Override
@@ -64,92 +67,126 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     // Arguments and input fields always have a parent
     var parent = (GraphQLNamedSchemaElement) context.getParentNode();
     var parentName = parent.getName();
-    var key = parentName + "_" + name;
+    var key = parentName + "." + name;
+    return defaultForKey.get(key);
+  }
+
+  private static Map<String, Value> createDefaultMapping(RouteRequest defaultRouteRequest) {
+    var builder = new DefaultMappingBuilder();
     var preferences = defaultRouteRequest.preferences();
-    switch (key) {
-      case "planConnection_first":
-        return IntValue.of(defaultRouteRequest.numItineraries());
-      case "planConnection_searchWindow":
-        return defaultRouteRequest.searchWindow() != null
-          ? StringValue.of(defaultRouteRequest.searchWindow().toString())
-          : null;
-      case "AlightPreferencesInput_slack":
-        return StringValue.of(preferences.transit().alightSlack().defaultValue().toString());
-      case "BicycleParkingPreferencesInput_unpreferredCost":
-        return IntValue.of(
-          preferences.bike().parking().unpreferredVehicleParkingTagCost().toSeconds()
-        );
-      case "BicyclePreferencesInput_boardCost":
-        return IntValue.of(preferences.bike().boardCost());
-      case "BicyclePreferencesInput_reluctance":
-        return FloatValue.of(preferences.bike().reluctance());
-      case "BicyclePreferencesInput_speed":
-        return FloatValue.of(preferences.bike().speed());
-      case "BicycleWalkPreferencesCostInput_mountDismountCost":
-        return IntValue.of(preferences.bike().walking().mountDismountCost().toSeconds());
-      case "BicycleWalkPreferencesCostInput_reluctance":
-        return FloatValue.of(preferences.bike().walking().reluctance());
-      case "BicycleWalkPreferencesInput_mountDismountTime":
-        return StringValue.of(preferences.bike().walking().mountDismountTime().toString());
-      case "BicycleWalkPreferencesInput_speed":
-        return FloatValue.of(preferences.bike().walking().speed());
-      case "BoardPreferencesInput_slack":
-        return StringValue.of(preferences.transit().boardSlack().defaultValue().toString());
-      case "BoardPreferencesInput_waitReluctance":
-        return FloatValue.of(preferences.transfer().waitReluctance());
-      case "CarParkingPreferencesInput_unpreferredCost":
-        return IntValue.of(
-          preferences.car().parking().unpreferredVehicleParkingTagCost().toSeconds()
-        );
-      case "CarPreferencesInput_reluctance":
-        return FloatValue.of(preferences.car().reluctance());
-      case "DestinationBicyclePolicyInput_allowKeeping":
-        return BooleanValue.of(
-          preferences.bike().rental().allowArrivingInRentedVehicleAtDestination()
-        );
-      case "DestinationBicyclePolicyInput_keepingCost":
-        return IntValue.of(
-          preferences.bike().rental().arrivingInRentalVehicleAtDestinationCost().toSeconds()
-        );
-      case "DestinationScooterPolicyInput_allowKeeping":
-        return BooleanValue.of(
-          preferences.scooter().rental().allowArrivingInRentedVehicleAtDestination()
-        );
-      case "DestinationScooterPolicyInput_keepingCost":
-        return IntValue.of(
-          preferences.scooter().rental().arrivingInRentalVehicleAtDestinationCost().toSeconds()
-        );
-      case "ScooterPreferencesInput_reluctance":
-        return FloatValue.of(preferences.scooter().reluctance());
-      case "ScooterPreferencesInput_speed":
-        return FloatValue.of(preferences.scooter().speed());
-      case "TimetablePreferencesInput_excludeRealTimeUpdates":
-        return BooleanValue.of(preferences.transit().ignoreRealtimeUpdates());
-      case "TimetablePreferencesInput_includePlannedCancellations":
-        return BooleanValue.of(preferences.transit().includePlannedCancellations());
-      case "TimetablePreferencesInput_includeRealTimeCancellations":
-        return BooleanValue.of(preferences.transit().includeRealtimeCancellations());
-      case "TransferPreferencesInput_cost":
-        return IntValue.of(preferences.transfer().cost());
-      case "TransferPreferencesInput_maximumAdditionalTransfers":
-        return IntValue.of(preferences.transfer().maxAdditionalTransfers());
-      case "TransferPreferencesInput_maximumTransfers":
-        // Max transfers are wrong in the internal model but fixed in the API mapping
-        return IntValue.of(preferences.transfer().maxTransfers() - 1);
-      case "TransferPreferencesInput_slack":
-        return StringValue.of(preferences.transfer().slack().toString());
-      case "WalkPreferencesInput_boardCost":
-        return IntValue.of(preferences.walk().boardCost());
-      case "WalkPreferencesInput_reluctance":
-        return FloatValue.of(preferences.walk().reluctance());
-      case "WalkPreferencesInput_safetyFactor":
-        return FloatValue.of(preferences.walk().safetyFactor());
-      case "WalkPreferencesInput_speed":
-        return FloatValue.of(preferences.walk().speed());
-      case "WheelchairPreferencesInput_enabled":
-        return BooleanValue.of(defaultRouteRequest.wheelchair());
-      default:
-        return null;
+    return builder
+      .intReq("planConnection.first", defaultRouteRequest.numItineraries())
+      .stringOpt("planConnection.searchWindow", defaultRouteRequest.searchWindow())
+      .stringReq("AlightPreferencesInput.slack", preferences.transit().alightSlack().defaultValue())
+      .intReq(
+        "BicycleParkingPreferencesInput.unpreferredCost",
+        preferences.bike().parking().unpreferredVehicleParkingTagCost().toSeconds()
+      )
+      .intReq("BicyclePreferencesInput.boardCost", preferences.bike().boardCost())
+      .floatReq("BicyclePreferencesInput.reluctance", preferences.bike().reluctance())
+      .floatReq("BicyclePreferencesInput.speed", preferences.bike().speed())
+      .intReq(
+        "BicycleWalkPreferencesCostInput.mountDismountCost",
+        preferences.bike().walking().mountDismountCost().toSeconds()
+      )
+      .floatReq(
+        "BicycleWalkPreferencesCostInput.reluctance",
+        preferences.bike().walking().reluctance()
+      )
+      .stringReq(
+        "BicycleWalkPreferencesInput.mountDismountTime",
+        preferences.bike().walking().mountDismountTime()
+      )
+      .floatReq("BicycleWalkPreferencesInput.speed", preferences.bike().walking().speed())
+      .stringReq("BoardPreferencesInput.slack", preferences.transit().boardSlack().defaultValue())
+      .floatReq("BoardPreferencesInput.waitReluctance", preferences.transfer().waitReluctance())
+      .intReq(
+        "CarParkingPreferencesInput.unpreferredCost",
+        preferences.car().parking().unpreferredVehicleParkingTagCost().toSeconds()
+      )
+      .floatReq("CarPreferencesInput.reluctance", preferences.car().reluctance())
+      .boolReq(
+        "DestinationBicyclePolicyInput.allowKeeping",
+        preferences.bike().rental().allowArrivingInRentedVehicleAtDestination()
+      )
+      .intReq(
+        "DestinationBicyclePolicyInput.keepingCost",
+        preferences.bike().rental().arrivingInRentalVehicleAtDestinationCost().toSeconds()
+      )
+      .boolReq(
+        "DestinationScooterPolicyInput.allowKeeping",
+        preferences.scooter().rental().allowArrivingInRentedVehicleAtDestination()
+      )
+      .intReq(
+        "DestinationScooterPolicyInput.keepingCost",
+        preferences.scooter().rental().arrivingInRentalVehicleAtDestinationCost().toSeconds()
+      )
+      .floatReq("ScooterPreferencesInput.reluctance", preferences.scooter().reluctance())
+      .floatReq("ScooterPreferencesInput.speed", preferences.scooter().speed())
+      .boolReq(
+        "TimetablePreferencesInput.excludeRealTimeUpdates",
+        preferences.transit().ignoreRealtimeUpdates()
+      )
+      .boolReq(
+        "TimetablePreferencesInput.includePlannedCancellations",
+        preferences.transit().includePlannedCancellations()
+      )
+      .boolReq(
+        "TimetablePreferencesInput.includeRealTimeCancellations",
+        preferences.transit().includeRealtimeCancellations()
+      )
+      .intReq("TransferPreferencesInput.cost", preferences.transfer().cost())
+      .intReq(
+        "TransferPreferencesInput.maximumAdditionalTransfers",
+        preferences.transfer().maxAdditionalTransfers()
+      )
+      // Max transfers are wrong in the internal model but fixed in the API mapping
+      .intReq(
+        "TransferPreferencesInput.maximumTransfers",
+        preferences.transfer().maxTransfers() - 1
+      )
+      .stringReq("TransferPreferencesInput.slack", preferences.transfer().slack())
+      .intReq("WalkPreferencesInput.boardCost", preferences.walk().boardCost())
+      .floatReq("WalkPreferencesInput.reluctance", preferences.walk().reluctance())
+      .floatReq("WalkPreferencesInput.safetyFactor", preferences.walk().safetyFactor())
+      .floatReq("WalkPreferencesInput.speed", preferences.walk().speed())
+      .boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair())
+      .build();
+  }
+
+  private static class DefaultMappingBuilder {
+
+    private final Map<String, Value> defaultValueForKey = new HashMap<String, Value>();
+
+    public DefaultMappingBuilder intReq(String key, int value) {
+      defaultValueForKey.put(key, IntValue.of(value));
+      return this;
+    }
+
+    public DefaultMappingBuilder floatReq(String key, double value) {
+      defaultValueForKey.put(key, FloatValue.of(value));
+      return this;
+    }
+
+    public DefaultMappingBuilder stringReq(String key, Object value) {
+      defaultValueForKey.put(key, StringValue.of(value.toString()));
+      return this;
+    }
+
+    public DefaultMappingBuilder stringOpt(String key, @Nullable Object value) {
+      if (value != null) {
+        defaultValueForKey.put(key, StringValue.of(value.toString()));
+      }
+      return this;
+    }
+
+    public DefaultMappingBuilder boolReq(String key, boolean value) {
+      defaultValueForKey.put(key, BooleanValue.of(value));
+      return this;
+    }
+
+    public Map<String, Value> build() {
+      return defaultValueForKey;
     }
   }
 }
