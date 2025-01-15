@@ -1,164 +1,120 @@
-export type NestedData = null | undefined | string | number | boolean | NestedData[] | { [key: string]: NestedData };
-
 /**
- * Retrieves a nested value from an object/array based on a dot-separated path.
- * Supports wildcard (`*`) in paths to match any index in arrays.
- *
+ * Retrieves a nested value from an object based on a dot-separated path.
  * @param obj - The object/array to traverse.
- * @param path - The dot-separated path string (e.g. "myList.*.fieldName").
+ * @param path - The dot-separated path string (e.g. "myList.0.fieldName").
  * @returns The value at the specified path or undefined if not found.
  */
-export function getNestedValue(obj: NestedData, path: string): NestedData {
-  const keys = path.split('.');
-
-  return keys.reduce<NestedData>((acc, key) => {
-    if (acc == null) {
-      // If acc is null or undefined, no deeper value can be retrieved
-      return undefined;
-    }
-
-    if (key === '*') {
-      // If wildcard, return all matching values from the array
-      if (Array.isArray(acc)) {
-        // We map over each item in the array, recursing on the "remaining" path
-        return acc
-          .map(
-            (item) => getNestedValue(item, keys.slice(1).join('.')), // skip the current wildcard
-          )
-          .filter((val) => val !== undefined);
-      }
-      // Wildcard on non-array is invalid => undefined
-      return undefined;
-    }
-
-    // Non-wildcard key:
-    if (Array.isArray(acc)) {
-      // If current data is an array, try to interpret `key` as an index
-      const index = Number(key);
-      if (!Number.isNaN(index)) {
-        return acc[index];
-      }
-      // If the path key isn't a valid index, return undefined
-      return undefined;
-    }
-
-    if (typeof acc === 'object') {
-      // If it's a plain object, we can index by key
-      return (acc as { [k: string]: NestedData })[key];
-    }
-
-    // If it's a primitive (string, number, boolean), there's nothing left to traverse
-    return undefined;
+export const getNestedValue = (obj: any, path: string): any => {
+  return path.split('.').reduce((acc, key) => {
+    if (acc == null) return undefined;
+    return acc[key];
   }, obj);
-}
+};
 
 /**
  * Sets a nested value in an object (or array) based on a dot-separated path,
  * returning a new top-level object/array to ensure immutability.
- * Supports wildcard (`*`) in paths for updating all items in an array.
+ *
+ * This version detects numeric path segments (like "0", "1") and uses arrays
+ * at those levels. Non-numeric segments use objects. If there's a mismatch,
+ * it will convert that level to the correct type.
  *
  * @param obj - The original object/array.
- * @param path - The dot-separated path string (e.g. "myList.*.fieldName").
+ * @param path - The dot-separated path string (e.g. "myList.0.fieldName").
  * @param value - The value to set at that path.
  * @returns A new object (or array) with the updated value.
  */
-export function setNestedValue(obj: NestedData, path: string, value: NestedData): NestedData {
+export const setNestedValue = (obj: any, path: string, value: any): any => {
   const keys = path.split('.');
 
-  function cloneAndSet(current: NestedData, index: number): NestedData {
+  /**
+   * Recursively traverse `obj` based on the path segments.
+   * At each level, create a shallow clone of the array/object,
+   * then update the next key.
+   */
+  function cloneAndSet(current: any, index: number): any {
     const key = keys[index];
-    const isLastSegment = index === keys.length - 1;
+    const isNumeric = !isNaN(Number(key));
 
-    // Wildcard logic
-    if (key === '*') {
-      if (!Array.isArray(current)) {
-        // Wildcard used on non-array => just return current
-        console.error(`Wildcard '*' used on non-array at path: ${keys.slice(0, index).join('.')}`);
-        return current;
-      }
-
-      // If last segment is '*', we are setting the entire array, but that doesn't
-      // quite make sense. Usually you'd do something like `myList.*.fieldName`.
-      // We'll assume it means "set each item in the array to `value`" if last segment.
-      if (isLastSegment) {
-        return current.map(() => value);
-      }
-
-      // Otherwise, for each array item, recurse
-      return current.map((item) => cloneAndSet(item, index + 1));
-    }
-
-    // For arrays, interpret `key` as an index, if it's numeric
-    const numericKey = Number(key);
-    const isNumericKey = !Number.isNaN(numericKey);
-
-    if (isLastSegment) {
-      // Base case: actually set the value here
-      if (Array.isArray(current) && isNumericKey) {
-        // Clone array, set index
+    // Base case: if we're at the final segment, just return `value`.
+    if (index === keys.length - 1) {
+      // If current is an array and key is numeric, place `value` at that index
+      if (Array.isArray(current) && isNumeric) {
         const newArray = [...current];
-        newArray[numericKey] = value;
+        newArray[Number(key)] = value;
         return newArray;
       }
-      if (typeof current === 'object' && !Array.isArray(current)) {
-        // Clone object, set property
+      // If current is an object and key is non-numeric, place `value`
+      if (!Array.isArray(current) && !isNumeric) {
         return { ...current, [key]: value };
       }
-      // If we're here, `current` might be a primitive or an array but `key` isn’t numeric
-      // We must create a new array or object to attach the value
-      if (isNumericKey) {
-        const newArr: NestedData[] = Array.isArray(current) ? [...current] : [];
-        newArr[numericKey] = value;
-        return newArr;
+      // If there's a mismatch, create the correct type
+      if (isNumeric) {
+        // We expected an array, so create a new one
+        const arr: any[] = Array.isArray(current) ? [...current] : [];
+        arr[Number(key)] = value;
+        return arr;
       } else {
-        // Create a new object if it isn't an object
-        if (Array.isArray(current)) {
-          // If "current" is an array, fallback to a new object.
-          return { [key]: value };
-        } else if (typeof current === 'object' && current !== null) {
-          // If "current" is a non-null object, safely spread it.
-          return { ...current as object, [key]: value };
-        } else {
-          // Otherwise (primitive or null), fallback to a new object.
-          return { [key]: value };
-        }
+        // We expected an object
+        return { ...(Array.isArray(current) ? {} : current), [key]: value };
       }
     }
 
-    // Recursive case: set deeper paths
-    let child: NestedData;
-    if (Array.isArray(current) && isNumericKey) {
-      // If current is an array and key is numeric => we set that index
+    // If we are *not* at the final segment, we need to recurse deeper.
+
+    // Next level
+    const nextKey = keys[index + 1];
+    const nextIsNumeric = !isNaN(Number(nextKey));
+
+    if (Array.isArray(current) && isNumeric) {
+      // current is an array, and we have a numeric key
       const newArray = [...current];
-      child = current[numericKey];
-      newArray[numericKey] = cloneAndSet(child !== undefined ? child : /* create child if missing */ {}, index + 1);
+      const childVal = current[Number(key)];
+      newArray[Number(key)] = cloneAndSet(
+          // pass existing childVal or fallback to correct type
+          childVal !== undefined ? childVal : nextIsNumeric ? [] : {},
+          index + 1
+      );
       return newArray;
-    } else if (typeof current === 'object' && !Array.isArray(current) && !isNumericKey && current !== null) {
+
+    } else if (!Array.isArray(current) && !isNumeric) {
+      // current is an object, and we have a string key
       const newObj = { ...current };
-      child = current[key];
-      newObj[key] = cloneAndSet(child !== undefined ? child : /* create child if missing */ {}, index + 1);
+      const childVal = current[key];
+      newObj[key] = cloneAndSet(
+          childVal !== undefined ? childVal : nextIsNumeric ? [] : {},
+          index + 1
+      );
       return newObj;
+
     } else {
-      // If we got here, `current` might be a primitive or array with wrong key type, etc.
-      // We must create something new to continue.
-      if (isNumericKey) {
-        const newArr: NestedData[] = [];
-        newArr[numericKey] = cloneAndSet({}, index + 1);
-        return newArr;
+      // There's a mismatch:
+      // e.g. current is an object but key is numeric (so we want an array),
+      // or current is an array but key is non-numeric (so we want an object).
+      // We'll convert to the correct type at this level.
+      if (isNumeric) {
+        // create array
+        const arr: any[] = [];
+        arr[Number(key)] = cloneAndSet(
+            nextIsNumeric ? [] : {},
+            index + 1
+        );
+        return arr;
       } else {
+        // create object
         return {
-          [key]: cloneAndSet({}, index + 1),
+          [key]: cloneAndSet(nextIsNumeric ? [] : {}, index + 1),
         };
       }
     }
   }
 
-  // Ensure `obj` is initialized to an array or object if it's null/undefined
+  // If the root `obj` is undefined or null, let the root
+  // be an object or array depending on the first key:
   if (obj == null) {
-    const firstKeyIsNumeric = !Number.isNaN(Number(keys[0]));
-    // If the first key is numeric, we start with an array; otherwise, an object
+    const firstKeyIsNumeric = !isNaN(Number(keys[0]));
     obj = firstKeyIsNumeric ? [] : {};
   }
 
   return cloneAndSet(obj, 0);
-}
+};

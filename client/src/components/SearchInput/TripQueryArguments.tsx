@@ -302,7 +302,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
 
     return (
       <div>
-        {arrayVal.map((_item: any, index: number) => {
+        {arrayVal.map((_item: unknown, index: number) => {
           const itemPath = `${listPath}.${index}`;
 
           const itemNestedArgs = allArgs
