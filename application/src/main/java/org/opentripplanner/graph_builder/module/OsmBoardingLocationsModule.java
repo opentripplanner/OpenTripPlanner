@@ -117,43 +117,74 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   }
 
   private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index) {
-    var stop = ts.getStop();
-    var stopCode = stop.getCode();
+    if (connectVertexToNode(ts, index)) return true;
+
+    if (connectVertexToWay(ts, index)) return true;
+
+    return connectVertexToArea(ts, index);
+  }
+
+  private Envelope getEnvelope(TransitStopVertex ts) {
     Envelope envelope = new Envelope(ts.getCoordinate());
 
     double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
+    return envelope;
+  }
 
-    // if the boarding location is a node it's generated in the OSM processing step but we need
-    // link it here
-    var nearbyBoardingLocations = index
-      .getVerticesForEnvelope(envelope)
+  /**
+   * Connect a transit stop vertex into a boarding location area in the index.
+   * <p>
+   * A centroid vertex is generated in the area and connected to the vertices on the platform edge.
+   *
+   * @return if the vertex has been connected
+   */
+  private boolean connectVertexToArea(TransitStopVertex ts, StreetIndex index) {
+    RegularStop stop = ts.getStop();
+    var nearbyAreaEdgeList = index
+      .getEdgesForEnvelope(getEnvelope(ts))
       .stream()
-      .filter(OsmBoardingLocationVertex.class::isInstance)
-      .map(OsmBoardingLocationVertex.class::cast)
+      .filter(AreaEdge.class::isInstance)
+      .map(AreaEdge.class::cast)
+      .map(AreaEdge::getArea)
       .collect(Collectors.toSet());
 
-    for (var boardingLocation : nearbyBoardingLocations) {
-      if (matchesReference(stop, boardingLocation.references)) {
-        if (!boardingLocation.isConnectedToStreetNetwork()) {
-          linker.linkVertexPermanently(
-            boardingLocation,
-            new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BOTH_WAYS,
-            (osmBoardingLocationVertex, splitVertex) ->
-              getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
-          );
-        }
-        linkBoardingLocationToStop(ts, stopCode, boardingLocation);
+    // Iterate over all nearby areas representing transit stops in OSM, linking to them if they have a stop code or id
+    // in their ref= tag that matches the GTFS stop code of this StopVertex.
+    for (var edgeList : nearbyAreaEdgeList) {
+      if (matchesReference(stop, edgeList.references)) {
+        var name = edgeList
+          .getAreas()
+          .stream()
+          .findFirst()
+          .map(NamedArea::getName)
+          .orElse(LOCALIZED_PLATFORM_NAME);
+        var boardingLocation = makeBoardingLocation(
+          stop,
+          edgeList.getGeometry().getCentroid(),
+          edgeList.references,
+          name
+        );
+        linker.addPermanentAreaVertex(boardingLocation, edgeList);
+        linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
         return true;
       }
     }
+    return false;
+  }
 
-    // if the boarding location is a non-area way we are finding the vertex representing the
-    // center of the way, splitting if needed
+  /**
+   * Connect a transit stop vertex to a boarding location way in the index.
+   * <p>
+   * The vertex is connected to the center of the way if one is found, splitting it if needed.
+   *
+   * @return if the vertex has been connected
+   */
+  private boolean connectVertexToWay(TransitStopVertex ts, StreetIndex index) {
+    var stop = ts.getStop();
     var nearbyEdges = new HashMap<Platform, List<Edge>>();
 
-    for (var edge : index.getEdgesForEnvelope(envelope)) {
+    for (var edge : index.getEdgesForEnvelope(getEnvelope(ts))) {
       osmInfoGraphBuildService
         .findPlatform(edge)
         .ifPresent(platform -> {
@@ -184,39 +215,40 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
         LinkingDirection.BOTH_WAYS,
         platformEdgeList.getValue().stream().map(StreetEdge.class::cast).collect(Collectors.toSet())
       )) {
-        linkBoardingLocationToStop(ts, stopCode, vertex);
+        linkBoardingLocationToStop(ts, stop.getCode(), vertex);
       }
       return true;
     }
+    return false;
+  }
 
-    // if the boarding location is an area then we are generating the vertex here and
-    // use the AreaEdgeList to link it to the correct vertices of the platform edge
-    var nearbyAreaEdgeList = index
-      .getEdgesForEnvelope(envelope)
+  /**
+   * Connect a transit stop vertex to a boarding location node.
+   * <p>
+   * The node is generated in the OSM processing step but we need to link it here.
+   *
+   * @return If the vertex has been connected.
+   */
+  private boolean connectVertexToNode(TransitStopVertex ts, StreetIndex index) {
+    var nearbyBoardingLocations = index
+      .getVerticesForEnvelope(getEnvelope(ts))
       .stream()
-      .filter(AreaEdge.class::isInstance)
-      .map(AreaEdge.class::cast)
-      .map(AreaEdge::getArea)
+      .filter(OsmBoardingLocationVertex.class::isInstance)
+      .map(OsmBoardingLocationVertex.class::cast)
       .collect(Collectors.toSet());
 
-    // Iterate over all nearby areas representing transit stops in OSM, linking to them if they have a stop code or id
-    // in their ref= tag that matches the GTFS stop code of this StopVertex.
-    for (var edgeList : nearbyAreaEdgeList) {
-      if (matchesReference(stop, edgeList.references)) {
-        var name = edgeList
-          .getAreas()
-          .stream()
-          .findFirst()
-          .map(NamedArea::getName)
-          .orElse(LOCALIZED_PLATFORM_NAME);
-        var boardingLocation = makeBoardingLocation(
-          stop,
-          edgeList.getGeometry().getCentroid(),
-          edgeList.references,
-          name
-        );
-        linker.addPermanentAreaVertex(boardingLocation, edgeList);
-        linkBoardingLocationToStop(ts, stopCode, boardingLocation);
+    for (var boardingLocation : nearbyBoardingLocations) {
+      if (matchesReference(ts.getStop(), boardingLocation.references)) {
+        if (!boardingLocation.isConnectedToStreetNetwork()) {
+          linker.linkVertexPermanently(
+            boardingLocation,
+            new TraverseModeSet(TraverseMode.WALK),
+            LinkingDirection.BOTH_WAYS,
+            (osmBoardingLocationVertex, splitVertex) ->
+              getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
+          );
+        }
+        linkBoardingLocationToStop(ts, ts.getStop().getCode(), boardingLocation);
         return true;
       }
     }
