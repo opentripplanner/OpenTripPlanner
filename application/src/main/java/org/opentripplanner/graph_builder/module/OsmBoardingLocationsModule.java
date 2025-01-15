@@ -5,12 +5,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -34,6 +37,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StationElement;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
@@ -168,11 +172,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     for (var platformEdgeList : nearbyEdges.entrySet()) {
       Platform platform = platformEdgeList.getKey();
       var name = platform.name();
-      var label = "platform-centroid/%s".formatted(stop.getId().toString());
-      var centroid = platform.geometry().getCentroid();
-      var boardingLocation = vertexFactory.osmBoardingLocation(
-        new Coordinate(centroid.getX(), centroid.getY()),
-        label,
+      var boardingLocation = makeBoardingLocation(
+        stop,
+        platform.geometry().getCentroid(),
         platform.references(),
         name
       );
@@ -207,11 +209,9 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           .findFirst()
           .map(NamedArea::getName)
           .orElse(LOCALIZED_PLATFORM_NAME);
-        var label = "platform-centroid/%s".formatted(stop.getId().toString());
-        var centroid = edgeList.getGeometry().getCentroid();
-        var boardingLocation = vertexFactory.osmBoardingLocation(
-          new Coordinate(centroid.getX(), centroid.getY()),
-          label,
+        var boardingLocation = makeBoardingLocation(
+          stop,
+          edgeList.getGeometry().getCentroid(),
           edgeList.references,
           name
         );
@@ -221,6 +221,21 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       }
     }
     return false;
+  }
+
+  private OsmBoardingLocationVertex makeBoardingLocation(
+    RegularStop stop,
+    Point centroid,
+    Set<String> refs,
+    I18NString name
+  ) {
+    var label = "platform-centroid/%s".formatted(stop.getId().toString());
+    return vertexFactory.osmBoardingLocation(
+      new Coordinate(centroid.getX(), centroid.getY()),
+      label,
+      refs,
+      name
+    );
   }
 
   private List<Edge> getConnectingEdges(
