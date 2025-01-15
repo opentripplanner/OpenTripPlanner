@@ -72,6 +72,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add a matcher API for filters in the transit service used for regularStop lookup [#6234](https://github.com/opentripplanner/OpenTripPlanner/pull/6234)
 - Make all polling updaters wait for graph update finish [#6262](https://github.com/opentripplanner/OpenTripPlanner/pull/6262)
 - When using ScheduledTransitLeg's copy builder, also copy alerts [#6368](https://github.com/opentripplanner/OpenTripPlanner/pull/6368)
+- Process boarding location for OSM ways (linear platforms) [#6247](https://github.com/opentripplanner/OpenTripPlanner/pull/6247)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
