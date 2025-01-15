@@ -2,6 +2,7 @@ package org.opentripplanner.updater.vehicle_parking;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -12,7 +13,6 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.DataSource;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +27,6 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
     VehicleParkingAvailabilityUpdater.class
   );
   private final DataSource<AvailabiltyUpdate> source;
-  private WriteToGraphCallback saveResultOnGraph;
-
   private final VehicleParkingRepository repository;
 
   public VehicleParkingAvailabilityUpdater(
@@ -44,17 +42,12 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
   }
 
   @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
-
-  @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException, ExecutionException {
     if (source.update()) {
       var updates = source.getUpdates();
 
       var graphWriterRunnable = new AvailabilityUpdater(updates);
-      saveResultOnGraph.execute(graphWriterRunnable);
+      updateGraph(graphWriterRunnable);
     }
   }
 

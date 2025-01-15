@@ -101,8 +101,10 @@
         "com.google.cloud:libraries-bom",
         "com.google.guava:guava",
         "io.micrometer:micrometer-registry-prometheus",
-        "io.micrometer:micrometer-registry-influx"
+        "io.micrometer:micrometer-registry-influx",
+        "com.google.protobuf:protobuf-java"
       ],
+      "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 7th through 8th day of the month"
     },
     {
@@ -141,6 +143,22 @@
       ],
       "automerge": true,
       "schedule": "on the 4th day of the month"
+    },
+    {
+      "groupName": "highly trusted dependencies (patch)",
+      "matchUpdateTypes": ["patch"],
+      "schedule": ["on the 27th day of the month"],
+      "matchPackageNames": [
+        "org.onebusaway:onebusaway-gtfs",
+        "org.glassfish.jersey.{/,}**",
+        "com.google.guava:guava",
+        "com.google.cloud:libraries-bom",
+        "com.google.protobuf:protobuf-java",
+        "io.micrometer:micrometer-registry-prometheus",
+        "io.micrometer:micrometer-registry-influx",
+        "com.fasterxml.jackson:{/,}**",
+        "com.fasterxml.jackson.datatype::{/,}**"
+      ]
     },
     {
       "description": "give some projects time to publish a changelog before opening the PR",
