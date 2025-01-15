@@ -389,10 +389,6 @@ public class ScheduledTransitLeg implements TransitLeg {
     return accessibilityScore;
   }
 
-  public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new ScheduledTransitLegBuilder<>(this).withAccessibilityScore(score).build();
-  }
-
   /**
    * Should be used for debug logging only
    * <p>
