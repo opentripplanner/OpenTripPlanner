@@ -54,8 +54,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
-  protected final Integer boardStopPosInPattern;
-  protected final Integer alightStopPosInPattern;
+  protected final int boardStopPosInPattern;
+  protected final int alightStopPosInPattern;
   private final int generalizedCost;
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
