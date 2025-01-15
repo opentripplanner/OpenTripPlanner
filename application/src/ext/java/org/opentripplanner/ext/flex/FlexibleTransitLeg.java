@@ -98,8 +98,6 @@ public class FlexibleTransitLeg implements TransitLeg {
     return getTrip().getMode();
   }
 
-
-
   @Override
   public ZonedDateTime getStartTime() {
     return startTime;

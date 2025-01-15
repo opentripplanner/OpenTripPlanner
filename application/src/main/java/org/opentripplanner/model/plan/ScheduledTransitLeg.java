@@ -389,6 +389,10 @@ public class ScheduledTransitLeg implements TransitLeg {
     return accessibilityScore;
   }
 
+  public ScheduledTransitLegBuilder copy() {
+    return new ScheduledTransitLegBuilder<>(this);
+  }
+
   /**
    * Should be used for debug logging only
    * <p>
@@ -418,10 +422,6 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .toString();
-  }
-
-  public ScheduledTransitLegBuilder copy() {
-    return new ScheduledTransitLegBuilder<>(this);
   }
 
   /**
