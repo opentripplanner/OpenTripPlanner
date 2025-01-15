@@ -8,7 +8,7 @@ export interface TripArguments {
 
 export interface Argument {
   type: TypeDescriptor;
-  defaultValue?: any;
+  defaultValue?: string;
 }
 
 export type TypeDescriptor = ScalarType | NestedObject;

@@ -1,7 +1,8 @@
 import React from 'react';
+import {TripQueryVariables} from "../../gql/graphql.ts";
 
 interface ViewArgumentsRawProps {
-  tripQueryVariables: any;
+  tripQueryVariables: TripQueryVariables;
 }
 
 const ViewArgumentsRaw: React.FC<ViewArgumentsRawProps> = ({ tripQueryVariables }) => {

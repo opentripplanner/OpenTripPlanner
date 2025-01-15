@@ -22,7 +22,7 @@ function formatArgumentName(input: string): string {
 type ArgumentConfig = {
   path: string;
   type: string;
-  defaultValue: any;
+  defaultValue?: string;
   enumValues?: string[];
   isComplex?: boolean;
   isList?: boolean;
@@ -34,7 +34,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
       path: string;
       type: string;
       subtype?: string;
-      defaultValue: any;
+      defaultValue?: string;
       enumValues?: string[];
       isComplex?: boolean;
       isList?: boolean;
@@ -67,7 +67,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     path: string;
     type: string;
     name?: string;
-    defaultValue: any;
+    defaultValue?: string;
     enumValues?: string[];
     isComplex?: boolean;
     isList?: boolean;
@@ -76,7 +76,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
       path: string;
       type: string;
       name?: string;
-      defaultValue: any;
+      defaultValue?: string;
       enumValues?: string[];
       isComplex?: boolean;
       isList?: boolean;
@@ -98,7 +98,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     path: string;
     type: string;
     name?: string;
-    defaultValue: any;
+    defaultValue?: string;
     enumValues?: string[];
     isComplex?: boolean;
     isList?: boolean;
@@ -107,7 +107,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
       path: string;
       type: string;
       name?: string;
-      defaultValue: any;
+      defaultValue?: string;
       enumValues?: string[];
       isComplex?: boolean;
       isList?: boolean;
@@ -142,7 +142,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
         allArgs.push({
           path: currentPath,
           type: 'Group',
-          defaultValue: null,
           isComplex: true,
           isList: false,
         });
@@ -156,7 +155,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
         });
       }
     } else if (typeof argData === 'object' && argData.fields) {
-      allArgs.push({ path: currentPath, type: 'Group', defaultValue: null, isComplex: true });
+      allArgs.push({ path: currentPath, type: 'Group', isComplex: true });
       allArgs = allArgs.concat(extractAllArgs(argData.fields, [...parentPath, argName]));
     } else {
       allArgs.push({ path: currentPath, type: argData.type ?? typeof argData, defaultValue: argData.defaultValue });
@@ -286,7 +285,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
           name?: string;
           fields?: Record<string, any>;
         };
-        defaultValue?: any;
+        defaultValue?: string;
         isList?: boolean;
       }
     >;
@@ -371,7 +370,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     args: {
       path: string;
       type: string;
-      defaultValue: any;
+      defaultValue?: string;
       enumValues?: string[];
       isComplex?: boolean;
       isList?: boolean;
@@ -380,7 +379,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     allArgs: {
       path: string;
       type: string;
-      defaultValue: any;
+      defaultValue?: string;
       enumValues?: string[];
       isComplex?: boolean;
       isList?: boolean;

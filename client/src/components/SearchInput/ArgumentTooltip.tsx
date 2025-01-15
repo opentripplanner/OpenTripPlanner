@@ -4,7 +4,7 @@ import inputIcon from '../../static/img/input.svg';
 import durationIcon from '../../static/img/lap-timer.svg';
 
 interface ArgumentTooltipProps {
-  defaultValue: any;
+  defaultValue?: string;
   type?: string;
 }
 
