@@ -9,7 +9,9 @@ import { LogoSection } from '../components/SearchBar/LogoSection.tsx';
 import { InputFieldsSection } from '../components/SearchBar/InputFieldsSection.tsx';
 import TripQueryArguments from '../components/SearchInput/TripQueryArguments.tsx';
 import Sidebar from '../components/SearchInput/Sidebar.tsx';
-import ViewArgumentsRaw from "../components/SearchInput/ViewArgumentsRaw.tsx";
+import ViewArgumentsRaw from '../components/SearchInput/ViewArgumentsRaw.tsx';
+import { TripSchemaProvider } from '../components/SearchInput/TripSchemaContext.tsx';
+import { getApiUrl } from '../util/getApiUrl.ts';
 
 export function App() {
   const serverInfo = useServerInfo();
@@ -42,10 +44,12 @@ export function App() {
                 pageResults={callback}
                 loading={loading}
               ></ItineraryListContainer>
-              <TripQueryArguments
-                tripQueryVariables={tripQueryVariables}
-                setTripQueryVariables={setTripQueryVariables}
-              ></TripQueryArguments>
+              <TripSchemaProvider endpoint={getApiUrl()}>
+                <TripQueryArguments
+                  tripQueryVariables={tripQueryVariables}
+                  setTripQueryVariables={setTripQueryVariables}
+                ></TripQueryArguments>
+              </TripSchemaProvider>
               <ViewArgumentsRaw tripQueryVariables={tripQueryVariables}></ViewArgumentsRaw>
             </Sidebar>
           </div>

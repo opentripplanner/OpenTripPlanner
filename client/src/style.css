@@ -404,11 +404,18 @@ select {
   box-sizing: border-box;
 }
 
+
+
 .argument-list input[type="text"],
 .argument-list input[type="number"] {
   width: 50px;
 }
 .argument-list input[type="datetime-local"] {
+  width: 140px;
+}
+
+input.comma-separated-input[type="text"],
+input.comma-separated-input[type="number"] {
   width: 140px;
 }
 

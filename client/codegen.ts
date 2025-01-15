@@ -1,5 +1,4 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
-import * as path from 'node:path';
 
 const config: CodegenConfig = {
   overwrite: true,

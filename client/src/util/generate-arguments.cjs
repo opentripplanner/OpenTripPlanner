@@ -23,17 +23,12 @@ function getNamedType(type) {
 function resolveType(type, schema = new Set()) {
   const namedType = getNamedType(type);
 
-  // Debug: Log the named type
-  console.log('Resolving type:', namedType.name);
 
   if (isScalarType(namedType)) {
     return { type: 'Scalar', subtype: namedType.name };
   }
 
   if (isEnumType(namedType)) {
-    // Debug: Log enum type values
-    console.log('Enum type detected:', namedType.name, 'Values:', namedType.getValues().map((val) => val.name));
-    // Return enum type explicitly
     return { type: 'Enum', values: namedType.getValues().map((val) => val.name) };
   }
 
@@ -41,10 +36,7 @@ function resolveType(type, schema = new Set()) {
     const fields = namedType.getFields();
     const fieldTypes = {};
 
-    // Debug: Log the fields of the input object type
-    console.log('Input object type detected:', namedType.name, 'Fields:', Object.keys(fields));
-
-    Object.keys(fields).forEach((fieldName) => {
+        Object.keys(fields).forEach((fieldName) => {
       const field = fields[fieldName];
 
       // Exclude deprecated fields within input objects
@@ -99,10 +91,7 @@ const generateTripArgsJsonPlugin = async (schema) => {
         return; // Skip deprecated arguments
       }
 
-      // Debug: Log each argument being processed
-      console.log('Processing argument:', arg.name, 'Type:', arg.type.toString());
-
-      const argName = arg.name;
+            const argName = arg.name;
       const argType = resolveType(arg.type, schema);
       const argDefaultValue = arg.defaultValue !== undefined ? arg.defaultValue : null;
       const isList = isListType(arg.type); // Detect if the argument is a list

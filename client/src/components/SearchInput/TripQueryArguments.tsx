@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import tripArgumentsData from '../../gql/query-arguments.json';
+//import tripArgumentsData from '../../gql/query-arguments.json';
+import { useTripSchema } from './TripSchemaContext';
 import { TripQueryVariables } from '../../gql/graphql';
 import { getNestedValue, setNestedValue } from './nestedUtils';
 import ArgumentTooltip from './ArgumentTooltip.tsx';
@@ -42,12 +43,23 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
   const [expandedArguments, setExpandedArguments] = useState<{ [key: string]: boolean }>({});
   const [searchText] = useState('');
 
+  const { tripArgs, loading, error } = useTripSchema();
+
   useEffect(() => {
+    if (!tripArgs) return; // Don't run if the data isn't loaded yet
+    if (loading || error) return; // Optionally handle error/loading
+
+    // Example: tripArgs has shape { trip: { arguments: {} } }
+    const extractedArgs = extractAllArgs(tripArgs.trip.arguments);
+    setArgumentsList(extractedArgs);
+  }, [tripArgs, loading, error]);
+
+  /**useEffect(() => {
     const tripArgs = tripArgumentsData.trip.arguments;
     const extractedArgs = extractAllArgs(tripArgs);
     setArgumentsList(extractedArgs);
   }, []);
-
+**/
   const extractAllArgs = (
     args: { [key: string]: any },
     parentPath: string[] = [],
@@ -262,11 +274,11 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     .filter(({ path }) => formatArgumentName(path).toLowerCase().includes(searchText.toLowerCase()))
     .filter(({ path }) => !excludedArguments.has(path));
 
-  const renderListOfInputObjects = (listPath: string, allArgs: ArgumentConfig[], level: number) => {
+  const renderListOfInputObjects = (listPath: string, allArgs: ArgumentConfig[], level: number, tripArgs: any) => {
     const arrayVal = getNestedValue(tripQueryVariables, listPath) || [];
 
     // Dynamically determine the button label based on the type name
-    const argumentsData = tripArgumentsData.trip.arguments as Record<
+    const argumentsData = tripArgs as Record<
       string,
       {
         type: {
@@ -392,7 +404,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
               </span>
 
               {isExpanded && isList ? (
-                <div style={{ marginLeft: 20 }}>{renderListOfInputObjects(path, allArgs, nestedLevel)}</div>
+                <div style={{ marginLeft: 20 }}>{renderListOfInputObjects(path, allArgs, nestedLevel, tripArgs)}</div>
               ) : isExpanded ? (
                 /* original single-object rendering */
                 renderArgumentInputs(nestedArgs, nestedLevel, allArgs)
@@ -416,13 +428,18 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
                         checked={currentValue ?? false}
                         onChange={(e) => handleInputChange(path, e.target.checked)}
                       />
-                      {isInUse && <a onClick={() => handleRemoveArgument(path)} className={"remove-argument"}>x</a>}
+                      {isInUse && (
+                        <a onClick={() => handleRemoveArgument(path)} className={'remove-argument'}>
+                          x
+                        </a>
+                      )}
                     </span>
                   );
                 })()}
 
               {['String', 'DoubleFunction', 'ID', 'Duration'].includes(type) && isList && (
                 <input
+                  className={'comma-separated-input'}
                   type="text"
                   id={path}
                   value={(() => {
@@ -430,7 +447,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
                     return Array.isArray(currentValue) ? currentValue.join(', ') : ''; // Join array into a comma-separated string
                   })()}
                   onChange={(e) => handleInputChange(path, e.target.value)}
-                  placeholder="Enter comma-separated IDs"
+                  placeholder="Comma-separated list"
                 />
               )}
               {['String', 'DoubleFunction', 'ID', 'Duration'].includes(type) && !isList && (
@@ -533,27 +550,26 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     setTripQueryVariables(newVars);
   };
 
-
   return (
-      <div className={'left-pane-container below-content'}>
-        <div className="panel-header">
-          Filters
-          <button className="reset-button" onClick={handleReset}>
-            Reset
-          </button>
-        </div>
-        {filteredArgumentsList.length === 0 ? (
-            <p>No arguments found.</p>
-        ) : (
-            <div className={'argument-list'}>
-              {renderArgumentInputs(
-                  filteredArgumentsList.filter((arg) => arg.path.split('.').length === 1),
-                  0,
-                  filteredArgumentsList,
-              )}
-            </div>
-        )}
+    <div className={'left-pane-container below-content'}>
+      <div className="panel-header">
+        Filters
+        <button className="reset-button" onClick={handleReset}>
+          Reset
+        </button>
       </div>
+      {filteredArgumentsList.length === 0 ? (
+        <p>No arguments found.</p>
+      ) : (
+        <div className={'argument-list'}>
+          {renderArgumentInputs(
+            filteredArgumentsList.filter((arg) => arg.path.split('.').length === 1),
+            0,
+            filteredArgumentsList,
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
