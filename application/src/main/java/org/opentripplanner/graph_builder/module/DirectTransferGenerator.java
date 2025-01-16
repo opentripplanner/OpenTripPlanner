@@ -142,9 +142,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
         // Calculate default transfers.
-        for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests) {
+        for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
           StreetMode mode = transferProfile.journey().transfer().mode();
-          var nearbyStops = transferConfiguration.defaultNearbyStopFinderForMode
+          var nearbyStops = transferConfiguration
+            .defaultNearbyStopFinderForMode()
             .get(mode)
             .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
           for (NearbyStop sd : nearbyStops) {
@@ -159,10 +160,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           }
         }
         // Calculate flex transfers if flex routing is enabled.
-        for (RouteRequest transferProfile : transferConfiguration.flexTransferRequests) {
+        for (RouteRequest transferProfile : transferConfiguration.flexTransferRequests()) {
           // Flex transfer requests only use the WALK mode.
           StreetMode mode = StreetMode.WALK;
-          var nearbyStops = transferConfiguration.defaultNearbyStopFinderForMode
+          var nearbyStops = transferConfiguration
+            .defaultNearbyStopFinderForMode()
             .get(mode)
             .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), true);
           // This code is for finding transfers from AreaStops to Stops, transfers
@@ -181,9 +183,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         }
         // Calculate transfers between stops that are visited by trips that allow cars, if configured.
         if (carsAllowedStops.contains(stop)) {
-          for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests) {
+          for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
             StreetMode mode = transferProfile.journey().transfer().mode();
-            var nearbyStops = transferConfiguration.carsAllowedStopNearbyStopFinderForMode
+            var nearbyStops = transferConfiguration
+              .carsAllowedStopNearbyStopFinderForMode()
               .get(mode)
               .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
             for (NearbyStop sd : nearbyStops) {
