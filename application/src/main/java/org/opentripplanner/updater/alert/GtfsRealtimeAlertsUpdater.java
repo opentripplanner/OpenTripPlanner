@@ -2,6 +2,7 @@ package org.opentripplanner.updater.alert;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import java.net.URI;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
@@ -26,7 +27,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   private final TransitAlertService transitAlertService;
   private final HttpHeaders headers;
   private final OtpHttpClient otpHttpClient;
-  private WriteToGraphCallback saveResultOnGraph;
   private Long lastTimestamp = Long.MIN_VALUE;
 
   public GtfsRealtimeAlertsUpdater(
@@ -48,11 +48,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
     LOG.info("Creating real-time alert updater running every {}: {}", pollingPeriod(), url);
   }
 
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
-  }
-
   public TransitAlertService getTransitAlertService() {
     return transitAlertService;
   }
@@ -63,32 +58,26 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   }
 
   @Override
-  protected void runPolling() {
-    try {
-      final FeedMessage feed = otpHttpClient.getAndMap(
-        URI.create(url),
-        this.headers.asMap(),
-        FeedMessage.PARSER::parseFrom
-      );
+  protected void runPolling() throws InterruptedException, ExecutionException {
+    final FeedMessage feed = otpHttpClient.getAndMap(
+      URI.create(url),
+      this.headers.asMap(),
+      FeedMessage::parseFrom
+    );
 
-      long feedTimestamp = feed.getHeader().getTimestamp();
-      if (feedTimestamp == lastTimestamp) {
-        LOG.debug("Ignoring feed with a timestamp that has not been updated from {}", url);
-        return;
-      }
-      if (feedTimestamp < lastTimestamp) {
-        LOG.info("Ignoring feed with older than previous timestamp from {}", url);
-        return;
-      }
-
-      // Handle update in graph writer runnable
-      saveResultOnGraph.execute(context ->
-        updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher())
-      );
-
-      lastTimestamp = feedTimestamp;
-    } catch (Exception e) {
-      LOG.error("Failed to process GTFS-RT Alerts feed from {}", url, e);
+    long feedTimestamp = feed.getHeader().getTimestamp();
+    if (feedTimestamp == lastTimestamp) {
+      LOG.debug("Ignoring feed with a timestamp that has not been updated from {}", url);
+      return;
     }
+    if (feedTimestamp < lastTimestamp) {
+      LOG.info("Ignoring feed with older than previous timestamp from {}", url);
+      return;
+    }
+
+    // Handle update in graph writer runnable
+    updateGraph(context -> updateHandler.update(feed, context.gtfsRealtimeFuzzyTripMatcher()));
+
+    lastTimestamp = feedTimestamp;
   }
 }

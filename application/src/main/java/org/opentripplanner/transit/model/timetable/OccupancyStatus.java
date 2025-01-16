@@ -9,7 +9,7 @@ import org.opentripplanner.framework.doc.DocumentedEnum;
  * <p>
  * Descriptions are copied from the GTFS-RT specification with additions of SIRI nordic profile documentation.
  */
-public enum OccupancyStatus implements DocumentedEnum {
+public enum OccupancyStatus implements DocumentedEnum<OccupancyStatus> {
   NO_DATA_AVAILABLE,
   EMPTY,
   MANY_SEATS_AVAILABLE,

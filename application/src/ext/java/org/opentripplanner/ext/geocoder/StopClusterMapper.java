@@ -121,7 +121,7 @@ class StopClusterMapper {
       .stream()
       .collect(
         Collectors.groupingBy(sl ->
-          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
+          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate10m())
         )
       )
       .values()

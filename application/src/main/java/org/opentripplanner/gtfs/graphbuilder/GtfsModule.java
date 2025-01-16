@@ -1,5 +1,7 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
+import static org.opentripplanner.utils.color.ColorUtils.computeBrightness;
+
 import java.awt.Color;
 import java.io.IOException;
 import java.io.Serializable;
@@ -12,6 +14,7 @@ import java.util.Set;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.Area;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
@@ -25,7 +28,7 @@ import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopArea;
+import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -51,6 +54,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.color.Brightness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +66,8 @@ public class GtfsModule implements GraphBuilderModule {
     FareTransferRule.class,
     RiderCategory.class,
     FareMedium.class,
-    StopArea.class
+    StopAreaElement.class,
+    Area.class
   );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
@@ -397,8 +402,7 @@ public class GtfsModule implements GraphBuilderModule {
    * If a route doesn't have color or already has routeColor and routeTextColor nothing is done.
    * <p>
    * textColor can be black or white. White for dark colors and black for light colors of
-   * routeColor. If color is light or dark is calculated based on luminance formula: sqrt(
-   * 0.299*Red^2 + 0.587*Green^2 + 0.114*Blue^2 )
+   * routeColor.
    */
   private void generateRouteColor(Route route) {
     String routeColor = route.getColor();
@@ -413,16 +417,7 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     Color routeColorColor = Color.decode("#" + routeColor);
-    //gets float of RED, GREEN, BLUE in range 0...1
-    float[] colorComponents = routeColorColor.getRGBColorComponents(null);
-    //Calculates luminance based on https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
-    double newRed = 0.299 * Math.pow(colorComponents[0], 2.0);
-    double newGreen = 0.587 * Math.pow(colorComponents[1], 2.0);
-    double newBlue = 0.114 * Math.pow(colorComponents[2], 2.0);
-    double luminance = Math.sqrt(newRed + newGreen + newBlue);
-
-    //For brighter colors use black text color and reverse for darker
-    if (luminance > 0.5) {
+    if (computeBrightness(routeColorColor) == Brightness.LIGHT) {
       textColor = "000000";
     } else {
       textColor = "FFFFFF";

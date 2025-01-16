@@ -8,16 +8,20 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -220,6 +224,13 @@ public class TimetableSnapshot {
   public TripPattern getNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate) {
     TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
     return realTimeNewTripPatternsForModifiedTrips.get(tripIdAndServiceDate);
+  }
+
+  /**
+   * List trips which have been canceled.
+   */
+  public List<TripOnServiceDate> listCanceledTrips() {
+    return findTripsOnServiceDates(TripTimes::isCanceled);
   }
 
   /**
@@ -641,6 +652,37 @@ public class TimetableSnapshot {
     if (readOnly) {
       throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
     }
+  }
+
+  private TripOnServiceDate mapToTripOnServiceDate(TripTimes tripTimes, Timetable timetable) {
+    return TripOnServiceDate
+      .of(tripTimes.getTrip().getId())
+      .withServiceDate(timetable.getServiceDate())
+      .withTrip(tripTimes.getTrip())
+      .build();
+  }
+
+  /**
+   * Find trips from timetables based on filter criteria.
+   *
+   * @param filter used to filter {@link TripTimes}.
+   */
+  private List<TripOnServiceDate> findTripsOnServiceDates(Predicate<TripTimes> filter) {
+    return timetables
+      .values()
+      .stream()
+      .flatMap(timetables ->
+        timetables
+          .stream()
+          .flatMap(timetable ->
+            timetable
+              .getTripTimes()
+              .stream()
+              .filter(filter)
+              .map(tripTimes -> mapToTripOnServiceDate(tripTimes, timetable))
+          )
+      )
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   protected static class SortedTimetableComparator implements Comparator<Timetable> {

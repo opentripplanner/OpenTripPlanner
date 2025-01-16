@@ -427,8 +427,8 @@ This is temporary and will be removed in a future version of OTP. Use this to sp
 ## Other updaters in sandboxes
 
 - [Vehicle parking](sandbox/VehicleParking.md)
-- [Siri over HTTP](sandbox/siri/SiriUpdater.md)
-- [Siri over Google Cloud PubSub](sandbox/siri/SiriGooglePubSubUpdater.md)
-- [Siri over Azure Message Bus](sandbox/siri/SiriAzureUpdater.md)
+- [SIRI over HTTP](sandbox/siri/SiriUpdater.md)
+- [SIRI over Google Cloud PubSub](sandbox/siri/SiriGooglePubSubUpdater.md)
+- [SIRI over Azure Message Bus](sandbox/siri/SiriAzureUpdater.md)
 - [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)
 

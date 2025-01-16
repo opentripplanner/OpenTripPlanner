@@ -24,6 +24,7 @@ import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -157,6 +158,11 @@ public interface TransitService {
   Collection<Trip> listTrips();
 
   /**
+   * List all canceled trips.
+   */
+  List<TripOnServiceDate> listCanceledTrips();
+
+  /**
    * Return all routes, including those created by real-time updates.
    */
   Collection<Route> listRoutes();
@@ -266,7 +272,7 @@ public interface TransitService {
 
   boolean transitFeedCovers(Instant dateTime);
 
-  Collection<RegularStop> findRegularStops(Envelope envelope);
+  Collection<RegularStop> findRegularStopsByBoundingBox(Envelope envelope);
 
   Collection<AreaStop> findAreaStops(Envelope envelope);
 
@@ -282,6 +288,7 @@ public interface TransitService {
    * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
    */
   List<TransitMode> findTransitModes(StopLocationsGroup station);
+
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
@@ -302,18 +309,13 @@ public interface TransitService {
   Map<LocalDate, TIntSet> getServiceCodesRunningForDate();
 
   /**
-   * Returns a list of TripOnServiceDates that match the filtering defined in the request.
-   *
-   * @param request - A TripOnServiceDateRequest object with filtering defined.
-   * @return - A list of TripOnServiceDates
+   * Returns a list of {@link TripOnServiceDate}s that match the filtering defined in the request.
    */
   List<TripOnServiceDate> findTripsOnServiceDate(TripOnServiceDateRequest request);
 
   /**
-   * Returns a list of Trips that match the filtering defined in the request.
+   * Returns a list of {@link Trip}s that match the filtering defined in the request.
    *
-   * @param request - A TripRequest object with filtering defined.
-   * @return - A list of Trips
    */
   List<Trip> getTrips(TripRequest request);
 
@@ -324,4 +326,12 @@ public interface TransitService {
    * @return true if the trip exists, false otherwise
    */
   boolean containsTrip(FeedScopedId id);
+
+  /**
+   * Returns a list of {@link RegularStop}s that lay within a bounding box and match the other criteria
+   * in the request object.
+   */
+  Collection<RegularStop> findRegularStopsByBoundingBox(
+    FindRegularStopsByBoundingBoxRequest request
+  );
 }

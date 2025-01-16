@@ -2,9 +2,11 @@ package org.opentripplanner.apis.transmodel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.idl.SchemaPrinter;
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -19,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -30,6 +33,15 @@ import org.slf4j.LoggerFactory;
 @Path("/transmodel/v3")
 @Produces(MediaType.APPLICATION_JSON)
 public class TransmodelAPI {
+
+  // Note, the blank line at the end is intended
+  private static final String SCHEMA_DOC_HEADER =
+    """
+# THIS IS NOT INTENDED FOR PRODUCTION USE. We recommend using the GraphQL introspection instead.
+# This is intended for the OTP Debug UI and can also be used by humans to get the schema with the
+# OTP configured default-values injected.
+
+""";
 
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
@@ -69,6 +81,7 @@ public class TransmodelAPI {
     TransmodelAPIParameters config,
     TimetableRepository timetableRepository,
     RouteRequest defaultRouteRequest,
+    ApiDocumentationProfile documentationProfile,
     TransitRoutingConfig transitRoutingConfig
   ) {
     if (config.hideFeedId()) {
@@ -80,6 +93,7 @@ public class TransmodelAPI {
       TransmodelGraphQLSchema.create(
         defaultRouteRequest,
         timetableRepository.getTimeZone(),
+        documentationProfile,
         transitRoutingConfig
       );
   }
@@ -136,6 +150,13 @@ public class TransmodelAPI {
       maxNumberOfResultFields,
       getTagsFromHeaders(headers)
     );
+  }
+
+  @GET
+  @Path("schema.graphql")
+  public Response getGraphQLSchema() {
+    var text = SCHEMA_DOC_HEADER + new SchemaPrinter().print(schema);
+    return Response.ok().encoding("UTF-8").entity(text).build();
   }
 
   private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {

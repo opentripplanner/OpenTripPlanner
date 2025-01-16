@@ -3,11 +3,13 @@ package org.opentripplanner.apis.transmodel;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.apis.transmodel.mapping.SeverityMapper.getTransmodelSeverity;
+import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDToDomain;
 import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.FILTER_PLACE_TYPE_ENUM;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar;
+import static org.opentripplanner.apis.transmodel.support.GqlUtil.toListNullSafe;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -27,6 +29,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.SchemaTransformer;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -42,8 +45,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
+import org.opentripplanner.apis.support.graphql.injectdoc.CustomDocumentation;
+import org.opentripplanner.apis.support.graphql.injectdoc.InjectCustomDocumentation;
 import org.opentripplanner.apis.transmodel.mapping.PlaceMapper;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
@@ -115,6 +122,7 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -155,10 +163,12 @@ public class TransmodelGraphQLSchema {
   public static GraphQLSchema create(
     RouteRequest defaultRequest,
     ZoneId timeZoneId,
-    TransitTuningParameters transitTuningParameters
+    ApiDocumentationProfile docProfile,
+    TransitTuningParameters transitTuning
   ) {
-    return new TransmodelGraphQLSchema(defaultRequest, timeZoneId, transitTuningParameters)
-      .create();
+    var schema = new TransmodelGraphQLSchema(defaultRequest, timeZoneId, transitTuning).create();
+    schema = decorateSchemaWithCustomDocumentation(schema, docProfile);
+    return schema;
   }
 
   @SuppressWarnings("unchecked")
@@ -439,10 +449,7 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(env ->
-            StopPlaceType.fetchStopPlaceById(
-              TransitIdMapper.mapIDToDomain(env.getArgument("id")),
-              env
-            )
+            StopPlaceType.fetchStopPlaceById(mapIDToDomain(env.getArgument("id")), env)
           )
           .build()
       )
@@ -576,7 +583,7 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment ->
             GqlUtil
               .getTransitService(environment)
-              .getStopLocation(TransitIdMapper.mapIDToDomain(environment.getArgument("id")))
+              .getStopLocation(mapIDToDomain(environment.getArgument("id")))
           )
           .build()
       )
@@ -610,7 +617,7 @@ public class TransmodelGraphQLSchema {
               }
               TransitService transitService = GqlUtil.getTransitService(environment);
               return ((List<String>) environment.getArgument("ids")).stream()
-                .map(id -> transitService.getStopLocation(TransitIdMapper.mapIDToDomain(id)))
+                .map(id -> transitService.getStopLocation(mapIDToDomain(id)))
                 .collect(Collectors.toList());
             }
             if (environment.getArgument("name") == null) {
@@ -661,7 +668,14 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .argument(
-            GraphQLArgument.newArgument().name("authority").type(Scalars.GraphQLString).build()
+            GraphQLArgument
+              .newArgument()
+              .name("authority")
+              .deprecate(
+                "This is the Transmodel namespace or the GTFS feedID - avoid using this. Request a new field if necessary."
+              )
+              .type(Scalars.GraphQLString)
+              .build()
           )
           .argument(
             GraphQLArgument
@@ -669,7 +683,7 @@ public class TransmodelGraphQLSchema {
               .name("filterByInUse")
               .description("If true only quays with at least one visiting line are included.")
               .type(Scalars.GraphQLBoolean)
-              .defaultValue(Boolean.FALSE)
+              .defaultValueProgrammatic(Boolean.FALSE)
               .build()
           )
           .dataFetcher(environment -> {
@@ -683,24 +697,19 @@ public class TransmodelGraphQLSchema {
                 environment.getArgument("maximumLatitude")
               )
             );
+
+            var authority = environment.<String>getArgument("authority");
+            var filterInUse = environment.<Boolean>getArgument("filterByInUse");
+
+            FindRegularStopsByBoundingBoxRequest findRegularStopsByBoundingBoxRequest = FindRegularStopsByBoundingBoxRequest
+              .of(envelope)
+              .withFeedId(authority)
+              .filterByInUse(filterInUse)
+              .build();
+
             return GqlUtil
               .getTransitService(environment)
-              .findRegularStops(envelope)
-              .stream()
-              .filter(stop -> envelope.contains(stop.getCoordinate().asJtsCoordinate()))
-              .filter(stop ->
-                environment.getArgument("authority") == null ||
-                stop.getId().getFeedId().equalsIgnoreCase(environment.getArgument("authority"))
-              )
-              .filter(stop -> {
-                boolean filterByInUse = TRUE.equals(environment.getArgument("filterByInUse"));
-                boolean inUse = !GqlUtil
-                  .getTransitService(environment)
-                  .findPatterns(stop, true)
-                  .isEmpty();
-                return !filterByInUse || inUse;
-              })
-              .collect(Collectors.toList());
+              .findRegularStopsByBoundingBox(findRegularStopsByBoundingBoxRequest);
           })
           .build()
       )
@@ -1309,11 +1318,11 @@ public class TransmodelGraphQLSchema {
             );
             var privateCodes = FilterValues.ofEmptyIsEverything(
               "privateCodes",
-              environment.<List<String>>getArgument("privateCodes")
+              toListNullSafe(environment.<List<String>>getArgument("privateCodes"))
             );
             var activeServiceDates = FilterValues.ofEmptyIsEverything(
               "activeDates",
-              environment.<List<LocalDate>>getArgument("activeDates")
+              toListNullSafe(environment.<List<LocalDate>>getArgument("activeDates"))
             );
 
             TripRequest tripRequest = TripRequest
@@ -1438,7 +1447,7 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            var bikeParkId = TransitIdMapper.mapIDToDomain(environment.getArgument("id"));
+            var bikeParkId = mapIDToDomain(environment.getArgument("id"));
             return GqlUtil
               .getVehicleParkingService(environment)
               .listBikeParks()
@@ -1573,7 +1582,7 @@ public class TransmodelGraphQLSchema {
             return GqlUtil
               .getTransitService(environment)
               .getTransitAlertService()
-              .getAlertById(TransitIdMapper.mapIDToDomain(situationNumber));
+              .getAlertById(mapIDToDomain(situationNumber));
           })
           .build()
       )
@@ -1620,7 +1629,7 @@ public class TransmodelGraphQLSchema {
       .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType))
       .build();
 
-    return GraphQLSchema
+    var schema = GraphQLSchema
       .newSchema()
       .query(queryType)
       .additionalType(placeInterface)
@@ -1628,9 +1637,23 @@ public class TransmodelGraphQLSchema {
       .additionalType(Relay.pageInfoType)
       .additionalDirective(TransmodelDirectives.TIMING_DATA)
       .build();
+
+    return schema;
   }
 
-  private List<FeedScopedId> toIdList(List<String> ids) {
+  private static GraphQLSchema decorateSchemaWithCustomDocumentation(
+    GraphQLSchema schema,
+    ApiDocumentationProfile docProfile
+  ) {
+    var customDocumentation = CustomDocumentation.of(docProfile);
+    if (customDocumentation.isEmpty()) {
+      return schema;
+    }
+    var visitor = new InjectCustomDocumentation(customDocumentation);
+    return SchemaTransformer.transformSchema(schema, visitor);
+  }
+
+  private List<FeedScopedId> toIdList(@Nullable List<String> ids) {
     if (ids == null) {
       return Collections.emptyList();
     }
