@@ -164,6 +164,27 @@ public class OsmModuleTest {
     }
   }
 
+  /**
+   * There is a one-way road which is also marked as a platform in Sky Campus which crashed OSM
+   */
+  @Test
+  void testCrappyOsmPlatform() {
+    var deduplicator = new Deduplicator();
+    var graph = new Graph(deduplicator);
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmModule = OsmModule
+      .of(
+        new OsmProvider(RESOURCE_LOADER.file("sky_campus.osm.pbf"), false),
+        graph,
+        osmInfoRepository,
+        new DefaultVehicleParkingRepository()
+      )
+      .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
+      .build();
+    osmModule.buildGraph();
+    assertTrue(true);
+  }
+
   @Test
   public void testBuildAreaWithoutVisibility() {
     testBuildingAreas(true);
