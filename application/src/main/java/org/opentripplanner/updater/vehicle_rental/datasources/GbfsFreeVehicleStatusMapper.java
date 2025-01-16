@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class GbfsFreeVehicleStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
-  private static final Throttle THROTTLE = Throttle.ofOneMinute();
+  private static final Throttle FUEL_PERCENT_LOG_THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
@@ -61,19 +61,17 @@ public class GbfsFreeVehicleStatusMapper {
         vehicle.getLastReported() != null
           ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
           : null;
-      Ratio fuelPercent = null;
-      try {
-        if (vehicle.getCurrentFuelPercent() != null) {
-          fuelPercent = new Ratio(vehicle.getCurrentFuelPercent());
-        }
-      } catch (IllegalArgumentException e) {
-        THROTTLE.throttle(() ->
-          LOG.warn(
-            "Current fuel percent value not valid: {} - {}",
-            vehicle.getCurrentFuelPercent(),
-            e.getMessage()
-          ));
-      }
+
+      var fuelRatio = Ratio
+        .ofBoxed(
+          vehicle.getCurrentFuelPercent(),
+          validationErrorMessage ->
+            FUEL_PERCENT_LOG_THROTTLE.throttle(() ->
+              LOG.warn("'currentFuelPercent' is not valid. Details: " + validationErrorMessage)
+            )
+        )
+        .orElse(null);
+
       Distance rangeMeters = null;
       try {
         rangeMeters =
@@ -97,7 +95,7 @@ public class GbfsFreeVehicleStatusMapper {
       ) {
         return null;
       }
-      rentalVehicle.fuel = new RentalVehicleFuel(fuelPercent, rangeMeters);
+      rentalVehicle.fuel = new RentalVehicleFuel(fuelRatio, rangeMeters);
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {

@@ -18,22 +18,22 @@ public class RatioTest {
 
   @Test
   void validRatios() {
-    assertDoesNotThrow(() -> new Ratio(HALF));
-    assertDoesNotThrow(() -> new Ratio(ZERO));
-    assertDoesNotThrow(() -> new Ratio(ONE));
+    assertDoesNotThrow(() -> Ratio.of(HALF));
+    assertDoesNotThrow(() -> Ratio.of(ZERO));
+    assertDoesNotThrow(() -> Ratio.of(ONE));
   }
 
   @Test
   void invalidRatios() {
-    assertThrows(IllegalArgumentException.class, () -> new Ratio(TOO_HIGH));
-    assertThrows(IllegalArgumentException.class, () -> new Ratio(TOO_LOW));
+    assertThrows(IllegalArgumentException.class, () -> Ratio.of(TOO_HIGH));
+    assertThrows(IllegalArgumentException.class, () -> Ratio.of(TOO_LOW));
   }
 
   @Test
   void testHashCode() {
-    Ratio half = new Ratio(HALF);
+    Ratio half = Ratio.of(HALF);
 
-    Ratio half2 = new Ratio(HALF);
+    Ratio half2 = Ratio.of(HALF);
     assertEquals(half.hashCode(), half2.hashCode());
 
     Double halfDouble = 2d;
