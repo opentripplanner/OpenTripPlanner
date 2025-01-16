@@ -6,6 +6,7 @@ import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -24,20 +25,25 @@ public class PlatformLinkerTest {
     var stairsEndpointLabel = VertexLabel.osm(1028861028);
 
     var deduplicator = new Deduplicator();
-    var gg = new Graph(deduplicator);
+    var graph = new Graph(deduplicator);
 
     File file = ResourceLoader.of(this).file("skoyen.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule osmModule = OsmModule
-      .of(provider, gg, new DefaultVehicleParkingRepository())
+      .of(
+        provider,
+        graph,
+        new DefaultOsmInfoGraphBuildRepository(),
+        new DefaultVehicleParkingRepository()
+      )
       .withPlatformEntriesLinking(true)
       .build();
 
     osmModule.buildGraph();
 
-    Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);
+    Vertex stairsEndpoint = graph.getVertex(stairsEndpointLabel);
 
     // verify outgoing links
     assertTrue(stairsEndpoint.getOutgoing().stream().anyMatch(AreaEdge.class::isInstance));

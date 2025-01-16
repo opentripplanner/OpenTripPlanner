@@ -11,13 +11,27 @@
                     "streetName": "street",
                     "area": false,
                     "relativeDirection": "DEPART",
-                    "absoluteDirection": "NORTHEAST"
+                    "absoluteDirection": "NORTHEAST",
+                    "feature": null
                   },
                   {
                     "streetName": "elevator",
                     "area": false,
                     "relativeDirection": "ELEVATOR",
-                    "absoluteDirection": null
+                    "absoluteDirection": null,
+                    "feature": null
+                  },
+                  {
+                    "streetName": "entrance",
+                    "area": false,
+                    "relativeDirection": "CONTINUE",
+                    "absoluteDirection": null,
+                    "feature": {
+                      "__typename": "Entrance",
+                      "publicCode": "A",
+                      "entranceId": "osm:123",
+                      "wheelchairAccessible": "POSSIBLE"
+                    }
                   }
                 ]
               },

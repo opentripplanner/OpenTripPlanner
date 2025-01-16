@@ -21,6 +21,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -152,16 +153,20 @@ public class LinkingTest {
   public static TestOtpModel buildGraphNoTransit() {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
-    var gg = new Graph(deduplicator);
+    var graph = new Graph(deduplicator);
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
 
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
-    OsmProvider provider = new OsmProvider(file, false);
+    var provider = new OsmProvider(file, false);
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
-    OsmModule osmModule = OsmModule.of(provider, gg, new DefaultVehicleParkingRepository()).build();
+    var osmModule = OsmModule
+      .of(provider, graph, osmInfoRepository, vehicleParkingRepository)
+      .build();
 
     osmModule.buildGraph();
-    return new TestOtpModel(gg, timetableRepository);
+    return new TestOtpModel(graph, timetableRepository);
   }
 
   private static List<StreetTransitStopLink> outgoingStls(final TransitStopVertex tsv) {
