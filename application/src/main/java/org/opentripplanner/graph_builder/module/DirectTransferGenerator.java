@@ -141,70 +141,15 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         LOG.debug("Linking stop '{}' {}", stop, ts0);
 
-        // Calculate default transfers.
-        for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
-          StreetMode mode = transferProfile.journey().transfer().mode();
-          var nearbyStops = transferConfiguration
-            .defaultNearbyStopFinderForMode()
-            .get(mode)
-            .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
-          for (NearbyStop sd : nearbyStops) {
-            // Skip the origin stop, loop transfers are not needed.
-            if (sd.stop == stop) {
-              continue;
-            }
-            if (sd.stop.transfersNotAllowed()) {
-              continue;
-            }
-            createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
-          }
-        }
-        // Calculate flex transfers if flex routing is enabled.
-        for (RouteRequest transferProfile : transferConfiguration.flexTransferRequests()) {
-          // Flex transfer requests only use the WALK mode.
-          StreetMode mode = StreetMode.WALK;
-          var nearbyStops = transferConfiguration
-            .defaultNearbyStopFinderForMode()
-            .get(mode)
-            .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), true);
-          // This code is for finding transfers from AreaStops to Stops, transfers
-          // from Stops to AreaStops and between Stops are already covered above.
-          for (NearbyStop sd : nearbyStops) {
-            // Skip the origin stop, loop transfers are not needed.
-            if (sd.stop == stop) {
-              continue;
-            }
-            if (sd.stop instanceof RegularStop) {
-              continue;
-            }
-            // The TransferKey and PathTransfer are created differently for flex routing.
-            createPathTransfer(sd.stop, stop, sd, distinctTransfers, mode);
-          }
-        }
-        // Calculate transfers between stops that are visited by trips that allow cars, if configured.
-        if (carsAllowedStops.contains(stop)) {
-          for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
-            StreetMode mode = transferProfile.journey().transfer().mode();
-            var nearbyStops = transferConfiguration
-              .carsAllowedStopNearbyStopFinderForMode()
-              .get(mode)
-              .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
-            for (NearbyStop sd : nearbyStops) {
-              // Skip the origin stop, loop transfers are not needed.
-              if (sd.stop == stop) {
-                continue;
-              }
-              if (sd.stop.transfersNotAllowed()) {
-                continue;
-              }
-              // Only calculate transfers between carsAllowedStops.
-              if (!carsAllowedStops.contains(sd.stop)) {
-                continue;
-              }
-              createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
-            }
-          }
-        }
+        calculateDefaultTransfers(transferConfiguration, ts0, stop, distinctTransfers);
+        calculateFlexTransfers(transferConfiguration, ts0, stop, distinctTransfers);
+        calculateCarsAllowedTransfers(
+          transferConfiguration,
+          ts0,
+          stop,
+          distinctTransfers,
+          carsAllowedStops
+        );
 
         LOG.debug(
           "Linked stop {} with {} transfers to stops with different patterns.",
@@ -371,6 +316,101 @@ public class DirectTransferGenerator implements GraphBuilderModule {
       defaultNearbyStopFinderForMode,
       carsAllowedStopNearbyStopFinderForMode
     );
+  }
+
+  /**
+   * This method calculates default transfers.
+   */
+  private void calculateDefaultTransfers(
+    TransferConfiguration transferConfiguration,
+    TransitStopVertex ts0,
+    RegularStop stop,
+    Map<TransferKey, PathTransfer> distinctTransfers
+  ) {
+    for (RouteRequest transferProfile : transferConfiguration.defaultTransferRequests()) {
+      StreetMode mode = transferProfile.journey().transfer().mode();
+      var nearbyStops = transferConfiguration
+        .defaultNearbyStopFinderForMode()
+        .get(mode)
+        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
+      for (NearbyStop sd : nearbyStops) {
+        // Skip the origin stop, loop transfers are not needed.
+        if (sd.stop == stop) {
+          continue;
+        }
+        if (sd.stop.transfersNotAllowed()) {
+          continue;
+        }
+        createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
+      }
+    }
+  }
+
+  /**
+   * This method calculates flex transfers if flex routing is enabled.
+   */
+  private void calculateFlexTransfers(
+    TransferConfiguration transferConfiguration,
+    TransitStopVertex ts0,
+    RegularStop stop,
+    Map<TransferKey, PathTransfer> distinctTransfers
+  ) {
+    for (RouteRequest transferProfile : transferConfiguration.flexTransferRequests()) {
+      // Flex transfer requests only use the WALK mode.
+      StreetMode mode = StreetMode.WALK;
+      var nearbyStops = transferConfiguration
+        .defaultNearbyStopFinderForMode()
+        .get(mode)
+        .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), true);
+      // This code is for finding transfers from AreaStops to Stops, transfers
+      // from Stops to AreaStops and between Stops are already covered above.
+      for (NearbyStop sd : nearbyStops) {
+        // Skip the origin stop, loop transfers are not needed.
+        if (sd.stop == stop) {
+          continue;
+        }
+        if (sd.stop instanceof RegularStop) {
+          continue;
+        }
+        // The TransferKey and PathTransfer are created differently for flex routing.
+        createPathTransfer(sd.stop, stop, sd, distinctTransfers, mode);
+      }
+    }
+  }
+
+  /**
+   * This method calculates transfers between stops that are visited by trips that allow cars, if configured.
+   */
+  private void calculateCarsAllowedTransfers(
+    TransferConfiguration transferConfiguration,
+    TransitStopVertex ts0,
+    RegularStop stop,
+    Map<TransferKey, PathTransfer> distinctTransfers,
+    Set<StopLocation> carsAllowedStops
+  ) {
+    if (carsAllowedStops.contains(stop)) {
+      for (RouteRequest transferProfile : transferConfiguration.carsAllowedStopTransferRequests()) {
+        StreetMode mode = transferProfile.journey().transfer().mode();
+        var nearbyStops = transferConfiguration
+          .carsAllowedStopNearbyStopFinderForMode()
+          .get(mode)
+          .findNearbyStops(ts0, transferProfile, transferProfile.journey().transfer(), false);
+        for (NearbyStop sd : nearbyStops) {
+          // Skip the origin stop, loop transfers are not needed.
+          if (sd.stop == stop) {
+            continue;
+          }
+          if (sd.stop.transfersNotAllowed()) {
+            continue;
+          }
+          // Only calculate transfers between carsAllowedStops.
+          if (!carsAllowedStops.contains(sd.stop)) {
+            continue;
+          }
+          createPathTransfer(stop, sd.stop, sd, distinctTransfers, mode);
+        }
+      }
+    }
   }
 
   private record TransferConfiguration(
