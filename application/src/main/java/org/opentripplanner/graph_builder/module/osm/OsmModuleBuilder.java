@@ -28,6 +28,7 @@ public class OsmModuleBuilder {
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
+  private boolean includeOsmSubwayEntrances = false;
   private int maxAreaNodes;
   private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
@@ -83,6 +84,11 @@ public class OsmModuleBuilder {
     return this;
   }
 
+  public OsmModuleBuilder withIncludeOsmSubwayEntrances(boolean includeOsmSubwayEntrances) {
+    this.includeOsmSubwayEntrances = includeOsmSubwayEntrances;
+    return this;
+  }
+
   public OsmModuleBuilder withStreetLimitationParameters(StreetLimitationParameters parameters) {
     this.streetLimitationParameters = parameters;
     return this;
@@ -103,7 +109,8 @@ public class OsmModuleBuilder {
         areaVisibility,
         platformEntriesLinking,
         staticParkAndRide,
-        staticBikeParkAndRide
+        staticBikeParkAndRide,
+        includeOsmSubwayEntrances
       )
     );
   }

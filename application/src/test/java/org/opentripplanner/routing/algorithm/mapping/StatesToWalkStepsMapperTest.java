@@ -13,6 +13,7 @@ import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class StatesToWalkStepsMapperTest {
 
@@ -42,6 +43,7 @@ class StatesToWalkStepsMapperTest {
     var walkSteps = buildWalkSteps(builder);
     assertEquals(2, walkSteps.size());
     var enter = walkSteps.get(1);
+    assertEquals(new FeedScopedId("F", "Lichterfelde-Ost"), enter.entrance().get().getId());
     assertEquals(ENTER_STATION, enter.getRelativeDirection());
   }
 
@@ -53,8 +55,9 @@ class StatesToWalkStepsMapperTest {
       .exitStation("Lichterfelde-Ost");
     var walkSteps = buildWalkSteps(builder);
     assertEquals(3, walkSteps.size());
-    var enter = walkSteps.get(2);
-    assertEquals(EXIT_STATION, enter.getRelativeDirection());
+    var exit = walkSteps.get(2);
+    assertEquals(new FeedScopedId("F", "Lichterfelde-Ost"), exit.entrance().get().getId());
+    assertEquals(EXIT_STATION, exit.getRelativeDirection());
   }
 
   @Test
