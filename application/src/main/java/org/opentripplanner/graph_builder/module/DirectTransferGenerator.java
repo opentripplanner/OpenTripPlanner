@@ -89,10 +89,10 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    /* Initialize transit model index which is needed by the nearby stop finder. */
+    // Initialize transit model index which is needed by the nearby stop finder.
     timetableRepository.index();
 
-    /* The linker will use streets if they are available, or straight-line distance otherwise. */
+    // The linker will use streets if they are available, or straight-line distance otherwise.
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(defaultMaxTransferDuration);
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
@@ -301,7 +301,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     List<RouteRequest> carsAllowedStopTransferRequests = new ArrayList<>();
     List<RouteRequest> flexTransferRequests = new ArrayList<>();
     HashMap<StreetMode, NearbyStopFinder> defaultNearbyStopFinderForMode = new HashMap<>();
-    /* These are used for calculating transfers only between carsAllowedStops. */
+    // These are used for calculating transfers only between carsAllowedStops.
     HashMap<StreetMode, NearbyStopFinder> carsAllowedStopNearbyStopFinderForMode = new HashMap<>();
 
     // Check that the mode specified in transferParametersForMode can also be found in transferRequests.
