@@ -14,6 +14,7 @@ import java.util.Set;
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.Area;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
@@ -27,7 +28,7 @@ import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopArea;
+import org.onebusaway.gtfs.model.StopAreaElement;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -66,7 +67,8 @@ public class GtfsModule implements GraphBuilderModule {
     FareTransferRule.class,
     RiderCategory.class,
     FareMedium.class,
-    StopArea.class
+    StopAreaElement.class,
+    Area.class
   );
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);

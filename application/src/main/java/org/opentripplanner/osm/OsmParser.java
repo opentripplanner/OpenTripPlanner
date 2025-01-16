@@ -1,11 +1,11 @@
 package org.opentripplanner.osm;
 
+import crosby.binary.BinaryParser;
+import crosby.binary.Osmformat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.openstreetmap.osmosis.osmbinary.BinaryParser;
-import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.model.OsmMemberType;
 import org.opentripplanner.osm.model.OsmNode;

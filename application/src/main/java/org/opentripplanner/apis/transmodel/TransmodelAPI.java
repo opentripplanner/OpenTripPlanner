@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -80,6 +81,7 @@ public class TransmodelAPI {
     TransmodelAPIParameters config,
     TimetableRepository timetableRepository,
     RouteRequest defaultRouteRequest,
+    ApiDocumentationProfile documentationProfile,
     TransitRoutingConfig transitRoutingConfig
   ) {
     if (config.hideFeedId()) {
@@ -91,6 +93,7 @@ public class TransmodelAPI {
       TransmodelGraphQLSchema.create(
         defaultRouteRequest,
         timetableRepository.getTimeZone(),
+        documentationProfile,
         transitRoutingConfig
       );
   }

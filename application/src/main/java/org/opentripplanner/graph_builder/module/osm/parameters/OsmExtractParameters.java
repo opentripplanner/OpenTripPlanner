@@ -11,16 +11,28 @@ import org.opentripplanner.osm.tagmapping.OsmTagMapperSource;
  * Example: {@code "osm" : [ {source: "file:///path/to/otp/norway.pbf"} ] }
  *
  */
-public record OsmExtractParameters(URI source, OsmTagMapperSource osmTagMapper, ZoneId timeZone)
+public record OsmExtractParameters(
+  URI source,
+  OsmTagMapperSource osmTagMapper,
+  ZoneId timeZone,
+  boolean includeOsmSubwayEntrances
+)
   implements DataSourceConfig {
   public static final OsmTagMapperSource DEFAULT_OSM_TAG_MAPPER = OsmTagMapperSource.DEFAULT;
 
   public static final ZoneId DEFAULT_TIME_ZONE = null;
 
+  public static final boolean DEFAULT_INCLUDE_OSM_SUBWAY_ENTRANCES = false;
+
   public static final OsmExtractParameters DEFAULT = new OsmExtractParametersBuilder().build();
 
   OsmExtractParameters(OsmExtractParametersBuilder builder) {
-    this(builder.getSource(), builder.getOsmTagMapper(), builder.getTimeZone());
+    this(
+      builder.getSource(),
+      builder.getOsmTagMapper(),
+      builder.getTimeZone(),
+      builder.includeOsmSubwayEntrances()
+    );
   }
 
   @Override
@@ -35,6 +47,10 @@ public record OsmExtractParameters(URI source, OsmTagMapperSource osmTagMapper, 
   @Nullable
   public ZoneId timeZone() {
     return timeZone;
+  }
+
+  public boolean includeOsmSubwayEntrances() {
+    return includeOsmSubwayEntrances;
   }
 
   public OsmExtractParametersBuilder copyOf() {

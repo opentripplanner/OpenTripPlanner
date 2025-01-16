@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -20,7 +21,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
  * This is used to load the graph, and finally this class can create the
  * {@link ConstructApplication} for the next phase.
  * <p>
- * By splitting the these two responsibilities into two separate phases we are sure all
+ * By splitting these two responsibilities into two separate phases we are sure all
  * components (graph and transit model) created in the load phase will be available for
  * creating the application using Dagger dependency injection.
  */
@@ -55,6 +56,7 @@ public class LoadApplication {
   public ConstructApplication appConstruction(SerializedGraphObject obj) {
     return createAppConstruction(
       obj.graph,
+      obj.osmInfoGraphBuildRepository,
       obj.timetableRepository,
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
@@ -69,6 +71,7 @@ public class LoadApplication {
   public ConstructApplication appConstruction() {
     return createAppConstruction(
       factory.emptyGraph(),
+      factory.emptyOsmInfoGraphBuildRepository(),
       factory.emptyTimetableRepository(),
       factory.emptyWorldEnvelopeRepository(),
       factory.emptyVehicleParkingRepository(),
@@ -92,6 +95,7 @@ public class LoadApplication {
 
   private ConstructApplication createAppConstruction(
     Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -103,6 +107,7 @@ public class LoadApplication {
     return new ConstructApplication(
       cli,
       graph,
+      osmInfoGraphBuildRepository,
       timetableRepository,
       worldEnvelopeRepository,
       config(),
