@@ -17,12 +17,14 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GbfsFreeVehicleStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
+  private static final Throttle THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
@@ -65,11 +67,12 @@ public class GbfsFreeVehicleStatusMapper {
           fuelPercent = new Ratio(vehicle.getCurrentFuelPercent());
         }
       } catch (IllegalArgumentException e) {
-        LOG.warn(
-          "Current fuel percent value not valid: {} - {}",
-          vehicle.getCurrentFuelPercent(),
-          e.getMessage()
-        );
+        THROTTLE.throttle(() ->
+          LOG.warn(
+            "Current fuel percent value not valid: {} - {}",
+            vehicle.getCurrentFuelPercent(),
+            e.getMessage()
+          ));
       }
       Distance rangeMeters = null;
       try {
