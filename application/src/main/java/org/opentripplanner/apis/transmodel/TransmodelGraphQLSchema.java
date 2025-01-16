@@ -29,6 +29,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
+import graphql.schema.SchemaTransformer;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -44,8 +45,12 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
+import org.opentripplanner.apis.support.graphql.injectdoc.CustomDocumentation;
+import org.opentripplanner.apis.support.graphql.injectdoc.InjectCustomDocumentation;
 import org.opentripplanner.apis.transmodel.mapping.PlaceMapper;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.model.DefaultRouteRequestType;
@@ -158,10 +163,12 @@ public class TransmodelGraphQLSchema {
   public static GraphQLSchema create(
     RouteRequest defaultRequest,
     ZoneId timeZoneId,
-    TransitTuningParameters transitTuningParameters
+    ApiDocumentationProfile docProfile,
+    TransitTuningParameters transitTuning
   ) {
-    return new TransmodelGraphQLSchema(defaultRequest, timeZoneId, transitTuningParameters)
-      .create();
+    var schema = new TransmodelGraphQLSchema(defaultRequest, timeZoneId, transitTuning).create();
+    schema = decorateSchemaWithCustomDocumentation(schema, docProfile);
+    return schema;
   }
 
   @SuppressWarnings("unchecked")
@@ -1622,7 +1629,7 @@ public class TransmodelGraphQLSchema {
       .field(DatedServiceJourneyQuery.createQuery(datedServiceJourneyType))
       .build();
 
-    return GraphQLSchema
+    var schema = GraphQLSchema
       .newSchema()
       .query(queryType)
       .additionalType(placeInterface)
@@ -1630,9 +1637,23 @@ public class TransmodelGraphQLSchema {
       .additionalType(Relay.pageInfoType)
       .additionalDirective(TransmodelDirectives.TIMING_DATA)
       .build();
+
+    return schema;
   }
 
-  private List<FeedScopedId> toIdList(List<String> ids) {
+  private static GraphQLSchema decorateSchemaWithCustomDocumentation(
+    GraphQLSchema schema,
+    ApiDocumentationProfile docProfile
+  ) {
+    var customDocumentation = CustomDocumentation.of(docProfile);
+    if (customDocumentation.isEmpty()) {
+      return schema;
+    }
+    var visitor = new InjectCustomDocumentation(customDocumentation);
+    return SchemaTransformer.transformSchema(schema, visitor);
+  }
+
+  private List<FeedScopedId> toIdList(@Nullable List<String> ids) {
     if (ids == null) {
       return Collections.emptyList();
     }
