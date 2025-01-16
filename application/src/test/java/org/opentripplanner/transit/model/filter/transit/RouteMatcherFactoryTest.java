@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -26,54 +27,18 @@ class RouteMatcherFactoryTest {
     route1 =
       Route
         .of(new FeedScopedId("feedId", "routeId"))
-        .withAgency(
-          Agency
-            .of(new FeedScopedId("feedId", "agencyId"))
-            .withName("AGENCY")
-            .withTimezone("Europe/Oslo")
-            .build()
-        )
+        .withAgency(TimetableRepositoryForTest.agency("AGENCY"))
         .withMode(TransitMode.BUS)
         .withShortName("ROUTE1")
-        .withLongName(
-          new I18NString() {
-            @Override
-            public String toString() {
-              return "ROUTE1LONG";
-            }
-
-            @Override
-            public String toString(Locale locale) {
-              return "ROUTE1LONG";
-            }
-          }
-        )
+        .withLongName(I18NString.of("ROUTE1LONG"))
         .build();
     route2 =
       Route
         .of(new FeedScopedId("otherFeedId", "otherRouteId"))
-        .withAgency(
-          Agency
-            .of(new FeedScopedId("otherFeedId", "otherAgencyId"))
-            .withName("OTHER_AGENCY")
-            .withTimezone("Europe/Oslo")
-            .build()
-        )
+        .withAgency(TimetableRepositoryForTest.agency("OTHER_AGENCY"))
         .withMode(TransitMode.RAIL)
         .withShortName("ROUTE2")
-        .withLongName(
-          new I18NString() {
-            @Override
-            public String toString() {
-              return "ROUTE2LONG";
-            }
-
-            @Override
-            public String toString(Locale locale) {
-              return "ROUTE2LONG";
-            }
-          }
-        )
+        .withLongName(I18NString.of("ROUTE2LONG"))
         .build();
   }
 
@@ -81,7 +46,7 @@ class RouteMatcherFactoryTest {
   void testAgencies() {
     FindRoutesRequest request = FindRoutesRequest
       .of()
-      .withAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of("agencyId")))
+      .withAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of("AGENCY")))
       .build();
 
     Matcher<Route> matcher = RouteMatcherFactory.of(request, r -> false);
@@ -164,7 +129,7 @@ class RouteMatcherFactoryTest {
   void testAll() {
     FindRoutesRequest request = FindRoutesRequest
       .of()
-      .withAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of("agencyId")))
+      .withAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of("AGENCY")))
       .withTransitModes(FilterValues.ofEmptyIsEverything("transitModes", List.of(TransitMode.BUS)))
       .withShortName("ROUTE1")
       .withShortNames(FilterValues.ofEmptyIsEverything("publicCodes", List.of("ROUTE1", "ROUTE3")))

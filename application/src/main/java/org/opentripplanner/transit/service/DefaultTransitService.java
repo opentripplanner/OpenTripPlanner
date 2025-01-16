@@ -197,8 +197,8 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<Route> getRoutes(Collection<FeedScopedId> id) {
-    return id.stream().map(this::getRoute).filter(Objects::nonNull).toList();
+  public Collection<Route> getRoutes(Collection<FeedScopedId> ids) {
+    return ids.stream().map(this::getRoute).filter(Objects::nonNull).toList();
   }
 
   @Override
