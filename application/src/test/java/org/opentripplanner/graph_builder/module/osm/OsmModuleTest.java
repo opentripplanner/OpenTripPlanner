@@ -24,6 +24,7 @@ import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
@@ -180,11 +181,28 @@ public class OsmModuleTest {
     var provider = new OsmProvider() {
       @Override
       public void readOsm(OsmDatabase osmdb) {
-        final OsmWay way = new OsmWay();
+
+        var way = new OsmWay();
         way.addTag("public_transport", "platform");
+        way.addTag("access", "no");
+        way.addTag("motor_vehicle", "permissive");
         way.addTag("ref", "123");
+        way.addTag("oneway", "yes");
         way.setOsmProvider(this);
+        way.getNodeRefs().add(1);
+        way.getNodeRefs().add(2);
         osmdb.addWay(way);
+
+        osmdb.doneSecondPhaseWays();
+
+        var node1 = new OsmNode(1,1);
+        node1.setId(1);
+        var node2 = new OsmNode(1.1,1.1);
+        node2.setId(2);
+
+        osmdb.addNode(node1);
+        osmdb.addNode(node2);
+
       }
 
       @Override
@@ -219,6 +237,7 @@ public class OsmModuleTest {
       )
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
       .build();
+
     osmModule.buildGraph();
     assertThat(graph.getEdges()).isNotEmpty();
   }
