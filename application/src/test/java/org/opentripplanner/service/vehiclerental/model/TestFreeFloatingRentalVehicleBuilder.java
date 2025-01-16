@@ -17,7 +17,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
 
   private double latitude = DEFAULT_LATITUDE;
   private double longitude = DEFAULT_LONGITUDE;
-  private Ratio currentFuelPercent = new Ratio(DEFAULT_CURRENT_FUEL_PERCENT);
+  private Ratio currentFuelPercent = Ratio.of(DEFAULT_CURRENT_FUEL_PERCENT);
   private Double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
   private VehicleRentalSystem system = null;
   private String network = NETWORK_1;
@@ -44,7 +44,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
     if (currentFuelPercent == null) {
       this.currentFuelPercent = null;
     } else {
-      this.currentFuelPercent = new Ratio(currentFuelPercent);
+      this.currentFuelPercent = Ratio.ofBoxed(currentFuelPercent, ignore -> {}).orElse(null);
     }
     return this;
   }
