@@ -312,7 +312,7 @@ public class TimetableTest {
     stopTimeUpdateBuilder.setStopSequence(1);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
     var stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    stopTimeEventBuilder.setDelay(0);
+    stopTimeEventBuilder.setDelay(900);
     stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
     stopTimeUpdateBuilder.setStopSequence(2);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
@@ -475,7 +475,8 @@ public class TimetableTest {
       assertEquals(0, updatedTripTimes.getArrivalDelay(1));
       assertEquals(0, updatedTripTimes.getDepartureDelay(1));
       assertEquals(-100, updatedTripTimes.getArrivalDelay(2));
-      assertEquals(-100, updatedTripTimes.getDepartureDelay(2));
+      // the stop is a timepoint so the bus will wait until the scheduled time
+      assertEquals(0, updatedTripTimes.getDepartureDelay(2));
       assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
 
       // REQUIRED_NO_DATA propagation type should always set NO_DATA flags'
@@ -514,7 +515,8 @@ public class TimetableTest {
       assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
       assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
       assertEquals(-700, updatedTripTimes.getArrivalDelay(2));
-      assertEquals(-700, updatedTripTimes.getDepartureDelay(2));
+      // the stop is a timepoint so the bus will wait until the scheduled time
+      assertEquals(0, updatedTripTimes.getDepartureDelay(2));
       assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
 
       // REQUIRED_NO_DATA propagation type should always set NO_DATA flags'
@@ -547,13 +549,17 @@ public class TimetableTest {
       SERVICE_DATE,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA
     );
-    // if arrival time is not defined but departure time is not and the arrival time is greater
-    // than to departure time on a stop, we should not try to fix it by default because the spec
-    // only allows you to drop all estimates for a stop when it's passed according to schedule
-    assertTrue(result.isFailure());
-
-    result.ifFailure(err -> {
-      assertEquals(err.errorType(), NEGATIVE_DWELL_TIME);
+    // the spec does not require you to supply both arrival and departure on a StopTimeUpdate
+    // it says:
+    // either arrival or departure must be provided within a StopTimeUpdate - both fields cannot be
+    // empty
+    // therefore the processing should succeed even if only one of them is given
+    assertTrue(result.isSuccess());
+    result.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(15, updatedTripTimes.getArrivalDelay(2));
+      assertEquals(15, updatedTripTimes.getDepartureDelay(2));
     });
   }
 
@@ -586,7 +592,8 @@ public class TimetableTest {
       assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
       assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
       assertEquals(-700, updatedTripTimes.getArrivalDelay(2));
-      assertEquals(-700, updatedTripTimes.getDepartureDelay(2));
+      // the stop is a timepoint so the bus will wait until the scheduled time
+      assertEquals(0, updatedTripTimes.getDepartureDelay(2));
       assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
 
       // REQUIRED propagation type should never set NO_DATA flags'
