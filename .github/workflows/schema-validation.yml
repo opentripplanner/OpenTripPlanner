@@ -1,0 +1,34 @@
+name: Validate schema changes
+ 
+on:
+  pull_request:
+    branches:
+      - dev-2.x
+ 
+jobs:
+  validate-gtfs:
+    if: github.repository_owner == 'opentripplanner'
+    name: Validate GraphQL schema changes
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+ 
+      - uses: kamilkisiela/graphql-inspector@master
+        with:
+          name: Validate GTFS GraphQL schema changes
+          schema: 'dev-2.x:application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'
+          annotations: false
+          fail-on-breaking: true
+          rules: |
+            ignoreDescriptionChanges
+      
+      - uses: kamilkisiela/graphql-inspector@master
+        with:
+          name: Validate Transmodel GraphQL schema changes
+          schema: 'dev-2.x:application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'
+          annotations: false
+          fail-on-breaking: true
+          rules: |
+            ignoreDescriptionChanges
