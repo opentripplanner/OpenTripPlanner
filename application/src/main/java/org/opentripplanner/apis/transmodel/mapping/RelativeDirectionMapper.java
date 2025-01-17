@@ -22,12 +22,12 @@ public class RelativeDirectionMapper {
         CIRCLE_COUNTERCLOCKWISE,
         ELEVATOR,
         UTURN_LEFT,
-        UTURN_RIGHT -> relativeDirection;
-      // for these the Transmodel API doesn't have a mapping. should it?
-      case ENTER_STATION,
+        UTURN_RIGHT,
+        ENTER_STATION,
         EXIT_STATION,
-        ENTER_OR_EXIT_STATION,
-        FOLLOW_SIGNS -> RelativeDirection.CONTINUE;
+        FOLLOW_SIGNS -> relativeDirection;
+      // this type should never be exposed by an API
+      case ENTER_OR_EXIT_STATION -> RelativeDirection.CONTINUE;
     };
   }
 }
