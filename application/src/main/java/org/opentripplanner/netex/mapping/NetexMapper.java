@@ -208,8 +208,6 @@ public class NetexMapper {
     addEntriesToGroupMapperForPostProcessingLater();
   }
 
-
-
   /* PRIVATE METHODS */
 
   private void setupGroupMapping() {
@@ -532,13 +530,15 @@ public class NetexMapper {
   }
 
   private void mapScheduledStopPointsToQuays() {
-    currentNetexIndex.getQuayIdByStopPointRef().localKeys().forEach(id -> {
-      var sspid = idFactory.createId(id);
-      var stopId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
-      var stop = Objects.requireNonNull(transitBuilder.getStops().get(stopId));
-      System.out.printf("%s -> %s%n", sspid, stopId);
-      transitBuilder.stopsByScheduledStopPoints().put(sspid, stop);
-    });
+    currentNetexIndex
+      .getQuayIdByStopPointRef()
+      .localKeys()
+      .forEach(id -> {
+        var sspid = idFactory.createId(id);
+        var stopId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
+        var stop = Objects.requireNonNull(transitBuilder.getStops().get(stopId));
+        transitBuilder.stopsByScheduledStopPoints().put(sspid, stop);
+      });
   }
 
   private void mapVehicleParkings() {

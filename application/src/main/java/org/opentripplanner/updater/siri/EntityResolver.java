@@ -190,7 +190,9 @@ public class EntityResolver {
    */
   public RegularStop resolveQuay(String stopPointRef) {
     var id = resolveId(stopPointRef);
-    return transitService.findStopByScheduledStopPoint(id).orElseGet(() -> transitService.getRegularStop(id));
+    return transitService
+      .findStopByScheduledStopPoint(id)
+      .orElseGet(() -> transitService.getRegularStop(id));
   }
 
   /**
