@@ -9,6 +9,10 @@ jobs:
   validate-gtfs:
     if: github.repository_owner == 'opentripplanner'
     name: Validate GraphQL schema changes
+    permissions:
+      contents: read
+      pull-requests: write
+      checks: write
     runs-on: ubuntu-latest
  
     steps:
