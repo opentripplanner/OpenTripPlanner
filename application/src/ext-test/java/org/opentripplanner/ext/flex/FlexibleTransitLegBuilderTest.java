@@ -65,7 +65,7 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
     assertEquals(copy.getStartTime(), ZDT);
     assertEquals(copy.getEndTime(), ZDT);
     assertEquals(copy.getTransitAlerts(), Set.of(ALERT));
-    assertEquals(copy.fareProducts(), List.of(FARE_PRODUCT_USE ));
+    assertEquals(copy.fareProducts(), List.of(FARE_PRODUCT_USE));
   }
 
   @Test
