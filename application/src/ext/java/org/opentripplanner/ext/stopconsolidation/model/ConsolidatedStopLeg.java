@@ -10,13 +10,11 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
 
   private final Place from;
   private final Place to;
-  private final ScheduledTransitLeg original;
 
   ConsolidatedStopLeg(ConsolidatedStopLegBuilder builder) {
     super(builder);
     this.from = Objects.requireNonNull(builder.from());
     this.to = Objects.requireNonNull(builder.to());
-    this.original = Objects.requireNonNull(builder.original());
   }
 
   @Override
@@ -34,7 +32,4 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
     return new ConsolidatedStopLegBuilder(this);
   }
 
-  ScheduledTransitLeg original() {
-    return original;
-  }
 }
