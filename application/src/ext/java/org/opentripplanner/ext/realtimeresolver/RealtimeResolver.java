@@ -59,7 +59,6 @@ public class RealtimeResolver {
       .withTransferToNextLeg(original.getTransferToNextLeg())
       .withGeneralizedCost(original.getGeneralizedCost())
       .withAccessibilityScore(original.accessibilityScore())
-      .withAlerts(reference.getTransitAlerts())
       .build();
   }
 }
