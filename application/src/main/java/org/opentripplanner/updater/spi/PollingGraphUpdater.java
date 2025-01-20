@@ -2,6 +2,9 @@ package org.opentripplanner.updater.spi;
 
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,10 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
    * removed that.
    */
   protected volatile boolean primed;
+  /**
+   * Parent update manager. Is used to execute graph writer runnables.
+   */
+  protected WriteToGraphCallback saveResultOnGraph;
 
   /** Shared configuration code for all polling graph updaters. */
   protected PollingGraphUpdater(PollingGraphUpdaterParameters config) {
@@ -95,9 +102,22 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     return configRef;
   }
 
+  @Override
+  public final void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
+  }
+
   /**
    * Mirrors GraphUpdater.run method. Only difference is that runPolling will be run multiple times
    * with pauses in between. The length of the pause is defined in the preference frequency.
    */
   protected abstract void runPolling() throws Exception;
+
+  protected final void updateGraph(GraphWriterRunnable task)
+    throws ExecutionException, InterruptedException {
+    var result = saveResultOnGraph.execute(task);
+    if (OTPFeature.WaitForGraphUpdateInPollingUpdaters.isOn()) {
+      result.get();
+    }
+  }
 }
