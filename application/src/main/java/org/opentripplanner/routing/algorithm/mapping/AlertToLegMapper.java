@@ -59,7 +59,7 @@ public class AlertToLegMapper {
     FeedScopedId tripId = leg.getTrip().getId();
     LocalDate serviceDate = leg.getServiceDate();
 
-    var totalAlerts = new ArrayList<TransitAlert>();
+    var totalAlerts = new HashSet<TransitAlert>();
 
     if (fromStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = isFirstLeg

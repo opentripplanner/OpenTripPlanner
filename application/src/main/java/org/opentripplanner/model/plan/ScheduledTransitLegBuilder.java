@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
@@ -172,8 +173,8 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return accessibilityScore;
   }
 
-  public B withAlerts(Collection<TransitAlert> alerts) {
-    this.alerts = Set.copyOf(alerts);
+  public B withAlerts(Set<TransitAlert> alerts) {
+    this.alerts = Objects.requireNonNull(alerts);
     return instance();
   }
 
