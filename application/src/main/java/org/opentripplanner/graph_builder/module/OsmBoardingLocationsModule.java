@@ -24,6 +24,7 @@ import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
@@ -134,41 +135,55 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   /**
    * Connect a transit stop vertex into a boarding location area in the index.
-   * <p>
-   * A centroid vertex is generated in the area and connected to the vertices on the platform edge.
+   * A centroid vertex is generated in the area or its sub platform
+   * and connected to the visibility vertices of the area
    *
    * @return if the vertex has been connected
    */
   private boolean connectVertexToArea(TransitStopVertex ts, StreetIndex index) {
     RegularStop stop = ts.getStop();
-    var nearbyAreaEdgeLists = index
-      .getEdgesForEnvelope(getEnvelope(ts))
-      .stream()
-      .filter(AreaEdge.class::isInstance)
-      .map(AreaEdge.class::cast)
-      .map(AreaEdge::getArea)
-      .collect(Collectors.toSet());
+    var nearbyAreas = new HashMap<AreaEdgeList, Platform>();
 
-    // Iterate over all nearby areas representing transit stops in OSM, linking to them if they have a stop code or id
+    // Find nearby areas representing transit stops in OSM, having  a stop code or id
     // in their ref= tag that matches the GTFS stop code of this StopVertex.
-    for (var edgeList : nearbyAreaEdgeLists) {
-      if (matchesReference(stop, edgeList.references)) {
-        var name = edgeList
-          .getAreas()
-          .stream()
-          .findFirst()
-          .map(NamedArea::getName)
-          .orElse(LOCALIZED_PLATFORM_NAME);
-        var boardingLocation = makeBoardingLocation(
-          stop,
-          edgeList.getGeometry().getCentroid(),
-          edgeList.references,
-          name
-        );
-        linker.addPermanentAreaVertex(boardingLocation, edgeList);
-        linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
-        return true;
+    // Find also an actual included platform which may be a part of a larger area
+    for (var edge : index.getEdgesForEnvelope(getEnvelope(ts))) {
+      if (edge instanceof AreaEdge aEdge) {
+        var areaEdgeList = aEdge.getArea();
+        if (matchesReference(stop, areaEdgeList.references)) {
+          var opt = osmInfoGraphBuildService.findPlatform(edge);
+          if (opt.isPresent()) {
+            var platform = opt.get();
+            if (!matchesReference(stop, platform.references())) {
+              nearbyAreas.put(areaEdgeList, platform);
+            }
+          }
+          // collect area also if no platform available
+          if (nearbyAreas.get(areaEdgeList) == null) {
+            nearbyAreas.put(areaEdgeList, null);
+          }
+        }
       }
+    }
+
+    // Iterate over resulting areas and create proper linking to them
+    for (var area : nearbyAreas.entrySet()) {
+      var edgeList = area.getKey();
+      var name = edgeList
+        .getAreas()
+        .stream()
+        .findFirst()
+        .map(NamedArea::getName)
+        .orElse(LOCALIZED_PLATFORM_NAME);
+
+      Platform platform = nearbyAreas.get(edgeList);
+      var centroid = platform != null
+        ? platform.geometry().getCentroid()
+        : edgeList.getGeometry().getCentroid();
+      var boardingLocation = makeBoardingLocation(stop, centroid, edgeList.references, name);
+      linker.addPermanentAreaVertex(boardingLocation, edgeList);
+      linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+      return true;
     }
     return false;
   }
