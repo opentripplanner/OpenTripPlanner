@@ -15,7 +15,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
-import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.utils.logging.Throttle;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -97,8 +97,10 @@ public class Transfer {
       );
     }
 
-    var initialStates = State.getInitialStates(Set.of(edges.getFirst().getFromVertex()), request);
-    var state = EdgeTraverser.traverseEdges(initialStates, edges);
+    StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
+    se.setTimeSeconds(0);
+
+    var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
 
     return state.map(s ->
       new DefaultRaptorTransfer(
