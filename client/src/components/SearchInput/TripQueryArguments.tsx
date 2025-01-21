@@ -1,6 +1,5 @@
 import React, { JSX, useEffect, useState } from 'react';
-// import tripArgumentsData from '../../gql/query-arguments.json';
-import { useTripSchema } from './TripSchemaContext';
+import { useTripSchema } from './useTripSchema.ts';
 import { TripQueryVariables } from '../../gql/graphql';
 import { getNestedValue, setNestedValue } from './nestedUtils';
 import ArgumentTooltip from './ArgumentTooltip.tsx';
@@ -59,10 +58,9 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     if (!tripArgs) return; // Don't run if the data isn't loaded yet
     if (loading || error) return; // Optionally handle error/loading
 
-    // Example: tripArgs has shape { trip: { arguments: {} } }
     const extractedArgs = extractAllArgs(tripArgs.trip.arguments);
     setArgumentsList(extractedArgs);
-  }, [tripArgs, loading, error]);
+  }, [tripArgs, loading, error, extractAllArgs]);
 
   /**
    * Recursively extracts a flat list of arguments (ProcessedArgument[]).
@@ -91,7 +89,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
   ): ProcessedArgument[] {
     let allArgs: ProcessedArgument[] = [];
 
-    // Check if we have a recognized ArgData object with a `type` property
     if (typeof argData === 'object' && argData.type) {
       if (argData.type.type === 'Enum') {
         const enumValues = ['Not selected', ...(argData.type.values || [])];
@@ -233,7 +230,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
       return variables; // Otherwise leave it as is
     }
 
-    // For nested paths (e.g. "nested.key.inner"):
+    // For nested paths
     const pathParts = path.split('.');
     for (let i = pathParts.length - 1; i > 0; i--) {
       const parentPath = pathParts.slice(0, i).join('.');
@@ -331,8 +328,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
             </div>
           );
         })}
-
-        {/* Add button with a dynamic name */}
         <button onClick={() => handleAddItem(listPath)}>+ Add {typeName}</button>
       </div>
     );
@@ -359,9 +354,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     setTripQueryVariables(updatedTripQueryVariables);
   }
 
-  /**
-   * Recursively renders inputs for an array of `ProcessedArgument`s.
-   */
   function renderArgumentInputs(args: ProcessedArgument[], level: number, allArgs: ProcessedArgument[]): JSX.Element[] {
     return args.map(({ path, type, defaultValue, enumValues, isComplex, isList }) => {
       const isExpanded = expandedArguments[path];
