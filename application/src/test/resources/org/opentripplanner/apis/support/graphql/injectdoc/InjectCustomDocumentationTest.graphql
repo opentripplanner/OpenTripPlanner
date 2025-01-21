@@ -1,0 +1,54 @@
+schema {
+  query: QueryType
+}
+
+"REPLACE"
+union AB = AType | BType
+
+"APPEND TO"
+union AC = AType | BType
+
+# Add doc to an undocumented type
+type AType {
+  a: Duration
+  b: String
+}
+
+# Replace existing doc
+"REPLACE"
+type BType {
+  a: String @deprecated(reason: "REPLACE")
+}
+
+# Append doc to existing documentation
+"APPEND TO"
+type CType {
+  "APPENT TO"
+  a: Duration
+  b: String @deprecated(reason: "APPEND TO")
+}
+
+type QueryType {
+  # Add doc to method - args is currently not supported
+  findAB(args: InputType): AB
+  getAC: AC
+  listCs: CType
+  listEs: [AEnum]
+}
+
+# Add doc to enums
+enum AEnum {
+  E1
+  E2
+  E3 @deprecated(reason: "REPLACE")
+}
+
+# Add doc to scalar
+scalar Duration
+
+# Add doc to input type
+input InputType {
+  a: String
+  b: String
+  c: String @deprecated(reason: "REPLACE")
+}

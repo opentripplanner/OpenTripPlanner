@@ -95,7 +95,7 @@ class ElevatorProcessor {
       }
       int travelTime = parseDuration(node).orElse(-1);
 
-      var wheelchair = node.getWheelchairAccessibility();
+      var wheelchair = node.wheelchairAccessibility();
 
       createElevatorHopEdges(
         onboardVertices,
@@ -138,7 +138,7 @@ class ElevatorProcessor {
 
       int travelTime = parseDuration(elevatorWay).orElse(-1);
       int levels = nodes.size();
-      var wheelchair = elevatorWay.getWheelchairAccessibility();
+      var wheelchair = elevatorWay.wheelchairAccessibility();
 
       createElevatorHopEdges(
         onboardVertices,

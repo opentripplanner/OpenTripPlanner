@@ -202,7 +202,7 @@ public class TestStateBuilder {
 
     currentState =
       EdgeTraverser
-        .traverseEdges(new State[] { currentState }, List.of(link, boardEdge, hopEdge, alightEdge))
+        .traverseEdges(currentState, List.of(link, boardEdge, hopEdge, alightEdge))
         .orElseThrow();
     return this;
   }

@@ -54,22 +54,22 @@ import org.opentripplanner.visualizer.GraphVisualizer;
 @Component(
   modules = {
     ConfigModule.class,
-    TransitModule.class,
-    WorldEnvelopeServiceModule.class,
+    ConstructApplicationModule.class,
+    EmissionsServiceModule.class,
+    GeocoderModule.class,
+    InteractiveLauncherModule.class,
     RealtimeVehicleServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
-    VehicleRentalServiceModule.class,
-    VehicleRentalRepositoryModule.class,
-    VehicleParkingServiceModule.class,
-    ConstructApplicationModule.class,
     RideHailingServicesModule.class,
-    EmissionsServiceModule.class,
+    TransitModule.class,
+    VehicleParkingServiceModule.class,
+    VehicleRentalRepositoryModule.class,
+    VehicleRentalServiceModule.class,
     SorlandsbanenNorwayModule.class,
     SchemaModule.class,
     StopConsolidationServiceModule.class,
-    InteractiveLauncherModule.class,
     StreetLimitationParametersServiceModule.class,
-    GeocoderModule.class,
+    WorldEnvelopeServiceModule.class,
   }
 )
 public interface ConstructApplicationFactory {

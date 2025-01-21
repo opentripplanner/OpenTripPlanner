@@ -39,6 +39,7 @@ public class SpeedTestTimer {
     List.of(loggerRegistry)
   );
   private final MeterRegistry uploadRegistry = MeterRegistrySetup.getRegistry().orElse(null);
+
   private boolean groupResultByTestCaseCategory = false;
 
   public static int nanosToMillisecond(long nanos) {
@@ -137,6 +138,18 @@ public class SpeedTestTimer {
   }
 
   /**
+   * Execute the runnable and record its runtime in the meter name passed in.
+   */
+  public void recordTimer(String meterName, Runnable runnable) {
+    if (uploadRegistry != null) {
+      registry.add(uploadRegistry);
+      var timer = registry.timer(meterName);
+      timer.record(runnable);
+      registry.remove(uploadRegistry);
+    }
+  }
+
+  /**
    * Calculate the total time mean for the given timer. If the timer is not
    * found {@link #NOT_AVAILABLE} is returned. This can be the case in unit tests,
    * where not all parts of the code is run.
@@ -175,7 +188,7 @@ public class SpeedTestTimer {
       }
 
       private String capitalize(String name) {
-        if (name.length() != 0 && !Character.isUpperCase(name.charAt(0))) {
+        if (!name.isEmpty() && !Character.isUpperCase(name.charAt(0))) {
           char[] chars = name.toCharArray();
           chars[0] = Character.toUpperCase(chars[0]);
           return new String(chars);
@@ -208,8 +221,8 @@ public class SpeedTestTimer {
 
       for (Result it : results) {
         any = it;
-        min = it.min < min ? it.min : min;
-        max = it.max > max ? it.max : max;
+        min = Math.min(it.min, min);
+        max = Math.max(it.max, max);
         totTime += it.totTime;
         count += it.count;
       }

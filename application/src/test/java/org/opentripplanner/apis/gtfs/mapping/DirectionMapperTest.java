@@ -23,6 +23,7 @@ class DirectionMapperTest {
   void relativeDirection() {
     Arrays
       .stream(RelativeDirection.values())
+      .filter(v -> v != RelativeDirection.ENTER_OR_EXIT_STATION)
       .forEach(d -> {
         var mapped = DirectionMapper.map(d);
         assertEquals(d.toString(), mapped.toString());
