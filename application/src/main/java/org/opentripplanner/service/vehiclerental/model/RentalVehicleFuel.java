@@ -18,7 +18,7 @@ public class RentalVehicleFuel {
   public final Ratio percent;
 
   /**
-   * Current fuel percentage, expressed from 0 to 1.
+   * Distance that the vehicle can travel with the vehicle's current fuel.
    */
   @Nullable
   public final Distance range;
