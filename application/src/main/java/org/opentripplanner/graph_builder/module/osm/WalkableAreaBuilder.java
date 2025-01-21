@@ -92,6 +92,8 @@ class WalkableAreaBuilder {
   private final SafetyValueNormalizer normalizer;
   private final VertexFactory vertexFactory;
 
+  private static final String labelTemplate = "way (area) %s from %s to %s"; // for AreaEdge names
+
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
@@ -518,14 +520,12 @@ class WalkableAreaBuilder {
         endEndpoint.getCoordinate()
       );
 
-      String label =
-        "way (area) " +
-        areaEntity.getId() +
-        " from " +
-        startEndpoint.getLabel() +
-        " to " +
-        endEndpoint.getLabel();
-
+      String label = String.format(
+        labelTemplate,
+        areaEntity.getId(),
+        startEndpoint.getLabel(),
+        endEndpoint.getLabel()
+      );
       I18NString name = namer.getNameForWay(areaEntity, label);
       AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
         .withFromVertex(startEndpoint)
@@ -542,13 +542,12 @@ class WalkableAreaBuilder {
         .withLink(areaEntity.isLink());
 
       label =
-        "way (area) " +
-        areaEntity.getId() +
-        " from " +
-        endEndpoint.getLabel() +
-        " to " +
-        startEndpoint.getLabel();
-
+        String.format(
+          labelTemplate,
+          areaEntity.getId(),
+          endEndpoint.getLabel(),
+          startEndpoint.getLabel()
+        );
       name = namer.getNameForWay(areaEntity, label);
       AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
         .withFromVertex(endEndpoint)
