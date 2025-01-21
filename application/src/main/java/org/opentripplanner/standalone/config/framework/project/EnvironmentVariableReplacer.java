@@ -3,12 +3,12 @@ package org.opentripplanner.standalone.config.framework.project;
 import static java.util.Map.entry;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.utils.text.TextVariablesSubstitution;
 
 /**
  * Replaces environment variable placeholders specified on the format ${variable} in a text with the
@@ -58,46 +58,47 @@ public class EnvironmentVariableReplacer {
    * Search for {@link #PATTERN}s and replace each placeholder with the value of the corresponding
    * environment variable.
    *
-   * @param source is used only to generate human friendly error message in case the text contain a
-   *               placeholder which can not be found.
-   * @throws IllegalArgumentException if a placeholder exist in the {@code text}, but the
-   *                                  environment variable do not exist.
+   * @param source is used only to generate a human friendly error message in case the text
+   *               contains a placeholder which cannot be found.
+   * @throws IllegalArgumentException if a placeholder exists in the {@code text}, but the
+   *                                  environment variable does not exist.
    */
   public static String insertEnvironmentVariables(String text, String source) {
-    return insertVariables(text, source, System::getenv);
+    return insertVariables(text, source, EnvironmentVariableReplacer::getEnvVarOrProjectInfo);
   }
 
+  /**
+   * Same as {@link #insertEnvironmentVariables(String, String)}, but the caller mus provide the
+   * {@code variableResolver} - environment and project info variables are not available.
+   */
   public static String insertVariables(
     String text,
     String source,
-    Function<String, String> getEnvVar
+    Function<String, String> variableResolver
   ) {
-    Map<String, String> substitutions = new HashMap<>();
-    Matcher matcher = PATTERN.matcher(text);
+    return TextVariablesSubstitution.insertVariables(
+      text,
+      variableResolver,
+      varName -> errorVariableNameNotFound(varName, source)
+    );
+  }
 
-    while (matcher.find()) {
-      String subKey = matcher.group(0);
-      String nameOnly = matcher.group(1);
-      if (!substitutions.containsKey(nameOnly)) {
-        String value = getEnvVar.apply(nameOnly);
-        if (value != null) {
-          substitutions.put(subKey, value);
-        } else if (PROJECT_INFO.containsKey(nameOnly)) {
-          substitutions.put(subKey, PROJECT_INFO.get(nameOnly));
-        } else {
-          throw new OtpAppException(
-            "Environment variable name '" +
-            nameOnly +
-            "' in config '" +
-            source +
-            "' not found in the system environment variables."
-          );
-        }
-      }
+  @Nullable
+  private static String getEnvVarOrProjectInfo(String key) {
+    String value = System.getenv(key);
+    if (value == null) {
+      return PROJECT_INFO.get(key);
     }
-    for (Map.Entry<String, String> entry : substitutions.entrySet()) {
-      text = text.replace(entry.getKey(), entry.getValue());
-    }
-    return text;
+    return value;
+  }
+
+  private static void errorVariableNameNotFound(String variableName, String source) {
+    throw new OtpAppException(
+      "Environment variable name '" +
+      variableName +
+      "' in config '" +
+      source +
+      "' not found in the system environment variables."
+    );
   }
 }

@@ -6,8 +6,6 @@ public class Coordinates {
 
   public static final Coordinate BERLIN = of(52.5212, 13.4105);
   public static final Coordinate BERLIN_BRANDENBURG_GATE = of(52.51627, 13.37770);
-  public static final Coordinate BERLIN_FERNSEHTURM = of(52.52084, 13.40934);
-  public static final Coordinate BERLIN_ADMIRALBRUCKE = of(52.49526, 13.415093);
   public static final Coordinate HAMBURG = of(53.5566, 10.0003);
   public static final Coordinate KONGSBERG_PLATFORM_1 = of(59.67216, 9.65107);
   public static final Coordinate BOSTON = of(42.36541, -71.06129);

@@ -20,6 +20,14 @@
             area
             relativeDirection
             absoluteDirection
+            feature {
+              __typename
+              ... on Entrance {
+                publicCode
+                entranceId
+                wheelchairAccessible
+              }
+            }
           }
         }
       }

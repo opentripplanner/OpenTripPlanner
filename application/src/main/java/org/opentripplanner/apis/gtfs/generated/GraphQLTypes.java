@@ -4327,7 +4327,11 @@ public class GraphQLTypes {
     UPDATED,
   }
 
-  /** Actions to take relative to the current position when engaging a walking/driving step. */
+  /**
+   * A direction that is not absolute but rather fuzzy and context-dependent.
+   * It provides the passenger with information what they should do in this step depending on where they
+   * were in the previous one.
+   */
   public enum GraphQLRelativeDirection {
     CIRCLE_CLOCKWISE,
     CIRCLE_COUNTERCLOCKWISE,
