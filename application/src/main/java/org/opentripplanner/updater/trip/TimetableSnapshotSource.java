@@ -497,11 +497,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      debug(
-        tripId,
-        serviceDate,
-        "NEW trip doesn't have a start date in TripDescriptor, skipping."
-      );
+      debug(tripId, serviceDate, "NEW trip doesn't have a start date in TripDescriptor, skipping.");
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
