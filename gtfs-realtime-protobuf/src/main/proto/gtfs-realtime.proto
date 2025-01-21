@@ -190,7 +190,7 @@ message TripUpdate {
     // To specify a completely certain prediction, set its uncertainty to 0.
     optional int32 uncertainty = 3;
 
-    // Scheduled time for an added or replacement trip.
+    // Scheduled time for a new or replacement trip.
     // In Unix time (i.e., number of seconds since January 1st 1970 00:00:00
     // UTC).
     optional int64 scheduled_time = 4;
@@ -278,21 +278,8 @@ message TripUpdate {
       optional string assigned_stop_id = 1;
 
       // The updated headsign of the vehicle at the stop.
+      // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
       optional string stop_headsign = 2;
-
-      // The updated pickup of the vehicle at the stop.
-      optional DropOffPickupType pickup_type = 3;
-
-      // The updated drop off of the vehicle at the stop.
-      optional DropOffPickupType drop_off_type = 4;
-
-      // The extensions namespace allows 3rd-party developers to extend the
-      // GTFS Realtime Specification in order to add and evaluate new features
-      // and modifications to the spec.
-      extensions 1000 to 1999;
-
-      // The following extension IDs are reserved for private use by any organization.
-      extensions 9000 to 9999;
 
       enum DropOffPickupType {
         // Regularly scheduled pickup/dropoff.
@@ -307,6 +294,22 @@ message TripUpdate {
         // Must coordinate with driver to arrange pickup/dropoff.
         COORDINATE_WITH_DRIVER = 3;
       }
+
+      // The updated pickup of the vehicle at the stop.
+      // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
+      optional DropOffPickupType pickup_type = 3;
+
+      // The updated drop off of the vehicle at the stop.
+      // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
+      optional DropOffPickupType drop_off_type = 4;
+
+      // The extensions namespace allows 3rd-party developers to extend the
+      // GTFS Realtime Specification in order to add and evaluate new features
+      // and modifications to the spec.
+      extensions 1000 to 1999;
+
+      // The following extension IDs are reserved for private use by any organization.
+      extensions 9000 to 9999;
     }
 
     // Realtime updates for certain properties defined within GTFS stop_times.txt
@@ -829,8 +832,10 @@ message TripDescriptor {
     // enough to the scheduled trip to be associated with it.
     SCHEDULED = 0;
 
-    // An extra trip unrelated to any existing trips, for example, to respond to sudden passenger load.
-    ADDED = 1;
+    // This value has been deprecated as the behavior was unspecified. 
+    // Use DUPLICATED for an extra trip that is the same as a scheduled trip except the start date or time, 
+    // or NEW for an extra trip that is unrelated to an existing trip.
+    ADDED = 1 [deprecated = true];
 
     // A trip that is running with no schedule associated to it (GTFS frequencies.txt exact_times=0).
     // Trips with ScheduleRelationship=UNSCHEDULED must also set all StopTimeUpdates.ScheduleRelationship=UNSCHEDULED.
@@ -870,6 +875,10 @@ message TripDescriptor {
     // real-time predictions.
     // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
     DELETED = 7;
+
+    // An extra trip unrelated to any existing trips, for example, to respond to sudden passenger load.
+    // NOTE: This field is still experimental, and subject to change. It may be formally adopted in the future.
+    NEW = 8;
   }
   optional ScheduleRelationship schedule_relationship = 4;
 
