@@ -25,6 +25,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -56,6 +57,10 @@ public class SerializedGraphObject implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(SerializedGraphObject.class);
 
   public final Graph graph;
+
+  @Nullable
+  public final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
+
   public final TimetableRepository timetableRepository;
   public final WorldEnvelopeRepository worldEnvelopeRepository;
   private final Collection<Edge> edges;
@@ -84,6 +89,7 @@ public class SerializedGraphObject implements Serializable {
 
   public SerializedGraphObject(
     Graph graph,
+    @Nullable OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
@@ -96,6 +102,7 @@ public class SerializedGraphObject implements Serializable {
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
+    this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.timetableRepository = timetableRepository;
     this.worldEnvelopeRepository = worldEnvelopeRepository;
     this.parkingRepository = parkingRepository;

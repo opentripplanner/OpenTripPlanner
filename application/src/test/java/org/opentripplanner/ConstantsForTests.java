@@ -34,6 +34,7 @@ import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -137,9 +138,11 @@ public class ConstantsForTests {
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       // Add street data from OSM
       {
-        OsmProvider osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
-        OsmModule osmModule = OsmModule
-          .of(osmProvider, graph, new DefaultVehicleParkingRepository())
+        var osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
+        var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+        var vehicleParkingRepository = new DefaultVehicleParkingRepository();
+        var osmModule = OsmModule
+          .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
           .build();
@@ -195,9 +198,11 @@ public class ConstantsForTests {
       var graph = new Graph(deduplicator);
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
-      OsmProvider osmProvider = new OsmProvider(osmFile, true);
-      OsmModule osmModule = OsmModule
-        .of(osmProvider, graph, new DefaultVehicleParkingRepository())
+      var osmProvider = new OsmProvider(osmFile, true);
+      var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+      var vehicleParkingRepository = new DefaultVehicleParkingRepository();
+      var osmModule = OsmModule
+        .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
         .build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
@@ -245,8 +250,9 @@ public class ConstantsForTests {
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
       {
-        OsmProvider osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
-        OsmModule osmModule = OsmModule.of(osmProvider, graph, parkingService).build();
+        var osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
+        var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+        var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, parkingService).build();
         osmModule.buildGraph();
       }
       // Add transit data from Netex

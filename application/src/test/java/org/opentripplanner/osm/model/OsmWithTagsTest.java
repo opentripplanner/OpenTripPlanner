@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 public class OsmWithTagsTest {
 
@@ -213,6 +214,20 @@ public class OsmWithTagsTest {
     var osm3 = new OsmWithTags();
     osm3.addTag("wheelchair", "yes");
     assertTrue(osm3.isWheelchairAccessible());
+  }
+
+  @Test
+  void wheelchairAccessibility() {
+    var osm1 = new OsmWithTags();
+    assertEquals(Accessibility.NO_INFORMATION, osm1.wheelchairAccessibility());
+
+    var osm2 = new OsmWithTags();
+    osm2.addTag("wheelchair", "no");
+    assertEquals(Accessibility.NOT_POSSIBLE, osm2.wheelchairAccessibility());
+
+    var osm3 = new OsmWithTags();
+    osm3.addTag("wheelchair", "yes");
+    assertEquals(Accessibility.POSSIBLE, osm3.wheelchairAccessibility());
   }
 
   @Test

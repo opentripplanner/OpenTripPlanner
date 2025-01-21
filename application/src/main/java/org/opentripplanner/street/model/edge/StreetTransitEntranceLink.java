@@ -2,6 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.transit.model.site.Entrance;
 
 /**
  * This represents the connection between a street vertex and a transit vertex belonging the street
@@ -41,6 +42,18 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
 
   public boolean isExit() {
     return !isEntrance;
+  }
+
+  /**
+   * Get the {@link Entrance} that this edge links to.
+   */
+  public Entrance entrance() {
+    if (getToVertex() instanceof TransitEntranceVertex tev) {
+      return tev.getEntrance();
+    } else if (getFromVertex() instanceof TransitEntranceVertex tev) {
+      return tev.getEntrance();
+    }
+    throw new IllegalStateException("%s doesn't link to an entrance.".formatted(this));
   }
 
   protected int getStreetToStopTime() {

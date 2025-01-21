@@ -10,6 +10,7 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -39,7 +40,12 @@ public class UnroutableTest {
     var osmDataFile = ResourceLoader.of(UnroutableTest.class).file("bridge_construction.osm.pbf");
     OsmProvider provider = new OsmProvider(osmDataFile, true);
     OsmModule osmBuilder = OsmModule
-      .of(provider, graph, new DefaultVehicleParkingRepository())
+      .of(
+        provider,
+        graph,
+        new DefaultOsmInfoGraphBuildRepository(),
+        new DefaultVehicleParkingRepository()
+      )
       .withAreaVisibility(true)
       .build();
     osmBuilder.buildGraph();

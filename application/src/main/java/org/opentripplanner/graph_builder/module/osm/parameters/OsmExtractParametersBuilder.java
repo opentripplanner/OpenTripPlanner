@@ -24,14 +24,18 @@ public class OsmExtractParametersBuilder {
    */
   private ZoneId timeZone;
 
+  private boolean includeOsmSubwayEntrances;
+
   public OsmExtractParametersBuilder() {
     this.osmTagMapper = OsmExtractParameters.DEFAULT_OSM_TAG_MAPPER;
     this.timeZone = OsmExtractParameters.DEFAULT_TIME_ZONE;
+    this.includeOsmSubwayEntrances = OsmExtractParameters.DEFAULT_INCLUDE_OSM_SUBWAY_ENTRANCES;
   }
 
   public OsmExtractParametersBuilder(OsmExtractParameters original) {
     this.osmTagMapper = original.osmTagMapper();
     this.timeZone = original.timeZone();
+    this.includeOsmSubwayEntrances = original.includeOsmSubwayEntrances();
   }
 
   public OsmExtractParametersBuilder withSource(URI source) {
@@ -49,6 +53,13 @@ public class OsmExtractParametersBuilder {
     return this;
   }
 
+  public OsmExtractParametersBuilder withIncludeOsmSubwayEntrances(
+    boolean includeOsmSubwayEntrances
+  ) {
+    this.includeOsmSubwayEntrances = includeOsmSubwayEntrances;
+    return this;
+  }
+
   public URI getSource() {
     return source;
   }
@@ -59,6 +70,10 @@ public class OsmExtractParametersBuilder {
 
   public ZoneId getTimeZone() {
     return timeZone;
+  }
+
+  public boolean includeOsmSubwayEntrances() {
+    return includeOsmSubwayEntrances;
   }
 
   public OsmExtractParameters build() {

@@ -1,9 +1,12 @@
 package org.opentripplanner.standalone.config.routerconfig;
 
+import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
 
 import java.time.Duration;
 import java.util.List;
+import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.server.OTPWebApplicationParameters;
@@ -13,6 +16,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
 
   private final Duration apiProcessingTimeout;
   private final List<RequestTraceParameter> traceParameters;
+  private final ApiDocumentationProfile apiDocumentationProfile;
 
   public ServerConfig(String parameterName, NodeAdapter root) {
     NodeAdapter c = root
@@ -41,6 +45,14 @@ The timeout is not enforced when the parallel routing OTP feature is in use.
 """
         )
         .asDuration(Duration.ofSeconds(-1));
+
+    this.apiDocumentationProfile =
+      c
+        .of("apiDocumentationProfile")
+        .since(V2_7)
+        .summary(ApiDocumentationProfile.DEFAULT.typeDescription())
+        .description(docEnumValueList(ApiDocumentationProfile.values()))
+        .asEnum(ApiDocumentationProfile.DEFAULT);
 
     this.traceParameters =
       c
@@ -105,6 +117,15 @@ Only log4j and logback support this.
     return apiProcessingTimeout;
   }
 
+  @Override
+  public List<RequestTraceParameter> traceParameters() {
+    return traceParameters;
+  }
+
+  public ApiDocumentationProfile apiDocumentationProfile() {
+    return apiDocumentationProfile;
+  }
+
   public void validate(Duration streetRoutingTimeout) {
     if (
       !apiProcessingTimeout.isNegative() &&
@@ -118,10 +139,5 @@ Only log4j and logback support this.
         ')'
       );
     }
-  }
-
-  @Override
-  public List<RequestTraceParameter> traceParameters() {
-    return traceParameters;
   }
 }
