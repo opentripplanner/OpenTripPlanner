@@ -50,24 +50,6 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
 
-/**
- * Theoretically, it is not correct to build the visibility graph on the joined polygon of areas
- * with different levels of bike safety. That's because in the optimal path, you might end up
- * changing direction at area boundaries. The problem is known as "weighted planar subdivisions",
- * and the best known algorithm is O(N^3). That's not much worse than general visibility graph
- * construction, but it would have to be done at runtime to account for the differences in bike
- * safety preferences. Ted Chiang's "Story Of Your Life" describes how a very similar problem in
- * optics gives rise to Snell's Law. It is the second-best story about a law of physics that I know
- * of (Chiang's "Exhalation" is the first).
- * <p>
- * Anyway, since we're not going to run an O(N^3) algorithm at runtime just to give people who don't
- * understand Snell's Law weird paths that they can complain about, this should be just fine.
- * </p>
- * <p>
- * TODO this approach could be replaced by building a walkable grid of edges for an area, so the
- * number of edges for an area wouldn't be determined by the nodes. The current approach can lead
- * to an excessive number of edges, or to no edges at all if maxAreaNodes is surpassed.
- */
 class WalkableAreaBuilder {
 
   private final DataImportIssueStore issueStore;
@@ -187,8 +169,7 @@ class WalkableAreaBuilder {
     // List of edges belonging to the walkable area
     Set<Edge> edges = new HashSet<>();
 
-    // Edges which are part of the rings. We want to keep there for linking even tough they
-    // might not be part of the visibility edges.
+    // Edges which are part of the rings
     Set<Edge> ringEdges = new HashSet<>();
 
     // OSM ways that this area group consists of
@@ -202,6 +183,7 @@ class WalkableAreaBuilder {
       )
       .collect(Collectors.toSet());
 
+    // transit stop reference values which improve transit vertex linking
     var references = getStopReferences(group);
 
     // create polygon and accumulate nodes for area
@@ -210,8 +192,7 @@ class WalkableAreaBuilder {
 
       AreaEdgeList edgeList = new AreaEdgeList(polygon, references);
 
-      // the points corresponding to concave or hole vertices
-      // or those linked to ways
+      // the points corresponding to concave or hole vertices or those linked to ways
       HashSet<OsmNode> visibilityNodes = new HashSet<>();
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
@@ -300,7 +281,7 @@ class WalkableAreaBuilder {
               );
               // A node can only be a visibility node only if it is an entrance to the
               // area or a convex point, i.e. the angle is over 180 degrees.
-              // For holes, the internal angle is calculated, so we must swap the sign
+              // For holes, the internal angle is calculated, so we must swap the convexity condition
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
                 edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
@@ -331,7 +312,7 @@ class WalkableAreaBuilder {
       }
 
       // if area is too complex, consider only part of visibility nodes
-      // so that at least some edges passing through the area is added
+      // so that at least some edges passing through the area are added
       // otherwise routing can use only area boundary edges
       float skip_ratio = (float) maxAreaNodes / (float) visibilityNodes.size();
       int i = 0;
@@ -394,8 +375,8 @@ class WalkableAreaBuilder {
   }
 
   /**
-   * Do an all-pairs shortest path search from a list of vertices over a specified set of edges, and
-   * retain only those edges which are actually used in some shortest path.
+   * Do an all-pairs shortest path search from a list of vertices over a specified set of edges,
+   *  and retain only those edges which are actually used in some shortest path.
    */
   private void pruneAreaEdges(
     Collection<Vertex> startingVertices,
