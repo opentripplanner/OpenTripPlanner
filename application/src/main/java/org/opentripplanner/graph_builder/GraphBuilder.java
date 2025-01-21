@@ -17,7 +17,9 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.configure.DaggerGraphBuilderFactory;
+import org.opentripplanner.graph_builder.module.configure.GraphBuilderFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -62,6 +64,7 @@ public class GraphBuilder implements Runnable {
     BuildConfig config,
     GraphBuilderDataSources dataSources,
     Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
@@ -78,10 +81,11 @@ public class GraphBuilder implements Runnable {
 
     timetableRepository.initTimeZone(config.transitModelTimeZone);
 
-    var builder = DaggerGraphBuilderFactory
-      .builder()
+    GraphBuilderFactory.Builder builder = DaggerGraphBuilderFactory.builder();
+    builder
       .config(config)
       .graph(graph)
+      .osmInfoGraphBuildRepository(osmInfoGraphBuildRepository)
       .timetableRepository(timetableRepository)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)

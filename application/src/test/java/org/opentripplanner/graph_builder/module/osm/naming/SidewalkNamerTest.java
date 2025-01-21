@@ -58,7 +58,7 @@ class SidewalkNamerTest {
     assertNotEquals(sidewalk.edge.getName(), pryorStreet.edge.getName());
     builder.postProcess(new SidewalkNamer());
     assertEquals(sidewalk.edge.getName(), pryorStreet.edge.getName());
-    assertFalse(sidewalk.edge.hasBogusName());
+    assertFalse(sidewalk.edge.nameIsDerived());
   }
 
   private static class ModelBuilder {

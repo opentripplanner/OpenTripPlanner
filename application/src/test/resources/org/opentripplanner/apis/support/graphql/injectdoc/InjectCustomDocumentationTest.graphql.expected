@@ -1,0 +1,95 @@
+schema {
+  query: QueryType
+}
+
+"Marks the field, argument, input field or enum value as deprecated"
+directive @deprecated(
+    "The reason for the deprecation"
+    reason: String = "No longer supported"
+  ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Indicates an Input Object is a OneOf Input Object."
+directive @oneOf on INPUT_OBJECT
+
+"Directs the executor to skip this field or fragment when the `if` argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Exposes a URL that specifies the behaviour of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behaviour of this scalar."
+    url: String!
+  ) on SCALAR
+
+"AB.description"
+union AB = AType | BType
+
+"""
+APPEND TO
+
+AC.description.append
+"""
+union AC = AType | BType
+
+"AType.description"
+type AType {
+  "AType.a.description"
+  a: Duration
+  b: String @deprecated(reason : "AType.b.deprecated")
+}
+
+"BType.description"
+type BType {
+  "BType.a.description"
+  a: String @deprecated(reason : "REPLACE")
+}
+
+"""
+APPEND TO
+
+CType.description.append
+"""
+type CType {
+  """
+  APPENT TO
+
+  CType.a.description.append
+  """
+  a: Duration
+  b: String @deprecated(reason : "APPEND TO")
+}
+
+type QueryType {
+  "QueryType.findAB.description"
+  findAB(args: InputType): AB
+  getAC: AC @deprecated(reason : "QueryType.getAC.deprecated")
+  listCs: CType
+  listEs: [AEnum]
+}
+
+"AEnum.description"
+enum AEnum {
+  "AEnum.E1.description"
+  E1
+  E2 @deprecated(reason : "AEnum.E2.deprecated")
+  E3 @deprecated(reason : "REPLACE")
+}
+
+"Duration.description"
+scalar Duration
+
+"InputType.description"
+input InputType {
+  "InputType.a.description"
+  a: String
+  b: String @deprecated(reason : "InputType.b.deprecated")
+  c: String @deprecated(reason : "REPLACE")
+}
