@@ -16,8 +16,8 @@ import {
 //
 // Types
 //
-interface ResolvedType {
-    type: 'Scalar' | 'Enum' | 'InputObject';
+export interface ResolvedType {
+    type: 'Scalar' | 'Enum' | 'InputObject' | 'Group';
     // For scalars or fallback, e.g. "String", "Int", etc.
     subtype?: string;
     // For input objects
@@ -25,7 +25,7 @@ interface ResolvedType {
     fields?: {
         [fieldName: string]: {
             type: ResolvedType;
-            defaultValue: any;
+            defaultValue?: string | number | boolean | object | null; // Updated type
             isList: boolean;
         };
     };
@@ -33,10 +33,10 @@ interface ResolvedType {
     values?: string[];
 }
 
-interface ArgumentRepresentation {
+export interface ArgumentRepresentation {
     [argName: string]: {
         type: ResolvedType;
-        defaultValue?: any;
+        defaultValue?: string | number | boolean | object | null; // Updated type
         isList: boolean;
     };
 }
@@ -79,7 +79,7 @@ function resolveType(type: GraphQLType): ResolvedType {
         const fields = namedType.getFields();
         const fieldTypes: Record<
             string,
-            { type: ResolvedType; defaultValue: any; isList: boolean }
+            { type: ResolvedType; defaultValue?: string | number | boolean | object | null; isList: boolean } // Updated type
         > = {};
 
         for (const fieldName of Object.keys(fields)) {
@@ -135,7 +135,7 @@ function generateTripArgs(schema: GraphQLSchema): TripArgsRepresentation {
 
         const argName = arg.name;
         const argType = resolveType(arg.type);
-        const argDefaultValue = arg.defaultValue !== undefined ? arg.defaultValue : null;
+        const argDefaultValue = arg.defaultValue !== null ? arg.defaultValue : null;
         const isList = isListType(arg.type);
 
         argsJson[argName] = {

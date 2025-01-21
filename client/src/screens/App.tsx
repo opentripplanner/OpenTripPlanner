@@ -50,7 +50,7 @@ export function App() {
                   setTripQueryVariables={setTripQueryVariables}
                 ></TripQueryArguments>
               </TripSchemaProvider>
-              <ViewArgumentsRaw tripQueryVariables={tripQueryVariables}></ViewArgumentsRaw>
+              <ViewArgumentsRaw tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables}></ViewArgumentsRaw>
             </Sidebar>
           </div>
           <div className="box map-section">
