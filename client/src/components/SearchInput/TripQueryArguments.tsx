@@ -105,7 +105,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
           isList: argData.isList,
         });
       } else if (argData.type.type === 'InputObject' && argData.isList) {
-        debugger;
         // This is a list of InputObjects
         allArgs.push({
           path: currentPath,
@@ -292,7 +291,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
   ): React.JSX.Element {
     // We assume getNestedValue returns unknown; cast to an array if needed
     const arrayVal = (getNestedValue(tripQueryVariables, listPath) ?? []) as unknown[];
-    debugger;
+
     // You can customize this if you have a better naming scheme
     const typeName = type.name;
 
