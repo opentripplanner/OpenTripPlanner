@@ -59,6 +59,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.PlanImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.QueryTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RealTimeEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalPlaceTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleFuelImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RideHailingEstimateImpl;
@@ -199,6 +200,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(RealTimeEstimateImpl.class))
         .type(typeWiring.build(EstimatedTimeImpl.class))
         .type(typeWiring.build(EntranceImpl.class))
+        .type(typeWiring.build(RentalVehicleFuelImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

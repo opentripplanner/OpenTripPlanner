@@ -29,12 +29,12 @@ public class RentalVehicleFuel {
   }
 
   @Nullable
-  public Double getPercent() {
-    return this.percent != null ? this.percent.asDouble() : null;
+  public Ratio getPercent() {
+    return this.percent;
   }
 
   @Nullable
-  public Integer getRange() {
-    return this.range != null ? this.range.toMeters() : null;
+  public Distance getRange() {
+    return range;
   }
 }
