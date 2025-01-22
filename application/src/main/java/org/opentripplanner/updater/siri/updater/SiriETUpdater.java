@@ -74,7 +74,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
         final boolean markPrimed = !moreData;
         List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
-          saveResultOnGraph.execute(context -> {
+          updateGraph(context -> {
             var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
             metricsConsumer.accept(result);

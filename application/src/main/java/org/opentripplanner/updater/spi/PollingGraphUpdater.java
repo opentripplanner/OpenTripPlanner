@@ -40,7 +40,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
-  protected WriteToGraphCallback saveResultOnGraph;
+  private WriteToGraphCallback saveResultOnGraph;
 
   /** Shared configuration code for all polling graph updaters. */
   protected PollingGraphUpdater(PollingGraphUpdaterParameters config) {
