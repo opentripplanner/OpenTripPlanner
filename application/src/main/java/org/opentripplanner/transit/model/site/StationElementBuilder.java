@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.site;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -54,7 +55,7 @@ public abstract class StationElementBuilder<
     return code;
   }
 
-  public B withCode(String code) {
+  public B withCode(@Nullable String code) {
     this.code = code;
     return instance();
   }

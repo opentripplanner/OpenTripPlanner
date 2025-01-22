@@ -150,6 +150,7 @@ public class OTPMain {
       // with using the embedded router config.
       new SerializedGraphObject(
         app.graph(),
+        app.osmInfoGraphBuildRepository(),
         app.timetableRepository(),
         app.worldEnvelopeRepository(),
         app.vehicleParkingRepository(),

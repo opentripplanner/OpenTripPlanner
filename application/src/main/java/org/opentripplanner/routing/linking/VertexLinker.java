@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -226,20 +227,43 @@ public class VertexLinker {
     return tempEdges;
   }
 
+  /**
+   * Link a boarding location vertex to specific street edges.
+   * <p>
+   * This is used if a platform is mapped as a linear way, where the given edges form the platform.
+   */
+  public Set<StreetVertex> linkToSpecificStreetEdgesPermanently(
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    Set<StreetEdge> edges
+  ) {
+    var xscale = getXscale(vertex);
+    return linkToCandidateEdges(
+      vertex,
+      traverseModes,
+      direction,
+      Scope.PERMANENT,
+      null,
+      edges.stream().map(e -> new DistanceTo<>(e, distance(vertex, e, xscale))).toList(),
+      xscale
+    );
+  }
+
   private Set<StreetVertex> linkToStreetEdges(
     Vertex vertex,
     TraverseModeSet traverseModes,
     LinkingDirection direction,
     Scope scope,
     int radiusMeters,
-    DisposableEdgeCollection tempEdges
+    @Nullable DisposableEdgeCollection tempEdges
   ) {
     final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
 
     Envelope env = new Envelope(vertex.getCoordinate());
 
     // Perform a simple local equirectangular projection, so distances are expressed in degrees latitude.
-    final double xscale = Math.cos(vertex.getLat() * Math.PI / 180);
+    final double xscale = getXscale(vertex);
 
     // Expand more in the longitude direction than the latitude direction to account for converging meridians.
     env.expandBy(radiusDeg / xscale, radiusDeg);
@@ -257,6 +281,30 @@ public class VertexLinker {
       .filter(ead -> ead.distanceDegreesLat < radiusDeg)
       .toList();
 
+    return linkToCandidateEdges(
+      vertex,
+      traverseModes,
+      direction,
+      scope,
+      tempEdges,
+      candidateEdges,
+      xscale
+    );
+  }
+
+  private static double getXscale(Vertex vertex) {
+    return Math.cos(vertex.getLat() * Math.PI / 180);
+  }
+
+  private Set<StreetVertex> linkToCandidateEdges(
+    Vertex vertex,
+    TraverseModeSet traverseModes,
+    LinkingDirection direction,
+    Scope scope,
+    @Nullable DisposableEdgeCollection tempEdges,
+    List<DistanceTo<StreetEdge>> candidateEdges,
+    double xscale
+  ) {
     if (candidateEdges.isEmpty()) {
       return Set.of();
     }
@@ -269,7 +317,7 @@ public class VertexLinker {
     return closestEdges
       .stream()
       .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
-      .filter(v -> v != null)
+      .filter(Objects::nonNull)
       .collect(Collectors.toSet());
   }
 

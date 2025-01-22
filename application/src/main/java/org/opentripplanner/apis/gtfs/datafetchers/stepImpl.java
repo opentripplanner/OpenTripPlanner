@@ -50,7 +50,12 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<String> exit() {
-    return environment -> getSource(environment).getExit();
+    return environment -> getSource(environment).highwayExit().orElse(null);
+  }
+
+  @Override
+  public DataFetcher<Object> feature() {
+    return environment -> getSource(environment).entrance().orElse(null);
   }
 
   @Override

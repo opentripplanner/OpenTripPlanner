@@ -33,12 +33,19 @@ class VertexGenerator {
   private final HashMap<Long, Map<OsmLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
   private final OsmDatabase osmdb;
   private final Set<String> boardingAreaRefTags;
+  private final Boolean includeOsmSubwayEntrances;
   private final VertexFactory vertexFactory;
 
-  public VertexGenerator(OsmDatabase osmdb, Graph graph, Set<String> boardingAreaRefTags) {
+  public VertexGenerator(
+    OsmDatabase osmdb,
+    Graph graph,
+    Set<String> boardingAreaRefTags,
+    boolean includeOsmSubwayEntrances
+  ) {
     this.osmdb = osmdb;
     this.vertexFactory = new VertexFactory(graph);
     this.boardingAreaRefTags = boardingAreaRefTags;
+    this.includeOsmSubwayEntrances = includeOsmSubwayEntrances;
   }
 
   /**
@@ -93,6 +100,11 @@ class VertexGenerator {
         BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
         bv.setBarrierPermissions(node.overridePermissions(BarrierVertex.defaultBarrierPermissions));
         iv = bv;
+      }
+
+      if (includeOsmSubwayEntrances && node.isSubwayEntrance()) {
+        String ref = node.getTag("ref");
+        iv = vertexFactory.stationEntrance(nid, coordinate, ref, node.wheelchairAccessibility());
       }
 
       if (iv == null) {

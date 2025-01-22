@@ -30,6 +30,8 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.configure.OsmInfoGraphBuildServiceModule;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -37,7 +39,7 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Singleton
-@Component(modules = { GraphBuilderModules.class })
+@Component(modules = { GraphBuilderModules.class, OsmInfoGraphBuildServiceModule.class })
 public interface GraphBuilderFactory {
   //DataImportIssueStore issueStore();
   GraphBuilder graphBuilder();
@@ -79,6 +81,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder timetableRepository(TimetableRepository timetableRepository);
+
+    @BindsInstance
+    Builder osmInfoGraphBuildRepository(OsmInfoGraphBuildRepository osmInfoGraphBuildRepository);
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);

@@ -48,7 +48,7 @@ public class WalkableAreaBuilderTest {
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
-      new VertexGenerator(osmdb, graph, Set.of()),
+      new VertexGenerator(osmdb, graph, Set.of(), false),
       new DefaultNamer(),
       new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
       DataImportIssueStore.NOOP,

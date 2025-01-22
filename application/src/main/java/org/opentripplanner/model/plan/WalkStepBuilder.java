@@ -9,6 +9,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 
@@ -25,6 +26,7 @@ public class WalkStepBuilder {
   private RelativeDirection relativeDirection;
   private ElevationProfile elevationProfile;
   private String exit;
+  private Entrance entrance;
   private boolean stayOn = false;
   /**
    * Distance used for appending elevation profiles
@@ -71,6 +73,11 @@ public class WalkStepBuilder {
 
   public WalkStepBuilder withExit(String exit) {
     this.exit = exit;
+    return this;
+  }
+
+  public WalkStepBuilder withEntrance(@Nullable Entrance entrance) {
+    this.entrance = entrance;
     return this;
   }
 
@@ -159,6 +166,7 @@ public class WalkStepBuilder {
       directionText,
       streetNotes,
       exit,
+      entrance,
       elevationProfile,
       nameIsDerived,
       walkingBike,

@@ -27,7 +27,6 @@ import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParking
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
@@ -153,8 +152,8 @@ public class SpeedTest {
       // Given the following setup
       SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
       var config = SpeedTestConfig.config(opts.rootDir());
-      loadOtpFeatures(opts);
-      var model = loadGraph(opts.rootDir(), config.graph);
+      SetupHelper.loadOtpFeatures(opts);
+      var model = SetupHelper.loadGraph(opts.rootDir(), config.graph);
       var timetableRepository = model.timetableRepository();
       var buildConfig = model.buildConfig();
       var graph = model.graph();
@@ -192,6 +191,9 @@ public class SpeedTest {
     }
 
     updateTimersWithGlobalCounters();
+
+    timer.finishUp();
+
     printProfileStatistics();
     saveTestCasesToResultFile();
     System.err.println("\nSpeedTest done! " + projectInfo().getVersionString());
@@ -267,27 +269,6 @@ public class SpeedTest {
 
   /* setup helper methods */
 
-  private static void loadOtpFeatures(SpeedTestCmdLineOpts opts) {
-    ConfigModel.initializeOtpFeatures(new OtpConfigLoader(opts.rootDir()).loadOtpConfig());
-  }
-
-  private static LoadModel loadGraph(File baseDir, URI path) {
-    File file = path == null
-      ? OtpDataStore.graphFile(baseDir)
-      : path.isAbsolute() ? new File(path) : new File(baseDir, path.getPath());
-    SerializedGraphObject serializedGraphObject = SerializedGraphObject.load(file);
-    Graph graph = serializedGraphObject.graph;
-
-    if (graph == null) {
-      throw new IllegalStateException();
-    }
-
-    TimetableRepository timetableRepository = serializedGraphObject.timetableRepository;
-    timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
-    return new LoadModel(graph, timetableRepository, serializedGraphObject.buildConfig);
-  }
-
   private void initProfileStatistics() {
     for (SpeedTestProfile key : opts.profiles()) {
       workerResults.put(key, new ArrayList<>());
@@ -352,7 +333,6 @@ public class SpeedTest {
     timer.globalCount("jvm_max_memory", runtime.maxMemory());
     timer.globalCount("jvm_total_memory", runtime.totalMemory());
     timer.globalCount("jvm_used_memory", runtime.totalMemory() - runtime.freeMemory());
-    timer.finishUp();
   }
 
   /**
@@ -368,8 +348,4 @@ public class SpeedTest {
     }
     return stream.limit(opts.numOfItineraries()).toList();
   }
-
-  /* inline classes */
-
-  record LoadModel(Graph graph, TimetableRepository timetableRepository, BuildConfig buildConfig) {}
 }

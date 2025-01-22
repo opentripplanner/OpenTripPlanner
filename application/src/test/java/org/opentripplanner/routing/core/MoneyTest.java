@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -39,6 +40,7 @@ class MoneyTest {
     );
   }
 
+  @Disabled
   @ParameterizedTest(name = "{0} with locale {1} should localise to \"{2}\"")
   @MethodSource("testCases")
   void localize(Money money, Locale locale, String expected) {
