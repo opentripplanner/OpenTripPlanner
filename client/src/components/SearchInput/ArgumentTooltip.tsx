@@ -2,10 +2,10 @@ import React from 'react';
 import infoIcon from '../../static/img/help-info-solid.svg';
 import inputIcon from '../../static/img/input.svg';
 import durationIcon from '../../static/img/lap-timer.svg';
-import {ResolvedType} from "./useTripArgs.ts";
+import { ResolvedType } from './useTripArgs.ts';
 
 interface ArgumentTooltipProps {
-  defaultValue?: string | number | boolean | object | null | undefined
+  defaultValue?: string | number | boolean | object | null | undefined;
   type?: ResolvedType;
 }
 

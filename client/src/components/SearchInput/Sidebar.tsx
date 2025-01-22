@@ -12,13 +12,13 @@ const Sidebar: React.FC<SidebarProps> = ({ children }) => {
 
   // Function to return the appropriate image based on the index
   const getIconForIndex = (index: number) => {
-      switch (index) {
+    switch (index) {
       case 0:
         return <img src={tripIcon} alt="Itineray list" title="Itineray" />;
       case 1:
         return <img src={filterIcon} alt="Filters" title="Filters" />;
       case 2:
-          return <img width="25" height="25" src={jsonIcon} alt="Filters" title="Filters" />;
+        return <img width="25" height="25" src={jsonIcon} alt="Filters" title="Filters" />;
       default:
         return null;
     }

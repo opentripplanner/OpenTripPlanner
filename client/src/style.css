@@ -114,7 +114,6 @@
   min-width: 300px;
 }
 
-
 .left-pane-container .time-zone-info {
   margin: 10px 20px;
   font-size: 12px;
@@ -379,7 +378,7 @@ input[type='number'] {
   font-size: 13px;
   padding: 5px 10px;
   margin: 5px 0;
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 3px;
@@ -390,10 +389,9 @@ input[type='number'] {
   background-color: #0056b3; /* Darker on hover */
 }
 
-
-.argument-list input[type="text"],
-.argument-list input[type="number"],
-.argument-list input[type="datetime-local"],
+.argument-list input[type='text'],
+.argument-list input[type='number'],
+.argument-list input[type='datetime-local'],
 select {
   font-size: 12px;
   padding: 0;
@@ -404,18 +402,16 @@ select {
   box-sizing: border-box;
 }
 
-
-
-.argument-list input[type="text"],
-.argument-list input[type="number"] {
+.argument-list input[type='text'],
+.argument-list input[type='number'] {
   width: 50px;
 }
-.argument-list input[type="datetime-local"] {
+.argument-list input[type='datetime-local'] {
   width: 140px;
 }
 
-input.comma-separated-input[type="text"],
-input.comma-separated-input[type="number"] {
+input.comma-separated-input[type='text'],
+input.comma-separated-input[type='number'] {
   width: 140px;
 }
 
@@ -438,7 +434,7 @@ input.comma-separated-input[type="number"] {
   font-size: 13px;
   padding: 5px 10px;
   margin: 5px 0;
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   border: none;
   border-radius: 3px;

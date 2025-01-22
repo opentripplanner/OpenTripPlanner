@@ -29,17 +29,21 @@ export function InputFieldsSection({
   return (
     <div className="box input-group search-bar">
       <div className="input-family">
-        <LocationInputField label="From"
-                            id="fromInputField"
-                            locationFieldKey="from"
-                            tripQueryVariables={tripQueryVariables}
-                            setTripQueryVariables={setTripQueryVariables}/>
+        <LocationInputField
+          label="From"
+          id="fromInputField"
+          locationFieldKey="from"
+          tripQueryVariables={tripQueryVariables}
+          setTripQueryVariables={setTripQueryVariables}
+        />
         <SwapLocationsButton tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-        <LocationInputField label="To"
-                            id="toInputField"
-                            locationFieldKey="to"
-                            tripQueryVariables={tripQueryVariables}
-                            setTripQueryVariables={setTripQueryVariables} />
+        <LocationInputField
+          label="To"
+          id="toInputField"
+          locationFieldKey="to"
+          tripQueryVariables={tripQueryVariables}
+          setTripQueryVariables={setTripQueryVariables}
+        />
       </div>
       <div className="input-family">
         <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />

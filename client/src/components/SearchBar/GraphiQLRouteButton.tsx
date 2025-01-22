@@ -1,6 +1,6 @@
 import { Button } from 'react-bootstrap';
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import { queryAsString } from '../../static/query/tripQuery.tsx';
+import { queryAsString } from '../../gql/tripQuery.tsx';
 import graphqlIcon from '../../static/img/graphql-solid.svg';
 
 const graphiQLUrl = import.meta.env.VITE_GRAPHIQL_URL;

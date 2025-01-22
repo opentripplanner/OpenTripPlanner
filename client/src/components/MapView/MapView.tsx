@@ -80,7 +80,7 @@ export function MapView({
     // 2) Add the native MapLibre attribution control
     onLoad(e);
   }
-  
+
   const mapRef = useRef<MapRef>(null); // Create a ref for MapRef
   return (
     <div className="map-container below-content">

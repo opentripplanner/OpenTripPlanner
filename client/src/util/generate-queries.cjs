@@ -1,11 +1,10 @@
-const { getNullableType, isObjectType } = require('graphql');
 const fs = require('fs');
 const path = require('path');
 
 /**
  * Plugin to generate GraphQL queries dynamically from schema
  */
-const generateQueriesPlugin = async (schema, documents, config) => {
+const generateQueriesPlugin = async (schema) => {
   const queryType = schema.getQueryType();
   if (!queryType) {
     return '// No Query type found in the schema';
@@ -26,11 +25,12 @@ const generateQueriesPlugin = async (schema, documents, config) => {
   const queries = [];
 
   Object.keys(queryFields).forEach((fieldName) => {
-    if (fieldName === 'trip') { // Only interested in the trip query
+    if (fieldName === 'trip') {
+      // Only interested in the trip query
       const field = queryFields[fieldName];
 
       // Filter out deprecated arguments using deprecationReason - isDeprecated does not work
-      const validArgs = field.args.filter(arg => !arg.deprecationReason);
+      const validArgs = field.args.filter((arg) => !arg.deprecationReason);
 
       // Generate the arguments for the query with filtered arguments
       const args = validArgs.map((arg) => `  $${arg.name}: ${arg.type}`).join('\n');
@@ -38,7 +38,7 @@ const generateQueriesPlugin = async (schema, documents, config) => {
       // Generate the arguments for the query variables with filtered arguments
       const argsForQuery = validArgs.map((arg) => `    ${arg.name}: $${arg.name}`).join('\n');
 
-      const query = `import { graphql } from '../../gql';
+      const query = `import { graphql } from '../gql';
 import { print } from 'graphql/index';
 
 // Generated trip query based on schema.graphql

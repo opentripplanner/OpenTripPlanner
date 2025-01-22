@@ -28,9 +28,7 @@ export function ItineraryListContainer({
   return (
     <section className="left-pane-container below-content" ref={containerRef}>
       <>
-        <div className="panel-header">
-          Itinerary results
-        </div>
+        <div className="panel-header">Itinerary results</div>
         <div className="pagination-controls">
           <ItineraryPaginationControl
             onPagination={pageResults}
