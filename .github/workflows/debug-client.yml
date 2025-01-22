@@ -2,6 +2,8 @@ name: Debug client
 
 on:
   push:
+    branches:
+      - dev-2.x
     paths:
       - 'client/**'
   pull_request:
@@ -45,7 +47,7 @@ jobs:
           npm run coverage
 
       - name: Deploy compiled assets to repo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+        if: github.event_name == 'push'
         env:
           REMOTE: debug-client
           LOCAL_BRANCH: local-assets
