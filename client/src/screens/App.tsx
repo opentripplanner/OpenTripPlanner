@@ -10,7 +10,7 @@ import { InputFieldsSection } from '../components/SearchBar/InputFieldsSection.t
 import TripQueryArguments from '../components/SearchInput/TripQueryArguments.tsx';
 import Sidebar from '../components/SearchInput/Sidebar.tsx';
 import ViewArgumentsRaw from '../components/SearchInput/ViewArgumentsRaw.tsx';
-import { TripSchemaProvider } from '../components/SearchInput/TripSchemaContext.tsx';
+import { TripSchemaProvider } from '../components/SearchInput/TripSchemaProvider.tsx';
 import { getApiUrl } from '../util/getApiUrl.ts';
 
 export function App() {
@@ -50,7 +50,10 @@ export function App() {
                   setTripQueryVariables={setTripQueryVariables}
                 ></TripQueryArguments>
               </TripSchemaProvider>
-              <ViewArgumentsRaw tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables}></ViewArgumentsRaw>
+              <ViewArgumentsRaw
+                tripQueryVariables={tripQueryVariables}
+                setTripQueryVariables={setTripQueryVariables}
+              ></ViewArgumentsRaw>
             </Sidebar>
           </div>
           <div className="box map-section">
