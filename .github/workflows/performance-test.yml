@@ -91,7 +91,7 @@ jobs:
           cp otp-shaded/target/otp-shaded-*-SNAPSHOT.jar otp.jar
           java -Xmx32G -jar otp.jar --build --save test/performance/${{ matrix.location }}/
 
-      - name: Run speed test
+      - name: Run RAPTOR speed test
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         env:
           PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
@@ -113,3 +113,12 @@ jobs:
         with:
           name: ${{ matrix.location }}-flight-recorder
           path: application/${{ matrix.location }}-speed-test.jfr
+
+      - name: Run transfer cache speed test
+        if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
+        env:
+          PERFORMANCE_INFLUX_DB_PASSWORD: ${{ secrets.PERFORMANCE_INFLUX_DB_PASSWORD }}
+          SPEEDTEST_LOCATION: ${{ matrix.location }}
+          MAVEN_OPTS: "-Xmx50g -Dmaven.repo.local=/home/lenni/.m2/repository/"
+        run: |
+          mvn --projects application exec:java -Dexec.mainClass="org.opentripplanner.transit.speed_test.TransferCacheTest" -Dexec.classpathScope=test -Dexec.args="--dir=test/performance/${{ matrix.location }}"
