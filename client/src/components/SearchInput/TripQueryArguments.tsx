@@ -6,33 +6,11 @@ import ArgumentTooltip from './ArgumentTooltip.tsx';
 import { excludedArguments } from './excluded-arguments.ts';
 import { ResolvedType } from './useTripArgs.ts';
 import ResetButton from './ResetButton.tsx';
+import { DefaultValue, extractAllArgs, ProcessedArgument } from './extractArgs.ts';
 
 interface TripQueryArgumentsProps {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
-}
-
-type DefaultValue = string | number | boolean | object | null;
-
-// Adjust as needed; you might need a more precise type for `ArgData`.
-interface ArgData {
-  type: ResolvedType;
-  name?: string;
-  defaultValue?: DefaultValue;
-  enumValues?: string[];
-  isComplex?: boolean;
-  isList?: boolean;
-  args?: Record<string, ArgData>; // Recursive for nested arguments
-}
-
-interface ProcessedArgument {
-  path: string;
-  type: ResolvedType;
-  name?: string;
-  defaultValue?: DefaultValue;
-  enumValues?: string[];
-  isComplex?: boolean;
-  isList?: boolean;
 }
 
 /**
@@ -62,97 +40,6 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
     setArgumentsList(extractedArgs);
   }, [tripArgs, loading, error, extractAllArgs]);
 
-  /**
-   * Recursively extracts a flat list of arguments (ProcessedArgument[]).
-   */
-  function extractAllArgs(args: Record<string, ArgData> | undefined, parentPath: string[] = []): ProcessedArgument[] {
-    let allArgs: ProcessedArgument[] = [];
-    if (!args) return [];
-
-    Object.entries(args).forEach(([argName, argData]) => {
-      const currentPath = [...parentPath, argName].join('.');
-      allArgs = allArgs.concat(processArgument(argName, argData, currentPath, parentPath));
-    });
-
-    return allArgs;
-  }
-
-  /**
-   * Converts a single ArgData into one or more ProcessedArgument entries.
-   * If the argData is an InputObject with nested fields, we recurse.
-   */
-  function processArgument(
-    argName: string,
-    argData: ArgData,
-    currentPath: string,
-    parentPath: string[],
-  ): ProcessedArgument[] {
-    let allArgs: ProcessedArgument[] = [];
-
-    if (typeof argData === 'object' && argData.type) {
-      if (argData.type.type === 'Enum') {
-        const enumValues = ['Not selected', ...(argData.type.values || [])];
-        const defaultValue = argData.defaultValue !== undefined ? argData.defaultValue : 'Not selected';
-
-        allArgs.push({
-          path: currentPath,
-          type: { type: 'Enum' },
-          defaultValue,
-          enumValues,
-          isList: argData.isList,
-        });
-      } else if (argData.type.type === 'InputObject' && argData.isList) {
-        // This is a list of InputObjects
-        allArgs.push({
-          path: currentPath,
-          type: { type: 'Group', name: argData.type.name }, // We'll still call this 'Group'
-          defaultValue: argData.defaultValue,
-          isComplex: true,
-          isList: true,
-        });
-
-        allArgs = allArgs.concat(extractAllArgs(argData.type.fields, [...parentPath, `${argName}.*`]));
-      } else if (argData.type.type === 'InputObject') {
-        // Single InputObject
-        allArgs.push({
-          path: currentPath,
-          type: { type: 'Group', name: argData.type.name },
-          isComplex: true,
-          isList: false,
-        });
-        allArgs = allArgs.concat(extractAllArgs(argData.type.fields, [...parentPath, argName]));
-      } else if (argData.type.type === 'Scalar') {
-        allArgs.push({
-          path: currentPath,
-          type: { type: argData.type.type, subtype: argData.type.subtype },
-          defaultValue: argData.defaultValue,
-          isList: argData.isList,
-        });
-      }
-    } else if (typeof argData === 'object' && argData.type?.fields) {
-      // Possibly a nested object with fields
-      allArgs.push({
-        path: currentPath,
-        type: { type: 'Group' },
-        isComplex: true,
-      });
-      allArgs = allArgs.concat(extractAllArgs(argData.type.fields, [...parentPath, argName]));
-    } else {
-      // Fallback case
-      allArgs.push({
-        path: currentPath,
-        type: argData.type ?? (typeof argData as unknown), // <— If argData.type is missing, fallback
-        defaultValue: argData.defaultValue,
-      });
-    }
-
-    return allArgs;
-  }
-
-  /**
-   * Normalizes array indices in a path (e.g., "parent.0.child" -> "parent.*.child")
-   * so that we match the patterns stored in `argumentsList`.
-   */
   function normalizePathForList(path: string): string {
     // Replace numeric segments with `*`
     return path.replace(/\.\d+/g, '.*');
@@ -199,17 +86,14 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
    * Returns the updated variables.
    */
   function cleanUpParentIfEmpty(variables: TripQueryVariables, path: string): TripQueryVariables {
-    // Handle the case where `path` is top-level (no dots)
     if (!path.includes('.')) {
       const topValue = getNestedValue(variables, path);
 
-      // If it’s an empty array, remove it entirely from `variables`
       if (Array.isArray(topValue) && topValue.length === 0) {
         // Create a shallow copy as a flexible object:
         const copy = { ...variables } as Record<string, unknown>;
         // Remove the property:
         delete copy[path];
-        // Cast back to TripQueryVariables (still type-safe as far as usage):
         return copy as TripQueryVariables;
       }
 
