@@ -38,7 +38,7 @@ const generateQueriesPlugin = async (schema) => {
       // Generate the arguments for the query variables with filtered arguments
       const argsForQuery = validArgs.map((arg) => `    ${arg.name}: $${arg.name}`).join('\n');
 
-      const query = `import { graphql } from '../gql';
+      const query = `import { graphql } from '../../gql';
 import { print } from 'graphql/index';
 
 // Generated trip query based on schema.graphql

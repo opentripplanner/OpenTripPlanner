@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { request } from 'graphql-request';
 import { Location, QueryType, TripQueryVariables } from '../gql/graphql.ts';
 import { getApiUrl } from '../util/getApiUrl.ts';
-import { query } from '../gql/tripQuery.tsx';
+import { query } from '../static/query/tripQuery.tsx';
 
 /**
   General purpose trip query document for debugging trip searches
