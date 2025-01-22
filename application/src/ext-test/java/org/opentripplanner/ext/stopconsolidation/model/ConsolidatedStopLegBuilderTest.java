@@ -1,14 +1,13 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner._support.time.DateTimes.LOCAL_DATE;
+import static org.opentripplanner._support.time.DateTimes.ANY_LOCAL_DATE;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.FARE_PRODUCT_USE;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.DateTimes;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -31,7 +30,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants{
     .build();
   private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG = new ScheduledTransitLegBuilder<>()
     .withZoneId(ZoneIds.BERLIN)
-    .withServiceDate(LOCAL_DATE)
+    .withServiceDate(ANY_LOCAL_DATE)
     .withTripPattern(PATTERN)
     .withBoardStopIndexInPattern(0)
     .withAlightStopIndexInPattern(1).build();
