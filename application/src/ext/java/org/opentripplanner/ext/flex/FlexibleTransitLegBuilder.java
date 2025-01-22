@@ -18,9 +18,9 @@ public class FlexibleTransitLegBuilder {
   private Set<TransitAlert> transitAlerts = new HashSet<>();
   private List<FareProductUse> fareProducts = new ArrayList<>();
 
-  public FlexibleTransitLegBuilder() {}
+  FlexibleTransitLegBuilder() {}
 
-  public FlexibleTransitLegBuilder(FlexibleTransitLeg original) {
+  FlexibleTransitLegBuilder(FlexibleTransitLeg original) {
     flexTripEdge = original.flexTripEdge();
     startTime = original.getStartTime();
     endTime = original.getEndTime();

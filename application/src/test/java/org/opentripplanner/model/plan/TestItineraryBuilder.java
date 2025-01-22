@@ -15,7 +15,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.ext.flex.FlexibleTransitLegBuilder;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
@@ -247,7 +246,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
       flexPath
     );
 
-    FlexibleTransitLeg leg = new FlexibleTransitLegBuilder()
+    FlexibleTransitLeg leg = FlexibleTransitLeg
+      .of()
       .withFlexTripEdge(edge)
       .withStartTime(newTime(start))
       .withEndTime(newTime(end))

@@ -13,7 +13,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.ext.flex.FlexibleTransitLegBuilder;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -336,7 +336,8 @@ public class GraphPathToItineraryMapper {
     ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
-    return new FlexibleTransitLegBuilder()
+    return FlexibleTransitLeg
+      .of()
       .withFlexTripEdge(flexEdge)
       .withStartTime(startTime)
       .withEndTime(endTime)

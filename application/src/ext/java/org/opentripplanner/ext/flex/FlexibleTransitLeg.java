@@ -57,6 +57,13 @@ public class FlexibleTransitLeg implements TransitLeg {
     this.fareProducts = List.copyOf(builder.fareProducts());
   }
 
+  /**
+   * Return an empty builder for {@link FlexibleTransitLeg}.
+   */
+  public static FlexibleTransitLegBuilder of() {
+    return new FlexibleTransitLegBuilder();
+  }
+
   @Override
   public Agency getAgency() {
     return getTrip().getRoute().getAgency();
