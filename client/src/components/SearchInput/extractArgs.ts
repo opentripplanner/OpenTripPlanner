@@ -21,7 +21,17 @@ export interface ProcessedArgument {
   isComplex?: boolean;
   isList?: boolean;
 }
-
+/**
+ * Returns a human-readable name from a path like "someNestedArg.subArg".
+ */
+export function formatArgumentName(input: string): string {
+  if (!input) {
+    return ' ';
+  }
+  const parts = input.split('.');
+  const formatted = parts[parts.length - 1].replace(/([A-Z])/g, ' $1').trim();
+  return formatted.replace(/\b\w/g, (char) => char.toUpperCase()) + ' ';
+}
 /**
  * Recursively extracts a flat list of arguments (ProcessedArgument[]).
  */

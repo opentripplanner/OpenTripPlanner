@@ -6,23 +6,11 @@ import ArgumentTooltip from './ArgumentTooltip.tsx';
 import { excludedArguments } from './excluded-arguments.ts';
 import { ResolvedType } from './useTripArgs.ts';
 import ResetButton from './ResetButton.tsx';
-import { DefaultValue, extractAllArgs, ProcessedArgument } from './extractArgs.ts';
+import { DefaultValue, extractAllArgs, formatArgumentName, ProcessedArgument } from './extractArgs.ts';
 
 interface TripQueryArgumentsProps {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
-}
-
-/**
- * Returns a human-readable name from a path like "someNestedArg.subArg".
- */
-function formatArgumentName(input: string): string {
-  if (!input) {
-    return ' ';
-  }
-  const parts = input.split('.');
-  const formatted = parts[parts.length - 1].replace(/([A-Z])/g, ' $1').trim();
-  return formatted.replace(/\b\w/g, (char) => char.toUpperCase()) + ' ';
 }
 
 const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariables, setTripQueryVariables }) => {
@@ -38,7 +26,7 @@ const TripQueryArguments: React.FC<TripQueryArgumentsProps> = ({ tripQueryVariab
 
     const extractedArgs = extractAllArgs(tripArgs.trip.arguments);
     setArgumentsList(extractedArgs);
-  }, [tripArgs, loading, error, extractAllArgs]);
+  }, [tripArgs, loading, error]);
 
   function normalizePathForList(path: string): string {
     // Replace numeric segments with `*`
