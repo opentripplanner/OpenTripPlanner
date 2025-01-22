@@ -33,7 +33,10 @@ class FareLegRuleMapperTest {
       1,
       5000d,
       10000d,
-      new LinearDistance(Distance.ofKilometers(5), Distance.ofKilometers(10))
+      new LinearDistance(
+        Distance.ofKilometersBoxed(5d, ignore -> {}).orElse(null),
+        Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
+      )
     ),
     new TestCase(null, null, null, null)
   );

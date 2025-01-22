@@ -105,7 +105,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
     vehicle.fuel =
       new RentalVehicleFuel(
         currentFuelPercent,
-        currentRangeMeters != null ? Distance.ofMeters(currentRangeMeters) : null
+        Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null)
       );
     return vehicle;
   }

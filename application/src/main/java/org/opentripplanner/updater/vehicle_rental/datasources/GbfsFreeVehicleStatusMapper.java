@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class GbfsFreeVehicleStatusMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
-  private static final Throttle FUEL_PERCENT_LOG_THROTTLE = Throttle.ofOneMinute();
+  private static final Throttle LOG_THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
@@ -66,25 +66,25 @@ public class GbfsFreeVehicleStatusMapper {
         .ofBoxed(
           vehicle.getCurrentFuelPercent(),
           validationErrorMessage ->
-            FUEL_PERCENT_LOG_THROTTLE.throttle(() ->
-              LOG.warn("'currentFuelPercent' is not valid. Details: " + validationErrorMessage)
+            LOG_THROTTLE.throttle(() ->
+              LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
             )
         )
         .orElse(null);
-
-      Distance rangeMeters = null;
-      try {
-        rangeMeters =
-          vehicle.getCurrentRangeMeters() != null
-            ? Distance.ofMeters(vehicle.getCurrentRangeMeters())
-            : null;
-      } catch (IllegalArgumentException e) {
-        LOG.warn(
-          "Current range meter value not valid: {} - {}",
+      var rangeMeters = Distance
+        .ofMetersBoxed(
           vehicle.getCurrentRangeMeters(),
-          e.getMessage()
-        );
-      }
+          error -> {
+            LOG_THROTTLE.throttle(() ->
+              LOG.warn(
+                "Current range meter value not valid: {} - {}",
+                vehicle.getCurrentRangeMeters(),
+                error
+              )
+            );
+          }
+        )
+        .orElse(null);
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&

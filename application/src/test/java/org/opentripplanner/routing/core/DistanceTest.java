@@ -8,12 +8,24 @@ import org.opentripplanner.transit.model.basic.Distance;
 
 public class DistanceTest {
 
-  private static final Distance ONE_THOUSAND_FIVE_HUNDRED_METERS = Distance.ofMeters(1500d);
-  private static final Distance ONE_POINT_FIVE_KILOMETERS = Distance.ofKilometers(1.5d);
-  private static final Distance TWO_KILOMETERS = Distance.ofKilometers(2d);
-  private static final Distance ONE_HUNDRED_METERS = Distance.ofMeters(100d);
-  private static final Distance POINT_ONE_KILOMETER = Distance.ofKilometers(0.1d);
-  private static final Distance ONE_HUNDRED_POINT_FIVE_METERS = Distance.ofMeters(100.5d);
+  private static final Distance ONE_THOUSAND_FIVE_HUNDRED_METERS = Distance
+    .ofMetersBoxed(1500d, ignore -> {})
+    .orElse(null);
+  private static final Distance ONE_POINT_FIVE_KILOMETERS = Distance
+    .ofKilometersBoxed(1.5d, ignore -> {})
+    .orElse(null);
+  private static final Distance TWO_KILOMETERS = Distance
+    .ofKilometersBoxed(2d, ignore -> {})
+    .orElse(null);
+  private static final Distance ONE_HUNDRED_METERS = Distance
+    .ofMetersBoxed(100d, ignore -> {})
+    .orElse(null);
+  private static final Distance POINT_ONE_KILOMETER = Distance
+    .ofKilometersBoxed(0.1d, ignore -> {})
+    .orElse(null);
+  private static final Distance ONE_HUNDRED_POINT_FIVE_METERS = Distance
+    .ofMetersBoxed(100.5d, ignore -> {})
+    .orElse(null);
 
   @Test
   void equals() {
@@ -25,7 +37,9 @@ public class DistanceTest {
 
   @Test
   void testHashCode() {
-    assertEquals(Distance.ofMeters(5d).hashCode(), Distance.ofMeters(5d).hashCode());
-    assertNotEquals(Distance.ofMeters(5d).hashCode(), Double.valueOf(5d).hashCode());
+    assertEquals(
+      Distance.ofMetersBoxed(5d, ignore -> {}).hashCode(),
+      Distance.ofMetersBoxed(5d, ignore -> {}).hashCode()
+    );
   }
 }

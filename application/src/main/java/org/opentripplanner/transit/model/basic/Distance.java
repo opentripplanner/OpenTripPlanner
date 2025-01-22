@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.model.basic;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 
 public class Distance {
@@ -10,21 +13,62 @@ public class Distance {
 
   /** Returns a Distance object representing the given number of meters */
   private Distance(int distanceInMillimeters) {
-    if (distanceInMillimeters < 0) {
-      throw new IllegalArgumentException("Distance cannot be negative");
-    }
-
     this.millimeters = distanceInMillimeters;
   }
 
+  /**
+   * This method is similar to {@link #of(double, Consumer)}, but throws an
+   * {@link IllegalArgumentException} if the distance is negative.
+   */
+  private static Distance of(int distanceInMillimeters) {
+    return of(
+      distanceInMillimeters,
+      errMsg -> {
+        throw new IllegalArgumentException(errMsg);
+      }
+    )
+      .orElseThrow();
+  }
+
+  private static Optional<Distance> of(
+    int distanceInMillimeters,
+    Consumer<String> validationErrorHandler
+  ) {
+    if (distanceInMillimeters >= 0) {
+      return Optional.of(new Distance(distanceInMillimeters));
+    } else {
+      validationErrorHandler.accept(
+        "Distance must be greater or equal than 0, but was: " + distanceInMillimeters
+      );
+      return Optional.empty();
+    }
+  }
+
+  private static Optional<Distance> ofBoxed(
+    @Nullable Double value,
+    Consumer<String> validationErrorHandler,
+    int multiplier
+  ) {
+    if (value == null) {
+      return Optional.empty();
+    }
+    return of((int) (value * multiplier), validationErrorHandler);
+  }
+
   /** Returns a Distance object representing the given number of meters */
-  public static Distance ofMeters(double value) throws IllegalArgumentException {
-    return new Distance((int) (value * MILLIMETERS_PER_M));
+  public static Optional<Distance> ofMetersBoxed(
+    @Nullable Double value,
+    Consumer<String> validationErrorHandler
+  ) {
+    return ofBoxed(value, validationErrorHandler, MILLIMETERS_PER_M);
   }
 
   /** Returns a Distance object representing the given number of kilometers */
-  public static Distance ofKilometers(double value) {
-    return new Distance((int) (value * MILLIMETERS_PER_KM));
+  public static Optional<Distance> ofKilometersBoxed(
+    @Nullable Double value,
+    Consumer<String> validationErrorHandler
+  ) {
+    return ofBoxed(value, validationErrorHandler, MILLIMETERS_PER_KM);
   }
 
   /** Returns the distance in meters */
@@ -49,7 +93,7 @@ public class Distance {
 
   @Override
   public String toString() {
-     if (millimeters > MILLIMETERS_PER_KM) {
+    if (millimeters > MILLIMETERS_PER_KM) {
       return ValueObjectToStringBuilder
         .of()
         .addNum((double) this.millimeters / (double) MILLIMETERS_PER_KM, "km")
