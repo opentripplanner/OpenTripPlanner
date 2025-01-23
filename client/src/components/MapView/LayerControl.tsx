@@ -134,34 +134,65 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
 
       {/* DEBUG (VECTOR) LAYERS */}
       <h4 style={{ marginTop: '1rem' }}>Debug Layers</h4>
-      {Object.entries(layerGroups).map(([groupName, layers]) => (
-        <div key={groupName} style={{ marginBottom: '10px' }}>
-          <h6 style={{ margin: '0 0 5px' }}>{groupName}</h6>
-          {layers.map((layer) => {
-            // Grab the map property for whether it’s visible or not:
-            const isVisible = mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none';
+      {Object.entries(layerGroups).map(([groupName, layers]) => {
+        // Determine if *all* layers in this group are currently visible.
+        const allVisible = layers.every(
+          (layer) => mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none',
+        );
 
-            return (
+        // Define a helper to toggle all layers in the group at once.
+        const toggleGroupVisibility = (checked: boolean) => {
+          layers.forEach((layer) => {
+            toggleLayerVisibility(layer.id, checked);
+          });
+        };
+
+        return (
+          <div key={groupName} style={{ marginBottom: '10px' }}>
+            <h6 style={{ margin: '0 0 5px' }}>
               <label
-                key={layer.id}
                 style={{
-                  display: 'block',
+                  display: 'flex',
+                  alignItems: 'center',
                   cursor: 'pointer',
-                  marginBottom: '5px',
                 }}
               >
                 <input
                   type="checkbox"
-                  checked={isVisible}
-                  onChange={(e) => toggleLayerVisibility(layer.id, e.target.checked)}
+                  checked={allVisible}
+                  onChange={(e) => toggleGroupVisibility(e.target.checked)}
                   style={{ marginRight: '5px' }}
                 />
-                {layer.name}
+                {groupName}
               </label>
-            );
-          })}
-        </div>
-      ))}
+            </h6>
+
+            {layers.map((layer) => {
+              // Figure out if the layer is visible or not:
+              const isVisible = mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none';
+
+              return (
+                <label
+                  key={layer.id}
+                  style={{
+                    display: 'block',
+                    cursor: 'pointer',
+                    marginBottom: '5px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isVisible}
+                    onChange={(e) => toggleLayerVisibility(layer.id, e.target.checked)}
+                    style={{ marginLeft: '20px', marginRight: '5px' }}
+                  />
+                  {layer.name}
+                </label>
+              );
+            })}
+          </div>
+        );
+      })}
     </div>
   );
 };

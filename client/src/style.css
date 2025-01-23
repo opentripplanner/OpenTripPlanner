@@ -261,7 +261,7 @@
 .sidebar-button.right {
   position: absolute;
   right: 0; /* Default position when sidebar is closed */
-  background: #ccc;
+  background: #fff;
   color: white;
   border: none;
   border-radius: 4px;
