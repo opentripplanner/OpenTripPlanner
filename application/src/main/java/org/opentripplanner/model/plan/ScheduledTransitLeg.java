@@ -297,6 +297,11 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  public ScheduledTransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
+    return copy().withAlerts(alerts).build();
+  }
+
+  @Override
   @Nullable
   public PickDrop getBoardRule() {
     if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {

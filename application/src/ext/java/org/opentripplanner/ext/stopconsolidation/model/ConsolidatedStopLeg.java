@@ -17,6 +17,10 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
     this.to = Objects.requireNonNull(builder.to());
   }
 
+  public static ConsolidatedStopLegBuilder of(ScheduledTransitLeg stl) {
+    return new ConsolidatedStopLegBuilder(stl);
+  }
+
   @Override
   public Place getFrom() {
     return from;

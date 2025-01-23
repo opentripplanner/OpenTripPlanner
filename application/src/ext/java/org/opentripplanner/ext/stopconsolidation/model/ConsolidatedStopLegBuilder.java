@@ -9,11 +9,11 @@ public class ConsolidatedStopLegBuilder extends ScheduledTransitLegBuilder<Conso
   private Place from;
   private Place to;
 
-  public ConsolidatedStopLegBuilder(ScheduledTransitLeg leg) {
+  ConsolidatedStopLegBuilder(ScheduledTransitLeg leg) {
     super(leg);
   }
 
-  public ConsolidatedStopLegBuilder(ConsolidatedStopLeg consolidatedStopLeg) {
+  ConsolidatedStopLegBuilder(ConsolidatedStopLeg consolidatedStopLeg) {
     super(consolidatedStopLeg);
     this.from = consolidatedStopLeg.getFrom();
     this.to = consolidatedStopLeg.getTo();

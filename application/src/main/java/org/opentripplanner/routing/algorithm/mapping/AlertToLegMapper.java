@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.plan.AlertsAware;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -45,10 +46,6 @@ public class AlertToLegMapper {
    *                   stop condition.
    */
   public TransitLeg decorateWithAlerts(TransitLeg leg, boolean isFirstLeg) {
-    // Alert alerts are only relevant for transit legs
-    if (!leg.isTransitLeg()) {
-      return leg;
-    }
     ZonedDateTime legStartTime = leg.getStartTime();
     ZonedDateTime legEndTime = leg.getEndTime();
     StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
@@ -122,11 +119,7 @@ public class AlertToLegMapper {
       !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
     );
 
-    return switch (leg) {
-      case ScheduledTransitLeg l -> l.copy().withAlerts(totalAlerts).build();
-      case FlexibleTransitLeg l -> l.copy().withAlerts(totalAlerts).build();
-      default -> leg;
-    };
+    return leg.decorateWithAlerts(Set.copyOf(totalAlerts));
   }
 
   /**

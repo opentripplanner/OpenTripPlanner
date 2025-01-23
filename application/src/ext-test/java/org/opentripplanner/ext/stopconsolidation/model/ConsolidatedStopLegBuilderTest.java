@@ -61,7 +61,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants{
   void copyConsolidatedLeg(){
     var leg = new ConsolidatedStopLegBuilder(SCHEDULED_TRANSIT_LEG).withFrom(E.stop).withTo(F.stop).withAlerts(ALERTS).build();
 
-    var copy = new ConsolidatedStopLegBuilder(leg).build();
+    var copy = leg.copy().build();
 
     assertEquals(E.stop, copy.getFrom().stop);
     assertEquals(F.stop, copy.getTo().stop);

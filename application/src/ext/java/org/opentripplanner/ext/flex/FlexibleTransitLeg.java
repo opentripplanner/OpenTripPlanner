@@ -166,6 +166,11 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
+  public TransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
+    return copy().withAlerts(alerts).build();
+  }
+
+  @Override
   public PickDrop getBoardRule() {
     return edge.getFlexTrip().getBoardRule(getBoardStopPosInPattern());
   }

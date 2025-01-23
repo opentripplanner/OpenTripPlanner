@@ -381,9 +381,7 @@ public interface Leg {
     return Set.of();
   }
 
-  default Set<TransitAlert> getTransitAlerts() {
-    return Set.of();
-  }
+  Set<TransitAlert> getTransitAlerts();
 
   @Nullable
   default PickDrop getBoardRule() {

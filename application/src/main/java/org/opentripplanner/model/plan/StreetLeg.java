@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.utils.lang.DoubleUtils;
@@ -123,6 +124,11 @@ public class StreetLeg implements Leg {
   @Override
   public Set<StreetNote> getStreetNotes() {
     return streetNotes;
+  }
+
+  @Override
+  public Set<TransitAlert> getTransitAlerts() {
+    return Set.of();
   }
 
   @Override
