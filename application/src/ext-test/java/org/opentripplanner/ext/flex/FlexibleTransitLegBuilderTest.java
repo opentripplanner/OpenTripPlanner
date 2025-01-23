@@ -70,12 +70,13 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
 
   @Test
   void timeShift(){
-    var leg = new FlexibleTransitLegBuilder().withStartTime(ANY_ZONED_DATE_TIME_1).withEndTime(ANY_ZONED_DATE_TIME_2).withFlexTripEdge(EDGE).withFareProducts(List.of(FARE_PRODUCT_USE)).build();
+    var leg = new FlexibleTransitLegBuilder().withStartTime(ANY_ZONED_DATE_TIME_1).withEndTime(ANY_ZONED_DATE_TIME_2).withFlexTripEdge(EDGE).withFareProducts(List.of(FARE_PRODUCT_USE)).withAlerts(Set.of(ALERT)).build();
 
     var shifted = leg.withTimeShift(TIME_SHIFT);
 
     assertEquals(ANY_ZONED_DATE_TIME_1.plus(TIME_SHIFT), shifted.getStartTime());
     assertEquals(ANY_ZONED_DATE_TIME_2.plus(TIME_SHIFT), shifted.getEndTime());
     assertEquals(List.of(FARE_PRODUCT_USE), shifted.fareProducts());
+    assertEquals(Set.of(ALERT), shifted.getTransitAlerts());
   }
 }
