@@ -14,6 +14,8 @@
     "preview": "vite preview",
     "prebuild": "npm run codegen && npm run lint && npm run check-format",
     "predev": "npm run codegen",
+    "codegen-preprocess": "graphql-codegen --config codegen-preprocess.ts",
+    "precodegen": "npm run codegen-preprocess",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
@@ -26,7 +28,8 @@
     "react": "19.0.0",
     "react-bootstrap": "2.10.7",
     "react-dom": "19.0.0",
-    "react-map-gl": "7.1.8"
+    "react-map-gl": "7.1.8",
+    "react-select": "5.9.0"
   },
   "devDependencies": {
     "@eslint/compat": "1.2.5",
