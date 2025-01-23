@@ -212,7 +212,7 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return new FlexibleTransitLegBuilder(this).withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).build();
+    return copy().withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).build();
   }
 
   @Override
@@ -252,9 +252,8 @@ public class FlexibleTransitLeg implements TransitLeg {
       .toString();
   }
 
-  public FlexTripEdge flexTripEdge() {
+  FlexTripEdge flexTripEdge() {
     return edge;
   }
-
 
 }
