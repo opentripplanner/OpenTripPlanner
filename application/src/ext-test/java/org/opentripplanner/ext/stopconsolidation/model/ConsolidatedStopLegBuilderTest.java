@@ -33,6 +33,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants{
     .withServiceDate(ANY_LOCAL_DATE)
     .withTripPattern(PATTERN)
     .withBoardStopIndexInPattern(0)
+    .withDistanceMeters(1000)
     .withAlightStopIndexInPattern(1).build();
   private static final List<FareProductUse> FARES = List.of(FARE_PRODUCT_USE);
 

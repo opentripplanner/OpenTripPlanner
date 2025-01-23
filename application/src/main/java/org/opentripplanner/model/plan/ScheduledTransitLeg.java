@@ -13,7 +13,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -34,7 +33,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
-import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -76,7 +74,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.endTime = builder.endTime();
 
     this.serviceDate = builder.serviceDate();
-    this.zoneId = Objects.requireNonNull(builder.zoneId());
+    this.zoneId = Objects.requireNonNull(builder.zoneId(), "zoneId");
 
     this.tripOnServiceDate = builder.tripOnServiceDate();
 
@@ -93,14 +91,9 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    this.distanceMeters =
-      builder
-        .overrideDistanceMeters()
-        .orElseGet(() ->
-          DoubleUtils.roundTo2Decimals(getDistanceFromCoordinates(transitLegCoordinates))
-        );
+    this.distanceMeters = Objects.requireNonNull(builder.distanceMeters(), "distanceMeters");
     this.directDistanceMeters =
-      getDistanceFromCoordinates(
+      GeometryUtils.sumDistances(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
       );
     this.transitAlerts = Set.copyOf(builder.alerts());
@@ -434,6 +427,19 @@ public class ScheduledTransitLeg implements TransitLeg {
       .toString();
   }
 
+  public static double computeDistanceMeters(
+    TripPattern originalTripPattern,
+    int boardStopIndexInPattern,
+    int alightStopIndexInPattern
+  ) {
+    List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
+      originalTripPattern,
+      boardStopIndexInPattern,
+      alightStopIndexInPattern
+    );
+    return GeometryUtils.sumDistances(transitLegCoordinates);
+  }
+
   /**
    * Non-null getter for trip
    */
@@ -441,7 +447,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     return tripTimes.getTrip();
   }
 
-  private static List<Coordinate> extractTransitLegCoordinates(
+  public static List<Coordinate> extractTransitLegCoordinates(
     TripPattern tripPattern,
     int boardStopIndexInPattern,
     int alightStopIndexInPattern
@@ -455,13 +461,5 @@ public class ScheduledTransitLeg implements TransitLeg {
     }
 
     return transitLegCoordinates;
-  }
-
-  private static double getDistanceFromCoordinates(List<Coordinate> coordinates) {
-    double distance = 0;
-    for (int i = 1; i < coordinates.size(); i++) {
-      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
-    }
-    return distance;
   }
 }

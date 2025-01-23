@@ -528,7 +528,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
           .withZoneId(UTC)
           .withTransferFromPreviousLeg(transferFromPreviousLeg)
           .withGeneralizedCost(legCost)
-          .withOverrideDistanceMeters(distance)
+          .withDistanceMeters(distance)
           .withFrequencyHeadwayInSeconds(headwaySecs)
           .build();
     } else {
@@ -544,7 +544,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
           .withZoneId(UTC)
           .withTransferFromPreviousLeg(transferFromPreviousLeg)
           .withGeneralizedCost(legCost)
-          .withOverrideDistanceMeters(distance)
+          .withDistanceMeters(distance)
           .build();
     }
 

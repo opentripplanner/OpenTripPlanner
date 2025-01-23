@@ -171,6 +171,13 @@ public record ScheduledTransitLegReference(
       .withServiceDate(serviceDate)
       .withTripOnServiceDate(tripOnServiceDate)
       .withZoneId(timeZone)
+      .withDistanceMeters(
+        ScheduledTransitLeg.computeDistanceMeters(
+          tripPattern,
+          fromStopPositionInPattern,
+          toStopPositionInPattern
+        )
+      )
       // TODO: What should we have here
       .withGeneralizedCost(0)
       .build();

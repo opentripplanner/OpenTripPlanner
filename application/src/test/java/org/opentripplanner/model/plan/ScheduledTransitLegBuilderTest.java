@@ -96,6 +96,7 @@ class ScheduledTransitLegBuilderTest {
       .withServiceDate(DATE)
       .withTripPattern(PATTERN)
       .withBoardStopIndexInPattern(0)
-      .withAlightStopIndexInPattern(1);
+      .withAlightStopIndexInPattern(1)
+      .withDistanceMeters(10000);
   }
 }

@@ -243,6 +243,9 @@ public class AlternativeLegs {
       .withServiceDate(serviceDay)
       .withZoneId(timeZone)
       .withTripOnServiceDate(tripOnServiceDate)
+      .withDistanceMeters(
+        ScheduledTransitLeg.computeDistanceMeters(pattern, boardingPosition, alightingPosition)
+      )
       .build();
   }
 

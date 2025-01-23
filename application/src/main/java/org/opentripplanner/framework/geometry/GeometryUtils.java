@@ -282,4 +282,12 @@ public class GeometryUtils {
 
     return Arrays.stream(envelopes);
   }
+
+  public static double sumDistances(List<Coordinate> coordinates) {
+    double distance = 0;
+    for (int i = 1; i < coordinates.size(); i++) {
+      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
+    }
+    return distance;
+  }
 }

@@ -146,6 +146,7 @@ class EmissionsTest {
       .withEndTime(TIME.plusMinutes(10))
       .withServiceDate(TIME.toLocalDate())
       .withZoneId(ZoneIds.BERLIN)
+      .withDistanceMeters(ScheduledTransitLeg.computeDistanceMeters(pattern, 0,2))
       .build();
   }
 }
