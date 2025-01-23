@@ -78,6 +78,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - If configured, add subway station entrances from OSM to walk steps [#6343](https://github.com/opentripplanner/OpenTripPlanner/pull/6343)
 - Revert allow multiple states during transfer edge traversals [#6357](https://github.com/opentripplanner/OpenTripPlanner/pull/6357)
 - Generate Raptor transfer cache in parallel [#6326](https://github.com/opentripplanner/OpenTripPlanner/pull/6326)
+- Add 'transferParametersForMode' build config field [#6215](https://github.com/opentripplanner/OpenTripPlanner/pull/6215)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
