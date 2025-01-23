@@ -302,6 +302,11 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+    return copy().withFareProducts(fares).build();
+  }
+
+  @Override
   @Nullable
   public PickDrop getBoardRule() {
     if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {

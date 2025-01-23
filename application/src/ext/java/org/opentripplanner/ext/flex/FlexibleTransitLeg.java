@@ -171,6 +171,11 @@ public class FlexibleTransitLeg implements TransitLeg {
   }
 
   @Override
+  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+    return copy().withFareProducts(fares).build();
+  }
+
+  @Override
   public PickDrop getBoardRule() {
     return edge.getFlexTrip().getBoardRule(getBoardStopPosInPattern());
   }
@@ -250,4 +255,6 @@ public class FlexibleTransitLeg implements TransitLeg {
   public FlexTripEdge flexTripEdge() {
     return edge;
   }
+
+
 }
