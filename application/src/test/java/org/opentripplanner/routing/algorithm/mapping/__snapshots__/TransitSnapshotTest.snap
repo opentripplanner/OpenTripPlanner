@@ -356,7 +356,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 1580.921,
+          "distance" : 1580.92,
           "endTime" : "2009-11-17T18:18:49.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:14:50.000+00:00",
@@ -538,7 +538,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 3448.605,
+          "distance" : 3448.6,
           "endTime" : "2009-11-17T18:34:55.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:19:32.000+00:00",
@@ -1324,7 +1324,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 5218.856,
+          "distance" : 5218.86,
           "endTime" : "2009-11-17T18:35:54.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:15:40.000+00:00",
@@ -1880,7 +1880,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 1580.921,
+          "distance" : 1580.92,
           "endTime" : "2009-11-17T18:34:53.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:30:50.000+00:00",
@@ -2062,7 +2062,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 3448.605,
+          "distance" : 3448.6,
           "endTime" : "2009-11-17T18:50:55.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:35:36.000+00:00",
@@ -3062,7 +3062,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 3729.974,
+          "distance" : 3729.97,
           "endTime" : "2009-11-17T18:26:49.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:14:00.000+00:00",
@@ -3523,7 +3523,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 3729.974,
+          "distance" : 3729.97,
           "endTime" : "2009-11-17T18:42:19.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:29:00.000+00:00",
@@ -4238,7 +4238,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 2493.243,
+          "distance" : 2493.24,
           "endTime" : "2009-11-17T19:05:00.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:45:25.000+00:00",
@@ -4620,7 +4620,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 3729.974,
+          "distance" : 3729.97,
           "endTime" : "2009-11-17T18:57:49.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:45:00.000+00:00",
@@ -5088,7 +5088,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 1355.207,
+          "distance" : 1355.21,
           "endTime" : "2009-11-17T18:51:01.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:46:00.000+00:00",
@@ -5199,7 +5199,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "agencyUrl" : "http://trimet.org",
           "arrivalDelay" : 0,
           "departureDelay" : 0,
-          "distance" : 3838.715,
+          "distance" : 3838.71,
           "endTime" : "2009-11-17T19:08:50.000+00:00",
           "from" : {
             "arrival" : "2009-11-17T18:51:01.000+00:00",

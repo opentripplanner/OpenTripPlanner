@@ -33,6 +33,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -91,7 +92,10 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    this.distanceMeters = Objects.requireNonNull(builder.distanceMeters(), "distanceMeters");
+    this.distanceMeters =
+      DoubleUtils.roundTo2Decimals(
+        Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
+      );
     this.directDistanceMeters =
       GeometryUtils.sumDistances(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
