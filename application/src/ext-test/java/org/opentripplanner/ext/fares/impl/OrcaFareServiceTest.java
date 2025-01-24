@@ -226,12 +226,12 @@ public class OrcaFareServiceTest {
     );
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     // We don't get any fares for the skagit transit leg below here because they don't accept ORCA (electronic)
-    calculateFare(rides, FareType.electronicSpecial, ONE_DOLLAR.plus(ONE_DOLLAR).plus(DEFAULT_TEST_RIDE_PRICE.times(2)));
     calculateFare(
       rides,
-      FareType.electronicRegular,
-      DEFAULT_TEST_RIDE_PRICE.times(4)
+      FareType.electronicSpecial,
+      ONE_DOLLAR.plus(ONE_DOLLAR).plus(DEFAULT_TEST_RIDE_PRICE.times(2))
     );
+    calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(4));
     calculateFare(
       rides,
       FareType.electronicSenior,
