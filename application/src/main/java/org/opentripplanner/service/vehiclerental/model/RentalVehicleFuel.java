@@ -15,13 +15,13 @@ public class RentalVehicleFuel {
    * Current fuel percentage, expressed from 0 to 1.
    */
   @Nullable
-  public final Ratio percent;
+  private final Ratio percent;
 
   /**
    * Distance that the vehicle can travel with the current fuel.
    */
   @Nullable
-  public final Distance range;
+  private final Distance range;
 
   public RentalVehicleFuel(@Nullable Ratio fuelPercent, @Nullable Distance range) {
     this.percent = fuelPercent;
