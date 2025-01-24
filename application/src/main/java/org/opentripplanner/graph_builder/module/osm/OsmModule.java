@@ -272,6 +272,15 @@ public class OsmModule implements GraphBuilderModule {
     } else {
       LOG.info("Done building visibility graphs for walkable areas.");
     }
+    var stats = walkableAreaBuilder.getStats();
+    LOG.error(
+      String.format(
+        "VISIBILITYVERTEXCOUNT %d areaEdgeCount %d recursedSegments %d",
+        stats[0],
+        stats[1],
+        stats[2]
+      )
+    );
   }
 
   private void buildBasicGraph() {

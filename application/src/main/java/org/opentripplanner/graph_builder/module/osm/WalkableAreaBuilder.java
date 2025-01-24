@@ -49,6 +49,8 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class WalkableAreaBuilder {
 
@@ -75,6 +77,11 @@ class WalkableAreaBuilder {
   private final VertexFactory vertexFactory;
 
   private static final String labelTemplate = "way (area) %s from %s to %s"; // for AreaEdge names
+  private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
+
+  private int visibilityVertexCount = 0;
+  private int areaEdgeCount = 0;
+  private int recursedSegments = 0;
 
   public WalkableAreaBuilder(
     Graph graph,
@@ -107,6 +114,10 @@ class WalkableAreaBuilder {
           .collect(Collectors.toList())
         : List.of();
     this.vertexFactory = new VertexFactory(graph);
+  }
+
+  public int[] getStats() {
+    return new int[] { visibilityVertexCount, areaEdgeCount, recursedSegments };
   }
 
   /**
@@ -221,6 +232,7 @@ class WalkableAreaBuilder {
           visibilityNodes.add(node);
           startingNodes.add(node);
           edgeList.addVisibilityVertex(vertex);
+          visibilityVertexCount++;
         }
 
         for (Ring outerRing : area.outermostRings) {
@@ -241,6 +253,7 @@ class WalkableAreaBuilder {
               startingNodes.add(node);
               edgeList.addVisibilityVertex(v);
               linkPointsAdded = true;
+              visibilityVertexCount++;
             }
           }
 
@@ -265,10 +278,12 @@ class WalkableAreaBuilder {
               (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
             ) {
               visibilityNodes.add(node);
+              visibilityVertexCount++;
               edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
             if (isStartingNode(node, osmWayIds)) {
               visibilityNodes.add(node);
+              visibilityVertexCount++;
               startingNodes.add(node);
               edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
@@ -284,11 +299,13 @@ class WalkableAreaBuilder {
               // For holes, the internal angle is calculated, so we must swap the convexity condition
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
+                visibilityVertexCount++;
                 edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
               if (isStartingNode(node, osmWayIds)) {
                 visibilityNodes.add(node);
                 startingNodes.add(node);
+                visibilityVertexCount++;
                 edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
             }
@@ -544,12 +561,14 @@ class WalkableAreaBuilder {
         .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
         .withLink(areaEntity.isLink());
 
+      areaEdgeCount += 2;
       AreaEdge street = streetEdgeBuilder.buildAndConnect();
 
       AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
       normalizer.applyWayProperties(street, backStreet, wayData, areaEntity);
       return Set.of(street, backStreet);
     } else {
+      recursedSegments++;
       // take the part that intersects with the start vertex
       Coordinate startCoordinate = startEndpoint.getCoordinate();
       Point startPoint = geometryFactory.createPoint(startCoordinate);
