@@ -11,7 +11,11 @@ public class Distance {
   private static final int MILLIMETERS_PER_KM = 1000 * MILLIMETERS_PER_M;
   private final int millimeters;
 
-  /** Returns a Distance object representing the given number of meters */
+  /**
+   * Represents a distance.
+   * The class ensures that the distance, saved as an integer
+   * representing the millimeters, is not negative.
+   */
   private Distance(int distanceInMillimeters) {
     this.millimeters = distanceInMillimeters;
   }
@@ -78,12 +82,12 @@ public class Distance {
   }
 
   @Override
-  public boolean equals(Object other) {
-    if (other instanceof Distance distance) {
-      return distance.millimeters == this.millimeters;
-    } else {
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
       return false;
     }
+    var other = (Distance) o;
+    return this.millimeters == other.millimeters;
   }
 
   @Override
