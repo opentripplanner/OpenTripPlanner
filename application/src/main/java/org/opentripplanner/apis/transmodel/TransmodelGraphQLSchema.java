@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -1166,17 +1167,17 @@ public class TransmodelGraphQLSchema {
           .dataFetcher(environment -> {
             if (environment.containsArgument("ids")) {
               var ids = mapIDsToDomainNullSafe(environment.getArgument("ids"));
-              Boolean flexibleOnly = environment.getArgument("flexibleOnly");
-              int numberOfArgsPassed = environment.getArguments().size();
-              // Since flexibleOnly has a default, it is always passed so we compare against 2 instead
-              // of 1, and check if the value has been set.
-              boolean moreThanOneArgPassed =
-                numberOfArgsPassed > 2 ||
-                (numberOfArgsPassed == 2 && Boolean.TRUE.equals(flexibleOnly));
 
-              if (moreThanOneArgPassed) {
+              // flexibleLines gets special treatment because it has a default value.
+              if (
+                Stream
+                  .of("name", "publicCode", "publicCodes", "transportModes", "authorities")
+                  .anyMatch(environment::containsArgument) ||
+                Boolean.TRUE.equals(environment.getArgument("flexibleOnly"))
+              ) {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
               }
+
               return GqlUtil.getTransitService(environment).getRoutes(ids);
             }
 
