@@ -165,7 +165,6 @@ public class ConstructApplication {
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    initializeSchema();
     return new OTPWebApplication(routerConfig().server(), this::createServerContext);
   }
 
@@ -349,13 +348,5 @@ public class ConstructApplication {
 
   public StreetLimitationParameters streetLimitationParameters() {
     return factory.streetLimitationParameters();
-  }
-
-  private void initializeSchema() {
-    if (OTPFeature.GtfsGraphQlApi.isOn()) {
-      LOG.info("Initializing schema for the GTFS GraphQL API.");
-      // Initializing the schema singleton (server shuts down if there is an issue)
-      factory.schema();
-    }
   }
 }

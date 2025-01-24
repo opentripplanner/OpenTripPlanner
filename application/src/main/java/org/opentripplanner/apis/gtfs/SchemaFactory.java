@@ -77,7 +77,6 @@ import org.opentripplanner.apis.gtfs.datafetchers.serviceTimeRangeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stepImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.stopAtDistanceImpl;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
-import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -207,7 +206,7 @@ public class SchemaFactory {
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
     } catch (Exception e) {
       LOG.error("Unable to build GTFS GraphQL Schema", e);
-      throw new OtpAppException("Unable to build GTFS GraphQL Schema: " + e.getMessage());
+      return null;
     }
   }
 }
