@@ -1719,6 +1719,9 @@ enum RelativeDirection {
   continue
   depart
   elevator
+  enterStation
+  exitStation
+  followSigns
   hardLeft
   hardRight
   left
