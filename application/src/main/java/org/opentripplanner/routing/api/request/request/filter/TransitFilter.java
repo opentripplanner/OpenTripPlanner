@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.request.filter;
 
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public interface TransitFilter {

@@ -23,6 +23,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -39,6 +40,7 @@ public class FlexRouter {
   private final Graph graph;
   private final TransitService transitService;
   private final FlexParameters flexParameters;
+  private final List<TransitFilter> filters;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -57,7 +59,7 @@ public class FlexRouter {
     Graph graph,
     TransitService transitService,
     FlexParameters flexParameters,
-    Instant requestedTime,
+    List<TransitFilter> filters, Instant requestedTime,
     @Nullable Instant requestedBookingTime,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
@@ -67,6 +69,7 @@ public class FlexRouter {
     this.graph = graph;
     this.transitService = transitService;
     this.flexParameters = flexParameters;
+    this.filters = filters;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
@@ -114,7 +117,9 @@ public class FlexRouter {
       callbackService,
       accessFlexPathCalculator,
       egressFlexPathCalculator,
-      flexParameters.maxTransferDuration()
+      flexParameters.maxTransferDuration(),
+      transitService,
+      filters
     )
       .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
@@ -139,7 +144,9 @@ public class FlexRouter {
     return new FlexAccessFactory(
       callbackService,
       accessFlexPathCalculator,
-      flexParameters.maxTransferDuration()
+      flexParameters.maxTransferDuration(),
+      transitService,
+      filters
     )
       .createFlexAccesses(streetAccesses, dates);
   }

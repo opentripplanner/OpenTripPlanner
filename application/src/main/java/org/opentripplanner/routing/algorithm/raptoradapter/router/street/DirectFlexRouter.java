@@ -58,6 +58,7 @@ public class DirectFlexRouter {
         serverContext.graph(),
         serverContext.transitService(),
         serverContext.flexParameters(),
+        request.journey().transit().filters(),
         request.dateTime(),
         request.bookingTime(),
         additionalSearchDays.additionalSearchDaysInPast(),

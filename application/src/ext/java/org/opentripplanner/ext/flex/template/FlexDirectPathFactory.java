@@ -10,12 +10,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
+import org.opentripplanner.transit.service.TransitService;
 
 public class FlexDirectPathFactory {
 
@@ -23,17 +25,23 @@ public class FlexDirectPathFactory {
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
   private final Duration maxTransferDuration;
+  private final TransitService transitService;
+  private final List<TransitFilter> filters;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
-    Duration maxTransferDuration
+    Duration maxTransferDuration,
+    TransitService transitService,
+    List<TransitFilter> filters
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;
     this.egressPathCalculator = egressPathCalculator;
     this.maxTransferDuration = maxTransferDuration;
+    this.transitService = transitService;
+    this.filters = filters;
   }
 
   public Collection<DirectFlexPath> calculateDirectFlexPaths(
@@ -48,7 +56,9 @@ public class FlexDirectPathFactory {
     var flexAccessTemplates = new FlexAccessFactory(
       callbackService,
       accessPathCalculator,
-      maxTransferDuration
+      maxTransferDuration,
+      transitService,
+      filters
     )
       .calculateFlexAccessTemplates(streetAccesses, dates);
 
