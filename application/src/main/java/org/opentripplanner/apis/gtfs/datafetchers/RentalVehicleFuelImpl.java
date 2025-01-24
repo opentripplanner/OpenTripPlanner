@@ -10,17 +10,13 @@ public class RentalVehicleFuelImpl implements GraphQLDataFetchers.GraphQLRentalV
   @Override
   public DataFetcher<Double> percent() {
     return environment ->
-      getSource(environment).getPercent() != null
-        ? getSource(environment).getPercent().asDouble()
-        : null;
+      getSource(environment).percent() != null ? getSource(environment).percent().asDouble() : null;
   }
 
   @Override
   public DataFetcher<Integer> range() {
     return environment ->
-      getSource(environment).getRange() != null
-        ? getSource(environment).getRange().toMeters()
-        : null;
+      getSource(environment).range() != null ? getSource(environment).range().toMeters() : null;
   }
 
   private RentalVehicleFuel getSource(DataFetchingEnvironment environment) {

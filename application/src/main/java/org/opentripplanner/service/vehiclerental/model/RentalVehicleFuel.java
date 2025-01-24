@@ -29,12 +29,12 @@ public class RentalVehicleFuel {
   }
 
   @Nullable
-  public Ratio getPercent() {
+  public Ratio percent() {
     return this.percent;
   }
 
   @Nullable
-  public Distance getRange() {
+  public Distance range() {
     return range;
   }
 }
