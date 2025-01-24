@@ -54,7 +54,7 @@ class OsmBoardingLocationsModuleTest {
           .map(VertexLabel::osm)
           .collect(Collectors.toSet())
       ),
-      Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
+      Arguments.of(true, Set.of(VertexLabel.osm(768590748)))
     );
   }
 
@@ -157,7 +157,7 @@ class OsmBoardingLocationsModuleTest {
 
     assertConnections(platformCentroid, Set.of(BoardingLocationToStopLink.class, AreaEdge.class));
 
-    /*    assertEquals(
+    assertEquals(
       linkedVertices,
       platformCentroid
         .getOutgoingStreetEdges()
@@ -175,7 +175,7 @@ class OsmBoardingLocationsModuleTest {
         .map(Edge::getFromVertex)
         .map(Vertex::getLabel)
         .collect(Collectors.toSet())
-	);*/
+    );
 
     platformCentroids
       .stream()
