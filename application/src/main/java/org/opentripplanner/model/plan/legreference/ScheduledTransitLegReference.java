@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.plan.LegUtils;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
@@ -172,7 +173,7 @@ public record ScheduledTransitLegReference(
       .withTripOnServiceDate(tripOnServiceDate)
       .withZoneId(timeZone)
       .withDistanceMeters(
-        ScheduledTransitLeg.computeDistanceMeters(
+        LegUtils.computeDistanceMeters(
           tripPattern,
           fromStopPositionInPattern,
           toStopPositionInPattern

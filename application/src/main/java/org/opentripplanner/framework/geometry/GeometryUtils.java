@@ -283,6 +283,9 @@ public class GeometryUtils {
     return Arrays.stream(envelopes);
   }
 
+  /**
+   * Returns the sum of the distances in between the pairs of coordinates in meters.
+   */
   public static double sumDistances(List<Coordinate> coordinates) {
     double distance = 0;
     for (int i = 1; i < coordinates.size(); i++) {

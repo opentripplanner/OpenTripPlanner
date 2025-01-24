@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -85,7 +84,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.generalizedCost = builder.generalizedCost();
 
     this.accessibilityScore = builder.accessibilityScore();
-    List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
+    List<Coordinate> transitLegCoordinates = LegUtils.extractTransitLegCoordinates(
       tripPattern,
       builder.boardStopIndexInPattern(),
       builder.alightStopIndexInPattern()
@@ -431,39 +430,10 @@ public class ScheduledTransitLeg implements TransitLeg {
       .toString();
   }
 
-  public static double computeDistanceMeters(
-    TripPattern originalTripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern
-  ) {
-    List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
-      originalTripPattern,
-      boardStopIndexInPattern,
-      alightStopIndexInPattern
-    );
-    return GeometryUtils.sumDistances(transitLegCoordinates);
-  }
-
   /**
    * Non-null getter for trip
    */
   private Trip trip() {
     return tripTimes.getTrip();
-  }
-
-  public static List<Coordinate> extractTransitLegCoordinates(
-    TripPattern tripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern
-  ) {
-    List<Coordinate> transitLegCoordinates = new ArrayList<>();
-
-    for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
-      transitLegCoordinates.addAll(
-        Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates())
-      );
-    }
-
-    return transitLegCoordinates;
   }
 }
