@@ -158,7 +158,8 @@
         "io.micrometer:micrometer-registry-influx",
         "com.fasterxml.jackson:{/,}**",
         "com.fasterxml.jackson.datatype::{/,}**"
-      ]
+      ],
+      "automerge": true
     },
     {
       "description": "give some projects time to publish a changelog before opening the PR",
