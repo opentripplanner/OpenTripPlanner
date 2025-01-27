@@ -186,9 +186,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Route getRoute(FeedScopedId id) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      Route realtimeAddedRoute = currentSnapshot.getRealtimeAddedRoute(id);
+    if (this.timetableSnapshot != null) {
+      Route realtimeAddedRoute = this.timetableSnapshot.getRealtimeAddedRoute(id);
       if (realtimeAddedRoute != null) {
         return realtimeAddedRoute;
       }
@@ -263,9 +262,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Trip getTrip(FeedScopedId id) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      Trip trip = currentSnapshot.getRealTimeAddedTrip(id);
+    if (this.timetableSnapshot != null) {
+      Trip trip = this.timetableSnapshot.getRealTimeAddedTrip(id);
       if (trip != null) {
         return trip;
       }
@@ -285,11 +283,10 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public List<TripOnServiceDate> listCanceledTrips() {
     OTPRequestTimeoutException.checkForTimeout();
-    var timetableSnapshot = lazyGetTimeTableSnapShot();
-    if (timetableSnapshot == null) {
+    if (this.timetableSnapshot == null) {
       return List.of();
     }
-    List<TripOnServiceDate> canceledTrips = timetableSnapshot.listCanceledTrips();
+    List<TripOnServiceDate> canceledTrips = this.timetableSnapshot.listCanceledTrips();
     canceledTrips.sort(new TripOnServiceDateComparator());
     return canceledTrips;
   }
@@ -297,11 +294,10 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Trip> listTrips() {
     OTPRequestTimeoutException.checkForTimeout();
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
+    if (this.timetableSnapshot != null) {
       return new CollectionsView<>(
         timetableRepositoryIndex.getAllTrips(),
-        currentSnapshot.listRealTimeAddedTrips()
+        this.timetableSnapshot.listRealTimeAddedTrips()
       );
     }
     return Collections.unmodifiableCollection(timetableRepositoryIndex.getAllTrips());
@@ -310,11 +306,10 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Collection<Route> listRoutes() {
     OTPRequestTimeoutException.checkForTimeout();
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
+    if (this.timetableSnapshot != null) {
       return new CollectionsView<>(
         timetableRepositoryIndex.getAllRoutes(),
-        currentSnapshot.listRealTimeAddedRoutes()
+        this.timetableSnapshot.listRealTimeAddedRoutes()
       );
     }
     return timetableRepositoryIndex.getAllRoutes();
@@ -322,9 +317,9 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripPattern findPattern(Trip trip) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      TripPattern realtimeAddedTripPattern = currentSnapshot.getRealTimeAddedPatternForTrip(trip);
+    if (this.timetableSnapshot != null) {
+      TripPattern realtimeAddedTripPattern =
+        this.timetableSnapshot.getRealTimeAddedPatternForTrip(trip);
       if (realtimeAddedTripPattern != null) {
         return realtimeAddedTripPattern;
       }
@@ -347,11 +342,9 @@ public class DefaultTransitService implements TransitEditorService {
     Collection<TripPattern> tripPatterns = new HashSet<>(
       timetableRepositoryIndex.getPatternsForRoute(route)
     );
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      Collection<TripPattern> realTimeAddedPatternForRoute = currentSnapshot.getRealTimeAddedPatternForRoute(
-        route
-      );
+    if (this.timetableSnapshot != null) {
+      Collection<TripPattern> realTimeAddedPatternForRoute =
+        this.timetableSnapshot.getRealTimeAddedPatternForRoute(route);
       tripPatterns.addAll(realTimeAddedPatternForRoute);
     }
     return tripPatterns;
@@ -472,9 +465,8 @@ public class DefaultTransitService implements TransitEditorService {
     Set<TripPattern> tripPatterns = new HashSet<>(findPatterns(stop));
 
     if (includeRealtimeUpdates) {
-      TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-      if (currentSnapshot != null) {
-        tripPatterns.addAll(currentSnapshot.getPatternsForStop(stop));
+      if (this.timetableSnapshot != null) {
+        tripPatterns.addAll(this.timetableSnapshot.getPatternsForStop(stop));
       }
     }
     return tripPatterns;
@@ -505,47 +497,32 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Timetable findTimetable(TripPattern tripPattern, LocalDate serviceDate) {
     OTPRequestTimeoutException.checkForTimeout();
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    return currentSnapshot != null
-      ? currentSnapshot.resolve(tripPattern, serviceDate)
+    return this.timetableSnapshot != null
+      ? this.timetableSnapshot.resolve(tripPattern, serviceDate)
       : tripPattern.getScheduledTimetable();
   }
 
   @Override
   public TripPattern findNewTripPatternForModifiedTrip(FeedScopedId tripId, LocalDate serviceDate) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot == null) {
+    if (this.timetableSnapshot == null) {
       return null;
     }
-    return currentSnapshot.getNewTripPatternForModifiedTrip(tripId, serviceDate);
+    return this.timetableSnapshot.getNewTripPatternForModifiedTrip(tripId, serviceDate);
   }
 
   @Override
   public boolean hasNewTripPatternsForModifiedTrips() {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot == null) {
+    if (this.timetableSnapshot == null) {
       return false;
     }
-    return currentSnapshot.hasNewTripPatternsForModifiedTrips();
-  }
-
-  /**
-   * Lazy-initialization of TimetableSnapshot
-   *
-   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
-   */
-  @Nullable
-  private TimetableSnapshot lazyGetTimeTableSnapShot() {
-    return this.timetableSnapshot;
+    return this.timetableSnapshot.hasNewTripPatternsForModifiedTrips();
   }
 
   @Override
   public TripOnServiceDate getTripOnServiceDate(FeedScopedId id) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateById(
-        id
-      );
+    if (this.timetableSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate =
+        this.timetableSnapshot.getRealTimeAddedTripOnServiceDateById(id);
       if (tripOnServiceDate != null) {
         return tripOnServiceDate;
       }
@@ -555,11 +532,10 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public Collection<TripOnServiceDate> listTripsOnServiceDate() {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
+    if (this.timetableSnapshot != null) {
       return new CollectionsView<>(
         timetableRepository.getAllTripsOnServiceDates(),
-        currentSnapshot.listRealTimeAddedTripOnServiceDate()
+        this.timetableSnapshot.listRealTimeAddedTripOnServiceDate()
       );
     }
     return timetableRepository.getAllTripsOnServiceDates();
@@ -567,11 +543,9 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate = currentSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(
-        tripIdAndServiceDate
-      );
+    if (this.timetableSnapshot != null) {
+      TripOnServiceDate tripOnServiceDate =
+        this.timetableSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
       if (tripOnServiceDate != null) {
         return tripOnServiceDate;
       }
@@ -593,9 +567,8 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public boolean containsTrip(FeedScopedId id) {
-    TimetableSnapshot currentSnapshot = lazyGetTimeTableSnapShot();
-    if (currentSnapshot != null) {
-      Trip trip = currentSnapshot.getRealTimeAddedTrip(id);
+    if (this.timetableSnapshot != null) {
+      Trip trip = this.timetableSnapshot.getRealTimeAddedTrip(id);
       if (trip != null) {
         return true;
       }
