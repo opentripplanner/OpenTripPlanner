@@ -26,6 +26,7 @@ public class TimetableSnapshotFlush implements Runnable {
     try {
       LOG.debug("Flushing timetable snapshot buffer");
       snapshotManager.purgeAndCommit();
+      LOG.debug("Flushed timetable snapshot buffer");
     } catch (Throwable t) {
       LOG.error("Error flushing timetable snapshot buffer", t);
     }
