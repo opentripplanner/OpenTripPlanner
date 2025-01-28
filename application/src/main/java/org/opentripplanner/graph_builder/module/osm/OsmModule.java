@@ -19,8 +19,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
-import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.DefaultOsmProvider;
+import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
@@ -453,7 +453,8 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private Optional<Platform> getPlatform(OsmWay way) {
-    if (way.isBoardingLocation()) {
+    var references = way.getMultiTagValues(params.boardingAreaRefTags());
+    if (way.isBoardingLocation() && !references.isEmpty()) {
       var nodeRefs = way.getNodeRefs();
       var size = nodeRefs.size();
       var nodes = new Coordinate[size];
@@ -464,8 +465,6 @@ public class OsmModule implements GraphBuilderModule {
       var geometryFactory = GeometryUtils.getGeometryFactory();
 
       var geometry = geometryFactory.createLineString(nodes);
-
-      var references = way.getMultiTagValues(params.boardingAreaRefTags());
 
       return Optional.of(
         new Platform(

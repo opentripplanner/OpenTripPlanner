@@ -166,7 +166,6 @@ public class OsmModuleTest {
     }
   }
 
-
   @Test
   public void testBuildAreaWithoutVisibility() {
     testBuildingAreas(true);
