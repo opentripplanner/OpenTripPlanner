@@ -37,6 +37,7 @@ public class DefaultOsmProvider implements OsmProvider {
 
   private final OsmTagMapper osmTagMapper;
 
+  private final boolean includeSubwayEntrances;
   private final WayPropertySet wayPropertySet;
   private byte[] cachedBytes = null;
 
@@ -46,6 +47,7 @@ public class DefaultOsmProvider implements OsmProvider {
       new FileDataSource(file, FileType.OSM),
       OsmTagMapperSource.DEFAULT,
       null,
+      false,
       cacheDataInMem,
       DataImportIssueStore.NOOP
     );
@@ -55,12 +57,14 @@ public class DefaultOsmProvider implements OsmProvider {
     DataSource dataSource,
     OsmTagMapperSource tagMapperSource,
     ZoneId zoneId,
+    boolean includeSubwayEntrances,
     boolean cacheDataInMem,
     DataImportIssueStore issueStore
   ) {
     this.source = dataSource;
     this.zoneId = zoneId;
     this.osmTagMapper = tagMapperSource.getInstance();
+    this.includeSubwayEntrances = includeSubwayEntrances;
     this.wayPropertySet = new WayPropertySet(issueStore);
     osmTagMapper.populateProperties(wayPropertySet);
     this.cacheDataInMem = cacheDataInMem;
