@@ -4,7 +4,7 @@ import java.util.List;
 import org.opentripplanner.model.fare.FareProductUse;
 
 /**
- * An interface to signal that an entity (typically a leg) can have alerts attached to it.
+ * An interface to signal that an entity (typically a leg) can have fares attached to it.
  */
 public interface FareProductAware<T> {
   /**

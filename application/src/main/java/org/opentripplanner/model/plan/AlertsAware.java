@@ -4,7 +4,7 @@ import java.util.Set;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 /**
- * An interface to signal that an entity (typically a leg) can have fares attached to it.
+ * An interface to signal that an entity (typically a leg) can have alerts attached to it.
  */
 public interface AlertsAware<T> {
   Set<TransitAlert> getTransitAlerts();
