@@ -4,6 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
@@ -14,6 +15,11 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   @Override
   public DataFetcher<Boolean> allowPickupNow() {
     return environment -> getSource(environment).allowPickupNow();
+  }
+
+  @Override
+  public DataFetcher<RentalVehicleFuel> fuel() {
+    return environment -> getSource(environment).getFuel();
   }
 
   @Override
