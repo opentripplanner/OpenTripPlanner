@@ -21,8 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parser for the OpenStreetMap PBF format. Parses files in three passes: First the relations, then
- * the ways, then the nodes are also loaded.
+ * Implementation of the provider interface that reads OSM binary files from disk.
  */
 public class DefaultOsmProvider implements OsmProvider {
 
