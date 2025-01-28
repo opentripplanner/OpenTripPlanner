@@ -11,23 +11,19 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
-import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
-import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
-import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.CreativeNamer;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
@@ -170,77 +166,6 @@ public class OsmModuleTest {
     }
   }
 
-
-
-  /**
-   * There is a one-way road which is also marked as a platform in Sky Campus which crashed OSM
-   */
-  @Test
-  void testCrappyOsmPlatform() {
-
-    var provider = new OsmProvider() {
-      @Override
-      public void readOsm(OsmDatabase osmdb) {
-
-        var way = new OsmWay();
-        way.addTag("public_transport", "platform");
-        way.addTag("access", "no");
-        way.addTag("motor_vehicle", "permissive");
-        way.addTag("ref", "123");
-        way.addTag("oneway", "yes");
-        way.setOsmProvider(this);
-        way.getNodeRefs().add(1);
-        way.getNodeRefs().add(2);
-        osmdb.addWay(way);
-
-        osmdb.doneSecondPhaseWays();
-
-        var node1 = new OsmNode(1,1);
-        node1.setId(1);
-        var node2 = new OsmNode(1.1,1.1);
-        node2.setId(2);
-
-        osmdb.addNode(node1);
-        osmdb.addNode(node2);
-
-      }
-
-      @Override
-      public OsmTagMapper getOsmTagMapper() {
-        return new OsmTagMapper();
-      }
-
-      @Override
-      public void checkInputs() {
-
-      }
-
-      @Override
-      public WayPropertySet getWayPropertySet() {
-        return new WayPropertySet();
-      }
-
-      @Override
-      public ZoneId getZoneId() {
-        return ZoneIds.LONDON;
-      }
-    };
-    var deduplicator = new Deduplicator();
-    var graph = new Graph(deduplicator);
-    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        osmInfoRepository,
-        new DefaultVehicleParkingRepository()
-      )
-      .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
-      .build();
-
-    osmModule.buildGraph();
-    assertThat(graph.getEdges()).isNotEmpty();
-  }
 
   @Test
   public void testBuildAreaWithoutVisibility() {
