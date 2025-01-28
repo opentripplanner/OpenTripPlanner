@@ -22,9 +22,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public boolean isReserved = false;
   public boolean isDisabled = false;
   public Instant lastReported;
-  public Double currentRangeMeters;
   public VehicleRentalStation station;
   public String pricingPlanId;
+  public RentalVehicleFuel fuel;
 
   @Override
   public FeedScopedId getId() {
@@ -132,5 +132,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   @Override
   public VehicleRentalSystem getVehicleRentalSystem() {
     return system;
+  }
+
+  public RentalVehicleFuel getFuel() {
+    return fuel;
   }
 }

@@ -58,6 +58,7 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -908,6 +909,8 @@ public class GraphQLDataFetchers {
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
 
+    public DataFetcher<RentalVehicleFuel> fuel();
+
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
     public DataFetcher<Double> lat();
@@ -933,6 +936,13 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<RentalVehicleTypeCount>> byType();
 
     public DataFetcher<Integer> total();
+  }
+
+  /** Rental vehicle fuel represent the current status of the battery or fuel of a rental vehicle */
+  public interface GraphQLRentalVehicleFuel {
+    public DataFetcher<Double> percent();
+
+    public DataFetcher<Integer> range();
   }
 
   public interface GraphQLRentalVehicleType {
