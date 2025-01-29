@@ -80,6 +80,7 @@ public class DefaultTransitService implements TransitEditorService {
   /**
    * This should only be accessed through the getTimetableSnapshot method.
    */
+  @Nullable
   private final TimetableSnapshot timetableSnapshot;
 
   /**
