@@ -19,11 +19,10 @@ public class FlexAccessFactory {
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator pathCalculator,
     Duration maxTransferDuration,
-    TransitService transitService,
-    List<TransitFilter> filters
+    FlexTransitFilter filter
   ) {
     this.callbackService = callbackService;
-    this.filter = new FlexTransitFilter(transitService, filters);
+    this.filter = filter;
     this.templateFactory = FlexTemplateFactory.of(pathCalculator, maxTransferDuration);
   }
 

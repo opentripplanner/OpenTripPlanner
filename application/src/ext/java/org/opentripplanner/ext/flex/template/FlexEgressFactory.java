@@ -10,14 +10,17 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 public class FlexEgressFactory {
 
   private final FlexAccessEgressCallbackAdapter callbackService;
+  private final FlexTransitFilter filter;
   private final FlexTemplateFactory templateFactory;
 
   public FlexEgressFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator pathCalculator,
-    Duration maxTransferDuration
+    Duration maxTransferDuration,
+    FlexTransitFilter filter
   ) {
     this.callbackService = callbackService;
+    this.filter = filter;
     this.templateFactory = FlexTemplateFactory.of(pathCalculator, maxTransferDuration);
   }
 
@@ -40,6 +43,7 @@ public class FlexEgressFactory {
     var closestFlexTrips = ClosestTrip.of(callbackService, streetEgresses, dates, false);
     return closestFlexTrips
       .stream()
+      .filter(filter::matchesTransitFilters)
       .flatMap(it -> templateFactory.createEgressTemplates(it).stream())
       .toList();
   }

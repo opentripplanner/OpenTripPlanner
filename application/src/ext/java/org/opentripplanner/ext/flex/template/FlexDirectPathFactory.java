@@ -25,23 +25,20 @@ public class FlexDirectPathFactory {
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
   private final Duration maxTransferDuration;
-  private final TransitService transitService;
-  private final List<TransitFilter> filters;
+  private final FlexTransitFilter filter;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
     Duration maxTransferDuration,
-    TransitService transitService,
-    List<TransitFilter> filters
+    FlexTransitFilter filter
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;
     this.egressPathCalculator = egressPathCalculator;
     this.maxTransferDuration = maxTransferDuration;
-    this.transitService = transitService;
-    this.filters = filters;
+    this.filter = filter;
   }
 
   public Collection<DirectFlexPath> calculateDirectFlexPaths(
@@ -57,15 +54,15 @@ public class FlexDirectPathFactory {
       callbackService,
       accessPathCalculator,
       maxTransferDuration,
-      transitService,
-      filters
+      filter
     )
       .calculateFlexAccessTemplates(streetAccesses, dates);
 
     var flexEgressTemplates = new FlexEgressFactory(
       callbackService,
       egressPathCalculator,
-      maxTransferDuration
+      maxTransferDuration,
+      filter
     )
       .calculateFlexEgressTemplates(streetEgresses, dates);
 

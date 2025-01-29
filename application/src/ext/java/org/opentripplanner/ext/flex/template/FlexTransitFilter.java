@@ -5,17 +5,17 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.transit.service.TransitService;
 
-class FlexTransitFilter {
+public class FlexTransitFilter {
 
   private final TransitService transitService;
   private final List<TransitFilter> filters;
 
-  FlexTransitFilter(TransitService transitService, List<TransitFilter> filters) {
+  public FlexTransitFilter(TransitService transitService, List<TransitFilter> filters) {
     this.transitService = transitService;
     this.filters = filters;
   }
 
-  boolean matchesTransitFilters(ClosestTrip trip) {
+  public boolean matchesTransitFilters(ClosestTrip trip) {
     var t = trip.flexTrip().getTrip() ;
     var pattern = Objects.requireNonNull(transitService.findPattern(t), "flex trip doesn't have a pattern.");
     for (TransitFilter filter : filters) {

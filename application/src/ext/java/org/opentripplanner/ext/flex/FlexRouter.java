@@ -18,6 +18,7 @@ import org.opentripplanner.ext.flex.template.FlexAccessFactory;
 import org.opentripplanner.ext.flex.template.FlexDirectPathFactory;
 import org.opentripplanner.ext.flex.template.FlexEgressFactory;
 import org.opentripplanner.ext.flex.template.FlexServiceDate;
+import org.opentripplanner.ext.flex.template.FlexTransitFilter;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.PathTransfer;
@@ -40,7 +41,6 @@ public class FlexRouter {
   private final Graph graph;
   private final TransitService transitService;
   private final FlexParameters flexParameters;
-  private final List<TransitFilter> filters;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
   private final FlexIndex flexIndex;
@@ -54,12 +54,14 @@ public class FlexRouter {
   private final int requestedTime;
   private final int requestedBookingTime;
   private final List<FlexServiceDate> dates;
+  private final FlexTransitFilter flexTransitFilter;
 
   public FlexRouter(
     Graph graph,
     TransitService transitService,
     FlexParameters flexParameters,
-    List<TransitFilter> filters, Instant requestedTime,
+    List<TransitFilter> filters,
+    Instant requestedTime,
     @Nullable Instant requestedBookingTime,
     int additionalPastSearchDays,
     int additionalFutureSearchDays,
@@ -69,10 +71,10 @@ public class FlexRouter {
     this.graph = graph;
     this.transitService = transitService;
     this.flexParameters = flexParameters;
-    this.filters = filters;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
+    this.flexTransitFilter = new FlexTransitFilter(transitService, filters);
     this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
@@ -118,8 +120,7 @@ public class FlexRouter {
       accessFlexPathCalculator,
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration(),
-      transitService,
-      filters
+      flexTransitFilter
     )
       .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
@@ -145,8 +146,7 @@ public class FlexRouter {
       callbackService,
       accessFlexPathCalculator,
       flexParameters.maxTransferDuration(),
-      transitService,
-      filters
+      flexTransitFilter
     )
       .createFlexAccesses(streetAccesses, dates);
   }
@@ -156,7 +156,8 @@ public class FlexRouter {
     return new FlexEgressFactory(
       callbackService,
       egressFlexPathCalculator,
-      flexParameters.maxTransferDuration()
+      flexParameters.maxTransferDuration(),
+      flexTransitFilter
     )
       .createFlexEgresses(streetEgresses, dates);
   }
