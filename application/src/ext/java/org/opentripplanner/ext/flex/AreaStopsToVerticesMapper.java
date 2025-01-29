@@ -54,9 +54,9 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {
-        var matchedVertices = matchingVerticesForStop(streetIndex, areaStop);
         // Keep lambda! A method-ref would cause incorrect class and line number to be logged
         progress.step(m -> LOG.info(m));
+        var matchedVertices = matchingVerticesForStop(streetIndex, areaStop);
         return matchedVertices;
       });
 
