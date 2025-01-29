@@ -109,7 +109,7 @@
     },
     {
       "groupName": "Update GTFS API code generation in a single PR",
-      "matchFiles": ["src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
+      "matchFiles": ["application/src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
       "reviewers": ["optionsome", "leonardehrenfried"],
       "schedule": "on the 11th through 12th day of the month"
     },
