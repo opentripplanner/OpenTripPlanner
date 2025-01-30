@@ -36,7 +36,13 @@ public class AlertMetrics implements MeterBinder {
 
   @Override
   public void bindTo(MeterRegistry meterRegistry) {
-    this.statuses = MultiGauge.builder("alerts").register(meterRegistry);
+    this.statuses =
+      MultiGauge
+        .builder("alerts")
+        .description(
+          "Total number of alerts (sourced from GTFS-Alerts and SIRI-SX), in the system."
+        )
+        .register(meterRegistry);
     ApplicationShutdownSupport.addShutdownHook("alert-metrics-shutdown", scheduler::shutdownNow);
   }
 

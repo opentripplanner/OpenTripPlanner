@@ -23,7 +23,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for
