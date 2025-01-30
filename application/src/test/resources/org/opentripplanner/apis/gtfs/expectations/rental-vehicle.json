@@ -15,6 +15,10 @@
       "rentalNetwork": {
         "networkId": "Network-1",
         "url": "https://foo.bar"
+      },
+      "fuel": {
+        "percent": 0.5,
+        "range": 5501
       }
     }
   }

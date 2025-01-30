@@ -26,39 +26,46 @@ export function ItineraryListContainer({
   const timeZone = useContext(TimeZoneContext);
 
   return (
-    <section className="itinerary-list-container below-content" ref={containerRef}>
-      <ItineraryPaginationControl
-        onPagination={pageResults}
-        previousPageCursor={tripQueryResult?.trip.previousPageCursor}
-        nextPageCursor={tripQueryResult?.trip.nextPageCursor}
-        loading={loading}
-      />
-      <Accordion
-        activeKey={`${selectedTripPatternIndex}`}
-        onSelect={(eventKey) => setSelectedTripPatternIndex(parseInt(eventKey as string))}
-      >
-        {tripQueryResult &&
-          tripQueryResult.trip.tripPatterns.map((tripPattern, itineraryIndex) => (
-            <Accordion.Item
-              eventKey={`${itineraryIndex}`}
-              key={`${itineraryIndex}`}
-              bsPrefix={tripPattern.systemNotices.length === 0 ? '' : 'accordion-item-filtered'}
-            >
-              <Accordion.Header>
-                <ItineraryHeaderContent
-                  containerWidth={containerWidth}
-                  tripPattern={tripPattern}
-                  itineraryIndex={itineraryIndex}
-                  earliestStartTime={earliestStartTime}
-                  latestEndTime={latestEndTime}
-                />
-              </Accordion.Header>
-              <Accordion.Body>
-                <ItineraryDetails tripPattern={tripPattern} />
-              </Accordion.Body>
-            </Accordion.Item>
-          ))}
-      </Accordion>
+    <section className="left-pane-container below-content" ref={containerRef}>
+      <>
+        <div className="panel-header">Itinerary results</div>
+        <div className="pagination-controls">
+          <ItineraryPaginationControl
+            onPagination={pageResults}
+            previousPageCursor={tripQueryResult?.trip.previousPageCursor}
+            nextPageCursor={tripQueryResult?.trip.nextPageCursor}
+            loading={loading}
+          />
+        </div>
+        <Accordion
+          activeKey={`${selectedTripPatternIndex}`}
+          onSelect={(eventKey) => setSelectedTripPatternIndex(parseInt(eventKey as string))}
+        >
+          {tripQueryResult &&
+            tripQueryResult.trip.tripPatterns.map((tripPattern, itineraryIndex) => (
+              <Accordion.Item
+                eventKey={`${itineraryIndex}`}
+                key={`${itineraryIndex}`}
+                bsPrefix={tripPattern.systemNotices.length === 0 ? '' : 'accordion-item-filtered'}
+              >
+                <Accordion.Header>
+                  <ItineraryHeaderContent
+                    containerWidth={containerWidth}
+                    tripPattern={tripPattern}
+                    itineraryIndex={itineraryIndex}
+                    earliestStartTime={earliestStartTime}
+                    latestEndTime={latestEndTime}
+                  />
+                </Accordion.Header>
+                <Accordion.Body>
+                  <ItineraryDetails tripPattern={tripPattern} />
+                </Accordion.Body>
+              </Accordion.Item>
+            ))}
+        </Accordion>
+      </>
+
+      {/* Time Zone Info */}
       <div className="time-zone-info">
         All times in <code>{timeZone}</code>
       </div>

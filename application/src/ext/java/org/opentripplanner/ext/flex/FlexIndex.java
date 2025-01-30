@@ -64,6 +64,10 @@ public class FlexIndex {
     return routeById.get(id);
   }
 
+  public boolean contains(Route route) {
+    return routeById.containsKey(route.getId());
+  }
+
   public Collection<Route> getAllFlexRoutes() {
     return routeById.values();
   }
