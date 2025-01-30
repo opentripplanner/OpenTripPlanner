@@ -17,6 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.BikePreferences;
+import org.opentripplanner.routing.api.request.preference.CarPreferences;
+import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
+import org.opentripplanner.routing.api.request.preference.TransferPreferences;
+import org.opentripplanner.routing.api.request.preference.TransitPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
+import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 
 /**
  * GraphQL type visitor that injects default values to input fields and query arguments from code
@@ -75,118 +84,152 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     var builder = new DefaultMappingBuilder()
       .intReq("planConnection.first", defaultRouteRequest.numItineraries())
       .stringOpt("planConnection.searchWindow", defaultRouteRequest.searchWindow());
-    {
-      var bike = defaultRouteRequest.preferences().bike();
-      builder
-        .intReq("BicyclePreferencesInput.boardCost", bike.boardCost())
-        .floatReq("BicyclePreferencesInput.reluctance", bike.reluctance())
-        .floatReq("BicyclePreferencesInput.speed", bike.speed());
-      {
-        var bikeParking = bike.parking();
-        builder.intReq(
-          "BicycleParkingPreferencesInput.unpreferredCost",
-          bikeParking.unpreferredVehicleParkingTagCost().toSeconds()
-        );
-      }
-      {
-        var bikeRental = bike.rental();
-        builder
-          .boolReq(
-            "DestinationBicyclePolicyInput.allowKeeping",
-            bikeRental.allowArrivingInRentedVehicleAtDestination()
-          )
-          .intReq(
-            "DestinationBicyclePolicyInput.keepingCost",
-            bikeRental.arrivingInRentalVehicleAtDestinationCost().toSeconds()
-          );
-      }
-      {
-        var bikeWalking = bike.walking();
-        builder
-          .intReq(
-            "BicycleWalkPreferencesCostInput.mountDismountCost",
-            bikeWalking.mountDismountCost().toSeconds()
-          )
-          .floatReq("BicycleWalkPreferencesCostInput.reluctance", bikeWalking.reluctance())
-          .stringReq(
-            "BicycleWalkPreferencesInput.mountDismountTime",
-            bikeWalking.mountDismountTime()
-          )
-          .floatReq("BicycleWalkPreferencesInput.speed", bikeWalking.speed());
-      }
-    }
-    {
-      var car = defaultRouteRequest.preferences().car();
-      builder.floatReq("CarPreferencesInput.reluctance", car.reluctance());
-      {
-        var parking = car.parking();
-        builder.intReq(
-          "CarParkingPreferencesInput.unpreferredCost",
-          parking.unpreferredVehicleParkingTagCost().toSeconds()
-        );
-      }
-    }
-    {
-      var scooter = defaultRouteRequest.preferences().scooter();
-      builder
-        .floatReq("ScooterPreferencesInput.reluctance", scooter.reluctance())
-        .floatReq("ScooterPreferencesInput.speed", scooter.speed());
-      {
-        var rental = scooter.rental();
-        builder
-          .boolReq(
-            "DestinationScooterPolicyInput.allowKeeping",
-            rental.allowArrivingInRentedVehicleAtDestination()
-          )
-          .intReq(
-            "DestinationScooterPolicyInput.keepingCost",
-            rental.arrivingInRentalVehicleAtDestinationCost().toSeconds()
-          );
-      }
-    }
-    {
-      var transit = defaultRouteRequest.preferences().transit();
-      builder
-        .stringReq("AlightPreferencesInput.slack", transit.alightSlack().defaultValue())
-        .stringReq("BoardPreferencesInput.slack", transit.boardSlack().defaultValue())
-        .boolReq(
-          "TimetablePreferencesInput.excludeRealTimeUpdates",
-          transit.ignoreRealtimeUpdates()
-        )
-        .boolReq(
-          "TimetablePreferencesInput.includePlannedCancellations",
-          transit.includePlannedCancellations()
-        )
-        .boolReq(
-          "TimetablePreferencesInput.includeRealTimeCancellations",
-          transit.includeRealtimeCancellations()
-        );
-    }
-    {
-      var transfer = defaultRouteRequest.preferences().transfer();
-      builder
-        .floatReq("BoardPreferencesInput.waitReluctance", transfer.waitReluctance())
-        .intReq("TransferPreferencesInput.cost", transfer.cost())
-        .intReq(
-          "TransferPreferencesInput.maximumAdditionalTransfers",
-          transfer.maxAdditionalTransfers()
-        )
-        // Max transfers are wrong in the internal model but fixed in the API mapping
-        .intReq("TransferPreferencesInput.maximumTransfers", transfer.maxTransfers() - 1)
-        .stringReq("TransferPreferencesInput.slack", transfer.slack());
-    }
-    {
-      var walk = defaultRouteRequest.preferences().walk();
-      builder
-        .intReq("WalkPreferencesInput.boardCost", walk.boardCost())
-        .floatReq("WalkPreferencesInput.reluctance", walk.reluctance())
-        .floatReq("WalkPreferencesInput.safetyFactor", walk.safetyFactor())
-        .floatReq("WalkPreferencesInput.speed", walk.speed());
-    }
-    {
-      builder.boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair());
-    }
+    setBikeDefaults(defaultRouteRequest.preferences().bike(), builder);
+    setCarDefaults(defaultRouteRequest.preferences().car(), builder);
+    setScooterDefaults(defaultRouteRequest.preferences().scooter(), builder);
+    setTransitDefaults(defaultRouteRequest.preferences().transit(), builder);
+    setTransferDefaults(defaultRouteRequest.preferences().transfer(), builder);
+    setWalkDefaults(defaultRouteRequest.preferences().walk(), builder);
+    setWheelchairDefaults(defaultRouteRequest, builder);
     return builder.build();
+  }
+
+  private static void setBikeDefaults(BikePreferences bike, DefaultMappingBuilder builder) {
+    builder
+      .intReq("BicyclePreferencesInput.boardCost", bike.boardCost())
+      .floatReq("BicyclePreferencesInput.reluctance", bike.reluctance())
+      .floatReq("BicyclePreferencesInput.speed", bike.speed());
+    setBikeParkingDefaults(bike.parking(), builder);
+    setBikeRentalDefaults(bike.rental(), builder);
+    setBikeWalkingDefaults(bike.walking(), builder);
+  }
+
+  private static void setBikeParkingDefaults(
+    VehicleParkingPreferences parking,
+    DefaultMappingBuilder builder
+  ) {
+    builder.intReq(
+      "BicycleParkingPreferencesInput.unpreferredCost",
+      parking.unpreferredVehicleParkingTagCost().toSeconds()
+    );
+  }
+
+  private static void setBikeRentalDefaults(
+    VehicleRentalPreferences rental,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .boolReq(
+        "DestinationBicyclePolicyInput.allowKeeping",
+        rental.allowArrivingInRentedVehicleAtDestination()
+      )
+      .intReq(
+        "DestinationBicyclePolicyInput.keepingCost",
+        rental.arrivingInRentalVehicleAtDestinationCost().toSeconds()
+      );
+  }
+
+  private static void setBikeWalkingDefaults(
+    VehicleWalkingPreferences walking,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .intReq(
+        "BicycleWalkPreferencesCostInput.mountDismountCost",
+        walking.mountDismountCost().toSeconds()
+      )
+      .floatReq("BicycleWalkPreferencesCostInput.reluctance", walking.reluctance())
+      .stringReq("BicycleWalkPreferencesInput.mountDismountTime", walking.mountDismountTime())
+      .floatReq("BicycleWalkPreferencesInput.speed", walking.speed());
+  }
+
+  private static void setCarDefaults(CarPreferences car, DefaultMappingBuilder builder) {
+    builder.floatReq("CarPreferencesInput.reluctance", car.reluctance());
+    setCarParkingDefaults(car.parking(), builder);
+  }
+
+  private static void setCarParkingDefaults(
+    VehicleParkingPreferences parking,
+    DefaultMappingBuilder builder
+  ) {
+    builder.intReq(
+      "CarParkingPreferencesInput.unpreferredCost",
+      parking.unpreferredVehicleParkingTagCost().toSeconds()
+    );
+  }
+
+  private static void setScooterDefaults(
+    ScooterPreferences scooter,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .floatReq("ScooterPreferencesInput.reluctance", scooter.reluctance())
+      .floatReq("ScooterPreferencesInput.speed", scooter.speed());
+    setScooterRentalDefaults(scooter.rental(), builder);
+  }
+
+  private static void setScooterRentalDefaults(
+    VehicleRentalPreferences rental,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .boolReq(
+        "DestinationScooterPolicyInput.allowKeeping",
+        rental.allowArrivingInRentedVehicleAtDestination()
+      )
+      .intReq(
+        "DestinationScooterPolicyInput.keepingCost",
+        rental.arrivingInRentalVehicleAtDestinationCost().toSeconds()
+      );
+  }
+
+  private static void setTransitDefaults(
+    TransitPreferences transit,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .stringReq("AlightPreferencesInput.slack", transit.alightSlack().defaultValue())
+      .stringReq("BoardPreferencesInput.slack", transit.boardSlack().defaultValue())
+      .boolReq("TimetablePreferencesInput.excludeRealTimeUpdates", transit.ignoreRealtimeUpdates())
+      .boolReq(
+        "TimetablePreferencesInput.includePlannedCancellations",
+        transit.includePlannedCancellations()
+      )
+      .boolReq(
+        "TimetablePreferencesInput.includeRealTimeCancellations",
+        transit.includeRealtimeCancellations()
+      );
+  }
+
+  private static void setTransferDefaults(
+    TransferPreferences transfer,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .floatReq("BoardPreferencesInput.waitReluctance", transfer.waitReluctance())
+      .intReq("TransferPreferencesInput.cost", transfer.cost())
+      .intReq(
+        "TransferPreferencesInput.maximumAdditionalTransfers",
+        transfer.maxAdditionalTransfers()
+      )
+      // Max transfers are wrong in the internal model but fixed in the API mapping
+      .intReq("TransferPreferencesInput.maximumTransfers", transfer.maxTransfers() - 1)
+      .stringReq("TransferPreferencesInput.slack", transfer.slack());
+  }
+
+  private static void setWalkDefaults(WalkPreferences walk, DefaultMappingBuilder builder) {
+    builder
+      .intReq("WalkPreferencesInput.boardCost", walk.boardCost())
+      .floatReq("WalkPreferencesInput.reluctance", walk.reluctance())
+      .floatReq("WalkPreferencesInput.safetyFactor", walk.safetyFactor())
+      .floatReq("WalkPreferencesInput.speed", walk.speed());
+  }
+
+  private static void setWheelchairDefaults(
+    RouteRequest defaultRouteRequest,
+    DefaultMappingBuilder builder
+  ) {
+    builder.boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair());
   }
 
   private static class DefaultMappingBuilder {
