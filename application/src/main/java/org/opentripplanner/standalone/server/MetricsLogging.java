@@ -105,7 +105,5 @@ public class MetricsLogging {
     issueCount.forEach((issueType, number) ->
       Metrics.globalRegistry.gauge("graph_build_issues", List.of(Tag.of("type", issueType)), number)
     );
-
-
   }
 }
