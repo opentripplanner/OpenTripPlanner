@@ -8,6 +8,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -43,7 +44,8 @@ public final class WalkStep {
   private final double angle;
   private final boolean walkingBike;
 
-  private final String exit;
+  private final String highwayExit;
+  private final Entrance entrance;
   private final ElevationProfile elevationProfile;
   private final boolean stayOn;
 
@@ -55,7 +57,8 @@ public final class WalkStep {
     AbsoluteDirection absoluteDirection,
     I18NString directionText,
     Set<StreetNote> streetNotes,
-    String exit,
+    String highwayExit,
+    Entrance entrance,
     ElevationProfile elevationProfile,
     boolean nameIsDerived,
     boolean walkingBike,
@@ -75,7 +78,8 @@ public final class WalkStep {
     this.angle = DoubleUtils.roundTo2Decimals(angle);
     this.walkingBike = walkingBike;
     this.area = area;
-    this.exit = exit;
+    this.highwayExit = highwayExit;
+    this.entrance = entrance;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
     this.edges = List.copyOf(Objects.requireNonNull(edges));
@@ -126,8 +130,15 @@ public final class WalkStep {
   /**
    * When exiting a highway or traffic circle, the exit name/number.
    */
-  public String getExit() {
-    return exit;
+  public Optional<String> highwayExit() {
+    return Optional.ofNullable(highwayExit);
+  }
+
+  /**
+   * Get information about a subway station entrance or exit.
+   */
+  public Optional<Entrance> entrance() {
+    return Optional.ofNullable(entrance);
   }
 
   /**

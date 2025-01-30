@@ -30,13 +30,14 @@
     copy them directly into your environment, or perhaps include them in your
     favored resource bundler.
    -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/graphiql@3.0.4/graphiql.min.css" integrity="sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/graphiql@3.8.3/graphiql.min.css" integrity="sha256-sYaCR/jgUCzYaeWB9fPLVbM0hi5/UbHWy6zhEFm5rcI=" crossorigin="anonymous">
   <title>OTP GraphQL Explorer</title>
 </head>
 
 <body>
 <div id="graphiql">Loading...</div>
-<script src="https://cdn.jsdelivr.net/npm/graphiql@3.0.4/graphiql.min.js" integrity="sha256-t0BNtgZ2L82dpHhlgKJl4yJ1tbQxcp1N5NkEjR82A7E=" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/graphiql@3.8.3/graphiql.min.js" integrity="sha256-IvqrlAZ7aV5feVlhn75obrzIlVACoMl9mGvLukrUvCw=" crossorigin="anonymous"></script>
 
 <script>
   const gtfsExampleQuery = `
@@ -131,6 +132,11 @@ query TransmodelExampleQuery {
     updateURL();
   }
 
+  function onEditHeaders(headers) {
+    parameters.headers = headers;
+    updateURL();
+  }
+
   function updateURL() {
     if(parameters["query"] !== gtfsExampleQuery && parameters["query"] !== transmodelExampleQuery) {
 
@@ -168,16 +174,18 @@ query TransmodelExampleQuery {
     window.location.reload();
   };
 
-  function graphQLFetcher(graphQLParams) {
+  function graphQLFetcher(query, { headers }) {
+    const defaultHeaders = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    }
+    const mergedHeaders = Object.assign({}, defaultHeaders, headers);
     return fetch(
             urls[apiFlavor],
             {
               method: 'post',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(graphQLParams),
+              headers: mergedHeaders,
+              body: JSON.stringify(query),
               credentials: 'omit',
             },
     ).then(function (response) {
@@ -198,10 +206,12 @@ query TransmodelExampleQuery {
             defaultVariableEditorOpen: true,
             query: parameters.query || defaultQueries[apiFlavor],
             variables: parameters.variables,
+            headers: parameters.headers,
             operationName: parameters.operationName,
             onEditQuery: onEditQuery,
             onEditVariables: onEditVariables,
             onEditOperationName: onEditOperationName,
+            onEditHeaders: onEditHeaders,
             defaultEditorToolsVisibility: true
           },
           React.createElement(GraphiQL.Logo, {}, [header, select]));
