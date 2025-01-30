@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This class is responsible for wiring up various metrics to micrometer, which we use for
@@ -47,6 +48,7 @@ public class MetricsLogging {
     new LogbackMetrics().bindTo(Metrics.globalRegistry);
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
+    new AlertMetrics(timetableRepository).bindTo(Metrics.globalRegistry);
 
     if (timetableRepository.getTransitLayer() != null) {
       new GuavaCacheMetrics(
@@ -103,5 +105,7 @@ public class MetricsLogging {
     issueCount.forEach((issueType, number) ->
       Metrics.globalRegistry.gauge("graph_build_issues", List.of(Tag.of("type", issueType)), number)
     );
+
+
   }
 }
