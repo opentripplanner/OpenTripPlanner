@@ -30,10 +30,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
    * Feed id that is used for the trip ids in the TripUpdates
    */
   private final String feedId;
-  /**
-   * Parent update manager. Is used to execute graph writer runnables.
-   */
-  protected WriteToGraphCallback saveResultOnGraph;
 
   private final EstimatedTimetableHandler estimatedTimetableHandler;
 
@@ -58,11 +54,6 @@ public class SiriETUpdater extends PollingGraphUpdater {
       new EstimatedTimetableHandler(timetableSnapshotSource, config.fuzzyTripMatching(), feedId);
 
     this.metricsConsumer = metricsConsumer;
-  }
-
-  @Override
-  public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
   }
 
   /**

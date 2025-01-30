@@ -113,7 +113,7 @@ public class FlexDirectPathFactory {
 
     final State[] afterFlexState = flexEdge.traverse(accessNearbyStop.state);
 
-    var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState, egress.edges);
+    var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], egress.edges);
 
     if (finalStateOpt.isEmpty()) {
       return Optional.empty();

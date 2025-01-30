@@ -36,6 +36,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Route
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -239,6 +240,7 @@ public class TransitRouter {
 
   private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
     var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
+    StreetMode mode = streetRequest.mode();
 
     // Prepare access/egress lists
     RouteRequest accessRequest = request.clone();
@@ -252,13 +254,15 @@ public class TransitRouter {
       });
     }
 
-    Duration durationLimit = accessRequest
+    AccessEgressPreferences accessEgressPreferences = accessRequest
       .preferences()
       .street()
-      .accessEgress()
-      .maxDuration()
-      .valueOf(streetRequest.mode());
-    int stopCountLimit = accessRequest.preferences().street().accessEgress().maxStopCount();
+      .accessEgress();
+
+    Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
+    int stopCountLimit = accessEgressPreferences
+      .maxStopCountForMode()
+      .getOrDefault(mode, accessEgressPreferences.defaultMaxStopCount());
 
     var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
@@ -275,7 +279,7 @@ public class TransitRouter {
     var results = new ArrayList<>(accessEgresses);
 
     // Special handling of flex accesses
-    if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
+    if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
         temporaryVerticesContainer,
