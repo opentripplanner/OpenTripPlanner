@@ -289,7 +289,7 @@ public class GeometryUtils {
   public static double sumDistances(List<Coordinate> coordinates) {
     double distance = 0;
     for (int i = 1; i < coordinates.size(); i++) {
-      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
+      distance += SphericalDistanceLibrary.distance(coordinates.get(i - 1), coordinates.get(i));
     }
     return distance;
   }
