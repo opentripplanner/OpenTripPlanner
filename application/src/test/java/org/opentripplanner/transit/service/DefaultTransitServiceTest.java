@@ -160,7 +160,7 @@ class DefaultTransitServiceTest {
       new RealTimeTripUpdate(REAL_TIME_PATTERN, REALTIME_TRIP_TIMES, SERVICE_DATE)
     );
     timetableSnapshot.update(
-      new RealTimeTripUpdate(REAL_TIME_PATTERN, ADDED_TRIP_TIMES, SERVICE_DATE)
+      new RealTimeTripUpdate(REAL_TIME_PATTERN, ADDED_TRIP_TIMES, SERVICE_DATE, null, true, false)
     );
 
     var snapshot = timetableSnapshot.commit();

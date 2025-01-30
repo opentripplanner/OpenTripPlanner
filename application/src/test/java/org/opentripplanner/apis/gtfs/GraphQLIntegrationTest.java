@@ -165,6 +165,7 @@ class GraphQLIntegrationTest {
   private static final int TEN_MINUTES = 10 * 60;
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
+  private static final int SERVICE_CODE = 0;
 
   private static GraphQLRequestContext context;
 
@@ -206,12 +207,9 @@ class GraphQLIntegrationTest {
     var stopTimes2 = TEST_MODEL.stopTimesEvery5Minutes(3, trip2, "11:30");
     var tripTimes2 = TripTimesFactory.tripTimes(trip2, stopTimes2, DEDUPLICATOR);
 
-    var calendar = new CalendarServiceData();
-    FeedScopedId serviceId = calendar.getOrCreateServiceIdForDate(SERVICE_DATE);
-
     var tripToBeReplaced = TimetableRepositoryForTest
       .trip(REPLACEMENT_TRIP_ID)
-      .withServiceId(serviceId)
+      .withServiceId(cal_id)
       .build();
     final TripPattern pattern = TEST_MODEL
       .pattern(BUS)
@@ -259,15 +257,29 @@ class GraphQLIntegrationTest {
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
+    // Crate a calendar (needed for testing cancelled trips)
+    CalendarServiceData calendarServiceData = new CalendarServiceData();
+    var firstDate = LocalDate.of(2024, 8, 8);
+    var secondDate = LocalDate.of(2024, 8, 9);
+    calendarServiceData.putServiceDatesForServiceId(
+      cal_id,
+      List.of(firstDate, secondDate, SERVICE_DATE)
+    );
+    timetableRepository.getServiceCodes().put(cal_id, SERVICE_CODE);
+    timetableRepository.updateCalendarServiceData(
+      true,
+      calendarServiceData,
+      DataImportIssueStore.NOOP
+    );
+    timetableRepository.index();
+    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
+    tripTimes2.cancelTrip();
+    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+
     TransitEditorService transitService = new DefaultTransitService(timetableRepository) {
       private final TransitAlertService alertService = new TransitAlertServiceImpl(
         timetableRepository
       );
-
-      private final Trip addedTrip = Trip
-        .of(new FeedScopedId(FEED_ID, ADDED_TRIP_ID))
-        .withRoute(busRoute)
-        .build();
 
       @Override
       public List<TransitMode> findTransitModes(StopLocation stop) {
@@ -283,68 +295,44 @@ class GraphQLIntegrationTest {
       public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(ROUTE);
       }
-
-      @Override
-      public Trip getTrip(FeedScopedId id) {
-        if (addedTrip.getId().equals(id)) {
-          return addedTrip;
-        }
-
-        return super.getTrip(id);
-      }
-
-      @Override
-      public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
-        if (serviceDate.equals(SERVICE_DATE)) {
-          if (
-            addedTrip.equals(trip) ||
-            trip.getId().equals(new FeedScopedId(FEED_ID, REPLACEMENT_TRIP_ID))
-          ) {
-            var stopCount = 4;
-            var tripTimes = TripTimesFactory.tripTimes(
-              trip,
-              TEST_MODEL.stopTimesEvery5Minutes(4, trip, "00:00"),
-              new Deduplicator()
-            );
-            var tripPattern = TripPattern
-              .of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
-              .withRoute(trip.getRoute())
-              .withStopPattern(
-                TimetableRepositoryForTest.stopPattern(
-                  (RegularStop) A.stop,
-                  (RegularStop) B.stop,
-                  (RegularStop) C.stop,
-                  (RegularStop) D.stop
-                )
-              )
-              .build();
-            var result = new ArrayList<TripTimeOnDate>(stopCount);
-            for (var i = 0; i < stopCount; ++i) {
-              result.add(new TripTimeOnDate(tripTimes, i, tripPattern));
-            }
-            return Optional.of(result);
-          }
-        }
-
-        return super.getTripTimeOnDates(trip, serviceDate);
-      }
     };
     routes.forEach(transitService::addRoutes);
 
-    // Crate a calendar (needed for testing cancelled trips)
-    CalendarServiceData calendarServiceData = new CalendarServiceData();
-    var firstDate = LocalDate.of(2024, 8, 8);
-    var secondDate = LocalDate.of(2024, 8, 9);
-    calendarServiceData.putServiceDatesForServiceId(cal_id, List.of(firstDate, secondDate));
-    timetableRepository.getServiceCodes().put(cal_id, 0);
-    timetableRepository.updateCalendarServiceData(
-      true,
-      calendarServiceData,
-      DataImportIssueStore.NOOP
-    );
-    TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    tripTimes2.cancelTrip();
-    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+    final Trip addedTrip = Trip
+      .of(new FeedScopedId(FEED_ID, ADDED_TRIP_ID))
+      .withRoute(busRoute)
+      .build();
+
+    for (var t : List.of(addedTrip, tripToBeReplaced)) {
+      var realTimeTripTimes = TripTimesFactory.tripTimes(
+        t,
+        TEST_MODEL.stopTimesEvery5Minutes(4, t, "00:00"),
+        new Deduplicator()
+      );
+      realTimeTripTimes.setServiceCode(SERVICE_CODE);
+      timetableSnapshot.update(
+        new RealTimeTripUpdate(
+          TripPattern
+            .of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
+            .withRoute(t.getRoute())
+            .withStopPattern(
+              TimetableRepositoryForTest.stopPattern(
+                (RegularStop) A.stop,
+                (RegularStop) B.stop,
+                (RegularStop) C.stop,
+                (RegularStop) D.stop
+              )
+            )
+            .withCreatedByRealtimeUpdater(true)
+            .build(),
+          realTimeTripTimes,
+          SERVICE_DATE,
+          null,
+          t == addedTrip,
+          false
+        )
+      );
+    }
 
     var snapshot = timetableSnapshot.commit();
     timetableRepository.initTimetableSnapshotProvider(() -> snapshot);

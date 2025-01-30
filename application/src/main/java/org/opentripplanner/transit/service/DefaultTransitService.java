@@ -107,9 +107,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip) {
     TripPattern tripPattern = findPattern(trip);
-    if (tripPattern == null) {
-      return Optional.empty();
-    }
     return Optional.ofNullable(
       TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip)
     );
@@ -120,16 +117,6 @@ public class DefaultTransitService implements TransitEditorService {
     TripPattern pattern = findPattern(trip, serviceDate);
 
     Timetable timetable = findTimetable(pattern, serviceDate);
-
-    // If realtime moved pattern back to original trip, fetch it instead
-    if (timetable.getTripIndex(trip.getId()) == -1) {
-      LOG.warn(
-        "Trip {} not found in realtime pattern. This should not happen, and indicates a bug.",
-        trip
-      );
-      pattern = findPattern(trip);
-      timetable = findTimetable(pattern, serviceDate);
-    }
 
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
