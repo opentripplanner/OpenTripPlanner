@@ -82,7 +82,13 @@ public class OsmModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.params = params;
     this.osmdb = new OsmDatabase(issueStore);
-    this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
+    this.vertexGenerator =
+      new VertexGenerator(
+        osmdb,
+        graph,
+        params.boardingAreaRefTags(),
+        params.includeOsmSubwayEntrances()
+      );
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
   }

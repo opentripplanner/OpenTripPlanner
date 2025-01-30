@@ -6,6 +6,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import org.opentripplanner.apis.transmodel.mapping.BookingInfoMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -107,34 +108,7 @@ public class BookingArrangementType {
           .name("bookWhen")
           .description("Time constraints for booking")
           .type(EnumTypes.PURCHASE_WHEN)
-          .dataFetcher(environment -> {
-            BookingInfo bookingInfo = bookingInfo(environment);
-            if (bookingInfo.getMinimumBookingNotice().isPresent()) {
-              return null;
-            }
-            BookingTime latestBookingTime = bookingInfo.getLatestBookingTime();
-            BookingTime earliestBookingTime = bookingInfo.getEarliestBookingTime();
-
-            // Try to deduce the original enum from stored values
-            if (earliestBookingTime == null) {
-              if (latestBookingTime == null) {
-                return "timeOfTravelOnly";
-              } else if (latestBookingTime.getDaysPrior() == 1) {
-                return "untilPreviousDay";
-              } else if (latestBookingTime.getDaysPrior() == 0) {
-                return "advanceAndDayOfTravel";
-              } else {
-                return "other";
-              }
-            } else if (
-              earliestBookingTime.getDaysPrior() == 0 &&
-              (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
-            ) {
-              return "dayOfTravelOnly";
-            } else {
-              return "other";
-            }
-          })
+          .dataFetcher(environment -> BookingInfoMapper.mapToBookWhen(bookingInfo(environment)))
           .build()
       )
       .field(

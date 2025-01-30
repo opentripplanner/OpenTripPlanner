@@ -87,6 +87,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
@@ -96,6 +97,7 @@ import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
@@ -133,8 +135,15 @@ class GraphQLIntegrationTest {
     .withSystem("Network-1", "https://foo.bar")
     .build();
 
-  private static final VehicleRentalVehicle RENTAL_VEHICLE = new TestFreeFloatingRentalVehicleBuilder()
+  private static final VehicleRentalVehicle RENTAL_VEHICLE_1 = new TestFreeFloatingRentalVehicleBuilder()
     .withSystem("Network-1", "https://foo.bar")
+    .build();
+
+  private static final VehicleRentalVehicle RENTAL_VEHICLE_2 = new TestFreeFloatingRentalVehicleBuilder()
+    .withSystem("Network-2", "https://foo.bar.baz")
+    .withNetwork("Network-2")
+    .withCurrentRangeMeters(null)
+    .withCurrentFuelPercent(null)
     .build();
 
   static final Graph GRAPH = new Graph();
@@ -267,9 +276,20 @@ class GraphQLIntegrationTest {
       .withAbsoluteDirection(20)
       .build();
     var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR).build();
+    FeedScopedId entranceId = new FeedScopedId("osm", "123");
+    Entrance entrance = Entrance
+      .of(entranceId)
+      .withCoordinate(new WgsCoordinate(60, 80))
+      .withCode("A")
+      .withWheelchairAccessibility(Accessibility.POSSIBLE)
+      .build();
+    var step3 = walkStep("entrance")
+      .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+      .withEntrance(entrance)
+      .build();
 
     Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B, List.of(step1, step2))
+      .walk(20, B, List.of(step1, step2, step3))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)
@@ -344,7 +364,8 @@ class GraphQLIntegrationTest {
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
     defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
-    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE);
+    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
+    defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
 
     context =
       new GraphQLRequestContext(
@@ -511,7 +532,7 @@ class GraphQLIntegrationTest {
       return List.of(
         new PlaceAtDistance(stop, 0),
         new PlaceAtDistance(VEHICLE_RENTAL_STATION, 30),
-        new PlaceAtDistance(RENTAL_VEHICLE, 50)
+        new PlaceAtDistance(RENTAL_VEHICLE_1, 50)
       );
     }
   };

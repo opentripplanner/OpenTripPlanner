@@ -14,6 +14,8 @@
     "preview": "vite preview",
     "prebuild": "npm run codegen && npm run lint && npm run check-format",
     "predev": "npm run codegen",
+    "codegen-preprocess": "graphql-codegen --config codegen-preprocess.ts",
+    "precodegen": "npm run codegen-preprocess",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
@@ -26,7 +28,8 @@
     "react": "19.0.0",
     "react-bootstrap": "2.10.7",
     "react-dom": "19.0.0",
-    "react-map-gl": "7.1.8"
+    "react-map-gl": "7.1.8",
+    "react-select": "5.9.0"
   },
   "devDependencies": {
     "@eslint/compat": "1.2.5",
@@ -39,9 +42,9 @@
     "@types/react": "19.0.4",
     "@types/react-dom": "19.0.2",
     "@vitejs/plugin-react": "4.3.4",
-    "@vitest/coverage-v8": "2.1.8",
+    "@vitest/coverage-v8": "3.0.2",
     "eslint": "9.18.0",
-    "eslint-config-prettier": "9.1.0",
+    "eslint-config-prettier": "10.0.1",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-react": "7.37.3",
@@ -52,7 +55,7 @@
     "prettier": "3.4.2",
     "typescript": "5.7.3",
     "typescript-eslint": "8.19.1",
-    "vite": "6.0.7",
-    "vitest": "2.1.8"
+    "vite": "6.0.9",
+    "vitest": "3.0.2"
   }
 }
