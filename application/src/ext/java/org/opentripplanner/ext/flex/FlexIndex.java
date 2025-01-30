@@ -3,10 +3,8 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
@@ -25,7 +23,7 @@ public class FlexIndex {
 
   private final Multimap<StopLocation, FlexTrip<?, ?>> flexTripsByStop = HashMultimap.create();
 
-  private final List<Route> flexRoutes;
+  private final Map<FeedScopedId, Route> routeById = new HashMap<>();
 
   private final Map<FeedScopedId, FlexTrip<?, ?>> tripById = new HashMap<>();
 
@@ -35,9 +33,8 @@ public class FlexIndex {
       transfersToStop.put(transfer.to, transfer);
       transfersFromStop.put(transfer.from, transfer);
     }
-    var routes = new ArrayList<Route>();
     for (FlexTrip<?, ?> flexTrip : timetableRepository.getAllFlexTrips()) {
-      routes.add(flexTrip.getTrip().getRoute());
+      routeById.put(flexTrip.getTrip().getRoute().getId(), flexTrip.getTrip().getRoute());
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {
         if (stop instanceof GroupStop groupStop) {
@@ -49,7 +46,6 @@ public class FlexIndex {
         }
       }
     }
-    this.flexRoutes = List.copyOf(routes);
   }
 
   public Collection<PathTransfer> getTransfersToStop(StopLocation stopLocation) {
@@ -64,16 +60,12 @@ public class FlexIndex {
     return flexTripsByStop.get(stopLocation);
   }
 
-  public Route getRouteById(FeedScopedId id) {
-    return routeById.get(id);
-  }
-
   public boolean contains(Route route) {
     return routeById.containsKey(route.getId());
   }
 
   public Collection<Route> getAllFlexRoutes() {
-    return flexRoutes;
+    return routeById.values();
   }
 
   public FlexTrip<?, ?> getTripById(FeedScopedId id) {

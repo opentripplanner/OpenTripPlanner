@@ -104,7 +104,7 @@ class ScheduledDeviatedTripIntegrationTest {
       graph,
       new DefaultTransitService(timetableRepository),
       FlexParameters.defaultValues(),
-      List.of(),
+      List.of(AllowAllTransitFilter.of()),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       null,
       1,
