@@ -39,6 +39,7 @@ import org.opentripplanner.apis.gtfs.datafetchers.CoordinatesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.CurrencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DefaultFareProductImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.DepartureRowImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.EntranceImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.EstimatedTimeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.FareProductUseImpl;
@@ -58,12 +59,14 @@ import org.opentripplanner.apis.gtfs.datafetchers.PlanImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.QueryTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RealTimeEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalPlaceTypeResolver;
+import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleFuelImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RentalVehicleTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RideHailingEstimateImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RouteTypeImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.RoutingErrorImpl;
+import org.opentripplanner.apis.gtfs.datafetchers.StepFeatureTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.StopCallImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopGeometriesImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.StopImpl;
@@ -138,6 +141,7 @@ class GtfsGraphQLIndex {
         .type("AlertEntity", type -> type.typeResolver(new AlertEntityTypeResolver()))
         .type("CallStopLocation", type -> type.typeResolver(new CallStopLocationTypeResolver()))
         .type("CallScheduledTime", type -> type.typeResolver(new CallScheduledTimeTypeResolver()))
+        .type("StepFeature", type -> type.typeResolver(new StepFeatureTypeResolver()))
         .type(typeWiring.build(AgencyImpl.class))
         .type(typeWiring.build(AlertImpl.class))
         .type(typeWiring.build(BikeParkImpl.class))
@@ -197,6 +201,8 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(LegTimeImpl.class))
         .type(typeWiring.build(RealTimeEstimateImpl.class))
         .type(typeWiring.build(EstimatedTimeImpl.class))
+        .type(typeWiring.build(EntranceImpl.class))
+        .type(typeWiring.build(RentalVehicleFuelImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

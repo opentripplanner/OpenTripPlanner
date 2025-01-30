@@ -82,6 +82,9 @@ union CallStopLocation = Stop
 "Rental place union that represents either a VehicleRentalStation or a RentalVehicle"
 union RentalPlace = RentalVehicle | VehicleRentalStation
 
+"A feature for a step"
+union StepFeature = Entrance
+
 union StopPosition = PositionAtStop | PositionBetweenStops
 
 "A public transport agency"
@@ -486,6 +489,18 @@ type DepartureRow implements Node & PlaceInterface {
 type Emissions {
   "CO₂ emissions in grams."
   co2: Grams
+}
+
+"Station entrance or exit, originating from OSM or GTFS data."
+type Entrance {
+  "ID of the entrance in the format of `FeedId:EntranceId`. If the `FeedId` is `osm`, the entrance originates from OSM data."
+  entranceId: String!
+  "Name of the entrance or exit."
+  name: String
+  "Short text or a number that identifies the entrance or exit for passengers. For example, `A` or `B`."
+  publicCode: String
+  "Whether the entrance or exit is accessible by wheelchair"
+  wheelchairAccessible: WheelchairBoarding
 }
 
 "Real-time estimates for an arrival or departure at a certain place."
@@ -1876,6 +1891,8 @@ type RealTimeEstimate {
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
+  "Fuel or battery status of the rental vehicle"
+  fuel: RentalVehicleFuel
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   "Latitude of the vehicle (WGS 84)"
@@ -1903,6 +1920,14 @@ type RentalVehicleEntityCounts {
   byType: [RentalVehicleTypeCount!]!
   "The total number of entities (e.g. vehicles, spaces)."
   total: Int!
+}
+
+"Rental vehicle fuel represent the current status of the battery or fuel of a rental vehicle"
+type RentalVehicleFuel {
+  "Fuel or battery power remaining in the vehicle. Expressed from 0 to 1."
+  percent: Ratio
+  "Range in meters that the vehicle can travel with the current charge or fuel."
+  range: Int
 }
 
 type RentalVehicleType {
@@ -2855,6 +2880,8 @@ type step {
   elevationProfile: [elevationProfileComponent]
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
+  "Information about an feature associated with a step e.g. an station entrance or exit"
+  feature: StepFeature
   "The latitude of the start of the step."
   lat: Float
   "The longitude of the start of the step."
@@ -3529,15 +3556,40 @@ enum RealtimeState {
   UPDATED
 }
 
-"Actions to take relative to the current position when engaging a walking/driving step."
+"""
+A direction that is not absolute but rather fuzzy and context-dependent.
+It provides the passenger with information what they should do in this step depending on where they
+were in the previous one.
+"""
 enum RelativeDirection {
   CIRCLE_CLOCKWISE
   CIRCLE_COUNTERCLOCKWISE
+  """
+  Moving straight ahead in one of these cases
+    
+    - Passing through a crossing or intersection.
+    - Passing through a station entrance or exit when it is not know whether the passenger is
+      entering or exiting. If it _is_ known then `ENTER_STATION`/`EXIT_STATION` is used.
+      More information about the entrance is in the `step.feature` field.
+  """
   CONTINUE
   DEPART
   ELEVATOR
+  """
+  Entering a public transport station. If it's not known if the passenger is entering or exiting
+  then `CONTINUE` is used.
+    
+  More information about the entrance is in the `step.feature` field.
+  """
   ENTER_STATION
+  """
+  Exiting a public transport station. If it's not known if the passenger is entering or exiting
+  then `CONTINUE` is used.
+    
+  More information about the entrance is in the `step.feature` field.
+  """
   EXIT_STATION
+  "Follow the signs indicating a specific location like \"platform 1\" or \"exit B\"."
   FOLLOW_SIGNS
   HARD_LEFT
   HARD_RIGHT

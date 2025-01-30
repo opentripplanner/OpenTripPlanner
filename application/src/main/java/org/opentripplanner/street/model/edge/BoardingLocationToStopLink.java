@@ -3,7 +3,7 @@ package org.opentripplanner.street.model.edge;
 import java.util.List;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /**
@@ -12,16 +12,16 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
  */
 public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
-  private BoardingLocationToStopLink(OsmBoardingLocationVertex fromv, TransitStopVertex tov) {
+  private BoardingLocationToStopLink(StreetVertex fromv, TransitStopVertex tov) {
     super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
-  private BoardingLocationToStopLink(TransitStopVertex fromv, OsmBoardingLocationVertex tov) {
+  private BoardingLocationToStopLink(TransitStopVertex fromv, StreetVertex tov) {
     super(fromv, tov, fromv.getWheelchairAccessibility());
   }
 
   public static BoardingLocationToStopLink createBoardingLocationToStopLink(
-    OsmBoardingLocationVertex fromv,
+    StreetVertex fromv,
     TransitStopVertex tov
   ) {
     return connectToGraph(new BoardingLocationToStopLink(fromv, tov));
@@ -29,7 +29,7 @@ public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitS
 
   public static BoardingLocationToStopLink createBoardingLocationToStopLink(
     TransitStopVertex fromv,
-    OsmBoardingLocationVertex tov
+    StreetVertex tov
   ) {
     return connectToGraph(new BoardingLocationToStopLink(fromv, tov));
   }

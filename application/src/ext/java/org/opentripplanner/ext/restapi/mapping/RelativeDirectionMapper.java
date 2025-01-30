@@ -14,7 +14,7 @@ public class RelativeDirectionMapper {
       case HARD_LEFT -> ApiRelativeDirection.HARD_LEFT;
       case LEFT -> ApiRelativeDirection.LEFT;
       case SLIGHTLY_LEFT -> ApiRelativeDirection.SLIGHTLY_LEFT;
-      case CONTINUE -> ApiRelativeDirection.CONTINUE;
+      case CONTINUE, ENTER_OR_EXIT_STATION -> ApiRelativeDirection.CONTINUE;
       case SLIGHTLY_RIGHT -> ApiRelativeDirection.SLIGHTLY_RIGHT;
       case RIGHT -> ApiRelativeDirection.RIGHT;
       case HARD_RIGHT -> ApiRelativeDirection.HARD_RIGHT;
