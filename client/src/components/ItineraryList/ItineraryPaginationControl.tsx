@@ -12,7 +12,7 @@ export function ItineraryPaginationControl({
   loading: boolean;
 }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-evenly', margin: '1rem 0 ' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
       <Button
         variant="outline-primary"
         size="sm"

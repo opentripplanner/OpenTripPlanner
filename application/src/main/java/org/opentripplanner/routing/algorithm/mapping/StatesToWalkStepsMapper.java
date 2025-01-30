@@ -7,6 +7,7 @@ import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
@@ -25,9 +26,11 @@ import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.site.Entrance;
 
 /**
  * Process a list of states into a list of walking/driving instructions for a street leg.
@@ -158,7 +161,7 @@ public class StatesToWalkStepsMapper {
       return;
     } else if (edge instanceof StreetTransitEntranceLink link) {
       var direction = relativeDirectionForTransitLink(link);
-      createAndSaveStep(backState, forwardState, link.getName(), direction, edge);
+      createAndSaveStep(backState, forwardState, link.getName(), direction, edge, link.entrance());
       return;
     }
 
@@ -175,8 +178,18 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
+    } else if (backState.getVertex() instanceof StationEntranceVertex stationEntranceVertex) {
+      addStep(createStationEntranceWalkStep(backState, forwardState, stationEntranceVertex));
+      return;
     } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
-      createAndSaveStep(backState, forwardState, pwe.signpostedAs().get(), FOLLOW_SIGNS, edge);
+      createAndSaveStep(
+        backState,
+        forwardState,
+        pwe.signpostedAs().get(),
+        FOLLOW_SIGNS,
+        edge,
+        null
+      );
       return;
     }
 
@@ -515,12 +528,33 @@ public class StatesToWalkStepsMapper {
     return step;
   }
 
+  private WalkStepBuilder createStationEntranceWalkStep(
+    State backState,
+    State forwardState,
+    StationEntranceVertex vertex
+  ) {
+    Entrance entrance = Entrance
+      .of(vertex.id())
+      .withCode(vertex.code())
+      .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
+      .withWheelchairAccessibility(vertex.wheelchairAccessibility())
+      .build();
+
+    // don't care what came before or comes after
+    return createWalkStep(forwardState, backState)
+      // There is not a way to definitively determine if a user is entering or exiting the station,
+      // since the doors might be between or inside stations.
+      .withRelativeDirection(RelativeDirection.ENTER_OR_EXIT_STATION)
+      .withEntrance(entrance);
+  }
+
   private void createAndSaveStep(
     State backState,
     State forwardState,
     I18NString name,
     RelativeDirection direction,
-    Edge edge
+    Edge edge,
+    @Nullable Entrance entrance
   ) {
     addStep(
       createWalkStep(forwardState, backState)
@@ -528,6 +562,7 @@ public class StatesToWalkStepsMapper {
         .withNameIsDerived(false)
         .withDirections(lastAngle, DirectionUtils.getFirstAngle(edge.getGeometry()), false)
         .withRelativeDirection(direction)
+        .withEntrance(entrance)
         .addDistance(edge.getDistanceMeters())
     );
 

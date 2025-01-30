@@ -289,6 +289,9 @@ public class EnumTypes {
     .value("elevator", RelativeDirection.ELEVATOR)
     .value("uturnLeft", RelativeDirection.UTURN_LEFT)
     .value("uturnRight", RelativeDirection.UTURN_RIGHT)
+    .value("enterStation", RelativeDirection.ENTER_STATION)
+    .value("exitStation", RelativeDirection.EXIT_STATION)
+    .value("followSigns", RelativeDirection.FOLLOW_SIGNS)
     .build();
 
   public static final GraphQLEnumType REPORT_TYPE = GraphQLEnumType

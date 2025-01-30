@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
+import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -114,6 +115,11 @@ public interface TransitService {
    *
    */
   Route getRoute(FeedScopedId id);
+
+  /**
+   * Return all routes for a given set of ids, including routes created by real-time updates.
+   */
+  Collection<Route> getRoutes(Collection<FeedScopedId> ids);
 
   /**
    * Return the routes using the given stop, not including real-time updates.
@@ -344,4 +350,9 @@ public interface TransitService {
   Collection<RegularStop> findRegularStopsByBoundingBox(
     FindRegularStopsByBoundingBoxRequest request
   );
+
+  /**
+   * Returns a list of {@link Route}s that match the filtering defined in the request.
+   */
+  Collection<Route> findRoutes(FindRoutesRequest request);
 }

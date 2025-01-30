@@ -46,6 +46,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [maxDuration](#rd_accessEgress_maxDuration)                                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                                      | *Optional* | `"PT45M"`        |  2.1  |
 |    [maxStopCount](#rd_accessEgress_maxStopCount)                                                             |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                               | *Optional* | `500`            |  2.4  |
 |    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                                                     | *Optional* |                  |  2.1  |
+|    [maxStopCountForMode](#rd_accessEgress_maxStopCountForMode)                                               |  `enum map of integer` | Maximal number of stops collected in access/egress routing for the given mode                                                                            | *Optional* |                  |  2.7  |
 |    [penalty](#rd_accessEgress_penalty)                                                                       |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                                | *Optional* |                  |  2.4  |
 |       FLEXIBLE                                                                                               |        `object`        | NA                                                                                                                                                       | *Optional* |                  |  2.4  |
 |          costFactor                                                                                          |        `double`        | A factor multiplied with the time-penalty to get the cost-penalty.                                                                                       | *Optional* | `0.0`            |  2.4  |
@@ -429,6 +430,18 @@ Limit access/egress per street mode.
 
 Override the settings in `maxDuration` for specific street modes. This is
 done because some street modes searches are much more resource intensive than others.
+
+
+<h3 id="rd_accessEgress_maxStopCountForMode">maxStopCountForMode</h3>
+
+**Since version:** `2.7` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/accessEgress   
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+
+Maximal number of stops collected in access/egress routing for the given mode
+
+Safety limit to prevent access to and egress from too many stops.
+Mode-specific version of `maxStopCount`.
 
 
 <h3 id="rd_accessEgress_penalty">penalty</h3>
@@ -1250,6 +1263,9 @@ include stairs as a last result.
         "BIKE_RENTAL" : "20m"
       },
       "maxStopCount" : 500,
+      "maxStopCountForMode" : {
+        "CAR" : 0
+      },
       "penalty" : {
         "FLEXIBLE" : {
           "timePenalty" : "2m + 1.1t",
