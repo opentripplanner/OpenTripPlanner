@@ -10,7 +10,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 /**
  * Utility methods for constructing legs.
  */
-public class LegUtils {
+public class LegConstructionSupport {
 
   /**
    * Given a pattern, board and alight stop index compute the distance in meters.
