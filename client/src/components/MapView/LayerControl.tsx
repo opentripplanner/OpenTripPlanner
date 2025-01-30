@@ -1,200 +1,200 @@
-import type { ControlPosition } from 'react-map-gl';
-import { useControl } from 'react-map-gl';
-import { IControl, Map, TypedStyleLayer } from 'maplibre-gl';
+import React, { useEffect, useState, useCallback } from 'react';
+import type { AnyLayer, ControlPosition } from 'react-map-gl';
+import type { MapRef } from 'react-map-gl/maplibre';
 
-type LayerControlProps = {
-  position: ControlPosition;
+interface Layer {
+  id: string;
+  name: string;
+}
+
+interface LayerControlProps {
+  mapRef: MapRef | null;
+  position: ControlPosition; // not used in inline styling, but you might use it if you want
   setInteractiveLayerIds: (interactiveLayerIds: string[]) => void;
-};
+}
 
 /**
- * A maplibre control that allows you to switch vector tile layers on and off.
- *
- * It appears that you cannot use React elements but have to drop down to raw DOM. Please correct
- * me if I'm wrong.
+ * A React component to control:
+ *   1. Background (raster) layers (select exactly one to show).
+ *   2. Debug layers (vector-like layers) with groupings, toggle on/off individually.
  */
-class LayerControl implements IControl {
-  private readonly container: HTMLDivElement = document.createElement('div');
+const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayerIds }) => {
+  const [rasterLayers, setRasterLayers] = useState<Layer[]>([]);
+  const [layerGroups, setLayerGroups] = useState<Record<string, Layer[]>>({});
 
-  private readonly setInteractiveLayerIds: (interactiveLayerIds: string[]) => void;
+  /**
+   * Load background + debug layers from the style once the map is ready.
+   */
+  useEffect(() => {
+    if (!mapRef) return;
+    const mapInstance = mapRef.getMap();
 
-  constructor(setInteractiveLayerIds: (interactiveLayerIds: string[]) => void) {
-    this.setInteractiveLayerIds = setInteractiveLayerIds;
-  }
+    const loadLayers = () => {
+      const style = mapInstance.getStyle();
+      if (!style || !style.layers) return;
 
-  onAdd(map: Map) {
-    this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-select';
+      // 1. Gather all raster layers (for the background selector).
+      const rasters = style.layers
+        .filter((layer) => layer.type === 'raster')
+        .map((layer) => {
+          // Try to pick up a pretty name from metadata if available.
+          let name = layer.id;
+          if ((layer as AnyLayer).metadata?.name) {
+            name = (layer as AnyLayer).metadata.name;
+          }
+          return { id: layer.id, name };
+        });
+      setRasterLayers(rasters);
 
-    map.on('load', () => {
-      // clean on rerender
-      while (this.container.firstChild) {
-        this.container.removeChild(this.container.firstChild);
-      }
-
-      this.buildBackgroundLayers(map);
-      this.buildDebugLayers(map);
-    });
-
-    return this.container;
-  }
-
-  private buildBackgroundLayers(map: Map) {
-    const title = document.createElement('h4');
-    title.textContent = 'Background';
-    this.container.appendChild(title);
-
-    const select = document.createElement('select');
-    this.container.appendChild(select);
-
-    const rasterLayers = map
-      .getLayersOrder()
-      .map((l) => map.getLayer(l))
-      .filter((layer) => !!layer)
-      .filter((layer) => layer?.type == 'raster');
-
-    rasterLayers.forEach((layer) => {
-      if (layer) {
-        const option = document.createElement('option');
-        const meta = layer.metadata as { name: string };
-        option.textContent = meta.name;
-        option.id = layer.id;
-        option.value = layer.id;
-
-        select.appendChild(option);
-      }
-    });
-    select.onchange = () => {
-      const layerId = select.value;
-      const layer = map.getLayer(layerId);
-      if (layer) {
-        rasterLayers.forEach((l) => {
-          map.setLayoutProperty(l?.id, 'visibility', 'none');
+      // 2. Gather all "debug" layers (i.e. not raster, not "jsx").
+      //    Group them by metadata.group (falling back to "Misc").
+      const groups: Record<string, Layer[]> = {};
+      style.layers
+        .filter((layer) => layer.type !== 'raster' && !layer.id.startsWith('jsx'))
+        .reverse() // so that the topmost layers appear first
+        .forEach((layer) => {
+          const groupName = (layer as AnyLayer).metadata?.group || 'Misc';
+          if (!groups[groupName]) {
+            groups[groupName] = [];
+          }
+          groups[groupName].push({ id: layer.id, name: layer.id });
         });
 
-        map.setLayoutProperty(layer.id, 'visibility', 'visible');
-      }
+      setLayerGroups(groups);
     };
-  }
 
-  private buildDebugLayers(map: Map) {
-    const title = document.createElement('h4');
-    title.textContent = 'Debug layers';
-    this.container.appendChild(title);
+    if (mapInstance.isStyleLoaded()) {
+      loadLayers();
+    } else {
+      mapInstance.on('styledata', loadLayers);
+    }
 
-    const groups: Record<string, HTMLDivElement> = {};
-    map
-      .getLayersOrder()
-      .map((l) => map.getLayer(l))
-      .filter((layer) => !!layer)
-      .filter((layer) => this.layerInteractive(layer))
-      .reverse()
-      .forEach((layer) => {
-        if (layer) {
-          const meta: { group: string } = layer.metadata as { group: string };
+    return () => {
+      mapInstance.off('styledata', loadLayers);
+    };
+  }, [mapRef]);
 
-          let groupName: string = 'Misc';
-          if (meta.group) {
-            groupName = meta.group;
-          }
+  /**
+   * Toggle the visibility of an individual debug layer.
+   */
+  const toggleLayerVisibility = useCallback(
+    (layerId: string, isVisible: boolean) => {
+      if (!mapRef) return;
+      const mapInstance = mapRef.getMap();
+      mapInstance.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
 
-          const layerDiv = this.buildLayerDiv(layer as TypedStyleLayer, map);
+      // After toggling, recalculate which interactive layers are visible.
+      const style = mapInstance.getStyle();
+      if (!style || !style.layers) return;
 
-          if (groups[groupName]) {
-            groups[groupName]?.appendChild(layerDiv);
-          } else {
-            const groupDiv = this.buildGroupDiv(groupName, layerDiv);
-            groups[groupName] = groupDiv;
-            this.container.appendChild(groupDiv);
-          }
-        }
+      const visibleInteractive = style.layers
+        .filter((l) => l.type !== 'raster' && !l.id.startsWith('jsx'))
+        .filter((l) => mapInstance.getLayoutProperty(l.id, 'visibility') !== 'none')
+        .map((l) => l.id);
+
+      setInteractiveLayerIds(visibleInteractive);
+    },
+    [mapRef, setInteractiveLayerIds],
+  );
+
+  /**
+   * Show exactly one background (raster) layer at a time.
+   */
+  const setBackgroundLayer = useCallback(
+    (layerId: string) => {
+      if (!mapRef) return;
+      const mapInstance = mapRef.getMap();
+      rasterLayers.forEach((r) => {
+        mapInstance.setLayoutProperty(r.id, 'visibility', r.id === layerId ? 'visible' : 'none');
       });
-    // initialize clickable layers (initially stops)
-    this.updateInteractiveLayerIds(map);
-  }
+    },
+    [mapRef, rasterLayers],
+  );
 
-  private updateInteractiveLayerIds(map: Map) {
-    const visibleInteractiveLayerIds = map
-      .getLayersOrder()
-      .map((l) => map.getLayer(l))
-      .filter((layer) => !!layer)
-      .filter((layer) => this.layerVisible(map, layer) && this.layerInteractive(layer))
-      .map((layer) => layer.id);
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '10px',
+        width: '250px',
+        borderRadius: '4px',
+        overflowY: 'auto',
+      }}
+    >
+      {/* BACKGROUND (RASTER) LAYERS */}
+      <h4 style={{ marginTop: 0 }}>Background</h4>
+      <select onChange={(e) => setBackgroundLayer(e.target.value)}>
+        {rasterLayers.map((layer) => (
+          <option key={layer.id} value={layer.id}>
+            {layer.name}
+          </option>
+        ))}
+      </select>
 
-    this.setInteractiveLayerIds(visibleInteractiveLayerIds);
-  }
+      {/* DEBUG (VECTOR) LAYERS */}
+      <h4 style={{ marginTop: '1rem' }}>Debug Layers</h4>
+      {Object.entries(layerGroups).map(([groupName, layers]) => {
+        // Determine if *all* layers in this group are currently visible.
+        const allVisible = layers.every(
+          (layer) => mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none',
+        );
 
-  private buildLayerDiv(layer: TypedStyleLayer, map: Map) {
-    const layerDiv = document.createElement('div');
-    layerDiv.className = 'layer';
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.value = layer.id;
-    input.id = layer.id;
-    input.onchange = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (input.checked) {
-        map.setLayoutProperty(layer.id, 'visibility', 'visible');
-      } else {
-        map.setLayoutProperty(layer.id, 'visibility', 'none');
-      }
-      this.updateInteractiveLayerIds(map);
-    };
-    input.checked = this.layerVisible(map, layer);
-    input.className = 'layer';
-    const label = document.createElement('label');
-    label.textContent = layer.id;
-    label.htmlFor = layer.id;
-    layerDiv.appendChild(input);
-    layerDiv.appendChild(label);
-    return layerDiv;
-  }
+        // Define a helper to toggle all layers in the group at once.
+        const toggleGroupVisibility = (checked: boolean) => {
+          layers.forEach((layer) => {
+            toggleLayerVisibility(layer.id, checked);
+          });
+        };
 
-  private buildGroupDiv(groupName: string, layerDiv: HTMLDivElement) {
-    const groupDiv = document.createElement('div');
-    groupDiv.className = 'group';
+        return (
+          <div key={groupName} style={{ marginBottom: '10px' }}>
+            <h6 style={{ margin: '0 0 5px' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={allVisible}
+                  onChange={(e) => toggleGroupVisibility(e.target.checked)}
+                  style={{ marginRight: '5px' }}
+                />
+                {groupName}
+              </label>
+            </h6>
 
-    const groupInput = document.createElement('input');
-    groupInput.onchange = () => {
-      groupDiv.querySelectorAll<HTMLInputElement>('input.layer').forEach((input) => {
-        input.checked = groupInput.checked;
-        const event = new Event('change');
-        input.dispatchEvent(event);
-      });
-    };
-    groupInput.type = 'checkbox';
-    groupInput.id = groupName;
+            {layers.map((layer) => {
+              // Figure out if the layer is visible or not:
+              const isVisible = mapRef?.getMap().getLayoutProperty(layer.id, 'visibility') !== 'none';
 
-    const groupLabel = document.createElement('label');
-    groupLabel.textContent = groupName;
-    groupLabel.htmlFor = groupName;
-    groupLabel.className = 'group-label';
+              return (
+                <label
+                  key={layer.id}
+                  style={{
+                    display: 'block',
+                    cursor: 'pointer',
+                    marginBottom: '5px',
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isVisible}
+                    onChange={(e) => toggleLayerVisibility(layer.id, e.target.checked)}
+                    style={{ marginLeft: '20px', marginRight: '5px' }}
+                  />
+                  {layer.name}
+                </label>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
-    groupDiv.appendChild(groupInput);
-    groupDiv.appendChild(groupLabel);
-    groupDiv.appendChild(layerDiv);
-    return groupDiv;
-  }
-
-  private layerVisible(map: Map, layer: { id: string }) {
-    return map.getLayoutProperty(layer.id, 'visibility') !== 'none';
-  }
-
-  private layerInteractive(layer: { id: string; type: string }) {
-    // the polylines of the routing result are put in map layers called jsx-1, jsx-2...
-    // we don't want them to show up in the debug layer selector
-    return layer?.type !== 'raster' && !layer?.id.startsWith('jsx');
-  }
-
-  onRemove() {
-    this.container.parentNode?.removeChild(this.container);
-  }
-}
-
-export default function DebugLayerControl(props: LayerControlProps) {
-  useControl(() => new LayerControl(props.setInteractiveLayerIds), {
-    position: props.position,
-  });
-
-  return null;
-}
+export default LayerControl;

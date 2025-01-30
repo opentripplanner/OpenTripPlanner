@@ -192,6 +192,7 @@ public class ConstructApplication {
         routerConfig().transmodelApi(),
         timetableRepository(),
         routerConfig().routingRequestDefaults(),
+        routerConfig().server().apiDocumentationProfile(),
         routerConfig().transitTuningConfig()
       );
     }

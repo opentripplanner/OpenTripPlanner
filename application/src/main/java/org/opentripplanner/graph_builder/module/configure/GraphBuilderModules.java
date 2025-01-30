@@ -73,6 +73,7 @@ public class GraphBuilderModules {
           osmConfiguredDataSource.dataSource(),
           osmConfiguredDataSource.config().osmTagMapper(),
           osmConfiguredDataSource.config().timeZone(),
+          osmConfiguredDataSource.config().includeOsmSubwayEntrances(),
           config.osmCacheDataInMem,
           issueStore
         )
@@ -88,6 +89,7 @@ public class GraphBuilderModules {
       .withStaticBikeParkAndRide(config.staticBikeParkAndRide)
       .withMaxAreaNodes(config.maxAreaNodes)
       .withBoardingAreaRefTags(config.boardingLocationTags)
+      .withIncludeOsmSubwayEntrances(config.osmDefaults.includeOsmSubwayEntrances())
       .withIssueStore(issueStore)
       .withStreetLimitationParameters(streetLimitationParameters)
       .build();
@@ -257,7 +259,8 @@ public class GraphBuilderModules {
       timetableRepository,
       issueStore,
       config.maxTransferDuration,
-      config.transferRequests
+      config.transferRequests,
+      config.transferParametersForMode
     );
   }
 
