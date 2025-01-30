@@ -171,7 +171,9 @@ public final class AccessEgressPreferences implements Serializable {
     // Add penalty to all car variants with access and/or egress.
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
     for (var it : StreetMode.values()) {
-      if (it.includesDriving() && (it.accessAllowed() || it.egressAllowed())) {
+      if (
+        it.includesDriving() && (it.accessAllowed() || it.egressAllowed()) && !it.transferAllowed()
+      ) {
         penaltyBuilder.with(it, carPenalty);
       }
     }
