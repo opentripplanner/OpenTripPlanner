@@ -47,7 +47,7 @@ public class MetricsLogging {
     new LogbackMetrics().bindTo(Metrics.globalRegistry);
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
-    new AlertMetrics(timetableRepository).bindTo(Metrics.globalRegistry);
+    new AlertMetrics(timetableRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
 
     if (timetableRepository.getTransitLayer() != null) {
       new GuavaCacheMetrics(

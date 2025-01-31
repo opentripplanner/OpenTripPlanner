@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.server;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.routing.alertpatch.AlertCause;
@@ -18,24 +20,23 @@ import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A binder that creates metrics about the alerts present in the system. The metrics are read from
- * the alert service once a minute by a background thread.
+ * the alert service twice a minute by a background thread.
  */
 public class AlertMetrics implements MeterBinder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AlertMetrics.class);
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-  private final TimetableRepository timetableRepository;
+  private final Supplier<TransitAlertService> serviceSupplier;
   private MultiGauge statuses;
 
-  public AlertMetrics(TimetableRepository timetableRepository) {
-    this.timetableRepository = timetableRepository;
-    scheduler.scheduleWithFixedDelay(this::recordMetrics, 0, 1, TimeUnit.MINUTES);
+  public AlertMetrics(Supplier<TransitAlertService> serviceSupplier) {
+    this.serviceSupplier = serviceSupplier;
+    scheduler.scheduleWithFixedDelay(this::recordMetrics, 0, 30, TimeUnit.SECONDS);
   }
 
   @Override
@@ -43,9 +44,7 @@ public class AlertMetrics implements MeterBinder {
     this.statuses =
       MultiGauge
         .builder("alerts")
-        .description(
-          "Total number of alerts (sourced from GTFS-Alerts and SIRI-SX), in the system."
-        )
+        .description("Total number of alerts (sourced from GTFS-Alerts and SIRI-SX) in the system.")
         .register(meterRegistry);
     ApplicationShutdownSupport.addShutdownHook("alert-metrics-shutdown", scheduler::shutdownNow);
   }
@@ -54,10 +53,13 @@ public class AlertMetrics implements MeterBinder {
    * Creates a {@link MultiGauge} for the alerts and publishes (register in Micrometer language)
    * to the repository.
    */
-  private void recordMetrics() {
+  @VisibleForTesting
+  void recordMetrics() {
     try {
-      if (timetableRepository.getTransitAlertService() != null && statuses != null) {
-        var rows = summarizeAlerts(timetableRepository.getTransitAlertService());
+      // during construction of the app the service can be null so we must check for this case.
+      var transitAlertService = serviceSupplier.get();
+      if (transitAlertService != null && statuses != null) {
+        var rows = summarizeAlerts(transitAlertService);
         statuses.register(rows, true);
       }
     } catch (Exception e) {
