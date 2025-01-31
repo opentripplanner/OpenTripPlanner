@@ -15,6 +15,8 @@ public class TestOsmProvider implements OsmProvider {
 
   private final List<OsmWay> ways;
   private final List<OsmNode> nodes;
+  private final OsmTagMapper osmTagMapper = new OsmTagMapper();
+  private final WayPropertySet wayPropertySet = new WayPropertySet();
 
   public TestOsmProvider(List<OsmWay> ways, List<OsmNode> nodes) {
     this.ways = ways.stream().peek(w -> w.setOsmProvider(this)).toList();
@@ -36,7 +38,7 @@ public class TestOsmProvider implements OsmProvider {
 
   @Override
   public OsmTagMapper getOsmTagMapper() {
-    return new OsmTagMapper();
+    return osmTagMapper;
   }
 
   @Override
@@ -44,7 +46,7 @@ public class TestOsmProvider implements OsmProvider {
 
   @Override
   public WayPropertySet getWayPropertySet() {
-    return new WayPropertySet();
+    return wayPropertySet;
   }
 
   @Override
