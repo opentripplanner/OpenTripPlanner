@@ -22,6 +22,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A binder that creates metrics about the alerts present in the system. The metrics are read from
+ * the alert service once a minute by a background thread.
+ */
 public class AlertMetrics implements MeterBinder {
 
   private static final Logger LOG = LoggerFactory.getLogger(AlertMetrics.class);
@@ -31,7 +35,7 @@ public class AlertMetrics implements MeterBinder {
 
   public AlertMetrics(TimetableRepository timetableRepository) {
     this.timetableRepository = timetableRepository;
-    scheduler.scheduleWithFixedDelay(this::buildMetrics, 0, 1, TimeUnit.MINUTES);
+    scheduler.scheduleWithFixedDelay(this::recordMetrics, 0, 1, TimeUnit.MINUTES);
   }
 
   @Override
@@ -46,7 +50,11 @@ public class AlertMetrics implements MeterBinder {
     ApplicationShutdownSupport.addShutdownHook("alert-metrics-shutdown", scheduler::shutdownNow);
   }
 
-  private void buildMetrics() {
+  /**
+   * Creates a {@link MultiGauge} for the alerts and publishes (register in Micrometer language)
+   * to the repository.
+   */
+  private void recordMetrics() {
     try {
       if (timetableRepository.getTransitAlertService() != null && statuses != null) {
         var rows = summarizeAlerts(timetableRepository.getTransitAlertService());
@@ -79,6 +87,9 @@ public class AlertMetrics implements MeterBinder {
       .toList();
   }
 
+  /**
+   * The tags that can be exported for an alert.
+   */
   record AlertTags(
     String feedId,
     String siriCodespace,

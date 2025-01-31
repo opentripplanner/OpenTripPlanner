@@ -393,6 +393,7 @@ public class TimetableRepository implements Serializable {
   public TransitAlertService getTransitAlertService() {
     // during initialization we must return null, otherwise we would permanently store an empty
     // DelegatingTransitAlertServiceImpl
+    // this is wrong on many levels and should be refactored.
     if (updaterManager == null) {
       return null;
     } else if (transitAlertService == null) {
