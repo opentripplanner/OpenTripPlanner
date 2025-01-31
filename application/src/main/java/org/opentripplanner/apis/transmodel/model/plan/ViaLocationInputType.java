@@ -9,6 +9,7 @@ import graphql.schema.GraphQLInputType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import java.time.Duration;
+import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 
 public class ViaLocationInputType {
@@ -44,9 +45,8 @@ public class ViaLocationInputType {
   public static final String FIELD_LABEL = "label";
   public static final String FIELD_MINIMUM_WAIT_TIME = "minimumWaitTime";
   public static final String FIELD_STOP_LOCATION_IDS = "stopLocationIds";
+  public static final String FIELD_COORDINATE = "coordinate";
 
-  // TODO : Add coordinates
-  //private static final String FIELD_COORDINATES = "coordinates";
   public static final String FIELD_VISIT = "visit";
   public static final String DOC_FIELD_VISIT =
     "Board or alight at a stop location or visit a coordinate.";
@@ -68,6 +68,7 @@ public class ViaLocationInputType {
     stop place or a group of stop places. It is enough to visit ONE of the locations
     listed.
     """;
+  private static final String DOC_COORDINATE = "A coordinate to route through.";
 
   static final GraphQLInputObjectType VISIT_VIA_LOCATION_INPUT = GraphQLInputObjectType
     .newInputObject()
@@ -85,11 +86,11 @@ public class ViaLocationInputType {
       b
         .name(FIELD_STOP_LOCATION_IDS)
         .description(DOC_STOP_LOCATION_IDS)
-        .type(requiredListOfNonNullStrings())
+        .type(optionalListOfNonNullStrings())
     )
-    /*
-      TODO: Add support for coordinates
-       */
+    .field(b ->
+      b.name(FIELD_COORDINATE).description(DOC_COORDINATE).type(CoordinateInputType.INPUT_TYPE)
+    )
     .build();
 
   static final GraphQLInputObjectType PASS_THROUGH_VIA_LOCATION_INPUT = GraphQLInputObjectType
@@ -121,6 +122,10 @@ public class ViaLocationInputType {
     .build();
 
   private static GraphQLInputType requiredListOfNonNullStrings() {
-    return new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)));
+    return new GraphQLNonNull(optionalListOfNonNullStrings());
+  }
+
+  private static GraphQLInputType optionalListOfNonNullStrings() {
+    return new GraphQLList(new GraphQLNonNull(GraphQLString));
   }
 }

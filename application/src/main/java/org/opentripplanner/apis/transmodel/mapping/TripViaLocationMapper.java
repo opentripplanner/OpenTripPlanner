@@ -8,14 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType;
 import org.opentripplanner.apis.transmodel.support.OneOfInputValidator;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+@SuppressWarnings("unchecked")
 class TripViaLocationMapper {
 
   static List<ViaLocation> mapToViaLocations(final List<Map<String, Object>> via) {
@@ -57,7 +60,8 @@ class TripViaLocationMapper {
     var label = (String) inputMap.get(ViaLocationInputType.FIELD_LABEL);
     var minimumWaitTime = (Duration) inputMap.get(ViaLocationInputType.FIELD_MINIMUM_WAIT_TIME);
     var stopLocationIds = mapStopLocationIds(inputMap);
-    return new VisitViaLocation(label, minimumWaitTime, stopLocationIds, List.of());
+    var coordinate = mapCoordinate(inputMap);
+    return new VisitViaLocation(label, minimumWaitTime, stopLocationIds, coordinate);
   }
 
   private static PassThroughViaLocation mapPassThroughViaLocation(Map<String, Object> inputMap) {
@@ -68,14 +72,14 @@ class TripViaLocationMapper {
 
   private static List<FeedScopedId> mapStopLocationIds(Map<String, Object> map) {
     var c = (Collection<String>) map.get(ViaLocationInputType.FIELD_STOP_LOCATION_IDS);
+    return c == null ? List.of() : c.stream().map(TransitIdMapper::mapIDToDomain).toList();
+  }
 
-    // When coordinates are added, we need to accept null here...
-    if (c == null) {
-      throw new IllegalArgumentException(
-        "'" + ViaLocationInputType.FIELD_STOP_LOCATION_IDS + "' is not set!"
-      );
-    }
-    return c.stream().map(TransitIdMapper::mapIDToDomain).toList();
+  private static List<WgsCoordinate> mapCoordinate(Map<String, Object> map) {
+    return CoordinateInputType
+      .mapToWsgCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
+      .map(List::of)
+      .orElseGet(List::of);
   }
 
   /**
