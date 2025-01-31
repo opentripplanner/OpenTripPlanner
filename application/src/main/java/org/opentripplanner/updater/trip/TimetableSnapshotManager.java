@@ -20,10 +20,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
- * In order to keep code reviews easier this is an intermediate stage and will be refactored further.
- * In particular the following refactorings are planned:
- * <p>
- * - create only one "snapshot manager" per transit model that is shared between Siri/GTFS-RT updaters
  */
 public final class TimetableSnapshotManager {
 

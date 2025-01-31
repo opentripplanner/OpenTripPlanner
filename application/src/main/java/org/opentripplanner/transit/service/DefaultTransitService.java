@@ -78,7 +78,8 @@ public class DefaultTransitService implements TransitEditorService {
   private final TimetableRepositoryIndex timetableRepositoryIndex;
 
   /**
-   * This should only be accessed through the getTimetableSnapshot method.
+   * A nullable timetable snapshot containing real-time updates. If {@code null} then this
+   * instance does not contain any real-time information.
    */
   @Nullable
   private final TimetableSnapshot timetableSnapshot;
