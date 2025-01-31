@@ -47,7 +47,7 @@ public class StreetLeg implements Leg {
     this.generalizedCost = builder.getGeneralizedCost();
     this.elevationProfile = builder.getElevationProfile();
     this.legGeometry = builder.getGeometry();
-    this.walkSteps = builder.getWalkSteps();
+    this.walkSteps = Objects.requireNonNull(builder.getWalkSteps());
     this.streetNotes = Set.copyOf(builder.getStreetNotes());
     this.walkingBike = builder.getWalkingBike();
     this.rentedVehicle = builder.getRentedVehicle();
