@@ -168,11 +168,15 @@ public final class AccessEgressPreferences implements Serializable {
     var flexDefaultPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(10), 1.3f), 1.3);
     penaltyBuilder.with(StreetMode.FLEXIBLE, flexDefaultPenalty);
 
-    // Add penalty to all car variants with access and/or egress.
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
     for (var it : StreetMode.values()) {
+      // Apply car-penalty to all car modes allowed in access/egress only. Exclude car modes(CAR) used
+      // in direct street routing and car modes used when you bring the car with you onto transit. This is
+      // a bit limited and will not work if we combine car access/egress modes like CAR_TO_PARK with CAR
+      // in the same search. This is currently not possible, but if we enable this in the future this logic must be
+      // looked at again.
       if (
-        it.includesDriving() && (it.accessAllowed() || it.egressAllowed()) && !it.transferAllowed()
+        it.includesDriving() && (it.accessAllowed() || it.egressAllowed()) && it != StreetMode.CAR
       ) {
         penaltyBuilder.with(it, carPenalty);
       }
