@@ -45,7 +45,7 @@ public class FlexAccessFactory {
     var closestFlexTrips = ClosestTrip.of(callbackService, streetAccesses, dates, true);
     return closestFlexTrips
       .stream()
-      .filter(filter::matchesTransitFilters)
+      .filter(filter::allowsTrip)
       .flatMap(it -> templateFactory.createAccessTemplates(it).stream())
       .toList();
   }

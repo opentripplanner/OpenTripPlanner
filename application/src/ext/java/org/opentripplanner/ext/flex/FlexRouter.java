@@ -60,7 +60,7 @@ public class FlexRouter {
     Graph graph,
     TransitService transitService,
     FlexParameters flexParameters,
-    List<TransitFilter> filters,
+    FlexTransitFilter filters,
     Instant requestedTime,
     @Nullable Instant requestedBookingTime,
     int additionalPastSearchDays,
@@ -74,7 +74,7 @@ public class FlexRouter {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
-    this.flexTransitFilter = new FlexTransitFilter(transitService, filters);
+    this.flexTransitFilter = filters;
     this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(

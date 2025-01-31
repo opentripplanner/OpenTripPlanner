@@ -6,6 +6,8 @@ import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.ext.flex.template.FilterMapper;
+import org.opentripplanner.ext.flex.template.FlexTransitFilter;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -61,7 +63,7 @@ public class FlexAccessEgressRouter {
       serverContext.graph(),
       transitService,
       config,
-      request.journey().transit().filters(),
+      new FlexTransitFilter(FilterMapper.mapFilters(request.journey().transit().filters())),
       request.dateTime(),
       request.bookingTime(),
       searchDays.additionalSearchDaysInPast(),

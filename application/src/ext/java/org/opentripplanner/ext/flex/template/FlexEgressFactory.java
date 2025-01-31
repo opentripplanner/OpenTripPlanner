@@ -43,7 +43,7 @@ public class FlexEgressFactory {
     var closestFlexTrips = ClosestTrip.of(callbackService, streetEgresses, dates, false);
     return closestFlexTrips
       .stream()
-      .filter(filter::matchesTransitFilters)
+      .filter(filter::allowsTrip)
       .flatMap(it -> templateFactory.createEgressTemplates(it).stream())
       .toList();
   }

@@ -3,13 +3,18 @@ package org.opentripplanner.ext.flex;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -52,12 +57,14 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
     var results = timetableRepository
       .getSiteRepository()
       .listAreaStops()
-      .parallelStream()
+      .stream()
+      .sorted(Comparator.comparingDouble(areaStop -> areaStop.getGeometry().getArea()))
+      .parallel()
       .flatMap(areaStop -> {
-        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
+        LOG.info("Computing vertices for {} with area {}", areaStop, areaStop.getGeometry().getArea());
+        var result = matchingVerticesForStop(streetIndex, areaStop);
         progress.step(m -> LOG.info(m));
-        var matchedVertices = matchingVerticesForStop(streetIndex, areaStop);
-        return matchedVertices;
+        return result;
       });
 
     ImmutableMultimap<StreetVertex, AreaStop> mappedResults = results.collect(
