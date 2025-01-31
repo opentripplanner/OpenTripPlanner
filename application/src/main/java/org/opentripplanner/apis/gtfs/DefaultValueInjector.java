@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.gtfs;
 
+import graphql.language.ArrayValue;
 import graphql.language.BooleanValue;
+import graphql.language.EnumValue;
 import graphql.language.FloatValue;
 import graphql.language.IntValue;
 import graphql.language.StringValue;
@@ -14,8 +16,14 @@ import graphql.schema.GraphQLTypeVisitorStub;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.AccessModeMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.DirectModeMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.EgressModeMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.TransferModeMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
@@ -26,6 +34,7 @@ import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferen
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
 /**
  * GraphQL type visitor that injects default values to input fields and query arguments from code
@@ -33,7 +42,7 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
  */
 public class DefaultValueInjector extends GraphQLTypeVisitorStub implements GraphQLTypeVisitor {
 
-  private final Map<String, Value> defaultForKey;
+  private final Map<String, Value<?>> defaultForKey;
 
   public DefaultValueInjector(RouteRequest defaultRouteRequest) {
     this.defaultForKey = createDefaultMapping(defaultRouteRequest);
@@ -69,7 +78,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     return TraversalControl.CONTINUE;
   }
 
-  private Value getDefaultValueForSchemaObject(
+  private Value<?> getDefaultValueForSchemaObject(
     TraverserContext<GraphQLSchemaElement> context,
     String name
   ) {
@@ -80,12 +89,13 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     return defaultForKey.get(key);
   }
 
-  private static Map<String, Value> createDefaultMapping(RouteRequest defaultRouteRequest) {
+  private static Map<String, Value<?>> createDefaultMapping(RouteRequest defaultRouteRequest) {
     var builder = new DefaultMappingBuilder()
       .intReq("planConnection.first", defaultRouteRequest.numItineraries())
       .stringOpt("planConnection.searchWindow", defaultRouteRequest.searchWindow());
     setBikeDefaults(defaultRouteRequest.preferences().bike(), builder);
     setCarDefaults(defaultRouteRequest.preferences().car(), builder);
+    setModeDefaults(defaultRouteRequest.journey(), builder);
     setScooterDefaults(defaultRouteRequest.preferences().scooter(), builder);
     setTransitDefaults(defaultRouteRequest.preferences().transit(), builder);
     setTransferDefaults(defaultRouteRequest.preferences().transfer(), builder);
@@ -155,6 +165,41 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     builder.intReq(
       "CarParkingPreferencesInput.unpreferredCost",
       parking.unpreferredVehicleParkingTagCost().toSeconds()
+    );
+  }
+
+  private static void setModeDefaults(JourneyRequest journey, DefaultMappingBuilder builder) {
+    builder.enumListReq(
+      "PlanModesInput.direct",
+      StreetModeMapper
+        .getStreetModesForApi(journey.direct().mode())
+        .stream()
+        .map(mode -> (Enum) DirectModeMapper.map(mode))
+        .toList()
+    );
+    builder.enumListReq(
+      "PlanTransitModesInput.access",
+      StreetModeMapper
+        .getStreetModesForApi(journey.access().mode())
+        .stream()
+        .map(mode -> (Enum) AccessModeMapper.map(mode))
+        .toList()
+    );
+    builder.enumListReq(
+      "PlanTransitModesInput.egress",
+      StreetModeMapper
+        .getStreetModesForApi(journey.egress().mode())
+        .stream()
+        .map(mode -> (Enum) EgressModeMapper.map(mode))
+        .toList()
+    );
+    builder.enumListReq(
+      "PlanTransitModesInput.transfer",
+      StreetModeMapper
+        .getStreetModesForApi(journey.transfer().mode())
+        .stream()
+        .map(mode -> (Enum) TransferModeMapper.map(mode))
+        .toList()
     );
   }
 
@@ -234,7 +279,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
 
   private static class DefaultMappingBuilder {
 
-    private final Map<String, Value> defaultValueForKey = new HashMap<String, Value>();
+    private final Map<String, Value<?>> defaultValueForKey = new HashMap<>();
 
     public DefaultMappingBuilder intReq(String key, int value) {
       defaultValueForKey.put(key, IntValue.of(value));
@@ -263,7 +308,18 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       return this;
     }
 
-    public Map<String, Value> build() {
+    public DefaultMappingBuilder enumListReq(String key, List<Enum> valueList) {
+      defaultValueForKey.put(
+        key,
+        ArrayValue
+          .newArrayValue()
+          .values((valueList.stream().map(value -> (Value) new EnumValue(value.name())).toList()))
+          .build()
+      );
+      return this;
+    }
+
+    public Map<String, Value<?>> build() {
       return defaultValueForKey;
     }
   }

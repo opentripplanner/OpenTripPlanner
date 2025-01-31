@@ -4319,7 +4319,6 @@ input PlanModesInput {
   If more than one mode is selected, at least one of them must be used but not necessarily all.
   There are modes that automatically also use walking such as the rental modes. To force rental
   to be used, this should only include the rental mode and not `WALK` in addition.
-  The default access mode is `WALK`.
   """
   direct: [PlanDirectMode!]
   "Should only the direct search without any transit be done."
@@ -4327,8 +4326,7 @@ input PlanModesInput {
   """
   Modes for different phases of an itinerary when transit is included. Also
   includes street mode selections related to connecting to the transit network
-  and transfers. By default, all transit modes are usable and `WALK` is used for
-  access, egress and transfers.
+  and transfers. By default, all transit modes are usable.
   """
   transit: PlanTransitModesInput
   """
@@ -4421,7 +4419,6 @@ input PlanTransitModesInput {
   If more than one mode is selected, at least one of them must be used but not necessarily all.
   There are modes that automatically also use walking such as the rental modes. To force rental
   to be used, this should only include the rental mode and not `WALK` in addition.
-  The default access mode is `WALK`.
   """
   access: [PlanAccessMode!]
   """
@@ -4429,13 +4426,9 @@ input PlanTransitModesInput {
   If more than one mode is selected, at least one of them must be used but not necessarily all.
   There are modes that automatically also use walking such as the rental modes. To force rental
   to be used, this should only include the rental mode and not `WALK` in addition.
-  The default access mode is `WALK`.
   """
   egress: [PlanEgressMode!]
-  """
-  Street mode that is used when searching for transfers. Selection of only one allowed for now.
-  The default transfer mode is `WALK`.
-  """
+  "Street mode that is used when searching for transfers. Selection of only one allowed for now."
   transfer: [PlanTransferMode!]
   """
   Transit modes and reluctances associated with them. Each defined mode can be used in
