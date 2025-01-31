@@ -5,6 +5,8 @@ import graphql.language.BooleanValue;
 import graphql.language.EnumValue;
 import graphql.language.FloatValue;
 import graphql.language.IntValue;
+import graphql.language.ObjectField;
+import graphql.language.ObjectValue;
 import graphql.language.StringValue;
 import graphql.language.Value;
 import graphql.schema.GraphQLArgument;
@@ -18,16 +20,19 @@ import graphql.util.TraverserContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.AccessModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.DirectModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.EgressModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.TransferModeMapper;
+import org.opentripplanner.apis.gtfs.mapping.routerequest.VehicleOptimizationTypeMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
+import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
@@ -35,6 +40,7 @@ import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferenc
 import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 /**
  * GraphQL type visitor that injects default values to input fields and query arguments from code
@@ -108,7 +114,15 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     builder
       .intReq("BicyclePreferencesInput.boardCost", bike.boardCost())
       .floatReq("BicyclePreferencesInput.reluctance", bike.reluctance())
-      .floatReq("BicyclePreferencesInput.speed", bike.speed());
+      .floatReq("BicyclePreferencesInput.speed", bike.speed())
+      .objectReq(
+        "BicyclePreferencesInput.optimization",
+        map(
+          bike.optimizeType(),
+          bike.optimizeTriangle(),
+          VehicleOptimizationTypeMapper::mapForBicycle
+        )
+      );
     setBikeParkingDefaults(bike.parking(), builder);
     setBikeRentalDefaults(bike.rental(), builder);
     setBikeWalkingDefaults(bike.walking(), builder);
@@ -209,7 +223,15 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   ) {
     builder
       .floatReq("ScooterPreferencesInput.reluctance", scooter.reluctance())
-      .floatReq("ScooterPreferencesInput.speed", scooter.speed());
+      .floatReq("ScooterPreferencesInput.speed", scooter.speed())
+      .objectReq(
+        "ScooterPreferencesInput.optimization",
+        map(
+          scooter.optimizeType(),
+          scooter.optimizeTriangle(),
+          VehicleOptimizationTypeMapper::mapForScooter
+        )
+      );
     setScooterRentalDefaults(scooter.rental(), builder);
   }
 
@@ -277,6 +299,50 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     builder.boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair());
   }
 
+  private static ObjectValue map(
+    VehicleRoutingOptimizeType type,
+    TimeSlopeSafetyTriangle triangle,
+    Function<VehicleRoutingOptimizeType, Enum> typeMapper
+  ) {
+    var optimizationField = type == VehicleRoutingOptimizeType.TRIANGLE
+      ? ObjectField
+        .newObjectField()
+        .name("triangle")
+        .value(
+          ObjectValue
+            .newObjectValue()
+            .objectField(
+              ObjectField
+                .newObjectField()
+                .name("flatness")
+                .value(FloatValue.of(triangle.slope()))
+                .build()
+            )
+            .objectField(
+              ObjectField
+                .newObjectField()
+                .name("safety")
+                .value(FloatValue.of(triangle.safety()))
+                .build()
+            )
+            .objectField(
+              ObjectField
+                .newObjectField()
+                .name("time")
+                .value(FloatValue.of(triangle.time()))
+                .build()
+            )
+            .build()
+        )
+        .build()
+      : ObjectField
+        .newObjectField()
+        .name("type")
+        .value(EnumValue.of(typeMapper.apply(type).name()))
+        .build();
+    return ObjectValue.newObjectValue().objectField(optimizationField).build();
+  }
+
   private static class DefaultMappingBuilder {
 
     private final Map<String, Value<?>> defaultValueForKey = new HashMap<>();
@@ -316,6 +382,11 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
           .values((valueList.stream().map(value -> (Value) new EnumValue(value.name())).toList()))
           .build()
       );
+      return this;
+    }
+
+    public DefaultMappingBuilder objectReq(String key, ObjectValue value) {
+      defaultValueForKey.put(key, value);
       return this;
     }
 
