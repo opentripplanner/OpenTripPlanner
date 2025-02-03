@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
 
 import com.azure.core.util.ExpandableStringEnum;
@@ -56,21 +56,22 @@ class AbstractAzureSiriUpdaterTest {
     when(mockConfig.isFuzzyTripMatching()).thenReturn(true);
 
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
-    updater = spy(new AbstractAzureSiriUpdater(mockConfig) {
-      @Override
-      protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {
-      }
+    updater =
+      spy(
+        new AbstractAzureSiriUpdater(mockConfig) {
+          @Override
+          protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {}
 
-      @Override
-      protected void errorConsumer(ServiceBusErrorContext errorContext) {
-      }
+          @Override
+          protected void errorConsumer(ServiceBusErrorContext errorContext) {}
 
-      @Override
-      protected void initializeData(String url,
-                                    Consumer<ServiceBusReceivedMessageContext> consumer
-      ) throws URISyntaxException {
-      }
-    });
+          @Override
+          protected void initializeData(
+            String url,
+            Consumer<ServiceBusReceivedMessageContext> consumer
+          ) throws URISyntaxException {}
+        }
+      );
 
     task = mock(AbstractAzureSiriUpdater.CheckedRunnable.class);
   }
@@ -81,8 +82,8 @@ class AbstractAzureSiriUpdaterTest {
    */
   @Test
   void testExecuteWithRetry_FullBackoffSequence() throws Throwable {
-    final int totalRunCalls = 10;       // 9 failures + 1 success
-    final int totalSleepCalls = 9;      // 9 retries
+    final int totalRunCalls = 10; // 9 failures + 1 success
+    final int totalSleepCalls = 9; // 9 retries
 
     doNothing().when(updater).sleep(anyInt());
 
@@ -97,7 +98,8 @@ class AbstractAzureSiriUpdaterTest {
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doNothing() // Succeed on the 10th attempt
-      .when(task).run();
+      .when(task)
+      .run();
 
     updater.executeWithRetry(task, "Test Task");
 
@@ -126,14 +128,20 @@ class AbstractAzureSiriUpdaterTest {
   public void testExecuteWithRetry_NonRetryableException() throws Throwable {
     doNothing().when(updater).sleep(anyInt());
 
-    ServiceBusException serviceBusException = createServiceBusException(ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED);
+    ServiceBusException serviceBusException = createServiceBusException(
+      ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED
+    );
 
     doThrow(serviceBusException).when(task).run();
 
     try {
       updater.executeWithRetry(task, "Test Task");
     } catch (ServiceBusException e) {
-      assertEquals(ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED, e.getReason(), "Exception should have reason MESSAGE_SIZE_EXCEEDED");
+      assertEquals(
+        ServiceBusFailureReason.MESSAGE_SIZE_EXCEEDED,
+        e.getReason(),
+        "Exception should have reason MESSAGE_SIZE_EXCEEDED"
+      );
     }
 
     verify(updater, never()).sleep(anyInt());
@@ -153,12 +161,15 @@ class AbstractAzureSiriUpdaterTest {
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doNothing()
-      .when(task).run();
+      .when(task)
+      .run();
 
     doAnswer(invocation -> {
-      latch.countDown();
-      return null;
-    }).when(updater).sleep(anyInt());
+        latch.countDown();
+        return null;
+      })
+      .when(updater)
+      .sleep(anyInt());
 
     updater.executeWithRetry(task, "Test Task");
 
@@ -169,11 +180,14 @@ class AbstractAzureSiriUpdaterTest {
     verify(updater, times(retriesBeforeSuccess)).sleep(sleepCaptor.capture());
 
     var sleepDurations = sleepCaptor.getAllValues();
-    long[] expectedBackoffSequence = {1000, 2000, 4000};
+    long[] expectedBackoffSequence = { 1000, 2000, 4000 };
 
     for (int i = 0; i < expectedBackoffSequence.length; i++) {
-      assertEquals(expectedBackoffSequence[i], Long.valueOf(sleepDurations.get(i)),
-        "Backoff duration mismatch at retry " + (i + 1));
+      assertEquals(
+        expectedBackoffSequence[i],
+        Long.valueOf(sleepDurations.get(i)),
+        "Backoff duration mismatch at retry " + (i + 1)
+      );
     }
 
     verify(task, times(retriesBeforeSuccess + 1)).run();
@@ -205,14 +219,17 @@ class AbstractAzureSiriUpdaterTest {
 
     doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doNothing()
-      .when(task).run();
+      .when(task)
+      .run();
 
     doAnswer(invocation -> {
-      if (invocation.getArgument(0).equals(1000)) {
-        latch.countDown();
-      }
-      return null;
-    }).when(updater).sleep(anyInt());
+        if (invocation.getArgument(0).equals(1000)) {
+          latch.countDown();
+        }
+        return null;
+      })
+      .when(updater)
+      .sleep(anyInt());
 
     updater.executeWithRetry(task, "Test Task");
 
@@ -232,10 +249,17 @@ class AbstractAzureSiriUpdaterTest {
   @ParameterizedTest(name = "shouldRetry with reason {0} should return {1}")
   @MethodSource("provideServiceBusFailureReasons")
   @DisplayName("Test shouldRetry for all ServiceBusFailureReason values")
-  void testShouldRetry_ServiceBusFailureReasons(ServiceBusFailureReason reason, boolean expectedRetry) throws Exception {
+  void testShouldRetry_ServiceBusFailureReasons(
+    ServiceBusFailureReason reason,
+    boolean expectedRetry
+  ) throws Exception {
     ServiceBusException serviceBusException = createServiceBusException(reason);
     boolean result = updater.shouldRetry(serviceBusException);
-    assertEquals(expectedRetry, result, "shouldRetry should return " + expectedRetry + " for reason " + reason);
+    assertEquals(
+      expectedRetry,
+      result,
+      "shouldRetry should return " + expectedRetry + " for reason " + reason
+    );
   }
 
   /**
@@ -258,7 +282,11 @@ class AbstractAzureSiriUpdaterTest {
   public void testShouldRetry_CoversAllReasons() {
     long enumCount = getExpandableStringEnumValues(ServiceBusFailureReason.class).size();
     long testCaseCount = provideServiceBusFailureReasons().count();
-    assertEquals(enumCount, testCaseCount, "All ServiceBusFailureReason values should be covered by tests.");
+    assertEquals(
+      enumCount,
+      testCaseCount,
+      "All ServiceBusFailureReason values should be covered by tests."
+    );
   }
 
   @Test
@@ -268,15 +296,24 @@ class AbstractAzureSiriUpdaterTest {
 
     doThrow(createServiceBusException(ServiceBusFailureReason.SERVICE_BUSY))
       .doThrow(new InterruptedException("Sleep interrupted"))
-      .when(task).run();
+      .when(task)
+      .run();
 
     doNothing().when(updater).sleep(1000);
 
-    InterruptedException thrownException = assertThrows(InterruptedException.class, () -> {
-      updater.executeWithRetry(task, "Test Task");
-    }, "Expected executeWithRetry to throw InterruptedException");
+    InterruptedException thrownException = assertThrows(
+      InterruptedException.class,
+      () -> {
+        updater.executeWithRetry(task, "Test Task");
+      },
+      "Expected executeWithRetry to throw InterruptedException"
+    );
 
-    assertEquals("Sleep interrupted", thrownException.getMessage(), "Exception message should match");
+    assertEquals(
+      "Sleep interrupted",
+      thrownException.getMessage(),
+      "Exception message should match"
+    );
     verify(updater, times(expectedSleepCalls)).sleep(1000);
     verify(task, times(expectedRunCalls)).run();
     assertTrue(Thread.currentThread().isInterrupted(), "Thread should be interrupted");
@@ -291,7 +328,8 @@ class AbstractAzureSiriUpdaterTest {
       .doThrow(new OtpHttpClientException("could not get historical data"))
       .doThrow(new OtpHttpClientException("could not get historical data"))
       .doNothing()
-      .when(task).run();
+      .when(task)
+      .run();
 
     doNothing().when(updater).sleep(anyInt());
 
@@ -304,8 +342,11 @@ class AbstractAzureSiriUpdaterTest {
     List<Integer> expectedBackoffSequence = Arrays.asList(1000, 2000, 4000);
 
     for (int i = 0; i < retryAttempts; i++) {
-      assertEquals(expectedBackoffSequence.get(i), sleepDurations.get(i),
-        "Backoff duration mismatch at retry " + (i + 1));
+      assertEquals(
+        expectedBackoffSequence.get(i),
+        sleepDurations.get(i),
+        "Backoff duration mismatch at retry " + (i + 1)
+      );
     }
 
     verify(task, times(retryAttempts + 1)).run();
@@ -318,9 +359,13 @@ class AbstractAzureSiriUpdaterTest {
     Exception unexpectedException = new NullPointerException("Unexpected null value");
     doThrow(unexpectedException).when(task).run();
 
-    Exception thrown = assertThrows(NullPointerException.class, () -> {
-      updater.executeWithRetry(task, "Test Task");
-    }, "Expected executeWithRetry to throw NullPointerException");
+    Exception thrown = assertThrows(
+      NullPointerException.class,
+      () -> {
+        updater.executeWithRetry(task, "Test Task");
+      },
+      "Expected executeWithRetry to throw NullPointerException"
+    );
 
     assertEquals("Unexpected null value", thrown.getMessage(), "Exception message should match");
     verify(updater, never()).sleep(anyInt());
@@ -344,7 +389,6 @@ class AbstractAzureSiriUpdaterTest {
       Arguments.of(ServiceBusFailureReason.QUOTA_EXCEEDED, true),
       Arguments.of(ServiceBusFailureReason.GENERAL_ERROR, true),
       Arguments.of(ServiceBusFailureReason.UNAUTHORIZED, true),
-
       // Non-Retryable Errors
       Arguments.of(ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND, false),
       Arguments.of(ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED, false),
@@ -361,7 +405,10 @@ class AbstractAzureSiriUpdaterTest {
    * @return A ServiceBusException instance with the specified reason.
    */
   private ServiceBusException createServiceBusException(ServiceBusFailureReason reason) {
-    ServiceBusException exception = new ServiceBusException(new Throwable(), ServiceBusErrorSource.RECEIVE);
+    ServiceBusException exception = new ServiceBusException(
+      new Throwable(),
+      ServiceBusErrorSource.RECEIVE
+    );
     try {
       Field reasonField = ServiceBusException.class.getDeclaredField("reason");
       reasonField.setAccessible(true);
@@ -379,7 +426,9 @@ class AbstractAzureSiriUpdaterTest {
    * @param <T>   The type parameter extending ExpandableStringEnum.
    * @return A Collection of all registered instances.
    */
-  private static <T extends ExpandableStringEnum<T>> Collection<T> getExpandableStringEnumValues(Class<T> clazz) {
+  private static <T extends ExpandableStringEnum<T>> Collection<T> getExpandableStringEnumValues(
+    Class<T> clazz
+  ) {
     try {
       Method valuesMethod = ExpandableStringEnum.class.getDeclaredMethod("values", Class.class);
       valuesMethod.setAccessible(true);

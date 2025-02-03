@@ -479,6 +479,20 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <configuration>
+                    <inputGlobs>
+                        <inputGlob>src/main/java/**/*.java</inputGlob>
+                        <inputGlob>src/ext/java/**/*.java</inputGlob>
+                        <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/ext-test/java/**/*.java</inputGlob>
+                        <inputGlob>src/**/*.json</inputGlob>
+                        <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
+                    </inputGlobs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>
