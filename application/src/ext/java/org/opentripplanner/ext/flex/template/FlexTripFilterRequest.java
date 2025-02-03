@@ -40,7 +40,9 @@ sealed interface FlexTripFilterRequest {
       if (containsSelect()) {
         return selectedRoutes.contains(routeId) || selectedAgencies.contains(agencyId);
       } else if (containsBan()) {
-        return !excludedRoutes.contains(routeId) && !excludedAgencies.contains(agencyId);
+        if (excludedRoutes.contains(routeId)) {
+          return false;
+        } else return !excludedAgencies.contains(agencyId);
       } else {
         return true;
       }
