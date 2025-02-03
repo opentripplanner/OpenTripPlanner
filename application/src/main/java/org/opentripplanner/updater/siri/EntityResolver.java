@@ -105,6 +105,7 @@ public class EntityResolver {
     );
   }
 
+  @Nullable
   public TripOnServiceDate resolveTripOnServiceDate(
     String serviceJourneyId,
     @Nullable LocalDate serviceDate
@@ -157,6 +158,7 @@ public class EntityResolver {
    * departure from the first stop, only the Date-part is actually used, and is defined to
    * represent the actual serviceDate. The time and zone part is ignored.
    */
+  @Nullable
   public LocalDate resolveServiceDate(@Nullable ZonedDateTime originAimedDepartureTime) {
     if (originAimedDepartureTime == null) {
       return null;
@@ -172,6 +174,7 @@ public class EntityResolver {
    * Resolve a {@link Trip} by resolving a service journey id from FramedVehicleJourneyRef ->
    * DatedVehicleJourneyRef.
    */
+  @Nullable
   public Trip resolveTrip(@Nullable FramedVehicleJourneyRefStructure journey) {
     if (journey != null) {
       return resolveTrip(journey.getDatedVehicleJourneyRef());
