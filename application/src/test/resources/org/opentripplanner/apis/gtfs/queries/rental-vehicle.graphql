@@ -19,5 +19,9 @@
       networkId
       url
     }
+    fuel {
+      percent
+      range
+    }
   }
 }

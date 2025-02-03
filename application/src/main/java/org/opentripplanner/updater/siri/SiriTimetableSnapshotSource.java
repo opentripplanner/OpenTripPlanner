@@ -16,8 +16,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -27,7 +25,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -45,12 +42,12 @@ import uk.org.siri.siri20.EstimatedVehicleJourney;
  * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
-public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
+public class SiriTimetableSnapshotSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
 
   /**
-   * Use a id generator to generate TripPattern ids for new TripPatterns created by RealTime
+   * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
    */
   private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
@@ -70,27 +67,18 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TimetableSnapshotManager snapshotManager;
 
   public SiriTimetableSnapshotSource(
-    TimetableSnapshotSourceParameters parameters,
-    TimetableRepository timetableRepository
+    TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager
   ) {
-    this.snapshotManager =
-      new TimetableSnapshotManager(
-        timetableRepository.getTransitLayerUpdater(),
-        parameters,
-        () -> LocalDate.now(timetableRepository.getTimeZone())
-      );
+    this.snapshotManager = snapshotManager;
     this.transitEditorService =
-      new DefaultTransitService(timetableRepository, getTimetableSnapshotBuffer());
+      new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshotBuffer());
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::findPattern);
-
-    timetableRepository.initTimetableSnapshotProvider(this);
   }
 
   /**
-   * Method to apply a trip update list to the most recent version of the timetable snapshot.
-   * FIXME RT_AB: TripUpdate is the GTFS term, and these SIRI ETs are never converted into that
-   *              same internal model.
+   * Method to apply estimated timetables to the most recent version of the timetable snapshot.
    *
    * @param incrementality  the incrementality of the update, for example if updates represent all
    *                        updates that are active right now, i.e. all previous updates should be
@@ -129,21 +117,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     LOG.debug("message contains {} trip updates", updates.size());
 
     return UpdateResult.ofResults(results);
-  }
-
-  @Override
-  public TimetableSnapshot getTimetableSnapshot() {
-    return snapshotManager.getTimetableSnapshot();
-  }
-
-  /**
-   * @return the current timetable snapshot buffer that contains pending changes (not yet published
-   * in a snapshot).
-   * This should be used in the context of an updater to build a TransitEditorService that sees all
-   * the changes applied so far by real-time updates.
-   */
-  public TimetableSnapshot getTimetableSnapshotBuffer() {
-    return snapshotManager.getTimetableSnapshotBuffer();
   }
 
   private Result<UpdateSuccess, UpdateError> apply(
@@ -215,7 +188,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * Snapshot timetable is used as source if initialised, trip patterns scheduled timetable if not.
    */
   private Timetable getCurrentTimetable(TripPattern tripPattern, LocalDate serviceDate) {
-    return getTimetableSnapshotBuffer().resolve(tripPattern, serviceDate);
+    return snapshotManager.getTimetableSnapshotBuffer().resolve(tripPattern, serviceDate);
   }
 
   private Result<TripUpdate, UpdateError> handleModifiedTrip(
@@ -357,12 +330,5 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     return success;
-  }
-
-  /**
-   * Flush pending changes in the timetable snapshot buffer and publish a new snapshot.
-   */
-  public void flushBuffer() {
-    snapshotManager.purgeAndCommit();
   }
 }

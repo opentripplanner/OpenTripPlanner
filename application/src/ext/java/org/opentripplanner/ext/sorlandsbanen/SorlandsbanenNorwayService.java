@@ -32,9 +32,12 @@ public class SorlandsbanenNorwayService {
   private static final double SOUTH_BORDER_LIMIT = 59.1;
   private static final int MIN_DISTANCE_LIMIT = 120_000;
 
-
   @Nullable
-  public ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(RouteRequest request, AccessEgresses accessEgresses, TransitLayer transitLayer) {
+  public ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
+    RouteRequest request,
+    AccessEgresses accessEgresses,
+    TransitLayer transitLayer
+  ) {
     WgsCoordinate from = findStopCoordinate(
       request.from(),
       accessEgresses.getAccesses(),
@@ -53,9 +56,11 @@ public class SorlandsbanenNorwayService {
 
     return new ExtraMcRouterSearch<>() {
       @Override
-      public RaptorTransitDataProvider<TripSchedule> createTransitDataAlternativeSearch(RaptorTransitDataProvider<TripSchedule> transitDataMainSearch) {
+      public RaptorTransitDataProvider<TripSchedule> createTransitDataAlternativeSearch(
+        RaptorTransitDataProvider<TripSchedule> transitDataMainSearch
+      ) {
         return new RaptorRoutingRequestTransitData(
-          (RaptorRoutingRequestTransitData)transitDataMainSearch,
+          (RaptorRoutingRequestTransitData) transitDataMainSearch,
           new CoachCostCalculator<>(transitDataMainSearch.multiCriteriaCostCalculator())
         );
       }

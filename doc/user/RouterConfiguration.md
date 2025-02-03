@@ -514,6 +514,7 @@ Used to group requests when monitoring OTP.
     },
     "car" : {
       "reluctance" : 10,
+      "boardCost" : 600,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {
@@ -568,6 +569,9 @@ Used to group requests when monitoring OTP.
         "BIKE_RENTAL" : "20m"
       },
       "maxStopCount" : 500,
+      "maxStopCountForMode" : {
+        "CAR" : 0
+      },
       "penalty" : {
         "FLEXIBLE" : {
           "timePenalty" : "2m + 1.1t",

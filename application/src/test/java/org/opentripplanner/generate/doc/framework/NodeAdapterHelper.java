@@ -15,6 +15,7 @@ public class NodeAdapterHelper {
     new AnchorAbbreviation("od.", "osmDefaults."),
     new AnchorAbbreviation("lfp.", "localFileNamePatterns."),
     new AnchorAbbreviation("u.", "updaters."),
+    new AnchorAbbreviation("tpfm.", "transferParametersForMode."),
     new AnchorAbbreviation("0.", "[0]."),
     new AnchorAbbreviation("1.", "[1].")
   );

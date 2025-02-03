@@ -24,6 +24,7 @@ export function DepartureArrivalSelect({
         size="sm"
         onChange={(e) => (e.target.value === 'arrival' ? onChange(true) : onChange(false))}
         value={tripQueryVariables.arriveBy ? 'arrival' : 'departure'}
+        style={{ verticalAlign: 'bottom' }}
       >
         <option value="arrival">Arrive before</option>
         <option value="departure">Depart after</option>

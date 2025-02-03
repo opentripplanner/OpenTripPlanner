@@ -222,10 +222,7 @@ public class IndexAPI {
       );
 
       var stops = transitService().findRegularStopsByBoundingBox(envelope);
-      return stops
-        .stream()
-        .map(StopMapper::mapToApiShort)
-        .toList();
+      return stops.stream().map(StopMapper::mapToApiShort).toList();
     }
   }
 

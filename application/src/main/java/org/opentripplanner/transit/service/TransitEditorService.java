@@ -32,23 +32,4 @@ public interface TransitEditorService extends TransitService {
    */
   @Nullable
   Trip getScheduledTrip(FeedScopedId id);
-
-  /**
-   * Set the original, immutable, transit layer,
-   * based on scheduled data (not real-time data).
-   */
-  void setTransitLayer(TransitLayer transitLayer);
-
-  /**
-   * Return true if a real-time transit layer is present.
-   * The real-time transit layer is optional,
-   * it is present only when real-time updaters are configured.
-   */
-  boolean hasRealtimeTransitLayer();
-
-  /**
-   * Publish the latest snapshot of the real-time transit layer.
-   * Should be called only when creating a new TransitLayer, from the graph writer thread.
-   */
-  void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer);
 }

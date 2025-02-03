@@ -3,7 +3,6 @@ package org.opentripplanner.ext.sorlandsbanen;
 import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 
-
 /**
  * The purpose of this class is to create a key to be able to compare paths so duplicate results
  * can be ignored.

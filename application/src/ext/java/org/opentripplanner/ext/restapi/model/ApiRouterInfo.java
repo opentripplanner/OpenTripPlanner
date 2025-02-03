@@ -50,7 +50,12 @@ public class ApiRouterInfo {
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
     this.travelOptions =
-      ApiTravelOptionsMaker.makeOptions(graph, vehicleRentalService, vehicleParkingService, transitService);
+      ApiTravelOptionsMaker.makeOptions(
+        graph,
+        vehicleRentalService,
+        vehicleParkingService,
+        transitService
+      );
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {

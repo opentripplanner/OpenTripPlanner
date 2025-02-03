@@ -62,17 +62,11 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   private void removeShortWalkLegs(Itinerary itinerary) {
     var legs = new ArrayList<>(itinerary.getLegs());
     var first = legs.getFirst();
-    if (
-      service.isPartOfConsolidatedStop(first.getTo().stop) &&
-        isShortWalkLeg(first)
-    ) {
+    if (service.isPartOfConsolidatedStop(first.getTo().stop) && isShortWalkLeg(first)) {
       legs.removeFirst();
     }
     var last = legs.getLast();
-    if (
-      service.isPartOfConsolidatedStop(last.getFrom().stop) &&
-        isShortWalkLeg(last)
-    ) {
+    if (service.isPartOfConsolidatedStop(last.getFrom().stop) && isShortWalkLeg(last)) {
       legs.removeLast();
     }
 
@@ -82,14 +76,15 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   }
 
   private boolean isTransferWithinConsolidatedStop(Leg l) {
-    return isShortWalkLeg(l) &&
+    return (
+      isShortWalkLeg(l) &&
       service.isPartOfConsolidatedStop(l.getFrom().stop) &&
-      service.isPartOfConsolidatedStop(l.getTo().stop);
+      service.isPartOfConsolidatedStop(l.getTo().stop)
+    );
   }
 
   private static boolean isShortWalkLeg(Leg leg) {
-    return leg.isWalkingLeg() &&
-      leg.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS;
+    return leg.isWalkingLeg() && leg.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS;
   }
 
   /**

@@ -37,7 +37,7 @@ class GbfsFreeVehicleStatusMapperTest {
         new FeedScopedId("1", "scooter"),
         "Scooter",
         RentalFormFactor.SCOOTER,
-        null,
+        RentalVehicleType.PropulsionType.COMBUSTION,
         null
       )
     )
@@ -62,7 +62,6 @@ class GbfsFreeVehicleStatusMapperTest {
     bike.setLon(1d);
     bike.setVehicleTypeId("bike");
     var mapped = MAPPER.mapFreeVehicleStatus(bike);
-
     assertEquals("Default vehicle type", mapped.name.toString());
   }
 
@@ -73,6 +72,7 @@ class GbfsFreeVehicleStatusMapperTest {
     bike.setLat(1d);
     bike.setLon(1d);
     bike.setVehicleTypeId("scooter");
+    bike.setCurrentRangeMeters(2000d);
     var mapped = MAPPER.mapFreeVehicleStatus(bike);
 
     assertEquals("Scooter", mapped.name.toString());

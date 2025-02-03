@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
-
 import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.messaging.servicebus.ServiceBusClientBuilder;
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
@@ -98,9 +97,14 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config) {
     this.configRef = Objects.requireNonNull(config.configRef(), "configRef must not be null");
-    this.authenticationType = Objects.requireNonNull(config.getAuthenticationType(), "authenticationType must not be null");
+    this.authenticationType =
+      Objects.requireNonNull(config.getAuthenticationType(), "authenticationType must not be null");
     this.topicName = Objects.requireNonNull(config.getTopicName(), "topicName must not be null");
-    this.dataInitializationUrl = Objects.requireNonNull(config.getDataInitializationUrl(), "dataInitializationUrl must not be null");
+    this.dataInitializationUrl =
+      Objects.requireNonNull(
+        config.getDataInitializationUrl(),
+        "dataInitializationUrl must not be null"
+      );
     this.timeout = config.getTimeout();
     this.feedId = Objects.requireNonNull(config.feedId(), "feedId must not be null");
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
@@ -108,16 +112,18 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     this.fuzzyTripMatching = config.isFuzzyTripMatching();
 
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      this.fullyQualifiedNamespace = Objects.requireNonNull(
-        config.getFullyQualifiedNamespace(),
-        "fullyQualifiedNamespace must not be null when using FederatedIdentity authentication"
-      );
+      this.fullyQualifiedNamespace =
+        Objects.requireNonNull(
+          config.getFullyQualifiedNamespace(),
+          "fullyQualifiedNamespace must not be null when using FederatedIdentity authentication"
+        );
       this.serviceBusUrl = null;
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      this.serviceBusUrl = Objects.requireNonNull(
-        config.getServiceBusUrl(),
-        "serviceBusUrl must not be null when using SharedAccessKey authentication"
-      );
+      this.serviceBusUrl =
+        Objects.requireNonNull(
+          config.getServiceBusUrl(),
+          "serviceBusUrl must not be null when using SharedAccessKey authentication"
+        );
       this.fullyQualifiedNamespace = null;
     } else {
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
@@ -143,7 +149,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   @Override
   public void run() {
-
     // In Kubernetes this should be the POD identifier
     subscriptionName = System.getenv("HOSTNAME");
     if (subscriptionName == null || subscriptionName.isBlank()) {
@@ -151,20 +156,14 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     }
 
     try {
-      executeWithRetry(
-        this::setupSubscription,
-        "Setting up Service Bus subscription to topic"
-      );
+      executeWithRetry(this::setupSubscription, "Setting up Service Bus subscription to topic");
 
       executeWithRetry(
         () -> initializeData(dataInitializationUrl, messageConsumer),
         "Initializing historical Siri data"
       );
 
-      executeWithRetry(
-        this::startEventProcessor,
-        "Starting Service Bus event processor"
-      );
+      executeWithRetry(this::startEventProcessor, "Starting Service Bus event processor");
 
       setPrimed();
 
@@ -181,7 +180,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
           }
         }
       );
-
     } catch (ServiceBusException e) {
       LOG.error("Service Bus encountered an error during setup: {}", e.getMessage(), e);
     } catch (URISyntaxException e) {
@@ -235,7 +233,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         attemptCounter++;
         try {
           sleep(sleepPeriod);
-        } catch (InterruptedException ie){
+        } catch (InterruptedException ie) {
           LOG.warn("{} was interrupted during sleep.", description);
           Thread.currentThread().interrupt(); // Restore interrupted status
           throw ie;
@@ -250,21 +248,16 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       ServiceBusFailureReason reason = sbException.getReason();
 
       if (RETRYABLE_REASONS.contains(reason)) {
-
         LOG.warn("Transient error encountered: {}. Retrying...", reason);
         return true;
-
       } else if (NON_RETRYABLE_REASONS.contains(reason)) {
-
         LOG.error("Non-recoverable error encountered: {}. Not retrying.", reason);
         return false;
-
       } else {
         LOG.warn("Unhandled ServiceBusFailureReason: {}. Retrying by default.", reason);
         return true;
       }
-    }
-    else if (ExceptionUtils.hasCause(e, OtpHttpClientException.class)){
+    } else if (ExceptionUtils.hasCause(e, OtpHttpClientException.class)) {
       // retry for OtpHttpClientException as it is thrown if historical data can't be read at the moment
       return true;
     }
@@ -297,8 +290,15 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       .setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
-    if ( Boolean.TRUE.equals( serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName).block())) {
-      LOG.info("Subscription '{}' already exists. Deleting existing subscription.", subscriptionName);
+    if (
+      Boolean.TRUE.equals(
+        serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName).block()
+      )
+    ) {
+      LOG.info(
+        "Subscription '{}' already exists. Deleting existing subscription.",
+        subscriptionName
+      );
       serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
       LOG.info("Service Bus deleted subscription {}.", subscriptionName);
     }
@@ -314,28 +314,34 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     ServiceBusClientBuilder clientBuilder = new ServiceBusClientBuilder();
 
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      Preconditions.checkNotNull(fullyQualifiedNamespace, "fullyQualifiedNamespace must be set for FederatedIdentity authentication");
+      Preconditions.checkNotNull(
+        fullyQualifiedNamespace,
+        "fullyQualifiedNamespace must be set for FederatedIdentity authentication"
+      );
       clientBuilder
         .fullyQualifiedNamespace(fullyQualifiedNamespace)
         .credential(new DefaultAzureCredentialBuilder().build());
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      Preconditions.checkNotNull(serviceBusUrl, "serviceBusUrl must be set for SharedAccessKey authentication");
-      clientBuilder
-        .connectionString(serviceBusUrl);
+      Preconditions.checkNotNull(
+        serviceBusUrl,
+        "serviceBusUrl must be set for SharedAccessKey authentication"
+      );
+      clientBuilder.connectionString(serviceBusUrl);
     } else {
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
     }
 
-    eventProcessor = clientBuilder
-      .processor()
-      .topicName(topicName)
-      .subscriptionName(subscriptionName)
-      .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-      .disableAutoComplete() // Receive and delete does not need autocomplete
-      .prefetchCount(prefetchCount)
-      .processError(errorConsumer)
-      .processMessage(messageConsumer)
-      .buildProcessorClient();
+    eventProcessor =
+      clientBuilder
+        .processor()
+        .topicName(topicName)
+        .subscriptionName(subscriptionName)
+        .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+        .disableAutoComplete() // Receive and delete does not need autocomplete
+        .prefetchCount(prefetchCount)
+        .processError(errorConsumer)
+        .processMessage(messageConsumer)
+        .buildProcessorClient();
 
     eventProcessor.start();
     LOG.info(
@@ -345,7 +351,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       prefetchCount
     );
   }
-
 
   @Override
   public boolean isPrimed() {
@@ -391,7 +396,6 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     return fuzzyTripMatching;
   }
 
-
   protected abstract void initializeData(
     String url,
     Consumer<ServiceBusReceivedMessageContext> consumer
@@ -416,8 +420,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
     var reason = e.getReason();
 
-    if (reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-        reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND) {
+    if (
+      reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
+      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
+    ) {
       LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",
         reason,
@@ -425,8 +431,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       );
     } else if (reason == ServiceBusFailureReason.MESSAGE_LOCK_LOST) {
       LOG.error("Message lock lost for message", e);
-    } else if (reason == ServiceBusFailureReason.SERVICE_BUSY ||
-      reason == ServiceBusFailureReason.UNAUTHORIZED) {
+    } else if (
+      reason == ServiceBusFailureReason.SERVICE_BUSY ||
+      reason == ServiceBusFailureReason.UNAUTHORIZED
+    ) {
       LOG.error("Service Bus is busy or unauthorized, wait and try again");
       try {
         // Choosing an arbitrary amount of time to wait until trying again.

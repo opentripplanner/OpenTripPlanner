@@ -20,10 +20,10 @@ export function ItineraryFilterDebugSelect({
         onChange={(e) => {
           setTripQueryVariables({
             ...tripQueryVariables,
-            itineraryFiltersDebug: e.target.value as ItineraryFilterDebugProfile,
+            itineraryFilters: { debug: e.target.value as ItineraryFilterDebugProfile },
           });
         }}
-        value={tripQueryVariables.itineraryFiltersDebug || 'not_selected'}
+        value={tripQueryVariables.itineraryFilters?.debug || 'not_selected'}
       >
         <option value="not_selected">Not selected</option>
         {Object.values(ItineraryFilterDebugProfile).map((debugProfile) => (
