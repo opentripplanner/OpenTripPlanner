@@ -20,10 +20,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
- * In order to keep code reviews easier this is an intermediate stage and will be refactored further.
- * In particular the following refactorings are planned:
- * <p>
- * - create only one "snapshot manager" per transit model that is shared between Siri/GTFS-RT updaters
  */
 public final class TimetableSnapshotManager {
 
@@ -61,7 +57,7 @@ public final class TimetableSnapshotManager {
    *                     considered 'today'. This is useful for unit testing.
    */
   public TimetableSnapshotManager(
-    TransitLayerUpdater transitLayerUpdater,
+    @Nullable TransitLayerUpdater transitLayerUpdater,
     TimetableSnapshotSourceParameters parameters,
     Supplier<LocalDate> localDateNow
   ) {
@@ -73,8 +69,8 @@ public final class TimetableSnapshotManager {
   }
 
   /**
-   * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   * timetable objects it references are guaranteed to never change, so the requesting thread is
+   * @return an up-to-date snapshot of real-time data. This snapshot and the timetable objects it
+   * references are guaranteed to never change, so the requesting thread is
    * provided a consistent view of all TripTimes. The routing thread need only release its reference
    * to the snapshot to release resources.
    */
