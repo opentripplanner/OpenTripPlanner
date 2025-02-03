@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import java.util.List;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * Filters trips based on filter criteria. This is a much reduced version of the general
@@ -20,12 +21,16 @@ public class FlexTransitFilter {
     this.filters = filters;
   }
 
+  boolean allowsTrip(ClosestTrip closestTrip) {
+    return allowsTrip(closestTrip.flexTrip().getTrip());
+  }
+
   /**
    * Should the trip be considered according to the filter criteria.
    */
-  public boolean allowsTrip(ClosestTrip closestTrip) {
+  public boolean allowsTrip(Trip trip) {
     for (var filter : filters) {
-      if (!filter.allowsTrip(closestTrip.flexTrip().getTrip())) {
+      if (!filter.allowsTrip(trip)) {
         return false;
       }
     }
