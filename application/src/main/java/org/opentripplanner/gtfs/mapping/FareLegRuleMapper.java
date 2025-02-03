@@ -4,13 +4,17 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import java.util.Collection;
 import java.util.Objects;
-import org.opentripplanner.ext.fares.model.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class FareLegRuleMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(FareLegRuleMapper.class);
 
   private final FareProductMapper fareProductMapper;
   private final DataImportIssueStore issueStore;
@@ -75,8 +79,28 @@ public final class FareLegRuleMapper {
         fareLegRule.getMaxDistance().intValue()
       );
       case 1 -> new FareDistance.LinearDistance(
-        Distance.ofMeters(fareLegRule.getMinDistance()),
-        Distance.ofMeters(fareLegRule.getMaxDistance())
+        Distance
+          .ofMetersBoxed(
+            fareLegRule.getMinDistance(),
+            error ->
+              LOG.warn(
+                "Fare leg rule min distance not valid: {} - {}",
+                fareLegRule.getMinDistance(),
+                error
+              )
+          )
+          .orElse(null),
+        Distance
+          .ofMetersBoxed(
+            fareLegRule.getMaxDistance(),
+            error ->
+              LOG.warn(
+                "Fare leg rule max distance not valid: {} - {}",
+                fareLegRule.getMaxDistance(),
+                error
+              )
+          )
+          .orElse(null)
       );
       default -> null;
     };

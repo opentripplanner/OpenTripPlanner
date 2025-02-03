@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -13,14 +14,17 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
@@ -29,6 +33,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -38,6 +43,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -46,6 +52,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 
@@ -212,6 +219,14 @@ public abstract class GtfsTest {
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
+
+    createTransitLayerForRaptor(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
+
+    var snapshotManager = new TimetableSnapshotManager(
+      new TransitLayerUpdater(timetableRepository),
+      TimetableSnapshotSourceParameters.PUBLISH_IMMEDIATELY,
+      LocalDate::now
+    );
     serverContext =
       TestServerContext.createServerContext(
         graph,
@@ -219,12 +234,7 @@ public abstract class GtfsTest {
         fareServiceFactory.makeFareService()
       );
     timetableSnapshotSource =
-      new TimetableSnapshotSource(
-        TimetableSnapshotSourceParameters.DEFAULT
-          .withPurgeExpiredData(true)
-          .withMaxSnapshotFrequency(Duration.ZERO),
-        timetableRepository
-      );
+      new TimetableSnapshotSource(timetableRepository, snapshotManager, LocalDate::now);
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
@@ -244,8 +254,14 @@ public abstract class GtfsTest {
         updates,
         feedId.getId()
       );
-      timetableSnapshotSource.flushBuffer();
       alertsUpdateHandler.update(feedMessage, null);
-    } catch (Exception exception) {}
+    } catch (FileNotFoundException exception) {}
+    serverContext =
+      TestServerContext.createServerContext(
+        graph,
+        timetableRepository,
+        snapshotManager,
+        new DefaultFareService()
+      );
   }
 }

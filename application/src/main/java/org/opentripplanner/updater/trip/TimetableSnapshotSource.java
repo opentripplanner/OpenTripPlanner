@@ -43,7 +43,6 @@ import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -63,7 +62,6 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -80,7 +78,7 @@ import org.slf4j.event.Level;
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
  * a specific point in time.
  */
-public class TimetableSnapshotSource implements TimetableSnapshotProvider {
+public class TimetableSnapshotSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
@@ -108,37 +106,22 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private final TimetableSnapshotManager snapshotManager;
   private final Supplier<LocalDate> localDateNow;
 
-  public TimetableSnapshotSource(
-    TimetableSnapshotSourceParameters parameters,
-    TimetableRepository timetableRepository
-  ) {
-    this(parameters, timetableRepository, () -> LocalDate.now(timetableRepository.getTimeZone()));
-  }
-
   /**
    * Constructor is package local to allow unit-tests to provide their own clock, not using system
    * time.
    */
-  TimetableSnapshotSource(
-    TimetableSnapshotSourceParameters parameters,
+  public TimetableSnapshotSource(
     TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
     Supplier<LocalDate> localDateNow
   ) {
-    this.snapshotManager =
-      new TimetableSnapshotManager(
-        timetableRepository.getTransitLayerUpdater(),
-        parameters,
-        localDateNow
-      );
+    this.snapshotManager = snapshotManager;
     this.timeZone = timetableRepository.getTimeZone();
+    this.localDateNow = localDateNow;
     this.transitEditorService =
       new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshotBuffer());
     this.deduplicator = timetableRepository.getDeduplicator();
     this.serviceCodes = timetableRepository.getServiceCodes();
-    this.localDateNow = localDateNow;
-
-    // Inject this into the transit model
-    timetableRepository.initTimetableSnapshotProvider(this);
   }
 
   /**
@@ -346,20 +329,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
     return tripTimes.getRealTimeState() == RealTimeState.ADDED;
-  }
-
-  @Override
-  public TimetableSnapshot getTimetableSnapshot() {
-    return snapshotManager.getTimetableSnapshot();
-  }
-
-  /**
-   * @return the current timetable snapshot buffer that contains pending changes (not yet published
-   * in a snapshot). This should be used in the context of an updater to build  a TransitEditorService
-   * that sees all the changes applied so far by real-time updates.
-   */
-  public TimetableSnapshot getTimetableSnapshotBuffer() {
-    return snapshotManager.getTimetableSnapshotBuffer();
   }
 
   private static void logUpdateResult(
@@ -1240,9 +1209,5 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   private enum CancelationType {
     CANCEL,
     DELETE,
-  }
-
-  public void flushBuffer() {
-    snapshotManager.purgeAndCommit();
   }
 }

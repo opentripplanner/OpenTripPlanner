@@ -1,8 +1,9 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
 
 import io.micrometer.core.instrument.Metrics;
+import java.time.LocalDate;
 import java.util.List;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
@@ -32,20 +33,43 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 public class TestServerContext {
 
   private TestServerContext() {}
 
-  /** Create a context for unit testing, using the default RouteRequest. */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository,
     FareService fareService
   ) {
     timetableRepository.index();
-    final RouterConfig routerConfig = RouterConfig.DEFAULT;
-    var transitService = new DefaultTransitService(timetableRepository);
+    createTransitLayerForRaptor(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
+    return createServerContext(
+      graph,
+      timetableRepository,
+      new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now),
+      fareService
+    );
+  }
+
+  /** Create a context for unit testing, using the default RouteRequest. */
+  public static OtpServerRequestContext createServerContext(
+    Graph graph,
+    TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
+    FareService fareService
+  ) {
+    timetableRepository.index();
+    var routerConfig = RouterConfig.DEFAULT;
+    //createTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
+    snapshotManager.purgeAndCommit();
+    var transitService = new DefaultTransitService(
+      timetableRepository,
+      snapshotManager.getTimetableSnapshot()
+    );
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
@@ -54,7 +78,7 @@ public class TestServerContext {
         RaptorEnvironmentFactory.create(routerConfig.transitTuningConfig().searchThreadPoolSize())
       ),
       graph,
-      new DefaultTransitService(timetableRepository),
+      transitService,
       Metrics.globalRegistry,
       routerConfig.vectorTileConfig(),
       createWorldEnvelopeService(),
@@ -72,7 +96,6 @@ public class TestServerContext {
       DebugUiConfig.DEFAULT,
       fareService
     );
-    creatTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
     return context;
   }
 

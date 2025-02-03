@@ -542,7 +542,20 @@ does not exist.
               Safety limit to prevent access to and egress from too many stops.
               """
               )
-              .asInt(dftAccessEgress.maxStopCount())
+              .asInt(dftAccessEgress.defaultMaxStopCount()),
+            cae
+              .of("maxStopCountForMode")
+              .since(V2_7)
+              .summary(
+                "Maximal number of stops collected in access/egress routing for the given mode"
+              )
+              .description(
+                """
+              Safety limit to prevent access to and egress from too many stops.
+              Mode-specific version of `maxStopCount`.
+              """
+              )
+              .asEnumMap(StreetMode.class, Integer.class)
           );
       })
       .withMaxDirectDuration(
