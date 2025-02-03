@@ -514,6 +514,7 @@ Used to group requests when monitoring OTP.
     },
     "car" : {
       "reluctance" : 10,
+      "boardCost" : 600,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {
