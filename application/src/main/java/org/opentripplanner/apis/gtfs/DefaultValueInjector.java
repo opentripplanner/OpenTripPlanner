@@ -39,6 +39,8 @@ import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferen
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingFilter;
+import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingSelect;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
@@ -117,7 +119,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       .floatReq("BicyclePreferencesInput.speed", bike.speed())
       .objectReq(
         "BicyclePreferencesInput.optimization",
-        map(
+        mapVehicleOptimize(
           bike.optimizeType(),
           bike.optimizeTriangle(),
           VehicleOptimizationTypeMapper::mapForBicycle
@@ -132,10 +134,16 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleParkingPreferences parking,
     DefaultMappingBuilder builder
   ) {
-    builder.intReq(
-      "BicycleParkingPreferencesInput.unpreferredCost",
-      parking.unpreferredVehicleParkingTagCost().toSeconds()
-    );
+    builder
+      .intReq(
+        "BicycleParkingPreferencesInput.unpreferredCost",
+        parking.unpreferredVehicleParkingTagCost().toSeconds()
+      )
+      .arrayReq("BicycleParkingPreferencesInput.filters", mapVehicleParkingFilter(parking.filter()))
+      .arrayReq(
+        "BicycleParkingPreferencesInput.preferred",
+        mapVehicleParkingFilter(parking.preferred())
+      );
   }
 
   private static void setBikeRentalDefaults(
@@ -176,10 +184,16 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     VehicleParkingPreferences parking,
     DefaultMappingBuilder builder
   ) {
-    builder.intReq(
-      "CarParkingPreferencesInput.unpreferredCost",
-      parking.unpreferredVehicleParkingTagCost().toSeconds()
-    );
+    builder
+      .intReq(
+        "CarParkingPreferencesInput.unpreferredCost",
+        parking.unpreferredVehicleParkingTagCost().toSeconds()
+      )
+      .arrayReq("CarParkingPreferencesInput.filters", mapVehicleParkingFilter(parking.filter()))
+      .arrayReq(
+        "CarParkingPreferencesInput.preferred",
+        mapVehicleParkingFilter(parking.preferred())
+      );
   }
 
   private static void setModeDefaults(JourneyRequest journey, DefaultMappingBuilder builder) {
@@ -226,7 +240,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       .floatReq("ScooterPreferencesInput.speed", scooter.speed())
       .objectReq(
         "ScooterPreferencesInput.optimization",
-        map(
+        mapVehicleOptimize(
           scooter.optimizeType(),
           scooter.optimizeTriangle(),
           VehicleOptimizationTypeMapper::mapForScooter
@@ -299,7 +313,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     builder.boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair());
   }
 
-  private static ObjectValue map(
+  private static ObjectValue mapVehicleOptimize(
     VehicleRoutingOptimizeType type,
     TimeSlopeSafetyTriangle triangle,
     Function<VehicleRoutingOptimizeType, Enum> typeMapper
@@ -341,6 +355,51 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
         .value(EnumValue.of(typeMapper.apply(type).name()))
         .build();
     return ObjectValue.newObjectValue().objectField(optimizationField).build();
+  }
+
+  private static ArrayValue mapVehicleParkingFilter(VehicleParkingFilter filter) {
+    var arrayBuilder = ArrayValue.newArrayValue();
+    if (!filter.not().isEmpty() || !filter.select().isEmpty()) {
+      arrayBuilder.value(
+        ObjectValue
+          .newObjectValue()
+          .objectField(mapVehicleParkingSelects("not", filter.not()))
+          .objectField(mapVehicleParkingSelects("select", filter.select()))
+          .build()
+      );
+    }
+    return arrayBuilder.build();
+  }
+
+  private static ObjectField mapVehicleParkingSelects(
+    String fieldName,
+    List<VehicleParkingSelect> selectList
+  ) {
+    var selects = selectList
+      .stream()
+      .map(select ->
+        (Value) ObjectValue
+          .newObjectValue()
+          .objectField(
+            ObjectField
+              .newObjectField()
+              .name("tags")
+              .value(
+                ArrayValue
+                  .newArrayValue()
+                  .values(select.tags().stream().map(tag -> (Value) StringValue.of(tag)).toList())
+                  .build()
+              )
+              .build()
+          )
+          .build()
+      )
+      .toList();
+    return ObjectField
+      .newObjectField()
+      .name(fieldName)
+      .value(ArrayValue.newArrayValue().values(selects).build())
+      .build();
   }
 
   private static class DefaultMappingBuilder {
@@ -386,6 +445,11 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     }
 
     public DefaultMappingBuilder objectReq(String key, ObjectValue value) {
+      defaultValueForKey.put(key, value);
+      return this;
+    }
+
+    public DefaultMappingBuilder arrayReq(String key, ArrayValue value) {
       defaultValueForKey.put(key, value);
       return this;
     }

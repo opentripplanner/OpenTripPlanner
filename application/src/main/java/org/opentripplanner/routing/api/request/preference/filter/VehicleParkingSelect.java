@@ -19,6 +19,11 @@ public sealed interface VehicleParkingSelect {
    */
   boolean isEmpty();
 
+  /**
+   * Get the tags from the select. Is not meant for checking for matches.
+   */
+  Set<String> tags();
+
   record TagsSelect(Set<String> tags) implements VehicleParkingSelect {
     @Override
     public boolean matches(VehicleParking p) {
@@ -28,6 +33,11 @@ public sealed interface VehicleParkingSelect {
     @Override
     public boolean isEmpty() {
       return tags.isEmpty();
+    }
+
+    @Override
+    public Set<String> tags() {
+      return tags;
     }
 
     @Override
