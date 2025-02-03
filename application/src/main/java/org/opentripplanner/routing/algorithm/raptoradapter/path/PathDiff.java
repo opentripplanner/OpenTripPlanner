@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
@@ -48,11 +47,11 @@ public class PathDiff<T extends RaptorTripSchedule> {
     this.walkDuration =
       path
         .legStream()
-        .filter(PathLeg::isTransferLeg)
+        .filter(l -> l.isAccessLeg() || l.isTransferLeg() || l.isEgressLeg())
         .mapToInt(l -> l.asTransferLeg().duration())
         .sum();
     this.routes.addAll(
-        path.transitLegs().map(l -> l.trip().pattern().debugInfo()).collect(Collectors.toList())
+        path.transitLegs().map(l -> l.trip().pattern().debugInfo()).toList()
       );
     this.stops.addAll(path.listStops());
   }
@@ -68,10 +67,12 @@ public class PathDiff<T extends RaptorTripSchedule> {
   ) {
     var result = diff(left, right, skipCost);
 
+    // Walk* is access + transfer + egress time, independent of street mode - could be flex
+    // or bycycle as well.
     TableBuilder tbl = Table
       .of()
       .withAlights(Center, Right, Right, Right, Right, Right, Right, Left)
-      .withHeaders("STATUS", "TX", "Duration", "Cost", "Walk", "Start", "End", "Path");
+      .withHeaders("STATUS", "TX", "Duration", "Cost", "Walk*", "Start", "End", "Path");
 
     for (DiffEntry<PathDiff<T>> e : result) {
       if (skipEquals && e.isEqual()) {
