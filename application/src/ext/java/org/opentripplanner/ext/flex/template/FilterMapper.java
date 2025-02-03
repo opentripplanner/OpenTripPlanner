@@ -9,32 +9,48 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FilterMapper {
+
   public static FlexTripFilterRequest mapFilters(TransitFilterRequest sr) {
     var bannedAgencies = new HashSet<FeedScopedId>();
     var bannedRoutes = new HashSet<FeedScopedId>();
     var selectedAgencies = new HashSet<FeedScopedId>();
     var selectedRoutes = new HashSet<FeedScopedId>();
 
-    sr.not().forEach(s -> {
-      bannedRoutes.addAll(s.routes());
-      bannedAgencies.addAll(s.agencies());
-    });
-    sr.select().forEach(s -> {
-      selectedRoutes.addAll(s.routes());
-      selectedAgencies.addAll(s.agencies());
-    });
+    sr
+      .not()
+      .forEach(s -> {
+        bannedRoutes.addAll(s.routes());
+        bannedAgencies.addAll(s.agencies());
+      });
+    sr
+      .select()
+      .forEach(s -> {
+        selectedRoutes.addAll(s.routes());
+        selectedAgencies.addAll(s.agencies());
+      });
 
-    return new FlexTripFilterRequest.Filter(selectedAgencies, bannedAgencies, selectedRoutes, bannedRoutes);
+    return new FlexTripFilterRequest.Filter(
+      selectedAgencies,
+      bannedAgencies,
+      selectedRoutes,
+      bannedRoutes
+    );
   }
 
   public static List<FlexTripFilterRequest> mapFilters(List<TransitFilter> filters) {
-    return filters.stream().map(s -> switch (s) {
-      case TransitFilterRequest sr -> mapFilters(sr);
-      case AllowAllTransitFilter sr -> new FlexTripFilterRequest.AllowAll();
-      // excluding all transit means all fixed schedule transit but flex can still be use for
-      // direct routes, therefor it means to everything in the contrext of flex
-      case ExcludeAllTransitFilter f -> new FlexTripFilterRequest.AllowAll();
-      default -> throw new IllegalStateException("Unexpected value: " + s);
-    }).distinct().toList();
+    return filters
+      .stream()
+      .map(s ->
+        switch (s) {
+          case TransitFilterRequest sr -> mapFilters(sr);
+          case AllowAllTransitFilter sr -> new FlexTripFilterRequest.AllowAll();
+          // excluding all transit means all fixed schedule transit but flex can still be use for
+          // direct routes, therefor it means to everything in the contrext of flex
+          case ExcludeAllTransitFilter f -> new FlexTripFilterRequest.AllowAll();
+          default -> throw new IllegalStateException("Unexpected value: " + s);
+        }
+      )
+      .distinct()
+      .toList();
   }
 }

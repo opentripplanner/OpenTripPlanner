@@ -240,7 +240,10 @@ public class FlexIntegrationTest {
     var modes = request.journey().modes().copyOf();
 
     if (onlyDirect) {
-      modes.withDirectMode(FLEXIBLE).withAccessMode(StreetMode.WALK).withEgressMode(StreetMode.WALK);
+      modes
+        .withDirectMode(FLEXIBLE)
+        .withAccessMode(StreetMode.WALK)
+        .withEgressMode(StreetMode.WALK);
       request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
       request.journey().transit().disable();
     } else {

@@ -61,7 +61,11 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       .sorted(Comparator.comparingDouble(areaStop -> areaStop.getGeometry().getArea()))
       .parallel()
       .flatMap(areaStop -> {
-        LOG.info("Computing vertices for {} with area {}", areaStop, areaStop.getGeometry().getArea());
+        LOG.info(
+          "Computing vertices for {} with area {}",
+          areaStop,
+          areaStop.getGeometry().getArea()
+        );
         var result = matchingVerticesForStop(streetIndex, areaStop);
         progress.step(m -> LOG.info(m));
         return result;

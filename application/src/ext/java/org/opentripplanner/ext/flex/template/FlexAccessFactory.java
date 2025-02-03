@@ -49,5 +49,4 @@ public class FlexAccessFactory {
       .flatMap(it -> templateFactory.createAccessTemplates(it).stream())
       .toList();
   }
-
 }
