@@ -327,6 +327,13 @@ public class OtpTransitServiceBuilder {
   }
 
   /**
+   * Add a mapping from a scheduled stop point to the regular stop.
+   */
+  public void addStopByScheduledStopPoint(FeedScopedId sspid, RegularStop stop) {
+    stopsByScheduledStopPoints.put(sspid, stop);
+  }
+
+  /**
    * Find all serviceIds in both CalendarServices and CalendarServiceDates.
    */
   Set<FeedScopedId> findAllServiceIds() {
