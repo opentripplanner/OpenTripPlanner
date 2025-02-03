@@ -4,22 +4,21 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.filter.FlexTripFilter;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
-import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessFactory {
 
   private final FlexAccessEgressCallbackAdapter callbackService;
-  private final FlexTransitFilter filter;
+  private final FlexTripFilter filter;
   private final FlexTemplateFactory templateFactory;
 
   public FlexAccessFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator pathCalculator,
     Duration maxTransferDuration,
-    FlexTransitFilter filter
+    FlexTripFilter filter
   ) {
     this.callbackService = callbackService;
     this.filter = filter;
@@ -45,7 +44,7 @@ public class FlexAccessFactory {
     var closestFlexTrips = ClosestTrip.of(callbackService, streetAccesses, dates, true);
     return closestFlexTrips
       .stream()
-      .filter(filter::allowsTrip)
+      .filter(ct -> filter.allowsTrip(ct.flexTrip().getTrip()))
       .flatMap(it -> templateFactory.createAccessTemplates(it).stream())
       .toList();
   }

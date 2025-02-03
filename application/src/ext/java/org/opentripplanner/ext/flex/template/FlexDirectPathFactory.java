@@ -9,15 +9,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.ext.flex.filter.FlexTripFilter;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
-import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
-import org.opentripplanner.transit.service.TransitService;
 
 public class FlexDirectPathFactory {
 
@@ -25,14 +24,14 @@ public class FlexDirectPathFactory {
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
   private final Duration maxTransferDuration;
-  private final FlexTransitFilter filter;
+  private final FlexTripFilter filter;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
     Duration maxTransferDuration,
-    FlexTransitFilter filter
+    FlexTripFilter filter
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;

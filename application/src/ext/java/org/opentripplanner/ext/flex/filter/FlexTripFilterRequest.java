@@ -1,11 +1,13 @@
-package org.opentripplanner.ext.flex.template;
+package org.opentripplanner.ext.flex.filter;
 
+import com.google.common.base.MoreObjects;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-sealed interface FlexTripFilterRequest {
+public sealed interface FlexTripFilterRequest {
   boolean allowsTrip(Trip trip);
 
   /**
@@ -73,12 +75,31 @@ sealed interface FlexTripFilterRequest {
     public int hashCode() {
       return Objects.hash(selectedAgencies, excludedAgencies, selectedRoutes, excludedRoutes);
     }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder
+        .of(Filter.class)
+        .addCol("selectedAgencies", selectedAgencies)
+        .addCol("excludedAgencies", excludedAgencies)
+        .addCol("selectedRoutes", selectedRoutes)
+        .addCol("excludedRoutes", excludedRoutes)
+        .toString();
+    }
   }
 
   /**
    * The default filter which allows all flex trips to be used for routing.
    */
   final class AllowAll implements FlexTripFilterRequest {
+
+    private static final AllowAll INSTANCE = new AllowAll();
+
+    private AllowAll() {}
+
+    public static AllowAll of() {
+      return INSTANCE;
+    }
 
     @Override
     public boolean allowsTrip(Trip trip) {
@@ -88,6 +109,11 @@ sealed interface FlexTripFilterRequest {
     @Override
     public boolean equals(Object obj) {
       return obj instanceof AllowAll;
+    }
+
+    @Override
+    public String toString() {
+      return AllowAll.class.getSimpleName();
     }
   }
 }

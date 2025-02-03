@@ -1,25 +1,25 @@
-package org.opentripplanner.ext.flex.template;
+package org.opentripplanner.ext.flex.filter;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static org.opentripplanner.ext.flex.template.FlexTransitFilterTest.FilterResult.EXCLUDED;
-import static org.opentripplanner.ext.flex.template.FlexTransitFilterTest.FilterResult.SELECTED;
+import static org.opentripplanner.ext.flex.filter.FlexTripFilterTest.FilterResult.EXCLUDED;
+import static org.opentripplanner.ext.flex.filter.FlexTripFilterTest.FilterResult.SELECTED;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.agency;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.ext.flex.template.FlexTripFilterRequest.Filter;
+import org.opentripplanner.ext.flex.filter.FlexTripFilterRequest.Filter;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-class FlexTransitFilterTest {
+class FlexTripFilterTest {
 
   private static List<Arguments> allowAllCases() {
     return List.of(
@@ -33,7 +33,7 @@ class FlexTransitFilterTest {
   @ParameterizedTest
   @MethodSource("allowAllCases")
   void allowAll(Route route, Agency agency) {
-    var filter = FlexTransitFilter.ALLOW_ALL;
+    var filter = FlexTripFilter.ALLOW_ALL;
 
     var trip = trip(route, agency);
 
@@ -53,7 +53,7 @@ class FlexTransitFilterTest {
   @ParameterizedTest
   @MethodSource("selectedAgencyCases")
   void selectedAgency(Route route, Agency agency, FilterResult expectation) {
-    var filter = new FlexTransitFilter(
+    var filter = new FlexTripFilter(
       List.of(new Filter(Set.of(id("selected")), Set.of(), Set.of(), Set.of()))
     );
 
@@ -75,7 +75,7 @@ class FlexTransitFilterTest {
   @ParameterizedTest
   @MethodSource("selectedRouteCases")
   void selectedRoute(Route route, Agency agency, FilterResult expectation) {
-    var filter = new FlexTransitFilter(
+    var filter = new FlexTripFilter(
       List.of(new Filter(Set.of(), Set.of(), Set.of(id("selected")), Set.of()))
     );
 
@@ -97,7 +97,7 @@ class FlexTransitFilterTest {
   @ParameterizedTest
   @MethodSource("excludedAgencyCases")
   void excludedAgency(Route route, Agency agency, FilterResult expectation) {
-    var filter = new FlexTransitFilter(
+    var filter = new FlexTripFilter(
       List.of(new Filter(Set.of(), Set.of(id("excluded")), Set.of(), Set.of()))
     );
 
@@ -119,7 +119,7 @@ class FlexTransitFilterTest {
   @ParameterizedTest
   @MethodSource("excludedRouteCases")
   void excludedRoute(Route route, Agency agency, FilterResult expectation) {
-    var filter = new FlexTransitFilter(
+    var filter = new FlexTripFilter(
       List.of(new Filter(Set.of(), Set.of(), Set.of(), Set.of(id("excluded"))))
     );
 
@@ -142,7 +142,7 @@ class FlexTransitFilterTest {
   @ParameterizedTest
   @MethodSource("excludedCases")
   void excluded(Route route, Agency agency, FilterResult expectation) {
-    var filter = new FlexTransitFilter(
+    var filter = new FlexTripFilter(
       List.of(
         new Filter(Set.of(), Set.of(id("excluded-agency")), Set.of(), Set.of(id("excluded-route")))
       )
@@ -166,9 +166,9 @@ class FlexTransitFilterTest {
     SELECTED,
     EXCLUDED;
 
-    void assertFilter(Trip trip, FlexTransitFilter filter) {
+    void assertFilter(Trip trip, FlexTripFilter filter) {
       if (this == EXCLUDED) {
-        assertFalse(filter.allowsTrip(trip));
+        Assertions.assertFalse(filter.allowsTrip(trip));
       } else if (this == SELECTED) {
         assertTrue(filter.allowsTrip(trip));
       }
