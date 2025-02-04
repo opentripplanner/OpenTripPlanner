@@ -18,7 +18,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 
-class SiriTimetableSnapshotSourceTest implements RealtimeTestConstants {
+class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_1_INPUT = TripInput
     .of(TRIP_1_ID)

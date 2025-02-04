@@ -12,7 +12,7 @@ import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public final class TimetableSnapshotManager {
    */
   public TimetableSnapshotManager(
     @Nullable TransitLayerUpdater transitLayerUpdater,
-    TimetableSnapshotSourceParameters parameters,
+    TimetableSnapshotParameters parameters,
     Supplier<LocalDate> localDateNow
   ) {
     this.transitLayerUpdater = transitLayerUpdater;

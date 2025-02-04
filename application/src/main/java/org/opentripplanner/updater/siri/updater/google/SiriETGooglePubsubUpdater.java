@@ -1,7 +1,7 @@
 package org.opentripplanner.updater.siri.updater.google;
 
 import java.util.function.Consumer;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.siri.updater.AsyncEstimatedTimetableProcessor;
 import org.opentripplanner.updater.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.updater.siri.updater.EstimatedTimetableHandler;
@@ -25,7 +25,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
-    SiriTimetableSnapshotSource timetableSnapshotSource
+    SiriRealTimeTripUpdateAdapter adapter
   ) {
     configRef = config.configRef();
 
@@ -40,11 +40,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       );
 
     estimatedTimetableHandler =
-      new EstimatedTimetableHandler(
-        timetableSnapshotSource,
-        config.fuzzyTripMatching(),
-        config.feedId()
-      );
+      new EstimatedTimetableHandler(adapter, config.fuzzyTripMatching(), config.feedId());
 
     updateResultConsumer = TripUpdateMetrics.streaming(config);
   }

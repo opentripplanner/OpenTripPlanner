@@ -32,7 +32,7 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 public class TestServerContext {
@@ -48,7 +48,7 @@ public class TestServerContext {
     return createServerContext(
       graph,
       timetableRepository,
-      new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now)
+      new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now)
     );
   }
 

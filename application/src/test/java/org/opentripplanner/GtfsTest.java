@@ -47,10 +47,10 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
+import org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
@@ -60,7 +60,7 @@ public abstract class GtfsTest {
   public TimetableRepository timetableRepository;
 
   AlertsUpdateHandler alertsUpdateHandler;
-  TimetableSnapshotSource timetableSnapshotSource;
+  GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
   TransitAlertServiceImpl alertPatchServiceImpl;
   public OtpServerRequestContext serverContext;
   public GtfsFeedId feedId;
@@ -218,11 +218,11 @@ public abstract class GtfsTest {
 
     var snapshotManager = new TimetableSnapshotManager(
       new TransitLayerUpdater(timetableRepository),
-      TimetableSnapshotSourceParameters.PUBLISH_IMMEDIATELY,
+      TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       LocalDate::now
     );
-    timetableSnapshotSource =
-      new TimetableSnapshotSource(timetableRepository, snapshotManager, LocalDate::now);
+    tripUpdateAdapter =
+      new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, LocalDate::now);
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
@@ -235,7 +235,7 @@ public abstract class GtfsTest {
       for (FeedEntity feedEntity : feedEntityList) {
         updates.add(feedEntity.getTripUpdate());
       }
-      timetableSnapshotSource.applyTripUpdates(
+      tripUpdateAdapter.applyTripUpdates(
         null,
         REQUIRED_NO_DATA,
         UpdateIncrementality.DIFFERENTIAL,
