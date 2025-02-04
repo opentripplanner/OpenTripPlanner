@@ -3,6 +3,7 @@ package org.opentripplanner.ext.stopconsolidation;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
+import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLegBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -48,7 +49,7 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
         var from = service.primaryStop(stl.getFrom().stop.getId()).orElse(stl.getFrom().stop);
         // to show the name that's on the display inside the vehicle we use the agency-specific name
         var to = service.agencySpecificStop(stl.getTo().stop, agency);
-        return new ConsolidatedStopLeg(stl, from, to);
+        return ConsolidatedStopLeg.of(stl).withFrom(from).withTo(to).build();
       } else {
         return leg;
       }

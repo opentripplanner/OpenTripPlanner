@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -54,6 +55,7 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -291,35 +293,6 @@ class GraphQLIntegrationTest {
       .withEntrance(entrance)
       .build();
 
-    Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B, List.of(step1, step2, step3))
-      .bus(busRoute, 122, T11_01, T11_15, C)
-      .rail(439, T11_30, T11_50, D)
-      .carHail(D10m, E)
-      .build();
-
-    add10MinuteDelay(i1);
-
-    var busLeg = i1.getTransitLeg(1);
-    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
-
-    var fares = new ItineraryFares();
-
-    var dayPass = fareProduct("day-pass");
-    fares.addItineraryProducts(List.of(dayPass));
-
-    var singleTicket = fareProduct("single-ticket");
-    fares.addFareProduct(railLeg, singleTicket);
-    fares.addFareProduct(busLeg, singleTicket);
-    i1.setFare(fares);
-
-    i1.setFare(fares);
-    FaresToItineraryMapper.addFaresToLegs(fares, i1);
-
-    i1.setAccessibilityScore(0.5f);
-
-    railLeg.withAccessibilityScore(.3f);
-
     var entitySelector = new EntitySelector.Stop(A.stop.getId());
     var alert = TransitAlert
       .of(id("an-alert"))
@@ -335,7 +308,36 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    railLeg.addAlert(alert);
+    Itinerary i1 = newItinerary(A, T11_00)
+      .walk(20, B, List.of(step1, step2, step3))
+      .bus(busRoute, 122, T11_01, T11_15, C)
+      .rail(439, T11_30, T11_50, D)
+      .carHail(D10m, E)
+      .build();
+
+    add10MinuteDelay(i1);
+
+    var busLeg = i1.getTransitLeg(1);
+    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
+    railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
+    ArrayList<Leg> legs = new ArrayList<>(i1.getLegs());
+    legs.set(2, railLeg);
+    i1.setLegs(legs);
+
+    var fares = new ItineraryFares();
+
+    var dayPass = fareProduct("day-pass");
+    fares.addItineraryProducts(List.of(dayPass));
+
+    var singleTicket = fareProduct("single-ticket");
+    fares.addFareProduct(railLeg, singleTicket);
+    fares.addFareProduct(busLeg, singleTicket);
+    i1.setFare(fares);
+
+    i1.setFare(fares);
+    FaresToItineraryMapper.addFaresToLegs(fares, i1);
+
+    i1.setAccessibilityScore(0.5f);
 
     var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);
