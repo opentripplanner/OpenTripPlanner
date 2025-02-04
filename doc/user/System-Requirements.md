@@ -22,5 +22,5 @@ For Azure, the Digitransit project did benchmarking of the available virtual mac
 
 ### Google Cloud
 
-Entur uses a scalable fleet of instances of type `c2d-standard-8`.
+Entur uses a scalable fleet of instances of type `c4-standard-8`.
   
