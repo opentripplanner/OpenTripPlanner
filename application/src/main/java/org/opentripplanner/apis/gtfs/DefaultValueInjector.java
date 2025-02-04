@@ -17,6 +17,7 @@ import graphql.schema.GraphQLTypeVisitor;
 import graphql.schema.GraphQLTypeVisitorStub;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +152,11 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     DefaultMappingBuilder builder
   ) {
     builder
+      .arrayStringsOpt(
+        "BicycleRentalPreferencesInput.allowedNetworks",
+        rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
+      )
+      .arrayStringsReq("BicycleRentalPreferencesInput.bannedNetworks", rental.bannedNetworks())
       .boolReq(
         "DestinationBicyclePolicyInput.allowKeeping",
         rental.allowArrivingInRentedVehicleAtDestination()
@@ -178,6 +184,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   private static void setCarDefaults(CarPreferences car, DefaultMappingBuilder builder) {
     builder.floatReq("CarPreferencesInput.reluctance", car.reluctance());
     setCarParkingDefaults(car.parking(), builder);
+    setCarRentalDefaults(car.rental(), builder);
   }
 
   private static void setCarParkingDefaults(
@@ -194,6 +201,18 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
         "CarParkingPreferencesInput.preferred",
         mapVehicleParkingFilter(parking.preferred())
       );
+  }
+
+  private static void setCarRentalDefaults(
+    VehicleRentalPreferences rental,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .arrayStringsOpt(
+        "CarRentalPreferencesInput.allowedNetworks",
+        rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
+      )
+      .arrayStringsReq("CarRentalPreferencesInput.bannedNetworks", rental.bannedNetworks());
   }
 
   private static void setModeDefaults(JourneyRequest journey, DefaultMappingBuilder builder) {
@@ -254,6 +273,11 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     DefaultMappingBuilder builder
   ) {
     builder
+      .arrayStringsOpt(
+        "ScooterRentalPreferencesInput.allowedNetworks",
+        rental.allowedNetworks().isEmpty() ? null : rental.allowedNetworks()
+      )
+      .arrayStringsReq("ScooterRentalPreferencesInput.bannedNetworks", rental.bannedNetworks())
       .boolReq(
         "DestinationScooterPolicyInput.allowKeeping",
         rental.allowArrivingInRentedVehicleAtDestination()
@@ -451,6 +475,30 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
 
     public DefaultMappingBuilder arrayReq(String key, ArrayValue value) {
       defaultValueForKey.put(key, value);
+      return this;
+    }
+
+    public DefaultMappingBuilder arrayStringsReq(String key, Collection<String> values) {
+      defaultValueForKey.put(
+        key,
+        ArrayValue
+          .newArrayValue()
+          .values(values.stream().map(value -> (Value) StringValue.of(value)).toList())
+          .build()
+      );
+      return this;
+    }
+
+    public DefaultMappingBuilder arrayStringsOpt(String key, @Nullable Collection<String> values) {
+      if (values != null) {
+        defaultValueForKey.put(
+          key,
+          ArrayValue
+            .newArrayValue()
+            .values(values.stream().map(value -> (Value) StringValue.of(value)).toList())
+            .build()
+        );
+      }
       return this;
     }
 

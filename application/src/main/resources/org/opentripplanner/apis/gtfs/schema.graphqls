@@ -3913,7 +3913,10 @@ input BicyclePreferencesInput {
 
 "Preferences related to bicycle rental (station based or floating bicycle rental)."
 input BicycleRentalPreferencesInput {
-  "Rental networks which can be potentially used as part of an itinerary."
+  """
+  Rental networks which can be potentially used as part of an itinerary. If this field has no default value,
+  it means that all networks are allowed unless some are banned with `bannedNetworks`.
+  """
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
@@ -4004,7 +4007,10 @@ input CarPreferencesInput {
 
 "Preferences related to car rental (station based or floating car rental)."
 input CarRentalPreferencesInput {
-  "Rental networks which can be potentially used as part of an itinerary."
+  """
+  Rental networks which can be potentially used as part of an itinerary. If this field has no default value,
+  it means that all networks are allowed unless some are banned with `bannedNetworks`.
+  """
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
@@ -4501,7 +4507,10 @@ input ScooterPreferencesInput {
 
 "Preferences related to scooter rental (station based or floating scooter rental)."
 input ScooterRentalPreferencesInput {
-  "Rental networks which can be potentially used as part of an itinerary."
+  """
+  Rental networks which can be potentially used as part of an itinerary. If this field has no default value,
+  it means that all networks are allowed unless some are banned with `bannedNetworks`.
+  """
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
