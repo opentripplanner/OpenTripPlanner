@@ -336,11 +336,47 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
    * path
    */
   public State reverse() {
-    State orig = this;
-    State ret = orig.reversedClone();
+    StreetSearchRequest reversedRequest = request
+      .copyOfReversed(getTime())
+      .withPreferences(p -> {
+        p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
+        p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
+      })
+      .build();
+    StateData newStateData = stateData.clone();
+    newStateData.backMode = null;
+    return traverseBackStates(
+      this,
+      new State(this.vertex, getTime(), newStateData, reversedRequest)
+    );
+  }
 
+  /**
+   * Reverse the path implicit in the given state, the path will be reversed but will have the same
+   * duration. This is the result of combining the functions from GraphPath optimize and reverse.
+   *
+   * @param reversedPreferences RoutingPreferences to use with the reverse function
+   *
+   * @return a state at the other end (or this end, in the case of a forward search) of a reversed
+   * path
+   */
+  public State reverse(RoutingPreferences reversedPreferences) {
+    StreetSearchRequest reversedRequest = request
+      .copyOfReversed(getTime())
+      .withPreferences(reversedPreferences)
+      .build();
+    StateData newStateData = stateData.clone();
+    newStateData.backMode = null;
+    return traverseBackStates(
+      this,
+      new State(this.vertex, getTime(), newStateData, reversedRequest)
+    );
+  }
+
+  private State traverseBackStates(State original, State reversedClone) {
+    State orig = original;
+    State ret = reversedClone;
     Edge edge;
-
     while (orig.getBackState() != null) {
       edge = orig.getBackEdge();
 
@@ -495,19 +531,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     } else {
       return 0.0;
     }
-  }
-
-  private State reversedClone() {
-    StreetSearchRequest reversedRequest = request
-      .copyOfReversed(getTime())
-      .withPreferences(p -> {
-        p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
-        p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
-      })
-      .build();
-    StateData newStateData = stateData.clone();
-    newStateData.backMode = null;
-    return new State(this.vertex, getTime(), newStateData, reversedRequest);
   }
 
   /**

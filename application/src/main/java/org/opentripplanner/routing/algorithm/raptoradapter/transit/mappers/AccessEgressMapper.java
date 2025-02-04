@@ -9,6 +9,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -16,28 +17,33 @@ public class AccessEgressMapper {
 
   public static List<RoutingAccessEgress> mapNearbyStops(
     Collection<NearbyStop> accessStops,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    RoutingPreferences reversedPreferences
   ) {
     return accessStops
       .stream()
-      .map(nearbyStop -> mapNearbyStop(nearbyStop, accessOrEgress))
+      .map(nearbyStop -> mapNearbyStop(nearbyStop, accessOrEgress, reversedPreferences))
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
   }
 
   public static Collection<RoutingAccessEgress> mapFlexAccessEgresses(
     Collection<FlexAccessEgress> flexAccessEgresses,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    RoutingPreferences reversedPreferences
   ) {
     return flexAccessEgresses
       .stream()
-      .map(flexAccessEgress -> new FlexAccessEgressAdapter(flexAccessEgress, accessOrEgress))
+      .map(flexAccessEgress ->
+        new FlexAccessEgressAdapter(flexAccessEgress, accessOrEgress, reversedPreferences)
+      )
       .collect(Collectors.toList());
   }
 
   private static RoutingAccessEgress mapNearbyStop(
     NearbyStop nearbyStop,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    RoutingPreferences reversedPreferences
   ) {
     if (!(nearbyStop.stop instanceof RegularStop)) {
       return null;
@@ -45,7 +51,7 @@ public class AccessEgressMapper {
 
     return new DefaultAccessEgress(
       nearbyStop.stop.getIndex(),
-      accessOrEgress.isEgress() ? nearbyStop.state.reverse() : nearbyStop.state
+      accessOrEgress.isEgress() ? nearbyStop.state.reverse(reversedPreferences) : nearbyStop.state
     );
   }
 }

@@ -37,6 +37,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.configure.Tran
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -244,6 +245,7 @@ public class TransitRouter {
 
     // Prepare access/egress lists
     RouteRequest accessRequest = request.clone();
+    RoutingPreferences reversedPreferences = null;
 
     if (type.isAccess()) {
       accessRequest.withPreferences(p -> {
@@ -252,6 +254,11 @@ public class TransitRouter {
         p.withScooter(s -> s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false))
         );
       });
+    } else {
+      // The states of egress requests are reversed. When the states are reversed, these preferences
+      // need to be set. This was previously done separately for each reversed state.
+      // The reversedPreferences variable is not used with access requests.
+      reversedPreferences = accessRequest.preferences().copyOfWithReversedPreferences().build();
     }
 
     AccessEgressPreferences accessEgressPreferences = accessRequest
@@ -273,7 +280,7 @@ public class TransitRouter {
       durationLimit,
       stopCountLimit
     );
-    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
+    var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type, reversedPreferences);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
 
     var results = new ArrayList<>(accessEgresses);
@@ -290,7 +297,9 @@ public class TransitRouter {
         type
       );
 
-      results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));
+      results.addAll(
+        AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type, reversedPreferences)
+      );
     }
 
     return results;

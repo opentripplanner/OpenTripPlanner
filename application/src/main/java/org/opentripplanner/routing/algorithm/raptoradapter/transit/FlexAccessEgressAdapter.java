@@ -5,6 +5,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 /**
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.
@@ -15,12 +16,13 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   public FlexAccessEgressAdapter(
     FlexAccessEgress flexAccessEgress,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    RoutingPreferences reversedPreferences
   ) {
     super(
       flexAccessEgress.stop().getIndex(),
       accessOrEgress.isEgress()
-        ? flexAccessEgress.lastState().reverse()
+        ? flexAccessEgress.lastState().reverse(reversedPreferences)
         : flexAccessEgress.lastState()
     );
     this.flexAccessEgress = flexAccessEgress;

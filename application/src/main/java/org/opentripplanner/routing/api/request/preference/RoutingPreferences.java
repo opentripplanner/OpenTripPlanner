@@ -61,6 +61,16 @@ public final class RoutingPreferences implements Serializable {
     return new Builder(this);
   }
 
+  /**
+   * The states of egress requests are reversed. When the states are reversed, these preferences
+   * need to be set. This was previously done separately for each reversed state.
+   */
+  public Builder copyOfWithReversedPreferences() {
+    return copyOf()
+      .withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)))
+      .withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
+  }
+
   public TransitPreferences transit() {
     return transit;
   }
