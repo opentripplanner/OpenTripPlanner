@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
@@ -131,9 +131,9 @@ public class SpeedTest {
         null,
         DebugUiConfig.DEFAULT
       );
-    // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
+    // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    createTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
+    createRaptorTransitData(timetableRepository, config.transitRoutingParams);
 
     initializeTransferCache(config.transitRoutingParams, timetableRepository);
 

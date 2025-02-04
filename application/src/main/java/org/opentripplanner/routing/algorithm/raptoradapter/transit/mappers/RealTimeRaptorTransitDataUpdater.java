@@ -13,7 +13,7 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.TransferIndexGenerator;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -24,20 +24,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Update the TransitLayer from a set of TimeTables. A shallow copy is made of the TransitLayer
+ * Update the RaptorTransitData from a set of TimeTables. A shallow copy is made of the RaptorTransitData
  * (this also includes a shallow copy of the TripPatternsForDate map). TripPatterns are matched on
- * id and replaced by their updated versions. The realtime TransitLayer is then switched out with
- * the updated copy in an atomic operation. This ensures that any TransitLayer that is referenced
+ * id and replaced by their updated versions. The realtime RaptorTransitData is then switched out with
+ * the updated copy in an atomic operation. This ensures that any RaptorTransitData that is referenced
  * from the Graph is never changed.
  *
- * This is a way of keeping the TransitLayer up to date (in sync with the TimetableRepository plus its most
+ * This is a way of keeping the RaptorTransitData up to date (in sync with the TimetableRepository plus its most
  * recent TimetableSnapshot) without repeatedly deriving it from scratch every few seconds. The same
- * incremental changes are applied to both the TimetableSnapshot and the TransitLayer and they are
+ * incremental changes are applied to both the TimetableSnapshot and the RaptorTransitData and they are
  * published together.
  */
-public class TransitLayerUpdater {
+public class RealTimeRaptorTransitDataUpdater {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TransitLayerUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RealTimeRaptorTransitDataUpdater.class);
 
   private final TimetableRepository timetableRepository;
 
@@ -55,7 +55,7 @@ public class TransitLayerUpdater {
 
   private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache = new HashMap<>();
 
-  public TransitLayerUpdater(TimetableRepository timetableRepository) {
+  public RealTimeRaptorTransitDataUpdater(TimetableRepository timetableRepository) {
     this.timetableRepository = timetableRepository;
   }
 
@@ -63,7 +63,7 @@ public class TransitLayerUpdater {
     Collection<Timetable> updatedTimetables,
     Map<TripPattern, SortedSet<Timetable>> timetables
   ) {
-    if (!timetableRepository.hasRealtimeTransitLayer()) {
+    if (!timetableRepository.hasRealtimeRaptorTransitData()) {
       return;
     }
 
@@ -71,8 +71,8 @@ public class TransitLayerUpdater {
 
     // Make a shallow copy of the realtime transit layer. Only the objects that are copied will be
     // changed during this update process.
-    TransitLayer realtimeTransitLayer = new TransitLayer(
-      timetableRepository.getRealtimeTransitLayer()
+    RaptorTransitData realtimeRaptorTransitData = new RaptorTransitData(
+      timetableRepository.getRealtimeRaptorTransitData()
     );
 
     // Instantiate a TripPatternForDateMapper with the new TripPattern mappings
@@ -86,7 +86,7 @@ public class TransitLayerUpdater {
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
-      transferIndexGenerator = realtimeTransitLayer.getTransferIndexGenerator();
+      transferIndexGenerator = realtimeRaptorTransitData.getTransferIndexGenerator();
     }
     Set<TripPatternForDate> previouslyUsedPatterns = new HashSet<>();
     // Map new TriPatternForDate and index for old and new TripPatternsForDate on service date
@@ -95,7 +95,7 @@ public class TransitLayerUpdater {
       TripPattern tripPattern = timetable.getPattern();
 
       if (!tripPatternsStartingOnDateMapCache.containsKey(date)) {
-        Map<TripPattern, TripPatternForDate> map = realtimeTransitLayer
+        Map<TripPattern, TripPatternForDate> map = realtimeRaptorTransitData
           .getTripPatternsOnServiceDateCopy(date)
           .stream()
           .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t));
@@ -159,7 +159,7 @@ public class TransitLayerUpdater {
     for (LocalDate date : datesToBeUpdated) {
       tripPatternsRunningOnDateMapCache.computeIfAbsent(
         date,
-        p -> new HashSet<>(realtimeTransitLayer.getTripPatternsRunningOnDateCopy(date))
+        p -> new HashSet<>(realtimeRaptorTransitData.getTripPatternsRunningOnDateCopy(date))
       );
 
       // Remove old cached tripPatterns where tripTimes are no longer running
@@ -215,16 +215,16 @@ public class TransitLayerUpdater {
         }
       }
 
-      realtimeTransitLayer.replaceTripPatternsForDate(date, new ArrayList<>(patternsForDate));
+      realtimeRaptorTransitData.replaceTripPatternsForDate(date, new ArrayList<>(patternsForDate));
     }
 
     if (transferIndexGenerator != null) {
-      realtimeTransitLayer.setConstrainedTransfers(transferIndexGenerator.generateTransfers());
+      realtimeRaptorTransitData.setConstrainedTransfers(transferIndexGenerator.generateTransfers());
     }
 
-    // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to
+    // Switch out the reference with the updated realtimeRaptorTransitData. This is synchronized to
     // guarantee that the reference is set after all the fields have been updated.
-    timetableRepository.setRealtimeTransitLayer(realtimeTransitLayer);
+    timetableRepository.setRealtimeRaptorTransitData(realtimeRaptorTransitData);
 
     LOG.debug(
       "UPDATING {} tripPatterns took {} ms",

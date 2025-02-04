@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
-import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -30,7 +30,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -214,10 +214,10 @@ public abstract class GtfsTest {
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
 
-    createTransitLayerForRaptor(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
+    createRaptorTransitData(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
 
     var snapshotManager = new TimetableSnapshotManager(
-      new TransitLayerUpdater(timetableRepository),
+      new RealTimeRaptorTransitDataUpdater(timetableRepository),
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       LocalDate::now
     );

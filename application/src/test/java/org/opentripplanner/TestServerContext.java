@@ -1,6 +1,6 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.LocalDate;
@@ -44,7 +44,7 @@ public class TestServerContext {
     TimetableRepository timetableRepository
   ) {
     timetableRepository.index();
-    createTransitLayerForRaptor(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
+    createRaptorTransitData(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
     return createServerContext(
       graph,
       timetableRepository,

@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.SiteRepositoryMock;
 
-class TransitLayerMapperTest {
+class RaptorTransitDataMapperTest {
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
@@ -43,7 +43,7 @@ class TransitLayerMapperTest {
 
   @Test
   public void createStopBoardAlightTransferCosts() {
-    int[] result = TransitLayerMapper.createStopBoardAlightTransferCosts(
+    int[] result = RaptorTransitDataMapper.createStopBoardAlightTransferCosts(
       new SiteRepositoryMock(STOPS),
       TransitTuningParameters.FOR_TEST
     );

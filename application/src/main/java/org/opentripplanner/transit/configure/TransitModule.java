@@ -5,9 +5,9 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -25,12 +25,12 @@ public abstract class TransitModule {
   @Provides
   @Singleton
   public static TimetableSnapshotManager timetableSnapshotManager(
-    TransitLayerUpdater transitLayerUpdater,
+    RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
     ConfigModel config,
     TimetableRepository timetableRepository
   ) {
     return new TimetableSnapshotManager(
-      transitLayerUpdater,
+      realtimeRaptorTransitDataUpdater,
       config.routerConfig().updaterConfig().timetableSnapshotParameters(),
       () -> LocalDate.now(timetableRepository.getTimeZone())
     );
@@ -38,12 +38,14 @@ public abstract class TransitModule {
 
   /**
    * Create a single instance of the transit layer updater which holds the incremental caches for
-   * the updates that need to applied to the {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer}.
+   * the updates that need to applied to the {@link RaptorTransitData}.
    */
   @Provides
   @Singleton
-  public static TransitLayerUpdater transitLayerUpdater(TimetableRepository timetableRepository) {
-    return new TransitLayerUpdater(timetableRepository);
+  public static RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater(
+    TimetableRepository timetableRepository
+  ) {
+    return new RealTimeRaptorTransitDataUpdater(timetableRepository);
   }
 
   /**

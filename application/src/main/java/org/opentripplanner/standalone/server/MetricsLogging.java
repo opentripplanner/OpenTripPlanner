@@ -48,9 +48,9 @@ public class MetricsLogging {
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
 
-    if (timetableRepository.getTransitLayer() != null) {
+    if (timetableRepository.getRaptorTransitData() != null) {
       new GuavaCacheMetrics(
-        timetableRepository.getTransitLayer().getTransferCache().getTransferCache(),
+        timetableRepository.getRaptorTransitData().getTransferCache().getTransferCache(),
         "raptorTransfersCache",
         List.of(Tag.of("cache", "raptorTransfers"))
       )

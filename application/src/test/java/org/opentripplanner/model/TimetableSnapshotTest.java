@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -299,7 +299,9 @@ public class TimetableSnapshotTest {
 
     AtomicBoolean updateIsCalled = new AtomicBoolean();
 
-    TransitLayerUpdater transitLayer = new TransitLayerUpdater(null) {
+    RealTimeRaptorTransitDataUpdater raptorTransitData = new RealTimeRaptorTransitDataUpdater(
+      null
+    ) {
       @Override
       public void update(
         Collection<Timetable> updatedTimetables,
@@ -311,7 +313,7 @@ public class TimetableSnapshotTest {
       }
     };
 
-    snapshot.commit(transitLayer, true);
+    snapshot.commit(raptorTransitData, true);
 
     assertTrue(updateIsCalled.get());
   }
