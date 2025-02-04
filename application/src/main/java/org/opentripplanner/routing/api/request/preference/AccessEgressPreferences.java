@@ -170,11 +170,11 @@ public final class AccessEgressPreferences implements Serializable {
 
     var carPenalty = TimeAndCostPenalty.of(TimePenalty.of(ofMinutes(20), 2f), 1.5);
     for (var it : StreetMode.values()) {
-      // Apply car-penalty to all car modes allowed in access/egress only. Exclude car modes(CAR) used
-      // in direct street routing and car modes used when you bring the car with you onto transit. This is
-      // a bit limited and will not work if we combine car access/egress modes like CAR_TO_PARK with CAR
-      // in the same search. This is currently not possible, but if we enable this in the future this logic must be
-      // looked at again.
+      // Apply car-penalty to all car modes used in access/egress. Car modes(CAR) used in direct street
+      // routing and car modes used when you bring the car with you onto transit should be excluded. The
+      // penalty should also be applied to modes used in access, egress AND direct (CAR_TO_PARK and
+      // CAR_RENTAL). This is not ideal, since we get an unfair comparison in the itinerary filters. We will
+      // live with this for now, but might revisit it later.
       if (
         it.includesDriving() && (it.accessAllowed() || it.egressAllowed()) && it != StreetMode.CAR
       ) {
