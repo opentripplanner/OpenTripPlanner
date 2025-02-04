@@ -46,5 +46,4 @@ public class EnumMapperTest {
     }
     assertTrue(rest.isEmpty());
   }
-
 }

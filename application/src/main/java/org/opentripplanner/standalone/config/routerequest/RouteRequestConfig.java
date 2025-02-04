@@ -542,7 +542,20 @@ does not exist.
               Safety limit to prevent access to and egress from too many stops.
               """
               )
-              .asInt(dftAccessEgress.maxStopCount())
+              .asInt(dftAccessEgress.defaultMaxStopCount()),
+            cae
+              .of("maxStopCountForMode")
+              .since(V2_7)
+              .summary(
+                "Maximal number of stops collected in access/egress routing for the given mode"
+              )
+              .description(
+                """
+              Safety limit to prevent access to and egress from too many stops.
+              Mode-specific version of `maxStopCount`.
+              """
+              )
+              .asEnumMap(StreetMode.class, Integer.class)
           );
       })
       .withMaxDirectDuration(
@@ -622,6 +635,19 @@ your users receive a timely response. You can also limit the max duration. There
             "A multiplier for how bad driving is, compared to being in transit for equal lengths of time."
           )
           .asDouble(dft.reluctance())
+      )
+      .withBoardCost(
+        c
+          .of("boardCost")
+          .since(V2_7)
+          .summary(
+            "Prevents unnecessary transfers by adding a cost for boarding a transit vehicle."
+          )
+          .description(
+            "This is the cost that is used when boarding while driving. " +
+            "This can be different compared to the boardCost while walking or cycling."
+          )
+          .asInt(dft.boardCost())
       )
       .withPickupCost(
         c

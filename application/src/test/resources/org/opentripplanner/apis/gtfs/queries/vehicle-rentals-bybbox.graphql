@@ -26,6 +26,10 @@
         networkId
         url
       }
+      fuel {
+        percent
+        range
+      }
     }
     ... on VehicleRentalStation {
       stationId

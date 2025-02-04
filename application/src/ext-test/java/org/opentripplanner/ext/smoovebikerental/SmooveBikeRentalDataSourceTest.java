@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 
 class SmooveBikeRentalDataSourceTest {
 

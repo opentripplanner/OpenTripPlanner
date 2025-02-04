@@ -1,0 +1,63 @@
+{
+    previousPageCursor
+    nextPageCursor
+    tripPatterns {
+        aimedStartTime
+        aimedEndTime
+        expectedEndTime
+        expectedStartTime
+        duration
+        distance
+        legs {
+            id
+            mode
+            aimedStartTime
+            aimedEndTime
+            expectedEndTime
+            expectedStartTime
+            realtime
+            distance
+            duration
+            fromPlace {
+                name
+                quay {
+                    id
+                }
+            }
+            toPlace {
+                name
+                quay {
+                    id
+                }
+            }
+            toEstimatedCall {
+                destinationDisplay {
+                    frontText
+                }
+            }
+            line {
+                publicCode
+                name
+                id
+                presentation {
+                    colour
+                }
+            }
+            authority {
+                name
+                id
+            }
+            pointsOnLink {
+                points
+            }
+            interchangeTo {
+                staySeated
+            }
+            interchangeFrom {
+                staySeated
+            }
+        }
+        systemNotices {
+            tag
+        }
+    }

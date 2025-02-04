@@ -19,14 +19,26 @@ class RouteRequestMapperCarTest {
   void testBasicCarPreferences() {
     var carArgs = createArgsCopy(RouteRequestMapperTest.ARGS);
     var reluctance = 7.5;
+    var boardCost = Cost.costOfSeconds(500);
     carArgs.put(
       "preferences",
-      Map.ofEntries(entry("street", Map.ofEntries(entry("car", Map.of("reluctance", reluctance)))))
+      Map.ofEntries(
+        entry(
+          "street",
+          Map.ofEntries(
+            entry(
+              "car",
+              Map.ofEntries(entry("reluctance", reluctance), entry("boardCost", boardCost))
+            )
+          )
+        )
+      )
     );
     var env = executionContext(carArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
     var carPreferences = routeRequest.preferences().car();
     assertEquals(reluctance, carPreferences.reluctance());
+    assertEquals(boardCost.toSeconds(), carPreferences.boardCost());
   }
 
   @Test

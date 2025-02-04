@@ -651,16 +651,21 @@ type QueryType {
   leg(id: ID!): Leg @timingData
   "Get a single line based on its id"
   line(id: ID!): Line @timingData
-  "Get all lines"
+  "Get all _lines_"
   lines(
-    "Set of ids of authorities to fetch lines for."
+    "Set of ids of _authorities_ to fetch _lines_ for."
     authorities: [String],
-    "Filter by lines containing flexible / on demand serviceJourneys only."
+    "Filter by _lines_ containing flexible / on demand _service journey_ only."
     flexibleOnly: Boolean = false,
+    "Set of ids of _lines_ to fetch. If this is set, no other filters can be set."
     ids: [ID],
+    "Prefix of the _name_ of the _line_ to fetch. This filter is case insensitive."
     name: String,
+    "_Public code_ of the _line_ to fetch."
     publicCode: String,
+    "Set of _public codes_ to fetch _lines_ for."
     publicCodes: [String],
+    "Set of _transport modes_ to fetch _lines_ for."
     transportModes: [TransportMode]
   ): [Line]! @timingData
   "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables."
@@ -1719,6 +1724,9 @@ enum RelativeDirection {
   continue
   depart
   elevator
+  enterStation
+  exitStation
+  followSigns
   hardLeft
   hardRight
   left

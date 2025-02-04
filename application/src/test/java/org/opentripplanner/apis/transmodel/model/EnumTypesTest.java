@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -93,7 +94,7 @@ class EnumTypesTest {
       Locale.ENGLISH
     );
     assertInstanceOf(String.class, value);
-    assertNotNull(value);
+    assertFalse(((String) value).isEmpty());
   }
 
   @Test

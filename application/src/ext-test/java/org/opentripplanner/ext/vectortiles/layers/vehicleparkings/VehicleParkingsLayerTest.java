@@ -110,7 +110,11 @@ public class VehicleParkingsLayerTest {
     var nodeAdapter = newNodeAdapterForTest(config);
     var tiles = VectorTileConfig.mapVectorTilesParameters(nodeAdapter, "vectorTiles");
     assertEquals(1, tiles.layers().size());
-    var builder = new VehicleParkingsLayerBuilder(new DefaultVehicleParkingService(repo), tiles.layers().getFirst(), Locale.US);
+    var builder = new VehicleParkingsLayerBuilder(
+      new DefaultVehicleParkingService(repo),
+      tiles.layers().getFirst(),
+      Locale.US
+    );
 
     List<Geometry> geometries = builder.getGeometries(new Envelope(0.99, 1.01, 1.99, 2.01));
 

@@ -23,7 +23,7 @@ public class InvalidStopPointRefTest implements RealtimeTestConstants {
   @ParameterizedTest(name = "invalid id of ''{0}'', extraJourney={1}")
   @MethodSource("cases")
   void rejectEmptyStopPointRef(String invalidRef, boolean extraJourney) {
-    var env = RealtimeTestEnvironment.siri().build();
+    var env = RealtimeTestEnvironment.of().build();
 
     // journey contains empty stop point ref elements
     // happens in the South Tyrolian feed: https://github.com/noi-techpark/odh-mentor-otp/issues/213

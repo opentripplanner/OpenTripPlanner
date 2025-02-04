@@ -26,7 +26,7 @@ class StopClusterMapperTest {
     .siteRepositoryBuilder()
     .withRegularStops(STOPS)
     .build();
-  private static final TimetableRepository TRANSIT_MODEL = new TimetableRepository(
+  private static final TimetableRepository TIMETABLE_REPOSITORY = new TimetableRepository(
     SITE_REPOSITORY,
     new Deduplicator()
   );
@@ -40,8 +40,8 @@ class StopClusterMapperTest {
     var repo = new DefaultStopConsolidationRepository();
     repo.addGroups(List.of(new ConsolidatedStopGroup(STOP_A.getId(), List.of(STOP_B.getId()))));
 
-    var service = new DefaultStopConsolidationService(repo, TRANSIT_MODEL);
-    var mapper = new StopClusterMapper(new DefaultTransitService(TRANSIT_MODEL), service);
+    var service = new DefaultStopConsolidationService(repo, TIMETABLE_REPOSITORY);
+    var mapper = new StopClusterMapper(new DefaultTransitService(TIMETABLE_REPOSITORY), service);
 
     var clusters = mapper.generateStopClusters(LOCATIONS, List.of());
 

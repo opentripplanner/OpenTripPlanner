@@ -57,7 +57,8 @@ public class ScheduledDeviatedTrip
   public static boolean isScheduledDeviatedFlexTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> notFixedStop = Predicate.not(st -> st.getStop() instanceof RegularStop);
     return (
-      stopTimes.stream().anyMatch(notFixedStop) && stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlexWindow)
+      stopTimes.stream().anyMatch(notFixedStop) &&
+      stopTimes.stream().noneMatch(StopTime::combinesContinuousStoppingWithFlexWindow)
     );
   }
 

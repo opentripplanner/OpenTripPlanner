@@ -12,11 +12,11 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareLegRule;
 import org.onebusaway.gtfs.model.FareMedium;
 import org.onebusaway.gtfs.model.FareProduct;
-import org.opentripplanner.ext.fares.model.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.Stops;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.transit.model.basic.Distance;
 
 class FareLegRuleMapperTest {
 
@@ -33,7 +33,10 @@ class FareLegRuleMapperTest {
       1,
       5000d,
       10000d,
-      new LinearDistance(Distance.ofKilometers(5), Distance.ofKilometers(10))
+      new LinearDistance(
+        Distance.ofKilometersBoxed(5d, ignore -> {}).orElse(null),
+        Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
+      )
     ),
     new TestCase(null, null, null, null)
   );

@@ -22,7 +22,7 @@ class InvalidTripIdTest {
   @ParameterizedTest(name = "tripId=\"{0}\"")
   @MethodSource("invalidCases")
   void invalidTripId(String tripId) {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var tripDescriptorBuilder = GtfsRealtime.TripDescriptor.newBuilder();
     if (tripId != null) {
       tripDescriptorBuilder.setTripId(tripId);

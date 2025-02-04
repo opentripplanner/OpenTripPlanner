@@ -15,10 +15,15 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * Everything from the main result is kept, and any additional rail results from the alternative
  * search are added.
  */
-class MergePaths<T extends RaptorTripSchedule> implements BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> {
+class MergePaths<T extends RaptorTripSchedule>
+  implements
+    BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> {
 
   @Override
-  public Collection<RaptorPath<T>> apply(Collection<RaptorPath<T>> main, Collection<RaptorPath<T>> alternatives) {
+  public Collection<RaptorPath<T>> apply(
+    Collection<RaptorPath<T>> main,
+    Collection<RaptorPath<T>> alternatives
+  ) {
     Map<PathKey, RaptorPath<T>> result = new HashMap<>();
     addAllToMap(result, main);
     addRailToMap(result, alternatives);
@@ -27,7 +32,7 @@ class MergePaths<T extends RaptorTripSchedule> implements BiFunction<Collection<
 
   private void addAllToMap(Map<PathKey, RaptorPath<T>> map, Collection<RaptorPath<T>> paths) {
     for (var it : paths) {
-        map.put(new PathKey(it), it);
+      map.put(new PathKey(it), it);
     }
   }
 

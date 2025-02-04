@@ -1,13 +1,14 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
 import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -45,7 +47,9 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
+import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 /**
  * Test response times for a large batch of origin/destination points. Also demonstrates how to run
@@ -101,6 +105,7 @@ public class SpeedTest {
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
+      new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now),
       config.updatersConfig
     );
     if (timetableRepository.getUpdaterManager() != null) {
@@ -135,7 +140,7 @@ public class SpeedTest {
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    creatTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
+    createTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
 
     initializeTransferCache(config.transitRoutingParams, timetableRepository);
 

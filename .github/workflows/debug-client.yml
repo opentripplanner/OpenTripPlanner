@@ -2,9 +2,13 @@ name: Debug client
 
 on:
   push:
+    branches:
+      - dev-2.x
     paths:
       - 'client/**'
   pull_request:
+    branches:
+      - dev-2.x
     paths:
       - 'client/**'
 
@@ -41,11 +45,11 @@ jobs:
         working-directory: client
         run: |
           npm install
-          npm run build -- --base https://cdn.jsdelivr.net/gh/opentripplanner/debug-client-assets@main/${VERSION}/
+          npm run build -- --base https://www.opentripplanner.org/debug-client-assets/${VERSION}/
           npm run coverage
 
       - name: Deploy compiled assets to repo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+        if: github.event_name == 'push'
         env:
           REMOTE: debug-client
           LOCAL_BRANCH: local-assets

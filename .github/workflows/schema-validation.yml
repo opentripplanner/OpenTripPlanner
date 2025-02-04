@@ -1,0 +1,37 @@
+name: Validate schema changes
+ 
+on:
+  pull_request:
+    branches:
+      - dev-2.x
+ 
+jobs:
+  validate-gtfs:
+    if: github.repository_owner == 'opentripplanner'
+    name: Validate GraphQL schema changes
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: 'Fetch dev.2.x for diffing'
+        run: |
+          git fetch origin dev-2.x --depth 1
+
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install GraphQL Inspector
+        run: |
+          npm i --global @graphql-inspector/ci graphql @graphql-inspector/diff-command @graphql-inspector/graphql-loader @graphql-inspector/git-loader
+      
+      - name: Validate GTFS GraphQL schema changes
+        run: |
+          graphql-inspector diff 'git:origin/dev-2.x:application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls' 'application/src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls'
+
+      - name: Validate Transmodel GraphQL schema changes
+        run: |
+          graphql-inspector diff 'git:origin/dev-2.x:application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql' 'application/src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql'

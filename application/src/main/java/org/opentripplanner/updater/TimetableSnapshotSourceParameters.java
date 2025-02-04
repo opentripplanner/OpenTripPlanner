@@ -15,6 +15,11 @@ public record TimetableSnapshotSourceParameters(
     true
   );
 
+  public static final TimetableSnapshotSourceParameters PUBLISH_IMMEDIATELY = new TimetableSnapshotSourceParameters(
+    Duration.ZERO,
+    false
+  );
+
   /* Factory functions, used instead of a builder - useful in tests. */
 
   public TimetableSnapshotSourceParameters withMaxSnapshotFrequency(Duration maxSnapshotFrequency) {
