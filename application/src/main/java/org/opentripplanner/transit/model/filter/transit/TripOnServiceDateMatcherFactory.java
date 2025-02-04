@@ -14,11 +14,19 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 /**
  * A factory for creating matchers for {@link TripOnServiceDate} objects.
  * <p/>
- * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a request. The
- * resulting matcher can be used to filter a list of {@link TripOnServiceDate} objects.
+ * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a request.
+ * The resulting matcher can be used to filter a list of {@link TripOnServiceDate} objects.
  */
 public class TripOnServiceDateMatcherFactory {
 
+  /**
+   * Creates a matcher for {@link TripOnServiceDate} objects based on the given request.
+   *
+   * @param request - a {@link TripOnServiceDateRequest} object that contains the criteria for the
+   *                matcher.
+   * @return a {@link Matcher<TripOnServiceDate>} to be used for filtering {@link TripOnServiceDate}
+   *                objects.
+   */
   public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();
 

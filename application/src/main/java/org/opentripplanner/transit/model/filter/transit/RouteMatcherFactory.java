@@ -11,8 +11,24 @@ import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.expr.NullSafeWrapperMatcher;
 import org.opentripplanner.transit.model.network.Route;
 
+/**
+ * A factory for creating matchers for {@link Route} objects.
+ * <p/>
+ * This factory is used to create matchers for {@link Route} objects based on a request. The
+ * resulting matcher can be used to filter a list of {@link Route} objects.
+ */
 public class RouteMatcherFactory {
 
+  /**
+   * Creates a matcher that filters {@link Route} objects with the provided {@code request}
+   * and {@code isFlexRoutePredicate}. The {@code isFlexRoutePredicate} is used to determine if a
+   * {@link Route} is a flexible route. The isFlexRoutePredicate is an injected function, because
+   * the check is done by the transit service which has access to all stops and routes.
+   *
+   * @param request - a {@link FindRoutesRequest} object that contains the criteria for the matcher.
+   * @param isFlexRoutePredicate a function that determines if a {@link Route} is a flexible route.
+   * @return a {@link Matcher<Route>} to be used for filtering {@link Route} objects.
+   */
   public static Matcher<Route> of(
     FindRoutesRequest request,
     Predicate<Route> isFlexRoutePredicate

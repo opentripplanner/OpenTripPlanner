@@ -21,6 +21,11 @@ public class RegularStopMatcherFactory {
    * and {@code inUseProvider}. The {@code inUseProvider} is used to determine if a {@link RegularStop} is
    * in use. The inUseProvider is an injected function, because the check is done by the transit service
    * which has access to all stops and routes. A stop is used if it has routes visiting the stop.
+   *
+   * @param request - a {@link FindRegularStopsByBoundingBoxRequest} object that contains the
+   *                criteria for the matcher.
+   * @param inUseProvider a function that determines if a {@link RegularStop} is in use.
+   * @return a {@link Matcher<RegularStop>} to be used for filtering {@link RegularStop} objects.
    */
   public static Matcher<RegularStop> of(
     FindRegularStopsByBoundingBoxRequest request,

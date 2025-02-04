@@ -1,5 +1,12 @@
 package org.opentripplanner.transit.api.request;
 
+import org.opentripplanner.transit.model.site.StopLocation;
+
+/**
+ * A request for finding {@link StopLocation}.
+ * </p>
+ * This request is used to retrieve StopLocations that match the provided filter values.
+ */
 public class FindStopLocationsRequest {
 
   private String name;
