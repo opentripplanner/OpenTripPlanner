@@ -5,7 +5,9 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class ConsolidatedStopLegBuilder extends ScheduledTransitLegBuilder<ConsolidatedStopLegBuilder> {
+public class ConsolidatedStopLegBuilder
+  extends ScheduledTransitLegBuilder<ConsolidatedStopLegBuilder> {
+
   private Place from;
   private Place to;
 
@@ -41,6 +43,4 @@ public class ConsolidatedStopLegBuilder extends ScheduledTransitLegBuilder<Conso
   public ConsolidatedStopLeg build() {
     return new ConsolidatedStopLeg(this);
   }
-
-
 }

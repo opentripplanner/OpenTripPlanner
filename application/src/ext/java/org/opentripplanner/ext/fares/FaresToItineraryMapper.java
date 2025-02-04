@@ -25,7 +25,7 @@ public class FaresToItineraryMapper {
     i.transformTransitLegs(leg -> {
       var legUses = fares.getLegProducts().get(leg);
       var allUses = ListUtils.combine(itineraryFareUses, legUses);
-      if(leg instanceof FareProductAware<TransitLeg> fpa) {
+      if (leg instanceof FareProductAware<TransitLeg> fpa) {
         return fpa.decorateWithFareProducts(allUses);
       } else {
         return leg;

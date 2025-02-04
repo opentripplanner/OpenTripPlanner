@@ -11,6 +11,7 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 public class FlexibleTransitLegBuilder {
+
   private FlexTripEdge flexTripEdge;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
@@ -33,6 +34,7 @@ public class FlexibleTransitLegBuilder {
     this.flexTripEdge = flexTripEdge;
     return this;
   }
+
   public FlexTripEdge flexTripEdge() {
     return flexTripEdge;
   }
@@ -85,5 +87,4 @@ public class FlexibleTransitLegBuilder {
   public FlexibleTransitLeg build() {
     return new FlexibleTransitLeg(this);
   }
-
 }

@@ -35,5 +35,4 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
   public ScheduledTransitLegBuilder copy() {
     return new ConsolidatedStopLegBuilder(this);
   }
-
 }

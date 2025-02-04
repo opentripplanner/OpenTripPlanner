@@ -40,7 +40,7 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    var first = (ScheduledTransitLeg)itinerary.getLegs().getFirst();
+    var first = (ScheduledTransitLeg) itinerary.getLegs().getFirst();
     var withFp = first.copy().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
     var legs = new ArrayList<>(itinerary.getLegs());
     legs.set(0, withFp);

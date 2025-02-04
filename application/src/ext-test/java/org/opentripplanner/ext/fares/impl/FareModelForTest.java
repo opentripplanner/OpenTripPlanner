@@ -86,15 +86,17 @@ public class FareModelForTest {
     .setAgency(OTHER_FEED_AGENCY.getId())
     .build();
   public static final FareProduct FARE_PRODUCT = new FareProduct(
-      id("fp"),
-      "fare product",
-      Money.euros(10.00f),
-      null,
-      null,
-      null
-    );
-  public static final FareProductUse FARE_PRODUCT_USE =
-      new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", FARE_PRODUCT);
+    id("fp"),
+    "fare product",
+    Money.euros(10.00f),
+    null,
+    null,
+    null
+  );
+  public static final FareProductUse FARE_PRODUCT_USE = new FareProductUse(
+    "c1a04702-1fb6-32d4-ba02-483bf68111ed",
+    FARE_PRODUCT
+  );
 
   // Fare rule sets
   static FareRuleSet AIRPORT_TO_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);

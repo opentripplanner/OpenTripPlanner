@@ -46,9 +46,7 @@ public class FlexibleTransitLeg implements TransitLeg {
   private final int generalizedCost;
   private final List<FareProductUse> fareProducts;
 
-  FlexibleTransitLeg(
-    FlexibleTransitLegBuilder builder
-  ) {
+  FlexibleTransitLeg(FlexibleTransitLegBuilder builder) {
     this.edge = Objects.requireNonNull(builder.flexTripEdge());
     this.startTime = Objects.requireNonNull(builder.startTime());
     this.endTime = Objects.requireNonNull(builder.endTime());
@@ -212,7 +210,10 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return copy().withStartTime(startTime.plus(duration)).withEndTime(endTime.plus(duration)).build();
+    return copy()
+      .withStartTime(startTime.plus(duration))
+      .withEndTime(endTime.plus(duration))
+      .build();
   }
 
   @Override
@@ -255,5 +256,4 @@ public class FlexibleTransitLeg implements TransitLeg {
   FlexTripEdge flexTripEdge() {
     return edge;
   }
-
 }

@@ -147,7 +147,7 @@ class EmissionsTest {
       .withEndTime(TIME.plusMinutes(10))
       .withServiceDate(TIME.toLocalDate())
       .withZoneId(ZoneIds.BERLIN)
-      .withDistanceMeters(LegConstructionSupport.computeDistanceMeters(pattern, 0,2))
+      .withDistanceMeters(LegConstructionSupport.computeDistanceMeters(pattern, 0, 2))
       .build();
   }
 }
