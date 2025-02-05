@@ -28,12 +28,12 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimetableMapper {
+class TimetableMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableMapper.class);
 
   /**
-   * Apply the TripUpdate to the appropriate TripTimes from this Timetable. The existing TripTimes
+   * Apply the TripUpdate to the appropriate TripTimes from a Timetable. The existing TripTimes
    * must not be modified directly because they may be shared with the underlying
    * scheduledTimetable, or other updated Timetables. The {@link TimetableSnapshot} performs the
    * protective copying of this Timetable. It is not done in this update method to avoid repeatedly
