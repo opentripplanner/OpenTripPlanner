@@ -82,10 +82,12 @@ public class RouteRequestConfig {
         c
           .of("modes")
           .since(V2_0)
-          .summary("The set of access/egress/direct/transit modes to be used for the route search.")
+          .summary(
+            "The set of access/egress/direct/transfer modes (separated by a comma) to be used for the route search."
+          )
           .asCustomStringType(
             RequestModes.defaultRequestModes(),
-            "TRANSIT,WALK",
+            "WALK",
             s -> new QualifiedModeSet(s).getRequestModes()
           )
       );
