@@ -384,14 +384,13 @@ public class TimetableSnapshotSource {
     }
 
     // Get new TripTimes based on scheduled timetable
-    var result = pattern
-      .getScheduledTimetable()
-      .createUpdatedTripTimesFromGTFSRT(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        backwardsDelayPropagationType
-      );
+    var result = Timetable.createUpdatedTripTimesFromGTFSRT(
+      pattern.getScheduledTimetable(),
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      backwardsDelayPropagationType
+    );
 
     if (result.isFailure()) {
       // necessary so the success type is correct

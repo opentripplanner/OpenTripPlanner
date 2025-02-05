@@ -155,7 +155,8 @@ public class Timetable implements Serializable {
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
    */
-  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGTFSRT(
+  public static Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGTFSRT(
+    Timetable timetable,
     TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
@@ -185,9 +186,9 @@ public class Timetable implements Serializable {
 
     String tripId = tripDescriptor.getTripId();
 
-    var feedScopedTripId = new FeedScopedId(this.getPattern().getFeedId(), tripId);
+    var feedScopedTripId = new FeedScopedId(timetable.getPattern().getFeedId(), tripId);
 
-    int tripIndex = getTripIndex(tripId);
+    int tripIndex = timetable.getTripIndex(tripId);
     if (tripIndex == -1) {
       LOG.debug("tripId {} not found in pattern.", tripId);
       return Result.failure(new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN));
@@ -195,7 +196,7 @@ public class Timetable implements Serializable {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
 
-    RealTimeTripTimes newTimes = getTripTimes(tripIndex).copyScheduledTimes();
+    RealTimeTripTimes newTimes = timetable.getTripTimes(tripIndex).copyScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -220,7 +221,7 @@ public class Timetable implements Serializable {
         if (update.hasStopSequence()) {
           match = update.getStopSequence() == newTimes.gtfsSequenceOfStopIndex(i);
         } else if (update.hasStopId()) {
-          match = pattern.getStop(i).getId().getId().equals(update.getStopId());
+          match = timetable.getPattern().getStop(i).getId().getId().equals(update.getStopId());
         }
       }
 

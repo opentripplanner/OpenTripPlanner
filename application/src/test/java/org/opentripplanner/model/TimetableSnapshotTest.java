@@ -423,14 +423,14 @@ public class TimetableSnapshotTest {
     TripUpdate tripUpdate,
     LocalDate serviceDate
   ) {
-    var result = pattern
-      .getScheduledTimetable()
-      .createUpdatedTripTimesFromGTFSRT(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    final Timetable scheduledTimetable = pattern.getScheduledTimetable();
+    var result = Timetable.createUpdatedTripTimesFromGTFSRT(
+      scheduledTimetable,
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
     if (result.isSuccess()) {
       return resolver.update(
         new RealTimeTripUpdate(pattern, result.successValue().getTripTimes(), serviceDate)
