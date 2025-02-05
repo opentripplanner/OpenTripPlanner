@@ -40,6 +40,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.TimetableMapper;
 
 public class TimetableSnapshotTest {
 
@@ -424,7 +425,7 @@ public class TimetableSnapshotTest {
     LocalDate serviceDate
   ) {
     final Timetable scheduledTimetable = pattern.getScheduledTimetable();
-    var result = Timetable.createUpdatedTripTimesFromGTFSRT(
+    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
       scheduledTimetable,
       tripUpdate,
       timeZone,

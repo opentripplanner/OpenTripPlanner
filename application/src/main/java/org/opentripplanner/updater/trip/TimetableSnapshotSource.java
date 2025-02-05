@@ -42,7 +42,6 @@ import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -384,7 +383,7 @@ public class TimetableSnapshotSource {
     }
 
     // Get new TripTimes based on scheduled timetable
-    var result = Timetable.createUpdatedTripTimesFromGTFSRT(
+    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
       pattern.getScheduledTimetable(),
       tripUpdate,
       timeZone,
