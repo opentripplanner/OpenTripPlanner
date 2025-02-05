@@ -11,7 +11,6 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -42,7 +41,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RouteRequest routeRequestDefaults;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
-  private final TileRendererManager tileRendererManager;
   private final VectorTileConfig vectorTileConfig;
   private final FlexParameters flexParameters;
   private final TraverseVisitor traverseVisitor;
@@ -72,7 +70,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RouteRequest routeRequestDefaults,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
-    TileRendererManager tileRendererManager,
     VectorTileConfig vectorTileConfig,
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
@@ -93,7 +90,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.transitRoutingConfig = transitRoutingConfig;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
-    this.tileRendererManager = tileRendererManager;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleRentalService = vehicleRentalService;
     this.vehicleParkingService = vehicleParkingService;
@@ -143,7 +139,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       routeRequestDefaults,
       meterRegistry,
       raptorConfig,
-      new TileRendererManager(graph, routeRequestDefaults.preferences()),
       vectorTileConfig,
       worldEnvelopeService,
       realtimeVehicleService,
@@ -246,11 +241,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
-  }
-
-  @Override
-  public TileRendererManager tileRendererManager() {
-    return tileRendererManager;
   }
 
   @Override
