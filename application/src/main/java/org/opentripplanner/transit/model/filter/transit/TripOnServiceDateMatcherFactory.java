@@ -12,20 +12,18 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
- * A factory for creating matchers for {@link TripOnServiceDate} objects.
- * <p/>
+ * A factory for creating matchers for TripOnServiceDates.
+ * <p>
  * This factory is used to create matchers for {@link TripOnServiceDate} objects based on a request.
- * The resulting matcher can be used to filter a list of {@link TripOnServiceDate} objects.
+ * The resulting matcher can be used to filter a list of TripOnServiceDate objects.
  */
 public class TripOnServiceDateMatcherFactory {
 
   /**
-   * Creates a matcher for {@link TripOnServiceDate} objects based on the given request.
+   * Creates a matcher for TripOnServiceDates.
    *
-   * @param request - a {@link TripOnServiceDateRequest} object that contains the criteria for the
-   *                matcher.
-   * @return a {@link Matcher<TripOnServiceDate>} to be used for filtering {@link TripOnServiceDate}
-   *                objects.
+   * @param request the criteria for filtering TripOnServiceDates.
+   * @return a matcher for filtering TripOnServiceDates.
    */
   public static Matcher<TripOnServiceDate> of(TripOnServiceDateRequest request) {
     ExpressionBuilder<TripOnServiceDate> expr = ExpressionBuilder.of();

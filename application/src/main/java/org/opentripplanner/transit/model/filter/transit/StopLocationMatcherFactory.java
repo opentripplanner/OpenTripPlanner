@@ -8,19 +8,18 @@ import org.opentripplanner.transit.model.filter.expr.NullSafeWrapperMatcher;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * A factory for creating matchers for {@link StopLocation} objects.
- * <p/>
- * This factory is used to create matchers for {@link StopLocation} objects based on a request. The
- * resulting matcher can be used to filter a list of {@link StopLocation} objects.
+ * A factory for creating matchers for StopLocations.
+ * <p>
+ * This factory creates matchers for {@link StopLocation} objects based on the criteria specified
+ * in a request. The resulting matcher can be used to filter a list of StopLocations.
  */
 public class StopLocationMatcherFactory {
 
   /**
-   * Creates a matcher that filters {@link StopLocation} objects with the provided {@code request}.
+   * Creates a matcher that filters StopLocations.
    *
-   * @param request - a {@link FindStopLocationsRequest} object that contains the criteria for the
-   *                matcher.
-   * @return a {@link Matcher<StopLocation>} to be used for filtering {@link StopLocation} objects.
+   * @param request the criteria for filtering StopLocations.
+   * @return a matcher for filtering StopLocations.
    */
   public static Matcher<StopLocation> of(FindStopLocationsRequest request) {
     ExpressionBuilder<StopLocation> expr = ExpressionBuilder.of();
