@@ -17,12 +17,16 @@ import graphql.schema.GraphQLTypeVisitor;
 import graphql.schema.GraphQLTypeVisitorStub;
 import graphql.util.TraversalControl;
 import graphql.util.TraverserContext;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.AccessModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.DirectModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.routerequest.EgressModeMapper;
@@ -43,7 +47,11 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingFilter;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingSelect;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
+import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * GraphQL type visitor that injects default values to input fields and query arguments from code
@@ -104,7 +112,11 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       .stringOpt("planConnection.searchWindow", defaultRouteRequest.searchWindow());
     setBikeDefaults(defaultRouteRequest.preferences().bike(), builder);
     setCarDefaults(defaultRouteRequest.preferences().car(), builder);
-    setModeDefaults(defaultRouteRequest.journey(), builder);
+    setModeDefaults(
+      defaultRouteRequest.journey(),
+      defaultRouteRequest.preferences().transit(),
+      builder
+    );
     setScooterDefaults(defaultRouteRequest.preferences().scooter(), builder);
     setTransitDefaults(defaultRouteRequest.preferences().transit(), builder);
     setTransferDefaults(defaultRouteRequest.preferences().transfer(), builder);
@@ -215,39 +227,48 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       .arrayStringsReq("CarRentalPreferencesInput.bannedNetworks", rental.bannedNetworks());
   }
 
-  private static void setModeDefaults(JourneyRequest journey, DefaultMappingBuilder builder) {
-    builder.enumListReq(
-      "PlanModesInput.direct",
-      StreetModeMapper
-        .getStreetModesForApi(journey.direct().mode())
-        .stream()
-        .map(mode -> (Enum) DirectModeMapper.map(mode))
-        .toList()
-    );
-    builder.enumListReq(
-      "PlanTransitModesInput.access",
-      StreetModeMapper
-        .getStreetModesForApi(journey.access().mode())
-        .stream()
-        .map(mode -> (Enum) AccessModeMapper.map(mode))
-        .toList()
-    );
-    builder.enumListReq(
-      "PlanTransitModesInput.egress",
-      StreetModeMapper
-        .getStreetModesForApi(journey.egress().mode())
-        .stream()
-        .map(mode -> (Enum) EgressModeMapper.map(mode))
-        .toList()
-    );
-    builder.enumListReq(
-      "PlanTransitModesInput.transfer",
-      StreetModeMapper
-        .getStreetModesForApi(journey.transfer().mode())
-        .stream()
-        .map(mode -> (Enum) TransferModeMapper.map(mode))
-        .toList()
-    );
+  private static void setModeDefaults(
+    JourneyRequest journey,
+    TransitPreferences transit,
+    DefaultMappingBuilder builder
+  ) {
+    builder
+      .enumListReq(
+        "PlanModesInput.direct",
+        StreetModeMapper
+          .getStreetModesForApi(journey.direct().mode())
+          .stream()
+          .map(mode -> (Enum) DirectModeMapper.map(mode))
+          .toList()
+      )
+      .enumListReq(
+        "PlanTransitModesInput.access",
+        StreetModeMapper
+          .getStreetModesForApi(journey.access().mode())
+          .stream()
+          .map(mode -> (Enum) AccessModeMapper.map(mode))
+          .toList()
+      )
+      .enumListReq(
+        "PlanTransitModesInput.egress",
+        StreetModeMapper
+          .getStreetModesForApi(journey.egress().mode())
+          .stream()
+          .map(mode -> (Enum) EgressModeMapper.map(mode))
+          .toList()
+      )
+      .enumListReq(
+        "PlanTransitModesInput.transfer",
+        StreetModeMapper
+          .getStreetModesForApi(journey.transfer().mode())
+          .stream()
+          .map(mode -> (Enum) TransferModeMapper.map(mode))
+          .toList()
+      )
+      .arrayReq(
+        "PlanTransitModesInput.transit",
+        mapTransitModes(journey.transit().filters(), transit.reluctanceForMode())
+      );
   }
 
   private static void setScooterDefaults(
@@ -335,6 +356,74 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     DefaultMappingBuilder builder
   ) {
     builder.boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair());
+  }
+
+  private static ArrayValue mapTransitModes(
+    List<TransitFilter> filters,
+    Map<TransitMode, Double> reluctanceForMode
+  ) {
+    var modesWithReluctance = filters
+      .stream()
+      .flatMap(filter -> {
+        if (filter instanceof AllowAllTransitFilter) {
+          return Arrays
+            .stream(GraphQLTypes.GraphQLTransitMode.values())
+            .map(mode -> mapTransitMode(mode, reluctanceForMode.get(TransitModeMapper.map(mode))));
+        }
+        if (filter instanceof TransitFilterRequest request) {
+          return request
+            .select()
+            .stream()
+            .map(select ->
+              select
+                .transportModes()
+                .stream()
+                .map(mode ->
+                  mapTransitMode(
+                    TransitModeMapper.map(mode.mainMode()),
+                    reluctanceForMode.get(mode.mainMode())
+                  )
+                )
+                .toList()
+            )
+            .flatMap(List::stream);
+        }
+        return Stream.of();
+      })
+      .toList();
+    return ArrayValue.newArrayValue().values(modesWithReluctance).build();
+  }
+
+  private static Value mapTransitMode(
+    GraphQLTypes.GraphQLTransitMode mode,
+    @Nullable Double reluctance
+  ) {
+    var objectBuilder = ObjectValue
+      .newObjectValue()
+      .objectField(
+        ObjectField.newObjectField().name("mode").value(EnumValue.of(mode.name())).build()
+      );
+    if (reluctance != null) {
+      objectBuilder.objectField(
+        ObjectField
+          .newObjectField()
+          .name("cost")
+          .value(
+            ObjectValue
+              .newObjectValue()
+              .objectField(
+                ObjectField
+                  .newObjectField()
+                  .name("reluctance")
+                  .value(FloatValue.of(reluctance))
+                  .build()
+              )
+              .build()
+          )
+          .build()
+      );
+    }
+    return objectBuilder.build();
   }
 
   private static ObjectValue mapVehicleOptimize(
