@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import type { AnyLayer, ControlPosition } from 'react-map-gl';
+import type { AnyLayer, ControlPosition } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 
 interface Layer {
