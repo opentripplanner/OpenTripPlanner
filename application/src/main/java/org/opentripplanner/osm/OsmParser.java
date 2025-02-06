@@ -23,10 +23,10 @@ class OsmParser extends BinaryParser {
 
   private final OsmDatabase osmdb;
   private final Map<String, String> stringTable = new HashMap<>();
-  private final OsmProvider provider;
+  private final DefaultOsmProvider provider;
   private OsmParserPhase parsePhase;
 
-  public OsmParser(OsmDatabase osmdb, OsmProvider provider) {
+  public OsmParser(OsmDatabase osmdb, DefaultOsmProvider provider) {
     this.osmdb = Objects.requireNonNull(osmdb);
     this.provider = Objects.requireNonNull(provider);
   }

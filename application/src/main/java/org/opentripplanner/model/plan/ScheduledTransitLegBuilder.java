@@ -3,8 +3,11 @@ package org.opentripplanner.model.plan;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.Set;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -26,7 +29,9 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private ConstrainedTransfer transferToNextLeg;
   private int generalizedCost;
   private Float accessibilityScore;
-  private Set<TransitAlert> alerts = new HashSet<>();
+  private Set<TransitAlert> alerts = Set.of();
+  private Double distanceMeters;
+  private List<FareProductUse> fareProducts = List.of();
 
   public ScheduledTransitLegBuilder() {}
 
@@ -45,6 +50,8 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     accessibilityScore = original.accessibilityScore();
     zoneId = original.getZoneId();
     alerts = original.getTransitAlerts();
+    distanceMeters = original.getDistanceMeters();
+    fareProducts = original.fareProducts();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -164,8 +171,31 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return accessibilityScore;
   }
 
+  public B withAlerts(Set<TransitAlert> alerts) {
+    this.alerts = Objects.requireNonNull(alerts);
+    return instance();
+  }
+
   public Set<TransitAlert> alerts() {
     return alerts;
+  }
+
+  public B withDistanceMeters(double distance) {
+    this.distanceMeters = distance;
+    return instance();
+  }
+
+  public Double distanceMeters() {
+    return distanceMeters;
+  }
+
+  public List<FareProductUse> fareProducts() {
+    return fareProducts;
+  }
+
+  public B withFareProducts(List<FareProductUse> fareProducts) {
+    this.fareProducts = Objects.requireNonNull(fareProducts);
+    return instance();
   }
 
   public ScheduledTransitLeg build() {

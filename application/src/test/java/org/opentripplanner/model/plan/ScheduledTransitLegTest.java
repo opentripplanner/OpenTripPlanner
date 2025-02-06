@@ -83,6 +83,7 @@ class ScheduledTransitLegTest {
       .withEndTime(TIME.plusMinutes(10))
       .withServiceDate(TIME.toLocalDate())
       .withZoneId(ZoneIds.BERLIN)
-      .withGeneralizedCost(100);
+      .withGeneralizedCost(100)
+      .withDistanceMeters(1000);
   }
 }

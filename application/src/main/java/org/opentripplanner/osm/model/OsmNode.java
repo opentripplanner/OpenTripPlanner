@@ -11,6 +11,13 @@ public class OsmNode extends OsmWithTags {
   public double lat;
   public double lon;
 
+  public OsmNode() {}
+
+  public OsmNode(double lat, double lon) {
+    this.lat = lat;
+    this.lon = lon;
+  }
+
   public String toString() {
     return "osm node " + id;
   }

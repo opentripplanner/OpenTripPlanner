@@ -336,7 +336,13 @@ public class GraphPathToItineraryMapper {
     ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
-    return new FlexibleTransitLeg(flexEdge, startTime, endTime, generalizedCost);
+    return FlexibleTransitLeg
+      .of()
+      .withFlexTripEdge(flexEdge)
+      .withStartTime(startTime)
+      .withEndTime(endTime)
+      .withGeneralizedCost(generalizedCost)
+      .build();
   }
 
   /**

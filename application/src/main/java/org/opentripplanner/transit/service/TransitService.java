@@ -334,6 +334,11 @@ public interface TransitService {
   boolean containsTrip(FeedScopedId id);
 
   /**
+   * @see TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   */
+  Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint);
+
+  /**
    * Returns a list of {@link RegularStop}s that lay within a bounding box and match the other criteria
    * in the request object.
    */

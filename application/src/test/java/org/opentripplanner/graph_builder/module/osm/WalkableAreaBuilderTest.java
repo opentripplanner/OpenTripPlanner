@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -42,7 +42,7 @@ public class WalkableAreaBuilderTest {
 
     final File file = ResourceLoader.of(WalkableAreaBuilderTest.class).file(osmFile);
     assertTrue(file.exists());
-    new OsmProvider(file, false).readOsm(osmdb);
+    new DefaultOsmProvider(file, false).readOsm(osmdb);
     osmdb.postLoad();
 
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(

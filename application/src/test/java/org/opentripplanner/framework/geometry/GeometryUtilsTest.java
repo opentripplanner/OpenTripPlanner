@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner._support.geometry.Coordinates;
 
 public class GeometryUtilsTest {
 
@@ -265,5 +266,12 @@ public class GeometryUtilsTest {
       "[Env[0.0 : 1.0, 0.0 : 1.0], Env[1.0 : 2.0, 1.0 : 2.0], Env[2.0 : 3.0, 2.0 : 3.0], Env[3.0 : 4.0, 3.0 : 4.0], Env[4.0 : 5.0, 4.0 : 5.0], Env[5.0 : 6.0, 5.0 : 6.0]]",
       envelopes.toString()
     );
+  }
+
+  @Test
+  void sumDistances() {
+    var coordinates = List.of(Coordinates.BERLIN, Coordinates.HAMBURG, Coordinates.BERLIN);
+    var meters = GeometryUtils.sumDistances(coordinates);
+    assertEquals(510_768, meters, 50);
   }
 }

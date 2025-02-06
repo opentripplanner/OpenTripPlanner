@@ -8,23 +8,31 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 public class ConsolidatedStopLeg extends ScheduledTransitLeg {
 
-  private final StopLocation from;
-  private final StopLocation to;
+  private final Place from;
+  private final Place to;
 
-  public ConsolidatedStopLeg(ScheduledTransitLeg original, StopLocation from, StopLocation to) {
-    super(new ScheduledTransitLegBuilder<>(original));
-    this.from = Objects.requireNonNull(from);
-    this.to = Objects.requireNonNull(to);
-    this.setFareProducts(original.fareProducts());
+  ConsolidatedStopLeg(ConsolidatedStopLegBuilder builder) {
+    super(builder);
+    this.from = Objects.requireNonNull(builder.from());
+    this.to = Objects.requireNonNull(builder.to());
+  }
+
+  public static ConsolidatedStopLegBuilder of(ScheduledTransitLeg stl) {
+    return new ConsolidatedStopLegBuilder(stl);
   }
 
   @Override
   public Place getFrom() {
-    return Place.forStop(from);
+    return from;
   }
 
   @Override
   public Place getTo() {
-    return Place.forStop(to);
+    return to;
+  }
+
+  @Override
+  public ScheduledTransitLegBuilder copy() {
+    return new ConsolidatedStopLegBuilder(this);
   }
 }

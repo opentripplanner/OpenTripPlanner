@@ -11,8 +11,10 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -101,6 +103,11 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
+  public Set<TransitAlert> getTransitAlerts() {
+    return Set.of();
+  }
+
+  @Override
   public int getGeneralizedCost() {
     if (first.getGeneralizedCost() == UNKNOWN) {
       return second.getGeneralizedCost();
@@ -120,9 +127,6 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void setFareProducts(List<FareProductUse> products) {}
-
-  @Override
   public List<FareProductUse> fareProducts() {
     return List.of();
   }
@@ -132,5 +136,15 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
    */
   public List<Leg> originalLegs() {
     return List.of(first, second);
+  }
+
+  @Override
+  public TransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+    throw new UnsupportedOperationException();
   }
 }

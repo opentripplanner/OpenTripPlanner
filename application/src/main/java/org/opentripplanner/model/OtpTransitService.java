@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -15,6 +16,7 @@ import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -77,4 +79,9 @@ public interface OtpTransitService {
    * transit services if they are outside the configured 'transitServiceStart' and 'transitServiceEnd'
    */
   boolean hasActiveTransit();
+
+  /**
+   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   */
+  Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint();
 }

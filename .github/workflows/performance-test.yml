@@ -39,10 +39,11 @@ jobs:
 
           # extended locations that are run only after merging to dev-2.x
 
-          - location: hamburg # German city
-            iterations: 1
-            jfr-delay: "50s"
-            profile: extended
+          # Hamburg is disabled because of https://github.com/opentripplanner/OpenTripPlanner/issues/6430
+          # - location: hamburg # German city
+          #  iterations: 1
+          #  jfr-delay: "50s"
+          #  profile: extended
 
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1

@@ -115,7 +115,7 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
       .stream()
       .map(leg -> {
         if (leg instanceof ScheduledTransitLeg transitLeg) {
-          return transitLeg.withAccessibilityScore(compute(transitLeg));
+          return transitLeg.copy().withAccessibilityScore(compute(transitLeg)).build();
         } else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
           return streetLeg.withAccessibilityScore(compute(streetLeg));
         } else {
