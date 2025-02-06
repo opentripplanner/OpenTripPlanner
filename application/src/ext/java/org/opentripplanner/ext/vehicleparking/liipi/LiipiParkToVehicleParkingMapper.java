@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import com.bedatadriven.jackson.datatype.jts.parsers.GenericGeometryParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,11 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps a HSL Park facility into a {@link VehicleParking}.
+ * Maps a Liipi Park facility into a {@link VehicleParking}.
  */
-public class HslParkToVehicleParkingMapper {
+public class LiipiParkToVehicleParkingMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(HslParkToVehicleParkingMapper.class);
+  private static final Logger log = LoggerFactory.getLogger(LiipiParkToVehicleParkingMapper.class);
 
   private static final GenericGeometryParser GEOMETRY_PARSER = new GenericGeometryParser(
     GeometryUtils.getGeometryFactory()
@@ -44,7 +44,7 @@ public class HslParkToVehicleParkingMapper {
 
   private final ZoneId zoneId;
 
-  public HslParkToVehicleParkingMapper(
+  public LiipiParkToVehicleParkingMapper(
     String feedId,
     OpeningHoursCalendarService openingHoursCalendarService,
     ZoneId zoneId

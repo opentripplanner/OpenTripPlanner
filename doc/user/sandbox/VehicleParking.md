@@ -13,7 +13,7 @@ enabled/disabled through `otp-config.json` but from `router-config.json` updater
 
 Currently contains the following updaters:
 
-- [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
+- [Liipi](https://parking.fintraffic.fi/docs/index.html)
 - [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - [Bikely](https://www.safebikely.com/)
 - SIRI-FM
@@ -30,7 +30,7 @@ All updaters have the following parameters in common:
 
 ## HSL Park and Ride
 
-<!-- hsl-park BEGIN -->
+<!-- liipi BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
 | Config Parameter                |     Type    | Summary                                                                      |  Req./Opt. | Default Value | Since |
@@ -61,7 +61,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[2]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `liipi` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -84,20 +84,20 @@ Used for converting abstract opening hours into concrete points in time.
   "updaters" : [
     {
       "type" : "vehicle-parking",
-      "sourceType" : "hsl-park",
-      "feedId" : "hslpark",
+      "sourceType" : "liipi",
+      "feedId" : "liipi",
       "timeZone" : "Europe/Helsinki",
       "facilitiesFrequencySec" : 3600,
-      "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+      "facilitiesUrl" : "https://parking.fintraffic.fi/api/v1/facilities.json?limit=-1",
       "utilizationsFrequencySec" : 600,
-      "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
-      "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+      "utilizationsUrl" : "https://parking.fintraffic.fi/api/v1/utilizations.json?limit=-1",
+      "hubsUrl" : "https://parking.fintraffic.fi/api/v1/hubs.json?limit=-1"
     }
   ]
 }
 ```
 
-<!-- hsl-park END -->
+<!-- liipi END -->
 
 ## ParkAPI 
 
@@ -131,7 +131,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[3]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `liipi` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -216,7 +216,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[4]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `liipi` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -281,7 +281,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[13]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `liipi` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 
@@ -348,7 +348,7 @@ This will end up in the API responses as the feed id of the parking lot.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[14]   
-**Enum values:** `park-api` | `bicycle-park-api` | `hsl-park` | `bikely` | `bikeep` | `siri-fm`
+**Enum values:** `park-api` | `bicycle-park-api` | `liipi` | `bikely` | `bikeep` | `siri-fm`
 
 The source of the vehicle updates.
 

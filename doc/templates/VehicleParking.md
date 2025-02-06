@@ -13,7 +13,7 @@ enabled/disabled through `otp-config.json` but from `router-config.json` updater
 
 Currently contains the following updaters:
 
-- [HSL Park and Ride](https://p.hsl.fi/docs/index.html)
+- [Liipi](https://parking.fintraffic.fi/docs/index.html)
 - [ParkAPI](https://github.com/offenesdresden/ParkAPI)
 - [Bikely](https://www.safebikely.com/)
 - SIRI-FM
@@ -30,7 +30,7 @@ All updaters have the following parameters in common:
 
 ## HSL Park and Ride
 
-<!-- INSERT: hsl-park -->
+<!-- INSERT: liipi -->
 
 ## ParkAPI 
 

@@ -1,17 +1,17 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * Contains updates to a {@link HslParkUpdater} park.
+ * Contains updates to a {@link LiipiParkUpdater} park.
  */
-public class HslParkPatch {
+public class LiipiParkPatch {
 
   private final FeedScopedId facilityId;
   private final String capacityType;
   private final Integer spacesAvailable;
 
-  public HslParkPatch(FeedScopedId facilityId, String capacityType, Integer spacesAvailable) {
+  public LiipiParkPatch(FeedScopedId facilityId, String capacityType, Integer spacesAvailable) {
     this.facilityId = facilityId;
     this.capacityType = capacityType;
     this.spacesAvailable = spacesAvailable;
