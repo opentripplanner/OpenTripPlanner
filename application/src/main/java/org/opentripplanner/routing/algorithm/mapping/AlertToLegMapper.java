@@ -5,10 +5,14 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.plan.AlertsAware;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -36,17 +40,12 @@ public class AlertToLegMapper {
   }
 
   /**
-   * Find and add alerts to the leg passed in.
+   * Takes the (immutable) leg and returns a copy of it with the alerts attached.
    *
    * @param isFirstLeg Whether the leg is a first leg of the itinerary. This affects the matched
    *                   stop condition.
    */
-  public void addTransitAlertsToLeg(Leg leg, boolean isFirstLeg) {
-    // Alert alerts are only relevant for transit legs
-    if (!leg.isTransitLeg()) {
-      return;
-    }
-
+  public TransitLeg decorateWithAlerts(TransitLeg leg, boolean isFirstLeg) {
     ZonedDateTime legStartTime = leg.getStartTime();
     ZonedDateTime legEndTime = leg.getEndTime();
     StopLocation fromStop = leg.getFrom() == null ? null : leg.getFrom().stop;
@@ -55,6 +54,8 @@ public class AlertToLegMapper {
     FeedScopedId routeId = leg.getRoute().getId();
     FeedScopedId tripId = leg.getTrip().getId();
     LocalDate serviceDate = leg.getServiceDate();
+
+    var totalAlerts = new HashSet<TransitAlert>();
 
     if (fromStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = isFirstLeg
@@ -66,7 +67,7 @@ public class AlertToLegMapper {
       alerts.addAll(
         getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
       );
-      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
     }
     if (toStop instanceof RegularStop stop) {
       Set<StopCondition> stopConditions = StopCondition.ARRIVING;
@@ -75,7 +76,7 @@ public class AlertToLegMapper {
       alerts.addAll(
         getAlertsForRelatedStops(stop, id -> transitAlertService.getStopAlerts(id, stopConditions))
       );
-      addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+      totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
     }
 
     if (leg.getIntermediateStops() != null) {
@@ -94,7 +95,7 @@ public class AlertToLegMapper {
           ZonedDateTime stopArrival = visit.arrival.scheduledTime();
           ZonedDateTime stopDeparture = visit.departure.scheduledTime();
 
-          addTransitAlertsToLeg(leg, alerts, stopArrival, stopDeparture);
+          totalAlerts.addAll(filterAlertsByTime(alerts, stopArrival, stopDeparture));
         }
       }
     }
@@ -103,40 +104,36 @@ public class AlertToLegMapper {
 
     // trips
     alerts = transitAlertService.getTripAlerts(leg.getTrip().getId(), serviceDate);
-    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+    totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
     // route
     alerts = transitAlertService.getRouteAlerts(leg.getRoute().getId());
-    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+    totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
     // agency
     alerts = transitAlertService.getAgencyAlerts(leg.getAgency().getId());
-    addTransitAlertsToLeg(leg, alerts, legStartTime, legEndTime);
+    totalAlerts.addAll(filterAlertsByTime(alerts, legStartTime, legEndTime));
 
     // Filter alerts when there are multiple timePeriods for each alert
-    leg
-      .getTransitAlerts()
-      .removeIf(alert ->
-        !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
-      );
+    totalAlerts.removeIf(alert ->
+      !alert.displayDuring(leg.getStartTime().toEpochSecond(), leg.getEndTime().toEpochSecond())
+    );
+
+    return leg.decorateWithAlerts(Set.copyOf(totalAlerts));
   }
 
   /**
-   * Add alerts for the leg, if they are valid for the duration of the leg.
+   * Filter alerts if they are valid for the duration of the leg.
    */
-  private static void addTransitAlertsToLeg(
-    Leg leg,
+  private static List<TransitAlert> filterAlertsByTime(
     Collection<TransitAlert> alerts,
     ZonedDateTime fromTime,
     ZonedDateTime toTime
   ) {
-    if (alerts != null) {
-      for (TransitAlert alert : alerts) {
-        if (alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond())) {
-          leg.addAlert(alert);
-        }
-      }
-    }
+    return alerts
+      .stream()
+      .filter(alert -> alert.displayDuring(fromTime.toEpochSecond(), toTime.toEpochSecond()))
+      .toList();
   }
 
   private Collection<TransitAlert> getAlertsForStopAndRoute(

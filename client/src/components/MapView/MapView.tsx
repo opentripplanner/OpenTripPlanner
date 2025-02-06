@@ -5,10 +5,9 @@ import {
   MapGeoJSONFeature,
   MapMouseEvent,
   NavigationControl,
-  VectorTileSource,
   MapRef,
 } from 'react-map-gl/maplibre';
-import maplibregl from 'maplibre-gl';
+import maplibregl, { VectorTileSource } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';

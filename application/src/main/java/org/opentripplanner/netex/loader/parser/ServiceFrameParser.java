@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.logging.MaxCountLogger;
 import org.opentripplanner.netex.index.NetexEntityIndex;
@@ -136,13 +137,11 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     index.networkIdByGroupOfLineId.addAll(networkIdByGroupOfLineId);
   }
 
-  private void parseStopAssignments(StopAssignmentsInFrame_RelStructure stopAssignments) {
+  private void parseStopAssignments(@Nullable StopAssignmentsInFrame_RelStructure stopAssignments) {
     if (stopAssignments == null) return;
 
     for (JAXBElement<?> stopAssignment : stopAssignments.getStopAssignment()) {
-      if (stopAssignment.getValue() instanceof PassengerStopAssignment) {
-        var assignment = (PassengerStopAssignment) stopAssignment.getValue();
-
+      if (stopAssignment.getValue() instanceof PassengerStopAssignment assignment) {
         if (assignment.getQuayRef() == null) {
           PASSENGER_STOP_ASSIGNMENT_LOGGER.info(
             "PassengerStopAssignment with empty quay ref is dropped. Assigment: {}",
@@ -153,9 +152,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
           String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
         }
-      } else if (stopAssignment.getValue() instanceof FlexibleStopAssignment) {
+      } else if (stopAssignment.getValue() instanceof FlexibleStopAssignment assignment) {
         if (OTPFeature.FlexRouting.isOn()) {
-          FlexibleStopAssignment assignment = (FlexibleStopAssignment) stopAssignment.getValue();
           String flexibleStopPlaceRef = assignment.getFlexibleStopPlaceRef().getRef();
 
           // TODO OTP2 - This check belongs to the mapping or as a separate validation
@@ -176,7 +174,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     }
   }
 
-  private void parseRoutes(RoutesInFrame_RelStructure routes) {
+  private void parseRoutes(@Nullable RoutesInFrame_RelStructure routes) {
     if (routes == null) return;
 
     for (JAXBElement<?> element : routes.getRoute_()) {

@@ -19,7 +19,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildService;
@@ -82,7 +82,7 @@ class OsmBoardingLocationsModuleTest {
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
     var factory = new VertexFactory(graph);
 
-    var provider = new OsmProvider(file, false);
+    var provider = new DefaultOsmProvider(file, false);
     var floatingBusVertex = factory.transitStop(
       TransitStopVertex.of().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
     );
@@ -200,7 +200,7 @@ class OsmBoardingLocationsModuleTest {
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var osmModule = OsmModule
       .of(
-        new OsmProvider(
+        new DefaultOsmProvider(
           ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
           false
         ),

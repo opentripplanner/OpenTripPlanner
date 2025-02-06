@@ -3,10 +3,13 @@ package org.opentripplanner.ext.fares.impl;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.OTHER_FEED_AGENCY;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.util.List;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -82,6 +85,18 @@ public class FareModelForTest {
     .setTransfers(1)
     .setAgency(OTHER_FEED_AGENCY.getId())
     .build();
+  public static final FareProduct FARE_PRODUCT = new FareProduct(
+    id("fp"),
+    "fare product",
+    Money.euros(10.00f),
+    null,
+    null,
+    null
+  );
+  public static final FareProductUse FARE_PRODUCT_USE = new FareProductUse(
+    "c1a04702-1fb6-32d4-ba02-483bf68111ed",
+    FARE_PRODUCT
+  );
 
   // Fare rule sets
   static FareRuleSet AIRPORT_TO_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);

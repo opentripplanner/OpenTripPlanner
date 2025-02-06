@@ -1,5 +1,5 @@
 import { TripPattern } from '../../gql/graphql.ts';
-import { Layer, Source } from 'react-map-gl';
+import { Layer, Source } from 'react-map-gl/maplibre';
 import { decode } from '@googlemaps/polyline-codec';
 import { getColorForLeg } from '../../util/getColorForLeg.ts';
 

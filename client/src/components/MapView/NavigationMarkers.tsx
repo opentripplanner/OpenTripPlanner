@@ -1,5 +1,5 @@
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import { Marker } from 'react-map-gl';
+import { Marker } from 'react-map-gl/maplibre';
 import markerFlagStart from '../../static/img/marker-flag-start-shadowed.png';
 import markerFlagEnd from '../../static/img/marker-flag-end-shadowed.png';
 import { useCoordinateResolver } from './useCoordinateResolver.ts';
