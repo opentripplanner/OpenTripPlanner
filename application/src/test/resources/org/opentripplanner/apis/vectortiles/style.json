@@ -294,6 +294,32 @@
       }
     },
     {
+      "id": "walk-safety",
+      "type": "line",
+      "source": "vectorSource",
+      "source-layer": "edges",
+      "minzoom": 6,
+      "maxzoom": 23,
+      "paint": {
+        "line-color": [
+          "rgb",
+          ["min", 255, ["*", 30, ["get", "walkSafetyFactor"]]],
+          ["max", 0, ["-", 255, ["*", 30, ["get", "walkSafetyFactor"]]]],
+          60
+        ],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
+        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+      },
+      "filter": ["in", "class", "StreetEdge"],
+      "layout": {
+        "line-cap": "round",
+        "visibility": "none"
+      },
+      "metadata": {
+        "group": "Safety"
+      }
+    },
+    {
       "id": "permission PEDESTRIAN",
       "source": "vectorSource",
       "source-layer": "edges",
