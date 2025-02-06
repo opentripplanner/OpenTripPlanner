@@ -190,7 +190,9 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   }
 
   private static void setCarDefaults(CarPreferences car, DefaultMappingBuilder builder) {
-    builder.floatReq("CarPreferencesInput.reluctance", car.reluctance());
+    builder
+      .floatReq("CarPreferencesInput.reluctance", car.reluctance())
+      .intReq("CarPreferencesInput.boardCost", car.boardCost());
     setCarParkingDefaults(car.parking(), builder);
     setCarRentalDefaults(car.rental(), builder);
   }
