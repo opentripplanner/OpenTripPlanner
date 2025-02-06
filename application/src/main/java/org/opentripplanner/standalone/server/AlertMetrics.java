@@ -50,7 +50,7 @@ public class AlertMetrics implements MeterBinder {
   }
 
   /**
-   * Creates a {@link MultiGauge} for the alerts and publishes (register in Micrometer language)
+   * Creates a {@link MultiGauge} for the alerts and publishes ("registers" in Micrometer language)
    * to the repository.
    */
   @VisibleForTesting
