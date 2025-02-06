@@ -298,6 +298,18 @@ public class DebugStyleSpec {
         .lineOffset(LINE_OFFSET)
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("walk-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColorFromProperty("walkSafetyFactor")
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
   }
