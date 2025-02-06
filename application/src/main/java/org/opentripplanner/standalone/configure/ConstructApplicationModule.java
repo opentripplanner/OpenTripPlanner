@@ -12,6 +12,7 @@ import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
@@ -52,27 +53,35 @@ public class ConstructApplicationModule {
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
-    return DefaultServerRequestContext.create(
-      routerConfig.transitTuningConfig(),
-      defaultRequest,
-      raptorConfig,
+    var transitRoutingConfig = routerConfig.transitTuningConfig();
+    var vectorTileConfig = routerConfig.vectorTileConfig();
+    var flexParameters = routerConfig.flexParameters();
+
+    // TODO: Inject this, can this use the routerConfig routingRequest ?
+    var tileRendererManager = new TileRendererManager(graph, defaultRequest.preferences());
+
+    return new DefaultServerRequestContext(
+      debugUiConfig,
+      flexParameters,
       graph,
-      transitService,
       Metrics.globalRegistry,
-      routerConfig.vectorTileConfig(),
-      worldEnvelopeService,
+      raptorConfig,
       realtimeVehicleService,
-      vehicleRentalService,
-      vehicleParkingService,
-      emissionsService,
-      sorlandsbanenService,
-      routerConfig.flexParameters(),
       rideHailingServices,
-      stopConsolidationService,
+      defaultRequest,
       streetLimitationParametersService,
-      traverseVisitor,
+      transitRoutingConfig,
+      transitService,
+      vectorTileConfig,
+      vehicleParkingService,
+      vehicleRentalService,
+      worldEnvelopeService,
+      emissionsService,
       luceneIndex,
-      debugUiConfig
+      sorlandsbanenService,
+      stopConsolidationService,
+      tileRendererManager,
+      traverseVisitor
     );
   }
 
