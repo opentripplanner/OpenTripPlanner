@@ -143,7 +143,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // streetToStopTime may be zero so that searching from the stop coordinates instead of
     // the stop id catch transit departing at that exact search time.
     int streetToStopTime = getStreetToStopTime();
-    s1.incrementTimeInSeconds(streetToStopTime);
+    s1.incrementTimeInMilliseconds(1000L * streetToStopTime);
     s1.incrementWeight(STEL_TRAVERSE_COST + streetToStopTime);
     return s1.makeStateArray();
   }

@@ -29,8 +29,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   /* Data which is likely to change at most traversals */
 
-  // the current time at this state, in seconds since UNIX epoch
-  protected long time;
+  // the current time at this state, in milliseconds since UNIX epoch
+  protected long time_ms;
 
   // accumulated weight up to this state
   public double weight;
@@ -76,7 +76,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         vertex.rentalRestrictions().noDropOffNetworks();
     }
     this.walkDistance = 0;
-    this.time = startTime.getEpochSecond();
+    this.time_ms = startTime.toEpochMilli();
   }
 
   /**
@@ -169,7 +169,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   /** Returns time in seconds since epoch */
   public long getTimeSeconds() {
-    return time;
+    return time_ms / 1000;
+  }
+
+  public long getTimeMilliseconds() {
+    return time_ms;
   }
 
   /** returns the length of the trip in seconds up to this state */
@@ -266,8 +270,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return this.weight;
   }
 
-  public int getTimeDeltaSeconds() {
-    return backState != null ? (int) (getTimeSeconds() - backState.getTimeSeconds()) : 0;
+  public int getTimeDeltaMilliseconds() {
+    return backState != null ? (int) (getTimeMilliseconds() - backState.getTimeMilliseconds()) : 0;
   }
 
   public double getWeightDelta() {
@@ -311,7 +315,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public Instant getTime() {
-    return Instant.ofEpochSecond(time);
+    return Instant.ofEpochMilli(time_ms);
   }
 
   public String getVehicleRentalNetwork() {
@@ -351,7 +355,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       // note the distinction between setFromState and setBackState
       editor.setFromState(orig);
 
-      editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
+      editor.incrementTimeInMilliseconds(orig.getAbsTimeDeltaMilliseconds());
       editor.incrementWeight(orig.getWeightDelta());
       editor.incrementWalkDistance(orig.getWalkDistanceDelta());
 
@@ -485,8 +489,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
   }
 
-  private int getAbsTimeDeltaSeconds() {
-    return Math.abs(getTimeDeltaSeconds());
+  private int getAbsTimeDeltaMilliseconds() {
+    return Math.abs(getTimeDeltaMilliseconds());
   }
 
   private double getWalkDistanceDelta() {
