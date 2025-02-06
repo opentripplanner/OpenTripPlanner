@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import DebugLayerControl from './LayerControl';
-import { ControlPosition } from 'react-map-gl';
+import { ControlPosition } from 'react-map-gl/maplibre';
 import debugLayerIcon from '../../static/img/graph.svg';
 import { MapRef } from 'react-map-gl/maplibre';
 

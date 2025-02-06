@@ -232,4 +232,11 @@ public class WayTestData {
     way.addTag("capacity", "10");
     return way;
   }
+
+  public static OsmWay platform() {
+    var way = new OsmWay();
+    way.addTag("public_transport", "platform");
+    way.addTag("ref", "123");
+    return way;
+  }
 }

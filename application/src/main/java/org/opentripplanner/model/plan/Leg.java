@@ -381,9 +381,7 @@ public interface Leg {
     return Set.of();
   }
 
-  default Set<TransitAlert> getTransitAlerts() {
-    return Set.of();
-  }
+  Set<TransitAlert> getTransitAlerts();
 
   @Nullable
   default PickDrop getBoardRule() {
@@ -485,10 +483,6 @@ public interface Leg {
     return null;
   }
 
-  default void addAlert(TransitAlert alert) {
-    throw new UnsupportedOperationException();
-  }
-
   default Leg withTimeShift(Duration duration) {
     throw new UnsupportedOperationException();
   }
@@ -503,13 +497,6 @@ public interface Leg {
 
     return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
-
-  /**
-   * Set {@link FareProductUse} for this leg. Their use-id can identify them across several
-   * legs.
-   */
-  @Sandbox
-  void setFareProducts(List<FareProductUse> products);
 
   /**
    * Get the {@link FareProductUse} for this leg.

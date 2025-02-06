@@ -39,7 +39,7 @@ public class TileRendererManager {
     renderers.put("traversal", new EdgeVertexTileRenderer(new TraversalPermissionsEdgeRenderer()));
     renderers.put(
       "wheelchair",
-      new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingPreferences))
+      new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingPreferences.wheelchair()))
     );
     renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
     renderers.put("pathways", new EdgeVertexTileRenderer(new PathwayEdgeRenderer()));

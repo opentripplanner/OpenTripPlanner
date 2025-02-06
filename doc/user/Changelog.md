@@ -83,6 +83,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add all routing parameters to debug UI [#6370](https://github.com/opentripplanner/OpenTripPlanner/pull/6370)
 - Add currentFuelPercent and currentRangeMeters to RentalVehichle in the GTFS GraphQL API [#6272](https://github.com/opentripplanner/OpenTripPlanner/pull/6272)
 - Add a matcher API for filters in the transit service used for route lookup [#6378](https://github.com/opentripplanner/OpenTripPlanner/pull/6378)
+- Use SIRI-ET and GTFS-RT TripUpdates at the same time [#6363](https://github.com/opentripplanner/OpenTripPlanner/pull/6363)
+- Add 'boardCost' parameter for cars [#6413](https://github.com/opentripplanner/OpenTripPlanner/pull/6413)
+- Fix processing of one-way boarding locations [#6410](https://github.com/opentripplanner/OpenTripPlanner/pull/6410)
+- Allow SIRI's StopPointRef to refer to a NeTEx scheduled stop point [#6397](https://github.com/opentripplanner/OpenTripPlanner/pull/6397)
+- Cleanup DefaultServerRequestContext [#6416](https://github.com/opentripplanner/OpenTripPlanner/pull/6416)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)

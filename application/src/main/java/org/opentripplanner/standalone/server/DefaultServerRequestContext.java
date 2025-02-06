@@ -36,22 +36,35 @@ import org.opentripplanner.transit.service.TransitService;
 @HttpRequestScoped
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
-  private final List<RideHailingService> rideHailingServices;
+  // Keep sort order: Main services, optional services and writable/none final fields
+  //                  All 3 sections is sorted alphabetically.
+
+  private final DebugUiConfig debugUiConfig;
+  private final FlexParameters flexParameters;
   private final Graph graph;
-  private final TransitService transitService;
-  private final TransitRoutingConfig transitRoutingConfig;
-  private final RouteRequest routeRequestDefaults;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
-  private final TileRendererManager tileRendererManager;
-  private final VectorTileConfig vectorTileConfig;
-  private final FlexParameters flexParameters;
-  private final TraverseVisitor traverseVisitor;
-  private final WorldEnvelopeService worldEnvelopeService;
   private final RealtimeVehicleService realtimeVehicleService;
-  private final VehicleRentalService vehicleRentalService;
+  private final List<RideHailingService> rideHailingServices;
+  private final RouteRequest routeRequestDefaults;
+  private final StreetLimitationParametersService streetLimitationParametersService;
+  private final TransitRoutingConfig transitRoutingConfig;
+  private final TransitService transitService;
+  private final VectorTileConfig vectorTileConfig;
   private final VehicleParkingService vehicleParkingService;
+  private final VehicleRentalService vehicleRentalService;
+  private final WorldEnvelopeService worldEnvelopeService;
+
+  /* Optional fields */
+
+  @Nullable
   private final EmissionsService emissionsService;
+
+  @Nullable
+  private final LuceneIndex luceneIndex;
+
+  @Nullable
+  private final TileRendererManager tileRendererManager;
 
   @Nullable
   private final GraphQLSchema schema;
@@ -59,114 +72,69 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final SorlandsbanenNorwayService sorlandsbanenService;
 
+  @Nullable
   private final StopConsolidationService stopConsolidationService;
-  private final StreetLimitationParametersService streetLimitationParametersService;
-  private final LuceneIndex luceneIndex;
-  private final DebugUiConfig debugUiConfig;
+
+  @Nullable
+  private final TraverseVisitor traverseVisitor;
+
+  /* Lazy initialized fields */
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
 
   /**
+   * Create a server context valid for one http request only!
    * Make sure all mutable components are copied/cloned before calling this constructor.
    */
-  private DefaultServerRequestContext(
+  public DefaultServerRequestContext(
+    // Keep the same order as in the field declaration
+    DebugUiConfig debugUiConfig,
+    FlexParameters flexParameters,
     Graph graph,
-    TransitService transitService,
-    TransitRoutingConfig transitRoutingConfig,
-    RouteRequest routeRequestDefaults,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
-    TileRendererManager tileRendererManager,
-    VectorTileConfig vectorTileConfig,
-    WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    @Nullable EmissionsService emissionsService,
-    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    @Nullable GraphQLSchema schema,
     List<RideHailingService> rideHailingServices,
-    @Nullable StopConsolidationService stopConsolidationService,
+    RouteRequest routeRequestDefaults,
     StreetLimitationParametersService streetLimitationParametersService,
-    FlexParameters flexParameters,
-    @Nullable TraverseVisitor traverseVisitor,
+    TransitRoutingConfig transitRoutingConfig,
+    TransitService transitService,
+    VectorTileConfig vectorTileConfig,
+    VehicleParkingService vehicleParkingService,
+    VehicleRentalService vehicleRentalService,
+    WorldEnvelopeService worldEnvelopeService,
+    @Nullable EmissionsService emissionsService,
     @Nullable LuceneIndex luceneIndex,
-    DebugUiConfig debugUiConfig
+    @Nullable GraphQLSchema schema,
+    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
+    @Nullable StopConsolidationService stopConsolidationService,
+    @Nullable TileRendererManager tileRendererManager,
+    @Nullable TraverseVisitor traverseVisitor
   ) {
+    this.debugUiConfig = debugUiConfig;
+    this.flexParameters = flexParameters;
     this.graph = graph;
-    this.transitService = transitService;
-    this.transitRoutingConfig = transitRoutingConfig;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
-    this.tileRendererManager = tileRendererManager;
-    this.vectorTileConfig = vectorTileConfig;
-    this.vehicleRentalService = vehicleRentalService;
-    this.vehicleParkingService = vehicleParkingService;
-    this.flexParameters = flexParameters;
-    this.traverseVisitor = traverseVisitor;
-    this.routeRequestDefaults = routeRequestDefaults;
-    this.worldEnvelopeService = worldEnvelopeService;
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
-    this.emissionsService = emissionsService;
-    this.sorlandsbanenService = sorlandsbanenService;
-    this.schema = schema;
-    this.stopConsolidationService = stopConsolidationService;
+    this.routeRequestDefaults = routeRequestDefaults;
     this.streetLimitationParametersService = streetLimitationParametersService;
-    this.luceneIndex = luceneIndex;
-    this.debugUiConfig = debugUiConfig;
-  }
+    this.transitRoutingConfig = transitRoutingConfig;
+    this.transitService = transitService;
+    this.vectorTileConfig = vectorTileConfig;
+    this.vehicleParkingService = vehicleParkingService;
+    this.vehicleRentalService = vehicleRentalService;
+    this.worldEnvelopeService = worldEnvelopeService;
 
-  /**
-   * Create a server context valid for one http request only!
-   */
-  public static DefaultServerRequestContext create(
-    TransitRoutingConfig transitRoutingConfig,
-    RouteRequest routeRequestDefaults,
-    RaptorConfig<TripSchedule> raptorConfig,
-    Graph graph,
-    TransitService transitService,
-    MeterRegistry meterRegistry,
-    VectorTileConfig vectorTileConfig,
-    WorldEnvelopeService worldEnvelopeService,
-    RealtimeVehicleService realtimeVehicleService,
-    VehicleRentalService vehicleRentalService,
-    VehicleParkingService vehicleParkingService,
-    @Nullable EmissionsService emissionsService,
-    @Nullable SorlandsbanenNorwayService sorlandsbanenService,
-    @Nullable GraphQLSchema schema,
-    FlexParameters flexParameters,
-    List<RideHailingService> rideHailingServices,
-    @Nullable StopConsolidationService stopConsolidationService,
-    StreetLimitationParametersService streetLimitationParametersService,
-    @Nullable TraverseVisitor traverseVisitor,
-    @Nullable LuceneIndex luceneIndex,
-    DebugUiConfig debugUiConfig
-  ) {
-    return new DefaultServerRequestContext(
-      graph,
-      transitService,
-      transitRoutingConfig,
-      routeRequestDefaults,
-      meterRegistry,
-      raptorConfig,
-      new TileRendererManager(graph, routeRequestDefaults.preferences()),
-      vectorTileConfig,
-      worldEnvelopeService,
-      realtimeVehicleService,
-      vehicleRentalService,
-      vehicleParkingService,
-      emissionsService,
-      sorlandsbanenService,
-      schema,
-      rideHailingServices,
-      stopConsolidationService,
-      streetLimitationParametersService,
-      flexParameters,
-      traverseVisitor,
-      luceneIndex,
-      debugUiConfig
-    );
+    // Optional fields
+    this.emissionsService = emissionsService;
+    this.luceneIndex = luceneIndex;
+    this.schema = schema;
+    this.sorlandsbanenService = sorlandsbanenService;
+    this.stopConsolidationService = stopConsolidationService;
+    this.tileRendererManager = tileRendererManager;
+    this.traverseVisitor = traverseVisitor;
   }
 
   @Override
