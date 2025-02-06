@@ -84,6 +84,7 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
       const mapInstance = mapRef.getMap();
       mapInstance.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
 
+      // After toggling, recalculate which interactive layers are visible.
       const selected = findSelectedDebugLayers(mapInstance);
       setInteractiveLayerIds(selected);
     },

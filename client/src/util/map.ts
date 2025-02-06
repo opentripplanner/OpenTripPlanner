@@ -4,7 +4,6 @@ import { MapInstance } from 'react-map-gl/maplibre';
  * Find currently selected (= visible) debug layers.
  */
 export const findSelectedDebugLayers = (mapInstance: MapInstance): string[] => {
-  // After toggling, recalculate which interactive layers are visible.
   const style = mapInstance.getStyle();
   if (!style || !style.layers) {
     return [];
