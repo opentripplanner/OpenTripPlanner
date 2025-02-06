@@ -54,7 +54,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final VehicleRentalService vehicleRentalService;
   private final WorldEnvelopeService worldEnvelopeService;
 
-  /* Optional services */
+  /* Optional fields */
 
   @Nullable
   private final EmissionsService emissionsService;
@@ -74,7 +74,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final TraverseVisitor traverseVisitor;
 
-  /* Writable fields */
+  /* Lazy initialized fields */
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
 
@@ -121,6 +121,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
     this.worldEnvelopeService = worldEnvelopeService;
+
+    // Optional fields
     this.emissionsService = emissionsService;
     this.luceneIndex = luceneIndex;
     this.sorlandsbanenService = sorlandsbanenService;
