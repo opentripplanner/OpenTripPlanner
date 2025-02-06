@@ -129,13 +129,6 @@
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>com.google.dagger</groupId>
-                            <artifactId>dagger-compiler</artifactId>
-                            <version>${google.dagger.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
