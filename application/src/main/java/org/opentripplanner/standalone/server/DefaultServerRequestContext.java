@@ -11,7 +11,6 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -63,9 +62,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final LuceneIndex luceneIndex;
 
   @Nullable
-  private final TileRendererManager tileRendererManager;
-
-  @Nullable
   private final SorlandsbanenNorwayService sorlandsbanenService;
 
   @Nullable
@@ -103,7 +99,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     @Nullable LuceneIndex luceneIndex,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     @Nullable StopConsolidationService stopConsolidationService,
-    @Nullable TileRendererManager tileRendererManager,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     this.debugUiConfig = debugUiConfig;
@@ -127,7 +122,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.luceneIndex = luceneIndex;
     this.sorlandsbanenService = sorlandsbanenService;
     this.stopConsolidationService = stopConsolidationService;
-    this.tileRendererManager = tileRendererManager;
     this.traverseVisitor = traverseVisitor;
   }
 
@@ -216,11 +210,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
-  }
-
-  @Override
-  public TileRendererManager tileRendererManager() {
-    return tileRendererManager;
   }
 
   @Override
