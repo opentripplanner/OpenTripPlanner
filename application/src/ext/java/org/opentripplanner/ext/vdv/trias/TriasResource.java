@@ -2,10 +2,13 @@ package org.opentripplanner.ext.vdv.trias;
 
 import de.vdv.ojp20.CallAtNearStopStructure;
 import de.vdv.ojp20.CallAtStopStructure;
+import de.vdv.ojp20.DatedJourneyStructure;
 import de.vdv.ojp20.InternationalTextStructure;
+import de.vdv.ojp20.JourneyRefStructure;
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPResponseStructure;
 import de.vdv.ojp20.OJPStopEventDeliveryStructure;
+import de.vdv.ojp20.ServiceDepartureStructure;
 import de.vdv.ojp20.StopEventResultStructure;
 import de.vdv.ojp20.StopEventStructure;
 import de.vdv.ojp20.siri.DefaultedTextStructure;
@@ -14,7 +17,6 @@ import de.vdv.ojp20.siri.StopPointRefStructure;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.JAXBContext;
@@ -26,17 +28,11 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.time.ZonedDateTime;
 import javax.xml.namespace.QName;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,24 +67,11 @@ public class TriasResource {
 
       // Convert Java object to XML string
       var outputStream = new ByteArrayOutputStream();
-      var xmlWriter = new OutputStreamWriter(outputStream);
-      marshaller.marshal(ojp, xmlWriter);
+      marshaller.marshal(ojp, outputStream);
 
-      var xslt = TriasResource.class.getResource("trias_to_ojp2.0_response.xslt").openStream();
+      var xmlSource = new StreamSource(new ByteArrayInputStream(outputStream.toByteArray()));
 
-      // Create a Source for the XML and XSLT files
-      Source xmlSource = new StreamSource(new ByteArrayInputStream(outputStream.toByteArray()));
-      Source xsltSource = new StreamSource(xslt);
-
-      // Create the Transformer using the XSLT
-      TransformerFactory factory = TransformerFactory.newInstance();
-      Transformer transformer = factory.newTransformer(xsltSource);
-
-      // Set optional properties for the transformer
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-
-      Result result = new StreamResult(writer);
-      transformer.transform(xmlSource, result);
+      OjpToTriasTransformer.transform(writer, xmlSource);
     } catch (IOException | JAXBException | TransformerException e) {
       throw new RuntimeException(e);
     }
@@ -105,8 +88,16 @@ public class TriasResource {
             new InternationalTextStructure()
               .withText(new DefaultedTextStructure().withValue("Wertheim, Waldhaus").withLang("de"))
           )
+          .withServiceDeparture(
+            new ServiceDepartureStructure().withTimetabledTime(ZonedDateTime.now())
+          )
       );
-    var stopEvent = new StopEventStructure().withThisCall(call);
+    var stopEvent = new StopEventStructure()
+      .withThisCall(call)
+      .withService(
+        new DatedJourneyStructure()
+          .withJourneyRef(new JourneyRefStructure().withValue("vrn:49976::H:s24:13"))
+      );
     var result = new StopEventResultStructure().withStopEvent(stopEvent);
     var sed = new OJPStopEventDeliveryStructure().withStatus(true).withRest(jaxbElement(result));
     var serviceDelivery = new ServiceDelivery()
