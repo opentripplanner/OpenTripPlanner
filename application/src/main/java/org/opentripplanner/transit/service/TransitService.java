@@ -239,7 +239,6 @@ public interface TransitService {
    * Return the timetable for a given trip pattern and date, taking into account real-time updates.
    * If no real-times update are applied, fall back to scheduled data.
    */
-  @Nullable
   Timetable findTimetable(TripPattern tripPattern, LocalDate serviceDate);
 
   /**

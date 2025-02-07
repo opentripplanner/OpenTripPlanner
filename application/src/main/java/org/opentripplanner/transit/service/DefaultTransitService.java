@@ -129,7 +129,7 @@ public class DefaultTransitService implements TransitEditorService {
       Instant midnight = ServiceDateUtils
         .asStartOfService(serviceDate, this.getTimeZone())
         .toInstant();
-      return Optional.ofNullable(
+      return Optional.of(
         TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight)
       );
     }
