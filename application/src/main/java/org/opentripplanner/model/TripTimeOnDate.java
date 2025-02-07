@@ -96,9 +96,6 @@ public class TripTimeOnDate {
     Instant midnight
   ) {
     TripTimes times = table.getTripTimes(trip);
-    if (times == null) {
-      return null;
-    }
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
