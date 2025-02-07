@@ -14,16 +14,21 @@ import de.vdv.ojp20.siri.StopPointRefStructure;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlSchema;
 import jakarta.xml.bind.annotation.XmlType;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import javax.xml.namespace.QName;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
@@ -46,14 +51,20 @@ public class TriasResource {
   public Response index() {
     try {
       var ojp = makeOjp();
-      return Response.ok(ojp).build();
+
+      StreamingOutput stream = os -> {
+        Writer writer = new BufferedWriter(new OutputStreamWriter(os));
+        transform(ojp, writer);
+        writer.flush();
+      };
+      return Response.ok(stream).build();
     } catch (Exception e) {
       LOG.error("Error producing TRIAS response", e);
       return Response.serverError().build();
     }
   }
 
-  public static void transform(OJP ojp) {
+  public static void transform(OJP ojp, Writer writer) {
     try {
       var context = JAXBContext.newInstance(OJP.class);
       var marshaller = context.createMarshaller();
@@ -76,8 +87,7 @@ public class TriasResource {
       // Set optional properties for the transformer
       transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
-      // Output the transformation result to the console or a file
-      Result result = new StreamResult(System.out); // For console output
+      Result result = new StreamResult(writer);
       transformer.transform(xmlSource, result);
     } catch (IOException | JAXBException | TransformerException e) {
       throw new RuntimeException(e);
