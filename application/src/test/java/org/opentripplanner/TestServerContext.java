@@ -64,11 +64,7 @@ public class TestServerContext {
     }
     if (snapshotManager == null) {
       snapshotManager =
-        new TimetableSnapshotManager(
-          null,
-          TimetableSnapshotSourceParameters.DEFAULT,
-          LocalDate::now
-        );
+        new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now);
     }
 
     timetableRepository.index();
