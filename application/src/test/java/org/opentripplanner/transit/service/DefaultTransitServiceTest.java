@@ -106,7 +106,7 @@ class DefaultTransitServiceTest {
   }
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
-  private static final LocalDate NO_SERVICE_DATE = LocalDate.of(2000, 1, 1);
+  private static final LocalDate NO_SERVICE_DATE = LocalDate.of(2024, 1, 2);
 
   @BeforeAll
   static void setup() {
@@ -275,5 +275,10 @@ class DefaultTransitServiceTest {
       ),
       service.getTripTimeOnDates(ADDED_TRIP, SERVICE_DATE)
     );
+  }
+
+  @Test
+  void getRealtimeTripTimesForAddedTripOnNoServiceDay() {
+    assertEquals(Optional.empty(), service.getTripTimeOnDates(ADDED_TRIP, NO_SERVICE_DATE));
   }
 }
