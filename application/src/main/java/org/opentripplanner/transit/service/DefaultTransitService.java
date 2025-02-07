@@ -594,6 +594,11 @@ public class DefaultTransitService implements TransitEditorService {
     return this.timetableRepositoryIndex.containsTrip(id);
   }
 
+  @Override
+  public Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint) {
+    return timetableRepository.findStopByScheduledStopPoint(scheduledStopPoint);
+  }
+
   /**
    * Returns a list of Trips that match the filtering defined in the request.
    *

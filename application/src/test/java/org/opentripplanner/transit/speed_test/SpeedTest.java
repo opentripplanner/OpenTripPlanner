@@ -16,6 +16,7 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
@@ -105,31 +106,34 @@ public class SpeedTest {
       timetableRepository.getUpdaterManager().startUpdaters();
     }
 
+    var raptorConfig = new RaptorConfig<TripSchedule>(
+      config.transitRoutingParams,
+      RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
+    );
+
     this.serverContext =
-      DefaultServerRequestContext.create(
-        config.transitRoutingParams,
-        config.request,
-        new RaptorConfig<>(
-          config.transitRoutingParams,
-          RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
-        ),
+      new DefaultServerRequestContext(
+        DebugUiConfig.DEFAULT,
+        config.flexConfig,
         graph,
-        new DefaultTransitService(timetableRepository),
         timer.getRegistry(),
-        VectorTileConfig.DEFAULT,
-        TestServerContext.createWorldEnvelopeService(),
+        raptorConfig,
         TestServerContext.createRealtimeVehicleService(transitService),
-        TestServerContext.createVehicleRentalService(),
+        List.of(),
+        config.request,
+        TestServerContext.createStreetLimitationParametersService(),
+        config.transitRoutingParams,
+        new DefaultTransitService(timetableRepository),
+        VectorTileConfig.DEFAULT,
         TestServerContext.createVehicleParkingService(),
+        TestServerContext.createVehicleRentalService(),
+        TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createEmissionsService(),
         null,
-        config.flexConfig,
-        List.of(),
-        null,
-        TestServerContext.createStreetLimitationParametersService(),
         null,
         null,
-        DebugUiConfig.DEFAULT
+        null,
+        null
       );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here
