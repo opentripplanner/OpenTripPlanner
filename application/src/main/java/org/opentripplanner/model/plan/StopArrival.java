@@ -13,6 +13,7 @@ public final class StopArrival {
   public final LegCallTime departure;
   public final Integer stopPosInPattern;
   public final Integer gtfsStopSequence;
+  public final boolean canceled;
 
   /**
    * @param arrival          The time the rider will arrive at the place.
@@ -27,13 +28,15 @@ public final class StopArrival {
     LegCallTime arrival,
     LegCallTime departure,
     Integer stopPosInPattern,
-    Integer gtfsStopSequence
+    Integer gtfsStopSequence,
+    boolean canceled
   ) {
     this.place = place;
     this.arrival = arrival;
     this.departure = departure;
     this.stopPosInPattern = stopPosInPattern;
     this.gtfsStopSequence = gtfsStopSequence;
+    this.canceled = canceled;
   }
 
   @Override

@@ -101,12 +101,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<StopArrival> from() {
     return environment -> {
       Leg source = getSource(environment);
+      var boardRule = source.getBoardRule();
       return new StopArrival(
         source.getFrom(),
         source.start(),
         source.start(),
         source.getBoardStopPosInPattern(),
-        source.getBoardingGtfsStopSequence()
+        source.getBoardingGtfsStopSequence(),
+        boardRule != null && boardRule.isNotRoutable()
       );
     };
   }
@@ -247,12 +249,14 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<StopArrival> to() {
     return environment -> {
       Leg source = getSource(environment);
+      var alightRule = source.getAlightRule();
       return new StopArrival(
         source.getTo(),
         source.end(),
         source.end(),
         source.getAlightStopPosInPattern(),
-        source.getAlightGtfsStopSequence()
+        source.getAlightGtfsStopSequence(),
+        alightRule != null && alightRule.isNotRoutable()
       );
     };
   }

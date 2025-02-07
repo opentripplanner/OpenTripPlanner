@@ -28,7 +28,7 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
   @Override
   public DataFetcher<StopArrival> from() {
     return environment ->
-      new StopArrival(getSource(environment).getTripPlan().from, null, null, null, null);
+      new StopArrival(getSource(environment).getTripPlan().from, null, null, null, null, false);
   }
 
   @Override
@@ -115,7 +115,7 @@ public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
   @Override
   public DataFetcher<StopArrival> to() {
     return environment ->
-      new StopArrival(getSource(environment).getTripPlan().to, null, null, null, null);
+      new StopArrival(getSource(environment).getTripPlan().to, null, null, null, null, false);
   }
 
   private RoutingResponse getSource(DataFetchingEnvironment environment) {
