@@ -5,6 +5,7 @@ import static jakarta.xml.bind.Marshaller.*;
 import de.vdv.ojp20.OJP;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +33,6 @@ class TriasResourceTest {
   void ojpToTrias() throws JAXBException {
     var ojp = TriasResource.makeOjp();
 
-    TriasResource.transform(ojp);
+    TriasResource.transform(ojp, new PrintWriter(System.out));
   }
 }
