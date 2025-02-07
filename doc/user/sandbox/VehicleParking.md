@@ -2,7 +2,7 @@
 
 ## Contact Info
 
-- For HSL Park and Ride updater: Digitransit team, HSL, Helsinki, Finland
+- For Liipi updater: Digitransit team, HSL, Helsinki, Finland
 - For Bikely, Bikeep and SIRI-FM updater: Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 
 
@@ -28,7 +28,7 @@ All updaters have the following parameters in common:
 - `type`: this needs to be `"vehicle-parking"`
 - `feedId`: this is used as a "prefix" for park ids, entrance ids and sometimes also for tags.
 
-## HSL Park and Ride
+## Liipi
 
 <!-- liipi BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
@@ -396,6 +396,6 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ## Changelog
 
 - Create initial sandbox implementation (January 2022, [#3796](https://github.com/opentripplanner/OpenTripPlanner/pull/3796))
-- Add timeZone parameter to hsl and parkapi updaters (September 2022, [#4427](https://github.com/opentripplanner/OpenTripPlanner/pull/4427))
-- Added support for HSL parking hubs (October 2022, [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510))
+- Add timeZone parameter to Liipi updater (September 2022, [#4427](https://github.com/opentripplanner/OpenTripPlanner/pull/4427))
+- Added support for Liipi parking hubs (October 2022, [#4510](https://github.com/opentripplanner/OpenTripPlanner/pull/4510))
 - Add Bikely updater (November 2022, [#4589](https://github.com/opentripplanner/OpenTripPlanner/pull/4589))
