@@ -27,6 +27,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -47,6 +48,8 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.alert.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
@@ -202,6 +205,12 @@ public abstract class GtfsTest {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
     timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+    timetableRepository.setUpdaterManager(
+      new GraphUpdaterManager(
+        new DefaultRealTimeUpdateContext(new Graph(), timetableRepository, new TimetableSnapshot()),
+        List.of()
+      )
+    );
 
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,

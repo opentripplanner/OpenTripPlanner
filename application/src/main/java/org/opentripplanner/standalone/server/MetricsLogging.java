@@ -19,6 +19,7 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -47,6 +48,9 @@ public class MetricsLogging {
     new LogbackMetrics().bindTo(Metrics.globalRegistry);
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
+    if (OTPFeature.AlertMetrics.isOn()) {
+      new AlertMetrics(timetableRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
+    }
 
     if (timetableRepository.getTransitLayer() != null) {
       new GuavaCacheMetrics(

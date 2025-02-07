@@ -36,6 +36,7 @@ import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -385,8 +386,17 @@ public class TimetableRepository implements Serializable {
     this.noticesByElement.putAll(noticesByElement);
   }
 
+  /**
+   * Returns the alert service or null if the @{code updaterManager} is not set yet.
+   */
+  @Nullable
   public TransitAlertService getTransitAlertService() {
-    if (transitAlertService == null) {
+    // during initialization we must return null, otherwise we would permanently store an empty
+    // DelegatingTransitAlertServiceImpl
+    // this is wrong on many levels and should be refactored.
+    if (updaterManager == null) {
+      return null;
+    } else if (transitAlertService == null) {
       transitAlertService = new DelegatingTransitAlertServiceImpl(this);
     }
     return transitAlertService;
