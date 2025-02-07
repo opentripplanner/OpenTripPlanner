@@ -30,9 +30,8 @@ class TriasResourceTest {
   }
 
   @Test
-  void ojpToTrias() throws JAXBException {
+  void ojpToTrias() {
     var ojp = TriasResource.makeOjp();
-
-    TriasResource.transform(ojp, new PrintWriter(System.out));
+    OjpToTriasTransformer.transform(ojp, new PrintWriter(System.out));
   }
 }
