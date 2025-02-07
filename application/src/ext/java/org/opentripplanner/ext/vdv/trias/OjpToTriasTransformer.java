@@ -1,5 +1,10 @@
 package org.opentripplanner.ext.vdv.trias;
 
+import de.vdv.ojp20.OJP;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 import javax.xml.transform.OutputKeys;
@@ -26,7 +31,24 @@ public class OjpToTriasTransformer {
     }
   }
 
-  static void transform(Writer writer, StreamSource xmlSource)
+  public static void transform(OJP ojp, Writer writer) {
+    try {
+      var context = JAXBContext.newInstance(OJP.class);
+      var marshaller = context.createMarshaller();
+
+      // Convert Java object to XML string
+      var outputStream = new ByteArrayOutputStream();
+      marshaller.marshal(ojp, outputStream);
+
+      var xmlSource = new StreamSource(new ByteArrayInputStream(outputStream.toByteArray()));
+
+      transform(writer, xmlSource);
+    } catch (IOException | JAXBException | TransformerException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void transform(Writer writer, StreamSource xmlSource)
     throws IOException, TransformerException {
     var transformer = TEMPLATES.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");

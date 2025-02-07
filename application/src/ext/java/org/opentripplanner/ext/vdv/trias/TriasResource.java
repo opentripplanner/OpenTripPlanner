@@ -19,21 +19,14 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlSchema;
 import jakarta.xml.bind.annotation.XmlType;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.time.ZonedDateTime;
 import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,30 +43,13 @@ public class TriasResource {
 
       StreamingOutput stream = os -> {
         Writer writer = new BufferedWriter(new OutputStreamWriter(os));
-        transform(ojp, writer);
+        OjpToTriasTransformer.transform(ojp, writer);
         writer.flush();
       };
       return Response.ok(stream).build();
     } catch (Exception e) {
       LOG.error("Error producing TRIAS response", e);
       return Response.serverError().build();
-    }
-  }
-
-  public static void transform(OJP ojp, Writer writer) {
-    try {
-      var context = JAXBContext.newInstance(OJP.class);
-      var marshaller = context.createMarshaller();
-
-      // Convert Java object to XML string
-      var outputStream = new ByteArrayOutputStream();
-      marshaller.marshal(ojp, outputStream);
-
-      var xmlSource = new StreamSource(new ByteArrayInputStream(outputStream.toByteArray()));
-
-      OjpToTriasTransformer.transform(writer, xmlSource);
-    } catch (IOException | JAXBException | TransformerException e) {
-      throw new RuntimeException(e);
     }
   }
 
