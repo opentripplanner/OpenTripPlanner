@@ -27,4 +27,11 @@ class TriasResourceTest {
     // Print the XML output
     System.out.println(xmlWriter);
   }
+
+  @Test
+  void ojpToTrias() throws JAXBException {
+    var ojp = TriasResource.makeOjp();
+
+    TriasResource.transform(ojp);
+  }
 }
