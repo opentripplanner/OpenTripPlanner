@@ -138,13 +138,6 @@
             <version>${siri-java-model.version}</version>
         </dependency>
 
-        <!-- XML <-> protobuf-mapper for SIRI-->
-        <dependency>
-            <groupId>org.entur</groupId>
-            <artifactId>siri-protobuf-mapper</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-
         <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
