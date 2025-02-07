@@ -29,6 +29,8 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -88,6 +90,7 @@ public class DebugStyleSpec {
     TemporaryFreeEdge.class,
   };
   private static final String EDGES_GROUP = "Edges";
+  private static final String ELEVATION_GROUP = "Elevation";
   private static final String SAFETY_GROUP = "Safety";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
@@ -138,6 +141,7 @@ public class DebugStyleSpec {
         safety(edges),
         traversalPermissions(edges),
         edges(edges),
+        elevation(edges),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -285,6 +289,24 @@ public class DebugStyleSpec {
     );
   }
 
+  private static List<StyleBuilder> elevation(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder
+        .ofId("maximum-slope")
+        .group(ELEVATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        // Slope can be higher than this in theory but distinction between high values is not needed
+        .lineColorFromProperty("maximumSlope", 0, 0.35)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
   private static List<StyleBuilder> safety(VectorSourceLayer edges) {
     return List.of(
       StyleBuilder
@@ -292,7 +314,7 @@ public class DebugStyleSpec {
         .group(SAFETY_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
-        .lineColorFromProperty("bicycleSafetyFactor")
+        .lineColorFromProperty("bicycleSafetyFactor", 1, 10)
         .edgeFilter(StreetEdge.class)
         .lineWidth(LINE_HALF_WIDTH)
         .lineOffset(LINE_OFFSET)
@@ -304,7 +326,7 @@ public class DebugStyleSpec {
         .group(SAFETY_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
-        .lineColorFromProperty("walkSafetyFactor")
+        .lineColorFromProperty("walkSafetyFactor", 1, 10)
         .edgeFilter(StreetEdge.class)
         .lineWidth(LINE_HALF_WIDTH)
         .lineOffset(LINE_OFFSET)

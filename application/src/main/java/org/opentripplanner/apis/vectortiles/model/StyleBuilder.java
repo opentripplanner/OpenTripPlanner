@@ -183,13 +183,14 @@ public class StyleBuilder {
   /**
    * Generates the line color based off a numeric property in the feature.
    * <p>
-   * The scale of the property must be from 1 to infinity.
+   * The scale of the property must be between 0 and infinity but the color scale is limited to be
+   * between minValue and maxValue.
    * <p>
-   * 1 is displayed as a bright green and the higher the number gets, the "redder" the color
+   * minValue is displayed as a bright green and the higher the number gets, the "redder" the color
    * becomes.
    */
-  public StyleBuilder lineColorFromProperty(String propertyName) {
-    var multiplier = List.of("*", 30, List.of("get", propertyName));
+  public StyleBuilder lineColorFromProperty(String propertyName, double minValue, double maxValue) {
+    var multiplier = List.of("*", 255 / (maxValue - minValue), List.of("get", propertyName));
     paint.put(
       "line-color",
       List.of(
