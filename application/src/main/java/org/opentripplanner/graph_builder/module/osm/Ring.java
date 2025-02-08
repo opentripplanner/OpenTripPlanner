@@ -81,7 +81,7 @@ class Ring {
       (next.lat - cur.lat) -
       (cur.lat - prev.lat) *
       (next.lon - cur.lon) >
-      0.00000000001 // 0.0000000000001 fixes unit tests
+      0.00000000001
     );
   }
 
