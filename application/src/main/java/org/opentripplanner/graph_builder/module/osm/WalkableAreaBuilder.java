@@ -70,7 +70,7 @@ class WalkableAreaBuilder {
 
   private final boolean platformEntriesLinking;
 
-  private final List<OsmVertex> platformLinkingEndpoints;
+  private final List<OsmVertex> platformLinkingPoints;
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueNormalizer normalizer;
@@ -103,14 +103,14 @@ class WalkableAreaBuilder {
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
-    this.platformLinkingEndpoints =
+    this.platformLinkingPoints =
       platformEntriesLinking
         ? graph
           .getVertices()
           .stream()
           .filter(OsmVertex.class::isInstance)
           .map(OsmVertex.class::cast)
-          .filter(this::isPlatformLinkingEndpoint)
+          .filter(this::isPlatformLinkingPoint)
           .collect(Collectors.toList())
         : List.of();
     this.vertexFactory = new VertexFactory(graph);
@@ -147,7 +147,6 @@ class WalkableAreaBuilder {
               createEdgesForRingSegment(edgeList, area, outerRing, i, alreadyAddedEdges)
             );
           }
-          //TODO: is this actually needed?
           for (Ring innerRing : outerRing.getHoles()) {
             for (int j = 0; j < innerRing.nodes.size(); ++j) {
               edges.addAll(
@@ -218,10 +217,12 @@ class WalkableAreaBuilder {
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
       for (Area area : group.areas) {
-        if (!polygon.contains(area.jtsMultiPolygon)) {
-          continue;
+        // test if area is inside current ring. This is necessary only if there are many areas or outer rings
+        if (group.areas.size() != 1 || group.outermostRings.size() != 1) {
+          if (!polygon.contains(area.jtsMultiPolygon)) {
+            continue;
+          }
         }
-
         // Add stops/entrances from public transit relations into the area
         // they may provide the only entrance to a platform
         // which otherwise would be pruned as unconnected island
@@ -240,14 +241,14 @@ class WalkableAreaBuilder {
           boolean linkPointsAdded = !entrances.isEmpty();
           // Add unconnected entries to area if platformEntriesLinking parameter is true
           if (platformEntriesLinking && area.parent.isPlatform()) {
-            List<OsmVertex> endpointsWithin = platformLinkingEndpoints
+            List<OsmVertex> verticesWithin = platformLinkingPoints
               .stream()
               .filter(t ->
                 outerRing.jtsPolygon.contains(geometryFactory.createPoint(t.getCoordinate()))
               )
               .toList();
-            platformLinkingVertices.addAll(endpointsWithin);
-            for (OsmVertex v : endpointsWithin) {
+            platformLinkingVertices.addAll(verticesWithin);
+            for (OsmVertex v : verticesWithin) {
               OsmNode node = osmdb.getNode(v.nodeId);
               visibilityNodes.add(node);
               startingNodes.add(node);
@@ -296,7 +297,7 @@ class WalkableAreaBuilder {
               );
               // A node can only be a visibility node only if it is an entrance to the
               // area or a convex point, i.e. the angle is over 180 degrees.
-              // For holes, the internal angle is calculated, so we must swap the convexity condition
+              // For holes, we must swap the convexity condition
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
                 visibilityVertexCount++;
@@ -340,9 +341,9 @@ class WalkableAreaBuilder {
           continue;
         }
         i = (int) Math.floor(sum_i);
-        IntersectionVertex startEndpoint = vertexBuilder.getVertexForOsmNode(nodeI, areaEntity);
+        IntersectionVertex vertex1 = vertexBuilder.getVertexForOsmNode(nodeI, areaEntity);
         if (startingNodes.contains(nodeI)) {
-          startingVertices.add(startEndpoint);
+          startingVertices.add(vertex1);
         }
         int j = 0;
         float sum_j = 0;
@@ -355,25 +356,20 @@ class WalkableAreaBuilder {
           NodeEdge edge = new NodeEdge(nodeI, nodeJ);
           if (alreadyAddedEdges.contains(edge)) continue;
 
-          IntersectionVertex endEndpoint = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
+          IntersectionVertex vertex2 = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
 
           Coordinate[] coordinates = new Coordinate[] {
-            startEndpoint.getCoordinate(),
-            endEndpoint.getCoordinate(),
+            vertex1.getCoordinate(),
+            vertex2.getCoordinate(),
           };
           LineString line = geometryFactory.createLineString(coordinates);
           if (polygon.contains(line)) {
-            Set<AreaEdge> segments = createSegments(
-              startEndpoint,
-              endEndpoint,
-              group.areas,
-              edgeList
-            );
+            Set<AreaEdge> segments = createSegments(vertex1, vertex2, group.areas, edgeList);
             edges.addAll(segments);
-            if (platformLinkingVertices.contains(startEndpoint)) {
+            if (platformLinkingVertices.contains(vertex1)) {
               ringEdges.addAll(segments);
             }
-            if (platformLinkingVertices.contains(endEndpoint)) {
+            if (platformLinkingVertices.contains(vertex2)) {
               ringEdges.addAll(segments);
             }
           }
@@ -463,23 +459,23 @@ class WalkableAreaBuilder {
       return Set.of();
     }
     alreadyAddedEdges.add(nodeEdge);
-    IntersectionVertex startEndpoint = vertexBuilder.getVertexForOsmNode(node, area.parent);
-    IntersectionVertex endEndpoint = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
+    IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent);
+    IntersectionVertex v2 = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
 
-    return createSegments(startEndpoint, endEndpoint, List.of(area), edgeList);
+    return createSegments(v1, v2, List.of(area), edgeList);
   }
 
   private Set<AreaEdge> createSegments(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    IntersectionVertex vertex1,
+    IntersectionVertex vertex2,
     Collection<Area> areas,
     AreaEdgeList edgeList
   ) {
     List<Area> intersects = new ArrayList<>();
 
     Coordinate[] coordinates = new Coordinate[] {
-      startEndpoint.getCoordinate(),
-      endEndpoint.getCoordinate(),
+      vertex1.getCoordinate(),
+      vertex2.getCoordinate(),
     };
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     LineString line = geometryFactory.createLineString(coordinates);
@@ -514,20 +510,20 @@ class WalkableAreaBuilder {
         .getCarSpeedForWay(areaEntity, false);
 
       double length = SphericalDistanceLibrary.distance(
-        startEndpoint.getCoordinate(),
-        endEndpoint.getCoordinate()
+        vertex1.getCoordinate(),
+        vertex2.getCoordinate()
       );
 
       String label = String.format(
         labelTemplate,
         areaEntity.getId(),
-        startEndpoint.getLabel(),
-        endEndpoint.getLabel()
+        vertex1.getLabel(),
+        vertex2.getLabel()
       );
       I18NString name = namer.getNameForWay(areaEntity, label);
       AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
-        .withFromVertex(startEndpoint)
-        .withToVertex(endEndpoint)
+        .withFromVertex(vertex1)
+        .withToVertex(vertex2)
         .withGeometry(line)
         .withName(name)
         .withMeterLength(length)
@@ -540,16 +536,11 @@ class WalkableAreaBuilder {
         .withLink(areaEntity.isLink());
 
       label =
-        String.format(
-          labelTemplate,
-          areaEntity.getId(),
-          endEndpoint.getLabel(),
-          startEndpoint.getLabel()
-        );
+        String.format(labelTemplate, areaEntity.getId(), vertex2.getLabel(), vertex1.getLabel());
       name = namer.getNameForWay(areaEntity, label);
       AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
-        .withFromVertex(endEndpoint)
-        .withToVertex(startEndpoint)
+        .withFromVertex(vertex2)
+        .withToVertex(vertex1)
         .withGeometry(line.reverse())
         .withName(name)
         .withMeterLength(length)
@@ -570,7 +561,7 @@ class WalkableAreaBuilder {
     } else {
       recursedSegments++;
       // take the part that intersects with the start vertex
-      Coordinate startCoordinate = startEndpoint.getCoordinate();
+      Coordinate startCoordinate = vertex1.getCoordinate();
       Point startPoint = geometryFactory.createPoint(startCoordinate);
       Set<AreaEdge> edges = new HashSet<>();
       for (Area area : intersects) {
@@ -604,13 +595,13 @@ class WalkableAreaBuilder {
             continue;
           }
 
-          IntersectionVertex newEndpoint = areaBoundaryVertexForCoordinate.get(edgeCoordinate);
-          if (newEndpoint == null) {
-            newEndpoint = vertexFactory.intersection(edgeCoordinate);
-            areaBoundaryVertexForCoordinate.put(edgeCoordinate, newEndpoint);
+          IntersectionVertex newVertex = areaBoundaryVertexForCoordinate.get(edgeCoordinate);
+          if (newVertex == null) {
+            newVertex = vertexFactory.intersection(edgeCoordinate);
+            areaBoundaryVertexForCoordinate.put(edgeCoordinate, newVertex);
           }
-          edges.addAll(createSegments(startEndpoint, newEndpoint, List.of(area), edgeList));
-          edges.addAll(createSegments(newEndpoint, endEndpoint, intersects, edgeList));
+          edges.addAll(createSegments(vertex1, newVertex, List.of(area), edgeList));
+          edges.addAll(createSegments(newVertex, vertex2, intersects, edgeList));
           return edges;
         }
       }
@@ -651,7 +642,7 @@ class WalkableAreaBuilder {
     }
   }
 
-  private boolean isPlatformLinkingEndpoint(OsmVertex osmVertex) {
+  private boolean isPlatformLinkingPoint(OsmVertex osmVertex) {
     boolean isCandidate = false;
     Vertex start = null;
     for (Edge e : osmVertex.getIncoming()) {
@@ -665,16 +656,16 @@ class WalkableAreaBuilder {
     }
 
     if (isCandidate && start != null) {
-      boolean isEndpoint = true;
+      boolean isLinkingPoint = true;
       for (Edge se : osmVertex.getOutgoing()) {
         if (
           !se.getToVertex().getCoordinate().equals(start.getCoordinate()) &&
           !(se instanceof AreaEdge)
         ) {
-          isEndpoint = false;
+          isLinkingPoint = false;
         }
       }
-      return isEndpoint;
+      return isLinkingPoint;
     }
     return false;
   }
