@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.UUID;
 import javax.xml.namespace.QName;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -91,13 +92,13 @@ public class OjpMapper {
       )
       .withLineRef(new LineRefStructure().withValue(route.getId().getId()))
       .withMode(new ModeStructure().withPtMode(PtModeMapper.map(route.getMode())))
-      .withPublishedServiceName(internationalText(route.getName()))
+      .withPublishedServiceName(internationalText(route.getName(), lang(tripTimeOnDate)))
       .withOperatorRef(new OperatorRefStructure().withValue(route.getAgency().getId().getId()))
       .withOriginStopPointRef(stopPointRef(firstStop))
-      .withOriginText(internationalText(firstStop.getName()))
+      .withOriginText(internationalText(firstStop.getName(), lang(tripTimeOnDate)))
       .withDestinationStopPointRef(stopPointRef(lastStop))
-      .withDestinationText(internationalText(tripTimeOnDate.getHeadsign()))
-      .withRouteDescription(internationalText(route.getDescription()));
+      .withDestinationText(internationalText(tripTimeOnDate.getHeadsign(), lang(tripTimeOnDate)))
+      .withRouteDescription(internationalText(route.getDescription(), lang(tripTimeOnDate)));
   }
 
   private CallAtStopStructure callAtStop(TripTimeOnDate tripTimeOnDate) {
@@ -105,13 +106,23 @@ public class OjpMapper {
     var stopPointRef = stopPointRef(stop);
     var call = new CallAtStopStructure()
       .withStopPointRef(stopPointRef)
-      .withStopPointName(internationalText(stop.getName()))
+      .withStopPointName(internationalText(stop.getName(), lang(tripTimeOnDate)))
       .withServiceDeparture(serviceDeparture(tripTimeOnDate))
-      .withOrder(BigInteger.valueOf(tripTimeOnDate.getGtfsSequence()));
+      .withOrder(BigInteger.valueOf(tripTimeOnDate.getGtfsSequence()))
+      .withNoBoardingAtStop(isNone(tripTimeOnDate.getPickupType()))
+      .withNoAlightingAtStop(isNone(tripTimeOnDate.getDropoffType()));
     if (stop.getPlatformCode() != null) {
-      call.withPlannedQuay(internationalText(stop.getPlatformCode()));
+      call.withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)));
     }
     return call;
+  }
+
+  private static String lang(TripTimeOnDate tripTimeOnDate) {
+    return tripTimeOnDate.getTrip().getRoute().getAgency().getLang();
+  }
+
+  private static boolean isNone(PickDrop pickDrop) {
+    return pickDrop == PickDrop.NONE;
   }
 
   private ServiceDepartureStructure serviceDeparture(TripTimeOnDate tripTimeOnDate) {
@@ -127,20 +138,20 @@ public class OjpMapper {
     return new StopPointRefStructure().withValue(stop.getId().getId());
   }
 
-  private static InternationalTextStructure internationalText(I18NString string) {
+  private static InternationalTextStructure internationalText(I18NString string, String lang) {
     if (string == null) {
       return null;
     } else {
-      return internationalText(string.toString());
+      return internationalText(string.toString(), lang);
     }
   }
 
-  private static InternationalTextStructure internationalText(String string) {
+  private static InternationalTextStructure internationalText(String string, String lang) {
     if (string == null) {
       return null;
     } else {
       return new InternationalTextStructure()
-        .withText(new DefaultedTextStructure().withValue(string).withLang("de"));
+        .withText(new DefaultedTextStructure().withValue(string).withLang(lang));
     }
   }
 
