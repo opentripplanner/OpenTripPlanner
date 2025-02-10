@@ -10,12 +10,9 @@ import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.ojp.OjpMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
