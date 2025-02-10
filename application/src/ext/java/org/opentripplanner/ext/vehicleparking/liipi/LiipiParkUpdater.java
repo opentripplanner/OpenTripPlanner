@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import java.util.List;
 import java.util.Map;
@@ -16,48 +16,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Vehicle parking updater class for https://github.com/HSLdevcom/parkandrideAPI format APIs. There
- * has been further development in a private repository (the current state is documented in
- * https://p.hsl.fi/docs/index.html) but this updater supports both formats.
+ * Vehicle parking updater class for Liipi format APIs. The format is documented in
+ * https://parking.fintraffic.fi/docs/index.html).
  */
-public class HslParkUpdater implements DataSource<VehicleParking> {
+public class LiipiParkUpdater implements DataSource<VehicleParking> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HslParkUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LiipiParkUpdater.class);
 
   private static final String JSON_PARSE_PATH = "results";
 
-  private final HslFacilitiesDownloader facilitiesDownloader;
+  private final LiipiFacilitiesDownloader facilitiesDownloader;
   private final int facilitiesFrequencySec;
-  private final HslHubsDownloader hubsDownloader;
+  private final LiipiHubsDownloader hubsDownloader;
   private final JsonDataListDownloader utilizationsDownloader;
-  private final HslParkToVehicleParkingMapper vehicleParkingMapper;
-  private final HslHubToVehicleParkingGroupMapper vehicleParkingGroupMapper;
-  private final HslParkUtilizationToPatchMapper parkPatchMapper;
+  private final LiipiParkToVehicleParkingMapper vehicleParkingMapper;
+  private final LiipiHubToVehicleParkingGroupMapper vehicleParkingGroupMapper;
+  private final LiipiParkUtilizationToPatchMapper parkPatchMapper;
 
   private long lastFacilitiesFetchTime;
 
   private List<VehicleParking> parks;
   private Map<FeedScopedId, VehicleParkingGroup> hubForPark;
 
-  public HslParkUpdater(
-    HslParkUpdaterParameters parameters,
+  public LiipiParkUpdater(
+    LiipiParkUpdaterParameters parameters,
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
     String feedId = parameters.feedId();
     vehicleParkingMapper =
-      new HslParkToVehicleParkingMapper(feedId, openingHoursCalendarService, parameters.timeZone());
-    vehicleParkingGroupMapper = new HslHubToVehicleParkingGroupMapper(feedId);
-    parkPatchMapper = new HslParkUtilizationToPatchMapper(feedId);
+      new LiipiParkToVehicleParkingMapper(
+        feedId,
+        openingHoursCalendarService,
+        parameters.timeZone()
+      );
+    vehicleParkingGroupMapper = new LiipiHubToVehicleParkingGroupMapper(feedId);
+    parkPatchMapper = new LiipiParkUtilizationToPatchMapper(feedId);
     var otpHttpClientFactory = new OtpHttpClientFactory();
     facilitiesDownloader =
-      new HslFacilitiesDownloader(
+      new LiipiFacilitiesDownloader(
         parameters.facilitiesUrl(),
         JSON_PARSE_PATH,
         vehicleParkingMapper::parsePark,
         otpHttpClientFactory
       );
     hubsDownloader =
-      new HslHubsDownloader(
+      new LiipiHubsDownloader(
         parameters.hubsUrl(),
         JSON_PARSE_PATH,
         vehicleParkingGroupMapper::parseHub,
@@ -99,13 +102,13 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
       hubForPark = this.hubForPark;
     }
     if (parks != null) {
-      List<HslParkPatch> utilizations = utilizationsDownloader.download();
+      List<LiipiParkPatch> utilizations = utilizationsDownloader.download();
       if (utilizations != null) {
-        Map<FeedScopedId, List<HslParkPatch>> patches = utilizations
+        Map<FeedScopedId, List<LiipiParkPatch>> patches = utilizations
           .stream()
           .collect(Collectors.groupingBy(utilization -> utilization.getId()));
         parks.forEach(park -> {
-          List<HslParkPatch> patchesForPark = patches.get(park.getId());
+          List<LiipiParkPatch> patchesForPark = patches.get(park.getId());
           if (patchesForPark != null) {
             park.updateAvailability(createVehicleAvailability(patchesForPark));
           }
@@ -128,11 +131,11 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
     return parks;
   }
 
-  private static VehicleParkingSpaces createVehicleAvailability(List<HslParkPatch> patches) {
+  private static VehicleParkingSpaces createVehicleAvailability(List<LiipiParkPatch> patches) {
     VehicleParkingSpacesBuilder availabilityBuilder = VehicleParkingSpaces.builder();
     boolean hasHandledSpaces = false;
 
-    for (HslParkPatch patch : patches) {
+    for (LiipiParkPatch patch : patches) {
       String type = patch.getCapacityType();
 
       if (type != null) {
