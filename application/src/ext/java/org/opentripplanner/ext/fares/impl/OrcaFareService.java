@@ -31,6 +31,7 @@ public class OrcaFareService extends DefaultFareService {
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
 
   public static final String COMM_TRANS_AGENCY_ID = "29";
+  public static final String COMM_TRANS_FLEX_AGENCY_ID = "4969";
   public static final String KC_METRO_AGENCY_ID = "1";
   public static final String SOUND_TRANSIT_AGENCY_ID = "40";
   public static final String T_LINK_AGENCY_ID = "F1";
@@ -60,7 +61,6 @@ public class OrcaFareService extends DefaultFareService {
 
   protected enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
-    COMM_TRANS_COMMUTER_EXPRESS,
     EVERETT_TRANSIT,
     KC_WATER_TAXI_VASHON_ISLAND,
     KC_WATER_TAXI_WEST_SEATTLE,
@@ -157,14 +157,11 @@ public class OrcaFareService extends DefaultFareService {
     var route = leg.getRoute();
     var tripId = leg.getTrip().getId().getId();
     return switch (agencyId) {
-      case COMM_TRANS_AGENCY_ID -> {
+      case COMM_TRANS_AGENCY_ID, COMM_TRANS_FLEX_AGENCY_ID -> {
         try {
           int routeId = Integer.parseInt(route.getShortName());
           if (routeId >= 500 && routeId < 600) {
             yield RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
-          }
-          if (routeId >= 400 && routeId <= 899) {
-            yield RideType.COMM_TRANS_COMMUTER_EXPRESS;
           }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
@@ -264,7 +261,7 @@ public class OrcaFareService extends DefaultFareService {
     }
     return switch (fareType) {
       case youth, electronicYouth -> Optional.of(getYouthFare());
-      case electronicSpecial -> getLiftFare(rideType, defaultFare, leg.getRoute());
+      case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
       default -> Optional.of(defaultFare);
@@ -285,6 +282,9 @@ public class OrcaFareService extends DefaultFareService {
     Leg leg
   ) {
     Route route = leg.getRoute();
+    if (route == null) {
+      return Optional.of(defaultFare);
+    }
     return switch (rideType) {
       case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType)
         ? optionalUSD(5.75f)
@@ -309,10 +309,23 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply Orca lift discount fares based on the ride type.
    */
-  private Optional<Money> getLiftFare(RideType rideType, Money defaultFare, Route route) {
+  private Optional<Money> getLiftFare(RideType rideType, Money defaultFare, Leg leg) {
+    var route = leg.getRoute();
+    if (route == null) {
+      return Optional.of(defaultFare);
+    }
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case COMM_TRANS_LOCAL_SWIFT -> {
+        if (
+          leg
+            .getStartTime()
+            .isBefore(ZonedDateTime.of(2025, 3, 1, 0, 0, 0, 0, leg.getStartTime().getZone()))
+        ) {
+          yield optionalUSD(1.25f);
+        } else {
+          yield optionalUSD(1.00f);
+        }
+      }
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(4.5f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(3.75f);
       case KC_METRO,
@@ -348,11 +361,22 @@ public class OrcaFareService extends DefaultFareService {
     Leg leg
   ) {
     var route = leg.getRoute();
-    var regularFare = getRegularFare(fareType, rideType, defaultFare, leg);
+    if (route == null) {
+      return Optional.of(defaultFare);
+    }
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case COMM_TRANS_LOCAL_SWIFT -> {
+        if (
+          leg
+            .getStartTime()
+            .isBefore(ZonedDateTime.of(2025, 3, 1, 0, 0, 0, 0, leg.getStartTime().getZone()))
+        ) {
+          yield optionalUSD(1.25f);
+        } else {
+          yield optionalUSD(1.00f);
+        }
+      }
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case EVERETT_TRANSIT -> optionalUSD(0.5f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
