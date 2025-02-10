@@ -169,7 +169,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   /** Always round the same way and in the same direction when converting milliseconds to seconds.
    * This means that request.arriveBy must be taken into account. Used in many places. */
-  private long secondsOfMilliseconds(long milliseconds) {
+  private long millisecondsToSeconds(long milliseconds) {
     if (request.arriveBy()) {
       return milliseconds / 1000L;
     } else {
@@ -179,7 +179,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   /** Returns time in seconds since epoch */
   public long getTimeSeconds() {
-    return secondsOfMilliseconds(time_ms);
+    return millisecondsToSeconds(time_ms);
   }
 
   public long getTimeMilliseconds() {
@@ -285,7 +285,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public int getTimeDeltaSeconds() {
-    return (int) secondsOfMilliseconds(getTimeDeltaMilliseconds());
+    return (int) millisecondsToSeconds(getTimeDeltaMilliseconds());
   }
 
   public int getTimeDeltaMilliseconds() {
@@ -335,7 +335,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   public Instant getTime() {
     // We're not letting the subsecond time out right now, because everything else
     // expects whole seconds.
-    return Instant.ofEpochSecond(secondsOfMilliseconds(time_ms));
+    return Instant.ofEpochSecond(millisecondsToSeconds(time_ms));
   }
 
   public Instant getTimeAccurate() {

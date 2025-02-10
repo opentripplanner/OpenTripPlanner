@@ -187,6 +187,10 @@ public class StateEditor {
     child.time_ms += (traversingBackward ? -milliseconds : milliseconds);
   }
 
+  public void incrementTimeInSeconds(long seconds) {
+    incrementTimeInMilliseconds(1000L * seconds);
+  }
+
   public void incrementWalkDistance(double length) {
     if (length < 0) {
       LOG.warn("A state's walk distance is being incremented by a negative amount.");
