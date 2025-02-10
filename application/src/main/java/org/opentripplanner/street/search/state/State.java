@@ -167,9 +167,19 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return stateData.carPickupState;
   }
 
+  /** Always round the same way and in the same direction when converting milliseconds to seconds.
+   * This means that request.arriveBy must be taken into account. Used in many places. */
+  private long secondsOfMilliseconds(long milliseconds) {
+    if (request.arriveBy()) {
+      return milliseconds / 1000L;
+    } else {
+      return (milliseconds + 999L) / 1000L;
+    }
+  }
+
   /** Returns time in seconds since epoch */
   public long getTimeSeconds() {
-    return time_ms / 1000;
+    return secondsOfMilliseconds(time_ms);
   }
 
   public long getTimeMilliseconds() {
@@ -178,7 +188,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   /** returns the length of the trip in seconds up to this state */
   public long getElapsedTimeSeconds() {
-    return Math.abs(getTimeSeconds() - request.startTime().getEpochSecond());
+    return (getElapsedTimeMilliseconds() + 999L) / 1000L;
+  }
+
+  public long getElapsedTimeMilliseconds() {
+    return Math.abs(getTimeMilliseconds() - request.startTime().toEpochMilli());
   }
 
   public boolean isCompatibleVehicleRentalState(State state) {
@@ -270,6 +284,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return this.weight;
   }
 
+  public int getTimeDeltaSeconds() {
+    return (int) secondsOfMilliseconds(getTimeDeltaMilliseconds());
+  }
+
   public int getTimeDeltaMilliseconds() {
     return backState != null ? (int) (getTimeMilliseconds() - backState.getTimeMilliseconds()) : 0;
   }
@@ -315,6 +333,12 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public Instant getTime() {
+    // We're not letting the subsecond time out right now, because everything else
+    // expects whole seconds.
+    return Instant.ofEpochSecond(secondsOfMilliseconds(time_ms));
+  }
+
+  public Instant getTimeAccurate() {
     return Instant.ofEpochMilli(time_ms);
   }
 
