@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
@@ -89,23 +90,18 @@ public class SiriFuzzyTripMatcher {
 
     if (trips == null || trips.isEmpty()) {
       CallWrapper lastStop = calls.getLast();
-      String lastStopPoint = lastStop.getStopPointRef();
+      // resolves a scheduled stop point id to a quay (regular stop) if necessary
+      // quay ids also work
+      RegularStop stop = entityResolver.resolveQuay(lastStop.getStopPointRef());
+      if (stop == null) {
+        return Result.failure(NO_FUZZY_TRIP_MATCH);
+      }
       ZonedDateTime arrivalTime = lastStop.getAimedArrivalTime() != null
         ? lastStop.getAimedArrivalTime()
         : lastStop.getAimedDepartureTime();
 
       if (arrivalTime != null) {
-        trips = getMatchingTripsOnStopOrSiblings(lastStopPoint, arrivalTime, entityResolver);
-        if (CollectionUtils.isEmpty(trips)) {
-          var id = entityResolver.resolveId(lastStopPoint);
-          trips =
-            transitService
-              .findStopByScheduledStopPoint(id)
-              .map(stop ->
-                getMatchingTripsOnStopOrSiblings(stop.getId().getId(), arrivalTime, entityResolver)
-              )
-              .orElse(Set.of());
-        }
+        trips = getMatchingTripsOnStopOrSiblings(stop.getId().getId(), arrivalTime, entityResolver);
       }
     }
     if (trips == null || trips.isEmpty()) {
