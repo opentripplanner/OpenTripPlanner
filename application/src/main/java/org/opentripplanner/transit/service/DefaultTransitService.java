@@ -32,7 +32,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
@@ -639,15 +639,15 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public TransitLayer getTransitLayer() {
+  public RaptorTransitData getRaptorTransitData() {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.timetableRepository.getTransitLayer();
+    return this.timetableRepository.getRaptorTransitData();
   }
 
   @Override
-  public TransitLayer getRealtimeTransitLayer() {
+  public RaptorTransitData getRealtimeRaptorTransitData() {
     OTPRequestTimeoutException.checkForTimeout();
-    return this.timetableRepository.getRealtimeTransitLayer();
+    return this.timetableRepository.getRealtimeRaptorTransitData();
   }
 
   @Override

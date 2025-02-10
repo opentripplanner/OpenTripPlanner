@@ -19,8 +19,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.updater.spi.UpdateResult;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -32,8 +32,8 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
 
   public final TimetableRepository timetableRepository;
   public final TimetableSnapshotManager snapshotManager;
-  private final SiriTimetableSnapshotSource siriSource;
-  private final TimetableSnapshotSource gtfsSource;
+  private final SiriRealTimeTripUpdateAdapter siriAdapter;
+  private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;
 
   public static RealtimeTestEnvironmentBuilder of() {
@@ -47,12 +47,12 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.snapshotManager =
       new TimetableSnapshotManager(
         null,
-        TimetableSnapshotSourceParameters.PUBLISH_IMMEDIATELY,
+        TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
         () -> SERVICE_DATE
       );
-    siriSource = new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
-    gtfsSource =
-      new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
+    siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
+    gtfsAdapter =
+      new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () -> SERVICE_DATE);
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
   }
 
@@ -79,7 +79,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
-    return new EstimatedTimetableHandler(siriSource, fuzzyMatching, getFeedId());
+    return new EstimatedTimetableHandler(siriAdapter, fuzzyMatching, getFeedId());
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
@@ -162,7 +162,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     List<GtfsRealtime.TripUpdate> updates,
     UpdateIncrementality incrementality
   ) {
-    UpdateResult updateResult = gtfsSource.applyTripUpdates(
+    UpdateResult updateResult = gtfsAdapter.applyTripUpdates(
       null,
       BackwardsDelayPropagationType.REQUIRED_NO_DATA,
       incrementality,

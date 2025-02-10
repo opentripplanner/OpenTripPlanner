@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.speed_test;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
 import java.util.stream.IntStream;
@@ -32,7 +32,7 @@ public class TransferCacheTest {
 
       // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
       // we do it manually here
-      createTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
+      createRaptorTransitData(timetableRepository, config.transitRoutingParams);
 
       assertTestDateHasData(timetableRepository, config, buildConfig);
 
@@ -60,7 +60,7 @@ public class TransferCacheTest {
         routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
         timer.recordTimer(
           "transfer_cache_computation",
-          () -> timetableRepository.getTransitLayer().initTransferCacheForRequest(routeRequest)
+          () -> timetableRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
         );
       });
   }

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,9 +18,9 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class HslParkUpdaterTest {
+public class LiipiParkUpdaterTest {
 
-  private static final ResourceLoader LOADER = ResourceLoader.of(HslParkUpdaterTest.class);
+  private static final ResourceLoader LOADER = ResourceLoader.of(LiipiParkUpdaterTest.class);
   private static final String UTILIZATIONS_URL = LOADER.url("utilizations.json").toString();
   private static final String HUBS_URL = LOADER.url("hubs.json").toString();
   private static final String FACILITIES_URL = LOADER.url("facilities.json").toString();
@@ -29,11 +29,11 @@ public class HslParkUpdaterTest {
   void parseParks() {
     var timeZone = ZoneIds.HELSINKI;
 
-    var parameters = new HslParkUpdaterParameters(
+    var parameters = new LiipiParkUpdaterParameters(
       "",
       3000,
       FACILITIES_URL,
-      "hslpark",
+      "liipi",
       null,
       30,
       UTILIZATIONS_URL,
@@ -45,7 +45,7 @@ public class HslParkUpdaterTest {
       LocalDate.of(2022, Month.JANUARY, 1),
       LocalDate.of(2023, Month.JANUARY, 1)
     );
-    var updater = new HslParkUpdater(parameters, openingHoursCalendarService);
+    var updater = new LiipiParkUpdater(parameters, openingHoursCalendarService);
 
     assertTrue(updater.update());
     var parkingLots = updater.getUpdates();
@@ -54,7 +54,7 @@ public class HslParkUpdaterTest {
 
     var first = parkingLots.get(0);
     assertEquals("Tapiola Park", first.getName().toString());
-    assertEquals("hslpark:990", first.getId().toString());
+    assertEquals("liipi:990", first.getId().toString());
     assertEquals(24.804713, first.getCoordinate().longitude());
     assertEquals(60.1760189, first.getCoordinate().latitude());
     var entrance = first.getEntrances().get(0);
@@ -70,9 +70,9 @@ public class HslParkUpdaterTest {
     assertNull(first.getCapacity().getWheelchairAccessibleCarSpaces());
     var firstTags = first.getTags();
     assertEquals(7, firstTags.size());
-    assertTrue(firstTags.contains("hslpark:SERVICE_COVERED"));
-    assertTrue(firstTags.contains("hslpark:AUTHENTICATION_METHOD_HSL_TICKET"));
-    assertTrue(firstTags.contains("hslpark:PRICING_METHOD_PAID_10H"));
+    assertTrue(firstTags.contains("liipi:SERVICE_COVERED"));
+    assertTrue(firstTags.contains("liipi:AUTHENTICATION_METHOD_HSL_TICKET"));
+    assertTrue(firstTags.contains("liipi:PRICING_METHOD_PAID_10H"));
     assertEquals(VehicleParkingState.OPERATIONAL, first.getState());
     assertTrue(first.hasRealTimeData());
     assertEquals(600, first.getAvailability().getCarSpaces());
@@ -92,7 +92,7 @@ public class HslParkUpdaterTest {
     );
 
     var firstVehicleParkingGroup = first.getVehicleParkingGroup();
-    assertEquals("hslpark:321", firstVehicleParkingGroup.id().toString());
+    assertEquals("liipi:321", firstVehicleParkingGroup.id().toString());
     assertEquals("HubYksi", firstVehicleParkingGroup.name().toString(new Locale("fi")));
     assertEquals("HubEn", firstVehicleParkingGroup.name().toString(new Locale("sv")));
     assertEquals(24.804913, firstVehicleParkingGroup.coordinate().longitude());
@@ -154,11 +154,11 @@ public class HslParkUpdaterTest {
   void parseParksWithoutTimeZone() {
     ZoneId timeZone = null;
 
-    var parameters = new HslParkUpdaterParameters(
+    var parameters = new LiipiParkUpdaterParameters(
       "",
       3000,
       FACILITIES_URL,
-      "hslpark",
+      "liipi",
       null,
       30,
       UTILIZATIONS_URL,
@@ -170,7 +170,7 @@ public class HslParkUpdaterTest {
       LocalDate.of(2022, Month.JANUARY, 1),
       LocalDate.of(2023, Month.JANUARY, 1)
     );
-    var updater = new HslParkUpdater(parameters, openingHoursCalendarService);
+    var updater = new LiipiParkUpdater(parameters, openingHoursCalendarService);
 
     assertTrue(updater.update());
     var parkingLots = updater.getUpdates();
@@ -179,7 +179,7 @@ public class HslParkUpdaterTest {
 
     var first = parkingLots.get(0);
     assertEquals("Tapiola Park", first.getName().toString());
-    assertEquals("hslpark:990", first.getId().toString());
+    assertEquals("liipi:990", first.getId().toString());
     assertEquals(24.804713, first.getCoordinate().longitude());
     assertEquals(60.1760189, first.getCoordinate().latitude());
     assertNull(first.getOpeningHours());

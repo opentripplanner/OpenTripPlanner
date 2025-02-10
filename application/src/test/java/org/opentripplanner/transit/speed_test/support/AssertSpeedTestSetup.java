@@ -14,7 +14,7 @@ public class AssertSpeedTestSetup {
     BuildConfig buildConfig
   ) {
     int numberOfPatternForTestDate = timetableRepository
-      .getTransitLayer()
+      .getRaptorTransitData()
       .getTripPatternsForRunningDate(config.testDate)
       .size();
 

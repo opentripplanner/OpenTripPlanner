@@ -73,13 +73,11 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 /**
- * This class should be used to create snapshots of lookup tables of realtime data. This is
- * necessary to provide planning threads a consistent constant view of a graph with realtime data at
- * a specific point in time.
+ * Adapts from GTFS-RT TripUpdates to OTP's internal real-time data model.
  */
-public class TimetableSnapshotSource {
+public class GtfsRealTimeTripUpdateAdapter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GtfsRealTimeTripUpdateAdapter.class);
 
   /**
    * Maximum time in seconds since midnight for arrivals and departures
@@ -109,7 +107,7 @@ public class TimetableSnapshotSource {
    * Constructor is package local to allow unit-tests to provide their own clock, not using system
    * time.
    */
-  public TimetableSnapshotSource(
+  public GtfsRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
     Supplier<LocalDate> localDateNow

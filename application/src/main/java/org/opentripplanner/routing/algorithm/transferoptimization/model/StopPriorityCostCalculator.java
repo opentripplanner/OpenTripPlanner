@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
@@ -10,7 +10,7 @@ import org.opentripplanner.utils.lang.IntUtils;
 public class StopPriorityCostCalculator {
 
   /**
-   * @see TransitLayer#getStopBoardAlightTransferCosts()
+   * @see RaptorTransitData#getStopBoardAlightTransferCosts()
    */
   private final int[] stopBoardAlightTransferCosts;
   private final double extraStopBoardAlightCostFactor;

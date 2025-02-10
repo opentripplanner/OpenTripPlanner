@@ -87,6 +87,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add 'boardCost' parameter for cars [#6413](https://github.com/opentripplanner/OpenTripPlanner/pull/6413)
 - Fix processing of one-way boarding locations [#6410](https://github.com/opentripplanner/OpenTripPlanner/pull/6410)
 - Allow SIRI's StopPointRef to refer to a NeTEx scheduled stop point [#6397](https://github.com/opentripplanner/OpenTripPlanner/pull/6397)
+- Cleanup DefaultServerRequestContext [#6416](https://github.com/opentripplanner/OpenTripPlanner/pull/6416)
+- Add support for alert metrics [#6415](https://github.com/opentripplanner/OpenTripPlanner/pull/6415)
+- Replacing protobuf-format in SIRI-Updater with standard xml [#6409](https://github.com/opentripplanner/OpenTripPlanner/pull/6409)
+- Add walk and bicycle safety debug layer, remove raster ones [#6434](https://github.com/opentripplanner/OpenTripPlanner/pull/6434)
+- Add maximum slope debug layer [#6447](https://github.com/opentripplanner/OpenTripPlanner/pull/6447)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)

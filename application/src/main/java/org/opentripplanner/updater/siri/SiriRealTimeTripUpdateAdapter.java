@@ -38,13 +38,11 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 
 /**
- * This class should be used to create snapshots of lookup tables of real-time data. This is
- * necessary to provide planning threads a consistent constant view of a graph with real-time data at
- * a specific point in time.
+ * Adapts from SIRI-ET EstimatedTimetables to OTP's internal real-time data model.
  */
-public class SiriTimetableSnapshotSource {
+public class SiriRealTimeTripUpdateAdapter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SiriTimetableSnapshotSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriRealTimeTripUpdateAdapter.class);
 
   /**
    * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
@@ -66,7 +64,7 @@ public class SiriTimetableSnapshotSource {
 
   private final TimetableSnapshotManager snapshotManager;
 
-  public SiriTimetableSnapshotSource(
+  public SiriRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager
   ) {

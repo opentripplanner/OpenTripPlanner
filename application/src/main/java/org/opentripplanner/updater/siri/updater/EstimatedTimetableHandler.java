@@ -2,7 +2,7 @@ package org.opentripplanner.updater.siri.updater;
 
 import java.util.List;
 import org.opentripplanner.updater.RealTimeUpdateContext;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -12,7 +12,7 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
  */
 public class EstimatedTimetableHandler {
 
-  private final SiriTimetableSnapshotSource snapshotSource;
+  private final SiriRealTimeTripUpdateAdapter adapter;
   private final boolean fuzzyTripMatching;
   /**
    * The ID for the static feed to which these real time updates are applied
@@ -20,11 +20,11 @@ public class EstimatedTimetableHandler {
   private final String feedId;
 
   public EstimatedTimetableHandler(
-    SiriTimetableSnapshotSource snapshotSource,
+    SiriRealTimeTripUpdateAdapter adapter,
     boolean fuzzyTripMatching,
     String feedId
   ) {
-    this.snapshotSource = snapshotSource;
+    this.adapter = adapter;
     this.fuzzyTripMatching = fuzzyTripMatching;
     this.feedId = feedId;
   }
@@ -37,7 +37,7 @@ public class EstimatedTimetableHandler {
     UpdateIncrementality updateMode,
     RealTimeUpdateContext context
   ) {
-    return snapshotSource.applyEstimatedTimetable(
+    return adapter.applyEstimatedTimetable(
       fuzzyTripMatching ? context.siriFuzzyTripMatcher() : null,
       context.entityResolver(feedId),
       feedId,

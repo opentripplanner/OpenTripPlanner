@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import com.bedatadriven.jackson.datatype.jts.parsers.GenericGeometryParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,12 +19,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps a HSL Park hub into a {@link VehicleParkingGroup}.
+ * Maps a Liipi Park hub into a {@link VehicleParkingGroup}.
  */
-public class HslHubToVehicleParkingGroupMapper {
+public class LiipiHubToVehicleParkingGroupMapper {
 
   private static final Logger log = LoggerFactory.getLogger(
-    HslHubToVehicleParkingGroupMapper.class
+    LiipiHubToVehicleParkingGroupMapper.class
   );
 
   private static final GenericGeometryParser GEOMETRY_PARSER = new GenericGeometryParser(
@@ -33,12 +33,12 @@ public class HslHubToVehicleParkingGroupMapper {
 
   private final String feedId;
 
-  public HslHubToVehicleParkingGroupMapper(String feedId) {
+  public LiipiHubToVehicleParkingGroupMapper(String feedId) {
     this.feedId = feedId;
   }
 
   public Map<FeedScopedId, VehicleParkingGroup> parseHub(JsonNode jsonNode) {
-    var hubId = HslParkToVehicleParkingMapper.createIdForNode(jsonNode, "id", feedId);
+    var hubId = LiipiParkToVehicleParkingMapper.createIdForNode(jsonNode, "id", feedId);
     try {
       Map<String, String> translations = new HashMap<>();
       JsonNode nameNode = jsonNode.path("name");

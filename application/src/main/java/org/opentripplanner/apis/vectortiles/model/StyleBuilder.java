@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.vectortiles.model;
 
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -158,12 +160,6 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder circleStroke(String color, int width) {
-    paint.put("circle-stroke-color", validateColor(color));
-    paint.put("circle-stroke-width", width);
-    return this;
-  }
-
   public StyleBuilder circleStroke(String color, ZoomDependentNumber width) {
     paint.put("circle-stroke-color", validateColor(color));
     paint.put("circle-stroke-width", width.toJson());
@@ -186,6 +182,34 @@ public class StyleBuilder {
     return this;
   }
 
+  /**
+   * Generates the line color based off a numeric property in the feature.
+   * <p>
+   * The scale of the property must be between 0 and infinity but the color scale is limited to be
+   * between minValue and maxValue.
+   * <p>
+   * minValue is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
+   */
+  public StyleBuilder lineColorFromProperty(String propertyName, double minValue, double maxValue) {
+    var multiplier = List.of(
+      "*",
+      roundTo2Decimals(255 / (maxValue - minValue)),
+      List.of("get", propertyName)
+    );
+    paint.put(
+      "line-color",
+      List.of(
+        "rgb",
+        List.of("min", 255, multiplier),
+        List.of("max", 0, List.of("-", 255, multiplier)),
+        // we add a small amount of blue so that the colours don't look too neon
+        60
+      )
+    );
+    return this;
+  }
+
   public StyleBuilder lineColorMatch(
     String propertyName,
     Collection<String> values,
@@ -199,21 +223,6 @@ public class StyleBuilder {
         List.of(defaultValue)
       )
     );
-    return this;
-  }
-
-  public StyleBuilder lineOpacity(float lineOpacity) {
-    paint.put("line-opacity", lineOpacity);
-    return this;
-  }
-
-  public StyleBuilder lineDasharray(float... dashArray) {
-    paint.put("line-dasharray", dashArray);
-    return this;
-  }
-
-  public StyleBuilder lineWidth(float width) {
-    paint.put("line-width", width);
     return this;
   }
 
