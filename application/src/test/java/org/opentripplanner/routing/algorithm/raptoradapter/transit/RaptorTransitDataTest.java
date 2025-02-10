@@ -18,7 +18,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
-class TransitLayerTest {
+class RaptorTransitDataTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final TripTimes TRIP_TIMES;
@@ -57,7 +57,7 @@ class TransitLayerTest {
       date
     );
     var tripPatterns = List.of(tripPatternForDate);
-    var transitLayer = new TransitLayer(
+    var raptorTransitData = new RaptorTransitData(
       Map.of(date, tripPatterns),
       null,
       null,
@@ -67,12 +67,12 @@ class TransitLayerTest {
       null,
       null
     );
-    var runningOnDate = transitLayer.getTripPatternsRunningOnDateCopy(date);
+    var runningOnDate = raptorTransitData.getTripPatternsRunningOnDateCopy(date);
     assertEquals(1, runningOnDate.size());
     assertEquals(tripPatterns, runningOnDate);
     assertFalse(tripPatterns == runningOnDate);
-    assertEquals(0, transitLayer.getTripPatternsRunningOnDateCopy(date.minusDays(1)).size());
-    assertEquals(0, transitLayer.getTripPatternsRunningOnDateCopy(date.plusDays(1)).size());
+    assertEquals(0, raptorTransitData.getTripPatternsRunningOnDateCopy(date.minusDays(1)).size());
+    assertEquals(0, raptorTransitData.getTripPatternsRunningOnDateCopy(date.plusDays(1)).size());
   }
 
   @Test
@@ -86,7 +86,7 @@ class TransitLayerTest {
       date
     );
     var tripPatterns = List.of(tripPatternForDate);
-    var transitLayer = new TransitLayer(
+    var raptorTransitData = new RaptorTransitData(
       Map.of(date, tripPatterns),
       null,
       null,
@@ -96,12 +96,12 @@ class TransitLayerTest {
       null,
       null
     );
-    var runningOnDate = transitLayer.getTripPatternsForRunningDate(date);
+    var runningOnDate = raptorTransitData.getTripPatternsForRunningDate(date);
     assertEquals(1, runningOnDate.size());
     assertEquals(tripPatterns, runningOnDate);
     assertTrue(tripPatterns == runningOnDate);
-    assertEquals(0, transitLayer.getTripPatternsForRunningDate(date.minusDays(1)).size());
-    assertEquals(0, transitLayer.getTripPatternsForRunningDate(date.plusDays(1)).size());
+    assertEquals(0, raptorTransitData.getTripPatternsForRunningDate(date.minusDays(1)).size());
+    assertEquals(0, raptorTransitData.getTripPatternsForRunningDate(date.plusDays(1)).size());
   }
 
   @Test
@@ -114,7 +114,7 @@ class TransitLayerTest {
       List.of(),
       date
     );
-    var transitLayer = new TransitLayer(
+    var raptorTransitData = new RaptorTransitData(
       Map.of(date, List.of(tripPatternForDate)),
       null,
       null,
@@ -124,11 +124,11 @@ class TransitLayerTest {
       null,
       null
     );
-    var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(date);
+    var startingOnDate = raptorTransitData.getTripPatternsOnServiceDateCopy(date);
     assertEquals(1, startingOnDate.size());
     assertEquals(tripPatternForDate, startingOnDate.getFirst());
-    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(date.minusDays(1)).size());
-    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(date.plusDays(1)).size());
+    assertEquals(0, raptorTransitData.getTripPatternsOnServiceDateCopy(date.minusDays(1)).size());
+    assertEquals(0, raptorTransitData.getTripPatternsOnServiceDateCopy(date.plusDays(1)).size());
   }
 
   @Test
@@ -142,7 +142,7 @@ class TransitLayerTest {
       List.of(),
       serviceDate
     );
-    var transitLayer = new TransitLayer(
+    var raptorTransitData = new RaptorTransitData(
       Map.of(runningDate, List.of(tripPatternForDate)),
       null,
       null,
@@ -152,12 +152,12 @@ class TransitLayerTest {
       null,
       null
     );
-    var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(serviceDate);
+    var startingOnDate = raptorTransitData.getTripPatternsOnServiceDateCopy(serviceDate);
     // starting date should be determined by service date, not running date which refers to the
     // normal calendar date that the trip pattern is running on
     assertEquals(1, startingOnDate.size());
     assertEquals(tripPatternForDate, startingOnDate.getFirst());
-    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(runningDate).size());
+    assertEquals(0, raptorTransitData.getTripPatternsOnServiceDateCopy(runningDate).size());
   }
 
   @Test
@@ -172,7 +172,7 @@ class TransitLayerTest {
       List.of(),
       firstRunningDate
     );
-    var transitLayer = new TransitLayer(
+    var raptorTransitData = new RaptorTransitData(
       Map.ofEntries(
         entry(firstRunningDate, List.of(tripPatternForDate)),
         entry(secondRunningDate, List.of(tripPatternForDate))
@@ -185,12 +185,12 @@ class TransitLayerTest {
       null,
       null
     );
-    var startingOnDate = transitLayer.getTripPatternsOnServiceDateCopy(firstRunningDate);
+    var startingOnDate = raptorTransitData.getTripPatternsOnServiceDateCopy(firstRunningDate);
     // Transit layer indexes trip patterns by running date and to get trip patterns for certain
     // service date, we need to look up the trip patterns for the next running date as well, but
     // we don't want to return duplicates
     assertEquals(1, startingOnDate.size());
     assertEquals(tripPatternForDate, startingOnDate.getFirst());
-    assertEquals(0, transitLayer.getTripPatternsOnServiceDateCopy(secondRunningDate).size());
+    assertEquals(0, raptorTransitData.getTripPatternsOnServiceDateCopy(secondRunningDate).size());
   }
 }

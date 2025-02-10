@@ -14,8 +14,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Maps the TransitLayer object from the TimetableRepository object. The ServiceDay hierarchy is reversed,
+ * Maps the RaptorTransitData object from the TimetableRepository object. The ServiceDay hierarchy is reversed,
  * with service days at the top level, which contains TripPatternForDate objects that contain only
  * TripSchedules running on that particular date. This makes it faster to filter out TripSchedules
  * when doing Range Raptor searches.
@@ -41,31 +41,31 @@ import org.slf4j.LoggerFactory;
  * seconds to 15 seconds, and the total startup time from 80 seconds to 60 seconds. (JAN 2020,
  * MacBook Pro, 3.1 GHz i7)
  */
-public class TransitLayerMapper {
+public class RaptorTransitDataMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TransitLayerMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RaptorTransitDataMapper.class);
 
   private final TransitService transitService;
   private final SiteRepository siteRepository;
 
-  private TransitLayerMapper(TimetableRepository timetableRepository) {
+  private RaptorTransitDataMapper(TimetableRepository timetableRepository) {
     this.transitService = new DefaultTransitService(timetableRepository);
     this.siteRepository = timetableRepository.getSiteRepository();
   }
 
-  public static TransitLayer map(
+  public static RaptorTransitData map(
     TransitTuningParameters tuningParameters,
     TimetableRepository timetableRepository
   ) {
-    return new TransitLayerMapper(timetableRepository).map(tuningParameters);
+    return new RaptorTransitDataMapper(timetableRepository).map(tuningParameters);
   }
 
-  private TransitLayer map(TransitTuningParameters tuningParameters) {
+  private RaptorTransitData map(TransitTuningParameters tuningParameters) {
     HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
     List<List<Transfer>> transfersByStopIndex;
     ConstrainedTransfersForPatterns constrainedTransfers = null;
 
-    LOG.info("Mapping transitLayer from TimetableRepository...");
+    LOG.info("Mapping raptorTransitData from TimetableRepository...");
 
     Collection<TripPattern> allTripPatterns = transitService.listTripPatterns();
 
@@ -84,7 +84,7 @@ public class TransitLayerMapper {
 
     LOG.info("Mapping complete.");
 
-    return new TransitLayer(
+    return new RaptorTransitData(
       tripPatternsByStopByDate,
       transfersByStopIndex,
       transitService.getTransferService(),

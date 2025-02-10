@@ -21,13 +21,8 @@ import org.opentripplanner.transit.service.SiteRepository;
  * and indexed differently for efficient use by the Raptor router. Patterns and trips are split out
  * by days, retaining only the services actually running on any particular day.
  *
- * TODO RT_AB: this name may reflect usage in R5, where the TransportNetwork encompasses two
- *  sub-aggregates (one for the streets and one for the public transit data). Here, the TransitLayer
- *  seems to just be an indexed and rearranged copy of the main TimetableRepository instance. TG has
- *  indicated that "layer" should be restricted in its standard OO meaning, and this class should
- *  really be merged into TimetableRepository.
  */
-public class TransitLayer {
+public class RaptorTransitData {
 
   /**
    * Transit data required for routing, indexed by each local date(Graph TimeZone) it runs through.
@@ -60,24 +55,24 @@ public class TransitLayer {
   private final int[] stopBoardAlightTransferCosts;
 
   /**
-   * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
-   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace entire
+   * Makes a shallow copy of the RaptorTransitData, except for the tripPatternsForDate, where a shallow
+   * copy of the HashMap is made. This is sufficient, as the RealTimeRaptorTransitDataUpdater will replace entire
    * keys and their values in the map.
    */
-  public TransitLayer(TransitLayer transitLayer) {
+  public RaptorTransitData(RaptorTransitData raptorTransitData) {
     this(
-      transitLayer.tripPatternsRunningOnDate,
-      transitLayer.transfersByStopIndex,
-      transitLayer.transferService,
-      transitLayer.siteRepository,
-      transitLayer.transferCache,
-      transitLayer.constrainedTransfers,
-      transitLayer.transferIndexGenerator,
-      transitLayer.stopBoardAlightTransferCosts
+      raptorTransitData.tripPatternsRunningOnDate,
+      raptorTransitData.transfersByStopIndex,
+      raptorTransitData.transferService,
+      raptorTransitData.siteRepository,
+      raptorTransitData.transferCache,
+      raptorTransitData.constrainedTransfers,
+      raptorTransitData.transferIndexGenerator,
+      raptorTransitData.stopBoardAlightTransferCosts
     );
   }
 
-  public TransitLayer(
+  public RaptorTransitData(
     Map<LocalDate, List<TripPatternForDate>> tripPatternsRunningOnDate,
     List<List<Transfer>> transfersByStopIndex,
     TransferService transferService,

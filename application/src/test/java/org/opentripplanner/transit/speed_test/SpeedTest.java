@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.speed_test;
 
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
-import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 import static org.opentripplanner.standalone.configure.ConstructApplication.initializeTransferCache;
 import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetup.assertTestDateHasData;
 
@@ -41,7 +41,7 @@ import org.opentripplanner.transit.speed_test.model.testcase.TestStatus;
 import org.opentripplanner.transit.speed_test.model.timer.SpeedTestTimer;
 import org.opentripplanner.transit.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
@@ -99,7 +99,7 @@ public class SpeedTest {
       new DefaultVehicleRentalService(),
       new DefaultVehicleParkingRepository(),
       timetableRepository,
-      new TimetableSnapshotManager(null, TimetableSnapshotSourceParameters.DEFAULT, LocalDate::now),
+      new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now),
       config.updatersConfig
     );
     if (timetableRepository.getUpdaterManager() != null) {
@@ -134,9 +134,9 @@ public class SpeedTest {
         null,
         null
       );
-    // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now
+    // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here
-    createTransitLayerForRaptor(timetableRepository, config.transitRoutingParams);
+    createRaptorTransitData(timetableRepository, config.transitRoutingParams);
 
     initializeTransferCache(config.transitRoutingParams, timetableRepository);
 

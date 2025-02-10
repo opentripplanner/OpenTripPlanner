@@ -1,6 +1,6 @@
 package org.opentripplanner;
 
-import static org.opentripplanner.standalone.configure.ConstructApplication.createTransitLayerForRaptor;
+import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 
 import io.micrometer.core.instrument.Metrics;
 import java.time.LocalDate;
@@ -35,7 +35,7 @@ import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 
 public class TestServerContext {
@@ -64,15 +64,11 @@ public class TestServerContext {
     }
     if (snapshotManager == null) {
       snapshotManager =
-        new TimetableSnapshotManager(
-          null,
-          TimetableSnapshotSourceParameters.DEFAULT,
-          LocalDate::now
-        );
+        new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now);
     }
 
     timetableRepository.index();
-    createTransitLayerForRaptor(timetableRepository, routerConfig.transitTuningConfig());
+    createRaptorTransitData(timetableRepository, routerConfig.transitTuningConfig());
 
     snapshotManager.purgeAndCommit();
 
