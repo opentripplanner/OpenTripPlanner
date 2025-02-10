@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.siri;
 
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 
@@ -27,7 +26,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,16 +87,16 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (trips == null || trips.isEmpty()) {
-      CallWrapper lastStop = calls.getLast();
+      CallWrapper lastCall = calls.getLast();
       // resolves a scheduled stop point id to a quay (regular stop) if necessary
       // quay ids also work
-      RegularStop stop = entityResolver.resolveQuay(lastStop.getStopPointRef());
+      RegularStop stop = entityResolver.resolveQuay(lastCall.getStopPointRef());
       if (stop == null) {
         return Result.failure(NO_FUZZY_TRIP_MATCH);
       }
-      ZonedDateTime arrivalTime = lastStop.getAimedArrivalTime() != null
-        ? lastStop.getAimedArrivalTime()
-        : lastStop.getAimedDepartureTime();
+      ZonedDateTime arrivalTime = lastCall.getAimedArrivalTime() != null
+        ? lastCall.getAimedArrivalTime()
+        : lastCall.getAimedDepartureTime();
 
       if (arrivalTime != null) {
         trips = getMatchingTripsOnStopOrSiblings(stop.getId().getId(), arrivalTime, entityResolver);
