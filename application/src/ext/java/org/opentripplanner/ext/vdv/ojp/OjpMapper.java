@@ -104,17 +104,14 @@ public class OjpMapper {
   private CallAtStopStructure callAtStop(TripTimeOnDate tripTimeOnDate) {
     var stop = tripTimeOnDate.getStop();
     var stopPointRef = stopPointRef(stop);
-    var call = new CallAtStopStructure()
+    return new CallAtStopStructure()
       .withStopPointRef(stopPointRef)
       .withStopPointName(internationalText(stop.getName(), lang(tripTimeOnDate)))
       .withServiceDeparture(serviceDeparture(tripTimeOnDate))
       .withOrder(BigInteger.valueOf(tripTimeOnDate.getGtfsSequence()))
       .withNoBoardingAtStop(isNone(tripTimeOnDate.getPickupType()))
-      .withNoAlightingAtStop(isNone(tripTimeOnDate.getDropoffType()));
-    if (stop.getPlatformCode() != null) {
-      call.withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)));
-    }
-    return call;
+      .withNoAlightingAtStop(isNone(tripTimeOnDate.getDropoffType()))
+      .withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)));
   }
 
   private static String lang(TripTimeOnDate tripTimeOnDate) {
