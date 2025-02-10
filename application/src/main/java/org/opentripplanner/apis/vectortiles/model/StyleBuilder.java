@@ -158,12 +158,6 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder circleStroke(String color, int width) {
-    paint.put("circle-stroke-color", validateColor(color));
-    paint.put("circle-stroke-width", width);
-    return this;
-  }
-
   public StyleBuilder circleStroke(String color, ZoomDependentNumber width) {
     paint.put("circle-stroke-color", validateColor(color));
     paint.put("circle-stroke-width", width.toJson());
@@ -186,6 +180,29 @@ public class StyleBuilder {
     return this;
   }
 
+  /**
+   * Generates the line color based off a numeric property in the feature.
+   * <p>
+   * The scale of the property must be from 1 to infinity.
+   * <p>
+   * 1 is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
+   */
+  public StyleBuilder lineColorFromProperty(String propertyName) {
+    var multiplier = List.of("*", 30, List.of("get", propertyName));
+    paint.put(
+      "line-color",
+      List.of(
+        "rgb",
+        List.of("min", 255, multiplier),
+        List.of("max", 0, List.of("-", 255, multiplier)),
+        // we add a small amount of blue so that the colours don't look too neon
+        60
+      )
+    );
+    return this;
+  }
+
   public StyleBuilder lineColorMatch(
     String propertyName,
     Collection<String> values,
@@ -199,21 +216,6 @@ public class StyleBuilder {
         List.of(defaultValue)
       )
     );
-    return this;
-  }
-
-  public StyleBuilder lineOpacity(float lineOpacity) {
-    paint.put("line-opacity", lineOpacity);
-    return this;
-  }
-
-  public StyleBuilder lineDasharray(float... dashArray) {
-    paint.put("line-dasharray", dashArray);
-    return this;
-  }
-
-  public StyleBuilder lineWidth(float width) {
-    paint.put("line-width", width);
     return this;
   }
 

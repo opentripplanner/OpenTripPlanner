@@ -132,7 +132,6 @@ public class SpeedTest {
         null,
         null,
         null,
-        null,
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TimetableRepository, but for now

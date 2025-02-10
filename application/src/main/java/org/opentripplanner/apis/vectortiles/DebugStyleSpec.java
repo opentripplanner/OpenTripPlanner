@@ -3,6 +3,7 @@ package org.opentripplanner.apis.vectortiles;
 import static org.opentripplanner.inspector.vector.edge.EdgePropertyMapper.streetPermissionAsString;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.vectortiles.model.StyleBuilder;
@@ -87,6 +88,7 @@ public class DebugStyleSpec {
     TemporaryFreeEdge.class,
   };
   private static final String EDGES_GROUP = "Edges";
+  private static final String SAFETY_GROUP = "Safety";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
   private static final String PERMISSIONS_GROUP = "Permissions";
@@ -133,6 +135,7 @@ public class DebugStyleSpec {
         backgroundLayers(extraRasterSources),
         wheelchair(edges),
         noThruTraffic(edges),
+        safety(edges),
         traversalPermissions(edges),
         edges(edges),
         vertices(vertices),
@@ -277,6 +280,35 @@ public class DebugStyleSpec {
         .lineWidth(LINE_WIDTH)
         .lineOffset(LINE_OFFSET)
         .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> safety(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder
+        .ofId("bicycle-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColorFromProperty("bicycleSafetyFactor")
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("walk-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColorFromProperty("walkSafetyFactor")
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
