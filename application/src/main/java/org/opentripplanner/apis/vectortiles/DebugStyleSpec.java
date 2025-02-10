@@ -3,7 +3,6 @@ package org.opentripplanner.apis.vectortiles;
 import static org.opentripplanner.inspector.vector.edge.EdgePropertyMapper.streetPermissionAsString;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.vectortiles.model.StyleBuilder;
@@ -29,8 +28,6 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.utils.collection.ListUtils;
 
