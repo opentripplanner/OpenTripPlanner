@@ -344,4 +344,8 @@ public class TripTimeOnDate {
   public int hashCode() {
     return Objects.hash(tripTimes, stopIndex, tripPattern, serviceDate, midnight);
   }
+
+  public TripPattern pattern() {
+    return tripPattern;
+  }
 }

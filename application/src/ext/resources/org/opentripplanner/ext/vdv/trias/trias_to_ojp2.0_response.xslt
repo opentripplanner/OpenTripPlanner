@@ -2,7 +2,7 @@
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
 	<xsl:template match="ojp:OJP">
-		<Trias version="1.3" xmlns:trias="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias  file:///C:/Users/ue71603/MG_Daten/github/TRIAS/Trias.xsd">
+		<Trias version="1.2" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias  file:///C:/Users/ue71603/MG_Daten/github/TRIAS/Trias.xsd">
 		<xsl:apply-templates select="ojp:OJPResponse"/>
 		</Trias>
 	</xsl:template>
@@ -103,7 +103,7 @@
 				<xsl:value-of select="siri:StopPointRef"/>
 			</StopPointRef>
 			<StopPointName>
-				<Text><xsl:value-of select="ojp:StopPointName/ojp:Text"/></Text>
+				<xsl:apply-templates select="ojp:StopPointName"/>
 			</StopPointName>
 			<PrivateCode>
 				<System><xsl:value-of select="ojp:PrivateCode/ojp:System"/>
@@ -121,12 +121,10 @@
 				<xsl:value-of select="siri:StopPointRef"/>
 			</StopPointRef>
 			<StopPointName>
-				<Text>
-					<xsl:value-of select="ojp:StopPointName/ojp:Text"/>
-				</Text>
+				<xsl:apply-templates select="ojp:StopPointName"/>
 			</StopPointName>
 			<PlannedBay>
-				<Text><xsl:value-of select="ojp:PlannedQuay/ojp:Text"/></Text>
+				<xsl:apply-templates select="ojp:PlannedQuay"/>
 			</PlannedBay>
 			<xsl:if test="ojp:EstimatedQuay">
 			<EstimatedBay>
@@ -209,6 +207,11 @@
 		</OnwardCall>
 	</xsl:template>
 	<!--*********************************************-->
+	<xsl:template match="ojp:Text">
+		<Text><xsl:value-of select="text()"/></Text>
+		<Language><xsl:value-of select="@xml:lang"/></Language>
+	</xsl:template>
+	<!--*********************************************-->
 	<xsl:template match="ojp:Service">
 		<Service>
 			<OperatingDayRef><xsl:value-of select="ojp:OperatingDayRef"/></OperatingDayRef>
@@ -225,9 +228,21 @@
 				</PublishedLineName>
 				<OperatorRef><xsl:value-of select="siri:OperatorRef"/></OperatorRef>
 			</ServiceSection>
+			<OriginStopPointRef>
+				<xsl:value-of select="ojp:OriginStopPointRef"/>
+			</OriginStopPointRef>
+			<OriginText>
+				<xsl:apply-templates select="ojp:OriginText"/>
+			</OriginText>
+			<DestinationStopPointRef>
+				<xsl:value-of select="ojp:DestinationStopPointRef"/>
+			</DestinationStopPointRef>
 			<DestinationText>
-				<Text><xsl:value-of select="ojp:DestinationText/ojp:Text"/></Text>
+				<xsl:apply-templates select="ojp:DestinationText"/>
 			</DestinationText>
+			<RouteDescription>
+				<xsl:apply-templates select="ojp:RouteDescription"/>
+			</RouteDescription>
 		</Service>
 	</xsl:template>
 </xsl:stylesheet>
