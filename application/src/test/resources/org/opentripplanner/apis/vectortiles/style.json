@@ -277,20 +277,8 @@
       "paint": {
         "line-color": [
           "rgb",
-          [
-            "min",
-            255,
-            ["*", 28.333333333333332, ["get", "bicycleSafetyFactor"]]
-          ],
-          [
-            "max",
-            0,
-            [
-              "-",
-              255,
-              ["*", 28.333333333333332, ["get", "bicycleSafetyFactor"]]
-            ]
-          ],
+          ["min", 255, ["*", 28.33, ["get", "bicycleSafetyFactor"]]],
+          ["max", 0, ["-", 255, ["*", 28.33, ["get", "bicycleSafetyFactor"]]]],
           60
         ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
@@ -315,12 +303,8 @@
       "paint": {
         "line-color": [
           "rgb",
-          ["min", 255, ["*", 28.333333333333332, ["get", "walkSafetyFactor"]]],
-          [
-            "max",
-            0,
-            ["-", 255, ["*", 28.333333333333332, ["get", "walkSafetyFactor"]]]
-          ],
+          ["min", 255, ["*", 28.33, ["get", "walkSafetyFactor"]]],
+          ["max", 0, ["-", 255, ["*", 28.33, ["get", "walkSafetyFactor"]]]],
           60
         ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
@@ -622,12 +606,8 @@
       "paint": {
         "line-color": [
           "rgb",
-          ["min", 255, ["*", 728.5714285714287, ["get", "maximumSlope"]]],
-          [
-            "max",
-            0,
-            ["-", 255, ["*", 728.5714285714287, ["get", "maximumSlope"]]]
-          ],
+          ["min", 255, ["*", 728.57, ["get", "maximumSlope"]]],
+          ["max", 0, ["-", 255, ["*", 728.57, ["get", "maximumSlope"]]]],
           60
         ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],

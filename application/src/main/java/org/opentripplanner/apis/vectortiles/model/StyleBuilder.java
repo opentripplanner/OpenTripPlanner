@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.vectortiles.model;
 
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -190,7 +192,11 @@ public class StyleBuilder {
    * becomes.
    */
   public StyleBuilder lineColorFromProperty(String propertyName, double minValue, double maxValue) {
-    var multiplier = List.of("*", 255 / (maxValue - minValue), List.of("get", propertyName));
+    var multiplier = List.of(
+      "*",
+      roundTo2Decimals(255 / (maxValue - minValue)),
+      List.of("get", propertyName)
+    );
     paint.put(
       "line-color",
       List.of(
