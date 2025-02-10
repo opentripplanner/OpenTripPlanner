@@ -1,5 +1,9 @@
 package org.opentripplanner.updater.siri;
 
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -15,16 +19,18 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.MonitoredVehicleJourneyStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 /**
@@ -54,36 +60,10 @@ public class SiriFuzzyTripMatcher {
   }
 
   /**
-   * Matches VehicleActivity to a set of possible Trips based on tripId
-   */
-  public Trip match(
-    MonitoredVehicleJourneyStructure monitoredVehicleJourney,
-    EntityResolver entityResolver
-  ) {
-    if (monitoredVehicleJourney.getDestinationRef() != null) {
-      String destinationRef = monitoredVehicleJourney.getDestinationRef().getValue();
-      ZonedDateTime arrivalTime = monitoredVehicleJourney.getDestinationAimedArrivalTime();
-
-      if (arrivalTime != null) {
-        Set<Trip> trips = getMatchingTripsOnStopOrSiblings(
-          destinationRef,
-          arrivalTime,
-          entityResolver
-        );
-        if (trips.isEmpty()) {
-          return null;
-        }
-        return getTripForJourney(trips, monitoredVehicleJourney);
-      }
-    }
-    return null;
-  }
-
-  /**
    * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
    */
   @Nullable
-  public TripAndPattern match(
+  public Result<TripAndPattern, UpdateError.UpdateErrorType> match(
     EstimatedVehicleJourney journey,
     EntityResolver entityResolver,
     BiFunction<TripPattern, LocalDate, Timetable> getCurrentTimetable,
@@ -92,11 +72,11 @@ public class SiriFuzzyTripMatcher {
     List<CallWrapper> calls = CallWrapper.of(journey);
 
     if (calls.isEmpty()) {
-      return null;
+      return Result.failure(NO_VALID_STOPS);
     }
 
     if (calls.getFirst().getAimedDepartureTime() == null) {
-      return null;
+      return Result.failure(NO_FUZZY_TRIP_MATCH);
     }
 
     Set<Trip> trips = null;
@@ -116,10 +96,20 @@ public class SiriFuzzyTripMatcher {
 
       if (arrivalTime != null) {
         trips = getMatchingTripsOnStopOrSiblings(lastStopPoint, arrivalTime, entityResolver);
+        if (CollectionUtils.isEmpty(trips)) {
+          var id = entityResolver.resolveId(lastStopPoint);
+          trips =
+            transitService
+              .findStopByScheduledStopPoint(id)
+              .map(stop ->
+                getMatchingTripsOnStopOrSiblings(stop.getId().getId(), arrivalTime, entityResolver)
+              )
+              .orElse(Set.of());
+        }
       }
     }
     if (trips == null || trips.isEmpty()) {
-      return null;
+      return Result.failure(NO_FUZZY_TRIP_MATCH);
     }
 
     if (journey.getLineRef() != null) {
@@ -254,7 +244,7 @@ public class SiriFuzzyTripMatcher {
    * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
    */
   @Nullable
-  TripAndPattern getTripAndPatternForJourney(
+  Result<TripAndPattern, UpdateError.UpdateErrorType> getTripAndPatternForJourney(
     Set<Trip> trips,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
@@ -264,7 +254,7 @@ public class SiriFuzzyTripMatcher {
     var journeyFirstStop = entityResolver.resolveQuay(calls.getFirst().getStopPointRef());
     var journeyLastStop = entityResolver.resolveQuay(calls.getLast().getStopPointRef());
     if (journeyFirstStop == null || journeyLastStop == null) {
-      return null;
+      return Result.failure(NO_VALID_STOPS);
     }
 
     ZonedDateTime date = calls.getFirst().getAimedDepartureTime();
@@ -310,63 +300,12 @@ public class SiriFuzzyTripMatcher {
     }
 
     if (possibleTrips.isEmpty()) {
-      return null;
+      return Result.failure(UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH);
     } else if (possibleTrips.size() > 1) {
       LOG.warn("Multiple trip and pattern combinations found, skipping all, {}", possibleTrips);
-      return null;
+      return Result.failure(UpdateError.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES);
     } else {
-      return possibleTrips.iterator().next();
+      return Result.success(possibleTrips.iterator().next());
     }
-  }
-
-  /**
-   * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
-   */
-  private Trip getTripForJourney(
-    Set<Trip> trips,
-    MonitoredVehicleJourneyStructure monitoredVehicleJourney
-  ) {
-    ZonedDateTime date = monitoredVehicleJourney.getOriginAimedDepartureTime();
-    if (date == null) {
-      //If no date is set - assume Realtime-data is reported for 'today'.
-      date = ZonedDateTime.now();
-    }
-    LocalDate serviceDate = date.toLocalDate();
-
-    List<Trip> results = new ArrayList<>();
-    for (Trip trip : trips) {
-      Set<LocalDate> serviceDatesForServiceId = transitService
-        .getCalendarService()
-        .getServiceDatesForServiceId(trip.getServiceId());
-
-      for (LocalDate next : serviceDatesForServiceId) {
-        if (next.equals(serviceDate)) {
-          results.add(trip);
-        }
-      }
-    }
-
-    if (results.size() == 1) {
-      return results.getFirst();
-    } else if (results.size() > 1) {
-      // Multiple possible matches - check if lineRef/routeId matches
-      if (
-        monitoredVehicleJourney.getLineRef() != null &&
-        monitoredVehicleJourney.getLineRef().getValue() != null
-      ) {
-        String lineRef = monitoredVehicleJourney.getLineRef().getValue();
-        for (Trip trip : results) {
-          if (lineRef.equals(trip.getRoute().getId().getId())) {
-            // Return first trip where the lineRef matches routeId
-            return trip;
-          }
-        }
-      }
-
-      // Line does not match any routeId - return first result.
-      return results.getFirst();
-    }
-
-    return null;
   }
 }
