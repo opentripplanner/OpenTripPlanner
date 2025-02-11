@@ -123,9 +123,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
     var otpServerRequestContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      new DefaultFareService(),
       null,
-      defaultRequest,
-      new DefaultFareService()
+      defaultRequest
     );
 
     context =

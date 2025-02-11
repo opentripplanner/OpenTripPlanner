@@ -50,16 +50,16 @@ public class TestServerContext {
     TimetableRepository timetableRepository,
     FareService fareService
   ) {
-    return createServerContext(graph, timetableRepository, null, null, fareService);
+    return createServerContext(graph, timetableRepository, fareService, null, null);
   }
 
   /** Create a context for unit testing */
   public static OtpServerRequestContext createServerContext(
     Graph graph,
     TimetableRepository timetableRepository,
+    FareService fareService,
     @Nullable TimetableSnapshotManager snapshotManager,
-    @Nullable RouteRequest request,
-    FareService fareService
+    @Nullable RouteRequest request
   ) {
     var routerConfig = RouterConfig.DEFAULT;
 

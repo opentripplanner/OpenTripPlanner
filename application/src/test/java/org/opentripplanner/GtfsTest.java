@@ -263,9 +263,9 @@ public abstract class GtfsTest {
       TestServerContext.createServerContext(
         graph,
         timetableRepository,
+        new DefaultFareService(),
         snapshotManager,
-        null,
-        new DefaultFareService()
+        null
       );
   }
 }
