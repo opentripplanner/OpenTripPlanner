@@ -86,10 +86,6 @@ public class TestPathBuilder implements RaptorTestConstants {
     return walk(TestTransfer.transfer(toStop, duration));
   }
 
-  public TestPathBuilder walk(int duration, int toStop, int cost) {
-    return walk(TestTransfer.transfer(toStop, duration, cost));
-  }
-
   public TestPathBuilder walk(TestTransfer transfer) {
     builder.transfer(transfer, transfer.stop());
     return this;
@@ -124,11 +120,6 @@ public class TestPathBuilder implements RaptorTestConstants {
         ? TestAccessEgress.free(currentStop())
         : TestAccessEgress.walk(currentStop(), duration)
     );
-  }
-
-  public PathBuilder<TestTripSchedule> access(TestAccessEgress access) {
-    builder.access(access);
-    return builder;
   }
 
   public RaptorPath<TestTripSchedule> egress(TestAccessEgress egress) {
