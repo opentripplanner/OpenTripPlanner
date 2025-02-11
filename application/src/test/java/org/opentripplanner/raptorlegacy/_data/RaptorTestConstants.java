@@ -4,7 +4,10 @@ import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
@@ -61,10 +64,23 @@ public interface RaptorTestConstants {
   int ALIGHT_SLACK = 15;
   int TRANSFER_SLACK = 60;
 
+  // COST_CALCULATION
+  int BOARD_COST = 60;
+  int TRANSFER_COST = 120;
+  double WAIT_RELUCTANCE = 0.8;
+
   RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
+  );
+
+  RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    BOARD_COST,
+    TRANSFER_COST,
+    WAIT_RELUCTANCE,
+    null,
+    null
   );
 
   default String stopIndexToName(int index) {
