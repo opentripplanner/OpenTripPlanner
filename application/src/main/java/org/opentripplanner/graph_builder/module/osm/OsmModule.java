@@ -242,6 +242,7 @@ public class OsmModule implements GraphBuilderModule {
     WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
+      osmInfoGraphBuildRepository,
       vertexGenerator,
       params.edgeNamer(),
       normalizer,

@@ -35,6 +35,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -86,6 +87,7 @@ class WalkableAreaBuilder {
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
     VertexGenerator vertexBuilder,
     EdgeNamer namer,
     SafetyValueNormalizer normalizer,
@@ -96,6 +98,7 @@ class WalkableAreaBuilder {
   ) {
     this.graph = graph;
     this.osmdb = osmdb;
+    this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.vertexBuilder = vertexBuilder;
     this.namer = namer;
     this.normalizer = normalizer;
@@ -125,12 +128,10 @@ class WalkableAreaBuilder {
    * visibility calculations
    */
   public void buildWithoutVisibility(AreaGroup group) {
-    var references = getStopReferences(group);
-
     // create polygon and accumulate nodes for area
     for (Ring ring : group.outermostRings) {
       Set<AreaEdge> edges = new HashSet<>();
-      AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon, references);
+      AreaEdgeList edgeList = new AreaEdgeList(ring.jtsPolygon);
       // the points corresponding to concave or hole vertices
       // or those linked to ways
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
@@ -193,14 +194,11 @@ class WalkableAreaBuilder {
       )
       .collect(Collectors.toSet());
 
-    // transit stop reference values which improve transit vertex linking
-    var references = getStopReferences(group);
-
     // create polygon and accumulate nodes for area
     for (Ring ring : group.outermostRings) {
       Polygon polygon = ring.jtsPolygon;
 
-      AreaEdgeList edgeList = new AreaEdgeList(polygon, references);
+      AreaEdgeList edgeList = new AreaEdgeList(polygon);
 
       // the points corresponding to concave or hole vertices or those linked to ways
       HashSet<OsmNode> visibilityNodes = new HashSet<>();
@@ -377,14 +375,6 @@ class WalkableAreaBuilder {
       }
     }
     pruneAreaEdges(startingVertices, edges, ringEdges);
-  }
-
-  private Set<String> getStopReferences(AreaGroup group) {
-    return group.areas
-      .stream()
-      .filter(g -> g.parent.isBoardingLocation())
-      .flatMap(g -> g.parent.getMultiTagValues(boardingLocationRefTags).stream())
-      .collect(Collectors.toSet());
   }
 
   /**
@@ -574,7 +564,7 @@ class WalkableAreaBuilder {
       NamedArea namedArea = new NamedArea();
       OsmWithTags areaEntity = area.parent;
 
-      String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
+      String id = "way (area) " + areaEntity.getId();
       I18NString name = namer.getNameForWay(areaEntity, id);
       namedArea.setName(name);
 
@@ -587,6 +577,14 @@ class WalkableAreaBuilder {
       namedArea.setOriginalEdges(intersection);
       namedArea.setPermission(wayData.getPermission());
       edgeList.addArea(namedArea);
+
+      if(areaEntity.isBoardingLocation()) {
+	  var references = areaEntity.getMultiTagValues(boardingLocationRefTags);
+	  if(!references.isEmpty()) {
+	      var platform = new Platform(name, area.jtsMultiPolygon, references);
+	      osmInfoGraphBuildRepository.addPlatform(area, platform);
+	  }
+      }
     }
   }
 
