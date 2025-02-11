@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -49,7 +50,7 @@ public class TestServerContext {
     TimetableRepository timetableRepository,
     FareService fareService
   ) {
-    return createServerContext(graph, timetableRepository, null, null);
+    return createServerContext(graph, timetableRepository, null, null, fareService);
   }
 
   /** Create a context for unit testing */
@@ -57,8 +58,7 @@ public class TestServerContext {
     Graph graph,
     TimetableRepository timetableRepository,
     @Nullable TimetableSnapshotManager snapshotManager,
-    @Nullable RouteRequest request
-    TimetableSnapshotManager snapshotManager,
+    @Nullable RouteRequest request,
     FareService fareService
   ) {
     var routerConfig = RouterConfig.DEFAULT;
@@ -88,8 +88,8 @@ public class TestServerContext {
 
     return new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
-      routerConfig.flexParameters(),
       fareService,
+      routerConfig.flexParameters(),
       graph,
       Metrics.globalRegistry,
       raptorConfig,

@@ -260,6 +260,12 @@ public abstract class GtfsTest {
       alertsUpdateHandler.update(feedMessage, null);
     } catch (FileNotFoundException exception) {}
     serverContext =
-      TestServerContext.createServerContext(graph, timetableRepository, snapshotManager, null);
+      TestServerContext.createServerContext(
+        graph,
+        timetableRepository,
+        snapshotManager,
+        null,
+        new DefaultFareService()
+      );
   }
 }

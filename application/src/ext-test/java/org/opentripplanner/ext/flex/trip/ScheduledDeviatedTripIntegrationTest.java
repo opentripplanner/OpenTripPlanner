@@ -89,7 +89,11 @@ class ScheduledDeviatedTripIntegrationTest {
   void flexTripInTransitMode() {
     var feedId = timetableRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, timetableRepository, new DefaultFareService());
+    var serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      new DefaultFareService()
+    );
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId("Transfer Point for Route 30", feedId, "cujv");

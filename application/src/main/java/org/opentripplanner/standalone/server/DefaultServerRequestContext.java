@@ -83,7 +83,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public DefaultServerRequestContext(
     // Keep the same order as in the field declaration
     DebugUiConfig debugUiConfig,
-    FareService fareService
+    FareService fareService,
     FlexParameters flexParameters,
     Graph graph,
     MeterRegistry meterRegistry,
@@ -106,6 +106,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   ) {
     this.debugUiConfig = debugUiConfig;
     this.flexParameters = flexParameters;
+    this.fareService = fareService;
     this.graph = graph;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;

@@ -18,7 +18,11 @@ class VectorTilesResourceTest {
     // the Grizzly request is awful to instantiate, using Mockito
     var grizzlyRequest = Mockito.mock(Request.class);
     var resource = new VectorTilesResource(
-      TestServerContext.createServerContext(new Graph(), new TimetableRepository(), new DefaultFareService()),
+      TestServerContext.createServerContext(
+        new Graph(),
+        new TimetableRepository(),
+        new DefaultFareService()
+      ),
       grizzlyRequest,
       "default"
     );

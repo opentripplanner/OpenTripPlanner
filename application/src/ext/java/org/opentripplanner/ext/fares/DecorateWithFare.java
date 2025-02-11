@@ -8,6 +8,7 @@ import org.opentripplanner.routing.fares.FareService;
  * Computes the fares of an itinerary and adds them.
  */
 public final class DecorateWithFare implements ItineraryDecorator {
+
   private final FareService fareService;
 
   public DecorateWithFare(FareService fareService) {
@@ -22,5 +23,4 @@ public final class DecorateWithFare implements ItineraryDecorator {
       FaresToItineraryMapper.addFaresToLegs(fare, itinerary);
     }
   }
-
 }
