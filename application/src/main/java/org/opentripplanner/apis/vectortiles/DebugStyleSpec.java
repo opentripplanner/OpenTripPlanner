@@ -138,7 +138,7 @@ public class DebugStyleSpec {
         safety(edges),
         traversalPermissions(edges),
         edges(edges),
-        elevation(edges),
+        elevation(edges, vertices),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -286,7 +286,7 @@ public class DebugStyleSpec {
     );
   }
 
-  private static List<StyleBuilder> elevation(VectorSourceLayer edges) {
+  private static List<StyleBuilder> elevation(VectorSourceLayer edges, VectorSourceLayer vertices) {
     return List.of(
       StyleBuilder
         .ofId("maximum-slope")
@@ -299,6 +299,15 @@ public class DebugStyleSpec {
         .lineWidth(LINE_HALF_WIDTH)
         .lineOffset(LINE_OFFSET)
         .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("vertex-elevation")
+        .group(ELEVATION_GROUP)
+        .typeSymbol()
+        .symbolText("elevation")
+        .vectorSourceLayer(vertices)
+        .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );

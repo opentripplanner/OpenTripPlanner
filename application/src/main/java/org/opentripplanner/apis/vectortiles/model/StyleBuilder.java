@@ -130,9 +130,7 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder lineText(String name) {
-    layout.put("symbol-placement", "line-center");
-    layout.put("symbol-spacing", 1000);
+  public StyleBuilder symbolText(String name) {
     layout.put("text-field", "{%s}".formatted(name));
     layout.put("text-font", List.of("KlokanTech Noto Sans Regular"));
     layout.put(
@@ -148,6 +146,12 @@ public class StyleBuilder {
     paint.put("text-halo-blur", 4);
     paint.put("text-halo-width", 3);
     return this;
+  }
+
+  public StyleBuilder lineText(String name) {
+    layout.put("symbol-placement", "line-center");
+    layout.put("symbol-spacing", 1000);
+    return symbolText(name);
   }
 
   public StyleBuilder textOffset(float offset) {

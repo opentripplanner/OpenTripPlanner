@@ -1349,6 +1349,47 @@
       }
     },
     {
+      "id" : "vertex-elevation",
+      "type" : "symbol",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "layout" : {
+        "text-field" : "{elevation}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Elevation"
+      }
+    },
+    {
       "id" : "vertex",
       "type" : "circle",
       "source" : "vectorSource",
