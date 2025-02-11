@@ -277,8 +277,12 @@
       "paint": {
         "line-color": [
           "rgb",
-          ["min", 255, ["*", 28.33, ["get", "bicycleSafetyFactor"]]],
-          ["max", 0, ["-", 255, ["*", 28.33, ["get", "bicycleSafetyFactor"]]]],
+          ["min", 255, ["*", 80.0, ["log2", ["get", "bicycleSafetyFactor"]]]],
+          [
+            "max",
+            0,
+            ["-", 255, ["*", 80.0, ["log2", ["get", "bicycleSafetyFactor"]]]]
+          ],
           60
         ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
@@ -303,8 +307,12 @@
       "paint": {
         "line-color": [
           "rgb",
-          ["min", 255, ["*", 28.33, ["get", "walkSafetyFactor"]]],
-          ["max", 0, ["-", 255, ["*", 28.33, ["get", "walkSafetyFactor"]]]],
+          ["min", 255, ["*", 80.0, ["log2", ["get", "walkSafetyFactor"]]]],
+          [
+            "max",
+            0,
+            ["-", 255, ["*", 80.0, ["log2", ["get", "walkSafetyFactor"]]]]
+          ],
           60
         ],
         "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],

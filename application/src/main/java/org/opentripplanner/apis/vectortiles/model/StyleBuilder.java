@@ -210,6 +210,30 @@ public class StyleBuilder {
     return this;
   }
 
+  /**
+   * Generates the line color based off a numeric property in the feature.
+   * <p>
+   * The scale of the property must be between 1 and infinity. RGB values (0, 255) are computed with
+   * the following formula: log2(propertyValue) * logMultiplier.
+   * <p>
+   * 1 is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
+   */
+  public StyleBuilder log2LineColorFromProperty(String propertyName, double logMultiplier) {
+    var multiplier = List.of("*", logMultiplier, List.of("log2", List.of("get", propertyName)));
+    paint.put(
+      "line-color",
+      List.of(
+        "rgb",
+        List.of("min", 255, multiplier),
+        List.of("max", 0, List.of("-", 255, multiplier)),
+        // we add a small amount of blue so that the colours don't look too neon
+        60
+      )
+    );
+    return this;
+  }
+
   public StyleBuilder lineColorMatch(
     String propertyName,
     Collection<String> values,
