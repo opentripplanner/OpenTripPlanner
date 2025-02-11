@@ -4,8 +4,8 @@ import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdater;
 import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdater;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
-import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdater;
-import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
+import org.opentripplanner.ext.vehicleparking.liipi.LiipiParkUpdater;
+import org.opentripplanner.ext.vehicleparking.liipi.LiipiParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.BicycleParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.CarParkAPIUpdater;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
@@ -25,8 +25,8 @@ public class VehicleParkingDataSourceFactory {
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
     return switch (parameters.sourceType()) {
-      case HSL_PARK -> new HslParkUpdater(
-        (HslParkUpdaterParameters) parameters,
+      case LIIPI -> new LiipiParkUpdater(
+        (LiipiParkUpdaterParameters) parameters,
         openingHoursCalendarService
       );
       case PARK_API -> new CarParkAPIUpdater(

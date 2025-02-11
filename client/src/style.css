@@ -1,39 +1,43 @@
-.app {
-  min-width: 810px;
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  grid-template-rows: 1fr 2fr;
+  height: 100vh;
+  gap: 0;
 }
+
+.box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .navbar-brand {
   color: #4078bc;
-  margin-top: 20px;
-  margin-right: 14px;
+  font-size: 2rem;
 }
 
 @media (min-width: 1895px) {
-  .top-content {
-    height: 75px;
-  }
-
   .below-content {
-    height: calc(100vh - 75px);
+    height: calc(100vh - 175px);
   }
 }
 
 @media (max-width: 1896px) {
-  .top-content {
-    height: 150px;
-  }
-
   .below-content {
-    height: calc(100vh - 150px);
+    height: calc(100vh - 175px);
   }
 }
 
-@media (max-width: 1120px) {
-  .top-content {
-    height: 200px;
-  }
-
+@media (max-width: 1250px) {
   .below-content {
-    height: calc(100vh - 200px);
+    height: calc(100vh - 250px);
+  }
+}
+
+@media (max-width: 900px) {
+  .below-content {
+    height: calc(100vh - 325px);
   }
 }
 
@@ -48,6 +52,10 @@
   flex-wrap: wrap;
   justify-content: space-between;
   margin-right: 1rem;
+}
+
+.search-bar input.input-tiny {
+  max-width: 50px;
 }
 
 .search-bar input.input-small {
@@ -73,16 +81,40 @@
   margin: 30px 0 auto 0;
 }
 
-.search-bar .swap-from-to img {
+.input-family {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.swap-from-to img {
   width: 15px;
 }
 
-.itinerary-list-container {
-  width: 36rem;
-  overflow-y: auto;
+.logo-container {
+  display: flex;
+  flex-direction: column;
 }
 
-.itinerary-list-container .time-zone-info {
+.logo-container .details {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.logo-image {
+  margin-right: 2px;
+}
+
+.left-pane-container {
+  font-size: 12px;
+  width: 100%;
+  overflow-y: auto;
+  min-width: 300px;
+}
+
+.left-pane-container .time-zone-info {
   margin: 10px 20px;
   font-size: 12px;
   text-align: right;
@@ -206,4 +238,209 @@
 
 .maplibregl-ctrl-group.layer-select div.layer {
   margin-left: 17px;
+}
+
+.right-menu-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 100%;
+  background-color: #f4f4f4;
+  overflow-x: hidden;
+  transition: 0.3s;
+  padding-top: 60px;
+  box-shadow: none;
+}
+
+.right-menu-container.open {
+  width: 250px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-button.right {
+  position: absolute;
+  right: 0; /* Default position when sidebar is closed */
+  background: #fff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px;
+  cursor: pointer;
+  transition:
+    right 0.3s,
+    background-color 0.2s; /* Smooth transitions */
+}
+
+.sidebar-button.right.open {
+  right: 270px; /* Shifted position when sidebar is open */
+}
+
+.sidebar-button.active {
+  background: #fff;
+}
+
+.sidebar-button:hover {
+  background: #4078bc; /* Slightly darker when hovered */
+}
+
+.sidebar-button.active:hover {
+  background: #fff;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* For Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+.default-tooltip-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.pagination-controls {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.default-tooltip-icon {
+  width: 10px;
+  height: 10px;
+}
+.argument-label {
+  padding-right: 2px;
+}
+
+/* Sidebar Container */
+.sidebar-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-top: black 1px solid;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40px;
+  background-color: #f7f7f7;
+  border-right: 1px solid #ccc;
+}
+
+/* Sidebar Buttons */
+.sidebar-button {
+  cursor: pointer;
+  padding: 5px;
+  text-align: center;
+  border-radius: 8px;
+  margin: 5px 0;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar-button:hover {
+  background-color: #e0e0e0;
+}
+
+.sidebar-button.active {
+  background-color: #ddd;
+  font-weight: bold;
+}
+
+/* Content Area */
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  margin: 5px;
+}
+
+.panel-header {
+  font-size: 24px;
+  text-align: center;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.argument-list {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.argument-list button {
+  font-size: 13px;
+  padding: 5px 10px;
+  margin: 5px 0;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.argument-list button:hover {
+  background-color: #0056b3; /* Darker on hover */
+}
+
+.argument-list input[type='text'],
+.argument-list input[type='number'],
+.argument-list input[type='datetime-local'],
+select {
+  font-size: 12px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-bottom: 1px solid #ccc; /* Bottom border only */
+  background: none;
+  box-sizing: border-box;
+}
+
+.argument-list input[type='text'],
+.argument-list input[type='number'] {
+  width: 50px;
+}
+.argument-list input[type='datetime-local'] {
+  width: 140px;
+}
+
+input.comma-separated-input[type='text'],
+input.comma-separated-input[type='number'] {
+  width: 140px;
+}
+
+.remove-argument {
+  margin-left: 2px;
+  color: red;
+  cursor: pointer;
+}
+
+.reset-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  /* The transform ensures the button is vertically centered
+     if your header has a fixed height or if text is multiline. */
+}
+
+.panel-header button {
+  font-size: 13px;
+  padding: 5px 10px;
+  margin: 5px 0;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.panel-header button:hover {
+  background-color: #0056b3; /* Darker on hover */
 }

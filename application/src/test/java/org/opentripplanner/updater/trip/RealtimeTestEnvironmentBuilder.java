@@ -21,16 +21,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
-  private RealtimeTestEnvironment.SourceType sourceType;
   private final TimetableRepository timetableRepository = new TimetableRepository(
     SITE_REPOSITORY,
     new Deduplicator()
   );
-
-  RealtimeTestEnvironmentBuilder withSourceType(RealtimeTestEnvironment.SourceType sourceType) {
-    this.sourceType = sourceType;
-    return this;
-  }
 
   public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     createTrip(trip);
@@ -39,7 +33,6 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
   }
 
   public RealtimeTestEnvironment build() {
-    Objects.requireNonNull(sourceType, "sourceType cannot be null");
     timetableRepository.initTimeZone(TIME_ZONE);
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
@@ -55,7 +48,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       DataImportIssueStore.NOOP
     );
 
-    return new RealtimeTestEnvironment(sourceType, timetableRepository);
+    return new RealtimeTestEnvironment(timetableRepository);
   }
 
   private Trip createTrip(TripInput tripInput) {

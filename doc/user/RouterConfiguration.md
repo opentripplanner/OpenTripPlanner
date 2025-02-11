@@ -514,6 +514,7 @@ Used to group requests when monitoring OTP.
     },
     "car" : {
       "reluctance" : 10,
+      "boardCost" : 600,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {
@@ -568,6 +569,9 @@ Used to group requests when monitoring OTP.
         "BIKE_RENTAL" : "20m"
       },
       "maxStopCount" : 500,
+      "maxStopCountForMode" : {
+        "CAR" : 0
+      },
       "penalty" : {
         "FLEXIBLE" : {
           "timePenalty" : "2m + 1.1t",
@@ -765,14 +769,14 @@ Used to group requests when monitoring OTP.
     },
     {
       "type" : "vehicle-parking",
-      "sourceType" : "hsl-park",
-      "feedId" : "hslpark",
+      "sourceType" : "liipi",
+      "feedId" : "liipi",
       "timeZone" : "Europe/Helsinki",
       "facilitiesFrequencySec" : 3600,
-      "facilitiesUrl" : "https://p.hsl.fi/api/v1/facilities.json?limit=-1",
+      "facilitiesUrl" : "https://parking.fintraffic.fi/api/v1/facilities.json?limit=-1",
       "utilizationsFrequencySec" : 600,
-      "utilizationsUrl" : "https://p.hsl.fi/api/v1/utilizations.json?limit=-1",
-      "hubsUrl" : "https://p.hsl.fi/api/v1/hubs.json?limit=-1"
+      "utilizationsUrl" : "https://parking.fintraffic.fi/api/v1/utilizations.json?limit=-1",
+      "hubsUrl" : "https://parking.fintraffic.fi/api/v1/hubs.json?limit=-1"
     },
     {
       "type" : "vehicle-parking",

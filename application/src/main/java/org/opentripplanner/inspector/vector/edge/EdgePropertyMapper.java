@@ -35,8 +35,10 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
     var props = Lists.newArrayList(
       kv("permission", streetPermissionAsString(se.getPermission())),
       kv("bicycleSafetyFactor", roundTo2Decimals(se.getBicycleSafetyFactor())),
+      kv("walkSafetyFactor", roundTo2Decimals(se.getWalkSafetyFactor())),
       kv("noThruTraffic", noThruTrafficAsString(se)),
-      kv("wheelchairAccessible", se.isWheelchairAccessible())
+      kv("wheelchairAccessible", se.isWheelchairAccessible()),
+      kv("maximumSlope", roundTo2Decimals(se.getMaxSlope()))
     );
     if (se.nameIsDerived()) {
       props.addFirst(kv("name", "%s (generated)".formatted(se.getName().toString())));

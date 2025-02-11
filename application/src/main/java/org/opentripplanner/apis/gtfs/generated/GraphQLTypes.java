@@ -555,18 +555,24 @@ public class GraphQLTypes {
 
   public static class GraphQLCarPreferencesInput {
 
+    private org.opentripplanner.framework.model.Cost boardCost;
     private GraphQLCarParkingPreferencesInput parking;
     private Double reluctance;
     private GraphQLCarRentalPreferencesInput rental;
 
     public GraphQLCarPreferencesInput(Map<String, Object> args) {
       if (args != null) {
+        this.boardCost = (org.opentripplanner.framework.model.Cost) args.get("boardCost");
         this.parking =
           new GraphQLCarParkingPreferencesInput((Map<String, Object>) args.get("parking"));
         this.reluctance = (Double) args.get("reluctance");
         this.rental =
           new GraphQLCarRentalPreferencesInput((Map<String, Object>) args.get("rental"));
       }
+    }
+
+    public org.opentripplanner.framework.model.Cost getGraphQLBoardCost() {
+      return this.boardCost;
     }
 
     public GraphQLCarParkingPreferencesInput getGraphQLParking() {
@@ -579,6 +585,10 @@ public class GraphQLTypes {
 
     public GraphQLCarRentalPreferencesInput getGraphQLRental() {
       return this.rental;
+    }
+
+    public void setGraphQLBoardCost(org.opentripplanner.framework.model.Cost boardCost) {
+      this.boardCost = boardCost;
     }
 
     public void setGraphQLParking(GraphQLCarParkingPreferencesInput parking) {

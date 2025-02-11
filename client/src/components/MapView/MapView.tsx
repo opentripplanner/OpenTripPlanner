@@ -5,17 +5,18 @@ import {
   MapGeoJSONFeature,
   MapMouseEvent,
   NavigationControl,
-  VectorTileSource,
+  MapRef,
 } from 'react-map-gl/maplibre';
+import maplibregl, { VectorTileSource } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
 import { LegLines } from './LegLines.tsx';
 import { useMapDoubleClick } from './useMapDoubleClick.ts';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
-import DebugLayerControl from './LayerControl.tsx';
+import RightMenu from './RightMenu.tsx';
 
 const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
 
@@ -66,9 +67,24 @@ export function MapView({
     }
   };
 
+  const onLoad = (e: MapEvent) => {
+    const map = e.target;
+    map.addControl(new maplibregl.AttributionControl(), 'bottom-left');
+  };
+
+  function handleMapLoad(e: MapEvent) {
+    // 1) Call your existing function
+    panToWorldEnvelopeIfRequired(e);
+
+    // 2) Add the native MapLibre attribution control
+    onLoad(e);
+  }
+
+  const mapRef = useRef<MapRef>(null); // Create a ref for MapRef
   return (
     <div className="map-container below-content">
       <Map
+        attributionControl={false}
         // @ts-ignore
         mapLib={import('maplibre-gl')}
         // @ts-ignore
@@ -87,7 +103,8 @@ export function MapView({
         // disable pitching and rotating the map
         touchPitch={false}
         dragRotate={false}
-        onLoad={panToWorldEnvelopeIfRequired}
+        onLoad={handleMapLoad}
+        ref={mapRef}
       >
         <NavigationControl position="top-left" />
         <NavigationMarkers
@@ -96,7 +113,8 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
-        <DebugLayerControl position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} />
+
+        <RightMenu position="top-right" setInteractiveLayerIds={setInteractiveLayerIds} mapRef={mapRef?.current} />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}

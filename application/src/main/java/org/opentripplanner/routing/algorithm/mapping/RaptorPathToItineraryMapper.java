@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -15,6 +14,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.FrequencyTransitLegBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegConstructionSupport;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -27,9 +27,9 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -39,8 +39,8 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
-import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
@@ -53,7 +53,7 @@ import org.opentripplanner.transit.service.TransitService;
  */
 public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
-  private final TransitLayer transitLayer;
+  private final RaptorTransitData raptorTransitData;
 
   private final RouteRequest request;
   private final StreetSearchRequest transferStreetRequest;
@@ -66,7 +66,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   /**
    * Constructs an itinerary mapper for a request and a set of results
    *
-   * @param transitLayer          the currently active transit layer (may have real-time data
+   * @param raptorTransitData          the currently active transit layer (may have real-time data
    *                              applied)
    * @param transitSearchTimeZero the point in time all times in seconds are counted from
    * @param request               the current routing request
@@ -74,11 +74,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   public RaptorPathToItineraryMapper(
     Graph graph,
     TransitService transitService,
-    TransitLayer transitLayer,
+    RaptorTransitData raptorTransitData,
     ZonedDateTime transitSearchTimeZero,
     RouteRequest request
   ) {
-    this.transitLayer = transitLayer;
+    this.raptorTransitData = raptorTransitData;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.transferMode = request.journey().transfer().mode();
     this.request = request;
@@ -254,6 +254,11 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     TripOnServiceDate tripOnServiceDate = getTripOnServiceDate(tripSchedule);
 
+    var distanceMeters = LegConstructionSupport.computeDistanceMeters(
+      tripSchedule.getOriginalTripPattern(),
+      boardStopIndexInPattern,
+      alightStopIndexInPattern
+    );
     return new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripSchedule.getOriginalTripTimes())
       .withTripPattern(tripSchedule.getOriginalTripPattern())
@@ -261,6 +266,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .withAlightStopIndexInPattern(alightStopIndexInPattern)
       .withStartTime(createZonedDateTime(pathLeg.fromTime()))
       .withEndTime(createZonedDateTime(pathLeg.toTime()))
+      .withDistanceMeters(distanceMeters)
       .withServiceDate(tripSchedule.getServiceDate())
       .withZoneId(transitSearchTimeZero.getZone().normalized())
       .withTripOnServiceDate(tripOnServiceDate)
@@ -293,7 +299,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * be considered backwards-incompatible, this is an opt-in feature.
    */
   private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
-    var transferStop = Place.forStop(transitLayer.getStopByIndex(previousLeg.toStop()));
+    var transferStop = Place.forStop(raptorTransitData.getStopByIndex(previousLeg.toStop()));
     return StreetLeg
       .create()
       .withMode(TraverseMode.WALK)
@@ -309,8 +315,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
-    var transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
-    var transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
+    var transferFromStop = raptorTransitData.getStopByIndex(pathLeg.fromStop());
+    var transferToStop = raptorTransitData.getStopByIndex(pathLeg.toStop());
     Transfer transfer = ((DefaultRaptorTransfer) pathLeg.transfer()).transfer();
 
     Place from = Place.forStop(transferFromStop);
@@ -361,15 +367,24 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .build()
       );
     } else {
-      var legTransferSearchRequest = transferStreetRequest
-        .copyOf(createZonedDateTime(pathLeg.fromTime()).toInstant())
-        .build();
-      var initialStates = State.getInitialStates(
-        Set.of(edges.getFirst().getFromVertex()),
-        legTransferSearchRequest
-      );
-      var state = EdgeTraverser.traverseEdges(initialStates, edges);
-      var graphPath = new GraphPath<>(state.get());
+      StateEditor se = new StateEditor(edges.get(0).getFromVertex(), transferStreetRequest);
+      se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
+
+      State s = se.makeState();
+      ArrayList<State> transferStates = new ArrayList<>();
+      transferStates.add(s);
+      for (Edge e : edges) {
+        var states = e.traverse(s);
+        if (State.isEmpty(states)) {
+          s = null;
+        } else {
+          transferStates.add(states[0]);
+          s = states[0];
+        }
+      }
+
+      State[] states = transferStates.toArray(new State[0]);
+      var graphPath = new GraphPath<>(states[states.length - 1]);
 
       Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
 

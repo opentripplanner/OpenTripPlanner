@@ -7,7 +7,7 @@ import gnu.trove.list.TLongList;
 import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -17,7 +17,7 @@ public class OsmParserTest {
   @Test
   public void testBinaryParser() {
     File osmFile = ResourceLoader.of(this).file("map.osm.pbf");
-    OsmProvider pr = new OsmProvider(osmFile, true);
+    DefaultOsmProvider pr = new DefaultOsmProvider(osmFile, true);
     OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
 
     pr.readOsm(osmdb);
