@@ -42,7 +42,7 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleRental
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureSXUpdaterConfig;
 import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
@@ -65,7 +65,7 @@ public class UpdatersConfig implements UpdatersParameters {
 
   private final Multimap<Type, Object> configList = ArrayListMultimap.create();
 
-  private final TimetableSnapshotSourceParameters timetableUpdates;
+  private final TimetableSnapshotParameters timetableUpdates;
 
   @Nullable
   private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
@@ -105,15 +105,15 @@ public class UpdatersConfig implements UpdatersParameters {
 
   /**
    * Read "timetableUpdates" parameters. These parameters are used to configure the
-   * TimetableSnapshotSource. Both the GTFS and Siri version uses the same parameters.
+   * GtfsRealTimeTripUpdateAdapter. Both the GTFS and Siri version uses the same parameters.
    */
-  private TimetableSnapshotSourceParameters timetableUpdates(NodeAdapter c) {
-    var dflt = TimetableSnapshotSourceParameters.DEFAULT;
+  private TimetableSnapshotParameters timetableUpdates(NodeAdapter c) {
+    var dflt = TimetableSnapshotParameters.DEFAULT;
     if (c.isEmpty()) {
       return dflt;
     }
 
-    return new TimetableSnapshotSourceParameters(
+    return new TimetableSnapshotParameters(
       c
         .of("maxSnapshotFrequency")
         .since(V2_2)
@@ -134,7 +134,7 @@ public class UpdatersConfig implements UpdatersParameters {
     );
   }
 
-  public TimetableSnapshotSourceParameters timetableSnapshotParameters() {
+  public TimetableSnapshotParameters timetableSnapshotParameters() {
     return timetableUpdates;
   }
 

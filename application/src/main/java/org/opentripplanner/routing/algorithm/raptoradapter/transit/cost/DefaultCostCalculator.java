@@ -23,7 +23,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
   /**
    * Costs for boarding and alighting at a given stop during transfer.
-   * See TransitLayer.getStopBoardAlightTransferCosts()
+   * See RaptorTransitData.getStopBoardAlightTransferCosts()
    */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;

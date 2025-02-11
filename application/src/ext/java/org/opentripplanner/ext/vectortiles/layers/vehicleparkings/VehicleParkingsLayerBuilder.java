@@ -46,7 +46,8 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     return service
-      .listVehicleParkings().stream()
+      .listVehicleParkings()
+      .stream()
       .map(vehicleParking -> {
         Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);

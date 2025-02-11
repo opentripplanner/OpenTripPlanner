@@ -164,10 +164,9 @@ class DefaultTransitServiceTest {
     );
 
     var snapshot = timetableSnapshot.commit();
-    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
 
     service =
-      new DefaultTransitService(timetableRepository) {
+      new DefaultTransitService(timetableRepository, snapshot) {
         @Override
         public Collection<TripPattern> findPatterns(StopLocation stop) {
           if (stop.equals(STOP_B)) {

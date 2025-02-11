@@ -59,6 +59,7 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -241,22 +242,7 @@ class GraphQLIntegrationTest {
     timetableRepository.addAgency(agency);
 
     timetableRepository.initTimeZone(BERLIN);
-    timetableRepository.index();
-    var routes = Arrays
-      .stream(TransitMode.values())
-      .sorted(Comparator.comparing(Enum::name))
-      .map(m ->
-        TimetableRepositoryForTest
-          .route(m.name())
-          .withMode(m)
-          .withLongName(I18NString.of("Long name for %s".formatted(m)))
-          .withGtfsSortOrder(sortOrder(m))
-          .withBikesAllowed(bikesAllowed(m))
-          .build()
-      )
-      .toList();
 
-    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
     // Crate a calendar (needed for testing cancelled trips)
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     var firstDate = LocalDate.of(2024, 8, 8);
@@ -272,31 +258,26 @@ class GraphQLIntegrationTest {
       DataImportIssueStore.NOOP
     );
     timetableRepository.index();
+
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
     tripTimes2.cancelTrip();
     timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
 
-    TransitEditorService transitService = new DefaultTransitService(timetableRepository) {
-      private final TransitAlertService alertService = new TransitAlertServiceImpl(
-        timetableRepository
-      );
+    var routes = Arrays
+      .stream(TransitMode.values())
+      .sorted(Comparator.comparing(Enum::name))
+      .map(m ->
+        TimetableRepositoryForTest
+          .route(m.name())
+          .withMode(m)
+          .withLongName(I18NString.of("Long name for %s".formatted(m)))
+          .withGtfsSortOrder(sortOrder(m))
+          .withBikesAllowed(bikesAllowed(m))
+          .build()
+      )
+      .toList();
 
-      @Override
-      public List<TransitMode> findTransitModes(StopLocation stop) {
-        return List.of(BUS, FERRY);
-      }
-
-      @Override
-      public TransitAlertService getTransitAlertService() {
-        return alertService;
-      }
-
-      @Override
-      public Set<Route> findRoutes(StopLocation stop) {
-        return Set.of(ROUTE);
-      }
-    };
-    routes.forEach(transitService::addRoutes);
+    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
 
     final Trip addedTrip = Trip
       .of(new FeedScopedId(FEED_ID, ADDED_TRIP_ID))
@@ -335,7 +316,29 @@ class GraphQLIntegrationTest {
     }
 
     var snapshot = timetableSnapshot.commit();
-    timetableRepository.initTimetableSnapshotProvider(() -> snapshot);
+
+    TransitEditorService transitService = new DefaultTransitService(timetableRepository, snapshot) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(
+        timetableRepository
+      );
+
+      @Override
+      public List<TransitMode> findTransitModes(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+
+      @Override
+      public TransitAlertService getTransitAlertService() {
+        return alertService;
+      }
+
+      @Override
+      public Set<Route> findRoutes(StopLocation stop) {
+        return Set.of(ROUTE);
+      }
+    };
+
+    routes.forEach(transitService::addRoutes);
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)
@@ -354,35 +357,6 @@ class GraphQLIntegrationTest {
       .withEntrance(entrance)
       .build();
 
-    Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B, List.of(step1, step2, step3))
-      .bus(busRoute, 122, T11_01, T11_15, C)
-      .rail(439, T11_30, T11_50, D)
-      .carHail(D10m, E)
-      .build();
-
-    add10MinuteDelay(i1);
-
-    var busLeg = i1.getTransitLeg(1);
-    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
-
-    var fares = new ItineraryFares();
-
-    var dayPass = fareProduct("day-pass");
-    fares.addItineraryProducts(List.of(dayPass));
-
-    var singleTicket = fareProduct("single-ticket");
-    fares.addFareProduct(railLeg, singleTicket);
-    fares.addFareProduct(busLeg, singleTicket);
-    i1.setFare(fares);
-
-    i1.setFare(fares);
-    FaresToItineraryMapper.addFaresToLegs(fares, i1);
-
-    i1.setAccessibilityScore(0.5f);
-
-    railLeg.withAccessibilityScore(.3f);
-
     var entitySelector = new EntitySelector.Stop(A.stop.getId());
     var alert = TransitAlert
       .of(id("an-alert"))
@@ -398,7 +372,36 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    railLeg.addAlert(alert);
+    Itinerary i1 = newItinerary(A, T11_00)
+      .walk(20, B, List.of(step1, step2, step3))
+      .bus(busRoute, 122, T11_01, T11_15, C)
+      .rail(439, T11_30, T11_50, D)
+      .carHail(D10m, E)
+      .build();
+
+    add10MinuteDelay(i1);
+
+    var busLeg = i1.getTransitLeg(1);
+    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
+    railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
+    ArrayList<Leg> legs = new ArrayList<>(i1.getLegs());
+    legs.set(2, railLeg);
+    i1.setLegs(legs);
+
+    var fares = new ItineraryFares();
+
+    var dayPass = fareProduct("day-pass");
+    fares.addItineraryProducts(List.of(dayPass));
+
+    var singleTicket = fareProduct("single-ticket");
+    fares.addFareProduct(railLeg, singleTicket);
+    fares.addFareProduct(busLeg, singleTicket);
+    i1.setFare(fares);
+
+    i1.setFare(fares);
+    FaresToItineraryMapper.addFaresToLegs(fares, i1);
+
+    i1.setAccessibilityScore(0.5f);
 
     var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);

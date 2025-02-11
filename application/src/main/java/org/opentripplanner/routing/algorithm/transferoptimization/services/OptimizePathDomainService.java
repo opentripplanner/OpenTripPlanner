@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -79,7 +79,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
 
   /**
-   * @see TransitLayer#getStopBoardAlightTransferCosts()
+   * @see RaptorTransitData#getStopBoardAlightTransferCosts()
    */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;

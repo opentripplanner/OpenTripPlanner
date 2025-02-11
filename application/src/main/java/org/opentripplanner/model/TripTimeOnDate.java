@@ -96,7 +96,7 @@ public class TripTimeOnDate {
     Instant midnight
   ) {
     // The timetable given should always contain the trip.
-    // if the trip doesn't run on the date, the scheduled timetable should be given. 
+    // if the trip doesn't run on the date, the scheduled timetable should be given.
     TripTimes times = Objects.requireNonNull(table.getTripTimes(trip));
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
