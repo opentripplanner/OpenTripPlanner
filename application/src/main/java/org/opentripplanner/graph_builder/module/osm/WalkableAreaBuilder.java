@@ -354,7 +354,7 @@ class WalkableAreaBuilder {
           }
           j = (int) Math.floor(sum_j);
           NodeEdge edge = new NodeEdge(nodeI, nodeJ);
-          if (alreadyAddedEdges.contains(edge)) continue;
+          if (nodeI == nodeJ || alreadyAddedEdges.contains(edge)) continue;
 
           IntersectionVertex vertex2 = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
 
@@ -485,6 +485,15 @@ class WalkableAreaBuilder {
       vertex1.getCoordinate(),
       vertex2.getCoordinate(),
     };
+    double length = SphericalDistanceLibrary.distance(
+      vertex1.getCoordinate(),
+      vertex2.getCoordinate()
+    );
+    if (length < 0.01) {
+      // vertex1 and vertex2 are in the same position
+      return Set.of();
+    }
+
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     LineString line = geometryFactory.createLineString(coordinates);
 
@@ -505,15 +514,9 @@ class WalkableAreaBuilder {
       }
     }
     if (parent == null) {
-      // No intersections - not really possible if edge has some length
+      // No intersections - not really possible
       return Set.of();
     }
-
-    double length = SphericalDistanceLibrary.distance(
-      vertex1.getCoordinate(),
-      vertex2.getCoordinate()
-    );
-
     String label = String.format(
       labelTemplate,
       parent.getId(),
