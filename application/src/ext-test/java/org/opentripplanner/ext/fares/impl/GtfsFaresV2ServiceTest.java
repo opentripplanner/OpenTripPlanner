@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
@@ -23,6 +22,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -331,21 +331,29 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     List<FareLegRule> distanceRules = List.of(
       FareLegRule
         .of(DISTANCE_ID, tenKmProduct)
-        .withFareDistance(new LinearDistance(
-          Distance.ofKilometersBoxed(7d, ignore -> {}).orElse(null),
-          Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)))
+        .withFareDistance(
+          new LinearDistance(
+            Distance.ofKilometersBoxed(7d, ignore -> {}).orElse(null),
+            Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
+          )
+        )
         .build(),
       FareLegRule
         .of(DISTANCE_ID, threeKmProduct)
-        .withFareDistance(new LinearDistance(
-          Distance.ofKilometersBoxed(3d, ignore -> {}).orElse(null),
-          Distance.ofKilometersBoxed(6d, ignore -> {}).orElse(null)))
+        .withFareDistance(
+          new LinearDistance(
+            Distance.ofKilometersBoxed(3d, ignore -> {}).orElse(null),
+            Distance.ofKilometersBoxed(6d, ignore -> {}).orElse(null)
+          )
+        )
         .build(),
       FareLegRule
         .of(DISTANCE_ID, twoKmProduct)
-        .withFareDistance(new LinearDistance(
-          Distance.ofMetersBoxed(0d, ignore -> {}).orElse(null),
-          Distance.ofMetersBoxed(2000d, ignore -> {}).orElse(null))
+        .withFareDistance(
+          new LinearDistance(
+            Distance.ofMetersBoxed(0d, ignore -> {}).orElse(null),
+            Distance.ofMetersBoxed(2000d, ignore -> {}).orElse(null)
+          )
         )
         .build()
     );

@@ -17,6 +17,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.LegConstructionSupport;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -146,6 +147,7 @@ class EmissionsTest {
       .withEndTime(TIME.plusMinutes(10))
       .withServiceDate(TIME.toLocalDate())
       .withZoneId(ZoneIds.BERLIN)
+      .withDistanceMeters(LegConstructionSupport.computeDistanceMeters(pattern, 0, 2))
       .build();
   }
 }

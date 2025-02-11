@@ -64,9 +64,4 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
     }
     return visits;
   }
-
-  @Override
-  public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new FrequencyTransitLegBuilder(this).withAccessibilityScore(score).build();
-  }
 }

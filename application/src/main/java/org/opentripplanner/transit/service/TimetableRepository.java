@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFI
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import jakarta.inject.Inject;
 import java.io.Serializable;
@@ -28,16 +29,14 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.transfer.DefaultTransferService;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -69,20 +68,16 @@ import org.slf4j.LoggerFactory;
  * only in NeTEx, the NeTEx name is used in the internal model.
  *
  * A TimetableRepository instance also includes references to some transient indexes of its contents, to
- * the TransitLayer derived from it, and to some other services and utilities that operate upon
+ * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
  * its contents.
  *
  * The TimetableRepository stands in opposition to two other aggregates: the Graph (representing the
- * street network) and the TransitLayer (representing many of the same things in the TimetableRepository
+ * street network) and the RaptorTransitData (representing many of the same things in the TimetableRepository
  * but rearranged to be more efficient for Raptor routing).
  *
  * At this point the TimetableRepository is not often read directly. Many requests will look at the
- * TransitLayer rather than the TimetableRepository it's derived from. Both are often accessed via the
- * TransitService rather than directly reading the fields of TimetableRepository or TransitLayer.
- *
- * TODO RT_AB: consider renaming. By some definitions this is not really the model, but a top-level
- *   object grouping together instances of model classes with things that operate on and map those
- *   instances.
+ * RaptorTransitData rather than the TimetableRepository it's derived from. Both are often accessed via the
+ * TransitService rather than directly reading the fields of TimetableRepository or RaptorTransitData.
  */
 public class TimetableRepository implements Serializable {
 
@@ -107,32 +102,22 @@ public class TimetableRepository implements Serializable {
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
   /**
-   * The TransitLayer representation (optimized and rearranged for Raptor) of this TimetableRepository's
+   * The RaptorTransitData representation (optimized and rearranged for Raptor) of this TimetableRepository's
    * scheduled (non-realtime) contents.
    */
-  private transient TransitLayer transitLayer;
+  private transient RaptorTransitData raptorTransitData;
 
   /**
-   * This updater applies realtime changes queued up for the next TimetableSnapshot such that
-   * this TimetableRepository.realtimeSnapshot remains aligned with the service represented in
-   * (this TimetableRepository instance + that next TimetableSnapshot). This is a way of keeping the
-   * TransitLayer up to date without repeatedly deriving it from scratch every few seconds. The
-   * same incremental changes are applied to both sets of data and they are published together.
-   */
-  private transient TransitLayerUpdater transitLayerUpdater;
-
-  /**
-   * An optionally present second TransitLayer representing the contents of this TimetableRepository plus
+   * An optionally present second RaptorTransitData representing the contents of this TimetableRepository plus
    * the results of realtime updates in the latest TimetableSnapshot.
    */
-  private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
+  private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData = new ConcurrentPublished<>();
 
   private final transient Deduplicator deduplicator;
 
   private final CalendarServiceData calendarServiceData = new CalendarServiceData();
 
   private transient TimetableRepositoryIndex index;
-  private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
   private ZoneId timeZone = null;
   private boolean timeZoneExplicitlySet = false;
 
@@ -149,6 +134,8 @@ public class TimetableRepository implements Serializable {
   private final Map<FeedScopedId, FlexTrip<?, ?>> flexTripsById = new HashMap<>();
 
   private transient TransitAlertService transitAlertService;
+
+  private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
 
   @Inject
   public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
@@ -174,51 +161,45 @@ public class TimetableRepository implements Serializable {
     }
   }
 
+  /** Data model for Raptor routing, with realtime updates applied (if any). */
+  public RaptorTransitData getRaptorTransitData() {
+    return raptorTransitData;
+  }
+
+  public void setRaptorTransitData(RaptorTransitData raptorTransitData) {
+    this.raptorTransitData = raptorTransitData;
+  }
+
+  /** Data model for Raptor routing, with realtime updates applied (if any). */
   @Nullable
-  public TimetableSnapshot getTimetableSnapshot() {
-    return timetableSnapshotProvider == null
-      ? null
-      : timetableSnapshotProvider.getTimetableSnapshot();
+  public RaptorTransitData getRealtimeRaptorTransitData() {
+    return realtimeRaptorTransitData.get();
   }
 
-  public void initTimetableSnapshotProvider(TimetableSnapshotProvider timetableSnapshotProvider) {
-    if (this.timetableSnapshotProvider != null) {
-      throw new IllegalArgumentException(
-        "We support only one timetableSnapshotSource, there are two implementation; one for " +
-        "GTFS and one for Netex/Siri. They need to be refactored to work together. This cast " +
-        "will fail if updaters try setup both."
-      );
-    }
-    this.timetableSnapshotProvider = timetableSnapshotProvider;
+  /**
+   * Publish the latest snapshot of the real-time transit layer.
+   * Should be called only when creating a new RaptorTransitData, from the graph writer thread.
+   */
+  public void setRealtimeRaptorTransitData(RaptorTransitData realtimeRaptorTransitData) {
+    this.realtimeRaptorTransitData.publish(realtimeRaptorTransitData);
   }
 
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
-  public TransitLayer getTransitLayer() {
-    return transitLayer;
-  }
-
-  public void setTransitLayer(TransitLayer transitLayer) {
-    this.transitLayer = transitLayer;
-  }
-
-  /** Data model for Raptor routing, with realtime updates applied (if any). */
-  public TransitLayer getRealtimeTransitLayer() {
-    return realtimeTransitLayer.get();
-  }
-
-  public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
-    this.realtimeTransitLayer.publish(realtimeTransitLayer);
-  }
-
-  public boolean hasRealtimeTransitLayer() {
-    return realtimeTransitLayer != null;
+  /**
+   * Return true if a real-time transit layer is present.
+   * The real-time transit layer is optional,
+   * it is present only when real-time updaters are configured.
+   */
+  public boolean hasRealtimeRaptorTransitData() {
+    return realtimeRaptorTransitData != null;
   }
 
   public DefaultTransferService getTransferService() {
     return transferService;
   }
 
-  // Check to see if we have transit information for a given date
+  /**
+   * Returns true if this repository contains any transit data at the given instant.
+   */
   public boolean transitFeedCovers(Instant time) {
     return (
       !time.isBefore(this.transitServiceStarts.toInstant()) &&
@@ -234,7 +215,7 @@ public class TimetableRepository implements Serializable {
     transitModes.add(mode);
   }
 
-  /** List of transit modes that are availible in GTFS data used in this graph **/
+  /** List of transit modes that are available in GTFS data used in this graph **/
   public HashSet<TransitMode> getTransitModes() {
     return transitModes;
   }
@@ -258,11 +239,11 @@ public class TimetableRepository implements Serializable {
 
   /**
    * Get or create a serviceId for a given date. This method is used when a new trip is added from a
-   * realtime data update. It make sure the date is in the existing transit service period.
+   * realtime data update. It makes sure the date is in the existing transit service period.
    * <p>
    *
    * @param serviceDate service date for the added service id
-   * @return service-id for date if it exist or is created. If the given service date is outside the
+   * @return service-id for date if it exists or is created. If the given service date is outside the
    * service period {@code null} is returned.
    */
   @Nullable
@@ -405,8 +386,17 @@ public class TimetableRepository implements Serializable {
     this.noticesByElement.putAll(noticesByElement);
   }
 
+  /**
+   * Returns the alert service or null if the @{code updaterManager} is not set yet.
+   */
+  @Nullable
   public TransitAlertService getTransitAlertService() {
-    if (transitAlertService == null) {
+    // during initialization we must return null, otherwise we would permanently store an empty
+    // DelegatingTransitAlertServiceImpl
+    // this is wrong on many levels and should be refactored.
+    if (updaterManager == null) {
+      return null;
+    } else if (transitAlertService == null) {
       transitAlertService = new DelegatingTransitAlertServiceImpl(this);
     }
     return transitAlertService;
@@ -453,6 +443,28 @@ public class TimetableRepository implements Serializable {
     tripPatternForId.put(id, tripPattern);
   }
 
+  public void addScheduledStopPointMapping(Map<FeedScopedId, RegularStop> mapping) {
+    stopsByScheduledStopPointRefs.putAll(mapping);
+  }
+
+  /**
+   * Return the stop that is associated with the NeTEx concept of a scheduled stop point.
+   * <p>
+   * The scheduled stop point which is a "location-independent" stop that schedule systems provide
+   * which in turn can be later be resolved to an actual stop.
+   * <p>
+   * This way two schedule systems can use their own IDs for scheduled stop points but the stop (the
+   * actual physical infrastructure) is the same.
+   * <p>
+   * SIRI feeds are encouraged to refer to scheduled stop points in an EstimatedCall's stopPointRef
+   * but the specs are unclear and the reality on the ground very mixed.
+   *
+   * @link <a href="https://public.3.basecamp.com/p/TcEEP5WrNZJPBxrJU9GAjint">NeTEx Basecamp discussion</a>
+   */
+  public Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint) {
+    return Optional.ofNullable(stopsByScheduledStopPointRefs.get(scheduledStopPoint));
+  }
+
   /**
    * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
    * vertices/edges anymore.
@@ -479,10 +491,6 @@ public class TimetableRepository implements Serializable {
     return updaterManager;
   }
 
-  public TransitLayerUpdater getTransitLayerUpdater() {
-    return transitLayerUpdater;
-  }
-
   public Deduplicator getDeduplicator() {
     return deduplicator;
   }
@@ -506,10 +514,6 @@ public class TimetableRepository implements Serializable {
 
   private void updateHasTransit(boolean hasTransit) {
     this.hasTransit = this.hasTransit || hasTransit;
-  }
-
-  public void setTransitLayerUpdater(TransitLayerUpdater transitLayerUpdater) {
-    this.transitLayerUpdater = transitLayerUpdater;
   }
 
   /**
@@ -564,6 +568,13 @@ public class TimetableRepository implements Serializable {
   @Nullable
   TimetableRepositoryIndex getTimetableRepositoryIndex() {
     return index;
+  }
+
+  /**
+   * For all dates in the system get the service codes that run on it.
+   */
+  public Map<LocalDate, TIntSet> getServiceCodesRunningForDate() {
+    return Collections.unmodifiableMap(index.getServiceCodesRunningForDate());
   }
 
   public boolean isIndexed() {
