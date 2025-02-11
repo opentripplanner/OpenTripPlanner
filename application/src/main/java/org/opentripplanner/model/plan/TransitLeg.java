@@ -2,7 +2,7 @@ package org.opentripplanner.model.plan;
 
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public interface TransitLeg extends Leg {
+public interface TransitLeg extends Leg, AlertsAware<TransitLeg>, FareProductAware<TransitLeg> {
   /**
    * The mode (e.g., <code>BUS</code>) used when traversing this leg.
    */

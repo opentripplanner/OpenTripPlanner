@@ -105,9 +105,10 @@ public class EntityResolver {
     );
   }
 
+  @Nullable
   public TripOnServiceDate resolveTripOnServiceDate(
     String serviceJourneyId,
-    LocalDate serviceDate
+    @Nullable LocalDate serviceDate
   ) {
     if (serviceDate == null) {
       return null;
@@ -157,11 +158,12 @@ public class EntityResolver {
    * departure from the first stop, only the Date-part is actually used, and is defined to
    * represent the actual serviceDate. The time and zone part is ignored.
    */
-  public LocalDate resolveServiceDate(ZonedDateTime originAimedDepartureTime) {
+  @Nullable
+  public LocalDate resolveServiceDate(@Nullable ZonedDateTime originAimedDepartureTime) {
     if (originAimedDepartureTime == null) {
       return null;
     }
-    // This grab the local-date from timestamp passed into OTP ignoring the time and zone
+    // This grabs the local-date from timestamp passed into OTP ignoring the time and zone
     // information. An alternative is to use the transit model zone:
     // 'originAimedDepartureTime.withZoneSameInstant(transitService.getTimeZone())'
 
@@ -172,7 +174,8 @@ public class EntityResolver {
    * Resolve a {@link Trip} by resolving a service journey id from FramedVehicleJourneyRef ->
    * DatedVehicleJourneyRef.
    */
-  public Trip resolveTrip(FramedVehicleJourneyRefStructure journey) {
+  @Nullable
+  public Trip resolveTrip(@Nullable FramedVehicleJourneyRefStructure journey) {
     if (journey != null) {
       return resolveTrip(journey.getDatedVehicleJourneyRef());
     }
@@ -184,10 +187,15 @@ public class EntityResolver {
   }
 
   /**
-   * Resolve a {@link RegularStop} from a quay id.
+   * Resolve a {@link RegularStop} from a scheduled stop point or quay id.
+   *
+   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
    */
-  public RegularStop resolveQuay(String quayRef) {
-    return transitService.getRegularStop(resolveId(quayRef));
+  public RegularStop resolveQuay(String stopPointRef) {
+    var id = resolveId(stopPointRef);
+    return transitService
+      .findStopByScheduledStopPoint(id)
+      .orElseGet(() -> transitService.getRegularStop(id));
   }
 
   /**
