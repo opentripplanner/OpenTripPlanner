@@ -17,7 +17,7 @@ public class CanceledTripTest implements RealtimeTestConstants {
   @Test
   void listCanceledTrips() {
     var env = RealtimeTestEnvironment
-      .gtfs()
+      .of()
       .addTrip(
         TripInput
           .of(TRIP_1_ID)

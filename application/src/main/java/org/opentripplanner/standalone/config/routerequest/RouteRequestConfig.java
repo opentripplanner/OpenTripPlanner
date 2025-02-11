@@ -636,6 +636,19 @@ your users receive a timely response. You can also limit the max duration. There
           )
           .asDouble(dft.reluctance())
       )
+      .withBoardCost(
+        c
+          .of("boardCost")
+          .since(V2_7)
+          .summary(
+            "Prevents unnecessary transfers by adding a cost for boarding a transit vehicle."
+          )
+          .description(
+            "This is the cost that is used when boarding while driving. " +
+            "This can be different compared to the boardCost while walking or cycling."
+          )
+          .asInt(dft.boardCost())
+      )
       .withPickupCost(
         c
           .of("pickupCost")

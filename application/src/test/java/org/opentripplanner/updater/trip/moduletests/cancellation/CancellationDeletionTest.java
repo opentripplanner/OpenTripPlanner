@@ -36,7 +36,7 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
     var env = RealtimeTestEnvironment
-      .gtfs()
+      .of()
       .addTrip(
         TripInput
           .of(TRIP_1_ID)
@@ -77,7 +77,7 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var addedTripId = "added-trip";
     // First add ADDED trip
     var update = new TripUpdateBuilder(

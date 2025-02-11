@@ -23,6 +23,7 @@ public final class CarPreferences implements Serializable {
   public static final CarPreferences DEFAULT = new CarPreferences();
 
   private final double reluctance;
+  private final Cost boardCost;
   private final VehicleParkingPreferences parking;
   private final VehicleRentalPreferences rental;
   private final Duration pickupTime;
@@ -33,6 +34,7 @@ public final class CarPreferences implements Serializable {
   /** Create a new instance with default values. */
   private CarPreferences() {
     this.reluctance = 2.0;
+    this.boardCost = Cost.costOfMinutes(10);
     this.parking = VehicleParkingPreferences.DEFAULT;
     this.rental = VehicleRentalPreferences.DEFAULT;
     this.pickupTime = Duration.ofMinutes(1);
@@ -43,6 +45,7 @@ public final class CarPreferences implements Serializable {
 
   private CarPreferences(Builder builder) {
     this.reluctance = Units.reluctance(builder.reluctance);
+    this.boardCost = builder.boardCost;
     this.parking = builder.parking;
     this.rental = builder.rental;
     this.pickupTime = Duration.ofSeconds(Units.duration(builder.pickupTime));
@@ -61,6 +64,15 @@ public final class CarPreferences implements Serializable {
 
   public double reluctance() {
     return reluctance;
+  }
+
+  /**
+   * Separate cost for boarding a vehicle with a car, which is different compared to on foot or with a bicycle. This
+   * is in addition to the cost of the transfer and waiting-time. It is also in addition to
+   * the {@link TransferPreferences#cost()}.
+   */
+  public int boardCost() {
+    return boardCost.toSeconds();
   }
 
   /** Parking preferences that can be different per request */
@@ -106,6 +118,7 @@ public final class CarPreferences implements Serializable {
     CarPreferences that = (CarPreferences) o;
     return (
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
+      boardCost.equals(that.boardCost) &&
       parking.equals(that.parking) &&
       rental.equals(that.rental) &&
       Objects.equals(pickupTime, that.pickupTime) &&
@@ -119,6 +132,7 @@ public final class CarPreferences implements Serializable {
   public int hashCode() {
     return Objects.hash(
       reluctance,
+      boardCost,
       parking,
       rental,
       pickupTime,
@@ -133,6 +147,7 @@ public final class CarPreferences implements Serializable {
     return ToStringBuilder
       .of(CarPreferences.class)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
+      .addObj("boardCost", boardCost, DEFAULT.boardCost)
       .addObj("parking", parking, DEFAULT.parking)
       .addObj("rental", rental, DEFAULT.rental)
       .addObj("pickupTime", pickupTime, DEFAULT.pickupTime)
@@ -147,6 +162,7 @@ public final class CarPreferences implements Serializable {
 
     private final CarPreferences original;
     private double reluctance;
+    private Cost boardCost;
     private VehicleParkingPreferences parking;
     private VehicleRentalPreferences rental;
     private int pickupTime;
@@ -157,6 +173,7 @@ public final class CarPreferences implements Serializable {
     public Builder(CarPreferences original) {
       this.original = original;
       this.reluctance = original.reluctance;
+      this.boardCost = original.boardCost;
       this.parking = original.parking;
       this.rental = original.rental;
       this.pickupTime = (int) original.pickupTime.toSeconds();
@@ -171,6 +188,15 @@ public final class CarPreferences implements Serializable {
 
     public Builder withReluctance(double reluctance) {
       this.reluctance = reluctance;
+      return this;
+    }
+
+    public Cost boardCost() {
+      return boardCost;
+    }
+
+    public Builder withBoardCost(int boardCost) {
+      this.boardCost = Cost.costOfSeconds(boardCost);
       return this;
     }
 

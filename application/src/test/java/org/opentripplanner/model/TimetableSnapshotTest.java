@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -303,7 +303,9 @@ public class TimetableSnapshotTest {
 
     AtomicBoolean updateIsCalled = new AtomicBoolean();
 
-    TransitLayerUpdater transitLayer = new TransitLayerUpdater(null) {
+    RealTimeRaptorTransitDataUpdater raptorTransitData = new RealTimeRaptorTransitDataUpdater(
+      null
+    ) {
       @Override
       public void update(
         Collection<Timetable> updatedTimetables,
@@ -315,7 +317,7 @@ public class TimetableSnapshotTest {
       }
     };
 
-    snapshot.commit(transitLayer, true);
+    snapshot.commit(raptorTransitData, true);
 
     assertTrue(updateIsCalled.get());
   }
@@ -417,13 +419,13 @@ public class TimetableSnapshotTest {
   }
 
   /**
-   * This test checks that the original timetable is given to TransitLayerUpdater for previously
+   * This test checks that the original timetable is given to RaptorTransitDataUpdater for previously
    * added patterns after the buffer is cleared.
    * <p>
    * Refer to bug #6197 for details.
    */
   @Test
-  void testTransitLayerUpdateAfterClear() {
+  void testRaptorTransitDataUpdaterAfterClear() {
     var resolver = new TimetableSnapshot();
 
     // make an updated trip
@@ -478,7 +480,7 @@ public class TimetableSnapshotTest {
       false
     );
 
-    var transitLayerUpdater = new TransitLayerUpdater(null) {
+    var raptorTransitDataUpdater = new RealTimeRaptorTransitDataUpdater(null) {
       int count = 0;
 
       /**
@@ -531,16 +533,16 @@ public class TimetableSnapshotTest {
 
     resolver.update(realTimeTripUpdate);
     resolver.update(addedTripUpdate);
-    resolver.commit(transitLayerUpdater, true);
+    resolver.commit(raptorTransitDataUpdater, true);
 
     resolver.clear(feedId);
     resolver.clear(feedId);
     resolver.clear(feedId);
-    assertTrue(resolver.commit(transitLayerUpdater, true).isEmpty());
+    assertTrue(resolver.commit(raptorTransitDataUpdater, true).isEmpty());
 
     resolver.clear(feedId);
     resolver.clear(feedId);
-    assertTrue(resolver.commit(transitLayerUpdater, true).isEmpty());
+    assertTrue(resolver.commit(raptorTransitDataUpdater, true).isEmpty());
   }
 
   private static TimetableSnapshot createCommittedSnapshot() {

@@ -58,10 +58,10 @@
 
 
     <properties>
-        <otp.serialization.version.id>178</otp.serialization.version.id>
+        <otp.serialization.version.id>183</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>32.1</geotools.version>
+        <geotools.version>32.2</geotools.version>
         <google.dagger.version>2.54</google.dagger.version>
         <jackson.version>2.18.2</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
@@ -74,8 +74,8 @@
         <micrometer.version>1.14.3</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.28.3</protobuf.version>
-        <siri-java-model.version>1.28</siri-java-model.version>
+        <protobuf.version>4.29.3</protobuf.version>
+        <siri-java-model.version>2.0.0</siri-java-model.version>
         <slf4j.version>2.0.16</slf4j.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -129,13 +129,6 @@
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>com.google.dagger</groupId>
-                            <artifactId>dagger-compiler</artifactId>
-                            <version>${google.dagger.version}</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>
@@ -305,8 +298,6 @@
                     <inputGlobs>
                         <inputGlob>src/main/java/**/*.java</inputGlob>
                         <inputGlob>src/test/java/**/*.java</inputGlob>
-                        <inputGlob>src/**/*.json</inputGlob>
-                        <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
                     </inputGlobs>
                 </configuration>
                 <executions>
@@ -396,7 +387,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.51.0</version>
+                <version>26.54.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

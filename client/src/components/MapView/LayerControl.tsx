@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import type { AnyLayer, ControlPosition } from 'react-map-gl';
+import type { ControlPosition } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre';
 
 interface Layer {
@@ -39,8 +39,9 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         .map((layer) => {
           // Try to pick up a pretty name from metadata if available.
           let name = layer.id;
-          if ((layer as AnyLayer).metadata?.name) {
-            name = (layer as AnyLayer).metadata.name;
+          const layerName = (layer.metadata as Record<string, string>)?.name;
+          if (layerName) {
+            name = layerName;
           }
           return { id: layer.id, name };
         });
@@ -53,7 +54,7 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
         .filter((layer) => layer.type !== 'raster' && !layer.id.startsWith('jsx'))
         .reverse() // so that the topmost layers appear first
         .forEach((layer) => {
-          const groupName = (layer as AnyLayer).metadata?.group || 'Misc';
+          const groupName = (layer.metadata as Record<string, string>)?.group || 'Misc';
           if (!groups[groupName]) {
             groups[groupName] = [];
           }
