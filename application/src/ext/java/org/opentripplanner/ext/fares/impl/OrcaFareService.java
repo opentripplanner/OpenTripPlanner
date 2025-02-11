@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import com.google.common.collect.Lists;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Currency;
@@ -370,7 +371,7 @@ public class OrcaFareService extends DefaultFareService {
         if (
           leg
             .getStartTime()
-            .isBefore(ZonedDateTime.of(2025, 3, 1, 0, 0, 0, 0, leg.getStartTime().getZone()))
+            .isBefore(LocalDate.of(2025, 3, 1).atStartOfDay(leg.getStartTime().getZone()))
         ) {
           yield optionalUSD(1.25f);
         } else {
