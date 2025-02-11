@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
+import static org.opentripplanner.raptorlegacy._data.api.BasicPathTestCase.C1_CALCULATOR;
 
 import java.util.List;
 import java.util.Objects;

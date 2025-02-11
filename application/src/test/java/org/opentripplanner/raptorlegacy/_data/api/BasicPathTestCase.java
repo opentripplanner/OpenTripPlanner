@@ -1,4 +1,4 @@
-package org.opentripplanner.raptorlegacy._data.stoparrival;
+package org.opentripplanner.raptorlegacy._data.api;
 
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.TimeUtils.time;

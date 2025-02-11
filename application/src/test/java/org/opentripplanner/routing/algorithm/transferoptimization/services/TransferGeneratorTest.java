@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
+import static org.opentripplanner.raptorlegacy._data.api.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptorlegacy._data.transit.TestRoute.route;
 import static org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule.schedule;
 
