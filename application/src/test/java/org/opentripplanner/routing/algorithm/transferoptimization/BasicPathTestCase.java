@@ -1,4 +1,4 @@
-package org.opentripplanner.raptorlegacy._data.api;
+package org.opentripplanner.routing.algorithm.transferoptimization;
 
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 import static org.opentripplanner.utils.time.TimeUtils.time;
