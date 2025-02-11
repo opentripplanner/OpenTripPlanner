@@ -364,7 +364,7 @@ class WalkableAreaBuilder {
           };
           LineString line = geometryFactory.createLineString(coordinates);
           if (polygon.contains(line)) {
-            Set<AreaEdge> segments = createSegments(vertex1, vertex2, group.areas, edgeList);
+            Set<AreaEdge> segments = createSegments(vertex1, vertex2, group.areas, edgeList, true);
             edges.addAll(segments);
             if (platformLinkingVertices.contains(vertex1)) {
               ringEdges.addAll(segments);
@@ -472,14 +472,15 @@ class WalkableAreaBuilder {
     IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent);
     IntersectionVertex v2 = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
 
-    return createSegments(v1, v2, List.of(area), edgeList);
+    return createSegments(v1, v2, List.of(area), edgeList, false);
   }
 
   private Set<AreaEdge> createSegments(
     IntersectionVertex vertex1,
     IntersectionVertex vertex2,
     Collection<Area> areas,
-    AreaEdgeList edgeList
+    AreaEdgeList edgeList,
+    boolean testIntersection
   ) {
     Coordinate[] coordinates = new Coordinate[] {
       vertex1.getCoordinate(),
@@ -505,8 +506,8 @@ class WalkableAreaBuilder {
     // combine properties of intersected areas
     for (Area area : areas) {
       MultiPolygon polygon = area.jtsMultiPolygon;
-      Geometry intersection = polygon.intersection(line);
-      if (intersection.getLength() > 0.000001) {
+      boolean crosses = testIntersection ? polygon.intersection(line).getLength() > 0.000001 : true;
+      if (crosses) {
         parent = area.parent;
         wayData = getAreaProperties(parent);
         areaPermissions = areaPermissions.intersection(wayData.getPermission());
