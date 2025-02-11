@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.api.model;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -13,6 +14,26 @@ import org.opentripplanner.utils.time.TimeUtils;
  * to Raptor - all these are the same thing.
  */
 public interface RaptorAccessEgress {
+  /**
+   * Raptor may decorate access/egress passed into Raptor. Use this method to get the original
+   * instance of a given {@code type} type passed into Raptor. The first element matching the the
+   * given {@code type} in the chain of delegates (see {@link AbstractAccessEgressDecorator}) is
+   * returned.
+   * <p>
+   * This method is primarily for use outside Raptor to get the base access-egress instant to
+   * access the EXTENDED state of the base type - state not part of the Raptor interface. This is
+   * useful in the caller to get access to additional information stored in the base type.
+   * <p>
+   * Be careful, calling methods part of the {@link RaptorAccessEgress} interface on the returned
+   * value will no longer be decorated - not be the value used by Raptor.
+   *
+   * @throws IllegalStateException if the given {@code parentType} does not exist in the chain
+   *  of delegates including the first and last element.
+   */
+  default <T extends RaptorAccessEgress> Optional<T> findOriginal(Class<T> type) {
+    return AbstractAccessEgressDecorator.findType(this, type);
+  }
+
   /**
    * <ul>
    *     <li>Access: The first stop in the journey, where the access path just arrived at.

@@ -39,7 +39,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     this.generalizedCost = generalizedCost;
     this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
     this.penalty = penalty;
-    this.lastState = lastState;
+    this.lastState = Objects.requireNonNull(lastState);
   }
 
   public DefaultAccessEgress(int stop, State lastState) {
@@ -63,7 +63,7 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
       penalty,
       other.getLastState()
     );
-    if (other.hasPenalty()) {
+    if (other.penalty() != TimeAndCost.ZERO) {
       throw new IllegalStateException("Can not add penalty twice...");
     }
   }
@@ -101,11 +101,6 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   @Override
   public boolean isWalkOnly() {
     return lastState.containsOnlyWalkMode();
-  }
-
-  @Override
-  public boolean hasPenalty() {
-    return !penalty.isZero();
   }
 
   @Override
