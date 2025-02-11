@@ -87,6 +87,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [boardSlackForMode](#rd_boardSlackForMode)                                                                   | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                                         | *Optional* |                  |  2.0  |
 | car                                                                                                          |        `object`        | Car preferences.                                                                                                                                         | *Optional* |                  |  2.5  |
 |    accelerationSpeed                                                                                         |        `double`        | The acceleration speed of an automobile, in meters per second per second.                                                                                | *Optional* | `2.9`            |  2.0  |
+|    [boardCost](#rd_car_boardCost)                                                                            |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.                                                                          | *Optional* | `600`            |  2.7  |
 |    decelerationSpeed                                                                                         |        `double`        | The deceleration speed of an automobile, in meters per second per second.                                                                                | *Optional* | `2.9`            |  2.0  |
 |    pickupCost                                                                                                |        `integer`       | Add a cost for car pickup changes when a pickup or drop off takes place                                                                                  | *Optional* | `120`            |  2.1  |
 |    pickupTime                                                                                                |       `duration`       | Add a time for car pickup changes when a pickup or drop off takes place                                                                                  | *Optional* | `"PT1M"`         |  2.1  |
@@ -617,6 +618,15 @@ How much extra time should be given when boarding a vehicle for each given mode.
 Sometimes there is a need to configure a board times for specific modes, such as airplanes or
 ferries, where the check-in process needs to be done in good time before ride.
 
+
+<h3 id="rd_car_boardCost">boardCost</h3>
+
+**Since version:** `2.7` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `600`   
+**Path:** /routingDefaults/car 
+
+Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.
+
+This is the cost that is used when boarding while driving. This can be different compared to the boardCost while walking or cycling.
 
 <h3 id="rd_car_parking_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
 
@@ -1209,6 +1219,7 @@ include stairs as a last result.
     },
     "car" : {
       "reluctance" : 10,
+      "boardCost" : 600,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {

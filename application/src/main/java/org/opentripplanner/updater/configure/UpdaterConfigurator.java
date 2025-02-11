@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.configure;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -19,17 +20,15 @@ import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
-import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.siri.updater.configure.SiriUpdaterModule;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
-import org.opentripplanner.updater.siri.updater.lite.SiriLiteHttpLoader;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
+import org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
-import org.opentripplanner.updater.trip.TimetableSnapshotSource;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
@@ -53,8 +52,7 @@ public class UpdaterConfigurator {
   private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
   private final VehicleParkingRepository parkingRepository;
-  private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
-  private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
+  private final TimetableSnapshotManager snapshotManager;
 
   private UpdaterConfigurator(
     Graph graph,
@@ -62,6 +60,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
@@ -70,6 +69,7 @@ public class UpdaterConfigurator {
     this.timetableRepository = timetableRepository;
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
+    this.snapshotManager = snapshotManager;
   }
 
   public static void configure(
@@ -78,6 +78,7 @@ public class UpdaterConfigurator {
     VehicleRentalRepository vehicleRentalRepository,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
+    TimetableSnapshotManager snapshotManager,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
@@ -86,6 +87,7 @@ public class UpdaterConfigurator {
       vehicleRentalRepository,
       parkingRepository,
       timetableRepository,
+      snapshotManager,
       updatersParameters
     )
       .configure();
@@ -103,18 +105,13 @@ public class UpdaterConfigurator {
       )
     );
 
-    TimetableSnapshot timetableSnapshotBuffer = null;
-    if (siriTimetableSnapshotSource != null) {
-      timetableSnapshotBuffer = siriTimetableSnapshotSource.getTimetableSnapshotBuffer();
-    } else if (gtfsTimetableSnapshotSource != null) {
-      timetableSnapshotBuffer = gtfsTimetableSnapshotSource.getTimetableSnapshotBuffer();
-    }
+    TimetableSnapshot timetableSnapshotBuffer = snapshotManager.getTimetableSnapshotBuffer();
     GraphUpdaterManager updaterManager = new GraphUpdaterManager(
       new DefaultRealTimeUpdateContext(graph, timetableRepository, timetableSnapshotBuffer),
       updaters
     );
 
-    configureTimetableSnapshotFlush(updaterManager);
+    configureTimetableSnapshotFlush(updaterManager, snapshotManager);
 
     updaterManager.startUpdaters();
 
@@ -178,23 +175,19 @@ public class UpdaterConfigurator {
       updaters.add(new GtfsRealtimeAlertsUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
-      updaters.add(new PollingTripUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(new PollingTripUpdater(configItem, provideGtfsAdapter()));
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(
-        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
-      );
+      updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
-      updaters.add(
-        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
-      );
+      updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
-      updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
@@ -203,7 +196,7 @@ public class UpdaterConfigurator {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
-      updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
       switch (configItem.updateType()) {
@@ -225,7 +218,7 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
-      updaters.add(new SiriAzureETUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(new SiriAzureETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
       updaters.add(new SiriAzureSXUpdater(configItem, timetableRepository));
@@ -234,43 +227,33 @@ public class UpdaterConfigurator {
     return updaters;
   }
 
-  private SiriTimetableSnapshotSource provideSiriTimetableSnapshot() {
-    if (siriTimetableSnapshotSource == null) {
-      this.siriTimetableSnapshotSource =
-        new SiriTimetableSnapshotSource(
-          updatersParameters.timetableSnapshotParameters(),
-          timetableRepository
-        );
-    }
-
-    return siriTimetableSnapshotSource;
+  private SiriRealTimeTripUpdateAdapter provideSiriAdapter() {
+    return new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
   }
 
-  private TimetableSnapshotSource provideGtfsTimetableSnapshot() {
-    if (gtfsTimetableSnapshotSource == null) {
-      this.gtfsTimetableSnapshotSource =
-        new TimetableSnapshotSource(
-          updatersParameters.timetableSnapshotParameters(),
-          timetableRepository
-        );
-    }
-    return gtfsTimetableSnapshotSource;
+  private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
+    return new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      () -> LocalDate.now(timetableRepository.getTimeZone())
+    );
   }
 
   /**
    * If SIRI or GTFS real-time updaters are in use, configure a periodic flush of the timetable
    * snapshot.
    */
-  private void configureTimetableSnapshotFlush(GraphUpdaterManager updaterManager) {
-    if (siriTimetableSnapshotSource != null || gtfsTimetableSnapshotSource != null) {
-      updaterManager
-        .getScheduler()
-        .scheduleWithFixedDelay(
-          new TimetableSnapshotFlush(siriTimetableSnapshotSource, gtfsTimetableSnapshotSource),
-          0,
-          updatersParameters.timetableSnapshotParameters().maxSnapshotFrequency().toSeconds(),
-          TimeUnit.SECONDS
-        );
-    }
+  private void configureTimetableSnapshotFlush(
+    GraphUpdaterManager updaterManager,
+    TimetableSnapshotManager snapshotManager
+  ) {
+    updaterManager
+      .getScheduler()
+      .scheduleWithFixedDelay(
+        new TimetableSnapshotFlush(snapshotManager),
+        0,
+        updatersParameters.timetableSnapshotParameters().maxSnapshotFrequency().toSeconds(),
+        TimeUnit.SECONDS
+      );
   }
 }

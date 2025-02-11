@@ -13,7 +13,6 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -109,9 +108,6 @@ public interface OtpServerRequestContext {
   StreetLimitationParametersService streetLimitationParametersService();
 
   MeterRegistry meterRegistry();
-
-  /** Inspector/debug services */
-  TileRendererManager tileRendererManager();
 
   /**
    * Callback which is injected into the {@code DirectStreetRouter}, used to visualize the

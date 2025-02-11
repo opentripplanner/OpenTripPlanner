@@ -21,7 +21,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
@@ -57,14 +57,14 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  * fetching tables of specific information like the routes passing through a particular stop, or for
  * gaining access to the entirety of the data to perform routing.
  * <p>
- * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TimetableRepository.
- *   Is this intentional, because TransitLayer is meant to be read-only and TimetableRepository is not?
+ * TODO RT_AB: this interface seems to provide direct access to RaptorTransitData but not TimetableRepository.
+ *   Is this intentional, because RaptorTransitData is meant to be read-only and TimetableRepository is not?
  *   Should this be renamed TransitDataService since it seems to provide access to the data but
  *   not to transit routing functionality (which is provided by the RoutingService)?
  *   The DefaultTransitService implementation has a TimetableRepository instance and many of its methods
  *   read through to that TimetableRepository instance. But that field itself is not exposed, while the
- *   TransitLayer is here. It seems like exposing the raw TransitLayer is still a risk since it's
- *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
+ *   RaptorTransitData is here. It seems like exposing the raw RaptorTransitData is still a risk since it's
+ *   copy-on-write and shares a lot of objects with any other RaptorTransitData instances.
  */
 public interface TransitService {
   Collection<String> listFeedIds();
@@ -258,9 +258,9 @@ public interface TransitService {
 
   Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
-  TransitLayer getTransitLayer();
+  RaptorTransitData getRaptorTransitData();
 
-  TransitLayer getRealtimeTransitLayer();
+  RaptorTransitData getRealtimeRaptorTransitData();
 
   CalendarService getCalendarService();
 
@@ -332,6 +332,11 @@ public interface TransitService {
    * @return true if the trip exists, false otherwise
    */
   boolean containsTrip(FeedScopedId id);
+
+  /**
+   * @see TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   */
+  Optional<RegularStop> findStopByScheduledStopPoint(FeedScopedId scheduledStopPoint);
 
   /**
    * Returns a list of {@link RegularStop}s that lay within a bounding box and match the other criteria

@@ -6,13 +6,13 @@ import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
 import com.google.cloud.pubsub.v1.SubscriptionAdminClient;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.pubsub.v1.ExpirationPolicy;
 import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.ProjectTopicName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.PushConfig;
 import com.google.pubsub.v1.Subscription;
+import jakarta.xml.bind.JAXBException;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
@@ -24,7 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
-import org.entur.protobuf.mapper.SiriMapper;
+import javax.xml.stream.XMLStreamException;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
@@ -32,11 +32,11 @@ import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.updater.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.utils.text.FileSizeToTextConverter;
 import org.opentripplanner.utils.time.DurationUtils;
+import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
-import uk.org.siri.www.siri.SiriType;
 
 /**
  * A source of estimated timetables that reads SIRI-ET messages from a Google PubSub subscription.
@@ -59,8 +59,8 @@ import uk.org.siri.www.siri.SiriType;
  * <pre>
  *   "type": "google-pubsub-siri-et-updater",
  *   "projectName":"project-1234",                                                      // Google Cloud project name
- *   "topicName": "protobuf.estimated_timetables",                                      // Google Cloud Pubsub topic
- *   "dataInitializationUrl": "http://server/realtime/protobuf/et"  // Optional URL used to initialize OTP with all existing data
+ *   "topicName": "xml.estimated_timetables",                                           // Google Cloud Pubsub topic
+ *   "dataInitializationUrl": "http://server/realtime/xml/et"  // Optional URL used to initialize OTP with all existing data
  * </pre>
  */
 public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimetableSource {
@@ -80,7 +80,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
 
   /**
    * The URL used to fetch all initial updates.
-   * The URL responds to HTTP GET and returns all initial data in protobuf-format. It will be
+   * The URL responds to HTTP GET and returns all initial data in xml-format. It will be
    * called once to initialize real-time-data.
    * All subsequent updates will be received from Google Cloud Pubsub.
    */
@@ -245,16 +245,15 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   }
 
   /**
-   * Decode the protobuf-encoded message payload into an optional SIRI ServiceDelivery.
+   * Decode the xml-encoded message payload into an optional SIRI ServiceDelivery.
    */
   private Optional<ServiceDelivery> serviceDelivery(ByteString data) {
-    SiriType siriType;
+    Siri siri;
     try {
-      siriType = SiriType.parseFrom(data);
-    } catch (InvalidProtocolBufferException e) {
+      siri = SiriXml.parseXml(data.toStringUtf8());
+    } catch (XMLStreamException | JAXBException e) {
       throw new RuntimeException(e);
     }
-    Siri siri = SiriMapper.mapToJaxb(siriType);
     return Optional.ofNullable(siri.getServiceDelivery());
   }
 
@@ -306,7 +305,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
       return otpHttpClient.getAndMap(
         dataInitializationUrl,
         initialGetDataTimeout,
-        Map.of("Content-Type", "application/x-protobuf"),
+        Map.of("Content-Type", "application/xml"),
         ByteString::readFrom
       );
     }

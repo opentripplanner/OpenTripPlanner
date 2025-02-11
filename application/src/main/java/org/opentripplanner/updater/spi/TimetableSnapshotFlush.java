@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.spi;
 
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.trip.TimetableSnapshotSource;
+import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,27 +13,17 @@ public class TimetableSnapshotFlush implements Runnable {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotFlush.class);
 
-  private final SiriTimetableSnapshotSource siriTimetableSnapshotSource;
-  private final TimetableSnapshotSource gtfsTimetableSnapshotSource;
+  private final TimetableSnapshotManager snapshotManager;
 
-  public TimetableSnapshotFlush(
-    SiriTimetableSnapshotSource siriTimetableSnapshotSource,
-    TimetableSnapshotSource gtfsTimetableSnapshotSource
-  ) {
-    this.siriTimetableSnapshotSource = siriTimetableSnapshotSource;
-    this.gtfsTimetableSnapshotSource = gtfsTimetableSnapshotSource;
+  public TimetableSnapshotFlush(TimetableSnapshotManager snapshotManager) {
+    this.snapshotManager = snapshotManager;
   }
 
   @Override
   public void run() {
     try {
       LOG.debug("Flushing timetable snapshot buffer");
-      if (siriTimetableSnapshotSource != null) {
-        siriTimetableSnapshotSource.flushBuffer();
-      }
-      if (gtfsTimetableSnapshotSource != null) {
-        gtfsTimetableSnapshotSource.flushBuffer();
-      }
+      snapshotManager.purgeAndCommit();
       LOG.debug("Flushed timetable snapshot buffer");
     } catch (Throwable t) {
       LOG.error("Error flushing timetable snapshot buffer", t);

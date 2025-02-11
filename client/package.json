@@ -24,11 +24,11 @@
     "bootstrap": "5.3.3",
     "graphql": "16.10.0",
     "graphql-request": "7.1.2",
-    "maplibre-gl": "4.7.1",
+    "maplibre-gl": "5.1.0",
     "react": "19.0.0",
     "react-bootstrap": "2.10.7",
     "react-dom": "19.0.0",
-    "react-map-gl": "7.1.8",
+    "react-map-gl": "8.0.0",
     "react-select": "5.9.0"
   },
   "devDependencies": {
@@ -42,7 +42,7 @@
     "@types/react": "19.0.4",
     "@types/react-dom": "19.0.2",
     "@vitejs/plugin-react": "4.3.4",
-    "@vitest/coverage-v8": "3.0.2",
+    "@vitest/coverage-v8": "3.0.5",
     "eslint": "9.18.0",
     "eslint-config-prettier": "10.0.1",
     "eslint-plugin-import": "2.31.0",
@@ -56,6 +56,6 @@
     "typescript": "5.7.3",
     "typescript-eslint": "8.19.1",
     "vite": "6.0.9",
-    "vitest": "3.0.2"
+    "vitest": "3.0.5"
   }
 }

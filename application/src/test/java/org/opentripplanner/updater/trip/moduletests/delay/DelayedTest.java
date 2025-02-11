@@ -30,7 +30,7 @@ class DelayedTest implements RealtimeTestConstants {
       .addStop(STOP_A1, "0:00:10", "0:00:11")
       .addStop(STOP_B1, "0:00:20", "0:00:21")
       .build();
-    var env = RealtimeTestEnvironment.gtfs().addTrip(TRIP_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
@@ -80,7 +80,7 @@ class DelayedTest implements RealtimeTestConstants {
       .addStop(STOP_C1, "0:15:00", "0:16:00")
       .addStop(STOP_D1, "0:20:00", "0:20:00")
       .build();
-    var env = RealtimeTestEnvironment.gtfs().addTrip(tripInput).build();
+    var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)

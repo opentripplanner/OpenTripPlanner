@@ -5,8 +5,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +12,6 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -36,6 +33,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -51,19 +49,19 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
   private final LineString legGeometry;
-  private final Set<TransitAlert> transitAlerts = new HashSet<>();
+  private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
-  protected final Integer boardStopPosInPattern;
-  protected final Integer alightStopPosInPattern;
+  protected final int boardStopPosInPattern;
+  protected final int alightStopPosInPattern;
   private final int generalizedCost;
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private final TripOnServiceDate tripOnServiceDate;
-  private double distanceMeters;
+  private final double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
-  private List<FareProductUse> fareProducts = List.of();
+  private final List<FareProductUse> fareProducts;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     this.tripTimes = builder.tripTimes();
@@ -76,7 +74,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.endTime = builder.endTime();
 
     this.serviceDate = builder.serviceDate();
-    this.zoneId = Objects.requireNonNull(builder.zoneId());
+    this.zoneId = Objects.requireNonNull(builder.zoneId(), "zoneId");
 
     this.tripOnServiceDate = builder.tripOnServiceDate();
 
@@ -86,19 +84,23 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.generalizedCost = builder.generalizedCost();
 
     this.accessibilityScore = builder.accessibilityScore();
-    List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
+    List<Coordinate> transitLegCoordinates = LegConstructionSupport.extractTransitLegCoordinates(
       tripPattern,
       builder.boardStopIndexInPattern(),
       builder.alightStopIndexInPattern()
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    setDistanceMeters(getDistanceFromCoordinates(transitLegCoordinates));
+    this.distanceMeters =
+      DoubleUtils.roundTo2Decimals(
+        Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
+      );
     this.directDistanceMeters =
-      getDistanceFromCoordinates(
+      GeometryUtils.sumDistances(
         List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
       );
-    this.transitAlerts.addAll(builder.alerts());
+    this.transitAlerts = Set.copyOf(builder.alerts());
+    this.fareProducts = List.copyOf(builder.fareProducts());
   }
 
   public ZoneId getZoneId() {
@@ -232,11 +234,6 @@ public class ScheduledTransitLeg implements TransitLeg {
     return distanceMeters;
   }
 
-  /** Only for testing purposes */
-  protected void setDistanceMeters(double distanceMeters) {
-    this.distanceMeters = DoubleUtils.roundTo2Decimals(distanceMeters);
-  }
-
   public double getDirectDistanceMeters() {
     return directDistanceMeters;
   }
@@ -293,6 +290,16 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public Set<TransitAlert> getTransitAlerts() {
     return transitAlerts;
+  }
+
+  @Override
+  public ScheduledTransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
+    return copy().withAlerts(alerts).build();
+  }
+
+  @Override
+  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+    return copy().withFareProducts(fares).build();
   }
 
   @Override
@@ -377,28 +384,19 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public void addAlert(TransitAlert alert) {
-    transitAlerts.add(alert);
-  }
-
-  @Override
-  public void setFareProducts(List<FareProductUse> products) {
-    this.fareProducts = List.copyOf(products);
-  }
-
-  @Override
   public List<FareProductUse> fareProducts() {
     return fareProducts;
   }
 
   @Override
   @Nullable
+  @Sandbox
   public Float accessibilityScore() {
     return accessibilityScore;
   }
 
-  public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new ScheduledTransitLegBuilder<>(this).withAccessibilityScore(score).build();
+  public ScheduledTransitLegBuilder copy() {
+    return new ScheduledTransitLegBuilder<>(this);
   }
 
   /**
@@ -437,29 +435,5 @@ public class ScheduledTransitLeg implements TransitLeg {
    */
   private Trip trip() {
     return tripTimes.getTrip();
-  }
-
-  private List<Coordinate> extractTransitLegCoordinates(
-    TripPattern tripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern
-  ) {
-    List<Coordinate> transitLegCoordinates = new ArrayList<>();
-
-    for (int i = boardStopIndexInPattern + 1; i <= alightStopIndexInPattern; i++) {
-      transitLegCoordinates.addAll(
-        Arrays.asList(tripPattern.getHopGeometry(i - 1).getCoordinates())
-      );
-    }
-
-    return transitLegCoordinates;
-  }
-
-  private double getDistanceFromCoordinates(List<Coordinate> coordinates) {
-    double distance = 0;
-    for (int i = 1; i < coordinates.size(); i++) {
-      distance += SphericalDistanceLibrary.distance(coordinates.get(i), coordinates.get(i - 1));
-    }
-    return distance;
   }
 }

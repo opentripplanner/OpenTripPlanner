@@ -11,8 +11,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -26,10 +28,12 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
+import org.opentripplanner.updater.GraphUpdaterManager;
 
 class ScheduledTransitLegReferenceTest {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final int SERVICE_CODE = 555;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 1, 1);
   private static final int NUMBER_OF_STOPS = 3;
@@ -81,6 +85,12 @@ class ScheduledTransitLegReferenceTest {
     TimetableRepository timetableRepository = new TimetableRepository(
       siteRepository,
       new Deduplicator()
+    );
+    timetableRepository.setUpdaterManager(
+      new GraphUpdaterManager(
+        new DefaultRealTimeUpdateContext(new Graph(), timetableRepository, new TimetableSnapshot()),
+        List.of()
+      )
     );
     timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
     timetableRepository.getServiceCodes().put(tripPattern.getId(), SERVICE_CODE);

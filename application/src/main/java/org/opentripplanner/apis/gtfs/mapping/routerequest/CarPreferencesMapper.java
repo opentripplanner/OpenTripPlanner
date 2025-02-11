@@ -27,6 +27,10 @@ public class CarPreferencesMapper {
     if (reluctance != null) {
       preferences.withReluctance(reluctance);
     }
+    var boardCost = args.getGraphQLBoardCost();
+    if (boardCost != null) {
+      preferences.withBoardCost(boardCost.toSeconds());
+    }
     preferences.withParking(parking ->
       setCarParkingPreferences(parking, args.getGraphQLParking(), environment)
     );

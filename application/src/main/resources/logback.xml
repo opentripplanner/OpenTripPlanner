@@ -100,9 +100,9 @@
   <logger name="org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler" level="off" />
 
   <!-- If you want to debug realtime updates set these loggers to debug -->
-  <logger name="org.opentripplanner.updater.trip.TimetableSnapshotSource" level="info" />
+  <logger name="org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter" level="info" />
   <logger name="org.opentripplanner.model.Timetable" level="warn" />
-  <logger name="org.opentripplanner.updater.siri.SiriTimetableSnapshotSource" level="warn" />
+  <logger name="org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter" level="warn" />
   <logger name="org.opentripplanner.updater.siri.TimetableHelper" level="warn" />
 
   <!-- optional logging configuration to define your own custom logging needs -->

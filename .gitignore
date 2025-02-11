@@ -47,3 +47,6 @@ streetGraph.obj
 graph.obj
 # IntelliJ creates these pid files when you attach the debugger to tests
 .attach_pid*
+
+# draw.io backup files
+*.svg.bkp
