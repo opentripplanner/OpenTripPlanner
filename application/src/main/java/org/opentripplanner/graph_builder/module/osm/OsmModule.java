@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
@@ -18,6 +19,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
@@ -117,7 +119,7 @@ public class OsmModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    for (OsmProvider provider : providers) {
+    for (var provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
       LOG.info(
         "Using OSM way configuration from {}.",
@@ -135,7 +137,7 @@ public class OsmModule implements GraphBuilderModule {
 
   @Override
   public void checkInputs() {
-    for (OsmProvider provider : providers) {
+    for (var provider : providers) {
       provider.checkInputs();
     }
   }
@@ -431,8 +433,9 @@ public class OsmModule implements GraphBuilderModule {
           normalizer.applyWayProperties(street, backStreet, wayData, way);
 
           platform.ifPresent(plat -> {
-            osmInfoGraphBuildRepository.addPlatform(street, plat);
-            osmInfoGraphBuildRepository.addPlatform(backStreet, plat);
+            for (var s : streets.asIterable()) {
+              osmInfoGraphBuildRepository.addPlatform(s, plat);
+            }
           });
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -450,7 +453,8 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private Optional<Platform> getPlatform(OsmWay way) {
-    if (way.isBoardingLocation()) {
+    var references = way.getMultiTagValues(params.boardingAreaRefTags());
+    if (way.isBoardingLocation() && !references.isEmpty()) {
       var nodeRefs = way.getNodeRefs();
       var size = nodeRefs.size();
       var nodes = new Coordinate[size];
@@ -461,8 +465,6 @@ public class OsmModule implements GraphBuilderModule {
       var geometryFactory = GeometryUtils.getGeometryFactory();
 
       var geometry = geometryFactory.createLineString(nodes);
-
-      var references = way.getMultiTagValues(params.boardingAreaRefTags());
 
       return Optional.of(
         new Platform(
@@ -494,8 +496,8 @@ public class OsmModule implements GraphBuilderModule {
     OsmWay way,
     long startNode,
     long endNode,
-    StreetEdge street,
-    StreetEdge backStreet
+    @Nullable StreetEdge street,
+    @Nullable StreetEdge backStreet
   ) {
     /* Check if there are turn restrictions starting on this segment */
     Collection<TurnRestrictionTag> restrictionTags = osmdb.getFromWayTurnRestrictions(way.getId());
@@ -617,7 +619,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private float getMaxCarSpeed() {
     float maxSpeed = 0f;
-    for (OsmProvider provider : providers) {
+    for (var provider : providers) {
       var carSpeed = provider.getOsmTagMapper().getMaxUsedCarSpeed(provider.getWayPropertySet());
       if (carSpeed > maxSpeed) {
         maxSpeed = carSpeed;

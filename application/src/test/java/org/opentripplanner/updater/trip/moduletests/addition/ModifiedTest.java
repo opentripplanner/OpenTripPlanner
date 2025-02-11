@@ -27,7 +27,7 @@ public class ModifiedTest implements RealtimeTestConstants {
       .addStop(STOP_B1, "8:40:00", "8:40:00")
       .withHeadsign("Original Headsign")
       .build();
-    var env = RealtimeTestEnvironment.gtfs().addTrip(TRIP_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
     var builder = new TripUpdateBuilder(
       TRIP_1_ID,
       SERVICE_DATE,

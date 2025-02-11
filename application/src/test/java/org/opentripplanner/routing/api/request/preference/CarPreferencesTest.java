@@ -11,6 +11,7 @@ import org.opentripplanner.framework.model.Cost;
 class CarPreferencesTest {
 
   private static final double RELUCTANCE = 5.111;
+  public static final int BOARD_COST = 550;
   private static final double EXPECTED_RELUCTANCE = 5.1;
   private static final int PICKUP_TIME = 600;
   private static final int PICKUP_COST = 500;
@@ -22,6 +23,7 @@ class CarPreferencesTest {
   private final CarPreferences subject = CarPreferences
     .of()
     .withReluctance(RELUCTANCE)
+    .withBoardCost(BOARD_COST)
     .withPickupTime(Duration.ofSeconds(PICKUP_TIME))
     .withPickupCost(PICKUP_COST)
     .withAccelerationSpeed(ACCELERATION_SPEED)
@@ -33,6 +35,11 @@ class CarPreferencesTest {
   @Test
   void reluctance() {
     assertEquals(EXPECTED_RELUCTANCE, subject.reluctance());
+  }
+
+  @Test
+  void boardCost() {
+    assertEquals(BOARD_COST, subject.boardCost());
   }
 
   @Test
@@ -85,6 +92,7 @@ class CarPreferencesTest {
     assertEquals(
       "CarPreferences{" +
       "reluctance: 5.1, " +
+      "boardCost: $550, " +
       "parking: VehicleParkingPreferences{cost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "pickupTime: PT10M, " +

@@ -19,7 +19,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(PollingTripUpdater.class);
 
   private final GtfsRealtimeTripUpdateSource updateSource;
-  private final TimetableSnapshotSource snapshotSource;
+  private final GtfsRealTimeTripUpdateAdapter adapter;
 
   /**
    * Feed id that is used for the trip ids in the TripUpdates
@@ -40,14 +40,14 @@ public class PollingTripUpdater extends PollingGraphUpdater {
 
   public PollingTripUpdater(
     PollingTripUpdaterParameters parameters,
-    TimetableSnapshotSource snapshotSource
+    GtfsRealTimeTripUpdateAdapter adapter
   ) {
     super(parameters);
     // Create update streamer from preferences
     this.feedId = parameters.feedId();
     this.updateSource = new GtfsRealtimeTripUpdateSource(parameters);
     this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
-    this.snapshotSource = snapshotSource;
+    this.adapter = adapter;
     this.fuzzyTripMatching = parameters.fuzzyTripMatching();
 
     this.recordMetrics = BatchTripUpdateMetrics.batch(parameters);
@@ -72,7 +72,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     if (updates != null) {
       // Handle trip updates via graph writer runnable
       TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
-        snapshotSource,
+        adapter,
         fuzzyTripMatching,
         backwardsDelayPropagationType,
         incrementality,

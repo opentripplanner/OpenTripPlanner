@@ -33,7 +33,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTrip() {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
 
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addStopTime(STOP_A1_ID, 30)
@@ -47,7 +47,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedTripWithNewRoute() {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
@@ -86,7 +86,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithUnknownStop() {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
@@ -110,7 +110,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
@@ -134,7 +134,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithSkippedStop() {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE, "A loop");
     builder
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
@@ -170,7 +170,7 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   public void addedTripWithDelay() {
-    var env = RealtimeTestEnvironment.gtfs().build();
+    var env = RealtimeTestEnvironment.of().build();
     var builder = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE);
 
     builder

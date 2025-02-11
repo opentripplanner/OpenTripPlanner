@@ -96,6 +96,7 @@ public class NetexModule implements GraphBuilderModule {
         //           - have operators and notice assignments.
         timetableRepository.addOperators(otpService.getAllOperators());
         timetableRepository.addNoticeAssignments(otpService.getNoticeAssignments());
+        timetableRepository.addScheduledStopPointMapping(otpService.stopsByScheduledStopPoint());
 
         AddTransitEntitiesToGraph.addToGraph(
           otpService,
