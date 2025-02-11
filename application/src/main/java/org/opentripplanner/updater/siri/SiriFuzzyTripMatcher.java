@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -61,7 +60,6 @@ public class SiriFuzzyTripMatcher {
   /**
    * Matches EstimatedVehicleJourney to a set of possible Trips based on tripId
    */
-  @Nullable
   public Result<TripAndPattern, UpdateError.UpdateErrorType> match(
     EstimatedVehicleJourney journey,
     EntityResolver entityResolver,
@@ -237,8 +235,7 @@ public class SiriFuzzyTripMatcher {
   /**
    * Finds the correct trip based on OTP-ServiceDate and SIRI-DepartureTime
    */
-  @Nullable
-  Result<TripAndPattern, UpdateError.UpdateErrorType> getTripAndPatternForJourney(
+  private Result<TripAndPattern, UpdateError.UpdateErrorType> getTripAndPatternForJourney(
     Set<Trip> trips,
     List<CallWrapper> calls,
     EntityResolver entityResolver,
