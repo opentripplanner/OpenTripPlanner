@@ -445,6 +445,16 @@ class WalkableAreaBuilder {
     );
   }
 
+  private WayProperties getAreaProperties(OsmWithTags entity) {
+    if (!wayPropertiesCache.containsKey(entity)) {
+      var wayData = entity.getOsmProvider().getWayPropertySet().getDataForWay(entity);
+      wayPropertiesCache.put(entity, wayData);
+      return wayData;
+    } else {
+      return wayPropertiesCache.get(entity);
+    }
+  }
+
   private Set<AreaEdge> createEdgesForRingSegment(
     AreaEdgeList edgeList,
     Area area,
@@ -471,142 +481,83 @@ class WalkableAreaBuilder {
     Collection<Area> areas,
     AreaEdgeList edgeList
   ) {
-    List<Area> intersects = new ArrayList<>();
-
     Coordinate[] coordinates = new Coordinate[] {
       vertex1.getCoordinate(),
       vertex2.getCoordinate(),
     };
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     LineString line = geometryFactory.createLineString(coordinates);
+
+    OsmWithTags parent = null;
+    WayProperties wayData = null;
+    StreetTraversalPermission areaPermissions = StreetTraversalPermission.ALL;
+    boolean wheelchairAccessible = true;
+
+    // combine properties of intersected areas
     for (Area area : areas) {
       MultiPolygon polygon = area.jtsMultiPolygon;
       Geometry intersection = polygon.intersection(line);
       if (intersection.getLength() > 0.000001) {
-        intersects.add(area);
+        parent = area.parent;
+        wayData = getAreaProperties(parent);
+        areaPermissions = areaPermissions.intersection(wayData.getPermission());
+        wheelchairAccessible = wheelchairAccessible && parent.isWheelchairAccessible();
       }
     }
-    if (intersects.isEmpty()) {
-      // apparently our intersection here was bogus
+    if (parent == null) {
+      // No intersections - not really possible if edge has some length
       return Set.of();
     }
-    // do we need to recurse?
-    if (intersects.size() == 1) {
-      Area area = intersects.getFirst();
-      OsmWithTags areaEntity = area.parent;
 
-      WayProperties wayData;
-      if (!wayPropertiesCache.containsKey(areaEntity)) {
-        wayData = areaEntity.getOsmProvider().getWayPropertySet().getDataForWay(areaEntity);
-        wayPropertiesCache.put(areaEntity, wayData);
-      } else {
-        wayData = wayPropertiesCache.get(areaEntity);
-      }
-      StreetTraversalPermission areaPermissions = wayData.getPermission();
+    double length = SphericalDistanceLibrary.distance(
+      vertex1.getCoordinate(),
+      vertex2.getCoordinate()
+    );
 
-      float carSpeed = areaEntity
-        .getOsmProvider()
-        .getOsmTagMapper()
-        .getCarSpeedForWay(areaEntity, false);
+    String label = String.format(
+      labelTemplate,
+      parent.getId(),
+      vertex1.getLabel(),
+      vertex2.getLabel()
+    );
 
-      double length = SphericalDistanceLibrary.distance(
-        vertex1.getCoordinate(),
-        vertex2.getCoordinate()
-      );
+    float carSpeed = parent.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(parent, false);
 
-      String label = String.format(
-        labelTemplate,
-        areaEntity.getId(),
-        vertex1.getLabel(),
-        vertex2.getLabel()
-      );
-      I18NString name = namer.getNameForWay(areaEntity, label);
-      AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
-        .withFromVertex(vertex1)
-        .withToVertex(vertex2)
-        .withGeometry(line)
-        .withName(name)
-        .withMeterLength(length)
-        .withPermission(areaPermissions)
-        .withBack(false)
-        .withArea(edgeList)
-        .withCarSpeed(carSpeed)
-        .withBogusName(areaEntity.hasNoName())
-        .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
-        .withLink(areaEntity.isLink());
+    I18NString name = namer.getNameForWay(parent, label);
+    AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
+      .withFromVertex(vertex1)
+      .withToVertex(vertex2)
+      .withGeometry(line)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(areaPermissions)
+      .withBack(false)
+      .withArea(edgeList)
+      .withCarSpeed(carSpeed)
+      .withBogusName(parent.hasNoName())
+      .withWheelchairAccessible(wheelchairAccessible)
+      .withLink(parent.isLink());
 
-      label =
-        String.format(labelTemplate, areaEntity.getId(), vertex2.getLabel(), vertex1.getLabel());
-      name = namer.getNameForWay(areaEntity, label);
-      AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
-        .withFromVertex(vertex2)
-        .withToVertex(vertex1)
-        .withGeometry(line.reverse())
-        .withName(name)
-        .withMeterLength(length)
-        .withPermission(areaPermissions)
-        .withBack(true)
-        .withArea(edgeList)
-        .withCarSpeed(carSpeed)
-        .withBogusName(areaEntity.hasNoName())
-        .withWheelchairAccessible(areaEntity.isWheelchairAccessible())
-        .withLink(areaEntity.isLink());
+    label = String.format(labelTemplate, parent.getId(), vertex2.getLabel(), vertex1.getLabel());
+    name = namer.getNameForWay(parent, label);
+    AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
+      .withFromVertex(vertex2)
+      .withToVertex(vertex1)
+      .withGeometry(line.reverse())
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(areaPermissions)
+      .withBack(true)
+      .withArea(edgeList)
+      .withCarSpeed(carSpeed)
+      .withBogusName(parent.hasNoName())
+      .withWheelchairAccessible(wheelchairAccessible)
+      .withLink(parent.isLink());
 
-      areaEdgeCount += 2;
-      AreaEdge street = streetEdgeBuilder.buildAndConnect();
-
-      AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
-      normalizer.applyWayProperties(street, backStreet, wayData, areaEntity);
-      return Set.of(street, backStreet);
-    } else {
-      recursedSegments++;
-      // take the part that intersects with the start vertex
-      Coordinate startCoordinate = vertex1.getCoordinate();
-      Point startPoint = geometryFactory.createPoint(startCoordinate);
-      Set<AreaEdge> edges = new HashSet<>();
-      for (Area area : intersects) {
-        MultiPolygon polygon = area.jtsMultiPolygon;
-        if (
-          !(polygon.intersects(startPoint) || polygon.getBoundary().intersects(startPoint))
-        ) continue;
-        Geometry lineParts = line.intersection(polygon);
-        if (lineParts.getLength() > 0.000001) {
-          Coordinate edgeCoordinate = null;
-          // this is either a LineString or a MultiLineString (we hope)
-          if (lineParts instanceof MultiLineString mls) {
-            boolean found = false;
-            for (int i = 0; i < mls.getNumGeometries(); ++i) {
-              LineString segment = (LineString) mls.getGeometryN(i);
-              if (found) {
-                edgeCoordinate = segment.getEndPoint().getCoordinate();
-                break;
-              }
-              if (segment.contains(startPoint) || segment.getBoundary().contains(startPoint)) {
-                found = true;
-                if (segment.getLength() > 0.000001) {
-                  edgeCoordinate = segment.getEndPoint().getCoordinate();
-                  break;
-                }
-              }
-            }
-          } else if (lineParts instanceof LineString lineString) {
-            edgeCoordinate = lineString.getEndPoint().getCoordinate();
-          } else {
-            continue;
-          }
-
-          IntersectionVertex newVertex = areaBoundaryVertexForCoordinate.get(edgeCoordinate);
-          if (newVertex == null) {
-            newVertex = vertexFactory.intersection(edgeCoordinate);
-            areaBoundaryVertexForCoordinate.put(edgeCoordinate, newVertex);
-          }
-          edges.addAll(createSegments(vertex1, newVertex, List.of(area), edgeList));
-          edges.addAll(createSegments(newVertex, vertex2, intersects, edgeList));
-          return edges;
-        }
-      }
-    }
-    return Set.of();
+    AreaEdge street = streetEdgeBuilder.buildAndConnect();
+    AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
+    normalizer.applyWayProperties(street, backStreet, wayData, parent);
+    return Set.of(street, backStreet);
   }
 
   private void createNamedAreas(AreaEdgeList edgeList, Ring ring, Collection<Area> areas) {
@@ -623,18 +574,11 @@ class WalkableAreaBuilder {
       I18NString name = namer.getNameForWay(areaEntity, id);
       namedArea.setName(name);
 
-      WayProperties wayData;
-      if (!wayPropertiesCache.containsKey(areaEntity)) {
-        wayData = areaEntity.getOsmProvider().getWayPropertySet().getDataForWay(areaEntity);
-        wayPropertiesCache.put(areaEntity, wayData);
-      } else {
-        wayData = wayPropertiesCache.get(areaEntity);
-      }
-
-      double bicycleSafety = wayPropertiesCache.get(areaEntity).bicycleSafety().forward();
+      WayProperties wayData = getAreaProperties(areaEntity);
+      double bicycleSafety = wayData.bicycleSafety().forward();
       namedArea.setBicycleSafetyMultiplier(bicycleSafety);
 
-      double walkSafety = wayPropertiesCache.get(areaEntity).walkSafety().forward();
+      double walkSafety = wayData.walkSafety().forward();
       namedArea.setWalkSafetyMultiplier(walkSafety);
       namedArea.setOriginalEdges(intersection);
       namedArea.setPermission(wayData.getPermission());
