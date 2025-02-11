@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
@@ -45,6 +46,7 @@ public class APIEndpoints {
     // See the OTPFeature enum for details.
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
+    addIfEnabled(DebugUi, GraphInspectorTileResource.class);
     addIfEnabled(DebugUi, GraphInspectorVectorTileResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     // scheduled to be removed and only here for backwards compatibility

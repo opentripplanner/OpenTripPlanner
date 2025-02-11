@@ -11,6 +11,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -46,6 +47,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final List<RideHailingService> rideHailingServices;
   private final RouteRequest routeRequestDefaults;
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final TileRendererManager tileRendererManager;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
   private final VectorTileConfig vectorTileConfig;
@@ -99,6 +101,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     @Nullable LuceneIndex luceneIndex,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     @Nullable StopConsolidationService stopConsolidationService,
+    @Nullable TileRendererManager tileRendererManager,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     this.debugUiConfig = debugUiConfig;
@@ -110,6 +113,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.routeRequestDefaults = routeRequestDefaults;
     this.streetLimitationParametersService = streetLimitationParametersService;
+    this.tileRendererManager = tileRendererManager;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
     this.vectorTileConfig = vectorTileConfig;
@@ -210,6 +214,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
+  }
+
+  @Override
+  public TileRendererManager tileRendererManager() {
+    return tileRendererManager;
   }
 
   @Override
