@@ -1,9 +1,11 @@
 package org.opentripplanner.updater.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.trip.RealtimeTestConstants.STOP_A1;
 import static org.opentripplanner.updater.trip.RealtimeTestConstants.STOP_B1;
 import static org.opentripplanner.updater.trip.RealtimeTestConstants.TRIP_1_ID;
@@ -64,6 +66,27 @@ class SiriFuzzyTripMatcherTest {
 
     var result = match(journey, env);
     assertTrue(result.isSuccess());
+  }
+
+  @Test
+  void unknownStopPointRef() {
+    var trip1input = tripInput(TRIP_1_ID);
+
+    var env = RealtimeTestEnvironment.of().addTrip(trip1input).build();
+
+    var journey = new SiriEtBuilder(env.getDateTimeHelper())
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A1)
+          .departAimedExpected("00:10:00", "00:10:00")
+          .call("SOME_MADE_UP_ID")
+          .arriveAimedExpected("00:20:00", "00:20:00")
+      )
+      .buildEstimatedVehicleJourney();
+
+    var result = match(journey, env);
+    assertTrue(result.isFailure());
+    assertEquals(NO_FUZZY_TRIP_MATCH, result.failureValue());
   }
 
   private static Result<TripAndPattern, UpdateError.UpdateErrorType> match(

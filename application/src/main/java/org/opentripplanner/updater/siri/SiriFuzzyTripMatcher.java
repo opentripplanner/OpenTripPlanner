@@ -97,7 +97,7 @@ public class SiriFuzzyTripMatcher {
         : lastCall.getAimedDepartureTime();
 
       if (arrivalTime != null) {
-        trips = getMatchingTripsOnStopOrSiblings(stop.getId().getId(), arrivalTime, entityResolver);
+        trips = getMatchingTripsOnStopOrSiblings(stop, arrivalTime);
       }
     }
     if (trips == null || trips.isEmpty()) {
@@ -173,14 +173,17 @@ public class SiriFuzzyTripMatcher {
     LOG.info("Built start-stop-cache [{}].", startStopTripCache.size());
   }
 
+  private static String createStartStopKey(RegularStop stop, int lastStopArrivalTime) {
+    return createStartStopKey(stop.getId().getId(), lastStopArrivalTime);
+  }
+
   private static String createStartStopKey(String lastStopId, int lastStopArrivalTime) {
     return lastStopId + ":" + lastStopArrivalTime;
   }
 
   private Set<Trip> getMatchingTripsOnStopOrSiblings(
-    String lastStopPoint,
-    ZonedDateTime arrivalTime,
-    EntityResolver entityResolver
+    RegularStop lastStop,
+    ZonedDateTime arrivalTime
   ) {
     int secondsSinceMidnight = ServiceDateUtils.secondsSinceStartOfService(
       arrivalTime,
@@ -193,13 +196,10 @@ public class SiriFuzzyTripMatcher {
       transitService.getTimeZone()
     );
 
-    Set<Trip> trips = startStopTripCache.get(
-      createStartStopKey(lastStopPoint, secondsSinceMidnight)
-    );
+    Set<Trip> trips = startStopTripCache.get(createStartStopKey(lastStop, secondsSinceMidnight));
     if (trips == null) {
       //Attempt to fetch trips that started yesterday - i.e. add 24 hours to arrival-time
-      trips =
-        startStopTripCache.get(createStartStopKey(lastStopPoint, secondsSinceMidnightYesterday));
+      trips = startStopTripCache.get(createStartStopKey(lastStop, secondsSinceMidnightYesterday));
     }
 
     if (trips != null) {
@@ -207,13 +207,12 @@ public class SiriFuzzyTripMatcher {
     }
 
     //SIRI-data may report other platform, but still on the same Parent-stop
-    var stop = entityResolver.resolveQuay(lastStopPoint);
-    if (stop == null || !stop.isPartOfStation()) {
+    if (!lastStop.isPartOfStation()) {
       return Set.of();
     }
 
     trips = new HashSet<>();
-    var allQuays = stop.getParentStation().getChildStops();
+    var allQuays = lastStop.getParentStation().getChildStops();
     for (var quay : allQuays) {
       Set<Trip> tripSet = startStopTripCache.get(
         createStartStopKey(quay.getId().getId(), secondsSinceMidnight)
