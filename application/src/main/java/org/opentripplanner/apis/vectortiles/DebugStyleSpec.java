@@ -329,6 +329,28 @@ public class DebugStyleSpec {
         .lineOffset(LINE_OFFSET)
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("bicycle-safety-text")
+        .vectorSourceLayer(edges)
+        .group(SAFETY_GROUP)
+        .typeSymbol()
+        .lineText("bicycleSafetyFactor")
+        .textOffset(1)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("walk-safety-text")
+        .vectorSourceLayer(edges)
+        .group(SAFETY_GROUP)
+        .typeSymbol()
+        .lineText("walkSafetyFactor")
+        .textOffset(1)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );
   }
