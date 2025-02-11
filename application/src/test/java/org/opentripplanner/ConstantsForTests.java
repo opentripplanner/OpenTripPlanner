@@ -28,7 +28,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -139,7 +139,7 @@ public class ConstantsForTests {
       var fareFactory = new DefaultFareServiceFactory();
       // Add street data from OSM
       {
-        var osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
+        var osmProvider = new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
         var vehicleParkingRepository = new DefaultVehicleParkingRepository();
         var osmModule = OsmModule
@@ -193,7 +193,7 @@ public class ConstantsForTests {
       var graph = new Graph(deduplicator);
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
-      var osmProvider = new OsmProvider(osmFile, true);
+      var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
       var osmModule = OsmModule
@@ -245,7 +245,7 @@ public class ConstantsForTests {
       var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
       // Add street data from OSM
       {
-        var osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
+        var osmProvider = new DefaultOsmProvider(OSLO_EAST_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
         var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, parkingService).build();
         osmModule.buildGraph();

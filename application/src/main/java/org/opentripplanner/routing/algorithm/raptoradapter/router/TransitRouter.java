@@ -26,8 +26,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorRequestMapper;
@@ -118,11 +118,11 @@ public class TransitRouter {
       );
     }
 
-    var transitLayer = request.preferences().transit().ignoreRealtimeUpdates()
-      ? serverContext.transitService().getTransitLayer()
-      : serverContext.transitService().getRealtimeTransitLayer();
+    var raptorTransitData = request.preferences().transit().ignoreRealtimeUpdates()
+      ? serverContext.transitService().getRaptorTransitData()
+      : serverContext.transitService().getRealtimeRaptorTransitData();
 
-    var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
+    var requestTransitDataProvider = createRequestTransitDataProvider(raptorTransitData);
 
     debugTimingAggregator.finishedPatternFiltering();
 
@@ -147,7 +147,7 @@ public class TransitRouter {
     // Route transit
     var raptorService = new RaptorService<>(
       serverContext.raptorConfig(),
-      createExtraMcRouterSearch(accessEgresses, transitLayer)
+      createExtraMcRouterSearch(accessEgresses, raptorTransitData)
     );
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
@@ -159,11 +159,11 @@ public class TransitRouter {
 
     if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
-        transitLayer::getStopByIndex,
+        raptorTransitData::getStopByIndex,
         requestTransitDataProvider.stopNameResolver(),
         serverContext.transitService().getTransferService(),
         requestTransitDataProvider,
-        transitLayer.getStopBoardAlightTransferCosts(),
+        raptorTransitData.getStopBoardAlightTransferCosts(),
         request.preferences().transfer().optimization(),
         raptorRequest.multiCriteria()
       );
@@ -175,7 +175,7 @@ public class TransitRouter {
     RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       serverContext.graph(),
       serverContext.transitService(),
-      transitLayer,
+      raptorTransitData,
       transitSearchTimeZero,
       request
     );
@@ -323,10 +323,10 @@ public class TransitRouter {
   }
 
   private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
-    TransitLayer transitLayer
+    RaptorTransitData raptorTransitData
   ) {
     return new RaptorRoutingRequestTransitData(
-      transitLayer,
+      raptorTransitData,
       transitGroupPriorityService,
       transitSearchTimeZero,
       additionalSearchDays.additionalSearchDaysInPast(),
@@ -402,7 +402,7 @@ public class TransitRouter {
   @Nullable
   private ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
     AccessEgresses accessEgresses,
-    TransitLayer transitLayer
+    RaptorTransitData raptorTransitData
   ) {
     if (OTPFeature.Sorlandsbanen.isOff()) {
       return null;
@@ -410,6 +410,6 @@ public class TransitRouter {
     var service = serverContext.sorlandsbanenService();
     return service == null
       ? null
-      : service.createExtraMcRouterSearch(request, accessEgresses, transitLayer);
+      : service.createExtraMcRouterSearch(request, accessEgresses, raptorTransitData);
   }
 }

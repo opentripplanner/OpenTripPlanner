@@ -51,8 +51,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -301,14 +301,14 @@ public class RaptorPathToItineraryMapperTest {
     return new RaptorPathToItineraryMapper<>(
       new Graph(),
       new DefaultTransitService(timetableRepository),
-      getTransitLayer(),
+      getRaptorTransitData(),
       dateTime.atZone(ZoneIds.CET),
       new RouteRequest()
     );
   }
 
-  private static TransitLayer getTransitLayer() {
-    return new TransitLayer(
+  private static RaptorTransitData getRaptorTransitData() {
+    return new RaptorTransitData(
       new HashMap<>(),
       null,
       null,

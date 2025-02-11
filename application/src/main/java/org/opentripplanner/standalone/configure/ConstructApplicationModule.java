@@ -54,28 +54,32 @@ public class ConstructApplicationModule {
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
-    return DefaultServerRequestContext.create(
-      routerConfig.transitTuningConfig(),
-      defaultRequest,
-      raptorConfig,
-      graph,
-      transitService,
-      Metrics.globalRegistry,
-      routerConfig.vectorTileConfig(),
-      worldEnvelopeService,
-      realtimeVehicleService,
-      vehicleRentalService,
-      vehicleParkingService,
-      emissionsService,
-      sorlandsbanenService,
-      routerConfig.flexParameters(),
-      rideHailingServices,
-      stopConsolidationService,
-      streetLimitationParametersService,
-      traverseVisitor,
-      luceneIndex,
+    var transitRoutingConfig = routerConfig.transitTuningConfig();
+    var vectorTileConfig = routerConfig.vectorTileConfig();
+    var flexParameters = routerConfig.flexParameters();
+
+    return new DefaultServerRequestContext(
       debugUiConfig,
-      fareService
+      fareService,
+      flexParameters,
+      graph,
+      Metrics.globalRegistry,
+      raptorConfig,
+      realtimeVehicleService,
+      rideHailingServices,
+      defaultRequest,
+      streetLimitationParametersService,
+      transitRoutingConfig,
+      transitService,
+      vectorTileConfig,
+      vehicleParkingService,
+      vehicleRentalService,
+      worldEnvelopeService,
+      emissionsService,
+      luceneIndex,
+      sorlandsbanenService,
+      stopConsolidationService,
+      traverseVisitor
     );
   }
 

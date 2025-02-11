@@ -87,6 +87,8 @@ public class DebugStyleSpec {
     TemporaryFreeEdge.class,
   };
   private static final String EDGES_GROUP = "Edges";
+  private static final String ELEVATION_GROUP = "Elevation";
+  private static final String SAFETY_GROUP = "Safety";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
   private static final String PERMISSIONS_GROUP = "Permissions";
@@ -133,8 +135,10 @@ public class DebugStyleSpec {
         backgroundLayers(extraRasterSources),
         wheelchair(edges),
         noThruTraffic(edges),
+        safety(edges),
         traversalPermissions(edges),
         edges(edges),
+        elevation(edges),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -277,6 +281,53 @@ public class DebugStyleSpec {
         .lineWidth(LINE_WIDTH)
         .lineOffset(LINE_OFFSET)
         .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> elevation(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder
+        .ofId("maximum-slope")
+        .group(ELEVATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        // Slope can be higher than this in theory but distinction between high values is not needed
+        .lineColorFromProperty("maximumSlope", 0, 0.35)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> safety(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder
+        .ofId("bicycle-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColorFromProperty("bicycleSafetyFactor", 1, 10)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder
+        .ofId("walk-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .lineColorFromProperty("walkSafetyFactor", 1, 10)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()
     );

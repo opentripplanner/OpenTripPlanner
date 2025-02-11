@@ -138,13 +138,6 @@
             <version>${siri-java-model.version}</version>
         </dependency>
 
-        <!-- XML <-> protobuf-mapper for SIRI-->
-        <dependency>
-            <groupId>org.entur</groupId>
-            <artifactId>siri-protobuf-mapper</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-
         <dependency>
             <groupId>org.mobilitydata</groupId>
             <artifactId>gbfs-java-model</artifactId>
@@ -335,7 +328,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.4.1</version>
+            <version>5.4.2</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -424,6 +417,19 @@
         </testResources>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.dagger</groupId>
+                            <artifactId>dagger-compiler</artifactId>
+                            <version>${google.dagger.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>3.6.0</version>
@@ -478,6 +484,20 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.hubspot.maven.plugins</groupId>
+                <artifactId>prettier-maven-plugin</artifactId>
+                <configuration>
+                    <inputGlobs>
+                        <inputGlob>src/main/java/**/*.java</inputGlob>
+                        <inputGlob>src/ext/java/**/*.java</inputGlob>
+                        <inputGlob>src/test/java/**/*.java</inputGlob>
+                        <inputGlob>src/ext-test/java/**/*.java</inputGlob>
+                        <inputGlob>src/**/*.json</inputGlob>
+                        <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
+                    </inputGlobs>
+                </configuration>
             </plugin>
         </plugins>
     </build>

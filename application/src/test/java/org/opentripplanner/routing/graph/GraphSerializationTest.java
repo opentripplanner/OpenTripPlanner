@@ -175,8 +175,8 @@ public class GraphSerializationTest {
       "outgoing",
       "buildTime",
       "tripPatternForId",
-      "transitLayer",
-      "realtimeTransitLayer",
+      "raptorTransitData",
+      "realtimeRaptorTransitData",
       "dateTime",
       "notesForEdge",
       "uniqueMatchers"

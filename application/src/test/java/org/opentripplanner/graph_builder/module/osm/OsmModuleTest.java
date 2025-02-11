@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.model.OsmWithTags;
@@ -58,7 +60,7 @@ public class OsmModuleTest {
 
     File file = RESOURCE_LOADER.file("map.osm.pbf");
 
-    OsmProvider provider = new OsmProvider(file, true);
+    DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
 
     OsmModule osmModule = OsmModule
       .of(
@@ -123,7 +125,7 @@ public class OsmModuleTest {
     var gg = new Graph(deduplicator);
 
     File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
-    var provider = new OsmProvider(file, true);
+    var provider = new DefaultOsmProvider(file, true);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
     var osmModule = OsmModule
@@ -322,7 +324,7 @@ public class OsmModuleTest {
     var graph = new Graph(deduplicator);
 
     File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
-    OsmProvider provider = new OsmProvider(file, false);
+    DefaultOsmProvider provider = new DefaultOsmProvider(file, false);
     OsmModule loader = OsmModule
       .of(
         provider,
@@ -348,10 +350,10 @@ public class OsmModuleTest {
   private BuildResult buildParkingLots() {
     var graph = new Graph();
     var service = new DefaultVehicleParkingRepository();
-    var providers = Stream
+    List<OsmProvider> providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
       .map(RESOURCE_LOADER::file)
-      .map(f -> new OsmProvider(f, false))
+      .map(f -> (OsmProvider) new DefaultOsmProvider(f, false))
       .toList();
     var module = OsmModule
       .of(providers, graph, new DefaultOsmInfoGraphBuildRepository(), service)
@@ -378,7 +380,7 @@ public class OsmModuleTest {
     var graph = new Graph(deduplicator);
 
     File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
-    var provider = new OsmProvider(file, false);
+    var provider = new DefaultOsmProvider(file, false);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 

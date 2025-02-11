@@ -208,11 +208,7 @@ class StopClusterMapper {
     } else {
       var group = transitService.getStopLocationsGroup(id);
       var feedPublisher = toFeedPublisher(transitService.getFeedInfo(id.getFeedId()));
-      var modes = transitService
-        .findTransitModes(group)
-        .stream()
-        .map(Enum::name)
-        .toList();
+      var modes = transitService.findTransitModes(group).stream().map(Enum::name).toList();
       var agencies = agenciesForStopLocationsGroup(group)
         .stream()
         .map(StopClusterMapper::toAgency)

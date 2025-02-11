@@ -3994,6 +3994,8 @@ input CarParkingPreferencesInput {
 
 "Preferences related to traveling on a car (excluding car travel on transit services such as taxi)."
 input CarPreferencesInput {
+  "Cost of boarding a vehicle with a car."
+  boardCost: Cost
   "Car parking related preferences."
   parking: CarParkingPreferencesInput
   "A multiplier for how bad travelling on car is compared to being in transit for equal lengths of time."
