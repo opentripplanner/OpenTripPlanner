@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import static org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters.UpdateType.FULL;
 
@@ -9,9 +9,9 @@ import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParamete
 
 /**
  * Class that extends {@link VehicleParkingUpdaterParameters} with parameters required by {@link
- * HslParkUpdater}.
+ * LiipiParkUpdater}.
  */
-public record HslParkUpdaterParameters(
+public record LiipiParkUpdaterParameters(
   String configRef,
   int facilitiesFrequencySec,
   String facilitiesUrl,

@@ -2,12 +2,11 @@ package org.opentripplanner.updater.siri.updater;
 
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
-import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   public SiriETUpdater(
     Parameters config,
-    SiriTimetableSnapshotSource timetableSnapshotSource,
+    SiriRealTimeTripUpdateAdapter adapter,
     EstimatedTimetableSource source,
     Consumer<UpdateResult> metricsConsumer
   ) {
@@ -51,7 +50,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
     estimatedTimetableHandler =
-      new EstimatedTimetableHandler(timetableSnapshotSource, config.fuzzyTripMatching(), feedId);
+      new EstimatedTimetableHandler(adapter, config.fuzzyTripMatching(), feedId);
 
     this.metricsConsumer = metricsConsumer;
   }

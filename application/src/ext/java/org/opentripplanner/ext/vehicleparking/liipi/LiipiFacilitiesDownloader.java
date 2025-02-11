@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vehicleparking.hslpark;
+package org.opentripplanner.ext.vehicleparking.liipi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,9 +19,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HslFacilitiesDownloader {
+public class LiipiFacilitiesDownloader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HslFacilitiesDownloader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LiipiFacilitiesDownloader.class);
   private static final ObjectMapper mapper = new ObjectMapper();
 
   private final String jsonParsePath;
@@ -29,7 +29,7 @@ public class HslFacilitiesDownloader {
   private final String url;
   private final OtpHttpClient otpHttpClient;
 
-  public HslFacilitiesDownloader(
+  public LiipiFacilitiesDownloader(
     String url,
     String jsonParsePath,
     BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser,

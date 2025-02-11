@@ -22,7 +22,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -32,10 +31,10 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
-public class TimetableSnapshotSourceTest {
+public class GtfsRealTimeTripUpdateAdapterTest {
 
   private static final LocalDate SERVICE_DATE = LocalDate.parse("2009-02-01");
   private TimetableRepository timetableRepository;
@@ -54,11 +53,7 @@ public class TimetableSnapshotSourceTest {
 
     feedId = transitService.listFeedIds().stream().findFirst().get();
     snapshotManager =
-      new TimetableSnapshotManager(
-        null,
-        TimetableSnapshotSourceParameters.DEFAULT,
-        () -> SERVICE_DATE
-      );
+      new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, () -> SERVICE_DATE);
   }
 
   @Test
@@ -261,7 +256,11 @@ public class TimetableSnapshotSourceTest {
     }
   }
 
-  private TimetableSnapshotSource defaultUpdater() {
-    return new TimetableSnapshotSource(timetableRepository, snapshotManager, () -> SERVICE_DATE);
+  private GtfsRealTimeTripUpdateAdapter defaultUpdater() {
+    return new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      () -> SERVICE_DATE
+    );
   }
 }
