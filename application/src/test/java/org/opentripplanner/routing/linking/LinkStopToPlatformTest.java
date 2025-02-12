@@ -34,12 +34,9 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LinkStopToPlatformTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
@@ -137,10 +134,6 @@ public class LinkStopToPlatformTest {
 
     Graph graph = prepareTest(platform, visibilityPoints, stops);
     linkStops(graph);
-
-    for (Edge e : graph.getEdges()) {
-      LOG.debug("Edge {}", e);
-    }
 
     // Two bottom edges gets split into half (+2 edges)
     // both split points are linked to the stop bidirectonally (+4 edges).
