@@ -151,26 +151,27 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     // Find a nearby area representing transit stop in OSM, linking to it if
     // stop code or id in ref= tag matches the GTFS stop code of this StopVertex.
+    boolean connected = false;
     for (var edgeList : nearbyAreaEdgeList) {
       for (NamedArea area : edgeList.getAreas()) {
-	osmInfoGraphBuildService
-	  .findPlatform(area)
-          .ifPresent(platform -> {
-	    if (matchesReference(stop, platform.references())) {
-		var boardingLocation = makeBoardingLocation(
-		    stop,
-		    area.getGeometry().getCentroid(),
-		    area.references,
-		    area.getName();
-                );
-                linker.addPermanentAreaVertex(boardingLocation, edgeList);
-                linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
-		return true;
-	}
-	      })
-	    }
+        var platOpt = osmInfoGraphBuildService.findPlatform(area);
+        if (platOpt.isPresent()) {
+          var platform = platOpt.get();
+          if (matchesReference(stop, platform.references())) {
+            var boardingLocation = makeBoardingLocation(
+              stop,
+              area.getGeometry().getCentroid(),
+              platform.references(),
+              area.getName()
+            );
+            linker.addPermanentAreaVertex(boardingLocation, edgeList);
+            linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+            connected = true;
+          }
+        }
+      }
     }
-    return false;
+    return connected;
   }
 
   /**

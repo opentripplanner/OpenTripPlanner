@@ -61,7 +61,7 @@ public class LinkStopToPlatformTest {
     closedGeom[platform.length] = closedGeom[0];
 
     Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
-    AreaEdgeList areaEdgeList = new AreaEdgeList(polygon, Set.of());
+    AreaEdgeList areaEdgeList = new AreaEdgeList(polygon);
 
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops

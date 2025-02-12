@@ -22,6 +22,7 @@ import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
@@ -48,6 +49,7 @@ public class WalkableAreaBuilderTest {
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
+      new DefaultOsmInfoGraphBuildRepository(),
       new VertexGenerator(osmdb, graph, Set.of(), false),
       new DefaultNamer(),
       new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),

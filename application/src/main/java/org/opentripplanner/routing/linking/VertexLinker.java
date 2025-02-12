@@ -676,7 +676,7 @@ public class VertexLinker {
 
     NamedArea hit = null;
     for (NamedArea area : areas) {
-      Geometry polygon = area.getPolygon();
+      Geometry polygon = area.getGeometry();
       Geometry intersection = polygon.intersection(line);
       if (intersection.getLength() > 0.000001) {
         hit = area;

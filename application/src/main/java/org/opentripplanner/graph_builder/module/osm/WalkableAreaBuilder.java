@@ -36,6 +36,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -56,13 +57,10 @@ import org.slf4j.LoggerFactory;
 class WalkableAreaBuilder {
 
   private final DataImportIssueStore issueStore;
-
   private final int maxAreaNodes;
-
   private final Graph graph;
-
   private final OsmDatabase osmdb;
-
+  private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   private final Map<OsmWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
   private final VertexGenerator vertexBuilder;
@@ -578,12 +576,12 @@ class WalkableAreaBuilder {
       namedArea.setPermission(wayData.getPermission());
       edgeList.addArea(namedArea);
 
-      if(areaEntity.isBoardingLocation()) {
-	  var references = areaEntity.getMultiTagValues(boardingLocationRefTags);
-	  if(!references.isEmpty()) {
-	      var platform = new Platform(name, area.jtsMultiPolygon, references);
-	      osmInfoGraphBuildRepository.addPlatform(area, platform);
-	  }
+      if (areaEntity.isBoardingLocation()) {
+        var references = areaEntity.getMultiTagValues(boardingLocationRefTags);
+        if (!references.isEmpty()) {
+          var platform = new Platform(name, area.jtsMultiPolygon, references);
+          osmInfoGraphBuildRepository.addPlatform(namedArea, platform);
+        }
       }
     }
   }

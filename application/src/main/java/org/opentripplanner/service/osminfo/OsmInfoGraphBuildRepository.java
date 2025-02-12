@@ -27,7 +27,6 @@ public interface OsmInfoGraphBuildRepository extends Serializable {
    */
   Optional<Platform> findPlatform(Edge edge);
 
-
   /**
    * Find the platform which relates to an area
    */

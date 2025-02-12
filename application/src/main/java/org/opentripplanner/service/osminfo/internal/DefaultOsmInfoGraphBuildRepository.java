@@ -46,6 +46,11 @@ public class DefaultOsmInfoGraphBuildRepository
 
   @Override
   public String toString() {
-    return "DefaultOsmInfoGraphBuildRepository{platforms size = " + platforms.size() + areaPlatforms.size()"}";
+    return (
+      "DefaultOsmInfoGraphBuildRepository{platforms size = " +
+      platforms.size() +
+      areaPlatforms.size() +
+      "}"
+    );
   }
 }
