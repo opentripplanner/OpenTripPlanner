@@ -74,19 +74,16 @@ class DelayedTest implements RealtimeTestConstants {
   void complexDelay() {
     var tripInput = TripInput
       .of(TRIP_2_ID)
-      .addStop(STOP_A1, "0:00:00", "0:00:00")
-      // 5-minute dwell
-      .addStop(STOP_B1, "0:05:00", "0:10:00")
-      .addStop(STOP_C1, "0:15:00", "0:16:00")
-      .addStop(STOP_D1, "0:20:00", "0:20:00")
+      .addStop(STOP_A1, "0:01:00", "0:01:01")
+      .addStop(STOP_B1, "0:01:10", "0:01:11")
+      .addStop(STOP_C1, "0:01:20", "0:01:21")
       .build();
     var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
-      .addDelayedArrivalStopTime(1, 900) // 00:20 arr
-      .addDelayedStopTime(2, 540) // 00:24 arr / 00:25 dep
-      .addDelayedDepartureStopTime(3, 420) // 00:27 dep
+      .addDelayedStopTime(1, 60, 80)
+      .addDelayedStopTime(2, 90, 90)
       .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
@@ -122,6 +119,50 @@ class DelayedTest implements RealtimeTestConstants {
     );
 
     assertEquals(
+      "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
+      env.getScheduledTimetable(TRIP_2_ID)
+    );
+    assertEquals(
+      "UPDATED | A1 0:01 0:01:01 | B1 0:02:10 0:02:31 | C1 0:02:50 0:02:51",
+      env.getRealtimeTimetable(TRIP_2_ID)
+    );
+  }
+
+  @Test
+  void delayedAfterNextStopDeparture() {
+    var tripInput = TripInput
+      .of(TRIP_2_ID)
+      .addStop(STOP_A1, "0:00:00", "0:00:00")
+      // 5-minute dwell
+      .addStop(STOP_B1, "0:05:00", "0:10:00")
+      .addStop(STOP_C1, "0:15:00", "0:16:00")
+      .addStop(STOP_D1, "0:20:00", "0:20:00")
+      .build();
+    var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
+
+    var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
+      .addDelayedStopTime(0, 0)
+      .addDelayedArrivalStopTime(1, 900) // 00:20 arr
+      .addDelayedStopTime(2, 540) // 00:24 arr / 00:25 dep
+      .addDelayedDepartureStopTime(3, 420) // 00:27 dep
+      .build();
+
+    assertSuccess(env.applyTripUpdate(tripUpdate));
+
+    var snapshot = env.getTimetableSnapshot();
+
+    var trip2 = env.getTransitService().getTrip(id(TRIP_2_ID));
+    var originalTripPattern = env.getTransitService().findPattern(trip2);
+
+    var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
+
+    final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(TRIP_2_ID);
+    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
+      originalTripIndexScheduled
+    );
+    assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
+
+    assertEquals(
       "SCHEDULED | A1 0:00 0:00 | B1 0:05 0:10 | C1 0:15 0:16 | D1 0:20 0:20",
       env.getScheduledTimetable(TRIP_2_ID)
     );
@@ -131,3 +172,4 @@ class DelayedTest implements RealtimeTestConstants {
     );
   }
 }
+
