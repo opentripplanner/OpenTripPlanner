@@ -21,24 +21,15 @@ public class AreaEdgeList implements Serializable {
 
   private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
   private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
-
-  // these are all of the original edges of the area, whether
-  // or not there are corresponding OSM edges. It is used as part of a hack
-  // to fix up areas after network linking.
-  private final Polygon originalEdges;
-
+  private final Polygon geometry;
   private final List<NamedArea> areas = new ArrayList<>();
 
-  public AreaEdgeList(Polygon originalEdges) {
-    this.originalEdges = originalEdges;
+  public AreaEdgeList(Polygon geometry) {
+    this.geometry = geometry;
   }
 
   public String toString() {
-    return String.format(
-      "AreaEdgeList: visibilityVertices=%s, %s",
-      visibilityVertices,
-      originalEdges
-    );
+    return String.format("AreaEdgeList: visibilityVertices=%s, %s", visibilityVertices, geometry);
   }
 
   public void addArea(NamedArea namedArea) {
@@ -50,7 +41,7 @@ public class AreaEdgeList implements Serializable {
   }
 
   public Geometry getGeometry() {
-    return originalEdges;
+    return geometry;
   }
 
   /**
