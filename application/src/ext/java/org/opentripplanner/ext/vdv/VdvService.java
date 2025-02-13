@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vdv;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -18,13 +19,13 @@ public class VdvService {
     this.transitService = transitService;
   }
 
-  public List<TripTimeOnDate> findStopTimesInPattern(String stopId, int numResults) {
+  public List<TripTimeOnDate> findStopTimesInPattern(String stopId, LocalDateTime time, int numResults) {
     var stop = transitService.getRegularStop(FeedScopedId.parse("tampere:" + stopId));
     List<StopTimesInPattern> stopTimesInPatterns = transitService.findStopTimesInPattern(
       stop,
-      Instant.now(),
+      time.atZone(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(2),
-      numResults,
+      10,
       ArrivalDeparture.BOTH,
       true
     );
@@ -33,6 +34,7 @@ public class VdvService {
       .stream()
       .flatMap(st -> st.times.stream())
       .sorted(Comparator.comparingLong(TripTimeOnDate::getRealtimeDeparture))
+      .limit(numResults)
       .toList();
   }
 }

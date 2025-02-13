@@ -38,7 +38,6 @@ public class TriasResource {
   }
 
   @POST
-  @Path("/")
   @Produces("application/xml")
   public Response index(String triasInput) {
     try {
@@ -53,8 +52,9 @@ public class TriasResource {
 
       if (request instanceof OJPStopEventRequestStructure ser) {
         var stopId = ser.getLocation().getPlaceRef().getStopPointRef().getValue();
+        var time = ser.getLocation().getDepArrTime();
         var numResults = ser.getParams().getNumberOfResults().intValue();
-        var tripTimesOnDate = vdvService.findStopTimesInPattern(stopId, numResults);
+        var tripTimesOnDate = vdvService.findStopTimesInPattern(stopId, time, numResults);
         var ojpOutput = mapper.mapStopTimesInPattern(tripTimesOnDate, Instant.now());
         final StreamingOutput stream = ojpToTrias(ojpOutput);
         return Response.ok(stream).build();
