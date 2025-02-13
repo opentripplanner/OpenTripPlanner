@@ -78,10 +78,6 @@ class WalkableAreaBuilder {
   private static final String labelTemplate = "way (area) %s from %s to %s"; // for AreaEdge names
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-  private int visibilityVertexCount = 0;
-  private int areaEdgeCount = 0;
-  private int recursedSegments = 0;
-
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
@@ -115,10 +111,6 @@ class WalkableAreaBuilder {
           .collect(Collectors.toList())
         : List.of();
     this.vertexFactory = new VertexFactory(graph);
-  }
-
-  public int[] getStats() {
-    return new int[] { visibilityVertexCount, areaEdgeCount, recursedSegments };
   }
 
   /**
@@ -229,7 +221,6 @@ class WalkableAreaBuilder {
           visibilityNodes.add(node);
           startingNodes.add(node);
           areaGroup.addVisibilityVertex(vertex);
-          visibilityVertexCount++;
         }
 
         for (Ring outerRing : area.outermostRings) {
@@ -250,7 +241,6 @@ class WalkableAreaBuilder {
               startingNodes.add(node);
               areaGroup.addVisibilityVertex(v);
               linkPointsAdded = true;
-              visibilityVertexCount++;
             }
           }
 
@@ -275,12 +265,10 @@ class WalkableAreaBuilder {
               (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
             ) {
               visibilityNodes.add(node);
-              visibilityVertexCount++;
               areaGroup.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
             if (isStartingNode(node, osmWayIds)) {
               visibilityNodes.add(node);
-              visibilityVertexCount++;
               startingNodes.add(node);
               areaGroup.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
@@ -296,13 +284,11 @@ class WalkableAreaBuilder {
               // For holes, we must swap the convexity condition
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
-                visibilityVertexCount++;
                 areaGroup.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
               if (isStartingNode(node, osmWayIds)) {
                 visibilityNodes.add(node);
                 startingNodes.add(node);
-                visibilityVertexCount++;
                 areaGroup.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
             }
