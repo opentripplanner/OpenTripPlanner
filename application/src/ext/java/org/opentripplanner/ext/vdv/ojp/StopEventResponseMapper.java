@@ -16,18 +16,14 @@ import de.vdv.ojp20.StopEventStructure;
 import de.vdv.ojp20.siri.DefaultedTextStructure;
 import de.vdv.ojp20.siri.LineRefStructure;
 import de.vdv.ojp20.siri.OperatorRefStructure;
-import de.vdv.ojp20.siri.ParticipantRefStructure;
-import de.vdv.ojp20.siri.ServiceDelivery;
 import de.vdv.ojp20.siri.StopPointRefStructure;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.XmlType;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import javax.xml.namespace.QName;
@@ -47,7 +43,7 @@ public class StopEventResponseMapper {
     this.zoneId = zoneId;
   }
 
-  public OJP mapStopTimesInPattern(List<TripTimeOnDate> tripTimesOnDate, Instant timestamp) {
+  public OJP mapStopTimesInPattern(List<TripTimeOnDate> tripTimesOnDate, ZonedDateTime timestamp) {
     List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
       .stream()
       .map(this::stopEventResult)
@@ -57,12 +53,9 @@ public class StopEventResponseMapper {
     var sed = new OJPStopEventDeliveryStructure().withStatus(true);
     stopEvents.forEach(sed::withRest);
 
-    var serviceDelivery = new ServiceDelivery()
-      .withAbstractFunctionalServiceDelivery(jaxbElement(sed))
-      .withResponseTimestamp(
-        new XmlDateTime(timestamp.atZone(zoneId).truncatedTo(ChronoUnit.MILLIS))
-      )
-      .withProducerRef(new ParticipantRefStructure().withValue("OpenTripPlanner"));
+    var serviceDelivery = ServiceDeliveryMapper
+      .serviceDelivery(timestamp)
+      .withAbstractFunctionalServiceDelivery(StopEventResponseMapper.jaxbElement(sed));
 
     var response = new OJPResponseStructure().withServiceDelivery(serviceDelivery);
     return new OJP().withOJPResponse(response);

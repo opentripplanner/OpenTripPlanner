@@ -40,9 +40,9 @@
   <!--*********************************************-->
 
   <xsl:template match="siri:ErrorCondition">
-    <ErrorCondition>
+    <siri:ErrorCondition>
       <xsl:value-of select="node()"/>
-    </ErrorCondition>
+    </siri:ErrorCondition>
   </xsl:template>
 
 
