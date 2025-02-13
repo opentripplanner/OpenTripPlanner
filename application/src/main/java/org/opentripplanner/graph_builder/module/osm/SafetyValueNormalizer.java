@@ -11,7 +11,7 @@ import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
@@ -54,14 +54,14 @@ class SafetyValueNormalizer {
 
     issueStore.add(new Graphwide("Multiplying all walk safety values by " + (1 / bestWalkSafety)));
     HashSet<Edge> seenEdges = new HashSet<>();
-    HashSet<AreaEdgeList> seenAreas = new HashSet<>();
+    HashSet<AreaGroup> seenAreas = new HashSet<>();
     for (Vertex vertex : graph.getVertices()) {
       for (Edge e : vertex.getOutgoing()) {
         if (e instanceof AreaEdge) {
-          AreaEdgeList areaEdgeList = ((AreaEdge) e).getArea();
-          if (seenAreas.contains(areaEdgeList)) continue;
-          seenAreas.add(areaEdgeList);
-          for (Area area : areaEdgeList.getAreas()) {
+          AreaGroup areaGroup = ((AreaEdge) e).getArea();
+          if (seenAreas.contains(areaGroup)) continue;
+          seenAreas.add(areaGroup);
+          for (Area area : areaGroup.getAreas()) {
             area.setBicycleSafetyMultiplier(area.getBicycleSafetyMultiplier() / bestBikeSafety);
             area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
           }

@@ -20,7 +20,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
-import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -58,20 +58,20 @@ public class LinkStopToPlatformTest {
     closedGeom[platform.length] = closedGeom[0];
 
     Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
-    AreaEdgeList areaEdgeList = new AreaEdgeList(polygon);
+    AreaGroup areaGroup = new AreaGroup(polygon);
 
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
     for (int i : visible) {
-      areaEdgeList.addVisibilityVertex(vertices.get(i));
+      areaGroup.addVisibilityVertex(vertices.get(i));
     }
 
-    // AreaEdgeList must include a valid Area which defines area atttributes
+    // AreaGroup must include a valid Area which defines area atttributes
     Area area = new Area();
     area.setName(new LocalizedString("test platform"));
     area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
     area.setOriginalEdges(polygon);
-    areaEdgeList.addArea(area);
+    areaGroup.addArea(area);
 
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;
@@ -79,13 +79,13 @@ public class LinkStopToPlatformTest {
       var edgeBuilder1 = createAreaEdge(
         vertices.get(i),
         vertices.get(next_i),
-        areaEdgeList,
+        areaGroup,
         "edge " + i
       );
       var edgeBuilder2 = createAreaEdge(
         vertices.get(next_i),
         vertices.get(i),
-        areaEdgeList,
+        areaGroup,
         "edge " + String.valueOf(i + platform.length)
       );
       // make one corner surrounded by walk nothru edges
@@ -272,7 +272,7 @@ public class LinkStopToPlatformTest {
   private AreaEdgeBuilder createAreaEdge(
     IntersectionVertex v1,
     IntersectionVertex v2,
-    AreaEdgeList area,
+    AreaGroup area,
     String nameString
   ) {
     LineString line = geometryFactory.createLineString(

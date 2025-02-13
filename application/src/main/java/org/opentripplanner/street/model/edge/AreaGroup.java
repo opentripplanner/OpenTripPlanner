@@ -17,19 +17,19 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
  *
  * @author novalis
  */
-public class AreaEdgeList implements Serializable {
+public class AreaGroup implements Serializable {
 
   private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
   private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
   private final Polygon geometry;
   private final List<Area> areas = new ArrayList<>();
 
-  public AreaEdgeList(Polygon geometry) {
+  public AreaGroup(Polygon geometry) {
     this.geometry = geometry;
   }
 
   public String toString() {
-    return String.format("AreaEdgeList: visibilityVertices=%s, %s", visibilityVertices, geometry);
+    return String.format("AreaGroup: visibilityVertices=%s, %s", visibilityVertices, geometry);
   }
 
   public void addArea(Area area) {

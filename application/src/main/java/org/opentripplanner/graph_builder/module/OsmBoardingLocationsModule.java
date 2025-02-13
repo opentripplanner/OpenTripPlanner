@@ -141,7 +141,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    */
   private boolean connectVertexToArea(TransitStopVertex ts, StreetIndex index) {
     RegularStop stop = ts.getStop();
-    var nearbyAreaEdgeList = index
+    var nearbyAreaGroup = index
       .getEdgesForEnvelope(getEnvelope(ts))
       .stream()
       .filter(AreaEdge.class::isInstance)
@@ -151,7 +151,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     // Find a nearby area representing transit stop in OSM, linking to it if
     // stop code or id in ref= tag matches the GTFS stop code of this StopVertex.
-    for (var edgeList : nearbyAreaEdgeList) {
+    for (var edgeList : nearbyAreaGroup) {
       for (Area area : edgeList.getAreas()) {
         var platOpt = osmInfoGraphBuildService.findPlatform(area);
         if (platOpt.isPresent()) {
