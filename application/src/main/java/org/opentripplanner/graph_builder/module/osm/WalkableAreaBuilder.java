@@ -79,8 +79,8 @@ class WalkableAreaBuilder {
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
   private int visibilityVertexCount = 0;
-  private int convexCount = 0;
-  private int concaveCount = 0;
+  private int areaEdgeCount = 0;
+  private int recursedSegments = 0;
 
   public WalkableAreaBuilder(
     Graph graph,
@@ -118,7 +118,7 @@ class WalkableAreaBuilder {
   }
 
   public int[] getStats() {
-    return new int[] { visibilityVertexCount, convexCount, concaveCount };
+    return new int[] { visibilityVertexCount, areaEdgeCount, recursedSegments };
   }
 
   /**
@@ -210,14 +210,10 @@ class WalkableAreaBuilder {
 
       OsmWithTags areaEntity = group.getSomeOsmObject();
 
-      // we try to catch trivial convex areas to optimize expensive geometric operations
-      // area is convex if it consists of one polygon only, there are no holes
-      // and every boundary point is convex
-      boolean convex = group.areas.size() == 1;
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
       for (Area area : group.areas) {
-        // test if area is inside current ring. Test is necessary only if there are many areas or outer rings
+        // test if area is inside current ring. This is necessary only if there are many areas or outer rings
         if (group.areas.size() != 1 || group.outermostRings.size() != 1) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
             continue;
@@ -236,7 +232,6 @@ class WalkableAreaBuilder {
           visibilityVertexCount++;
         }
 
-        convex = convex && area.outermostRings.size() == 1;
         for (Ring outerRing : area.outermostRings) {
           // variable to indicate if some additional entrance points have been added to area
           boolean linkPointsAdded = !entrances.isEmpty();
@@ -271,13 +266,14 @@ class WalkableAreaBuilder {
             edges.addAll(newEdges);
             ringEdges.addAll(newEdges);
 
-            var nodeConcave = outerRing.isNodeConcave(i);
-            convex = convex && !nodeConcave;
             // A node can only be a visibility node only if it is an entrance to the
-            // area or a concave point, i.e. the angle is over 180 degrees.
+            // area or a convex point, i.e. the angle is over 180 degrees.
             // Also, if additional linking points have been defined, add some points from outer
             // edge to ensure that platform geometry gets connected
-            if (nodeConcave || (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))) {
+            if (
+              outerRing.isNodeConvex(i) ||
+              (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
+            ) {
               visibilityNodes.add(node);
               visibilityVertexCount++;
               edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
@@ -289,15 +285,16 @@ class WalkableAreaBuilder {
               edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
           }
-          convex = convex && outerRing.getHoles().size() == 0; // hole breaks convexity
           for (Ring innerRing : outerRing.getHoles()) {
             for (int j = 0; j < innerRing.nodes.size(); ++j) {
               OsmNode node = innerRing.nodes.get(j);
               edges.addAll(
                 createEdgesForRingSegment(edgeList, area, innerRing, j, alreadyAddedEdges)
               );
+              // A node can only be a visibility node only if it is an entrance to the
+              // area or a convex point, i.e. the angle is over 180 degrees.
               // For holes, we must swap the convexity condition
-              if (!innerRing.isNodeConcave(j)) {
+              if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
                 visibilityVertexCount++;
                 edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
@@ -328,11 +325,6 @@ class WalkableAreaBuilder {
         issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
       }
 
-      if (convex) {
-        convexCount++;
-      } else {
-        concaveCount++;
-      }
       // if area is too complex, consider only part of visibility nodes
       // so that at least some edges passing through the area are added
       // otherwise routing can use only area boundary edges
@@ -367,14 +359,8 @@ class WalkableAreaBuilder {
             vertex2.getCoordinate(),
           };
           LineString line = geometryFactory.createLineString(coordinates);
-          if (convex || polygon.contains(line)) {
-            Set<AreaEdge> segments = createSegments(
-              vertex1,
-              vertex2,
-              group.areas,
-              edgeList,
-              !convex
-            );
+          if (polygon.contains(line)) {
+            Set<AreaEdge> segments = createSegments(vertex1, vertex2, group.areas, edgeList, true);
             edges.addAll(segments);
             if (platformLinkingVertices.contains(vertex1)) {
               ringEdges.addAll(segments);

@@ -11,7 +11,7 @@ import org.opentripplanner.osm.model.OsmNode;
 class RingTest {
 
   @Test
-  void testIsNodeConcave() {
+  void testIsNodeConvex() {
     OsmNode a = new OsmNode();
     a.lat = 0.0;
     a.lon = 0.0;
@@ -30,39 +30,39 @@ class RingTest {
 
     Ring ring = new Ring(List.of(a, b, c, d, a));
 
-    assertFalse(ring.isNodeConcave(0));
-    assertFalse(ring.isNodeConcave(1));
-    assertFalse(ring.isNodeConcave(2));
-    assertFalse(ring.isNodeConcave(3));
-    assertFalse(ring.isNodeConcave(4));
+    assertFalse(ring.isNodeConvex(0));
+    assertFalse(ring.isNodeConvex(1));
+    assertFalse(ring.isNodeConvex(2));
+    assertFalse(ring.isNodeConvex(3));
+    assertFalse(ring.isNodeConvex(4));
 
     ring = new Ring(List.of(a, d, c, b, a));
 
-    assertFalse(ring.isNodeConcave(0));
-    assertFalse(ring.isNodeConcave(1));
-    assertFalse(ring.isNodeConcave(2));
-    assertFalse(ring.isNodeConcave(3));
-    assertFalse(ring.isNodeConcave(4));
+    assertFalse(ring.isNodeConvex(0));
+    assertFalse(ring.isNodeConvex(1));
+    assertFalse(ring.isNodeConvex(2));
+    assertFalse(ring.isNodeConvex(3));
+    assertFalse(ring.isNodeConvex(4));
 
     ring = new Ring(List.of(a, e, b, c, d, a));
 
-    assertFalse(ring.isNodeConcave(0));
-    assertTrue(ring.isNodeConcave(1));
-    assertFalse(ring.isNodeConcave(2));
-    assertFalse(ring.isNodeConcave(3));
-    assertFalse(ring.isNodeConcave(4));
-    assertFalse(ring.isNodeConcave(5));
+    assertFalse(ring.isNodeConvex(0));
+    assertTrue(ring.isNodeConvex(1));
+    assertFalse(ring.isNodeConvex(2));
+    assertFalse(ring.isNodeConvex(3));
+    assertFalse(ring.isNodeConvex(4));
+    assertFalse(ring.isNodeConvex(5));
 
     ring = new Ring(List.of(a, e, d, c, b, a));
 
     // Ring has been reversed
     assertEquals(0.5, ring.nodes.get(4).lat);
 
-    assertFalse(ring.isNodeConcave(0));
-    assertFalse(ring.isNodeConcave(1));
-    assertFalse(ring.isNodeConcave(2));
-    assertFalse(ring.isNodeConcave(3));
-    assertTrue(ring.isNodeConcave(4));
-    assertFalse(ring.isNodeConcave(5));
+    assertFalse(ring.isNodeConvex(0));
+    assertFalse(ring.isNodeConvex(1));
+    assertFalse(ring.isNodeConvex(2));
+    assertFalse(ring.isNodeConvex(3));
+    assertTrue(ring.isNodeConvex(4));
+    assertFalse(ring.isNodeConvex(5));
   }
 }

@@ -69,9 +69,9 @@ class Ring {
   }
 
   /**
-   * Checks whether the ith node in the ring is concave (has an angle of over 180 degrees).
+   * Checks whether the ith node in the ring is convex (has an angle of over 180 degrees).
    */
-  boolean isNodeConcave(int i) {
+  boolean isNodeConvex(int i) {
     int n = nodes.size() - 1;
     OsmNode cur = nodes.get(i);
     OsmNode prev = nodes.get((i + n - 1) % n);
