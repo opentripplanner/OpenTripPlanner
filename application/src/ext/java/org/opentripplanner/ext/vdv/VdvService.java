@@ -18,13 +18,13 @@ public class VdvService {
     this.transitService = transitService;
   }
 
-  public List<TripTimeOnDate> findStopTimesInPattern() {
-    var stop = transitService.getRegularStop(FeedScopedId.parse("tampere:0810"));
+  public List<TripTimeOnDate> findStopTimesInPattern(String stopId, int numResults) {
+    var stop = transitService.getRegularStop(FeedScopedId.parse("tampere:" + stopId));
     List<StopTimesInPattern> stopTimesInPatterns = transitService.findStopTimesInPattern(
       stop,
       Instant.now(),
       Duration.ofHours(2),
-      20,
+      numResults,
       ArrivalDeparture.BOTH,
       true
     );

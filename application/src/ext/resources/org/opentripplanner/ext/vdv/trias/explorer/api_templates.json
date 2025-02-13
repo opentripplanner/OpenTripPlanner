@@ -23,7 +23,8 @@
           "label": "Number of results",
           "type": "integer",
           "default": "1"
-        },        {
+        },
+        {
           "name": "stop_event_type",
           "label": "Stop event type reference",
           "type": "enumeration",

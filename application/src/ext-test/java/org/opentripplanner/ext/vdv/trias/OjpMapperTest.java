@@ -14,7 +14,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.vdv.ojp.OjpMapper;
+import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -66,7 +66,7 @@ class OjpMapperTest {
 
   @Test
   void test() throws JAXBException {
-    var mapper = new OjpMapper(ZoneIds.BERLIN);
+    var mapper = new StopEventResponseMapper(ZoneIds.BERLIN);
 
     var ojp = mapper.mapStopTimesInPattern(List.of(TRIP_TIMES_ON_DATE), timestamp);
 
@@ -86,7 +86,7 @@ class OjpMapperTest {
 
   @Test
   void ojpToTrias() {
-    var mapper = new OjpMapper(ZoneIds.BERLIN);
+    var mapper = new StopEventResponseMapper(ZoneIds.BERLIN);
     var ojp = mapper.mapStopTimesInPattern(List.of(TRIP_TIMES_ON_DATE), timestamp);
     OjpToTriasTransformer.transform(ojp, new PrintWriter(System.out));
   }

@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vdv.trias;
 
+import de.vdv.ojp20.OJP;
+import de.vdv.ojp20.OJPStopEventRequestStructure;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -7,14 +9,17 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import jakarta.xml.bind.JAXBException;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.time.Instant;
 import java.util.Objects;
+import javax.xml.transform.TransformerException;
 import org.opentripplanner.ext.vdv.VdvService;
-import org.opentripplanner.ext.vdv.ojp.OjpMapper;
+import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
+import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,31 +30,55 @@ public class TriasResource {
   private static final Logger LOG = LoggerFactory.getLogger(TriasResource.class);
 
   private final VdvService vdvService;
-  private final OjpMapper mapper;
+  private final StopEventResponseMapper mapper;
 
   public TriasResource(@Context OtpServerRequestContext context) {
     this.vdvService = new VdvService(context.transitService());
-    this.mapper = new OjpMapper(context.transitService().getTimeZone());
+    this.mapper = new StopEventResponseMapper(context.transitService().getTimeZone());
   }
 
   @POST
   @Path("/")
   @Produces("application/xml")
-  public Response index() {
+  public Response index(String triasInput) {
     try {
-      var tripTimesOnDate = vdvService.findStopTimesInPattern();
-      var ojp = mapper.mapStopTimesInPattern(tripTimesOnDate, Instant.now());
+      var ojp = OjpToTriasTransformer.readTrias(triasInput);
 
-      StreamingOutput stream = os -> {
-        Writer writer = new BufferedWriter(new OutputStreamWriter(os));
-        OjpToTriasTransformer.transform(ojp, writer);
-        writer.flush();
-      };
-      return Response.ok(stream).build();
+      var request = ojp
+        .getOJPRequest()
+        .getServiceRequest()
+        .getAbstractFunctionalServiceRequest()
+        .getFirst()
+        .getValue();
+
+      if (request instanceof OJPStopEventRequestStructure ser) {
+        var stopId = ser.getLocation().getPlaceRef().getStopPointRef().getValue();
+        var numResults = ser.getParams().getNumberOfResults().intValue();
+        var tripTimesOnDate = vdvService.findStopTimesInPattern(stopId, numResults);
+        var ojpOutput = mapper.mapStopTimesInPattern(tripTimesOnDate, Instant.now());
+        final StreamingOutput stream = ojpToTrias(ojpOutput);
+        return Response.ok(stream).build();
+      }
+      else {
+        var error = ErrorMapper.error("Request %s is not supported".formatted(request.getClass().getSimpleName()));
+        return Response.serverError().entity(error).build();
+      }
+    } catch (JAXBException | TransformerException e) {
+      var error = ErrorMapper.error("Could not read TRIAS request.");
+      return Response.serverError().entity(error).build();
     } catch (Exception e) {
       LOG.error("Error producing TRIAS response", e);
       return Response.serverError().build();
     }
+  }
+
+  private static StreamingOutput ojpToTrias(OJP ojpOutput) {
+    StreamingOutput stream = os -> {
+      Writer writer = new BufferedWriter(new OutputStreamWriter(os));
+      OjpToTriasTransformer.transform(ojpOutput, writer);
+      writer.flush();
+    };
+    return stream;
   }
 
   @GET
