@@ -94,6 +94,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add maximum slope debug layer [#6447](https://github.com/opentripplanner/OpenTripPlanner/pull/6447)
 - Disable OptimizeTransfers for via search temporarily. [#6449](https://github.com/opentripplanner/OpenTripPlanner/pull/6449)
 - Return error codes from SiriFuzzyTripMatcher, add support for scheduled stop points [#6448](https://github.com/opentripplanner/OpenTripPlanner/pull/6448)
+- Remove default accessegress penalty for car modes that use transit [#6414](https://github.com/opentripplanner/OpenTripPlanner/pull/6414)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
