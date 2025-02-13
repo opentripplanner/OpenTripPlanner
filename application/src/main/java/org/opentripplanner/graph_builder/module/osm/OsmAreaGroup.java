@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
 /**
  * A group of possibly-contiguous areas sharing the same level
  */
-class AreaGroup {
+class OsmAreaGroup {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AreaGroup.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OsmAreaGroup.class);
 
   /*
    * The list of underlying areas, used when generating edges out of the visibility graph
@@ -42,7 +42,7 @@ class AreaGroup {
 
   public final Geometry union;
 
-  public AreaGroup(Collection<OsmArea> areas) {
+  public OsmAreaGroup(Collection<OsmArea> areas) {
     this.areas = areas;
 
     // Merging non-convex polygons is complicated, so we need to convert to JTS, let JTS do the
@@ -86,7 +86,7 @@ class AreaGroup {
     }
   }
 
-  public static List<AreaGroup> groupAreas(Map<OsmArea, OsmLevel> areasLevels) {
+  public static List<OsmAreaGroup> groupAreas(Map<OsmArea, OsmLevel> areasLevels) {
     DisjointSet<OsmArea> groups = new DisjointSet<>();
     Multimap<OsmNode, OsmArea> areasForNode = LinkedListMultimap.create();
     for (OsmArea area : areasLevels.keySet()) {
@@ -115,10 +115,10 @@ class AreaGroup {
       }
     }
 
-    List<AreaGroup> out = new ArrayList<>();
+    List<OsmAreaGroup> out = new ArrayList<>();
     for (Set<OsmArea> areaSet : groups.sets()) {
       try {
-        out.add(new AreaGroup(areaSet));
+        out.add(new OsmAreaGroup(areaSet));
       } catch (RingConstructionException e) {
         for (OsmArea area : areaSet) {
           LOG.debug(
@@ -126,7 +126,7 @@ class AreaGroup {
             area +
             ".  This area might not be at fault; it might be one of the other areas in this list."
           );
-          out.add(new AreaGroup(Arrays.asList(area)));
+          out.add(new OsmAreaGroup(Arrays.asList(area)));
         }
       }
     }

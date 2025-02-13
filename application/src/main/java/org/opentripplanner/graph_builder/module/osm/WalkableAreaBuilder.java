@@ -125,7 +125,7 @@ class WalkableAreaBuilder {
    * For all areas just use outermost rings as edges so that areas can be routable without
    * visibility calculations
    */
-  public void buildWithoutVisibility(AreaGroup group) {
+  public void buildWithoutVisibility(OsmAreaGroup group) {
     // create polygon and accumulate nodes for area
     for (Ring ring : group.outermostRings) {
       Set<AreaEdge> edges = new HashSet<>();
@@ -169,7 +169,7 @@ class WalkableAreaBuilder {
     }
   }
 
-  public void buildWithVisibility(AreaGroup group) {
+  public void buildWithVisibility(OsmAreaGroup group) {
     // These sets contain the nodes/vertices which can be used to traverse from the rest of the
     // street network onto the walkable area
     Set<OsmNode> startingNodes = new HashSet<>();

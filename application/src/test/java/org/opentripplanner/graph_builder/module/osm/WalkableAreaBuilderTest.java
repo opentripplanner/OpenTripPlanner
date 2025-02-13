@@ -63,9 +63,9 @@ public class WalkableAreaBuilderTest {
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));
-    final List<AreaGroup> areaGroups = AreaGroup.groupAreas(areasLevels);
+    final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(areasLevels);
 
-    final Consumer<AreaGroup> build = visibility
+    final Consumer<OsmAreaGroup> build = visibility
       ? walkableAreaBuilder::buildWithVisibility
       : walkableAreaBuilder::buildWithoutVisibility;
 

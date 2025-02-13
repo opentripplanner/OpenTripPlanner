@@ -108,20 +108,20 @@ class ParkingProcessor {
     return vehicleParkingToAdd;
   }
 
-  public Collection<VehicleParking> buildBikeParkAndRideAreas(List<AreaGroup> areaGroups) {
+  public Collection<VehicleParking> buildBikeParkAndRideAreas(List<OsmAreaGroup> areaGroups) {
     return buildParkAndRideAreasForGroups(areaGroups, false);
   }
 
-  public Collection<VehicleParking> buildParkAndRideAreas(List<AreaGroup> areaGroups) {
+  public Collection<VehicleParking> buildParkAndRideAreas(List<OsmAreaGroup> areaGroups) {
     return buildParkAndRideAreasForGroups(areaGroups, true);
   }
 
   private List<VehicleParking> buildParkAndRideAreasForGroups(
-    List<AreaGroup> areaGroups,
+    List<OsmAreaGroup> areaGroups,
     boolean isCarParkAndRide
   ) {
     List<VehicleParking> vehicleParkingToAdd = new ArrayList<>();
-    for (AreaGroup group : areaGroups) {
+    for (OsmAreaGroup group : areaGroups) {
       var vehicleParking = buildParkAndRideAreasForGroup(group, isCarParkAndRide);
       if (vehicleParking != null) {
         vehicleParkingToAdd.add(vehicleParking);
@@ -188,7 +188,10 @@ class ParkingProcessor {
     return accessVertices;
   }
 
-  private VehicleParking buildParkAndRideAreasForGroup(AreaGroup group, boolean isCarParkAndRide) {
+  private VehicleParking buildParkAndRideAreasForGroup(
+    OsmAreaGroup group,
+    boolean isCarParkAndRide
+  ) {
     Envelope envelope = new Envelope();
     Set<VertexAndName> accessVertices = new HashSet<>();
 
@@ -286,7 +289,7 @@ class ParkingProcessor {
    * it would not be usable by the routing algorithm as it's unreachable.
    */
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
-    AreaGroup group,
+    OsmAreaGroup group,
     I18NString vehicleParkingName,
     OsmWithTags entity,
     boolean isCarPark

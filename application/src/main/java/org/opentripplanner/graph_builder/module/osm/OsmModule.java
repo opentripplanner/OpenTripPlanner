@@ -184,13 +184,13 @@ public class OsmModule implements GraphBuilderModule {
     validateBarriers();
 
     if (params.staticParkAndRide()) {
-      List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
+      List<OsmAreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
       var carParkingAreas = parkingProcessor.buildParkAndRideAreas(areaGroups);
       parkingLots.addAll(carParkingAreas);
       LOG.info("Created {} car P+R areas.", carParkingAreas.size());
     }
     if (params.staticBikeParkAndRide()) {
-      List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
+      List<OsmAreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
       var bikeParkingAreas = parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
       parkingLots.addAll(bikeParkingAreas);
       LOG.info("Created {} bike P+R areas", bikeParkingAreas.size());
@@ -222,12 +222,12 @@ public class OsmModule implements GraphBuilderModule {
     return d;
   }
 
-  private List<AreaGroup> groupAreas(Collection<OsmArea> areas) {
+  private List<OsmAreaGroup> groupAreas(Collection<OsmArea> areas) {
     Map<OsmArea, OsmLevel> areasLevels = new HashMap<>(areas.size());
     for (OsmArea area : areas) {
       areasLevels.put(area, osmdb.getLevelForWay(area.parent));
     }
-    return AreaGroup.groupAreas(areasLevels);
+    return OsmAreaGroup.groupAreas(areasLevels);
   }
 
   private void buildWalkableAreas(boolean skipVisibility) {
@@ -238,7 +238,7 @@ public class OsmModule implements GraphBuilderModule {
     } else {
       LOG.info("Building visibility graphs for walkable areas.");
     }
-    List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
+    List<OsmAreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
     WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
@@ -252,7 +252,7 @@ public class OsmModule implements GraphBuilderModule {
       params.boardingAreaRefTags()
     );
     if (skipVisibility) {
-      for (AreaGroup group : areaGroups) {
+      for (OsmAreaGroup group : areaGroups) {
         walkableAreaBuilder.buildWithoutVisibility(group);
       }
     } else {
@@ -261,7 +261,7 @@ public class OsmModule implements GraphBuilderModule {
         50,
         areaGroups.size()
       );
-      for (AreaGroup group : areaGroups) {
+      for (OsmAreaGroup group : areaGroups) {
         walkableAreaBuilder.buildWithVisibility(group);
         //Keep lambda! A method-ref would log incorrect class and line number
         //noinspection Convert2MethodRef
