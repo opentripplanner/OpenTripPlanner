@@ -145,7 +145,7 @@ class VertexGenerator {
       });
     }
     // Intersect ways at area boundaries if needed.
-    for (Area area : Iterables.concat(
+    for (OsmArea area : Iterables.concat(
       osmdb.getWalkableAreas(),
       osmdb.getParkAndRideAreas(),
       osmdb.getBikeParkingAreas()

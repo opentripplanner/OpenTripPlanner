@@ -170,7 +170,7 @@ public class OsmModule implements GraphBuilderModule {
       parkingLots.addAll(bikeParkingNodes);
     }
 
-    for (Area area : Iterables.concat(
+    for (OsmArea area : Iterables.concat(
       osmdb.getWalkableAreas(),
       osmdb.getParkAndRideAreas(),
       osmdb.getBikeParkingAreas()
@@ -222,9 +222,9 @@ public class OsmModule implements GraphBuilderModule {
     return d;
   }
 
-  private List<AreaGroup> groupAreas(Collection<Area> areas) {
-    Map<Area, OsmLevel> areasLevels = new HashMap<>(areas.size());
-    for (Area area : areas) {
+  private List<AreaGroup> groupAreas(Collection<OsmArea> areas) {
+    Map<OsmArea, OsmLevel> areasLevels = new HashMap<>(areas.size());
+    for (OsmArea area : areas) {
       areasLevels.put(area, osmdb.getLevelForWay(area.parent));
     }
     return AreaGroup.groupAreas(areasLevels);

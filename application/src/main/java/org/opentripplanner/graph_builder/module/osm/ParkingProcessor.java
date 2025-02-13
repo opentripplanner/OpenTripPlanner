@@ -155,7 +155,7 @@ class ParkingProcessor {
     return null;
   }
 
-  private List<VertexAndName> processVehicleParkingArea(Area area, Envelope envelope) {
+  private List<VertexAndName> processVehicleParkingArea(OsmArea area, Envelope envelope) {
     return area.outermostRings
       .stream()
       .flatMap(ring -> processVehicleParkingArea(ring, area.parent, envelope).stream())
@@ -196,7 +196,7 @@ class ParkingProcessor {
 
     // Process all nodes from outer rings
     // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
-    for (Area area : group.areas) {
+    for (OsmArea area : group.areas) {
       entity = area.parent;
 
       var areaAccessVertices = processVehicleParkingArea(area, envelope);

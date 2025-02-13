@@ -59,7 +59,7 @@ public class WalkableAreaBuilderTest {
       boardingAreaRefTags
     );
 
-    final Map<Area, OsmLevel> areasLevels = osmdb
+    final Map<OsmArea, OsmLevel> areasLevels = osmdb
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));

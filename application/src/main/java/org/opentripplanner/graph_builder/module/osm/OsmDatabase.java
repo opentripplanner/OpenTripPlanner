@@ -78,13 +78,13 @@ public class OsmDatabase {
   private final TLongObjectMap<OsmRelation> relationsById = new TLongObjectHashMap<>();
 
   /* All walkable areas */
-  private final List<Area> walkableAreas = new ArrayList<>();
+  private final List<OsmArea> walkableAreas = new ArrayList<>();
 
   /* All P+R areas */
-  private final List<Area> parkAndRideAreas = new ArrayList<>();
+  private final List<OsmArea> parkAndRideAreas = new ArrayList<>();
 
   /* All bike parking areas */
-  private final List<Area> bikeParkingAreas = new ArrayList<>();
+  private final List<OsmArea> bikeParkingAreas = new ArrayList<>();
 
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OsmWay>> areasForNode = new TLongObjectHashMap<>();
@@ -166,15 +166,15 @@ public class OsmDatabase {
     return Collections.unmodifiableCollection(carParkingNodes.valueCollection());
   }
 
-  public Collection<Area> getWalkableAreas() {
+  public Collection<OsmArea> getWalkableAreas() {
     return Collections.unmodifiableCollection(walkableAreas);
   }
 
-  public Collection<Area> getParkAndRideAreas() {
+  public Collection<OsmArea> getParkAndRideAreas() {
     return Collections.unmodifiableCollection(parkAndRideAreas);
   }
 
-  public Collection<Area> getBikeParkingAreas() {
+  public Collection<OsmArea> getBikeParkingAreas() {
     return Collections.unmodifiableCollection(bikeParkingAreas);
   }
 
@@ -373,7 +373,7 @@ public class OsmDatabase {
      */
     Set<KeyPair> commonSegments = new HashSet<>();
     HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
-    for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
+    for (OsmArea area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
       for (Ring ring : area.outermostRings) {
         processAreaRingForUnconnectedAreas(commonSegments, spndx, area, ring);
       }
@@ -590,7 +590,7 @@ public class OsmDatabase {
   private void processAreaRingForUnconnectedAreas(
     Set<KeyPair> commonSegments,
     HashGridSpatialIndex<RingSegment> spndx,
-    Area area,
+    OsmArea area,
     Ring ring
   ) {
     for (int j = 0; j < ring.nodes.size(); j++) {
@@ -688,8 +688,8 @@ public class OsmDatabase {
         }
       }
       try {
-        addArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
-      } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
+        addArea(new OsmArea(way, List.of(way), Collections.emptyList(), nodesById));
+      } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
         // the area; we'll mark it as processed so that we don't retry.
@@ -751,8 +751,8 @@ public class OsmDatabase {
       }
       processedAreas.add(relation);
       try {
-        addArea(new Area(relation, outerWays, innerWays, nodesById));
-      } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
+        addArea(new OsmArea(relation, outerWays, innerWays, nodesById));
+      } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
         continue;
       }
@@ -784,9 +784,9 @@ public class OsmDatabase {
   }
 
   /**
-   * Handler for a new Area (single way area or multipolygon relations)
+   * Handler for a new OsmArea (single way area or multipolygon relations)
    */
-  private void addArea(Area area) {
+  private void addArea(OsmArea area) {
     StreetTraversalPermission permissions = area.parent
       .getOsmProvider()
       .getWayPropertySet()
@@ -1108,7 +1108,7 @@ public class OsmDatabase {
   // Simple holder for the spatial index
   static class RingSegment {
 
-    Area area;
+    OsmArea area;
 
     Ring ring;
 

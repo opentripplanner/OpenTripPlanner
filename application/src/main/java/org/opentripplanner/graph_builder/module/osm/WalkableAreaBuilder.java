@@ -135,7 +135,7 @@ class WalkableAreaBuilder {
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
-      for (Area area : group.areas) {
+      for (OsmArea area : group.areas) {
         if (!ring.jtsPolygon.contains(area.jtsMultiPolygon)) {
           continue;
         }
@@ -212,7 +212,7 @@ class WalkableAreaBuilder {
 
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
-      for (Area area : group.areas) {
+      for (OsmArea area : group.areas) {
         // test if area is inside current ring. This is necessary only if there are many areas or outer rings
         if (group.areas.size() != 1 || group.outermostRings.size() != 1) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
@@ -445,7 +445,7 @@ class WalkableAreaBuilder {
 
   private Set<AreaEdge> createEdgesForRingSegment(
     AreaEdgeList edgeList,
-    Area area,
+    OsmArea area,
     Ring ring,
     int i,
     HashSet<NodeEdge> alreadyAddedEdges
@@ -466,7 +466,7 @@ class WalkableAreaBuilder {
   private Set<AreaEdge> createSegments(
     IntersectionVertex vertex1,
     IntersectionVertex vertex2,
-    Collection<Area> areas,
+    Collection<OsmArea> areas,
     AreaEdgeList edgeList,
     boolean testIntersection
   ) {
@@ -492,7 +492,7 @@ class WalkableAreaBuilder {
     boolean wheelchairAccessible = true;
 
     // combine properties of intersected areas
-    for (Area area : areas) {
+    for (OsmArea area : areas) {
       MultiPolygon polygon = area.jtsMultiPolygon;
       boolean crosses = testIntersection ? polygon.intersection(line).getLength() > 0.000001 : true;
       if (crosses) {
@@ -552,9 +552,9 @@ class WalkableAreaBuilder {
     return Set.of(street, backStreet);
   }
 
-  private void createNamedAreas(AreaEdgeList edgeList, Ring ring, Collection<Area> areas) {
+  private void createNamedAreas(AreaEdgeList edgeList, Ring ring, Collection<OsmArea> areas) {
     Polygon containingArea = ring.jtsPolygon;
-    for (Area area : areas) {
+    for (OsmArea area : areas) {
       Geometry intersection = containingArea.intersection(area.jtsMultiPolygon);
       if (intersection.getArea() == 0) {
         continue;

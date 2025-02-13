@@ -33,7 +33,7 @@ class AreaGroup {
   /*
    * The list of underlying areas, used when generating edges out of the visibility graph
    */
-  Collection<Area> areas;
+  Collection<OsmArea> areas;
 
   /**
    * The joined outermost rings of the areas (with inner rings for holes as necessary).
@@ -42,7 +42,7 @@ class AreaGroup {
 
   public final Geometry union;
 
-  public AreaGroup(Collection<Area> areas) {
+  public AreaGroup(Collection<OsmArea> areas) {
     this.areas = areas;
 
     // Merging non-convex polygons is complicated, so we need to convert to JTS, let JTS do the
@@ -52,7 +52,7 @@ class AreaGroup {
 
     // However, JTS will lose the coord<->osmnode mapping, and we will have to reconstruct it.
     HashMap<Coordinate, OsmNode> nodeMap = new HashMap<>();
-    for (Area area : areas) {
+    for (OsmArea area : areas) {
       for (Ring ring : area.outermostRings) {
         allRings.add(ring.jtsPolygon);
         for (OsmNode node : ring.nodes) {
@@ -86,10 +86,10 @@ class AreaGroup {
     }
   }
 
-  public static List<AreaGroup> groupAreas(Map<Area, OsmLevel> areasLevels) {
-    DisjointSet<Area> groups = new DisjointSet<>();
-    Multimap<OsmNode, Area> areasForNode = LinkedListMultimap.create();
-    for (Area area : areasLevels.keySet()) {
+  public static List<AreaGroup> groupAreas(Map<OsmArea, OsmLevel> areasLevels) {
+    DisjointSet<OsmArea> groups = new DisjointSet<>();
+    Multimap<OsmNode, OsmArea> areasForNode = LinkedListMultimap.create();
+    for (OsmArea area : areasLevels.keySet()) {
       for (Ring ring : area.outermostRings) {
         for (Ring inner : ring.getHoles()) {
           for (OsmNode node : inner.nodes) {
@@ -104,9 +104,9 @@ class AreaGroup {
 
     // areas that can be joined must share nodes and levels
     for (OsmNode osmNode : areasForNode.keySet()) {
-      for (Area area1 : areasForNode.get(osmNode)) {
+      for (OsmArea area1 : areasForNode.get(osmNode)) {
         OsmLevel level1 = areasLevels.get(area1);
-        for (Area area2 : areasForNode.get(osmNode)) {
+        for (OsmArea area2 : areasForNode.get(osmNode)) {
           OsmLevel level2 = areasLevels.get(area2);
           if ((level1 == null && level2 == null) || (level1 != null && level1.equals(level2))) {
             groups.union(area1, area2);
@@ -116,11 +116,11 @@ class AreaGroup {
     }
 
     List<AreaGroup> out = new ArrayList<>();
-    for (Set<Area> areaSet : groups.sets()) {
+    for (Set<OsmArea> areaSet : groups.sets()) {
       try {
         out.add(new AreaGroup(areaSet));
       } catch (RingConstructionException e) {
-        for (Area area : areaSet) {
+        for (OsmArea area : areaSet) {
           LOG.debug(
             "Failed to create merged area for " +
             area +
