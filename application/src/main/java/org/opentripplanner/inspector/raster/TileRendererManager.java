@@ -42,8 +42,6 @@ public class TileRendererManager {
       new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingPreferences.wheelchair()))
     );
     renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
-    renderers.put("pathways", new EdgeVertexTileRenderer(new PathwayEdgeRenderer()));
-    renderers.put("areas", new EdgeVertexTileRenderer(new AreaEdgeRenderer()));
   }
 
   public void registerRenderer(String layer, TileRenderer tileRenderer) {
