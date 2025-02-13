@@ -12,9 +12,9 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
@@ -25,11 +25,11 @@ class OsmArea {
 
   final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
-  final OsmWithTags parent;
+  final OsmEntity parent;
   public MultiPolygon jtsMultiPolygon;
 
   OsmArea(
-    OsmWithTags parent,
+    OsmEntity parent,
     List<OsmWay> outerRingWays,
     List<OsmWay> innerRingWays,
     TLongObjectMap<OsmNode> nodes

@@ -36,6 +36,7 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevel.Source;
 import org.opentripplanner.osm.model.OsmNode;
@@ -43,7 +44,6 @@ import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmTag;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -92,7 +92,7 @@ public class OsmDatabase {
   /* Map of all area OSMWay for a given node */
   private final List<OsmWay> singleWayAreas = new ArrayList<>();
 
-  private final Set<OsmWithTags> processedAreas = new HashSet<>();
+  private final Set<OsmEntity> processedAreas = new HashSet<>();
 
   /* Set of area way IDs */
   private final TLongSet areaWayIds = new TLongHashSet();
@@ -104,7 +104,7 @@ public class OsmDatabase {
   private final TLongSet areaNodeIds = new TLongHashSet();
 
   /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-  private final Map<OsmWithTags, OsmLevel> wayLevels = new HashMap<>();
+  private final Map<OsmEntity, OsmLevel> wayLevels = new HashMap<>();
 
   /* Set of turn restrictions for each turn "from" way ID */
   private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap.create();
@@ -116,7 +116,7 @@ public class OsmDatabase {
    * Map of all transit stop nodes that lie within an area and which are connected to the area by
    * a relation. Keyed by the area's OSM way.
    */
-  private final Multimap<OsmWithTags, OsmNode> stopsInAreas = HashMultimap.create();
+  private final Multimap<OsmEntity, OsmNode> stopsInAreas = HashMultimap.create();
 
   /*
    * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -190,11 +190,11 @@ public class OsmDatabase {
     return turnRestrictionsByToWay.get(toWayId);
   }
 
-  public Collection<OsmNode> getStopsInArea(OsmWithTags areaParent) {
+  public Collection<OsmNode> getStopsInArea(OsmEntity areaParent) {
     return stopsInAreas.get(areaParent);
   }
 
-  public OsmLevel getLevelForWay(OsmWithTags way) {
+  public OsmLevel getLevelForWay(OsmEntity way) {
     return Objects.requireNonNullElse(wayLevels.get(way), OsmLevel.DEFAULT);
   }
 
@@ -636,7 +636,7 @@ public class OsmDatabase {
     return node;
   }
 
-  private void applyLevelsForWay(OsmWithTags way) {
+  private void applyLevelsForWay(OsmEntity way) {
     /* Determine OSM level for each way, if it was not already set */
     if (!wayLevels.containsKey(way)) {
       // if this way is not a key in the wayLevels map, a level map was not
@@ -763,7 +763,7 @@ public class OsmDatabase {
           continue;
         }
 
-        OsmWithTags way = waysById.get(member.getRef());
+        OsmEntity way = waysById.get(member.getRef());
         if (way == null) {
           continue;
         }
@@ -1011,7 +1011,7 @@ public class OsmDatabase {
         continue;
       }
 
-      OsmWithTags way = waysById.get(member.getRef());
+      OsmEntity way = waysById.get(member.getRef());
       if (way == null) {
         continue;
       }
@@ -1052,7 +1052,7 @@ public class OsmDatabase {
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
    */
   private void processPublicTransportStopArea(OsmRelation relation) {
-    Set<OsmWithTags> platformAreas = new HashSet<>();
+    Set<OsmEntity> platformAreas = new HashSet<>();
     Set<OsmNode> platformNodes = new HashSet<>();
     for (OsmRelationMember member : relation.getMembers()) {
       switch (member.getType()) {
@@ -1075,7 +1075,7 @@ public class OsmDatabase {
       }
     }
 
-    for (OsmWithTags area : platformAreas) {
+    for (OsmEntity area : platformAreas) {
       if (area == null) {
         throw new RuntimeException(
           "Could not process public transport relation '%s' (%s)".formatted(

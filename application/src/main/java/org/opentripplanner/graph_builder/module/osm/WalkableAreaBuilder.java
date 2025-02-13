@@ -26,10 +26,10 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -61,7 +61,7 @@ class WalkableAreaBuilder {
   private final Graph graph;
   private final OsmDatabase osmdb;
   private final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
-  private final Map<OsmWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
+  private final Map<OsmEntity, WayProperties> wayPropertiesCache = new HashMap<>();
 
   private final VertexGenerator vertexBuilder;
 
@@ -208,7 +208,7 @@ class WalkableAreaBuilder {
 
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-      OsmWithTags areaEntity = group.getSomeOsmObject();
+      OsmEntity areaEntity = group.getSomeOsmObject();
 
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
@@ -433,7 +433,7 @@ class WalkableAreaBuilder {
     );
   }
 
-  private WayProperties getAreaProperties(OsmWithTags entity) {
+  private WayProperties getAreaProperties(OsmEntity entity) {
     if (!wayPropertiesCache.containsKey(entity)) {
       var wayData = entity.getOsmProvider().getWayPropertySet().getDataForWay(entity);
       wayPropertiesCache.put(entity, wayData);
@@ -486,7 +486,7 @@ class WalkableAreaBuilder {
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
     LineString line = geometryFactory.createLineString(coordinates);
 
-    OsmWithTags parent = null;
+    OsmEntity parent = null;
     WayProperties wayData = null;
     StreetTraversalPermission areaPermissions = StreetTraversalPermission.ALL;
     boolean wheelchairAccessible = true;
@@ -560,7 +560,7 @@ class WalkableAreaBuilder {
         continue;
       }
       Area namedArea = new Area();
-      OsmWithTags areaEntity = area.parent;
+      OsmEntity areaEntity = area.parent;
 
       String id = "way (area) " + areaEntity.getId();
       I18NString name = namer.getNameForWay(areaEntity, id);

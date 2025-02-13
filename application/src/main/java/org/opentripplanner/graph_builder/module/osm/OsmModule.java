@@ -21,10 +21,10 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
@@ -493,7 +493,7 @@ public class OsmModule implements GraphBuilderModule {
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 
-  private void setWayName(OsmWithTags way) {
+  private void setWayName(OsmEntity way) {
     if (!way.hasTag("name")) {
       I18NString creativeName = way.getOsmProvider().getWayPropertySet().getCreativeNameForWay(way);
       if (creativeName != null) {

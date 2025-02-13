@@ -3,7 +3,7 @@ package org.opentripplanner.osm.wayproperty.specifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 /**
  * This specifier allows you to specify a very precise match. It will only result in a positive when
@@ -39,7 +39,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OsmWithTags way) {
+  public Scores matchScores(OsmEntity way) {
     return new Scores(
       allForwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE,
       allBackwardTagsMatch(way) ? bestMatchScore : NO_MATCH_SCORE
@@ -47,7 +47,7 @@ public class ExactMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public int matchScore(OsmWithTags way) {
+  public int matchScore(OsmEntity way) {
     if (allTagsMatch(way)) {
       return bestMatchScore;
     } else {
@@ -60,15 +60,15 @@ public class ExactMatchSpecifier implements OsmSpecifier {
     return conditions.stream().map(Object::toString).collect(Collectors.joining("; "));
   }
 
-  public boolean allTagsMatch(OsmWithTags way) {
+  public boolean allTagsMatch(OsmEntity way) {
     return conditions.stream().allMatch(o -> o.isMatch(way));
   }
 
-  public boolean allBackwardTagsMatch(OsmWithTags way) {
+  public boolean allBackwardTagsMatch(OsmEntity way) {
     return conditions.stream().allMatch(c -> c.isBackwardMatch(way));
   }
 
-  public boolean allForwardTagsMatch(OsmWithTags way) {
+  public boolean allForwardTagsMatch(OsmEntity way) {
     return conditions.stream().allMatch(c -> c.isForwardMatch(way));
   }
 

@@ -21,8 +21,8 @@ import org.opentripplanner.graph_builder.issues.InvalidVehicleParkingCapacity;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.osm.OsmOpeningHoursParser;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
@@ -44,14 +44,14 @@ class ParkingProcessor {
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
   private final DataImportIssueStore issueStore;
   private final OsmOpeningHoursParser osmOpeningHoursParser;
-  private final BiFunction<OsmNode, OsmWithTags, IntersectionVertex> getVertexForOsmNode;
+  private final BiFunction<OsmNode, OsmEntity, IntersectionVertex> getVertexForOsmNode;
   private final VertexFactory vertexFactory;
   private final VehicleParkingHelper vehicleParkingHelper;
 
   public ParkingProcessor(
     Graph graph,
     DataImportIssueStore issueStore,
-    BiFunction<OsmNode, OsmWithTags, IntersectionVertex> getVertexForOsmNode
+    BiFunction<OsmNode, OsmEntity, IntersectionVertex> getVertexForOsmNode
   ) {
     this.issueStore = issueStore;
     this.getVertexForOsmNode = getVertexForOsmNode;
@@ -130,7 +130,7 @@ class ParkingProcessor {
     return vehicleParkingToAdd;
   }
 
-  private OHCalendar parseOpeningHours(OsmWithTags entity) {
+  private OHCalendar parseOpeningHours(OsmEntity entity) {
     final var openingHoursTag = entity.getTag("opening_hours");
     if (openingHoursTag != null) {
       final ZoneId zoneId = entity.getOsmProvider().getZoneId();
@@ -164,7 +164,7 @@ class ParkingProcessor {
 
   private List<VertexAndName> processVehicleParkingArea(
     Ring ring,
-    OsmWithTags entity,
+    OsmEntity entity,
     Envelope envelope
   ) {
     List<VertexAndName> accessVertices = new ArrayList<>();
@@ -195,7 +195,7 @@ class ParkingProcessor {
     Envelope envelope = new Envelope();
     Set<VertexAndName> accessVertices = new HashSet<>();
 
-    OsmWithTags entity = null;
+    OsmEntity entity = null;
 
     // Process all nodes from outer rings
     // These are IntersectionVertices not OsmVertices because there can be both OsmVertices and TransitStopStreetVertices.
@@ -291,7 +291,7 @@ class ParkingProcessor {
   private List<VehicleParking.VehicleParkingEntranceCreator> createArtificialEntrances(
     OsmAreaGroup group,
     I18NString vehicleParkingName,
-    OsmWithTags entity,
+    OsmEntity entity,
     boolean isCarPark
   ) {
     LOG.debug(
@@ -318,7 +318,7 @@ class ParkingProcessor {
   VehicleParking createVehicleParkingObjectFromOsmEntity(
     boolean isCarParkAndRide,
     Coordinate coordinate,
-    OsmWithTags entity,
+    OsmEntity entity,
     I18NString creativeName,
     List<VehicleParking.VehicleParkingEntranceCreator> entrances
   ) {
@@ -398,7 +398,7 @@ class ParkingProcessor {
       .build();
   }
 
-  private I18NString nameParkAndRideEntity(OsmWithTags osmWithTags) {
+  private I18NString nameParkAndRideEntity(OsmEntity osmWithTags) {
     // If there is an explicit name user that. The explicit name is used so that tag-based
     // translations are used, which are not handled by "CreativeNamer"s.
     I18NString creativeName = osmWithTags.getAssumedName();
@@ -419,11 +419,11 @@ class ParkingProcessor {
     return creativeName;
   }
 
-  private OptionalInt parseCapacity(OsmWithTags element) {
+  private OptionalInt parseCapacity(OsmEntity element) {
     return parseCapacity(element, "capacity");
   }
 
-  private OptionalInt parseCapacity(OsmWithTags element, String capacityTag) {
+  private OptionalInt parseCapacity(OsmEntity element, String capacityTag) {
     return element.parseIntOrBoolean(
       capacityTag,
       v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
@@ -433,7 +433,7 @@ class ParkingProcessor {
   private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
     Set<VertexAndName> accessVertices,
     I18NString vehicleParkingName,
-    OsmWithTags entity
+    OsmEntity entity
   ) {
     List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
     var sortedAccessVertices = accessVertices

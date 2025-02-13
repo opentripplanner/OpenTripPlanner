@@ -17,9 +17,9 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.osm.Ring.RingConstructionException;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -133,7 +133,7 @@ class OsmAreaGroup {
     return out;
   }
 
-  public OsmWithTags getSomeOsmObject() {
+  public OsmEntity getSomeOsmObject() {
     return areas.iterator().next().parent;
   }
 

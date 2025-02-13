@@ -26,7 +26,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /**
  * A base class for OSM entities containing common methods.
  */
-public class OsmWithTags {
+public class OsmEntity {
 
   /**
    * highway=* values that we don't want to even consider when building the graph.
@@ -96,7 +96,7 @@ public class OsmWithTags {
   /**
    * Adds a tag.
    */
-  public OsmWithTags addTag(String key, String value) {
+  public OsmEntity addTag(String key, String value) {
     if (key == null || value == null) {
       return this;
     }
@@ -721,7 +721,7 @@ public class OsmWithTags {
    * Perhaps this entity has a name that isn't in the source data, but it's also possible that
    * it's explicitly tagged as not having one.
    *
-   * @see OsmWithTags#isExplicitlyUnnamed()
+   * @see OsmEntity#isExplicitlyUnnamed()
    */
   public boolean hasNoName() {
     return !isNamed();
@@ -731,7 +731,7 @@ public class OsmWithTags {
    * Whether this entity explicitly doesn't have a name. This is different to no name being
    * set on the entity in OSM.
    *
-   * @see OsmWithTags#isNamed()
+   * @see OsmEntity#isNamed()
    * @see https://wiki.openstreetmap.org/wiki/Tag:noname%3Dyes
    */
   public boolean isExplicitlyUnnamed() {

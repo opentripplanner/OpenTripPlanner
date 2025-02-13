@@ -1,12 +1,12 @@
 package org.opentripplanner.osm.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 public record FloorNumberUnknownGuessedFromAltitude(
   String layer,
   Integer floorNumber,
-  OsmWithTags entity
+  OsmEntity entity
 )
   implements DataImportIssue {
   private static final String FMT =
