@@ -44,10 +44,6 @@ public class TileRendererManager {
     renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
   }
 
-  public void registerRenderer(String layer, TileRenderer tileRenderer) {
-    renderers.put(layer, tileRenderer);
-  }
-
   public BufferedImage renderTile(final MapTile mapTile, String layer) {
     TileRenderContext context = new TileRenderContext() {
       @Override
