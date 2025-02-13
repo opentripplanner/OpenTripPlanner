@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 import javax.xml.namespace.QName;
@@ -35,6 +36,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.rutebanken.time.XmlDateTime;
 
 public class StopEventResponseMapper {
 
@@ -57,7 +59,9 @@ public class StopEventResponseMapper {
 
     var serviceDelivery = new ServiceDelivery()
       .withAbstractFunctionalServiceDelivery(jaxbElement(sed))
-      .withResponseTimestamp(timestamp.atZone(zoneId))
+      .withResponseTimestamp(
+        new XmlDateTime(timestamp.atZone(zoneId).truncatedTo(ChronoUnit.MILLIS))
+      )
       .withProducerRef(new ParticipantRefStructure().withValue("OpenTripPlanner"));
 
     var response = new OJPResponseStructure().withServiceDelivery(serviceDelivery);
@@ -86,14 +90,16 @@ public class StopEventResponseMapper {
     var firstStop = tripTimeOnDate.pattern().getStops().getFirst();
     var lastStop = tripTimeOnDate.pattern().getStops().getLast();
     return new DatedJourneyStructure()
-      .withJourneyRef(new JourneyRefStructure().withValue(tripTimeOnDate.getTrip().getId().getId()))
+      .withJourneyRef(
+        new JourneyRefStructure().withValue(tripTimeOnDate.getTrip().getId().toString())
+      )
       .withOperatingDayRef(
         new OperatingDayRefStructure().withValue(tripTimeOnDate.getServiceDay().toString())
       )
-      .withLineRef(new LineRefStructure().withValue(route.getId().getId()))
+      .withLineRef(new LineRefStructure().withValue(route.getId().toString()))
       .withMode(new ModeStructure().withPtMode(PtModeMapper.map(route.getMode())))
       .withPublishedServiceName(internationalText(route.getName(), lang(tripTimeOnDate)))
-      .withOperatorRef(new OperatorRefStructure().withValue(route.getAgency().getId().getId()))
+      .withOperatorRef(new OperatorRefStructure().withValue(route.getAgency().getId().toString()))
       .withOriginStopPointRef(stopPointRef(firstStop))
       .withOriginText(internationalText(firstStop.getName(), lang(tripTimeOnDate)))
       .withDestinationStopPointRef(stopPointRef(lastStop))
@@ -124,15 +130,15 @@ public class StopEventResponseMapper {
 
   private ServiceDepartureStructure serviceDeparture(TripTimeOnDate tripTimeOnDate) {
     var departure = new ServiceDepartureStructure()
-      .withTimetabledTime(scheduledDeparture(tripTimeOnDate));
+      .withTimetabledTime(new XmlDateTime(scheduledDeparture(tripTimeOnDate)));
     if (tripTimeOnDate.isRealtime()) {
-      departure.withEstimatedTime(realtimeDeparture(tripTimeOnDate));
+      departure.withEstimatedTime(new XmlDateTime(realtimeDeparture(tripTimeOnDate)));
     }
     return departure;
   }
 
   private static StopPointRefStructure stopPointRef(StopLocation stop) {
-    return new StopPointRefStructure().withValue(stop.getId().getId());
+    return new StopPointRefStructure().withValue(stop.getId().toString());
   }
 
   private static InternationalTextStructure internationalText(I18NString string, String lang) {

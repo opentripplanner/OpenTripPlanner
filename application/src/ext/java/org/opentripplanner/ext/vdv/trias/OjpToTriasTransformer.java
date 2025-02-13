@@ -42,7 +42,7 @@ public class OjpToTriasTransformer {
     }
   }
 
-  public static OJP readTrias(String trias) throws JAXBException, TransformerException {
+  public static OJP triasToOjp(String trias) throws JAXBException, TransformerException {
     var context = JAXBContext.newInstance(OJP.class);
 
     var xmlSource = new StreamSource(
