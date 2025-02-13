@@ -11,6 +11,8 @@ import java.io.StringWriter;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
@@ -60,9 +62,9 @@ class OjpMapperTest {
     SERVICE_DATE.atStartOfDay(ZoneIds.BERLIN).toInstant()
   );
 
-  private static final Instant timestamp = OffsetDateTime
+  private static final ZonedDateTime timestamp = OffsetDateTime
     .parse("2025-02-10T14:24:02+01:00")
-    .toInstant();
+    .atZoneSameInstant(ZoneIds.BERLIN);
 
   @Test
   void test() throws JAXBException {

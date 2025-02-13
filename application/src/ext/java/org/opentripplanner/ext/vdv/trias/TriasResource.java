@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vdv.trias;
 
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPStopEventRequestStructure;
+import de.vdv.ojp20.siri.AbstractFunctionalServiceRequestStructure;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -14,7 +15,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -22,10 +22,9 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
+import org.opentripplanner.ext.vdv.ojp.OjpService;
 import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.framework.EntityNotFoundException;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,62 +33,54 @@ public class TriasResource {
 
   private static final Logger LOG = LoggerFactory.getLogger(TriasResource.class);
 
-  private final VdvService vdvService;
-  private final StopEventResponseMapper mapper;
-  private final ZoneId zoneId;
+  private final OjpService ojpService;
 
   public TriasResource(@Context OtpServerRequestContext context) {
-    this.vdvService = new VdvService(context.transitService());
-    this.mapper = new StopEventResponseMapper(context.transitService().getTimeZone());
-    this.zoneId = context.transitService().getTimeZone();
+    ZoneId zoneId = context.transitService().getTimeZone();
+    VdvService vdvService = new VdvService(context.transitService());
+    StopEventResponseMapper mapper = new StopEventResponseMapper(zoneId);
+    this.ojpService = new OjpService(vdvService, mapper, zoneId);
   }
 
   @POST
   @Produces("application/xml")
   public Response index(String triasInput) {
-    OJP ojpResponse;
     try {
       var ojp = OjpToTriasTransformer.triasToOjp(triasInput);
 
-      var request = ojp
-        .getOJPRequest()
-        .getServiceRequest()
-        .getAbstractFunctionalServiceRequest()
-        .getFirst()
-        .getValue();
+      var request = getValue(ojp);
 
       if (request instanceof OJPStopEventRequestStructure ser) {
-        ojpResponse = handleStopEvenRequest(ser);
+        var ojpResponse = ojpService.handleStopEvenRequest(ser);
+        final StreamingOutput stream = ojpToTrias(ojpResponse);
+        return Response.ok(stream).build();
       } else {
-        ojpResponse =
-          ErrorMapper.error(
-            "Request type '%s' is not supported".formatted(request.getClass().getSimpleName())
-          );
+        return error(
+          "Request type '%s' is not supported".formatted(request.getClass().getSimpleName())
+        );
       }
     } catch (JAXBException | TransformerException e) {
-      ojpResponse = ErrorMapper.error("Could not read TRIAS request.");
-    } catch (EntityNotFoundException | IllegalArgumentException e) {
-      ojpResponse = ErrorMapper.error(e.getMessage());
+      LOG.error("Error reading request", e);
+      return error("Could not read TRIAS request.");
     } catch (Exception e) {
-      LOG.error("Error producing TRIAS response", e);
-      ojpResponse = ErrorMapper.error(e.getMessage());
+      return error(e.getMessage());
     }
-    final StreamingOutput stream = ojpToTrias(ojpResponse);
-    return Response.ok(stream).build();
   }
 
-  private OJP handleStopEvenRequest(OJPStopEventRequestStructure ser) {
-    var stopId = FeedScopedId.parse(ser.getLocation().getPlaceRef().getStopPointRef().getValue());
-    var time = Optional
-      .ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId))
-      .orElse(ZonedDateTime.now(zoneId));
-    var numResults = Optional
-      .ofNullable(ser.getParams())
-      .map(s -> s.getNumberOfResults())
-      .map(i -> i.intValue())
-      .orElse(1);
-    var tripTimesOnDate = vdvService.findStopTimesInPattern(stopId, time.toInstant(), numResults);
-    return mapper.mapStopTimesInPattern(tripTimesOnDate, Instant.now());
+  private static AbstractFunctionalServiceRequestStructure getValue(OJP ojp) {
+    return Optional
+      .ofNullable(ojp.getOJPRequest())
+      .map(s -> s.getServiceRequest())
+      .stream()
+      .flatMap(s -> s.getAbstractFunctionalServiceRequest().stream())
+      .findFirst()
+      .orElseThrow(() -> new IllegalArgumentException("No request found in TRIAS XML body."))
+      .getValue();
+  }
+
+  private static Response error(String value) {
+    var trias = ojpToTrias(ErrorMapper.error(value, ZonedDateTime.now()));
+    return Response.status(Response.Status.BAD_REQUEST).entity(trias).build();
   }
 
   private static StreamingOutput ojpToTrias(OJP ojpOutput) {

@@ -6,15 +6,17 @@ import de.vdv.ojp20.siri.CapabilityNotSupportedErrorStructure;
 import de.vdv.ojp20.siri.ErrorDescriptionStructure;
 import de.vdv.ojp20.siri.ServiceDelivery;
 import de.vdv.ojp20.siri.ServiceDeliveryStructure;
+import java.time.ZonedDateTime;
 
 public class ErrorMapper {
 
-  public static OJP error(String value) {
+  public static OJP error(String value, ZonedDateTime timestamp) {
     return new OJP()
       .withOJPResponse(
         new OJPResponseStructure()
           .withServiceDelivery(
-            new ServiceDelivery()
+            ServiceDeliveryMapper
+              .serviceDelivery(timestamp)
               .withErrorCondition(
                 new ServiceDeliveryStructure.ErrorCondition()
                   .withDescription(new ErrorDescriptionStructure().withValue(value))
