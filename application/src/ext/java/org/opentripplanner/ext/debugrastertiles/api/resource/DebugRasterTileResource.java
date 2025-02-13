@@ -6,7 +6,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -20,18 +19,9 @@ import org.opentripplanner.ext.debugrastertiles.TileRendererManager;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
- * Slippy map tile API for rendering various graph information for inspection/debugging purpose
- * (bike safety factor, connectivity...).
- * <p>
- * One can easily add a new layer by adding the following kind of code to a leaflet map:
- *
- * <pre>
- *   var bikesafety = new L.TileLayer(
- *      'http://localhost:8080/otp/routers/default/inspector/tile/bike-safety/{z}/{x}/{y}.png',
- *      { maxZoom : 22 });
- *   var map = L.map(...);
- *   L.control.layers(null, { "Bike safety": bikesafety }).addTo(map);
- * </pre>
+ * Slippy raster map tile API for rendering various graph information for inspection/debugging
+ * purpose (bike safety factor, connectivity...). Vector tile alternatives should be preferably used
+ * instead.
  * <p>
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
@@ -40,24 +30,17 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * @see TileRendererManager
  * @see TileRenderer
  */
-@Path("/routers/{ignoreRouterId}/inspector")
-public class GraphInspectorTileResource {
+@Path("/debugrastertiles")
+public class DebugRasterTileResource {
 
   private final OtpServerRequestContext serverContext;
 
-  public GraphInspectorTileResource(
-    @Context OtpServerRequestContext serverContext,
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
-  ) {
+  public DebugRasterTileResource(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
   }
 
   @GET
-  @Path("/tile/{layer}/{z}/{x}/{y}.{ext}")
+  @Path("/{layer}/{z}/{x}/{y}.{ext}")
   @Produces("image/*")
   public Response tileGet(
     @PathParam("x") int x,
@@ -82,18 +65,5 @@ public class GraphInspectorTileResource {
     cc.setMaxAge(3600);
     cc.setNoCache(false);
     return Response.ok(baos.toByteArray()).type(format.toString()).cacheControl(cc).build();
-  }
-
-  /**
-   * Gets all layer names
-   * <p>
-   * Used in fronted to create layer chooser
-   */
-  @GET
-  @Path("layers")
-  @Produces(MediaType.APPLICATION_JSON)
-  public InspectorLayersList getLayers() {
-    OtpServerRequestContext serverContext = this.serverContext;
-    return new InspectorLayersList(serverContext.tileRendererManager().getRenderers());
   }
 }

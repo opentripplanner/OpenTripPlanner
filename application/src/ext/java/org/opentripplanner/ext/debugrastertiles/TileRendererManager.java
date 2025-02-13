@@ -6,7 +6,7 @@ import java.util.Map;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.opentripplanner.ext.debugrastertiles.TileRenderer.TileRenderContext;
-import org.opentripplanner.ext.debugrastertiles.api.resource.GraphInspectorTileResource;
+import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * the renderer to paint the tile.
  *
  * @author laurent
- * @see GraphInspectorTileResource
+ * @see DebugRasterTileResource
  * @see TileRenderer
  */
 public class TileRendererManager {
@@ -91,14 +91,5 @@ public class TileRendererManager {
     renderer.renderTile(context);
     LOG.debug("Rendered tile at {} in {} ms", mapTile.bbox(), System.currentTimeMillis() - start);
     return image;
-  }
-
-  /**
-   * Gets all renderers
-   * <p>
-   * Used to return list of renderers to client. Could be also used to show legend.
-   */
-  public Map<String, TileRenderer> getRenderers() {
-    return renderers;
   }
 }

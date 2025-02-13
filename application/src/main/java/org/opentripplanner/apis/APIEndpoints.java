@@ -23,7 +23,7 @@ import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.apis.vectortiles.GraphInspectorVectorTileResource;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
-import org.opentripplanner.ext.debugrastertiles.api.resource.GraphInspectorTileResource;
+import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
@@ -46,7 +46,7 @@ public class APIEndpoints {
     // See the OTPFeature enum for details.
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
-    addIfEnabled(DebugUi, GraphInspectorTileResource.class);
+    addIfEnabled(DebugUi, DebugRasterTileResource.class);
     addIfEnabled(DebugUi, GraphInspectorVectorTileResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     // scheduled to be removed and only here for backwards compatibility
