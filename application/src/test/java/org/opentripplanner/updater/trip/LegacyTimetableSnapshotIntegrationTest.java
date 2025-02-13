@@ -268,7 +268,7 @@ public class LegacyTimetableSnapshotIntegrationTest {
     LocalDate serviceDate
   ) {
     final Timetable scheduledTimetable = pattern.getScheduledTimetable();
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       scheduledTimetable,
       tripUpdate,
       timeZone,

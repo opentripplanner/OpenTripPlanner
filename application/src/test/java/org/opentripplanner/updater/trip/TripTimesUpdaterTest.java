@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
 
-public class TimetableMapperTest {
+public class TripTimesUpdaterTest {
 
   private static final ZoneId TIME_ZONE = ZoneIds.NEW_YORK;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
@@ -80,7 +80,7 @@ public class TimetableMapperTest {
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     var tripUpdate = tripUpdateBuilder.build();
 
-    Result<TripTimesPatch, UpdateError> result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    Result<TripTimesPatch, UpdateError> result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -109,7 +109,7 @@ public class TimetableMapperTest {
     stopTimeUpdateBuilder.setStopSequence(0);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
     tripUpdate = tripUpdateBuilder.build();
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -139,7 +139,7 @@ public class TimetableMapperTest {
       LocalDateTime.of(2009, Month.AUGUST, 7, 0, 10, 0, 0).atZone(TIME_ZONE).toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -174,7 +174,7 @@ public class TimetableMapperTest {
     );
     var tripUpdate = tripUpdateBuilder.build();
     assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -202,7 +202,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder.setDelay(0);
     tripUpdate = tripUpdateBuilder.build();
     result =
-      TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
         timetable,
         tripUpdate,
         TIME_ZONE,
@@ -232,7 +232,7 @@ public class TimetableMapperTest {
     tripUpdate = tripUpdateBuilder.build();
 
     result =
-      TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
         timetable,
         tripUpdate,
         TIME_ZONE,
@@ -260,7 +260,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
     result =
-      TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
         timetable,
         tripUpdate,
         TIME_ZONE,
@@ -287,7 +287,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
     result =
-      TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
         timetable,
         tripUpdate,
         TIME_ZONE,
@@ -322,7 +322,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder.setDelay(-1);
     var tripUpdate = tripUpdateBuilder.build();
 
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -348,7 +348,7 @@ public class TimetableMapperTest {
     stopTimeUpdateBuilder.setStopSequence(3);
     stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.NO_DATA);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -392,7 +392,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(15);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -431,7 +431,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder.setDelay(15);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -464,7 +464,7 @@ public class TimetableMapperTest {
     StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(-100);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -504,7 +504,7 @@ public class TimetableMapperTest {
     StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(-700);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -549,7 +549,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(15);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -578,7 +578,7 @@ public class TimetableMapperTest {
     stopTimeEventBuilder.setDelay(-700);
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -628,7 +628,7 @@ public class TimetableMapperTest {
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -674,7 +674,7 @@ public class TimetableMapperTest {
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -719,7 +719,7 @@ public class TimetableMapperTest {
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -754,7 +754,7 @@ public class TimetableMapperTest {
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -799,7 +799,7 @@ public class TimetableMapperTest {
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
       TIME_ZONE,
@@ -852,7 +852,7 @@ public class TimetableMapperTest {
     var scheduledTimetable = patternIndex
       .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
       .getScheduledTimetable();
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       scheduledTimetable,
       tripUpdate,
       TIME_ZONE,
@@ -916,7 +916,7 @@ public class TimetableMapperTest {
       .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
       .getScheduledTimetable();
 
-    var patch = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+    var patch = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       scheduledTimetable,
       tripUpdate,
       TIME_ZONE,
@@ -977,7 +977,7 @@ public class TimetableMapperTest {
       builder.addRawStopTime(emptyStopTime(2, setEmptyEvent));
       TripUpdate tripUpdate = builder.build();
 
-      var result = TimetableMapper.createUpdatedTripTimesFromGTFSRT(
+      var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
         timetable,
         tripUpdate,
         TIME_ZONE,

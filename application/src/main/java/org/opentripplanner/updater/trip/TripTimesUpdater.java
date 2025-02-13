@@ -28,9 +28,9 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class TimetableMapper {
+class TripTimesUpdater {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TripTimesUpdater.class);
 
   /**
    * Apply the TripUpdate to the appropriate TripTimes from a Timetable. The existing TripTimes
