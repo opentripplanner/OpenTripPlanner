@@ -151,7 +151,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
     // Find a nearby area representing transit stop in OSM, linking to it if
     // stop code or id in ref= tag matches the GTFS stop code of this StopVertex.
-    boolean connected = false;
     for (var edgeList : nearbyAreaEdgeList) {
       for (NamedArea area : edgeList.getAreas()) {
         var platOpt = osmInfoGraphBuildService.findPlatform(area);
@@ -166,12 +165,12 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
             );
             linker.addPermanentAreaVertex(boardingLocation, edgeList);
             linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
-            connected = true;
+            return true;
           }
         }
       }
     }
-    return connected;
+    return false;
   }
 
   /**
