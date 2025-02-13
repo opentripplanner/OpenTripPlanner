@@ -9,8 +9,8 @@
         {
           "name": "stop_point_ref",
           "label": "Stop point reference",
-          "type": "integer",
-          "default": "8507000",
+          "type": "string",
+          "default": "tampere:123",
           "required": true
         },
         {

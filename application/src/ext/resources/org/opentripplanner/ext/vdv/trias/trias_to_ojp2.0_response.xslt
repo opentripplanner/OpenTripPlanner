@@ -22,6 +22,8 @@
       </siri:ProducerRef>
       <Language>en</Language> <!-- TODO hack -->
       <xsl:apply-templates select="ojp:OJPStopEventDelivery"/>
+      <xsl:apply-templates select="siri:ErrorCondition"/>
+
     </ServiceDelivery>
   </xsl:template>
   <!--*********************************************-->
@@ -33,6 +35,14 @@
         <xsl:apply-templates select="ojp:StopEventResult"/>
       </StopEventResponse>
     </DeliveryPayload>
+  </xsl:template>
+
+  <!--*********************************************-->
+
+  <xsl:template match="siri:ErrorCondition">
+    <ErrorCondition>
+      <xsl:value-of select="node()"/>
+    </ErrorCondition>
   </xsl:template>
 
 
@@ -128,7 +138,9 @@
       </PlannedBay>
       <xsl:if test="ojp:EstimatedQuay">
         <EstimatedBay>
-          <Text><xsl:value-of select="ojp:EstimatedQuay/ojp:Text"/></Text></EstimatedBay></xsl:if>
+          <Text><xsl:value-of select="ojp:EstimatedQuay/ojp:Text"/></Text>
+        </EstimatedBay>
+      </xsl:if>
       <xsl:apply-templates select="ojp:ServiceArrival"/>
       <xsl:apply-templates select="ojp:ServiceDeparture"/>
       <xsl:if test="ojp:Order">
