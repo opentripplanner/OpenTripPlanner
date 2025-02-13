@@ -2,12 +2,12 @@ package org.opentripplanner.ext.vdv;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -19,8 +19,15 @@ public class VdvService {
     this.transitService = transitService;
   }
 
-  public List<TripTimeOnDate> findStopTimesInPattern(String stopId, LocalDateTime time, int numResults) {
-    var stop = transitService.getRegularStop(FeedScopedId.parse("tampere:" + stopId));
+  public List<TripTimeOnDate> findStopTimesInPattern(
+    FeedScopedId stopId,
+    Instant time,
+    int numResults
+  ) throws EntityNotFoundException {
+    var stop = transitService.getRegularStop(stopId);
+    if (stop == null) {
+      throw new EntityNotFoundException("StopPlace", stopId);
+    }
     List<StopTimesInPattern> stopTimesInPatterns = transitService.findStopTimesInPattern(
       stop,
       time.atZone(transitService.getTimeZone()).toInstant(),
