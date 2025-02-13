@@ -11,6 +11,7 @@
     <name>OpenTripPlanner - Root</name>
     <description>The OpenTripPlanner multimodal journey planning system</description>
     <url>https://opentripplanner.org</url>
+
     <licenses>
         <license>
             <name>GNU Lesser General Public License</name>
@@ -402,11 +403,7 @@
                 <artifactId>guava</artifactId>
                 <version>33.4.0-jre</version>
             </dependency>
-            <dependency>
-                <groupId>net.minidev</groupId>
-                <artifactId>json-smart</artifactId>
-                <version>1.3.3</version>
-            </dependency>
+
             <!-- Logging API -->
             <dependency>
                 <groupId>org.slf4j</groupId>
