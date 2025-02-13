@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vdv.trias;
 
 import jakarta.xml.bind.JAXBException;
 import java.io.StringWriter;
+import java.time.ZonedDateTime;
 import javax.xml.transform.TransformerException;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class OjpToTriasTransformerTest {
 
   @Test
   void error() {
-    var ojp = ErrorMapper.error("Foo error");
+    var ojp = ErrorMapper.error("Foo error", ZonedDateTime.now());
 
     var writer = new StringWriter();
     OjpToTriasTransformer.transform(ojp, writer);
