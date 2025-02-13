@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.application.OTPFeature.APIBikeRental
 import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.framework.application.OTPFeature.DebugRasterTiles;
 import static org.opentripplanner.framework.application.OTPFeature.DebugUi;
 import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
 import static org.opentripplanner.framework.application.OTPFeature.LegacyRestApi;
@@ -46,7 +47,6 @@ public class APIEndpoints {
     // See the OTPFeature enum for details.
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
-    addIfEnabled(DebugUi, DebugRasterTileResource.class);
     addIfEnabled(DebugUi, GraphInspectorVectorTileResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     // scheduled to be removed and only here for backwards compatibility
@@ -57,6 +57,7 @@ public class APIEndpoints {
 
     // Sandbox extension APIs
     addIfEnabled(ActuatorAPI, ActuatorAPI.class);
+    addIfEnabled(DebugRasterTiles, DebugRasterTileResource.class);
     addIfEnabled(ReportApi, ReportResource.class);
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
