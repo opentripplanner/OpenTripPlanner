@@ -6,10 +6,10 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
- * A named area is a subset of an area with a certain set of properties (name, safety, etc).
+ * Area is a subset of an area group with a certain set of properties (name, safety, etc).
  */
 
-public class NamedArea implements Serializable {
+public class Area implements Serializable {
 
   private Geometry geometry;
   private I18NString name;

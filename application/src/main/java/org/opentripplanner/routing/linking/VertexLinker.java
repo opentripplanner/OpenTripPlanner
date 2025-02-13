@@ -21,11 +21,11 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -585,7 +585,7 @@ public class VertexLinker {
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
-    List<NamedArea> areas = edgeList.getAreas();
+    List<Area> areas = edgeList.getAreas();
     Geometry origPolygon = edgeList.getGeometry();
     Geometry polygon = origPolygon.union(origPolygon.getBoundary()).buffer(0.000001);
 
@@ -621,7 +621,7 @@ public class VertexLinker {
         continue;
       }
 
-      // check to see if this splits multiple NamedAreas. This code is rather similar to
+      // check to see if this splits multiple Areas. This code is rather similar to
       // code in OSMGBI, but the data structures are different
       createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
       added++;
@@ -662,7 +662,7 @@ public class VertexLinker {
     IntersectionVertex from,
     IntersectionVertex to,
     AreaEdgeList ael,
-    List<NamedArea> areas,
+    List<Area> areas,
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
@@ -674,8 +674,8 @@ public class VertexLinker {
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
 
-    NamedArea hit = null;
-    for (NamedArea area : areas) {
+    Area hit = null;
+    for (Area area : areas) {
       Geometry polygon = area.getGeometry();
       Geometry intersection = polygon.intersection(line);
       if (intersection.getLength() > 0.000001) {

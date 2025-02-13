@@ -38,11 +38,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
@@ -165,7 +165,7 @@ class WalkableAreaBuilder {
         )
         .forEach(edgeList::addVisibilityVertex);
 
-      createNamedAreas(edgeList, ring, group.areas);
+      createAreas(edgeList, ring, group.areas);
     }
   }
 
@@ -319,7 +319,7 @@ class WalkableAreaBuilder {
         continue;
       }
 
-      createNamedAreas(edgeList, ring, group.areas);
+      createAreas(edgeList, ring, group.areas);
 
       if (visibilityNodes.size() > maxAreaNodes) {
         issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
@@ -552,14 +552,14 @@ class WalkableAreaBuilder {
     return Set.of(street, backStreet);
   }
 
-  private void createNamedAreas(AreaEdgeList edgeList, Ring ring, Collection<OsmArea> areas) {
+  private void createAreas(AreaEdgeList edgeList, Ring ring, Collection<OsmArea> areas) {
     Polygon containingArea = ring.jtsPolygon;
     for (OsmArea area : areas) {
       Geometry intersection = containingArea.intersection(area.jtsMultiPolygon);
       if (intersection.getArea() == 0) {
         continue;
       }
-      NamedArea namedArea = new NamedArea();
+      Area namedArea = new Area();
       OsmWithTags areaEntity = area.parent;
 
       String id = "way (area) " + areaEntity.getId();

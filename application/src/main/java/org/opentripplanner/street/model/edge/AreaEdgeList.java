@@ -22,7 +22,7 @@ public class AreaEdgeList implements Serializable {
   private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
   private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
   private final Polygon geometry;
-  private final List<NamedArea> areas = new ArrayList<>();
+  private final List<Area> areas = new ArrayList<>();
 
   public AreaEdgeList(Polygon geometry) {
     this.geometry = geometry;
@@ -32,11 +32,11 @@ public class AreaEdgeList implements Serializable {
     return String.format("AreaEdgeList: visibilityVertices=%s, %s", visibilityVertices, geometry);
   }
 
-  public void addArea(NamedArea namedArea) {
-    areas.add(namedArea);
+  public void addArea(Area area) {
+    areas.add(area);
   }
 
-  public List<NamedArea> getAreas() {
+  public List<Area> getAreas() {
     return areas;
   }
 

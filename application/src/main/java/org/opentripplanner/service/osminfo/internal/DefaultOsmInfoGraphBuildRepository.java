@@ -8,14 +8,14 @@ import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 
 public class DefaultOsmInfoGraphBuildRepository
   implements OsmInfoGraphBuildRepository, Serializable {
 
   private final Map<Edge, Platform> platforms = new HashMap<>();
-  private final Map<NamedArea, Platform> areaPlatforms = new HashMap<>();
+  private final Map<Area, Platform> areaPlatforms = new HashMap<>();
 
   @Inject
   public DefaultOsmInfoGraphBuildRepository() {}
@@ -28,7 +28,7 @@ public class DefaultOsmInfoGraphBuildRepository
   }
 
   @Override
-  public void addPlatform(NamedArea area, Platform platform) {
+  public void addPlatform(Area area, Platform platform) {
     Objects.requireNonNull(area);
     Objects.requireNonNull(platform);
     this.areaPlatforms.put(area, platform);
@@ -40,7 +40,7 @@ public class DefaultOsmInfoGraphBuildRepository
   }
 
   @Override
-  public Optional<Platform> findPlatform(NamedArea area) {
+  public Optional<Platform> findPlatform(Area area) {
     return Optional.ofNullable(areaPlatforms.get(area));
   }
 

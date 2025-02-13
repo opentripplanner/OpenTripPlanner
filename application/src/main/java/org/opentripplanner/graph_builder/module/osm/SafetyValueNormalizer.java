@@ -9,10 +9,10 @@ import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -61,7 +61,7 @@ class SafetyValueNormalizer {
           AreaEdgeList areaEdgeList = ((AreaEdge) e).getArea();
           if (seenAreas.contains(areaEdgeList)) continue;
           seenAreas.add(areaEdgeList);
-          for (NamedArea area : areaEdgeList.getAreas()) {
+          for (Area area : areaEdgeList.getAreas()) {
             area.setBicycleSafetyMultiplier(area.getBicycleSafetyMultiplier() / bestBikeSafety);
             area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
           }

@@ -17,11 +17,11 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
@@ -66,12 +66,12 @@ public class LinkStopToPlatformTest {
       areaEdgeList.addVisibilityVertex(vertices.get(i));
     }
 
-    // AreaEdgeList must include a valid NamedArea which defines area atttributes
-    NamedArea namedArea = new NamedArea();
-    namedArea.setName(new LocalizedString("test platform"));
-    namedArea.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    namedArea.setOriginalEdges(polygon);
-    areaEdgeList.addArea(namedArea);
+    // AreaEdgeList must include a valid Area which defines area atttributes
+    Area area = new Area();
+    area.setName(new LocalizedString("test platform"));
+    area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    area.setOriginalEdges(polygon);
+    areaEdgeList.addArea(area);
 
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;

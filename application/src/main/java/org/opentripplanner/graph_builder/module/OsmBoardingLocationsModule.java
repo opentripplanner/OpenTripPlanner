@@ -23,10 +23,10 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -152,7 +152,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     // Find a nearby area representing transit stop in OSM, linking to it if
     // stop code or id in ref= tag matches the GTFS stop code of this StopVertex.
     for (var edgeList : nearbyAreaEdgeList) {
-      for (NamedArea area : edgeList.getAreas()) {
+      for (Area area : edgeList.getAreas()) {
         var platOpt = osmInfoGraphBuildService.findPlatform(area);
         if (platOpt.isPresent()) {
           var platform = platOpt.get();

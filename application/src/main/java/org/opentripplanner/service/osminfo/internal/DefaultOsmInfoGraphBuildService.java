@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 
 public class DefaultOsmInfoGraphBuildService implements OsmInfoGraphBuildService {
 
@@ -23,7 +23,7 @@ public class DefaultOsmInfoGraphBuildService implements OsmInfoGraphBuildService
   }
 
   @Override
-  public Optional<Platform> findPlatform(NamedArea area) {
+  public Optional<Platform> findPlatform(Area area) {
     return repository.findPlatform(area);
   }
 

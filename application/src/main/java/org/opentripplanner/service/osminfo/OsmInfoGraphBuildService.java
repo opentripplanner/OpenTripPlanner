@@ -2,8 +2,8 @@ package org.opentripplanner.service.osminfo;
 
 import java.util.Optional;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 
 /**
  * The responsibility of this service is to provide information from Open Street Map, which
@@ -27,5 +27,5 @@ public interface OsmInfoGraphBuildService {
   /**
    * Find the platform which relates to an area
    */
-  Optional<Platform> findPlatform(NamedArea area);
+  Optional<Platform> findPlatform(Area area);
 }

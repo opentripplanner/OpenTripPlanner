@@ -3,8 +3,8 @@ package org.opentripplanner.service.osminfo;
 import java.io.Serializable;
 import java.util.Optional;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 
 /**
  * Store OSM data used during graph build, but discard it after it is complete.
@@ -20,7 +20,7 @@ public interface OsmInfoGraphBuildRepository extends Serializable {
   /**
    * Associate named area with a platform
    */
-  void addPlatform(NamedArea area, Platform platform);
+  void addPlatform(Area area, Platform platform);
 
   /**
    * Find the platform the edge belongs to
@@ -30,5 +30,5 @@ public interface OsmInfoGraphBuildRepository extends Serializable {
   /**
    * Find the platform which relates to an area
    */
-  Optional<Platform> findPlatform(NamedArea area);
+  Optional<Platform> findPlatform(Area area);
 }
