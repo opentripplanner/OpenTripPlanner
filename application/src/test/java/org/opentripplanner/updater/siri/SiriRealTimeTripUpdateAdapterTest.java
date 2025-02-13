@@ -34,6 +34,8 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     .addStop(STOP_C1, "0:01:20", "0:01:21")
     .build();
 
+  private static final String ADDED_TRIP_ID = "newJourney";
+
   @Test
   void testCancelTrip() {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
@@ -58,18 +60,20 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     Route route = ROUTE_1;
     int numPatternForRoute = env.getTransitService().findPatterns(route).size();
 
-    String newJourneyId = "newJourney";
     var updates = createValidAddedJourney(env).buildEstimatedTimetableDeliveries();
 
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals("ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04", env.getRealtimeTimetable(newJourneyId));
+    assertEquals(
+      "ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04",
+      env.getRealtimeTimetable(ADDED_TRIP_ID)
+    );
     assertEquals(
       "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
-      env.getScheduledTimetable(newJourneyId)
+      env.getScheduledTimetable(ADDED_TRIP_ID)
     );
-    FeedScopedId tripId = id(newJourneyId);
+    FeedScopedId tripId = id(ADDED_TRIP_ID);
     TransitService transitService = env.getTransitService();
     Trip trip = transitService.getTrip(tripId);
     assertNotNull(trip);
@@ -99,10 +103,13 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals("ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
+    assertEquals(
+      "ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04",
+      env.getRealtimeTimetable(ADDED_TRIP_ID)
+    );
     assertEquals(
       "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
-      env.getScheduledTimetable("newJourney")
+      env.getScheduledTimetable(ADDED_TRIP_ID)
     );
     TransitService transitService = env.getTransitService();
     assertEquals(numRoutes + 1, transitService.listRoutes().size());
@@ -135,7 +142,7 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     // Create an extra journey with invalid planned data (travel back in time)
     // and valid real time data
     var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
-      .withEstimatedVehicleJourneyCode("newJourney")
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
@@ -159,7 +166,7 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
 
     // Create an extra journey with unknown line and operator
     var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
-      .withEstimatedVehicleJourneyCode("newJourney")
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef("unknown operator")
       .withLineRef("unknown line")
@@ -182,7 +189,7 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withEstimatedVehicleJourneyCode("newJourney")
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       // replace trip1
       .withVehicleJourneyRef(TRIP_1_ID)
@@ -196,10 +203,13 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
 
-    assertEquals("ADDED | A1 [R] 0:02 0:02 | C1 0:04 0:04", env.getRealtimeTimetable("newJourney"));
+    assertEquals(
+      "ADDED | A1 [R] 0:02 0:02 | C1 0:04 0:04",
+      env.getRealtimeTimetable(ADDED_TRIP_ID)
+    );
     assertEquals(
       "SCHEDULED | A1 0:01 0:01 | C1 0:03 0:03",
-      env.getScheduledTimetable("newJourney")
+      env.getScheduledTimetable(ADDED_TRIP_ID)
     );
 
     // Original trip should not get canceled
@@ -319,6 +329,63 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     );
   }
 
+  /**
+   * When a scheduled trip is modified (both trip times and stops) and subsequently cancelled,
+   * it should be marked as cancelled and reverted to its scheduled trip times and stops.
+   */
+  @Test
+  void testChangeQuayAndCancelScheduledTrip() {
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    assertEquals(
+      "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      env.getRealtimeTimetable(TRIP_1_ID)
+    );
+    changeQuayAndCancelTrip(env, TRIP_1_ID);
+
+    assertEquals(
+      "CANCELED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      env.getRealtimeTimetable(TRIP_1_ID)
+    );
+  }
+
+  /**
+   * When an added trip is modified (both trip times and stops) and subsequently cancelled,
+   * it should be marked as cancelled and reverted to its initial trip times and stops
+   */
+  @Test
+  void testChangeQuayAndCancelAddedTrip() {
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var creation = new SiriEtBuilder(env.getDateTimeHelper())
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
+      .withIsExtraJourney(true)
+      .withOperatorRef(OPERATOR_1_ID)
+      .withLineRef(ROUTE_1_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A1)
+          .arriveAimedExpected("0:00:10", "0:00:10")
+          .departAimedExpected("0:00:11", "0:00:11")
+          .call(STOP_B1)
+          .arriveAimedExpected("0:00:20", "0:00:20")
+          .departAimedExpected("0:00:21", "0:00:21")
+      )
+      .buildEstimatedTimetableDeliveries();
+    var creationResult = env.applyEstimatedTimetable(creation);
+    assertEquals(1, creationResult.successful());
+    assertEquals(
+      "ADDED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      env.getRealtimeTimetable(ADDED_TRIP_ID)
+    );
+    changeQuayAndCancelTrip(env, ADDED_TRIP_ID);
+
+    // the arrival time on first stop is adjusted to the departure time to avoid negative dwell time
+    // conversely the departure time on last stop is adjusted to the arrival time
+    assertEquals(
+      "CANCELED | A1 0:00:11 0:00:11 | B1 0:00:20 0:00:20",
+      env.getRealtimeTimetable(ADDED_TRIP_ID)
+    );
+  }
+
   @Test
   void testCancelStop() {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_2_INPUT).build();
@@ -396,7 +463,7 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
-      .withDatedVehicleJourneyRef("newJourney")
+      .withDatedVehicleJourneyRef(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_1_ID)
@@ -487,7 +554,7 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
 
   private static SiriEtBuilder createValidAddedJourney(RealtimeTestEnvironment env) {
     return new SiriEtBuilder(env.getDateTimeHelper())
-      .withEstimatedVehicleJourneyCode("newJourney")
+      .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_1_ID)
       .withLineRef(ROUTE_1_ID)
@@ -511,5 +578,35 @@ class SiriRealTimeTripUpdateAdapterTest implements RealtimeTestConstants {
       "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
+  }
+
+  private static void changeQuayAndCancelTrip(RealtimeTestEnvironment env, String tripId) {
+    var modification = new SiriEtBuilder(env.getDateTimeHelper())
+      .withDatedVehicleJourneyRef(tripId)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A1)
+          .departAimedExpected("00:00:11", "00:00:15")
+          // change to another quay in the same station
+          .call(STOP_B2)
+          .arriveAimedExpected("00:00:20", "00:00:25")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var modificationResult = env.applyEstimatedTimetable(modification);
+    assertEquals(1, modificationResult.successful());
+    assertEquals(
+      "MODIFIED | A1 0:00:15 0:00:15 | B2 0:00:25 0:00:25",
+      env.getRealtimeTimetable(tripId)
+    );
+
+    var cancellation = new SiriEtBuilder(env.getDateTimeHelper())
+      .withDatedVehicleJourneyRef(tripId)
+      .withCancellation(true)
+      .buildEstimatedTimetableDeliveries();
+
+    var cancellationResult = env.applyEstimatedTimetable(cancellation);
+
+    assertEquals(1, cancellationResult.successful());
   }
 }
