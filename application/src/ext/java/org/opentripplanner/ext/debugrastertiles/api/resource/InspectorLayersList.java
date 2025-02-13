@@ -1,9 +1,9 @@
-package org.opentripplanner.api.resource;
+package org.opentripplanner.ext.debugrastertiles.api.resource;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.opentripplanner.inspector.raster.TileRenderer;
+import org.opentripplanner.ext.debugrastertiles.TileRenderer;
 
 /**
  * @author mabu

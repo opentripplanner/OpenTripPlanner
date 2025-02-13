@@ -1,14 +1,14 @@
-package org.opentripplanner.inspector.raster;
+package org.opentripplanner.ext.debugrastertiles;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeSegmentColor;
-import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVertexRenderer;
-import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.EdgeVisualAttributes;
-import org.opentripplanner.inspector.raster.EdgeVertexTileRenderer.VertexVisualAttributes;
+import org.opentripplanner.ext.debugrastertiles.EdgeVertexTileRenderer.EdgeSegmentColor;
+import org.opentripplanner.ext.debugrastertiles.EdgeVertexTileRenderer.EdgeVertexRenderer;
+import org.opentripplanner.ext.debugrastertiles.EdgeVertexTileRenderer.EdgeVisualAttributes;
+import org.opentripplanner.ext.debugrastertiles.EdgeVertexTileRenderer.VertexVisualAttributes;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;

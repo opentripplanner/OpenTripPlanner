@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector.raster;
+package org.opentripplanner.ext.debugrastertiles;
 
 import java.awt.Graphics2D;
 import org.locationtech.jts.geom.Envelope;

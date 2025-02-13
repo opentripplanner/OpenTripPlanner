@@ -1,4 +1,4 @@
-package org.opentripplanner.api.resource;
+package org.opentripplanner.ext.debugrastertiles.api.resource;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -13,9 +13,10 @@ import java.io.ByteArrayOutputStream;
 import javax.imageio.ImageIO;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
-import org.opentripplanner.inspector.raster.MapTile;
-import org.opentripplanner.inspector.raster.TileRenderer;
-import org.opentripplanner.inspector.raster.TileRendererManager;
+import org.opentripplanner.api.resource.WebMercatorTile;
+import org.opentripplanner.ext.debugrastertiles.MapTile;
+import org.opentripplanner.ext.debugrastertiles.TileRenderer;
+import org.opentripplanner.ext.debugrastertiles.TileRendererManager;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
