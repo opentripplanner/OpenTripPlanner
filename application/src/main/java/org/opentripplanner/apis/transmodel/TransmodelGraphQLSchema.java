@@ -613,7 +613,7 @@ public class TransmodelGraphQLSchema {
               }
 
               TransitService transitService = GqlUtil.getTransitService(environment);
-              return ids.stream().map(transitService::getStopLocation).collect(Collectors.toList());
+              return ids.stream().map(transitService::getStopLocation).toList();
             }
 
             FindStopLocationsRequest request = FindStopLocationsRequest
