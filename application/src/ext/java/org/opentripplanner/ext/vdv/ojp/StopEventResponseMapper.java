@@ -36,12 +36,12 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class OjpMapper {
+public class StopEventResponseMapper {
 
   private static final String OJP_NAMESPACE = "http://www.vdv.de/ojp";
   private final ZoneId zoneId;
 
-  public OjpMapper(ZoneId zoneId) {
+  public StopEventResponseMapper(ZoneId zoneId) {
     this.zoneId = zoneId;
   }
 
@@ -49,7 +49,7 @@ public class OjpMapper {
     List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
       .stream()
       .map(this::stopEventResult)
-      .map(OjpMapper::jaxbElement)
+      .map(StopEventResponseMapper::jaxbElement)
       .toList();
 
     var sed = new OJPStopEventDeliveryStructure().withStatus(true);
