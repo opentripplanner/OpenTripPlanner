@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.routing.util.DiffEntry;
 import org.opentripplanner.routing.util.DiffTool;
@@ -48,11 +49,9 @@ public class PathDiff<T extends RaptorTripSchedule> {
       path
         .legStream()
         .filter(l -> l.isAccessLeg() || l.isTransferLeg() || l.isEgressLeg())
-        .mapToInt(l -> l.asTransferLeg().duration())
+        .mapToInt(PathLeg::duration)
         .sum();
-    this.routes.addAll(
-        path.transitLegs().map(l -> l.trip().pattern().debugInfo()).toList()
-      );
+    this.routes.addAll(path.transitLegs().map(l -> l.trip().pattern().debugInfo()).toList());
     this.stops.addAll(path.listStops());
   }
 
