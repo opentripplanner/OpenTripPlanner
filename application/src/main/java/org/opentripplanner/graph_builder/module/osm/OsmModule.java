@@ -270,8 +270,6 @@ public class OsmModule implements GraphBuilderModule {
       LOG.info(progress.completeMessage());
     }
 
-    LOG.error("Skipped {}", walkableAreaBuilder.skipped);
-
     if (skipVisibility) {
       LOG.info("Done building rings for walkable areas.");
     } else {

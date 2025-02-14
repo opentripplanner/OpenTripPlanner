@@ -78,8 +78,6 @@ class WalkableAreaBuilder {
   private static final String labelTemplate = "way (area) %s from %s to %s"; // for AreaEdge names
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-  public int skipped;
-
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
@@ -113,7 +111,6 @@ class WalkableAreaBuilder {
           .collect(Collectors.toList())
         : List.of();
     this.vertexFactory = new VertexFactory(graph);
-    this.skipped = 0;
   }
 
   /**
@@ -601,14 +598,12 @@ class WalkableAreaBuilder {
 
   private boolean skipEdge(OsmNode nodeI, OsmNode nodeJ, HashSet<NodeEdge> alreadyAddedEdges) {
     if (nodeI == nodeJ) {
-      skipped++;
       return true;
     }
     NodeEdge edge = new NodeEdge(nodeI, nodeJ);
     if (
       alreadyAddedEdges.contains(edge) || alreadyAddedEdges.contains(new NodeEdge(nodeJ, nodeI))
     ) {
-      skipped++;
       return true;
     }
     alreadyAddedEdges.add(edge);
