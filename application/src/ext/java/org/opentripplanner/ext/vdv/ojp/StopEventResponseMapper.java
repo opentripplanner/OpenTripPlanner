@@ -25,6 +25,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.xml.namespace.QName;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -36,6 +37,11 @@ import org.rutebanken.time.XmlDateTime;
 
 public class StopEventResponseMapper {
 
+  public enum OptionalFeature {
+    PREVIOUS_CALLS,
+    ONWARD_CALLS
+  }
+
   private static final String OJP_NAMESPACE = "http://www.vdv.de/ojp";
   private final ZoneId zoneId;
 
@@ -43,7 +49,7 @@ public class StopEventResponseMapper {
     this.zoneId = zoneId;
   }
 
-  public OJP mapStopTimesInPattern(List<TripTimeOnDate> tripTimesOnDate, ZonedDateTime timestamp) {
+  public OJP mapStopTimesInPattern(List<TripTimeOnDate> tripTimesOnDate, ZonedDateTime timestamp, Set<OptionalFeature> optionalFeatures) {
     List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
       .stream()
       .map(this::stopEventResult)
@@ -61,7 +67,7 @@ public class StopEventResponseMapper {
     return new OJP().withOJPResponse(response);
   }
 
-  private StopEventResultStructure stopEventResult(TripTimeOnDate tripTimeOnDate) {
+  private StopEventResultStructure stopEventResult(TripTimeOnDate tripTimeOnDate, O) {
     var call = new CallAtNearStopStructure().withCallAtStop(callAtStop(tripTimeOnDate));
     var stopEvent = new StopEventStructure()
       .withThisCall(call)
@@ -70,12 +76,12 @@ public class StopEventResponseMapper {
   }
 
   private String eventId(TripTimeOnDate tripTimeOnDate) {
-    var x = new StringBuilder()
+    var bytes = new StringBuilder()
       .append(tripTimeOnDate.getStopTimeKey().toString())
       .append(tripTimeOnDate.getServiceDay())
       .toString()
       .getBytes(StandardCharsets.UTF_8);
-    return UUID.nameUUIDFromBytes(x).toString();
+    return UUID.nameUUIDFromBytes(bytes).toString();
   }
 
   private static DatedJourneyStructure datedJourney(TripTimeOnDate tripTimeOnDate) {
