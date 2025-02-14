@@ -38,7 +38,6 @@ public class TriasResource {
   public TriasResource(@Context OtpServerRequestContext context) {
     ZoneId zoneId = context.transitService().getTimeZone();
     VdvService vdvService = new VdvService(context.transitService());
-    StopEventResponseMapper mapper = new StopEventResponseMapper(zoneId);
     this.ojpService = new OjpService(vdvService, mapper, zoneId);
   }
 

@@ -5,6 +5,7 @@ import de.vdv.ojp20.OJPStopEventRequestStructure;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.Set;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -31,6 +32,6 @@ public class OjpService {
       .map(i -> i.intValue())
       .orElse(1);
     var tripTimesOnDate = vdvService.findStopTimesInPattern(stopId, time.toInstant(), numResults);
-    return mapper.mapStopTimesInPattern(tripTimesOnDate, ZonedDateTime.now());
+    return mapper.mapStopTimesInPattern(tripTimesOnDate, ZonedDateTime.now(), Set.of());
   }
 }
