@@ -98,9 +98,12 @@ public class PagingService {
     }
 
     // SearchWindow cropped -> decrease search-window
-    if (pageCursorInput != null) {
+    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null) {
       boolean cropSWHead = doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = pageCursorInput.pageCut().startTimeAsInstant();
+      Instant rmItineraryStartTime = pageCursorInput
+        .numItinerariesFilterResults()
+        .pageCut()
+        .startTimeAsInstant();
 
       return searchWindowAdjuster.decreaseSearchWindow(
         searchWindowUsed,
@@ -125,11 +128,15 @@ public class PagingService {
   }
 
   private Instant lastKeptDepartureTime() {
-    return pageCursorInput == null ? null : pageCursorInput.pageCut().startTimeAsInstant();
+    return pageCursorInput == null && pageCursorInput.numItinerariesFilterResults() == null
+      ? null
+      : pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant();
   }
 
   private Instant firstKeptDepartureTime() {
-    return pageCursorInput == null ? null : pageCursorInput.pageCut().startTimeAsInstant();
+    return pageCursorInput == null && pageCursorInput.numItinerariesFilterResults() == null
+      ? null
+      : pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant();
   }
 
   private PagingSearchWindowAdjuster createSearchWindowAdjuster(
@@ -185,7 +192,7 @@ public class PagingService {
         searchWindowUsed
       );
 
-    if (pageCursorInput != null) {
+    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() == null) {
       factory = factory.withRemovedItineraries(pageCursorInput);
     }
     return factory;

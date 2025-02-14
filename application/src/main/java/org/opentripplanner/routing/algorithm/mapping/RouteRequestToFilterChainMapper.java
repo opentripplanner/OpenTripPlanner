@@ -3,16 +3,17 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.emissions.DecorateWithEmission;
 import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -32,7 +33,8 @@ public class RouteRequestToFilterChainMapper {
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
-    Consumer<PageCursorInput> pageCursorInputSubscriber
+    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber,
+    Consumer<OptionalInt> bestStreetOnlyCostSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -44,6 +46,11 @@ public class RouteRequestToFilterChainMapper {
     // The page cursor has deduplication information only in certain cases.
     if (request.pageCursor() != null && request.pageCursor().containsItineraryPageCut()) {
       builder = builder.withPagingDeduplicationFilter(request.pageCursor().itineraryPageCut());
+    }
+
+    // The page cursor has best street only cost information only in certain cases.
+    if (request.pageCursor() != null && request.pageCursor().containsBestStreetOnlyCost()) {
+      builder = builder.withBestStreetOnlyCost(request.pageCursor().bestStreetOnlyCost());
     }
 
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
@@ -89,7 +96,8 @@ public class RouteRequestToFilterChainMapper {
         context.transitService()::findMultiModalStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
-      .withPageCursorInputSubscriber(pageCursorInputSubscriber)
+      .withNumItinerariesFilterResultsSubscriber(numItinerariesFilterResultsSubscriber)
+      .withBestStreetOnlyCostSubscriber(bestStreetOnlyCostSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
       .withFilterDirectFlexBySearchWindow(params.filterDirectFlexBySearchWindow())

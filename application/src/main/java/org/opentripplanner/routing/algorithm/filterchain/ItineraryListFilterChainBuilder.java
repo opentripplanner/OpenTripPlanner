@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalInt;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -16,7 +17,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveBikeRentalWithMostlyWalking;
@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemovePa
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.FlexSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
@@ -78,7 +79,8 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Consumer<PageCursorInput> pageCursorInputSubscriber;
+  private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
+  private Consumer<OptionalInt> bestStreetOnlyCostSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -89,6 +91,7 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
+  private OptionalInt bestStreetOnlyCost = OptionalInt.empty();
   private boolean transitGroupPriorityUsed = false;
   private boolean filterDirectFlexBySearchWindow = true;
 
@@ -277,10 +280,32 @@ public class ItineraryListFilterChainBuilder {
    * the last thing* happening in the filter-chain after the final sort. So, if another filter
    * removes an itinerary, the itinerary is not considered with respect to this limit.
    */
-  public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
-    Consumer<PageCursorInput> pageCursorInputSubscriber
+  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultsSubscriber(
+    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber
   ) {
-    this.pageCursorInputSubscriber = pageCursorInputSubscriber;
+    this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber;
+    return this;
+  }
+
+  /**
+   * After the first search the paging does not keep the best street only cost without storing it in the cursor.
+   * This stores the best street only cost in the cursor.
+   */
+  public ItineraryListFilterChainBuilder withBestStreetOnlyCostSubscriber(
+    Consumer<OptionalInt> bestStreetOnlyCostSubscriber
+  ) {
+    this.bestStreetOnlyCostSubscriber = bestStreetOnlyCostSubscriber;
+    return this;
+  }
+
+  /**
+   * If the search is done with a page cursor that contains an encoded best street only cost, then
+   * this function adds the information to the RemoveTransitIfStreetOnlyIsBetter filter.
+   *
+   * @param bestStreetOnlyCost the best street only cost used in filtering.
+   */
+  public ItineraryListFilterChainBuilder withBestStreetOnlyCost(OptionalInt bestStreetOnlyCost) {
+    this.bestStreetOnlyCost = bestStreetOnlyCost;
     return this;
   }
 
@@ -435,7 +460,11 @@ public class ItineraryListFilterChainBuilder {
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
         addRemoveFilter(
           filters,
-          new RemoveTransitIfStreetOnlyIsBetter(removeTransitWithHigherCostThanBestOnStreetOnly)
+          new RemoveTransitIfStreetOnlyIsBetter(
+            removeTransitWithHigherCostThanBestOnStreetOnly,
+            bestStreetOnlyCost,
+            bestStreetOnlyCostSubscriber
+          )
         );
       }
 
@@ -495,7 +524,7 @@ public class ItineraryListFilterChainBuilder {
           new NumItinerariesFilter(
             maxNumberOfItineraries,
             maxNumberOfItinerariesCropSection,
-            pageCursorInputSubscriber
+            numItinerariesFilterResultsSubscriber
           )
         );
       }

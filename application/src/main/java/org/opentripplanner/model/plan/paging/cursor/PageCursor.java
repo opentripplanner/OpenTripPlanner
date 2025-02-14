@@ -1,7 +1,11 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
+import static org.opentripplanner.model.plan.paging.cursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
+
 import java.time.Duration;
 import java.time.Instant;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -24,11 +28,17 @@ public record PageCursor(
   Instant earliestDepartureTime,
   Instant latestArrivalTime,
   Duration searchWindow,
-  @Nullable ItinerarySortKey itineraryPageCut
+  @Nullable ItinerarySortKey itineraryPageCut,
+  OptionalInt bestStreetOnlyCost
 ) {
   public boolean containsItineraryPageCut() {
     return itineraryPageCut != null;
   }
+
+  public boolean containsBestStreetOnlyCost() {
+    return bestStreetOnlyCost.isPresent();
+  }
+
   @Nullable
   public String encode() {
     return PageCursorSerializer.encode(this);
@@ -71,6 +81,7 @@ public record PageCursor(
       .addDuration("searchWindow", searchWindow)
       // This will only include the sort vector, not everything else in the itinerary
       .addObjOp("itineraryPageCut", itineraryPageCut, ItinerarySortKey::keyAsString)
+      .addObj("bestStreetOnlyCost", bestStreetOnlyCost)
       .toString();
   }
 }

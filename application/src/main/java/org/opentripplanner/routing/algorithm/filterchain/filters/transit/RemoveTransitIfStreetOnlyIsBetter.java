@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
+import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -15,10 +15,21 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  */
 public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
-  private final CostLinearFunction costLimitFunction;
+  private static final Consumer<OptionalInt> IGNORE_SUBSCRIBER = i -> {};
 
-  public RemoveTransitIfStreetOnlyIsBetter(CostLinearFunction costLimitFunction) {
+  private final CostLinearFunction costLimitFunction;
+  private final OptionalInt bestStreetOnlyCost;
+  private final Consumer<OptionalInt> bestStreetOnlyCostSubscriber;
+
+  public RemoveTransitIfStreetOnlyIsBetter(
+    CostLinearFunction costLimitFunction,
+    OptionalInt bestStreetOnlyCost,
+    Consumer<OptionalInt> bestStreetOnlyCostSubscriber
+  ) {
     this.costLimitFunction = costLimitFunction;
+    this.bestStreetOnlyCost = bestStreetOnlyCost;
+    this.bestStreetOnlyCostSubscriber =
+      bestStreetOnlyCostSubscriber == null ? IGNORE_SUBSCRIBER : bestStreetOnlyCostSubscriber;
   }
 
   /**
@@ -41,9 +52,17 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
-    if (minStreetCost.isEmpty()) {
+    // If the best street only cost can't be found in the itineraries but
+    // it is present in the cursor, then the information from the cursor is used.
+    // If no cost is found an empty list is returned.
+    if (minStreetCost.isEmpty() && bestStreetOnlyCost.isPresent()) {
+      minStreetCost = bestStreetOnlyCost;
+    } else {
       return List.of();
     }
+
+    // The best street only cost is saved in the cursor.
+    bestStreetOnlyCostSubscriber.accept(minStreetCost);
 
     var limit = costLimitFunction
       .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))

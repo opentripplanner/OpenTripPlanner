@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 final class PageCursorSerializer {
 
-  private static final byte VERSION = 1;
+  private static final byte VERSION = 2;
   private static final Logger LOG = LoggerFactory.getLogger(PageCursor.class);
 
   private static final String TYPE_FIELD = "Type";
@@ -23,6 +24,7 @@ final class PageCursorSerializer {
   private static final String CUT_ARRIVAL_TIME_FIELD = "cutArrivalTime";
   private static final String CUT_N_TRANSFERS_FIELD = "cutTx";
   private static final String CUT_COST_FIELD = "cutCost";
+  private static final String BEST_STREET_ONLY_COST_FIELD = "bestStreetOnlyCost";
 
   private static final TokenSchema SCHEMA_TOKEN = TokenSchema
     .ofVersion(VERSION)
@@ -36,6 +38,7 @@ final class PageCursorSerializer {
     .addTimeInstant(CUT_ARRIVAL_TIME_FIELD)
     .addInt(CUT_N_TRANSFERS_FIELD)
     .addInt(CUT_COST_FIELD)
+    .addInt(BEST_STREET_ONLY_COST_FIELD)
     .build();
 
   /** private constructor to prevent instantiating this utility class */
@@ -59,6 +62,11 @@ final class PageCursorSerializer {
         .withTimeInstant(CUT_ARRIVAL_TIME_FIELD, cut.endTimeAsInstant())
         .withInt(CUT_N_TRANSFERS_FIELD, cut.getNumberOfTransfers())
         .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
+    }
+
+    OptionalInt bestStreetOnlyCost = cursor.bestStreetOnlyCost();
+    if (bestStreetOnlyCost.isPresent()) {
+      tokenBuilder.withInt(BEST_STREET_ONLY_COST_FIELD, bestStreetOnlyCost.getAsInt());
     }
 
     return tokenBuilder.build();
@@ -99,7 +107,23 @@ final class PageCursorSerializer {
       // Add logic to read in data from next version here.
       // if(token.version() > 1) { /* get v2 here */}
 
-      return new PageCursor(type, originalSortOrder, edt, lat, searchWindow, itineraryPageCut);
+      OptionalInt bestStreetOnlyCost = OptionalInt.empty();
+      if (token.version() > 1) {
+        Integer bestStreetOnlyCostField = token.getInt(BEST_STREET_ONLY_COST_FIELD);
+        if (bestStreetOnlyCostField != null) {
+          bestStreetOnlyCost = OptionalInt.of(bestStreetOnlyCostField);
+        }
+      }
+
+      return new PageCursor(
+        type,
+        originalSortOrder,
+        edt,
+        lat,
+        searchWindow,
+        itineraryPageCut,
+        bestStreetOnlyCost
+      );
     } catch (Exception e) {
       String details = e.getMessage();
       if (StringUtils.hasValue(details)) {

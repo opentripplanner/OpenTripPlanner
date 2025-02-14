@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.utils.collection.ListSection;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list
@@ -17,21 +19,23 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   public static final String TAG = "number-of-itineraries-filter";
 
-  private static final Consumer<PageCursorInput> IGNORE_SUBSCRIBER = i -> {};
+  private static final Consumer<NumItinerariesFilterResults> IGNORE_SUBSCRIBER = i -> {};
 
   private final int maxLimit;
   private final ListSection cropSection;
-  private final Consumer<PageCursorInput> pageCursorInputSubscriber;
+  private final Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
 
   public NumItinerariesFilter(
     int maxLimit,
     ListSection cropSection,
-    Consumer<PageCursorInput> pageCursorInputSubscriber
+    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber
   ) {
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
-    this.pageCursorInputSubscriber =
-      pageCursorInputSubscriber == null ? IGNORE_SUBSCRIBER : pageCursorInputSubscriber;
+    this.numItinerariesFilterResultsSubscriber =
+      numItinerariesFilterResultsSubscriber == null
+        ? IGNORE_SUBSCRIBER
+        : numItinerariesFilterResultsSubscriber;
   }
 
   @Override
@@ -58,8 +62,29 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
       itinerariesToKeep = itineraries.subList(0, maxLimit);
     }
 
-    pageCursorInputSubscriber.accept(
-      new NumItinerariesFilterResults(itinerariesToKeep, itinerariesToRemove, cropSection)
+    List<Instant> removedDepartures = itinerariesToRemove
+      .stream()
+      .map(it -> it.startTime().toInstant())
+      .toList();
+
+    Instant earliestRemovedDeparture = removedDepartures
+      .stream()
+      .min(Instant::compareTo)
+      .orElse(null);
+    Instant latestRemovedDeparture = removedDepartures
+      .stream()
+      .max(Instant::compareTo)
+      .orElse(null);
+    ItinerarySortKey pageCut = null;
+
+    if (cropSection == ListSection.HEAD) {
+      pageCut = ListUtils.first(itinerariesToKeep);
+    } else {
+      pageCut = ListUtils.last(itinerariesToKeep);
+    }
+
+    numItinerariesFilterResultsSubscriber.accept(
+      new NumItinerariesFilterResults(earliestRemovedDeparture, latestRemovedDeparture, pageCut)
     );
 
     return itinerariesToRemove;

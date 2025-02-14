@@ -16,7 +16,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.model.plan.paging.cursor.DefaultPageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -67,8 +67,8 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
+  private DefaultPageCursorInput.Builder pageCursorInputBuilder;
   private SearchParams raptorSearchParamsUsed = null;
-  private PageCursorInput pageCursorInput = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     request.applyPageCursor();
@@ -88,6 +88,7 @@ public class RoutingWorker {
         request.journey().transit().priorityGroupsByAgency(),
         request.journey().transit().priorityGroupsGlobal()
       );
+    this.pageCursorInputBuilder = DefaultPageCursorInput.of();
   }
 
   public RoutingResponse route() {
@@ -149,7 +150,8 @@ public class RoutingWorker {
         searchWindowUsed(),
         emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
-        it -> pageCursorInput = it
+        it -> pageCursorInputBuilder = pageCursorInputBuilder.withNumItinerariesFilterResults(it),
+        it -> pageCursorInputBuilder = pageCursorInputBuilder.withBestStreetOnlyCost(it)
       );
 
       filteredItineraries = filterChain.filter(itineraries);
@@ -304,7 +306,7 @@ public class RoutingWorker {
       serverContext.raptorTuningParameters(),
       request,
       raptorSearchParamsUsed,
-      pageCursorInput,
+      pageCursorInputBuilder.build(),
       itineraries
     );
   }

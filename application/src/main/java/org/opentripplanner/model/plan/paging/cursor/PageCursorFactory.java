@@ -5,6 +5,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -61,7 +62,7 @@ public class PageCursorFactory {
   public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
     this.wholeSwUsed = false;
     this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut = pageCursorFactoryParams.pageCut();
+    this.itineraryPageCut = pageCursorFactoryParams.numItinerariesFilterResults().pageCut();
     return this;
   }
 
@@ -120,15 +121,21 @@ public class PageCursorFactory {
     else {
       if (currentPageType == NEXT_PAGE) {
         prevEdt = edtBeforeNewSw();
-        nextEdt = pageCursorInput.earliestRemovedDeparture();
+        nextEdt = pageCursorInput.numItinerariesFilterResults().earliestRemovedDeparture();
       } else {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
-        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        prevEdt =
+          pageCursorInput
+            .numItinerariesFilterResults()
+            .latestRemovedDeparture()
+            .minus(newSearchWindow)
+            .plusSeconds(60);
         nextEdt = edtAfterUsedSw();
       }
     }
+    OptionalInt bestStreetOnlyCost = pageCursorInput.bestStreetOnlyCost();
     prevCursor =
       new PageCursor(
         PREVIOUS_PAGE,
@@ -136,10 +143,19 @@ public class PageCursorFactory {
         prevEdt,
         currentLat,
         newSearchWindow,
-        itineraryPageCut
+        itineraryPageCut,
+        bestStreetOnlyCost
       );
     nextCursor =
-      new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut);
+      new PageCursor(
+        NEXT_PAGE,
+        sortOrder,
+        nextEdt,
+        null,
+        newSearchWindow,
+        itineraryPageCut,
+        bestStreetOnlyCost
+      );
   }
 
   private Instant edtBeforeNewSw() {
