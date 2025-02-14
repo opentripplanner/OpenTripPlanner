@@ -381,14 +381,13 @@ public class GtfsRealTimeTripUpdateAdapter {
     }
 
     // Get new TripTimes based on scheduled timetable
-    var result = pattern
-      .getScheduledTimetable()
-      .createUpdatedTripTimesFromGTFSRT(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        backwardsDelayPropagationType
-      );
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      pattern.getScheduledTimetable(),
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      backwardsDelayPropagationType
+    );
 
     if (result.isFailure()) {
       // necessary so the success type is correct
