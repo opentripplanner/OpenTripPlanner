@@ -201,16 +201,7 @@ public class StyleBuilder {
       roundTo2Decimals(255 / (maxValue - minValue)),
       List.of("get", propertyName)
     );
-    paint.put(
-      "line-color",
-      List.of(
-        "rgb",
-        List.of("min", 255, multiplier),
-        List.of("max", 0, List.of("-", 255, multiplier)),
-        // we add a small amount of blue so that the colours don't look too neon
-        60
-      )
-    );
+    setLineColor(multiplier);
     return this;
   }
 
@@ -225,16 +216,7 @@ public class StyleBuilder {
    */
   public StyleBuilder log2LineColorFromProperty(String propertyName, double logMultiplier) {
     var multiplier = List.of("*", logMultiplier, List.of("log2", List.of("get", propertyName)));
-    paint.put(
-      "line-color",
-      List.of(
-        "rgb",
-        List.of("min", 255, multiplier),
-        List.of("max", 0, List.of("-", 255, multiplier)),
-        // we add a small amount of blue so that the colours don't look too neon
-        60
-      )
-    );
+    setLineColor(multiplier);
     return this;
   }
 
@@ -358,5 +340,18 @@ public class StyleBuilder {
     Stream
       .of(TYPE)
       .forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p)));
+  }
+
+  private void setLineColor(List<Object> valueSpecifier) {
+    paint.put(
+      "line-color",
+      List.of(
+        "rgb",
+        List.of("min", 255, valueSpecifier),
+        List.of("max", 0, List.of("-", 255, valueSpecifier)),
+        // we add a small amount of blue so that the colours don't look too neon
+        60
+      )
+    );
   }
 }
