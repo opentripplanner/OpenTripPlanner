@@ -78,6 +78,8 @@ class WalkableAreaBuilder {
   private static final String labelTemplate = "way (area) %s from %s to %s"; // for AreaEdge names
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
+  public int skipped;
+
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
@@ -111,6 +113,7 @@ class WalkableAreaBuilder {
           .collect(Collectors.toList())
         : List.of();
     this.vertexFactory = new VertexFactory(graph);
+    this.skipped = 0;
   }
 
   /**
@@ -122,11 +125,7 @@ class WalkableAreaBuilder {
     for (Ring ring : group.outermostRings) {
       Set<AreaEdge> edges = new HashSet<>();
       AreaGroup areaGroup = new AreaGroup(ring.jtsPolygon);
-      // the points corresponding to concave or hole vertices
-      // or those linked to ways
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
-      // we also want to fill in the edges of this area anyway, because we can,
-      // and to avoid the numerical problems that they tend to cause
       for (OsmArea area : group.areas) {
         if (!ring.jtsPolygon.contains(area.jtsMultiPolygon)) {
           continue;
@@ -194,16 +193,10 @@ class WalkableAreaBuilder {
       HashSet<OsmNode> visibilityNodes = new HashSet<>();
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
-      // we need to accumulate visibility points from all contained areas
-      // inside this ring, but only for shared nodes; we don't care about
-      // convexity, which we'll handle for the grouped area only.
-
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
       OsmEntity areaEntity = group.getSomeOsmObject();
 
-      // we also want to fill in the edges of this area anyway, because we can,
-      // and to avoid the numerical problems that they tend to cause
       for (OsmArea area : group.areas) {
         // test if area is inside current ring. This is necessary only if there are many areas or outer rings
         if (group.areas.size() != 1 || group.outermostRings.size() != 1) {
@@ -335,9 +328,9 @@ class WalkableAreaBuilder {
             continue;
           }
           j = (int) Math.floor(sum_j);
-          NodeEdge edge = new NodeEdge(nodeI, nodeJ);
-          if (nodeI == nodeJ || alreadyAddedEdges.contains(edge)) continue;
-
+          if (skipEdge(nodeI, nodeJ, alreadyAddedEdges)) {
+            continue;
+          }
           IntersectionVertex vertex2 = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
 
           Coordinate[] coordinates = new Coordinate[] {
@@ -438,11 +431,10 @@ class WalkableAreaBuilder {
   ) {
     OsmNode node = ring.nodes.get(i);
     OsmNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-    NodeEdge nodeEdge = new NodeEdge(node, nextNode);
-    if (alreadyAddedEdges.contains(nodeEdge)) {
+
+    if (skipEdge(node, nextNode, alreadyAddedEdges)) {
       return Set.of();
     }
-    alreadyAddedEdges.add(nodeEdge);
     IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent);
     IntersectionVertex v2 = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
 
@@ -605,6 +597,22 @@ class WalkableAreaBuilder {
     public boolean shouldSkipEdge(State current, Edge edge) {
       return !edges.contains(edge);
     }
+  }
+
+  private boolean skipEdge(OsmNode nodeI, OsmNode nodeJ, HashSet<NodeEdge> alreadyAddedEdges) {
+    if (nodeI == nodeJ) {
+      skipped++;
+      return true;
+    }
+    NodeEdge edge = new NodeEdge(nodeI, nodeJ);
+    if (
+      alreadyAddedEdges.contains(edge) || alreadyAddedEdges.contains(new NodeEdge(nodeJ, nodeI))
+    ) {
+      skipped++;
+      return true;
+    }
+    alreadyAddedEdges.add(edge);
+    return false;
   }
 
   private record NodeEdge(OsmNode from, OsmNode to) {}
