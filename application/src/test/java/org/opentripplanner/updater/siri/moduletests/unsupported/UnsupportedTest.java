@@ -11,6 +11,9 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 
+/**
+ * Contains tests for features that are not currently supported.
+ */
 public class UnsupportedTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_1_INPUT = TripInput
@@ -20,7 +23,6 @@ public class UnsupportedTest implements RealtimeTestConstants {
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();
 
-  // TODO: support this
   @Test
   @Disabled("Not supported yet")
   void testAddStop() {
@@ -49,7 +51,6 @@ public class UnsupportedTest implements RealtimeTestConstants {
     );
   }
 
-  // TODO: support this
   @Test
   @Disabled("Not supported yet")
   void testExtraUnknownStop() {
