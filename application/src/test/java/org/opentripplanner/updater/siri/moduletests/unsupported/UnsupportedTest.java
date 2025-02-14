@@ -49,10 +49,6 @@ public class UnsupportedTest implements RealtimeTestConstants {
     );
   }
 
-  /////////////////
-  // Error cases //
-  /////////////////
-
   // TODO: support this
   @Test
   @Disabled("Not supported yet")

@@ -6,7 +6,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -26,13 +25,6 @@ public class ExtraJourneyTest implements RealtimeTestConstants {
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
-    .build();
-
-  private static final TripInput TRIP_2_INPUT = TripInput
-    .of(TRIP_2_ID)
-    .addStop(STOP_A1, "0:01:00", "0:01:01")
-    .addStop(STOP_B1, "0:01:10", "0:01:11")
-    .addStop(STOP_C1, "0:01:20", "0:01:21")
     .build();
 
   private static final String ADDED_TRIP_ID = "newJourney";

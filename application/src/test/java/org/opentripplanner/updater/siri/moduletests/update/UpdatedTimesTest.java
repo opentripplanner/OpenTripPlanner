@@ -12,7 +12,7 @@ import org.opentripplanner.updater.trip.TripInput;
 
 public class UpdatedTimesTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_1_INPUT = TripInput
+  private static final TripInput TRIP_INPUT = TripInput
     .of(TRIP_1_ID)
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -24,7 +24,7 @@ public class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -43,7 +43,7 @@ public class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
@@ -60,7 +60,7 @@ public class UpdatedTimesTest implements RealtimeTestConstants {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);

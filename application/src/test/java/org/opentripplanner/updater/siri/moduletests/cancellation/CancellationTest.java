@@ -11,7 +11,7 @@ import org.opentripplanner.updater.trip.TripInput;
 
 public class CancellationTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_1_INPUT = TripInput
+  private static final TripInput TRIP_INPUT = TripInput
     .of(TRIP_1_ID)
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -22,7 +22,7 @@ public class CancellationTest implements RealtimeTestConstants {
 
   @Test
   void testCancelTrip() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
 
     assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
 
@@ -43,7 +43,7 @@ public class CancellationTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuayAndCancelScheduledTrip() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
     assertEquals(
       "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
       env.getRealtimeTimetable(TRIP_1_ID)
@@ -62,7 +62,7 @@ public class CancellationTest implements RealtimeTestConstants {
    */
   @Test
   void testChangeQuayAndCancelAddedTrip() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
     var creation = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
