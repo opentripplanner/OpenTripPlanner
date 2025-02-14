@@ -25,6 +25,7 @@ import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
 import org.opentripplanner.ext.vdv.ojp.OjpService;
 import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +37,9 @@ public class TriasResource {
   private final OjpService ojpService;
 
   public TriasResource(@Context OtpServerRequestContext context) {
-    ZoneId zoneId = context.transitService().getTimeZone();
-    VdvService vdvService = new VdvService(context.transitService());
+    var zoneId = context.transitService().getTimeZone();
+    var vdvService = new VdvService(context.transitService());
+    var mapper = new StopEventResponseMapper(zoneId);
     this.ojpService = new OjpService(vdvService, mapper, zoneId);
   }
 
@@ -58,10 +60,13 @@ public class TriasResource {
           "Request type '%s' is not supported".formatted(request.getClass().getSimpleName())
         );
       }
+    } catch (EntityNotFoundException e) {
+      return error(e.getMessage());
     } catch (JAXBException | TransformerException e) {
-      LOG.error("Error reading request", e);
+      LOG.error("Error reading TRIAS request", e);
       return error("Could not read TRIAS request.");
     } catch (Exception e) {
+      LOG.error("Error processing TRIAS request", e);
       return error(e.getMessage());
     }
   }

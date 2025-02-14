@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import java.util.Optional;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -347,5 +348,37 @@ public class TripTimeOnDate {
 
   public TripPattern pattern() {
     return tripPattern;
+  }
+
+  /**
+   * Returns the previous stop time in the trip, if it isn't the first one.
+   */
+  public Optional<TripTimeOnDate> previousStop() {
+    if (stopIndex == 0) {
+      return Optional.empty();
+    }
+    return atStopIndex(stopIndex - 1);
+  }
+
+  /**
+   * Returns the next stop time in the trip, if it isn't the last one.
+   */
+  public Optional<TripTimeOnDate> nextStop() {
+    if (stopIndex == tripTimes.getNumStops() - 1) {
+      return Optional.empty();
+    }
+    return atStopIndex(stopIndex + 1);
+  }
+
+  private Optional<TripTimeOnDate> atStopIndex(int stopIndex) {
+    return Optional.of(
+      new TripTimeOnDate(
+        tripTimes,
+        stopIndex,
+        tripPattern,
+        serviceDate,
+        Instant.ofEpochSecond(midnight)
+      )
+    );
   }
 }
