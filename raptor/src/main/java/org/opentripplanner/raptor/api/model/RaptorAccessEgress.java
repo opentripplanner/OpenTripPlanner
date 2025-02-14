@@ -16,7 +16,7 @@ import org.opentripplanner.utils.time.TimeUtils;
 public interface RaptorAccessEgress {
   /**
    * Raptor may decorate access/egress passed into Raptor. Use this method to get the original
-   * instance of a given {@code type} type passed into Raptor. The first element matching the the
+   * instance of a given {@code type} type passed into Raptor. The first element matching the
    * given {@code type} in the chain of delegates (see {@link AbstractAccessEgressDecorator}) is
    * returned.
    * <p>
