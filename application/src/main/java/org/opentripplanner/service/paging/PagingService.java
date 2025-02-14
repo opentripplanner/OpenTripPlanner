@@ -128,15 +128,15 @@ public class PagingService {
   }
 
   private Instant lastKeptDepartureTime() {
-    return pageCursorInput == null && pageCursorInput.numItinerariesFilterResults() == null
-      ? null
-      : pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant();
+    return pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null
+      ? pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant()
+      : null;
   }
 
   private Instant firstKeptDepartureTime() {
-    return pageCursorInput == null && pageCursorInput.numItinerariesFilterResults() == null
-      ? null
-      : pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant();
+    return pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null
+      ? pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant()
+      : null;
   }
 
   private PagingSearchWindowAdjuster createSearchWindowAdjuster(
@@ -192,7 +192,7 @@ public class PagingService {
         searchWindowUsed
       );
 
-    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() == null) {
+    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null) {
       factory = factory.withRemovedItineraries(pageCursorInput);
     }
     return factory;
