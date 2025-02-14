@@ -9,10 +9,12 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
 import org.opentripplanner.utils.time.TimeUtils;
 
 @SuppressWarnings("ConstantConditions")
@@ -49,8 +51,8 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(NEXT_PAGE, T12_00, null, D1H)
       .withRemovedItineraries(
         new TestPageCursorInput(
-          newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build()
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
+          OptionalInt.empty()
         )
       );
 
@@ -79,8 +81,8 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H)
       .withRemovedItineraries(
         new TestPageCursorInput(
-          newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build()
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
+          OptionalInt.empty()
         )
       );
 
@@ -109,8 +111,8 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, T13_30, D1H)
       .withRemovedItineraries(
         new TestPageCursorInput(
-          newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build()
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
+          OptionalInt.empty()
         )
       );
 
@@ -139,8 +141,8 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
       .withRemovedItineraries(
         new TestPageCursorInput(
-          newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build()
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
+          OptionalInt.empty()
         )
       );
 
@@ -175,20 +177,18 @@ class PageCursorFactoryTest implements PlanTestConstants {
   }
 
   private record TestPageCursorInput(
-    Instant earliestKeptArrival,
-    Instant earliestRemovedDeparture,
-    Instant latestRemovedDeparture,
-    Instant latestRemovedArrival,
-    ItinerarySortKey pageCut
+    NumItinerariesFilterResults numItinerariesFilterResults,
+    OptionalInt bestStreetOnlyCost
   )
     implements PageCursorInput {
-    public TestPageCursorInput(Itinerary keptItinerary, Itinerary removedItinerary) {
+    public TestPageCursorInput(Itinerary removedItinerary, OptionalInt bestStreetOnlyCost) {
       this(
-        keptItinerary.endTimeAsInstant(),
-        removedItinerary.startTimeAsInstant(),
-        removedItinerary.startTimeAsInstant(),
-        removedItinerary.endTimeAsInstant(),
-        removedItinerary
+        new NumItinerariesFilterResults(
+          removedItinerary.startTimeAsInstant(),
+          removedItinerary.startTimeAsInstant(),
+          removedItinerary
+        ),
+        bestStreetOnlyCost
       );
     }
   }

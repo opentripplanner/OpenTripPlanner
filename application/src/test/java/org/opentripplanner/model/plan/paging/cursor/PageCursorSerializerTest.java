@@ -7,6 +7,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.utils.time.DurationUtils;
@@ -18,6 +19,7 @@ class PageCursorSerializerTest {
   private static final Duration SW = DurationUtils.duration("5h");
   private static final Instant DT = Instant.parse("2024-01-10T10:00:00Z");
   private static final Instant AT = Instant.parse("2024-01-10T12:00:00Z");
+  private static final OptionalInt BSOC = OptionalInt.empty();
 
   public static final String TOKEN_V1 =
     "MXxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafDIwMjQtMDEtMTVUMDA6MDA6MDFafDVofFNUUkVFVF" +
@@ -35,7 +37,8 @@ class PageCursorSerializerTest {
     EDT,
     LAT,
     SW,
-    CUT
+    CUT,
+    BSOC
   );
 
   private final PageCursor pageCursorV1withNulls = new PageCursor(
@@ -44,7 +47,8 @@ class PageCursorSerializerTest {
     EDT,
     null,
     SW,
-    null
+    null,
+    BSOC
   );
 
   @Test

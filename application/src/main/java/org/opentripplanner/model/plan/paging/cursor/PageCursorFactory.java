@@ -21,7 +21,7 @@ public class PageCursorFactory {
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
-  private PageCursorInput pageCursorInput = null;
+  private PageCursorInput pageCursorInput = DefaultPageCursorInput.of().build();
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;

@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.TimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +51,7 @@ class PageCursorTest implements PlanTestConstants {
     .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
     .bus(23, 0, 50, B)
     .build();
+  private static final OptionalInt BSOC = OptionalInt.empty();
 
   private TimeZone originalTimeZone;
   private PageCursor subjectDepartAfter;
@@ -61,9 +63,17 @@ class PageCursorTest implements PlanTestConstants {
     TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
 
     subjectDepartAfter =
-      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null);
+      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null, BSOC);
     subjectArriveBy =
-      new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW, PAGE_CUT);
+      new PageCursor(
+        PREVIOUS_PAGE,
+        STREET_AND_DEPARTURE_TIME,
+        EDT,
+        LAT,
+        SEARCH_WINDOW,
+        PAGE_CUT,
+        BSOC
+      );
   }
 
   @AfterEach
@@ -106,7 +116,7 @@ class PageCursorTest implements PlanTestConstants {
   public void cropItinerariesAt(PageType page, SortOrder order, ListSection expSection) {
     assertEquals(
       expSection,
-      new PageCursor(page, order, EDT, null, SEARCH_WINDOW, null).cropItinerariesAt()
+      new PageCursor(page, order, EDT, null, SEARCH_WINDOW, null, BSOC).cropItinerariesAt()
     );
   }
 

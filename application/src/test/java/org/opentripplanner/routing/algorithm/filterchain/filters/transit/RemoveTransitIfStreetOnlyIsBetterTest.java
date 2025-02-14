@@ -6,6 +6,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.OptionalInt;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Cost;
@@ -17,6 +18,8 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants {
 
+  OptionalInt subscribeResult = OptionalInt.empty();
+
   @Test
   void filterAwayNothingIfNoWalking() {
     // Given:
@@ -25,12 +28,15 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
 
     // When:
     RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
-      CostLinearFunction.of(Duration.ofSeconds(200), 1.2)
+      CostLinearFunction.of(Duration.ofSeconds(200), 1.2),
+      OptionalInt.empty(),
+      it -> subscribeResult = it
     );
     List<Itinerary> result = flagger.removeMatchesForTest(List.of(i1, i2));
 
     // Then:
     assertEquals(toStr(List.of(i1, i2)), toStr(result));
+    assertEquals(subscribeResult, OptionalInt.empty());
   }
 
   @Test
@@ -53,19 +59,24 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
 
     // When:
     RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
-      CostLinearFunction.of(Duration.ofSeconds(60), 1.2)
+      CostLinearFunction.of(Duration.ofSeconds(60), 1.2),
+      OptionalInt.empty(),
+      it -> subscribeResult = it
     );
     List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, bicycle, walk, i1));
 
     // Then:
     assertEquals(toStr(List.of(bicycle, walk, i1)), toStr(result));
+    assertEquals(subscribeResult, OptionalInt.of(bicycle.getGeneralizedCost()));
   }
 
   @Nested
   class AccessEgressPenalties {
 
     private static final RemoveTransitIfStreetOnlyIsBetter FLAGGER = new RemoveTransitIfStreetOnlyIsBetter(
-      CostLinearFunction.of(Duration.ZERO, 1.0)
+      CostLinearFunction.of(Duration.ZERO, 1.0),
+      OptionalInt.empty(),
+      it -> {}
     );
 
     @Test
