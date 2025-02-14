@@ -26,6 +26,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
+import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -138,7 +139,7 @@ public interface TransitService {
 
   Collection<GroupStop> listGroupStops();
 
-  StopLocation getStopLocation(FeedScopedId parseId);
+  StopLocation getStopLocation(FeedScopedId id);
 
   /**
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
@@ -350,4 +351,9 @@ public interface TransitService {
    * Returns a list of {@link Route}s that match the filtering defined in the request.
    */
   Collection<Route> findRoutes(FindRoutesRequest request);
+
+  /**
+   * Returns a list of {@link StopLocation}s that match the filtering defined in the request.
+   */
+  Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
 }

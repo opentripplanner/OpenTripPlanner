@@ -38,6 +38,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
+import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -45,6 +46,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.RegularStopMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.RouteMatcherFactory;
+import org.opentripplanner.transit.model.filter.transit.StopLocationMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -258,6 +260,12 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public StopLocation getStopLocation(FeedScopedId id) {
     return timetableRepository.getSiteRepository().getStopLocation(id);
+  }
+
+  @Override
+  public Collection<StopLocation> findStopLocations(FindStopLocationsRequest request) {
+    Matcher<StopLocation> matcher = StopLocationMatcherFactory.of(request);
+    return listStopLocations().stream().filter(matcher::match).toList();
   }
 
   @Override
