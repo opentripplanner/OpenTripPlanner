@@ -1,8 +1,9 @@
 package org.opentripplanner.apis.vectortiles;
 
-import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
+import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
+import static org.opentripplanner.test.support.JsonAssertions.isEqualJson;
 
 import java.io.File;
 import java.util.List;
@@ -40,7 +41,11 @@ class DebugStyleSpecTest {
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
     var expectation = readFile(STYLE_FILE);
-    writeFile(STYLE_FILE, JsonSupport.prettyPrint(json));
-    assertFileEquals(expectation, STYLE_FILE);
+    var newJson = JsonSupport.prettyPrint(json);
+    // Order of keys in a JSON object can randomly change so only write to file when necessary
+    if (!isEqualJson(expectation, json)) {
+      writeFile(STYLE_FILE, newJson);
+    }
+    assertEqualJson(expectation, newJson);
   }
 }
