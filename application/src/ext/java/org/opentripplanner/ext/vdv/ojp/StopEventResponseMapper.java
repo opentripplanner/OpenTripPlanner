@@ -39,7 +39,7 @@ public class StopEventResponseMapper {
 
   public enum OptionalFeature {
     PREVIOUS_CALLS,
-    ONWARD_CALLS
+    ONWARD_CALLS,
   }
 
   private static final String OJP_NAMESPACE = "http://www.vdv.de/ojp";
@@ -49,10 +49,14 @@ public class StopEventResponseMapper {
     this.zoneId = zoneId;
   }
 
-  public OJP mapStopTimesInPattern(List<TripTimeOnDate> tripTimesOnDate, ZonedDateTime timestamp, Set<OptionalFeature> optionalFeatures) {
+  public OJP mapStopTimesInPattern(
+    List<TripTimeOnDate> tripTimesOnDate,
+    ZonedDateTime timestamp,
+    Set<OptionalFeature> optionalFeatures
+  ) {
     List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
       .stream()
-      .map(this::stopEventResult)
+      .map(r -> this.stopEventResult(r, optionalFeatures))
       .map(StopEventResponseMapper::jaxbElement)
       .toList();
 
@@ -67,11 +71,23 @@ public class StopEventResponseMapper {
     return new OJP().withOJPResponse(response);
   }
 
-  private StopEventResultStructure stopEventResult(TripTimeOnDate tripTimeOnDate, O) {
+  private StopEventResultStructure stopEventResult(
+    TripTimeOnDate tripTimeOnDate,
+    Set<OptionalFeature> features
+  ) {
     var call = new CallAtNearStopStructure().withCallAtStop(callAtStop(tripTimeOnDate));
+
     var stopEvent = new StopEventStructure()
       .withThisCall(call)
       .withService(datedJourney(tripTimeOnDate));
+    if (features.contains(OptionalFeature.PREVIOUS_CALLS)) {
+      tripTimeOnDate
+        .previousStop()
+        .ifPresent(previous -> stopEvent.withPreviousCall(callNearStop(previous)));
+    }
+    if (features.contains(OptionalFeature.ONWARD_CALLS)) {
+      tripTimeOnDate.nextStop().ifPresent(next -> stopEvent.withOnwardCall(callNearStop(next)));
+    }
     return new StopEventResultStructure().withStopEvent(stopEvent).withId(eventId(tripTimeOnDate));
   }
 
@@ -117,6 +133,10 @@ public class StopEventResponseMapper {
       .withNoBoardingAtStop(isNone(tripTimeOnDate.getPickupType()))
       .withNoAlightingAtStop(isNone(tripTimeOnDate.getDropoffType()))
       .withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)));
+  }
+
+  private CallAtNearStopStructure callNearStop(TripTimeOnDate tripTimeOnDate) {
+    return new CallAtNearStopStructure().withCallAtStop(callAtStop(tripTimeOnDate));
   }
 
   private static String lang(TripTimeOnDate tripTimeOnDate) {
