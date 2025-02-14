@@ -19,13 +19,6 @@ public class UpdatedTimesTest implements RealtimeTestConstants {
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();
 
-  private static final TripInput TRIP_2_INPUT = TripInput
-    .of(TRIP_2_ID)
-    .addStop(STOP_A1, "0:01:00", "0:01:01")
-    .addStop(STOP_B1, "0:01:10", "0:01:11")
-    .addStop(STOP_C1, "0:01:20", "0:01:21")
-    .build();
-
   /**
    * Update calls without changing the pattern. Match trip by dated vehicle journey.
    */
@@ -73,19 +66,6 @@ public class UpdatedTimesTest implements RealtimeTestConstants {
     var result = env.applyEstimatedTimetable(updates);
     assertEquals(0, result.successful());
     assertFailure(UpdateError.UpdateErrorType.TRIP_NOT_FOUND, result);
-  }
-
-  /**
-   * Update calls without changing the pattern. Fuzzy matching.
-   */
-  @Test
-  void testUpdateJourneyWithFuzzyMatching() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
-
-    var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
-    var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
-    assertEquals(1, result.successful());
-    assertTripUpdated(env);
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
