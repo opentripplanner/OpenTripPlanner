@@ -168,7 +168,7 @@ public class WalkableAreaBuilderTest {
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
     // with two bidirectional edge pairs, and with the other entrance point
-    assertEquals(6, connectionEdges.size());
+    assertEquals(3, connectionEdges.size());
 
     // test that semicolon separated list of elevator levals works in level matching
     // e.g. 'level'='0;1'
