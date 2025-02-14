@@ -152,8 +152,9 @@ def main():
         merge_in_labeled_prs()
         merge_in_ext_branches()
         merge_in_old_release_with_no_changes()
+        run_custom_release_extensions()
 
-    run_custom_release_extensions()
+    merge_in_old_release_with_no_changes()
     set_maven_pom_version()
     set_ser_ver_id()
     run_maven_test()
@@ -384,8 +385,8 @@ def load_config():
         config.ser_ver_id_prefix = doc['ser_ver_id_prefix']
         debug(f'Config loaded: {config}')
 
-    if len(config.ser_ver_id_prefix) != 2:
-        error(f"Configure the 'ser_ver_id_prefix'. The prefix must be exactly two characters long. "
+    if len(config.ser_ver_id_prefix) > 2:
+        error(f"Configure the 'ser_ver_id_prefix'. The prefix must be maximum two characters long. "
               f"Value: <{config.ser_ver_id_prefix}>")
 
 
@@ -447,11 +448,28 @@ def list_labeled_prs():
         return
     info('Get PRs to include and their labels from GitHub - This requires authentication ...')
 
-    # The query body needs to be on one line, for an unknown reason.
-    query_text = ('query ReadOpenPullRequests { '
-                  'repository(owner:\\"opentripplanner\\", name:\\"OpenTripPlanner\\") { '
-                  f'pullRequests(first: 100, states: OPEN, labels: \\"{config.include_prs_label}\\") '
-                  '{ nodes { number, title, labels(first: 20) { nodes { name } } } } } } }')
+
+    query_text = '''
+    query ReadOpenPullRequests {
+      repository(owner:\\"opentripplanner\\", name:\\"OpenTripPlanner\\") {
+        pullRequests(first: 100, states: OPEN, labels: \\"''' + config.include_prs_label + '''\\") {
+          nodes {
+            number, 
+            title, 
+            labels(first: 20) {
+              nodes {
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+    '''
+
+    # The query body needs to be on one line, for an unknown reason. Replace 2 or more whitespace
+    # with a singe space.
+    query_text = re.sub(r'(?s)\s{2,}', ' ', query_text)
     post_body = '''
     {
       "query":"''' + query_text + '''",
@@ -606,8 +624,14 @@ def git_tag(version):
 
 
 def bump_release_ser_ver_id(current_id):
-    value = int(current_id[3:])
-    v = config.ser_ver_id_prefix + '-{:04d}'.format(value + 1)
+    # The id format can be either 'A-00053' or 'AA-0053'
+    if len(config.ser_ver_id_prefix) == 1:
+        ver_number = int(current_id[2:])
+        ser_format = '{:05d}'
+    else:
+        ver_number = int(current_id[3:])
+        ser_format = '{:04d}'
+    v = config.ser_ver_id_prefix + '-' + ser_format.format(ver_number + 1)
     debug(f'New serialization version id: {v}')
     return v
 
@@ -750,14 +774,14 @@ def print_help():
     Release process overview
       1. The configured release-branch is reset hard to the <base-revision>.
       2. Then the labeled PRs are merged into the release-branch, if configured.
-      3. The config-branch is rebased onto the release-branch.
+      3. The config-branches are merged into the release-branch.
       4. The pom.xml file is updated with a new version and serialization version id.
       5. The release is tested, tagged and pushed to Git repo.
 
     See the RELEASE_README.md for more details.
 
     Usage
-      script/prepare_release.py [options] [<base-revision>]
+      script/custom-release.py [options] [<base-revision>]
 
     Arguments
         <base-revision> : The base branch or commit to use as the base for the release. The
@@ -772,27 +796,28 @@ def print_help():
       --release  : Create a new release from the current local Git repo HEAD. It updates the
                    maven-project-version and the serialization-version-id, creates a new tag
                    and push the release. You should apply all fixes and commit BEFORE running
-                   this script. Can not be used with the <base-revision> argument set.
+                   this script. Can not be used with the <base-revision> argument set. The 
+                   'custom-release-extension' script is NOT run.
       --serVerId : Force incrementation of the serialization version id.
       --skipPRs  : Skip PRs labeled with the configured 'include_prs_label'.
       --summary  : Print a markdown summary to '.custom_release_summary.md'
 
     Examples
-      # script/prepare_release.py otp/dev-2.x --printSummary
-      # script/prepare_release.py 0715be88
-      # script/prepare_release.py --dryRun --debug entur/my-feature-branch
-      # script/prepare_release.py --release --serVerId
+      # script/custom-release.py otp/dev-2.x --printSummary
+      # script/custom-release.py 0715be88
+      # script/custom-release.py --dryRun --debug entur/my-feature-branch
+      # script/custom-release.py --release --serVerId
 
 
     Failure
       If a release fails, you may resume the release process after fixing the problem by running
       the custom-release script again. The script will automatically detect that the script failed
       and resume the release. Typical errors are merge conflicts and unit-test failures. Remember
-      to commit you changes after the problem is fixed.
+      to commit you changes after the problem is fixed, before running the script.
 
-      If you do not want to resume, an instead start over delete the {STATE_FILE} and run the
+      If you do not want to resume, and instead start over, delete the {STATE_FILE} and run the
       script again. You also need to delete the tag, if the release was tagged - this is last step
-      before the release is pushing to the remove git repo.
+      before the release is pushed to the remote git repo.
     """)
     exit(0)
 

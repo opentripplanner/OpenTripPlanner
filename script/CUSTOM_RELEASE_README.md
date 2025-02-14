@@ -1,4 +1,4 @@
-# README - OTP Cusom/Fork Release Scripts
+# README - OTP Custom/Fork Release Scripts
 
 **Note! This describes how you can set up and release OTP in you own GitHub fork, not how OTP in the
 main repo is released.**
@@ -13,7 +13,7 @@ The scripts here can be used to release a fork of OTP. Run
 
 You can customize the release with:
 
- - `script/custom-release-env.json` Requiered config for the main script.
+ - `script/custom-release-env.json` Required config for the main script.
  - `script/custom-release-extension` Optional script executed by the main scrit if it exist.
 
 
@@ -47,10 +47,13 @@ nothing is lost.
 > release by running the release script again. The script will detect that it failed and ask you
 > what to do.
 
-The release script also support maining a hotfix (`--hotfix`). Simply make the needed changes 
-to any previous release. For example merge in bug-fix branches. Complete the process by running
-`script/custom-release-extension --hotfix`.
+The release script also support making a hotfix release. Simply make the needed changes 
+to any commit in the release branch. For example merge in bug-fix branches on top of another 
+release tag. Complete the process by running:
 
+```
+# script/custom-release-extension --release
+```
 
 ### Advanced Git flow - roll back
 
@@ -100,17 +103,16 @@ The branch may include(optional):
   maintain it in a simple way and avoid merge conflicts.
 
 The config branches are merged into the release - so the best way to avoid merge conflict is to
-use a "old" commit in the **base branch/repo** as the base for your config. If the base commit
-exist in the target base revision used to create a new release, then you are guaranteed to avoid
-any merge conflicts - unless you change something - adding new files are safe.
+use a "old" commit from the **base branch/repo** as the base for your config. Do not use a commit 
+witch only exist in the release branch, this will lead to conficts with the pom.xml version number.
 
 
 ## Setup
 
-Create a extention branch (`main_config`) in your local fork based on a commit in the target
-repo(for example `HEAD` of `opentripplanner/OpenTripPlanner/dev-2.x`).
+Create a configuration extention branch (`main_config`) in your local fork based on a commit in the
+upstream repo, for example `HEAD` of `opentripplanner/OpenTripPlanner/dev-2.x`. 
 
-Add the `script/custom-release-env.json` file with you config, like this:
+Add the `script/custom-release-env.json` file to your branch. The content of the file should be:
 
 ```json
 {
@@ -134,8 +136,8 @@ If you organization is _Curium_, then the file would look like this:
 }
 ```
 
-The `<organization name>` must match the GitHub organization name in your local Git clone.
-Use `git remote -v` to list all remote repos. 
+The `<organization name>` must match the GitHub organization name (repository owner) in your local
+Git clone. Use `git remote -v` to list all remote repos. 
 
 ```
 # git remote -v 
@@ -165,10 +167,9 @@ enable it by changing the config.
 
 ## How To Make A Release
 
-Find the target branch/commit or use the branch `otp/dev-2.x`. If you use a specific branch/commit, 
-then replace `otp/dev-2.x` below with your branch/commit hash.
+Find the base branch/commit to use, for example `otp/dev-2.x`. If you use a specific branch/commit, 
+then replace `otp/dev-2.x` below with your branch name or commit hash. Run the  script:
 
-Run the `script/custom-release.py` script:
 ```
 # script/custom-release.py otp/dev-2.x
 ```
@@ -188,7 +189,8 @@ you rerun the script.
 > generated you mark the conflict as resolved.
 
 If a conflic happens in the CI/CD pipline it is recomended to fix the branch causing the conflict.
-The conflict can normally be fixed by rebasing or merging the extention branches or PRs. When 
+The conflict can normally be fixed by rebasing or merging the extention branches or PRs. If not,
+you will have to make the release on a local mashine resolving conflicts by hand.
 
 
 ## How-to make a hot-fix release 🔥
@@ -203,7 +205,20 @@ since the serialization version number is the same.
    version in the production environment. 
 3. Cherry-pick or fix the problem. 
 4. Run tests.
-5. Complete the release by running the `script/custom-release.py --hotfix`. 
+5. Complete the release by running the `script/custom-release.py --release`. 
+
+
+## How-to roll back, by rolling forward 🔥
+
+You can roll-back in two ways:
+
+1. Find the commit you want to use as the base in the base repository and run the script:
+   `script/custom-release.py <commit hash>`. This will create a new release using the
+   `<commit hash>` as the base. 
+2. Reset the release brach to a specific commit. Apply your changes. Merge in config
+   branches if nessessary, and run `script/custom-release.py --release`. This is similar to making
+   a hot-fix.
+
 
 ## How-to print a changelog summary
 
