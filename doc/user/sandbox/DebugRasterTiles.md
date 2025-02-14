@@ -19,7 +19,7 @@ The available layers are:
 
 ## Changelog
 
-- 2024-2-13: Moved raster tiles from core code into sandbox.
+- 2024-02-13: Moved raster tiles from core code into sandbox.
 
 
 ### Configuration
