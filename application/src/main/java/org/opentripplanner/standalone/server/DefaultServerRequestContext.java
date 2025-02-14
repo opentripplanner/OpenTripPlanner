@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.debugrastertiles.TileRendererManager;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -47,7 +46,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final List<RideHailingService> rideHailingServices;
   private final RouteRequest routeRequestDefaults;
   private final StreetLimitationParametersService streetLimitationParametersService;
-  private final TileRendererManager tileRendererManager;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
   private final VectorTileConfig vectorTileConfig;
@@ -101,7 +99,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     @Nullable LuceneIndex luceneIndex,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     @Nullable StopConsolidationService stopConsolidationService,
-    @Nullable TileRendererManager tileRendererManager,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     this.debugUiConfig = debugUiConfig;
@@ -113,7 +110,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.routeRequestDefaults = routeRequestDefaults;
     this.streetLimitationParametersService = streetLimitationParametersService;
-    this.tileRendererManager = tileRendererManager;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
     this.vectorTileConfig = vectorTileConfig;
@@ -214,11 +210,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
-  }
-
-  @Override
-  public TileRendererManager tileRendererManager() {
-    return tileRendererManager;
   }
 
   @Override

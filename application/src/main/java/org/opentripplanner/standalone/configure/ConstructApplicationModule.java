@@ -6,7 +6,6 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.debugrastertiles.TileRendererManager;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
@@ -57,9 +56,6 @@ public class ConstructApplicationModule {
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
 
-    // TODO: Inject this, can this use the routerConfig routingRequest ?
-    var tileRendererManager = new TileRendererManager(graph, defaultRequest.preferences());
-
     return new DefaultServerRequestContext(
       debugUiConfig,
       flexParameters,
@@ -80,7 +76,6 @@ public class ConstructApplicationModule {
       luceneIndex,
       sorlandsbanenService,
       stopConsolidationService,
-      tileRendererManager,
       traverseVisitor
     );
   }

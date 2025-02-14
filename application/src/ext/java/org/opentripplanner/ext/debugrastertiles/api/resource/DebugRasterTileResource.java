@@ -33,10 +33,14 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 @Path("/debugrastertiles")
 public class DebugRasterTileResource {
 
-  private final OtpServerRequestContext serverContext;
+  private final TileRendererManager tileRendererManager;
 
   public DebugRasterTileResource(@Context OtpServerRequestContext serverContext) {
-    this.serverContext = serverContext;
+    this.tileRendererManager =
+      new TileRendererManager(
+        serverContext.graph(),
+        serverContext.defaultRouteRequest().preferences().wheelchair()
+      );
   }
 
   @GET
@@ -53,8 +57,7 @@ public class DebugRasterTileResource {
     Envelope env = WebMercatorTile.tile2Envelope(x, y, z);
     MapTile mapTile = new MapTile(env, 256, 256);
 
-    OtpServerRequestContext serverContext = this.serverContext;
-    BufferedImage image = serverContext.tileRendererManager().renderTile(mapTile, layer);
+    BufferedImage image = tileRendererManager.renderTile(mapTile, layer);
 
     MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
     ByteArrayOutputStream baos = new ByteArrayOutputStream(

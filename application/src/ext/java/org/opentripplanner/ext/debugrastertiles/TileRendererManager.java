@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
 import org.opentripplanner.ext.debugrastertiles.TileRenderer.TileRenderContext;
 import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class TileRendererManager {
 
   private final Graph graph;
 
-  public TileRendererManager(Graph graph, RoutingPreferences routingPreferences) {
+  public TileRendererManager(Graph graph, WheelchairPreferences wheelchairPreferences) {
     this.graph = graph;
 
     // Register layers.
@@ -39,7 +39,7 @@ public class TileRendererManager {
     renderers.put("traversal", new EdgeVertexTileRenderer(new TraversalPermissionsEdgeRenderer()));
     renderers.put(
       "wheelchair",
-      new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(routingPreferences.wheelchair()))
+      new EdgeVertexTileRenderer(new WheelchairEdgeRenderer(wheelchairPreferences))
     );
     renderers.put("elevation", new EdgeVertexTileRenderer(new ElevationEdgeRenderer(graph)));
   }
