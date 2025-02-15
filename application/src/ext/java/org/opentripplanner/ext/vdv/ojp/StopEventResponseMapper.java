@@ -7,6 +7,7 @@ import de.vdv.ojp20.InternationalTextStructure;
 import de.vdv.ojp20.JourneyRefStructure;
 import de.vdv.ojp20.ModeStructure;
 import de.vdv.ojp20.OJP;
+import de.vdv.ojp20.OJPErrorStructure;
 import de.vdv.ojp20.OJPResponseStructure;
 import de.vdv.ojp20.OJPStopEventDeliveryStructure;
 import de.vdv.ojp20.OperatingDayRefStructure;
@@ -83,20 +84,19 @@ public class StopEventResponseMapper {
     if (features.contains(OptionalFeature.PREVIOUS_CALLS)) {
       tripTimeOnDate
         .previousStop()
-        .ifPresent(previous -> stopEvent.withPreviousCall(callNearStop(previous)));
+        .forEach(previous -> stopEvent.withPreviousCall(callNearStop(previous)));
     }
     if (features.contains(OptionalFeature.ONWARD_CALLS)) {
-      tripTimeOnDate.nextStop().ifPresent(next -> stopEvent.withOnwardCall(callNearStop(next)));
+      tripTimeOnDate.nextStop().forEach(next -> stopEvent.withOnwardCall(callNearStop(next)));
     }
     return new StopEventResultStructure().withStopEvent(stopEvent).withId(eventId(tripTimeOnDate));
   }
 
   private String eventId(TripTimeOnDate tripTimeOnDate) {
-    var bytes = new StringBuilder()
-      .append(tripTimeOnDate.getStopTimeKey().toString())
-      .append(tripTimeOnDate.getServiceDay())
-      .toString()
-      .getBytes(StandardCharsets.UTF_8);
+    var bytes =
+      (tripTimeOnDate.getStopTimeKey().toString() + tripTimeOnDate.getServiceDay()).getBytes(
+          StandardCharsets.UTF_8
+        );
     return UUID.nameUUIDFromBytes(bytes).toString();
   }
 
