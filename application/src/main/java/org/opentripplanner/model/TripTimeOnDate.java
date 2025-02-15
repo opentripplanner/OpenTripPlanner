@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.stream.IntStream;
+import org.apache.commons.lang3.IntegerRange;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -17,6 +19,7 @@ import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.IntRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -353,32 +356,35 @@ public class TripTimeOnDate {
   /**
    * Returns the previous stop time in the trip, if it isn't the first one.
    */
-  public Optional<TripTimeOnDate> previousStop() {
+  public List<TripTimeOnDate> previousStop() {
     if (stopIndex == 0) {
-      return Optional.empty();
+      return List.of();
+    } else {
+      return IntStream.range(0, stopIndex - 1).mapToObj(this::atStopIndex).toList();
     }
-    return atStopIndex(stopIndex - 1);
   }
 
   /**
    * Returns the next stop time in the trip, if it isn't the last one.
    */
-  public Optional<TripTimeOnDate> nextStop() {
+  public List<TripTimeOnDate> nextStop() {
     if (stopIndex == tripTimes.getNumStops() - 1) {
-      return Optional.empty();
+      return List.of();
+    } else {
+      return IntStream
+        .range(stopIndex + 1, tripTimes.getNumStops() - 1)
+        .mapToObj(this::atStopIndex)
+        .toList();
     }
-    return atStopIndex(stopIndex + 1);
   }
 
-  private Optional<TripTimeOnDate> atStopIndex(int stopIndex) {
-    return Optional.of(
-      new TripTimeOnDate(
-        tripTimes,
-        stopIndex,
-        tripPattern,
-        serviceDate,
-        Instant.ofEpochSecond(midnight)
-      )
+  private TripTimeOnDate atStopIndex(int stopIndex) {
+    return new TripTimeOnDate(
+      tripTimes,
+      stopIndex,
+      tripPattern,
+      serviceDate,
+      Instant.ofEpochSecond(midnight)
     );
   }
 }
