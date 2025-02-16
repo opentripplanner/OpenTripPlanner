@@ -42,7 +42,7 @@ class StopTimesHelper {
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
    */
-  public static List<StopTimesInPattern> stopTimesForStop(
+  static List<StopTimesInPattern> stopTimesForStop(
     TransitService transitService,
     StopLocation stop,
     Instant startTime,
@@ -86,7 +86,7 @@ class StopTimesHelper {
    * @param stop        Stop object to perform the search for
    * @param serviceDate Return all departures for the specified date
    */
-  public static List<StopTimesInPattern> stopTimesForStop(
+  static List<StopTimesInPattern> stopTimesForStop(
     TransitService transitService,
     StopLocation stop,
     LocalDate serviceDate,
@@ -146,7 +146,7 @@ class StopTimesHelper {
    *                             trip or the stop at the given stop location has been cancelled.
    *                             Deleted trips are never returned no matter the value of this parameter.
    */
-  public static List<TripTimeOnDate> stopTimesForPatternAtStop(
+  static List<TripTimeOnDate> stopTimesForPatternAtStop(
     TransitService transitService,
     StopLocation stop,
     TripPattern pattern,
