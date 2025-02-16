@@ -52,10 +52,21 @@ public class ResourceLoader {
     } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
-    assertTrue(
-      file.exists(),
-      "File '%s' not found on file system.".formatted(file.getAbsolutePath())
-    );
+    assertFileExists(file);
+    return file;
+  }
+
+  /**
+   * Returns a File instance in the original ext-test resources folder.
+   */
+  public File extTestResourceFile(String path) {
+    var fullPath =
+      "src/ext-test/resources/%s/%s".formatted(
+          clazz.getPackage().getName().replace(".", "/"),
+          path
+        );
+    File file = new File(fullPath);
+    assertFileExists(file);
     return file;
   }
 
@@ -114,5 +125,12 @@ public class ResourceLoader {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private static void assertFileExists(File file) {
+    assertTrue(
+      file.exists(),
+      "File '%s' not found on file system.".formatted(file.getAbsolutePath())
+    );
   }
 }
