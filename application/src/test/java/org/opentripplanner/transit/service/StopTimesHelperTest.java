@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.stoptimes;
+package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,8 +15,6 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 class StopTimesHelperTest {
 

@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.stoptimes;
+package org.opentripplanner.transit.service;
 
-import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.ARRIVALS;
-import static org.opentripplanner.routing.stoptimes.ArrivalDeparture.DEPARTURES;
+import static org.opentripplanner.transit.service.ArrivalDeparture.ARRIVALS;
+import static org.opentripplanner.transit.service.ArrivalDeparture.DEPARTURES;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import java.time.Duration;
@@ -22,10 +22,9 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
-public class StopTimesHelper {
+class StopTimesHelper {
 
   /**
    * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
@@ -115,7 +114,7 @@ public class StopTimesHelper {
             continue;
           }
           for (TripTimes t : tt.getTripTimes()) {
-            if (skipByTripCancellation(t, includeCancellations)) {
+            if (TripTimesHelper.skipByTripCancellation(t, includeCancellations)) {
               continue;
             }
             if (servicesRunning.contains(t.getServiceCode())) {
@@ -251,7 +250,7 @@ public class StopTimesHelper {
             if (!servicesRunning.contains(tripTimes.getServiceCode())) {
               continue;
             }
-            if (skipByTripCancellation(tripTimes, includeCancellations)) {
+            if (TripTimesHelper.skipByTripCancellation(tripTimes, includeCancellations)) {
               continue;
             }
             if (
@@ -299,17 +298,6 @@ public class StopTimesHelper {
       serviceDate
     );
     return replacement != null && !replacement.equals(pattern);
-  }
-
-  public static boolean skipByTripCancellation(TripTimes tripTimes, boolean includeCancellations) {
-    if (tripTimes.isDeleted()) {
-      return true;
-    }
-
-    return (
-      (tripTimes.isCanceled() || tripTimes.getTrip().getNetexAlteration().isCanceledOrReplaced()) &&
-      !includeCancellations
-    );
   }
 
   private static boolean skipByPickUpDropOff(
