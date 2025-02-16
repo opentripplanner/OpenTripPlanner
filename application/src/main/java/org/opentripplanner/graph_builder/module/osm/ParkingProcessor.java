@@ -398,21 +398,21 @@ class ParkingProcessor {
       .build();
   }
 
-  private I18NString nameParkAndRideEntity(OsmEntity osmWithTags) {
+  private I18NString nameParkAndRideEntity(OsmEntity osmEntity) {
     // If there is an explicit name user that. The explicit name is used so that tag-based
     // translations are used, which are not handled by "CreativeNamer"s.
-    I18NString creativeName = osmWithTags.getAssumedName();
+    I18NString creativeName = osmEntity.getAssumedName();
     if (creativeName == null) {
       // ... otherwise resort to "CreativeNamer"s
       creativeName =
-        osmWithTags.getOsmProvider().getWayPropertySet().getCreativeNameForWay(osmWithTags);
+        osmEntity.getOsmProvider().getWayPropertySet().getCreativeNameForWay(osmEntity);
     }
     if (creativeName == null) {
       creativeName =
         new NonLocalizedString(
           "Park & Ride (%s/%d)".formatted(
-              osmWithTags.getClass().getSimpleName(),
-              osmWithTags.getId()
+              osmEntity.getClass().getSimpleName(),
+              osmEntity.getId()
             )
         );
     }

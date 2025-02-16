@@ -173,10 +173,10 @@ class WalkableAreaBuilder {
     Set<Long> osmWayIds = group.areas
       .stream()
       .map(area -> area.parent)
-      .flatMap(osmWithTags ->
-        osmWithTags instanceof OsmRelation
-          ? ((OsmRelation) osmWithTags).getMembers().stream().map(OsmRelationMember::getRef)
-          : Stream.of(osmWithTags.getId())
+      .flatMap(osmEntity ->
+        osmEntity instanceof OsmRelation
+          ? ((OsmRelation) osmEntity).getMembers().stream().map(OsmRelationMember::getRef)
+          : Stream.of(osmEntity.getId())
       )
       .collect(Collectors.toSet());
 
