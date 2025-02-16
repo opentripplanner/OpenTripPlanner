@@ -3,9 +3,12 @@ package org.opentripplanner.ext.vdv.trias;
 import de.vdv.ojp20.OJP;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import javax.xml.transform.OutputKeys;
@@ -24,6 +27,12 @@ public class OjpToTriasTransformer {
   private static final Templates TRIAS_TO_OJP_TEMPLATE = loadTemplate(
     "trias_to_ojp2.0_request.xslt"
   );
+
+  public static String transform(OJP ojp) {
+    var writer = new StringWriter();
+    transform(ojp, writer);
+    return writer.toString();
+  }
 
   public static void transform(OJP ojp, Writer writer) {
     try {
