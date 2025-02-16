@@ -7,7 +7,6 @@ import de.vdv.ojp20.InternationalTextStructure;
 import de.vdv.ojp20.JourneyRefStructure;
 import de.vdv.ojp20.ModeStructure;
 import de.vdv.ojp20.OJP;
-import de.vdv.ojp20.OJPErrorStructure;
 import de.vdv.ojp20.OJPResponseStructure;
 import de.vdv.ojp20.OJPStopEventDeliveryStructure;
 import de.vdv.ojp20.OperatingDayRefStructure;
@@ -26,8 +25,11 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
@@ -38,6 +40,8 @@ import org.rutebanken.time.XmlDateTime;
 
 public class StopEventResponseMapper {
 
+  private final Function<String, Optional<String>> resolveFeedLanguage;
+
   public enum OptionalFeature {
     PREVIOUS_CALLS,
     ONWARD_CALLS,
@@ -46,8 +50,12 @@ public class StopEventResponseMapper {
   private static final String OJP_NAMESPACE = "http://www.vdv.de/ojp";
   private final ZoneId zoneId;
 
-  public StopEventResponseMapper(ZoneId zoneId) {
+  public StopEventResponseMapper(
+    ZoneId zoneId,
+    Function<String, Optional<String>> resolveFeedLanguage
+  ) {
     this.zoneId = zoneId;
+    this.resolveFeedLanguage = resolveFeedLanguage;
   }
 
   public OJP mapStopTimesInPattern(
@@ -100,7 +108,7 @@ public class StopEventResponseMapper {
     return UUID.nameUUIDFromBytes(bytes).toString();
   }
 
-  private static DatedJourneyStructure datedJourney(TripTimeOnDate tripTimeOnDate) {
+  private DatedJourneyStructure datedJourney(TripTimeOnDate tripTimeOnDate) {
     final Route route = tripTimeOnDate.getTrip().getRoute();
     var firstStop = tripTimeOnDate.pattern().getStops().getFirst();
     var lastStop = tripTimeOnDate.pattern().getStops().getLast();
@@ -139,8 +147,14 @@ public class StopEventResponseMapper {
     return new CallAtNearStopStructure().withCallAtStop(callAtStop(tripTimeOnDate));
   }
 
-  private static String lang(TripTimeOnDate tripTimeOnDate) {
-    return tripTimeOnDate.getTrip().getRoute().getAgency().getLang();
+  @Nullable
+  private String lang(TripTimeOnDate tripTimeOnDate) {
+    var agencyLang = tripTimeOnDate.getTrip().getRoute().getAgency().getLang();
+    if (agencyLang != null) {
+      return agencyLang;
+    } else {
+      return resolveFeedLanguage.apply(tripTimeOnDate.getTrip().getId().getFeedId()).orElse(null);
+    }
   }
 
   private static boolean isNone(PickDrop pickDrop) {
