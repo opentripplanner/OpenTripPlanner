@@ -17,15 +17,19 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.xml.transform.TransformerException;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
 import org.opentripplanner.ext.vdv.ojp.OjpService;
 import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +41,13 @@ public class TriasResource {
   private final OjpService ojpService;
 
   public TriasResource(@Context OtpServerRequestContext context) {
-    var zoneId = context.transitService().getTimeZone();
+    var transitService = context.transitService();
+    var zoneId = transitService.getTimeZone();
     var vdvService = new VdvService(context.transitService());
-    var mapper = new StopEventResponseMapper(zoneId);
+    var mapper = new StopEventResponseMapper(
+      zoneId,
+      feedId -> Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang)
+    );
     this.ojpService = new OjpService(vdvService, mapper, zoneId);
   }
 
