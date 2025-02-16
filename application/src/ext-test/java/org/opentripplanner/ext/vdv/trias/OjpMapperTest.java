@@ -8,12 +8,13 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
@@ -65,12 +66,14 @@ class OjpMapperTest {
   private static final ZonedDateTime timestamp = OffsetDateTime
     .parse("2025-02-10T14:24:02+01:00")
     .atZoneSameInstant(ZoneIds.BERLIN);
+  private static final Function<String, Optional<String>> RESOLVE_FEED_LANG = feedId ->
+    Optional.of("de");
 
   @Test
   void test() throws JAXBException {
-    var mapper = new StopEventResponseMapper(ZoneIds.BERLIN);
+    var mapper = new StopEventResponseMapper(ZoneIds.BERLIN, RESOLVE_FEED_LANG);
 
-    var ojp = mapper.mapStopTimesInPattern(List.of(TRIP_TIMES_ON_DATE), timestamp);
+    var ojp = mapper.mapStopTimesInPattern(List.of(TRIP_TIMES_ON_DATE), timestamp, Set.of());
 
     var context = JAXBContext.newInstance(OJP.class);
     var marshaller = context.createMarshaller();
@@ -88,8 +91,8 @@ class OjpMapperTest {
 
   @Test
   void ojpToTrias() {
-    var mapper = new StopEventResponseMapper(ZoneIds.BERLIN);
-    var ojp = mapper.mapStopTimesInPattern(List.of(TRIP_TIMES_ON_DATE), timestamp);
+    var mapper = new StopEventResponseMapper(ZoneIds.BERLIN, RESOLVE_FEED_LANG);
+    var ojp = mapper.mapStopTimesInPattern(List.of(TRIP_TIMES_ON_DATE), timestamp, Set.of());
     OjpToTriasTransformer.transform(ojp, new PrintWriter(System.out));
   }
 }
