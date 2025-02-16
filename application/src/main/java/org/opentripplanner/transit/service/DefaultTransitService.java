@@ -440,21 +440,6 @@ public class DefaultTransitService implements TransitEditorService {
     );
   }
 
-  /**
-   * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop for the
-   * previous, current and next service date. It uses a priority queue to keep track of the next
-   * departures. The queue is shared between all dates, as services from the previous service date
-   * can visit the stop later than the current service date's services.
-   * <p>
-   * TODO: Add frequency based trips
-   *
-   * @param stop               Stop object to perform the search for
-   * @param pattern            Pattern object to perform the search for
-   * @param startTime          Start time for the search.
-   * @param timeRange          Searches forward for timeRange from startTime
-   * @param numberOfDepartures Number of departures to fetch per pattern
-   * @param arrivalDeparture   Filter by arrivals, departures, or both
-   */
   @Override
   public List<TripTimeOnDate> findTripTimeOnDate(
     StopLocation stop,

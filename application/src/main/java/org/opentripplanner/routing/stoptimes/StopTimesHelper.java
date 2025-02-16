@@ -137,12 +137,15 @@ public class StopTimesHelper {
    * <p>
    * TODO: Add frequency based trips
    *
-   * @param stop               Stop object to perform the search for
-   * @param pattern            Pattern object to perform the search for
-   * @param startTime          Start time for the search.
-   * @param timeRange          Searches forward for timeRange from startTime
-   * @param numberOfDepartures Number of departures to fetch per pattern
-   * @param arrivalDeparture   Filter by arrivals, departures, or both.
+   * @param stop                 Stop object to perform the search for
+   * @param pattern              Pattern object to perform the search for
+   * @param startTime            Start time for the search.
+   * @param timeRange            Searches forward for timeRange from startTime
+   * @param numberOfDepartures   Number of departures to fetch per pattern
+   * @param arrivalDeparture     Filter by arrivals, departures, or both.
+   * @param includeCancellations If the result should include those trip times where either the entire
+   *                             trip or the stop at the given stop location has been cancelled.
+   *                             Deleted trips are never returned no matter the value of this parameter.
    */
   public static List<TripTimeOnDate> stopTimesForPatternAtStop(
     TransitService transitService,
@@ -331,12 +334,12 @@ public class StopTimesHelper {
 
   private static boolean skipByStopCancellation(
     TripPattern pattern,
-    boolean includeCancelledTrips,
+    boolean includeCancelled,
     int stopIndex
   ) {
     boolean pickupCancelled = pattern.getBoardType(stopIndex).is(PickDrop.CANCELLED);
     boolean dropOffCancelled = pattern.getAlightType(stopIndex).is(PickDrop.CANCELLED);
 
-    return (pickupCancelled || dropOffCancelled) && !includeCancelledTrips;
+    return (pickupCancelled || dropOffCancelled) && !includeCancelled;
   }
 }
