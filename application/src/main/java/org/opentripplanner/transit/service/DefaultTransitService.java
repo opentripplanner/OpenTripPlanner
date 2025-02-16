@@ -377,22 +377,6 @@ public class DefaultTransitService implements TransitEditorService {
     return this.timetableRepository.getSiteRepository().getMultiModalStationForStation(station);
   }
 
-  /**
-   * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
-   * the previous, current and next service date. It uses a priority queue to keep track of the next
-   * departures. The queue is shared between all dates, as services from the previous service date
-   * can visit the stop later than the current service date's services. This happens eg. with
-   * sleeper trains.
-   * <p>
-   * TODO: Add frequency based trips
-   *
-   * @param stop                  Stop object to perform the search for
-   * @param startTime             Start time for the search.
-   * @param timeRange             Searches forward for timeRange from startTime
-   * @param numberOfDepartures    Number of departures to fetch per pattern
-   * @param arrivalDeparture      Filter by arrivals, departures, or both
-   * @param includeCancelledTrips If true, cancelled trips will also be included in result.
-   */
   @Override
   public List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
@@ -414,13 +398,6 @@ public class DefaultTransitService implements TransitEditorService {
     );
   }
 
-  /**
-   * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
-   * creating complete stop timetables for a single day.
-   *
-   * @param stop        Stop object to perform the search for
-   * @param serviceDate Return all departures for the specified date
-   */
   @Override
   public List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
