@@ -40,7 +40,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
    * Set the time at a transit index if it is optimal. This sets both the best time and the
    * transfer time.
    *
-   * @param nextLeg When chaining two Raptor searches together, the next-leg is the next
+   * @param nextLegArrivals When chaining two Raptor searches together, the next-leg is the next
    *                search we are copying state into.
    */
   public McStopArrivals(
@@ -48,13 +48,13 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     @Nullable EgressPaths egressPaths,
     ViaConnections viaConnections,
     DestinationArrivalPaths<T> paths,
-    McStopArrivals<T> nextLeg,
+    McStopArrivals<T> nextLegArrivals,
     McStopArrivalFactory<T> stopArrivalFactory,
     ArrivalParetoSetComparatorFactory<McStopArrival<T>> comparatorFactory,
     DebugHandlerFactory<T> debugHandlerFactory
   ) {
     // Assert only-one-of next or egressPaths is set
-    if (nextLeg == null) {
+    if (nextLegArrivals == null) {
       Objects.requireNonNull(egressPaths);
     } else if (egressPaths != null) {
       throw new IllegalArgumentException(
@@ -69,7 +69,7 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
     this.debugHandlerFactory = debugHandlerFactory;
     this.debugStats = new DebugStopArrivalsStatistics(debugHandlerFactory.debugLogger());
 
-    initViaConnections(viaConnections, stopArrivalFactory, nextLeg);
+    initViaConnections(viaConnections, stopArrivalFactory, nextLegArrivals);
     initEgressStopAndGlueItToDestinationArrivals(egressPaths, paths);
   }
 

@@ -31,7 +31,7 @@ public final class RaptorViaLocation {
     String label,
     boolean allowPassThrough,
     Duration minimumWaitTime,
-    List<StopAndTransfer> connections
+    List<BuilderStopAndTransfer> connections
   ) {
     this.label = label;
     this.allowPassThrough = allowPassThrough;
@@ -130,13 +130,13 @@ public final class RaptorViaLocation {
     return buf.append("}").toString();
   }
 
-  private List<RaptorViaConnection> validateConnections(List<StopAndTransfer> connections) {
+  private List<RaptorViaConnection> validateConnections(List<BuilderStopAndTransfer> connections) {
     if (connections.isEmpty()) {
       throw new IllegalArgumentException("At least one connection is required.");
     }
     var list = connections
       .stream()
-      .map(it -> new RaptorViaConnection(this, it.fromStop, it.transfer))
+      .map(it -> RaptorViaConnection.of(this, it.fromStop, it.transfer))
       .toList();
 
     // Compare all pairs to check for duplicates and non-optimal connections
@@ -159,7 +159,7 @@ public final class RaptorViaLocation {
     private final String label;
     private final boolean allowPassThrough;
     private final Duration minimumWaitTime;
-    private final List<StopAndTransfer> connections = new ArrayList<>();
+    private final List<BuilderStopAndTransfer> connections = new ArrayList<>();
 
     public Builder(String label, boolean allowPassThrough, Duration minimumWaitTime) {
       this.label = label;
@@ -168,12 +168,12 @@ public final class RaptorViaLocation {
     }
 
     public Builder addViaStop(int stop) {
-      this.connections.add(new StopAndTransfer(stop, null));
+      this.connections.add(new BuilderStopAndTransfer(stop, null));
       return this;
     }
 
     public Builder addViaTransfer(int fromStop, RaptorTransfer transfer) {
-      this.connections.add(new StopAndTransfer(fromStop, transfer));
+      this.connections.add(new BuilderStopAndTransfer(fromStop, transfer));
       return this;
     }
 
@@ -187,5 +187,5 @@ public final class RaptorViaLocation {
    * needed to create the bidirectional relationship between {@link RaptorViaLocation} and
    * {@link RaptorViaConnection}.
    */
-  private record StopAndTransfer(int fromStop, @Nullable RaptorTransfer transfer) {}
+  private static record BuilderStopAndTransfer(int fromStop, @Nullable RaptorTransfer transfer) {}
 }
