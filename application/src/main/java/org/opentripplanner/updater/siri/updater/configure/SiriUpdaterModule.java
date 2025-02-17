@@ -2,7 +2,7 @@ package org.opentripplanner.updater.siri.updater.configure;
 
 import java.util.function.Consumer;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.siri.updater.EstimatedTimetableSource;
 import org.opentripplanner.updater.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.updater.siri.updater.SiriETUpdater;
@@ -26,14 +26,9 @@ public class SiriUpdaterModule {
 
   public static SiriETUpdater createSiriETUpdater(
     SiriETUpdater.Parameters params,
-    SiriTimetableSnapshotSource timetableSnapshotSource
+    SiriRealTimeTripUpdateAdapter adapter
   ) {
-    return new SiriETUpdater(
-      params,
-      timetableSnapshotSource,
-      createSource(params),
-      createMetricsConsumer(params)
-    );
+    return new SiriETUpdater(params, adapter, createSource(params), createMetricsConsumer(params));
   }
 
   public static SiriSXUpdater createSiriSXUpdater(

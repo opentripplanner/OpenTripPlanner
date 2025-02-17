@@ -21,8 +21,6 @@ import org.opentripplanner.apis.transmodel.model.framework.TransmodelDirectives;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.TripTimeOnDateHelper;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -235,14 +233,7 @@ public class ServiceJourneyType {
           .description(
             "Returns scheduled passing times only - without real-time-updates, for realtime-data use 'estimatedCalls'"
           )
-          .dataFetcher(env -> {
-            Trip trip = trip(env);
-            TripPattern tripPattern = GqlUtil.getTransitService(env).findPattern(trip);
-            if (tripPattern == null) {
-              return List.of();
-            }
-            return TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip);
-          })
+          .dataFetcher(env -> GqlUtil.getTransitService(env).getScheduledTripTimes(trip(env)))
           .build()
       )
       .field(
@@ -269,11 +260,10 @@ public class ServiceJourneyType {
               .ofNullable(environment.getArgument("date"))
               .map(LocalDate.class::cast)
               .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
-            return TripTimeOnDateHelper.getTripTimeOnDates(
-              GqlUtil.getTransitService(environment),
-              trip(environment),
-              serviceDate
-            );
+            return GqlUtil
+              .getTransitService(environment)
+              .getTripTimeOnDates(trip(environment), serviceDate)
+              .orElse(null);
           })
           .build()
       )

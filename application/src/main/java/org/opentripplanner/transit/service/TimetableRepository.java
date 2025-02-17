@@ -33,9 +33,10 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.transfer.DefaultTransferService;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -67,16 +68,16 @@ import org.slf4j.LoggerFactory;
  * only in NeTEx, the NeTEx name is used in the internal model.
  *
  * A TimetableRepository instance also includes references to some transient indexes of its contents, to
- * the TransitLayer derived from it, and to some other services and utilities that operate upon
+ * the RaptorTransitData derived from it, and to some other services and utilities that operate upon
  * its contents.
  *
  * The TimetableRepository stands in opposition to two other aggregates: the Graph (representing the
- * street network) and the TransitLayer (representing many of the same things in the TimetableRepository
+ * street network) and the RaptorTransitData (representing many of the same things in the TimetableRepository
  * but rearranged to be more efficient for Raptor routing).
  *
  * At this point the TimetableRepository is not often read directly. Many requests will look at the
- * TransitLayer rather than the TimetableRepository it's derived from. Both are often accessed via the
- * TransitService rather than directly reading the fields of TimetableRepository or TransitLayer.
+ * RaptorTransitData rather than the TimetableRepository it's derived from. Both are often accessed via the
+ * TransitService rather than directly reading the fields of TimetableRepository or RaptorTransitData.
  */
 public class TimetableRepository implements Serializable {
 
@@ -101,16 +102,16 @@ public class TimetableRepository implements Serializable {
   private ZonedDateTime transitServiceEnds = LocalDate.MIN.atStartOfDay(ZoneId.systemDefault());
 
   /**
-   * The TransitLayer representation (optimized and rearranged for Raptor) of this TimetableRepository's
+   * The RaptorTransitData representation (optimized and rearranged for Raptor) of this TimetableRepository's
    * scheduled (non-realtime) contents.
    */
-  private transient TransitLayer transitLayer;
+  private transient RaptorTransitData raptorTransitData;
 
   /**
-   * An optionally present second TransitLayer representing the contents of this TimetableRepository plus
+   * An optionally present second RaptorTransitData representing the contents of this TimetableRepository plus
    * the results of realtime updates in the latest TimetableSnapshot.
    */
-  private final transient ConcurrentPublished<TransitLayer> realtimeTransitLayer = new ConcurrentPublished<>();
+  private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData = new ConcurrentPublished<>();
 
   private final transient Deduplicator deduplicator;
 
@@ -161,26 +162,26 @@ public class TimetableRepository implements Serializable {
   }
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
-  public TransitLayer getTransitLayer() {
-    return transitLayer;
+  public RaptorTransitData getRaptorTransitData() {
+    return raptorTransitData;
   }
 
-  public void setTransitLayer(TransitLayer transitLayer) {
-    this.transitLayer = transitLayer;
+  public void setRaptorTransitData(RaptorTransitData raptorTransitData) {
+    this.raptorTransitData = raptorTransitData;
   }
 
   /** Data model for Raptor routing, with realtime updates applied (if any). */
   @Nullable
-  public TransitLayer getRealtimeTransitLayer() {
-    return realtimeTransitLayer.get();
+  public RaptorTransitData getRealtimeRaptorTransitData() {
+    return realtimeRaptorTransitData.get();
   }
 
   /**
    * Publish the latest snapshot of the real-time transit layer.
-   * Should be called only when creating a new TransitLayer, from the graph writer thread.
+   * Should be called only when creating a new RaptorTransitData, from the graph writer thread.
    */
-  public void setRealtimeTransitLayer(TransitLayer realtimeTransitLayer) {
-    this.realtimeTransitLayer.publish(realtimeTransitLayer);
+  public void setRealtimeRaptorTransitData(RaptorTransitData realtimeRaptorTransitData) {
+    this.realtimeRaptorTransitData.publish(realtimeRaptorTransitData);
   }
 
   /**
@@ -188,8 +189,8 @@ public class TimetableRepository implements Serializable {
    * The real-time transit layer is optional,
    * it is present only when real-time updaters are configured.
    */
-  public boolean hasRealtimeTransitLayer() {
-    return realtimeTransitLayer != null;
+  public boolean hasRealtimeRaptorTransitData() {
+    return realtimeRaptorTransitData != null;
   }
 
   public DefaultTransferService getTransferService() {
@@ -385,8 +386,17 @@ public class TimetableRepository implements Serializable {
     this.noticesByElement.putAll(noticesByElement);
   }
 
+  /**
+   * Returns the alert service or null if the @{code updaterManager} is not set yet.
+   */
+  @Nullable
   public TransitAlertService getTransitAlertService() {
-    if (transitAlertService == null) {
+    // during initialization we must return null, otherwise we would permanently store an empty
+    // DelegatingTransitAlertServiceImpl
+    // this is wrong on many levels and should be refactored.
+    if (updaterManager == null) {
+      return null;
+    } else if (transitAlertService == null) {
       transitAlertService = new DelegatingTransitAlertServiceImpl(this);
     }
     return transitAlertService;

@@ -23,10 +23,10 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
   private final String feedId;
   private final Consumer<UpdateResult> sendMetrics;
-  private final TimetableSnapshotSource snapshotSource;
+  private final GtfsRealTimeTripUpdateAdapter adapter;
 
   TripUpdateGraphWriterRunnable(
-    TimetableSnapshotSource snapshotSource,
+    GtfsRealTimeTripUpdateAdapter adapter,
     boolean fuzzyTripMatching,
     BackwardsDelayPropagationType backwardsDelayPropagationType,
     UpdateIncrementality updateIncrementality,
@@ -34,7 +34,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     String feedId,
     Consumer<UpdateResult> sendMetrics
   ) {
-    this.snapshotSource = snapshotSource;
+    this.adapter = adapter;
     this.fuzzyTripMatching = fuzzyTripMatching;
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
     this.updateIncrementality = updateIncrementality;
@@ -45,7 +45,7 @@ class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
   @Override
   public void run(RealTimeUpdateContext context) {
-    var result = snapshotSource.applyTripUpdates(
+    var result = adapter.applyTripUpdates(
       fuzzyTripMatching ? context.gtfsRealtimeFuzzyTripMatcher() : null,
       backwardsDelayPropagationType,
       updateIncrementality,

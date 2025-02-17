@@ -20,18 +20,15 @@ import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.updater.siri.updater.SiriHttpLoader;
-import org.opentripplanner.updater.siri.updater.SiriSXUpdater;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.siri.updater.configure.SiriUpdaterModule;
 import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdater;
-import org.opentripplanner.updater.siri.updater.lite.SiriLiteHttpLoader;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
+import org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TimetableSnapshotSource;
 import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
@@ -178,23 +175,19 @@ public class UpdaterConfigurator {
       updaters.add(new GtfsRealtimeAlertsUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getPollingStoptimeUpdaterParameters()) {
-      updaters.add(new PollingTripUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(new PollingTripUpdater(configItem, provideGtfsAdapter()));
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository));
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {
-      updaters.add(
-        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
-      );
+      updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriETLiteUpdaterParameters()) {
-      updaters.add(
-        SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriTimetableSnapshot())
-      );
+      updaters.add(SiriUpdaterModule.createSiriETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriETGooglePubsubUpdaterParameters()) {
-      updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(new SiriETGooglePubsubUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
@@ -203,7 +196,7 @@ public class UpdaterConfigurator {
       updaters.add(SiriUpdaterModule.createSiriSXUpdater(configItem, timetableRepository));
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
-      updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot()));
+      updaters.add(new MqttGtfsRealtimeUpdater(configItem, provideGtfsAdapter()));
     }
     for (var configItem : updatersParameters.getVehicleParkingUpdaterParameters()) {
       switch (configItem.updateType()) {
@@ -225,7 +218,7 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
-      updaters.add(new SiriAzureETUpdater(configItem, provideSiriTimetableSnapshot()));
+      updaters.add(new SiriAzureETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
       updaters.add(new SiriAzureSXUpdater(configItem, timetableRepository));
@@ -234,12 +227,12 @@ public class UpdaterConfigurator {
     return updaters;
   }
 
-  private SiriTimetableSnapshotSource provideSiriTimetableSnapshot() {
-    return new SiriTimetableSnapshotSource(timetableRepository, snapshotManager);
+  private SiriRealTimeTripUpdateAdapter provideSiriAdapter() {
+    return new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
   }
 
-  private TimetableSnapshotSource provideGtfsTimetableSnapshot() {
-    return new TimetableSnapshotSource(
+  private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
+    return new GtfsRealTimeTripUpdateAdapter(
       timetableRepository,
       snapshotManager,
       () -> LocalDate.now(timetableRepository.getTimeZone())

@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 
 class TimetableSnapshotManagerTest {
 
@@ -85,7 +85,7 @@ class TimetableSnapshotManagerTest {
 
     var snapshotManager = new TimetableSnapshotManager(
       null,
-      TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(purgeExpiredData),
+      TimetableSnapshotParameters.DEFAULT.withPurgeExpiredData(purgeExpiredData),
       clock::get
     );
 

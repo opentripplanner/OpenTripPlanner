@@ -12,7 +12,6 @@ import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
-import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -27,10 +26,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
-import org.opentripplanner.ext.emissions.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
@@ -38,7 +36,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -46,32 +43,18 @@ import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangl
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
-import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
-import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
-import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
-import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
-import org.opentripplanner.standalone.config.DebugUiConfig;
-import org.opentripplanner.standalone.config.RouterConfig;
-import org.opentripplanner.standalone.server.DefaultServerRequestContext;
-import org.opentripplanner.street.model.StreetLimitationParameters;
-import org.opentripplanner.street.service.DefaultStreetLimitationParametersService;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TripRequestMapperTest implements PlanTestConstants {
 
-  private static TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-
+  private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
-
   private static final Function<StopLocation, String> STOP_TO_ID = s -> s.getId().toString();
 
   private static final Route route1 = TimetableRepositoryForTest.route("route1").build();
@@ -82,7 +65,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private static final RegularStop stop3 = TEST_MODEL.stop("ST:stop3", 3, 1).build();
 
   private static final Graph graph = new Graph();
-  private static final DefaultTransitService transitService;
+  private static final TimetableRepository timetableRepository;
 
   private TransmodelRequestContext context;
 
@@ -99,7 +82,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .withRegularStop(stop3)
       .build();
 
-    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
+    timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.STOCKHOLM);
     var calendarServiceData = new CalendarServiceData();
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
@@ -116,7 +99,6 @@ public class TripRequestMapperTest implements PlanTestConstants {
       DataImportIssueStore.NOOP
     );
     timetableRepository.index();
-    transitService = new DefaultTransitService(timetableRepository);
   }
 
   @BeforeEach
@@ -134,32 +116,18 @@ public class TripRequestMapperTest implements PlanTestConstants {
       )
     );
 
+    var otpServerRequestContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      null,
+      defaultRequest
+    );
+
     context =
       new TransmodelRequestContext(
-        DefaultServerRequestContext.create(
-          RouterConfig.DEFAULT.transitTuningConfig(),
-          defaultRequest,
-          RaptorConfig.defaultConfigForTest(),
-          graph,
-          transitService,
-          Metrics.globalRegistry,
-          RouterConfig.DEFAULT.vectorTileConfig(),
-          new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
-          new DefaultRealtimeVehicleService(transitService),
-          new DefaultVehicleRentalService(),
-          new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
-          new DefaultEmissionsService(new EmissionsDataModel()),
-          null,
-          RouterConfig.DEFAULT.flexParameters(),
-          List.of(),
-          null,
-          new DefaultStreetLimitationParametersService(new StreetLimitationParameters()),
-          null,
-          null,
-          DebugUiConfig.DEFAULT
-        ),
-        null,
-        transitService
+        otpServerRequestContext,
+        otpServerRequestContext.routingService(),
+        otpServerRequestContext.transitService()
       );
   }
 

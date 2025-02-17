@@ -124,6 +124,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
+import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -468,9 +469,10 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(env -> {
-            if ((env.getArgument("ids") instanceof List)) {
-              return ((List<String>) env.getArgument("ids")).stream()
-                .map(TransitIdMapper::mapIDToDomain)
+            var ids = mapIDsToDomainNullSafe(env.getArgument("ids"));
+            if (!ids.isEmpty()) {
+              return ids
+                .stream()
                 .map(id -> StopPlaceType.fetchStopPlaceById(id, env))
                 .collect(Collectors.toList());
             }
@@ -603,32 +605,23 @@ public class TransmodelGraphQLSchema {
           )
           .argument(GraphQLArgument.newArgument().name("name").type(Scalars.GraphQLString).build())
           .dataFetcher(environment -> {
-            if ((environment.getArgument("ids") instanceof List)) {
-              if (
-                environment
-                  .getArguments()
-                  .entrySet()
-                  .stream()
-                  .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
-                  .count() !=
-                1
-              ) {
+            if (environment.containsArgument("ids")) {
+              var ids = mapIDsToDomainNullSafe(environment.getArgument("ids"));
+
+              if (environment.getArgument("name") != null) {
                 throw new IllegalArgumentException("Unable to combine other filters with ids");
               }
+
               TransitService transitService = GqlUtil.getTransitService(environment);
-              return ((List<String>) environment.getArgument("ids")).stream()
-                .map(id -> transitService.getStopLocation(mapIDToDomain(id)))
-                .collect(Collectors.toList());
+              return ids.stream().map(transitService::getStopLocation).toList();
             }
-            if (environment.getArgument("name") == null) {
-              return GqlUtil.getTransitService(environment).listStopLocations();
-            }
-            //                            else {
-            //                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)
-            //                                        .stream()
-            //                                        .map(result -> index.stopForId.get(mapper.fromIdString(result.id)));
-            //                            }
-            return emptyList();
+
+            FindStopLocationsRequest request = FindStopLocationsRequest
+              .of()
+              .withName(environment.getArgument("name"))
+              .build();
+
+            return GqlUtil.getTransitService(environment).findStopLocations(request);
           })
           .build()
       )

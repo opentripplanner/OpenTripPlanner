@@ -1,0 +1,38 @@
+fragment StoptimeSummary on Stoptime {
+  stop {
+    gtfsId
+  }
+  scheduledDeparture
+  realtimeDeparture
+}
+
+fragment TripSummary on Trip {
+  gtfsId
+  timetabledOrigin: departureStoptime {
+    scheduledDeparture
+  }
+  datedOrigin: departureStoptime(serviceDate: "20240101") {
+    realtimeDeparture
+  }
+  timetabledDestination: arrivalStoptime {
+    scheduledArrival
+  }
+  datedDestination: arrivalStoptime(serviceDate: "20240101") {
+    realtimeArrival
+  }
+  stoptimes {
+    ...StoptimeSummary
+  }
+  stoptimesForDate(serviceDate: "20240101") {
+    ...StoptimeSummary
+  }
+}
+
+query GtfsExampleQuery {
+  addedTrip: trip(id: "F:ADDED_TRIP") {
+    ...TripSummary
+  }
+  replacementTrip: trip(id: "F:REPLACEMENT_TRIP") {
+    ...TripSummary
+  }
+}

@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.BitSet;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
- * Used to filter the elements in a {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer}
+ * Used to filter the elements in a {@link RaptorTransitData}
  * when constructing a {@link RaptorRoutingRequestTransitData} for a request.
  * <p>
  * {@link TripPatternForDate} and {@link TripTimes} are filtered based on the request parameters to
