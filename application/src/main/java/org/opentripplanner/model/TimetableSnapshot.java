@@ -23,7 +23,7 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
@@ -375,7 +375,10 @@ public class TimetableSnapshot {
     return commit(null, false);
   }
 
-  public TimetableSnapshot commit(TransitLayerUpdater transitLayerUpdater, boolean force) {
+  public TimetableSnapshot commit(
+    RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
+    boolean force
+  ) {
     validateNotReadOnly();
 
     if (!force && !this.isDirty()) {
@@ -394,8 +397,8 @@ public class TimetableSnapshot {
       true
     );
 
-    if (transitLayerUpdater != null) {
-      transitLayerUpdater.update(dirtyTimetables.values(), timetables);
+    if (realtimeRaptorTransitDataUpdater != null) {
+      realtimeRaptorTransitDataUpdater.update(dirtyTimetables.values(), timetables);
     }
 
     this.dirtyTimetables.clear();

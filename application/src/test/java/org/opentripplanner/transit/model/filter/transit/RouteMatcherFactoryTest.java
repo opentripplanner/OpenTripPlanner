@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.filter.transit;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +14,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Agency;
 
 class RouteMatcherFactoryTest {
 
@@ -23,7 +21,7 @@ class RouteMatcherFactoryTest {
   private Route route2;
 
   @BeforeEach
-  void setUp() {
+  void setup() {
     route1 =
       Route
         .of(new FeedScopedId("feedId", "routeId"))

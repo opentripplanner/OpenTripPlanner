@@ -17,7 +17,7 @@ import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParam
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
 
 public interface UpdatersParameters {
-  TimetableSnapshotSourceParameters timetableSnapshotParameters();
+  TimetableSnapshotParameters timetableSnapshotParameters();
 
   VehicleRentalServiceDirectoryFetcherParameters getVehicleRentalServiceDirectoryFetcherParameters();
 

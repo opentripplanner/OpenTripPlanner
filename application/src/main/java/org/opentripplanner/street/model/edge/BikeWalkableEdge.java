@@ -18,8 +18,8 @@ public interface BikeWalkableEdge {
     editor.setBackWalkingBike(true);
     if (shouldIncludeCost) {
       editor.incrementWeight(preferences.bike().walking().mountDismountCost().toSeconds());
-      editor.incrementTimeInSeconds(
-        (int) preferences.bike().walking().mountDismountTime().toSeconds()
+      editor.incrementTimeInMilliseconds(
+        preferences.bike().walking().mountDismountTime().toMillis()
       );
     }
   }
@@ -31,8 +31,8 @@ public interface BikeWalkableEdge {
     editor.setBackWalkingBike(false);
     if (shouldIncludeCost) {
       editor.incrementWeight(preferences.bike().walking().mountDismountCost().toSeconds());
-      editor.incrementTimeInSeconds(
-        (int) preferences.bike().walking().mountDismountTime().toSeconds()
+      editor.incrementTimeInMilliseconds(
+        preferences.bike().walking().mountDismountTime().toMillis()
       );
     }
   }

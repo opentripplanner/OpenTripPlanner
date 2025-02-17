@@ -51,6 +51,10 @@ public class SiriEtBuilder {
     return List.of(etd);
   }
 
+  public EstimatedVehicleJourney buildEstimatedVehicleJourney() {
+    return evj;
+  }
+
   public SiriEtBuilder withCancellation(boolean canceled) {
     evj.setCancellation(canceled);
     return this;

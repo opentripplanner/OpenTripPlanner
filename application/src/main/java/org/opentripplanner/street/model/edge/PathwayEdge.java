@@ -111,19 +111,19 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     RoutingPreferences preferences = s0.getPreferences();
 
     /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
-    int time = traversalTime;
+    long time_ms = 1000L * traversalTime;
 
-    if (time == 0) {
+    if (time_ms == 0) {
       if (distance > 0) {
-        time = (int) (distance / preferences.walk().speed());
+        time_ms = (long) (1000.0 * distance / preferences.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time = (int) (0.4 * Math.abs(steps) / preferences.walk().speed());
+        time_ms = (long) (1000.0 * 0.4 * Math.abs(steps) / preferences.walk().speed());
       }
     }
 
-    if (time > 0) {
-      double weight = time;
+    if (time_ms > 0) {
+      double weight = time_ms / 1000.0;
       if (s0.getRequest().wheelchair()) {
         weight *=
           StreetEdgeReluctanceCalculator.computeWheelchairReluctance(
@@ -141,7 +141,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
             isStairs()
           );
       }
-      s1.incrementTimeInSeconds(time);
+      s1.incrementTimeInMilliseconds(time_ms);
       s1.incrementWeight(weight);
     } else {
       // elevators often don't have a traversal time, distance or steps, so we need to add

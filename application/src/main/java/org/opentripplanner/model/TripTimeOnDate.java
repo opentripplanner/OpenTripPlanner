@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -31,7 +33,10 @@ public class TripTimeOnDate {
   private final int stopIndex;
   // This is only needed because TripTimes has no reference to TripPattern
   private final TripPattern tripPattern;
+
+  @Nullable
   private final LocalDate serviceDate;
+
   private final long midnight;
 
   public TripTimeOnDate(TripTimes tripTimes, int stopIndex, TripPattern tripPattern) {
@@ -46,8 +51,8 @@ public class TripTimeOnDate {
     TripTimes tripTimes,
     int stopIndex,
     TripPattern tripPattern,
-    LocalDate serviceDate,
-    Instant midnight
+    @Nullable LocalDate serviceDate,
+    @Nullable Instant midnight
   ) {
     this.tripTimes = tripTimes;
     this.stopIndex = stopIndex;
@@ -59,9 +64,15 @@ public class TripTimeOnDate {
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
    * StopPatterns.
+   *
+   * @return null if the trip does not exist in the timetable
    */
+  @Nullable
   public static List<TripTimeOnDate> fromTripTimes(Timetable table, Trip trip) {
     TripTimes times = table.getTripTimes(trip);
+    if (times == null) {
+      return null;
+    }
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern()));
@@ -72,8 +83,11 @@ public class TripTimeOnDate {
   /**
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
    * StopPatterns.
+   * <br>
+   * The timetable given must correspond to the service day so that it must contain the trip.
    *
-   * @param serviceDate service day to set, if null none is set
+   * @param table the timetable for the service day
+   * @param serviceDate service day to set
    */
   public static List<TripTimeOnDate> fromTripTimes(
     Timetable table,
@@ -81,7 +95,9 @@ public class TripTimeOnDate {
     LocalDate serviceDate,
     Instant midnight
   ) {
-    TripTimes times = table.getTripTimes(trip);
+    // The timetable given should always contain the trip.
+    // if the trip doesn't run on the date, the scheduled timetable should be given.
+    TripTimes times = Objects.requireNonNull(table.getTripTimes(trip));
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
@@ -309,5 +325,23 @@ public class TripTimeOnDate {
 
   public BookingInfo getDropOffBookingInfo() {
     return tripTimes.getDropOffBookingInfo(stopIndex);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    TripTimeOnDate that = (TripTimeOnDate) o;
+    return (
+      stopIndex == that.stopIndex &&
+      midnight == that.midnight &&
+      Objects.equals(tripTimes, that.tripTimes) &&
+      Objects.equals(tripPattern, that.tripPattern) &&
+      Objects.equals(serviceDate, that.serviceDate)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(tripTimes, stopIndex, tripPattern, serviceDate, midnight);
   }
 }

@@ -29,8 +29,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   /* Data which is likely to change at most traversals */
 
-  // the current time at this state, in seconds since UNIX epoch
-  protected long time;
+  // the current time at this state, in milliseconds since UNIX epoch
+  protected long time_ms;
 
   // accumulated weight up to this state
   public double weight;
@@ -76,7 +76,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         vertex.rentalRestrictions().noDropOffNetworks();
     }
     this.walkDistance = 0;
-    this.time = startTime.getEpochSecond();
+    this.time_ms = startTime.toEpochMilli();
   }
 
   /**
@@ -167,14 +167,32 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return stateData.carPickupState;
   }
 
+  /** Always round the same way and in the same direction when converting milliseconds to seconds.
+   * This means that request.arriveBy must be taken into account. Used in many places. */
+  private long millisecondsToSeconds(long milliseconds) {
+    if (request.arriveBy()) {
+      return milliseconds / 1000L;
+    } else {
+      return (milliseconds + 999L) / 1000L;
+    }
+  }
+
   /** Returns time in seconds since epoch */
   public long getTimeSeconds() {
-    return time;
+    return millisecondsToSeconds(time_ms);
+  }
+
+  public long getTimeMilliseconds() {
+    return time_ms;
   }
 
   /** returns the length of the trip in seconds up to this state */
   public long getElapsedTimeSeconds() {
-    return Math.abs(getTimeSeconds() - request.startTime().getEpochSecond());
+    return (getElapsedTimeMilliseconds() + 999L) / 1000L;
+  }
+
+  public long getElapsedTimeMilliseconds() {
+    return Math.abs(getTimeMilliseconds() - request.startTime().toEpochMilli());
   }
 
   public boolean isCompatibleVehicleRentalState(State state) {
@@ -267,7 +285,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public int getTimeDeltaSeconds() {
-    return backState != null ? (int) (getTimeSeconds() - backState.getTimeSeconds()) : 0;
+    return (int) millisecondsToSeconds(getTimeDeltaMilliseconds());
+  }
+
+  public int getTimeDeltaMilliseconds() {
+    return backState != null ? (int) (getTimeMilliseconds() - backState.getTimeMilliseconds()) : 0;
   }
 
   public double getWeightDelta() {
@@ -311,7 +333,13 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public Instant getTime() {
-    return Instant.ofEpochSecond(time);
+    // We're not letting the subsecond time out right now, because everything else
+    // expects whole seconds.
+    return Instant.ofEpochSecond(millisecondsToSeconds(time_ms));
+  }
+
+  public Instant getTimeAccurate() {
+    return Instant.ofEpochMilli(time_ms);
   }
 
   public String getVehicleRentalNetwork() {
@@ -351,7 +379,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       // note the distinction between setFromState and setBackState
       editor.setFromState(orig);
 
-      editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
+      editor.incrementTimeInMilliseconds(orig.getAbsTimeDeltaMilliseconds());
       editor.incrementWeight(orig.getWeightDelta());
       editor.incrementWalkDistance(orig.getWalkDistanceDelta());
 
@@ -485,8 +513,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
   }
 
-  private int getAbsTimeDeltaSeconds() {
-    return Math.abs(getTimeDeltaSeconds());
+  private int getAbsTimeDeltaMilliseconds() {
+    return Math.abs(getTimeDeltaMilliseconds());
   }
 
   private double getWalkDistanceDelta() {

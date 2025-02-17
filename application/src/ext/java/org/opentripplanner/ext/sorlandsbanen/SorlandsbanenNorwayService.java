@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -36,14 +36,18 @@ public class SorlandsbanenNorwayService {
   public ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
     RouteRequest request,
     AccessEgresses accessEgresses,
-    TransitLayer transitLayer
+    RaptorTransitData raptorTransitData
   ) {
     WgsCoordinate from = findStopCoordinate(
       request.from(),
       accessEgresses.getAccesses(),
-      transitLayer
+      raptorTransitData
     );
-    WgsCoordinate to = findStopCoordinate(request.to(), accessEgresses.getEgresses(), transitLayer);
+    WgsCoordinate to = findStopCoordinate(
+      request.to(),
+      accessEgresses.getEgresses(),
+      raptorTransitData
+    );
 
     if (from.isNorthOf(SOUTH_BORDER_LIMIT) && to.isNorthOf(SOUTH_BORDER_LIMIT)) {
       return null;
@@ -83,7 +87,7 @@ public class SorlandsbanenNorwayService {
   private static WgsCoordinate findStopCoordinate(
     GenericLocation location,
     Collection<? extends RoutingAccessEgress> accessEgress,
-    TransitLayer transitLayer
+    RaptorTransitData raptorTransitData
   ) {
     if (location.lat != null) {
       return new WgsCoordinate(location.lat, location.lng);
@@ -91,7 +95,7 @@ public class SorlandsbanenNorwayService {
 
     StopLocation firstStop = null;
     for (RoutingAccessEgress it : accessEgress) {
-      StopLocation stop = transitLayer.getStopByIndex(it.stop());
+      StopLocation stop = raptorTransitData.getStopByIndex(it.stop());
       if (stop.getId().equals(location.stopId)) {
         return stop.getCoordinate();
       }

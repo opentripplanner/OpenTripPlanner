@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
 import org.apache.hc.core5.net.URIBuilder;
-import org.opentripplanner.updater.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
@@ -33,17 +33,17 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
   private final LocalDate fromDateTime;
-  private final SiriTimetableSnapshotSource snapshotSource;
+  private final SiriRealTimeTripUpdateAdapter adapter;
 
   private final Consumer<UpdateResult> recordMetrics;
 
   public SiriAzureETUpdater(
     SiriAzureETUpdaterParameters config,
-    SiriTimetableSnapshotSource snapshotSource
+    SiriRealTimeTripUpdateAdapter adapter
   ) {
     super(config);
     this.fromDateTime = config.getFromDateTime();
-    this.snapshotSource = snapshotSource;
+    this.adapter = adapter;
     this.recordMetrics = TripUpdateMetrics.streaming(config);
   }
 
@@ -97,7 +97,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
   private Future<?> processMessage(List<EstimatedTimetableDeliveryStructure> updates) {
     return super.saveResultOnGraph.execute(context -> {
-      var result = snapshotSource.applyEstimatedTimetable(
+      var result = adapter.applyEstimatedTimetable(
         fuzzyTripMatching() ? context.siriFuzzyTripMatcher() : null,
         context.entityResolver(feedId),
         feedId,

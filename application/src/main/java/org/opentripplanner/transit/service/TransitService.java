@@ -21,11 +21,12 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
+import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -57,16 +58,26 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  * fetching tables of specific information like the routes passing through a particular stop, or for
  * gaining access to the entirety of the data to perform routing.
  * <p>
- * TODO RT_AB: this interface seems to provide direct access to TransitLayer but not TimetableRepository.
- *   Is this intentional, because TransitLayer is meant to be read-only and TimetableRepository is not?
+ * TODO RT_AB: this interface seems to provide direct access to RaptorTransitData but not TimetableRepository.
+ *   Is this intentional, because RaptorTransitData is meant to be read-only and TimetableRepository is not?
  *   Should this be renamed TransitDataService since it seems to provide access to the data but
  *   not to transit routing functionality (which is provided by the RoutingService)?
  *   The DefaultTransitService implementation has a TimetableRepository instance and many of its methods
  *   read through to that TimetableRepository instance. But that field itself is not exposed, while the
- *   TransitLayer is here. It seems like exposing the raw TransitLayer is still a risk since it's
- *   copy-on-write and shares a lot of objects with any other TransitLayer instances.
+ *   RaptorTransitData is here. It seems like exposing the raw RaptorTransitData is still a risk since it's
+ *   copy-on-write and shares a lot of objects with any other RaptorTransitData instances.
  */
 public interface TransitService {
+  /**
+   * @return empty if the trip doesn't exist in the timetable (e.g. real-time added)
+   */
+  Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip);
+
+  /**
+   * @return empty if the trip doesn't run on the date specified
+   */
+  Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate);
+
   Collection<String> listFeedIds();
 
   Collection<Agency> listAgencies();
@@ -138,7 +149,7 @@ public interface TransitService {
 
   Collection<GroupStop> listGroupStops();
 
-  StopLocation getStopLocation(FeedScopedId parseId);
+  StopLocation getStopLocation(FeedScopedId id);
 
   /**
    * Return all stops associated with the given id. If a Station, a MultiModalStation, or a
@@ -229,7 +240,6 @@ public interface TransitService {
    * Return the timetable for a given trip pattern and date, taking into account real-time updates.
    * If no real-times update are applied, fall back to scheduled data.
    */
-  @Nullable
   Timetable findTimetable(TripPattern tripPattern, LocalDate serviceDate);
 
   /**
@@ -258,9 +268,9 @@ public interface TransitService {
 
   Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
-  TransitLayer getTransitLayer();
+  RaptorTransitData getRaptorTransitData();
 
-  TransitLayer getRealtimeTransitLayer();
+  RaptorTransitData getRealtimeRaptorTransitData();
 
   CalendarService getCalendarService();
 
@@ -350,4 +360,9 @@ public interface TransitService {
    * Returns a list of {@link Route}s that match the filtering defined in the request.
    */
   Collection<Route> findRoutes(FindRoutesRequest request);
+
+  /**
+   * Returns a list of {@link StopLocation}s that match the filtering defined in the request.
+   */
+  Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
 }

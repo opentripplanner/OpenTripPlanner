@@ -113,7 +113,6 @@ class StreetPreferencesTest {
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: CONSTANT, " +
       "accessEgress: AccessEgressPreferences{penalty: TimeAndCostPenaltyForEnum{" +
-      "CAR: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
       "CAR_TO_PARK: " +
       CAR_TO_PARK_PENALTY +
       ", " +
