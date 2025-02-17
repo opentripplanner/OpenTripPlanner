@@ -176,8 +176,8 @@ class WalkableAreaBuilder {
       .stream()
       .map(area -> area.parent)
       .flatMap(osmEntity ->
-        osmEntity instanceof OsmRelation
-          ? ((OsmRelation) osmEntity).getMembers().stream().map(OsmRelationMember::getRef)
+        osmEntity instanceof OsmRelation relation
+          ? relation.getMembers().stream().map(OsmRelationMember::getRef)
           : Stream.of(osmEntity.getId())
       )
       .collect(Collectors.toSet());
