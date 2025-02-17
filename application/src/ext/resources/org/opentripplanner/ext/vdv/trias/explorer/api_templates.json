@@ -10,7 +10,7 @@
           "name": "stop_point_ref",
           "label": "Stop point reference",
           "type": "string",
-          "default": "nvbw:de:08111:6020:1:2",
+          "default": "de:08111:6020:1:2",
           "required": true
         },
         {
