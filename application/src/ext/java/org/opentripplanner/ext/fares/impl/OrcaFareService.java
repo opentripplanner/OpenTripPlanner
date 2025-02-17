@@ -54,6 +54,9 @@ public class OrcaFareService extends DefaultFareService {
     "cash"
   );
 
+  // TODO: Remove after mar 1
+  private static final LocalDate CT_FARE_CHANGE_DATE = LocalDate.of(2025, 3, 1);
+
   protected enum TransferType {
     ORCA_INTERAGENCY_TRANSFER,
     SAME_AGENCY_TRANSFER,
@@ -224,15 +227,6 @@ public class OrcaFareService extends DefaultFareService {
     };
   }
 
-  private static String routeLongNameFallBack(Route route) {
-    var longName = route.getLongName();
-    if (longName == null) {
-      return "";
-    } else {
-      return longName.toString();
-    }
-  }
-
   public OrcaFareService(Collection<FareRuleSet> regularFareRules) {
     addFareRules(FareType.regular, regularFareRules);
     addFareRules(FareType.senior, regularFareRules);
@@ -271,6 +265,16 @@ public class OrcaFareService extends DefaultFareService {
 
   private static Optional<Money> optionalUSD(float amount) {
     return Optional.of(usDollars(amount));
+  }
+
+  private static Optional<Money> getCTLocalReducedFare(Leg leg) {
+    if (
+      leg.getStartTime().isBefore(CT_FARE_CHANGE_DATE.atStartOfDay(leg.getStartTime().getZone()))
+    ) {
+      return optionalUSD(1.25f);
+    } else {
+      return optionalUSD(1.00f);
+    }
   }
 
   /**
@@ -316,17 +320,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.of(defaultFare);
     }
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> {
-        if (
-          leg
-            .getStartTime()
-            .isBefore(ZonedDateTime.of(2025, 3, 1, 0, 0, 0, 0, leg.getStartTime().getZone()))
-        ) {
-          yield optionalUSD(1.25f);
-        } else {
-          yield optionalUSD(1.00f);
-        }
-      }
+      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(4.5f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(3.75f);
       case KC_METRO,
@@ -367,17 +361,7 @@ public class OrcaFareService extends DefaultFareService {
     }
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> {
-        if (
-          leg
-            .getStartTime()
-            .isBefore(LocalDate.of(2025, 3, 1).atStartOfDay(leg.getStartTime().getZone()))
-        ) {
-          yield optionalUSD(1.25f);
-        } else {
-          yield optionalUSD(1.00f);
-        }
-      }
+      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case EVERETT_TRANSIT -> optionalUSD(0.5f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
