@@ -19,6 +19,7 @@ import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
+import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class RouterConfig implements Serializable {
   private final FlexConfig flexConfig;
   private final TransmodelAPIConfig transmodelApi;
   private final VectorTileConfig vectorTileConfig;
+  private final TriasApiConfig triasApiConfig;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -72,6 +74,7 @@ public class RouterConfig implements Serializable {
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileConfig = VectorTileConfig.mapVectorTilesParameters(root, "vectorTiles");
+    this.triasApiConfig = new TriasApiConfig("triasApi", root);
     this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -156,5 +159,9 @@ public class RouterConfig implements Serializable {
    */
   public boolean hasUnknownParameters() {
     return root.hasUnknownParameters();
+  }
+
+  public TriasApiConfig triasApiConfig() {
+    return triasApiConfig;
   }
 }

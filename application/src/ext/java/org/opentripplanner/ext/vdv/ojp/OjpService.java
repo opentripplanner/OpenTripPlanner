@@ -13,22 +13,30 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.ext.vdv.VdvService;
+import org.opentripplanner.ext.vdv.id.IdResolver;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class OjpService {
 
   private final VdvService vdvService;
+  private final IdResolver idResolver;
   private final StopEventResponseMapper mapper;
   private final ZoneId zoneId;
 
-  public OjpService(VdvService vdvService, StopEventResponseMapper mapper, ZoneId zoneId) {
+  public OjpService(
+    VdvService vdvService,
+    IdResolver idResolver,
+    StopEventResponseMapper mapper,
+    ZoneId zoneId
+  ) {
     this.vdvService = vdvService;
+    this.idResolver = idResolver;
     this.mapper = mapper;
     this.zoneId = zoneId;
   }
 
   public OJP handleStopEvenRequest(OJPStopEventRequestStructure ser) {
-    var stopId = FeedScopedId.parse(ser.getLocation().getPlaceRef().getStopPointRef().getValue());
+    var stopId = idResolver.parse(ser.getLocation().getPlaceRef().getStopPointRef().getValue());
     var time = Optional
       .ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId))
       .orElse(ZonedDateTime.now(zoneId));

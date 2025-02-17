@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
+import org.opentripplanner.ext.vdv.id.IdResolver;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -41,6 +42,7 @@ import org.rutebanken.time.XmlDateTime;
 public class StopEventResponseMapper {
 
   private final Function<String, Optional<String>> resolveFeedLanguage;
+  private final IdResolver idResolver;
 
   public enum OptionalFeature {
     PREVIOUS_CALLS,
@@ -52,9 +54,11 @@ public class StopEventResponseMapper {
 
   public StopEventResponseMapper(
     ZoneId zoneId,
+    IdResolver idResolver,
     Function<String, Optional<String>> resolveFeedLanguage
   ) {
     this.zoneId = zoneId;
+    this.idResolver = idResolver;
     this.resolveFeedLanguage = resolveFeedLanguage;
   }
 
@@ -92,10 +96,10 @@ public class StopEventResponseMapper {
     if (features.contains(OptionalFeature.PREVIOUS_CALLS)) {
       tripTimeOnDate
         .previousStop()
-        .forEach(previous -> stopEvent.withPreviousCall(callNearStop(previous)));
+        .forEach(previous -> stopEvent.withPreviousCall(callAtNearStop(previous)));
     }
     if (features.contains(OptionalFeature.ONWARD_CALLS)) {
-      tripTimeOnDate.nextStop().forEach(next -> stopEvent.withOnwardCall(callNearStop(next)));
+      tripTimeOnDate.nextStop().forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
     }
     return new StopEventResultStructure().withStopEvent(stopEvent).withId(eventId(tripTimeOnDate));
   }
@@ -114,15 +118,17 @@ public class StopEventResponseMapper {
     var lastStop = tripTimeOnDate.pattern().getStops().getLast();
     return new DatedJourneyStructure()
       .withJourneyRef(
-        new JourneyRefStructure().withValue(tripTimeOnDate.getTrip().getId().toString())
+        new JourneyRefStructure().withValue(idResolver.toString(tripTimeOnDate.getTrip().getId()))
       )
       .withOperatingDayRef(
         new OperatingDayRefStructure().withValue(tripTimeOnDate.getServiceDay().toString())
       )
-      .withLineRef(new LineRefStructure().withValue(route.getId().toString()))
+      .withLineRef(new LineRefStructure().withValue(idResolver.toString(route.getId())))
       .withMode(new ModeStructure().withPtMode(PtModeMapper.map(route.getMode())))
       .withPublishedServiceName(internationalText(route.getName(), lang(tripTimeOnDate)))
-      .withOperatorRef(new OperatorRefStructure().withValue(route.getAgency().getId().toString()))
+      .withOperatorRef(
+        new OperatorRefStructure().withValue(idResolver.toString(route.getAgency().getId()))
+      )
       .withOriginStopPointRef(stopPointRef(firstStop))
       .withOriginText(internationalText(firstStop.getName(), lang(tripTimeOnDate)))
       .withDestinationStopPointRef(stopPointRef(lastStop))
@@ -143,7 +149,7 @@ public class StopEventResponseMapper {
       .withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)));
   }
 
-  private CallAtNearStopStructure callNearStop(TripTimeOnDate tripTimeOnDate) {
+  private CallAtNearStopStructure callAtNearStop(TripTimeOnDate tripTimeOnDate) {
     return new CallAtNearStopStructure().withCallAtStop(callAtStop(tripTimeOnDate));
   }
 
@@ -170,8 +176,8 @@ public class StopEventResponseMapper {
     return departure;
   }
 
-  private static StopPointRefStructure stopPointRef(StopLocation stop) {
-    return new StopPointRefStructure().withValue(stop.getId().toString());
+  private StopPointRefStructure stopPointRef(StopLocation stop) {
+    return new StopPointRefStructure().withValue(idResolver.toString(stop.getId()));
   }
 
   private static InternationalTextStructure internationalText(I18NString string, String lang) {
