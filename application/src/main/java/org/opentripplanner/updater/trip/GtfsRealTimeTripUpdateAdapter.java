@@ -104,8 +104,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   private final Supplier<LocalDate> localDateNow;
 
   /**
-   * Constructor is package local to allow unit-tests to provide their own clock, not using system
-   * time.
+   * Constructor to allow tests to provide their own clock, not using system time.
    */
   public GtfsRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
