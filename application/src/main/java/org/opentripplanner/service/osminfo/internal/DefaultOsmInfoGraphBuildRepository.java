@@ -10,6 +10,7 @@ import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class DefaultOsmInfoGraphBuildRepository
   implements OsmInfoGraphBuildRepository, Serializable {
@@ -46,11 +47,10 @@ public class DefaultOsmInfoGraphBuildRepository
 
   @Override
   public String toString() {
-    return (
-      "DefaultOsmInfoGraphBuildRepository{platforms size = " +
-      platforms.size() +
-      areaPlatforms.size() +
-      "}"
-    );
+    return ToStringBuilder
+      .of(DefaultOsmInfoGraphBuildRepository.class)
+      .addNum("Linear platforms", platforms.size())
+      .addNum("Area platforms", areaPlatforms.size())
+      .toString();
   }
 }
