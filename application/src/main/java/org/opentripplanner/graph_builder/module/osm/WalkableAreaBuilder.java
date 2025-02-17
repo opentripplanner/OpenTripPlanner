@@ -75,7 +75,9 @@ class WalkableAreaBuilder {
   private final SafetyValueNormalizer normalizer;
   private final VertexFactory vertexFactory;
 
-  private static final String labelTemplate = "way (area) %s from %s to %s"; // for AreaEdge names
+  // template for AreaEdge names
+  private static final String labelTemplate = "way (area) %s from %s to %s";
+
   private static final Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
   public WalkableAreaBuilder(
@@ -325,7 +327,7 @@ class WalkableAreaBuilder {
             continue;
           }
           j = (int) Math.floor(sum_j);
-          if (skipEdge(nodeI, nodeJ, alreadyAddedEdges)) {
+          if (shouldSkipEdge(nodeI, nodeJ, alreadyAddedEdges)) {
             continue;
           }
           IntersectionVertex vertex2 = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
@@ -409,7 +411,7 @@ class WalkableAreaBuilder {
     );
   }
 
-  private WayProperties getAreaProperties(OsmEntity entity) {
+  private WayProperties findAreaProperties(OsmEntity entity) {
     if (!wayPropertiesCache.containsKey(entity)) {
       var wayData = entity.getOsmProvider().getWayPropertySet().getDataForWay(entity);
       wayPropertiesCache.put(entity, wayData);
@@ -429,7 +431,7 @@ class WalkableAreaBuilder {
     OsmNode node = ring.nodes.get(i);
     OsmNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
 
-    if (skipEdge(node, nextNode, alreadyAddedEdges)) {
+    if (shouldSkipEdge(node, nextNode, alreadyAddedEdges)) {
       return Set.of();
     }
     IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent);
@@ -472,7 +474,7 @@ class WalkableAreaBuilder {
       boolean crosses = testIntersection ? polygon.intersection(line).getLength() > 0.000001 : true;
       if (crosses) {
         parent = area.parent;
-        wayData = getAreaProperties(parent);
+        wayData = findAreaProperties(parent);
         areaPermissions = areaPermissions.intersection(wayData.getPermission());
         wheelchairAccessible = wheelchairAccessible && parent.isWheelchairAccessible();
       }
@@ -541,7 +543,7 @@ class WalkableAreaBuilder {
       I18NString name = namer.getNameForWay(areaEntity, id);
       namedArea.setName(name);
 
-      WayProperties wayData = getAreaProperties(areaEntity);
+      WayProperties wayData = findAreaProperties(areaEntity);
       double bicycleSafety = wayData.bicycleSafety().forward();
       namedArea.setBicycleSafetyMultiplier(bicycleSafety);
 
@@ -596,7 +598,11 @@ class WalkableAreaBuilder {
     }
   }
 
-  private boolean skipEdge(OsmNode nodeI, OsmNode nodeJ, HashSet<NodeEdge> alreadyAddedEdges) {
+  private boolean shouldSkipEdge(
+    OsmNode nodeI,
+    OsmNode nodeJ,
+    HashSet<NodeEdge> alreadyAddedEdges
+  ) {
     if (nodeI == nodeJ) {
       return true;
     }

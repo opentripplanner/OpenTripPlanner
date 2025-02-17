@@ -19,8 +19,7 @@ public interface OsmInfoGraphBuildService {
   /**
    * Find the platform the given edge is part of.
    * <p>
-   * TODO: This service currently only stores linear platforms and area platforms
-   * node platforms should be supported as well.
+   * TODO: node platforms should be supported as well.
    */
   Optional<Platform> findPlatform(Edge edge);
 
