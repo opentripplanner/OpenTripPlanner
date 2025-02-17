@@ -15,21 +15,21 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.xml.transform.TransformerException;
 import org.opentripplanner.ext.vdv.VdvService;
+import org.opentripplanner.ext.vdv.id.HideFeedIdResolver;
+import org.opentripplanner.ext.vdv.id.IdResolver;
+import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
 import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
 import org.opentripplanner.ext.vdv.ojp.OjpService;
 import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
-import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +44,22 @@ public class TriasResource {
     var transitService = context.transitService();
     var zoneId = transitService.getTimeZone();
     var vdvService = new VdvService(context.transitService());
+
+    IdResolver idResolver = idResolver(context.triasApiConfig());
     var mapper = new StopEventResponseMapper(
       zoneId,
+      idResolver,
       feedId -> Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang)
     );
-    this.ojpService = new OjpService(vdvService, mapper, zoneId);
+    this.ojpService = new OjpService(vdvService, idResolver, mapper, zoneId);
+  }
+
+  private IdResolver idResolver(TriasApiConfig triasApiConfig) {
+    if (triasApiConfig.hideFeedId()) {
+      return new HideFeedIdResolver(triasApiConfig.inputFeedId());
+    } else {
+      return new UseFeedIdResolver();
+    }
   }
 
   @POST
