@@ -72,6 +72,7 @@ public class ConstructApplicationModule {
       streetLimitationParametersService,
       transitRoutingConfig,
       transitService,
+      routerConfig.triasApiConfig(),
       vectorTileConfig,
       vehicleParkingService,
       vehicleRentalService,

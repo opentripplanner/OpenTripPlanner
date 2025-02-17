@@ -28,6 +28,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.RaptorEnvironmentFactory;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -122,6 +123,7 @@ public class SpeedTest {
       TestServerContext.createStreetLimitationParametersService(),
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
+        null,
       VectorTileConfig.DEFAULT,
       TestServerContext.createVehicleParkingService(),
       TestServerContext.createVehicleRentalService(),
