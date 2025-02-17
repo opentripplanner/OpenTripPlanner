@@ -410,10 +410,7 @@ class ParkingProcessor {
     if (creativeName == null) {
       creativeName =
         new NonLocalizedString(
-          "Park & Ride (%s/%d)".formatted(
-              osmEntity.getClass().getSimpleName(),
-              osmEntity.getId()
-            )
+          "Park & Ride (%s/%d)".formatted(osmEntity.getClass().getSimpleName(), osmEntity.getId())
         );
     }
     return creativeName;
