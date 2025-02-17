@@ -12,12 +12,12 @@ import org.opentripplanner.routing.api.request.StreetMode;
  * <p>
  * <b>Note!</b> The created transfer does NOT have a AStar path (list of edges).
  */
-public final class TestTransfer {
+public final class TestTransfers {
 
   public static final double DEFAULT_WALK_RELUCTANCE = 2.0;
 
   /** This is a utility class, should not be instansiated */
-  private TestTransfer() {}
+  private TestTransfers() {}
 
   public static DefaultRaptorTransfer transfer(int stop, int durationInSeconds, int cost) {
     var tx = new Transfer(
