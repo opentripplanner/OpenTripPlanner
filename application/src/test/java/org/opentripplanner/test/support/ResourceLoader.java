@@ -57,17 +57,17 @@ public class ResourceLoader {
   }
 
   /**
+   * Returns a File instance in the original test resources folder.
+   */
+  public File testResourceFile(String path) {
+    return resourceFile("test", path);
+  }
+
+  /**
    * Returns a File instance in the original ext-test resources folder.
    */
   public File extTestResourceFile(String path) {
-    var fullPath =
-      "src/ext-test/resources/%s/%s".formatted(
-          clazz.getPackage().getName().replace(".", "/"),
-          path
-        );
-    File file = new File(fullPath);
-    assertFileExists(file);
-    return file;
+    return resourceFile("ext-test", path);
   }
 
   /**
@@ -132,5 +132,21 @@ public class ResourceLoader {
       file.exists(),
       "File '%s' not found on file system.".formatted(file.getAbsolutePath())
     );
+  }
+
+  /**
+   * Returns a File instance from the resources folder of the specified resourceDir (for example
+   * test).
+   */
+  private File resourceFile(String resourceDir,String path) {
+    var fullPath =
+      "src/%s/resources/%s/%s".formatted(
+        resourceDir,
+        clazz.getPackage().getName().replace(".", "/"),
+        path
+      );
+    File file = new File(fullPath);
+    assertFileExists(file);
+    return file;
   }
 }
