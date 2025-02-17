@@ -30,6 +30,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 public class WalkableAreaBuilderTest {
 
+  private DefaultOsmInfoGraphBuildRepository osmInfoRepository;
+
   public Graph buildGraph(final TestInfo testInfo) {
     var graph = new Graph();
     final Method testMethod = testInfo.getTestMethod().get();
@@ -38,8 +40,9 @@ public class WalkableAreaBuilderTest {
     final int maxAreaNodes = testMethod.getAnnotation(MaxAreaNodes.class).value();
     final boolean platformEntriesLinking = true;
 
-    final Set<String> boardingAreaRefTags = Set.of();
+    final Set<String> boardingAreaRefTags = Set.of("ref");
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
+    this.osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
 
     final File file = ResourceLoader.of(WalkableAreaBuilderTest.class).file(osmFile);
     assertTrue(file.exists());
@@ -49,7 +52,7 @@ public class WalkableAreaBuilderTest {
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
-      new DefaultOsmInfoGraphBuildRepository(),
+      osmInfoRepository,
       new VertexGenerator(osmdb, graph, Set.of(), false),
       new DefaultNamer(),
       new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
@@ -180,6 +183,21 @@ public class WalkableAreaBuilderTest {
       .distinct()
       .toList();
     assertEquals(1, elevatorConnection.size());
+
+    // first platform area has ref tag. Check that it is available in
+    // DefaultOsmInfoGraphBuildRepository
+    var areaGroups = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143840)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+
+    var area = areaGroups.getFirst().getAreas().getFirst();
+    var platform = this.osmInfoRepository.findPlatform(area);
+    assertTrue(platform.isPresent());
+    assertEquals(Set.of("007"), platform.get().references());
   }
 
   @Test
