@@ -399,7 +399,7 @@ class ParkingProcessor {
   }
 
   private I18NString nameParkAndRideEntity(OsmEntity osmEntity) {
-    // If there is an explicit name user that. The explicit name is used so that tag-based
+    // If there is an explicit name use that. The explicit name is used so that tag-based
     // translations are used, which are not handled by "CreativeNamer"s.
     I18NString creativeName = osmEntity.getAssumedName();
     if (creativeName == null) {
