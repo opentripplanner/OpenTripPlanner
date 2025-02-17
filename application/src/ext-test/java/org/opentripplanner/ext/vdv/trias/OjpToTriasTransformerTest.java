@@ -36,8 +36,10 @@ class OjpToTriasTransformerTest {
   void error() {
     var ojp = ErrorMapper.error("An error occurred", ZDT);
     var actual = OjpToTriasTransformer.transform(ojp);
-    var expected = ResourceLoader.of(this).fileToString("error.xml");
-    assertEqualStrings(expected, actual);
+    var file = LOADER.extTestResourceFile("error.xml");
+    var original = readFile(file);
+    writeFile(file, actual);
+    assertEqualStrings(original, actual);
   }
 
   private static void assertEqualStrings(String expected, String actual) {
