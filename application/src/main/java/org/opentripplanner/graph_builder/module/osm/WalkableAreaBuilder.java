@@ -197,8 +197,8 @@ class WalkableAreaBuilder {
       OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
-        // test if area is inside current ring. This is necessary only if there are many areas or outer rings
-        if (group.areas.size() != 1 || group.outermostRings.size() != 1) {
+        // test if area is inside the current ring
+        if (!group.isSimpleAreaGroup()) {
           if (!polygon.contains(area.jtsMultiPolygon)) {
             continue;
           }

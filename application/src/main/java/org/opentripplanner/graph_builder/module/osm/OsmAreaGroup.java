@@ -137,6 +137,16 @@ class OsmAreaGroup {
     return areas.iterator().next().parent;
   }
 
+  /**
+   * Check if area group has a trivial geometry of one boundary ring and one respective area
+   * In such a case it is known that the area and the boundary ring match
+   *
+   * @return true if area group consists of one polygion only
+   */
+  public boolean isSimpleAreaGroup() {
+    return areas.size() == 1 && outermostRings.size() == 1;
+  }
+
   private Ring toRing(Polygon polygon, HashMap<Coordinate, OsmNode> nodeMap) {
     List<OsmNode> shell = new ArrayList<>();
     for (Coordinate coord : polygon.getExteriorRing().getCoordinates()) {
