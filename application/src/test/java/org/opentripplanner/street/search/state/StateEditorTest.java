@@ -20,13 +20,13 @@ public class StateEditorTest {
   static Vertex vertex = StreetModelForTest.intersectionVertex(1, 1);
 
   @Test
-  public final void testIncrementTimeInSeconds() {
+  public final void testIncrementTimeInMilliseconds() {
     StateEditor stateEditor = new StateEditor(vertex, StreetSearchRequest.of().build());
 
     stateEditor.setTimeSeconds(0);
-    stateEditor.incrementTimeInSeconds(999999999);
+    stateEditor.incrementTimeInMilliseconds(999999999);
 
-    assertEquals(999999999, stateEditor.child.getTimeSeconds());
+    assertEquals(999999999, stateEditor.child.getTimeMilliseconds());
   }
 
   @Test
