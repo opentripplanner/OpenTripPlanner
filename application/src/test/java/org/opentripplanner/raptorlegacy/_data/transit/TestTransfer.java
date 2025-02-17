@@ -2,20 +2,34 @@ package org.opentripplanner.raptorlegacy._data.transit;
 
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toRaptorCost;
 
-import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import java.util.EnumSet;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.routing.api.request.StreetMode;
 
 /**
- * Simple implementation for {@link RaptorTransfer} for use in unit-tests.
- *
- * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
- *             module. Use the OTP model entities instead.
+ * Simple factory to create {@link DefaultRaptorTransfer}s for unit-testing.
+ * <p>
+ * <b>Note!</b> The created transfer does NOT have a AStar path (list of edges).
  */
-@Deprecated
-public record TestTransfer(int stop, int durationInSeconds, int cost) implements RaptorTransfer {
+public final class TestTransfer {
+
   public static final double DEFAULT_WALK_RELUCTANCE = 2.0;
 
-  public static TestTransfer transfer(int stop, int durationInSeconds) {
-    return new TestTransfer(stop, durationInSeconds, walkCost(durationInSeconds));
+  /** This is a utility class, should not be instansiated */
+  private TestTransfer() {}
+
+  public static DefaultRaptorTransfer transfer(int stop, int durationInSeconds, int cost) {
+    var tx = new Transfer(
+      stop,
+      (int) Math.round(durationInSeconds * 1.3),
+      EnumSet.of(StreetMode.WALK)
+    );
+    return new DefaultRaptorTransfer(stop, durationInSeconds, cost, tx);
+  }
+
+  public static DefaultRaptorTransfer transfer(int stop, int durationInSeconds) {
+    return transfer(stop, durationInSeconds, walkCost(durationInSeconds));
   }
 
   public static int walkCost(int durationInSeconds) {
@@ -24,25 +38,5 @@ public record TestTransfer(int stop, int durationInSeconds, int cost) implements
 
   public static int walkCost(int durationInSeconds, double reluctance) {
     return toRaptorCost(durationInSeconds * reluctance);
-  }
-
-  @Override
-  public int stop() {
-    return stop;
-  }
-
-  @Override
-  public int c1() {
-    return cost;
-  }
-
-  @Override
-  public int durationInSeconds() {
-    return durationInSeconds;
-  }
-
-  @Override
-  public String toString() {
-    return asString();
   }
 }
