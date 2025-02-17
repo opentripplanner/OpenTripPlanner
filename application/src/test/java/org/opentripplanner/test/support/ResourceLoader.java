@@ -138,13 +138,13 @@ public class ResourceLoader {
    * Returns a File instance from the resources folder of the specified resourceDir (for example
    * test).
    */
-  private File resourceFile(String resourceDir,String path) {
+  private File resourceFile(String resourceDir, String path) {
     var fullPath =
       "src/%s/resources/%s/%s".formatted(
-        resourceDir,
-        clazz.getPackage().getName().replace(".", "/"),
-        path
-      );
+          resourceDir,
+          clazz.getPackage().getName().replace(".", "/"),
+          path
+        );
     File file = new File(fullPath);
     assertFileExists(file);
     return file;
