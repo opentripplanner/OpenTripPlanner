@@ -44,7 +44,7 @@ public class TriasResource {
   public TriasResource(@Context OtpServerRequestContext context) {
     var transitService = context.transitService();
     var zoneId = transitService.getTimeZone();
-    var vdvService = new VdvService(context.transitService());
+    var vdvService = new VdvService(context.transitService(), context.graphFinder());
 
     IdResolver idResolver = idResolver(context.triasApiConfig());
     var mapper = new StopEventResponseMapper(
