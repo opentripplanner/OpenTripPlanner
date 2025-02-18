@@ -8,6 +8,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.JAXBException;
@@ -56,19 +57,19 @@ public class TriasResource {
 
   private IdResolver idResolver(TriasApiConfig triasApiConfig) {
     if (triasApiConfig.hideFeedId()) {
-      return new HideFeedIdResolver(triasApiConfig.inputFeedId());
+      return new HideFeedIdResolver(triasApiConfig.hardcodedInputFeedId());
     } else {
       return new UseFeedIdResolver();
     }
   }
 
   @POST
-  @Produces("application/xml")
+  @Produces(MediaType.APPLICATION_XML)
   public Response index(String triasInput) {
     try {
       var ojp = OjpToTriasTransformer.triasToOjp(triasInput);
 
-      var request = getValue(ojp);
+      var request = findRequest(ojp);
 
       if (request instanceof OJPStopEventRequestStructure ser) {
         var ojpResponse = ojpService.handleStopEvenRequest(ser);
@@ -90,7 +91,7 @@ public class TriasResource {
     }
   }
 
-  private static AbstractFunctionalServiceRequestStructure getValue(OJP ojp) {
+  private static AbstractFunctionalServiceRequestStructure findRequest(OJP ojp) {
     return Optional
       .ofNullable(ojp.getOJPRequest())
       .map(s -> s.getServiceRequest())
@@ -117,28 +118,28 @@ public class TriasResource {
 
   @GET
   @Path("/explorer")
-  @Produces("text/html")
+  @Produces(MediaType.TEXT_HTML)
   public Response explorer() throws IOException {
     return classpathResource("explorer.html");
   }
 
   @GET
   @Path("/static/config.json")
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response configJson() throws IOException {
     return classpathResource("config.json");
   }
 
   @GET
   @Path("/static/api_templates.json")
-  @Produces("application/json")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response templatesJson() throws IOException {
     return classpathResource("api_templates.json");
   }
 
   @GET
   @Path("/static/stop_event.xml")
-  @Produces("application/xml")
+  @Produces(MediaType.APPLICATION_JSON)
   public Response stopEventXml() throws IOException {
     return classpathResource("stop_event.xml");
   }

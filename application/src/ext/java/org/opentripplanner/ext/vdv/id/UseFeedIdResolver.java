@@ -2,6 +2,9 @@ package org.opentripplanner.ext.vdv.id;
 
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * An id resolver that passes input and output ids through with the feed id.
+ */
 public class UseFeedIdResolver implements IdResolver {
 
   @Override
