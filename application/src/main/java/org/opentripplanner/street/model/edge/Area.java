@@ -62,7 +62,7 @@ public final class Area implements Serializable {
    * object identity instead.
    */
   @Override
-  public boolean equals(Object obj) {
+  public final boolean equals(Object obj) {
     return super.equals(obj);
   }
 
