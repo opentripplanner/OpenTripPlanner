@@ -7,7 +7,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class TriasApiConfig {
 
   private final boolean hideFeedId;
-  private final String inputFeedId;
+  private final String hardcodedInputFeedId;
 
   public TriasApiConfig(String parameterName, NodeAdapter root) {
     var c = root
@@ -26,7 +26,7 @@ public class TriasApiConfig {
           "feedId prefix."
         )
         .asBoolean(false);
-    inputFeedId =
+    hardcodedInputFeedId =
       c
         .of("hardcodedInputFeedId")
         .since(V2_7)
@@ -37,7 +37,7 @@ public class TriasApiConfig {
         )
         .asString(null);
 
-    if (hideFeedId && inputFeedId == null) {
+    if (hideFeedId && hardcodedInputFeedId == null) {
       throw new IllegalArgumentException(
         "If `hideFeedId` is set to `true`, `hardcodedInputFeedId` must also be set."
       );
@@ -48,7 +48,7 @@ public class TriasApiConfig {
     return hideFeedId;
   }
 
-  public String inputFeedId() {
-    return inputFeedId;
+  public String hardcodedInputFeedId() {
+    return hardcodedInputFeedId;
   }
 }
