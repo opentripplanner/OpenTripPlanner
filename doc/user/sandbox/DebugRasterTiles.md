@@ -6,12 +6,13 @@ The raster tiles are available with the following path structure:
 `/otp/debugrastertiles/{layer}/{z}/{x}/{y}.png`
 
 The available layers are:
-* bike-safety
-* walk-safety
-* thru-traffic
-* traversal
-* wheelchair
-* elevation
+
+- bike-safety
+- walk-safety
+- thru-traffic
+- traversal
+- wheelchair
+- elevation
 
 ## Contact Info
 
