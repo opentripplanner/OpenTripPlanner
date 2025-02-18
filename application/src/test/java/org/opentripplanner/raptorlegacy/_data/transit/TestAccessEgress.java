@@ -80,7 +80,6 @@ public class TestAccessEgress {
     int generalizedCost;
     int numberOfRides = ZERO;
     boolean stopReachedOnBoard = STOP_REACHED_ON_FOOT;
-    private boolean free = false;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -89,8 +88,7 @@ public class TestAccessEgress {
     }
 
     Builder withFree() {
-      this.free = true;
-      this.durationInSeconds = 0;
+      this.durationInSeconds = ZERO;
       return this;
     }
 
