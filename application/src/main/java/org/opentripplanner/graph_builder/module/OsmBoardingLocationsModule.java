@@ -159,7 +159,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           if (matchesReference(stop, platform.references())) {
             var boardingLocation = makeBoardingLocation(
               stop,
-              area.getGeometry().getCentroid(),
+              platform.geometry().getCentroid(),
               platform.references(),
               area.getName()
             );

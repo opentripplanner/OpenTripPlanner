@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -143,6 +144,20 @@ class OsmArea {
     } else {
       return null;
     }
+  }
+
+  /**
+   * Try to extract a point which is in  the middle of the area and
+   * also insaide the area geometry.
+   *
+   * @return Point geometry inside the area
+   */
+  public Point findInteriorPoint() {
+    var centroid = jtsMultiPolygon.getCentroid();
+    if (jtsMultiPolygon.intersects(centroid)) {
+      return centroid;
+    }
+    return jtsMultiPolygon.getInteriorPoint();
   }
 
   private MultiPolygon calculateJTSMultiPolygon() {
