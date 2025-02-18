@@ -71,7 +71,7 @@ public final class Area implements Serializable {
    * object identity instead.
    */
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     return super.hashCode();
   }
 }
