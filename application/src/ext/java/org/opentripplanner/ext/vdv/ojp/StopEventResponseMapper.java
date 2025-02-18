@@ -10,6 +10,7 @@ import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPResponseStructure;
 import de.vdv.ojp20.OJPStopEventDeliveryStructure;
 import de.vdv.ojp20.OperatingDayRefStructure;
+import de.vdv.ojp20.ServiceArrivalStructure;
 import de.vdv.ojp20.ServiceDepartureStructure;
 import de.vdv.ojp20.StopEventResultStructure;
 import de.vdv.ojp20.StopEventStructure;
@@ -21,7 +22,6 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.XmlType;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -95,11 +95,11 @@ public class StopEventResponseMapper {
       .withService(datedJourney(tripTimeOnDate));
     if (features.contains(OptionalFeature.PREVIOUS_CALLS)) {
       tripTimeOnDate
-        .previousStop()
+        .previousTimes()
         .forEach(previous -> stopEvent.withPreviousCall(callAtNearStop(previous)));
     }
     if (features.contains(OptionalFeature.ONWARD_CALLS)) {
-      tripTimeOnDate.nextStop().forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
+      tripTimeOnDate.nextTimes().forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
     }
     return new StopEventResultStructure().withStopEvent(stopEvent).withId(eventId(tripTimeOnDate));
   }
@@ -142,6 +142,7 @@ public class StopEventResponseMapper {
     return new CallAtStopStructure()
       .withStopPointRef(stopPointRef)
       .withStopPointName(internationalText(stop.getName(), lang(tripTimeOnDate)))
+      .withServiceArrival(serviceArrival(tripTimeOnDate))
       .withServiceDeparture(serviceDeparture(tripTimeOnDate))
       .withOrder(BigInteger.valueOf(tripTimeOnDate.getGtfsSequence()))
       .withNoBoardingAtStop(isNone(tripTimeOnDate.getPickupType()))
@@ -169,11 +170,21 @@ public class StopEventResponseMapper {
 
   private ServiceDepartureStructure serviceDeparture(TripTimeOnDate tripTimeOnDate) {
     var departure = new ServiceDepartureStructure()
-      .withTimetabledTime(new XmlDateTime(scheduledDeparture(tripTimeOnDate)));
-    if (tripTimeOnDate.isRealtime()) {
-      departure.withEstimatedTime(new XmlDateTime(realtimeDeparture(tripTimeOnDate)));
-    }
+      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledDepartureAt(zoneId)));
+    tripTimeOnDate
+      .realtimeDepartureAt(zoneId)
+      .ifPresent(time -> departure.withEstimatedTime(new XmlDateTime(time)));
     return departure;
+  }
+
+  private ServiceArrivalStructure serviceArrival(TripTimeOnDate tripTimeOnDate) {
+    var arrival = new ServiceArrivalStructure()
+      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledArrivalAt(zoneId)));
+
+    tripTimeOnDate
+      .realtimeArrivalAt(zoneId)
+      .ifPresent(time -> arrival.withEstimatedTime(new XmlDateTime(time)));
+    return arrival;
   }
 
   private StopPointRefStructure stopPointRef(StopLocation stop) {
@@ -195,16 +206,6 @@ public class StopEventResponseMapper {
       return new InternationalTextStructure()
         .withText(new DefaultedTextStructure().withValue(string).withLang(lang));
     }
-  }
-
-  private ZonedDateTime scheduledDeparture(TripTimeOnDate tripTimeOnDate) {
-    var localTime = LocalTime.ofSecondOfDay(tripTimeOnDate.getScheduledDeparture());
-    return tripTimeOnDate.getServiceDay().atTime(localTime).atZone(zoneId);
-  }
-
-  private ZonedDateTime realtimeDeparture(TripTimeOnDate tripTimeOnDate) {
-    var localTime = LocalTime.ofSecondOfDay(tripTimeOnDate.getRealtimeDeparture());
-    return tripTimeOnDate.getServiceDay().atTime(localTime).atZone(zoneId);
   }
 
   public static <T> JAXBElement<T> jaxbElement(T value) {
