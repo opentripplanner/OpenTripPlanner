@@ -87,7 +87,8 @@ class PageCursorTest implements PlanTestConstants {
       "PageCursor{type: NEXT_PAGE, sortOrder: STREET_AND_ARRIVAL_TIME, " +
       "edt: " +
       EDT_STR +
-      ", searchWindow: 2h}",
+      ", searchWindow: 2h" +
+      ", bestStreetOnlyCost: OptionalInt.empty}",
       subjectDepartAfter.toString()
     );
     assertEquals(
@@ -97,7 +98,8 @@ class PageCursorTest implements PlanTestConstants {
       ", lat: " +
       LAT_STR +
       ", searchWindow: 2h, " +
-      "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
+      "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]" +
+      ", bestStreetOnlyCost: OptionalInt.empty}",
       subjectArriveBy.toString()
     );
   }

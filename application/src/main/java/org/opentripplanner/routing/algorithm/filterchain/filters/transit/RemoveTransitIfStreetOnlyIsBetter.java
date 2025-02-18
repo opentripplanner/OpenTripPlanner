@@ -55,10 +55,12 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     // If the best street only cost can't be found in the itineraries but
     // it is present in the cursor, then the information from the cursor is used.
     // If no cost is found an empty list is returned.
-    if (minStreetCost.isEmpty() && bestStreetOnlyCost.isPresent()) {
-      minStreetCost = bestStreetOnlyCost;
-    } else {
-      return List.of();
+    if (minStreetCost.isEmpty()) {
+      if (bestStreetOnlyCost.isPresent()) {
+        minStreetCost = bestStreetOnlyCost;
+      } else {
+        return List.of();
+      }
     }
 
     // The best street only cost is saved in the cursor.

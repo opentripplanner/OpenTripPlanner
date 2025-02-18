@@ -19,7 +19,7 @@ class PageCursorSerializerTest {
   private static final Duration SW = DurationUtils.duration("5h");
   private static final Instant DT = Instant.parse("2024-01-10T10:00:00Z");
   private static final Instant AT = Instant.parse("2024-01-10T12:00:00Z");
-  private static final OptionalInt BSOC = OptionalInt.empty();
+  private static final OptionalInt BSOC = OptionalInt.of(123);
 
   public static final String TOKEN_V1 =
     "MXxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafDIwMjQtMDEtMTVUMDA6MDA6MDFafDVofFNUUkVFVF" +
@@ -28,10 +28,17 @@ class PageCursorSerializerTest {
   public static final String TOKEN_V1_W_NULLS =
     "MXxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafHw1aHxTVFJFRVRfQU5EX0RFUEFSVFVSRV9USU1FfH" +
     "x8fHx8";
+  public static final String TOKEN_V2 =
+    "MnxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafDIwMjQtMDEtMTVUMDA6MDA6MDFafDVofFNUUkVFVF" +
+    "9BTkRfREVQQVJUVVJFX1RJTUV8dHJ1ZXwyMDI0LTAxLTEwVDEwOjAwOjAwWnwyMDI0LTAxLTEwVDEyOjAwOjAwWnwz" +
+    "fDEyMDB8MTIzfA==";
+  public static final String TOKEN_V2_W_NULLS =
+    "MnxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafHw1aHxTVFJFRVRfQU5EX0RFUEFSVFVSRV9USU1FfH" +
+    "x8fHx8fA==";
 
   private static final ItinerarySortKey CUT = new DeduplicationPageCut(DT, AT, 1200, 3, true);
 
-  private static final PageCursor PAGE_CURSOR_V1 = new PageCursor(
+  private static final PageCursor PAGE_CURSOR_V2 = new PageCursor(
     PREVIOUS_PAGE,
     STREET_AND_DEPARTURE_TIME,
     EDT,
@@ -41,20 +48,20 @@ class PageCursorSerializerTest {
     BSOC
   );
 
-  private final PageCursor pageCursorV1withNulls = new PageCursor(
+  private final PageCursor pageCursorV2withNulls = new PageCursor(
     PREVIOUS_PAGE,
     STREET_AND_DEPARTURE_TIME,
     EDT,
     null,
     SW,
     null,
-    BSOC
+    OptionalInt.empty()
   );
 
   @Test
   void encode() {
-    assertEquals(TOKEN_V1, PageCursorSerializer.encode(PAGE_CURSOR_V1));
-    assertEquals(TOKEN_V1_W_NULLS, PageCursorSerializer.encode(pageCursorV1withNulls));
+    assertEquals(TOKEN_V2, PageCursorSerializer.encode(PAGE_CURSOR_V2));
+    assertEquals(TOKEN_V2_W_NULLS, PageCursorSerializer.encode(pageCursorV2withNulls));
   }
 
   @Test
@@ -77,5 +84,29 @@ class PageCursorSerializerTest {
     assertNull(tokenV1.latestArrivalTime());
     assertEquals(SW, tokenV1.searchWindow());
     assertNull(tokenV1.itineraryPageCut());
+  }
+
+  @Test
+  void decodeTokenV2() {
+    PageCursor tokenV2 = PageCursorSerializer.decode(TOKEN_V2);
+    assertEquals(PREVIOUS_PAGE, tokenV2.type());
+    assertEquals(STREET_AND_DEPARTURE_TIME, tokenV2.originalSortOrder());
+    assertEquals(EDT, tokenV2.earliestDepartureTime());
+    assertEquals(LAT, tokenV2.latestArrivalTime());
+    assertEquals(SW, tokenV2.searchWindow());
+    assertEquals(CUT, tokenV2.itineraryPageCut());
+    assertEquals(BSOC, tokenV2.bestStreetOnlyCost());
+  }
+
+  @Test
+  void decodeTokenV2_W_NULLS() {
+    PageCursor tokenV2 = PageCursorSerializer.decode(TOKEN_V2_W_NULLS);
+    assertEquals(PREVIOUS_PAGE, tokenV2.type());
+    assertEquals(STREET_AND_DEPARTURE_TIME, tokenV2.originalSortOrder());
+    assertEquals(EDT, tokenV2.earliestDepartureTime());
+    assertNull(tokenV2.latestArrivalTime());
+    assertEquals(SW, tokenV2.searchWindow());
+    assertNull(tokenV2.itineraryPageCut());
+    assertEquals(OptionalInt.empty(), tokenV2.bestStreetOnlyCost());
   }
 }
