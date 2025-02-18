@@ -88,6 +88,11 @@ public class DefaultTransitService implements TransitEditorService {
   private final TimetableSnapshot timetableSnapshot;
 
   /**
+   * Helper for fetching stop times for APIs.
+   */
+  private final StopTimesHelper stopTimesHelper;
+
+  /**
    * Create a service without a real-time snapshot (and therefore without any real-time data).
    */
   public DefaultTransitService(TimetableRepository timetableRepository) {
@@ -102,6 +107,7 @@ public class DefaultTransitService implements TransitEditorService {
     this.timetableRepository = timetableRepository;
     this.timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
     this.timetableSnapshot = timetableSnapshot;
+    this.stopTimesHelper = new StopTimesHelper(this);
   }
 
   @Override
@@ -387,8 +393,7 @@ public class DefaultTransitService implements TransitEditorService {
     boolean includeCancelledTrips
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    return StopTimesHelper.stopTimesForStop(
-      this,
+    return stopTimesHelper.stopTimesForStop(
       stop,
       startTime,
       timeRange,
@@ -406,8 +411,7 @@ public class DefaultTransitService implements TransitEditorService {
     boolean includeCancellations
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    return StopTimesHelper.stopTimesForStop(
-      this,
+    return stopTimesHelper.stopTimesForStop(
       stop,
       serviceDate,
       arrivalDeparture,
@@ -426,8 +430,7 @@ public class DefaultTransitService implements TransitEditorService {
     boolean includeCancellations
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    return StopTimesHelper.stopTimesForPatternAtStop(
-      this,
+    return stopTimesHelper.stopTimesForPatternAtStop(
       stop,
       pattern,
       startTime,

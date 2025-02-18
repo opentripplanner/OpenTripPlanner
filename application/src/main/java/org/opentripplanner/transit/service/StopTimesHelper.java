@@ -26,6 +26,12 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class StopTimesHelper {
 
+  private final TransitService transitService;
+
+  StopTimesHelper(TransitService transitService) {
+    this.transitService = transitService;
+  }
+
   /**
    * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
    * the previous, current and next service date. It uses a priority queue to keep track of the next
@@ -42,8 +48,7 @@ class StopTimesHelper {
    * @param arrivalDeparture      Filter by arrivals, departures, or both
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
    */
-  static List<StopTimesInPattern> stopTimesForStop(
-    TransitService transitService,
+  List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
     Instant startTime,
     Duration timeRange,
@@ -62,7 +67,6 @@ class StopTimesHelper {
 
     for (TripPattern pattern : patterns) {
       Queue<TripTimeOnDate> pq = listTripTimeOnDatesForPatternAtStop(
-        transitService,
         stop,
         pattern,
         startTime,
@@ -86,8 +90,7 @@ class StopTimesHelper {
    * @param stop        Stop object to perform the search for
    * @param serviceDate Return all departures for the specified date
    */
-  static List<StopTimesInPattern> stopTimesForStop(
-    TransitService transitService,
+  List<StopTimesInPattern> stopTimesForStop(
     StopLocation stop,
     LocalDate serviceDate,
     ArrivalDeparture arrivalDeparture,
@@ -146,8 +149,7 @@ class StopTimesHelper {
    *                             trip or the stop at the given stop location has been cancelled.
    *                             Deleted trips are never returned no matter the value of this parameter.
    */
-  static List<TripTimeOnDate> stopTimesForPatternAtStop(
-    TransitService transitService,
+  List<TripTimeOnDate> stopTimesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -157,7 +159,6 @@ class StopTimesHelper {
     boolean includeCancellations
   ) {
     Queue<TripTimeOnDate> pq = listTripTimeOnDatesForPatternAtStop(
-      transitService,
       stop,
       pattern,
       startTime,
@@ -186,8 +187,7 @@ class StopTimesHelper {
     return result;
   }
 
-  private static Queue<TripTimeOnDate> listTripTimeOnDatesForPatternAtStop(
-    TransitService transitService,
+  Queue<TripTimeOnDate> listTripTimeOnDatesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
