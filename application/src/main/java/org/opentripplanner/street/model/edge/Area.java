@@ -9,7 +9,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  * Area is a subset of an area group with a certain set of properties (name, safety, etc).
  */
 
-public class Area implements Serializable {
+public final class Area implements Serializable {
 
   private Geometry geometry;
   private I18NString name;
@@ -55,5 +55,23 @@ public class Area implements Serializable {
 
   public void setPermission(StreetTraversalPermission permission) {
     this.permission = permission;
+  }
+
+  /**
+   * We use this class as a map key, but it has no clear equality operation so we delegate to
+   * object identity instead.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    return super.equals(obj);
+  }
+
+  /**
+   * We use this class as a map key, but it has no clear hashcode so we delegate to
+   * object identity instead.
+   */
+  @Override
+  public int hashCode() {
+    return super.hashCode();
   }
 }
