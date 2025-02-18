@@ -99,6 +99,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use millisecond precision in A* traversal [#6436](https://github.com/opentripplanner/OpenTripPlanner/pull/6436)
 - Fix stop time fetching in added or replacement trips [#6245](https://github.com/opentripplanner/OpenTripPlanner/pull/6245)
 - Release script for downstream OTP forks [#6345](https://github.com/opentripplanner/OpenTripPlanner/pull/6345)
+- Restore debug raster tiles as a sandbox feature, and add safety and vertex elevation text debug layers [#6454](https://github.com/opentripplanner/OpenTripPlanner/pull/6454)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
