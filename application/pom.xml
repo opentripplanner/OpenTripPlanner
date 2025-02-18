@@ -496,6 +496,8 @@
                         <inputGlob>src/ext-test/java/**/*.java</inputGlob>
                         <inputGlob>src/**/*.json</inputGlob>
                         <inputGlob>src/test/resources/org/opentripplanner/apis/**/*.graphql</inputGlob>
+                        <!-- Ignore patterns. -->
+                        <inputGlob>!src/test/resources/org/opentripplanner/apis/vectortiles/style.json</inputGlob>
                     </inputGlobs>
                 </configuration>
             </plugin>
