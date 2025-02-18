@@ -189,7 +189,7 @@ public class WalkableAreaBuilderTest {
     var areaGroups = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143840)))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143846)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -198,6 +198,8 @@ public class WalkableAreaBuilderTest {
     var platform = this.osmInfoRepository.findPlatform(area);
     assertTrue(platform.isPresent());
     assertEquals(Set.of("007"), platform.get().references());
+    // test that boarding location for a concave platform is inside the platform area
+    assertTrue(area.getGeometry().intersects(platform.get().geometry()));
   }
 
   @Test
