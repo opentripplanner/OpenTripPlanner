@@ -91,6 +91,11 @@ public abstract sealed class RaptorViaConnection {
 
   public abstract boolean isSameStop();
 
+  /** Return true if the connection uses the street network to transfer from one stop to another. */
+  public final boolean isTransfer() {
+    return !isSameStop();
+  }
+
   /**
    * This method is used to check that all connections are unique/provide an optimal path.
    * The method returns {@code true} if this instance is better or equals to the given other
@@ -125,20 +130,20 @@ public abstract sealed class RaptorViaConnection {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return toString(Integer::toString);
   }
 
-  public String toString(RaptorStopNameResolver stopNameResolver) {
-    var buf = new StringBuilder(stopNameResolver.apply(fromStop));
+  public final String toString(RaptorStopNameResolver stopNameResolver) {
+    var buf = new StringBuilder("(stop ").append(stopNameResolver.apply(fromStop));
     if (transfer() != null) {
-      buf.append("~").append(stopNameResolver.apply(toStop()));
+      buf.append(" ~ ").append(stopNameResolver.apply(toStop()));
     }
     int d = durationInSeconds();
     if (d > RaptorConstants.ZERO) {
-      buf.append(" ").append(DurationUtils.durationToStr(d));
+      buf.append(", ").append(DurationUtils.durationToStr(d));
     }
-    return buf.toString();
+    return buf.append(')').toString();
   }
 
   private static final class RaptorViaStopConnection extends RaptorViaConnection {

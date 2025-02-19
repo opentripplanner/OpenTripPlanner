@@ -107,7 +107,7 @@ class RaptorRequestMapperTest {
 
     assertTrue(result.searchParams().hasViaLocations());
     assertEquals(
-      "[Via{label: Via A, minWaitTime: 13m, connections: [0 13m]}]",
+      "[Via{label: Via A, minWaitTime: 13m, connections: [(stop 0, 13m)]}]",
       result.searchParams().viaLocations().toString()
     );
   }
@@ -142,7 +142,7 @@ class RaptorRequestMapperTest {
 
     assertFalse(result.searchParams().viaLocations().isEmpty());
     assertEquals(
-      "[Via{label: Via coordinate, minWaitTime: 10m, connections: [47~123 10m10s]}]",
+      "[Via{label: Via coordinate, minWaitTime: 10m, connections: [(stop 47 ~ 123, 10m10s)]}]",
       result.searchParams().viaLocations().toString()
     );
   }
@@ -282,7 +282,7 @@ class RaptorRequestMapperTest {
           assertTrue(result.searchParams().hasViaLocations());
           // One via location exist(no NPE), but it does not allow pass-through
           assertEquals(
-            "Via{label: Via A, connections: [0]}",
+            "Via{label: Via A, connections: [(stop 0)]}",
             result.searchParams().viaLocations().get(0).toString()
           );
         }

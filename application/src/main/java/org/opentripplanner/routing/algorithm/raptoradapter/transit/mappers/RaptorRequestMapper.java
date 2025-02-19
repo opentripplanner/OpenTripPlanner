@@ -238,9 +238,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
   private RaptorViaLocation mapViaLocation(ViaLocation input) {
     if (input.isPassThroughLocation()) {
-      var builder = RaptorViaLocation.allowPassThrough(input.label());
+      var builder = RaptorViaLocation.passThrough(input.label());
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
-        builder.addViaStop(stopIndex);
+        builder.addPassThroughStop(stopIndex);
       }
       return builder.build();
     }
