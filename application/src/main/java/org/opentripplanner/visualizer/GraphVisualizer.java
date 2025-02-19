@@ -1432,7 +1432,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       stateListModel.addElement("weightdelta:" + st.getWeightDelta());
       stateListModel.addElement("rentingVehicle:" + st.isRentingVehicle());
       stateListModel.addElement("vehicleParked:" + st.isVehicleParked());
-      stateListModel.addElement("walkDistance:" + st.getTraversalDistanceMeters());
+      stateListModel.addElement("traversalDistance:" + st.getTraversalDistanceMeters());
       stateListModel.addElement("elapsedTime:" + st.getElapsedTimeSeconds());
       outputList.setModel(stateListModel);
 
