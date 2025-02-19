@@ -3,9 +3,11 @@ package org.opentripplanner.standalone.configure;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -63,7 +65,8 @@ public class LoadApplication {
       obj.issueSummary,
       obj.emissionsDataModel,
       obj.stopConsolidationRepository,
-      obj.streetLimitationParameters
+      obj.streetLimitationParameters,
+      obj.fareService
     );
   }
 
@@ -78,7 +81,8 @@ public class LoadApplication {
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
       factory.emptyStopConsolidationRepository(),
-      factory.emptyStreetLimitationParameters()
+      factory.emptyStreetLimitationParameters(),
+      new DefaultFareService()
     );
   }
 
@@ -102,7 +106,8 @@ public class LoadApplication {
     DataImportIssueSummary issueSummary,
     @Nullable EmissionsDataModel emissionsDataModel,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters
+    StreetLimitationParameters streetLimitationParameters,
+    FareService fareService
   ) {
     return new ConstructApplication(
       cli,
@@ -116,7 +121,8 @@ public class LoadApplication {
       emissionsDataModel,
       parkingRepository,
       stopConsolidationRepository,
-      streetLimitationParameters
+      streetLimitationParameters,
+      fareService
     );
   }
 }

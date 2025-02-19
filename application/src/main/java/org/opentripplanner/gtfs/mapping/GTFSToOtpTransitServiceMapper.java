@@ -138,12 +138,11 @@ public class GTFSToOtpTransitServiceMapper {
     return builder;
   }
 
-  public FareRulesData getFareRulesService() {
+  public FareRulesData fareRulesData() {
     return fareRulesBuilder;
   }
 
   public void mapStopTripAndRouteDataIntoBuilder() {
-    var siteRepository = builder.siteRepository();
     translationHelper.importTranslations(data.getAllTranslations(), data.getAllFeedInfos());
 
     builder.getAgenciesById().addAll(agencyMapper.map(data.getAllAgencies()));

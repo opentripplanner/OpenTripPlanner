@@ -159,7 +159,15 @@ public class OTPMain {
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
         app.emissionsDataModel(),
         app.stopConsolidationRepository(),
-        app.streetLimitationParameters()
+        app.streetLimitationParameters(),
+        // this is an old pattern that is from much earlier days of OTP: the fare service factory
+        // is a builder that gathers all the fare data during the graph build.
+        // at the very end of the build process we then make an immutable fare service out of that
+        // which we serialize into the graph.
+        // this is totally against how OTP is structured nowadays: the right way to solve it is
+        // to move the builder into the OtpTransitServiceBuilder and create the service with the
+        // rest of the transit data.
+        app.buildConfig().fareServiceFactory.makeFareService()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator

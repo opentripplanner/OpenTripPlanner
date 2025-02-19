@@ -24,6 +24,9 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -212,11 +215,14 @@ public abstract class GtfsTest {
       )
     );
 
+    var fareServiceFactory = new DefaultFareServiceFactory();
     GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
       gtfsBundleList,
       timetableRepository,
       graph,
-      ServiceDateInterval.unbounded()
+      DataImportIssueStore.NOOP,
+      ServiceDateInterval.unbounded(),
+      fareServiceFactory
     );
 
     gtfsGraphBuilderImpl.buildGraph();
@@ -254,6 +260,12 @@ public abstract class GtfsTest {
       alertsUpdateHandler.update(feedMessage, null);
     } catch (FileNotFoundException exception) {}
     serverContext =
-      TestServerContext.createServerContext(graph, timetableRepository, snapshotManager, null);
+      TestServerContext.createServerContext(
+        graph,
+        timetableRepository,
+        new DefaultFareService(),
+        snapshotManager,
+        null
+      );
   }
 }

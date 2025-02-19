@@ -17,6 +17,7 @@ import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServ
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -107,6 +108,8 @@ public interface ConstructApplicationFactory {
   @Nullable
   LuceneIndex luceneIndex();
 
+  FareService fareService();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -140,6 +143,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
+
+    @BindsInstance
+    Builder fareService(FareService fareService);
 
     ConstructApplicationFactory build();
   }

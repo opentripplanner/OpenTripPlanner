@@ -33,7 +33,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -103,22 +102,6 @@ public class GtfsModule implements GraphBuilderModule {
     this.fareServiceFactory = fareServiceFactory;
   }
 
-  public GtfsModule(
-    List<GtfsBundle> bundles,
-    TimetableRepository timetableRepository,
-    Graph graph,
-    ServiceDateInterval transitPeriodLimit
-  ) {
-    this(
-      bundles,
-      timetableRepository,
-      graph,
-      DataImportIssueStore.NOOP,
-      transitPeriodLimit,
-      new DefaultFareServiceFactory()
-    );
-  }
-
   @Override
   public void buildGraph() {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -147,7 +130,7 @@ public class GtfsModule implements GraphBuilderModule {
         mapper.mapStopTripAndRouteDataIntoBuilder();
 
         OtpTransitServiceBuilder builder = mapper.getBuilder();
-        var fareRulesService = mapper.getFareRulesService();
+        var fareRulesData = mapper.fareRulesData();
 
         builder.limitServiceDays(transitPeriodLimit);
 
@@ -200,8 +183,7 @@ public class GtfsModule implements GraphBuilderModule {
             .run(otpTransitService.getTripPatterns());
         }
 
-        fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
-        graph.setFareService(fareServiceFactory.makeFareService());
+        fareServiceFactory.processGtfs(fareRulesData, otpTransitService);
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
