@@ -208,6 +208,12 @@
   <xsl:template match="ojp:ThisCall">
     <ThisCall>
       <xsl:apply-templates select="ojp:CallAtStop"/>
+      <xsl:if test="ojp:WalkDuration">
+        <WalkDuration><xsl:value-of select="ojp:WalkDuration"/></WalkDuration>
+      </xsl:if>
+      <xsl:if test="ojp:WalkDistance">
+        <WalkDistance><xsl:value-of select="ojp:WalkDistance"/></WalkDistance>
+      </xsl:if>
     </ThisCall>
   </xsl:template>
   <!--*********************************************-->
