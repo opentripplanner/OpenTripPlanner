@@ -41,13 +41,13 @@
           "name": "include_onward_calls",
           "label": "IncludeOnwardCalls",
           "type": "boolean",
-          "default": true
+          "default": false
         },
         {
           "name": "include_realtime_data",
           "label": "IncludeRealtimeData",
           "type": "boolean",
-          "default": true
+          "default": false
         }
       ]
     },
@@ -91,13 +91,13 @@
           "name": "include_previous_calls",
           "label": "IncludePreviousCalls",
           "type": "boolean",
-          "default": true
+          "default": false
         },
         {
           "name": "include_onward_calls",
           "label": "IncludeOnwardCalls",
           "type": "boolean",
-          "default": true
+          "default": false
         },
         {
           "name": "include_realtime_data",

@@ -41,21 +41,21 @@
               </xsl:element>
               <Location>
                 <PlaceRef>
-                    <xsl:if test="//trias:StopPointRef">
-                      <xsl:element name="siri:StopPointRef">
-                        <xsl:value-of select="//trias:StopPointRef"/>
+                  <xsl:if test="//trias:StopPointRef">
+                    <xsl:element name="siri:StopPointRef">
+                      <xsl:value-of select="//trias:StopPointRef"/>
+                    </xsl:element>
+                  </xsl:if>
+                  <xsl:if test="//trias:GeoPosition">
+                    <GeoPosition>
+                      <xsl:element name="siri:Latitude">
+                        <xsl:value-of select="//trias:Latitude"/>
                       </xsl:element>
-                    </xsl:if>
-                    <xsl:if test="//trias:GeoPosition">
-                      <GeoPosition>
-                        <xsl:element name="siri:Latitude">
-                          <xsl:value-of select="//trias:Latitude"/>
-                        </xsl:element>
-                        <xsl:element name="siri:Longitude">
-                          <xsl:value-of select="//trias:Longitude"/>
-                        </xsl:element>
-                      </GeoPosition>
-                    </xsl:if >
+                      <xsl:element name="siri:Longitude">
+                        <xsl:value-of select="//trias:Longitude"/>
+                      </xsl:element>
+                    </GeoPosition>
+                  </xsl:if >
                 </PlaceRef>
                 <xsl:if test="//trias:DepArrTime">
                   <xsl:element name="DepArrTime">
@@ -87,6 +87,11 @@
                 <xsl:if test="//trias:IncludeRealtimeData">
                   <xsl:element name="IncludeRealtimeData">
                     <xsl:value-of select="//trias:IncludeRealtimeData"/>
+                  </xsl:element>
+                </xsl:if>
+                <xsl:if test="//trias:TimeWindow">
+                  <xsl:element name="TimeWindow">
+                    <xsl:value-of select="//trias:TimeWindow"/>
                   </xsl:element>
                 </xsl:if>
               </Params>
