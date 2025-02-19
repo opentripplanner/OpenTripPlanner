@@ -387,11 +387,8 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
-   * Returns the alert service. If {@link TimetableRepository#setUpdaterManager(GraphUpdaterManager)}
-   * has not been called, then this returns an empty instance.
-   * <p>
-   * After each call to {@link TimetableRepository#setUpdaterManager(GraphUpdaterManager)} the
-   * {@code transitAlertService} is re-instantiated.
+   * Returns the alert service. If no updaters are configured an empty instance is returned.
+   * See  {@link TimetableRepository#setUpdaterManager(GraphUpdaterManager)}.
    */
   public TransitAlertService getTransitAlertService() {
     if (transitAlertService == null) {
