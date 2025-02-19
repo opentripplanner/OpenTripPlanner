@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
+import org.opentripplanner.ext.vdv.CallAtStop;
 import org.opentripplanner.ext.vdv.id.IdResolver;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
@@ -63,13 +64,13 @@ public class StopEventResponseMapper {
   }
 
   public OJP mapStopTimesInPattern(
-    List<TripTimeOnDate> tripTimesOnDate,
+    List<CallAtStop> tripTimesOnDate,
     ZonedDateTime timestamp,
     Set<OptionalFeature> optionalFeatures
   ) {
     List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
       .stream()
-      .map(r -> this.stopEventResult(r, optionalFeatures))
+      .map(call -> this.stopEventResult(call, optionalFeatures))
       .map(StopEventResponseMapper::jaxbElement)
       .toList();
 
@@ -84,24 +85,29 @@ public class StopEventResponseMapper {
     return new OJP().withOJPResponse(response);
   }
 
-  private StopEventResultStructure stopEventResult(
-    TripTimeOnDate tripTimeOnDate,
-    Set<OptionalFeature> features
-  ) {
-    var call = new CallAtNearStopStructure().withCallAtStop(callAtStop(tripTimeOnDate));
+  private StopEventResultStructure stopEventResult(CallAtStop call, Set<OptionalFeature> features) {
+    var callAtNearStop = new CallAtNearStopStructure()
+      .withCallAtStop(callAtStop(call.tripTimeOnDate()))
+      .withWalkDuration(call.walkTime());
 
     var stopEvent = new StopEventStructure()
-      .withThisCall(call)
-      .withService(datedJourney(tripTimeOnDate));
+      .withThisCall(callAtNearStop)
+      .withService(datedJourney(call.tripTimeOnDate()));
     if (features.contains(OptionalFeature.PREVIOUS_CALLS)) {
-      tripTimeOnDate
+      call
+        .tripTimeOnDate()
         .previousTimes()
         .forEach(previous -> stopEvent.withPreviousCall(callAtNearStop(previous)));
     }
     if (features.contains(OptionalFeature.ONWARD_CALLS)) {
-      tripTimeOnDate.nextTimes().forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
+      call
+        .tripTimeOnDate()
+        .nextTimes()
+        .forEach(next -> stopEvent.withOnwardCall(callAtNearStop(next)));
     }
-    return new StopEventResultStructure().withStopEvent(stopEvent).withId(eventId(tripTimeOnDate));
+    return new StopEventResultStructure()
+      .withStopEvent(stopEvent)
+      .withId(eventId(call.tripTimeOnDate()));
   }
 
   private String eventId(TripTimeOnDate tripTimeOnDate) {

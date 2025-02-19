@@ -6,8 +6,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.model.StopTimesInPattern;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceType;
@@ -26,11 +24,8 @@ public class VdvService {
     this.finder = finder;
   }
 
-  public List<TripTimeOnDate> findTripTimesOnDate(
-    FeedScopedId stopId,
-    Instant time,
-    int numResults
-  ) throws EntityNotFoundException {
+  public List<CallAtStop> findTripTimesOnDate(FeedScopedId stopId, Instant time, int numResults)
+    throws EntityNotFoundException {
     var stop = transitService.getRegularStop(stopId);
     if (stop == null) {
       throw new EntityNotFoundException("StopPlace", stopId);
@@ -46,53 +41,42 @@ public class VdvService {
       )
       .stream()
       .flatMap(st -> st.times.stream())
+      .map(CallAtStop::noWalking)
       .toList();
 
     return sort(numResults, stopTimesInPatterns);
   }
 
-  public List<TripTimeOnDate> findTripTimesOnDate(
+  public List<CallAtStop> findTripTimesOnDate(
     WgsCoordinate coordinate,
     Instant time,
     int numResults
   ) {
     var tripTimesOnDate = finder
-      .findClosestPlaces(
-        coordinate.latitude(),
-        coordinate.longitude(),
-        1000,
-        100,
-        null,
-        List.of(PlaceType.PATTERN_AT_STOP),
-        null,
-        null,
-        null,
-        null,
-        null,
-        transitService
-      )
+      .findClosestStops(coordinate.asJtsCoordinate(), 1000)
       .stream()
-      .flatMap(p -> {
-        if (p.place() instanceof PatternAtStop stopTimesInPattern) {
-          return stopTimesInPattern
-            .getStoptimes(transitService, time, Duration.ofHours(2), 10, ArrivalDeparture.BOTH)
-            .stream();
-        } else {
-          return Stream.empty();
-        }
-      })
+      .flatMap(nearbyStop ->
+        transitService
+          .findStopTimesInPattern(
+            nearbyStop.stop,
+            time.plus(nearbyStop.duration()),
+            Duration.ofHours(2),
+            10,
+            ArrivalDeparture.BOTH,
+            true
+          )
+          .stream()
+          .flatMap(tt -> tt.times.stream().map(t -> new CallAtStop(t, nearbyStop.duration())))
+      )
       .toList();
 
     return sort(numResults, tripTimesOnDate);
   }
 
-  private static List<TripTimeOnDate> sort(
-    int numResults,
-    List<TripTimeOnDate> stopTimesInPatterns
-  ) {
+  private static List<CallAtStop> sort(int numResults, List<CallAtStop> stopTimesInPatterns) {
     return stopTimesInPatterns
       .stream()
-      .sorted(Comparator.comparingLong(TripTimeOnDate::getRealtimeDeparture))
+      .sorted(Comparator.comparing(tt -> tt.tripTimeOnDate().departure()))
       .limit(numResults)
       .toList();
   }
