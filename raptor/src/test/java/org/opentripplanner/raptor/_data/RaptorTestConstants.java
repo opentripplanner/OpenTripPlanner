@@ -84,4 +84,9 @@ public interface RaptorTestConstants {
   static String stopIndexToName(int index) {
     return Character.toString('A' + index - 1);
   }
+
+  static int stopNameToIndex(String name) {
+    char ch = name.startsWith("STOP_") ? name.charAt(5) : name.charAt(0);
+    return (int) (ch - 'A' + 1);
+  }
 }

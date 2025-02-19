@@ -1,13 +1,16 @@
 package org.opentripplanner.raptor._data.transit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable<TestTripSchedule> {
@@ -31,6 +34,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
   public static TestRoute route(String name, int... stopIndexes) {
     return route(TestTripPattern.pattern(name, stopIndexes));
+  }
+
+  public static Builder route(String name) {
+    return new Builder(name);
   }
 
   /* RaptorRoute */
@@ -87,6 +94,15 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     return this;
   }
 
+  public TestRoute withTimetable(String timetable) {
+    Arrays
+      .stream(timetable.split("\\n"))
+      .filter(StringUtils::hasValue)
+      .map(s -> TestTripSchedule.schedule(s).pattern(pattern).build())
+      .forEach(schedules::add);
+    return this;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
@@ -139,6 +155,39 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
             constraint
           );
       }
+    }
+  }
+
+  public static final class Builder {
+
+    private String name;
+
+    public Builder(String name) {
+      this.name = name;
+    }
+
+    /**
+     * Create a route with the given stop-pattern and schedule parsing the given {@code timetable}.
+     * The format of the timetable is:
+     * <pre>
+     *   A      B      C      F
+     * 10:00  10:20  10:25  10:45
+     * 11:00  11:20  11:25  11:45
+     * 12:00  12:20  12:25  12:45
+     * </pre>
+     * This will create a timetable with for stops(A, B, C, & F) and 3 scheduled trips. The
+     * {@link RaptorTestConstants#stopNameToIndex(String)} is used to resolve the stop index
+     * for each of the named stops A, B, C & F. The first line must contain the stop names(A-Z),
+     * and the each extra line is the trips. Extra white-space and empty lines are ignored.
+     */
+    public TestRoute timetable(String timetable) {
+      timetable = timetable.trim();
+      int end = timetable.indexOf('\n');
+      var stopIndexes = Arrays
+        .stream(timetable.substring(0, end).split("\\s+"))
+        .mapToInt(RaptorTestConstants::stopNameToIndex)
+        .toArray();
+      return route(name, stopIndexes).withTimetable(timetable.substring(end + 1));
     }
   }
 }

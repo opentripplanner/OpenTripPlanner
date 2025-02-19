@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
@@ -16,6 +17,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ViaConnectionStopArrivalEventListener;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
@@ -49,6 +51,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   private Heuristics heuristics;
   private McStopArrivals<T> arrivals;
   private McStopArrivals<T> nextLegArrivals = null;
+  private McStopArrivalFactory<T> stopArrivalFactory = null;
 
   public McRangeRaptorConfig(
     SearchContextViaLeg<T> contextLeg,
@@ -109,10 +112,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         new McStopArrivals<>(
           context().nStops(),
           contextLeg.egressPaths(),
-          contextLeg.viaConnections(),
+          createViaConnectionListeners(),
           createDestinationArrivalPaths(),
-          nextLegArrivals,
-          createStopArrivalFactory(),
           createFactoryParetoComparator(),
           context().debugFactory()
         );
@@ -169,7 +170,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private McStopArrivalFactory<T> createStopArrivalFactory() {
-    return includeC2() ? new StopArrivalFactoryC2<>() : new StopArrivalFactoryC1<>();
+    if (stopArrivalFactory == null) {
+      this.stopArrivalFactory =
+        includeC2() ? new StopArrivalFactoryC2<>() : new StopArrivalFactoryC1<>();
+    }
+    return stopArrivalFactory;
   }
 
   private SearchContext<T> context() {
@@ -206,6 +211,15 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private ArrivalParetoSetComparatorFactory<McStopArrival<T>> createFactoryParetoComparator() {
     return ArrivalParetoSetComparatorFactory.factory(mcRequest().relaxC1(), dominanceFunctionC2());
+  }
+
+  private List<ViaConnectionStopArrivalEventListener<T>> createViaConnectionListeners() {
+    return ViaConnectionStopArrivalEventListener.createEventListners(
+      contextLeg.viaConnections(),
+      createStopArrivalFactory(),
+      nextLegArrivals,
+      context().lifeCycle()::onTransfersForRoundComplete
+    );
   }
 
   private MultiCriteriaRequest<T> mcRequest() {

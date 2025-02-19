@@ -250,11 +250,14 @@ class J02_ViaStopSearchTest {
     // The second one includes the second via point.
     // Both arrive at the desired destination, so normally there should not be any transfers.
     data.withRoutes(
-      route("R2", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-        .withTimetable(
-          schedule("0:02 0:05 0:10 0:15 0:20 0:25"),
-          schedule("0:12 0:15 0:20 0:25 0:30 0:35"),
-          schedule("0:22 0:25 0:30 0:35 0:40 0:45")
+      route("R2")
+        .timetable(
+          """
+        A    B    C    D    E    F
+        0:02 0:05 0:10 0:15 0:20 0:25
+        0:12 0:15 0:20 0:25 0:30 0:35
+        0:22 0:25 0:30 0:35 0:40 0:45
+        """
         )
     );
 
