@@ -6,6 +6,7 @@ import de.vdv.ojp20.siri.AbstractFunctionalServiceRequestStructure;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -19,6 +20,7 @@ import java.io.Writer;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import javax.xml.transform.TransformerException;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.id.HideFeedIdResolver;
@@ -138,10 +140,14 @@ public class TriasResource {
   }
 
   @GET
-  @Path("/static/stop_event.xml")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Response stopEventXml() throws IOException {
-    return classpathResource("stop_event.xml");
+  @Path("/static/{fileName}")
+  @Produces(MediaType.APPLICATION_XML)
+  public Response stopEventXml(@PathParam("fileName") String fileName) throws IOException {
+    var allowed = Set.of("stop-event-coordinates.xml", "stop_event.xml");
+    if (!allowed.contains(fileName)) {
+      return classpathResource(fileName);
+    }
+    return classpathResource(fileName);
   }
 
   private static Response classpathResource(String name) throws IOException {

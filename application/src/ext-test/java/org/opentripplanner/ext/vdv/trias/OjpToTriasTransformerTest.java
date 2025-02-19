@@ -13,6 +13,8 @@ import java.io.StringWriter;
 import java.time.ZonedDateTime;
 import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
 import org.opentripplanner.test.support.ResourceLoader;
 
@@ -21,12 +23,13 @@ class OjpToTriasTransformerTest {
   private static final ResourceLoader LOADER = ResourceLoader.of(OjpToTriasTransformerTest.class);
   private static final ZonedDateTime ZDT = ZonedDateTime.parse("2025-02-17T14:24:02+01:00");
 
-  @Test
-  void stopEventRequest() throws JAXBException, TransformerException {
-    var triasReq = LOADER.fileToString("stop-event-request.xml");
+  @ParameterizedTest
+  @ValueSource(strings = { "stop-event-request.xml", "stop-event-request-coordinates.xml" })
+  void stopEventRequest(String name) throws JAXBException, TransformerException {
+    var triasReq = LOADER.fileToString(name);
     var transformed = OjpToTriasTransformer.triasToOjp(triasReq);
     var actual = toString(transformed);
-    var file = LOADER.extTestResourceFile("../ojp/stop-event-request.xml");
+    var file = LOADER.extTestResourceFile("../ojp/" + name);
     var original = readFile(file);
     writeFile(file, actual);
     assertFileEquals(original, file);

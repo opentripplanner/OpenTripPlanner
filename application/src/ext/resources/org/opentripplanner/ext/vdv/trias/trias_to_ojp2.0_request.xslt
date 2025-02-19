@@ -15,6 +15,11 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+  <xsl:template match="trias:GeoPosition">
+    <GeoPosition>
+      <xsl:value-of select="."/>
+    </GeoPosition>
+  </xsl:template>
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
   <xsl:template match="trias:Trias">
     <OJP xmlns="http://www.vdv.de/ojp" xmlns:siri="http://www.siri.org.uk/siri" version="2.0"
@@ -36,22 +41,21 @@
               </xsl:element>
               <Location>
                 <PlaceRef>
-                  <xsl:choose>
-                    <xsl:when test="//trias:StopPointRef">
+                    <xsl:if test="//trias:StopPointRef">
                       <xsl:element name="siri:StopPointRef">
                         <xsl:value-of select="//trias:StopPointRef"/>
                       </xsl:element>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:message terminate="yes">Error: The condition is not met.</xsl:message>
-                      <!-- also handling coordinates, StopPlace etc -->
-                    </xsl:otherwise>
-                  </xsl:choose>
-                  <Name>
-                    <xsl:element name="Text">
-                      <xsl:text>Will be ignored</xsl:text>
-                    </xsl:element>
-                  </Name>
+                    </xsl:if>
+                    <xsl:if test="//trias:GeoPosition">
+                      <GeoPosition>
+                        <xsl:element name="siri:Latitude">
+                          <xsl:value-of select="//trias:Latitude"/>
+                        </xsl:element>
+                        <xsl:element name="siri:Longitude">
+                          <xsl:value-of select="//trias:Longitude"/>
+                        </xsl:element>
+                      </GeoPosition>
+                    </xsl:if >
                 </PlaceRef>
                 <xsl:if test="//trias:DepArrTime">
                   <xsl:element name="DepArrTime">
