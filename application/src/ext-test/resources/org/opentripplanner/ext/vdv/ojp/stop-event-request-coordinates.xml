@@ -9,7 +9,10 @@
                 <siri:MessageIdentifier>mymessage-1</siri:MessageIdentifier>
                 <ojp:Location>
                     <ojp:PlaceRef>
-                        <siri:StopPointRef>8507000</siri:StopPointRef>
+                        <ojp:GeoPosition>
+                            <siri:Longitude>12.1231</siri:Longitude>
+                            <siri:Latitude>53.2323</siri:Latitude>
+                        </ojp:GeoPosition>
                     </ojp:PlaceRef>
                     <ojp:DepArrTime>2025-02-13T13:03:36</ojp:DepArrTime>
                 </ojp:Location>
