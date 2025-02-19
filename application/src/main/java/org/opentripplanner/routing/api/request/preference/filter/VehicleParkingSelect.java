@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference.filter;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
@@ -19,7 +20,23 @@ public sealed interface VehicleParkingSelect {
    */
   boolean isEmpty();
 
-  record TagsSelect(Set<String> tags) implements VehicleParkingSelect {
+  /**
+   * Get the tags from the select. Is not meant for checking for matches.
+   */
+  List<String> tags();
+
+  final class TagsSelect implements VehicleParkingSelect {
+
+    private final Set<String> tags;
+
+    public TagsSelect(Set<String> tags) {
+      this.tags = tags;
+    }
+
+    public List<String> tags() {
+      return tags.stream().toList();
+    }
+
     @Override
     public boolean matches(VehicleParking p) {
       return !Collections.disjoint(tags, p.getTags());

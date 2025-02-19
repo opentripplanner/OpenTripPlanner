@@ -132,6 +132,7 @@ public class SpeedTest {
         null,
         null,
         null,
+        null,
         null
       );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now

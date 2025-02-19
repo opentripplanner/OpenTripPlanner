@@ -436,6 +436,7 @@ class GraphQLIntegrationTest {
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
 
+    var routeRequest = new RouteRequest();
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
@@ -444,8 +445,9 @@ class GraphQLIntegrationTest {
         defaultVehicleRentalService,
         new DefaultVehicleParkingService(parkingRepository),
         realtimeVehicleService,
+        SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
         finder,
-        new RouteRequest()
+        routeRequest
       );
   }
 
