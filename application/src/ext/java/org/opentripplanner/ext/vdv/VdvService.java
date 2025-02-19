@@ -9,6 +9,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
@@ -34,14 +35,18 @@ public class VdvService {
     if (stop == null) {
       throw new EntityNotFoundException("StopPlace", stopId);
     }
-    List<StopTimesInPattern> stopTimesInPatterns = transitService.findStopTimesInPattern(
-      stop,
-      time.atZone(transitService.getTimeZone()).toInstant(),
-      Duration.ofHours(2),
-      10,
-      ArrivalDeparture.BOTH,
-      true
-    );
+    var stopTimesInPatterns = transitService
+      .findStopTimesInPattern(
+        stop,
+        time.atZone(transitService.getTimeZone()).toInstant(),
+        Duration.ofHours(2),
+        10,
+        ArrivalDeparture.BOTH,
+        true
+      )
+      .stream()
+      .flatMap(st -> st.times.stream())
+      .toList();
 
     return sort(numResults, stopTimesInPatterns);
   }
@@ -68,8 +73,10 @@ public class VdvService {
       )
       .stream()
       .flatMap(p -> {
-        if (p.place() instanceof StopTimesInPattern stopTimesInPattern) {
-          return Stream.of(stopTimesInPattern);
+        if (p.place() instanceof PatternAtStop stopTimesInPattern) {
+          return stopTimesInPattern
+            .getStoptimes(transitService, time, Duration.ofHours(2), 10, ArrivalDeparture.BOTH)
+            .stream();
         } else {
           return Stream.empty();
         }
@@ -81,11 +88,10 @@ public class VdvService {
 
   private static List<TripTimeOnDate> sort(
     int numResults,
-    List<StopTimesInPattern> stopTimesInPatterns
+    List<TripTimeOnDate> stopTimesInPatterns
   ) {
     return stopTimesInPatterns
       .stream()
-      .flatMap(st -> st.times.stream())
       .sorted(Comparator.comparingLong(TripTimeOnDate::getRealtimeDeparture))
       .limit(numResults)
       .toList();
