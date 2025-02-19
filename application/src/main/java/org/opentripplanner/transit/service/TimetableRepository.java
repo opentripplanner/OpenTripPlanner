@@ -525,11 +525,12 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
-   * Sets the updater manager for this repository.
+   * Sets the updater manager for this repository and makes sure the configured updaters
+   * are correctly applied to {@code transitAlertService}.
    * <p>
-   * Note: this also resets the {@code transitAlertService} so that the next call to
-   * {@link TimetableRepository#getTransitAlertService()} will then create a new instance
-   * of it.
+   * Note: before this method is called an empty {@code transitAlertService} is returned instead.
+   * <p>
+   * This logic is unfortunate and quite brittle. We would like to improve it in the future.
    */
   public void setUpdaterManager(GraphUpdaterManager updaterManager) {
     this.updaterManager = updaterManager;
