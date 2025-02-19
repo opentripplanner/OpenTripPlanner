@@ -103,7 +103,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   @Override
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
-    double distance = state.getWalkDistance();
+    double distance = state.getTraversalDistanceMeters();
     if (vertex instanceof TransitStopVertex transitVertex) {
       RegularStop stop = transitVertex.getStop();
       handleStop(stop, distance);
@@ -141,7 +141,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
         }
       }
 
-      return current.getWalkDistance() > furthestDistance;
+      return current.getTraversalDistanceMeters() > furthestDistance;
     };
   }
 

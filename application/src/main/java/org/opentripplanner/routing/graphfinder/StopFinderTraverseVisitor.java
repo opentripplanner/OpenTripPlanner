@@ -50,6 +50,6 @@ public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
    * reached.
    */
   public SkipEdgeStrategy<State, Edge> getSkipEdgeStrategy() {
-    return (current, edge) -> current.getWalkDistance() > radiusMeters;
+    return (current, edge) -> current.getTraversalDistanceMeters() > radiusMeters;
   }
 }

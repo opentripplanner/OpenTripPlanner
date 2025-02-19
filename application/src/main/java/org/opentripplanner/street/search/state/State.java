@@ -46,10 +46,8 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   /* StateData contains data which is unlikely to change as often */
   public StateData stateData;
 
-  // how far have we walked
-  // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
-  // we should DEFINITELY rename this variable and the associated methods.
-  public double walkDistance;
+  // how far have we traversed through the graph
+  public double traversalDistance_m;
 
   /* CONSTRUCTORS */
 
@@ -75,7 +73,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       this.stateData.noRentalDropOffZonesAtStartOfReverseSearch =
         vertex.rentalRestrictions().noDropOffNetworks();
     }
-    this.walkDistance = 0;
+    this.traversalDistance_m = 0;
     this.time_ms = startTime.toEpochMilli();
   }
 
@@ -272,8 +270,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return stateData.rentalVehicleFormFactor;
   }
 
-  public double getWalkDistance() {
-    return walkDistance;
+  /**
+   * Return how far this state has traversed through the graph, in meters.
+   */
+  public double getTraversalDistanceMeters() {
+    return traversalDistance_m;
   }
 
   public Vertex getVertex() {
@@ -381,7 +382,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
       editor.incrementTimeInMilliseconds(orig.getAbsTimeDeltaMilliseconds());
       editor.incrementWeight(orig.getWeightDelta());
-      editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+      editor.incrementTraversalDistanceMeters(orig.getWalkDistanceDeltaMeters());
 
       // propagate the modes through to the reversed edge
       editor.setBackMode(orig.getBackMode());
@@ -517,9 +518,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return Math.abs(getTimeDeltaMilliseconds());
   }
 
-  private double getWalkDistanceDelta() {
+  private double getWalkDistanceDeltaMeters() {
     if (backState != null) {
-      return Math.abs(this.walkDistance - backState.walkDistance);
+      return Math.abs(this.traversalDistance_m - backState.traversalDistance_m);
     } else {
       return 0.0;
     }

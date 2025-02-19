@@ -1231,7 +1231,7 @@ public class StreetEdge
       }
 
       if (!traverseMode.isInCar()) {
-        s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
+        s1.incrementTraversalDistanceMeters(turnDuration / 100); // just a tie-breaker
       }
 
       time_ms += (long) Math.ceil(1000.0 * turnDuration);
@@ -1239,7 +1239,7 @@ public class StreetEdge
     }
 
     if (!traverseMode.isInCar()) {
-      s1.incrementWalkDistance(getDistanceWithElevation());
+      s1.incrementTraversalDistanceMeters(getDistanceWithElevation());
     }
 
     if (costExtension != null) {

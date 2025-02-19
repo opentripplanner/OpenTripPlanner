@@ -37,7 +37,7 @@ public class EscalatorEdge extends Edge {
       }
       s1.incrementWeight(s0.getPreferences().walk().escalator().reluctance() * time);
       s1.incrementTimeInSeconds((long) time);
-      s1.incrementWalkDistance(getDistanceMeters());
+      s1.incrementTraversalDistanceMeters(getDistanceMeters());
       return s1.makeStateArray();
     } else return State.empty();
   }
