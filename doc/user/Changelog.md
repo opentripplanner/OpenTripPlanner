@@ -101,6 +101,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Release script for downstream OTP forks [#6345](https://github.com/opentripplanner/OpenTripPlanner/pull/6345)
 - Restore debug raster tiles as a sandbox feature, and add safety and vertex elevation text debug layers [#6454](https://github.com/opentripplanner/OpenTripPlanner/pull/6454)
 - Enhanced street graph processing of OSM areas [#6463](https://github.com/opentripplanner/OpenTripPlanner/pull/6463)
+- Clarify description of France report [ci skip] [#6471](https://github.com/opentripplanner/OpenTripPlanner/pull/6471)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
