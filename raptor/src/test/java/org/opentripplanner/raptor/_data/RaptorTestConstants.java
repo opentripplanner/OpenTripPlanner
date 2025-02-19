@@ -81,7 +81,7 @@ public interface RaptorTestConstants {
   int ONE_RIDE = 1;
   int TWO_RIDES = 2;
 
-  default String stopIndexToName(int index) {
+  static String stopIndexToName(int index) {
     return Character.toString('A' + index - 1);
   }
 }
