@@ -30,6 +30,7 @@ import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
 import org.opentripplanner.ext.vdv.ojp.OjpService;
 import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
@@ -82,7 +83,7 @@ public class TriasResource {
           "Request type '%s' is not supported".formatted(request.getClass().getSimpleName())
         );
       }
-    } catch (EntityNotFoundException e) {
+    } catch (EntityNotFoundException | RoutingValidationException e) {
       return error(e.getMessage());
     } catch (JAXBException | TransformerException e) {
       LOG.error("Error reading TRIAS request", e);
