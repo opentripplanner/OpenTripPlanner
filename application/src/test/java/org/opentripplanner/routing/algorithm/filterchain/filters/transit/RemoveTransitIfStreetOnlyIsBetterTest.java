@@ -70,6 +70,62 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
     assertEquals(subscribeResult, OptionalInt.of(bicycle.getGeneralizedCost()));
   }
 
+  @Test
+  void filterAwayLongTravelTimeWithoutWaitTimeWithCursorInfoAndDirectItinerary() {
+    // Given: a bicycle itinerary with low cost - transit with clearly higher cost are removed
+    Itinerary bicycle = newItinerary(A).bicycle(6, 8, E).build();
+    bicycle.setGeneralizedCost(200);
+
+    // transit with almost equal cost should not be dropped
+    Itinerary i1 = newItinerary(A).bus(21, 6, 8, E).build();
+    i1.setGeneralizedCost(220);
+
+    // transit with considerably higher cost will be dropped
+    Itinerary i2 = newItinerary(A).bus(31, 6, 8, E).build();
+    i2.setGeneralizedCost(360);
+
+    // When:
+    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
+      CostLinearFunction.of(Duration.ofSeconds(60), 1.2),
+      // This generalized cost that usually comes from the cursor should be used because it is lower
+      // than the lowest generalized cost of the direct itineraries.
+      OptionalInt.of(199),
+      it -> subscribeResult = it
+    );
+    List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, bicycle, i1));
+
+    // Then:
+    assertEquals(toStr(List.of(bicycle, i1)), toStr(result));
+    // The lowest generalized cost value should be saved
+    assertEquals(subscribeResult, OptionalInt.of(199));
+  }
+
+  @Test
+  void filterAwayLongTravelTimeWithoutWaitTimeWithCursorInfoAndWithoutDirectItinerary() {
+    // transit with almost equal cost should not be dropped
+    Itinerary i1 = newItinerary(A).bus(21, 6, 8, E).build();
+    i1.setGeneralizedCost(220);
+
+    // transit with considerably higher cost will be dropped
+    Itinerary i2 = newItinerary(A).bus(31, 6, 8, E).build();
+    i2.setGeneralizedCost(360);
+
+    // When:
+    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
+      CostLinearFunction.of(Duration.ofSeconds(60), 1.2),
+      // This generalized cost that usually comes from the cursor should be used because it is the
+      // only cost given to the filter because no direct itineraries exist.
+      OptionalInt.of(199),
+      it -> subscribeResult = it
+    );
+    List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, i1));
+
+    // Then:
+    assertEquals(toStr(List.of(i1)), toStr(result));
+    // The lowest generalized cost value should be saved
+    assertEquals(subscribeResult, OptionalInt.of(199));
+  }
+
   @Nested
   class AccessEgressPenalties {
 

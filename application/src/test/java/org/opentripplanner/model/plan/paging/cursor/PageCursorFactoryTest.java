@@ -38,10 +38,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(null, T12_00, null, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, false);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, false, false);
   }
 
   @Test
@@ -56,10 +56,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       );
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true);
+    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, true, false);
   }
 
   @Test
@@ -68,10 +68,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, false);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, false, false);
   }
 
   @Test
@@ -86,10 +86,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       );
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T11_01, null, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T11_01, null, D90M, PREVIOUS_PAGE, true, false);
   }
 
   @Test
@@ -98,10 +98,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(null, T12_00, T13_30, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, false);
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, false, false);
   }
 
   @Test
@@ -116,10 +116,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       );
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE, true, false);
   }
 
   @Test
@@ -128,10 +128,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, false, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, false);
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, false, false);
   }
 
   @Test
@@ -146,10 +146,28 @@ class PageCursorFactoryTest implements PlanTestConstants {
       );
 
     var nextPage = factory.nextPageCursor();
-    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true);
+    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true, false);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, true, false);
+  }
+
+  @Test
+  public void testBestStreetOnlyCost() {
+    var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
+      .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
+      .withPageCursorInput(
+        new TestPageCursorInput(
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
+          OptionalInt.of(123)
+        )
+      );
+
+    var nextPage = factory.nextPageCursor();
+    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true, true);
+
+    var prevPage = factory.previousPageCursor();
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE, true, true);
   }
 
   private static Instant time(String input) {
@@ -166,13 +184,15 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant expLat,
     Duration expSearchWindow,
     PageType expPageType,
-    Boolean hasDedupeParams
+    Boolean hasDedupeParams,
+    Boolean hasBestStreetOnlyCost
   ) {
     assertEquals(expEdt, pageCursor.earliestDepartureTime());
     assertEquals(expLat, pageCursor.latestArrivalTime());
     assertEquals(expSearchWindow, pageCursor.searchWindow());
     assertEquals(expPageType, pageCursor.type());
     assertEquals(hasDedupeParams, pageCursor.itineraryPageCut() != null);
+    assertEquals(hasBestStreetOnlyCost, pageCursor.bestStreetOnlyCost().isPresent());
   }
 
   private record TestPageCursorInput(
