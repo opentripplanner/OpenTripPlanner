@@ -2,6 +2,9 @@ package org.opentripplanner.transit.service;
 
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
+/**
+ * Helper class for filtering TripTimes.
+ */
 public class TripTimesHelper {
 
   /**
