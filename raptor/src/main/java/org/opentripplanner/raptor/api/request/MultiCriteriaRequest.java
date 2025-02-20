@@ -20,22 +20,18 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   @Nullable
   private final RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
 
-  private final List<PassThroughPoint> passThroughPoints;
-
   @Nullable
   private final Double relaxCostAtDestination;
 
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
-    this.passThroughPoints = List.of();
     this.relaxCostAtDestination = null;
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
-    this.passThroughPoints = builder.passThroughPoints();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
   }
 
@@ -68,11 +64,11 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   }
 
   public boolean hasPassThroughPoints() {
-    return !passThroughPoints.isEmpty();
+    throw new UnsupportedOperationException();
   }
 
   public List<PassThroughPoint> passThroughPoints() {
-    return passThroughPoints;
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -106,19 +102,13 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return (
       Objects.equals(relaxC1, that.relaxC1) &&
       Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
-      Objects.equals(passThroughPoints, that.passThroughPoints) &&
       Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-      relaxC1,
-      transitPriorityCalculator,
-      passThroughPoints,
-      relaxCostAtDestination
-    );
+    return Objects.hash(relaxC1, transitPriorityCalculator, relaxCostAtDestination);
   }
 
   @Override
@@ -127,13 +117,8 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       .of(MultiCriteriaRequest.class)
       .addObj("relaxC1", relaxC1, RelaxFunction.NORMAL)
       .addObj("transitPriorityCalculator", transitPriorityCalculator)
-      .addObj("passThroughPoints", passThroughPoints)
       .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .toString();
-  }
-
-  public boolean includeC2() {
-    return hasPassThroughPoints() || transitPriorityCalculator != null;
   }
 
   public static class Builder<T extends RaptorTripSchedule> {
@@ -141,13 +126,11 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
     private RaptorTransitGroupPriorityCalculator transitPriorityCalculator;
-    private List<PassThroughPoint> passThroughPoints;
     private Double relaxCostAtDestination;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
       this.relaxC1 = original.relaxC1;
-      this.passThroughPoints = original.passThroughPoints;
       this.transitPriorityCalculator = original.transitPriorityCalculator;
       this.relaxCostAtDestination = original.relaxCostAtDestination;
     }
@@ -173,14 +156,12 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     }
 
     public List<PassThroughPoint> passThroughPoints() {
-      return passThroughPoints;
+      throw new UnsupportedOperationException();
     }
 
     @Nullable
     public Builder<T> withPassThroughPoints(List<PassThroughPoint> points) {
-      // Prevent setting this to an empty list - here we use null to represent NOT_SET
-      passThroughPoints = (points == null || points.isEmpty()) ? List.of() : points;
-      return this;
+      throw new UnsupportedOperationException();
     }
 
     @Nullable
@@ -206,7 +187,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
         .of(MultiCriteriaRequest.Builder.class)
         .addObj("relaxC1", relaxC1)
         .addObj("transitPriorityCalculator", transitPriorityCalculator)
-        .addObj("passThroughPoints", passThroughPoints)
         .addNum("relaxCostAtDestination", relaxCostAtDestination)
         .toString();
     }

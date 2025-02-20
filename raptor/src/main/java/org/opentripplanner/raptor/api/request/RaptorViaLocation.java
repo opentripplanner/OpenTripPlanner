@@ -2,7 +2,9 @@ package org.opentripplanner.raptor.api.request;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
@@ -85,6 +87,17 @@ public final class RaptorViaLocation {
 
   public List<RaptorViaConnection> connections() {
     return connections;
+  }
+
+  /**
+   * This is a convenient accessor method used inside Raptor. It converts the list stops to a
+   * bit-set. Add other access methods if needed.
+   */
+  public BitSet asBitSet() {
+    return connections
+      .stream()
+      .mapToInt(RaptorViaConnection::fromStop)
+      .collect(BitSet::new, BitSet::set, BitSet::or);
   }
 
   @Override
@@ -185,6 +198,11 @@ public final class RaptorViaLocation {
 
     public BuilderPassThrough addPassThroughStop(int stop) {
       this.connections.add(new BuilderStopAndTransfer(stop, null));
+      return this;
+    }
+
+    public BuilderPassThrough addPassThroughStops(int... stops) {
+      IntStream.of(stops).forEach(this::addPassThroughStop);
       return this;
     }
 

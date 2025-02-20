@@ -280,6 +280,20 @@ public class SearchParams {
       .toString();
   }
 
+  public boolean isVisitViaSearch() {
+    return (
+      !viaLocations.isEmpty() &&
+      viaLocations.stream().noneMatch(RaptorViaLocation::isPassThroughSearch)
+    );
+  }
+
+  public boolean isPassThroughSearch() {
+    return (
+      !viaLocations.isEmpty() &&
+      viaLocations.stream().allMatch(RaptorViaLocation::isPassThroughSearch)
+    );
+  }
+
   static SearchParams defaults() {
     return new SearchParams();
   }
@@ -304,6 +318,10 @@ public class SearchParams {
     assertProperty(
       viaLocations.size() <= MAX_VIA_POINTS,
       "The 'viaLocations' exceeds the  maximum number of via-locations (" + MAX_VIA_POINTS + ")."
+    );
+    assertProperty(
+      viaLocations.isEmpty() || isVisitViaSearch() || isPassThroughSearch(),
+      "Combining pass-through and regular via-vist it is not allowed: " + viaLocations + "."
     );
   }
 }

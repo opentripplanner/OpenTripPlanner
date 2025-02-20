@@ -34,21 +34,13 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   }
 
   public SearchContext<T> build() {
-    return createContext(accessPaths(), viaConnections(), egressPaths());
-  }
-
-  private SearchContext<T> createContext(
-    AccessPaths accessPaths,
-    List<ViaConnections> viaConnections,
-    EgressPaths egressPaths
-  ) {
     return new SearchContext<>(
       request,
       tuningParameters,
       transit,
-      accessPaths,
-      viaConnections,
-      egressPaths,
+      accessPaths(),
+      viaConnections(),
+      egressPaths(),
       acceptC2AtDestination
     );
   }
@@ -62,7 +54,8 @@ public class SearchContextBuilder<T extends RaptorTripSchedule> {
   }
 
   private List<ViaConnections> viaConnections() {
-    return request.searchParams().hasViaLocations()
+    // TODO VIA - This need to be changed if we allow mixing visit-via an pass-thorugh
+    return request.searchParams().isVisitViaSearch()
       ? request
         .searchParams()
         .viaLocations()

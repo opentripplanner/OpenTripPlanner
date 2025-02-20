@@ -12,20 +12,21 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_F;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
+import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.api.request.RaptorViaLocation.passThrough;
 
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.RaptorService;
-import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 
 /**
@@ -46,19 +47,25 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
  */
 class J01_PassThroughTest {
 
-  static final List<PassThroughPoint> PASS_THROUGH_STOP_A = List.of(point("A", STOP_A));
-  static final List<PassThroughPoint> PASS_THROUGH_STOP_C = List.of(point("C", STOP_C));
-  static final List<PassThroughPoint> PASS_THROUGH_STOP_D = List.of(point("D", STOP_D));
-  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_OR_C = List.of(
-    point("B&C", STOP_B, STOP_C)
+  static final RaptorViaLocation PASS_THROUGH_STOP_A = passThrough("A")
+    .addPassThroughStop(STOP_A)
+    .build();
+  static final RaptorViaLocation PASS_THROUGH_STOP_C = passThrough("C")
+    .addPassThroughStop(STOP_C)
+    .build();
+  static final RaptorViaLocation PASS_THROUGH_STOP_D = passThrough("D")
+    .addPassThroughStop(STOP_D)
+    .build();
+  static final List<RaptorViaLocation> PASS_THROUGH_STOP_B_OR_C = List.of(
+    passThrough("B&C").addPassThroughStop(STOP_B).addPassThroughStop(STOP_C).build()
   );
-  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_C = List.of(
-    point("B", STOP_B),
-    point("C", STOP_C)
+  static final List<RaptorViaLocation> PASS_THROUGH_STOP_B_THEN_C = List.of(
+    passThrough("B").addPassThroughStop(STOP_B).build(),
+    passThrough("C").addPassThroughStop(STOP_C).build()
   );
-  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_D = List.of(
-    point("B", STOP_B),
-    point("D", STOP_D)
+  static final List<RaptorViaLocation> PASS_THROUGH_STOP_B_THEN_D = List.of(
+    passThrough("B").addPassThroughStop(STOP_B).build(),
+    passThrough("D").addPassThroughStop(STOP_D).build()
   );
 
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
@@ -102,11 +109,11 @@ class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_D))
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_C, D30s));
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addViaLocation(PASS_THROUGH_STOP_D)
+      .addEgressPaths(walk(STOP_D, D30s))
+      .addEgressPaths(walk(STOP_C, D30s));
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
@@ -133,14 +140,11 @@ class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc ->
-        // Include desired pass-through point in the request
-        mc.withPassThroughPoints(PASS_THROUGH_STOP_A)
-      )
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s));
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_B, D30s))
+      .addViaLocation(PASS_THROUGH_STOP_A)
+      .addEgressPaths(walk(STOP_D, D30s));
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
@@ -168,10 +172,10 @@ class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_C))
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s));
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addViaLocation(PASS_THROUGH_STOP_C)
+      .addEgressPaths(walk(STOP_D, D30s));
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
@@ -200,10 +204,10 @@ class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_B_THEN_D))
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_F, D30s));
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addViaLocations(PASS_THROUGH_STOP_B_THEN_D)
+      .addEgressPaths(walk(STOP_F, D30s));
 
     // Verify that Raptor generated journey with a transfer to r2 so that both pass-through points
     //  are included
@@ -230,10 +234,10 @@ class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_B_THEN_C))
       .searchParams()
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s));
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addViaLocations(PASS_THROUGH_STOP_B_THEN_C)
+      .addEgressPaths(walk(STOP_D, D30s));
 
     // Verify that only route with correct pass-through order is returned
     assertEquals(
@@ -259,13 +263,13 @@ class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_B_OR_C))
       .searchParams()
       // Both routes are pareto optimal.
       // Route 2 is faster but it contains more walk
-      .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addAccessPaths(TestAccessEgress.walk(STOP_B, D2m))
-      .addEgressPaths(TestAccessEgress.walk(STOP_E, D30s));
+      .addAccessPaths(walk(STOP_A, D30s))
+      .addAccessPaths(walk(STOP_B, D2m))
+      .addViaLocations(PASS_THROUGH_STOP_B_OR_C)
+      .addEgressPaths(walk(STOP_E, D30s));
 
     // Verify that both routes are included as a valid result
     assertEquals(
@@ -275,9 +279,5 @@ class J01_PassThroughTest {
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
-  }
-
-  private static PassThroughPoint point(String name, int... stops) {
-    return new PassThroughPoint(name, stops);
   }
 }

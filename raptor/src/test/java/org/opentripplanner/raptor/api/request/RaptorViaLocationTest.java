@@ -187,6 +187,27 @@ class RaptorViaLocationTest implements RaptorTestConstants {
   }
 
   @Test
+  void asBitSet() {
+    var subject = RaptorViaLocation
+      .passThrough(VIA_LABEL)
+      .addPassThroughStop(2)
+      .addPassThroughStop(7)
+      .addPassThroughStop(13)
+      .build();
+
+    var bitSet = subject.asBitSet();
+
+    // Sample some all set values as well as some not set values
+    assertFalse(bitSet.get(0));
+    assertTrue(bitSet.get(2));
+    assertFalse(bitSet.get(3));
+    assertFalse(bitSet.get(6));
+    assertTrue(bitSet.get(7));
+    assertTrue(bitSet.get(13));
+    assertFalse(bitSet.get(15000000));
+  }
+
+  @Test
   void testEqualsAndHAshCode() {
     var viaTxConnection = RaptorViaLocation
       .via("SameAsVia", MINIMUM_WAIT_TIME)

@@ -7,6 +7,7 @@ import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculator;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContextViaLeg;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -63,14 +64,18 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * The PassThroughPointsService is injected into the transit-calculator, so it needs to be
-   * created before the context(which create the calculator).So, to be able to do this, this
-   * factory is static, and the service is passed back in when this config is instantiated.
+   * Static factory method to allow the {@link org.opentripplanner.raptor.configure.RaptorConfig}
+   * inject PassThroughPointsService.
+   * TODO VIA - This method is not needed when pass-through is poted to use the chanied-worker
+   *            strategy, and not c2.
    */
-  public static PassThroughPointsService passThroughPointsService(
-    MultiCriteriaRequest<?> multiCriteriaRequest
+  public static PassThroughPointsService createPassThroughPointsService(
+    boolean enableMcPassThrought,
+    List<RaptorViaLocation> viaLocations
   ) {
-    return BitSetPassThroughPointsService.of(multiCriteriaRequest.passThroughPoints());
+    return enableMcPassThrought
+      ? BitSetPassThroughPointsService.of(viaLocations)
+      : BitSetPassThroughPointsService.NOOP;
   }
 
   /**
@@ -231,7 +236,10 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    * transit-group-priority features uses the c2 value.
    */
   private boolean includeC2() {
-    return mcRequest().includeC2();
+    return (
+      context().searchParams().isPassThroughSearch() ||
+      mcRequest().transitPriorityCalculator().isPresent()
+    );
   }
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
@@ -260,7 +268,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private boolean isPassThrough() {
-    return mcRequest().hasPassThroughPoints();
+    return context().searchParams().isPassThroughSearch();
   }
 
   private boolean isTransitPriority() {
