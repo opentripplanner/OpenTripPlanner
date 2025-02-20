@@ -103,6 +103,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Enhanced street graph processing of OSM areas [#6463](https://github.com/opentripplanner/OpenTripPlanner/pull/6463)
 - Inject defaults into the planConnection query in the GTFS GraphQL schema [#6339](https://github.com/opentripplanner/OpenTripPlanner/pull/6339)
 - Fix ClassCastException in Itinerary mapper [#6455](https://github.com/opentripplanner/OpenTripPlanner/pull/6455)
+- Create TripOnServiceDate for added GTFS trips [#6459](https://github.com/opentripplanner/OpenTripPlanner/pull/6459)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
