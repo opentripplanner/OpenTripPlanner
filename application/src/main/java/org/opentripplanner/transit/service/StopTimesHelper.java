@@ -18,9 +18,14 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
+import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateMatcherFactory;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -81,6 +86,32 @@ class StopTimesHelper {
     }
 
     return result;
+  }
+
+  public static List<TripTimeOnDate> findTripTimeOnDate(
+    TransitService transitService,
+    TripTimeOnDateRequest request
+  ) {
+    Matcher<TripTimeOnDate> matcher = TripTimeOnDateMatcherFactory.of(request);
+    return request
+      .timesAtStop()
+      .stream()
+      .flatMap(timeAtStop ->
+        stopTimesForStop(
+          transitService,
+          timeAtStop.stop(),
+          timeAtStop.time(),
+          request.timeWindow(),
+          10,
+          request.arrivalDeparture(),
+          true
+        )
+          .stream()
+          .flatMap(st -> st.times.stream())
+      )
+      .filter(matcher::match)
+      .sorted(TripTimeOnDate.compareByDeparture())
+      .toList();
   }
 
   /**
@@ -208,13 +239,12 @@ class StopTimesHelper {
     // The bounded priority Q is used to keep a sorted short list of trip times. We can not
     // rely on the trip times to be in order because of real-time updates. This code can
     // probably be optimized, and the trip search in the Raptor search does almost the same
-    // thing. This is no part of a routing request, but is a used frequently in some
+    // thing. This is not part of a routing request, but is a used frequently in some
     // operation like Entur for "departure boards" (apps, widgets, screens on platforms, and
     // hotel lobbies). Setting the numberOfDepartures and timeRange to a big number for a
     // transit hub could result in a DOS attack, but there are probably other more effective
     // ways to do it.
     //
-    // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
     MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue.orderedBy(
       Comparator.comparing(
         (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
