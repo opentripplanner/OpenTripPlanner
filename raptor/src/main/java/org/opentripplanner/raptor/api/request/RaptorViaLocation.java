@@ -23,18 +23,18 @@ public final class RaptorViaLocation {
   private static final int MIN_WAIT_TIME = (int) Duration.ZERO.toSeconds();
 
   private final String label;
-  private final boolean passThroughAllowed;
+  private final boolean passThroughSearch;
   private final int minimumWaitTime;
   private final List<RaptorViaConnection> connections;
 
   private RaptorViaLocation(
     String label,
-    boolean passThroughAllowed,
+    boolean passThroughSearch,
     Duration minimumWaitTime,
     List<BuilderStopAndTransfer> connections
   ) {
     this.label = label;
-    this.passThroughAllowed = passThroughAllowed;
+    this.passThroughSearch = passThroughSearch;
     this.minimumWaitTime =
       IntUtils.requireInRange(
         (int) minimumWaitTime.toSeconds(),
@@ -75,8 +75,8 @@ public final class RaptorViaLocation {
     return label;
   }
 
-  public boolean isPassThroughAllowed() {
-    return passThroughAllowed;
+  public boolean isPassThroughSearch() {
+    return passThroughSearch;
   }
 
   public int minimumWaitTime() {
@@ -85,10 +85,6 @@ public final class RaptorViaLocation {
 
   public List<RaptorViaConnection> connections() {
     return connections;
-  }
-
-  public String toString() {
-    return toString(Integer::toString);
   }
 
   @Override
@@ -101,20 +97,21 @@ public final class RaptorViaLocation {
     throw new UnsupportedOperationException("No need for hashCode of " + getClass());
   }
 
+  public String toString() {
+    return toString(Integer::toString);
+  }
+
   public String toString(RaptorStopNameResolver stopNameResolver) {
-    var buf = new StringBuilder("Via{");
+    var buf = new StringBuilder(getClass().getSimpleName()).append('{');
+    buf.append(isPassThroughSearch() ? "pass-through " : "via ");
     if (label != null) {
-      buf.append("label: ").append(label).append(", ");
-    }
-    if (passThroughAllowed) {
-      buf.append("allowPassThrough, ");
+      buf.append(label).append(" ");
     }
     if (minimumWaitTime > RaptorConstants.ZERO) {
-      buf.append("minWaitTime: ").append(DurationUtils.durationToStr(minimumWaitTime)).append(", ");
+      buf.append("wait ").append(DurationUtils.durationToStr(minimumWaitTime)).append(" ");
     }
     buf
-      .append("connections")
-      .append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "):")
+      .append(connections.size() <= 10 ? ": " : "(10/" + connections.size() + "): ")
       .append(connections.stream().limit(10).map(it -> it.toString(stopNameResolver)).toList());
     return buf.append("}").toString();
   }

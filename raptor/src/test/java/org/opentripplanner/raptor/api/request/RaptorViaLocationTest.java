@@ -58,8 +58,8 @@ class RaptorViaLocationTest implements RaptorTestConstants {
 
   @Test
   void passThrough() {
-    assertFalse(subject.isPassThroughAllowed());
-    assertTrue(subjectPassThrough.isPassThroughAllowed());
+    assertFalse(subject.isPassThroughSearch());
+    assertTrue(subjectPassThrough.isPassThroughSearch());
   }
 
   @Test
@@ -72,16 +72,16 @@ class RaptorViaLocationTest implements RaptorTestConstants {
   @Test
   void testToString() {
     assertEquals(
-      "Via{label: Via, minWaitTime: 23s, connections: [(stop 2 ~ 3, 53s), (stop 1, 23s)]}",
+      "RaptorViaLocation{via Via wait 23s : [(stop 2 ~ 3, 53s), (stop 1, 23s)]}",
       subject.toString()
     );
     assertEquals(
-      "Via{label: PassThrough, allowPassThrough, connections: [(stop 4)]}",
+      "RaptorViaLocation{pass-through PassThrough : [(stop 4)]}",
       subjectPassThrough.toString()
     );
 
     assertEquals(
-      "Via{label: Via, minWaitTime: 23s, connections: [(stop B ~ C, 53s), (stop A, 23s)]}",
+      "RaptorViaLocation{via Via wait 23s : [(stop B ~ C, 53s), (stop A, 23s)]}",
       subject.toString(RaptorTestConstants::stopIndexToName)
     );
   }
