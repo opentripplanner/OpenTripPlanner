@@ -211,10 +211,6 @@ public class SearchParams {
     return viaLocations;
   }
 
-  public boolean hasViaLocations() {
-    return !viaLocations.isEmpty();
-  }
-
   /**
    * Get the maximum duration of any access or egress path in seconds.
    */

@@ -281,6 +281,15 @@ public class RouteRequest implements Cloneable, Serializable {
     this.to = to;
   }
 
+
+  /**
+   * TransferOptimization is appled to all results exept via-visit requests.
+   * TODO VIA - When the Optimized transfer support this, then this method should be removed.
+   */
+  public boolean allowTransferOptimization() {
+    return !isViaSearch() || via.stream().allMatch(ViaLocation::isPassThroughLocation);
+  }
+
   /**
    * Return {@code true} if at least one via location is set!
    */

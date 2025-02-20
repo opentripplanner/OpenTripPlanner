@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.api.request;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -61,14 +60,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
   public Optional<RaptorTransitGroupPriorityCalculator> transitPriorityCalculator() {
     return Optional.ofNullable(transitPriorityCalculator);
-  }
-
-  public boolean hasPassThroughPoints() {
-    throw new UnsupportedOperationException();
-  }
-
-  public List<PassThroughPoint> passThroughPoints() {
-    throw new UnsupportedOperationException();
   }
 
   /**
@@ -153,15 +144,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     public Builder<T> withTransitPriorityCalculator(RaptorTransitGroupPriorityCalculator value) {
       transitPriorityCalculator = value;
       return this;
-    }
-
-    public List<PassThroughPoint> passThroughPoints() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Nullable
-    public Builder<T> withPassThroughPoints(List<PassThroughPoint> points) {
-      throw new UnsupportedOperationException();
     }
 
     @Nullable

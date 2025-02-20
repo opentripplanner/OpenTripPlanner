@@ -105,7 +105,7 @@ class RaptorRequestMapperTest {
 
     var result = map(req);
 
-    assertTrue(result.searchParams().hasViaLocations());
+    assertTrue(result.searchParams().isVisitViaSearch());
     assertEquals(
       "[RaptorViaLocation{via Via A wait 13m : [(stop 0, 13m)]}]",
       result.searchParams().viaLocations().toString()
@@ -120,10 +120,10 @@ class RaptorRequestMapperTest {
 
     var result = map(req);
 
-    assertTrue(result.multiCriteria().hasPassThroughPoints());
+    assertTrue(result.searchParams().isPassThroughSearch());
     assertEquals(
-      "[(Via A, stops: " + STOP_A.getIndex() + ")]",
-      result.multiCriteria().passThroughPoints().toString()
+      "[RaptorViaLocation{pass-through Via A : [(stop " + STOP_A.getIndex() + ")]}]",
+      result.searchParams().viaLocations().toString()
     );
   }
 
@@ -234,7 +234,7 @@ class RaptorRequestMapperTest {
   @ParameterizedTest(name = "{0}.  {1}  =>  {2}")
   @MethodSource("testViaAndTransitGroupPriorityCombinationsTestCases")
   void testViaAndTransitGroupPriorityCombinations(
-    String testDescription,
+    String ignore,
     List<RequestFeature> requestedFeatures,
     List<RequestFeature> expectedFeatures,
     @Nullable String errorMessage
@@ -279,7 +279,7 @@ class RaptorRequestMapperTest {
     switch (feature) {
       case VIA_VISIT:
         if (expected) {
-          assertTrue(result.searchParams().hasViaLocations());
+          assertTrue(result.searchParams().isVisitViaSearch());
           // One via location exist(no NPE), but it does not allow pass-through
           assertEquals(
             "RaptorViaLocation{via Via A : [(stop 0)]}",
@@ -289,24 +289,24 @@ class RaptorRequestMapperTest {
         break;
       case VIA_PASS_THROUGH:
         if (expected) {
-          assertTrue(result.multiCriteria().hasPassThroughPoints());
+          assertTrue(result.searchParams().isPassThroughSearch());
           assertEquals(
-            "(Via A, stops: 0)",
-            result.multiCriteria().passThroughPoints().get(0).toString()
+            "RaptorViaLocation{pass-through Via A : [(stop 0)]}",
+            result.searchParams().viaLocations().get(0).toString()
           );
         }
         break;
       case TRANSIT_GROUP_PRIORITY:
         assertEquals(expected, result.multiCriteria().transitPriorityCalculator().isPresent());
         if (expected) {
-          assertFalse(result.multiCriteria().hasPassThroughPoints());
+          assertFalse(result.searchParams().isPassThroughSearch());
         }
         break;
       case RELAX_COST_DEST:
         assertEquals(expected, result.multiCriteria().relaxCostAtDestination() != null);
         if (expected) {
-          assertFalse(result.multiCriteria().hasPassThroughPoints());
-          assertFalse(result.searchParams().hasViaLocations());
+          assertFalse(result.searchParams().isPassThroughSearch());
+          assertFalse(result.searchParams().isVisitViaSearch());
         }
         break;
     }

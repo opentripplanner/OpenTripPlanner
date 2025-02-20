@@ -20,7 +20,6 @@ import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.Optimization;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
@@ -138,17 +137,12 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var pt = preferences.transit();
       var r = pt.raptor();
 
-      if (hasPassThroughOnly()) {
-        mcBuilder.withPassThroughPoints(mapPassThroughPoints());
-      } else if (hasViaLocationsOnly()) {
-        builder.searchParams().addViaLocations(mapViaLocations());
-        // relax transit group priority can be used with via-visit-stop, but not with pass-through
-        if (pt.isRelaxTransitGroupPrioritySet()) {
-          mapRelaxTransitGroupPriority(mcBuilder, pt);
-        }
-      } else if (pt.isRelaxTransitGroupPrioritySet()) {
+      builder.searchParams().addViaLocations(mapViaLocations());
+
+      // relax transit group priority can be used with via-visit-stop, but not with pass-through
+      if (pt.isRelaxTransitGroupPrioritySet() && !hasPassThroughOnly()) {
         mapRelaxTransitGroupPriority(mcBuilder, pt);
-      } else {
+      } else if (!request.isViaSearch()) {
         // The deprecated relaxGeneralizedCostAtDestination is only enabled, if there is no
         // via location and the relaxTransitGroupPriority is not used (Normal).
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
@@ -258,17 +252,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       }
       return builder.build();
     }
-  }
-
-  private List<PassThroughPoint> mapPassThroughPoints() {
-    return request.getViaLocations().stream().map(this::mapPassThroughPoints).toList();
-  }
-
-  private PassThroughPoint mapPassThroughPoints(ViaLocation location) {
-    return new PassThroughPoint(
-      location.label(),
-      lookUpStopIndex.lookupStopLocationIndexes(location.stopLocationIds())
-    );
   }
 
   static RelaxFunction mapRelaxCost(CostLinearFunction relax) {
