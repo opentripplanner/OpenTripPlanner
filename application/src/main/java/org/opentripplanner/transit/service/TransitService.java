@@ -28,6 +28,7 @@ import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -268,6 +269,8 @@ public interface TransitService {
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations
   );
+
+  List<TripTimeOnDate> findTripTimeOnDate(TripTimeOnDateRequest request);
 
   Collection<GroupOfRoutes> listGroupsOfRoutes();
 
