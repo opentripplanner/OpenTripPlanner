@@ -18,10 +18,6 @@ public record TestTransfer(int stop, int durationInSeconds, int cost) implements
     return new TestTransfer(stop, durationInSeconds, walkCost(durationInSeconds));
   }
 
-  public static TestTransfer transfer(int stop, int durationInSeconds, int cost) {
-    return new TestTransfer(stop, durationInSeconds, cost);
-  }
-
   public static int walkCost(int durationInSeconds) {
     return walkCost(durationInSeconds, DEFAULT_WALK_RELUCTANCE);
   }
