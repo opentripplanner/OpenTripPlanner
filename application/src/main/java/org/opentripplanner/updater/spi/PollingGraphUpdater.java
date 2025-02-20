@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
@@ -44,12 +45,13 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   private WriteToGraphCallback saveResultOnGraph;
 
   /**
-   * Handle on the task posted during the previous polling execution.
+   * A Future representing pending completion of most recently submitted task.
    * If the updater posts several tasks during one polling cycle, the handle will point to the
    * latest posted task.
    * Initially null when the polling updater starts.
    */
-  private Future<?> previousTask;
+  @Nullable
+  private volatile Future<?> previousTask;
 
   /** Shared configuration code for all polling graph updaters. */
   protected PollingGraphUpdater(PollingGraphUpdaterParameters config) {
@@ -130,6 +132,9 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
    * Post an update task to the GraphWriter queue.
    * This is non-blocking.
    * This can be called several times during one polling cycle.
+   * This is the sole way for polling updater implementations to submit real-time update tasks,
+   * while technical details about the execution of these tasks
+   * (frequency, concurrency, waiting, ...) are encapsulated in this parent class.
    */
   protected final void updateGraph(GraphWriterRunnable task) {
     previousTask = saveResultOnGraph.execute(task);
