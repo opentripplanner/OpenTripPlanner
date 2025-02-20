@@ -7,6 +7,8 @@ import java.util.List;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
@@ -32,17 +34,16 @@ public class VdvService {
     if (stop == null) {
       throw new EntityNotFoundException("StopPlace", stopId);
     }
+    var timesAtStops = List.of(new TripTimeOnDateRequest.TimeAtStop(stop, time));
+
+    var request = TripTimeOnDateRequest
+      .of(timesAtStops)
+      .withArrivalDeparture(arrivalDeparture)
+      .withTimeWindow(timeWindow)
+      .build();
     var stopTimesInPatterns = transitService
-      .findStopTimesInPattern(
-        stop,
-        time.atZone(transitService.getTimeZone()).toInstant(),
-        Duration.ofHours(2),
-        10,
-        arrivalDeparture,
-        true
-      )
+      .findTripTimeOnDate(request)
       .stream()
-      .flatMap(st -> st.times.stream())
       .map(CallAtStop::noWalking)
       .toList();
 
@@ -65,10 +66,10 @@ public class VdvService {
             time.plus(nearbyStop.duration()),
             arrivalDeparture,
             timeWindow,
-            10
+            numResults
           )
           .stream()
-          .map(call -> call.withWalkTime(nearbyStop.duration()))
+          .map(tt -> tt.withWalkTime(nearbyStop.duration()))
       )
       .toList();
 
