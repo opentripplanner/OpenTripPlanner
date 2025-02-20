@@ -192,8 +192,8 @@ public class PagingService {
         searchWindowUsed
       );
 
-    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null) {
-      factory = factory.withRemovedItineraries(pageCursorInput);
+    if (pageCursorInput != null) {
+      factory = factory.withPageCursorInput(pageCursorInput);
     }
     return factory;
   }

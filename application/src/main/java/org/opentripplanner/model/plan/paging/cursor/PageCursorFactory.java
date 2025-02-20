@@ -51,18 +51,23 @@ public class PageCursorFactory {
   }
 
   /**
+   * This adds the page cursor input to the factory. The cursor input can contain information about numItinerariesFilterResults
+   * or the bestStreetOnlyCost.
+   * <p>
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
    * removed in the next and previous pages. This means we will use information from when we cropped
    * the list of itineraries to create the new search encoded in the page cursors. We will also add
    * information necessary for removing potential duplicates when paging.
    *
-   * @param pageCursorFactoryParams contains the result from the {@code PagingDuplicateFilter}
+   * @param pageCursorInput contains the generated page cursor input
    */
-  public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
-    this.wholeSwUsed = false;
-    this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut = pageCursorFactoryParams.numItinerariesFilterResults().pageCut();
+  public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
+    this.pageCursorInput = pageCursorInput;
+    if (pageCursorInput.numItinerariesFilterResults() != null) {
+      this.wholeSwUsed = false;
+      this.itineraryPageCut = pageCursorInput.numItinerariesFilterResults().pageCut();
+    }
     return this;
   }
 
@@ -135,6 +140,7 @@ public class PageCursorFactory {
         nextEdt = edtAfterUsedSw();
       }
     }
+
     OptionalInt bestStreetOnlyCost = pageCursorInput.bestStreetOnlyCost();
     prevCursor =
       new PageCursor(

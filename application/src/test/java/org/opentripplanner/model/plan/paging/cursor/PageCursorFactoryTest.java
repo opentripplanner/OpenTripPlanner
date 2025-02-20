@@ -12,7 +12,6 @@ import java.time.Instant;
 import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -49,7 +48,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
   public void sortArrivalAscendingCropSearchWindow() {
     var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, null, D1H)
-      .withRemovedItineraries(
+      .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
           OptionalInt.empty()
@@ -79,7 +78,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
   public void sortArrivalAscendingCropSearchWindowPreviousPage() {
     var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H)
-      .withRemovedItineraries(
+      .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
           OptionalInt.empty()
@@ -109,7 +108,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
   public void sortDepartureDescendingCropSearchWindow() {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, T13_30, D1H)
-      .withRemovedItineraries(
+      .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
           OptionalInt.empty()
@@ -139,7 +138,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
   public void sortDepartureDescendingCropSearchWindowNextPage() {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
-      .withRemovedItineraries(
+      .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
           OptionalInt.empty()

@@ -52,15 +52,17 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
-    // If the best street only cost can't be found in the itineraries but
-    // it is present in the cursor, then the information from the cursor is used.
-    // If no cost is found an empty list is returned.
-    if (minStreetCost.isEmpty()) {
-      if (bestStreetOnlyCost.isPresent()) {
-        minStreetCost = bestStreetOnlyCost;
-      } else {
-        return List.of();
-      }
+    if (minStreetCost.isEmpty() && bestStreetOnlyCost.isEmpty()) {
+      // If no cost is found an empty list is returned.
+      return List.of();
+    } else if (minStreetCost.isPresent() && bestStreetOnlyCost.isPresent()) {
+      // If both the minStreetCost and bestStreetOnlyCost are present, take the minimum value.
+      minStreetCost =
+        OptionalInt.of(Math.min(minStreetCost.getAsInt(), bestStreetOnlyCost.getAsInt()));
+    } else if (bestStreetOnlyCost.isPresent()) {
+      // If the best street only cost can't be found in the itineraries but
+      // it is present in the cursor, then the information from the cursor is used.
+      minStreetCost = bestStreetOnlyCost;
     }
 
     // The best street only cost is saved in the cursor.
