@@ -345,6 +345,7 @@ class RaptorRequestMapperTest {
     @Override
     public List<ViaCoordinateTransfer> createViaTransfers(
       RouteRequest request,
+      String ignore,
       WgsCoordinate coordinate
     ) {
       // Make sure the input is the expected via-coordinate

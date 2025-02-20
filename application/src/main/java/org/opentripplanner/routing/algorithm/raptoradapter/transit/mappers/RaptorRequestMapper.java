@@ -245,7 +245,11 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         builder.addViaStop(stopIndex);
       }
       for (var coordinate : input.coordinates()) {
-        var viaTransfers = viaTransferResolver.createViaTransfers(request, coordinate);
+        var viaTransfers = viaTransferResolver.createViaTransfers(
+          request,
+          input.label(),
+          coordinate
+        );
         for (var it : viaTransfers) {
           builder.addViaTransfer(it.fromStopIndex(), it);
         }

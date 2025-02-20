@@ -23,6 +23,7 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.lang.StringUtils;
 
 public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransferFactory {
 
@@ -48,16 +49,20 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   @Override
   public List<ViaCoordinateTransfer> createViaTransfers(
     RouteRequest request,
+    String viaLabel,
     WgsCoordinate coordinate
   ) {
     DisposableEdgeCollection tempEdges = null;
     try {
       var nearbyStopFinder = createNearbyStopFinder(radiusByDuration);
+      var name = I18NString.of(
+        (StringUtils.hasValue(viaLabel) ? viaLabel : "Via") + " " + coordinate
+      );
 
       var viaVertex = TemporaryStreetLocation.via(
         UUID.randomUUID().toString(),
         coordinate.asJtsCoordinate(),
-        I18NString.of("Via " + coordinate)
+        name
       );
 
       var m = mapTransferMode(request.journey().modes().transferMode);

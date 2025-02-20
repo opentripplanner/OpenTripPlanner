@@ -6,5 +6,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 
 public interface ViaCoordinateTransferFactory {
-  List<ViaCoordinateTransfer> createViaTransfers(RouteRequest request, WgsCoordinate coordinate);
+  List<ViaCoordinateTransfer> createViaTransfers(
+    RouteRequest request,
+    String label,
+    WgsCoordinate coordinate
+  );
 }
