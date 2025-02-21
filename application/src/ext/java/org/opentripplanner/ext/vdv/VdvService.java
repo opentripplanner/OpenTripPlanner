@@ -7,7 +7,6 @@ import java.util.List;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -40,6 +39,7 @@ public class VdvService {
       .of(timesAtStops)
       .withArrivalDeparture(arrivalDeparture)
       .withTimeWindow(timeWindow)
+      .withNumberOfDepartures(numResults)
       .build();
     var stopTimesInPatterns = transitService
       .findTripTimeOnDate(request)
