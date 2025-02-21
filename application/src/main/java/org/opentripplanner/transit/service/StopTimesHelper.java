@@ -102,7 +102,7 @@ class StopTimesHelper {
           timeAtStop.stop(),
           timeAtStop.time(),
           request.timeWindow(),
-          10,
+          request.numberOfDepartures(),
           request.arrivalDeparture(),
           true
         )
