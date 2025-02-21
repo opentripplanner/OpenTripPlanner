@@ -52,7 +52,7 @@ to any commit in the release branch. For example merge in bug-fix branches on to
 release tag. Complete the process by running:
 
 ```
-# script/custom-release-extension --release
+# script/custom-release.py --release
 ```
 
 ### Advanced Git flow - roll back
