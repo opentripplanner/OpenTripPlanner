@@ -14,6 +14,11 @@
                     <ojp:DepArrTime>2025-02-13T13:03:36</ojp:DepArrTime>
                 </ojp:Location>
                 <ojp:Params>
+                    <ojp:LineFilter>
+                        <ojp:Line/>
+                        <ojp:Line/>
+                        <ojp:Line/>
+                    </ojp:LineFilter>
                     <ojp:OperatorFilter>
                         <ojp:OperatorRef>vvs-111</ojp:OperatorRef>
                         <ojp:OperatorRef>vvs-222</ojp:OperatorRef>
