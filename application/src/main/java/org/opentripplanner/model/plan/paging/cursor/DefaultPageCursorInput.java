@@ -13,22 +13,23 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * details about the first itinerary removed (bottom of the head, or top of the tail) and whether
  * itineraries were cropped at the head or the tail.
  * <p>
- * The RemoveTransitIfStreetOnlyIsBetter filter removes transit itineraries if the best street only itinerary has a lower cost.
+ * The {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+ * filter removes transit itineraries if the best street only itinerary has a lower cost.
  * This class stores the cost of the best street only itinerary for use with paging.
  */
 public class DefaultPageCursorInput implements PageCursorInput {
 
   private final NumItinerariesFilterResults numItinerariesFilterResults;
-  private final OptionalInt bestStreetOnlyCost;
+  private final OptionalInt streetOnlyCost;
 
   public DefaultPageCursorInput() {
     this.numItinerariesFilterResults = null;
-    this.bestStreetOnlyCost = OptionalInt.empty();
+    this.streetOnlyCost = OptionalInt.empty();
   }
 
   public DefaultPageCursorInput(Builder builder) {
     this.numItinerariesFilterResults = builder.numItinerariesFilterResults();
-    this.bestStreetOnlyCost = builder.bestStreetOnlyCost();
+    this.streetOnlyCost = builder.streetOnlyCost();
   }
 
   public static DefaultPageCursorInput.Builder of() {
@@ -45,8 +46,8 @@ public class DefaultPageCursorInput implements PageCursorInput {
   }
 
   @Override
-  public OptionalInt bestStreetOnlyCost() {
-    return bestStreetOnlyCost;
+  public OptionalInt streetOnlyCost() {
+    return streetOnlyCost;
   }
 
   @Override
@@ -54,18 +55,18 @@ public class DefaultPageCursorInput implements PageCursorInput {
     return ToStringBuilder
       .of(DefaultPageCursorInput.class)
       .addObj("numItinerariesFilterResults", numItinerariesFilterResults)
-      .addObj("bestStreetOnlyCost", bestStreetOnlyCost)
+      .addObj("streetOnlyCost", streetOnlyCost)
       .toString();
   }
 
   public static class Builder {
 
     private NumItinerariesFilterResults numItinerariesFilterResults;
-    private OptionalInt bestStreetOnlyCost;
+    private OptionalInt streetOnlyCost;
 
     public Builder(DefaultPageCursorInput original) {
       this.numItinerariesFilterResults = original.numItinerariesFilterResults;
-      this.bestStreetOnlyCost = original.bestStreetOnlyCost;
+      this.streetOnlyCost = original.streetOnlyCost;
     }
 
     public NumItinerariesFilterResults numItinerariesFilterResults() {
@@ -79,12 +80,12 @@ public class DefaultPageCursorInput implements PageCursorInput {
       return this;
     }
 
-    public OptionalInt bestStreetOnlyCost() {
-      return bestStreetOnlyCost;
+    public OptionalInt streetOnlyCost() {
+      return streetOnlyCost;
     }
 
-    public Builder withBestStreetOnlyCost(OptionalInt bestStreetOnlyCost) {
-      this.bestStreetOnlyCost = bestStreetOnlyCost;
+    public Builder withStreetOnlyCost(OptionalInt streetOnlyCost) {
+      this.streetOnlyCost = streetOnlyCost;
       return this;
     }
 

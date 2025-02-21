@@ -80,7 +80,7 @@ public class ItineraryListFilterChainBuilder {
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
-  private Consumer<OptionalInt> bestStreetOnlyCostSubscriber;
+  private Consumer<OptionalInt> streetOnlyCostSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -91,7 +91,7 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
-  private OptionalInt bestStreetOnlyCost = OptionalInt.empty();
+  private OptionalInt streetOnlyCost = OptionalInt.empty();
   private boolean transitGroupPriorityUsed = false;
   private boolean filterDirectFlexBySearchWindow = true;
 
@@ -291,21 +291,22 @@ public class ItineraryListFilterChainBuilder {
    * After the first search the paging does not keep the best street only cost without storing it in the cursor.
    * This stores the best street only cost in the cursor.
    */
-  public ItineraryListFilterChainBuilder withBestStreetOnlyCostSubscriber(
-    Consumer<OptionalInt> bestStreetOnlyCostSubscriber
+  public ItineraryListFilterChainBuilder withStreetOnlyCostSubscriber(
+    Consumer<OptionalInt> streetOnlyCostSubscriber
   ) {
-    this.bestStreetOnlyCostSubscriber = bestStreetOnlyCostSubscriber;
+    this.streetOnlyCostSubscriber = streetOnlyCostSubscriber;
     return this;
   }
 
   /**
    * If the search is done with a page cursor that contains an encoded best street only cost, then
-   * this function adds the information to the RemoveTransitIfStreetOnlyIsBetter filter.
+   * this function adds the information to the
+   * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter} filter.
    *
-   * @param bestStreetOnlyCost the best street only cost used in filtering.
+   * @param streetOnlyCost the best street only cost used in filtering.
    */
-  public ItineraryListFilterChainBuilder withBestStreetOnlyCost(OptionalInt bestStreetOnlyCost) {
-    this.bestStreetOnlyCost = bestStreetOnlyCost;
+  public ItineraryListFilterChainBuilder withStreetOnlyCost(OptionalInt streetOnlyCost) {
+    this.streetOnlyCost = streetOnlyCost;
     return this;
   }
 
@@ -462,8 +463,8 @@ public class ItineraryListFilterChainBuilder {
           filters,
           new RemoveTransitIfStreetOnlyIsBetter(
             removeTransitWithHigherCostThanBestOnStreetOnly,
-            bestStreetOnlyCost,
-            bestStreetOnlyCostSubscriber
+            streetOnlyCost,
+            streetOnlyCostSubscriber
           )
         );
       }

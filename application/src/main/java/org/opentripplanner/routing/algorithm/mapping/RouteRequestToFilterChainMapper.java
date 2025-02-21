@@ -34,7 +34,7 @@ public class RouteRequestToFilterChainMapper {
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
     Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber,
-    Consumer<OptionalInt> bestStreetOnlyCostSubscriber
+    Consumer<OptionalInt> streetOnlyCostSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -49,8 +49,8 @@ public class RouteRequestToFilterChainMapper {
     }
 
     // The page cursor has best street only cost information only in certain cases.
-    if (request.pageCursor() != null && request.pageCursor().containsBestStreetOnlyCost()) {
-      builder = builder.withBestStreetOnlyCost(request.pageCursor().bestStreetOnlyCost());
+    if (request.pageCursor() != null && request.pageCursor().containsStreetOnlyCost()) {
+      builder = builder.withStreetOnlyCost(request.pageCursor().streetOnlyCost());
     }
 
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
@@ -97,7 +97,7 @@ public class RouteRequestToFilterChainMapper {
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withNumItinerariesFilterResultsSubscriber(numItinerariesFilterResultsSubscriber)
-      .withBestStreetOnlyCostSubscriber(bestStreetOnlyCostSubscriber)
+      .withStreetOnlyCostSubscriber(streetOnlyCostSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
       .withFilterDirectFlexBySearchWindow(params.filterDirectFlexBySearchWindow())

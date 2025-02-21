@@ -142,7 +142,7 @@ public class RoutingWorker {
         searchWindowUsed(),
         removeWalkAllTheWayResultsFromDirectFlex,
         it -> pageCursorInputBuilder = pageCursorInputBuilder.withNumItinerariesFilterResults(it),
-        it -> pageCursorInputBuilder = pageCursorInputBuilder.withBestStreetOnlyCost(it)
+        it -> pageCursorInputBuilder = pageCursorInputBuilder.withStreetOnlyCost(it)
       );
 
       filteredItineraries = filterChain.filter(itineraries);

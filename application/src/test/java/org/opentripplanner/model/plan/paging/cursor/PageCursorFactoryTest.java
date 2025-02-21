@@ -153,7 +153,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
   }
 
   @Test
-  public void testBestStreetOnlyCost() {
+  public void testStreetOnlyCost() {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
       .withPageCursorInput(
@@ -185,29 +185,29 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Duration expSearchWindow,
     PageType expPageType,
     Boolean hasDedupeParams,
-    Boolean hasBestStreetOnlyCost
+    Boolean hasStreetOnlyCost
   ) {
     assertEquals(expEdt, pageCursor.earliestDepartureTime());
     assertEquals(expLat, pageCursor.latestArrivalTime());
     assertEquals(expSearchWindow, pageCursor.searchWindow());
     assertEquals(expPageType, pageCursor.type());
     assertEquals(hasDedupeParams, pageCursor.itineraryPageCut() != null);
-    assertEquals(hasBestStreetOnlyCost, pageCursor.bestStreetOnlyCost().isPresent());
+    assertEquals(hasStreetOnlyCost, pageCursor.streetOnlyCost().isPresent());
   }
 
   private record TestPageCursorInput(
     NumItinerariesFilterResults numItinerariesFilterResults,
-    OptionalInt bestStreetOnlyCost
+    OptionalInt streetOnlyCost
   )
     implements PageCursorInput {
-    public TestPageCursorInput(Itinerary removedItinerary, OptionalInt bestStreetOnlyCost) {
+    public TestPageCursorInput(Itinerary removedItinerary, OptionalInt streetOnlyCost) {
       this(
         new NumItinerariesFilterResults(
           removedItinerary.startTimeAsInstant(),
           removedItinerary.startTimeAsInstant(),
           removedItinerary
         ),
-        bestStreetOnlyCost
+        streetOnlyCost
       );
     }
   }

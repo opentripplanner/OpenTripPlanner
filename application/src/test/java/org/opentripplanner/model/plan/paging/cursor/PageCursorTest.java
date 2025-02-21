@@ -51,7 +51,7 @@ class PageCursorTest implements PlanTestConstants {
     .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
     .bus(23, 0, 50, B)
     .build();
-  private static final OptionalInt BSOC = OptionalInt.empty();
+  private static final OptionalInt SOC = OptionalInt.empty();
 
   private TimeZone originalTimeZone;
   private PageCursor subjectDepartAfter;
@@ -63,7 +63,7 @@ class PageCursorTest implements PlanTestConstants {
     TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
 
     subjectDepartAfter =
-      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null, BSOC);
+      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null, SOC);
     subjectArriveBy =
       new PageCursor(
         PREVIOUS_PAGE,
@@ -72,7 +72,7 @@ class PageCursorTest implements PlanTestConstants {
         LAT,
         SEARCH_WINDOW,
         PAGE_CUT,
-        BSOC
+        SOC
       );
   }
 
@@ -88,7 +88,7 @@ class PageCursorTest implements PlanTestConstants {
       "edt: " +
       EDT_STR +
       ", searchWindow: 2h" +
-      ", bestStreetOnlyCost: OptionalInt.empty}",
+      ", streetOnlyCost: OptionalInt.empty}",
       subjectDepartAfter.toString()
     );
     assertEquals(
@@ -99,7 +99,7 @@ class PageCursorTest implements PlanTestConstants {
       LAT_STR +
       ", searchWindow: 2h, " +
       "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]" +
-      ", bestStreetOnlyCost: OptionalInt.empty}",
+      ", streetOnlyCost: OptionalInt.empty}",
       subjectArriveBy.toString()
     );
   }
@@ -118,7 +118,7 @@ class PageCursorTest implements PlanTestConstants {
   public void cropItinerariesAt(PageType page, SortOrder order, ListSection expSection) {
     assertEquals(
       expSection,
-      new PageCursor(page, order, EDT, null, SEARCH_WINDOW, null, BSOC).cropItinerariesAt()
+      new PageCursor(page, order, EDT, null, SEARCH_WINDOW, null, SOC).cropItinerariesAt()
     );
   }
 

@@ -26,14 +26,14 @@ public record PageCursor(
   Instant latestArrivalTime,
   Duration searchWindow,
   @Nullable ItinerarySortKey itineraryPageCut,
-  OptionalInt bestStreetOnlyCost
+  OptionalInt streetOnlyCost
 ) {
   public boolean containsItineraryPageCut() {
     return itineraryPageCut != null;
   }
 
-  public boolean containsBestStreetOnlyCost() {
-    return bestStreetOnlyCost.isPresent();
+  public boolean containsStreetOnlyCost() {
+    return streetOnlyCost.isPresent();
   }
 
   @Nullable
@@ -78,7 +78,7 @@ public record PageCursor(
       .addDuration("searchWindow", searchWindow)
       // This will only include the sort vector, not everything else in the itinerary
       .addObjOp("itineraryPageCut", itineraryPageCut, ItinerarySortKey::keyAsString)
-      .addObj("bestStreetOnlyCost", bestStreetOnlyCost)
+      .addObj("streetOnlyCost", streetOnlyCost)
       .toString();
   }
 }

@@ -51,8 +51,8 @@ public class PageCursorFactory {
   }
 
   /**
-   * This adds the page cursor input to the factory. The cursor input can contain information about numItinerariesFilterResults
-   * or the bestStreetOnlyCost.
+   * This adds the page cursor input to the factory. The cursor input can contain information about filtering results
+   * or the best street only cost.
    * <p>
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
@@ -141,7 +141,7 @@ public class PageCursorFactory {
       }
     }
 
-    OptionalInt bestStreetOnlyCost = pageCursorInput.bestStreetOnlyCost();
+    OptionalInt streetOnlyCost = pageCursorInput.streetOnlyCost();
     prevCursor =
       new PageCursor(
         PREVIOUS_PAGE,
@@ -150,7 +150,7 @@ public class PageCursorFactory {
         currentLat,
         newSearchWindow,
         itineraryPageCut,
-        bestStreetOnlyCost
+        streetOnlyCost
       );
     nextCursor =
       new PageCursor(
@@ -160,7 +160,7 @@ public class PageCursorFactory {
         null,
         newSearchWindow,
         itineraryPageCut,
-        bestStreetOnlyCost
+        streetOnlyCost
       );
   }
 

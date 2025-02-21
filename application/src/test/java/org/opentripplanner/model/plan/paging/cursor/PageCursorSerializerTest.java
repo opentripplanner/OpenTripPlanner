@@ -19,7 +19,7 @@ class PageCursorSerializerTest {
   private static final Duration SW = DurationUtils.duration("5h");
   private static final Instant DT = Instant.parse("2024-01-10T10:00:00Z");
   private static final Instant AT = Instant.parse("2024-01-10T12:00:00Z");
-  private static final OptionalInt BSOC = OptionalInt.of(123);
+  private static final OptionalInt SOC = OptionalInt.of(123);
 
   public static final String TOKEN_V1 =
     "MXxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafDIwMjQtMDEtMTVUMDA6MDA6MDFafDVofFNUUkVFVF" +
@@ -45,7 +45,7 @@ class PageCursorSerializerTest {
     LAT,
     SW,
     CUT,
-    BSOC
+    SOC
   );
 
   private final PageCursor pageCursorV2withNulls = new PageCursor(
@@ -95,7 +95,7 @@ class PageCursorSerializerTest {
     assertEquals(LAT, tokenV2.latestArrivalTime());
     assertEquals(SW, tokenV2.searchWindow());
     assertEquals(CUT, tokenV2.itineraryPageCut());
-    assertEquals(BSOC, tokenV2.bestStreetOnlyCost());
+    assertEquals(SOC, tokenV2.streetOnlyCost());
   }
 
   @Test
@@ -107,6 +107,6 @@ class PageCursorSerializerTest {
     assertNull(tokenV2.latestArrivalTime());
     assertEquals(SW, tokenV2.searchWindow());
     assertNull(tokenV2.itineraryPageCut());
-    assertEquals(OptionalInt.empty(), tokenV2.bestStreetOnlyCost());
+    assertEquals(OptionalInt.empty(), tokenV2.streetOnlyCost());
   }
 }

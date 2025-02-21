@@ -6,7 +6,8 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItine
 /**
  * This class holds information needed to create the next/previous page cursors either when there were
  * itineraries removed due to cropping the list of itineraries using the numItineraries parameter or
- * when the RemoveTransitIfStreetOnlyIsBetter is used.
+ * when the {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+ * filter is used.
  * <p>
  * The Instant fields come from the sets of itineraries that were removed and the ones that were
  * kept as a result of using the numItineraries parameter.
@@ -16,7 +17,8 @@ public interface PageCursorInput {
   NumItinerariesFilterResults numItinerariesFilterResults();
   /**
    * The best street only cost comes from taking the cost of the best street only itinerary from the first search.
-   * This is used as a comparison in RemoveTransitIfStreetOnlyIsBetter when paging is used.
+   * This is used as a comparison in {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+   * when paging is used.
    */
-  OptionalInt bestStreetOnlyCost();
+  OptionalInt streetOnlyCost();
 }

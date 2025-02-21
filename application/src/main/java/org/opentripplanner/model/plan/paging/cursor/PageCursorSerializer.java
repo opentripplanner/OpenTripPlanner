@@ -23,7 +23,7 @@ final class PageCursorSerializer {
   private static final String CUT_ARRIVAL_TIME_FIELD = "cutArrivalTime";
   private static final String CUT_N_TRANSFERS_FIELD = "cutTx";
   private static final String CUT_COST_FIELD = "cutCost";
-  private static final String BEST_STREET_ONLY_COST_FIELD = "bestStreetOnlyCost";
+  private static final String STREET_ONLY_COST_FIELD = "streetOnlyCost";
 
   private static final TokenSchema SCHEMA_TOKEN_VERSION_1 = TokenSchema
     .ofVersion(1)
@@ -50,7 +50,7 @@ final class PageCursorSerializer {
     .addTimeInstant(CUT_ARRIVAL_TIME_FIELD)
     .addInt(CUT_N_TRANSFERS_FIELD)
     .addInt(CUT_COST_FIELD)
-    .addInt(BEST_STREET_ONLY_COST_FIELD)
+    .addInt(STREET_ONLY_COST_FIELD)
     .build();
   private static final TokenSchema[] SCHEMA_TOKENS = {
     SCHEMA_TOKEN_VERSION_2,
@@ -80,9 +80,9 @@ final class PageCursorSerializer {
         .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
     }
 
-    OptionalInt bestStreetOnlyCost = cursor.bestStreetOnlyCost();
-    if (bestStreetOnlyCost.isPresent()) {
-      tokenBuilder.withInt(BEST_STREET_ONLY_COST_FIELD, bestStreetOnlyCost.getAsInt());
+    OptionalInt streetOnlyCost = cursor.streetOnlyCost();
+    if (streetOnlyCost.isPresent()) {
+      tokenBuilder.withInt(STREET_ONLY_COST_FIELD, streetOnlyCost.getAsInt());
     }
 
     return tokenBuilder.build();
@@ -124,11 +124,11 @@ final class PageCursorSerializer {
         // Add logic to read in data from next version here.
         // if(token.version() > 1) { /* get v2 here */}
 
-        OptionalInt bestStreetOnlyCost = OptionalInt.empty();
+        OptionalInt streetOnlyCost = OptionalInt.empty();
         if (token.version() > 1) {
-          Integer bestStreetOnlyCostField = token.getInt(BEST_STREET_ONLY_COST_FIELD);
-          if (bestStreetOnlyCostField != null) {
-            bestStreetOnlyCost = OptionalInt.of(bestStreetOnlyCostField);
+          Integer streetOnlyCostField = token.getInt(STREET_ONLY_COST_FIELD);
+          if (streetOnlyCostField != null) {
+            streetOnlyCost = OptionalInt.of(streetOnlyCostField);
           }
         }
 
@@ -139,7 +139,7 @@ final class PageCursorSerializer {
           lat,
           searchWindow,
           itineraryPageCut,
-          bestStreetOnlyCost
+          streetOnlyCost
         );
       } catch (Exception e) {
         String details = e.getMessage();

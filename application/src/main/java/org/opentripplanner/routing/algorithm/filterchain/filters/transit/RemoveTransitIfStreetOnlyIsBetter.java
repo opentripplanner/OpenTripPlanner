@@ -18,18 +18,18 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   private static final Consumer<OptionalInt> IGNORE_SUBSCRIBER = i -> {};
 
   private final CostLinearFunction costLimitFunction;
-  private final OptionalInt bestStreetOnlyCost;
-  private final Consumer<OptionalInt> bestStreetOnlyCostSubscriber;
+  private final OptionalInt streetOnlyCost;
+  private final Consumer<OptionalInt> streetOnlyCostSubscriber;
 
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
-    OptionalInt bestStreetOnlyCost,
-    Consumer<OptionalInt> bestStreetOnlyCostSubscriber
+    OptionalInt streetOnlyCost,
+    Consumer<OptionalInt> streetOnlyCostSubscriber
   ) {
     this.costLimitFunction = costLimitFunction;
-    this.bestStreetOnlyCost = bestStreetOnlyCost;
-    this.bestStreetOnlyCostSubscriber =
-      bestStreetOnlyCostSubscriber == null ? IGNORE_SUBSCRIBER : bestStreetOnlyCostSubscriber;
+    this.streetOnlyCost = streetOnlyCost;
+    this.streetOnlyCostSubscriber =
+      streetOnlyCostSubscriber == null ? IGNORE_SUBSCRIBER : streetOnlyCostSubscriber;
   }
 
   /**
@@ -52,21 +52,20 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
-    if (minStreetCost.isEmpty() && bestStreetOnlyCost.isEmpty()) {
+    if (minStreetCost.isEmpty() && streetOnlyCost.isEmpty()) {
       // If no cost is found an empty list is returned.
       return List.of();
-    } else if (minStreetCost.isPresent() && bestStreetOnlyCost.isPresent()) {
-      // If both the minStreetCost and bestStreetOnlyCost are present, take the minimum value.
-      minStreetCost =
-        OptionalInt.of(Math.min(minStreetCost.getAsInt(), bestStreetOnlyCost.getAsInt()));
-    } else if (bestStreetOnlyCost.isPresent()) {
+    } else if (minStreetCost.isPresent() && streetOnlyCost.isPresent()) {
+      // If both the minStreetCost and streetOnlyCost are present, take the minimum value.
+      minStreetCost = OptionalInt.of(Math.min(minStreetCost.getAsInt(), streetOnlyCost.getAsInt()));
+    } else if (streetOnlyCost.isPresent()) {
       // If the best street only cost can't be found in the itineraries but
       // it is present in the cursor, then the information from the cursor is used.
-      minStreetCost = bestStreetOnlyCost;
+      minStreetCost = streetOnlyCost;
     }
 
     // The best street only cost is saved in the cursor.
-    bestStreetOnlyCostSubscriber.accept(minStreetCost);
+    streetOnlyCostSubscriber.accept(minStreetCost);
 
     var limit = costLimitFunction
       .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))
