@@ -54,7 +54,7 @@ class OsmBoardingLocationsModuleTest {
           .map(VertexLabel::osm)
           .collect(Collectors.toSet())
       ),
-      Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
+      Arguments.of(true, Set.of(VertexLabel.osm(768590748)))
     );
   }
 

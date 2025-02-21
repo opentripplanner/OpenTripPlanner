@@ -38,9 +38,9 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
     TraverseMode mode = s0.currentMode();
-    int t = (int) (d / s0.getPreferences().getSpeed(mode, false));
+    int t = (int) (1000.0 * d / s0.getPreferences().getSpeed(mode, false));
     StateEditor s1 = s0.edit(this);
-    s1.incrementTimeInSeconds(t);
+    s1.incrementTimeInMilliseconds(t);
     s1.incrementWeight(d);
     return s1.makeStateArray();
   }

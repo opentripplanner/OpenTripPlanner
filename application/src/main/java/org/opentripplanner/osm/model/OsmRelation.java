@@ -3,7 +3,7 @@ package org.opentripplanner.osm.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OsmRelation extends OsmWithTags {
+public class OsmRelation extends OsmEntity {
 
   private final List<OsmRelationMember> members = new ArrayList<>();
 

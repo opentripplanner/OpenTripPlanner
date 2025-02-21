@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.SidewalkNamer;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
@@ -18,21 +18,21 @@ public interface EdgeNamer {
   /**
    * Get the edge name from an OSM way.
    */
-  I18NString name(OsmWithTags way);
+  I18NString name(OsmEntity way);
 
   /**
    * Callback function for each way/edge combination so that more complicated names can be built
    * in the post-processing step.
    */
-  void recordEdges(OsmWithTags way, StreetEdgePair edge);
+  void recordEdges(OsmEntity way, StreetEdgePair edge);
 
   /**
    * Called after each edge has been named to build a more complex name out of the relationships
-   * tracked in {@link EdgeNamer#recordEdges(OsmWithTags, StreetEdgePair)}.
+   * tracked in {@link EdgeNamer#recordEdges(OsmEntity, StreetEdgePair)}.
    */
   void postprocess();
 
-  default I18NString getNameForWay(OsmWithTags way, String id) {
+  default I18NString getNameForWay(OsmEntity way, String id) {
     var name = name(way);
 
     if (name == null) {

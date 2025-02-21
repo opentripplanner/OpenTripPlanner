@@ -38,10 +38,6 @@ public class TestTransferPoint implements TransferPoint {
     return 2;
   }
 
-  public int getStopPosition() {
-    return this.stopPosition;
-  }
-
   public boolean matches(TestTripSchedule schedule, int stop, int stopPosition) {
     return this.schedule == schedule && this.stop == stop && this.stopPosition == stopPosition;
   }

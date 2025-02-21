@@ -3,6 +3,7 @@ package org.opentripplanner.raptorlegacy._data.api;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -76,7 +77,7 @@ public class TestPathBuilder implements RaptorTestConstants {
    * Create access with the given {@code startTime}, but allow the access to be time-shifted
    * according to the opening hours of the given {@code transfer}.
    */
-  private TestPathBuilder access(int startTime, TestAccessEgress transfer) {
+  private TestPathBuilder access(int startTime, RaptorAccessEgress transfer) {
     reset(startTime);
     builder.access(transfer);
     return this;
@@ -84,10 +85,6 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   public TestPathBuilder walk(int duration, int toStop) {
     return walk(TestTransfer.transfer(toStop, duration));
-  }
-
-  public TestPathBuilder walk(int duration, int toStop, int cost) {
-    return walk(TestTransfer.transfer(toStop, duration, cost));
   }
 
   public TestPathBuilder walk(TestTransfer transfer) {
@@ -126,12 +123,7 @@ public class TestPathBuilder implements RaptorTestConstants {
     );
   }
 
-  public PathBuilder<TestTripSchedule> access(TestAccessEgress access) {
-    builder.access(access);
-    return builder;
-  }
-
-  public RaptorPath<TestTripSchedule> egress(TestAccessEgress egress) {
+  public RaptorPath<TestTripSchedule> egress(RaptorAccessEgress egress) {
     builder.egress(egress);
     builder.c2(c2);
     return builder.build();

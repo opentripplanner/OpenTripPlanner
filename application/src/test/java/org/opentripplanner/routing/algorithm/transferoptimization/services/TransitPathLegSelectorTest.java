@@ -116,7 +116,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   }
 
   private TransitPathLeg<TestTripSchedule> transitLeg(int egressStop) {
-    TestAccessEgress walk = TestAccessEgress.walk(egressStop, EGRESS_END - EGRESS_START);
+    var walk = TestAccessEgress.walk(egressStop, EGRESS_END - EGRESS_START);
     var egress = new EgressPathLeg<TestTripSchedule>(walk, EGRESS_START, EGRESS_END, walk.c1());
     int toTime = TRIP.arrival(TRIP.findArrivalStopPosition(Integer.MAX_VALUE, egressStop));
     int cost = 100 * (STOP_TIME_THREE - STOP_TIME_ONE);

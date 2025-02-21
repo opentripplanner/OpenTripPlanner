@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -46,6 +47,7 @@ public class ConstructApplicationModule {
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService,
+    @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex
@@ -74,6 +76,7 @@ public class ConstructApplicationModule {
       worldEnvelopeService,
       emissionsService,
       luceneIndex,
+      schema,
       sorlandsbanenService,
       stopConsolidationService,
       traverseVisitor

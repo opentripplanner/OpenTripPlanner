@@ -55,7 +55,7 @@
 
   <logger name="org.opentripplanner.framework.application" level="info"/>
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
-
+  <logger name="org.opentripplanner.graph_builder.module.osm.OsmModule" level="info"/>
 
   <logger name="org.opentripplanner.routing" level="info"/>
   <logger name="org.opentripplanner.routing.algorithm.transferoptimization" level="info"/>
@@ -101,7 +101,7 @@
 
   <!-- If you want to debug realtime updates set these loggers to debug -->
   <logger name="org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter" level="info" />
-  <logger name="org.opentripplanner.model.Timetable" level="warn" />
+  <logger name="org.opentripplanner.updater.trip.TripTimesUpdater" level="warn" />
   <logger name="org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter" level="warn" />
   <logger name="org.opentripplanner.updater.siri.TimetableHelper" level="warn" />
 

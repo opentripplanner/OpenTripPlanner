@@ -10,10 +10,10 @@ import java.util.OptionalInt;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -222,7 +222,7 @@ class ElevatorProcessor {
     return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
   }
 
-  private OptionalInt parseDuration(OsmWithTags element) {
+  private OptionalInt parseDuration(OsmEntity element) {
     return element.getTagAsInt(
       "duration",
       v ->
