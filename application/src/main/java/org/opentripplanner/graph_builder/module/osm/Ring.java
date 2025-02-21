@@ -77,7 +77,11 @@ class Ring {
     OsmNode prev = nodes.get((i + n - 1) % n);
     OsmNode next = nodes.get((i + 1) % n);
     return (
-      (cur.lon - prev.lon) * (next.lat - cur.lat) - (cur.lat - prev.lat) * (next.lon - cur.lon) > 0
+      (cur.lon - prev.lon) *
+      (next.lat - cur.lat) -
+      (cur.lat - prev.lat) *
+      (next.lon - cur.lon) >
+      0.00000000001
     );
   }
 

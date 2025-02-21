@@ -17,43 +17,31 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
  *
  * @author novalis
  */
-public class AreaEdgeList implements Serializable {
+public class AreaGroup implements Serializable {
 
   private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
   private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
+  private final Polygon geometry;
+  private final List<Area> areas = new ArrayList<>();
 
-  // these are all of the original edges of the area, whether
-  // or not there are corresponding OSM edges. It is used as part of a hack
-  // to fix up areas after network linking.
-  private final Polygon originalEdges;
-
-  public final Set<String> references;
-
-  private final List<NamedArea> areas = new ArrayList<>();
-
-  public AreaEdgeList(Polygon originalEdges, Set<String> references) {
-    this.originalEdges = originalEdges;
-    this.references = references;
+  public AreaGroup(Polygon geometry) {
+    this.geometry = geometry;
   }
 
   public String toString() {
-    return String.format(
-      "AreaEdgeList: visibilityVertices=%s, %s",
-      visibilityVertices,
-      originalEdges
-    );
+    return String.format("AreaGroup: visibilityVertices=%s, %s", visibilityVertices, geometry);
   }
 
-  public void addArea(NamedArea namedArea) {
-    areas.add(namedArea);
+  public void addArea(Area area) {
+    areas.add(area);
   }
 
-  public List<NamedArea> getAreas() {
+  public List<Area> getAreas() {
     return areas;
   }
 
   public Geometry getGeometry() {
-    return originalEdges;
+    return geometry;
   }
 
   /**

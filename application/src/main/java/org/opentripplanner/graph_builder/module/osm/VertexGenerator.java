@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
@@ -58,7 +58,7 @@ class VertexGenerator {
    * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
-  IntersectionVertex getVertexForOsmNode(OsmNode node, OsmWithTags way) {
+  IntersectionVertex getVertexForOsmNode(OsmNode node, OsmEntity way) {
     // If the node should be decomposed to multiple levels,
     // use the numeric level because it is unique, the human level may not be (although
     // it will likely lead to some head-scratching if it is not).
@@ -145,7 +145,7 @@ class VertexGenerator {
       });
     }
     // Intersect ways at area boundaries if needed.
-    for (Area area : Iterables.concat(
+    for (OsmArea area : Iterables.concat(
       osmdb.getWalkableAreas(),
       osmdb.getParkAndRideAreas(),
       osmdb.getBikeParkingAreas()
@@ -171,7 +171,7 @@ class VertexGenerator {
    * @param node the node to record for
    * @author mattwigway
    */
-  private OsmVertex recordLevel(OsmNode node, OsmWithTags way) {
+  private OsmVertex recordLevel(OsmNode node, OsmEntity way) {
     OsmLevel level = osmdb.getLevelForWay(way);
     Map<OsmLevel, OsmVertex> vertices;
     long nodeId = node.getId();

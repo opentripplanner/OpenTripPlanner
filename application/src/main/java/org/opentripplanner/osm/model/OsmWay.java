@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
-public class OsmWay extends OsmWithTags {
+public class OsmWay extends OsmEntity {
 
   private static final Set<String> ESCALATOR_CONVEYING_TAGS = Set.of(
     "yes",
