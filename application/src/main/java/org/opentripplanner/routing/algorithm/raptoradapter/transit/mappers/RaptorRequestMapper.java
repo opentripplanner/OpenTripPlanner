@@ -7,7 +7,9 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -29,6 +31,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
@@ -39,6 +42,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
+  private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LookupStopIndexCallback lookUpStopIndex;
 
   private RaptorRequestMapper(
@@ -47,16 +51,18 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     long transitSearchTimeZeroEpocSecond,
-    MeterRegistry meterRegistry,
+    @Nullable MeterRegistry meterRegistry,
+    ViaCoordinateTransferFactory viaTransferResolver,
     LookupStopIndexCallback lookUpStopIndex
   ) {
-    this.request = request;
+    this.request = Objects.requireNonNull(request);
     this.isMultiThreadedEnbled = isMultiThreaded;
-    this.accessPaths = accessPaths;
-    this.egressPaths = egressPaths;
+    this.accessPaths = Objects.requireNonNull(accessPaths);
+    this.egressPaths = Objects.requireNonNull(egressPaths);
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
     this.meterRegistry = meterRegistry;
-    this.lookUpStopIndex = lookUpStopIndex;
+    this.viaTransferResolver = Objects.requireNonNull(viaTransferResolver);
+    this.lookUpStopIndex = Objects.requireNonNull(lookUpStopIndex);
   }
 
   public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
@@ -66,6 +72,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     MeterRegistry meterRegistry,
+    ViaCoordinateTransferFactory viaTransferResolver,
     LookupStopIndexCallback lookUpStopIndex
   ) {
     return new RaptorRequestMapper<T>(
@@ -75,6 +82,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       egressPaths,
       transitSearchTimeZero.toEpochSecond(),
       meterRegistry,
+      viaTransferResolver,
       lookUpStopIndex
     )
       .doMap();
@@ -241,6 +249,12 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var builder = RaptorViaLocation.via(input.label(), input.minimumWaitTime());
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
         builder.addViaStop(stopIndex);
+      }
+      for (var coordinate : input.coordinates()) {
+        var viaTransfers = viaTransferResolver.createViaTransfers(request, coordinate);
+        for (var it : viaTransfers) {
+          builder.addViaTransfer(it.fromStopIndex(), it);
+        }
       }
       return builder.build();
     }

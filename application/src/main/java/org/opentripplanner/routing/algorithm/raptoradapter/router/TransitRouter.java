@@ -43,6 +43,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
@@ -61,6 +62,7 @@ public class TransitRouter {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TemporaryVerticesContainer temporaryVerticesContainer;
+  private final ViaCoordinateTransferFactory viaTransferResolver;
 
   private TransitRouter(
     RouteRequest request,
@@ -77,6 +79,7 @@ public class TransitRouter {
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
     this.temporaryVerticesContainer = createTemporaryVerticesContainer(request, serverContext);
+    this.viaTransferResolver = serverContext.viaTransferResolver();
   }
 
   public static TransitRouterResult route(
@@ -141,6 +144,7 @@ public class TransitRouter {
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
       serverContext.meterRegistry(),
+      viaTransferResolver,
       this::listStopIndexes
     );
 
