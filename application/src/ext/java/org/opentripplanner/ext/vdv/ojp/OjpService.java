@@ -53,8 +53,7 @@ public class OjpService {
     var time = Optional
       .ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId))
       .orElse(ZonedDateTime.now(zoneId));
-    int numResults = Optional
-      .ofNullable(ser.getParams())
+    int numResults = params(ser)
       .map(s -> s.getNumberOfResults())
       .map(i -> i.intValue())
       .orElse(1);
@@ -87,14 +86,28 @@ public class OjpService {
   }
 
   private Set<FeedScopedId> selectedAgencies(OJPStopEventRequestStructure ser) {
-    return Optional
-      .ofNullable(ser.getParams())
+    return params(ser)
       .map(p -> p.getOperatorFilter())
       .map(o -> o.getOperatorRef())
       .stream()
       .flatMap(r -> r.stream().map(ref -> ref.getValue()))
       .map(idResolver::parse)
       .collect(Collectors.toSet());
+
+  }
+  private Set<FeedScopedId> selectedLines(OJPStopEventRequestStructure ser) {
+    return params(ser)
+      .map(p -> p.getLineFilter())
+      .map(o -> o.getLine())
+      .stream()
+      .flatMap(r -> r.stream().map(l->l.getLineRef().getValue()))
+      .map(idResolver::parse)
+      .collect(Collectors.toSet());
+  }
+
+  private static Optional<StopEventParamStructure> params(OJPStopEventRequestStructure ser) {
+    return Optional
+      .ofNullable(ser.getParams());
   }
 
   private Optional<FeedScopedId> stopPointRef(OJPStopEventRequestStructure ser) {
@@ -129,8 +142,7 @@ public class OjpService {
   }
 
   private static ArrivalDeparture arrivalDeparture(OJPStopEventRequestStructure ser) {
-    return Optional
-      .ofNullable(ser.getParams())
+    return params(ser)
       .map(StopEventParamStructure::getStopEventType)
       .map(OjpService::mapType)
       .orElse(ArrivalDeparture.BOTH);
@@ -145,8 +157,7 @@ public class OjpService {
   }
 
   private static Duration timeWindow(OJPStopEventRequestStructure ser) {
-    return Optional
-      .ofNullable(ser.getParams())
+    return params(ser)
       .map(StopEventParamStructure::getTimeWindow)
       .orElse(DEFAULT_TIME_WINDOW);
   }

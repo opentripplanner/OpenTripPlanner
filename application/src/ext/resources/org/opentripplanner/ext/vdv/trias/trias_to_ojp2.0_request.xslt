@@ -99,6 +99,17 @@
                     </xsl:for-each>
                   </OperatorFilter>
                 </xsl:if>
+                <xsl:if test="//trias:LineFilter">
+                  <LineFilter>
+                    <xsl:for-each select="//trias:LineFilter//trias:Line//trias:LineRef">
+                      <Line>
+                        <LineRef>
+                          <xsl:value-of select="."/>
+                        </LineRef>
+                      </Line>
+                    </xsl:for-each>
+                  </LineFilter>
+                </xsl:if>
               </Params>
             </OJPStopEventRequest>
           </xsl:if>
