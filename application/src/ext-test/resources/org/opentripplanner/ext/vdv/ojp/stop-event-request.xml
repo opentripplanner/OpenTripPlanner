@@ -14,6 +14,10 @@
                     <ojp:DepArrTime>2025-02-13T13:03:36</ojp:DepArrTime>
                 </ojp:Location>
                 <ojp:Params>
+                    <ojp:OperatorFilter>
+                        <ojp:OperatorRef>vvs-111</ojp:OperatorRef>
+                        <ojp:OperatorRef>vvs-222</ojp:OperatorRef>
+                    </ojp:OperatorFilter>
                     <ojp:NumberOfResults>1</ojp:NumberOfResults>
                     <ojp:StopEventType>departure</ojp:StopEventType>
                     <ojp:IncludePreviousCalls>true</ojp:IncludePreviousCalls>

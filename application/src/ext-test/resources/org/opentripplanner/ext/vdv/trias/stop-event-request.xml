@@ -17,6 +17,14 @@
                     <IncludePreviousCalls>true</IncludePreviousCalls>
                     <IncludeOnwardCalls>true</IncludeOnwardCalls>
                     <IncludeRealtimeData>true</IncludeRealtimeData>
+                    <OperatorFilter>
+                        <OperatorRef>vvs-111</OperatorRef>
+                        <OperatorRef>vvs-222</OperatorRef>
+                    </OperatorFilter>
+                    <LineFilter>
+                        <LineRef>vvs-aaa</LineRef>
+                        <LineRef>vvs-bbb</LineRef>
+                    </LineFilter>
                 </Params>
             </StopEventRequest>
         </RequestPayload>
