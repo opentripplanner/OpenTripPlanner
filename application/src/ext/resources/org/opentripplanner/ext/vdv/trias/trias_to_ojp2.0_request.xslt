@@ -3,6 +3,7 @@
                 xmlns:trias="http://www.vdv.de/trias"
                 xmlns:siri="http://www.siri.org.uk/siri"
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
   <xsl:template name="triasConvertBooleanToString">
     <xsl:param name="input"/>
     <!-- Default value is false -->
@@ -15,12 +16,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  <xsl:template match="trias:GeoPosition">
-    <GeoPosition>
-      <xsl:value-of select="."/>
-    </GeoPosition>
-  </xsl:template>
-  <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
+
   <xsl:template match="trias:Trias">
     <OJP xmlns="http://www.vdv.de/ojp" xmlns:siri="http://www.siri.org.uk/siri" version="2.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -93,6 +89,15 @@
                   <xsl:element name="TimeWindow">
                     <xsl:value-of select="//trias:TimeWindow"/>
                   </xsl:element>
+                </xsl:if>
+                <xsl:if test="//trias:OperatorFilter">
+                  <OperatorFilter>
+                    <xsl:for-each select="//trias:OperatorFilter//trias:OperatorRef">
+                      <xsl:element name="OperatorRef">
+                        <xsl:value-of select="."/>
+                      </xsl:element>
+                    </xsl:for-each>
+                  </OperatorFilter>
                 </xsl:if>
               </Params>
             </OJPStopEventRequest>
