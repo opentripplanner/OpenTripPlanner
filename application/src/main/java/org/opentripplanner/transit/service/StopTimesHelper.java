@@ -108,8 +108,8 @@ class StopTimesHelper {
         )
           .stream()
           .flatMap(st -> st.times.stream())
+          .filter(matcher::match)
       )
-      .filter(matcher::match)
       .sorted(TripTimeOnDate.compareByDeparture())
       .toList();
   }

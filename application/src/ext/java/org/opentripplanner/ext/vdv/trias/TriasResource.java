@@ -41,6 +41,10 @@ import org.slf4j.LoggerFactory;
 public class TriasResource {
 
   private static final Logger LOG = LoggerFactory.getLogger(TriasResource.class);
+  private static final Set<String> ALLOWED_CLASSPATH_RESOURCES = Set.of(
+    "stop-event-coordinates.xml",
+    "stop_event.xml"
+  );
 
   private final OjpService ojpService;
 
@@ -144,11 +148,11 @@ public class TriasResource {
   @Path("/static/{fileName}")
   @Produces(MediaType.APPLICATION_XML)
   public Response stopEventXml(@PathParam("fileName") String fileName) throws IOException {
-    var allowed = Set.of("stop-event-coordinates.xml", "stop_event.xml");
-    if (!allowed.contains(fileName)) {
+    if (!ALLOWED_CLASSPATH_RESOURCES.contains(fileName)) {
       return classpathResource(fileName);
+    } else {
+      return Response.status(Response.Status.NOT_FOUND).build();
     }
-    return classpathResource(fileName);
   }
 
   private static Response classpathResource(String name) throws IOException {
