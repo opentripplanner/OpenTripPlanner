@@ -125,17 +125,15 @@ public class DefaultTransitService implements TransitEditorService {
 
     Timetable timetable = findTimetable(pattern, serviceDate);
 
+    Instant midnight = ServiceDateUtils
+      .asStartOfService(serviceDate, this.getTimeZone())
+      .toInstant();
+
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
-    if (
-      times == null ||
-      !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
-    ) {
+    if (times == null) {
       return Optional.empty();
     } else {
-      Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate, this.getTimeZone())
-        .toInstant();
       return Optional.of(TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight));
     }
   }

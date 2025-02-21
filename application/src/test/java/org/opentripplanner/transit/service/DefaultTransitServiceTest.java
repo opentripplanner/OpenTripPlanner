@@ -250,11 +250,6 @@ class DefaultTransitServiceTest {
   }
 
   @Test
-  void getTripTimesOnNoServiceDay() {
-    assertEquals(Optional.empty(), service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE));
-  }
-
-  @Test
   void getScheduledTripTimesForAddedTrip() {
     assertEquals(Optional.empty(), service.getScheduledTripTimes(ADDED_TRIP));
   }
