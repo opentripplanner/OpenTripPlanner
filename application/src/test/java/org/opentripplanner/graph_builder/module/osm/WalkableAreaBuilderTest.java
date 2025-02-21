@@ -22,12 +22,15 @@ import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class WalkableAreaBuilderTest {
+
+  private DefaultOsmInfoGraphBuildRepository osmInfoRepository;
 
   public Graph buildGraph(final TestInfo testInfo) {
     var graph = new Graph();
@@ -37,8 +40,9 @@ public class WalkableAreaBuilderTest {
     final int maxAreaNodes = testMethod.getAnnotation(MaxAreaNodes.class).value();
     final boolean platformEntriesLinking = true;
 
-    final Set<String> boardingAreaRefTags = Set.of();
+    final Set<String> boardingAreaRefTags = Set.of("ref");
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
+    this.osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
 
     final File file = ResourceLoader.of(WalkableAreaBuilderTest.class).file(osmFile);
     assertTrue(file.exists());
@@ -48,6 +52,7 @@ public class WalkableAreaBuilderTest {
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
+      osmInfoRepository,
       new VertexGenerator(osmdb, graph, Set.of(), false),
       new DefaultNamer(),
       new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
@@ -57,13 +62,13 @@ public class WalkableAreaBuilderTest {
       boardingAreaRefTags
     );
 
-    final Map<Area, OsmLevel> areasLevels = osmdb
+    final Map<OsmArea, OsmLevel> areasLevels = osmdb
       .getWalkableAreas()
       .stream()
       .collect(toMap(a -> a, a -> osmdb.getLevelForWay(a.parent)));
-    final List<AreaGroup> areaGroups = AreaGroup.groupAreas(areasLevels);
+    final List<OsmAreaGroup> areaGroups = OsmAreaGroup.groupAreas(areasLevels);
 
-    final Consumer<AreaGroup> build = visibility
+    final Consumer<OsmAreaGroup> build = visibility
       ? walkableAreaBuilder::buildWithVisibility
       : walkableAreaBuilder::buildWithoutVisibility;
 
@@ -166,7 +171,7 @@ public class WalkableAreaBuilderTest {
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
     // with two bidirectional edge pairs, and with the other entrance point
-    assertEquals(6, connectionEdges.size());
+    assertEquals(3, connectionEdges.size());
 
     // test that semicolon separated list of elevator levals works in level matching
     // e.g. 'level'='0;1'
@@ -178,6 +183,23 @@ public class WalkableAreaBuilderTest {
       .distinct()
       .toList();
     assertEquals(1, elevatorConnection.size());
+
+    // first platform area has ref tag. Check that it is available in
+    // DefaultOsmInfoGraphBuildRepository
+    var areaGroups = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143846)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+
+    var area = areaGroups.getFirst().getAreas().getFirst();
+    var platform = this.osmInfoRepository.findPlatform(area);
+    assertTrue(platform.isPresent());
+    assertEquals(Set.of("007"), platform.get().references());
+    // test that boarding location for a concave platform is inside the platform area
+    assertTrue(area.getGeometry().intersects(platform.get().geometry()));
   }
 
   @Test

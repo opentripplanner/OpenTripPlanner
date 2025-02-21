@@ -90,7 +90,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     var AB_PRICE = euros(2.80f);
     var BC_PRICE = euros(2.80f);
-    var CD_PRICE = euros(3.20f);
+    var CD_PRICE = euros(2.80f);
     var ABC_PRICE = euros(4.10f);
     var BCD_PRICE = euros(4.10f);
     var ABCD_PRICE = euros(5.70f);

@@ -55,6 +55,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -104,8 +105,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   private final Supplier<LocalDate> localDateNow;
 
   /**
-   * Constructor is package local to allow unit-tests to provide their own clock, not using system
-   * time.
+   * Constructor to allow tests to provide their own clock, not using system time.
    */
   public GtfsRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
@@ -381,14 +381,13 @@ public class GtfsRealTimeTripUpdateAdapter {
     }
 
     // Get new TripTimes based on scheduled timetable
-    var result = pattern
-      .getScheduledTimetable()
-      .createUpdatedTripTimesFromGTFSRT(
-        tripUpdate,
-        timeZone,
-        serviceDate,
-        backwardsDelayPropagationType
-      );
+    var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      pattern.getScheduledTimetable(),
+      tripUpdate,
+      timeZone,
+      serviceDate,
+      backwardsDelayPropagationType
+    );
 
     if (result.isFailure()) {
       // necessary so the success type is correct
@@ -887,6 +886,14 @@ public class GtfsRealTimeTripUpdateAdapter {
           .ifPresent(newTripTimes::updateWheelchairAccessibility);
       }
     }
+
+    // create a TripOnServiceDate for added trips
+    TripOnServiceDate tripOnServiceDate = null;
+    if (realTimeState == RealTimeState.ADDED) {
+      tripOnServiceDate =
+        TripOnServiceDate.of(trip.getId()).withTrip(trip).withServiceDate(serviceDate).build();
+    }
+
     trace(
       trip.getId(),
       serviceDate,
@@ -896,14 +903,14 @@ public class GtfsRealTimeTripUpdateAdapter {
       pattern.firstStop().getName(),
       pattern.lastStop().getName()
     );
+
     // Add new trip times to the buffer
-    // TODO add support for TripOnServiceDate for GTFS-RT
     return snapshotManager.updateBuffer(
       new RealTimeTripUpdate(
         pattern,
         newTripTimes,
         serviceDate,
-        null,
+        tripOnServiceDate,
         realTimeState == RealTimeState.ADDED,
         isAddedRoute
       )

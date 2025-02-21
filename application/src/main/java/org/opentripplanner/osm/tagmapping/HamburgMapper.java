@@ -1,6 +1,6 @@
 package org.opentripplanner.osm.tagmapping;
 
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 /**
  * Modified mapper to allow through traffic for combination access=customers and customers=HVV.
@@ -13,7 +13,7 @@ import org.opentripplanner.osm.model.OsmWithTags;
 public class HamburgMapper extends GermanyMapper {
 
   @Override
-  public boolean isGeneralNoThroughTraffic(OsmWithTags way) {
+  public boolean isGeneralNoThroughTraffic(OsmEntity way) {
     String access = way.getTag("access");
     boolean isNoThroughTraffic = doesTagValueDisallowThroughTraffic(access);
 

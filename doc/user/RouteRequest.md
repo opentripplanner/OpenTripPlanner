@@ -29,7 +29,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | locale                                                                                                       |        `locale`        | TODO                                                                                                                                                     | *Optional* | `"en_US"`        |  2.0  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                                       |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                                   | *Optional* | `"PT4H"`         |  2.1  |
 | [maxJourneyDuration](#rd_maxJourneyDuration)                                                                 |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                                                    | *Optional* | `"PT24H"`        |  2.1  |
-| modes                                                                                                        |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                                           | *Optional* | `"TRANSIT,WALK"` |  2.0  |
+| modes                                                                                                        |        `string`        | The set of access/egress/direct/transfer modes (separated by a comma) to be used for the route search.                                                   | *Optional* | `"WALK"`         |  2.0  |
 | nonpreferredTransferPenalty                                                                                  |        `integer`       | Penalty (in seconds) for using a non-preferred transfer.                                                                                                 | *Optional* | `180`            |  2.0  |
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                             | *Optional* | `50`             |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                            | *Optional* | `300`            |  2.0  |
@@ -461,7 +461,6 @@ performance will be better.
 
 The default values are
 
-- `car` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-pickup` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)

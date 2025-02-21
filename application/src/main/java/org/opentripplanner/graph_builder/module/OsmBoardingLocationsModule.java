@@ -23,10 +23,10 @@ import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -135,13 +135,13 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   /**
    * Connect a transit stop vertex into a boarding location area in the index.
    * <p>
-   * A centroid vertex is generated in the area and connected to the vertices on the platform edge.
+   * A centroid vertex is generated and connected to the visibility vertices on the area edge.
    *
    * @return if the vertex has been connected
    */
   private boolean connectVertexToArea(TransitStopVertex ts, StreetIndex index) {
     RegularStop stop = ts.getStop();
-    var nearbyAreaEdgeList = index
+    var nearbyAreaGroups = index
       .getEdgesForEnvelope(getEnvelope(ts))
       .stream()
       .filter(AreaEdge.class::isInstance)
@@ -149,25 +149,25 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .map(AreaEdge::getArea)
       .collect(Collectors.toSet());
 
-    // Iterate over all nearby areas representing transit stops in OSM, linking to them if they have a stop code or id
-    // in their ref= tag that matches the GTFS stop code of this StopVertex.
-    for (var edgeList : nearbyAreaEdgeList) {
-      if (matchesReference(stop, edgeList.references)) {
-        var name = edgeList
-          .getAreas()
-          .stream()
-          .findFirst()
-          .map(NamedArea::getName)
-          .orElse(LOCALIZED_PLATFORM_NAME);
-        var boardingLocation = makeBoardingLocation(
-          stop,
-          edgeList.getGeometry().getCentroid(),
-          edgeList.references,
-          name
-        );
-        linker.addPermanentAreaVertex(boardingLocation, edgeList);
-        linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
-        return true;
+    // Find a nearby area representing transit stop in OSM, linking to it if
+    // stop code or id in ref= tag matches the GTFS stop code of this StopVertex.
+    for (var areaGroup : nearbyAreaGroups) {
+      for (Area area : areaGroup.getAreas()) {
+        var platOpt = osmInfoGraphBuildService.findPlatform(area);
+        if (platOpt.isPresent()) {
+          var platform = platOpt.get();
+          if (matchesReference(stop, platform.references())) {
+            var boardingLocation = makeBoardingLocation(
+              stop,
+              platform.geometry().getCentroid(),
+              platform.references(),
+              area.getName()
+            );
+            linker.addPermanentAreaVertex(boardingLocation, areaGroup);
+            linkBoardingLocationToStop(ts, stop.getCode(), boardingLocation);
+            return true;
+          }
+        }
       }
     }
     return false;
