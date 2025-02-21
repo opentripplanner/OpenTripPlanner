@@ -211,7 +211,7 @@ class AddedTest implements RealtimeTestConstants {
     assertNotNull(trip);
     assertNotNull(transitService.findPattern(trip));
     assertNotNull(
-      transitService.getTripOnServiceDate(TimetableRepositoryForTest.id(ADDED_TRIP_ID))
+      transitService.getTripOnServiceDate(TimetableRepositoryForTest.id(tripId))
     );
 
     var stopA = env.timetableRepository.getSiteRepository().getRegularStop(STOP_A1.getId());
