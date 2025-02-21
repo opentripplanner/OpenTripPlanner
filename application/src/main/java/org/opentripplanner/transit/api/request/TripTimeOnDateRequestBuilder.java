@@ -20,6 +20,7 @@ public class TripTimeOnDateRequestBuilder {
   private FilterValues<TransitMode> modes = FilterValues.ofEmptyIsEverything("modes", List.of());
   private Duration timeWindow = Duration.ofHours(2);
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
+  private int numberOfDepartures = 10;
 
   TripTimeOnDateRequestBuilder(List<TimeAtStop> timesAtStops) {
     this.timesAtStop = timesAtStops;
@@ -50,14 +51,20 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
+  public TripTimeOnDateRequestBuilder withNumberOfDepartures(int numberOfDepartures) {
+    this.numberOfDepartures = numberOfDepartures;
+    return this;
+  }
+
   public TripTimeOnDateRequest build() {
     return new TripTimeOnDateRequest(
       timesAtStop,
       timeWindow,
       arrivalDeparture,
-      modes,
+      numberOfDepartures,
       agencies,
-      routes
+      routes,
+      modes
     );
   }
 }

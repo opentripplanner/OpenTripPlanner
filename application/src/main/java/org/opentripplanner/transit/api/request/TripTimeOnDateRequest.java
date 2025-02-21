@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.api.model.RequiredFilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -18,14 +17,16 @@ public class TripTimeOnDateRequest {
   private final FilterValues<TransitMode> modes;
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
+  private final int numberOfDepartures;
 
   TripTimeOnDateRequest(
     List<TimeAtStop> timesAtStop,
     Duration timeWindow,
     ArrivalDeparture arrivalDeparture,
-    FilterValues<TransitMode> modes,
+    int numberOfDepartures,
     FilterValues<FeedScopedId> agencies,
-    FilterValues<FeedScopedId> routes
+    FilterValues<FeedScopedId> routes,
+    FilterValues<TransitMode> modes
   ) {
     this.timesAtStops = timesAtStop;
     this.agencies = agencies;
@@ -33,6 +34,7 @@ public class TripTimeOnDateRequest {
     this.modes = modes;
     this.timeWindow = timeWindow;
     this.arrivalDeparture = arrivalDeparture;
+    this.numberOfDepartures = numberOfDepartures;
   }
 
   public static TripTimeOnDateRequestBuilder of(List<TimeAtStop> timesAtStops) {
@@ -61,6 +63,10 @@ public class TripTimeOnDateRequest {
 
   public ArrivalDeparture arrivalDeparture() {
     return arrivalDeparture;
+  }
+
+  public int numberOfDepartures() {
+    return numberOfDepartures;
   }
 
   public record TimeAtStop(StopLocation stop, Instant time) {}
