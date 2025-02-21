@@ -153,8 +153,12 @@ class TripTimesUpdater {
           newTimes.setNoData(i);
         } else {
           // Else the status is SCHEDULED, update times as needed.
-          GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.hasArrival() ? update.getArrival() : null;
-          GtfsRealtime.TripUpdate.StopTimeEvent departure = update.hasDeparture() ? update.getDeparture() : null;
+          GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.hasArrival()
+            ? update.getArrival()
+            : null;
+          GtfsRealtime.TripUpdate.StopTimeEvent departure = update.hasDeparture()
+            ? update.getDeparture()
+            : null;
 
           // This extra variable is necessary if the departure is specified but the arrival isn't.
           // We want to propagate the arrival delay from the previous stop, even if the departure
