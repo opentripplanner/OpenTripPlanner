@@ -4,14 +4,12 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.stream.IntStream;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -100,10 +98,6 @@ public class TestTripSchedule implements TripSchedule {
     return wheelchairBoarding;
   }
 
-  public int size() {
-    return arrivalTimes.length;
-  }
-
   @Override
   public String toString() {
     if (Arrays.equals(arrivalTimes, departureTimes)) {
@@ -153,18 +147,6 @@ public class TestTripSchedule implements TripSchedule {
     public TestTripSchedule.Builder originalPattern(TripPattern pattern) {
       this.originalPattern = pattern;
       return this;
-    }
-
-    public TestTripSchedule.Builder copy() {
-      var b = new TestTripSchedule.Builder();
-      b.pattern = pattern;
-      b.arrivalTimes = arrivalTimes;
-      b.departureTimes = departureTimes;
-      b.arrivalDepartureOffset = arrivalDepartureOffset;
-      b.transitReluctanceIndex = transitReluctanceIndex;
-      b.wheelchairBoarding = wheelchairBoarding;
-      b.originalPattern = originalPattern;
-      return b;
     }
 
     public TestTripSchedule.Builder pattern(String name, int... stops) {
@@ -217,26 +199,6 @@ public class TestTripSchedule implements TripSchedule {
     }
 
     /**
-     * Shift all arrival/departure times by the given {@code offset}. Be careful, this
-     * method change the builder instance, use {@link #copy()} if you need the original.
-     * <p>
-     * Offset unit is seconds.
-     */
-    public TestTripSchedule.Builder shiftTimes(int offset) {
-      if (arrivalTimes == departureTimes) {
-        arrivalTimes = departureTimes = IntUtils.shiftArray(offset, arrivalTimes);
-      } else {
-        if (arrivalTimes != null) {
-          arrivalTimes = IntUtils.shiftArray(offset, arrivalTimes);
-        }
-        if (departureTimes != null) {
-          departureTimes = IntUtils.shiftArray(offset, departureTimes);
-        }
-      }
-      return this;
-    }
-
-    /**
      * Set the transit-reluctance-index.
      * <p>
      * The default is 0.
@@ -249,13 +211,6 @@ public class TestTripSchedule implements TripSchedule {
     public TestTripSchedule.Builder wheelchairBoarding(Accessibility wcb) {
       this.wheelchairBoarding = wcb;
       return this;
-    }
-
-    public TestTripSchedule.Builder[] repeat(int nTimes, int everySeconds) {
-      return IntStream
-        .range(0, nTimes)
-        .mapToObj(i -> copy().shiftTimes(i * everySeconds))
-        .toArray(Builder[]::new);
     }
 
     public TestTripSchedule build() {

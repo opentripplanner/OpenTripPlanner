@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.server;
 
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +63,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final LuceneIndex luceneIndex;
 
   @Nullable
+  private final GraphQLSchema schema;
+
+  @Nullable
   private final SorlandsbanenNorwayService sorlandsbanenService;
 
   @Nullable
@@ -97,6 +101,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     @Nullable EmissionsService emissionsService,
     @Nullable LuceneIndex luceneIndex,
+    @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     @Nullable StopConsolidationService stopConsolidationService,
     @Nullable TraverseVisitor traverseVisitor
@@ -120,6 +125,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     // Optional fields
     this.emissionsService = emissionsService;
     this.luceneIndex = luceneIndex;
+    this.schema = schema;
     this.sorlandsbanenService = sorlandsbanenService;
     this.stopConsolidationService = stopConsolidationService;
     this.traverseVisitor = traverseVisitor;
@@ -195,6 +201,12 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public List<RideHailingService> rideHailingServices() {
     return rideHailingServices;
+  }
+
+  @Nullable
+  @Override
+  public GraphQLSchema schema() {
+    return schema;
   }
 
   @Override

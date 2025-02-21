@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 
 import java.util.List;
 import java.util.Objects;
@@ -80,7 +79,7 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
     public final int y;
 
     private A(String name, int x, int y) {
-      super(SLACK_PROVIDER, C1_CALCULATOR, T00_00, WAIT_TIME_CALC, null, 0.0, null);
+      super(SLACK_PROVIDER, COST_CALCULATOR, T00_00, WAIT_TIME_CALC, null, 0.0, null);
       this.name = name;
       this.x = x;
       this.y = y;

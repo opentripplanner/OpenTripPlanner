@@ -320,7 +320,7 @@ public class RouteRequest implements Cloneable, Serializable {
     return searchWindow;
   }
 
-  public void setSearchWindow(Duration searchWindow) {
+  public void setSearchWindow(@Nullable Duration searchWindow) {
     if (searchWindow != null) {
       if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
         throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);

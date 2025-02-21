@@ -11,8 +11,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.specifier.ExactMatchSpecifier;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
@@ -25,7 +25,7 @@ class WayPropertySetTest {
 
     @Test
     public void carTunnel() {
-      OsmWithTags tunnel = WayTestData.carTunnel();
+      OsmEntity tunnel = WayTestData.carTunnel();
       WayPropertySet wps = wps();
       assertEquals(CAR, wps.getDataForWay(tunnel).getPermission());
     }
@@ -42,7 +42,7 @@ class WayPropertySetTest {
       assertEquals(0f, wps.maxUsedCarSpeed, delta);
 
       // Speed limit that is within limits should be used as the max used car speed
-      OsmWithTags streetWithSpeedLimit = new OsmWithTags();
+      OsmEntity streetWithSpeedLimit = new OsmEntity();
       streetWithSpeedLimit.addTag("highway", "motorway");
       streetWithSpeedLimit.addTag("maxspeed", "120");
       var waySpeed = wps.getCarSpeedForWay(streetWithSpeedLimit, false);
@@ -51,7 +51,7 @@ class WayPropertySetTest {
 
       // Speed limit that is higher than maxPossibleCarSpeed should be ignored and regular motorway
       // speed limit should be used instead
-      OsmWithTags streetWithTooHighSpeedLimit = new OsmWithTags();
+      OsmEntity streetWithTooHighSpeedLimit = new OsmEntity();
       streetWithTooHighSpeedLimit.addTag("highway", "motorway");
       streetWithTooHighSpeedLimit.addTag("maxspeed", "200");
       waySpeed = wps.getCarSpeedForWay(streetWithTooHighSpeedLimit, false);
@@ -60,7 +60,7 @@ class WayPropertySetTest {
 
       // Speed limit that is too low should be ignored and regular motorway speed limit should
       // be used instead
-      OsmWithTags streetWithTooLowSpeedLimit = new OsmWithTags();
+      OsmEntity streetWithTooLowSpeedLimit = new OsmEntity();
       streetWithTooLowSpeedLimit.addTag("highway", "motorway");
       streetWithTooLowSpeedLimit.addTag("maxspeed", "0");
       waySpeed = wps.getCarSpeedForWay(streetWithTooLowSpeedLimit, false);

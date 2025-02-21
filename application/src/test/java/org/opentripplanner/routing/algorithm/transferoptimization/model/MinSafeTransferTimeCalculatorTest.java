@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator.bound;
 import static org.opentripplanner.utils.time.TimeUtils.time;
 
@@ -10,15 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
-import org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.utils.time.DurationUtils;
 
 public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
 
   private static final int D2m = DurationUtils.durationInSeconds("2m");
-  private static final int TRANSIT_TIME = 2000 - (BOARD_SLACK + ALIGHT_SLACK);
-  private static final TestPathBuilder PATH_BUILDER = new TestPathBuilder(C1_CALCULATOR);
+  private static final int D32m20s = DurationUtils.durationInSeconds("32m20s");
+  private static final int TRANSIT_TIME = D32m20s;
+
+  private static final TestPathBuilder PATH_BUILDER = new TestPathBuilder(COST_CALCULATOR);
 
   private final MinSafeTransferTimeCalculator<TestTripSchedule> subject = new MinSafeTransferTimeCalculator<>(
     SLACK_PROVIDER
@@ -27,7 +27,14 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
     .access(time("10:00:15"), STOP_A, D2m)
     .bus("L11", time("10:03"), TRANSIT_TIME, STOP_B)
     .egress(D2m);
-  RaptorPath<TestTripSchedule> path_3_bus_legs = BasicPathTestCase.basicTripAsPath();
+
+  RaptorPath<TestTripSchedule> path_3_bus_legs = PATH_BUILDER
+    .access(time("10:00:15"), STOP_A, D2m)
+    .bus("L1", time("10:03"), TRANSIT_TIME, STOP_B)
+    .walk(D2m, STOP_C)
+    .bus("L2", time("10:45"), TRANSIT_TIME, STOP_D)
+    .bus("L3", time("11:30"), TRANSIT_TIME, STOP_E)
+    .egress(D2m);
 
   @Test
   public void testMinSafeTransferTimeOneTransit() {
@@ -36,7 +43,7 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
 
   @Test
   public void testMinSafeTransferTimeThreeTransits() {
-    assertEquals(276, subject.minSafeTransferTime(List.of(path_3_bus_legs)));
+    assertEquals(400, subject.minSafeTransferTime(List.of(path_3_bus_legs)));
   }
 
   @Test

@@ -9,27 +9,28 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 
 /**
  * Stores information about an OSM area needed for visibility graph construction. Algorithm based on
  * http://wiki.openstreetmap.org/wiki/Relation:multipolygon/Algorithm but generally done in a
  * quick/dirty way.
  */
-class Area {
+class OsmArea {
 
   final List<Ring> outermostRings;
   // This is the way or relation that has the relevant tags for the area
-  final OsmWithTags parent;
+  final OsmEntity parent;
   public MultiPolygon jtsMultiPolygon;
 
-  Area(
-    OsmWithTags parent,
+  OsmArea(
+    OsmEntity parent,
     List<OsmWay> outerRingWays,
     List<OsmWay> innerRingWays,
     TLongObjectMap<OsmNode> nodes
@@ -143,6 +144,20 @@ class Area {
     } else {
       return null;
     }
+  }
+
+  /**
+   * Try to extract a point which is in  the middle of the area and
+   * also insaide the area geometry.
+   *
+   * @return Point geometry inside the area
+   */
+  public Point findInteriorPoint() {
+    var centroid = jtsMultiPolygon.getCentroid();
+    if (jtsMultiPolygon.intersects(centroid)) {
+      return centroid;
+    }
+    return jtsMultiPolygon.getInteriorPoint();
   }
 
   private MultiPolygon calculateJTSMultiPolygon() {

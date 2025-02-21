@@ -4,7 +4,10 @@ import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.utils.time.TimeUtils.hm2time;
 
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
  * @deprecated This was earlier part of Raptor and should not be used outside the Raptor
@@ -16,7 +19,6 @@ public interface RaptorTestConstants {
   int D0s = 0;
   int D1s = 1;
   int D10s = 10;
-  int D11s = 11;
   int D20s = 20;
   int D30s = 30;
   int D40s = 40;
@@ -25,11 +27,6 @@ public interface RaptorTestConstants {
   int D3m = durationInSeconds("3m");
   int D4m = durationInSeconds("4m");
   int D5m = durationInSeconds("5m");
-  int D7m = durationInSeconds("7m");
-  int D8m = durationInSeconds("8m");
-  int D10m = durationInSeconds("10m");
-  int D11m = durationInSeconds("11m");
-  int D20m = durationInSeconds("20m");
   int D24h = durationInSeconds("24h");
 
   /**
@@ -39,15 +36,6 @@ public interface RaptorTestConstants {
 
   // Time constants, all values are in seconds
   int T00_00 = hm2time(0, 0);
-  int T00_02 = hm2time(0, 2);
-  int T00_10 = hm2time(0, 10);
-  int T00_30 = hm2time(0, 30);
-  int T00_40 = hm2time(0, 40);
-  int T01_00 = hm2time(1, 0);
-
-  int TX_0 = 0;
-  int TX_1 = 1;
-  int TX_2 = 2;
 
   // Stop indexes - Note! There is no stop defined for index 0(zero)! You must
   // account for that in the test if you use the stop index.
@@ -76,15 +64,24 @@ public interface RaptorTestConstants {
   int ALIGHT_SLACK = 15;
   int TRANSFER_SLACK = 60;
 
+  // COST_CALCULATION
+  int BOARD_COST = 60;
+  int TRANSFER_COST = 120;
+  double WAIT_RELUCTANCE = 0.8;
+
   RaptorSlackProvider SLACK_PROVIDER = new DefaultSlackProvider(
     TRANSFER_SLACK,
     BOARD_SLACK,
     ALIGHT_SLACK
   );
 
-  // FLEX
-  int ONE_RIDE = 1;
-  int TWO_RIDES = 2;
+  RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
+    BOARD_COST,
+    TRANSFER_COST,
+    WAIT_RELUCTANCE,
+    null,
+    null
+  );
 
   default String stopIndexToName(int index) {
     return Character.toString('A' + index - 1);

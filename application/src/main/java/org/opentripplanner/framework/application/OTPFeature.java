@@ -109,6 +109,7 @@ public enum OTPFeature {
     true,
     "Enable usage of data overlay when calculating costs for the street network."
   ),
+  DebugRasterTiles(false, true, "Enable debug raster tile API."),
   FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),

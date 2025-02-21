@@ -182,7 +182,10 @@ public class HSLFareService extends DefaultFareService {
             }
           }
           Money newFare = attribute.getPrice();
-          if (newFare.lessThan(bestFare)) {
+          if (
+            newFare.lessThan(bestFare) ||
+            (newFare.equals(bestFare) && ruleSet.getContains().equals(zones))
+          ) {
             bestAttribute = attribute;
             bestFare = newFare;
           }

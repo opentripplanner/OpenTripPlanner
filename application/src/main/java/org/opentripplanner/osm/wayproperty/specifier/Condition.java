@@ -5,7 +5,7 @@ import static org.opentripplanner.osm.wayproperty.specifier.Condition.MatchResul
 import static org.opentripplanner.osm.wayproperty.specifier.Condition.MatchResult.WILDCARD;
 
 import java.util.Arrays;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 public sealed interface Condition {
   String key();
@@ -14,17 +14,17 @@ public sealed interface Condition {
     return EXACT;
   }
 
-  boolean isExtendedKeyMatch(OsmWithTags way, String exKey);
+  boolean isExtendedKeyMatch(OsmEntity way, String exKey);
 
   /**
    * Test to what degree the OSM entity matches with this operation when taking the regular tag keys
    * into account.
    */
-  default boolean isMatch(OsmWithTags way) {
+  default boolean isMatch(OsmEntity way) {
     return isExtendedKeyMatch(way, this.key());
   }
 
-  default MatchResult match(OsmWithTags way) {
+  default MatchResult match(OsmEntity way) {
     return isMatch(way) ? matchType() : NONE;
   }
 
@@ -35,7 +35,7 @@ public sealed interface Condition {
    * For example, it should not match a way with `cycleway:right=lane` when the `cycleway=lane` was
    * required but `cycleway:left=lane` should match.
    */
-  default boolean isLeftMatch(OsmWithTags way) {
+  default boolean isLeftMatch(OsmEntity way) {
     var leftKey = this.key() + ":left";
     if (way.hasTag(leftKey)) {
       return isExtendedKeyMatch(way, leftKey);
@@ -51,7 +51,7 @@ public sealed interface Condition {
    * For example, it should not match a way with `cycleway:left=lane` when the `cycleway=lane` was
    * required but `cycleway:right=lane` should match.
    */
-  default boolean isRightMatch(OsmWithTags way) {
+  default boolean isRightMatch(OsmEntity way) {
     var rightKey = this.key() + ":right";
     if (way.hasTag(rightKey)) {
       return isExtendedKeyMatch(way, rightKey);
@@ -64,7 +64,7 @@ public sealed interface Condition {
    * Test to what degree the OSM entity matches with this operation when taking the ':both' key
    * suffixes into account.
    */
-  default boolean isExplicitBothMatch(OsmWithTags way) {
+  default boolean isExplicitBothMatch(OsmEntity way) {
     var bothKey = this.key() + ":both";
     if (way.hasTag(bothKey)) {
       return isExtendedKeyMatch(way, bothKey);
@@ -73,7 +73,7 @@ public sealed interface Condition {
     }
   }
 
-  default boolean isForwardMatch(OsmWithTags way) {
+  default boolean isForwardMatch(OsmEntity way) {
     var forwardKey = this.key() + ":forward";
     if (way.hasTag(forwardKey)) {
       return isExtendedKeyMatch(way, forwardKey);
@@ -83,11 +83,11 @@ public sealed interface Condition {
     }
   }
 
-  default MatchResult matchForward(OsmWithTags way) {
+  default MatchResult matchForward(OsmEntity way) {
     return isForwardMatch(way) ? matchType() : NONE;
   }
 
-  default boolean isBackwardMatch(OsmWithTags way) {
+  default boolean isBackwardMatch(OsmEntity way) {
     var backwardKey = this.key() + ":backward";
     if (way.hasTag(backwardKey)) {
       return isExtendedKeyMatch(way, backwardKey);
@@ -97,7 +97,7 @@ public sealed interface Condition {
     }
   }
 
-  default MatchResult matchBackward(OsmWithTags way) {
+  default MatchResult matchBackward(OsmEntity way) {
     return isBackwardMatch(way) ? matchType() : NONE;
   }
 
@@ -112,7 +112,7 @@ public sealed interface Condition {
    */
   record Equals(String key, String value) implements Condition {
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       return way.hasTag(exKey) && way.isTag(exKey, value);
     }
 
@@ -131,7 +131,7 @@ public sealed interface Condition {
       return WILDCARD;
     }
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       return way.hasTag(exKey);
     }
 
@@ -146,7 +146,7 @@ public sealed interface Condition {
    */
   record Absent(String key) implements Condition {
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       return !way.hasTag(exKey);
     }
 
@@ -161,7 +161,7 @@ public sealed interface Condition {
    */
   record GreaterThan(String key, int value) implements Condition {
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() > value;
     }
@@ -177,7 +177,7 @@ public sealed interface Condition {
    */
   record LessThan(String key, int value) implements Condition {
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() < value;
     }
@@ -199,7 +199,7 @@ public sealed interface Condition {
     }
 
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       var maybeInt = way.getTagAsInt(exKey, ignored -> {});
       return maybeInt.isPresent() && maybeInt.getAsInt() >= lower && maybeInt.getAsInt() <= upper;
     }
@@ -215,7 +215,7 @@ public sealed interface Condition {
    */
   record OneOf(String key, String... values) implements Condition {
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       return Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value));
     }
 
@@ -237,7 +237,7 @@ public sealed interface Condition {
     }
 
     @Override
-    public boolean isExtendedKeyMatch(OsmWithTags way, String exKey) {
+    public boolean isExtendedKeyMatch(OsmEntity way, String exKey) {
       return (
         !way.hasTag(exKey) || Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value))
       );

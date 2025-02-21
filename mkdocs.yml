@@ -102,6 +102,7 @@ nav:
 - Sandbox:
     - About: 'SandboxExtension.md'
     - Actuator API: 'sandbox/ActuatorAPI.md'
+    - Debug Raster Tiles: 'sandbox/DebugRasterTiles.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
     - SIRI Updaters: 'sandbox/siri/SiriUpdater.md'

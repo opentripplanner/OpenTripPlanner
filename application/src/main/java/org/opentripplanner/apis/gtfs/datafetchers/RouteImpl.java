@@ -8,12 +8,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
-import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -171,7 +171,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<GraphQLTransitMode> mode() {
-    return environment -> GraphQLUtils.toGraphQL(getSource(environment).getMode());
+    return environment -> TransitModeMapper.map(getSource(environment).getMode());
   }
 
   @Override
