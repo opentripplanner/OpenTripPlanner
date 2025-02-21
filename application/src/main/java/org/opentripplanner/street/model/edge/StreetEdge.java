@@ -1169,7 +1169,7 @@ public class StreetEdge
         default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
       };
 
-    int time = (int) Math.ceil(traversalCosts.time());
+    long time_ms = (long) Math.ceil(1000.0 * traversalCosts.time());
     var weight = traversalCosts.weight();
 
     /* Compute turn cost. */
@@ -1234,7 +1234,7 @@ public class StreetEdge
         s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
-      time += (int) Math.ceil(turnDuration);
+      time_ms += (long) Math.ceil(1000.0 * turnDuration);
       weight += preferences.street().turnReluctance() * turnDuration;
     }
 
@@ -1246,7 +1246,7 @@ public class StreetEdge
       weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
     }
 
-    s1.incrementTimeInSeconds(time);
+    s1.incrementTimeInMilliseconds(time_ms);
 
     s1.incrementWeight(weight);
 

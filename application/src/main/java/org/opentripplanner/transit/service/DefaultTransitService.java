@@ -38,6 +38,7 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.routing.stoptimes.StopTimesHelper;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
+import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.Notice;
@@ -45,6 +46,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.RegularStopMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.RouteMatcherFactory;
+import org.opentripplanner.transit.model.filter.transit.StopLocationMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -65,8 +67,12 @@ import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
+import org.opentripplanner.utils.time.ServiceDateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the Transit Service and Transit Editor Service.
@@ -76,6 +82,7 @@ import org.opentripplanner.utils.collection.CollectionsView;
  */
 public class DefaultTransitService implements TransitEditorService {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransitService.class);
   private final TimetableRepository timetableRepository;
 
   private final TimetableRepositoryIndex timetableRepositoryIndex;
@@ -102,6 +109,35 @@ public class DefaultTransitService implements TransitEditorService {
     this.timetableRepository = timetableRepository;
     this.timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
     this.timetableSnapshot = timetableSnapshot;
+  }
+
+  @Override
+  public Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip) {
+    TripPattern tripPattern = findPattern(trip);
+    return Optional.ofNullable(
+      TripTimeOnDate.fromTripTimes(tripPattern.getScheduledTimetable(), trip)
+    );
+  }
+
+  @Override
+  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
+    TripPattern pattern = findPattern(trip, serviceDate);
+
+    Timetable timetable = findTimetable(pattern, serviceDate);
+
+    // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
+    TripTimes times = timetable.getTripTimes(trip);
+    if (
+      times == null ||
+      !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
+    ) {
+      return Optional.empty();
+    } else {
+      Instant midnight = ServiceDateUtils
+        .asStartOfService(serviceDate, this.getTimeZone())
+        .toInstant();
+      return Optional.of(TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight));
+    }
   }
 
   @Override
@@ -258,6 +294,12 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public StopLocation getStopLocation(FeedScopedId id) {
     return timetableRepository.getSiteRepository().getStopLocation(id);
+  }
+
+  @Override
+  public Collection<StopLocation> findStopLocations(FindStopLocationsRequest request) {
+    Matcher<StopLocation> matcher = StopLocationMatcherFactory.of(request);
+    return listStopLocations().stream().filter(matcher::match).toList();
   }
 
   @Override

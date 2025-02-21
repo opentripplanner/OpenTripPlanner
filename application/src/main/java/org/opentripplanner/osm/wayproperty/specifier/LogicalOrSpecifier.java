@@ -3,7 +3,7 @@ package org.opentripplanner.osm.wayproperty.specifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 /**
  * Allows to specify a 'logical or' condition to specify a match. This intended to be used with a
@@ -31,12 +31,12 @@ public class LogicalOrSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OsmWithTags way) {
+  public Scores matchScores(OsmEntity way) {
     return Scores.of(matchScore(way));
   }
 
   @Override
-  public int matchScore(OsmWithTags way) {
+  public int matchScore(OsmEntity way) {
     var oneMatchesExactly = subSpecs.stream().anyMatch(subspec -> subspec.allTagsMatch(way));
     if (oneMatchesExactly) {
       return 1;

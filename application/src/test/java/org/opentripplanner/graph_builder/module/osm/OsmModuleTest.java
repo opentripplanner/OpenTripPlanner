@@ -22,8 +22,8 @@ import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.CreativeNamer;
 import org.opentripplanner.osm.wayproperty.MixinPropertiesBuilder;
 import org.opentripplanner.osm.wayproperty.WayProperties;
@@ -178,7 +178,7 @@ public class OsmModuleTest {
 
   @Test
   public void testWayDataSet() {
-    OsmWithTags way = new OsmWay();
+    OsmEntity way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("surface", "gravel");
@@ -267,7 +267,7 @@ public class OsmModuleTest {
 
   @Test
   public void testCreativeNaming() {
-    OsmWithTags way = new OsmWay();
+    OsmEntity way = new OsmWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
     way.addTag("access", "no");

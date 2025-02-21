@@ -1,107 +1,168 @@
 {
-  "name": "OTP Debug Tiles",
-  "sources": {
-    "positron": {
-      "name": "Positron",
-      "tiles": [
+  "name" : "OTP Debug Tiles",
+  "sources" : {
+    "positron" : {
+      "name" : "Positron",
+      "tiles" : [
         "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png"
       ],
-      "maxzoom": 19,
-      "tileSize": 256,
-      "attribution": "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
-      "type": "raster"
+      "maxzoom" : 19,
+      "tileSize" : 256,
+      "attribution" : "© <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a>, &copy; <a href=\"https://carto.com/attributions\">CARTO</a>",
+      "type" : "raster"
     },
-    "vectorSource": {
-      "id": "vectorSource",
-      "url": "https://example.com",
-      "type": "vector"
+    "vectorSource" : {
+      "id" : "vectorSource",
+      "url" : "https://example.com",
+      "type" : "vector"
     },
-    "osm-carto": {
-      "name": "OSM Carto",
-      "tiles": ["https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"],
-      "maxzoom": 19,
-      "tileSize": 256,
-      "attribution": "© OpenStreetMap Contributors",
-      "type": "raster"
+    "osm-carto" : {
+      "name" : "OSM Carto",
+      "tiles" : [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      ],
+      "maxzoom" : 19,
+      "tileSize" : 256,
+      "attribution" : "© OpenStreetMap Contributors",
+      "type" : "raster"
     }
   },
-  "layers": [
+  "layers" : [
     {
-      "id": "osm-carto",
-      "type": "raster",
-      "source": "osm-carto",
-      "minzoom": 0,
-      "metadata": {
-        "group": "Other",
-        "name": "OSM Carto"
+      "id" : "osm-carto",
+      "type" : "raster",
+      "source" : "osm-carto",
+      "minzoom" : 0,
+      "metadata" : {
+        "group" : "Other",
+        "name" : "OSM Carto"
       }
     },
     {
-      "id": "positron",
-      "type": "raster",
-      "source": "positron",
-      "minzoom": 0,
-      "layout": {
-        "visibility": "none"
+      "id" : "positron",
+      "type" : "raster",
+      "source" : "positron",
+      "minzoom" : 0,
+      "layout" : {
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Other",
-        "name": "Positron"
+      "metadata" : {
+        "group" : "Other",
+        "name" : "Positron"
       }
     },
     {
-      "id": "wheelchair-accessible",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": "#136b04",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+      "id" : "wheelchair-accessible",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#136b04",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": ["==", "wheelchairAccessible", true],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "filter" : [
+        "==",
+        "wheelchairAccessible",
+        true
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Wheelchair accessibility"
+      "metadata" : {
+        "group" : "Wheelchair accessibility"
       }
     },
     {
-      "id": "wheelchair-inaccessible",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": "#fc0f2a",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+      "id" : "wheelchair-inaccessible",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#fc0f2a",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": ["==", "wheelchairAccessible", false],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "filter" : [
+        "==",
+        "wheelchairAccessible",
+        false
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Wheelchair accessibility"
+      "metadata" : {
+        "group" : "Wheelchair accessibility"
       }
     },
     {
-      "id": "no-thru-traffic PEDESTRIAN",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "no-thru-traffic PEDESTRIAN",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "match",
-          ["get", "noThruTraffic"],
+          [
+            "get",
+            "noThruTraffic"
+          ],
           "NONE",
           "#140d0e",
           "PEDESTRIAN",
@@ -120,33 +181,80 @@
           "#adb2b0",
           "#140d0e"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "any",
-        ["in", "PEDESTRIAN", ["string", ["get", "noThruTraffic"]]],
-        ["in", "ALL", ["string", ["get", "noThruTraffic"]]]
+        [
+          "in",
+          "PEDESTRIAN",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ]
       ],
-      "layout": {
-        "line-cap": "butt",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "butt",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "No-thru traffic"
+      "metadata" : {
+        "group" : "No-thru traffic"
       }
     },
     {
-      "id": "no-thru-traffic BICYCLE",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "no-thru-traffic BICYCLE",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "match",
-          ["get", "noThruTraffic"],
+          [
+            "get",
+            "noThruTraffic"
+          ],
           "NONE",
           "#140d0e",
           "PEDESTRIAN",
@@ -165,33 +273,80 @@
           "#adb2b0",
           "#140d0e"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "any",
-        ["in", "BICYCLE", ["string", ["get", "noThruTraffic"]]],
-        ["in", "ALL", ["string", ["get", "noThruTraffic"]]]
+        [
+          "in",
+          "BICYCLE",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ]
       ],
-      "layout": {
-        "line-cap": "butt",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "butt",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "No-thru traffic"
+      "metadata" : {
+        "group" : "No-thru traffic"
       }
     },
     {
-      "id": "no-thru-traffic CAR",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "no-thru-traffic CAR",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "match",
-          ["get", "noThruTraffic"],
+          [
+            "get",
+            "noThruTraffic"
+          ],
           "NONE",
           "#140d0e",
           "PEDESTRIAN",
@@ -210,36 +365,80 @@
           "#adb2b0",
           "#140d0e"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "any",
-        ["in", "CAR", ["string", ["get", "noThruTraffic"]]],
-        ["in", "ALL", ["string", ["get", "noThruTraffic"]]]
+        [
+          "in",
+          "CAR",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "noThruTraffic"
+            ]
+          ]
+        ]
       ],
-      "layout": {
-        "line-cap": "butt",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "butt",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "No-thru traffic"
+      "metadata" : {
+        "group" : "No-thru traffic"
       }
     },
     {
-      "id": "no-thru-traffic-text",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "symbol",
-      "minzoom": 17,
-      "maxzoom": 23,
-      "paint": {
-        "text-color": "#000",
-        "text-halo-color": "#fff",
-        "text-halo-blur": 4,
-        "text-halo-width": 3
+      "id" : "no-thru-traffic-text",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "symbol",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
       },
-      "filter": [
+      "filter" : [
         "in",
         "class",
         "StreetEdge",
@@ -250,86 +449,342 @@
         "TemporaryPartialStreetEdge",
         "TemporaryFreeEdge"
       ],
-      "layout": {
-        "symbol-placement": "line-center",
-        "symbol-spacing": 1000,
-        "text-field": "{noThruTraffic}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 6.0, 24, 12.0],
-        "text-max-width": 100,
-        "text-keep-upright": true,
-        "text-rotation-alignment": "map",
-        "text-overlap": "never",
-        "text-offset": [0, 1.0],
-        "visibility": "none"
+      "layout" : {
+        "symbol-placement" : "line-center",
+        "symbol-spacing" : 1000,
+        "text-field" : "{noThruTraffic}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "text-offset" : [
+          0,
+          1.0
+        ],
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "No-thru traffic"
+      "metadata" : {
+        "group" : "No-thru traffic"
       }
     },
     {
-      "id": "bicycle-safety",
-      "type": "line",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "bicycle-safety",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "rgb",
-          ["min", 255, ["*", 28.33, ["get", "bicycleSafetyFactor"]]],
-          ["max", 0, ["-", 255, ["*", 28.33, ["get", "bicycleSafetyFactor"]]]],
+          [
+            "min",
+            255,
+            [
+              "*",
+              80.0,
+              [
+                "log2",
+                [
+                  "get",
+                  "bicycleSafetyFactor"
+                ]
+              ]
+            ]
+          ],
+          [
+            "max",
+            0,
+            [
+              "-",
+              255,
+              [
+                "*",
+                80.0,
+                [
+                  "log2",
+                  [
+                    "get",
+                    "bicycleSafetyFactor"
+                  ]
+                ]
+              ]
+            ]
+          ],
           60
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.1,
+          23,
+          6.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": ["in", "class", "StreetEdge"],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Safety"
+      "metadata" : {
+        "group" : "Safety"
       }
     },
     {
-      "id": "walk-safety",
-      "type": "line",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "walk-safety",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "rgb",
-          ["min", 255, ["*", 28.33, ["get", "walkSafetyFactor"]]],
-          ["max", 0, ["-", 255, ["*", 28.33, ["get", "walkSafetyFactor"]]]],
+          [
+            "min",
+            255,
+            [
+              "*",
+              80.0,
+              [
+                "log2",
+                [
+                  "get",
+                  "walkSafetyFactor"
+                ]
+              ]
+            ]
+          ],
+          [
+            "max",
+            0,
+            [
+              "-",
+              255,
+              [
+                "*",
+                80.0,
+                [
+                  "log2",
+                  [
+                    "get",
+                    "walkSafetyFactor"
+                  ]
+                ]
+              ]
+            ]
+          ],
           60
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.1,
+          23,
+          6.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": ["in", "class", "StreetEdge"],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Safety"
+      "metadata" : {
+        "group" : "Safety"
       }
     },
     {
-      "id": "permission PEDESTRIAN",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "bicycle-safety-text",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "symbol",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "symbol-placement" : "line-center",
+        "symbol-spacing" : 1000,
+        "text-field" : "{bicycleSafetyFactor}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "text-offset" : [
+          0,
+          1.0
+        ],
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Safety"
+      }
+    },
+    {
+      "id" : "walk-safety-text",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "symbol",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "symbol-placement" : "line-center",
+        "symbol-spacing" : 1000,
+        "text-field" : "{walkSafetyFactor}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "text-offset" : [
+          0,
+          1.0
+        ],
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Safety"
+      }
+    },
+    {
+      "id" : "permission PEDESTRIAN",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "match",
-          ["get", "permission"],
+          [
+            "get",
+            "permission"
+          ],
           "NONE",
           "#140d0e",
           "PEDESTRIAN",
@@ -348,33 +803,80 @@
           "#adb2b0",
           "#140d0e"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "any",
-        ["in", "PEDESTRIAN", ["string", ["get", "permission"]]],
-        ["in", "ALL", ["string", ["get", "permission"]]]
+        [
+          "in",
+          "PEDESTRIAN",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ]
       ],
-      "layout": {
-        "line-cap": "butt",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "butt",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Permissions"
+      "metadata" : {
+        "group" : "Permissions"
       }
     },
     {
-      "id": "permission BICYCLE",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "permission BICYCLE",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "match",
-          ["get", "permission"],
+          [
+            "get",
+            "permission"
+          ],
           "NONE",
           "#140d0e",
           "PEDESTRIAN",
@@ -393,33 +895,80 @@
           "#adb2b0",
           "#140d0e"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "any",
-        ["in", "BICYCLE", ["string", ["get", "permission"]]],
-        ["in", "ALL", ["string", ["get", "permission"]]]
+        [
+          "in",
+          "BICYCLE",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ]
       ],
-      "layout": {
-        "line-cap": "butt",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "butt",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Permissions"
+      "metadata" : {
+        "group" : "Permissions"
       }
     },
     {
-      "id": "permission CAR",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "line",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "permission CAR",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "line",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "match",
-          ["get", "permission"],
+          [
+            "get",
+            "permission"
+          ],
           "NONE",
           "#140d0e",
           "PEDESTRIAN",
@@ -438,36 +987,80 @@
           "#adb2b0",
           "#140d0e"
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "any",
-        ["in", "CAR", ["string", ["get", "permission"]]],
-        ["in", "ALL", ["string", ["get", "permission"]]]
+        [
+          "in",
+          "CAR",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ],
+        [
+          "in",
+          "ALL",
+          [
+            "string",
+            [
+              "get",
+              "permission"
+            ]
+          ]
+        ]
       ],
-      "layout": {
-        "line-cap": "butt",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "butt",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Permissions"
+      "metadata" : {
+        "group" : "Permissions"
       }
     },
     {
-      "id": "permission-text",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "type": "symbol",
-      "minzoom": 17,
-      "maxzoom": 23,
-      "paint": {
-        "text-color": "#000",
-        "text-halo-color": "#fff",
-        "text-halo-blur": 4,
-        "text-halo-width": 3
+      "id" : "permission-text",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "symbol",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
       },
-      "filter": [
+      "filter" : [
         "in",
         "class",
         "StreetEdge",
@@ -478,36 +1071,77 @@
         "TemporaryPartialStreetEdge",
         "TemporaryFreeEdge"
       ],
-      "layout": {
-        "symbol-placement": "line-center",
-        "symbol-spacing": 1000,
-        "text-field": "{permission}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 6.0, 24, 12.0],
-        "text-max-width": 100,
-        "text-keep-upright": true,
-        "text-rotation-alignment": "map",
-        "text-overlap": "never",
-        "text-offset": [0, 1.0],
-        "visibility": "none"
+      "layout" : {
+        "symbol-placement" : "line-center",
+        "symbol-spacing" : 1000,
+        "text-field" : "{permission}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "text-offset" : [
+          0,
+          1.0
+        ],
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Permissions"
+      "metadata" : {
+        "group" : "Permissions"
       }
     },
     {
-      "id": "edge",
-      "type": "line",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": "#f21d52",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+      "id" : "edge",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#f21d52",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.1,
+          23,
+          6.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "in",
         "class",
         "StreetEdge",
@@ -518,28 +1152,28 @@
         "TemporaryPartialStreetEdge",
         "TemporaryFreeEdge"
       ],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Edges"
+      "metadata" : {
+        "group" : "Edges"
       }
     },
     {
-      "id": "edge-name",
-      "type": "symbol",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "minzoom": 17,
-      "maxzoom": 23,
-      "paint": {
-        "text-color": "#000",
-        "text-halo-color": "#fff",
-        "text-halo-blur": 4,
-        "text-halo-width": 3
+      "id" : "edge-name",
+      "type" : "symbol",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
       },
-      "filter": [
+      "filter" : [
         "in",
         "class",
         "StreetEdge",
@@ -550,35 +1184,73 @@
         "TemporaryPartialStreetEdge",
         "TemporaryFreeEdge"
       ],
-      "layout": {
-        "symbol-placement": "line-center",
-        "symbol-spacing": 1000,
-        "text-field": "{name}",
-        "text-font": ["KlokanTech Noto Sans Regular"],
-        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 6.0, 24, 12.0],
-        "text-max-width": 100,
-        "text-keep-upright": true,
-        "text-rotation-alignment": "map",
-        "text-overlap": "never",
-        "visibility": "none"
+      "layout" : {
+        "symbol-placement" : "line-center",
+        "symbol-spacing" : 1000,
+        "text-field" : "{name}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Edges"
+      "metadata" : {
+        "group" : "Edges"
       }
     },
     {
-      "id": "link",
-      "type": "line",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": "#22DD9E",
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.2, 23, 8.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+      "id" : "link",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : "#22DD9E",
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.2,
+          23,
+          8.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": [
+      "filter" : [
         "in",
         "class",
         "StreetTransitStopLink",
@@ -588,179 +1260,302 @@
         "StreetVehicleParkingLink",
         "StreetStationCentroidLink"
       ],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Edges"
+      "metadata" : {
+        "group" : "Edges"
       }
     },
     {
-      "id": "maximum-slope",
-      "type": "line",
-      "source": "vectorSource",
-      "source-layer": "edges",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "line-color": [
+      "id" : "maximum-slope",
+      "type" : "line",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "line-color" : [
           "rgb",
-          ["min", 255, ["*", 728.57, ["get", "maximumSlope"]]],
-          ["max", 0, ["-", 255, ["*", 728.57, ["get", "maximumSlope"]]]],
+          [
+            "min",
+            255,
+            [
+              "*",
+              728.57,
+              [
+                "get",
+                "maximumSlope"
+              ]
+            ]
+          ],
+          [
+            "max",
+            0,
+            [
+              "-",
+              255,
+              [
+                "*",
+                728.57,
+                [
+                  "get",
+                  "maximumSlope"
+                ]
+              ]
+            ]
+          ],
           60
         ],
-        "line-width": ["interpolate", ["linear"], ["zoom"], 13, 0.1, 23, 6.0],
-        "line-offset": ["interpolate", ["linear"], ["zoom"], 13, 0.4, 23, 7.0]
+        "line-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.1,
+          23,
+          6.0
+        ],
+        "line-offset" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          0.4,
+          23,
+          7.0
+        ]
       },
-      "filter": ["in", "class", "StreetEdge"],
-      "layout": {
-        "line-cap": "round",
-        "visibility": "none"
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge"
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Elevation"
+      "metadata" : {
+        "group" : "Elevation"
       }
     },
     {
-      "id": "vertex",
-      "type": "circle",
-      "source": "vectorSource",
-      "source-layer": "vertices",
-      "minzoom": 15,
-      "maxzoom": 23,
-      "paint": {
-        "circle-stroke-color": "#140d0e",
-        "circle-stroke-width": [
+      "id" : "vertex-elevation",
+      "type" : "symbol",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "layout" : {
+        "text-field" : "{elevation}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
           "interpolate",
-          ["linear"],
-          ["zoom"],
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Elevation"
+      }
+    },
+    {
+      "id" : "vertex",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 15,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
           15,
           0.2,
           23,
           3.0
         ],
-        "circle-radius": [
+        "circle-radius" : [
           "interpolate",
-          ["linear"],
-          ["zoom"],
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
           15,
           1.0,
           23,
           7.0
         ],
-        "circle-color": "#BC55F2"
+        "circle-color" : "#BC55F2"
       },
-      "layout": {
-        "visibility": "none"
+      "layout" : {
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Vertices"
+      "metadata" : {
+        "group" : "Vertices"
       }
     },
     {
-      "id": "parking-vertex",
-      "type": "circle",
-      "source": "vectorSource",
-      "source-layer": "vertices",
-      "minzoom": 13,
-      "maxzoom": 23,
-      "paint": {
-        "circle-stroke-color": "#140d0e",
-        "circle-stroke-width": [
+      "id" : "parking-vertex",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : [
           "interpolate",
-          ["linear"],
-          ["zoom"],
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
           15,
           0.2,
           23,
           3.0
         ],
-        "circle-radius": [
+        "circle-radius" : [
           "interpolate",
-          ["linear"],
-          ["zoom"],
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
           13,
           1.4,
           23,
           10.0
         ],
-        "circle-color": "#136b04"
+        "circle-color" : "#136b04"
       },
-      "filter": ["in", "class", "VehicleParkingEntranceVertex"],
-      "layout": {
-        "visibility": "none"
+      "filter" : [
+        "in",
+        "class",
+        "VehicleParkingEntranceVertex"
+      ],
+      "layout" : {
+        "visibility" : "none"
       },
-      "metadata": {
-        "group": "Vertices"
+      "metadata" : {
+        "group" : "Vertices"
       }
     },
     {
-      "id": "area-stop",
-      "type": "fill",
-      "source": "vectorSource",
-      "source-layer": "stops",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "fill-color": "#22DD9E",
-        "fill-opacity": 0.5,
-        "fill-outline-color": "#140d0e"
+      "id" : "area-stop",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#22DD9E",
+        "fill-opacity" : 0.5,
+        "fill-outline-color" : "#140d0e"
       },
-      "metadata": {
-        "group": "Stops"
+      "metadata" : {
+        "group" : "Stops"
       }
     },
     {
-      "id": "group-stop",
-      "type": "fill",
-      "source": "vectorSource",
-      "source-layer": "stops",
-      "minzoom": 6,
-      "maxzoom": 23,
-      "paint": {
-        "fill-color": "#22DD9E",
-        "fill-opacity": 0.5,
-        "fill-outline-color": "#140d0e"
+      "id" : "group-stop",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#22DD9E",
+        "fill-opacity" : 0.5,
+        "fill-outline-color" : "#140d0e"
       },
-      "metadata": {
-        "group": "Stops"
+      "metadata" : {
+        "group" : "Stops"
       }
     },
     {
-      "id": "regular-stop",
-      "type": "circle",
-      "source": "vectorSource",
-      "source-layer": "stops",
-      "minzoom": 10,
-      "maxzoom": 23,
-      "paint": {
-        "circle-stroke-color": "#140d0e",
-        "circle-stroke-width": [
+      "id" : "regular-stop",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 10,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : [
           "interpolate",
-          ["linear"],
-          ["zoom"],
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
           11,
           0.5,
           23,
           5.0
         ],
-        "circle-radius": [
+        "circle-radius" : [
           "interpolate",
-          ["linear"],
-          ["zoom"],
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
           11,
           0.5,
           23,
           10.0
         ],
-        "circle-color": "#fcf9fa"
+        "circle-color" : "#fcf9fa"
       },
-      "metadata": {
-        "group": "Stops"
+      "metadata" : {
+        "group" : "Stops"
       }
     }
   ],
-  "version": 8,
-  "glyphs": "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf"
+  "version" : 8,
+  "glyphs" : "https://cdn.jsdelivr.net/gh/klokantech/klokantech-gl-fonts@master/{fontstack}/{range}.pbf"
 }

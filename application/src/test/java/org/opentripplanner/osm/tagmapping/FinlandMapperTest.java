@@ -10,8 +10,8 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
@@ -34,60 +34,60 @@ class FinlandMapperTest {
    */
   @Test
   void testSafety() {
-    OsmWithTags primaryWay = new OsmWithTags();
+    OsmEntity primaryWay = new OsmEntity();
     primaryWay.addTag("highway", "primary");
     primaryWay.addTag("oneway", "no");
-    OsmWithTags livingStreetWay = new OsmWithTags();
+    OsmEntity livingStreetWay = new OsmEntity();
     livingStreetWay.addTag("highway", "living_street");
-    OsmWithTags footway = new OsmWithTags();
+    OsmEntity footway = new OsmEntity();
     footway.addTag("highway", "footway");
-    OsmWithTags sidewalk = new OsmWithTags();
+    OsmEntity sidewalk = new OsmEntity();
     sidewalk.addTag("footway", "sidewalk");
     sidewalk.addTag("highway", "footway");
-    OsmWithTags segregatedCycleway = new OsmWithTags();
+    OsmEntity segregatedCycleway = new OsmEntity();
     segregatedCycleway.addTag("segregated", "yes");
     segregatedCycleway.addTag("highway", "cycleway");
-    OsmWithTags tunnel = new OsmWithTags();
+    OsmEntity tunnel = new OsmEntity();
     tunnel.addTag("tunnel", "yes");
     tunnel.addTag("highway", "footway");
-    OsmWithTags bridge = new OsmWithTags();
+    OsmEntity bridge = new OsmEntity();
     bridge.addTag("bridge", "yes");
     bridge.addTag("highway", "footway");
-    OsmWithTags footwayCrossing = new OsmWithTags();
+    OsmEntity footwayCrossing = new OsmEntity();
     footwayCrossing.addTag("footway", "crossing");
     footwayCrossing.addTag("highway", "footway");
-    OsmWithTags footwayCrossingWithTrafficLights = new OsmWithTags();
+    OsmEntity footwayCrossingWithTrafficLights = new OsmEntity();
     footwayCrossingWithTrafficLights.addTag("footway", "crossing");
     footwayCrossingWithTrafficLights.addTag("highway", "footway");
     footwayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
-    OsmWithTags cyclewayCrossing = new OsmWithTags();
+    OsmEntity cyclewayCrossing = new OsmEntity();
     cyclewayCrossing.addTag("cycleway", "crossing");
     cyclewayCrossing.addTag("highway", "cycleway");
-    OsmWithTags cyclewayFootwayCrossing = new OsmWithTags();
+    OsmEntity cyclewayFootwayCrossing = new OsmEntity();
     cyclewayFootwayCrossing.addTag("footway", "crossing");
     cyclewayFootwayCrossing.addTag("highway", "cycleway");
-    OsmWithTags cyclewayCrossingWithTrafficLights = new OsmWithTags();
+    OsmEntity cyclewayCrossingWithTrafficLights = new OsmEntity();
     cyclewayCrossingWithTrafficLights.addTag("cycleway", "crossing");
     cyclewayCrossingWithTrafficLights.addTag("highway", "cycleway");
     cyclewayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
-    OsmWithTags cyclewayFootwayCrossingWithTrafficLights = new OsmWithTags();
+    OsmEntity cyclewayFootwayCrossingWithTrafficLights = new OsmEntity();
     cyclewayFootwayCrossingWithTrafficLights.addTag("footway", "crossing");
     cyclewayFootwayCrossingWithTrafficLights.addTag("highway", "cycleway");
     cyclewayFootwayCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
-    OsmWithTags cyclewaySegregatedCrossing = new OsmWithTags();
+    OsmEntity cyclewaySegregatedCrossing = new OsmEntity();
     cyclewaySegregatedCrossing.addTag("cycleway", "crossing");
     cyclewaySegregatedCrossing.addTag("segregated", "yes");
     cyclewaySegregatedCrossing.addTag("highway", "cycleway");
-    OsmWithTags cyclewaySegregatedFootwayCrossing = new OsmWithTags();
+    OsmEntity cyclewaySegregatedFootwayCrossing = new OsmEntity();
     cyclewaySegregatedFootwayCrossing.addTag("footway", "crossing");
     cyclewaySegregatedFootwayCrossing.addTag("segregated", "yes");
     cyclewaySegregatedFootwayCrossing.addTag("highway", "cycleway");
-    OsmWithTags cyclewaySegregatedCrossingWithTrafficLights = new OsmWithTags();
+    OsmEntity cyclewaySegregatedCrossingWithTrafficLights = new OsmEntity();
     cyclewaySegregatedCrossingWithTrafficLights.addTag("cycleway", "crossing");
     cyclewaySegregatedCrossingWithTrafficLights.addTag("segregated", "yes");
     cyclewaySegregatedCrossingWithTrafficLights.addTag("highway", "cycleway");
     cyclewaySegregatedCrossingWithTrafficLights.addTag("crossing", "traffic_signals");
-    OsmWithTags cyclewaySegregatedFootwayCrossingWithTrafficLights = new OsmWithTags();
+    OsmEntity cyclewaySegregatedFootwayCrossingWithTrafficLights = new OsmEntity();
     cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("footway", "crossing");
     cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("segregated", "yes");
     cyclewaySegregatedFootwayCrossingWithTrafficLights.addTag("highway", "cycleway");
@@ -145,7 +145,7 @@ class FinlandMapperTest {
 
   @Test
   void testSafetyWithMixins() {
-    OsmWithTags wayWithMixins = new OsmWithTags();
+    OsmEntity wayWithMixins = new OsmEntity();
     // highway=service has no custom bicycle or walk safety
     wayWithMixins.addTag("highway", "unclassified");
     // surface has mixin bicycle safety of 1.3 but no walk safety
@@ -155,7 +155,7 @@ class FinlandMapperTest {
     // 1.6 is the default walk safety for a way with ALL permissions and speed limit > 35 and <= 60 kph
     assertEquals(1.6, wps.getDataForWay(wayWithMixins).walkSafety().forward(), epsilon);
 
-    OsmWithTags wayWithMixinsAndCustomSafety = new OsmWithTags();
+    OsmEntity wayWithMixinsAndCustomSafety = new OsmEntity();
     // highway=service has custom bicycle safety of 1.1 but no custom walk safety
     wayWithMixinsAndCustomSafety.addTag("highway", "service");
     // surface has mixin bicycle safety of 1.3 but no walk safety
@@ -173,17 +173,17 @@ class FinlandMapperTest {
       epsilon
     );
 
-    OsmWithTags wayWithBicycleSidePath = new OsmWithTags();
+    OsmEntity wayWithBicycleSidePath = new OsmEntity();
     wayWithBicycleSidePath.addTag("bicycle", "use_sidepath");
     assertEquals(8, wps.getDataForWay(wayWithBicycleSidePath).walkSafety().forward(), epsilon);
-    OsmWithTags wayWithFootSidePath = new OsmWithTags();
+    OsmEntity wayWithFootSidePath = new OsmEntity();
     wayWithFootSidePath.addTag("foot", "use_sidepath");
     assertEquals(8, wps.getDataForWay(wayWithFootSidePath).walkSafety().forward(), epsilon);
   }
 
   @Test
   void testTagMapping() {
-    OsmWithTags way;
+    OsmEntity way;
     WayProperties wayData;
 
     way = new OsmWay();
@@ -210,7 +210,7 @@ class FinlandMapperTest {
    */
   @Test
   void testArea() {
-    OsmWithTags way;
+    OsmEntity way;
     WayProperties wayData;
 
     way = new OsmWay();

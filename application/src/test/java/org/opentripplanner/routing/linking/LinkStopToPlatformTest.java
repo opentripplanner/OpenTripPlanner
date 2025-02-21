@@ -17,11 +17,11 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
-import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
@@ -34,12 +34,9 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class LinkStopToPlatformTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
@@ -61,20 +58,20 @@ public class LinkStopToPlatformTest {
     closedGeom[platform.length] = closedGeom[0];
 
     Polygon polygon = GeometryUtils.getGeometryFactory().createPolygon(closedGeom);
-    AreaEdgeList areaEdgeList = new AreaEdgeList(polygon, Set.of());
+    AreaGroup areaGroup = new AreaGroup(polygon);
 
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
     for (int i : visible) {
-      areaEdgeList.addVisibilityVertex(vertices.get(i));
+      areaGroup.addVisibilityVertex(vertices.get(i));
     }
 
-    // AreaEdgeList must include a valid NamedArea which defines area atttributes
-    NamedArea namedArea = new NamedArea();
-    namedArea.setName(new LocalizedString("test platform"));
-    namedArea.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-    namedArea.setOriginalEdges(polygon);
-    areaEdgeList.addArea(namedArea);
+    // AreaGroup must include a valid Area which defines area atttributes
+    Area area = new Area();
+    area.setName(new LocalizedString("test platform"));
+    area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+    area.setOriginalEdges(polygon);
+    areaGroup.addArea(area);
 
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;
@@ -82,13 +79,13 @@ public class LinkStopToPlatformTest {
       var edgeBuilder1 = createAreaEdge(
         vertices.get(i),
         vertices.get(next_i),
-        areaEdgeList,
+        areaGroup,
         "edge " + i
       );
       var edgeBuilder2 = createAreaEdge(
         vertices.get(next_i),
         vertices.get(i),
-        areaEdgeList,
+        areaGroup,
         "edge " + String.valueOf(i + platform.length)
       );
       // make one corner surrounded by walk nothru edges
@@ -137,10 +134,6 @@ public class LinkStopToPlatformTest {
 
     Graph graph = prepareTest(platform, visibilityPoints, stops);
     linkStops(graph);
-
-    for (Edge e : graph.getEdges()) {
-      LOG.debug("Edge {}", e);
-    }
 
     // Two bottom edges gets split into half (+2 edges)
     // both split points are linked to the stop bidirectonally (+4 edges).
@@ -279,7 +272,7 @@ public class LinkStopToPlatformTest {
   private AreaEdgeBuilder createAreaEdge(
     IntersectionVertex v1,
     IntersectionVertex v2,
-    AreaEdgeList area,
+    AreaGroup area,
     String nameString
   ) {
     LineString line = geometryFactory.createLineString(

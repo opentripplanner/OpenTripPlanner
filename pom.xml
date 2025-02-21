@@ -58,11 +58,11 @@
 
 
     <properties>
-        <otp.serialization.version.id>183</otp.serialization.version.id>
+        <otp.serialization.version.id>184</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.2</geotools.version>
-        <google.dagger.version>2.54</google.dagger.version>
+        <google.dagger.version>2.55</google.dagger.version>
         <jackson.version>2.18.2</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.10</jersey.version>
@@ -475,12 +475,12 @@
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
-                <version>1.3.0</version>
+                <version>1.4.0</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.14.2</version>
+                <version>5.15.2</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>

@@ -110,7 +110,7 @@ public class VehicleParkingEdge extends Edge {
 
     StateEditor s0e = s0.edit(this);
     s0e.incrementWeight(parkingCost.toSeconds());
-    s0e.incrementTimeInSeconds((int) parkingTime.toSeconds());
+    s0e.incrementTimeInMilliseconds(parkingTime.toMillis());
     s0e.setVehicleParked(false, mode);
 
     var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());
@@ -156,7 +156,7 @@ public class VehicleParkingEdge extends Edge {
 
     StateEditor s0e = s0.edit(this);
     s0e.incrementWeight(parkingCost.toSeconds());
-    s0e.incrementTimeInSeconds((int) parkingTime.toSeconds());
+    s0e.incrementTimeInMilliseconds(parkingTime.toMillis());
     s0e.setVehicleParked(true, TraverseMode.WALK);
 
     var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());

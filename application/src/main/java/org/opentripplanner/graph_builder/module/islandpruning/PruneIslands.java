@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -107,13 +107,13 @@ public class PruneIslands implements GraphBuilderModule {
     // because serialization will break. Edge lists are reconstructed
     // only for graph vertices after loading the graph
     List<AreaEdge> areaEdges = graph.getEdgesOfType(AreaEdge.class);
-    HashSet<AreaEdgeList> areas = new HashSet<>();
+    HashSet<AreaGroup> areas = new HashSet<>();
     HashSet<Vertex> visibilityVertices = new HashSet<>();
 
     for (AreaEdge ae : areaEdges) {
       areas.add(ae.getArea());
     }
-    for (AreaEdgeList a : areas) {
+    for (AreaGroup a : areas) {
       visibilityVertices.addAll(a.visibilityVertices());
     }
 

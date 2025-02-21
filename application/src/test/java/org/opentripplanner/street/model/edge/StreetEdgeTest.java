@@ -170,8 +170,8 @@ public class StreetEdgeTest {
     State s4 = e1.traverse(s3)[0];
     State s5 = e0.traverse(s4)[0];
 
-    assertEquals(88, s2.getElapsedTimeSeconds());
-    assertEquals(88, s5.getElapsedTimeSeconds());
+    assertEquals(86, s2.getElapsedTimeSeconds());
+    assertEquals(86, s5.getElapsedTimeSeconds());
   }
 
   /**

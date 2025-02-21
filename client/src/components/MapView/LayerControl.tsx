@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import type { ControlPosition } from 'react-map-gl/maplibre';
-import type { MapRef } from 'react-map-gl/maplibre';
+import React, { useCallback, useEffect, useState } from 'react';
+import type { ControlPosition, MapRef } from 'react-map-gl/maplibre';
+import { findSelectedDebugLayers } from '../../util/map.ts';
 
 interface Layer {
   id: string;
@@ -85,15 +85,8 @@ const LayerControl: React.FC<LayerControlProps> = ({ mapRef, setInteractiveLayer
       mapInstance.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
 
       // After toggling, recalculate which interactive layers are visible.
-      const style = mapInstance.getStyle();
-      if (!style || !style.layers) return;
-
-      const visibleInteractive = style.layers
-        .filter((l) => l.type !== 'raster' && !l.id.startsWith('jsx'))
-        .filter((l) => mapInstance.getLayoutProperty(l.id, 'visibility') !== 'none')
-        .map((l) => l.id);
-
-      setInteractiveLayerIds(visibleInteractive);
+      const selected = findSelectedDebugLayers(mapInstance);
+      setInteractiveLayerIds(selected);
     },
     [mapRef, setInteractiveLayerIds],
   );

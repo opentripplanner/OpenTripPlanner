@@ -130,9 +130,7 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder lineText(String name) {
-    layout.put("symbol-placement", "line-center");
-    layout.put("symbol-spacing", 1000);
+  public StyleBuilder symbolText(String name) {
     layout.put("text-field", "{%s}".formatted(name));
     layout.put("text-font", List.of("KlokanTech Noto Sans Regular"));
     layout.put(
@@ -148,6 +146,12 @@ public class StyleBuilder {
     paint.put("text-halo-blur", 4);
     paint.put("text-halo-width", 3);
     return this;
+  }
+
+  public StyleBuilder lineText(String name) {
+    layout.put("symbol-placement", "line-center");
+    layout.put("symbol-spacing", 1000);
+    return symbolText(name);
   }
 
   public StyleBuilder textOffset(float offset) {
@@ -197,16 +201,22 @@ public class StyleBuilder {
       roundTo2Decimals(255 / (maxValue - minValue)),
       List.of("get", propertyName)
     );
-    paint.put(
-      "line-color",
-      List.of(
-        "rgb",
-        List.of("min", 255, multiplier),
-        List.of("max", 0, List.of("-", 255, multiplier)),
-        // we add a small amount of blue so that the colours don't look too neon
-        60
-      )
-    );
+    setLineColor(multiplier);
+    return this;
+  }
+
+  /**
+   * Generates the line color based off a numeric property in the feature.
+   * <p>
+   * The scale of the property must be between 1 and infinity. RGB values (0, 255) are computed with
+   * the following formula: log2(propertyValue) * logMultiplier.
+   * <p>
+   * 1 is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
+   */
+  public StyleBuilder log2LineColorFromProperty(String propertyName, double logMultiplier) {
+    var multiplier = List.of("*", logMultiplier, List.of("log2", List.of("get", propertyName)));
+    setLineColor(multiplier);
     return this;
   }
 
@@ -330,5 +340,18 @@ public class StyleBuilder {
     Stream
       .of(TYPE)
       .forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p)));
+  }
+
+  private void setLineColor(List<Object> valueSpecifier) {
+    paint.put(
+      "line-color",
+      List.of(
+        "rgb",
+        List.of("min", 255, valueSpecifier),
+        List.of("max", 0, List.of("-", 255, valueSpecifier)),
+        // we add a small amount of blue so that the colours don't look too neon
+        60
+      )
+    );
   }
 }

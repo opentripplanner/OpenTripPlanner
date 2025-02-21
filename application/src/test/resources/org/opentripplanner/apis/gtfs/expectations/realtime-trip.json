@@ -1,0 +1,114 @@
+{
+  "data": {
+    "addedTrip": {
+      "gtfsId": "F:ADDED_TRIP",
+      "timetabledOrigin": null,
+      "datedOrigin": {
+        "realtimeDeparture": 0
+      },
+      "timetabledDestination": null,
+      "datedDestination": {
+        "realtimeArrival": 900
+      },
+      "stoptimes": null,
+      "stoptimesForDate": [
+        {
+          "stop": {
+            "gtfsId": "F:A"
+          },
+          "scheduledDeparture": 0,
+          "realtimeDeparture": 0
+        },
+        {
+          "stop": {
+            "gtfsId": "F:B"
+          },
+          "scheduledDeparture": 300,
+          "realtimeDeparture": 300
+        },
+        {
+          "stop": {
+            "gtfsId": "F:C"
+          },
+          "scheduledDeparture": 600,
+          "realtimeDeparture": 600
+        },
+        {
+          "stop": {
+            "gtfsId": "F:D"
+          },
+          "scheduledDeparture": 900,
+          "realtimeDeparture": 900
+        }
+      ]
+    },
+    "replacementTrip": {
+      "gtfsId": "F:REPLACEMENT_TRIP",
+      "timetabledOrigin": {
+        "scheduledDeparture": 41400
+      },
+      "datedOrigin": {
+        "realtimeDeparture": 0
+      },
+      "timetabledDestination": {
+        "scheduledArrival": 42000
+      },
+      "datedDestination": {
+        "realtimeArrival": 900
+      },
+      "stoptimes": [
+        {
+          "stop": {
+            "gtfsId": "F:Stop_0"
+          },
+          "scheduledDeparture": 41400,
+          "realtimeDeparture": 41400
+        },
+        {
+          "stop": {
+            "gtfsId": "F:Stop_1"
+          },
+          "scheduledDeparture": 41700,
+          "realtimeDeparture": 41700
+        },
+        {
+          "stop": {
+            "gtfsId": "F:Stop_2"
+          },
+          "scheduledDeparture": 42000,
+          "realtimeDeparture": 42000
+        }
+      ],
+      "stoptimesForDate": [
+        {
+          "stop": {
+            "gtfsId": "F:A"
+          },
+          "scheduledDeparture": 0,
+          "realtimeDeparture": 0
+        },
+        {
+          "stop": {
+            "gtfsId": "F:B"
+          },
+          "scheduledDeparture": 300,
+          "realtimeDeparture": 300
+        },
+        {
+          "stop": {
+            "gtfsId": "F:C"
+          },
+          "scheduledDeparture": 600,
+          "realtimeDeparture": 600
+        },
+        {
+          "stop": {
+            "gtfsId": "F:D"
+          },
+          "scheduledDeparture": 900,
+          "realtimeDeparture": 900
+        }
+      ]
+    }
+  }
+}

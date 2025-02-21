@@ -17,6 +17,7 @@ import { useState, useCallback, useRef } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
 import RightMenu from './RightMenu.tsx';
+import { findSelectedDebugLayers } from '../../util/map.ts';
 
 const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
 
@@ -63,7 +64,7 @@ export function MapView({
     // provided by the WorldEnvelopeService
     if (map.getZoom() < 2) {
       const source = map.getSource('stops') as VectorTileSource;
-      map.fitBounds(source.bounds, { maxDuration: 50, linear: true });
+      map.fitBounds(source.bounds, { animate: false });
     }
   };
 
@@ -75,6 +76,9 @@ export function MapView({
   function handleMapLoad(e: MapEvent) {
     // 1) Call your existing function
     panToWorldEnvelopeIfRequired(e);
+
+    const selected = findSelectedDebugLayers(e.target);
+    setInteractiveLayerIds(selected);
 
     // 2) Add the native MapLibre attribution control
     onLoad(e);

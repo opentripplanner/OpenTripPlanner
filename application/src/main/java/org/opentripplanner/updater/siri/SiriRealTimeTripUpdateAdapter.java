@@ -219,21 +219,22 @@ public class SiriRealTimeTripUpdateAdapter {
       pattern = transitEditorService.findPattern(trip);
     } else if (fuzzyTripMatcher != null) {
       // No exact match found - search for trips based on arrival-times/stop-patterns
-      TripAndPattern tripAndPattern = fuzzyTripMatcher.match(
+      var result = fuzzyTripMatcher.match(
         estimatedVehicleJourney,
         entityResolver,
         this::getCurrentTimetable,
         snapshotManager::getNewTripPatternForModifiedTrip
       );
 
-      if (tripAndPattern == null) {
+      if (result.isFailure()) {
         LOG.debug(
           "No trips found for EstimatedVehicleJourney. {}",
           DebugString.of(estimatedVehicleJourney)
         );
-        return UpdateError.result(null, NO_FUZZY_TRIP_MATCH, dataSource);
+        return UpdateError.result(null, result.failureValue(), dataSource);
       }
 
+      var tripAndPattern = result.successValue();
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {

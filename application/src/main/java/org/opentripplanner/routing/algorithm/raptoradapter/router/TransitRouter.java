@@ -157,7 +157,13 @@ public class TransitRouter {
 
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
-    if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
+    // TODO VIA Temporarily turn OptimizeTransfers OFF for VIA search until the service support via
+    //          Remove '&& !request.isViaSearch()'
+    if (
+      OTPFeature.OptimizeTransfers.isOn() &&
+      !transitResponse.containsUnknownPaths() &&
+      !request.isViaSearch()
+    ) {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
         raptorTransitData::getStopByIndex,
         requestTransitDataProvider.stopNameResolver(),
