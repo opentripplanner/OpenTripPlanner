@@ -22,8 +22,15 @@
                         <OperatorRef>vvs-222</OperatorRef>
                     </OperatorFilter>
                     <LineFilter>
-                        <LineRef>vvs-aaa</LineRef>
-                        <LineRef>vvs-bbb</LineRef>
+                        <Line>
+                            <LineRef>vvs-aaa</LineRef>
+                        </Line>
+                        <Line>
+                            <LineRef>vvs-bbb</LineRef>
+                        </Line>
+                        <Line>
+                            <LineRef>vvs-ccc</LineRef>
+                        </Line>
                     </LineFilter>
                 </Params>
             </StopEventRequest>
