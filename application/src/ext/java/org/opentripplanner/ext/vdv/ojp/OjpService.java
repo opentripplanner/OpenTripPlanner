@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.vdv.CallAtStop;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.id.IdResolver;
@@ -60,33 +61,40 @@ public class OjpService {
 
     var arrivalDeparture = arrivalDeparture(ser);
     var timeWindow = timeWindow(ser);
+    Set<FeedScopedId> selectedAgencies = selectedAgencies(ser);
 
     List<CallAtStop> callsAtStop = List.of();
 
+    var params = new VdvService.StopEventRequestParams(
+      time.toInstant(),
+      arrivalDeparture,
+      timeWindow,
+      numResults,
+      selectedAgencies
+    );
+
     if (stopId.isPresent()) {
-      callsAtStop =
-        vdvService.findTripTimesOnDate(
-          stopId.get(),
-          time.toInstant(),
-          arrivalDeparture,
-          timeWindow,
-          numResults
-        );
+      callsAtStop = vdvService.findTripTimesOnDate(stopId.get(), params);
     } else if (coordinate.isPresent()) {
-      callsAtStop =
-        vdvService.findTripTimesOnDate(
-          coordinate.get(),
-          time.toInstant(),
-          arrivalDeparture,
-          timeWindow,
-          numResults
-        );
+      callsAtStop = vdvService.findTripTimesOnDate(coordinate.get(), params);
     }
+
     return mapper.mapStopTimesInPattern(
       callsAtStop,
       ZonedDateTime.now(),
       mapOptionalFeatures(ser.getParams())
     );
+  }
+
+  private Set<FeedScopedId> selectedAgencies(OJPStopEventRequestStructure ser) {
+    return Optional
+      .ofNullable(ser.getParams())
+      .map(p -> p.getOperatorFilter())
+      .map(o -> o.getOperatorRef())
+      .stream()
+      .flatMap(r -> r.stream().map(ref -> ref.getValue()))
+      .map(idResolver::parse)
+      .collect(Collectors.toSet());
   }
 
   private Optional<FeedScopedId> stopPointRef(OJPStopEventRequestStructure ser) {
