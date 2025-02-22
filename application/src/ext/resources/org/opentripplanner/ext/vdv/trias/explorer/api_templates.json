@@ -3,8 +3,8 @@
   "api_key": "",
   "templates": [
     {
-      "name": "StopEvent (stop point ref)",
-      "template": "stop-event-stop-point-ref.xml",
+      "name": "StopEvent (stop point)",
+      "template": "stop-event-stop-point.xml",
       "variables": [
         {
           "name": "stop_point_ref",
