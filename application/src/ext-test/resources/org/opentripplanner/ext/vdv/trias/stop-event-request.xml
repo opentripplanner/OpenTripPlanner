@@ -23,13 +23,14 @@
                     </OperatorFilter>
                     <LineFilter>
                         <Line>
-                            <LineRef>vvs-aaa</LineRef>
+                            <LineRef>aaa</LineRef>
                         </Line>
                         <Line>
-                            <LineRef>vvs-bbb</LineRef>
+                            <LineRef>bbb</LineRef>
                         </Line>
                         <Line>
-                            <LineRef>vvs-ccc</LineRef>
+                            <LineRef>ccc</LineRef>
+                            <Exlude>true</Exlude>
                         </Line>
                     </LineFilter>
                 </Params>
