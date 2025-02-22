@@ -19,10 +19,10 @@
                             <siri:LineRef>aaa</siri:LineRef>
                         </ojp:Line>
                         <ojp:Line>
-                            <siri:LineRef>vvs-bbb</siri:LineRef>
+                            <siri:LineRef>bbb</siri:LineRef>
                         </ojp:Line>
                         <ojp:Line>
-                            <siri:LineRef>vvs-ccc</siri:LineRef>
+                            <siri:LineRef>ccc</siri:LineRef>
                         </ojp:Line>
                     </ojp:LineFilter>
                     <ojp:OperatorFilter>
