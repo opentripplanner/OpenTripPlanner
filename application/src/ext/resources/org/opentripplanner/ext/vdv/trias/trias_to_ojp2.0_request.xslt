@@ -103,9 +103,9 @@
                   <LineFilter>
                     <xsl:for-each select="//trias:LineFilter//trias:Line//trias:LineRef">
                       <Line>
-                        <LineRef>
+                        <siri:LineRef>
                           <xsl:value-of select="."/>
-                        </LineRef>
+                        </siri:LineRef>
                       </Line>
                     </xsl:for-each>
                   </LineFilter>

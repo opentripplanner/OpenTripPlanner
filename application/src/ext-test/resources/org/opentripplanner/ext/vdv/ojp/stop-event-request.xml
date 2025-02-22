@@ -15,9 +15,15 @@
                 </ojp:Location>
                 <ojp:Params>
                     <ojp:LineFilter>
-                        <ojp:Line/>
-                        <ojp:Line/>
-                        <ojp:Line/>
+                        <ojp:Line>
+                            <siri:LineRef>aaa</siri:LineRef>
+                        </ojp:Line>
+                        <ojp:Line>
+                            <siri:LineRef>vvs-bbb</siri:LineRef>
+                        </ojp:Line>
+                        <ojp:Line>
+                            <siri:LineRef>vvs-ccc</siri:LineRef>
+                        </ojp:Line>
                     </ojp:LineFilter>
                     <ojp:OperatorFilter>
                         <ojp:OperatorRef>vvs-111</ojp:OperatorRef>
