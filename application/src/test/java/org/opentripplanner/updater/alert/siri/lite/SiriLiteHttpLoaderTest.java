@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.alert.lite;
+package org.opentripplanner.updater.alert.siri.lite;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.updater.alert.siri.lite.SiriLiteHttpLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 
