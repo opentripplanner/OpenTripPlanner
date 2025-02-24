@@ -6,7 +6,6 @@ import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
-import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
@@ -21,12 +20,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
@@ -34,15 +35,16 @@ import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
+import uk.org.siri.siri20.Siri;
 
-public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
+public class AbstractAzureSiriUpdater implements GraphUpdater {
 
   /**
    *  custom functional interface that allows throwing checked exceptions, thereby
    *  preserving the exception's intent and type.
    */
   @FunctionalInterface
-  interface CheckedRunnable {
+  protected interface CheckedRunnable {
     void run() throws Exception;
   }
 
@@ -71,45 +73,47 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private final String fullyQualifiedNamespace;
   private final String configRef;
   private final String serviceBusUrl;
-  private final boolean fuzzyTripMatching;
-  private final Consumer<ServiceBusReceivedMessageContext> messageConsumer = this::messageConsumer;
-  private final Consumer<ServiceBusErrorContext> errorConsumer = this::errorConsumer;
   private final String topicName;
   private final Duration autoDeleteOnIdle;
   private final int prefetchCount;
 
-  protected WriteToGraphCallback saveResultOnGraph;
   private ServiceBusProcessorClient eventProcessor;
   private ServiceBusAdministrationAsyncClient serviceBusAdmin;
   private boolean isPrimed = false;
   private String subscriptionName;
 
-  protected final String feedId;
+  private final SiriAzureMessageHandler messageHandler;
 
   /**
-   * The URL used to fetch all initial updates
+   * The URL used to fetch all initial updates, null means don't fetch initial data
    */
-  private final String dataInitializationUrl;
+  @Nullable
+  private final URI dataInitializationUrl;
+
   /**
    * The timeout used when fetching historical data
    */
   protected final int timeout;
 
-  public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config) {
+  public AbstractAzureSiriUpdater(
+    SiriAzureUpdaterParameters config,
+    SiriAzureMessageHandler messageHandler
+  ) {
+    this.messageHandler = Objects.requireNonNull(messageHandler);
+
+    try {
+      this.dataInitializationUrl = config.buildDataInitializationUrl().orElse(null);
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException("Invalid history url", e);
+    }
+
     this.configRef = Objects.requireNonNull(config.configRef(), "configRef must not be null");
     this.authenticationType =
       Objects.requireNonNull(config.getAuthenticationType(), "authenticationType must not be null");
     this.topicName = Objects.requireNonNull(config.getTopicName(), "topicName must not be null");
-    this.dataInitializationUrl =
-      Objects.requireNonNull(
-        config.getDataInitializationUrl(),
-        "dataInitializationUrl must not be null"
-      );
     this.timeout = config.getTimeout();
-    this.feedId = Objects.requireNonNull(config.feedId(), "feedId must not be null");
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
     this.prefetchCount = config.getPrefetchCount();
-    this.fuzzyTripMatching = config.isFuzzyTripMatching();
 
     if (authenticationType == AuthenticationType.FederatedIdentity) {
       this.fullyQualifiedNamespace =
@@ -130,21 +134,25 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     }
   }
 
-  /**
-   * Consume Service Bus topic message and implement business logic.
-   * @param messageContext The Service Bus processor message context that holds a received message and additional methods to settle the message.
-   */
-  protected abstract void messageConsumer(ServiceBusReceivedMessageContext messageContext);
+  public static AbstractAzureSiriUpdater createETUpdater(
+    SiriAzureETUpdaterParameters config,
+    SiriRealTimeTripUpdateAdapter adapter
+  ) {
+    var messageHandler = new SiriAzureETUpdater(config, adapter);
+    return new AbstractAzureSiriUpdater(config, messageHandler);
+  }
 
-  /**
-   * Consume error and decide how to manage it.
-   * @param errorContext Context for errors handled by the ServiceBusProcessorClient.
-   */
-  protected abstract void errorConsumer(ServiceBusErrorContext errorContext);
+  public static AbstractAzureSiriUpdater createSXUpdater(
+    SiriAzureSXUpdaterParameters config,
+    TimetableRepository timetableRepository
+  ) {
+    var messageHandler = new SiriAzureSXUpdater(config, timetableRepository);
+    return new AbstractAzureSiriUpdater(config, messageHandler);
+  }
 
   @Override
   public void setup(WriteToGraphCallback writeToGraphCallback) {
-    this.saveResultOnGraph = writeToGraphCallback;
+    this.messageHandler.setup(writeToGraphCallback);
   }
 
   @Override
@@ -159,7 +167,14 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       executeWithRetry(this::setupSubscription, "Setting up Service Bus subscription to topic");
 
       executeWithRetry(
-        () -> initializeData(dataInitializationUrl, messageConsumer),
+        () -> {
+          var initialData = fetchInitialSiriData();
+          if (initialData.isEmpty()) {
+            LOG.info("Got empty response from history endpoint");
+          } else {
+            messageHandler.processHistory(initialData.get());
+          }
+        },
         "Initializing historical Siri data"
       );
 
@@ -339,8 +354,8 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
         .disableAutoComplete() // Receive and delete does not need autocomplete
         .prefetchCount(prefetchCount)
-        .processError(errorConsumer)
-        .processMessage(messageConsumer)
+        .processError(this::errorConsumer)
+        .processMessage(messageHandler::handleMessage)
         .buildProcessorClient();
 
     eventProcessor.start();
@@ -369,14 +384,23 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   /**
    * Returns None for empty result
    */
-  protected Optional<ServiceDelivery> fetchInitialSiriData(URI uri) {
+  private Optional<ServiceDelivery> fetchInitialSiriData() {
+    if (dataInitializationUrl == null) {
+      return Optional.empty();
+    }
     var headers = HttpHeaders.of().acceptApplicationXML().build().asMap();
+
+    LOG.info(
+      "Fetching initial Siri data from {}, timeout is {} ms.",
+      this.dataInitializationUrl,
+      timeout
+    );
 
     try (OtpHttpClientFactory otpHttpClientFactory = new OtpHttpClientFactory()) {
       var otpHttpClient = otpHttpClientFactory.create(LOG);
       var t1 = System.currentTimeMillis();
       var siriOptional = otpHttpClient.executeAndMapOptional(
-        new HttpGet(uri),
+        new HttpGet(dataInitializationUrl),
         Duration.ofMillis(timeout),
         headers,
         SiriXml::parseXml
@@ -388,25 +412,16 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         LOG.info("Got status 204 'No Content'.");
       }
 
-      return siriOptional.map(siri -> siri.getServiceDelivery());
+      return siriOptional.map(Siri::getServiceDelivery);
     }
   }
-
-  boolean fuzzyTripMatching() {
-    return fuzzyTripMatching;
-  }
-
-  protected abstract void initializeData(
-    String url,
-    Consumer<ServiceBusReceivedMessageContext> consumer
-  ) throws URISyntaxException;
 
   /**
    * Make some sensible logging on error and if Service Bus is busy, sleep for some time before try again to get messages.
    * This code snippet is taken from Microsoft example <a href="https://docs.microsoft.com/sv-se/azure/service-bus-messaging/service-bus-java-how-to-use-queues">...</a>.
    * @param errorContext Context for errors handled by the ServiceBusProcessorClient.
    */
-  protected void defaultErrorConsumer(ServiceBusErrorContext errorContext) {
+  private void errorConsumer(ServiceBusErrorContext errorContext) {
     LOG.error(
       "Error when receiving messages from namespace={}, Entity={}",
       errorContext.getFullyQualifiedNamespace(),

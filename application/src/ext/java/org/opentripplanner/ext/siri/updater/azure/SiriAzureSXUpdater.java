@@ -1,53 +1,50 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
-import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import jakarta.xml.bind.JAXBException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
-import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.siri.SiriAlertsUpdateHandler;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 
-public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements TransitAlertProvider {
+public class SiriAzureSXUpdater implements TransitAlertProvider, SiriAzureMessageHandler {
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
   private final SiriAlertsUpdateHandler updateHandler;
   private final TransitAlertService transitAlertService;
 
-  private static final transient AtomicLong messageCounter = new AtomicLong(0);
-  private final LocalDate fromDateTime;
-  private final LocalDate toDateTime;
+  private static final AtomicLong messageCounter = new AtomicLong(0);
+
+  private WriteToGraphCallback saveResultOnGraph;
 
   public SiriAzureSXUpdater(
     SiriAzureSXUpdaterParameters config,
     TimetableRepository timetableRepository
   ) {
-    super(config);
-    this.fromDateTime = config.getFromDateTime();
-    this.toDateTime = config.getToDateTime();
     this.transitAlertService = new TransitAlertServiceImpl(timetableRepository);
-    this.updateHandler = new SiriAlertsUpdateHandler(feedId, transitAlertService, Duration.ZERO);
+    this.updateHandler =
+      new SiriAlertsUpdateHandler(config.feedId(), transitAlertService, Duration.ZERO);
   }
 
   @Override
-  protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {
+  public void setup(WriteToGraphCallback writeToGraphCallback) {
+    this.saveResultOnGraph = writeToGraphCallback;
+  }
+
+  @Override
+  public void handleMessage(ServiceBusReceivedMessageContext messageContext) {
     var message = messageContext.getMessage();
 
     LOG.debug(
@@ -70,36 +67,6 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
     }
   }
 
-  @Override
-  protected void errorConsumer(ServiceBusErrorContext errorContext) {
-    defaultErrorConsumer(errorContext);
-  }
-
-  @Override
-  protected void initializeData(String url, Consumer<ServiceBusReceivedMessageContext> consumer)
-    throws URISyntaxException {
-    if (url == null) {
-      LOG.info("No history url set up for Siri Azure SX Updater");
-      return;
-    }
-
-    URI uri = new URIBuilder(url)
-      .addParameter("publishFromDateTime", fromDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
-      .addParameter("publishToDateTime", toDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE))
-      .build();
-
-    LOG.info("Fetching initial Siri SX data from {}, timeout is {} ms.", uri, timeout);
-    var siri = fetchInitialSiriData(uri);
-
-    if (siri.isEmpty()) {
-      LOG.info("Got empty SX response from history endpoint");
-      return;
-    }
-
-    // This is fine since runnables are scheduled after each other
-    processHistory(siri.get());
-  }
-
   private Optional<ServiceDelivery> parseSiriSx(String xmlMessage, String id)
     throws XMLStreamException, JAXBException {
     var siri = SiriXml.parseXml(xmlMessage);
@@ -119,10 +86,11 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
   }
 
   private Future<?> processMessage(ServiceDelivery siriSx) {
-    return super.saveResultOnGraph.execute(context -> updateHandler.update(siriSx, context));
+    return saveResultOnGraph.execute(context -> updateHandler.update(siriSx, context));
   }
 
-  private void processHistory(ServiceDelivery siri) {
+  @Override
+  public void processHistory(ServiceDelivery siri) {
     var sx = siri.getSituationExchangeDeliveries();
 
     if (sx == null || sx.isEmpty()) {

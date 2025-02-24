@@ -33,6 +33,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import uk.org.siri.siri20.ServiceDelivery;
 
 class AbstractAzureSiriUpdaterTest {
 
@@ -58,19 +60,19 @@ class AbstractAzureSiriUpdaterTest {
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
     updater =
       spy(
-        new AbstractAzureSiriUpdater(mockConfig) {
-          @Override
-          protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {}
+        new AbstractAzureSiriUpdater(
+          mockConfig,
+          new SiriAzureMessageHandler() {
+            @Override
+            public void setup(WriteToGraphCallback writeToGraphCallback) {}
 
-          @Override
-          protected void errorConsumer(ServiceBusErrorContext errorContext) {}
+            @Override
+            public void handleMessage(ServiceBusReceivedMessageContext messageContext) {}
 
-          @Override
-          protected void initializeData(
-            String url,
-            Consumer<ServiceBusReceivedMessageContext> consumer
-          ) throws URISyntaxException {}
-        }
+            @Override
+            public void processHistory(ServiceDelivery siri) {}
+          }
+        )
       );
 
     task = mock(AbstractAzureSiriUpdater.CheckedRunnable.class);
