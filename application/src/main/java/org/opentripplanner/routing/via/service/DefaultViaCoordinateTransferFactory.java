@@ -59,7 +59,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
         (StringUtils.hasValue(viaLabel) ? viaLabel : "Via") + " " + coordinate
       );
 
-      var viaVertex = TemporaryStreetLocation.via(
+      var viaVertex = new TemporaryStreetLocation(
         UUID.randomUUID().toString(),
         coordinate.asJtsCoordinate(),
         name

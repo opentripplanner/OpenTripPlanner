@@ -102,12 +102,7 @@ public class StreetIndex {
   ) {
     boolean wheelchairAccessible = false;
 
-    TemporaryStreetLocation location = TemporaryStreetLocation.originOrDestination(
-      label,
-      nearestPoint,
-      name,
-      endVertex
-    );
+    var location = new TemporaryStreetLocation(label, nearestPoint, name);
 
     for (StreetEdge street : edges) {
       Vertex fromv = street.getFromVertex();
@@ -377,12 +372,8 @@ public class StreetIndex {
       name = new NonLocalizedString(label);
     }
 
-    TemporaryStreetLocation temporaryStreetLocation = TemporaryStreetLocation.originOrDestination(
-      UUID.randomUUID().toString(),
-      coordinate,
-      name,
-      endVertex
-    );
+    String id = UUID.randomUUID().toString();
+    var temporaryStreetLocation = new TemporaryStreetLocation(id, coordinate, name);
 
     TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
 

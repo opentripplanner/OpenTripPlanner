@@ -359,12 +359,8 @@ public abstract class GraphRoutingTest {
       double longitude,
       boolean endVertex
     ) {
-      return TemporaryStreetLocation.originOrDestination(
-        name,
-        new Coordinate(longitude, latitude),
-        new NonLocalizedString(name),
-        endVertex
-      );
+      var nearestPoint = new Coordinate(longitude, latitude);
+      return new TemporaryStreetLocation(name, nearestPoint, new NonLocalizedString(name));
     }
 
     public TemporaryFreeEdge link(TemporaryVertex from, StreetVertex to) {
