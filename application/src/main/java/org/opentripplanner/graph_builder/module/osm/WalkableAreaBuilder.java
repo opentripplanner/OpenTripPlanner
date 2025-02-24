@@ -267,9 +267,15 @@ class WalkableAreaBuilder {
           for (Ring innerRing : outerRing.getHoles()) {
             for (int j = 0; j < innerRing.nodes.size(); ++j) {
               OsmNode node = innerRing.nodes.get(j);
-              edges.addAll(
-                createEdgesForRingSegment(areaGroup, area, innerRing, j, alreadyAddedEdges)
+              var newEdges = createEdgesForRingSegment(
+                areaGroup,
+                area,
+                innerRing,
+                j,
+                alreadyAddedEdges
               );
+              edges.addAll(newEdges);
+              ringEdges.addAll(newEdges);
               // A node can only be a visibility node only if it is an entrance to the
               // area or a convex point, i.e. the angle is over 180 degrees.
               // For holes, we must swap the convexity condition
