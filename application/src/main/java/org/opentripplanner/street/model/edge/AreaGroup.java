@@ -52,7 +52,7 @@ public class AreaGroup implements Serializable {
   }
 
   /**
-   * Add a visibility vertex to this edge.
+   * Add a visibility vertex to this area group
    */
   public void addVisibilityVertex(IntersectionVertex toBeAdded) {
     Objects.requireNonNull(toBeAdded);
@@ -63,6 +63,22 @@ public class AreaGroup implements Serializable {
         visibilityVertices =
           Stream
             .concat(visibilityVertices.stream(), Stream.of(toBeAdded))
+            .collect(Collectors.toUnmodifiableSet());
+      }
+    }
+  }
+
+  /**
+   * Add a set of visibility vertices to this area groupo
+   */
+  public void addVisibilityVertices(Set<IntersectionVertex> vertices) {
+    synchronized (this) {
+      if (visibilityVertices == EMPTY_SET) {
+        visibilityVertices = Set.copyOf(vertices);
+      } else {
+        visibilityVertices =
+          Stream
+            .concat(visibilityVertices.stream(), vertices.stream())
             .collect(Collectors.toUnmodifiableSet());
       }
     }
