@@ -8,7 +8,6 @@ import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
-import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeTripUpdateSource;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;

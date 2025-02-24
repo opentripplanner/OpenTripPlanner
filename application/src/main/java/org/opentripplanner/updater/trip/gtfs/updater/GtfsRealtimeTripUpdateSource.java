@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs;
+package org.opentripplanner.updater.trip.gtfs.updater;
 
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
@@ -16,12 +16,11 @@ import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
-import org.opentripplanner.updater.trip.gtfs.updater.PollingTripUpdaterParameters;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GtfsRealtimeTripUpdateSource {
+class GtfsRealtimeTripUpdateSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeTripUpdateSource.class);
   /**

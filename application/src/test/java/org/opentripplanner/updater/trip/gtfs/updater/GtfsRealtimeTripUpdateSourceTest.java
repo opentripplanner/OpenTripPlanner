@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs;
+package org.opentripplanner.updater.trip.gtfs.updater;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.gtfs.updater.PollingTripUpdaterParameters;
 
 public class GtfsRealtimeTripUpdateSourceTest {
 
