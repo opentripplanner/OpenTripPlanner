@@ -527,7 +527,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   private State reversedClone() {
     StreetSearchRequest reversedRequest = request
-      .copyOfReversed(getTime())
+      .copyOfReversed(getTimeAccurate())
       .withPreferences(p -> {
         p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
         p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
@@ -535,7 +535,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;
-    return new State(this.vertex, getTime(), newStateData, reversedRequest);
+    return new State(this.vertex, getTimeAccurate(), newStateData, reversedRequest);
   }
 
   /**
