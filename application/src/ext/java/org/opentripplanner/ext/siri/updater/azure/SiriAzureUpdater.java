@@ -37,14 +37,19 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
-public class AbstractAzureSiriUpdater implements GraphUpdater {
+/**
+ * This is the main handler for siri messages over azure. It handles the generic code for communicating
+ * with the azure service bus and delegates to SiriAzureETUpdater and SiriAzureSXUpdater for ET and
+ * SX specific stuff.
+ */
+public class SiriAzureUpdater implements GraphUpdater {
 
   /**
    *  custom functional interface that allows throwing checked exceptions, thereby
    *  preserving the exception's intent and type.
    */
   @FunctionalInterface
-  protected interface CheckedRunnable {
+  interface CheckedRunnable {
     void run() throws Exception;
   }
 
@@ -93,9 +98,9 @@ public class AbstractAzureSiriUpdater implements GraphUpdater {
   /**
    * The timeout used when fetching historical data
    */
-  protected final int timeout;
+  private final int timeout;
 
-  public AbstractAzureSiriUpdater(
+  SiriAzureUpdater(
     SiriAzureUpdaterParameters config,
     SiriAzureMessageHandler messageHandler
   ) {
@@ -134,20 +139,20 @@ public class AbstractAzureSiriUpdater implements GraphUpdater {
     }
   }
 
-  public static AbstractAzureSiriUpdater createETUpdater(
+  public static SiriAzureUpdater createETUpdater(
     SiriAzureETUpdaterParameters config,
     SiriRealTimeTripUpdateAdapter adapter
   ) {
     var messageHandler = new SiriAzureETUpdater(config, adapter);
-    return new AbstractAzureSiriUpdater(config, messageHandler);
+    return new SiriAzureUpdater(config, messageHandler);
   }
 
-  public static AbstractAzureSiriUpdater createSXUpdater(
+  public static SiriAzureUpdater createSXUpdater(
     SiriAzureSXUpdaterParameters config,
     TimetableRepository timetableRepository
   ) {
     var messageHandler = new SiriAzureSXUpdater(config, timetableRepository);
-    return new AbstractAzureSiriUpdater(config, messageHandler);
+    return new SiriAzureUpdater(config, messageHandler);
   }
 
   @Override
@@ -212,7 +217,7 @@ public class AbstractAzureSiriUpdater implements GraphUpdater {
    * @param millis number of milliseconds
    * @throws InterruptedException if sleep is interrupted
    */
-  protected void sleep(int millis) throws InterruptedException {
+  void sleep(int millis) throws InterruptedException {
     Thread.sleep(millis);
   }
 
@@ -223,7 +228,7 @@ public class AbstractAzureSiriUpdater implements GraphUpdater {
    * @param description A description of the task for logging purposes.
    * @throws InterruptedException If the thread is interrupted while waiting between retries.
    */
-  protected void executeWithRetry(CheckedRunnable task, String description) throws Exception {
+  void executeWithRetry(CheckedRunnable task, String description) throws Exception {
     int sleepPeriod = 1000; // Start with 1-second delay
     int attemptCounter = 1;
 
@@ -258,7 +263,7 @@ public class AbstractAzureSiriUpdater implements GraphUpdater {
     }
   }
 
-  protected boolean shouldRetry(Exception e) {
+  boolean shouldRetry(Exception e) {
     if (e instanceof ServiceBusException sbException) {
       ServiceBusFailureReason reason = sbException.getReason();
 
