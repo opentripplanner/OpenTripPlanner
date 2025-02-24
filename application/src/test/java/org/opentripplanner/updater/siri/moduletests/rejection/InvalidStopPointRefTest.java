@@ -12,7 +12,7 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 
-public class InvalidStopPointRefTest implements RealtimeTestConstants {
+class InvalidStopPointRefTest implements RealtimeTestConstants {
 
   private static Stream<Arguments> cases() {
     return Stream

@@ -14,7 +14,7 @@ import org.opentripplanner.updater.trip.TripInput;
 /**
  * Contains tests for features that are not currently supported.
  */
-public class UnsupportedTest implements RealtimeTestConstants {
+class UnsupportedTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_1_INPUT = TripInput
     .of(TRIP_1_ID)

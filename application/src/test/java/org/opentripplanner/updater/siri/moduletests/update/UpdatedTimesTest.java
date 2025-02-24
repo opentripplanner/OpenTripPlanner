@@ -10,7 +10,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 
-public class UpdatedTimesTest implements RealtimeTestConstants {
+class UpdatedTimesTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_INPUT = TripInput
     .of(TRIP_1_ID)

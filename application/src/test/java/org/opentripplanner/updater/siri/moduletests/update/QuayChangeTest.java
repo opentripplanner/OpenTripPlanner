@@ -8,7 +8,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 
-public class QuayChangeTest implements RealtimeTestConstants {
+class QuayChangeTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_INPUT = TripInput
     .of(TRIP_1_ID)

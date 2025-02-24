@@ -9,7 +9,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 
-public class NotMonitoredTest implements RealtimeTestConstants {
+class NotMonitoredTest implements RealtimeTestConstants {
 
   private static final TripInput TRIP_1_INPUT = TripInput
     .of(TRIP_1_ID)
