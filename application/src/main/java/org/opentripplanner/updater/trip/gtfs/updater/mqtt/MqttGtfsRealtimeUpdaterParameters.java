@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs.updater;
+package org.opentripplanner.updater.trip.gtfs.updater.mqtt;
 
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;

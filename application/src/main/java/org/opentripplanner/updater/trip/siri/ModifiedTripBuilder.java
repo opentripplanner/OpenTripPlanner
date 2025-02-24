@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.trip.siri.mapper.PickDropMapper;
+import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ import uk.org.siri.siri20.OccupancyEnumeration;
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET
  * EstimatedVehicleJourney.
  */
-public class ModifiedTripBuilder {
+class ModifiedTripBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(ModifiedTripBuilder.class);
 

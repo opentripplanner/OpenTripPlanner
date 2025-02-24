@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.siri.mapper;
+package org.opentripplanner.updater.trip.siri.mapping;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.CANCELLED;

@@ -11,6 +11,7 @@ import static uk.org.siri.siri20.DepartureBoardingActivityEnumeration.NO_BOARDIN
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.updater.trip.siri.TestCall;
+import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import uk.org.siri.siri20.CallStatusEnumeration;
 
 class PickDropMapperTest {

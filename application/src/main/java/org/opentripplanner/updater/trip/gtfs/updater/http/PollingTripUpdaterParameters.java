@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs.updater;
+package org.opentripplanner.updater.trip.gtfs.updater.http;
 
 import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;

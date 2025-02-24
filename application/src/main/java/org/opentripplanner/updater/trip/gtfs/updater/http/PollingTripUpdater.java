@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs.updater;
+package org.opentripplanner.updater.trip.gtfs.updater.http;
 
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.trip.gtfs.updater.TripUpdateGraphWriterRunnable;
 import org.opentripplanner.updater.trip.metrics.BatchTripUpdateMetrics;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(PollingTripUpdater.class);
 
-  private final GtfsRealtimeTripUpdateSource updateSource;
+  private final HttpTripUpdateSource updateSource;
   private final GtfsRealTimeTripUpdateAdapter adapter;
 
   /**
@@ -47,7 +48,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
     super(parameters);
     // Create update streamer from preferences
     this.feedId = parameters.feedId();
-    this.updateSource = new GtfsRealtimeTripUpdateSource(parameters);
+    this.updateSource = new HttpTripUpdateSource(parameters);
     this.backwardsDelayPropagationType = parameters.backwardsDelayPropagationType();
     this.adapter = adapter;
     this.fuzzyTripMatching = parameters.fuzzyTripMatching();

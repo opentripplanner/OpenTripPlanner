@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
  *             analysed, designed and documented.
  */
-public class SiriTripPatternCache {
+class SiriTripPatternCache {
 
   // TODO RT_AB: Improve documentation. This seems to be the primary collection of added
   //   TripPatterns, with other collections serving as indexes. Similar to TripPatternCache.cache

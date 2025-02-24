@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.gtfs.updater;
+package org.opentripplanner.updater.trip.gtfs.updater.http;
 
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
@@ -20,9 +20,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class GtfsRealtimeTripUpdateSource {
+class HttpTripUpdateSource {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeTripUpdateSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HttpTripUpdateSource.class);
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
@@ -33,7 +33,7 @@ class GtfsRealtimeTripUpdateSource {
   private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
   private final OtpHttpClient otpHttpClient;
 
-  public GtfsRealtimeTripUpdateSource(PollingTripUpdaterParameters config) {
+  public HttpTripUpdateSource(PollingTripUpdaterParameters config) {
     this.feedId = config.feedId();
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
