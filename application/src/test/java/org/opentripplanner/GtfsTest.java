@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
-import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+import static org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;

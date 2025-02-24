@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip;
+package org.opentripplanner.updater.trip.gtfs;
 
 /**
  * The backwards delay propagation type for a GTFS RT trip updater.
