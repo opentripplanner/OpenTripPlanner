@@ -1,0 +1,19 @@
+package org.opentripplanner.updater.trip.gtfs.updater;
+
+import java.time.Duration;
+import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
+import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.UrlUpdaterParameters;
+
+public record PollingTripUpdaterParameters(
+  String configRef,
+  Duration frequency,
+  boolean fuzzyTripMatching,
+  BackwardsDelayPropagationType backwardsDelayPropagationType,
+
+  String feedId,
+  String url,
+  HttpHeaders headers
+)
+  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {}

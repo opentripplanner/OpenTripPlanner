@@ -51,10 +51,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.alert.AlertsUpdateHandler;
-import org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {

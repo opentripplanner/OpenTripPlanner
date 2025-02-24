@@ -20,9 +20,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
-import org.opentripplanner.updater.siri.updater.EstimatedTimetableHandler;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 
 /**

@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.trip.gtfs.updater.MqttGtfsRealtimeUpdaterParameters;
 
 public class MqttGtfsRealtimeUpdaterConfig {
 
