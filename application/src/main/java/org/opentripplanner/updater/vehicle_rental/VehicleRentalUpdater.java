@@ -164,7 +164,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
           DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
             vehicleRentalVertex,
             new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BOTH_WAYS,
+            LinkingDirection.BIDIRECTIONAL,
             (vertex, streetVertex) ->
               List.of(
                 StreetVehicleRentalLink.createStreetVehicleRentalLink(

@@ -160,7 +160,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       .linkVertexPermanently(
         tStop,
         WALK_ONLY,
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (transitVertex, streetVertex) -> {
           var linkEdges = createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex);
 
@@ -187,7 +187,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       .linkVertexPermanently(
         tStop,
         CAR_ONLY,
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (transitVertex, streetVertex) ->
           createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
       );
@@ -213,7 +213,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           vehicleParkingVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -234,7 +234,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           vehicleParkingVertex,
           new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -258,7 +258,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           tEntrance,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetTransitEntranceLink.createStreetTransitEntranceLink(
@@ -296,7 +296,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           station,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           stationAndStreetVertexLinker
         );
     }

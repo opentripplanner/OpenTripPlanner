@@ -212,7 +212,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
         boardingLocation,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         platformEdgeList.getValue().stream().map(StreetEdge.class::cast).collect(Collectors.toSet())
       )) {
         linkBoardingLocationToStop(ts, stop.getCode(), vertex);
@@ -243,7 +243,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           linker.linkVertexPermanently(
             boardingLocation,
             new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BOTH_WAYS,
+            LinkingDirection.BIDIRECTIONAL,
             (osmBoardingLocationVertex, splitVertex) ->
               getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
           );

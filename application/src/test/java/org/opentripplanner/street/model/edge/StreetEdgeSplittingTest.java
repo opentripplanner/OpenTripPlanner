@@ -76,7 +76,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     var splitResult = streetEdge1.splitNonDestructively(
       splitVtx,
       disposableEdgeCollection,
-      LinkingDirection.BOTH_WAYS
+      LinkingDirection.BIDIRECTIONAL
     );
     assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
     assertFalse(splitResult.tail().getTurnRestrictions().isEmpty());
@@ -97,7 +97,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
     var splitResult = streetEdge2.splitNonDestructively(
       splitVtx,
       disposableEdgeCollection,
-      LinkingDirection.BOTH_WAYS
+      LinkingDirection.BIDIRECTIONAL
     );
     assertEquals(splitResult.head(), addedRestriction(streetEdge1).to);
     assertOriginalRestrictionExists();

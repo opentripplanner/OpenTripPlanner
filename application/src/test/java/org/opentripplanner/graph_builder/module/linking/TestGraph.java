@@ -70,7 +70,7 @@ class TestGraph {
       linker.linkVertexPermanently(
         tStop,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (vertex, streetVertex) ->
           List.of(
             StreetTransitStopLink.createStreetTransitStopLink(

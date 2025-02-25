@@ -178,7 +178,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         var disposableWalkEdges = linker.linkVertexForRealTime(
           vehicleParkingEntranceVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -198,7 +198,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         var disposableCarEdges = linker.linkVertexForRealTime(
           vehicleParkingEntranceVertex,
           new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(

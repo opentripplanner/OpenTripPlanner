@@ -388,7 +388,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     if (fromLegs.isEmpty() || toLegs.isEmpty()) {
       throw new IllegalStateException(
-        "There need to be at least one edges to get from a stop to the via coordinate and back"
+        "There need to be at least one edge to get from a stop to the via coordinate and back"
       );
     }
     // We need to timeshift the toLegs

@@ -721,7 +721,7 @@ public class StreetEdge
     StreetEdge e1 = null;
     StreetEdge e2 = null;
 
-    if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
+    if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb1 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex((StreetVertex) fromv)
@@ -734,7 +734,7 @@ public class StreetEdge
       copyRentalRestrictionsToSplitEdge(e1);
       tempEdges.addEdge(e1);
     }
-    if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
+    if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb2 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex(v)

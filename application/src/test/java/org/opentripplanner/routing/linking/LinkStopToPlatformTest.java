@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -253,7 +252,7 @@ public class LinkStopToPlatformTest {
       linker.linkVertexPermanently(
         tStop,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (vertex, streetVertex) ->
           List.of(
             StreetTransitStopLink.createStreetTransitStopLink(

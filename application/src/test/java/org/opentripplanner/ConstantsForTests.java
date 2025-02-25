@@ -353,7 +353,7 @@ public class ConstantsForTests {
         linker.linkVertexPermanently(
           stationVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleRentalLink.createStreetVehicleRentalLink(

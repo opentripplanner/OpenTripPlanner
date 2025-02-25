@@ -11,13 +11,13 @@ class LinkingDirectionTest {
   void allowOutgoing() {
     assertFalse(LinkingDirection.INCOMING.allowOutgoing());
     assertTrue(LinkingDirection.OUTGOING.allowOutgoing());
-    assertTrue(LinkingDirection.BOTH_WAYS.allowOutgoing());
+    assertTrue(LinkingDirection.BIDIRECTIONAL.allowOutgoing());
   }
 
   @Test
   void allowIncoming() {
     assertTrue(LinkingDirection.INCOMING.allowIncoming());
     assertFalse(LinkingDirection.OUTGOING.allowIncoming());
-    assertTrue(LinkingDirection.BOTH_WAYS.allowIncoming());
+    assertTrue(LinkingDirection.BIDIRECTIONAL.allowIncoming());
   }
 }

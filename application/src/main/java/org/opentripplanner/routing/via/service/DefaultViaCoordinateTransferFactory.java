@@ -73,7 +73,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
           .linkVertexForRequest(
             viaVertex,
             new TraverseModeSet(m),
-            LinkingDirection.BOTH_WAYS,
+            LinkingDirection.BIDIRECTIONAL,
             (via, street) -> {
               var v = (TemporaryStreetLocation) via;
               return List.of(
