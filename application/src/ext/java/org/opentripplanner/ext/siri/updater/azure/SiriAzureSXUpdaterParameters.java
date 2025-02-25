@@ -6,12 +6,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import org.apache.hc.core5.net.URIBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SiriAzureSXUpdaterParameters extends SiriAzureUpdaterParameters {
-
-  private final Logger LOG = LoggerFactory.getLogger(getClass());
 
   private LocalDate fromDateTime;
   private LocalDate toDateTime;
@@ -40,7 +36,6 @@ public class SiriAzureSXUpdaterParameters extends SiriAzureUpdaterParameters {
   public Optional<URI> buildDataInitializationUrl() throws URISyntaxException {
     var url = getDataInitializationUrl();
     if (url == null) {
-      LOG.info("No history url set up for Siri Azure SX Updater");
       return Optional.empty();
     }
 

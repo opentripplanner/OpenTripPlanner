@@ -117,5 +117,9 @@ public abstract class SiriAzureUpdaterParameters {
     this.prefetchCount = prefetchCount;
   }
 
+  /**
+   * Create the url used for fetching initial data. Returns empty if there is no initial data url
+   * configured.
+   */
   public abstract Optional<URI> buildDataInitializationUrl() throws URISyntaxException;
 }

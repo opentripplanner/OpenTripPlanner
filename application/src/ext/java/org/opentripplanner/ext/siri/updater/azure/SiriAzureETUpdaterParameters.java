@@ -8,14 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class SiriAzureETUpdaterParameters
   extends SiriAzureUpdaterParameters
   implements UrlUpdaterParameters {
-
-  private final Logger LOG = LoggerFactory.getLogger(getClass());
 
   private LocalDate fromDateTime;
 
@@ -45,7 +41,6 @@ public class SiriAzureETUpdaterParameters
   public Optional<URI> buildDataInitializationUrl() throws URISyntaxException {
     var url = getDataInitializationUrl();
     if (url == null) {
-      LOG.info("No history url set up for Siri Azure ET Updater");
       return Optional.empty();
     }
     return Optional.of(
