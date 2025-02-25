@@ -557,7 +557,7 @@ does not exist.
               Mode-specific version of `maxStopCount`.
               """
               )
-              .asEnumMap(StreetMode.class, Integer.class)
+              .asEnumMap(StreetMode.class, Integer.class, dft.accessEgress().maxStopCountForMode())
           );
       })
       .withMaxDirectDuration(

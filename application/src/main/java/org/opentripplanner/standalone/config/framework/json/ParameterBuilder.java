@@ -272,13 +272,36 @@ public class ParameterBuilder {
    * @return a map of listed enum values as keys with value, or an empty map if not set.
    */
   public <T, E extends Enum<E>> Map<E, T> asEnumMap(Class<E> enumType, Class<T> elementJavaType) {
+    return asEnumMap(enumType, elementJavaType, Map.of());
+  }
+
+  /**
+   * Get a map of enum values listed in the config like this: (This example has Boolean values)
+   * <pre>
+   * key : {
+   *   A : true,  // turned on
+   *   B : false  // turned off
+   *   // Commented out to use default value
+   *   // C : true
+   * }
+   * </pre>
+   *
+   * @param <E>  The enum type
+   * @param <T>  The map value type.
+   * @return a map of listed enum values as keys with value, or the default value if not set.
+   */
+  public <T, E extends Enum<E>> Map<E, T> asEnumMap(
+    Class<E> enumType,
+    Class<T> elementJavaType,
+    Map<E, T> defaultValue
+  ) {
     var elementType = ConfigType.of(elementJavaType);
     info.withOptional().withEnumMap(enumType, elementType);
 
     var mapNode = buildObject();
 
     if (mapNode.isEmpty()) {
-      return Map.of();
+      return defaultValue;
     }
     EnumMap<E, T> result = new EnumMap<>(enumType);
 
