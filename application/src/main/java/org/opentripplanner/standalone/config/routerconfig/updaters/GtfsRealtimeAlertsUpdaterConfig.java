@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
 
 public class GtfsRealtimeAlertsUpdaterConfig {
 

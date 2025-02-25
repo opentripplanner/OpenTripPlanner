@@ -26,6 +26,7 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 
 public class AlertsUpdateHandlerTest {
 
