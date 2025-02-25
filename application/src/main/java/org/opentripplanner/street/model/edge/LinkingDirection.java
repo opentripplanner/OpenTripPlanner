@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.linking;
+package org.opentripplanner.street.model.edge;
 
 /**
  * Represents the direction of travel of the edges created when linking a vertex into the street
