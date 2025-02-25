@@ -160,7 +160,6 @@ class WalkableAreaBuilder {
   public void buildWithVisibility(OsmAreaGroup group) {
     // These sets contain the nodes/vertices which can be used to traverse from the rest of the
     // street network onto the walkable area
-    Set<OsmNode> startingNodes = new HashSet<>();
     Set<Vertex> startingVertices = new HashSet<>();
 
     // List of edges belonging to the walkable area
@@ -187,7 +186,6 @@ class WalkableAreaBuilder {
       AreaGroup areaGroup = new AreaGroup(polygon);
 
       // the points corresponding to concave or hole vertices or those linked to ways
-      HashSet<OsmNode> visibilityNodes = new HashSet<>();
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
@@ -210,8 +208,7 @@ class WalkableAreaBuilder {
           var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
           platformLinkingVertices.add(vertex);
           visibilityVertices.add(vertex);
-          visibilityNodes.add(node);
-          startingNodes.add(node);
+          startingVertices.add(vertex);
         }
 
         for (Ring outerRing : area.outermostRings) {
@@ -227,9 +224,7 @@ class WalkableAreaBuilder {
               .toList();
             platformLinkingVertices.addAll(verticesWithin);
             for (OsmVertex v : verticesWithin) {
-              OsmNode node = osmdb.getNode(v.nodeId);
-              visibilityNodes.add(node);
-              startingNodes.add(node);
+              startingVertices.add(v);
               visibilityVertices.add(v);
               linkPointsAdded = true;
             }
@@ -255,13 +250,12 @@ class WalkableAreaBuilder {
               outerRing.isNodeConvex(i) ||
               (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
             ) {
-              visibilityNodes.add(node);
               visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
             if (isStartingNode(node, osmWayIds)) {
-              visibilityNodes.add(node);
-              startingNodes.add(node);
-              visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
+              var v = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+              startingVertices.add(v);
+              visibilityVertices.add(v);
             }
           }
           for (Ring innerRing : outerRing.getHoles()) {
@@ -280,13 +274,12 @@ class WalkableAreaBuilder {
               // area or a convex point, i.e. the angle is over 180 degrees.
               // For holes, we must swap the convexity condition
               if (!innerRing.isNodeConvex(j)) {
-                visibilityNodes.add(node);
                 visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
               if (isStartingNode(node, osmWayIds)) {
-                visibilityNodes.add(node);
-                startingNodes.add(node);
-                visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
+                var v = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+                startingVertices.add(v);
+                visibilityVertices.add(v);
               }
             }
           }
@@ -305,39 +298,33 @@ class WalkableAreaBuilder {
       areaGroup.addVisibilityVertices(visibilityVertices);
       createAreas(areaGroup, ring, group.areas);
 
-      if (visibilityNodes.size() > maxAreaNodes) {
-        issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
+      if (visibilityVertices.size() > maxAreaNodes) {
+        issueStore.add(new AreaTooComplicated(group, visibilityVertices.size(), maxAreaNodes));
       }
 
       // if area is too complex, consider only part of visibility nodes
       // so that at least some edges passing through the area are added
       // otherwise routing can use only area boundary edges
-      float skip_ratio = (float) maxAreaNodes / (float) visibilityNodes.size();
+      float skip_ratio = (float) maxAreaNodes / (float) visibilityVertices.size();
       int i = 0;
       float sum_i = 0;
-      for (OsmNode nodeI : visibilityNodes) {
+      for (IntersectionVertex vertex1 : visibilityVertices) {
         sum_i += skip_ratio;
         if (Math.floor(sum_i) < i + 1) {
           continue;
         }
         i = (int) Math.floor(sum_i);
-        IntersectionVertex vertex1 = vertexBuilder.getVertexForOsmNode(nodeI, areaEntity);
-        if (startingNodes.contains(nodeI)) {
-          startingVertices.add(vertex1);
-        }
         int j = 0;
         float sum_j = 0;
-        for (OsmNode nodeJ : visibilityNodes) {
+        for (IntersectionVertex vertex2 : visibilityVertices) {
           sum_j += skip_ratio;
           if (Math.floor(sum_j) < j + 1) {
             continue;
           }
           j = (int) Math.floor(sum_j);
-          if (shouldSkipEdge(nodeI, nodeJ, alreadyAddedEdges)) {
+          if (shouldSkipEdge(vertex1, vertex2, alreadyAddedEdges)) {
             continue;
           }
-          IntersectionVertex vertex2 = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
-
           Coordinate[] coordinates = new Coordinate[] {
             vertex1.getCoordinate(),
             vertex2.getCoordinate(),
@@ -436,12 +423,12 @@ class WalkableAreaBuilder {
   ) {
     OsmNode node = ring.nodes.get(i);
     OsmNode nextNode = ring.nodes.get((i + 1) % ring.nodes.size());
-
-    if (shouldSkipEdge(node, nextNode, alreadyAddedEdges)) {
-      return Set.of();
-    }
     IntersectionVertex v1 = vertexBuilder.getVertexForOsmNode(node, area.parent);
     IntersectionVertex v2 = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
+
+    if (shouldSkipEdge(v1, v2, alreadyAddedEdges)) {
+      return Set.of();
+    }
 
     return createSegments(v1, v2, List.of(area), areaGroup, false);
   }
@@ -605,22 +592,20 @@ class WalkableAreaBuilder {
   }
 
   private boolean shouldSkipEdge(
-    OsmNode nodeI,
-    OsmNode nodeJ,
+    IntersectionVertex v1,
+    IntersectionVertex v2,
     HashSet<NodeEdge> alreadyAddedEdges
   ) {
-    if (nodeI == nodeJ) {
+    if (v1 == v2) {
       return true;
     }
-    NodeEdge edge = new NodeEdge(nodeI, nodeJ);
-    if (
-      alreadyAddedEdges.contains(edge) || alreadyAddedEdges.contains(new NodeEdge(nodeJ, nodeI))
-    ) {
+    NodeEdge edge = new NodeEdge(v1, v2);
+    if (alreadyAddedEdges.contains(edge) || alreadyAddedEdges.contains(new NodeEdge(v2, v1))) {
       return true;
     }
     alreadyAddedEdges.add(edge);
     return false;
   }
 
-  private record NodeEdge(OsmNode from, OsmNode to) {}
+  private record NodeEdge(IntersectionVertex from, IntersectionVertex to) {}
 }
