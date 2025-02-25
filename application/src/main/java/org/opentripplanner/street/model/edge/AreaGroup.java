@@ -69,7 +69,7 @@ public class AreaGroup implements Serializable {
   }
 
   /**
-   * Add a set of visibility vertices to this area groupo
+   * Add a set of visibility vertices to this area group
    */
   public void addVisibilityVertices(Set<IntersectionVertex> vertices) {
     synchronized (this) {

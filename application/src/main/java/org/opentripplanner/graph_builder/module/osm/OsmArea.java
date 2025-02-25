@@ -148,7 +148,7 @@ class OsmArea {
 
   /**
    * Try to extract a point which is in  the middle of the area and
-   * also insaide the area geometry.
+   * also inside the area geometry.
    *
    * @return Point geometry inside the area
    */
