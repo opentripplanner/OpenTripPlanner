@@ -26,8 +26,6 @@ public class ViaLocationInputType {
     on-board visit does not count, the traveler must alight or board at the given stop for it to to
     be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
     in the street network from a stop and back to another stop to join the transit network.
-    
-    NOTE! Coordinates are NOT supported yet.
     """;
   private static final String DOC_PASS_THROUGH_VIA_LOCATION =
     """
