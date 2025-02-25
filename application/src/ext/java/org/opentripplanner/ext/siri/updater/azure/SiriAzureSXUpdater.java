@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
 import java.time.Duration;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -36,35 +36,14 @@ public class SiriAzureSXUpdater implements TransitAlertProvider, SiriAzureMessag
   }
 
   @Override
-  public void handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+  @Nullable
+  public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
     var sxDeliveries = serviceDelivery.getSituationExchangeDeliveries();
     if (sxDeliveries == null || sxDeliveries.isEmpty()) {
       LOG.info("Empty Siri SX message {}", messageId);
+      return null;
     } else {
-      processMessage(serviceDelivery);
-    }
-  }
-
-  private Future<?> processMessage(ServiceDelivery siriSx) {
-    return saveResultOnGraph.execute(context -> updateHandler.update(siriSx, context));
-  }
-
-  @Override
-  public void processHistory(ServiceDelivery siri) {
-    var sx = siri.getSituationExchangeDeliveries();
-
-    if (sx == null || sx.isEmpty()) {
-      LOG.info("Did not receive any SX messages from history endpoint");
-      return;
-    }
-
-    try {
-      var t1 = System.currentTimeMillis();
-      var f = processMessage(siri);
-      f.get();
-      LOG.info("Azure SX updater initialized in {} ms.", (System.currentTimeMillis() - t1));
-    } catch (ExecutionException | InterruptedException e) {
-      throw new SiriAzureInitializationException("Error applying SX history", e);
+      return saveResultOnGraph.execute(context -> updateHandler.update(serviceDelivery, context));
     }
   }
 

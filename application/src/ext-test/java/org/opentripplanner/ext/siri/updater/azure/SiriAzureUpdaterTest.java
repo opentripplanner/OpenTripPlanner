@@ -19,8 +19,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,10 +67,10 @@ class SiriAzureUpdaterTest {
             public void setup(WriteToGraphCallback writeToGraphCallback) {}
 
             @Override
-            public void handleMessage(ServiceDelivery serviceDelivery, String messageId) {}
-
-            @Override
-            public void processHistory(ServiceDelivery siri) {}
+            @Nullable
+            public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+              return null;
+            }
           }
         )
       );

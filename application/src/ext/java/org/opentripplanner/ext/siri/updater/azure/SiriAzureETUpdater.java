@@ -2,9 +2,9 @@ package org.opentripplanner.ext.siri.updater.azure;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -43,12 +43,14 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   }
 
   @Override
-  public void handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+  @Nullable
+  public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
     var etDeliveries = serviceDelivery.getEstimatedTimetableDeliveries();
     if (etDeliveries == null || etDeliveries.isEmpty()) {
       LOG.info("Empty Siri ET message {}", messageId);
+      return null;
     } else {
-      processMessage(etDeliveries);
+      return processMessage(etDeliveries);
     }
   }
 
@@ -64,24 +66,5 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
       ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
       recordMetrics.accept(result);
     });
-  }
-
-  @Override
-  public void processHistory(ServiceDelivery siri) {
-    var updates = siri.getEstimatedTimetableDeliveries();
-
-    if (updates == null || updates.isEmpty()) {
-      LOG.info("Did not receive any ET messages from history endpoint");
-      return;
-    }
-
-    try {
-      long t1 = System.currentTimeMillis();
-      var f = processMessage(updates);
-      f.get();
-      LOG.info("Azure ET updater initialized in {} ms.", (System.currentTimeMillis() - t1));
-    } catch (ExecutionException | InterruptedException e) {
-      throw new SiriAzureInitializationException("Error applying history", e);
-    }
   }
 }

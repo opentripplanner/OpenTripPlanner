@@ -17,11 +17,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
@@ -39,7 +39,6 @@ import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
@@ -184,7 +183,7 @@ public class SiriAzureUpdater implements GraphUpdater {
           if (initialData.isEmpty()) {
             LOG.info("Got empty response from history endpoint");
           } else {
-            messageHandler.processHistory(initialData.get());
+            processInitialSiriData(initialData.get());
           }
         },
         "Initializing historical Siri data"
@@ -451,6 +450,19 @@ public class SiriAzureUpdater implements GraphUpdater {
       }
 
       return siriOptional.map(Siri::getServiceDelivery);
+    }
+  }
+
+  public void processInitialSiriData(ServiceDelivery serviceDelivery) {
+    try {
+      long t1 = System.currentTimeMillis();
+      var f = messageHandler.handleMessage(serviceDelivery, "history-message");
+      if (f != null) {
+        f.get();
+      }
+      LOG.info("{} updater initialized in {} ms.", updaterType, (System.currentTimeMillis() - t1));
+    } catch (ExecutionException | InterruptedException e) {
+      throw new SiriAzureInitializationException("Error applying history", e);
     }
   }
 
