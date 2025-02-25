@@ -144,7 +144,7 @@ class WalkableAreaBuilder {
           }
         }
       }
-      edges
+      var vertices = edges
         .stream()
         .flatMap(v ->
           Stream
@@ -152,7 +152,8 @@ class WalkableAreaBuilder {
             .filter(IntersectionVertex.class::isInstance)
             .map(IntersectionVertex.class::cast)
         )
-        .forEach(areaGroup::addVisibilityVertex);
+        .collect(Collectors.toSet());
+      areaGroup.addVisibilityVertices(vertices);
 
       createAreas(areaGroup, ring, group.areas);
     }
