@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.siri;
+package org.opentripplanner.updater.alert.siri;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,7 +34,6 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.RealTimeUpdateContext;
-import org.opentripplanner.updater.alert.siri.SiriAlertsUpdateHandler;
 import uk.org.ifopt.siri20.StopPlaceRef;
 import uk.org.siri.siri20.AffectedLineStructure;
 import uk.org.siri.siri20.AffectedRouteStructure;

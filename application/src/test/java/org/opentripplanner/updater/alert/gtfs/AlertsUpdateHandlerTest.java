@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.alert;
+package org.opentripplanner.updater.alert.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -26,7 +26,6 @@ import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 
 public class AlertsUpdateHandlerTest {
 
