@@ -2,11 +2,15 @@ package org.opentripplanner.graph_builder.module.osm.moduletests._support;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
+import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmWay;
 import org.opentripplanner.osm.tagmapping.OsmTagMapper;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
@@ -27,6 +31,8 @@ public class TestOsmProvider implements OsmProvider {
     return new Builder();
   }
 
+
+
   @Override
   public void readOsm(OsmDatabase osmdb) {
     ways.forEach(osmdb::addWay);
@@ -34,6 +40,8 @@ public class TestOsmProvider implements OsmProvider {
     osmdb.doneSecondPhaseWays();
 
     nodes.forEach(osmdb::addNode);
+
+    osmdb.doneThirdPhaseNodes();
   }
 
   @Override
@@ -56,8 +64,10 @@ public class TestOsmProvider implements OsmProvider {
 
   public static class Builder {
 
-    private final List<OsmWay> ways = new ArrayList<>();
+    private final AtomicLong counter = new AtomicLong();
     private final List<OsmNode> nodes = new ArrayList<>();
+    private final List<OsmWay> ways = new ArrayList<>();
+    private final List<OsmRelation> relation = new ArrayList<>();
 
     public TestOsmProvider build() {
       return new TestOsmProvider(ways, nodes);
@@ -76,6 +86,35 @@ public class TestOsmProvider implements OsmProvider {
 
       ways.add(way);
       nodes.addAll(List.of(from, to));
+      return this;
+    }
+
+    public Builder addAreaFromNodes(List<OsmNode> areaNodes) {
+      this.nodes.addAll(areaNodes);
+      var nodeIds = areaNodes.stream().map(OsmEntity::getId).toList();
+
+      var area = new OsmWay();
+      area.setId(counter.incrementAndGet());
+      area.addTag("area", "yes");
+      area.addTag("highway", "pedestrian");
+      area.getNodeRefs().addAll(nodeIds);
+      area.getNodeRefs().add(nodeIds.getFirst());
+
+      this.ways.add(area);
+      return this;
+    }
+
+    public Builder addWayFromNodes(OsmNode... nodes) {
+      var wayNodes = Arrays.stream(nodes).toList();
+      this.nodes.addAll(wayNodes);
+      var nodeIds = wayNodes.stream().map(OsmEntity::getId).toList();
+
+      var way = new OsmWay();
+      way.setId(counter.incrementAndGet());
+      way.addTag("highway", "pedestrian");
+      way.getNodeRefs().addAll(nodeIds);
+
+      this.ways.add(way);
       return this;
     }
   }
