@@ -72,7 +72,6 @@ class WalkableAreaBuilder {
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueNormalizer normalizer;
-  private final VertexFactory vertexFactory;
 
   // template for AreaEdge names
   private static final String labelTemplate = "way (area) %s from %s to %s";
@@ -111,7 +110,6 @@ class WalkableAreaBuilder {
           .filter(this::isPlatformLinkingPoint)
           .collect(Collectors.toList())
         : List.of();
-    this.vertexFactory = new VertexFactory(graph);
   }
 
   /**
