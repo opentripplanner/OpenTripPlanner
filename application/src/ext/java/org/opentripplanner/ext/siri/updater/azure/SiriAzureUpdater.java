@@ -6,21 +6,26 @@ import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
+import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
+import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
+import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
@@ -34,6 +39,7 @@ import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
@@ -74,6 +80,7 @@ public class SiriAzureUpdater implements GraphUpdater {
   );
 
   private final Logger LOG = LoggerFactory.getLogger(getClass());
+  private final String updaterType;
   private final AuthenticationType authenticationType;
   private final String fullyQualifiedNamespace;
   private final String configRef;
@@ -86,6 +93,8 @@ public class SiriAzureUpdater implements GraphUpdater {
   private ServiceBusAdministrationAsyncClient serviceBusAdmin;
   private boolean isPrimed = false;
   private String subscriptionName;
+
+  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
   private final SiriAzureMessageHandler messageHandler;
 
@@ -100,10 +109,7 @@ public class SiriAzureUpdater implements GraphUpdater {
    */
   private final int timeout;
 
-  SiriAzureUpdater(
-    SiriAzureUpdaterParameters config,
-    SiriAzureMessageHandler messageHandler
-  ) {
+  SiriAzureUpdater(SiriAzureUpdaterParameters config, SiriAzureMessageHandler messageHandler) {
     this.messageHandler = Objects.requireNonNull(messageHandler);
 
     try {
@@ -116,6 +122,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     this.authenticationType =
       Objects.requireNonNull(config.getAuthenticationType(), "authenticationType must not be null");
     this.topicName = Objects.requireNonNull(config.getTopicName(), "topicName must not be null");
+    this.updaterType = Objects.requireNonNull(config.getType(), "type must not be null");
     this.timeout = config.getTimeout();
     this.autoDeleteOnIdle = config.getAutoDeleteOnIdle();
     this.prefetchCount = config.getPrefetchCount();
@@ -360,7 +367,7 @@ public class SiriAzureUpdater implements GraphUpdater {
         .disableAutoComplete() // Receive and delete does not need autocomplete
         .prefetchCount(prefetchCount)
         .processError(this::errorConsumer)
-        .processMessage(messageHandler::handleMessage)
+        .processMessage(this::handleMessage)
         .buildProcessorClient();
 
     eventProcessor.start();
@@ -370,6 +377,32 @@ public class SiriAzureUpdater implements GraphUpdater {
       subscriptionName,
       prefetchCount
     );
+  }
+
+  private void handleMessage(ServiceBusReceivedMessageContext messageContext) {
+    var message = messageContext.getMessage();
+    MESSAGE_COUNTER.incrementAndGet();
+
+    if (MESSAGE_COUNTER.get() % 100 == 0) {
+      LOG.debug("Total SIRI-{} messages received={}", updaterType, MESSAGE_COUNTER.get());
+    }
+
+    try {
+      var siriXmlMessage = message.getBody().toString();
+      var siri = SiriXml.parseXml(siriXmlMessage);
+      var serviceDelivery = siri.getServiceDelivery();
+      if (serviceDelivery == null) {
+        if (siri.getHeartbeatNotification() != null) {
+          LOG.debug("Updater {} received SIRI heartbeat message", updaterType);
+        } else {
+          LOG.debug("Updater {} received SIRI message without ServiceDelivery", updaterType);
+        }
+      } else {
+        messageHandler.handleMessage(serviceDelivery, message.getMessageId());
+      }
+    } catch (JAXBException | XMLStreamException e) {
+      LOG.error(e.getLocalizedMessage(), e);
+    }
   }
 
   @Override
@@ -442,7 +475,7 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND
+      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this  be recoverable?
     ) {
       LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",

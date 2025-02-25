@@ -8,10 +8,9 @@ public interface SiriAzureMessageHandler {
   void setup(WriteToGraphCallback writeToGraphCallback);
 
   /**
-   * Consume Service Bus topic message and implement business logic.
-   * @param messageContext The Service Bus processor message context that holds a received message and additional methods to settle the message.
+   * Consume ServiceDelivery
    */
-  void handleMessage(ServiceBusReceivedMessageContext messageContext);
+  void handleMessage(ServiceDelivery serviceDelivery, String messageId);
 
   void processHistory(ServiceDelivery siri);
 }

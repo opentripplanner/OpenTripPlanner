@@ -1,22 +1,16 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
-import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
-import jakarta.xml.bind.JAXBException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import javax.xml.stream.XMLStreamException;
 import org.opentripplanner.updater.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
-import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -25,8 +19,6 @@ import uk.org.siri.siri20.ServiceDelivery;
 public class SiriAzureETUpdater implements SiriAzureMessageHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAzureSXUpdater.class);
-
-  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
   private final SiriRealTimeTripUpdateAdapter adapter;
   private final Consumer<UpdateResult> recordMetrics;
@@ -51,21 +43,12 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
   }
 
   @Override
-  public void handleMessage(ServiceBusReceivedMessageContext messageContext) {
-    var message = messageContext.getMessage();
-    MESSAGE_COUNTER.incrementAndGet();
-
-    if (MESSAGE_COUNTER.get() % 100 == 0) {
-      LOG.debug("Total SIRI-ET messages received={}", MESSAGE_COUNTER.get());
-    }
-
-    try {
-      var updates = parseSiriEt(message.getBody().toString(), message.getMessageId());
-      if (!updates.isEmpty()) {
-        processMessage(updates);
-      }
-    } catch (JAXBException | XMLStreamException e) {
-      LOG.error(e.getLocalizedMessage(), e);
+  public void handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+    var etDeliveries = serviceDelivery.getEstimatedTimetableDeliveries();
+    if (etDeliveries == null || etDeliveries.isEmpty()) {
+      LOG.info("Empty Siri ET message {}", messageId);
+    } else {
+      processMessage(etDeliveries);
     }
   }
 
@@ -100,24 +83,5 @@ public class SiriAzureETUpdater implements SiriAzureMessageHandler {
     } catch (ExecutionException | InterruptedException e) {
       throw new SiriAzureInitializationException("Error applying history", e);
     }
-  }
-
-  private List<EstimatedTimetableDeliveryStructure> parseSiriEt(String siriXmlMessage, String id)
-    throws JAXBException, XMLStreamException {
-    var siri = SiriXml.parseXml(siriXmlMessage);
-    if (
-      siri.getServiceDelivery() == null ||
-      siri.getServiceDelivery().getEstimatedTimetableDeliveries() == null ||
-      siri.getServiceDelivery().getEstimatedTimetableDeliveries().isEmpty()
-    ) {
-      if (siri.getHeartbeatNotification() != null) {
-        LOG.debug("Received SIRI heartbeat message");
-      } else {
-        LOG.info("Empty Siri message {}: {}", id, siriXmlMessage);
-      }
-      return new ArrayList<>();
-    }
-
-    return siri.getServiceDelivery().getEstimatedTimetableDeliveries();
   }
 }

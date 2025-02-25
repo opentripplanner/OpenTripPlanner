@@ -42,6 +42,7 @@ class SiriAzureUpdaterTest {
   @BeforeEach
   public void setUp() throws Exception {
     mockConfig = mock(SiriAzureUpdaterParameters.class);
+    when(mockConfig.getType()).thenReturn("siri-azure-test-updater");
     when(mockConfig.configRef()).thenReturn("testConfigRef");
     when(mockConfig.getAuthenticationType()).thenReturn(AuthenticationType.SharedAccessKey);
     when(mockConfig.getFullyQualifiedNamespace()).thenReturn("testNamespace");
@@ -64,7 +65,7 @@ class SiriAzureUpdaterTest {
             public void setup(WriteToGraphCallback writeToGraphCallback) {}
 
             @Override
-            public void handleMessage(ServiceBusReceivedMessageContext messageContext) {}
+            public void handleMessage(ServiceDelivery serviceDelivery, String messageId) {}
 
             @Override
             public void processHistory(ServiceDelivery siri) {}

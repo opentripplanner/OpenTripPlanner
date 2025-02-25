@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.util.Optional;
 
 public abstract class SiriAzureUpdaterParameters {
+
   private String configRef;
   private final String type;
   private AuthenticationType authenticationType;
