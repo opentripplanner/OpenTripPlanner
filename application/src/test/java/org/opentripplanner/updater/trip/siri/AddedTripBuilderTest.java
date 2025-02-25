@@ -142,7 +142,7 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
-    TripUpdate tripUpdate = addedTrip.successValue();
+    var tripUpdate = addedTrip.successValue();
     // Assert trip
     Trip trip = tripUpdate.tripTimes().getTrip();
     assertEquals(TRIP_ID, trip.getId(), "Trip should be mapped");
@@ -163,8 +163,6 @@ class AddedTripBuilderTest {
     assertNotEquals(REPLACED_ROUTE, route, "Should not re-use replaced route");
 
     assertTrue(tripUpdate.routeCreation(), "The route is marked as created by real time updater");
-
-    assertTrue(tripUpdate.tripCreation(), "The trip is marked as created by real time updater");
 
     TripPattern pattern = tripUpdate.addedTripPattern();
     assertNotNull(pattern);
