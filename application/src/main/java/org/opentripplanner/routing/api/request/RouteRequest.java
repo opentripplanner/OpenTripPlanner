@@ -282,7 +282,7 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   /**
-   * TransferOptimization is appled to all results exept via-visit requests.
+   * TransferOptimization is applied to all results except via-visit requests.
    * TODO VIA - When the Optimized transfer support this, then this method should be removed.
    */
   public boolean allowTransferOptimization() {

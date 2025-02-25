@@ -66,14 +66,14 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   /**
    * Static factory method to allow the {@link org.opentripplanner.raptor.configure.RaptorConfig}
    * inject PassThroughPointsService.
-   * TODO VIA - This method is not needed when pass-through is poted to use the chanied-worker
+   * TODO VIA - This method is not needed when pass-through is ported to use the chained-worker
    *            strategy, and not c2.
    */
   public static PassThroughPointsService createPassThroughPointsService(
-    boolean enableMcPassThrought,
+    boolean enableMcPassThrough,
     List<RaptorViaLocation> viaLocations
   ) {
-    return enableMcPassThrought
+    return enableMcPassThrough
       ? BitSetPassThroughPointsService.of(viaLocations)
       : BitSetPassThroughPointsService.NOOP;
   }
