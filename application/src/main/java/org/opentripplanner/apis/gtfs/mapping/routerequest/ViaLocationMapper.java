@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
@@ -20,6 +21,7 @@ class ViaLocationMapper {
   static final String FIELD_MINIMUM_WAIT_TIME = "minimumWaitTime";
   static final String FIELD_VISIT = "visit";
   static final String FIELD_PASS_THROUGH = "passThrough";
+  static final String FIELD_COORDINATE = "coordinate";
 
   static List<ViaLocation> mapToViaLocations(@Nullable List<Map<String, Map<String, Object>>> via) {
     return ListUtils
@@ -43,14 +45,25 @@ class ViaLocationMapper {
         (String) visit.get(FIELD_LABEL),
         (Duration) visit.get(FIELD_MINIMUM_WAIT_TIME),
         mapStopLocationIds((List<String>) visit.get(FIELD_STOP_LOCATION_IDS)),
-        List.of()
+        mapCoordinate(visit.get(FIELD_COORDINATE))
       );
     } else {
       throw new IllegalArgumentException("ViaLocation must define either pass-through or visit.");
     }
   }
 
-  private static List<FeedScopedId> mapStopLocationIds(List<String> ids) {
+  private static List<FeedScopedId> mapStopLocationIds(@Nullable List<String> ids) {
+    if (ids == null) {
+      return List.of();
+    }
     return ids.stream().map(FeedScopedId::parse).toList();
+  }
+
+  private static List<WgsCoordinate> mapCoordinate(@Nullable Object coordinate) {
+    if (coordinate == null) {
+      return List.of();
+    }
+    var map = (Map<String, Object>) coordinate;
+    return List.of(new WgsCoordinate((Double) map.get("latitude"), (Double) map.get("longitude")));
   }
 }
