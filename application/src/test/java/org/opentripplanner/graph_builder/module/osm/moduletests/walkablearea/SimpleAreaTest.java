@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.osm.moduletests;
+package org.opentripplanner.graph_builder.module.osm.moduletests.walkablearea;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,7 +16,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.test.support.GeoJsonIo;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class SimpleWalkableAreaTest {
+public class SimpleAreaTest {
 
   @Test
   void walkableArea() {
@@ -24,15 +24,16 @@ public class SimpleWalkableAreaTest {
     var inside1 = node(2, new WgsCoordinate(5, 5));
     var area = List.of(
       inside0,
-      node(1, new WgsCoordinate(0,5)),
+      node(1, new WgsCoordinate(0, 5)),
       inside1,
-      node(4, new WgsCoordinate(5,0))
+      node(4, new WgsCoordinate(5, 0))
     );
 
     var outside0 = node(5, new WgsCoordinate(-1, 0));
     var outside1 = node(6, new WgsCoordinate(6, 5));
 
-    var provider = TestOsmProvider.of()
+    var provider = TestOsmProvider
+      .of()
       .addAreaFromNodes(area)
       .addWayFromNodes(outside0, inside0)
       .addWayFromNodes(outside1, inside1)
@@ -40,7 +41,12 @@ public class SimpleWalkableAreaTest {
 
     var graph = new Graph(new Deduplicator());
     var osmModule = OsmModule
-      .of(provider, graph, new DefaultOsmInfoGraphBuildRepository(), new DefaultVehicleParkingRepository())
+      .of(
+        provider,
+        graph,
+        new DefaultOsmInfoGraphBuildRepository(),
+        new DefaultVehicleParkingRepository()
+      )
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
       .build();
@@ -51,8 +57,5 @@ public class SimpleWalkableAreaTest {
 
     System.out.println(GeoJsonIo.toUrl(graph));
     assertEquals(10, graph.getEdgesOfType(AreaEdge.class).size());
-
-
   }
-
 }

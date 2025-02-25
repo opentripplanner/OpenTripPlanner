@@ -19,10 +19,12 @@ public class TestOsmProvider implements OsmProvider {
 
   private final List<OsmWay> ways;
   private final List<OsmNode> nodes;
+  private final List<OsmRelation> relations;
   private final OsmTagMapper osmTagMapper = new OsmTagMapper();
   private final WayPropertySet wayPropertySet = new WayPropertySet();
 
-  public TestOsmProvider(List<OsmWay> ways, List<OsmNode> nodes) {
+  public TestOsmProvider(List<OsmRelation> relations, List<OsmWay> ways, List<OsmNode> nodes) {
+    this.relations = relations.stream().peek(r -> r.setOsmProvider(this)).toList();
     this.ways = ways.stream().peek(w -> w.setOsmProvider(this)).toList();
     this.nodes = List.copyOf(nodes);
   }
@@ -31,16 +33,13 @@ public class TestOsmProvider implements OsmProvider {
     return new Builder();
   }
 
-
-
   @Override
   public void readOsm(OsmDatabase osmdb) {
+    relations.forEach(osmdb::addRelation);
+    osmdb.doneFirstPhaseRelations();
     ways.forEach(osmdb::addWay);
-
     osmdb.doneSecondPhaseWays();
-
     nodes.forEach(osmdb::addNode);
-
     osmdb.doneThirdPhaseNodes();
   }
 
@@ -67,10 +66,10 @@ public class TestOsmProvider implements OsmProvider {
     private final AtomicLong counter = new AtomicLong();
     private final List<OsmNode> nodes = new ArrayList<>();
     private final List<OsmWay> ways = new ArrayList<>();
-    private final List<OsmRelation> relation = new ArrayList<>();
+    private final List<OsmRelation> relations = new ArrayList<>();
 
     public TestOsmProvider build() {
-      return new TestOsmProvider(ways, nodes);
+      return new TestOsmProvider(relations, ways, nodes);
     }
 
     /**
@@ -90,11 +89,15 @@ public class TestOsmProvider implements OsmProvider {
     }
 
     public Builder addAreaFromNodes(List<OsmNode> areaNodes) {
+      return addAreaFromNodes(counter.incrementAndGet(), areaNodes);
+    }
+
+    public Builder addAreaFromNodes(long id, List<OsmNode> areaNodes) {
       this.nodes.addAll(areaNodes);
       var nodeIds = areaNodes.stream().map(OsmEntity::getId).toList();
 
       var area = new OsmWay();
-      area.setId(counter.incrementAndGet());
+      area.setId(id);
       area.addTag("area", "yes");
       area.addTag("highway", "pedestrian");
       area.getNodeRefs().addAll(nodeIds);
@@ -115,6 +118,11 @@ public class TestOsmProvider implements OsmProvider {
       way.getNodeRefs().addAll(nodeIds);
 
       this.ways.add(way);
+      return this;
+    }
+
+    public Builder addRelation(OsmRelation relation) {
+      this.relations.add(relation);
       return this;
     }
   }

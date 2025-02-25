@@ -12,6 +12,8 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
+import org.locationtech.jts.operation.valid.IsValidOp;
+import org.locationtech.jts.operation.valid.TopologyValidationError;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
@@ -40,7 +42,7 @@ class OsmArea {
     List<TLongList> innerRingNodes = constructRings(innerRingWays);
     List<TLongList> outerRingNodes = constructRings(outerRingWays);
     if (innerRingNodes == null || outerRingNodes == null) {
-      throw new AreaConstructionException();
+      throw new AreaConstructionException("innerRing and outerRing nodes are null");
     }
     ArrayList<TLongList> allRings = new ArrayList<>(innerRingNodes);
     allRings.addAll(outerRingNodes);
@@ -75,7 +77,7 @@ class OsmArea {
         }
       }
     } catch (TopologyException ex) {
-      throw new AreaConstructionException();
+      throw new AreaConstructionException(ex.getMessage());
     }
 
     // Make outermostRings immutable
@@ -168,8 +170,12 @@ class OsmArea {
     MultiPolygon jtsMultiPolygon = GeometryUtils
       .getGeometryFactory()
       .createMultiPolygon(polygons.toArray(new Polygon[0]));
-    if (!jtsMultiPolygon.isValid()) {
-      throw new AreaConstructionException();
+    var validOp = new IsValidOp(jtsMultiPolygon);
+    if (!validOp.isValid()) {
+      var validationError = validOp.getValidationError();
+      throw new AreaConstructionException(
+        "%s at %s".formatted(validationError.getMessage(), validationError.getCoordinate())
+      );
     }
 
     return jtsMultiPolygon;
@@ -252,5 +258,17 @@ class OsmArea {
     return false;
   }
 
-  public static class AreaConstructionException extends RuntimeException {}
+  public static class AreaConstructionException extends RuntimeException {
+
+    private final String message;
+
+    public AreaConstructionException(String message) {
+      this.message = message;
+    }
+
+    @Override
+    public String getMessage() {
+      return message;
+    }
+  }
 }
