@@ -139,7 +139,7 @@ public class GraphPathFinder {
     Set<Vertex> to
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    Instant reqTime = request.dateTime();
+    Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.MILLIS);
 
     List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
 
@@ -152,12 +152,20 @@ public class GraphPathFinder {
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
         if (request.arriveBy()) {
           if (graphPath.states.getLast().getTimeAccurate().isAfter(reqTime)) {
-            LOG.error("A graph path arrives {} after the requested time {}. This implies a bug.", graphPath.states.getLast().getTimeAccurate(), reqTime);
+            LOG.error(
+              "A graph path arrives {} after the requested time {}. This implies a bug.",
+              graphPath.states.getLast().getTimeAccurate(),
+              reqTime
+            );
             gpi.remove();
           }
         } else {
           if (graphPath.states.getFirst().getTimeAccurate().isBefore(reqTime)) {
-            LOG.error("A graph path leaves {} before the requested time {}. This implies a bug.", graphPath.states.getFirst().getTimeAccurate(), reqTime);
+            LOG.error(
+              "A graph path leaves {} before the requested time {}. This implies a bug.",
+              graphPath.states.getFirst().getTimeAccurate(),
+              reqTime
+            );
             gpi.remove();
           }
         }

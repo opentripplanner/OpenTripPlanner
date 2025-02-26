@@ -57,6 +57,7 @@ public class DirectStreetRouter {
         directRequest,
         temporaryVertices
       );
+      var path = paths.getFirst();
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(

@@ -526,8 +526,11 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   private State reversedClone() {
+    // these must be getTime(), not getTimeAccurate(), so that the reversed path (which does not
+    // have arriveBy true anymore) has times which round correctly, as the rounding rules
+    // depend on arriveBy
     StreetSearchRequest reversedRequest = request
-      .copyOfReversed(getTimeAccurate())
+      .copyOfReversed(getTime())
       .withPreferences(p -> {
         p.withCar(c -> c.withRental(r -> r.withUseAvailabilityInformation(false)));
         p.withBike(b -> b.withRental(r -> r.withUseAvailabilityInformation(false)));
@@ -535,7 +538,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       .build();
     StateData newStateData = stateData.clone();
     newStateData.backMode = null;
-    return new State(this.vertex, getTimeAccurate(), newStateData, reversedRequest);
+    return new State(this.vertex, getTime(), newStateData, reversedRequest);
   }
 
   /**

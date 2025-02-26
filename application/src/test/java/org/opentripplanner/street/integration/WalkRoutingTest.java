@@ -52,7 +52,7 @@ class WalkRoutingTest {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {0, 200, 400, 499, 500, 501, 600, 700, 800, 900, 999})
+  @ValueSource(ints = { 0, 200, 400, 499, 500, 501, 600, 700, 800, 900, 999 })
   void pathReversalWorks(int offset) {
     var start = new GenericLocation(59.94646, 10.77511);
     var end = new GenericLocation(59.94641, 10.77522);
@@ -61,7 +61,10 @@ class WalkRoutingTest {
     var results = route(roundabout, start, end, time, true);
     Assertions.assertEquals(1, results.size());
     var states = results.get(0).states;
-    var diff = ChronoUnit.MILLIS.between(states.getFirst().getTimeAccurate(), states.getLast().getTimeAccurate());
+    var diff = ChronoUnit.MILLIS.between(
+      states.getFirst().getTimeAccurate(),
+      states.getLast().getTimeAccurate()
+    );
     Assertions.assertEquals(13926, diff); // should be same for every parametrized offset, otherwise irrelevant
   }
 
