@@ -545,7 +545,7 @@ does not exist.
               Safety limit to prevent access to and egress from too many stops.
               """
               )
-              .asInt(MaxStopCountLimit.DEFAULT_LIMIT),
+              .asInt(dftAccessEgress.maxStopCountLimit().defaultLimit()),
             cae
               .of("maxStopCountForMode")
               .since(V2_7)

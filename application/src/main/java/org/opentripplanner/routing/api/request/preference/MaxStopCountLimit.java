@@ -14,7 +14,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class MaxStopCountLimit {
 
-  public static final int DEFAULT_LIMIT = 500;
+  private static final int DEFAULT_LIMIT = 500;
   private static final Map<StreetMode, Integer> DEFAULT_FOR_MODE = Map.of();
 
   private final int defaultLimit;
@@ -41,6 +41,10 @@ public class MaxStopCountLimit {
     return limitForMode.getOrDefault(mode, defaultLimit);
   }
 
+  public int defaultLimit() {
+    return defaultLimit;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
@@ -65,10 +69,6 @@ public class MaxStopCountLimit {
     return Objects.hash(defaultLimit, limitForMode);
   }
 
-  private int defaultLimit() {
-    return defaultLimit;
-  }
-
   private Map<StreetMode, Integer> limitForMode() {
     return limitForMode;
   }
@@ -90,10 +90,6 @@ public class MaxStopCountLimit {
 
     int defaultLimit() {
       return defaultLimit;
-    }
-
-    Map<StreetMode, Integer> limitForMode() {
-      return limitForMode;
     }
 
     public Builder withDefaultLimit(int defaultLimit) {
