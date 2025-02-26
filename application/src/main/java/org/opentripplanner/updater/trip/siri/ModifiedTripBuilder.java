@@ -198,6 +198,8 @@ class ModifiedTripBuilder {
           // multiple non-pickup/dropoff stops are in between.
           newTimes.updateArrivalTime(stopIndex, departureFromPreviousStop);
           newTimes.updateDepartureTime(stopIndex, departureFromPreviousStop);
+
+          LOG.info("Siri time interpolation for non-pickup/dropoff stop");
         } else {
           int arrivalDelay = lastDepartureDelay;
           int departureDelay = lastDepartureDelay;
@@ -210,6 +212,8 @@ class ModifiedTripBuilder {
 
           newTimes.updateArrivalDelay(stopIndex, arrivalDelay);
           newTimes.updateDepartureDelay(stopIndex, departureDelay);
+
+          LOG.info("Siri time interpolation for stop");
         }
       }
 
