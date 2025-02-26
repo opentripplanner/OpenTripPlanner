@@ -11,12 +11,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -178,7 +178,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         var disposableWalkEdges = linker.linkVertexForRealTime(
           vehicleParkingEntranceVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -198,7 +198,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
         var disposableCarEdges = linker.linkVertexForRealTime(
           vehicleParkingEntranceVertex,
           new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(

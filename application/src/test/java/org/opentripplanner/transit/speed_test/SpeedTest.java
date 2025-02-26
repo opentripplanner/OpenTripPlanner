@@ -127,6 +127,7 @@ public class SpeedTest {
         VectorTileConfig.DEFAULT,
         TestServerContext.createVehicleParkingService(),
         TestServerContext.createVehicleRentalService(),
+        TestServerContext.createViaTransferResolver(graph, transitService),
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createEmissionsService(),
         null,

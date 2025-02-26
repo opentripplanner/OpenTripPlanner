@@ -201,7 +201,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
     if (next != null) {
       if (next.isTransfer()) {
-        next.timeShiftTransferTime(slackProvider);
+        next.setTransferTimeBasedOnPreviousLeg(slackProvider);
         if (next.next().isEgress()) {
           next.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime);
         }
@@ -527,13 +527,16 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  private void timeShiftTransferTime(RaptorSlackProvider slackProvider) {
+  private void setTransferTimeBasedOnPreviousLeg(RaptorSlackProvider slackProvider) {
     int newFromTime;
     if (prev.isTransit()) {
       newFromTime =
         prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
     } else if (prev.isAccess()) {
       newFromTime = prev.toTime();
+      // } else if (prev.isTransfer()) {
+      // via search and transfer connection
+      // newFromTime = prev.toTime + slackProvider.transferSlack();
     } else {
       throw new IllegalStateException("Unexpected leg type before TransferLeg: " + this);
     }

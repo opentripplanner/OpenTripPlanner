@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
@@ -27,6 +28,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -46,8 +49,20 @@ class RaptorRequestMapperTest {
     List.of(STOP_A.getId()),
     List.of()
   );
+  private static final int VIA_FROM_STOP_INDEX = 47;
+  private static final int VIA_TO_STOP_INDEX = 123;
   private static final List<RaptorAccessEgress> ACCESS = List.of(TestAccessEgress.walk(12, 45));
   private static final List<RaptorAccessEgress> EGRESS = List.of(TestAccessEgress.walk(144, 54));
+  private static final WgsCoordinate VIA_COORDINATE = WgsCoordinate.GREENWICH;
+  public static final ViaCoordinateTransfer VIA_TRANSFER = new ViaCoordinateTransfer(
+    VIA_COORDINATE,
+    VIA_FROM_STOP_INDEX,
+    VIA_TO_STOP_INDEX,
+    List.of(),
+    List.of(),
+    10,
+    12.0
+  );
 
   private static final CostLinearFunction R1 = CostLinearFunction.of("50 + 1.0x");
   private static final CostLinearFunction R2 = CostLinearFunction.of("0 + 1.5x");
@@ -90,9 +105,9 @@ class RaptorRequestMapperTest {
 
     var result = map(req);
 
-    assertTrue(result.searchParams().hasViaLocations());
+    assertTrue(result.searchParams().isVisitViaSearch());
     assertEquals(
-      "[Via{label: Via A, minWaitTime: 13m, connections: [0 13m]}]",
+      "[RaptorViaLocation{via Via A wait 13m : [(stop 0, 13m)]}]",
       result.searchParams().viaLocations().toString()
     );
   }
@@ -105,10 +120,30 @@ class RaptorRequestMapperTest {
 
     var result = map(req);
 
-    assertTrue(result.multiCriteria().hasPassThroughPoints());
+    assertTrue(result.searchParams().isPassThroughSearch());
     assertEquals(
-      "[(Via A, stops: " + STOP_A.getIndex() + ")]",
-      result.multiCriteria().passThroughPoints().toString()
+      "[RaptorViaLocation{pass-through Via A : [(stop " + STOP_A.getIndex() + ")]}]",
+      result.searchParams().viaLocations().toString()
+    );
+  }
+
+  @Test
+  void testViaCoordinate() {
+    var req = new RouteRequest();
+    Duration minimumWaitTime = Duration.ofMinutes(10);
+
+    req.setViaLocations(
+      List.of(
+        new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), List.of(VIA_COORDINATE))
+      )
+    );
+
+    var result = map(req);
+
+    assertFalse(result.searchParams().viaLocations().isEmpty());
+    assertEquals(
+      "[RaptorViaLocation{via Via coordinate wait 10m : [(stop 47 ~ 123, 10m10s)]}]",
+      result.searchParams().viaLocations().toString()
     );
   }
 
@@ -199,7 +234,7 @@ class RaptorRequestMapperTest {
   @ParameterizedTest(name = "{0}.  {1}  =>  {2}")
   @MethodSource("testViaAndTransitGroupPriorityCombinationsTestCases")
   void testViaAndTransitGroupPriorityCombinations(
-    String testDescription,
+    String ignore,
     List<RequestFeature> requestedFeatures,
     List<RequestFeature> expectedFeatures,
     @Nullable String errorMessage
@@ -231,6 +266,7 @@ class RaptorRequestMapperTest {
       ACCESS,
       EGRESS,
       null,
+      new DummyViaCoordinateTransferFactory(),
       id -> IntStream.of(STOPS_MAP.get(id).getIndex())
     );
   }
@@ -243,34 +279,34 @@ class RaptorRequestMapperTest {
     switch (feature) {
       case VIA_VISIT:
         if (expected) {
-          assertTrue(result.searchParams().hasViaLocations());
+          assertTrue(result.searchParams().isVisitViaSearch());
           // One via location exist(no NPE), but it does not allow pass-through
           assertEquals(
-            "Via{label: Via A, connections: [0]}",
+            "RaptorViaLocation{via Via A : [(stop 0)]}",
             result.searchParams().viaLocations().get(0).toString()
           );
         }
         break;
       case VIA_PASS_THROUGH:
         if (expected) {
-          assertTrue(result.multiCriteria().hasPassThroughPoints());
+          assertTrue(result.searchParams().isPassThroughSearch());
           assertEquals(
-            "(Via A, stops: 0)",
-            result.multiCriteria().passThroughPoints().get(0).toString()
+            "RaptorViaLocation{pass-through Via A : [(stop 0)]}",
+            result.searchParams().viaLocations().get(0).toString()
           );
         }
         break;
       case TRANSIT_GROUP_PRIORITY:
         assertEquals(expected, result.multiCriteria().transitPriorityCalculator().isPresent());
         if (expected) {
-          assertFalse(result.multiCriteria().hasPassThroughPoints());
+          assertFalse(result.searchParams().isPassThroughSearch());
         }
         break;
       case RELAX_COST_DEST:
         assertEquals(expected, result.multiCriteria().relaxCostAtDestination() != null);
         if (expected) {
-          assertFalse(result.multiCriteria().hasPassThroughPoints());
-          assertFalse(result.searchParams().hasViaLocations());
+          assertFalse(result.searchParams().isPassThroughSearch());
+          assertFalse(result.searchParams().isVisitViaSearch());
         }
         break;
     }
@@ -302,5 +338,19 @@ class RaptorRequestMapperTest {
     VIA_PASS_THROUGH,
     TRANSIT_GROUP_PRIORITY,
     RELAX_COST_DEST,
+  }
+
+  private static class DummyViaCoordinateTransferFactory implements ViaCoordinateTransferFactory {
+
+    @Override
+    public List<ViaCoordinateTransfer> createViaTransfers(
+      RouteRequest request,
+      String ignore,
+      WgsCoordinate coordinate
+    ) {
+      // Make sure the input is the expected via-coordinate
+      assertEquals(VIA_COORDINATE, coordinate);
+      return List.of(VIA_TRANSFER);
+    }
   }
 }

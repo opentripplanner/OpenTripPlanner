@@ -43,7 +43,7 @@ public class PathMapperTest implements RaptorTestConstants {
     var mapper = new ForwardPathMapper<>(
       SLACK_PROVIDER,
       C1_CALCULATOR,
-      this::stopIndexToName,
+      RaptorTestConstants::stopIndexToName,
       null,
       lifeCycle(),
       false
@@ -63,7 +63,7 @@ public class PathMapperTest implements RaptorTestConstants {
     var mapper = new ReversePathMapper<>(
       SLACK_PROVIDER,
       C1_CALCULATOR,
-      this::stopIndexToName,
+      RaptorTestConstants::stopIndexToName,
       null,
       lifeCycle(),
       false
@@ -123,7 +123,10 @@ public class PathMapperTest implements RaptorTestConstants {
   /* private helper methods */
 
   private void assertPath(RaptorPath<TestTripSchedule> path) {
-    assertEquals(BASIC_PATH_AS_DETAILED_STRING, path.toStringDetailed(this::stopIndexToName));
+    assertEquals(
+      BASIC_PATH_AS_DETAILED_STRING,
+      path.toStringDetailed(RaptorTestConstants::stopIndexToName)
+    );
   }
 
   private void runTestFlexForward(
@@ -134,7 +137,7 @@ public class PathMapperTest implements RaptorTestConstants {
     var mapper = new ForwardPathMapper<TestTripSchedule>(
       FLEX_SLACK_PROVIDER,
       FLEX_COST_CALCULATOR,
-      this::stopIndexToName,
+      RaptorTestConstants::stopIndexToName,
       null,
       lifeCycle(),
       false
@@ -142,7 +145,7 @@ public class PathMapperTest implements RaptorTestConstants {
     // When:
     RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);
     // Then:
-    assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
+    assertEquals(expected, path.toStringDetailed(RaptorTestConstants::stopIndexToName));
   }
 
   private void runTestFlexReverse(
@@ -153,7 +156,7 @@ public class PathMapperTest implements RaptorTestConstants {
     var mapper = new ReversePathMapper<TestTripSchedule>(
       FLEX_SLACK_PROVIDER,
       FLEX_COST_CALCULATOR,
-      this::stopIndexToName,
+      RaptorTestConstants::stopIndexToName,
       null,
       lifeCycle(),
       false
@@ -161,6 +164,6 @@ public class PathMapperTest implements RaptorTestConstants {
     // When:
     RaptorPath<TestTripSchedule> path = mapper.mapToPath(destArrival);
     // Then:
-    assertEquals(expected, path.toStringDetailed(this::stopIndexToName));
+    assertEquals(expected, path.toStringDetailed(RaptorTestConstants::stopIndexToName));
   }
 }

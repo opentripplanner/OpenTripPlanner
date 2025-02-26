@@ -109,12 +109,15 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void testToString() {
-    assertEquals(BASIC_PATH_AS_STRING, subject.toString(this::stopIndexToName));
+    assertEquals(BASIC_PATH_AS_STRING, subject.toString(RaptorTestConstants::stopIndexToName));
   }
 
   @Test
   public void testToStringDetailed() {
-    assertEquals(BASIC_PATH_AS_DETAILED_STRING, subject.toStringDetailed(this::stopIndexToName));
+    assertEquals(
+      BASIC_PATH_AS_DETAILED_STRING,
+      subject.toStringDetailed(RaptorTestConstants::stopIndexToName)
+    );
   }
 
   @Test

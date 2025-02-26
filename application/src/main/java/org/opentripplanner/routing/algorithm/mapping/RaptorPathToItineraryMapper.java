@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static org.opentripplanner.raptor.api.model.RaptorCostConverter.toOtpDomainCost;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedP
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -46,6 +48,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently
@@ -315,11 +318,19 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private List<Leg> mapTransferLeg(TransferPathLeg<T> pathLeg, TraverseMode transferMode) {
     var transferFromStop = raptorTransitData.getStopByIndex(pathLeg.fromStop());
     var transferToStop = raptorTransitData.getStopByIndex(pathLeg.toStop());
-    Transfer transfer = ((DefaultRaptorTransfer) pathLeg.transfer()).transfer();
+
+    var raptorTransfer = pathLeg.transfer();
 
     Place from = Place.forStop(transferFromStop);
     Place to = Place.forStop(transferToStop);
-    return mapNonTransitLeg(pathLeg, transfer, transferMode, from, to);
+
+    if (raptorTransfer instanceof DefaultRaptorTransfer dftTx) {
+      return mapTransferLeg(pathLeg, dftTx.transfer(), transferMode, from, to);
+    }
+    if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
+      return mapViaCoordinateTransferLeg(pathLeg, viaTx, transferMode, from, to);
+    }
+    throw new ClassCastException("Unknown transfer type: " + raptorTransfer.getClass());
   }
 
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {
@@ -337,7 +348,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return subItinerary.withTimeShiftToStartAt(createZonedDateTime(egressPathLeg.fromTime()));
   }
 
-  private List<Leg> mapNonTransitLeg(
+  private List<Leg> mapTransferLeg(
     PathLeg<T> pathLeg,
     Transfer transfer,
     TraverseMode transferMode,
@@ -361,33 +372,53 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .build()
       );
     } else {
-      StateEditor se = new StateEditor(edges.get(0).getFromVertex(), transferStreetRequest);
-      se.setTimeSeconds(createZonedDateTime(pathLeg.fromTime()).toEpochSecond());
-
-      State s = se.makeState();
-      ArrayList<State> transferStates = new ArrayList<>();
-      transferStates.add(s);
-      for (Edge e : edges) {
-        var states = e.traverse(s);
-        if (State.isEmpty(states)) {
-          s = null;
-        } else {
-          transferStates.add(states[0]);
-          s = states[0];
-        }
-      }
-
-      State[] states = transferStates.toArray(new State[0]);
-      var graphPath = new GraphPath<>(states[states.length - 1]);
-
-      Itinerary subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
-
-      if (subItinerary.getLegs().isEmpty()) {
-        return List.of();
-      }
-
-      return subItinerary.getLegs();
+      return mapTransferLegWithEdges(pathLeg.fromTime(), edges);
     }
+  }
+
+  private List<Leg> mapViaCoordinateTransferLeg(
+    PathLeg<T> pathLeg,
+    ViaCoordinateTransfer transfer,
+    TraverseMode transferMode,
+    Place from,
+    Place to
+  ) {
+    var fromLegs = mapTransferLegWithEdges(pathLeg.fromTime(), transfer.fromEdges());
+    var toLegs = mapTransferLegWithEdges(pathLeg.toTime(), transfer.toEdges());
+
+    if (fromLegs.isEmpty() || toLegs.isEmpty()) {
+      throw new IllegalStateException(
+        "There need to be at least one edge to get from a stop to the via coordinate and back"
+      );
+    }
+    // We need to timeshift the toLegs
+    long toDuration = toLegs.stream().mapToLong(l -> l.getDuration().toSeconds()).sum();
+
+    toLegs = toLegs.stream().map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration))).toList();
+
+    return ListUtils.combine(fromLegs, toLegs);
+  }
+
+  private List<Leg> mapTransferLegWithEdges(int fromTime, List<Edge> edges) {
+    StateEditor se = new StateEditor(edges.getFirst().getFromVertex(), transferStreetRequest);
+    se.setTimeSeconds(createZonedDateTime(fromTime).toEpochSecond());
+
+    State s = se.makeState();
+    ArrayList<State> transferStates = new ArrayList<>();
+    transferStates.add(s);
+    for (Edge e : edges) {
+      var states = e.traverse(s);
+      if (State.isEmpty(states)) {
+        s = null;
+      } else {
+        transferStates.add(states[0]);
+        s = states[0];
+      }
+    }
+    State[] states = transferStates.toArray(State[]::new);
+    var graphPath = new GraphPath<>(states[states.length - 1]);
+    var subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
+    return subItinerary.getLegs();
   }
 
   private Itinerary mapDirectPath(RaptorPath<T> path) {
@@ -417,7 +448,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
    * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
    * TODO: the logic should be revisited when adding support for transfer between on-board flex
-   * access and transit.
+   *       access and transit.
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (

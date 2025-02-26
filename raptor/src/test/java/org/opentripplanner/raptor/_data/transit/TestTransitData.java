@@ -135,7 +135,7 @@ public class TestTransitData
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     // Index is translated: 1->'A', 2->'B', 3->'C' ...
-    return this::stopIndexToName;
+    return RaptorTestConstants::stopIndexToName;
   }
 
   @Override

@@ -166,16 +166,14 @@ public class AStarTest {
     TemporaryStreetLocation from = new TemporaryStreetLocation(
       "near_shilshole_22nd",
       new Coordinate(-122.385050, 47.666620),
-      new NonLocalizedString("near_shilshole_22nd"),
-      false
+      new NonLocalizedString("near_shilshole_22nd")
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
       "near_56th_20th",
       new Coordinate(-122.382347, 47.669518),
-      new NonLocalizedString("near_56th_20th"),
-      true
+      new NonLocalizedString("near_56th_20th")
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
@@ -214,16 +212,14 @@ public class AStarTest {
     TemporaryStreetLocation from = new TemporaryStreetLocation(
       "near_shilshole_22nd",
       new Coordinate(-122.385050, 47.666620),
-      new NonLocalizedString("near_shilshole_22nd"),
-      false
+      new NonLocalizedString("near_shilshole_22nd")
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
       "near_56th_20th",
       new Coordinate(-122.382347, 47.669518),
-      new NonLocalizedString("near_56th_20th"),
-      true
+      new NonLocalizedString("near_56th_20th")
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 

@@ -7,7 +7,9 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -18,7 +20,6 @@ import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.Optimization;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorViaLocation;
@@ -29,6 +30,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGroupPriorityCalculator;
 
 public class RaptorRequestMapper<T extends RaptorTripSchedule> {
@@ -39,6 +41,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private final long transitSearchTimeZeroEpocSecond;
   private final boolean isMultiThreadedEnbled;
   private final MeterRegistry meterRegistry;
+  private final ViaCoordinateTransferFactory viaTransferResolver;
   private final LookupStopIndexCallback lookUpStopIndex;
 
   private RaptorRequestMapper(
@@ -47,16 +50,18 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     long transitSearchTimeZeroEpocSecond,
-    MeterRegistry meterRegistry,
+    @Nullable MeterRegistry meterRegistry,
+    ViaCoordinateTransferFactory viaTransferResolver,
     LookupStopIndexCallback lookUpStopIndex
   ) {
-    this.request = request;
+    this.request = Objects.requireNonNull(request);
     this.isMultiThreadedEnbled = isMultiThreaded;
-    this.accessPaths = accessPaths;
-    this.egressPaths = egressPaths;
+    this.accessPaths = Objects.requireNonNull(accessPaths);
+    this.egressPaths = Objects.requireNonNull(egressPaths);
     this.transitSearchTimeZeroEpocSecond = transitSearchTimeZeroEpocSecond;
     this.meterRegistry = meterRegistry;
-    this.lookUpStopIndex = lookUpStopIndex;
+    this.viaTransferResolver = Objects.requireNonNull(viaTransferResolver);
+    this.lookUpStopIndex = Objects.requireNonNull(lookUpStopIndex);
   }
 
   public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
@@ -66,6 +71,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     Collection<? extends RaptorAccessEgress> accessPaths,
     Collection<? extends RaptorAccessEgress> egressPaths,
     MeterRegistry meterRegistry,
+    ViaCoordinateTransferFactory viaTransferResolver,
     LookupStopIndexCallback lookUpStopIndex
   ) {
     return new RaptorRequestMapper<T>(
@@ -75,6 +81,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       egressPaths,
       transitSearchTimeZero.toEpochSecond(),
       meterRegistry,
+      viaTransferResolver,
       lookUpStopIndex
     )
       .doMap();
@@ -83,7 +90,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private RaptorRequest<T> doMap() {
     var builder = new RaptorRequestBuilder<T>();
     var searchParams = builder.searchParams();
-
     var preferences = request.preferences();
 
     // TODO Fix the Raptor search so pass-through and via search can be used together.
@@ -118,6 +124,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       searchParams.searchWindow(c.searchWindow());
     }
 
+    builder.searchParams().addViaLocations(mapViaLocations());
+
     if (preferences.transfer().maxTransfers() != null) {
       searchParams.maxNumberOfTransfers(preferences.transfer().maxTransfers());
     }
@@ -130,17 +138,10 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       var pt = preferences.transit();
       var r = pt.raptor();
 
-      if (hasPassThroughOnly()) {
-        mcBuilder.withPassThroughPoints(mapPassThroughPoints());
-      } else if (hasViaLocationsOnly()) {
-        builder.searchParams().addViaLocations(mapViaLocations());
-        // relax transit group priority can be used with via-visit-stop, but not with pass-through
-        if (pt.isRelaxTransitGroupPrioritySet()) {
-          mapRelaxTransitGroupPriority(mcBuilder, pt);
-        }
-      } else if (pt.isRelaxTransitGroupPrioritySet()) {
+      // relax transit group priority can be used with via-visit-stop, but not with pass-through
+      if (pt.isRelaxTransitGroupPrioritySet() && !hasPassThroughOnly()) {
         mapRelaxTransitGroupPriority(mcBuilder, pt);
-      } else {
+      } else if (!request.isViaSearch()) {
         // The deprecated relaxGeneralizedCostAtDestination is only enabled, if there is no
         // via location and the relaxTransitGroupPriority is not used (Normal).
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
@@ -230,9 +231,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
   private RaptorViaLocation mapViaLocation(ViaLocation input) {
     if (input.isPassThroughLocation()) {
-      var builder = RaptorViaLocation.allowPassThrough(input.label());
+      var builder = RaptorViaLocation.passThrough(input.label());
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
-        builder.addViaStop(stopIndex);
+        builder.addPassThroughStop(stopIndex);
       }
       return builder.build();
     }
@@ -242,19 +243,18 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
         builder.addViaStop(stopIndex);
       }
+      for (var coordinate : input.coordinates()) {
+        var viaTransfers = viaTransferResolver.createViaTransfers(
+          request,
+          input.label(),
+          coordinate
+        );
+        for (var it : viaTransfers) {
+          builder.addViaTransfer(it.fromStopIndex(), it);
+        }
+      }
       return builder.build();
     }
-  }
-
-  private List<PassThroughPoint> mapPassThroughPoints() {
-    return request.getViaLocations().stream().map(this::mapPassThroughPoints).toList();
-  }
-
-  private PassThroughPoint mapPassThroughPoints(ViaLocation location) {
-    return new PassThroughPoint(
-      location.label(),
-      lookUpStopIndex.lookupStopLocationIndexes(location.stopLocationIds())
-    );
   }
 
   static RelaxFunction mapRelaxCost(CostLinearFunction relax) {
