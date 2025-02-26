@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.transmodel.model.framework;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -27,28 +27,7 @@ class CoordinateInputTypeTest {
   }
 
   @Test
-  void mapToWsgCoordinateWithMissingLongitude() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () ->
-        CoordinateInputType.mapToWsgCoordinate(
-          "c",
-          Map.of("c", Map.ofEntries(Map.entry(CoordinateInputType.LONGITUDE, LONGITUDE_VALUE)))
-        )
-    );
-    assertEquals("The 'latitude' parameter is required.", ex.getMessage());
-  }
-
-  @Test
-  void mapToWsgCoordinateWithMissingLatitude() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () ->
-        CoordinateInputType.mapToWsgCoordinate(
-          "c",
-          Map.of("c", Map.ofEntries(Map.entry(CoordinateInputType.LATITUDE, LATITUDE_VALUE)))
-        )
-    );
-    assertEquals("The 'longitude' parameter is required.", ex.getMessage());
+  void mapEmptyCoordinateToNull() {
+    assertTrue(CoordinateInputType.mapToWsgCoordinate("c", Map.of()).isEmpty());
   }
 }

@@ -43,15 +43,13 @@ public class CoordinateInputType {
   ) {
     Map<String, Object> coordinate = (Map<String, Object>) input.get(fieldName);
 
-    if (coordinate != null) {
-      return Optional.of(
-        new WgsCoordinate(
-          readCoordinateValue(LATITUDE, coordinate),
-          readCoordinateValue(LONGITUDE, coordinate)
-        )
-      );
+    if (coordinate == null) {
+      return Optional.empty();
     }
-    return Optional.empty();
+
+    return Optional.of(
+      new WgsCoordinate((Double) coordinate.get(LATITUDE), (Double) coordinate.get(LONGITUDE))
+    );
   }
 
   public static Map<String, Object> mapForTest(WgsCoordinate coordinate) {
@@ -59,13 +57,5 @@ public class CoordinateInputType {
       Map.entry(LATITUDE, coordinate.latitude()),
       Map.entry(LONGITUDE, coordinate.longitude())
     );
-  }
-
-  private static Double readCoordinateValue(String fieldName, Map<String, Object> coordinate) {
-    var value = (Double) coordinate.get(fieldName);
-    if (value == null) {
-      throw new IllegalArgumentException("The '%s' parameter is required.".formatted(fieldName));
-    }
-    return value;
   }
 }
