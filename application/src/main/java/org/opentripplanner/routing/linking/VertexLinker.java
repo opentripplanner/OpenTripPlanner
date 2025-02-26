@@ -585,7 +585,6 @@ public class VertexLinker {
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
-    List<Area> areas = areaGroup.getAreas();
     Geometry polygon = areaGroup.getExpandedGeometry();
 
     // Due to truncating of precision in storage of the edge geometry, the new split vertex
@@ -614,22 +613,20 @@ public class VertexLinker {
         new Coordinate[] { nearestPoints[0], v.getCoordinate() }
       );
 
-      // ensure that new edge does not leave the bounds of the original area, or
-      // fall into any holes
+      // ensure that new edge does not leave the bounds of the area or hit any holes
       if (!polygon.contains(newGeometry)) {
         continue;
       }
 
-      // check to see if this splits multiple Areas. This code is rather similar to
-      // code in OSMGBI, but the data structures are different
-      createSegments(newVertex, v, areaGroup, areas, scope, tempEdges);
+      // add connecting edges
+      createEdges(newVertex, v, areaGroup, scope, tempEdges);
       added++;
     }
-    // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
-    // area calculation to be done after stop linking
+    // fallback when new vertex could not be connected without intersecting the boundary
+    // this happens for example when the added vertex is outside the area
     if (added == 0) {
       for (IntersectionVertex v : areaGroup.visibilityVertices()) {
-        createSegments(newVertex, v, areaGroup, areas, scope, tempEdges);
+        createEdges(newVertex, v, areaGroup, scope, tempEdges);
       }
     }
     if (scope == Scope.PERMANENT) {
@@ -657,11 +654,10 @@ public class VertexLinker {
     return modes;
   }
 
-  private void createSegments(
+  private void createEdges(
     IntersectionVertex from,
     IntersectionVertex to,
     AreaGroup ag,
-    List<Area> areas,
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
@@ -674,7 +670,7 @@ public class VertexLinker {
     );
 
     Area hit = null;
-    for (Area area : areas) {
+    for (Area area : ag.getAreas()) {
       Geometry polygon = area.getGeometry();
       Geometry intersection = polygon.intersection(line);
       if (intersection.getLength() > 0.000001) {
