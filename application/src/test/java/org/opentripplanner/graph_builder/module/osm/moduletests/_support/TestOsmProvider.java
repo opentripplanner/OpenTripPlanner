@@ -24,8 +24,15 @@ public class TestOsmProvider implements OsmProvider {
   private final WayPropertySet wayPropertySet = new WayPropertySet();
 
   public TestOsmProvider(List<OsmRelation> relations, List<OsmWay> ways, List<OsmNode> nodes) {
-    this.relations = relations.stream().peek(r -> r.setOsmProvider(this)).toList();
-    this.ways = ways.stream().peek(w -> w.setOsmProvider(this)).toList();
+    // this was originally peek() but Joel insisted that it's "for debugging"
+    for (OsmRelation relation : relations) {
+      relation.setOsmProvider(this);
+    }
+    this.relations = List.copyOf(relations);
+    for(OsmWay way : ways) {
+      way.setOsmProvider(this);
+    }
+    this.ways = List.copyOf(ways);
     this.nodes = List.copyOf(nodes);
   }
 
