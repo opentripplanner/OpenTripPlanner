@@ -17,6 +17,8 @@ public class MaxStopCountLimit {
   private static final int DEFAULT_LIMIT = 500;
   private static final Map<StreetMode, Integer> DEFAULT_FOR_MODE = Map.of();
 
+  public static final MaxStopCountLimit DEFAULT = new MaxStopCountLimit();
+
   private final int defaultLimit;
   private final Map<StreetMode, Integer> limitForMode;
 
@@ -28,6 +30,10 @@ public class MaxStopCountLimit {
   MaxStopCountLimit(Builder builder) {
     this.defaultLimit = IntUtils.requireNotNegative(builder.defaultLimit());
     this.limitForMode = builder.copyValueForEnum();
+  }
+
+  public static Builder of() {
+    return DEFAULT.copyOf();
   }
 
   public Builder copyOf() {

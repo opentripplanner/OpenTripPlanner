@@ -7,9 +7,6 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
-import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
@@ -18,17 +15,11 @@ class StreetPreferencesTest {
   private static final double TURN_RELUCTANCE = 2.0;
   private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
   private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
-  private static final int MAX_DEFAULT_STOP_COUNT = 245;
-  private static final int MAX_CAR_STOP_COUNT = 0;
   private static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
   private static final DrivingDirection DRIVING_DIRECTION = DrivingDirection.LEFT;
   private static final int ELEVATOR_BOARD_TIME = (int) Duration.ofMinutes(2).toSeconds();
   private static final IntersectionTraversalModel INTERSECTION_TRAVERSAL_MODEL =
     IntersectionTraversalModel.CONSTANT;
-  private static final TimeAndCostPenalty CAR_TO_PARK_PENALTY = TimeAndCostPenalty.of(
-    TimePenalty.of("2m + 1.5t"),
-    3.5
-  );
 
   private final StreetPreferences subject = StreetPreferences
     .of()
@@ -36,11 +27,7 @@ class StreetPreferencesTest {
     .withTurnReluctance(TURN_RELUCTANCE)
     .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))
     .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
-    .withAccessEgress(it -> it.withPenalty(Map.of(StreetMode.CAR_TO_PARK, CAR_TO_PARK_PENALTY)))
     .withAccessEgress(it -> it.withMaxDuration(MAX_ACCESS_EGRESS, Map.of()))
-    .withAccessEgress(it ->
-      it.withMaxStopCount(MAX_DEFAULT_STOP_COUNT, Map.of(StreetMode.CAR, MAX_CAR_STOP_COUNT))
-    )
     .withMaxDirectDuration(MAX_DIRECT, Map.of())
     .withRoutingTimeout(ROUTING_TIMEOUT)
     .build();
@@ -53,36 +40,6 @@ class StreetPreferencesTest {
   @Test
   void intersectionTraversalModel() {
     assertEquals(INTERSECTION_TRAVERSAL_MODEL, subject.intersectionTraversalModel());
-  }
-
-  @Test
-  void accessEgressPenalty() {
-    assertEquals(
-      TimeAndCostPenalty.ZERO,
-      subject.accessEgress().penalty().valueOf(StreetMode.WALK)
-    );
-    assertEquals(
-      CAR_TO_PARK_PENALTY,
-      subject.accessEgress().penalty().valueOf(StreetMode.CAR_TO_PARK)
-    );
-  }
-
-  @Test
-  void maxAccessEgressDuration() {
-    assertEquals(MAX_ACCESS_EGRESS, subject.accessEgress().maxDuration().defaultValue());
-  }
-
-  @Test
-  void maxAccessEgressStopCountLimit() {
-    assertEquals(MAX_DEFAULT_STOP_COUNT, subject.accessEgress().maxStopCountLimit().defaultLimit());
-    assertEquals(
-      MAX_DEFAULT_STOP_COUNT,
-      subject.accessEgress().maxStopCountLimit().limitForMode(StreetMode.BIKE)
-    );
-    assertEquals(
-      MAX_CAR_STOP_COUNT,
-      subject.accessEgress().maxStopCountLimit().limitForMode(StreetMode.CAR)
-    );
   }
 
   @Test
@@ -130,16 +87,9 @@ class StreetPreferencesTest {
       "routingTimeout: 3s, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: CONSTANT, " +
-      "accessEgress: AccessEgressPreferences{penalty: TimeAndCostPenaltyForEnum{" +
-      "CAR_TO_PARK: " +
-      CAR_TO_PARK_PENALTY +
-      ", " +
-      "CAR_PICKUP: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
-      "CAR_RENTAL: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
-      "CAR_HAILING: (timePenalty: 20m + 2.0 t, costFactor: 1.50), " +
-      "FLEXIBLE: (timePenalty: 10m + 1.30 t, costFactor: 1.30)}, " +
-      "maxDuration: DurationForStreetMode{default:5m}, " +
-      "maxStopCount: MaxStopCountLimit{defaultLimit: 245, limitForMode: {CAR=0}}}, " +
+      "accessEgress: AccessEgressPreferences{" +
+      "maxDuration: DurationForStreetMode{default:5m}" +
+      "}, " +
       "maxDirectDuration: DurationForStreetMode{default:10m}" +
       "}",
       subject.toString()
