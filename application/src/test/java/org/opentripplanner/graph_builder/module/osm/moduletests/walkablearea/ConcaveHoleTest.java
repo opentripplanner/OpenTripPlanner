@@ -98,6 +98,5 @@ public class ConcaveHoleTest {
 
     var vertex = graph.getVertex(VertexLabel.osm(visibilityNodeId));
     assertThat(vertex.getOutgoing()).hasSize(4);
-    assertThat(vertex.getOutgoing()).hasSize(4);
   }
 }
