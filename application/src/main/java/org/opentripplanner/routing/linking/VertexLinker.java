@@ -420,12 +420,12 @@ public class VertexLinker {
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
       if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
-        AreaGroup ael = aEdge.getArea();
-        if (ael.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
-          // do not relink again to the area when many edges are equally close
-          if (!linkedAreas.add(ael)) {
-            return null;
-          }
+        AreaGroup ag = aEdge.getArea();
+        if (linkedAreas.contains(ag)) {
+          return null;
+        }
+        if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+          linkedAreas.add(ag);
           if (vertex instanceof IntersectionVertex iv) {
             start = iv;
           } else {
