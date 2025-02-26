@@ -29,7 +29,7 @@ public class TestOsmProvider implements OsmProvider {
       relation.setOsmProvider(this);
     }
     this.relations = List.copyOf(relations);
-    for(OsmWay way : ways) {
+    for (OsmWay way : ways) {
       way.setOsmProvider(this);
     }
     this.ways = List.copyOf(ways);
