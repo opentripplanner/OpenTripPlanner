@@ -29,7 +29,7 @@ public class OsmModuleBuilder {
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
   private boolean includeOsmSubwayEntrances = false;
-  private int maxAreaNodes;
+  private int maxAreaNodes = 150;
   private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
   OsmModuleBuilder(
