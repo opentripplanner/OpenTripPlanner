@@ -7,11 +7,19 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 
-  private FilterValues<FeedScopedId> agencies = FilterValues.ofEmptyIsEverything(
-    "agencies",
+  private FilterValues<FeedScopedId> includedAgencies = FilterValues.ofEmptyIsEverything(
+    "selectedAgencies",
     List.of()
   );
-  private FilterValues<FeedScopedId> routes = FilterValues.ofEmptyIsEverything("routes", List.of());
+  private FilterValues<FeedScopedId> includedRoutes = FilterValues.ofEmptyIsEverything("selectedRoutes", List.of());
+
+  private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofEmptyIsEverything(
+    "excludedAgencies",
+    List.of()
+  );
+  private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofEmptyIsEverything("excludedRoutes", List.of());
+
+
   private FilterValues<String> netexInternalPlanningCodes = FilterValues.ofEmptyIsEverything(
     "netexInternalPlanningCodes",
     List.of()
@@ -23,13 +31,23 @@ public class TripRequestBuilder {
 
   TripRequestBuilder() {}
 
-  public TripRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
-    this.agencies = agencies;
+  public TripRequestBuilder withIncludedAgencies(FilterValues<FeedScopedId> agencies) {
+    this.includedAgencies = agencies;
     return this;
   }
 
-  public TripRequestBuilder withRoutes(FilterValues<FeedScopedId> routes) {
-    this.routes = routes;
+  public TripRequestBuilder withIncludedRoutes(FilterValues<FeedScopedId> routes) {
+    this.includedRoutes = routes;
+    return this;
+  }
+
+  public TripRequestBuilder withExcludedAgencies(FilterValues<FeedScopedId> agencies) {
+    this.excludedAgencies=  agencies;
+    return this;
+  }
+
+  public TripRequestBuilder withExcludedRoutes(FilterValues<FeedScopedId> routes) {
+    this.excludedRoutes= routes;
     return this;
   }
 
@@ -46,6 +64,6 @@ public class TripRequestBuilder {
   }
 
   public TripRequest build() {
-    return new TripRequest(agencies, routes, netexInternalPlanningCodes, serviceDates);
+    return new TripRequest(includedAgencies, includedRoutes, excludedAgencies, excludedRoutes, netexInternalPlanningCodes, serviceDates);
   }
 }

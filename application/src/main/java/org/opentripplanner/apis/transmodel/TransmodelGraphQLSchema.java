@@ -1313,8 +1313,8 @@ public class TransmodelGraphQLSchema {
 
             TripRequest tripRequest = TripRequest
               .of()
-              .withAgencies(authorities)
-              .withRoutes(lineIds)
+              .withIncludedAgencies(authorities)
+              .withIncludedRoutes(lineIds)
               .withNetexInternalPlanningCodes(privateCodes)
               .withServiceDates(activeServiceDates)
               .build();

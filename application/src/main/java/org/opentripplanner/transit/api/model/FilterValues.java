@@ -42,6 +42,13 @@ public abstract class FilterValues<E> {
     return new FilterValuesEmptyIsEverything<>(name, values);
   }
 
+  public static <E> FilterValues<E> ofEmptyIsNothing(
+    String name,
+    @Nullable Collection<E> values
+  ) {
+    return new FilterValuesEmptyIsNothing<>(name, values);
+  }
+
   /**
    * Returns a {@link RequiredFilterValues} that throws an exception at creation time if the filter
    * values is null or empty.

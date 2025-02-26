@@ -19,6 +19,9 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripMatcherFactoryTest {
 
+  public static final FeedScopedId AKT_ID = new FeedScopedId("F", "AKT");
+  public static final FeedScopedId RUTER1_ID = new FeedScopedId("F", "RUT:1");
+  public static final FeedScopedId RUTER2_ID = new FeedScopedId("F", "RUT:2");
   private Trip tripRut;
   private Trip tripRut2;
   private Trip tripAkt;
@@ -33,7 +36,7 @@ public class TripMatcherFactoryTest {
             .of(new FeedScopedId("F", "RUT:route:1"))
             .withAgency(
               Agency
-                .of(new FeedScopedId("F", "RUT:1"))
+                .of(RUTER1_ID)
                 .withName("RUT")
                 .withTimezone("Europe/Oslo")
                 .build()
@@ -52,7 +55,7 @@ public class TripMatcherFactoryTest {
             .of(new FeedScopedId("F", "RUT:route:2"))
             .withAgency(
               Agency
-                .of(new FeedScopedId("F", "RUT:2"))
+                .of(RUTER2_ID)
                 .withName("RUT")
                 .withTimezone("Europe/Oslo")
                 .build()
@@ -71,7 +74,7 @@ public class TripMatcherFactoryTest {
             .of(new FeedScopedId("F", "AKT:route:1"))
             .withAgency(
               Agency
-                .of(new FeedScopedId("F", "AKT"))
+                .of(AKT_ID)
                 .withName("AKT")
                 .withTimezone("Europe/Oslo")
                 .build()
@@ -85,10 +88,10 @@ public class TripMatcherFactoryTest {
   }
 
   @Test
-  void testMatchRouteId() {
+  void testMatchIncludeRouteId() {
     TripRequest request = TripRequest
       .of()
-      .withRoutes(
+      .withIncludedRoutes(
         FilterValues.ofEmptyIsEverything("routes", List.of(new FeedScopedId("F", "RUT:route:1")))
       )
       .build();
@@ -98,6 +101,22 @@ public class TripMatcherFactoryTest {
     assertTrue(matcher.match(tripRut));
     assertFalse(matcher.match(tripRut2));
     assertFalse(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testMatchExcludeRouteId() {
+    TripRequest request = TripRequest
+      .of()
+      .withExcludedRoutes(
+        FilterValues.ofEmptyIsEverything("routes", List.of(new FeedScopedId("F", "RUT:route:1")))
+      )
+      .build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertFalse(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
+    assertTrue(matcher.match(tripAkt));
   }
 
   @Test
@@ -112,10 +131,10 @@ public class TripMatcherFactoryTest {
   }
 
   @Test
-  void testMatchAgencyId() {
+  void testMatchIncludeAgencyId() {
     TripRequest request = TripRequest
       .of()
-      .withAgencies(
+      .withIncludedAgencies(
         FilterValues.ofEmptyIsEverything("agencies", List.of(new FeedScopedId("F", "RUT:1")))
       )
       .build();
@@ -124,6 +143,75 @@ public class TripMatcherFactoryTest {
 
     assertTrue(matcher.match(tripRut));
     assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
+  }
+  @Test
+  void testMatchExcludeAgencyId() {
+    TripRequest request = TripRequest
+      .of()
+      .withExcludedAgencies(
+        FilterValues.ofEmptyIsEverything("agencies", List.of(RUTER1_ID))
+      )
+      .build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertFalse(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
+    assertTrue(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testIncludeNoAgencies() {
+    TripRequest request = TripRequest
+      .of()
+      .withIncludedAgencies(
+        FilterValues.ofEmptyIsNothing("agencies", List.of())
+      )
+      .build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertFalse(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testDisjointAgencyFilters() {
+    TripRequest request = TripRequest
+      .of()
+      .withIncludedAgencies(
+        FilterValues.ofEmptyIsNothing("agencies", List.of(RUTER1_ID))
+      )
+      .withExcludedAgencies(
+        FilterValues.ofEmptyIsEverything("agencies", List.of(AKT_ID))
+      )
+      .build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertTrue(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testIntersectingAgencyFilters() {
+    TripRequest request = TripRequest
+      .of()
+      .withIncludedAgencies(
+        FilterValues.ofEmptyIsNothing("agencies", List.of(RUTER1_ID, RUTER2_ID, AKT_ID))
+      )
+      .withExcludedAgencies(
+        FilterValues.ofEmptyIsEverything("agencies", List.of(AKT_ID))
+      )
+      .build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertTrue(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
     assertFalse(matcher.match(tripAkt));
   }
 

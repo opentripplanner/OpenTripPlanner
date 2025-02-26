@@ -12,19 +12,27 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class TripRequest {
 
-  private final FilterValues<FeedScopedId> agencies;
-  private final FilterValues<FeedScopedId> routes;
+  private final FilterValues<FeedScopedId> includedAgencies;
+  private final FilterValues<FeedScopedId> includedRoutes;
+
+  private final FilterValues<FeedScopedId> excludedAgencies;
+  private final FilterValues<FeedScopedId> excludedRoutes;
+
   private final FilterValues<String> netexInternalPlanningCodes;
   private final FilterValues<LocalDate> serviceDates;
 
   TripRequest(
-    FilterValues<FeedScopedId> agencies,
-    FilterValues<FeedScopedId> routes,
+    FilterValues<FeedScopedId> includedAgencies,
+    FilterValues<FeedScopedId> includedRoutes,
+    FilterValues<FeedScopedId> excludedAgencies,
+    FilterValues<FeedScopedId> excludedRoutes,
     FilterValues<String> netexInternalPlanningCodes,
     FilterValues<LocalDate> serviceDates
   ) {
-    this.agencies = agencies;
-    this.routes = routes;
+    this.includedAgencies = includedAgencies;
+    this.includedRoutes = includedRoutes;
+    this.excludedAgencies = excludedAgencies;
+    this.excludedRoutes = excludedRoutes;
     this.netexInternalPlanningCodes = netexInternalPlanningCodes;
     this.serviceDates = serviceDates;
   }
@@ -33,12 +41,20 @@ public class TripRequest {
     return new TripRequestBuilder();
   }
 
-  public FilterValues<FeedScopedId> agencies() {
-    return agencies;
+  public FilterValues<FeedScopedId> includedAgencies() {
+    return includedAgencies;
   }
 
-  public FilterValues<FeedScopedId> routes() {
-    return routes;
+  public FilterValues<FeedScopedId> includedRoutes() {
+    return includedRoutes;
+  }
+
+  public FilterValues<FeedScopedId> excludedAgencies() {
+    return excludedAgencies;
+  }
+
+  public FilterValues<FeedScopedId> excludedRoutes() {
+    return excludedRoutes;
   }
 
   public FilterValues<String> netexInternalPlanningCodes() {
