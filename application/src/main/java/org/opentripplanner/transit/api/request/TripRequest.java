@@ -5,6 +5,7 @@ import java.util.Objects;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * A request for {@link Trip}s.
@@ -90,5 +91,18 @@ public class TripRequest {
       netexInternalPlanningCodes,
       serviceDates
     );
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TripRequest.class)
+      .addObj("includedAgencies", includedAgencies)
+      .addObj("includedRoutes", includedRoutes)
+      .addObj("excludedAgencies", excludedAgencies)
+      .addObj("excludedRoutes", excludedRoutes)
+      .addObj("netexInternalPlanningCodes", netexInternalPlanningCodes)
+      .addObj("serviceDates", serviceDates)
+      .toString();
   }
 }

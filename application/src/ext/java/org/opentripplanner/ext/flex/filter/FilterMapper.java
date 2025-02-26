@@ -55,12 +55,24 @@ public class FilterMapper {
         selectedAgencies.addAll(s.agencies());
       });
 
-    return TripRequest
-      .of()
-      .withIncludedAgencies(FilterValues.ofEmptyIsNothing("includedAgencies", selectedAgencies))
-      .withIncludedRoutes(FilterValues.ofEmptyIsNothing("includedRoutes", selectedRoutes))
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("excludedAgencies", bannedAgencies))
-      .withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", bannedRoutes))
-      .build();
+    var builder = TripRequest.of();
+
+    if (!selectedAgencies.isEmpty()) {
+      builder.withIncludedAgencies(
+        FilterValues.ofEmptyIsNothing("includedAgencies", selectedAgencies)
+      );
+    }
+    if (!selectedRoutes.isEmpty()) {
+      builder.withIncludedRoutes(FilterValues.ofEmptyIsNothing("includedRoutes", selectedRoutes));
+    }
+    if (!bannedAgencies.isEmpty()) {
+      builder.withExcludedAgencies(
+        FilterValues.ofEmptyIsEverything("excludedAgencies", bannedAgencies)
+      );
+    }
+    if (!bannedRoutes.isEmpty()) {
+      builder.withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", bannedRoutes));
+    }
+    return builder.build();
   }
 }

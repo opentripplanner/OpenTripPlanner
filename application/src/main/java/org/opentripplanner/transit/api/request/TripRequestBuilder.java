@@ -8,11 +8,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class TripRequestBuilder {
 
   private FilterValues<FeedScopedId> includedAgencies = FilterValues.ofEmptyIsEverything(
-    "selectedAgencies",
+    "includedAgencies",
     List.of()
   );
   private FilterValues<FeedScopedId> includedRoutes = FilterValues.ofEmptyIsEverything(
-    "selectedRoutes",
+    "includedRoutes",
     List.of()
   );
 
