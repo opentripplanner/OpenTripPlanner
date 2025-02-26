@@ -586,8 +586,7 @@ public class VertexLinker {
     DisposableEdgeCollection tempEdges
   ) {
     List<Area> areas = areaGroup.getAreas();
-    Geometry origPolygon = areaGroup.getGeometry();
-    Geometry polygon = origPolygon.union(origPolygon.getBoundary()).buffer(0.000001);
+    Geometry polygon = areaGroup.getExpandedGeometry();
 
     // Due to truncating of precision in storage of the edge geometry, the new split vertex
     // might be located just outside the area, so we calculate the point closest to the polygon

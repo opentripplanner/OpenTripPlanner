@@ -20,10 +20,13 @@ public class AreaGroup implements Serializable {
   private static final Set<IntersectionVertex> EMPTY_SET = Set.of();
   private Set<IntersectionVertex> visibilityVertices = EMPTY_SET;
   private final Polygon geometry;
+  private final Geometry expandedGeometry;
   private final List<Area> areas = new ArrayList<>();
 
   public AreaGroup(Polygon geometry) {
     this.geometry = geometry;
+    this.expandedGeometry =
+      geometry != null ? geometry.union(geometry.getBoundary()).buffer(0.000001) : null;
   }
 
   public String toString() {
@@ -40,6 +43,10 @@ public class AreaGroup implements Serializable {
 
   public Geometry getGeometry() {
     return geometry;
+  }
+
+  public Geometry getExpandedGeometry() {
+    return expandedGeometry;
   }
 
   /**
