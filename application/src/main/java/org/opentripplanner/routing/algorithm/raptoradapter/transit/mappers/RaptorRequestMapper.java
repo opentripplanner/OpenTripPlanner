@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -239,9 +240,11 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     }
     // Visit Via location
     else {
+      var viaStops = new HashSet<Integer>();
       var builder = RaptorViaLocation.via(input.label(), input.minimumWaitTime());
       for (int stopIndex : lookUpStopIndex.lookupStopLocationIndexes(input.stopLocationIds())) {
         builder.addViaStop(stopIndex);
+        viaStops.add(stopIndex);
       }
       for (var coordinate : input.coordinates()) {
         var viaTransfers = viaTransferResolver.createViaTransfers(
@@ -250,6 +253,12 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
           coordinate
         );
         for (var it : viaTransfers) {
+          // If via-stop and via-transfers are used together then walking from a stop
+          // to the coordinate andd back is not pareto optimal, using just the stop
+          // is the optimal option.
+          if(it.stop() == it.fromStopIndex() && viaStops.contains(it.stop())) {
+            continue;
+          }
           builder.addViaTransfer(it.fromStopIndex(), it);
         }
       }
