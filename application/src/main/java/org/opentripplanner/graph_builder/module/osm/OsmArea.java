@@ -42,7 +42,7 @@ class OsmArea {
     List<TLongList> innerRingNodes = constructRings(innerRingWays);
     List<TLongList> outerRingNodes = constructRings(outerRingWays);
     if (innerRingNodes == null || outerRingNodes == null) {
-      throw new AreaConstructionException("innerRing and outerRing nodes are null");
+      throw new AreaConstructionException("innerRing or outerRing nodes are null");
     }
     ArrayList<TLongList> allRings = new ArrayList<>(innerRingNodes);
     allRings.addAll(outerRingNodes);
