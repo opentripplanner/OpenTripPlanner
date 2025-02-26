@@ -42,7 +42,7 @@ public class ExpressionBuilder<T> {
   public <V> ExpressionBuilder<T> noMatches(
     FilterValues<V> filterValues,
     Function<V, Matcher<T>> matcherProvider
-  ){
+  ) {
     if (filterValues.includeEverything()) {
       return this;
     }

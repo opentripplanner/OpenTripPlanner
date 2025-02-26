@@ -2,9 +2,11 @@ package org.opentripplanner.transit.api.model;
 
 import java.util.Collection;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * {@link FilterValues} is meant to be used when filtering results from {@link TransitService}.
@@ -42,10 +44,7 @@ public abstract class FilterValues<E> {
     return new FilterValuesEmptyIsEverything<>(name, values);
   }
 
-  public static <E> FilterValues<E> ofEmptyIsNothing(
-    String name,
-    @Nullable Collection<E> values
-  ) {
+  public static <E> FilterValues<E> ofEmptyIsNothing(String name, @Nullable Collection<E> values) {
     return new FilterValuesEmptyIsNothing<>(name, values);
   }
 
@@ -89,5 +88,22 @@ public abstract class FilterValues<E> {
       );
     }
     return values;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof FilterValues<?> that)) return false;
+    return Objects.equals(values, that.values) && Objects.equals(name, that.name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(values, name);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(getClass()).addStr("name", name).addCol("values", values).toString();
   }
 }

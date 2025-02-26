@@ -21,7 +21,6 @@ import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.flex.FlexRouter;
-import org.opentripplanner.ext.flex.filter.FlexTripFilter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -40,6 +39,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -105,7 +105,7 @@ class ScheduledDeviatedTripIntegrationTest {
       graph,
       new DefaultTransitService(timetableRepository),
       FlexParameters.defaultValues(),
-      FlexTripFilter.ALLOW_ALL,
+      TripRequest.of().build(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       null,
       1,

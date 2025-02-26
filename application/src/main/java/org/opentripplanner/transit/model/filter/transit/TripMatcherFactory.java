@@ -62,11 +62,17 @@ public class TripMatcherFactory {
   }
 
   static Matcher<Trip> excludeAgencyId(FeedScopedId id) {
-    return new NegationMatcher<>("excludedAgency", new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId()));
+    return new NegationMatcher<>(
+      "excludedAgency",
+      new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId())
+    );
   }
 
   static Matcher<Trip> excludeRouteId(FeedScopedId id) {
-    return new NegationMatcher<>("excludedRoute", new EqualityMatcher<>("route", id, t -> t.getRoute().getId()));
+    return new NegationMatcher<>(
+      "excludedRoute",
+      new EqualityMatcher<>("route", id, t -> t.getRoute().getId())
+    );
   }
 
   static Matcher<Trip> netexInternalPlanningCode(String code) {

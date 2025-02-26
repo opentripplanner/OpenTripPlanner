@@ -6,17 +6,22 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.flex.filter.FlexTripFilterRequest.Filter;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
+import org.opentripplanner.transit.api.model.FilterValues;
+import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class FilterMapperTest {
+
+  private static final TripRequest ALLOW_ALL = TripRequest.of().build();
+  public static final FeedScopedId ROUTE_ID1 = id("r1");
 
   @Test
   void allowAll() {
     var filter = FilterMapper.mapFilters(List.of(AllowAllTransitFilter.of()));
-    assertEquals(FlexTripFilter.ALLOW_ALL, filter);
+    assertEquals(ALLOW_ALL, filter);
   }
 
   @Test
@@ -24,32 +29,17 @@ class FilterMapperTest {
     var filter = FilterMapper.mapFilters(
       List.of(AllowAllTransitFilter.of(), AllowAllTransitFilter.of())
     );
-    assertEquals(FlexTripFilter.ALLOW_ALL, filter);
+    assertEquals(ALLOW_ALL, filter);
   }
 
   @Test
   void routes() {
-    var select = SelectRequest.of().withRoutes(List.of(id("r1"))).build();
+    var select = SelectRequest.of().withRoutes(List.of(ROUTE_ID1)).build();
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
-    var filter = FilterMapper.mapFilters(List.of(transitFilter));
+    var request = FilterMapper.mapFilters(List.of(transitFilter));
     assertEquals(
-      new FlexTripFilter(
-        List.of(new Filter(Set.of(), Set.of(), Set.of(id("r1")), Set.of(id("r1"))))
-      ),
-      filter
-    );
-  }
-
-  @Test
-  void agencies() {
-    var select = SelectRequest.of().withAgencies(List.of(id("a1"))).build();
-    var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
-    var filter = FilterMapper.mapFilters(List.of(transitFilter));
-    assertEquals(
-      new FlexTripFilter(
-        List.of(new Filter(Set.of(id("a1")), Set.of(id("a1")), Set.of(), Set.of()))
-      ),
-      filter
+      FilterValues.ofEmptyIsNothing("includedRoutes", Set.of(ROUTE_ID1)),
+      request.includedRoutes()
     );
   }
 }

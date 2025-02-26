@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -63,5 +64,31 @@ public class TripRequest {
 
   public FilterValues<LocalDate> serviceDates() {
     return serviceDates;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof TripRequest that)) return false;
+    return (
+      Objects.equals(includedAgencies, that.includedAgencies) &&
+      Objects.equals(includedRoutes, that.includedRoutes) &&
+      Objects.equals(excludedAgencies, that.excludedAgencies) &&
+      Objects.equals(excludedRoutes, that.excludedRoutes) &&
+      Objects.equals(netexInternalPlanningCodes, that.netexInternalPlanningCodes) &&
+      Objects.equals(serviceDates, that.serviceDates)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      includedAgencies,
+      includedRoutes,
+      excludedAgencies,
+      excludedRoutes,
+      netexInternalPlanningCodes,
+      serviceDates
+    );
   }
 }

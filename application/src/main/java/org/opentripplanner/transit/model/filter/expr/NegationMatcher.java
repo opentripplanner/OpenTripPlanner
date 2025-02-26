@@ -17,10 +17,7 @@ public class NegationMatcher<T, V> implements Matcher<T> {
   /**
    * @param typeName The typeName appears in the toString for easier debugging.
    */
-  public NegationMatcher(
-    String typeName,
-    Matcher<T> valueMatcher
-  ) {
+  public NegationMatcher(String typeName, Matcher<T> valueMatcher) {
     this.typeName = typeName;
     this.valueMatcher = valueMatcher;
   }

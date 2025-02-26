@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.ext.flex.filter.FlexTripFilter;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
@@ -27,8 +26,12 @@ import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -53,13 +56,13 @@ public class FlexRouter {
   private final int requestedTime;
   private final int requestedBookingTime;
   private final List<FlexServiceDate> dates;
-  private final FlexTripFilter flexTripFilter;
+  private final Matcher<Trip> matcher;
 
   public FlexRouter(
     Graph graph,
     TransitService transitService,
     FlexParameters flexParameters,
-    FlexTripFilter filters,
+    TripRequest filterRequest,
     Instant requestedTime,
     @Nullable Instant requestedBookingTime,
     int additionalPastSearchDays,
@@ -73,7 +76,11 @@ public class FlexRouter {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
-    this.flexTripFilter = filters;
+    this.matcher =
+      TripMatcherFactory.of(
+        filterRequest,
+        transitService.getCalendarService()::getServiceDatesForServiceId
+      );
     this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper =
       new GraphPathToItineraryMapper(
@@ -119,7 +126,7 @@ public class FlexRouter {
       accessFlexPathCalculator,
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration(),
-      flexTripFilter
+      matcher
     )
       .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
@@ -145,7 +152,7 @@ public class FlexRouter {
       callbackService,
       accessFlexPathCalculator,
       flexParameters.maxTransferDuration(),
-      flexTripFilter
+      matcher
     )
       .createFlexAccesses(streetAccesses, dates);
   }
@@ -156,7 +163,7 @@ public class FlexRouter {
       callbackService,
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration(),
-      flexTripFilter
+      matcher
     )
       .createFlexEgresses(streetEgresses, dates);
   }

@@ -9,13 +9,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.opentripplanner.ext.flex.filter.FlexTripFilter;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public class FlexDirectPathFactory {
@@ -24,20 +25,20 @@ public class FlexDirectPathFactory {
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
   private final Duration maxTransferDuration;
-  private final FlexTripFilter filter;
+  private final Matcher<Trip> matcher;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
     Duration maxTransferDuration,
-    FlexTripFilter filter
+    Matcher<Trip> matcher
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;
     this.egressPathCalculator = egressPathCalculator;
     this.maxTransferDuration = maxTransferDuration;
-    this.filter = filter;
+    this.matcher = matcher;
   }
 
   public Collection<DirectFlexPath> calculateDirectFlexPaths(
@@ -53,7 +54,7 @@ public class FlexDirectPathFactory {
       callbackService,
       accessPathCalculator,
       maxTransferDuration,
-      filter
+      matcher
     )
       .calculateFlexAccessTemplates(streetAccesses, dates);
 
@@ -61,7 +62,7 @@ public class FlexDirectPathFactory {
       callbackService,
       egressPathCalculator,
       maxTransferDuration,
-      filter
+      matcher
     )
       .calculateFlexEgressTemplates(streetEgresses, dates);
 
