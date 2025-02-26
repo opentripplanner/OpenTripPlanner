@@ -62,7 +62,7 @@ public class FlexAccessEgressRouter {
       serverContext.graph(),
       transitService,
       config,
-      FilterMapper.mapFilters(request.journey().transit().filters()),
+      FilterMapper.map(request.journey().transit().filters()),
       request.dateTime(),
       request.bookingTime(),
       searchDays.additionalSearchDaysInPast(),

@@ -59,7 +59,7 @@ public class DirectFlexRouter {
         serverContext.graph(),
         serverContext.transitService(),
         serverContext.flexParameters(),
-        FilterMapper.mapFilters(request.journey().transit().filters()),
+        FilterMapper.map(request.journey().transit().filters()),
         request.dateTime(),
         request.bookingTime(),
         additionalSearchDays.additionalSearchDaysInPast(),
