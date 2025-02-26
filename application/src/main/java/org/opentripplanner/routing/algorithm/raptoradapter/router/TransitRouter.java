@@ -266,9 +266,7 @@ public class TransitRouter {
       .accessEgress();
 
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
-    int stopCountLimit = accessEgressPreferences
-      .maxStopCountForMode()
-      .getOrDefault(mode, accessEgressPreferences.defaultMaxStopCount());
+    int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);
 
     var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
