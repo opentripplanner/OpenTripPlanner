@@ -90,7 +90,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
   private RaptorRequest<T> doMap() {
     var builder = new RaptorRequestBuilder<T>();
     var searchParams = builder.searchParams();
-
     var preferences = request.preferences();
 
     // TODO Fix the Raptor search so pass-through and via search can be used together.
@@ -125,6 +124,8 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       searchParams.searchWindow(c.searchWindow());
     }
 
+    builder.searchParams().addViaLocations(mapViaLocations());
+
     if (preferences.transfer().maxTransfers() != null) {
       searchParams.maxNumberOfTransfers(preferences.transfer().maxTransfers());
     }
@@ -136,8 +137,6 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
     builder.withMultiCriteria(mcBuilder -> {
       var pt = preferences.transit();
       var r = pt.raptor();
-
-      builder.searchParams().addViaLocations(mapViaLocations());
 
       // relax transit group priority can be used with via-visit-stop, but not with pass-through
       if (pt.isRelaxTransitGroupPrioritySet() && !hasPassThroughOnly()) {
