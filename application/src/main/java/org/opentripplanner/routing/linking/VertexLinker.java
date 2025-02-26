@@ -587,14 +587,6 @@ public class VertexLinker {
   ) {
     Geometry polygon = areaGroup.getExpandedGeometry();
 
-    // Due to truncating of precision in storage of the edge geometry, the new split vertex
-    // might be located just outside the area, so we calculate the point closest to the polygon
-    // for the comparison.
-    Coordinate[] nearestPoints = DistanceOp.nearestPoints(
-      polygon,
-      GEOMETRY_FACTORY.createPoint(newVertex.getCoordinate())
-    );
-
     int added = 0;
 
     // if area is too complex, consider only part of visibility nodes
@@ -610,7 +602,7 @@ public class VertexLinker {
       i = (int) Math.floor(sum_i);
 
       LineString newGeometry = GEOMETRY_FACTORY.createLineString(
-        new Coordinate[] { nearestPoints[0], v.getCoordinate() }
+        new Coordinate[] { newVertex.getCoordinate(), v.getCoordinate() }
       );
 
       // ensure that new edge does not leave the bounds of the area or hit any holes
