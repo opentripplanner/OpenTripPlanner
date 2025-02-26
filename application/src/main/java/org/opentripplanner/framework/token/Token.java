@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 /**
@@ -37,8 +38,9 @@ public class Token {
     return (Duration) get(fieldName, TokenType.DURATION);
   }
 
-  public int getInt(String fieldName) {
-    return (int) get(fieldName, TokenType.INT);
+  public OptionalInt getInt(String fieldName) {
+    Integer v = (Integer) get(fieldName, TokenType.INT);
+    return v == null ? OptionalInt.empty() : OptionalInt.of(v);
   }
 
   public String getString(String fieldName) {

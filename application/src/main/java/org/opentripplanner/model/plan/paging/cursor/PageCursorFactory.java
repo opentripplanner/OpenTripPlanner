@@ -129,6 +129,7 @@ public class PageCursorFactory {
         nextEdt = edtAfterUsedSw();
       }
     }
+    // TODO - insert generalizedCostMaxLimit here
     prevCursor =
       new PageCursor(
         PREVIOUS_PAGE,
@@ -136,10 +137,12 @@ public class PageCursorFactory {
         prevEdt,
         currentLat,
         newSearchWindow,
-        itineraryPageCut
+        itineraryPageCut,
+        null
       );
+    // TODO - insert generalizedCostMaxLimit here
     nextCursor =
-      new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut);
+      new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut, null);
   }
 
   private Instant edtBeforeNewSw() {

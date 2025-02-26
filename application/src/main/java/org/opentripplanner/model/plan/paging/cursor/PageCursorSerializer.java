@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -10,7 +11,8 @@ import org.slf4j.LoggerFactory;
 
 final class PageCursorSerializer {
 
-  private static final byte VERSION = 1;
+  private static final byte VERSION_ONE = 1;
+  private static final byte VERSION_TWO = 2;
   private static final Logger LOG = LoggerFactory.getLogger(PageCursor.class);
 
   private static final String TYPE_FIELD = "Type";
@@ -23,9 +25,10 @@ final class PageCursorSerializer {
   private static final String CUT_ARRIVAL_TIME_FIELD = "cutArrivalTime";
   private static final String CUT_N_TRANSFERS_FIELD = "cutTx";
   private static final String CUT_COST_FIELD = "cutCost";
+  private static final String GENERALIZED_COST_MAX_LIMIT = "generalizedCostMaxLimit";
 
   private static final TokenSchema SCHEMA_TOKEN = TokenSchema
-    .ofVersion(VERSION)
+    .ofVersion(VERSION_ONE)
     .addEnum(TYPE_FIELD)
     .addTimeInstant(EDT_FIELD)
     .addTimeInstant(LAT_FIELD)
@@ -36,6 +39,9 @@ final class PageCursorSerializer {
     .addTimeInstant(CUT_ARRIVAL_TIME_FIELD)
     .addInt(CUT_N_TRANSFERS_FIELD)
     .addInt(CUT_COST_FIELD)
+    // VERSION_TWO
+    .newVersion()
+    .addInt(GENERALIZED_COST_MAX_LIMIT)
     .build();
 
   /** private constructor to prevent instantiating this utility class */
@@ -51,8 +57,8 @@ final class PageCursorSerializer {
       .withDuration(SEARCH_WINDOW_FIELD, cursor.searchWindow())
       .withEnum(SORT_ORDER_FIELD, cursor.originalSortOrder());
 
-    var cut = cursor.itineraryPageCut();
-    if (cut != null) {
+    if (cursor.containsItineraryPageCut()) {
+      var cut = cursor.itineraryPageCut();
       tokenBuilder
         .withBoolean(CUT_ON_STREET_FIELD, cut.isOnStreetAllTheWay())
         .withTimeInstant(CUT_DEPARTURE_TIME_FIELD, cut.startTimeAsInstant())
@@ -60,7 +66,12 @@ final class PageCursorSerializer {
         .withInt(CUT_N_TRANSFERS_FIELD, cut.getNumberOfTransfers())
         .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
     }
-
+    if (cursor.containsGeneralizedCostMaxLimit()) {
+      tokenBuilder.withInt(
+        GENERALIZED_COST_MAX_LIMIT,
+        cursor.generalizedCostMaxLimit().toSeconds()
+      );
+    }
     return tokenBuilder.build();
   }
 
@@ -90,16 +101,30 @@ final class PageCursorSerializer {
           new DeduplicationPageCut(
             cutDepartureTime,
             token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
-            token.getInt(CUT_COST_FIELD),
-            token.getInt(CUT_N_TRANSFERS_FIELD),
+            token.getInt(CUT_COST_FIELD).orElseThrow(),
+            token.getInt(CUT_N_TRANSFERS_FIELD).orElseThrow(),
             token.getBoolean(CUT_ON_STREET_FIELD)
           );
       }
 
-      // Add logic to read in data from next version here.
-      // if(token.version() > 1) { /* get v2 here */}
+      // VERSION TWO
+      Cost generalizedCostMaxLimit = null;
+      if (token.version() >= VERSION_TWO) {
+        var cost = token.getInt(GENERALIZED_COST_MAX_LIMIT);
+        if (cost.isPresent()) {
+          generalizedCostMaxLimit = Cost.costOfSeconds(cost.getAsInt());
+        }
+      }
 
-      return new PageCursor(type, originalSortOrder, edt, lat, searchWindow, itineraryPageCut);
+      return new PageCursor(
+        type,
+        originalSortOrder,
+        edt,
+        lat,
+        searchWindow,
+        itineraryPageCut,
+        generalizedCostMaxLimit
+      );
     } catch (Exception e) {
       String details = e.getMessage();
       if (StringUtils.hasValue(details)) {

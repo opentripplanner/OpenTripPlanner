@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan.paging.cursor;
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.collection.ListSection;
@@ -17,6 +18,11 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * clients.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
+ *
+ * @param generalizedCostMaxLimit The cost limit is used to filter itineraries based on the
+ *                                generalized-cost computed in the first page. This is resource
+ *                                intensive to compute so we do not want to compute it again in
+ *                                next/previous pages.
  */
 public record PageCursor(
   PageType type,
@@ -24,11 +30,17 @@ public record PageCursor(
   Instant earliestDepartureTime,
   Instant latestArrivalTime,
   Duration searchWindow,
-  @Nullable ItinerarySortKey itineraryPageCut
+  @Nullable ItinerarySortKey itineraryPageCut,
+  @Nullable Cost generalizedCostMaxLimit
 ) {
   public boolean containsItineraryPageCut() {
     return itineraryPageCut != null;
   }
+
+  public boolean containsGeneralizedCostMaxLimit() {
+    return generalizedCostMaxLimit != null;
+  }
+
   @Nullable
   public String encode() {
     return PageCursorSerializer.encode(this);
@@ -69,6 +81,7 @@ public record PageCursor(
       .addDateTime("edt", earliestDepartureTime)
       .addDateTime("lat", latestArrivalTime)
       .addDuration("searchWindow", searchWindow)
+      .addObj("generalizedCostMaxLimit", generalizedCostMaxLimit)
       // This will only include the sort vector, not everything else in the itinerary
       .addObjOp("itineraryPageCut", itineraryPageCut, ItinerarySortKey::keyAsString)
       .toString();
