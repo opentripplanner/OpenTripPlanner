@@ -22,12 +22,12 @@ public class DefaultPageCursorInput implements PageCursorInput {
   private final NumItinerariesFilterResults numItinerariesFilterResults;
   private final RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults;
 
-  public DefaultPageCursorInput() {
+  private DefaultPageCursorInput() {
     this.numItinerariesFilterResults = null;
     this.removeTransitIfStreetOnlyIsBetterResults = null;
   }
 
-  public DefaultPageCursorInput(Builder builder) {
+  private DefaultPageCursorInput(Builder builder) {
     this.numItinerariesFilterResults = builder.numItinerariesFilterResults();
     this.removeTransitIfStreetOnlyIsBetterResults =
       builder.removeTransitIfStreetOnlyIsBetterResults();
