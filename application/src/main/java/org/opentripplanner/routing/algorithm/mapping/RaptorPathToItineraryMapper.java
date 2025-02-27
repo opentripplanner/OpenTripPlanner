@@ -330,7 +330,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (raptorTransfer instanceof ViaCoordinateTransfer viaTx) {
       return mapViaCoordinateTransferLeg(pathLeg, viaTx, transferMode, from, to);
     }
-    throw new ClassCastException("Unknown transfer type: " + raptorTransfer.getClass());
+    throw new IllegalArgumentException("Unknown transfer type: " + raptorTransfer.getClass());
   }
 
   private Itinerary mapEgressLeg(EgressPathLeg<T> egressPathLeg) {

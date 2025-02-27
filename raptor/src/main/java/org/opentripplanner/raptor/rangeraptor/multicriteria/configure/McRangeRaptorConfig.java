@@ -219,7 +219,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private List<ViaConnectionStopArrivalEventListener<T>> createViaConnectionListeners() {
-    return ViaConnectionStopArrivalEventListener.createEventListners(
+    return ViaConnectionStopArrivalEventListener.createEventListeners(
       contextLeg.viaConnections(),
       createStopArrivalFactory(),
       nextLegArrivals,

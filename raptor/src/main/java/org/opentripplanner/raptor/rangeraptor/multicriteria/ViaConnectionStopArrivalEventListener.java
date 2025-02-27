@@ -1,5 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
+import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElements;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -11,6 +13,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArriv
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 import org.opentripplanner.raptor.rangeraptor.transit.ViaConnections;
 import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
+import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * This class is used to listen for stop arrivals in one raptor state and then copy
@@ -24,42 +27,42 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  * "transfer phase" of the Raptor algorithm. The life-cycle service will notify this class
  * at the right time to publish the transter-arrivals.
  */
-public class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
+public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
   implements ParetoSetEventListener<ArrivalView<T>> {
 
   private final McStopArrivalFactory<T> stopArrivalFactory;
   private final List<RaptorViaConnection> connections;
   private final McStopArrivals<T> next;
-  private final List<McStopArrival<T>> transfersCashe = new ArrayList<>();
+  private final List<McStopArrival<T>> transfersCache = new ArrayList<>();
 
   /**
    * @param publishTransfersEventHandler A callback used to publish via-transfer-connections. This
    *                                     should be done in the same phase as all other transfers
    *                                     processed by the Raptor algorithm.
    */
-  public ViaConnectionStopArrivalEventListener(
+  private ViaConnectionStopArrivalEventListener(
     McStopArrivalFactory<T> stopArrivalFactory,
     List<RaptorViaConnection> connections,
     McStopArrivals<T> next,
     Consumer<Runnable> publishTransfersEventHandler
   ) {
     this.stopArrivalFactory = stopArrivalFactory;
-    this.connections = connections;
+    this.connections = requireAtLeastNElements(connections, 1);
     this.next = next;
     publishTransfersEventHandler.accept(this::publishTransfers);
   }
 
   /**
    * Factory method for creating a {@link org.opentripplanner.raptor.util.paretoset.ParetoSet}
-   * listener used to copy the state when arriving at a "via piont" into the next Raptor "leg".
+   * listener used to copy the state when arriving at a "via point" into the next Raptor "leg".
    */
   public static <
     T extends RaptorTripSchedule
-  > List<ViaConnectionStopArrivalEventListener<T>> createEventListners(
+  > List<ViaConnectionStopArrivalEventListener<T>> createEventListeners(
     @Nullable ViaConnections viaConnections,
     McStopArrivalFactory<T> stopArrivalFactory,
     McStopArrivals<T> nextLegStopArrivals,
-    Consumer<Runnable> onTransitCompleate
+    Consumer<Runnable> onTransitComplete
   ) {
     if (viaConnections == null) {
       return List.of();
@@ -73,7 +76,7 @@ public class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
             stopArrivalFactory,
             connections,
             nextLegStopArrivals,
-            onTransitCompleate
+            onTransitComplete
           )
         )
       );
@@ -81,10 +84,10 @@ public class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
   }
 
   private void publishTransfers() {
-    for (var arrival : transfersCashe) {
+    for (var arrival : transfersCache) {
       next.addStopArrival(arrival);
     }
-    transfersCashe.clear();
+    transfersCache.clear();
   }
 
   int fromStop() {
@@ -98,7 +101,7 @@ public class ViaConnectionStopArrivalEventListener<T extends RaptorTripSchedule>
       var n = createViaStopArrival(e, c);
       if (n != null) {
         if (c.isTransfer()) {
-          transfersCashe.add(n);
+          transfersCache.add(n);
         } else {
           next.addStopArrival(n);
         }

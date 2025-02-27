@@ -37,7 +37,7 @@ public class CoordinateInputType {
     )
     .build();
 
-  public static Optional<WgsCoordinate> mapToWsgCoordinate(
+  public static Optional<WgsCoordinate> mapToWgsCoordinate(
     String fieldName,
     Map<String, Object> input
   ) {

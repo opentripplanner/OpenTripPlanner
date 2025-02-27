@@ -54,11 +54,6 @@ public interface RaptorTestConstants {
   int STOP_F = 6;
   int STOP_G = 7;
   int STOP_H = 8;
-  int STOP_I = 9;
-  int STOP_J = 10;
-  int STOP_K = 11;
-  int STOP_L = 12;
-  int STOP_M = 13;
 
   int NUM_STOPS = 14;
 

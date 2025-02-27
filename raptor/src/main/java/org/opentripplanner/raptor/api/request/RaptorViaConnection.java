@@ -187,7 +187,6 @@ public abstract sealed class RaptorViaConnection {
       this.transfer = transfer;
     }
 
-    @Nullable
     @Override
     public RaptorTransfer transfer() {
       return transfer;

@@ -77,7 +77,7 @@ class TripViaLocationMapper {
 
   private static List<WgsCoordinate> mapCoordinate(Map<String, Object> map) {
     return CoordinateInputType
-      .mapToWsgCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
+      .mapToWgsCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
       .map(List::of)
       .orElseGet(List::of);
   }

@@ -11,11 +11,11 @@ import org.opentripplanner.utils.time.DurationUtils;
 /**
  * This class will act as a {@link RaptorTransfer} during the Raptor routing and carry enough
  * information to create an itinerary after the routing is done.
- * <p>
- * When routing via a coordinate, we need to generate transfers Raptor can use for all permutations
- * of near-by-stops. This class is one such instance. We do NOT stitch the two sets of edges
- * together because this will use unnecessary resource before we know if an instance is used
- * in a Raptor Path. So this is left to the itinerary mapping.
+
+ * When routing through a coordinate, we need to generate transfers for each pair of stops
+ * connected to it. In this class we keep a reference to the incoming and outgoing paths, instead
+ * of connecting the two paths together into one. This approach reduces memory usage during
+ * routing. Connecting paths is left to the itinerary mapping.
  */
 public class ViaCoordinateTransfer implements RaptorTransfer {
 
@@ -37,7 +37,7 @@ public class ViaCoordinateTransfer implements RaptorTransfer {
    *                          via `minimum-wait-time`.
    * @param generalizedCostInSeconds The total cost traversing the from and to edges in the OTP
    *                                 domain generalized-cost. The unit is equivalent to seconds.
-   *                                 The cost will be converted to Raptor units and cashed for
+   *                                 The cost will be converted to Raptor units and cached for
    *                                 optimal performance.
    */
   public ViaCoordinateTransfer(

@@ -17,17 +17,17 @@ class CoordinateInputTypeTest {
   );
 
   @Test
-  void mapToWsgCoordinate() {
+  void mapToWgsCoordinate() {
     assertEquals(
       new WgsCoordinate(LATITUDE_VALUE, LONGITUDE_VALUE),
       CoordinateInputType
-        .mapToWsgCoordinate("c", Map.of("c", CoordinateInputType.mapForTest(COORDINATE)))
+        .mapToWgsCoordinate("c", Map.of("c", CoordinateInputType.mapForTest(COORDINATE)))
         .get()
     );
   }
 
   @Test
   void mapEmptyCoordinateToNull() {
-    assertTrue(CoordinateInputType.mapToWsgCoordinate("c", Map.of()).isEmpty());
+    assertTrue(CoordinateInputType.mapToWgsCoordinate("c", Map.of()).isEmpty());
   }
 }

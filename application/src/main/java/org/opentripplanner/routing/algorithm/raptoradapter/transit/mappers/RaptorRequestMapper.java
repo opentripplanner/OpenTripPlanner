@@ -254,9 +254,9 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         );
         for (var it : viaTransfers) {
           // If via-stop and via-transfers are used together then walking from a stop
-          // to the coordinate andd back is not pareto optimal, using just the stop
+          // to the coordinate and back is not pareto optimal, using just the stop
           // is the optimal option.
-          if(it.stop() == it.fromStopIndex() && viaStops.contains(it.stop())) {
+          if (it.stop() == it.fromStopIndex() && viaStops.contains(it.stop())) {
             continue;
           }
           builder.addViaTransfer(it.fromStopIndex(), it);

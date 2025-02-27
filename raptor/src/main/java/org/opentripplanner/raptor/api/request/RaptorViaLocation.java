@@ -6,7 +6,6 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.utils.lang.IntUtils;
@@ -21,8 +20,8 @@ import org.opentripplanner.utils.time.DurationUtils;
  */
 public final class RaptorViaLocation {
 
-  private static final int MAX_WAIT_TIME = (int) Duration.ofHours(24).toSeconds();
-  private static final int MIN_WAIT_TIME = (int) Duration.ZERO.toSeconds();
+  private static final Duration MAX_WAIT_TIME = Duration.ofHours(24);
+  private static final Duration MIN_WAIT_TIME = Duration.ZERO;
 
   private final String label;
   private final boolean passThroughSearch;
@@ -40,8 +39,8 @@ public final class RaptorViaLocation {
     this.minimumWaitTime =
       IntUtils.requireInRange(
         (int) minimumWaitTime.toSeconds(),
-        MIN_WAIT_TIME,
-        MAX_WAIT_TIME,
+        (int) MIN_WAIT_TIME.toSeconds(),
+        (int) MAX_WAIT_TIME.toSeconds(),
         "minimumWaitTime"
       );
     this.connections = validateConnections(connections);
@@ -50,8 +49,8 @@ public final class RaptorViaLocation {
   /**
    * Force the path through a set of stops, either on-board or as an alight or board stop.
    */
-  public static BuilderPassThrough passThrough(@Nullable String label) {
-    return new BuilderPassThrough(label);
+  public static PassThroughBuilder passThrough(@Nullable String label) {
+    return new PassThroughBuilder(label);
   }
 
   /**
@@ -59,8 +58,8 @@ public final class RaptorViaLocation {
    * alight transit at the given stop, on-board visits do not count, see
    * {@link #passThrough(String)}.
    */
-  public static BuilderViaMinTime via(@Nullable String label) {
-    return via(label, Duration.ZERO);
+  public static ViaVisitBuilder via(@Nullable String label) {
+    return via(label, MIN_WAIT_TIME);
   }
 
   /**
@@ -68,8 +67,8 @@ public final class RaptorViaLocation {
    * before continuing. To visit a stop, the path must board or alight transit at the given stop,
    * on-board visits do not count, see {@link #passThrough(String)}.
    */
-  public static BuilderViaMinTime via(@Nullable String label, Duration minimumWaitTime) {
-    return new BuilderViaMinTime(label, minimumWaitTime);
+  public static ViaVisitBuilder via(@Nullable String label, Duration minimumWaitTime) {
+    return new ViaVisitBuilder(label, minimumWaitTime);
   }
 
   @Nullable
@@ -110,6 +109,7 @@ public final class RaptorViaLocation {
     throw new UnsupportedOperationException("No need for hashCode of " + getClass());
   }
 
+  @Override
   public String toString() {
     return toString(Integer::toString);
   }
@@ -120,7 +120,7 @@ public final class RaptorViaLocation {
     if (label != null) {
       buf.append(label).append(" ");
     }
-    if (minimumWaitTime > RaptorConstants.ZERO) {
+    if (minimumWaitTime > MIN_WAIT_TIME.toSeconds()) {
       buf.append("wait ").append(DurationUtils.durationToStr(minimumWaitTime)).append(" ");
     }
     buf
@@ -153,7 +153,7 @@ public final class RaptorViaLocation {
     return list;
   }
 
-  public abstract static class AbstractBuilder<T extends AbstractBuilder> {
+  public abstract static sealed class AbstractBuilder<T extends AbstractBuilder> {
 
     protected final String label;
     protected final List<BuilderStopAndTransfer> connections = new ArrayList<>();
@@ -162,26 +162,26 @@ public final class RaptorViaLocation {
       this.label = label;
     }
 
-    public T addConnection(int stop, @Nullable RaptorTransfer transfer) {
+    T addConnection(int stop, @Nullable RaptorTransfer transfer) {
       this.connections.add(new BuilderStopAndTransfer(stop, transfer));
       return (T) this;
     }
   }
 
-  public static final class BuilderViaMinTime extends AbstractBuilder<BuilderViaMinTime> {
+  public static final class ViaVisitBuilder extends AbstractBuilder<ViaVisitBuilder> {
 
     private final Duration minimumWaitTime;
 
-    public BuilderViaMinTime(String label, Duration minimumWaitTime) {
+    public ViaVisitBuilder(String label, Duration minimumWaitTime) {
       super(label);
       this.minimumWaitTime = minimumWaitTime;
     }
 
-    public BuilderViaMinTime addViaStop(int stop) {
+    public ViaVisitBuilder addViaStop(int stop) {
       return addConnection(stop, null);
     }
 
-    public BuilderViaMinTime addViaTransfer(int fromStop, RaptorTransfer transfer) {
+    public ViaVisitBuilder addViaTransfer(int fromStop, RaptorTransfer transfer) {
       return addConnection(fromStop, transfer);
     }
 
@@ -190,18 +190,18 @@ public final class RaptorViaLocation {
     }
   }
 
-  public static final class BuilderPassThrough extends AbstractBuilder<BuilderPassThrough> {
+  public static final class PassThroughBuilder extends AbstractBuilder<PassThroughBuilder> {
 
-    public BuilderPassThrough(String label) {
+    public PassThroughBuilder(String label) {
       super(label);
     }
 
-    public BuilderPassThrough addPassThroughStop(int stop) {
+    public PassThroughBuilder addPassThroughStop(int stop) {
       this.connections.add(new BuilderStopAndTransfer(stop, null));
       return this;
     }
 
-    public BuilderPassThrough addPassThroughStops(int... stops) {
+    public PassThroughBuilder addPassThroughStops(int... stops) {
       IntStream.of(stops).forEach(this::addPassThroughStop);
       return this;
     }

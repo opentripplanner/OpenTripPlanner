@@ -3,6 +3,7 @@ package org.opentripplanner.routing.via.service;
 import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -12,6 +13,7 @@ import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbySt
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -39,8 +41,9 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   ) {
     this.graph = graph;
     this.transitService = transitService;
+
     // We divide the regular transfer radius by two, since we have two "transfers" after each
-    // other here. This reduces the number of possible transfers 4 times. The radius should
+    // other here. This reduces the number of possible transfers to one fourth. The radius should
     // probably have its own configuration setting. There are no algorithmic reasons for using
     // the transfer radius here, any value can be used.
     this.radiusByDuration = radiusByDuration.dividedBy(2);
@@ -83,25 +86,12 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
             }
           );
 
-      var toStops = nearbyStopFinder.findNearbyStops(
-        viaVertex,
-        request,
-        request.journey().transfer(),
-        false
-      );
-      var fromStops = nearbyStopFinder.findNearbyStops(
-        viaVertex,
-        request,
-        request.journey().transfer(),
-        true
-      );
+      var toStops = findNearbyStops(nearbyStopFinder, viaVertex, request, false);
+      var fromStops = findNearbyStops(nearbyStopFinder, viaVertex, request, true);
 
       var transfers = new ArrayList<ViaCoordinateTransfer>();
 
       for (NearbyStop from : fromStops) {
-        if (from.stop.transfersNotAllowed()) {
-          continue;
-        }
         for (NearbyStop to : toStops) {
           transfers.add(
             new ViaCoordinateTransfer(
@@ -118,6 +108,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
       }
       return transfers;
     } catch (RuntimeException ex) {
+      // This make sure we dispose the edges in case something goes wrong.
       if (tempEdges != null) {
         tempEdges.disposeEdges();
       }
@@ -125,17 +116,19 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     }
   }
 
-  private static TraverseMode mapTransferMode(StreetMode txM) {
-    if (txM.includesBiking()) {
-      return TraverseMode.BICYCLE;
+  private static TraverseMode mapTransferMode(StreetMode streetMode) {
+    if (streetMode.transferAllowed()) {
+      if (streetMode.includesBiking()) {
+        return TraverseMode.BICYCLE;
+      }
+      if (streetMode.includesDriving()) {
+        return TraverseMode.CAR;
+      }
+      if (streetMode.includesWalking()) {
+        return TraverseMode.WALK;
+      }
     }
-    if (txM.includesScooter()) {
-      return TraverseMode.SCOOTER;
-    }
-    if (txM.includesWalking()) {
-      return TraverseMode.WALK;
-    }
-    throw new IllegalStateException("Mode not allowed for transfer: " + txM);
+    throw new IllegalStateException("Mode not allowed for transfer: " + streetMode);
   }
 
   /**
@@ -148,5 +141,19 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     } else {
       return new StreetNearbyStopFinder(radiusByDuration, 0, null);
     }
+  }
+
+  /**
+   * Find the nearest stops allowed for transfers.
+   */
+  private List<NearbyStop> findNearbyStops(
+    NearbyStopFinder finder,
+    TemporaryStreetLocation viaVertex,
+    RouteRequest request,
+    boolean reverseDirection
+  ) {
+    var transferRequest = request.journey().transfer();
+    var r = finder.findNearbyStops(viaVertex, request, transferRequest, reverseDirection);
+    return r.stream().filter(it -> !it.stop.transfersNotAllowed()).toList();
   }
 }
