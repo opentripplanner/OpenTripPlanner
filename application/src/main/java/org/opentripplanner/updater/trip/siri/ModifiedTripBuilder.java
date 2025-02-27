@@ -199,7 +199,10 @@ class ModifiedTripBuilder {
           newTimes.updateArrivalTime(stopIndex, departureFromPreviousStop);
           newTimes.updateDepartureTime(stopIndex, departureFromPreviousStop);
 
-          LOG.info("Siri time interpolation for non-pickup/dropoff stop");
+          LOG.info(
+            "Siri non-pickup/dropoff stop time interpolation for tripId: {}",
+            newTimes.getTrip().getId()
+          );
         } else {
           int arrivalDelay = lastDepartureDelay;
           int departureDelay = lastDepartureDelay;
@@ -213,7 +216,7 @@ class ModifiedTripBuilder {
           newTimes.updateArrivalDelay(stopIndex, arrivalDelay);
           newTimes.updateDepartureDelay(stopIndex, departureDelay);
 
-          LOG.info("Siri time interpolation for stop");
+          LOG.info("Siri stop time interpolation for tripId: {}", newTimes.getTrip().getId());
         }
       }
 
