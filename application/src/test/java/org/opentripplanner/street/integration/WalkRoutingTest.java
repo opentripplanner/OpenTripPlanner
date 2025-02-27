@@ -1,9 +1,11 @@
 package org.opentripplanner.street.integration;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -48,7 +50,7 @@ class WalkRoutingTest {
   void shouldRouteAroundRoundabout() {
     var start = new GenericLocation(59.94646, 10.77511);
     var end = new GenericLocation(59.94641, 10.77522);
-    Assertions.assertDoesNotThrow(() -> route(roundabout, start, end, dateTime, false));
+    assertDoesNotThrow(() -> route(roundabout, start, end, dateTime, false));
   }
 
   @ParameterizedTest
@@ -59,13 +61,14 @@ class WalkRoutingTest {
     var base = dateTime.truncatedTo(ChronoUnit.SECONDS);
     var time = base.plusMillis(offset);
     var results = route(roundabout, start, end, time, true);
-    Assertions.assertEquals(1, results.size());
+    assertEquals(1, results.size());
     var states = results.get(0).states;
     var diff = ChronoUnit.MILLIS.between(
       states.getFirst().getTimeAccurate(),
       states.getLast().getTimeAccurate()
     );
-    Assertions.assertEquals(13926, diff); // should be same for every parametrized offset, otherwise irrelevant
+    // should be same for every parametrized offset, otherwise irrelevant
+    assertEquals(13926, diff);
   }
 
   private static List<GraphPath<State, Edge, Vertex>> route(
