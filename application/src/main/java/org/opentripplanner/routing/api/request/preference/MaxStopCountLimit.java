@@ -126,7 +126,7 @@ public class MaxStopCountLimit {
 
     /**
      * Build a copy of the current values, excluding the defaultLimit from the map. This
-     * ensures equality and make a defencive copy of the builder values. Hence, the builder
+     * ensures equality and makes a defensive copy of the builder values. Hence, the builder
      * can be used to generate new values if desired.
      * */
     Map<StreetMode, Integer> copyValueForEnum() {
@@ -152,7 +152,7 @@ public class MaxStopCountLimit {
     public MaxStopCountLimit build() {
       var it = new MaxStopCountLimit(this);
 
-      // Return original if not change, subscriber is not notified
+      // Return the original if there are no changes, the subscriber is not notified.
       if (original != null && original.equals(it)) {
         return original;
       }
