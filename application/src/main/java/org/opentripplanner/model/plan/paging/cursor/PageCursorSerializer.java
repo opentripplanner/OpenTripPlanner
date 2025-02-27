@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan.paging.cursor;
 
 import java.util.OptionalInt;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -23,7 +24,7 @@ final class PageCursorSerializer {
   private static final String CUT_ARRIVAL_TIME_FIELD = "cutArrivalTime";
   private static final String CUT_N_TRANSFERS_FIELD = "cutTx";
   private static final String CUT_COST_FIELD = "cutCost";
-  private static final String STREET_ONLY_COST_FIELD = "streetOnlyCost";
+  private static final String GENERALIZED_COST_MAX_LIMIT = "generalizedCostMaxLimit";
 
   private static final TokenSchema SCHEMA_TOKEN_VERSION_1 = TokenSchema
     .ofVersion(1)
@@ -50,7 +51,7 @@ final class PageCursorSerializer {
     .addTimeInstant(CUT_ARRIVAL_TIME_FIELD)
     .addInt(CUT_N_TRANSFERS_FIELD)
     .addInt(CUT_COST_FIELD)
-    .addInt(STREET_ONLY_COST_FIELD)
+    .addInt(GENERALIZED_COST_MAX_LIMIT)
     .build();
   private static final TokenSchema[] SCHEMA_TOKENS = {
     SCHEMA_TOKEN_VERSION_2,
@@ -80,9 +81,11 @@ final class PageCursorSerializer {
         .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
     }
 
-    OptionalInt streetOnlyCost = cursor.streetOnlyCost();
-    if (streetOnlyCost.isPresent()) {
-      tokenBuilder.withInt(STREET_ONLY_COST_FIELD, streetOnlyCost.getAsInt());
+    if (cursor.containsGeneralizedCostMaxLimit()) {
+      tokenBuilder.withInt(
+        GENERALIZED_COST_MAX_LIMIT,
+        cursor.generalizedCostMaxLimit().toSeconds()
+      );
     }
 
     return tokenBuilder.build();
@@ -124,11 +127,11 @@ final class PageCursorSerializer {
         // Add logic to read in data from next version here.
         // if(token.version() > 1) { /* get v2 here */}
 
-        OptionalInt streetOnlyCost = OptionalInt.empty();
+        Cost generalizedCostMaxLimit = null;
         if (token.version() > 1) {
-          Integer streetOnlyCostField = token.getInt(STREET_ONLY_COST_FIELD);
-          if (streetOnlyCostField != null) {
-            streetOnlyCost = OptionalInt.of(streetOnlyCostField);
+          Integer generalizedCostMaxLimitField = token.getInt(GENERALIZED_COST_MAX_LIMIT);
+          if (generalizedCostMaxLimitField != null) {
+            generalizedCostMaxLimit = Cost.costOfSeconds(generalizedCostMaxLimitField);
           }
         }
 
@@ -139,7 +142,7 @@ final class PageCursorSerializer {
           lat,
           searchWindow,
           itineraryPageCut,
-          streetOnlyCost
+          generalizedCostMaxLimit
         );
       } catch (Exception e) {
         String details = e.getMessage();

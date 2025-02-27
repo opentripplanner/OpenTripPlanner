@@ -9,11 +9,12 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.utils.time.TimeUtils;
 
 @SuppressWarnings("ConstantConditions")
@@ -51,7 +52,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
-          OptionalInt.empty()
+          null
         )
       );
 
@@ -81,7 +82,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
-          OptionalInt.empty()
+          null
         )
       );
 
@@ -111,7 +112,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          OptionalInt.empty()
+          null
         )
       );
 
@@ -141,7 +142,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          OptionalInt.empty()
+          null
         )
       );
 
@@ -153,13 +154,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
   }
 
   @Test
-  public void testStreetOnlyCost() {
+  public void testGeneralizedCostMaxLimit() {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
       .withPageCursorInput(
         new TestPageCursorInput(
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          OptionalInt.of(123)
+          Cost.costOfSeconds(123)
         )
       );
 
@@ -185,29 +186,29 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Duration expSearchWindow,
     PageType expPageType,
     Boolean hasDedupeParams,
-    Boolean hasStreetOnlyCost
+    Boolean hasGeneralizedCostMaxLimit
   ) {
     assertEquals(expEdt, pageCursor.earliestDepartureTime());
     assertEquals(expLat, pageCursor.latestArrivalTime());
     assertEquals(expSearchWindow, pageCursor.searchWindow());
     assertEquals(expPageType, pageCursor.type());
-    assertEquals(hasDedupeParams, pageCursor.itineraryPageCut() != null);
-    assertEquals(hasStreetOnlyCost, pageCursor.streetOnlyCost().isPresent());
+    assertEquals(hasDedupeParams, pageCursor.containsItineraryPageCut());
+    assertEquals(hasGeneralizedCostMaxLimit, pageCursor.containsGeneralizedCostMaxLimit());
   }
 
   private record TestPageCursorInput(
     NumItinerariesFilterResults numItinerariesFilterResults,
-    OptionalInt streetOnlyCost
+    RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults
   )
     implements PageCursorInput {
-    public TestPageCursorInput(Itinerary removedItinerary, OptionalInt streetOnlyCost) {
+    public TestPageCursorInput(Itinerary removedItinerary, Cost generalizedCostMaxLimit) {
       this(
         new NumItinerariesFilterResults(
           removedItinerary.startTimeAsInstant(),
           removedItinerary.startTimeAsInstant(),
           removedItinerary
         ),
-        streetOnlyCost
+        new RemoveTransitIfStreetOnlyIsBetterResults(generalizedCostMaxLimit)
       );
     }
   }

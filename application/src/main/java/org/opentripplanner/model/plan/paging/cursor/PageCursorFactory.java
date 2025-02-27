@@ -5,8 +5,8 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.OptionalInt;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -141,7 +141,12 @@ public class PageCursorFactory {
       }
     }
 
-    OptionalInt streetOnlyCost = pageCursorInput.streetOnlyCost();
+    Cost generalizedCostMaxLimit = null;
+    if (pageCursorInput.removeTransitIfStreetOnlyIsBetterResults() != null) {
+      generalizedCostMaxLimit =
+        pageCursorInput.removeTransitIfStreetOnlyIsBetterResults().generalizedCostMaxLimit();
+    }
+
     prevCursor =
       new PageCursor(
         PREVIOUS_PAGE,
@@ -150,7 +155,7 @@ public class PageCursorFactory {
         currentLat,
         newSearchWindow,
         itineraryPageCut,
-        streetOnlyCost
+        generalizedCostMaxLimit
       );
     nextCursor =
       new PageCursor(
@@ -160,7 +165,7 @@ public class PageCursorFactory {
         null,
         newSearchWindow,
         itineraryPageCut,
-        streetOnlyCost
+        generalizedCostMaxLimit
       );
   }
 

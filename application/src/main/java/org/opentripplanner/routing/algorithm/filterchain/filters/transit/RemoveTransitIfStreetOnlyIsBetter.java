@@ -15,21 +15,23 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  */
 public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
-  private static final Consumer<OptionalInt> IGNORE_SUBSCRIBER = i -> {};
+  private static final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> IGNORE_SUBSCRIBER = i -> {};
 
   private final CostLinearFunction costLimitFunction;
-  private final OptionalInt streetOnlyCost;
-  private final Consumer<OptionalInt> streetOnlyCostSubscriber;
+  private final Cost generalizedCostMaxLimit;
+  private final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber;
 
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
-    OptionalInt streetOnlyCost,
-    Consumer<OptionalInt> streetOnlyCostSubscriber
+    Cost generalizedCostMaxLimit,
+    Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
     this.costLimitFunction = costLimitFunction;
-    this.streetOnlyCost = streetOnlyCost;
-    this.streetOnlyCostSubscriber =
-      streetOnlyCostSubscriber == null ? IGNORE_SUBSCRIBER : streetOnlyCostSubscriber;
+    this.generalizedCostMaxLimit = generalizedCostMaxLimit;
+    this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
+      removeTransitIfStreetOnlyIsBetterResultsSubscriber == null
+        ? IGNORE_SUBSCRIBER
+        : removeTransitIfStreetOnlyIsBetterResultsSubscriber;
   }
 
   /**
@@ -52,20 +54,23 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
-    if (minStreetCost.isEmpty() && streetOnlyCost.isEmpty()) {
+    if (minStreetCost.isEmpty() && generalizedCostMaxLimit == null) {
       // If no cost is found an empty list is returned.
       return List.of();
-    } else if (minStreetCost.isPresent() && streetOnlyCost.isPresent()) {
-      // If both the minStreetCost and streetOnlyCost are present, take the minimum value.
-      minStreetCost = OptionalInt.of(Math.min(minStreetCost.getAsInt(), streetOnlyCost.getAsInt()));
-    } else if (streetOnlyCost.isPresent()) {
+    } else if (minStreetCost.isPresent() && generalizedCostMaxLimit != null) {
+      // If both the minStreetCost and generalizedCostMaxLimit are present, take the minimum value.
+      minStreetCost =
+        OptionalInt.of(Math.min(minStreetCost.getAsInt(), generalizedCostMaxLimit.toSeconds()));
+    } else if (generalizedCostMaxLimit != null) {
       // If the best street only cost can't be found in the itineraries but
       // it is present in the cursor, then the information from the cursor is used.
-      minStreetCost = streetOnlyCost;
+      minStreetCost = OptionalInt.of(generalizedCostMaxLimit.toSeconds());
     }
 
     // The best street only cost is saved in the cursor.
-    streetOnlyCostSubscriber.accept(minStreetCost);
+    removeTransitIfStreetOnlyIsBetterResultsSubscriber.accept(
+      new RemoveTransitIfStreetOnlyIsBetterResults(Cost.costOfSeconds(minStreetCost.getAsInt()))
+    );
 
     var limit = costLimitFunction
       .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))

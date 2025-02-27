@@ -7,8 +7,8 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.OptionalInt;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -19,7 +19,7 @@ class PageCursorSerializerTest {
   private static final Duration SW = DurationUtils.duration("5h");
   private static final Instant DT = Instant.parse("2024-01-10T10:00:00Z");
   private static final Instant AT = Instant.parse("2024-01-10T12:00:00Z");
-  private static final OptionalInt SOC = OptionalInt.of(123);
+  private static final Cost GCML = Cost.costOfSeconds(123);
 
   public static final String TOKEN_V1 =
     "MXxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafDIwMjQtMDEtMTVUMDA6MDA6MDFafDVofFNUUkVFVF" +
@@ -45,7 +45,7 @@ class PageCursorSerializerTest {
     LAT,
     SW,
     CUT,
-    SOC
+    GCML
   );
 
   private final PageCursor pageCursorV2withNulls = new PageCursor(
@@ -55,7 +55,7 @@ class PageCursorSerializerTest {
     null,
     SW,
     null,
-    OptionalInt.empty()
+    null
   );
 
   @Test
@@ -95,7 +95,7 @@ class PageCursorSerializerTest {
     assertEquals(LAT, tokenV2.latestArrivalTime());
     assertEquals(SW, tokenV2.searchWindow());
     assertEquals(CUT, tokenV2.itineraryPageCut());
-    assertEquals(SOC, tokenV2.streetOnlyCost());
+    assertEquals(GCML, tokenV2.generalizedCostMaxLimit());
   }
 
   @Test
@@ -107,6 +107,6 @@ class PageCursorSerializerTest {
     assertNull(tokenV2.latestArrivalTime());
     assertEquals(SW, tokenV2.searchWindow());
     assertNull(tokenV2.itineraryPageCut());
-    assertEquals(OptionalInt.empty(), tokenV2.streetOnlyCost());
+    assertEquals(null, tokenV2.generalizedCostMaxLimit());
   }
 }

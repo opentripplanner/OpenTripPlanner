@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
-import java.util.OptionalInt;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -20,16 +20,17 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class DefaultPageCursorInput implements PageCursorInput {
 
   private final NumItinerariesFilterResults numItinerariesFilterResults;
-  private final OptionalInt streetOnlyCost;
+  private final RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults;
 
   public DefaultPageCursorInput() {
     this.numItinerariesFilterResults = null;
-    this.streetOnlyCost = OptionalInt.empty();
+    this.removeTransitIfStreetOnlyIsBetterResults = null;
   }
 
   public DefaultPageCursorInput(Builder builder) {
     this.numItinerariesFilterResults = builder.numItinerariesFilterResults();
-    this.streetOnlyCost = builder.streetOnlyCost();
+    this.removeTransitIfStreetOnlyIsBetterResults =
+      builder.removeTransitIfStreetOnlyIsBetterResults();
   }
 
   public static DefaultPageCursorInput.Builder of() {
@@ -46,8 +47,8 @@ public class DefaultPageCursorInput implements PageCursorInput {
   }
 
   @Override
-  public OptionalInt streetOnlyCost() {
-    return streetOnlyCost;
+  public RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults() {
+    return removeTransitIfStreetOnlyIsBetterResults;
   }
 
   @Override
@@ -55,18 +56,19 @@ public class DefaultPageCursorInput implements PageCursorInput {
     return ToStringBuilder
       .of(DefaultPageCursorInput.class)
       .addObj("numItinerariesFilterResults", numItinerariesFilterResults)
-      .addObj("streetOnlyCost", streetOnlyCost)
+      .addObj("removeTransitIfStreetOnlyIsBetterResults", removeTransitIfStreetOnlyIsBetterResults)
       .toString();
   }
 
   public static class Builder {
 
     private NumItinerariesFilterResults numItinerariesFilterResults;
-    private OptionalInt streetOnlyCost;
+    private RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults;
 
     public Builder(DefaultPageCursorInput original) {
       this.numItinerariesFilterResults = original.numItinerariesFilterResults;
-      this.streetOnlyCost = original.streetOnlyCost;
+      this.removeTransitIfStreetOnlyIsBetterResults =
+        original.removeTransitIfStreetOnlyIsBetterResults;
     }
 
     public NumItinerariesFilterResults numItinerariesFilterResults() {
@@ -80,12 +82,14 @@ public class DefaultPageCursorInput implements PageCursorInput {
       return this;
     }
 
-    public OptionalInt streetOnlyCost() {
-      return streetOnlyCost;
+    public RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults() {
+      return removeTransitIfStreetOnlyIsBetterResults;
     }
 
-    public Builder withStreetOnlyCost(OptionalInt streetOnlyCost) {
-      this.streetOnlyCost = streetOnlyCost;
+    public Builder withRemoveTransitIfStreetOnlyIsBetterResults(
+      RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults
+    ) {
+      this.removeTransitIfStreetOnlyIsBetterResults = removeTransitIfStreetOnlyIsBetterResults;
       return this;
     }
 

@@ -14,6 +14,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -34,7 +35,7 @@ public class RouteRequestToFilterChainMapper {
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
     Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber,
-    Consumer<OptionalInt> streetOnlyCostSubscriber
+    Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -49,8 +50,8 @@ public class RouteRequestToFilterChainMapper {
     }
 
     // The page cursor has best street only cost information only in certain cases.
-    if (request.pageCursor() != null && request.pageCursor().containsStreetOnlyCost()) {
-      builder = builder.withStreetOnlyCost(request.pageCursor().streetOnlyCost());
+    if (request.pageCursor() != null && request.pageCursor().containsGeneralizedCostMaxLimit()) {
+      builder = builder.withGeneralizedCostMaxLimit(request.pageCursor().generalizedCostMaxLimit());
     }
 
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
@@ -97,7 +98,9 @@ public class RouteRequestToFilterChainMapper {
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withNumItinerariesFilterResultsSubscriber(numItinerariesFilterResultsSubscriber)
-      .withStreetOnlyCostSubscriber(streetOnlyCostSubscriber)
+      .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
+        removeTransitIfStreetOnlyIsBetterResultsSubscriber
+      )
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
       .withFilterDirectFlexBySearchWindow(params.filterDirectFlexBySearchWindow())

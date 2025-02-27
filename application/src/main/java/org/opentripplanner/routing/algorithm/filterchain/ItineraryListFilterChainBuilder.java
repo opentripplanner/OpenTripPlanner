@@ -14,6 +14,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -34,6 +35,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.Decorat
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
@@ -80,7 +82,7 @@ public class ItineraryListFilterChainBuilder {
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
-  private Consumer<OptionalInt> streetOnlyCostSubscriber;
+  private Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -91,7 +93,7 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
-  private OptionalInt streetOnlyCost = OptionalInt.empty();
+  private Cost generalizedCostMaxLimit = null;
   private boolean transitGroupPriorityUsed = false;
   private boolean filterDirectFlexBySearchWindow = true;
 
@@ -291,10 +293,11 @@ public class ItineraryListFilterChainBuilder {
    * After the first search the paging does not keep the best street only cost without storing it in the cursor.
    * This stores the best street only cost in the cursor.
    */
-  public ItineraryListFilterChainBuilder withStreetOnlyCostSubscriber(
-    Consumer<OptionalInt> streetOnlyCostSubscriber
+  public ItineraryListFilterChainBuilder withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
+    Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
-    this.streetOnlyCostSubscriber = streetOnlyCostSubscriber;
+    this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
+      removeTransitIfStreetOnlyIsBetterResultsSubscriber;
     return this;
   }
 
@@ -303,10 +306,10 @@ public class ItineraryListFilterChainBuilder {
    * this function adds the information to the
    * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter} filter.
    *
-   * @param streetOnlyCost the best street only cost used in filtering.
+   * @param generalizedCostMaxLimit the best street only cost used in filtering.
    */
-  public ItineraryListFilterChainBuilder withStreetOnlyCost(OptionalInt streetOnlyCost) {
-    this.streetOnlyCost = streetOnlyCost;
+  public ItineraryListFilterChainBuilder withGeneralizedCostMaxLimit(Cost generalizedCostMaxLimit) {
+    this.generalizedCostMaxLimit = generalizedCostMaxLimit;
     return this;
   }
 
@@ -463,8 +466,8 @@ public class ItineraryListFilterChainBuilder {
           filters,
           new RemoveTransitIfStreetOnlyIsBetter(
             removeTransitWithHigherCostThanBestOnStreetOnly,
-            streetOnlyCost,
-            streetOnlyCostSubscriber
+            generalizedCostMaxLimit,
+            removeTransitIfStreetOnlyIsBetterResultsSubscriber
           )
         );
       }

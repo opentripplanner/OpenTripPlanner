@@ -2,8 +2,8 @@ package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.OptionalInt;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.collection.ListSection;
@@ -26,14 +26,14 @@ public record PageCursor(
   Instant latestArrivalTime,
   Duration searchWindow,
   @Nullable ItinerarySortKey itineraryPageCut,
-  OptionalInt streetOnlyCost
+  @Nullable Cost generalizedCostMaxLimit
 ) {
   public boolean containsItineraryPageCut() {
     return itineraryPageCut != null;
   }
 
-  public boolean containsStreetOnlyCost() {
-    return streetOnlyCost.isPresent();
+  public boolean containsGeneralizedCostMaxLimit() {
+    return generalizedCostMaxLimit != null;
   }
 
   @Nullable
@@ -78,7 +78,7 @@ public record PageCursor(
       .addDuration("searchWindow", searchWindow)
       // This will only include the sort vector, not everything else in the itinerary
       .addObjOp("itineraryPageCut", itineraryPageCut, ItinerarySortKey::keyAsString)
-      .addObj("streetOnlyCost", streetOnlyCost)
+      .addObj("generalizedCostMaxLimit", generalizedCostMaxLimit)
       .toString();
   }
 }
