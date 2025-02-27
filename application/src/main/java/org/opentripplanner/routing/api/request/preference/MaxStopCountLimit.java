@@ -15,21 +15,21 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class MaxStopCountLimit {
 
   private static final int DEFAULT_LIMIT = 500;
-  private static final Map<StreetMode, Integer> DEFAULT_FOR_MODE = Map.of();
+  private static final Map<StreetMode, Integer> DEFAULT_FOR_MODES = Map.of();
 
   public static final MaxStopCountLimit DEFAULT = new MaxStopCountLimit();
 
   private final int defaultLimit;
-  private final Map<StreetMode, Integer> limitForMode;
+  private final Map<StreetMode, Integer> limitsForModes;
 
   public MaxStopCountLimit() {
     this.defaultLimit = DEFAULT_LIMIT;
-    this.limitForMode = DEFAULT_FOR_MODE;
+    this.limitsForModes = DEFAULT_FOR_MODES;
   }
 
   MaxStopCountLimit(Builder builder) {
     this.defaultLimit = IntUtils.requireNotNegative(builder.defaultLimit());
-    this.limitForMode = builder.copyCustomLimits();
+    this.limitsForModes = builder.copyCustomLimits();
   }
 
   public static Builder of() {
@@ -44,7 +44,7 @@ public class MaxStopCountLimit {
    * Get the max stop count limit for mode. If no custom value is defined, default is used.
    */
   public int limitForMode(StreetMode mode) {
-    return limitForMode.getOrDefault(mode, defaultLimit);
+    return limitsForModes.getOrDefault(mode, defaultLimit);
   }
 
   public int defaultLimit() {
@@ -56,7 +56,7 @@ public class MaxStopCountLimit {
     return ToStringBuilder
       .of(MaxStopCountLimit.class)
       .addNum("defaultLimit", defaultLimit, DEFAULT_LIMIT)
-      .addObj("limitForMode", limitForMode, DEFAULT_FOR_MODE)
+      .addObj("limitsForModes", limitsForModes, DEFAULT_FOR_MODES)
       .toString();
   }
 
@@ -67,27 +67,27 @@ public class MaxStopCountLimit {
 
     var that = (MaxStopCountLimit) o;
 
-    return (defaultLimit == that.defaultLimit && limitForMode.equals(that.limitForMode));
+    return (defaultLimit == that.defaultLimit && limitsForModes.equals(that.limitsForModes));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(defaultLimit, limitForMode);
+    return Objects.hash(defaultLimit, limitsForModes);
   }
 
-  private Map<StreetMode, Integer> limitForMode() {
-    return limitForMode;
+  private Map<StreetMode, Integer> limitsForModes() {
+    return limitsForModes;
   }
 
   private boolean hasCustomLimit(StreetMode mode) {
-    return limitForMode.containsKey(mode);
+    return limitsForModes.containsKey(mode);
   }
 
   public static class Builder {
 
     private final MaxStopCountLimit original;
     private int defaultLimit;
-    private Map<StreetMode, Integer> limitForMode = null;
+    private Map<StreetMode, Integer> limitsForModes = null;
 
     Builder(MaxStopCountLimit original) {
       this.original = original;
@@ -105,15 +105,15 @@ public class MaxStopCountLimit {
 
     public Builder with(StreetMode mode, Integer limit) {
       // Lazy initialize the valueForEnum map
-      if (limitForMode == null) {
-        limitForMode = new EnumMap<>(StreetMode.class);
+      if (limitsForModes == null) {
+        limitsForModes = new EnumMap<>(StreetMode.class);
         for (StreetMode it : StreetMode.values()) {
           if (original.hasCustomLimit(it)) {
-            limitForMode.put(it, original.limitForMode(it));
+            limitsForModes.put(it, original.limitForMode(it));
           }
         }
       }
-      limitForMode.put(mode, limit);
+      limitsForModes.put(mode, limit);
       return this;
     }
 
@@ -130,13 +130,13 @@ public class MaxStopCountLimit {
      * can be used to generate new values if desired.
      * */
     Map<StreetMode, Integer> copyCustomLimits() {
-      if (limitForMode == null) {
+      if (limitsForModes == null) {
         // The limitForMode is protected and should never be mutated, so we can reuse it
-        return original.limitForMode();
+        return original.limitsForModes();
       }
 
       var copy = new EnumMap<StreetMode, Integer>(StreetMode.class);
-      for (Map.Entry<StreetMode, Integer> it : limitForMode.entrySet()) {
+      for (Map.Entry<StreetMode, Integer> it : limitsForModes.entrySet()) {
         if (defaultLimit != it.getValue()) {
           copy.put(it.getKey(), it.getValue());
         }
