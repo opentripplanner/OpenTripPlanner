@@ -36,6 +36,8 @@ import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.SiteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -54,6 +56,8 @@ import org.opentripplanner.transit.service.SiteRepository;
  * replacement of the stop linker, #1305.
  */
 public class VertexLinker {
+
+  private static final Logger LOG = LoggerFactory.getLogger(VertexLinker.class);
 
   /**
    * if there are two ways and the distances to them differ by less than this value, we link to both
@@ -605,6 +609,7 @@ public class VertexLinker {
       // take min. 10 closest visibility points
       var appliedCount = (long) Math.max(10, Math.floor(totalCount * totalCount / areaComplexity));
       if (appliedCount < totalCount) {
+        LOG.error("visi reduced {} -> {}", totalCount, appliedCount);
         visibilityVertices =
           visibilityVertices
             .stream()
@@ -633,8 +638,7 @@ public class VertexLinker {
       for (IntersectionVertex v : visibilityVertices) {
         createEdges(newVertex, v, areaGroup, scope, tempEdges);
       }
-    }
-    if (scope == Scope.PERMANENT) {
+    } else if (scope == Scope.PERMANENT) {
       areaGroup.addVisibilityVertices(Set.of(newVertex));
     }
   }
