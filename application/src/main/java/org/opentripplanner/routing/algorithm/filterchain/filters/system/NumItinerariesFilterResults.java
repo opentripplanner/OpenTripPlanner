@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import java.time.Instant;
 import org.opentripplanner.model.plan.ItinerarySortKey;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * The NumItinerariesFilter removes itineraries from a list of itineraries based on the number to
@@ -23,4 +24,14 @@ public record NumItinerariesFilterResults(
   Instant earliestRemovedDeparture,
   Instant latestRemovedDeparture,
   ItinerarySortKey pageCut
-) {}
+) {
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(NumItinerariesFilterResults.class)
+      .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
+      .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
+      .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)
+      .toString();
+  }
+}
