@@ -115,8 +115,8 @@ class J03_ViaTransferSearchTest {
 
   @Test
   @DisplayName(
-    "Basic via search with just two routes. You should be forced use the provided via transfer " +
-    "even when a better regular transfer exist and an eariler depature could be reached. "
+    "Basic via search with just two routes. You should be forced to use the provided via transfer " +
+    "even when a better regular transfer exists and an earlier departure could be reached. "
   )
   void viaSearchArrivingByTransferAtViaStop() {
     var data = new TestTransitData();
@@ -155,7 +155,7 @@ class J03_ViaTransferSearchTest {
     "Via search with via transfer should force the usage of a route at the destination " +
     "avoiding using a via-transfer followed by a regular transfer."
   )
-  void viaTransferSearchNotFolloedByRegularTransfer() {
+  void viaTransferSearchNotFollowedByRegularTransfer() {
     var data = new TestTransitData();
 
     data
