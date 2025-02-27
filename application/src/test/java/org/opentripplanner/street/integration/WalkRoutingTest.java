@@ -25,7 +25,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 class WalkRoutingTest {
 
-  static final Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+  static final Instant dateTime = Instant.now();
   private final Graph roundabout;
 
   {

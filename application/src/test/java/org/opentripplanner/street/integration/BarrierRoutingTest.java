@@ -36,7 +36,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 public class BarrierRoutingTest {
 
-  private static final Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+  private static final Instant dateTime = Instant.now();
 
   private static Graph graph;
 

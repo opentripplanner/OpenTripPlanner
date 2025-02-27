@@ -93,12 +93,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     for (Vertex vertex : vertices) {
       for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
         states.add(
-          new State(
-            vertex,
-            streetSearchRequest.startTime().truncatedTo(ChronoUnit.SECONDS),
-            stateData,
-            streetSearchRequest
-          )
+          new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
         );
       }
     }

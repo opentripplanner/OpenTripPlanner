@@ -27,7 +27,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 public class CarRoutingTest {
 
-  static final Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+  static final Instant dateTime = Instant.now();
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(CarRoutingTest.class);
 
   private static Graph herrenbergGraph;
