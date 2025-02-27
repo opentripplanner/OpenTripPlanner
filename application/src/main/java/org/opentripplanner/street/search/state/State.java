@@ -3,6 +3,7 @@ package org.opentripplanner.street.search.state;
 import static org.opentripplanner.utils.lang.ObjectUtils.requireNotInitialized;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -92,7 +93,12 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     for (Vertex vertex : vertices) {
       for (StateData stateData : StateData.getInitialStateDatas(streetSearchRequest)) {
         states.add(
-          new State(vertex, streetSearchRequest.startTime(), stateData, streetSearchRequest)
+          new State(
+            vertex,
+            streetSearchRequest.startTime().truncatedTo(ChronoUnit.SECONDS),
+            stateData,
+            streetSearchRequest
+          )
         );
       }
     }

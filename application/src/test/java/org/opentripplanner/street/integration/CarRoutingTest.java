@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 public class CarRoutingTest {
 
-  static final Instant dateTime = Instant.now();
+  static final Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(CarRoutingTest.class);
 
   private static Graph herrenbergGraph;

@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +55,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private List<ViaLocation> via = Collections.emptyList();
 
-  private Instant dateTime = Instant.now();
+  private Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Nullable
   private Duration maxSearchWindow;
