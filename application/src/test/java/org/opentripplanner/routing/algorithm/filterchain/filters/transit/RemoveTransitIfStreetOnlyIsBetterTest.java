@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
@@ -91,12 +93,16 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
       Cost.costOfSeconds(199),
       it -> subscribeResult = it.generalizedCostMaxLimit()
     );
-    List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, bicycle, i1));
 
     // Then:
-    assertEquals(toStr(List.of(bicycle, i1)), toStr(result));
-    // The lowest generalized cost value should be saved
-    assertEquals(subscribeResult, Cost.costOfSeconds(199));
+    UnsupportedOperationException exception = assertThrows(
+      UnsupportedOperationException.class,
+      () -> flagger.removeMatchesForTest(List.of(i2, bicycle, i1))
+    );
+    assertEquals(
+      "Both the minStreetCostOption and generalizedCostMaxLimit are present, this should never happen.",
+      exception.getMessage()
+    );
   }
 
   @Test

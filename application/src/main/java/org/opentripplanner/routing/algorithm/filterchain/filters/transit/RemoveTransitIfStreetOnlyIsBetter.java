@@ -21,6 +21,12 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   private final Cost generalizedCostMaxLimit;
   private final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber;
 
+  /**
+   * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
+   * @param costLimitFunction the cost limit function to use with the filter
+   * @param generalizedCostMaxLimit this limit is not null when paging is used
+   * @param removeTransitIfStreetOnlyIsBetterResultsSubscriber this subscriber stores the generalizedCostMaxLimit for use with paging
+   */
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
     Cost generalizedCostMaxLimit,
@@ -48,33 +54,36 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // Find the best street-all-the-way option
-    OptionalInt minStreetCost = itineraries
+    OptionalInt minStreetCostOption = itineraries
       .stream()
       .filter(Itinerary::isOnStreetAllTheWay)
       .mapToInt(Itinerary::getGeneralizedCost)
       .min();
+    Cost minStreetCost = null;
 
-    if (minStreetCost.isEmpty() && generalizedCostMaxLimit == null) {
+    if (minStreetCostOption.isEmpty() && generalizedCostMaxLimit == null) {
       // If no cost is found an empty list is returned.
       return List.of();
-    } else if (minStreetCost.isPresent() && generalizedCostMaxLimit != null) {
-      // If both the minStreetCost and generalizedCostMaxLimit are present, take the minimum value.
-      minStreetCost =
-        OptionalInt.of(Math.min(minStreetCost.getAsInt(), generalizedCostMaxLimit.toSeconds()));
+    } else if (minStreetCostOption.isPresent() && generalizedCostMaxLimit != null) {
+      // This case should not be possible.
+      throw new UnsupportedOperationException(
+        "Both the minStreetCostOption and generalizedCostMaxLimit are present, this should never happen."
+      );
     } else if (generalizedCostMaxLimit != null) {
       // If the best street only cost can't be found in the itineraries but
       // it is present in the cursor, then the information from the cursor is used.
-      minStreetCost = OptionalInt.of(generalizedCostMaxLimit.toSeconds());
+      minStreetCost = generalizedCostMaxLimit;
+    } else {
+      // The minStreetCostOption is present.
+      minStreetCost = Cost.costOfSeconds(minStreetCostOption.getAsInt());
     }
 
     // The best street only cost is saved in the cursor.
     removeTransitIfStreetOnlyIsBetterResultsSubscriber.accept(
-      new RemoveTransitIfStreetOnlyIsBetterResults(Cost.costOfSeconds(minStreetCost.getAsInt()))
+      new RemoveTransitIfStreetOnlyIsBetterResults(minStreetCost)
     );
 
-    var limit = costLimitFunction
-      .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))
-      .toSeconds();
+    var limit = costLimitFunction.calculate(minStreetCost).toSeconds();
 
     // Filter away itineraries that have higher cost than limit cost computed above
     return itineraries
