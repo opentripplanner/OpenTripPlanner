@@ -20,6 +20,8 @@ import org.opentripplanner.model.plan.paging.cursor.DefaultPageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -66,8 +68,9 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
-  private DefaultPageCursorInput.Builder pageCursorInputBuilder;
   private SearchParams raptorSearchParamsUsed = null;
+  private NumItinerariesFilterResults numItinerariesFilterResults = null;
+  private RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     // Applying the page cursor modifies the request by removing the direct mode, for example.
@@ -88,7 +91,6 @@ public class RoutingWorker {
         request.journey().transit().priorityGroupsByAgency(),
         request.journey().transit().priorityGroupsGlobal()
       );
-    this.pageCursorInputBuilder = DefaultPageCursorInput.of();
   }
 
   public RoutingResponse route() {
@@ -141,10 +143,8 @@ public class RoutingWorker {
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
         removeWalkAllTheWayResultsFromDirectFlex,
-        it -> pageCursorInputBuilder = pageCursorInputBuilder.withNumItinerariesFilterResults(it),
-        it ->
-          pageCursorInputBuilder =
-            pageCursorInputBuilder.withRemoveTransitIfStreetOnlyIsBetterResults(it)
+        it -> numItinerariesFilterResults = it,
+        it -> removeTransitIfStreetOnlyIsBetterResults = it
       );
 
       filteredItineraries = filterChain.filter(itineraries);
@@ -296,7 +296,11 @@ public class RoutingWorker {
       serverContext.raptorTuningParameters(),
       request,
       raptorSearchParamsUsed,
-      pageCursorInputBuilder.build(),
+      DefaultPageCursorInput
+        .of()
+        .withNumItinerariesFilterResults(numItinerariesFilterResults)
+        .withRemoveTransitIfStreetOnlyIsBetterResults(removeTransitIfStreetOnlyIsBetterResults)
+        .build(),
       itineraries
     );
   }
