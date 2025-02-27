@@ -49,6 +49,11 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
   }
 
   @Override
+  public String getName() {
+    return "Elevation";
+  }
+
+  @Override
   public boolean hasEdgeSegments(Edge edge) {
     return true;
   }
