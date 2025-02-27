@@ -4,8 +4,8 @@ import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.alert.siri.mapping.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.CANNOT_RESOLVE_AGENCY;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -207,7 +207,7 @@ class AddedTripBuilder {
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
-        return UpdateError.result(tripId, NO_VALID_STOPS, dataSource);
+        return UpdateError.result(tripId, UNKNOWN_STOP, dataSource);
       }
 
       aimedStopTimes.add(stopTime);

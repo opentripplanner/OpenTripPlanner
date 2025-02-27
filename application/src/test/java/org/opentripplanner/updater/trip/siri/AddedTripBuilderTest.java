@@ -551,7 +551,7 @@ class AddedTripBuilderTest {
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
-      UpdateError.UpdateErrorType.NO_VALID_STOPS,
+      UpdateError.UpdateErrorType.UNKNOWN_STOP,
       addedTrip.failureValue().errorType(),
       "Trip creation should fail with call referring to unknown stop"
     );
