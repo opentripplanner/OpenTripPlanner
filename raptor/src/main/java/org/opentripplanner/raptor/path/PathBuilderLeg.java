@@ -534,9 +534,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
         prev.toTime() + slackProvider.alightSlack(prev.asTransitLeg().trip.pattern().slackIndex());
     } else if (prev.isAccess()) {
       newFromTime = prev.toTime();
-      // } else if (prev.isTransfer()) {
-      // via search and transfer connection
-      // newFromTime = prev.toTime + slackProvider.transferSlack();
     } else {
       throw new IllegalStateException("Unexpected leg type before TransferLeg: " + this);
     }
