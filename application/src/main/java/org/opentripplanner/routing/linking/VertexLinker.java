@@ -583,7 +583,7 @@ public class VertexLinker {
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
-    Geometry polygon = areaGroup.getExpandedGeometry();
+    Geometry polygon = areaGroup.getGeometry();
 
     int added = 0;
 
