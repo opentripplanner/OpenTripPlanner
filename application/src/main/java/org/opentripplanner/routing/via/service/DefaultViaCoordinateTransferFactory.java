@@ -3,7 +3,6 @@ package org.opentripplanner.routing.via.service;
 import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -13,7 +12,6 @@ import org.opentripplanner.graph_builder.module.nearbystops.StraightLineNearbySt
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
@@ -31,13 +29,13 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
 
   private final Graph graph;
   private final TransitService transitService;
-  private final Duration radiusByDuration;
+  private final Duration radiusAsDuration;
 
   @Inject
   public DefaultViaCoordinateTransferFactory(
     Graph graph,
     TransitService transitService,
-    Duration radiusByDuration
+    Duration radiusAsDuration
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -46,7 +44,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
     // other here. This reduces the number of possible transfers to one fourth. The radius should
     // probably have its own configuration setting. There are no algorithmic reasons for using
     // the transfer radius here, any value can be used.
-    this.radiusByDuration = radiusByDuration.dividedBy(2);
+    this.radiusAsDuration = radiusAsDuration.dividedBy(2);
   }
 
   @Override
@@ -57,7 +55,7 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
   ) {
     DisposableEdgeCollection tempEdges = null;
     try {
-      var nearbyStopFinder = createNearbyStopFinder(radiusByDuration);
+      var nearbyStopFinder = createNearbyStopFinder(radiusAsDuration);
       var name = I18NString.of(
         (StringUtils.hasValue(viaLabel) ? viaLabel : "Via") + " " + coordinate
       );
@@ -135,11 +133,11 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
    * Factory method for creating a NearbyStopFinder. The linker will use streets if they are
    * available, or straight-line distance otherwise.
    */
-  private NearbyStopFinder createNearbyStopFinder(Duration radiusByDuration) {
+  private NearbyStopFinder createNearbyStopFinder(Duration radiusAsDuration) {
     if (!graph.hasStreets) {
-      return new StraightLineNearbyStopFinder(transitService, radiusByDuration);
+      return new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
-      return new StreetNearbyStopFinder(radiusByDuration, 0, null);
+      return new StreetNearbyStopFinder(radiusAsDuration, 0, null);
     }
   }
 
