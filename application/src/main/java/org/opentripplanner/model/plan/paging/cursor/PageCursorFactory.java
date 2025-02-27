@@ -51,8 +51,7 @@ public class PageCursorFactory {
   }
 
   /**
-   * This adds the page cursor input to the factory. The cursor input can contain information about filtering results
-   * or the best street only cost.
+   * This adds the page cursor input to the factory. The cursor input contains information about filtering results.
    * <p>
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
