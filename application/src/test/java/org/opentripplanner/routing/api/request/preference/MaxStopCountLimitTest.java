@@ -45,7 +45,7 @@ public class MaxStopCountLimitTest {
   void testToString() {
     assertEquals("StreetPreferences{}", StreetPreferences.DEFAULT.toString());
     assertEquals(
-      "MaxStopCountLimit{" + "defaultLimit: 245, " + "limitForMode: {CAR=0}" + "}",
+      "MaxStopCountLimit{" + "defaultLimit: 245, " + "limitsForModes: {CAR=0}" + "}",
       subject.toString()
     );
   }
