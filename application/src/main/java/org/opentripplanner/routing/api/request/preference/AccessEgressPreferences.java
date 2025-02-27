@@ -122,7 +122,7 @@ public final class AccessEgressPreferences implements Serializable {
       Map<StreetMode, Integer> maxStopCountForMode
     ) {
       return withMaxStopCount(b ->
-        b.withDefaultLimit(defaultMaxStopCount).withValues(maxStopCountForMode)
+        b.withDefaultLimit(defaultMaxStopCount).withLimitsForModes(maxStopCountForMode)
       );
     }
 

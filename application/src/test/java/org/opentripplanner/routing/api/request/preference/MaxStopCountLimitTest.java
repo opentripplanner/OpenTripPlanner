@@ -16,7 +16,7 @@ public class MaxStopCountLimitTest {
   private final MaxStopCountLimit subject = MaxStopCountLimit
     .of()
     .withDefaultLimit(MAX_DEFAULT_STOP_COUNT)
-    .withValues(Map.of(StreetMode.CAR, MAX_CAR_STOP_COUNT))
+    .withLimitsForModes(Map.of(StreetMode.CAR, MAX_CAR_STOP_COUNT))
     .build();
 
   @Test

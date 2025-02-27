@@ -29,7 +29,7 @@ public class MaxStopCountLimit {
 
   MaxStopCountLimit(Builder builder) {
     this.defaultLimit = IntUtils.requireNotNegative(builder.defaultLimit());
-    this.limitForMode = builder.copyValueForEnum();
+    this.limitForMode = builder.copyCustomLimits();
   }
 
   public static Builder of() {
@@ -117,8 +117,8 @@ public class MaxStopCountLimit {
       return this;
     }
 
-    public Builder withValues(Map<StreetMode, Integer> values) {
-      for (Map.Entry<StreetMode, Integer> e : values.entrySet()) {
+    public Builder withLimitsForModes(Map<StreetMode, Integer> limitsForModes) {
+      for (Map.Entry<StreetMode, Integer> e : limitsForModes.entrySet()) {
         with(e.getKey(), e.getValue());
       }
       return this;
@@ -129,7 +129,7 @@ public class MaxStopCountLimit {
      * ensures equality and makes a defensive copy of the builder values. Hence, the builder
      * can be used to generate new values if desired.
      * */
-    Map<StreetMode, Integer> copyValueForEnum() {
+    Map<StreetMode, Integer> copyCustomLimits() {
       if (limitForMode == null) {
         // The limitForMode is protected and should never be mutated, so we can reuse it
         return original.limitForMode();
