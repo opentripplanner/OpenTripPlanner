@@ -573,6 +573,15 @@ public class VertexLinker {
   }
 
   /**
+   * Inaccurate but fast distance estimate for sorting
+   */
+  private Double distSquared(IntersectionVertex a, IntersectionVertex b) {
+    var aco = a.getCoordinate();
+    var bco = b.getCoordinate();
+    return new Double(aco.x * aco.x + aco.y * aco.y);
+  }
+
+  /**
    * Safely add a vertex to an area. This creates edges to all other vertices unless those edges
    * would cross one of the original edges.
    */
@@ -587,7 +596,24 @@ public class VertexLinker {
 
     int added = 0;
 
-    for (IntersectionVertex v : areaGroup.visibilityVertices()) {
+    var visibilityVertices = areaGroup.visibilityVertices();
+    if (scope != Scope.PERMANENT) {
+      // heuristics to ensure reasonable computation time
+      // The more complex the area polygon is, the less visibility connections we try to add
+      var areaComplexity = polygon.getNumPoints();
+      var totalCount = visibilityVertices.size();
+      // take min. 10 closest visibility points
+      var appliedCount = (long) Math.max(10, Math.floor(totalCount * totalCount / areaComplexity));
+      if (appliedCount < totalCount) {
+        visibilityVertices =
+          visibilityVertices
+            .stream()
+            .sorted((v1, v2) -> distSquared(v1, newVertex).compareTo(distSquared(v2, newVertex)))
+            .limit(appliedCount)
+            .collect(Collectors.toSet());
+      }
+    }
+    for (IntersectionVertex v : visibilityVertices) {
       LineString newGeometry = GEOMETRY_FACTORY.createLineString(
         new Coordinate[] { newVertex.getCoordinate(), v.getCoordinate() }
       );
@@ -604,7 +630,7 @@ public class VertexLinker {
     // fallback when new vertex could not be connected without intersecting the boundary
     // this happens for example when the added vertex is outside the area
     if (added == 0) {
-      for (IntersectionVertex v : areaGroup.visibilityVertices()) {
+      for (IntersectionVertex v : visibilityVertices) {
         createEdges(newVertex, v, areaGroup, scope, tempEdges);
       }
     }
