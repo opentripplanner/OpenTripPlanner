@@ -628,7 +628,7 @@ public class VertexLinker {
       }
     }
     if (scope == Scope.PERMANENT) {
-      areaGroup.addVisibilityVertex(newVertex);
+      areaGroup.addVisibilityVertices(Set.of(newVertex));
     }
   }
 

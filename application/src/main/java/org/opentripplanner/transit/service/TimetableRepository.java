@@ -387,16 +387,11 @@ public class TimetableRepository implements Serializable {
   }
 
   /**
-   * Returns the alert service or null if the @{code updaterManager} is not set yet.
+   * Returns the alert service. If no updaters are configured an empty instance is returned.
+   * See  {@link TimetableRepository#setUpdaterManager(GraphUpdaterManager)}.
    */
-  @Nullable
   public TransitAlertService getTransitAlertService() {
-    // during initialization we must return null, otherwise we would permanently store an empty
-    // DelegatingTransitAlertServiceImpl
-    // this is wrong on many levels and should be refactored.
-    if (updaterManager == null) {
-      return null;
-    } else if (transitAlertService == null) {
+    if (transitAlertService == null) {
       transitAlertService = new DelegatingTransitAlertServiceImpl(this);
     }
     return transitAlertService;
@@ -529,8 +524,17 @@ public class TimetableRepository implements Serializable {
     flexTripsById.put(id, flexTrip);
   }
 
+  /**
+   * Sets the updater manager for this repository and makes sure the configured updaters
+   * are correctly applied to {@code transitAlertService}.
+   * <p>
+   * Note: before this method is called an empty {@code transitAlertService} is returned instead.
+   * <p>
+   * This logic is unfortunate and quite brittle. We would like to improve it in the future.
+   */
   public void setUpdaterManager(GraphUpdaterManager updaterManager) {
     this.updaterManager = updaterManager;
+    this.transitAlertService = null;
   }
 
   public void addAllTransfersByStops(Multimap<StopLocation, PathTransfer> transfersByStop) {

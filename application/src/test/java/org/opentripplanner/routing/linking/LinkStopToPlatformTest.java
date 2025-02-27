@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -63,7 +64,7 @@ public class LinkStopToPlatformTest {
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
     for (int i : visible) {
-      areaGroup.addVisibilityVertex(vertices.get(i));
+      areaGroup.addVisibilityVertices(Set.of(vertices.get(i)));
     }
 
     // AreaGroup must include a valid Area which defines area atttributes

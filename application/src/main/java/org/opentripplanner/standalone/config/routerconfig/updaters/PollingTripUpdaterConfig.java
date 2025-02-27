@@ -6,8 +6,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
-import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
+import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
 
 public class PollingTripUpdaterConfig {
 
