@@ -360,7 +360,6 @@ public abstract class GraphRoutingTest {
       boolean endVertex
     ) {
       return new TemporaryStreetLocation(
-        name,
         new Coordinate(longitude, latitude),
         new NonLocalizedString(name),
         endVertex
