@@ -164,7 +164,6 @@ public class AStarTest {
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
-      "near_shilshole_22nd",
       new Coordinate(-122.385050, 47.666620),
       new NonLocalizedString("near_shilshole_22nd"),
       false
@@ -172,7 +171,6 @@ public class AStarTest {
     TemporaryConcreteEdge.createTemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
-      "near_56th_20th",
       new Coordinate(-122.382347, 47.669518),
       new NonLocalizedString("near_56th_20th"),
       true
@@ -193,7 +191,7 @@ public class AStarTest {
 
     assertEquals(9, states.size());
 
-    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabelString());
+    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getDefaultName());
     assertEquals("shilshole_22nd", states.get(1).getVertex().getLabelString());
     assertEquals("ballard_22nd", states.get(2).getVertex().getLabelString());
     assertEquals("market_22nd", states.get(3).getVertex().getLabelString());
@@ -201,7 +199,7 @@ public class AStarTest {
     assertEquals("market_russell", states.get(5).getVertex().getLabelString());
     assertEquals("market_20th", states.get(6).getVertex().getLabelString());
     assertEquals("56th_20th", states.get(7).getVertex().getLabelString());
-    assertEquals("near_56th_20th", states.get(8).getVertex().getLabelString());
+    assertEquals("near_56th_20th", states.get(8).getVertex().getDefaultName());
   }
 
   @Test
@@ -212,7 +210,6 @@ public class AStarTest {
     request.setArriveBy(true);
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
-      "near_shilshole_22nd",
       new Coordinate(-122.385050, 47.666620),
       new NonLocalizedString("near_shilshole_22nd"),
       false
@@ -220,7 +217,6 @@ public class AStarTest {
     TemporaryConcreteEdge.createTemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
-      "near_56th_20th",
       new Coordinate(-122.382347, 47.669518),
       new NonLocalizedString("near_56th_20th"),
       true
@@ -241,7 +237,7 @@ public class AStarTest {
 
     assertEquals(9, states.size());
 
-    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabelString());
+    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getDefaultName());
     assertEquals("shilshole_22nd", states.get(1).getVertex().getLabelString());
     assertEquals("ballard_22nd", states.get(2).getVertex().getLabelString());
     assertEquals("market_22nd", states.get(3).getVertex().getLabelString());
@@ -249,7 +245,7 @@ public class AStarTest {
     assertEquals("market_russell", states.get(5).getVertex().getLabelString());
     assertEquals("market_20th", states.get(6).getVertex().getLabelString());
     assertEquals("56th_20th", states.get(7).getVertex().getLabelString());
-    assertEquals("near_56th_20th", states.get(8).getVertex().getLabelString());
+    assertEquals("near_56th_20th", states.get(8).getVertex().getDefaultName());
   }
 
   @Test

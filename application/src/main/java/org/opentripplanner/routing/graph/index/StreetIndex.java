@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -102,12 +101,7 @@ public class StreetIndex {
   ) {
     boolean wheelchairAccessible = false;
 
-    TemporaryStreetLocation location = new TemporaryStreetLocation(
-      label,
-      nearestPoint,
-      name,
-      endVertex
-    );
+    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name, endVertex);
 
     for (StreetEdge street : edges) {
       Vertex fromv = street.getFromVertex();
@@ -378,7 +372,6 @@ public class StreetIndex {
     }
 
     TemporaryStreetLocation temporaryStreetLocation = new TemporaryStreetLocation(
-      UUID.randomUUID().toString(),
       coordinate,
       name,
       endVertex
