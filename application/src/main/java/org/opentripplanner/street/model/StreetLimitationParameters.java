@@ -11,7 +11,6 @@ import java.io.Serializable;
 public class StreetLimitationParameters implements Serializable {
 
   private float maxCarSpeed = StreetConstants.DEFAULT_MAX_CAR_SPEED;
-  private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
 
   @Inject
   public StreetLimitationParameters() {}
@@ -29,19 +28,5 @@ public class StreetLimitationParameters implements Serializable {
    */
   public float maxCarSpeed() {
     return maxCarSpeed;
-  }
-
-  /**
-   * Initiliaze limit for area linking
-   */
-  public void initMaxAreaNodes(int maxAreaNodes) {
-    this.maxAreaNodes = maxAreaNodes;
-  }
-
-  /**
-   * Get the limit for area linking
-   */
-  public float maxAreaNodes() {
-    return maxAreaNodes;
   }
 }
