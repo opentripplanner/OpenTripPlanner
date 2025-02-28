@@ -21,6 +21,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -78,7 +79,7 @@ public class VertexLinker {
   private final VertexFactory vertexFactory;
 
   private boolean areaVisibility = true;
-  private int maxAreaNodes = 150;
+  private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
@@ -610,9 +611,12 @@ public class VertexLinker {
       var areaComplexity = polygon.getNumPoints();
       var totalCount = visibilityVertices.size();
       // take min. 10 closest visibility points
-      var appliedCount = (long) Math.max(10, Math.floor(totalCount * totalCount / areaComplexity));
+      var appliedCount = (long) Math.max(
+        10,
+        Math.floor(maxAreaNodes * maxAreaNodes / areaComplexity)
+      );
       if (appliedCount < totalCount) {
-        // LOG.info("visi reduced {} -> {}", totalCount, appliedCount);
+        LOG.info("polygon = {}, visi reduced {} -> {}", areaComplexity, totalCount, appliedCount);
         visibilityVertices =
           visibilityVertices
             .stream()

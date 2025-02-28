@@ -133,6 +133,7 @@ public class OsmModule implements GraphBuilderModule {
     build();
     graph.hasStreets = true;
     streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
+    streetLimitationParameters.initMaxAreaNodes(params.maxAreaNodes());
   }
 
   @Override

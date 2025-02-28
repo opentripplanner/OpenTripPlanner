@@ -49,6 +49,7 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -473,7 +474,7 @@ the centroid.
           """
 When set to true, the elevation module will create a file cache for calculated elevation data.
 Subsequent graph builds can reuse the data in this file.
-  
+
 After building the graph, a file called `cached_elevations.obj` will be written to the cache
 directory. By default, this file is not written during graph builds. There is also a graph build
 parameter called `readCachedElevations` which is set to `true` by default.
@@ -502,7 +503,7 @@ recommended.
         .summary(
           "Visibility calculations for an area will not be done if there are more nodes than this limit."
         )
-        .asInt(150);
+        .asInt(StreetConstants.DEFAULT_MAX_AREA_NODES);
     maxElevationPropagationMeters =
       root
         .of("maxElevationPropagationMeters")
@@ -532,7 +533,7 @@ OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was
 that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
 seeking within files to guess what they are. Therefore, like all other file types GTFS is now
 detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
-Netex data is also often supplied in a ZIP file.        
+Netex data is also often supplied in a ZIP file.
 """
       )
       .asObject();
@@ -597,7 +598,7 @@ Netex data is also often supplied in a ZIP file.
             The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
             need to provide a path the the service credentials. Environment variables in the path are
             resolved.
-                  
+
             This is a path to a file on the local file system, not an URI.
             """
         )
