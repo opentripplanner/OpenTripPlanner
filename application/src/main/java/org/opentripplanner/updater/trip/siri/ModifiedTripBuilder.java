@@ -159,10 +159,10 @@ class ModifiedTripBuilder {
 
     int departureFromPreviousStop = 0;
     int lastDepartureDelay = 0;
-    List<StopLocation> stops = pattern.getStops();
-    for (int callCounter = 0; callCounter < stops.size(); callCounter++) {
-      StopLocation stop = stops.get(callCounter);
-      boolean foundMatch = false;
+    List<StopLocation> stopsInPattern = pattern.getStops();
+    for (int stopIndex = 0; stopIndex < stopsInPattern.size(); stopIndex++) {
+      StopLocation stopInPattern = stopsInPattern.get(stopIndex);
+      CallWrapper matchingCall = null;
 
       for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
@@ -170,48 +170,57 @@ class ModifiedTripBuilder {
         }
         //Current stop is being updated
         RegularStop stopPoint = entityResolver.resolveQuay(call.getStopPointRef());
-        foundMatch = stop.equals(stopPoint) || stop.isPartOfSameStationAs(stopPoint);
-        if (foundMatch) {
-          TimetableHelper.applyUpdates(
-            startOfService,
-            newTimes,
-            callCounter,
-            callCounter == (stops.size() - 1),
-            predictionInaccurate,
-            call,
-            occupancy
-          );
-
-          alreadyVisited.add(call);
-
-          lastDepartureDelay = newTimes.getDepartureDelay(callCounter);
+        if (stopInPattern.equals(stopPoint) || stopInPattern.isPartOfSameStationAs(stopPoint)) {
+          matchingCall = call;
           break;
         }
       }
-      if (!foundMatch) {
+
+      if (matchingCall != null) {
+        TimetableHelper.applyUpdates(
+          startOfService,
+          newTimes,
+          stopIndex,
+          stopIndex == (stopsInPattern.size() - 1),
+          predictionInaccurate,
+          matchingCall,
+          occupancy
+        );
+
+        alreadyVisited.add(matchingCall);
+
+        lastDepartureDelay = newTimes.getDepartureDelay(stopIndex);
+      } else {
         // No update found in calls
-        if (pattern.isBoardAndAlightAt(callCounter, NONE)) {
+        if (pattern.isBoardAndAlightAt(stopIndex, NONE)) {
           // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
           // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
           // multiple non-pickup/dropoff stops are in between.
-          newTimes.updateArrivalTime(callCounter, departureFromPreviousStop);
-          newTimes.updateDepartureTime(callCounter, departureFromPreviousStop);
+          newTimes.updateArrivalTime(stopIndex, departureFromPreviousStop);
+          newTimes.updateDepartureTime(stopIndex, departureFromPreviousStop);
+
+          LOG.info(
+            "Siri non-pickup/dropoff stop time interpolation for tripId: {}",
+            newTimes.getTrip().getId()
+          );
         } else {
           int arrivalDelay = lastDepartureDelay;
           int departureDelay = lastDepartureDelay;
 
           if (lastDepartureDelay == 0) {
             //No match has been found yet (i.e. still in RecordedCalls) - keep existing delays
-            arrivalDelay = existingTripTimes.getArrivalDelay(callCounter);
-            departureDelay = existingTripTimes.getDepartureDelay(callCounter);
+            arrivalDelay = existingTripTimes.getArrivalDelay(stopIndex);
+            departureDelay = existingTripTimes.getDepartureDelay(stopIndex);
           }
 
-          newTimes.updateArrivalDelay(callCounter, arrivalDelay);
-          newTimes.updateDepartureDelay(callCounter, departureDelay);
+          newTimes.updateArrivalDelay(stopIndex, arrivalDelay);
+          newTimes.updateDepartureDelay(stopIndex, departureDelay);
+
+          LOG.info("Siri stop time interpolation for tripId: {}", newTimes.getTrip().getId());
         }
       }
 
-      departureFromPreviousStop = newTimes.getDepartureTime(callCounter);
+      departureFromPreviousStop = newTimes.getDepartureTime(stopIndex);
     }
   }
 
