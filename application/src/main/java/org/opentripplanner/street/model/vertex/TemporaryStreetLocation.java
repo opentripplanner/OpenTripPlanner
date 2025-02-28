@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
+import java.util.concurrent.atomic.AtomicLong;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
@@ -15,8 +16,10 @@ import org.opentripplanner.street.model.edge.TemporaryEdge;
  */
 public final class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
 
-  public TemporaryStreetLocation(String id, Coordinate nearestPoint, I18NString name) {
-    super(id, nearestPoint, name);
+  private static final AtomicLong idCounter = new AtomicLong(0);
+
+  public TemporaryStreetLocation(Coordinate nearestPoint, I18NString name) {
+    super("TempVertex-" + idCounter.incrementAndGet(), nearestPoint, name);
   }
 
   @Override

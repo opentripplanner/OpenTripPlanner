@@ -65,8 +65,8 @@ public class BikeRentalTest extends GraphRoutingTest {
           D = intersection("D", 47.530, 19.000);
           E1 = entrance("E1", 47.530, 19.001);
 
-          T1 = streetLocation("T1", 47.500, 18.999, false);
-          T2 = streetLocation("T1", 47.530, 18.999, true);
+          T1 = streetLocation("T1", 47.500, 18.999);
+          T2 = streetLocation("T1", 47.530, 18.999);
 
           B1 = vehicleRentalStation("B1", 47.510, 19.001);
           B2 = vehicleRentalStation("B2", 47.520, 19.001);

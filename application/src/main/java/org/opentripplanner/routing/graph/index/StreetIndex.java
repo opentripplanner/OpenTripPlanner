@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -102,7 +101,7 @@ public class StreetIndex {
   ) {
     boolean wheelchairAccessible = false;
 
-    var location = new TemporaryStreetLocation(label, nearestPoint, name);
+    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name);
 
     for (StreetEdge street : edges) {
       Vertex fromv = street.getFromVertex();
@@ -372,8 +371,7 @@ public class StreetIndex {
       name = new NonLocalizedString(label);
     }
 
-    String id = UUID.randomUUID().toString();
-    var temporaryStreetLocation = new TemporaryStreetLocation(id, coordinate, name);
+    var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
     TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
 
