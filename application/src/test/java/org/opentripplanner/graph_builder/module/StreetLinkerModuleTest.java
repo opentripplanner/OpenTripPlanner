@@ -222,7 +222,8 @@ class StreetLinkerModuleTest {
           new DefaultVehicleParkingRepository(),
           timetableRepository,
           DataImportIssueStore.NOOP,
-          false
+          false,
+          0
         );
 
       assertFalse(stopVertex.isConnectedToGraph());

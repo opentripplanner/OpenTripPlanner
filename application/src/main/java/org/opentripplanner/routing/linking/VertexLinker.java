@@ -77,8 +77,8 @@ public class VertexLinker {
   private final SiteRepository siteRepository;
   private final VertexFactory vertexFactory;
 
-  // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
   private boolean addExtraEdgesToAreas = true;
+  private int maxAreaNodes = 150;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
@@ -133,9 +133,12 @@ public class VertexLinker {
     removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
-  // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)
   public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
+  }
+
+  public void setMaxAreaNodes(int maxAreaNodes) {
+    this.maxAreaNodes = maxAreaNodes;
   }
 
   /** projected distance from stop to edge, in latitude degrees */
@@ -603,13 +606,13 @@ public class VertexLinker {
     var visibilityVertices = areaGroup.visibilityVertices();
     if (scope != Scope.PERMANENT) {
       // heuristics to ensure reasonable computation time
-      // The more complex the area polygon is, the less visibility connections we try to add
+      // The more complex the area polygon is, the less visibility connections should be tried
       var areaComplexity = polygon.getNumPoints();
       var totalCount = visibilityVertices.size();
       // take min. 10 closest visibility points
       var appliedCount = (long) Math.max(10, Math.floor(totalCount * totalCount / areaComplexity));
       if (appliedCount < totalCount) {
-        LOG.error("visi reduced {} -> {}", totalCount, appliedCount);
+        // LOG.info("visi reduced {} -> {}", totalCount, appliedCount);
         visibilityVertices =
           visibilityVertices
             .stream()
