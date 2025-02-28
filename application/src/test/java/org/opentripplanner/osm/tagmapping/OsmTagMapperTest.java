@@ -202,6 +202,15 @@ class OsmTagMapperTest {
     assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(Locale.of("FI")));
   }
 
+  @Test
+  void indoorAreaName() {
+    var wps = wayProperySet();
+    var way = way("indoor", "area");
+    assertEquals("corridor", wps.getCreativeNameForWay(way).toString());
+    assertEquals("Korridor", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
+    assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(Locale.of("FI")));
+  }
+
   public OsmEntity way(String key, String value) {
     var way = new OsmEntity();
     way.addTag(key, value);
