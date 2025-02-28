@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
-import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -217,10 +216,10 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
-      updaters.add(new SiriAzureETUpdater(configItem, provideSiriAdapter()));
+      updaters.add(SiriAzureUpdater.createETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
-      updaters.add(new SiriAzureSXUpdater(configItem, timetableRepository));
+      updaters.add(SiriAzureUpdater.createSXUpdater(configItem, timetableRepository));
     }
 
     return updaters;

@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import com.azure.core.util.ExpandableStringEnum;
-import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusErrorSource;
 import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
@@ -15,15 +14,15 @@ import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,16 +32,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.opentripplanner.framework.io.OtpHttpClientException;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
+import uk.org.siri.siri20.ServiceDelivery;
 
-class AbstractAzureSiriUpdaterTest {
+class SiriAzureUpdaterTest {
 
   private SiriAzureUpdaterParameters mockConfig;
-  private AbstractAzureSiriUpdater updater;
-  private AbstractAzureSiriUpdater.CheckedRunnable task;
+  private SiriAzureUpdater updater;
+  private SiriAzureUpdater.CheckedRunnable task;
 
   @BeforeEach
   public void setUp() throws Exception {
     mockConfig = mock(SiriAzureUpdaterParameters.class);
+    when(mockConfig.getType()).thenReturn("siri-azure-test-updater");
     when(mockConfig.configRef()).thenReturn("testConfigRef");
     when(mockConfig.getAuthenticationType()).thenReturn(AuthenticationType.SharedAccessKey);
     when(mockConfig.getFullyQualifiedNamespace()).thenReturn("testNamespace");
@@ -58,22 +60,22 @@ class AbstractAzureSiriUpdaterTest {
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
     updater =
       spy(
-        new AbstractAzureSiriUpdater(mockConfig) {
-          @Override
-          protected void messageConsumer(ServiceBusReceivedMessageContext messageContext) {}
+        new SiriAzureUpdater(
+          mockConfig,
+          new SiriAzureMessageHandler() {
+            @Override
+            public void setup(WriteToGraphCallback writeToGraphCallback) {}
 
-          @Override
-          protected void errorConsumer(ServiceBusErrorContext errorContext) {}
-
-          @Override
-          protected void initializeData(
-            String url,
-            Consumer<ServiceBusReceivedMessageContext> consumer
-          ) throws URISyntaxException {}
-        }
+            @Override
+            @Nullable
+            public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+              return null;
+            }
+          }
+        )
       );
 
-    task = mock(AbstractAzureSiriUpdater.CheckedRunnable.class);
+    task = mock(SiriAzureUpdater.CheckedRunnable.class);
   }
 
   /**
