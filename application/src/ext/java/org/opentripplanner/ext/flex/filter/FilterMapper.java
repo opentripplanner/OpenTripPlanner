@@ -20,8 +20,8 @@ public class FilterMapper {
   public static final String INCLUDED_ROUTES = "includedRoutes";
   public static final String EXCLUDED_AGENCIES = "excludedAgencies";
   public static final String EXCLUDED_ROUTES = "excludedRoutes";
-  private final Set<FeedScopedId> bannedAgencies = new HashSet<>();
-  private final Set<FeedScopedId> bannedRoutes = new HashSet<>();
+  private final Set<FeedScopedId> excludedAgencies = new HashSet<>();
+  private final Set<FeedScopedId> excludedRoutes = new HashSet<>();
   private final Set<FeedScopedId> selectedAgencies = new HashSet<>();
   private final Set<FeedScopedId> selectedRoutes = new HashSet<>();
 
@@ -52,13 +52,13 @@ public class FilterMapper {
     if (!selectedRoutes.isEmpty()) {
       builder.withIncludedRoutes(FilterValues.ofEmptyIsNothing(INCLUDED_ROUTES, selectedRoutes));
     }
-    if (!bannedAgencies.isEmpty()) {
+    if (!excludedAgencies.isEmpty()) {
       builder.withExcludedAgencies(
-        FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, bannedAgencies)
+        FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, excludedAgencies)
       );
     }
-    if (!bannedRoutes.isEmpty()) {
-      builder.withExcludedRoutes(FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, bannedRoutes));
+    if (!excludedRoutes.isEmpty()) {
+      builder.withExcludedRoutes(FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, excludedRoutes));
     }
     return builder.build();
   }
@@ -67,8 +67,8 @@ public class FilterMapper {
     sr
       .not()
       .forEach(s -> {
-        bannedRoutes.addAll(s.routes());
-        bannedAgencies.addAll(s.agencies());
+        excludedRoutes.addAll(s.routes());
+        excludedAgencies.addAll(s.agencies());
       });
     sr
       .select()

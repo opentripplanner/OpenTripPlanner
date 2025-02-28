@@ -20,9 +20,11 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class ClosestTripTest {
@@ -73,13 +75,7 @@ class ClosestTripTest {
     var request = TripRequest.of().build();
     var matcher = TripMatcherFactory.of(request, id -> Set.of(DATE));
 
-    var trips = ClosestTrip.of(
-      ADAPTER,
-      List.of(new NearbyStop(STOP, 100, List.of(), null)),
-      matcher,
-      List.of(FSD),
-      true
-    );
+    var trips = closestTrips(matcher);
     assertThat(trips).hasSize(1);
     assertEquals(List.copyOf(trips).getFirst().flexTrip(), FLEX_TRIP);
   }
@@ -98,13 +94,17 @@ class ClosestTripTest {
 
     var matcher = TripMatcherFactory.of(request, id -> Set.of(DATE));
 
-    var trips = ClosestTrip.of(
+    var trips = closestTrips(matcher);
+    assertThat(trips).isEmpty();
+  }
+
+  private static Collection<ClosestTrip> closestTrips(Matcher<Trip> matcher) {
+    return ClosestTrip.of(
       ADAPTER,
       List.of(new NearbyStop(STOP, 100, List.of(), null)),
       matcher,
       List.of(FSD),
       true
     );
-    assertThat(trips).isEmpty();
   }
 }
