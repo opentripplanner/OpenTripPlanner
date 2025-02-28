@@ -42,10 +42,9 @@ public class FlexAccessFactory {
     Collection<NearbyStop> streetAccesses,
     List<FlexServiceDate> dates
   ) {
-    var closestFlexTrips = ClosestTrip.of(callbackService, streetAccesses, dates, true);
+    var closestFlexTrips = ClosestTrip.of(callbackService, streetAccesses, matcher, dates, true);
     return closestFlexTrips
       .stream()
-      .filter(ct -> matcher.match(ct.flexTrip().getTrip()))
       .flatMap(it -> templateFactory.createAccessTemplates(it).stream())
       .toList();
   }

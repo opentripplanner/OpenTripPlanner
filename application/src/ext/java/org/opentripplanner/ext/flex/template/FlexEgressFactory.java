@@ -42,10 +42,9 @@ public class FlexEgressFactory {
     Collection<NearbyStop> streetEgresses,
     List<FlexServiceDate> dates
   ) {
-    var closestFlexTrips = ClosestTrip.of(callbackService, streetEgresses, dates, false);
+    var closestFlexTrips = ClosestTrip.of(callbackService, streetEgresses, matcher, dates, false);
     return closestFlexTrips
       .stream()
-      .filter(ct -> matcher.match(ct.flexTrip().getTrip()))
       .flatMap(it -> templateFactory.createEgressTemplates(it).stream())
       .toList();
   }
