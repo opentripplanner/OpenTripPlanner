@@ -77,7 +77,7 @@ public class VertexLinker {
   private final SiteRepository siteRepository;
   private final VertexFactory vertexFactory;
 
-  private boolean addExtraEdgesToAreas = true;
+  private boolean areaVisibility = true;
   private int maxAreaNodes = 150;
 
   /**
@@ -133,8 +133,8 @@ public class VertexLinker {
     removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
-  public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
-    this.addExtraEdgesToAreas = addExtraEdgesToAreas;
+  public void setAddExtraEdgesToAreas(Boolean areaVisibility) {
+    this.areaVisibility = areaVisibility;
   }
 
   public void setMaxAreaNodes(int maxAreaNodes) {
@@ -426,7 +426,7 @@ public class VertexLinker {
       snapped = false;
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
-      if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+      if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
         AreaGroup ag = aEdge.getArea();
         if (linkedAreas.contains(ag)) {
           return null;
@@ -447,7 +447,7 @@ public class VertexLinker {
       }
     }
 
-    if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+    if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
       if (!snapped || !aEdge.getArea().visibilityVertices().contains(start)) {
         addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
       }
