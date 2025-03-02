@@ -52,39 +52,6 @@ public class Timetable implements Serializable {
     return new TimetableBuilder(this);
   }
 
-  /** @return the index of TripTimes for this trip ID in this particular Timetable */
-  public int getTripIndex(FeedScopedId tripId) {
-    int ret = 0;
-    for (TripTimes tt : tripTimes) {
-      // could replace linear search with indexing in stoptime updater, but not necessary
-      // at this point since the updater thread is far from pegged.
-      if (tt.getTrip().getId().equals(tripId)) {
-        return ret;
-      }
-      ret += 1;
-    }
-    return -1;
-  }
-
-  /**
-   * @return the index of TripTimes for this trip ID in this particular Timetable, ignoring
-   * AgencyIds.
-   */
-  public int getTripIndex(String tripId) {
-    int ret = 0;
-    for (TripTimes tt : tripTimes) {
-      if (tt.getTrip().getId().getId().equals(tripId)) {
-        return ret;
-      }
-      ret += 1;
-    }
-    return -1;
-  }
-
-  public TripTimes getTripTimes(int tripIndex) {
-    return tripTimes.get(tripIndex);
-  }
-
   @Nullable
   public TripTimes getTripTimes(Trip trip) {
     for (TripTimes tt : tripTimes) {
