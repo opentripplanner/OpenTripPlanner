@@ -63,8 +63,14 @@ public class OjpService {
     var timeWindow = timeWindow(ser);
     Set<FeedScopedId> selectedAgencies = agencyFilter(ser, o -> FALSE.equals(o.isExclude()));
     Set<FeedScopedId> selectedRoutes = lineFilter(ser, o -> FALSE.equals(o.isExclude()));
-    Set<FeedScopedId> excludedAgencies = agencyFilter(ser, f -> f == null || TRUE.equals(f.isExclude()));
-    Set<FeedScopedId> excludedRoutes = lineFilter(ser, f -> f == null || TRUE.equals(f.isExclude()));
+    Set<FeedScopedId> excludedAgencies = agencyFilter(
+      ser,
+      f -> f == null || TRUE.equals(f.isExclude())
+    );
+    Set<FeedScopedId> excludedRoutes = lineFilter(
+      ser,
+      f -> f == null || TRUE.equals(f.isExclude())
+    );
 
     List<CallAtStop> callsAtStop = List.of();
 
