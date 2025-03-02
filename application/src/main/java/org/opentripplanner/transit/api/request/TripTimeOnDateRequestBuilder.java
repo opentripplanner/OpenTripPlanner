@@ -28,7 +28,14 @@ public class TripTimeOnDateRequestBuilder {
     "routes",
     List.of()
   );
-  private FilterValues<TransitMode> modes = FilterValues.ofEmptyIsEverything("modes", List.of());
+  private FilterValues<TransitMode> includedModes = FilterValues.ofEmptyIsEverything(
+    "modes",
+    List.of()
+  );
+  private FilterValues<TransitMode> excludedModes = FilterValues.ofEmptyIsEverything(
+    "modes",
+    List.of()
+  );
   private Duration timeWindow = Duration.ofHours(2);
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
@@ -63,8 +70,13 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withIncludedMode(FilterValues<TransitMode> modes) {
-    this.modes = modes;
+  public TripTimeOnDateRequestBuilder withIncludedModes(FilterValues<TransitMode> modes) {
+    this.includedModes = modes;
+    return this;
+  }
+
+  public TripTimeOnDateRequestBuilder withExcludedModes(FilterValues<TransitMode> modes) {
+    this.excludedModes = modes;
     return this;
   }
 
@@ -94,7 +106,8 @@ public class TripTimeOnDateRequestBuilder {
       includedRoutes,
       excludedAgencies,
       excludedRoutes,
-      modes
+      includedModes,
+      excludedModes
     );
   }
 }
