@@ -12,14 +12,10 @@
                     <DepArrTime>2025-02-13T13:03:36</DepArrTime>
                 </Location>
                 <Params>
-                    <NumberOfResults>1</NumberOfResults>
-                    <StopEventType>departure</StopEventType>
-                    <IncludePreviousCalls>true</IncludePreviousCalls>
-                    <IncludeOnwardCalls>true</IncludeOnwardCalls>
-                    <IncludeRealtimeData>true</IncludeRealtimeData>
                     <OperatorFilter>
                         <OperatorRef>vvs-111</OperatorRef>
                         <OperatorRef>vvs-222</OperatorRef>
+                        <Exclude>false</Exclude>
                     </OperatorFilter>
                     <LineFilter>
                         <Line>
@@ -32,7 +28,13 @@
                             <LineRef>ccc</LineRef>
                             <Exlude>true</Exlude>
                         </Line>
+                        <Exclude>true</Exclude>
                     </LineFilter>
+                    <NumberOfResults>1</NumberOfResults>
+                    <StopEventType>departure</StopEventType>
+                    <IncludePreviousCalls>true</IncludePreviousCalls>
+                    <IncludeOnwardCalls>true</IncludeOnwardCalls>
+                    <IncludeRealtimeData>true</IncludeRealtimeData>
                 </Params>
             </StopEventRequest>
         </RequestPayload>

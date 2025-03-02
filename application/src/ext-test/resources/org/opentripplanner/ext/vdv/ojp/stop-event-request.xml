@@ -24,8 +24,10 @@
                         <ojp:Line>
                             <siri:LineRef>ccc</siri:LineRef>
                         </ojp:Line>
+                        <ojp:Exclude>false</ojp:Exclude>
                     </ojp:LineFilter>
                     <ojp:OperatorFilter>
+                        <ojp:Exclude>false</ojp:Exclude>
                         <ojp:OperatorRef>vvs-111</ojp:OperatorRef>
                         <ojp:OperatorRef>vvs-222</ojp:OperatorRef>
                     </ojp:OperatorFilter>
