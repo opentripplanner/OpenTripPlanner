@@ -192,6 +192,7 @@ public class OTPMain {
     app.timetableRepository().index();
     app.graph().index(app.timetableRepository().getSiteRepository());
 
+    app.graph().getLinker().setMaxAreaNodes(app.buildConfig().maxAreaNodes);
     // publishing the config version info make it available to the APIs
     setOtpConfigVersionsOnServerInfo(app);
 
