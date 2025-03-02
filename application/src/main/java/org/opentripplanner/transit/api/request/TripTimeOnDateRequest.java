@@ -20,7 +20,7 @@ public class TripTimeOnDateRequest {
   private final FilterValues<FeedScopedId> selectedRoutes;
   private final FilterValues<FeedScopedId> excludedAgencies;
   private final FilterValues<FeedScopedId> excludedRoutes;
-  private final FilterValues<TransitMode> modes;
+  private final FilterValues<TransitMode> includedModes;
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
   private final int numberOfDepartures;
@@ -35,7 +35,7 @@ public class TripTimeOnDateRequest {
     FilterValues<FeedScopedId> selectedRoutes,
     FilterValues<FeedScopedId> excludedAgencies,
     FilterValues<FeedScopedId> excludedRoutes,
-    FilterValues<TransitMode> modes
+    FilterValues<TransitMode> includedModes
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
     this.time = Objects.requireNonNull(time);
@@ -46,7 +46,7 @@ public class TripTimeOnDateRequest {
     this.selectedRoutes = selectedRoutes;
     this.excludedAgencies = excludedAgencies;
     this.excludedRoutes = excludedRoutes;
-    this.modes = modes;
+    this.includedModes = includedModes;
   }
 
   public static TripTimeOnDateRequestBuilder of(List<StopLocation> stopLocations) {
@@ -77,8 +77,8 @@ public class TripTimeOnDateRequest {
     return excludedRoutes;
   }
 
-  public FilterValues<TransitMode> modes() {
-    return modes;
+  public FilterValues<TransitMode> includedModes() {
+    return includedModes;
   }
 
   public Duration timeWindow() {

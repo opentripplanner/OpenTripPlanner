@@ -90,6 +90,18 @@
                     <xsl:value-of select="//trias:TimeWindow"/>
                   </xsl:element>
                 </xsl:if>
+                <xsl:if test="//trias:PtModeFilter">
+                  <ModeFilter>
+                    <xsl:for-each select="//trias:PtModeFilter//trias:PtMode">
+                      <xsl:element name="PtMode">
+                        <xsl:value-of select="."/>
+                      </xsl:element>
+                    </xsl:for-each>
+                    <xsl:if test="//trias:Exclude">
+                      <Exclude><xsl:value-of select="//trias:Exclude"/></Exclude>
+                    </xsl:if>
+                  </ModeFilter>
+                </xsl:if>
                 <xsl:if test="//trias:OperatorFilter">
                   <OperatorFilter>
                     <xsl:for-each select="//trias:OperatorFilter//trias:OperatorRef">

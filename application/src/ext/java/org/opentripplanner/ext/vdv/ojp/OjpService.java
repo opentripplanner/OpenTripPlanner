@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.vdv.ojp;
 
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
 import static org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
 
 import de.vdv.ojp20.LineDirectionFilterStructure;
+import de.vdv.ojp20.ModeFilterStructure;
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPStopEventRequestStructure;
 import de.vdv.ojp20.OperatorFilterStructure;
@@ -28,6 +28,7 @@ import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.id.IdResolver;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class OjpService {
@@ -50,41 +51,13 @@ public class OjpService {
     this.zoneId = zoneId;
   }
 
-  public OJP handleStopEvenRequest(OJPStopEventRequestStructure ser) {
+  public OJP handleStopEventRequest(OJPStopEventRequestStructure ser) {
     var stopId = stopPointRef(ser);
     var coordinate = coordinate(ser);
 
-    var time = Optional
-      .ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId))
-      .orElse(ZonedDateTime.now(zoneId));
-    int numResults = params(ser).map(s -> s.getNumberOfResults()).map(i -> i.intValue()).orElse(1);
-
-    var arrivalDeparture = arrivalDeparture(ser);
-    var timeWindow = timeWindow(ser);
-    Set<FeedScopedId> selectedAgencies = agencyFilter(ser, o -> FALSE.equals(o.isExclude()));
-    Set<FeedScopedId> selectedRoutes = lineFilter(ser, o -> FALSE.equals(o.isExclude()));
-    Set<FeedScopedId> excludedAgencies = agencyFilter(
-      ser,
-      f -> f == null || TRUE.equals(f.isExclude())
-    );
-    Set<FeedScopedId> excludedRoutes = lineFilter(
-      ser,
-      f -> f == null || TRUE.equals(f.isExclude())
-    );
+    final var params = extractStopEventParams(ser);
 
     List<CallAtStop> callsAtStop = List.of();
-
-    var params = new VdvService.StopEventRequestParams(
-      time.toInstant(),
-      arrivalDeparture,
-      timeWindow,
-      numResults,
-      selectedAgencies,
-      selectedRoutes,
-      excludedAgencies,
-      excludedRoutes
-    );
-
     if (stopId.isPresent()) {
       callsAtStop = vdvService.findTripTimesOnDate(stopId.get(), params);
     } else if (coordinate.isPresent()) {
@@ -96,6 +69,54 @@ public class OjpService {
       ZonedDateTime.now(),
       mapOptionalFeatures(ser.getParams())
     );
+  }
+
+  protected VdvService.StopEventRequestParams extractStopEventParams(
+    OJPStopEventRequestStructure ser
+  ) {
+    var time = Optional
+      .ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId))
+      .orElse(ZonedDateTime.now(zoneId));
+    int numResults = params(ser).map(s -> s.getNumberOfResults()).map(i -> i.intValue()).orElse(1);
+
+    var arrivalDeparture = arrivalDeparture(ser);
+    var timeWindow = timeWindow(ser);
+    Set<FeedScopedId> selectedAgencies = agencyFilter(ser, o -> !isExclude(o.isExclude()));
+    Set<FeedScopedId> selectedRoutes = lineFilter(ser, o -> !isExclude(o.isExclude()));
+    Set<FeedScopedId> excludedAgencies = agencyFilter(ser, f -> isExclude(f.isExclude()));
+    Set<FeedScopedId> excludedRoutes = lineFilter(ser, f -> isExclude(f.isExclude()));
+    Set<TransitMode> includedModes = modeFilter(ser, m -> !isExclude(m.isExclude()));
+    Set<TransitMode> excludedModes = modeFilter(ser, m -> isExclude(m.isExclude()));
+
+    return new VdvService.StopEventRequestParams(
+      time.toInstant(),
+      arrivalDeparture,
+      timeWindow,
+      numResults,
+      selectedAgencies,
+      selectedRoutes,
+      excludedAgencies,
+      excludedRoutes,
+      includedModes,
+      excludedModes
+    );
+  }
+
+  private static boolean isExclude(Boolean b) {
+    return b == null || TRUE.equals(b);
+  }
+
+  private Set<TransitMode> modeFilter(
+    OJPStopEventRequestStructure ser,
+    Predicate<ModeFilterStructure> predicate
+  ) {
+    return params(ser)
+      .map(StopEventParamStructure::getModeFilter)
+      .filter(predicate)
+      .map(ModeFilterStructure::getPtMode)
+      .stream()
+      .flatMap(m -> m.stream().map(PtModeMapper::map))
+      .collect(Collectors.toSet());
   }
 
   private Set<FeedScopedId> agencyFilter(

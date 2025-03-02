@@ -79,7 +79,7 @@ public class TriasResource {
       var request = findRequest(ojp);
 
       if (request instanceof OJPStopEventRequestStructure ser) {
-        var ojpResponse = ojpService.handleStopEvenRequest(ser);
+        var ojpResponse = ojpService.handleStopEventRequest(ser);
         final StreamingOutput stream = ojpToTrias(ojpResponse);
         return Response.ok(stream).build();
       } else {
