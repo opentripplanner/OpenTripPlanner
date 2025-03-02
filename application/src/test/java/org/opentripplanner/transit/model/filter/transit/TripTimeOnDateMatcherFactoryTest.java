@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.filter.transit;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.agency;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 
-public class TripTimeOnDateMatcherFactoryTest {
+class TripTimeOnDateMatcherFactoryTest {
 
   private static final RegularStop STOP = TimetableRepositoryForTest.of().stop("1").build();
   private static final LocalDate DATE = LocalDate.of(2025, 3, 2);
@@ -104,6 +104,44 @@ public class TripTimeOnDateMatcherFactoryTest {
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     assertTrue(matcher.match(tripTimeOnDate(ROUTE_1)));
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_2)));
+  }
+
+  @Test
+  void excludeMode() {
+    var request = request()
+      .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
+      .build();
+
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
+    assertTrue(matcher.match(tripTimeOnDate(ROUTE_2)));
+  }
+
+  @Test
+  void excludeModeAndRoute() {
+    var request = request()
+      .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
+      .withExcludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(ROUTE_2.getId())))
+      .build();
+
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_2)));
+  }
+
+  @Test
+  void excludeAgencyAndRoute() {
+    var request = request()
+      .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
+      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(ROUTE_2.getAgency().getId())))
+      .build();
+
+    var matcher = TripTimeOnDateMatcherFactory.of(request);
+
+    assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_2)));
   }
 
