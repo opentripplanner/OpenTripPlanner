@@ -88,7 +88,9 @@ public class VdvService {
         FilterValues.ofEmptyIsEverything("selectedAgencies", params.selectedAgencies)
       )
       .withIncludedRoutes(FilterValues.ofEmptyIsEverything("selectedRoutes", params.selectedRoutes))
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("excludedAgencies", params.excludedAgencies))
+      .withExcludedAgencies(
+        FilterValues.ofEmptyIsEverything("excludedAgencies", params.excludedAgencies)
+      )
       .withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", params.excludedRoutes))
       .build();
     return transitService.findTripTimeOnDate(request).stream().map(CallAtStop::noWalking).toList();
