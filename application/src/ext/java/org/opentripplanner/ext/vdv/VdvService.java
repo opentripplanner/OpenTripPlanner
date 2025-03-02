@@ -12,6 +12,7 @@ import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 public class VdvService {
@@ -34,8 +35,12 @@ public class VdvService {
     if (stop == null) {
       throw new EntityNotFoundException("StopPlace", stopId);
     }
-    var timesAtStops = List.of(new TripTimeOnDateRequest.TimeAtStop(stop, params.time));
-    var calls = findCallsAtStop(timesAtStops, params);
+    return findTripTimesOnDate(stop, params);
+  }
+
+  public List<CallAtStop> findTripTimesOnDate(StopLocation stop, StopEventRequestParams params) {
+    List<StopLocation> stopLocations = List.of(stop);
+    var calls = findCallsAtStop(stopLocations, params);
     return sort(params.numDepartures, calls);
   }
 
@@ -46,12 +51,11 @@ public class VdvService {
     var calls = finder
       .findClosestStops(coordinate.asJtsCoordinate(), 1000)
       .stream()
-      .flatMap(nearbyStop -> {
-        var stopParams = params.plusTime(nearbyStop.duration());
-        return this.findTripTimesOnDate(nearbyStop.stop.getId(), stopParams)
+      .flatMap(nearbyStop ->
+        this.findTripTimesOnDate(nearbyStop.stop, params)
           .stream()
-          .map(tt -> tt.withWalkTime(nearbyStop.duration()));
-      })
+          .map(tt -> tt.withWalkTime(nearbyStop.duration()))
+      )
       .toList();
 
     return sort(params.numDepartures(), calls);
@@ -66,7 +70,7 @@ public class VdvService {
   }
 
   private List<CallAtStop> findCallsAtStop(
-    List<TripTimeOnDateRequest.TimeAtStop> timesAtStops,
+    List<StopLocation> stopLocations,
     StopEventRequestParams params
   ) {
     if (params.numDepartures > MAX_DEPARTURES) {
@@ -75,7 +79,8 @@ public class VdvService {
       );
     }
     var request = TripTimeOnDateRequest
-      .of(timesAtStops)
+      .of(stopLocations)
+      .withTime(params.time)
       .withArrivalDeparture(params.arrivalDeparture)
       .withTimeWindow(params.timeWindow)
       .withNumberOfDepartures(params.numDepartures)
@@ -90,15 +95,5 @@ public class VdvService {
     Duration timeWindow,
     int numDepartures,
     Set<FeedScopedId> selectedAgencies
-  ) {
-    StopEventRequestParams plusTime(Duration duration) {
-      return new StopEventRequestParams(
-        time.plus(duration),
-        arrivalDeparture,
-        timeWindow,
-        numDepartures,
-        selectedAgencies
-      );
-    }
-  }
+  ) {}
 }

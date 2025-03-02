@@ -20,12 +20,10 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
-import org.opentripplanner.transit.model.filter.transit.TripOnServiceDateMatcherFactory;
 import org.opentripplanner.transit.model.filter.transit.TripTimeOnDateMatcherFactory;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -94,13 +92,13 @@ class StopTimesHelper {
   ) {
     Matcher<TripTimeOnDate> matcher = TripTimeOnDateMatcherFactory.of(request);
     return request
-      .timesAtStop()
+      .stopLocations()
       .stream()
-      .flatMap(timeAtStop ->
+      .flatMap(stopLocation ->
         stopTimesForStop(
           transitService,
-          timeAtStop.stop(),
-          timeAtStop.time(),
+          stopLocation,
+          request.time(),
           request.timeWindow(),
           request.numberOfDepartures(),
           request.arrivalDeparture(),
