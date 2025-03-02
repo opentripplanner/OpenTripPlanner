@@ -1,17 +1,17 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.api.model.RequiredFilterValues;
-import org.opentripplanner.transit.api.request.TripTimeOnDateRequest.TimeAtStop;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class TripTimeOnDateRequestBuilder {
 
-  private final List<TimeAtStop> timesAtStop;
+  private final List<StopLocation> stopLocations;
   private FilterValues<FeedScopedId> agencies = FilterValues.ofEmptyIsEverything(
     "agencies",
     List.of()
@@ -21,9 +21,15 @@ public class TripTimeOnDateRequestBuilder {
   private Duration timeWindow = Duration.ofHours(2);
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
+  private Instant time;
 
-  TripTimeOnDateRequestBuilder(List<TimeAtStop> timesAtStops) {
-    this.timesAtStop = timesAtStops;
+  TripTimeOnDateRequestBuilder(List<StopLocation> timesAtStops) {
+    this.stopLocations = timesAtStops;
+  }
+
+  public TripTimeOnDateRequestBuilder withTime(Instant time) {
+    this.time = time;
+    return this;
   }
 
   public TripTimeOnDateRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
@@ -58,7 +64,8 @@ public class TripTimeOnDateRequestBuilder {
 
   public TripTimeOnDateRequest build() {
     return new TripTimeOnDateRequest(
-      timesAtStop,
+      stopLocations,
+      time,
       timeWindow,
       arrivalDeparture,
       numberOfDepartures,

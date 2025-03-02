@@ -32,11 +32,15 @@ public class TripTimeOnDateMatcherFactory {
   }
 
   static Matcher<TripTimeOnDate> agencyId(FeedScopedId id) {
-    return new EqualityMatcher<>("agency", id, t -> t.getTrip().getRoute().getAgency().getId());
+    return new EqualityMatcher<>(
+      "selectedAgencies",
+      id,
+      t -> t.getTrip().getRoute().getAgency().getId()
+    );
   }
 
   static Matcher<TripTimeOnDate> routeId(FeedScopedId id) {
-    return new EqualityMatcher<>("route", id, t -> t.getTrip().getRoute().getId());
+    return new EqualityMatcher<>("selectedRoutes", id, t -> t.getTrip().getRoute().getId());
   }
 
   static Matcher<TripTimeOnDate> modes(TransitMode mode) {
