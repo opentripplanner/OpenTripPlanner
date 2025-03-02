@@ -97,6 +97,9 @@
                         <xsl:value-of select="."/>
                       </xsl:element>
                     </xsl:for-each>
+                    <xsl:if test="//trias:Exclude">
+                      <Exclude><xsl:value-of select="//trias:Exclude"/></Exclude>
+                    </xsl:if>
                   </OperatorFilter>
                 </xsl:if>
                 <xsl:if test="//trias:LineFilter">
@@ -108,6 +111,9 @@
                         </siri:LineRef>
                       </Line>
                     </xsl:for-each>
+                    <xsl:if test="//trias:Exclude">
+                      <Exclude><xsl:value-of select="//trias:Exclude"/></Exclude>
+                    </xsl:if>
                   </LineFilter>
                 </xsl:if>
               </Params>

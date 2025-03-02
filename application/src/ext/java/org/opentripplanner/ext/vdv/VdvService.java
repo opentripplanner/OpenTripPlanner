@@ -84,7 +84,12 @@ public class VdvService {
       .withArrivalDeparture(params.arrivalDeparture)
       .withTimeWindow(params.timeWindow)
       .withNumberOfDepartures(params.numDepartures)
-      .withAgencies(FilterValues.ofEmptyIsEverything("agencies", params.selectedAgencies))
+      .withIncludedAgencies(
+        FilterValues.ofEmptyIsEverything("selectedAgencies", params.selectedAgencies)
+      )
+      .withIncludedRoutes(FilterValues.ofEmptyIsEverything("selectedRoutes", params.selectedRoutes))
+      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("excludedAgencies", params.excludedAgencies))
+      .withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", params.excludedRoutes))
       .build();
     return transitService.findTripTimeOnDate(request).stream().map(CallAtStop::noWalking).toList();
   }
@@ -94,6 +99,9 @@ public class VdvService {
     ArrivalDeparture arrivalDeparture,
     Duration timeWindow,
     int numDepartures,
-    Set<FeedScopedId> selectedAgencies
+    Set<FeedScopedId> selectedAgencies,
+    Set<FeedScopedId> selectedRoutes,
+    Set<FeedScopedId> excludedAgencies,
+    Set<FeedScopedId> excludedRoutes
   ) {}
 }

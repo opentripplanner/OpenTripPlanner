@@ -12,11 +12,22 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class TripTimeOnDateRequestBuilder {
 
   private final List<StopLocation> stopLocations;
-  private FilterValues<FeedScopedId> agencies = FilterValues.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> includedAgencies = FilterValues.ofEmptyIsEverything(
     "agencies",
     List.of()
   );
-  private FilterValues<FeedScopedId> routes = FilterValues.ofEmptyIsEverything("routes", List.of());
+  private FilterValues<FeedScopedId> includedRoutes = FilterValues.ofEmptyIsEverything(
+    "routes",
+    List.of()
+  );
+  private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofEmptyIsEverything(
+    "agencies",
+    List.of()
+    );
+  private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofEmptyIsEverything(
+    "routes",
+    List.of()
+  );
   private FilterValues<TransitMode> modes = FilterValues.ofEmptyIsEverything("modes", List.of());
   private Duration timeWindow = Duration.ofHours(2);
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
@@ -32,13 +43,23 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
-    this.agencies = agencies;
+  public TripTimeOnDateRequestBuilder withIncludedAgencies(FilterValues<FeedScopedId> agencies) {
+    this.includedAgencies = agencies;
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withRoutes(FilterValues<FeedScopedId> routes) {
-    this.routes = routes;
+  public TripTimeOnDateRequestBuilder withIncludedRoutes(FilterValues<FeedScopedId> routes) {
+    this.includedRoutes = routes;
+    return this;
+  }
+
+  public TripTimeOnDateRequestBuilder withExcludedAgencies(FilterValues<FeedScopedId> agencies) {
+    this.excludedAgencies = agencies;
+    return this;
+  }
+
+  public TripTimeOnDateRequestBuilder withExcludedRoutes(FilterValues<FeedScopedId> routes) {
+    this.excludedRoutes = routes;
     return this;
   }
 
@@ -69,8 +90,10 @@ public class TripTimeOnDateRequestBuilder {
       timeWindow,
       arrivalDeparture,
       numberOfDepartures,
-      agencies,
-      routes,
+      includedAgencies,
+      includedRoutes,
+      excludedAgencies,
+      excludedRoutes,
       modes
     );
   }
