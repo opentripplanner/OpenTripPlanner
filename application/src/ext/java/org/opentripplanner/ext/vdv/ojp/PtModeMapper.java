@@ -20,4 +20,27 @@ public class PtModeMapper {
       case CARPOOL, TAXI -> VehicleModesOfTransportEnumeration.TAXI;
     };
   }
+
+  public static TransitMode map(VehicleModesOfTransportEnumeration mode) {
+    return switch (mode) {
+      case RAIL,
+        RAILWAY_SERVICE,
+        LIGHT_RAILWAY_SERVICE,
+        URBAN_RAILWAY_SERVICE,
+        URBAN_RAIL,
+        SUBURBAN_RAILWAY_SERVICE,
+        SUBURBAN_RAIL -> TransitMode.RAIL;
+      case COACH, COACH_SERVICE -> TransitMode.COACH;
+      case METRO, UNDERGROUND_SERVICE, UNDERGROUND, METRO_SERVICE -> TransitMode.SUBWAY;
+      case BUS, BUS_SERVICE -> TransitMode.BUS;
+      case TRAM, TRAM_SERVICE -> TransitMode.TRAM;
+      case FERRY, FERRY_SERVICE, WATER_TRANSPORT, WATER -> TransitMode.FERRY;
+      case AIR, AIR_SERVICE -> TransitMode.AIRPLANE;
+      case CABLEWAY, GONDOLA_CABLE_CAR_SERVICE, TELECABIN_SERVICE, TELECABIN -> TransitMode.GONDOLA;
+      case FUNICULAR, FUNICULAR_SERVICE, RACK_RAIL_SERVICE -> TransitMode.FUNICULAR;
+      case TROLLEY_BUS, TROLLEY_BUS_SERVICE, TROLLEYBUS_SERVICE -> TransitMode.TROLLEYBUS;
+      case TAXI_SERVICE, TAXI -> TransitMode.TAXI;
+      default -> throw new IllegalArgumentException("Unknown mode: " + mode);
+    };
+  }
 }

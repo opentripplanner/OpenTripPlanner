@@ -63,7 +63,7 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withModes(FilterValues<TransitMode> modes) {
+  public TripTimeOnDateRequestBuilder withIncludedMode(FilterValues<TransitMode> modes) {
     this.modes = modes;
     return this;
   }
