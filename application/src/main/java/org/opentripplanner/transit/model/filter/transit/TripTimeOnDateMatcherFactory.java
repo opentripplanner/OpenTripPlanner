@@ -31,6 +31,7 @@ public class TripTimeOnDateMatcherFactory {
     expr.atLeastOneMatch(request.includedModes(), TripTimeOnDateMatcherFactory::includeMode);
     expr.noMatches(request.excludedAgencies(), TripTimeOnDateMatcherFactory::excludeAgencyId);
     expr.noMatches(request.excludedRoutes(), TripTimeOnDateMatcherFactory::excludeRouteId);
+    expr.noMatches(request.excludedModes(), TripTimeOnDateMatcherFactory::excludeMode);
     return expr.build();
   }
 
@@ -52,5 +53,9 @@ public class TripTimeOnDateMatcherFactory {
 
   static Matcher<TripTimeOnDate> includeMode(TransitMode mode) {
     return new EqualityMatcher<>("mode", mode, t -> t.getTrip().getRoute().getMode());
+  }
+
+  static Matcher<TripTimeOnDate> excludeMode(TransitMode mode) {
+    return new NegationMatcher<>("mode", includeMode(mode));
   }
 }
