@@ -23,7 +23,7 @@ public class TripTimeOnDateRequestBuilder {
   private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofEmptyIsEverything(
     "agencies",
     List.of()
-    );
+  );
   private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofEmptyIsEverything(
     "routes",
     List.of()
