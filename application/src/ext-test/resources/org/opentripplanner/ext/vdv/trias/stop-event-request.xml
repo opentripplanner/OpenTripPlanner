@@ -12,6 +12,10 @@
                     <DepArrTime>2025-02-13T13:03:36</DepArrTime>
                 </Location>
                 <Params>
+                    <PtModeFilter>
+                        <Exclude>true</Exclude>
+                        <PtMode>bus</PtMode>
+                    </PtModeFilter>
                     <OperatorFilter>
                         <OperatorRef>vvs-111</OperatorRef>
                         <OperatorRef>vvs-222</OperatorRef>

@@ -10,6 +10,7 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -85,13 +86,14 @@ public class VdvService {
       .withTimeWindow(params.timeWindow)
       .withNumberOfDepartures(params.numDepartures)
       .withIncludedAgencies(
-        FilterValues.ofEmptyIsEverything("selectedAgencies", params.selectedAgencies)
+        FilterValues.ofEmptyIsEverything("selectedAgencies", params.includedAgencies)
       )
-      .withIncludedRoutes(FilterValues.ofEmptyIsEverything("selectedRoutes", params.selectedRoutes))
+      .withIncludedRoutes(FilterValues.ofEmptyIsEverything("selectedRoutes", params.includedRoutes))
       .withExcludedAgencies(
         FilterValues.ofEmptyIsEverything("excludedAgencies", params.excludedAgencies)
       )
       .withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", params.excludedRoutes))
+      .withIncludedMode(FilterValues.ofEmptyIsEverything("selectedModes", params.includedModes))
       .build();
     return transitService.findTripTimeOnDate(request).stream().map(CallAtStop::noWalking).toList();
   }
@@ -101,9 +103,11 @@ public class VdvService {
     ArrivalDeparture arrivalDeparture,
     Duration timeWindow,
     int numDepartures,
-    Set<FeedScopedId> selectedAgencies,
-    Set<FeedScopedId> selectedRoutes,
+    Set<FeedScopedId> includedAgencies,
+    Set<FeedScopedId> includedRoutes,
     Set<FeedScopedId> excludedAgencies,
-    Set<FeedScopedId> excludedRoutes
+    Set<FeedScopedId> excludedRoutes,
+    Set<TransitMode> includedModes,
+    Set<TransitMode> excludedModes
   ) {}
 }

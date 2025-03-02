@@ -14,6 +14,10 @@
                     <ojp:DepArrTime>2025-02-13T13:03:36</ojp:DepArrTime>
                 </ojp:Location>
                 <ojp:Params>
+                    <ojp:ModeFilter>
+                        <ojp:Exclude>true</ojp:Exclude>
+                        <ojp:PtMode>bus</ojp:PtMode>
+                    </ojp:ModeFilter>
                     <ojp:LineFilter>
                         <ojp:Line>
                             <siri:LineRef>aaa</siri:LineRef>
@@ -24,10 +28,10 @@
                         <ojp:Line>
                             <siri:LineRef>ccc</siri:LineRef>
                         </ojp:Line>
-                        <ojp:Exclude>false</ojp:Exclude>
+                        <ojp:Exclude>true</ojp:Exclude>
                     </ojp:LineFilter>
                     <ojp:OperatorFilter>
-                        <ojp:Exclude>false</ojp:Exclude>
+                        <ojp:Exclude>true</ojp:Exclude>
                         <ojp:OperatorRef>vvs-111</ojp:OperatorRef>
                         <ojp:OperatorRef>vvs-222</ojp:OperatorRef>
                     </ojp:OperatorFilter>

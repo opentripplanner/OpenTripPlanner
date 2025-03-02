@@ -28,39 +28,29 @@ public class TripTimeOnDateMatcherFactory {
 
     expr.atLeastOneMatch(request.selectedAgencies(), TripTimeOnDateMatcherFactory::includeAgencyId);
     expr.atLeastOneMatch(request.selectedRoutes(), TripTimeOnDateMatcherFactory::includeRouteId);
+    expr.atLeastOneMatch(request.includedModes(), TripTimeOnDateMatcherFactory::includeMode);
     expr.noMatches(request.excludedAgencies(), TripTimeOnDateMatcherFactory::excludeAgencyId);
     expr.noMatches(request.excludedRoutes(), TripTimeOnDateMatcherFactory::excludeRouteId);
-    expr.atLeastOneMatch(request.modes(), TripTimeOnDateMatcherFactory::mode);
     return expr.build();
   }
 
   static Matcher<TripTimeOnDate> includeAgencyId(FeedScopedId id) {
-    return new EqualityMatcher<>(
-      "includdeAgency",
-      id,
-      t -> t.getTrip().getRoute().getAgency().getId()
-    );
+    return new EqualityMatcher<>("agency", id, t -> t.getTrip().getRoute().getAgency().getId());
   }
 
   static Matcher<TripTimeOnDate> includeRouteId(FeedScopedId id) {
-    return new EqualityMatcher<>("inlcudedRoute", id, t -> t.getTrip().getRoute().getId());
+    return new EqualityMatcher<>("route", id, t -> t.getTrip().getRoute().getId());
   }
 
   static Matcher<TripTimeOnDate> excludeAgencyId(FeedScopedId id) {
-    return new NegationMatcher<>(
-      "excludedAgency",
-      new EqualityMatcher<>("agency", id, t -> t.getTrip().getRoute().getAgency().getId())
-    );
+    return new NegationMatcher<>("excludedAgency", includeAgencyId(id));
   }
 
   static Matcher<TripTimeOnDate> excludeRouteId(FeedScopedId id) {
-    return new NegationMatcher<>(
-      "excludedRoute",
-      new EqualityMatcher<>("route", id, t -> t.getTrip().getRoute().getId())
-    );
+    return new NegationMatcher<>("excludedRoute", includeRouteId(id));
   }
 
-  static Matcher<TripTimeOnDate> mode(TransitMode mode) {
+  static Matcher<TripTimeOnDate> includeMode(TransitMode mode) {
     return new EqualityMatcher<>("mode", mode, t -> t.getTrip().getRoute().getMode());
   }
 }
