@@ -18,6 +18,8 @@ public class TripTimeOnDateRequest {
   private final Instant time;
   private final FilterValues<FeedScopedId> selectedAgencies;
   private final FilterValues<FeedScopedId> selectedRoutes;
+  private final FilterValues<FeedScopedId> excludedAgencies;
+  private final FilterValues<FeedScopedId> excludedRoutes;
   private final FilterValues<TransitMode> modes;
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
@@ -31,6 +33,8 @@ public class TripTimeOnDateRequest {
     int numberOfDepartures,
     FilterValues<FeedScopedId> selectedAgencies,
     FilterValues<FeedScopedId> selectedRoutes,
+    FilterValues<FeedScopedId> excludedAgencies,
+    FilterValues<FeedScopedId> excludedRoutes,
     FilterValues<TransitMode> modes
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
@@ -40,6 +44,8 @@ public class TripTimeOnDateRequest {
     this.numberOfDepartures = numberOfDepartures;
     this.selectedAgencies = selectedAgencies;
     this.selectedRoutes = selectedRoutes;
+    this.excludedAgencies = excludedAgencies;
+    this.excludedRoutes = excludedRoutes;
     this.modes = modes;
   }
 
@@ -55,12 +61,20 @@ public class TripTimeOnDateRequest {
     return time;
   }
 
-  public FilterValues<FeedScopedId> agencies() {
+  public FilterValues<FeedScopedId> selectedAgencies() {
     return selectedAgencies;
   }
 
-  public FilterValues<FeedScopedId> routes() {
+  public FilterValues<FeedScopedId> selectedRoutes() {
     return selectedRoutes;
+  }
+
+  public FilterValues<FeedScopedId> excludedAgencies() {
+    return excludedAgencies;
+  }
+
+  public FilterValues<FeedScopedId> excludedRoutes() {
+    return excludedRoutes;
   }
 
   public FilterValues<TransitMode> modes() {

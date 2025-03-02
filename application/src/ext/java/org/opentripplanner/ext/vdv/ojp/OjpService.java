@@ -1,11 +1,14 @@
 package org.opentripplanner.ext.vdv.ojp;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
 import static org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
 
+import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPStopEventRequestStructure;
+import de.vdv.ojp20.OperatorFilterStructure;
 import de.vdv.ojp20.PlaceContextStructure;
 import de.vdv.ojp20.PlaceRefStructure;
 import de.vdv.ojp20.StopEventParamStructure;
@@ -18,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.vdv.CallAtStop;
 import org.opentripplanner.ext.vdv.VdvService;
@@ -57,7 +61,10 @@ public class OjpService {
 
     var arrivalDeparture = arrivalDeparture(ser);
     var timeWindow = timeWindow(ser);
-    Set<FeedScopedId> selectedAgencies = selectedAgencies(ser);
+    Set<FeedScopedId> selectedAgencies = agencyFilter(ser, o -> FALSE.equals(o.isExclude()));
+    Set<FeedScopedId> selectedRoutes = lineFilter(ser, o -> FALSE.equals(o.isExclude()));
+    Set<FeedScopedId> excludedAgencies = agencyFilter(ser, f -> f == null || TRUE.equals(f.isExclude()));
+    Set<FeedScopedId> excludedRoutes = lineFilter(ser, f -> f == null || TRUE.equals(f.isExclude()));
 
     List<CallAtStop> callsAtStop = List.of();
 
@@ -66,7 +73,10 @@ public class OjpService {
       arrivalDeparture,
       timeWindow,
       numResults,
-      selectedAgencies
+      selectedAgencies,
+      selectedRoutes,
+      excludedAgencies,
+      excludedRoutes
     );
 
     if (stopId.isPresent()) {
@@ -82,9 +92,13 @@ public class OjpService {
     );
   }
 
-  private Set<FeedScopedId> selectedAgencies(OJPStopEventRequestStructure ser) {
+  private Set<FeedScopedId> agencyFilter(
+    OJPStopEventRequestStructure ser,
+    Predicate<OperatorFilterStructure> predicate
+  ) {
     return params(ser)
       .map(p -> p.getOperatorFilter())
+      .filter(predicate)
       .map(o -> o.getOperatorRef())
       .stream()
       .flatMap(r -> r.stream().map(ref -> ref.getValue()))
@@ -92,9 +106,13 @@ public class OjpService {
       .collect(Collectors.toSet());
   }
 
-  private Set<FeedScopedId> selectedLines(OJPStopEventRequestStructure ser) {
+  private Set<FeedScopedId> lineFilter(
+    OJPStopEventRequestStructure ser,
+    Predicate<LineDirectionFilterStructure> predicate
+  ) {
     return params(ser)
       .map(p -> p.getLineFilter())
+      .filter(predicate)
       .map(o -> o.getLine())
       .stream()
       .flatMap(r -> r.stream().map(l -> l.getLineRef().getValue()))
