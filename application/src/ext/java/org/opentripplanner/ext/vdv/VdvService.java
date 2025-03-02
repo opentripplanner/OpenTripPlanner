@@ -93,7 +93,8 @@ public class VdvService {
         FilterValues.ofEmptyIsEverything("excludedAgencies", params.excludedAgencies)
       )
       .withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", params.excludedRoutes))
-      .withIncludedMode(FilterValues.ofEmptyIsEverything("selectedModes", params.includedModes))
+      .withIncludedModes(FilterValues.ofEmptyIsEverything("selectedModes", params.includedModes))
+      .withExcludedModes(FilterValues.ofEmptyIsEverything("excludedModes", params.excludedModes))
       .build();
     return transitService.findTripTimeOnDate(request).stream().map(CallAtStop::noWalking).toList();
   }
