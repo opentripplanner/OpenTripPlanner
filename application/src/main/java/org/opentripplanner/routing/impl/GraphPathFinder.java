@@ -139,7 +139,7 @@ public class GraphPathFinder {
     Set<Vertex> to
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.MILLIS);
+    Instant reqTime = request.dateTime();
 
     List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
 
