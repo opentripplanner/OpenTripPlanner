@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;

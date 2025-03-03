@@ -3,7 +3,6 @@ package org.opentripplanner.street.search.state;
 import static org.opentripplanner.utils.lang.ObjectUtils.requireNotInitialized;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;

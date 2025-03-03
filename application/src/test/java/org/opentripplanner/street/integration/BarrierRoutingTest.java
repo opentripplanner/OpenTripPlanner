@@ -7,7 +7,6 @@ import static org.opentripplanner.routing.api.request.StreetMode.CAR;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
