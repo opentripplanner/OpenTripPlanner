@@ -576,8 +576,8 @@ public class VertexLinker {
   /**
    * Link a new vertex permanently with area geometry
    */
-  public void addPermanentAreaVertex(IntersectionVertex newVertex, AreaGroup areaGroup) {
-    addAreaVertex(newVertex, areaGroup, Scope.PERMANENT, null);
+  public boolean addPermanentAreaVertex(IntersectionVertex newVertex, AreaGroup areaGroup) {
+    return addAreaVertex(newVertex, areaGroup, Scope.PERMANENT, null);
   }
 
   /**
@@ -590,11 +590,11 @@ public class VertexLinker {
   }
 
   /**
-   * Safely add a vertex to an area. This creates edges to all other vertices unless those edges
-   * would cross one of the original edges.
+   * Safely add a vertex to an area. This creates edges to all visibility vertices
+   * unless those edges would cross one of the area boundary edges
    */
 
-  public void addAreaVertex(
+  private boolean addAreaVertex(
     IntersectionVertex newVertex,
     AreaGroup areaGroup,
     Scope scope,
@@ -616,7 +616,13 @@ public class VertexLinker {
         Math.floor(maxAreaNodes * maxAreaNodes / areaComplexity)
       );
       if (appliedCount < totalCount) {
-        LOG.info("polygon = {}, visi reduced {} -> {}", areaComplexity, totalCount, appliedCount);
+        LOG.info(
+          "polygon = {}, maxNodes = {}, visi reduced {} -> {}",
+          areaComplexity,
+          maxAreaNodes,
+          totalCount,
+          appliedCount
+        );
         visibilityVertices =
           visibilityVertices
             .stream()
@@ -629,25 +635,24 @@ public class VertexLinker {
       LineString newGeometry = GEOMETRY_FACTORY.createLineString(
         new Coordinate[] { newVertex.getCoordinate(), v.getCoordinate() }
       );
-
       // ensure that new edge does not leave the bounds of the area or hit any holes
       if (!polygon.contains(newGeometry)) {
         continue;
       }
-
       // add connecting edges
       createEdges(newVertex, v, areaGroup, scope, tempEdges);
       added++;
     }
-    // fallback when new vertex could not be connected without intersecting the boundary
-    // this happens for example when the added vertex is outside the area
+    // return false if new vertex could not be connected without intersecting the boundary
+    // this happens when the added vertex is outside the area or all visibility edges are blocked
     if (added == 0) {
-      for (IntersectionVertex v : visibilityVertices) {
-        createEdges(newVertex, v, areaGroup, scope, tempEdges);
-      }
+      LOG.error("Area visibility connections failed");
+      return false;
     } else if (scope == Scope.PERMANENT) {
+      // marking the new vertex as visibilityVertex enables  direct connections to it
       areaGroup.addVisibilityVertices(Set.of(newVertex));
     }
+    return true;
   }
 
   static final Set<TraverseMode> noThruModes = Set.of(
