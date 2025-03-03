@@ -101,11 +101,15 @@ class ModifiedTripBuilder {
    * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
+    RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
+
+    if (cancellation) {
+      return cancelTrip(newTimes);
+    }
+
     if (calls.size() < 2) {
       return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
     }
-
-    RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
 
     var result = createStopPattern(pattern, calls, entityResolver);
     if (result.isFailure()) {
@@ -127,12 +131,8 @@ class ModifiedTripBuilder {
     }
 
     StopPattern stopPattern = result.successValue();
-    if (cancellation || stopPattern.isAllStopsNonRoutable()) {
-      LOG.debug("Trip is cancelled");
-      newTimes.cancelTrip();
-      return Result.success(
-        new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
-      );
+    if (stopPattern.isAllStopsNonRoutable()) {
+      return cancelTrip(newTimes);
     }
 
     applyUpdates(newTimes);
@@ -171,6 +171,17 @@ class ModifiedTripBuilder {
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
     return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate, dataSource));
+  }
+
+  /**
+   * Full cancellation of a trip.
+   */
+  private Result<TripUpdate, UpdateError> cancelTrip(RealTimeTripTimes newTimes) {
+    LOG.debug("Trip is cancelled");
+    newTimes.cancelTrip();
+    return Result.success(
+      new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
+    );
   }
 
   /**

@@ -45,6 +45,21 @@ class CancellationTest implements RealtimeTestConstants {
     assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
   }
 
+  @Test
+  void testCancelTripWithMissingTimes() {
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    assertEquals(RealTimeState.SCHEDULED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
+    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withCancellation(true)
+      .buildEstimatedTimetableDeliveries();
+
+    var result = env.applyEstimatedTimetable(updates);
+
+    assertEquals(1, result.successful());
+    assertEquals(RealTimeState.CANCELED, env.getTripTimesForTrip(TRIP_1_ID).getRealTimeState());
+  }
+
   /**
    * When a scheduled trip is modified (both trip times and stops) and subsequently cancelled,
    * it should be marked as cancelled and reverted to its scheduled trip times and stops.
