@@ -106,6 +106,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Create TripOnServiceDate for added GTFS trips [#6459](https://github.com/opentripplanner/OpenTripPlanner/pull/6459)
 - Improve street routing within concave parts of area holes [#6486](https://github.com/opentripplanner/OpenTripPlanner/pull/6486)
 - Fix rounding error in street routing [#6484](https://github.com/opentripplanner/OpenTripPlanner/pull/6484)
+- Support for coordinates in via search [#6477](https://github.com/opentripplanner/OpenTripPlanner/pull/6477)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
