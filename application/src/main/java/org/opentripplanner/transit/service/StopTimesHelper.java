@@ -187,7 +187,7 @@ class StopTimesHelper {
     return result;
   }
 
-  Queue<TripTimeOnDate> listTripTimeOnDatesForPatternAtStop(
+  private Queue<TripTimeOnDate> listTripTimeOnDatesForPatternAtStop(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
