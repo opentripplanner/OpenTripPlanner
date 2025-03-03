@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.siri.moduletests;
+package org.opentripplanner.updater.trip.siri.moduletests.rejection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
