@@ -116,7 +116,14 @@ class ModifiedTripBuilder {
         result.failureValue().errorType(),
         invalidStopIndex
       );
-      return result.toFailureResult();
+      return Result.failure(
+        new UpdateError(
+          existingTripTimes.getTrip().getId(),
+          result.failureValue().errorType(),
+          invalidStopIndex,
+          dataSource
+        )
+      );
     }
 
     StopPattern stopPattern = result.successValue();
