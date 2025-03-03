@@ -579,6 +579,7 @@ public class OsmEntity {
       isTag("railway", "halt") ||
       isTag("amenity", "bus_station") ||
       isTag("amenity", "ferry_terminal") ||
+      isTag("highway", "platform") ||
       isPlatform()
     );
   }
