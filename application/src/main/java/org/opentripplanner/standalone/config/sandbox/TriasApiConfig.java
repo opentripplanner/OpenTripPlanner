@@ -20,7 +20,7 @@ public class TriasApiConfig {
       c
         .of("hideFeedId")
         .since(V2_7)
-        .summary("Hide the FeedId in all API output, and add it to input.")
+        .summary("Hide the feed id in all API output, and add it to input ids.")
         .description(
           "Only turn this feature on if you have unique ids across all feeds, without the " +
           "feedId prefix."
