@@ -33,6 +33,10 @@ class TripTimeOnDateMatcherFactoryTest {
     .withAgency(agency("a2"))
     .withMode(TransitMode.BUS)
     .build();
+  private static final Route ROUTE_3 = route("r2")
+    .withAgency(agency("a3"))
+    .withMode(TransitMode.FERRY)
+    .build();
 
   @Test
   void noFilters() {
@@ -136,13 +140,16 @@ class TripTimeOnDateMatcherFactoryTest {
   void excludeAgencyAndRoute() {
     var request = request()
       .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(ROUTE_2.getAgency().getId())))
+      .withExcludedAgencies(
+        FilterValues.ofEmptyIsEverything("agencies", List.of(ROUTE_2.getAgency().getId()))
+      )
       .build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_1)));
     assertFalse(matcher.match(tripTimeOnDate(ROUTE_2)));
+    assertTrue(matcher.match(tripTimeOnDate(ROUTE_3)));
   }
 
   private static TripTimeOnDateRequestBuilder request() {
