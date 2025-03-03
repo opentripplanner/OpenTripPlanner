@@ -109,7 +109,10 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
     assertNotSame(forToday, schedule);
 
     var realtimeTripTimes = forToday.getTripTimes(id(addedTripId));
-    assertNotNull(realtimeTripTimes, "Added trip should be found in time table for the service date");
+    assertNotNull(
+      realtimeTripTimes,
+      "Added trip should be found in time table for the service date"
+    );
     assertEquals(state, realtimeTripTimes.getRealTimeState());
 
     var scheduledTripTimes = schedule.getTripTimes(id(addedTripId));

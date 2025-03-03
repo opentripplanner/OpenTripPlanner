@@ -71,8 +71,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the Transit Service and Transit Editor Service.
@@ -82,7 +80,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTransitService implements TransitEditorService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransitService.class);
   private final TimetableRepository timetableRepository;
 
   private final TimetableRepositoryIndex timetableRepositoryIndex;
