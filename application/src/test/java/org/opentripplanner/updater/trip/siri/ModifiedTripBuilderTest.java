@@ -181,7 +181,7 @@ class ModifiedTripBuilderTest {
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
-    TripUpdate tripUpdate = result.successValue();
+    var tripUpdate = result.successValue();
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
     TripTimes updatedTimes = tripUpdate.tripTimes();
     assertEquals(STOP_TIME_A_1.getArrivalTime(), updatedTimes.getArrivalTime(0));
@@ -211,7 +211,7 @@ class ModifiedTripBuilderTest {
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
-    TripUpdate tripUpdate = result.successValue();
+    var tripUpdate = result.successValue();
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
     TripTimes updatedTimes = tripUpdate.tripTimes();
     assertEquals(RealTimeState.CANCELED, updatedTimes.getRealTimeState());
@@ -256,7 +256,7 @@ class ModifiedTripBuilderTest {
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
-    TripUpdate tripUpdate = result.successValue();
+    var tripUpdate = result.successValue();
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
     TripTimes updatedTimes = tripUpdate.tripTimes();
     assertEquals(secondsInDay(10, 1), updatedTimes.getArrivalTime(0));
@@ -356,7 +356,7 @@ class ModifiedTripBuilderTest {
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
-    TripUpdate tripUpdate = result.successValue();
+    var tripUpdate = result.successValue();
     assertEquals(PATTERN.getStopPattern(), tripUpdate.stopPattern());
     TripTimes updatedTimes = tripUpdate.tripTimes();
     assertEquals(secondsInDay(9, 58), updatedTimes.getArrivalTime(0));
@@ -407,7 +407,7 @@ class ModifiedTripBuilderTest {
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
-    TripUpdate tripUpdate = result.successValue();
+    var tripUpdate = result.successValue();
     StopPattern stopPattern = tripUpdate.stopPattern();
     assertNotEquals(PATTERN.getStopPattern(), stopPattern);
     assertEquals(STOP_A_2, stopPattern.getStop(0));
@@ -508,7 +508,7 @@ class ModifiedTripBuilderTest {
     )
       .build();
 
-    TripUpdate tripUpdate = secondResult.successValue();
+    var tripUpdate = secondResult.successValue();
     StopPattern stopPattern = tripUpdate.stopPattern();
     assertEquals(PATTERN.getStopPattern(), stopPattern);
 

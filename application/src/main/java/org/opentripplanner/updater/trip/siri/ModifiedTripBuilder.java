@@ -99,7 +99,7 @@ class ModifiedTripBuilder {
    * Create a new StopPattern and TripTimes for the trip based on the calls, and other fields read
    * in form the SIRI-ET update.
    */
-  public Result<TripUpdate, UpdateError> build() {
+  public Result<SiriTripUpdate.SiriModifyTrip, UpdateError> build() {
     RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
 
     var stopPattern = createStopPattern(pattern, calls, entityResolver);
@@ -108,7 +108,12 @@ class ModifiedTripBuilder {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
       return Result.success(
-        new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
+        new SiriTripUpdate.SiriModifyTrip(
+          pattern.getStopPattern(),
+          newTimes,
+          serviceDate,
+          dataSource
+        )
       );
     }
 
@@ -147,7 +152,9 @@ class ModifiedTripBuilder {
     }
 
     LOG.debug("A valid TripUpdate object was applied using the Timetable class update method.");
-    return Result.success(new TripUpdate(stopPattern, newTimes, serviceDate, dataSource));
+    return Result.success(
+      new SiriTripUpdate.SiriModifyTrip(stopPattern, newTimes, serviceDate, dataSource)
+    );
   }
 
   /**

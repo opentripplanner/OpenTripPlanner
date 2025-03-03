@@ -163,7 +163,7 @@ class AddedTripBuilder {
     this.dataSource = dataSource;
   }
 
-  Result<TripUpdate, UpdateError> build() {
+  Result<SiriTripUpdate.SiriAddTrip, UpdateError> build() {
     if (calls.size() < 2) {
       return UpdateError.result(tripId, TOO_FEW_STOPS, dataSource);
     }
@@ -228,7 +228,7 @@ class AddedTripBuilder {
     tripTimes.validateNonIncreasingTimes();
     tripTimes.setServiceCode(transitService.getServiceCode(trip.getServiceId()));
 
-    TripPattern pattern = TripPattern
+    TripPattern addedTripPattern = TripPattern
       .of(getTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
@@ -273,12 +273,12 @@ class AddedTripBuilder {
       .build();
 
     return Result.success(
-      new TripUpdate(
+      new SiriTripUpdate.SiriAddTrip(
         stopPattern,
         updatedTripTimes,
         serviceDate,
         tripOnServiceDate,
-        pattern,
+        addedTripPattern,
         isAddedRoute,
         dataSource
       )

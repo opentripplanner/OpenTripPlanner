@@ -130,7 +130,7 @@ public class SiriRealTimeTripUpdateAdapter {
     boolean shouldAddNewTrip = false;
     try {
       shouldAddNewTrip = shouldAddNewTrip(journey, entityResolver);
-      Result<TripUpdate, UpdateError> result;
+      Result<? extends SiriTripUpdate, UpdateError> result;
       if (shouldAddNewTrip) {
         result =
           new AddedTripBuilder(
@@ -188,7 +188,7 @@ public class SiriRealTimeTripUpdateAdapter {
     return snapshotManager.getTimetableSnapshotBuffer().resolve(tripPattern, serviceDate);
   }
 
-  private Result<TripUpdate, UpdateError> handleModifiedTrip(
+  private Result<SiriTripUpdate.SiriModifyTrip, UpdateError> handleModifiedTrip(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     EstimatedVehicleJourney estimatedVehicleJourney
@@ -274,31 +274,46 @@ public class SiriRealTimeTripUpdateAdapter {
   /**
    * Add a (new) trip to the timetableRepository and the buffer
    */
-  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(TripUpdate tripUpdate) {
+  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(SiriTripUpdate tripUpdate) {
     Trip trip = tripUpdate.tripTimes().getTrip();
-    LocalDate serviceDate = tripUpdate.serviceDate();
 
-    final TripPattern pattern;
-    if (tripUpdate.tripPatternCreation()) {
-      pattern = tripUpdate.addedTripPattern();
-    } else {
-      // Get cached trip pattern or create one if it doesn't exist yet
-      pattern =
-        tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip, serviceDate);
+    final RealTimeTripUpdate realTimeTripUpdate;
+    switch (tripUpdate) {
+      case SiriTripUpdate.SiriAddTrip addTrip -> {
+        // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
+        realTimeTripUpdate =
+          new RealTimeTripUpdate(
+            addTrip.addedTripPattern(),
+            addTrip.tripTimes(),
+            addTrip.serviceDate(),
+            addTrip.addedTripOnServiceDate(),
+            true,
+            addTrip.routeCreation(),
+            addTrip.dataSource()
+          );
+      }
+      case SiriTripUpdate.SiriModifyTrip modifyTrip -> {
+        // Get cached trip pattern or create one if it doesn't exist yet
+        var tripPattern = tripPatternCache.getOrCreateTripPattern(
+          modifyTrip.stopPattern(),
+          trip,
+          modifyTrip.serviceDate()
+        );
+
+        realTimeTripUpdate =
+          new RealTimeTripUpdate(
+            tripPattern,
+            modifyTrip.tripTimes(),
+            modifyTrip.serviceDate(),
+            null,
+            false,
+            false,
+            modifyTrip.dataSource()
+          );
+      }
     }
-
-    // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.
-    RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(
-      pattern,
-      tripUpdate.tripTimes(),
-      serviceDate,
-      tripUpdate.addedTripOnServiceDate(),
-      tripUpdate.tripCreation(),
-      tripUpdate.routeCreation(),
-      tripUpdate.dataSource()
-    );
     var result = snapshotManager.updateBuffer(realTimeTripUpdate);
-    LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
+    LOG.debug("Applied real-time data for trip {} on {}", trip, tripUpdate.serviceDate());
     return result;
   }
 
