@@ -526,6 +526,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   private State reversedClone() {
+    // these must be getTime(), not getTimeAccurate(), so that the reversed path (which does not
+    // have arriveBy true anymore) has times which round correctly, as the rounding rules
+    // depend on arriveBy
     StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
       .withPreferences(p -> {

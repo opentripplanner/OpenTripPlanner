@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +55,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private List<ViaLocation> via = Collections.emptyList();
 
-  private Instant dateTime = Instant.now();
+  private Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Nullable
   private Duration maxSearchWindow;
@@ -152,8 +153,14 @@ public class RouteRequest implements Cloneable, Serializable {
     return dateTime;
   }
 
+  /**
+   * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy,
+   * and if we set the millisecond part to a non-zero value, rounding will not be guaranteed
+   * to be the same for departAt and arriveBy queries.
+   * @param dateTime Either a departAt time or an arriveBy time, one second's accuracy
+   */
   public void setDateTime(Instant dateTime) {
-    this.dateTime = dateTime;
+    this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
   }
 
   public void setDateTime(String date, String time, ZoneId tz) {
