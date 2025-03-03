@@ -3,7 +3,6 @@ package org.opentripplanner.updater.trip;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -26,14 +25,23 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
     new Deduplicator()
   );
 
+  public RealtimeTestEnvironmentBuilder() {
+    timetableRepository.initTimeZone(TIME_ZONE);
+  }
+
+  public RealtimeTestEnvironmentBuilder addTrip(TripInput... trip) {
+    for (var t : trip) {
+      addTrip(t);
+    }
+    return this;
+  }
+
   public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     createTrip(trip);
-    timetableRepository.index();
     return this;
   }
 
   public RealtimeTestEnvironment build() {
-    timetableRepository.initTimeZone(TIME_ZONE);
     timetableRepository.addAgency(TimetableRepositoryForTest.AGENCY);
 
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -41,12 +49,19 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
+
     timetableRepository.getServiceCodes().put(SERVICE_ID, 0);
     timetableRepository.updateCalendarServiceData(
       true,
       calendarServiceData,
       DataImportIssueStore.NOOP
     );
+
+    timetableRepository
+      .getAllTripPatterns()
+      .forEach(pattern -> {
+        pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
+      });
 
     return new RealtimeTestEnvironment(timetableRepository);
   }
