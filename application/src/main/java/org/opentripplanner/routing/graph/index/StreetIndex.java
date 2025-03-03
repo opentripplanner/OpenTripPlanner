@@ -22,10 +22,10 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
@@ -101,7 +101,7 @@ public class StreetIndex {
   ) {
     boolean wheelchairAccessible = false;
 
-    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name, endVertex);
+    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name);
 
     for (StreetEdge street : edges) {
       Vertex fromv = street.getFromVertex();
@@ -371,11 +371,7 @@ public class StreetIndex {
       name = new NonLocalizedString(label);
     }
 
-    TemporaryStreetLocation temporaryStreetLocation = new TemporaryStreetLocation(
-      coordinate,
-      name,
-      endVertex
-    );
+    var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
     TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
 

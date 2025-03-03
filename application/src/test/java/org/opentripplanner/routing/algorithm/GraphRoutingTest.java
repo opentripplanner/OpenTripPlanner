@@ -353,17 +353,9 @@ public abstract class GraphRoutingTest {
     }
 
     // -- Street linking
-    public TemporaryStreetLocation streetLocation(
-      String name,
-      double latitude,
-      double longitude,
-      boolean endVertex
-    ) {
-      return new TemporaryStreetLocation(
-        new Coordinate(longitude, latitude),
-        new NonLocalizedString(name),
-        endVertex
-      );
+    public TemporaryStreetLocation streetLocation(String name, double latitude, double longitude) {
+      var nearestPoint = new Coordinate(longitude, latitude);
+      return new TemporaryStreetLocation(nearestPoint, new NonLocalizedString(name));
     }
 
     public TemporaryFreeEdge link(TemporaryVertex from, StreetVertex to) {

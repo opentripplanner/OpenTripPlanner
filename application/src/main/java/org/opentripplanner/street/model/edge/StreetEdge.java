@@ -19,7 +19,6 @@ import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -721,7 +720,7 @@ public class StreetEdge
     StreetEdge e1 = null;
     StreetEdge e2 = null;
 
-    if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
+    if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb1 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex((StreetVertex) fromv)
@@ -734,7 +733,7 @@ public class StreetEdge
       copyRentalRestrictionsToSplitEdge(e1);
       tempEdges.addEdge(e1);
     }
-    if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
+    if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb2 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex(v)

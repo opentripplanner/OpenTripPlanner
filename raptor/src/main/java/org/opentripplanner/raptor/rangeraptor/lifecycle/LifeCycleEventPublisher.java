@@ -19,18 +19,18 @@ public class LifeCycleEventPublisher {
 
   @SuppressWarnings("unchecked")
   public LifeCycleEventPublisher(LifeCycleSubscriptions subscriptions) {
-    this.onRouteSearchListeners = subscriptions.onRouteSearchListeners.toArray(new Consumer[0]);
+    this.onRouteSearchListeners = subscriptions.onRouteSearchListeners.toArray(Consumer[]::new);
     this.setupIterationListeners =
-      subscriptions.setupIterationListeners.toArray(new IntConsumer[0]);
+      subscriptions.setupIterationListeners.toArray(IntConsumer[]::new);
     this.prepareForNextRoundListeners =
-      subscriptions.prepareForNextRoundListeners.toArray(new IntConsumer[0]);
+      subscriptions.prepareForNextRoundListeners.toArray(IntConsumer[]::new);
     this.transitsForRoundCompleteListeners =
-      subscriptions.transitsForRoundCompleteListeners.toArray(new Runnable[0]);
+      subscriptions.transitsForRoundCompleteListeners.toArray(Runnable[]::new);
     this.transfersForRoundCompleteListeners =
-      subscriptions.transfersForRoundCompleteListeners.toArray(new Runnable[0]);
-    this.roundCompleteListeners = subscriptions.roundCompleteListeners.toArray(new Consumer[0]);
+      subscriptions.transfersForRoundCompleteListeners.toArray(Runnable[]::new);
+    this.roundCompleteListeners = subscriptions.roundCompleteListeners.toArray(Consumer[]::new);
     this.iterationCompleteListeners =
-      subscriptions.iterationCompleteListeners.toArray(new Runnable[0]);
+      subscriptions.iterationCompleteListeners.toArray(Runnable[]::new);
     subscriptions.close();
   }
 

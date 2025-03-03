@@ -197,17 +197,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * whether the graph has a street network and if ConsiderPatternsForDirectTransfers feature is
    * enabled.
    */
-  private NearbyStopFinder createNearbyStopFinder(Duration radiusByDuration) {
+  private NearbyStopFinder createNearbyStopFinder(Duration radiusAsDuration) {
     var transitService = new DefaultTransitService(timetableRepository);
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(
         "Creating direct transfer edges between stops using straight line distance (not streets)..."
       );
-      finder = new StraightLineNearbyStopFinder(transitService, radiusByDuration);
+      finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      finder = new StreetNearbyStopFinder(radiusByDuration, 0, null);
+      finder = new StreetNearbyStopFinder(radiusAsDuration, 0, null);
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {

@@ -10,11 +10,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -160,7 +160,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       .linkVertexPermanently(
         tStop,
         WALK_ONLY,
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (transitVertex, streetVertex) -> {
           var linkEdges = createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex);
 
@@ -187,7 +187,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       .linkVertexPermanently(
         tStop,
         CAR_ONLY,
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (transitVertex, streetVertex) ->
           createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
       );
@@ -213,7 +213,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           vehicleParkingVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -234,7 +234,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           vehicleParkingVertex,
           new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -258,7 +258,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           tEntrance,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetTransitEntranceLink.createStreetTransitEntranceLink(
@@ -296,7 +296,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           station,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           stationAndStreetVertexLinker
         );
     }

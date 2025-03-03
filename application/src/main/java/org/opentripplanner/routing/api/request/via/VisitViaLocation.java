@@ -14,8 +14,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * visit does not count. The traveler must alight or board at the given stop for it to to be
  * accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point in
  * the street network from a stop and back to another stop to join the transit network.
- * <p>
- * TODO: NOTE! Coordinates are NOT supported yet.
  */
 public class VisitViaLocation extends AbstractViaLocation {
 

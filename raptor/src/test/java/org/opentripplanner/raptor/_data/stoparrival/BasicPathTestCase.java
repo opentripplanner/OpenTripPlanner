@@ -419,11 +419,14 @@ public class BasicPathTestCase implements RaptorTestConstants {
       transitArrivalCost(L21_END + ALIGHT_SLACK, TRIP_3, STOP_D, L31_START, STOP_E, L31_END)
     );
 
-    assertEquals(BASIC_PATH_AS_STRING, basicTripAsPath().toString(this::stopIndexToName));
+    assertEquals(
+      BASIC_PATH_AS_STRING,
+      basicTripAsPath().toString(RaptorTestConstants::stopIndexToName)
+    );
 
     assertEquals(
       BASIC_PATH_AS_DETAILED_STRING,
-      basicTripAsPath().toStringDetailed(this::stopIndexToName)
+      basicTripAsPath().toStringDetailed(RaptorTestConstants::stopIndexToName)
     );
   }
 
