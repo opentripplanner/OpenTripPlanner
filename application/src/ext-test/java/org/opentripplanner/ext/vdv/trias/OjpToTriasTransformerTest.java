@@ -15,7 +15,7 @@ import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner.ext.vdv.ojp.ErrorMapper;
+import org.opentripplanner.ext.vdv.ojp.mapping.ErrorMapper;
 import org.opentripplanner.test.support.ResourceLoader;
 
 class OjpToTriasTransformerTest {

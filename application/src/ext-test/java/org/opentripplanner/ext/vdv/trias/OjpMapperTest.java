@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.vdv.CallAtStop;
 import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
-import org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper;
+import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;

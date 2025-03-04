@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.ojp;
+package org.opentripplanner.ext.vdv.ojp.mapping;
 
 import de.vdv.ojp20.CallAtNearStopStructure;
 import de.vdv.ojp20.CallAtStopStructure;

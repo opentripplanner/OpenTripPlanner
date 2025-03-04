@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.ojp;
+package org.opentripplanner.ext.vdv.ojp.mapping;
 
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPResponseStructure;
