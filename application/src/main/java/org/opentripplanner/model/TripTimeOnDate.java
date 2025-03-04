@@ -362,13 +362,15 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the previous stop time in the trip, if it isn't the first one.
+   * Returns the previous stop time in the trip. If it's the first stop in the trip, it returns an
+   * empty list.
    */
   public List<TripTimeOnDate> previousTimes() {
     if (stopIndex == 0) {
       return List.of();
     } else {
-      return IntStream.range(0, stopIndex - 1).mapToObj(this::atStopIndex).toList();
+      // IntStream.range is (inclusive, exclusive)
+      return IntStream.range(0, stopIndex).mapToObj(this::atStopIndex).toList();
     }
   }
 
@@ -379,8 +381,9 @@ public class TripTimeOnDate {
     if (stopIndex == tripTimes.getNumStops() - 1) {
       return List.of();
     } else {
+      // IntStream.range is (inclusive, exclusive)
       return IntStream
-        .range(stopIndex + 1, tripTimes.getNumStops() - 1)
+        .range(stopIndex + 1, tripTimes.getNumStops())
         .mapToObj(this::atStopIndex)
         .toList();
     }
