@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.vdv.ojp;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
-import static org.opentripplanner.ext.vdv.ojp.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
+import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
+import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
 
 import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.ModeFilterStructure;
@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.vdv.CallAtStop;
 import org.opentripplanner.ext.vdv.VdvService;
 import org.opentripplanner.ext.vdv.id.IdResolver;
+import org.opentripplanner.ext.vdv.ojp.mapping.PtModeMapper;
+import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.TransitMode;
