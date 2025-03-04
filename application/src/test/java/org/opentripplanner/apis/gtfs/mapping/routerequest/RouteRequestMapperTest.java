@@ -5,6 +5,7 @@ import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuild
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.opentripplanner.apis.gtfs.SchemaObjectMappersForTests.mapCoordinate;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
@@ -48,17 +49,12 @@ class RouteRequestMapperTest {
   static final Map<String, Object> ARGS = Map.ofEntries(
     entry(
       "origin",
-      Map.ofEntries(
-        entry("location", Map.of("coordinate", Map.of("latitude", ORIGIN.x, "longitude", ORIGIN.y)))
-      )
+      Map.ofEntries(entry("location", Map.of("coordinate", mapCoordinate(ORIGIN.x, ORIGIN.y))))
     ),
     entry(
       "destination",
       Map.ofEntries(
-        entry(
-          "location",
-          Map.of("coordinate", Map.of("latitude", DESTINATION.x, "longitude", DESTINATION.y))
-        )
+        entry("location", Map.of("coordinate", mapCoordinate(DESTINATION.x, DESTINATION.y)))
       )
     )
   );
