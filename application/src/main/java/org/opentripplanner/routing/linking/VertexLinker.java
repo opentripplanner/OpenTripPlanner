@@ -394,17 +394,18 @@ public class VertexLinker {
   ) {
     IntersectionVertex start = null;
     boolean added = false;
-    boolean split = false;
 
-    // if vertex is inside an area, no need to snap to nearest edge and split it
+    // Always consider linking to closest point on the edge
+    IntersectionVertex split = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
+
+    // check if vertex is inside an area
     if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
       AreaGroup ag = aEdge.getArea();
 
-      if (linkedAreas.contains(ag)) {
-        // do not link many times to the same area
-        return null;
-      }
-      if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+      if (
+        !linkedAreas.contains(ag) &&
+        ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))
+      ) {
         // vertex is inside an area
         linkedAreas.add(ag);
         if (vertex instanceof IntersectionVertex iv) {
@@ -412,20 +413,19 @@ public class VertexLinker {
         } else {
           start = createSplitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
         }
+        // try connecting the vertex to the edge snapped split point, because
+        // connections to visibility vertices do not always provide an optimal route
+        addVisibilityEdges(start, split, ag, scope, tempEdges);
       } else {
-        // vertex is outside an area. Split the current area edge and connect
-        // split point to area visibility points to achieve optimal paths
-        start = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
-        split = true;
+        // vertex is outside an area. Use split point for area connections
+        start = split;
       }
+      // connect start point to area visibility points to achieve optimal paths
       if (!ag.visibilityVertices().contains(start)) {
-        added = addAreaVertex(start, ag, scope, tempEdges);
-      } else {
-        added = true;
+        addAreaVertex(start, ag, scope, tempEdges);
       }
-    }
-    if (!added && !split) {
-      start = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
+    } else {
+      start = split;
     }
 
     // TODO Consider moving this code
