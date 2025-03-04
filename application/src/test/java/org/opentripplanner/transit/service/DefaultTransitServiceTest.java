@@ -243,9 +243,10 @@ class DefaultTransitServiceTest {
 
   @Test
   void getTripTimesOnNoServiceDayWithUseScheduleOption() {
-    Instant midnight = ServiceDateUtils
-      .asStartOfService(SERVICE_DATE, service.getTimeZone())
-      .toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(
+      SERVICE_DATE,
+      service.getTimeZone()
+    ).toInstant();
 
     assertEquals(
       Optional.of(
