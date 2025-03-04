@@ -184,22 +184,19 @@ class ModifiedTripBuilderTest {
       timetableRepository.getTimeZone(),
       entityResolver,
       List.of(
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_A_1.getId().getId())
           .withAimedDepartureTime(zonedDateTime(10, 0))
           .withExpectedDepartureTime(zonedDateTime(10, 1))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_B_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 10))
           .withExpectedArrivalTime(zonedDateTime(10, 11))
           .withAimedDepartureTime(zonedDateTime(10, 12))
           .withExpectedDepartureTime(zonedDateTime(10, 13))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_C_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 20))
           .withExpectedArrivalTime(zonedDateTime(10, 22))
