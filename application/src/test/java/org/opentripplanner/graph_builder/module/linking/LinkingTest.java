@@ -19,7 +19,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -157,13 +157,16 @@ public class LinkingTest {
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
 
     File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
-    var provider = new OsmProvider(file, false);
+    var provider = new DefaultOsmProvider(file, false);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
-    var osmModule = OsmModule
-      .of(provider, graph, osmInfoRepository, vehicleParkingRepository)
-      .build();
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      osmInfoRepository,
+      vehicleParkingRepository
+    ).build();
 
     osmModule.buildGraph();
     return new TestOtpModel(graph, timetableRepository);

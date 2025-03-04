@@ -7,12 +7,12 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
@@ -20,15 +20,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A class which abstracts away locking, updating, committing and purging of the timetable snapshot.
- * In order to keep code reviews easier this is an intermediate stage and will be refactored further.
- * In particular the following refactorings are planned:
- * <p>
- * - create only one "snapshot manager" per transit model that is shared between Siri/GTFS-RT updaters
  */
 public final class TimetableSnapshotManager {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotManager.class);
-  private final TransitLayerUpdater transitLayerUpdater;
+  private final RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater;
 
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads.
@@ -61,11 +57,11 @@ public final class TimetableSnapshotManager {
    *                     considered 'today'. This is useful for unit testing.
    */
   public TimetableSnapshotManager(
-    TransitLayerUpdater transitLayerUpdater,
-    TimetableSnapshotSourceParameters parameters,
+    @Nullable RealTimeRaptorTransitDataUpdater realtimeRaptorTransitDataUpdater,
+    TimetableSnapshotParameters parameters,
     Supplier<LocalDate> localDateNow
   ) {
-    this.transitLayerUpdater = transitLayerUpdater;
+    this.realtimeRaptorTransitDataUpdater = realtimeRaptorTransitDataUpdater;
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = Objects.requireNonNull(localDateNow);
     // Force commit so that snapshot initializes
@@ -73,8 +69,8 @@ public final class TimetableSnapshotManager {
   }
 
   /**
-   * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-   * timetable objects it references are guaranteed to never change, so the requesting thread is
+   * @return an up-to-date snapshot of real-time data. This snapshot and the timetable objects it
+   * references are guaranteed to never change, so the requesting thread is
    * provided a consistent view of all TripTimes. The routing thread need only release its reference
    * to the snapshot to release resources.
    */
@@ -103,7 +99,7 @@ public final class TimetableSnapshotManager {
   void commitTimetableSnapshot(final boolean force) {
     if (force || buffer.isDirty()) {
       LOG.debug("Committing {}", buffer);
-      snapshot.publish(buffer.commit(transitLayerUpdater, force));
+      snapshot.publish(buffer.commit(realtimeRaptorTransitDataUpdater, force));
     } else {
       LOG.debug("Buffer was unchanged, keeping old snapshot.");
     }

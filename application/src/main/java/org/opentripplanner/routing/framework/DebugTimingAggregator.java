@@ -89,18 +89,22 @@ public class DebugTimingAggregator {
     renderingTimer = Timer.builder("routing.rendering").tags(tags).register(registry);
     filteringTimer = Timer.builder("routing.filtering").tags(tags).register(registry);
     transitRouterTimer = Timer.builder("routing.transit").tags(tags).register(registry);
-    itineraryCreationTimer =
-      Timer.builder("routing.itineraryCreation").tags(tags).register(registry);
+    itineraryCreationTimer = Timer.builder("routing.itineraryCreation")
+      .tags(tags)
+      .register(registry);
     raptorSearchTimer = Timer.builder(ROUTING_RAPTOR).tags(tags).register(registry);
     accessEgressTimer = Timer.builder("routing.accessEgress").tags(tags).register(registry);
-    tripPatternFilterTimer =
-      Timer.builder("routing.tripPatternFiltering").tags(tags).register(registry);
+    tripPatternFilterTimer = Timer.builder("routing.tripPatternFiltering")
+      .tags(tags)
+      .register(registry);
     preCalculationTimer = Timer.builder("routing.preCalculation").tags(tags).register(registry);
 
-    numEgressesDistribution =
-      DistributionSummary.builder("routing.numEgress").tags(tags).register(registry);
-    numAccessesDistribution =
-      DistributionSummary.builder("routing.numAccess").tags(tags).register(registry);
+    numEgressesDistribution = DistributionSummary.builder("routing.numEgress")
+      .tags(tags)
+      .register(registry);
+    numAccessesDistribution = DistributionSummary.builder("routing.numAccess")
+      .tags(tags)
+      .register(registry);
 
     egressTimer = Timer.builder("routing.egress").tags(tags).register(registry);
     accessTimer = Timer.builder("routing.access").tags(tags).register(registry);

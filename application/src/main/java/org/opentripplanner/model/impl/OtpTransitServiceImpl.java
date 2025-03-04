@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.Pathway;
 import org.opentripplanner.transit.model.site.PathwayNode;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.SiteRepository;
 
@@ -70,6 +71,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
   private final Collection<Trip> trips;
 
   private final Collection<FlexTrip<?, ?>> flexTrips;
+  private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint;
 
   /**
    * Create a read only version of the {@link OtpTransitService}.
@@ -91,6 +93,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
     this.tripPatterns = immutableList(builder.getTripPatterns().values());
     this.trips = immutableList(builder.getTripsById().values());
     this.flexTrips = immutableList(builder.getFlexTripsById().values());
+    this.stopsByScheduledStopPoint = Collections.unmodifiableMap(
+      builder.stopsByScheduledStopPoints()
+    );
   }
 
   @Override
@@ -184,6 +189,14 @@ class OtpTransitServiceImpl implements OtpTransitService {
   @Override
   public boolean hasActiveTransit() {
     return serviceIds.size() > 0;
+  }
+
+  /**
+   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   */
+  @Override
+  public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoint() {
+    return stopsByScheduledStopPoint;
   }
 
   /*  Private Methods */

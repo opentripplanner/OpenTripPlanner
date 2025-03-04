@@ -31,8 +31,7 @@ import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
 
 public class EnumTypes {
 
-  public static final GraphQLEnumType ABSOLUTE_DIRECTION = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType ABSOLUTE_DIRECTION = GraphQLEnumType.newEnum()
     .name("AbsoluteDirection")
     .value("north", AbsoluteDirection.NORTH)
     .value("northeast", AbsoluteDirection.NORTHEAST)
@@ -44,8 +43,7 @@ public class EnumTypes {
     .value("northwest", AbsoluteDirection.NORTHWEST)
     .build();
 
-  public static final GraphQLEnumType ALTERNATIVE_LEGS_FILTER = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType ALTERNATIVE_LEGS_FILTER = GraphQLEnumType.newEnum()
     .name("AlternativeLegsFilter")
     .value("noFilter", AlternativeLegsFilter.NO_FILTER)
     .value("sameAuthority", AlternativeLegsFilter.SAME_AGENCY)
@@ -54,16 +52,14 @@ public class EnumTypes {
     .value("sameLine", AlternativeLegsFilter.SAME_ROUTE)
     .build();
 
-  public static final GraphQLEnumType ARRIVAL_DEPARTURE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType ARRIVAL_DEPARTURE = GraphQLEnumType.newEnum()
     .name("ArrivalDeparture")
     .value("arrivals", ArrivalDeparture.ARRIVALS, "Only show arrivals")
     .value("departures", ArrivalDeparture.DEPARTURES, "Only show departures")
     .value("both", ArrivalDeparture.BOTH, "Show both arrivals and departures")
     .build();
 
-  public static final GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
     .name("BicycleOptimisationMethod")
     .value("quick", VehicleRoutingOptimizeType.SHORTEST_DURATION)
     .value("safe", VehicleRoutingOptimizeType.SAFE_STREETS)
@@ -72,8 +68,7 @@ public class EnumTypes {
     .value("triangle", VehicleRoutingOptimizeType.TRIANGLE)
     .build();
 
-  public static final GraphQLEnumType BIKES_ALLOWED = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType BIKES_ALLOWED = GraphQLEnumType.newEnum()
     .name("BikesAllowed")
     .value("noInformation", BikeAccess.UNKNOWN, "There is no bike information for the trip.")
     .value(
@@ -84,8 +79,7 @@ public class EnumTypes {
     .value("notAllowed", BikeAccess.NOT_ALLOWED, "No bicycles are allowed on this trip.")
     .build();
 
-  public static final GraphQLEnumType BOOKING_METHOD = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType BOOKING_METHOD = GraphQLEnumType.newEnum()
     .name("BookingMethod")
     .value("callDriver", BookingMethod.CALL_DRIVER)
     .value("callOffice", BookingMethod.CALL_OFFICE)
@@ -94,8 +88,7 @@ public class EnumTypes {
     .value("text", BookingMethod.TEXT_MESSAGE)
     .build();
 
-  public static final GraphQLEnumType DIRECTION_TYPE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType DIRECTION_TYPE = GraphQLEnumType.newEnum()
     .name("DirectionType")
     .value("unknown", Direction.UNKNOWN)
     .value("outbound", Direction.OUTBOUND)
@@ -104,8 +97,7 @@ public class EnumTypes {
     .value("anticlockwise", Direction.ANTICLOCKWISE)
     .build();
 
-  public static final GraphQLEnumType FILTER_PLACE_TYPE_ENUM = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType FILTER_PLACE_TYPE_ENUM = GraphQLEnumType.newEnum()
     .name("FilterPlaceType")
     .value("quay", TransmodelPlaceType.QUAY, "Quay")
     .value("stopPlace", TransmodelPlaceType.STOP_PLACE, "StopPlace")
@@ -114,8 +106,7 @@ public class EnumTypes {
     .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
     .build();
 
-  public static final GraphQLEnumType INPUT_FIELD = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType INPUT_FIELD = GraphQLEnumType.newEnum()
     .name("InputField")
     .value("dateTime", InputField.DATE_TIME)
     .value("from", InputField.FROM_PLACE)
@@ -123,8 +114,7 @@ public class EnumTypes {
     .value("intermediatePlace", InputField.INTERMEDIATE_PLACE)
     .build();
 
-  public static final GraphQLEnumType INTERCHANGE_PRIORITY = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType INTERCHANGE_PRIORITY = GraphQLEnumType.newEnum()
     .name("InterchangePriority")
     .value("preferred", TransferPriority.PREFERRED)
     .value("recommended", TransferPriority.RECOMMENDED)
@@ -132,8 +122,7 @@ public class EnumTypes {
     .value("notAllowed", TransferPriority.NOT_ALLOWED)
     .build();
 
-  public static final GraphQLEnumType INTERCHANGE_WEIGHTING = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType INTERCHANGE_WEIGHTING = GraphQLEnumType.newEnum()
     .description("Deprecated. Use STOP_INTERCHANGE_PRIORITY")
     .name("InterchangeWeighting")
     .value("preferredInterchange", 2, "Highest priority interchange.")
@@ -142,8 +131,7 @@ public class EnumTypes {
     .value("noInterchange", -1, "Interchange not allowed.")
     .build();
 
-  public static final GraphQLEnumType STOP_INTERCHANGE_PRIORITY = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType STOP_INTERCHANGE_PRIORITY = GraphQLEnumType.newEnum()
     .name("StopInterchangePriority")
     .value(
       "preferred",
@@ -178,8 +166,7 @@ public class EnumTypes {
     )
   );
 
-  public static final GraphQLEnumType LEG_MODE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType LEG_MODE = GraphQLEnumType.newEnum()
     .name("Mode")
     .value("air", TransitMode.AIRPLANE)
     .value("bicycle", TraverseMode.BICYCLE)
@@ -200,15 +187,13 @@ public class EnumTypes {
     .value("scooter", TraverseMode.SCOOTER)
     .build();
 
-  public static final GraphQLEnumType LOCALE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType LOCALE = GraphQLEnumType.newEnum()
     .name("Locale")
     .value("no", "no")
     .value("us", "us")
     .build();
 
-  public static final GraphQLEnumType MULTI_MODAL_MODE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType MULTI_MODAL_MODE = GraphQLEnumType.newEnum()
     .name("MultiModalMode")
     .value("parent", "parent", "Multi modal parent stop places without their mono modal children.")
     .value(
@@ -233,8 +218,7 @@ public class EnumTypes {
     )
   );
 
-  public static final GraphQLEnumType PURCHASE_WHEN = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType PURCHASE_WHEN = GraphQLEnumType.newEnum()
     .name("PurchaseWhen")
     .value("timeOfTravelOnly", "timeOfTravelOnly")
     .value("dayOfTravelOnly", "dayOfTravelOnly")
@@ -243,8 +227,7 @@ public class EnumTypes {
     .value("other", "other")
     .build();
 
-  public static final GraphQLEnumType REALTIME_STATE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType REALTIME_STATE = GraphQLEnumType.newEnum()
     .name("RealtimeState")
     .value(
       "scheduled",
@@ -273,8 +256,7 @@ public class EnumTypes {
     )
     .build();
 
-  public static final GraphQLEnumType RELATIVE_DIRECTION = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType RELATIVE_DIRECTION = GraphQLEnumType.newEnum()
     .name("RelativeDirection")
     .value("depart", RelativeDirection.DEPART)
     .value("hardLeft", RelativeDirection.HARD_LEFT)
@@ -289,17 +271,18 @@ public class EnumTypes {
     .value("elevator", RelativeDirection.ELEVATOR)
     .value("uturnLeft", RelativeDirection.UTURN_LEFT)
     .value("uturnRight", RelativeDirection.UTURN_RIGHT)
+    .value("enterStation", RelativeDirection.ENTER_STATION)
+    .value("exitStation", RelativeDirection.EXIT_STATION)
+    .value("followSigns", RelativeDirection.FOLLOW_SIGNS)
     .build();
 
-  public static final GraphQLEnumType REPORT_TYPE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType REPORT_TYPE = GraphQLEnumType.newEnum()
     .name("ReportType") //SIRI - ReportTypeEnumeration
     .value("general", "general", "Indicates a general info-message that should not affect trip.")
     .value("incident", "incident", "Indicates an incident that may affect trip.")
     .build();
 
-  public static final GraphQLEnumType ROUTING_ERROR_CODE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType ROUTING_ERROR_CODE = GraphQLEnumType.newEnum()
     .name("RoutingErrorCode")
     .value(
       "locationNotFound",
@@ -338,8 +321,7 @@ public class EnumTypes {
     )
     .build();
 
-  public static final GraphQLEnumType SERVICE_ALTERATION = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType SERVICE_ALTERATION = GraphQLEnumType.newEnum()
     .name("ServiceAlteration")
     .value("cancellation", TripAlteration.CANCELLATION)
     .value("replaced", TripAlteration.REPLACED)
@@ -347,8 +329,7 @@ public class EnumTypes {
     .value("planned", TripAlteration.PLANNED)
     .build();
 
-  public static final GraphQLEnumType SEVERITY = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType SEVERITY = GraphQLEnumType.newEnum()
     .name("Severity") //SIRI - SeverityEnumeration
     .value("unknown", "unknown", "Situation has unknown impact on trips.")
     .value("noImpact", "noImpact", "Situation has no impact on trips.")
@@ -360,8 +341,7 @@ public class EnumTypes {
     .value("undefined", "undefined", "Severity is undefined.")
     .build();
 
-  public static final GraphQLEnumType STOP_CONDITION_ENUM = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType STOP_CONDITION_ENUM = GraphQLEnumType.newEnum()
     .name("StopCondition") //SIRI - RoutePointTypeEnumeration
     .value(
       "destination",
@@ -390,8 +370,7 @@ public class EnumTypes {
     )
     .build();
 
-  public static final GraphQLEnumType STREET_MODE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType STREET_MODE = GraphQLEnumType.newEnum()
     .name("StreetMode")
     .value("foot", StreetMode.WALK, "Walk only")
     .value(
@@ -450,8 +429,7 @@ public class EnumTypes {
     )
     .build();
 
-  public static final GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType.newEnum()
     .name("TransportMode")
     .value("air", TransitMode.AIRPLANE)
     .value("bus", TransitMode.BUS)
@@ -475,8 +453,7 @@ public class EnumTypes {
     TransmodelTransportSubmode::getValue
   );
 
-  public static final GraphQLEnumType VERTEX_TYPE = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType VERTEX_TYPE = GraphQLEnumType.newEnum()
     .name("VertexType")
     .value("normal", VertexType.NORMAL)
     .value("transit", VertexType.TRANSIT)
@@ -485,8 +462,7 @@ public class EnumTypes {
     //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
     .build();
 
-  public static final GraphQLEnumType WHEELCHAIR_BOARDING = GraphQLEnumType
-    .newEnum()
+  public static final GraphQLEnumType WHEELCHAIR_BOARDING = GraphQLEnumType.newEnum()
     .name("WheelchairBoarding")
     .value(
       "noInformation",

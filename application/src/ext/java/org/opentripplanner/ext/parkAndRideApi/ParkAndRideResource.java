@@ -42,7 +42,9 @@ public class ParkAndRideResource {
     //           - serverContext.graphFinder(). This needs at least a comment!
     //           - This can be replaced with a search done with the SiteRepository
     //           - if we have a radius search there.
-    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStopsByBoundingBox);
+    this.graphFinder = new DirectGraphFinder(
+      serverContext.transitService()::findRegularStopsByBoundingBox
+    );
   }
 
   /** Envelopes are in latitude, longitude format */
@@ -97,8 +99,7 @@ public class ParkAndRideResource {
 
   public record ParkAndRideInfo(String name, double x, double y) {
     public static ParkAndRideInfo ofVehicleParking(VehicleParking parking) {
-      var name = Optional
-        .ofNullable(parking.getName())
+      var name = Optional.ofNullable(parking.getName())
         .map(I18NString::toString)
         .orElse(parking.getId().getId());
 

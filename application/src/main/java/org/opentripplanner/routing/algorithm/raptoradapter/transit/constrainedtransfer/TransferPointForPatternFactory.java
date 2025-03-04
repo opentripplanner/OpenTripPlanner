@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedt
 
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -12,7 +13,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * org.opentripplanner.model.transfer.TransferPoint} can not be used by Raptor as is, so we
  * transform them into {@link TransferPointMatcher}. For example to speed ut the search in Raptor we
  * avoid fetching Stops from memory and instead uses a {@code stopIndex}. This index is not
- * necessarily fixed, but generated for the {@link org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer},
+ * necessarily fixed, but generated for the {@link RaptorTransitData},
  * so we need to generate
  */
 
@@ -44,10 +45,9 @@ final class TransferPointForPatternFactory {
     private final TIntSet childStops;
 
     private StationSP(Station station) {
-      this.childStops =
-        new TIntHashSet(
-          station.getChildStops().stream().mapToInt(StopLocation::getIndex).toArray()
-        );
+      this.childStops = new TIntHashSet(
+        station.getChildStops().stream().mapToInt(StopLocation::getIndex).toArray()
+      );
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.opentripplanner.osm.wayproperty;
 
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 /**
  * A CreativeNamer makes up names for ways that don't have one in the OSM data set. It does this by
@@ -22,7 +22,7 @@ public class CreativeNamer {
     this.creativeNamePattern = pattern;
   }
 
-  public I18NString generateCreativeName(OsmWithTags way) {
+  public I18NString generateCreativeName(OsmEntity way) {
     return LocalizedStringMapper.getInstance().map(creativeNamePattern, way);
   }
 }

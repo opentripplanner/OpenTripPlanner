@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
@@ -67,17 +68,18 @@ class RouteRequestMapperTest {
     var timetableRepository = new TimetableRepository();
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
-    CONTEXT =
-      new GraphQLRequestContext(
-        new TestRoutingService(List.of()),
-        transitService,
-        new DefaultFareService(),
-        new DefaultVehicleRentalService(),
-        new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
-        new DefaultRealtimeVehicleService(transitService),
-        GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
-        new RouteRequest()
-      );
+    var routeRequest = new RouteRequest();
+    CONTEXT = new GraphQLRequestContext(
+      new TestRoutingService(List.of()),
+      transitService,
+      new DefaultFareService(),
+      new DefaultVehicleRentalService(),
+      new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
+      new DefaultRealtimeVehicleService(transitService),
+      SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
+      GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
+      routeRequest
+    );
   }
 
   @Test
@@ -104,9 +106,9 @@ class RouteRequestMapperTest {
       routeRequest.journey().transit().filters().toString()
     );
     assertTrue(
-      Duration
-        .between(defaultRequest.dateTime(), routeRequest.dateTime())
-        .compareTo(Duration.ofSeconds(10)) <
+      Duration.between(defaultRequest.dateTime(), routeRequest.dateTime()).compareTo(
+        Duration.ofSeconds(10)
+      ) <
       0
     );
 
@@ -327,8 +329,7 @@ class RouteRequestMapperTest {
     Locale locale,
     GraphQLRequestContext requestContext
   ) {
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
+    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query("")
       .operationName("planConnection")
       .context(requestContext)
@@ -339,8 +340,7 @@ class RouteRequestMapperTest {
       .executionInput(executionInput)
       .executionId(ExecutionId.from("planConnectionTest"))
       .build();
-    return DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
       .localContext(Map.of("locale", locale))
       .build();

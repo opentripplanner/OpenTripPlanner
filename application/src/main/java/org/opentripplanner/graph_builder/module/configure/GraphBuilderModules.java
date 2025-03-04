@@ -40,6 +40,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
@@ -67,9 +68,11 @@ public class GraphBuilderModules {
     StreetLimitationParameters streetLimitationParameters
   ) {
     List<OsmProvider> providers = new ArrayList<>();
-    for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+    for (ConfiguredDataSource<
+      OsmExtractParameters
+    > osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
       providers.add(
-        new OsmProvider(
+        new DefaultOsmProvider(
           osmConfiguredDataSource.dataSource(),
           osmConfiguredDataSource.config().osmTagMapper(),
           osmConfiguredDataSource.config().timeZone(),
@@ -80,8 +83,7 @@ public class GraphBuilderModules {
       );
     }
 
-    return OsmModule
-      .of(providers, graph, osmInfoGraphBuildRepository, vehicleParkingRepository)
+    return OsmModule.of(providers, graph, osmInfoGraphBuildRepository, vehicleParkingRepository)
       .withEdgeNamer(config.edgeNamer)
       .withAreaVisibility(config.areaVisibility)
       .withPlatformEntriesLinking(config.platformEntriesLinking)
@@ -105,7 +107,9 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+    for (ConfiguredDataSource<
+      GtfsFeedParameters
+    > gtfsData : dataSources.getGtfsConfiguredDatasource()) {
       GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
 
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
@@ -148,14 +152,13 @@ public class GraphBuilderModules {
     VehicleParkingRepository parkingService,
     DataImportIssueStore issueStore
   ) {
-    return new NetexConfigure(config)
-      .createNetexModule(
-        dataSources.getNetexConfiguredDatasource(),
-        timetableRepository,
-        parkingService,
-        graph,
-        issueStore
-      );
+    return new NetexConfigure(config).createNetexModule(
+      dataSources.getNetexConfiguredDatasource(),
+      timetableRepository,
+      parkingService,
+      graph,
+      issueStore
+    );
   }
 
   @Provides
@@ -259,7 +262,8 @@ public class GraphBuilderModules {
       timetableRepository,
       issueStore,
       config.maxTransferDuration,
-      config.transferRequests
+      config.transferRequests,
+      config.transferParametersForMode
     );
   }
 

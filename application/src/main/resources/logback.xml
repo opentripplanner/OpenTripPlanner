@@ -55,7 +55,7 @@
 
   <logger name="org.opentripplanner.framework.application" level="info"/>
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
-
+  <logger name="org.opentripplanner.graph_builder.module.osm.OsmModule" level="info"/>
 
   <logger name="org.opentripplanner.routing" level="info"/>
   <logger name="org.opentripplanner.routing.algorithm.transferoptimization" level="info"/>
@@ -100,10 +100,10 @@
   <logger name="org.opentripplanner.apis.support.graphql.LoggingDataFetcherExceptionHandler" level="off" />
 
   <!-- If you want to debug realtime updates set these loggers to debug -->
-  <logger name="org.opentripplanner.updater.trip.TimetableSnapshotSource" level="info" />
-  <logger name="org.opentripplanner.model.Timetable" level="warn" />
-  <logger name="org.opentripplanner.updater.siri.SiriTimetableSnapshotSource" level="warn" />
-  <logger name="org.opentripplanner.updater.siri.TimetableHelper" level="warn" />
+  <logger name="org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter" level="info" />
+  <logger name="org.opentripplanner.updater.trip.gtfs.TripTimesUpdater" level="warn" />
+  <logger name="org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter" level="warn" />
+  <logger name="org.opentripplanner.updater.trip.siri.TimetableHelper" level="warn" />
 
   <!-- optional logging configuration to define your own custom logging needs -->
   <!-- add it to the root of OTP runtime folder -->

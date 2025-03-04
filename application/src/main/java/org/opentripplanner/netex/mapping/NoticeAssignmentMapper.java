@@ -32,7 +32,8 @@ class NoticeAssignmentMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId = ArrayListMultimap.create();
+  private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId =
+    ArrayListMultimap.create();
 
   private final ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById;
 

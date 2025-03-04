@@ -16,8 +16,7 @@ class TransferOptimizationPreferencesTest {
   private static final double BACK_TRAVEL_WAIT_TIME_FACTOR = 1.2;
   private static final double EXTRA_STOP_BOARD_ALIGHT_COSTS_FACTOR = 100.0;
 
-  private final TransferOptimizationPreferences subject = TransferOptimizationPreferences
-    .of()
+  private final TransferOptimizationPreferences subject = TransferOptimizationPreferences.of()
     .withOptimizeTransferWaitTime(false)
     .withMinSafeWaitTimeFactor(MIN_SAFE_WAIT_TIME_FACTOR)
     .withBackTravelWaitTimeFactor(BACK_TRAVEL_WAIT_TIME_FACTOR)

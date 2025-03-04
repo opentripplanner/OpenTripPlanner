@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
@@ -39,9 +39,8 @@ public class TriangleInequalityTest {
 
   private static Graph graph;
 
-  private final IntersectionTraversalCalculator calculator = new ConstantIntersectionTraversalCalculator(
-    10.0
-  );
+  private final IntersectionTraversalCalculator calculator =
+    new ConstantIntersectionTraversalCalculator(10.0);
 
   private Vertex start;
   private Vertex end;
@@ -51,14 +50,13 @@ public class TriangleInequalityTest {
     graph = new Graph(new Deduplicator());
 
     File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
-    OsmProvider provider = new OsmProvider(file, true);
-    OsmModule osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
+    OsmModule osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withAreaVisibility(true)
       .build();
     osmModule.buildGraph();
@@ -163,8 +161,7 @@ public class TriangleInequalityTest {
     Vertex u,
     Vertex v
   ) {
-    return StreetSearchBuilder
-      .of()
+    return StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setOriginBackEdge(startBackEdge)
       .setRequest(options)
@@ -202,8 +199,7 @@ public class TriangleInequalityTest {
       prototypeOptions.journey().transit().setFilters(filters);
     }
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(prototypeOptions)

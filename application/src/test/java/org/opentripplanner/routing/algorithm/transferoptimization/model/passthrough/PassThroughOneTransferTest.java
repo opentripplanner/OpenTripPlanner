@@ -45,14 +45,12 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
    */
   private static final int N_STOPS = STOP_M + 1;
 
-  private final TestTripSchedule trip1 = TestTripSchedule
-    .schedule()
+  private final TestTripSchedule trip1 = TestTripSchedule.schedule()
     .pattern("Line 1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E)
     .times("10:05 10:10 10:15 10:20 10:25")
     .build();
 
-  private final TestTripSchedule trip2 = TestTripSchedule
-    .schedule()
+  private final TestTripSchedule trip2 = TestTripSchedule.schedule()
     .pattern("Line 2", STOP_F, STOP_G, STOP_H, STOP_I, STOP_J)
     .times("10:30 10:35 10:40 10:45 10:50")
     .build();

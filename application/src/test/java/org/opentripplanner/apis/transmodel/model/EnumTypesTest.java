@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.transmodel.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,26 +56,23 @@ class EnumTypesTest {
 
   @Test
   void createFromDocumentedEnumMissingValueThrowsException() {
-    assertThrows(
-      IllegalStateException.class,
-      () -> EnumTypes.createFromDocumentedEnum("oof", List.of(EnumTypes.map("Rab", Foo.Bar)))
+    assertThrows(IllegalStateException.class, () ->
+      EnumTypes.createFromDocumentedEnum("oof", List.of(EnumTypes.map("Rab", Foo.Bar)))
     );
   }
 
   @Test
   void createFromDocumentedEnumDuplicateThrowsException() {
-    assertThrows(
-      IllegalStateException.class,
-      () ->
-        EnumTypes.createFromDocumentedEnum(
-          "oof",
-          List.of(
-            EnumTypes.map("Rab", Foo.Bar),
-            EnumTypes.map("Hi", Foo.Hi),
-            // Duplicate: Bar -> throw exception
-            EnumTypes.map("Bar", Foo.Bar)
-          )
+    assertThrows(IllegalStateException.class, () ->
+      EnumTypes.createFromDocumentedEnum(
+        "oof",
+        List.of(
+          EnumTypes.map("Rab", Foo.Bar),
+          EnumTypes.map("Hi", Foo.Hi),
+          // Duplicate: Bar -> throw exception
+          EnumTypes.map("Bar", Foo.Bar)
         )
+      )
     );
   }
 
@@ -93,7 +91,7 @@ class EnumTypesTest {
       Locale.ENGLISH
     );
     assertInstanceOf(String.class, value);
-    assertNotNull(value);
+    assertFalse(((String) value).isEmpty());
   }
 
   @Test

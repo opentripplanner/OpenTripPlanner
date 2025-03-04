@@ -80,7 +80,8 @@ public class OtpTransitServiceBuilder {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
-  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments =
+    ArrayListMultimap.create();
 
   private final EntityById<Operator> operatorsById = new DefaultEntityById<>();
 
@@ -114,13 +115,16 @@ public class OtpTransitServiceBuilder {
 
   private final EntityById<Branding> brandingsById = new DefaultEntityById<>();
 
-  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap.create();
+  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId =
+    ArrayListMultimap.create();
 
   private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 
   private final EntityById<GroupOfRoutes> groupOfRouteById = new DefaultEntityById<>();
 
   private final List<VehicleParking> vehicleParkings = new ArrayList<>();
+
+  private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints = new HashMap<>();
 
   private final DataImportIssueStore issueStore;
 
@@ -278,6 +282,13 @@ public class OtpTransitServiceBuilder {
     return vehicleParkings;
   }
 
+  /**
+   * @see org.opentripplanner.transit.service.TimetableRepository#findStopByScheduledStopPoint(FeedScopedId)
+   */
+  public Map<FeedScopedId, RegularStop> stopsByScheduledStopPoints() {
+    return stopsByScheduledStopPoints;
+  }
+
   public OtpTransitService build() {
     return new OtpTransitServiceImpl(this);
   }
@@ -315,6 +326,13 @@ public class OtpTransitServiceBuilder {
     }
     removeEntitiesWithInvalidReferences();
     LOG.info("Limiting transit service days to time period complete.");
+  }
+
+  /**
+   * Add a mapping from a scheduled stop point to the regular stop.
+   */
+  public void addStopByScheduledStopPoint(FeedScopedId sspid, RegularStop stop) {
+    stopsByScheduledStopPoints.put(sspid, stop);
   }
 
   /**
@@ -449,7 +467,7 @@ public class OtpTransitServiceBuilder {
   }
 
   /**
-   * Return {@code true} if the the point is a trip-transfer-point and the trip reference is
+   * Return {@code true} if the point is a trip-transfer-point and the trip reference is
    * missing.
    */
   private boolean transferPointTripReferenceDoesNotExist(TransferPoint point) {

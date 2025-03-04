@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptorlegacy._data.transit.TestRoute.route;
 import static org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule.schedule;
 
@@ -24,7 +23,7 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
 import org.opentripplanner.raptorlegacy._data.transit.TestRoute;
-import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfers;
 import org.opentripplanner.raptorlegacy._data.transit.TestTransitData;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
@@ -46,7 +45,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  private final TestPathBuilder pathBuilder = new TestPathBuilder(SLACK_PROVIDER, C1_CALCULATOR);
+  private final TestPathBuilder pathBuilder = new TestPathBuilder(SLACK_PROVIDER, COST_CALCULATOR);
 
   private final TestTransitData data = new TestTransitData().withSlackProvider(SLACK_PROVIDER);
 
@@ -55,8 +54,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   @Test
   void findTransferPathWithoutTransfers() {
     data.withRoutes(
-      route(TestTripPattern.pattern("L1", STOP_A, STOP_B, STOP_C).withSlackIndex(1))
-        .withTimetable(schedule("10:00 10:20 10:30"))
+      route(TestTripPattern.pattern("L1", STOP_A, STOP_B, STOP_C).withSlackIndex(1)).withTimetable(
+        schedule("10:00 10:20 10:30")
+      )
     );
     var schedule = data.getRoute(0).getTripSchedule(0);
 
@@ -75,8 +75,10 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   @Test
   void findTransferForTheSameRoute() {
     data.withRoutes(
-      route("L1", STOP_A, STOP_B, STOP_C, STOP_D)
-        .withTimetable(schedule("10:02 10:10 10:20 10:30"), schedule("10:04 10:12 10:22 10:32"))
+      route("L1", STOP_A, STOP_B, STOP_C, STOP_D).withTimetable(
+        schedule("10:02 10:10 10:20 10:30"),
+        schedule("10:04 10:12 10:22 10:32")
+      )
     );
 
     // The only possible place to transfer between A and C is stop B:
@@ -119,7 +121,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     var schedule3 = data.getRoute(2).getTripSchedule(0);
 
     data
-      .withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m))
+      .withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D1m))
       .withGuaranteedTransfer(schedule1, STOP_B, schedule2, STOP_B)
       .withGuaranteedTransfer(schedule2, STOP_C, schedule3, STOP_D);
 
@@ -141,7 +143,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
       "[[" +
       "TripToTripTransfer{from: [2 10:20 BUS L1], to: [2 10:20 BUS L2]}" +
       "], [" +
-      "TripToTripTransfer{from: [3 10:30 BUS L2], to: [4 10:31 BUS L3], transfer: On-Street 1m ~ 4}" +
+      "TripToTripTransfer{from: [3 10:30 BUS L2], to: [4 10:31 BUS L3], transfer: WALK 1m $120 ~ 4}" +
       "]]",
       result.toString()
     );
@@ -149,16 +151,18 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
   @Test
   void findTransferForDifferentRoutes() {
-    TestRoute l1 = route("L1", STOP_A, STOP_B, STOP_C, STOP_D)
-      .withTimetable(schedule("10:02 10:10 10:20 10:30"));
-    TestRoute l2 = route("L2", STOP_E, STOP_C, STOP_F, STOP_G)
-      .withTimetable(schedule("10:12 10:22 10:32 10:40"));
+    TestRoute l1 = route("L1", STOP_A, STOP_B, STOP_C, STOP_D).withTimetable(
+      schedule("10:02 10:10 10:20 10:30")
+    );
+    TestRoute l2 = route("L2", STOP_E, STOP_C, STOP_F, STOP_G).withTimetable(
+      schedule("10:12 10:22 10:32 10:40")
+    );
 
     // S
     data
       .withRoutes(l1, l2)
-      .withTransfer(STOP_B, TestTransfer.transfer(STOP_E, D1m))
-      .withTransfer(STOP_D, TestTransfer.transfer(STOP_F, D20s));
+      .withTransfer(STOP_B, TestTransfers.transfer(STOP_E, D1m))
+      .withTransfer(STOP_D, TestTransfers.transfer(STOP_F, D20s));
 
     // The only possible place to transfer between A and D is stop C (no extra transfers):
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_C, STOP_G);
@@ -168,9 +172,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     var result = subject.findAllPossibleTransfers(transitLegs);
     assertEquals(
       "[[" +
-      "TripToTripTransfer{from: [2 10:10 BUS L1], to: [5 10:12 BUS L2], transfer: On-Street 1m ~ 5}, " +
+      "TripToTripTransfer{from: [2 10:10 BUS L1], to: [5 10:12 BUS L2], transfer: WALK 1m $120 ~ 5}, " +
       "TripToTripTransfer{from: [3 10:20 BUS L1], to: [3 10:22 BUS L2]}, " +
-      "TripToTripTransfer{from: [4 10:30 BUS L1], to: [6 10:32 BUS L2], transfer: On-Street 20s ~ 6}" +
+      "TripToTripTransfer{from: [4 10:30 BUS L1], to: [6 10:32 BUS L2], transfer: WALK 20s $40 ~ 6}" +
       "]]",
       result.toString()
     );
@@ -181,8 +185,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransfersForCircularLine1() {
     var l1 = route("L1", STOP_A, STOP_C, STOP_D).withTimetable(schedule("10:02 10:10 10:20"));
     // Passing same stop two times
-    var l2 = route("L2", STOP_D, STOP_E, STOP_D, STOP_F)
-      .withTimetable(schedule("10:30 10:40 10:50 11:00"));
+    var l2 = route("L2", STOP_D, STOP_E, STOP_D, STOP_F).withTimetable(
+      schedule("10:30 10:40 10:50 11:00")
+    );
 
     data.withRoutes(l1, l2);
 
@@ -204,10 +209,11 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransfersForCircularLine2() {
     var l1 = route("L1", STOP_A, STOP_C, STOP_D).withTimetable(schedule("10:02 10:10 10:20"));
     // Passing same stop two times
-    var l2 = route("L2", STOP_E, STOP_F, STOP_E, STOP_G)
-      .withTimetable(schedule("10:30 10:40 10:50 11:00"));
+    var l2 = route("L2", STOP_E, STOP_F, STOP_E, STOP_G).withTimetable(
+      schedule("10:30 10:40 10:50 11:00")
+    );
 
-    data.withRoutes(l1, l2).withTransfer(STOP_D, TestTransfer.transfer(STOP_E, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_D, TestTransfers.transfer(STOP_E, D1m));
 
     var schedule1 = data.getRoute(0).getTripSchedule(0);
     var schedule2 = data.getRoute(1).getTripSchedule(0);
@@ -227,8 +233,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     assertEquals(
       "[[" +
-      "TripToTripTransfer{from: [4 10:20 BUS L1], to: [5 10:30 BUS L2], transfer: On-Street 1m ~ 5}, " +
-      "TripToTripTransfer{from: [4 10:20 BUS L1], to: [5 10:50 BUS L2], transfer: On-Street 1m ~ 5}" +
+      "TripToTripTransfer{from: [4 10:20 BUS L1], to: [5 10:30 BUS L2], transfer: WALK 1m $120 ~ 5}, " +
+      "TripToTripTransfer{from: [4 10:20 BUS L1], to: [5 10:50 BUS L2], transfer: WALK 1m $120 ~ 5}" +
       "]]",
       result.toString()
     );
@@ -239,8 +245,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransfersForCircularLine3() {
     var l1 = route("L1", STOP_A, STOP_C, STOP_D).withTimetable(schedule("10:02 10:10 10:20"));
     // Passing same stop two times
-    var l2 = route("L2", STOP_D, STOP_E, STOP_D, STOP_F)
-      .withTimetable(schedule("10:10 10:20 10:30 10:40"));
+    var l2 = route("L2", STOP_D, STOP_E, STOP_D, STOP_F).withTimetable(
+      schedule("10:10 10:20 10:30 10:40")
+    );
 
     data.withRoutes(l1, l2);
 
@@ -288,10 +295,11 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransfersForCircularLine5() {
     var l1 = route("L1", STOP_A, STOP_C, STOP_D).withTimetable(schedule("10:02 10:10 10:20"));
     // Passing same stop two times
-    var l2 = route("L2", STOP_E, STOP_F, STOP_E, STOP_G)
-      .withTimetable(schedule("10:30 10:40 10:50 11:00"));
+    var l2 = route("L2", STOP_E, STOP_F, STOP_E, STOP_G).withTimetable(
+      schedule("10:30 10:40 10:50 11:00")
+    );
 
-    data.withRoutes(l1, l2).withTransfer(STOP_D, TestTransfer.transfer(STOP_E, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_D, TestTransfers.transfer(STOP_E, D1m));
 
     var schedule1 = data.getRoute(0).getTripSchedule(0);
     var schedule2 = data.getRoute(1).getTripSchedule(0);
@@ -316,7 +324,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // Only transfer on second visit
     // since first one is constrained
     assertEquals(
-      "[[TripToTripTransfer{from: [4 10:20 BUS L1], to: [5 10:50 BUS L2], transfer: On-Street 1m ~ 5}]]",
+      "[[TripToTripTransfer{from: [4 10:20 BUS L1], to: [5 10:50 BUS L2], transfer: WALK 1m $120 ~ 5}]]",
       result.toString()
     );
   }
@@ -326,8 +334,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
   void findTransfersForCircularLine6() {
     var l1 = route("L1", STOP_A, STOP_C, STOP_D).withTimetable(schedule("10:02 10:10 10:20"));
     // Passing same stop two times
-    var l2 = route("L2", STOP_D, STOP_E, STOP_F, STOP_D)
-      .withTimetable(schedule("10:30 10:40 10:50 11:00"));
+    var l2 = route("L2", STOP_D, STOP_E, STOP_F, STOP_D).withTimetable(
+      schedule("10:30 10:40 10:50 11:00")
+    );
 
     data.withRoutes(l1, l2);
 
@@ -380,7 +389,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     TestRoute l1 = route(p1).withTimetable(schedule("10:00 10:10 10:20"));
     TestRoute l2 = route("L2", STOP_B, STOP_D, STOP_E).withTimetable(schedule("10:20 10:30 10:40"));
 
-    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D1m));
 
     final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, STOP_A, ACCESS_DURATION)
@@ -398,7 +407,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // Transfer at B is not allowed
     assertEquals(
       "[[" +
-      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}" +
+      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: WALK 1m $120 ~ 4}" +
       "]]",
       result.toString()
     );
@@ -413,7 +422,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     TestRoute l2 = route(p2).withTimetable(schedule("10:20 10:30 10:40"));
 
-    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D1m));
 
     final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, STOP_A, ACCESS_DURATION)
@@ -431,7 +440,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // Transfer at B is not allowed
     assertEquals(
       "[[" +
-      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}" +
+      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: WALK 1m $120 ~ 4}" +
       "]]",
       result.toString()
     );
@@ -445,7 +454,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     TestRoute l1 = route(p1).withTimetable(schedule("10:00 10:10 10:20"));
     TestRoute l2 = route("L2", STOP_B, STOP_D, STOP_E).withTimetable(schedule("10:20 10:30 10:40"));
 
-    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D1m));
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_E);
 
@@ -469,7 +478,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     TestRoute l2 = route(p2).withTimetable(schedule("10:20 10:30 10:40"));
 
-    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D1m));
 
     var transitLegs = transitLegsTwoRoutes(STOP_A, STOP_B, STOP_E);
 
@@ -530,8 +539,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     var tripA = l1.getTripSchedule(0);
     var tripB = l2.getTripSchedule(0);
-    var constraint = TransferConstraint
-      .of()
+    var constraint = TransferConstraint.of()
       .minTransferTime((int) minTransferTime.getSeconds())
       .build();
     data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, constraint);
@@ -550,9 +558,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
         result.toString()
       );
     } else {
-      Assertions.assertThrows(
-        RuntimeException.class,
-        () -> subject.findAllPossibleTransfers(transitLegs)
+      Assertions.assertThrows(RuntimeException.class, () ->
+        subject.findAllPossibleTransfers(transitLegs)
       );
     }
   }
@@ -565,8 +572,8 @@ public class TransferGeneratorTest implements RaptorTestConstants {
 
     data
       .withRoutes(l1, l2, l3)
-      .withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D30s))
-      .withTransfer(STOP_D, TestTransfer.transfer(STOP_F, D20s));
+      .withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D30s))
+      .withTransfer(STOP_D, TestTransfers.transfer(STOP_F, D20s));
 
     // The only possible place to transfer between A and D is stop C (no extra transfers):
     var path = pathBuilder
@@ -586,9 +593,9 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     assertEquals(
       "[[" +
       "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:12 BUS L2]}, " +
-      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:22 BUS L2], transfer: On-Street 30s ~ 4}" +
+      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:22 BUS L2], transfer: WALK 30s $60 ~ 4}" +
       "], [" +
-      "TripToTripTransfer{from: [4 10:22 BUS L2], to: [6 10:24 BUS L3], transfer: On-Street 20s ~ 6}, " +
+      "TripToTripTransfer{from: [4 10:22 BUS L2], to: [6 10:24 BUS L3], transfer: WALK 20s $40 ~ 6}, " +
       "TripToTripTransfer{from: [5 10:32 BUS L2], to: [5 10:34 BUS L3]}" +
       "]]",
       result.toString()
@@ -599,16 +606,18 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     // given 3 possible expected transfers
     var expBxB = "TripToTripTransfer{from: [2 10:10 BUS L1], to: [2 10:20 BUS L2]}";
     var expCxD =
-      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: On-Street 1m ~ 4}";
+      "TripToTripTransfer{from: [3 10:20 BUS L1], to: [4 10:30 BUS L2], transfer: WALK 1m $120 ~ 4}";
     var expExE = "TripToTripTransfer{from: [5 10:30 BUS L1], to: [5 10:40 BUS L2]}";
 
-    var l1 = route("L1", STOP_A, STOP_B, STOP_C, STOP_E)
-      .withTimetable(schedule("10:00 10:10 10:20 10:30"));
+    var l1 = route("L1", STOP_A, STOP_B, STOP_C, STOP_E).withTimetable(
+      schedule("10:00 10:10 10:20 10:30")
+    );
 
-    var l2 = route("L2", STOP_B, STOP_D, STOP_E, STOP_F)
-      .withTimetable(schedule("10:20 10:30 10:40 10:50"));
+    var l2 = route("L2", STOP_B, STOP_D, STOP_E, STOP_F).withTimetable(
+      schedule("10:20 10:30 10:40 10:50")
+    );
 
-    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfer.transfer(STOP_D, D1m));
+    data.withRoutes(l1, l2).withTransfer(STOP_C, TestTransfers.transfer(STOP_D, D1m));
 
     final RaptorPath<TestTripSchedule> path = pathBuilder
       .access(ACCESS_START, STOP_A, ACCESS_DURATION)

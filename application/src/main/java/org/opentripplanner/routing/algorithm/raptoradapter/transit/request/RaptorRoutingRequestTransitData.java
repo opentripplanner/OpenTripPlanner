@@ -19,8 +19,8 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.SlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedBoardingSearch;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.constrainedtransfer.ConstrainedTransfersForPatterns;
@@ -32,13 +32,13 @@ import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPrior
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 /**
- * This is the data provider for the Range Raptor search engine. It uses data from the TransitLayer,
+ * This is the data provider for the Range Raptor search engine. It uses data from the RaptorTransitData,
  * but filters it by dates and modes per request. Transfer durations are pre-calculated per request
  * based on walk speed.
  */
 public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvider<TripSchedule> {
 
-  private final TransitLayer transitLayer;
+  private final RaptorTransitData raptorTransitData;
 
   private final TransferService transferService;
 
@@ -70,7 +70,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   private final int validTransitDataEndTime;
 
   public RaptorRoutingRequestTransitData(
-    TransitLayer transitLayer,
+    RaptorTransitData raptorTransitData,
     TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     int additionalPastSearchDays,
@@ -78,15 +78,15 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     TransitDataProviderFilter filter,
     RouteRequest request
   ) {
-    this.transferService = transitLayer.getTransferService();
-    this.transitLayer = transitLayer;
+    this.transferService = raptorTransitData.getTransferService();
+    this.raptorTransitData = raptorTransitData;
     this.transitSearchTimeZero = transitSearchTimeZero;
 
     // Delegate to the creator to construct the needed data structures. The code is messy so
     // it is nice to NOT have it in the class. It isolates this code to only be available at
     // the time of construction
     var transitDataCreator = new RaptorRoutingRequestTransitDataCreator(
-      transitLayer,
+      raptorTransitData,
       transitSearchTimeZero
     );
     List<TripPatternForDates> tripPatterns = transitDataCreator.createTripPatterns(
@@ -97,42 +97,38 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
-    this.transferIndex = transitLayer.getRaptorTransfersForRequest(request);
-    this.constrainedTransfers = transitLayer.getConstrainedTransfers();
+    this.transferIndex = raptorTransitData.getRaptorTransfersForRequest(request);
+    this.constrainedTransfers = raptorTransitData.getConstrainedTransfers();
 
     var mcCostParams = GeneralizedCostParametersMapper.map(request, patternIndex);
 
-    this.generalizedCostCalculator =
-      CostCalculatorFactory.createCostCalculator(
-        mcCostParams,
-        transitLayer.getStopBoardAlightTransferCosts()
-      );
+    this.generalizedCostCalculator = CostCalculatorFactory.createCostCalculator(
+      mcCostParams,
+      raptorTransitData.getStopBoardAlightTransferCosts()
+    );
 
-    this.slackProvider =
-      new SlackProvider(
-        (int) request.preferences().transfer().slack().toSeconds(),
-        request.preferences().transit().boardSlack(),
-        request.preferences().transit().alightSlack()
-      );
+    this.slackProvider = new SlackProvider(
+      (int) request.preferences().transfer().slack().toSeconds(),
+      request.preferences().transit().boardSlack(),
+      request.preferences().transit().alightSlack()
+    );
 
-    this.validTransitDataStartTime =
-      ServiceDateUtils.secondsSinceStartOfTime(
-        this.transitSearchTimeZero,
-        this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
-      );
+    this.validTransitDataStartTime = ServiceDateUtils.secondsSinceStartOfTime(
+      this.transitSearchTimeZero,
+      this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
+    );
     // The +1 is due to the validity being to the end of the day
-    this.validTransitDataEndTime =
-      ServiceDateUtils.secondsSinceStartOfTime(
-        this.transitSearchTimeZero,
-        this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
-      );
+    this.validTransitDataEndTime = ServiceDateUtils.secondsSinceStartOfTime(
+      this.transitSearchTimeZero,
+      this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
+    );
   }
 
   public RaptorRoutingRequestTransitData(
     RaptorRoutingRequestTransitData original,
     RaptorCostCalculator<TripSchedule> newCostCalculator
   ) {
-    this.transitLayer = original.transitLayer;
+    this.raptorTransitData = original.raptorTransitData;
     this.transitSearchTimeZero = original.transitSearchTimeZero;
     this.activeTripPatternsPerStop = original.activeTripPatternsPerStop;
     this.patternIndex = original.patternIndex;
@@ -176,7 +172,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
   @Override
   public int numberOfStops() {
-    return transitLayer.getStopCount();
+    return raptorTransitData.getStopCount();
   }
 
   @Override
@@ -207,10 +203,10 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
         return transferService.findTransfer(
           fromTrip.getOriginalTripTimes().getTrip(),
           fromStopPosition,
-          transitLayer.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
+          raptorTransitData.getStopByIndex(fromTrip.pattern().stopIndex(fromStopPosition)),
           toTrip.getOriginalTripTimes().getTrip(),
           toStopPosition,
-          transitLayer.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
+          raptorTransitData.getStopByIndex(toTrip.pattern().stopIndex(toStopPosition))
         );
       }
     };
@@ -219,7 +215,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   @Override
   public RaptorStopNameResolver stopNameResolver() {
     return (int stopIndex) -> {
-      var s = transitLayer.getStopByIndex(stopIndex);
+      var s = raptorTransitData.getStopByIndex(stopIndex);
       return s == null ? "null" : s.getName() + "(" + stopIndex + ")";
     };
   }

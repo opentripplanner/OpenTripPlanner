@@ -104,8 +104,7 @@ public class PatternAtStop {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(getClass())
+    return ToStringBuilder.of(getClass())
       .addStr("id", id)
       .addObj("stop", stop)
       .addObj("pattern", pattern)

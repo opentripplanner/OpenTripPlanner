@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.api;
 
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
@@ -13,7 +14,6 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -22,6 +22,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -62,6 +63,8 @@ import org.opentripplanner.transit.service.TransitService;
  */
 @HttpRequestScoped
 public interface OtpServerRequestContext {
+  DebugUiConfig debugUiConfig();
+
   /**
    * A RouteRequest containing default parameters that will be cloned when handling each request.
    */
@@ -110,9 +113,6 @@ public interface OtpServerRequestContext {
 
   MeterRegistry meterRegistry();
 
-  /** Inspector/debug services */
-  TileRendererManager tileRendererManager();
-
   /**
    * Callback which is injected into the {@code DirectStreetRouter}, used to visualize the
    * search.
@@ -128,7 +128,7 @@ public interface OtpServerRequestContext {
 
   VectorTileConfig vectorTileConfig();
 
-  DebugUiConfig debugUiConfig();
+  ViaCoordinateTransferFactory viaTransferResolver();
 
   /* Sandbox modules */
 
@@ -153,4 +153,7 @@ public interface OtpServerRequestContext {
 
   @Nullable
   SorlandsbanenNorwayService sorlandsbanenService();
+
+  @Nullable
+  GraphQLSchema schema();
 }

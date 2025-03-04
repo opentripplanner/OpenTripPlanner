@@ -42,16 +42,16 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleRental
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureSXUpdaterConfig;
 import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
-import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.UpdatersParameters;
-import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.lite.SiriETLiteUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.lite.SiriSXLiteUpdaterParameters;
-import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
+import org.opentripplanner.updater.alert.siri.lite.SiriSXLiteUpdaterParameters;
+import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
@@ -65,7 +65,7 @@ public class UpdatersConfig implements UpdatersParameters {
 
   private final Multimap<Type, Object> configList = ArrayListMultimap.create();
 
-  private final TimetableSnapshotSourceParameters timetableUpdates;
+  private final TimetableSnapshotParameters timetableUpdates;
 
   @Nullable
   private final VehicleRentalServiceDirectoryFetcherParameters vehicleRentalServiceDirectoryFetcherParameters;
@@ -77,14 +77,13 @@ public class UpdatersConfig implements UpdatersParameters {
         rootAdapter
       );
 
-    timetableUpdates =
-      timetableUpdates(
-        rootAdapter
-          .of("timetableUpdates")
-          .since(V2_2)
-          .summary("Global configuration for timetable updaters.")
-          .asObject()
-      );
+    timetableUpdates = timetableUpdates(
+      rootAdapter
+        .of("timetableUpdates")
+        .since(V2_2)
+        .summary("Global configuration for timetable updaters.")
+        .asObject()
+    );
 
     rootAdapter
       .of("updaters")
@@ -105,15 +104,15 @@ public class UpdatersConfig implements UpdatersParameters {
 
   /**
    * Read "timetableUpdates" parameters. These parameters are used to configure the
-   * TimetableSnapshotSource. Both the GTFS and Siri version uses the same parameters.
+   * GtfsRealTimeTripUpdateAdapter. Both the GTFS and Siri version uses the same parameters.
    */
-  private TimetableSnapshotSourceParameters timetableUpdates(NodeAdapter c) {
-    var dflt = TimetableSnapshotSourceParameters.DEFAULT;
+  private TimetableSnapshotParameters timetableUpdates(NodeAdapter c) {
+    var dflt = TimetableSnapshotParameters.DEFAULT;
     if (c.isEmpty()) {
       return dflt;
     }
 
-    return new TimetableSnapshotSourceParameters(
+    return new TimetableSnapshotParameters(
       c
         .of("maxSnapshotFrequency")
         .since(V2_2)
@@ -134,7 +133,7 @@ public class UpdatersConfig implements UpdatersParameters {
     );
   }
 
-  public TimetableSnapshotSourceParameters timetableSnapshotParameters() {
+  public TimetableSnapshotParameters timetableSnapshotParameters() {
     return timetableUpdates;
   }
 

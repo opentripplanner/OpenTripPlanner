@@ -24,8 +24,7 @@ class WheelchairPreferencesTest {
   )
   @MethodSource("roundingTestCases")
   void testConstructorNormalization(double raw, double rounded2, double rounded3) {
-    var roundedRequest = WheelchairPreferences
-      .of()
+    var roundedRequest = WheelchairPreferences.of()
       .withTripOnlyAccessible()
       .withStopOnlyAccessible()
       .withElevatorOnlyAccessible()
@@ -61,8 +60,7 @@ class WheelchairPreferencesTest {
         "WheelchairPreferences{trip: AccessibilityPreferences{unknownCost: $99, inaccessibleCost: $100}}"
       ),
       Arguments.of(
-        WheelchairPreferences
-          .of()
+        WheelchairPreferences.of()
           .withTripCost(10, 100)
           .withStopCost(20, 200)
           .withElevatorCost(30, 300)

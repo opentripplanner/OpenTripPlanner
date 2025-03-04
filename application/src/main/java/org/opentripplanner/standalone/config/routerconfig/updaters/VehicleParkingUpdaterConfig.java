@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import org.opentripplanner.ext.vehicleparking.bikeep.BikeepUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.bikely.BikelyUpdaterParameters;
-import org.opentripplanner.ext.vehicleparking.hslpark.HslParkUpdaterParameters;
+import org.opentripplanner.ext.vehicleparking.liipi.LiipiParkUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.parkapi.ParkAPIUpdaterParameters;
 import org.opentripplanner.ext.vehicleparking.sirifm.SiriFmUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -32,7 +32,7 @@ public class VehicleParkingUpdaterConfig {
       .description("This will end up in the API responses as the feed id of the parking lot.")
       .asString();
     return switch (sourceType) {
-      case HSL_PARK -> new HslParkUpdaterParameters(
+      case LIIPI -> new LiipiParkUpdaterParameters(
         updaterRef,
         c
           .of("facilitiesFrequencySec")
@@ -97,12 +97,12 @@ public class VehicleParkingUpdaterConfig {
           .summary("URL of the SIRI-FM Light endpoint.")
           .description(
             """
-          SIRI Light means that it must be available as a HTTP GET request rather than the usual
-          SIRI request mechanism of HTTP POST.
-          
-          The contents must also conform to the [Italian SIRI profile](https://github.com/5Tsrl/siri-italian-profile)
-          which requires SIRI 2.1.
-          """
+            SIRI Light means that it must be available as a HTTP GET request rather than the usual
+            SIRI request mechanism of HTTP POST.
+
+            The contents must also conform to the [Italian SIRI profile](https://github.com/5Tsrl/siri-italian-profile)
+            which requires SIRI 2.1.
+            """
           )
           .asUri(),
         feedId,

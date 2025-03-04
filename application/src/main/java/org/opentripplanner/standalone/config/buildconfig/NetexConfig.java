@@ -63,18 +63,18 @@ public class NetexConfig {
           .summary("Pattern for matching shared NeTEx files in a NeTEx bundle.")
           .description(
             """
-              This field is used to match *shared files*(zip file entries) in the module file. Shared
-              files are loaded first. Then the rest of the files are grouped and loaded.
+            This field is used to match *shared files*(zip file entries) in the module file. Shared
+            files are loaded first. Then the rest of the files are grouped and loaded.
 
-              The pattern `"shared-data.xml"` matches `"shared-data.xml"`
+            The pattern `"shared-data.xml"` matches `"shared-data.xml"`
 
-              File names are matched in the following order - and treated accordingly to the first match:
-              
-               - `ignoreFilePattern`
-               - `sharedFilePattern`
-               - `sharedGroupFilePattern`
-               - `groupFilePattern`
-              """
+            File names are matched in the following order - and treated accordingly to the first match:
+
+             - `ignoreFilePattern`
+             - `sharedFilePattern`
+             - `sharedGroupFilePattern`
+             - `groupFilePattern`
+            """
           )
           .docDefaultValue(dft.sharedFilePattern().pattern())
           .asPattern(base.sharedFilePattern().pattern())
@@ -124,9 +124,9 @@ public class NetexConfig {
           .summary("Pattern for matching ignored files in a NeTEx bundle.")
           .description(
             """
-              This field is used to exclude matching *files* in the module file(zip file entries).
-              The *ignored* files are *not* loaded.
-              """
+            This field is used to exclude matching *files* in the module file(zip file entries).
+            The *ignored* files are *not* loaded.
+            """
           )
           .docDefaultValue(dft.ignoreFilePattern().pattern())
           .asPattern(base.ignoreFilePattern().pattern())
@@ -150,7 +150,7 @@ public class NetexConfig {
             """
             Bicycles are allowed on most ferries however the Nordic profile doesn't contain a place
             where bicycle conveyance can be defined.
-            
+
             For this reason we allow bicycles on ferries by default and allow to override the rare
             case where this is not the case.
             """

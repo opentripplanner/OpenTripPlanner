@@ -19,6 +19,7 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -47,43 +48,41 @@ public class MetricsLogging {
     new LogbackMetrics().bindTo(Metrics.globalRegistry);
     new ProcessorMetrics().bindTo(Metrics.globalRegistry);
     new UptimeMetrics().bindTo(Metrics.globalRegistry);
+    if (OTPFeature.AlertMetrics.isOn()) {
+      new AlertMetrics(timetableRepository::getTransitAlertService).bindTo(Metrics.globalRegistry);
+    }
 
-    if (timetableRepository.getTransitLayer() != null) {
+    if (timetableRepository.getRaptorTransitData() != null) {
       new GuavaCacheMetrics(
-        timetableRepository.getTransitLayer().getTransferCache().getTransferCache(),
+        timetableRepository.getRaptorTransitData().getTransferCache().getTransferCache(),
         "raptorTransfersCache",
         List.of(Tag.of("cache", "raptorTransfers"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
     }
     new ExecutorServiceMetrics(
       ForkJoinPool.commonPool(),
       "commonPool",
       List.of(Tag.of("pool", "commonPool"))
-    )
-      .bindTo(Metrics.globalRegistry);
+    ).bindTo(Metrics.globalRegistry);
 
     if (timetableRepository.getUpdaterManager() != null) {
       new ExecutorServiceMetrics(
         timetableRepository.getUpdaterManager().getPollingUpdaterPool(),
         "pollingGraphUpdaters",
         List.of(Tag.of("pool", "pollingGraphUpdaters"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
         timetableRepository.getUpdaterManager().getNonPollingUpdaterPool(),
         "nonPollingGraphUpdaters",
         List.of(Tag.of("pool", "nonPollingGraphUpdaters"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
         timetableRepository.getUpdaterManager().getScheduler(),
         "graphUpdateScheduler",
         List.of(Tag.of("pool", "graphUpdateScheduler"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
     }
 
     if (raptorConfig.isMultiThreaded()) {
@@ -91,8 +90,7 @@ public class MetricsLogging {
         raptorConfig.threadPool(),
         "raptorHeuristics",
         List.of(Tag.of("pool", "raptorHeuristics"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
     }
 
     final Map<String, Long> issueCount = issueSummary.asMap();

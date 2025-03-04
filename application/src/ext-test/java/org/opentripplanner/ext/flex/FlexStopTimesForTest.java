@@ -12,8 +12,7 @@ import org.opentripplanner.utils.time.TimeUtils;
 public class FlexStopTimesForTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final StopLocation AREA_STOP = TEST_MODEL
-    .areaStop("area")
+  private static final StopLocation AREA_STOP = TEST_MODEL.areaStop("area")
     .withGeometry(Polygons.BERLIN)
     .build();
   private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
@@ -96,7 +95,4 @@ public class FlexStopTimesForTest {
     stopTime.setTrip(TRIP);
     return stopTime;
   }
-
-
-
 }

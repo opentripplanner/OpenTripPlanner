@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.utils.lang.DoubleUtils;
@@ -46,7 +47,7 @@ public class StreetLeg implements Leg {
     this.generalizedCost = builder.getGeneralizedCost();
     this.elevationProfile = builder.getElevationProfile();
     this.legGeometry = builder.getGeometry();
-    this.walkSteps = builder.getWalkSteps();
+    this.walkSteps = Objects.requireNonNull(builder.getWalkSteps());
     this.streetNotes = Set.copyOf(builder.getStreetNotes());
     this.walkingBike = builder.getWalkingBike();
     this.rentedVehicle = builder.getRentedVehicle();
@@ -126,6 +127,11 @@ public class StreetLeg implements Leg {
   }
 
   @Override
+  public Set<TransitAlert> getTransitAlerts() {
+    return Set.of();
+  }
+
+  @Override
   public Boolean getWalkingBike() {
     return walkingBike;
   }
@@ -168,16 +174,10 @@ public class StreetLeg implements Leg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return StreetLegBuilder
-      .of(this)
+    return StreetLegBuilder.of(this)
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
-  }
-
-  @Override
-  public void setFareProducts(List<FareProductUse> products) {
-    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -197,8 +197,7 @@ public class StreetLeg implements Leg {
    */
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(StreetLeg.class)
+    return ToStringBuilder.of(StreetLeg.class)
       .addObj("from", from)
       .addObj("to", to)
       .addTime("startTime", startTime)

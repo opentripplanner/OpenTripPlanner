@@ -87,6 +87,8 @@ public class DebugStyleSpec {
     TemporaryFreeEdge.class,
   };
   private static final String EDGES_GROUP = "Edges";
+  private static final String ELEVATION_GROUP = "Elevation";
+  private static final String SAFETY_GROUP = "Safety";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
   private static final String PERMISSIONS_GROUP = "Permissions";
@@ -107,8 +109,7 @@ public class DebugStyleSpec {
     VectorSourceLayer vertices,
     List<BackgroundTileLayer> extraLayers
   ) {
-    List<TileSource> vectorSources = Stream
-      .of(regularStops, edges, vertices)
+    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices)
       .map(VectorSourceLayer::vectorSource)
       .map(TileSource.class::cast)
       .toList();
@@ -133,8 +134,10 @@ public class DebugStyleSpec {
         backgroundLayers(extraRasterSources),
         wheelchair(edges),
         noThruTraffic(edges),
+        safety(edges),
         traversalPermissions(edges),
         edges(edges),
+        elevation(edges, vertices),
         vertices(vertices),
         stops(regularStops, areaStops, groupStops)
       )
@@ -142,12 +145,10 @@ public class DebugStyleSpec {
   }
 
   private static List<StyleBuilder> backgroundLayers(List<TileSource> extraLayers) {
-    return ListUtils
-      .combine(BACKGROUND_LAYERS, extraLayers)
+    return ListUtils.combine(BACKGROUND_LAYERS, extraLayers)
       .stream()
       .map(layer -> {
-        var builder = StyleBuilder
-          .ofId(layer.id())
+        var builder = StyleBuilder.ofId(layer.id())
           .displayName(layer.name())
           .typeRaster()
           .source(layer)
@@ -166,8 +167,7 @@ public class DebugStyleSpec {
     VectorSourceLayer groupStops
   ) {
     return List.of(
-      StyleBuilder
-        .ofId("area-stop")
+      StyleBuilder.ofId("area-stop")
         .group(STOPS_GROUP)
         .typeFill()
         .vectorSourceLayer(areaStops)
@@ -176,8 +176,7 @@ public class DebugStyleSpec {
         .fillOutlineColor(BLACK)
         .minZoom(6)
         .maxZoom(MAX_ZOOM),
-      StyleBuilder
-        .ofId("group-stop")
+      StyleBuilder.ofId("group-stop")
         .group(STOPS_GROUP)
         .typeFill()
         .vectorSourceLayer(groupStops)
@@ -186,8 +185,7 @@ public class DebugStyleSpec {
         .fillOutlineColor(BLACK)
         .minZoom(6)
         .maxZoom(MAX_ZOOM),
-      StyleBuilder
-        .ofId("regular-stop")
+      StyleBuilder.ofId("regular-stop")
         .group(STOPS_GROUP)
         .typeCircle()
         .vectorSourceLayer(regularStops)
@@ -206,8 +204,7 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> vertices(VectorSourceLayer vertices) {
     return List.of(
-      StyleBuilder
-        .ofId("vertex")
+      StyleBuilder.ofId("vertex")
         .group(VERTICES_GROUP)
         .typeCircle()
         .vectorSourceLayer(vertices)
@@ -219,8 +216,7 @@ public class DebugStyleSpec {
         .minZoom(15)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder
-        .ofId("parking-vertex")
+      StyleBuilder.ofId("parking-vertex")
         .group(VERTICES_GROUP)
         .typeCircle()
         .vectorSourceLayer(vertices)
@@ -238,8 +234,7 @@ public class DebugStyleSpec {
 
   private static List<StyleBuilder> edges(VectorSourceLayer edges) {
     return List.of(
-      StyleBuilder
-        .ofId("edge")
+      StyleBuilder.ofId("edge")
         .group(EDGES_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
@@ -250,8 +245,7 @@ public class DebugStyleSpec {
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder
-        .ofId("edge-name")
+      StyleBuilder.ofId("edge-name")
         .group(EDGES_GROUP)
         .typeSymbol()
         .lineText("name")
@@ -260,8 +254,7 @@ public class DebugStyleSpec {
         .minZoom(17)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder
-        .ofId("link")
+      StyleBuilder.ofId("link")
         .group(EDGES_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
@@ -282,12 +275,82 @@ public class DebugStyleSpec {
     );
   }
 
+  private static List<StyleBuilder> elevation(VectorSourceLayer edges, VectorSourceLayer vertices) {
+    return List.of(
+      StyleBuilder.ofId("maximum-slope")
+        .group(ELEVATION_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        // Slope can be higher than this in theory but distinction between high values is not needed
+        .lineColorFromProperty("maximumSlope", 0, 0.35)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("vertex-elevation")
+        .group(ELEVATION_GROUP)
+        .typeSymbol()
+        .symbolText("elevation")
+        .vectorSourceLayer(vertices)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> safety(VectorSourceLayer edges) {
+    return List.of(
+      StyleBuilder.ofId("bicycle-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .log2LineColorFromProperty("bicycleSafetyFactor", 80)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("walk-safety")
+        .group(SAFETY_GROUP)
+        .typeLine()
+        .vectorSourceLayer(edges)
+        .log2LineColorFromProperty("walkSafetyFactor", 80)
+        .edgeFilter(StreetEdge.class)
+        .lineWidth(LINE_HALF_WIDTH)
+        .lineOffset(LINE_OFFSET)
+        .minZoom(6)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("bicycle-safety-text")
+        .vectorSourceLayer(edges)
+        .group(SAFETY_GROUP)
+        .typeSymbol()
+        .lineText("bicycleSafetyFactor")
+        .textOffset(1)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("walk-safety-text")
+        .vectorSourceLayer(edges)
+        .group(SAFETY_GROUP)
+        .typeSymbol()
+        .lineText("walkSafetyFactor")
+        .textOffset(1)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
   private static List<StyleBuilder> traversalPermissions(VectorSourceLayer edges) {
-    var permissionStyles = Arrays
-      .stream(streetModes)
+    var permissionStyles = Arrays.stream(streetModes)
       .map(streetTraversalPermission ->
-        StyleBuilder
-          .ofId("permission " + streetTraversalPermission)
+        StyleBuilder.ofId("permission " + streetTraversalPermission)
           .vectorSourceLayer(edges)
           .group(PERMISSIONS_GROUP)
           .typeLine()
@@ -306,8 +369,7 @@ public class DebugStyleSpec {
       )
       .toList();
 
-    var textStyle = StyleBuilder
-      .ofId("permission-text")
+    var textStyle = StyleBuilder.ofId("permission-text")
       .vectorSourceLayer(edges)
       .group(PERMISSIONS_GROUP)
       .typeSymbol()
@@ -322,11 +384,9 @@ public class DebugStyleSpec {
   }
 
   private static List<StyleBuilder> noThruTraffic(VectorSourceLayer edges) {
-    var noThruTrafficStyles = Arrays
-      .stream(streetModes)
+    var noThruTrafficStyles = Arrays.stream(streetModes)
       .map(streetTraversalPermission ->
-        StyleBuilder
-          .ofId("no-thru-traffic " + streetTraversalPermission)
+        StyleBuilder.ofId("no-thru-traffic " + streetTraversalPermission)
           .vectorSourceLayer(edges)
           .group(NO_THRU_TRAFFIC_GROUP)
           .typeLine()
@@ -345,8 +405,7 @@ public class DebugStyleSpec {
       )
       .toList();
 
-    var textStyle = StyleBuilder
-      .ofId("no-thru-traffic-text")
+    var textStyle = StyleBuilder.ofId("no-thru-traffic-text")
       .vectorSourceLayer(edges)
       .group(NO_THRU_TRAFFIC_GROUP)
       .typeSymbol()
@@ -361,16 +420,14 @@ public class DebugStyleSpec {
   }
 
   private static List<String> permissionColors() {
-    return Arrays
-      .stream(StreetTraversalPermission.values())
+    return Arrays.stream(StreetTraversalPermission.values())
       .flatMap(p -> Stream.of(streetPermissionAsString(p), permissionColor(p)))
       .toList();
   }
 
   private static List<StyleBuilder> wheelchair(VectorSourceLayer edges) {
     return List.of(
-      StyleBuilder
-        .ofId("wheelchair-accessible")
+      StyleBuilder.ofId("wheelchair-accessible")
         .vectorSourceLayer(edges)
         .group(WHEELCHAIR_GROUP)
         .typeLine()
@@ -381,8 +438,7 @@ public class DebugStyleSpec {
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder
-        .ofId("wheelchair-inaccessible")
+      StyleBuilder.ofId("wheelchair-inaccessible")
         .vectorSourceLayer(edges)
         .group(WHEELCHAIR_GROUP)
         .typeLine()

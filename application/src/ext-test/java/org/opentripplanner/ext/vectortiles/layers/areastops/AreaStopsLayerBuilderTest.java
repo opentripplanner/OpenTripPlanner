@@ -25,26 +25,26 @@ class AreaStopsLayerBuilderTest {
   private static final I18NString NAME = I18NString.of("Test stop");
   private static final String CONFIG =
     """
-  {
-    "vectorTiles": {
-      "layers" : [
-        {
-          "name": "areaStops",
-          "type": "AreaStop",
-          "mapper": "OTPRR",
-          "maxZoom": 20,
-          "minZoom": 14,
-          "cacheMaxSeconds": 60,
-          "expansionFactor": 0
-        }
-      ]
+    {
+      "vectorTiles": {
+        "layers" : [
+          {
+            "name": "areaStops",
+            "type": "AreaStop",
+            "mapper": "OTPRR",
+            "maxZoom": 20,
+            "minZoom": 14,
+            "cacheMaxSeconds": 60,
+            "expansionFactor": 0
+          }
+        ]
+      }
     }
-  }
-  """;
-  private static final LayerParameters<VectorTilesResource.LayerType> LAYER_CONFIG = VectorTileConfig
-    .mapVectorTilesParameters(newNodeAdapterForTest(CONFIG), "vectorTiles")
-    .layers()
-    .getFirst();
+    """;
+  private static final LayerParameters<VectorTilesResource.LayerType> LAYER_CONFIG =
+    VectorTileConfig.mapVectorTilesParameters(newNodeAdapterForTest(CONFIG), "vectorTiles")
+      .layers()
+      .getFirst();
 
   private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 

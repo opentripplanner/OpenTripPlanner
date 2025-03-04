@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.vectortiles.model;
 
+import static org.opentripplanner.utils.lang.DoubleUtils.roundTo2Decimals;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -128,9 +130,7 @@ public class StyleBuilder {
     return this;
   }
 
-  public StyleBuilder lineText(String name) {
-    layout.put("symbol-placement", "line-center");
-    layout.put("symbol-spacing", 1000);
+  public StyleBuilder symbolText(String name) {
     layout.put("text-field", "{%s}".formatted(name));
     layout.put("text-font", List.of("KlokanTech Noto Sans Regular"));
     layout.put(
@@ -148,6 +148,12 @@ public class StyleBuilder {
     return this;
   }
 
+  public StyleBuilder lineText(String name) {
+    layout.put("symbol-placement", "line-center");
+    layout.put("symbol-spacing", 1000);
+    return symbolText(name);
+  }
+
   public StyleBuilder textOffset(float offset) {
     layout.put("text-offset", List.of(0, offset));
     return this;
@@ -155,12 +161,6 @@ public class StyleBuilder {
 
   public StyleBuilder circleColor(String color) {
     paint.put("circle-color", validateColor(color));
-    return this;
-  }
-
-  public StyleBuilder circleStroke(String color, int width) {
-    paint.put("circle-stroke-color", validateColor(color));
-    paint.put("circle-stroke-width", width);
     return this;
   }
 
@@ -186,6 +186,40 @@ public class StyleBuilder {
     return this;
   }
 
+  /**
+   * Generates the line color based off a numeric property in the feature.
+   * <p>
+   * The scale of the property must be between 0 and infinity but the color scale is limited to be
+   * between minValue and maxValue.
+   * <p>
+   * minValue is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
+   */
+  public StyleBuilder lineColorFromProperty(String propertyName, double minValue, double maxValue) {
+    var multiplier = List.of(
+      "*",
+      roundTo2Decimals(255 / (maxValue - minValue)),
+      List.of("get", propertyName)
+    );
+    setLineColor(multiplier);
+    return this;
+  }
+
+  /**
+   * Generates the line color based off a numeric property in the feature.
+   * <p>
+   * The scale of the property must be between 1 and infinity. RGB values (0, 255) are computed with
+   * the following formula: log2(propertyValue) * logMultiplier.
+   * <p>
+   * 1 is displayed as a bright green and the higher the number gets, the "redder" the color
+   * becomes.
+   */
+  public StyleBuilder log2LineColorFromProperty(String propertyName, double logMultiplier) {
+    var multiplier = List.of("*", logMultiplier, List.of("log2", List.of("get", propertyName)));
+    setLineColor(multiplier);
+    return this;
+  }
+
   public StyleBuilder lineColorMatch(
     String propertyName,
     Collection<String> values,
@@ -199,21 +233,6 @@ public class StyleBuilder {
         List.of(defaultValue)
       )
     );
-    return this;
-  }
-
-  public StyleBuilder lineOpacity(float lineOpacity) {
-    paint.put("line-opacity", lineOpacity);
-    return this;
-  }
-
-  public StyleBuilder lineDasharray(float... dashArray) {
-    paint.put("line-dasharray", dashArray);
-    return this;
-  }
-
-  public StyleBuilder lineWidth(float width) {
-    paint.put("line-width", width);
     return this;
   }
 
@@ -318,8 +337,20 @@ public class StyleBuilder {
   }
 
   private void validate() {
-    Stream
-      .of(TYPE)
-      .forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p)));
+    Stream.of(TYPE).forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p))
+    );
+  }
+
+  private void setLineColor(List<Object> valueSpecifier) {
+    paint.put(
+      "line-color",
+      List.of(
+        "rgb",
+        List.of("min", 255, valueSpecifier),
+        List.of("max", 0, List.of("-", 255, valueSpecifier)),
+        // we add a small amount of blue so that the colours don't look too neon
+        60
+      )
+    );
   }
 }

@@ -31,7 +31,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -44,14 +45,13 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   @BeforeEach
   public void setup() {
     var r1 = route("R1", STOP_A, STOP_B).withTimetable(schedule("0:02 0:05"));
-    var r2 = route("R2", STOP_B, STOP_C)
-      .withTimetable(
-        schedule("0:10 0:15"),
-        // Add another schedule - should not be used even if the not-allowed is
-        // attached to the first one - not-allowed in Raptor apply to the Route.
-        // The trip/timetable search should handle not-allowed on trip level.
-        schedule("0:12 0:17")
-      );
+    var r2 = route("R2", STOP_B, STOP_C).withTimetable(
+      schedule("0:10 0:15"),
+      // Add another schedule - should not be used even if the not-allowed is
+      // attached to the first one - not-allowed in Raptor apply to the Route.
+      // The trip/timetable search should handle not-allowed on trip level.
+      schedule("0:12 0:17")
+    );
     var r3 = route("R3", STOP_B, STOP_C).withTimetable(schedule("0:15 0:20"));
 
     var tripR1a = r1.timetable().getTripSchedule(0);
@@ -83,8 +83,7 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R3 0:15 0:20 ~ C ~ Walk 30s " +
       "[0:01:30 0:20:30 19m Tₓ1 C₁2_500]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("9m", TX_1, T00_00, T00_30)
       .add(standard().not(TC_STANDARD_REV), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)

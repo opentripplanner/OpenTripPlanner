@@ -29,7 +29,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | locale                                                                                                       |        `locale`        | TODO                                                                                                                                                     | *Optional* | `"en_US"`        |  2.0  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                                       |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                                   | *Optional* | `"PT4H"`         |  2.1  |
 | [maxJourneyDuration](#rd_maxJourneyDuration)                                                                 |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                                                    | *Optional* | `"PT24H"`        |  2.1  |
-| modes                                                                                                        |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                                           | *Optional* | `"TRANSIT,WALK"` |  2.0  |
+| modes                                                                                                        |        `string`        | The set of access/egress/direct/transfer modes (separated by a comma) to be used for the route search.                                                   | *Optional* | `"WALK"`         |  2.0  |
 | nonpreferredTransferPenalty                                                                                  |        `integer`       | Penalty (in seconds) for using a non-preferred transfer.                                                                                                 | *Optional* | `180`            |  2.0  |
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                             | *Optional* | `50`             |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                            | *Optional* | `300`            |  2.0  |
@@ -46,6 +46,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [maxDuration](#rd_accessEgress_maxDuration)                                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                                      | *Optional* | `"PT45M"`        |  2.1  |
 |    [maxStopCount](#rd_accessEgress_maxStopCount)                                                             |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                               | *Optional* | `500`            |  2.4  |
 |    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                                                     | *Optional* |                  |  2.1  |
+|    [maxStopCountForMode](#rd_accessEgress_maxStopCountForMode)                                               |  `enum map of integer` | Maximal number of stops collected in access/egress routing for the given mode                                                                            | *Optional* |                  |  2.7  |
 |    [penalty](#rd_accessEgress_penalty)                                                                       |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                                | *Optional* |                  |  2.4  |
 |       FLEXIBLE                                                                                               |        `object`        | NA                                                                                                                                                       | *Optional* |                  |  2.4  |
 |          costFactor                                                                                          |        `double`        | A factor multiplied with the time-penalty to get the cost-penalty.                                                                                       | *Optional* | `0.0`            |  2.4  |
@@ -86,6 +87,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [boardSlackForMode](#rd_boardSlackForMode)                                                                   | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                                         | *Optional* |                  |  2.0  |
 | car                                                                                                          |        `object`        | Car preferences.                                                                                                                                         | *Optional* |                  |  2.5  |
 |    accelerationSpeed                                                                                         |        `double`        | The acceleration speed of an automobile, in meters per second per second.                                                                                | *Optional* | `2.9`            |  2.0  |
+|    [boardCost](#rd_car_boardCost)                                                                            |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.                                                                          | *Optional* | `600`            |  2.7  |
 |    decelerationSpeed                                                                                         |        `double`        | The deceleration speed of an automobile, in meters per second per second.                                                                                | *Optional* | `2.9`            |  2.0  |
 |    pickupCost                                                                                                |        `integer`       | Add a cost for car pickup changes when a pickup or drop off takes place                                                                                  | *Optional* | `120`            |  2.1  |
 |    pickupTime                                                                                                |       `duration`       | Add a time for car pickup changes when a pickup or drop off takes place                                                                                  | *Optional* | `"PT1M"`         |  2.1  |
@@ -431,6 +433,18 @@ Override the settings in `maxDuration` for specific street modes. This is
 done because some street modes searches are much more resource intensive than others.
 
 
+<h3 id="rd_accessEgress_maxStopCountForMode">maxStopCountForMode</h3>
+
+**Since version:** `2.7` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/accessEgress   
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+
+Maximal number of stops collected in access/egress routing for the given mode
+
+Safety limit to prevent access to and egress from too many stops.
+Mode-specific version of `maxStopCount`.
+
+
 <h3 id="rd_accessEgress_penalty">penalty</h3>
 
 **Since version:** `2.4` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
@@ -447,7 +461,6 @@ performance will be better.
 
 The default values are
 
-- `car` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-to-park` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-pickup` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
 - `car-rental` = (timePenalty: 20m + 2.0 t, costFactor: 1.50)
@@ -604,6 +617,15 @@ How much extra time should be given when boarding a vehicle for each given mode.
 Sometimes there is a need to configure a board times for specific modes, such as airplanes or
 ferries, where the check-in process needs to be done in good time before ride.
 
+
+<h3 id="rd_car_boardCost">boardCost</h3>
+
+**Since version:** `2.7` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `600`   
+**Path:** /routingDefaults/car 
+
+Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.
+
+This is the cost that is used when boarding while driving. This can be different compared to the boardCost while walking or cycling.
 
 <h3 id="rd_car_parking_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
 
@@ -1196,6 +1218,7 @@ include stairs as a last result.
     },
     "car" : {
       "reluctance" : 10,
+      "boardCost" : 600,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {
@@ -1250,6 +1273,9 @@ include stairs as a last result.
         "BIKE_RENTAL" : "20m"
       },
       "maxStopCount" : 500,
+      "maxStopCountForMode" : {
+        "CAR" : 0
+      },
       "penalty" : {
         "FLEXIBLE" : {
           "timePenalty" : "2m + 1.1t",

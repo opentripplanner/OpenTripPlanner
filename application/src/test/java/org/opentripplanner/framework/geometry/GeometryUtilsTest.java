@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner._support.geometry.Coordinates;
 
 public class GeometryUtilsTest {
 
@@ -89,7 +90,8 @@ public class GeometryUtilsTest {
     referenceCoordinates[8][0] = coordinates;
 
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    CoordinateSequenceFactory coordinateSequenceFactory = geometryFactory.getCoordinateSequenceFactory();
+    CoordinateSequenceFactory coordinateSequenceFactory =
+      geometryFactory.getCoordinateSequenceFactory();
     CoordinateSequence sequence = coordinateSequenceFactory.create(coordinates);
     LineString geometry = new LineString(sequence, geometryFactory);
 
@@ -245,17 +247,15 @@ public class GeometryUtilsTest {
 
   @Test
   void toEnvelopes() {
-    Coordinate[] coordinates = List
-      .of(
-        new Coordinate(0, 0),
-        new Coordinate(1, 1),
-        new Coordinate(2, 2),
-        new Coordinate(3, 3),
-        new Coordinate(4, 4),
-        new Coordinate(5, 5),
-        new Coordinate(6, 6)
-      )
-      .toArray(new Coordinate[0]);
+    Coordinate[] coordinates = List.of(
+      new Coordinate(0, 0),
+      new Coordinate(1, 1),
+      new Coordinate(2, 2),
+      new Coordinate(3, 3),
+      new Coordinate(4, 4),
+      new Coordinate(5, 5),
+      new Coordinate(6, 6)
+    ).toArray(new Coordinate[0]);
 
     LineString line = GeometryUtils.makeLineString(coordinates);
 
@@ -265,5 +265,12 @@ public class GeometryUtilsTest {
       "[Env[0.0 : 1.0, 0.0 : 1.0], Env[1.0 : 2.0, 1.0 : 2.0], Env[2.0 : 3.0, 2.0 : 3.0], Env[3.0 : 4.0, 3.0 : 4.0], Env[4.0 : 5.0, 4.0 : 5.0], Env[5.0 : 6.0, 5.0 : 6.0]]",
       envelopes.toString()
     );
+  }
+
+  @Test
+  void sumDistances() {
+    var coordinates = List.of(Coordinates.BERLIN, Coordinates.HAMBURG, Coordinates.BERLIN);
+    var meters = GeometryUtils.sumDistances(coordinates);
+    assertEquals(510_768, meters, 50);
   }
 }

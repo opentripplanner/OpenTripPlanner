@@ -46,9 +46,9 @@ public class TestStateBuilder {
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
-  private static final Instant DEFAULT_START_TIME = OffsetDateTime
-    .parse("2023-04-18T12:00:00+02:00")
-    .toInstant();
+  private static final Instant DEFAULT_START_TIME = OffsetDateTime.parse(
+    "2023-04-18T12:00:00+02:00"
+  ).toInstant();
   private int count = 1;
 
   private State currentState;
@@ -58,16 +58,14 @@ public class TestStateBuilder {
   }
 
   private TestStateBuilder(StreetMode mode, AccessEgressType type) {
-    currentState =
-      new State(
-        StreetModelForTest.intersectionVertex(count, count),
-        StreetSearchRequest
-          .of()
-          .withArriveBy(type.isEgress())
-          .withMode(mode)
-          .withStartTime(DEFAULT_START_TIME)
-          .build()
-      );
+    currentState = new State(
+      StreetModelForTest.intersectionVertex(count, count),
+      StreetSearchRequest.of()
+        .withArriveBy(type.isEgress())
+        .withMode(mode)
+        .withStartTime(DEFAULT_START_TIME)
+        .build()
+    );
   }
 
   /**
@@ -200,10 +198,10 @@ public class TestStateBuilder {
       new NonLocalizedString("1")
     );
 
-    currentState =
-      EdgeTraverser
-        .traverseEdges(currentState, List.of(link, boardEdge, hopEdge, alightEdge))
-        .orElseThrow();
+    currentState = EdgeTraverser.traverseEdges(
+      currentState,
+      List.of(link, boardEdge, hopEdge, alightEdge)
+    ).orElseThrow();
     return this;
   }
 
@@ -325,8 +323,10 @@ public class TestStateBuilder {
     var edge = VehicleRentalEdge.createVehicleRentalEdge(vertex, rentalFormFactor);
 
     State[] traverse = edge.traverse(currentState);
-    currentState =
-      Arrays.stream(traverse).filter(it -> it.currentMode() != TraverseMode.WALK).findFirst().get();
+    currentState = Arrays.stream(traverse)
+      .filter(it -> it.currentMode() != TraverseMode.WALK)
+      .findFirst()
+      .get();
 
     assertTrue(currentState.isRentingVehicle());
 

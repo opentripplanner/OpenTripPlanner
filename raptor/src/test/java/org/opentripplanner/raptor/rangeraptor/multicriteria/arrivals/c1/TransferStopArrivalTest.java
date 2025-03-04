@@ -45,18 +45,17 @@ class TransferStopArrivalTest {
 
   private static final int EXPECTED_C1 = ACCESS_C1 + TRANSIT_C1 + TRANSFER_C1;
 
-  private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-    ACCESS_DEPARTURE_TIME,
-    ACCESS_WALK
-  );
+  private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL =
+    new AccessStopArrival<>(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
 
-  private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
-    ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
-    TRANSIT_TO_STOP,
-    TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.c1() + TRANSIT_C1,
-    TRANSIT_TRIP
-  );
+  private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL =
+    new TransitStopArrival<>(
+      ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
+      TRANSIT_TO_STOP,
+      TRANSIT_ALIGHT_TIME,
+      ACCESS_ARRIVAL.c1() + TRANSIT_C1,
+      TRANSIT_TRIP
+    );
 
   private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
     TRANSIT_ARRIVAL,

@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -79,7 +79,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private final TransferWaitTimeCostCalculator waitTimeCostCalculator;
 
   /**
-   * @see TransitLayer#getStopBoardAlightTransferCosts()
+   * @see RaptorTransitData#getStopBoardAlightTransferCosts()
    */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;
@@ -145,8 +145,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
         stopBoardAlightTransferCosts,
         extraStopBoardAlightCostsFactor,
         stopNameTranslator
-      )
-        .addTransitTail(last(originalTransitLegs))
+      ).addTransitTail(last(originalTransitLegs))
     );
 
     // Cache accessArrivalTime, any event before the access-arrival-time is safe to ignore
@@ -193,9 +192,9 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     }
 
     // Filter tails one final time
-    tails =
-      new TransitPathLegSelector<>(filter, tails)
-        .next(originalPath.accessLeg().nextTransitLeg().getFromStopPosition());
+    tails = new TransitPathLegSelector<>(filter, tails).next(
+      originalPath.accessLeg().nextTransitLeg().getFromStopPosition()
+    );
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);

@@ -68,17 +68,16 @@ public class VehicleRentalLayerTest {
     station.latitude = 1;
     station.longitude = 2;
     var germanName = "nameDE";
-    station.name =
-      TranslatedString.getI18NString(
-        new HashMap<>() {
-          {
-            put(null, NAME);
-            put("de", germanName);
-          }
-        },
-        false,
-        false
-      );
+    station.name = TranslatedString.getI18NString(
+      new HashMap<>() {
+        {
+          put(null, NAME);
+          put("de", germanName);
+        }
+      },
+      false,
+      false
+    );
     station.vehicleTypesAvailable = Map.of(vehicleType(BICYCLE), 5, vehicleType(SCOOTER), 10);
 
     Map<String, Object> map = new HashMap<>();

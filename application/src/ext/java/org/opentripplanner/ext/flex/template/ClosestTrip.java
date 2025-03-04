@@ -127,8 +127,9 @@ record ClosestTrip(
     FlexServiceDate date,
     int stopPos
   ) {
-    return RoutingBookingInfo
-      .of(date.requestedBookingTime(), trip.getPickupBookingInfo(stopPos))
-      .exceedsLatestBookingTime();
+    return RoutingBookingInfo.of(
+      date.requestedBookingTime(),
+      trip.getPickupBookingInfo(stopPos)
+    ).exceedsLatestBookingTime();
   }
 }

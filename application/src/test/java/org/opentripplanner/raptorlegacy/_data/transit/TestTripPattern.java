@@ -65,11 +65,6 @@ public class TestTripPattern implements DefaultTripPattern {
     return this;
   }
 
-  public TestTripPattern withPriorityGroup(int priorityGroupId) {
-    this.priorityGroupId = priorityGroupId;
-    return this;
-  }
-
   public TestTripPattern withRoute(Route route) {
     this.route = route;
     return this;
@@ -104,10 +99,6 @@ public class TestTripPattern implements DefaultTripPattern {
         restrictions[i] |= WHEELCHAIR_MASK;
       }
     }
-  }
-
-  public String getName() {
-    return name;
   }
 
   @Override
@@ -157,8 +148,7 @@ public class TestTripPattern implements DefaultTripPattern {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestTripPattern.class)
+    return ToStringBuilder.of(TestTripPattern.class)
       .addStr("name", name)
       .addInts("stops", stopIndexes)
       .addInts("restrictions", restrictions)

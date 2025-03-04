@@ -211,10 +211,6 @@ public class SearchParams {
     return viaLocations;
   }
 
-  public boolean hasViaLocations() {
-    return !viaLocations.isEmpty();
-  }
-
   /**
    * Get the maximum duration of any access or egress path in seconds.
    */
@@ -263,8 +259,7 @@ public class SearchParams {
   @Override
   public String toString() {
     var dft = defaults();
-    return ToStringBuilder
-      .of(SearchParams.class)
+    return ToStringBuilder.of(SearchParams.class)
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, dft.earliestDepartureTime)
       .addServiceTime("latestArrivalTime", latestArrivalTime, dft.latestArrivalTime)
       .addDurationSec("searchWindow", searchWindowInSeconds, dft.searchWindowInSeconds)
@@ -278,6 +273,20 @@ public class SearchParams {
       .addCollection("egressPaths", egressPaths, 5, RaptorAccessEgress::defaultToString)
       .addCollection("via", viaLocations, 5)
       .toString();
+  }
+
+  public boolean isVisitViaSearch() {
+    return (
+      !viaLocations.isEmpty() &&
+      viaLocations.stream().noneMatch(RaptorViaLocation::isPassThroughSearch)
+    );
+  }
+
+  public boolean isPassThroughSearch() {
+    return (
+      !viaLocations.isEmpty() &&
+      viaLocations.stream().allMatch(RaptorViaLocation::isPassThroughSearch)
+    );
   }
 
   static SearchParams defaults() {
@@ -304,6 +313,10 @@ public class SearchParams {
     assertProperty(
       viaLocations.size() <= MAX_VIA_POINTS,
       "The 'viaLocations' exceeds the  maximum number of via-locations (" + MAX_VIA_POINTS + ")."
+    );
+    assertProperty(
+      viaLocations.isEmpty() || isVisitViaSearch() || isPassThroughSearch(),
+      "Combining pass-through and regular via-vist it is not allowed: " + viaLocations + "."
     );
   }
 }

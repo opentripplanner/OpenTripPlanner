@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 import java.io.File;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.osm.OsmProvider;
+import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -25,11 +25,10 @@ class IslandPruningUtils {
       var graph = new Graph(deduplicator);
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
       // Add street data from OSM
-      var osmProvider = new OsmProvider(osmFile, true);
+      var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-      var osmModule = OsmModule
-        .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
+      var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
         .withEdgeNamer(new TestNamer())
         .build();
 

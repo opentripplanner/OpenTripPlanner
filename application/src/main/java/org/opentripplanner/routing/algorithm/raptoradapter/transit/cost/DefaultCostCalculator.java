@@ -23,7 +23,7 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
 
   /**
    * Costs for boarding and alighting at a given stop during transfer.
-   * See TransitLayer.getStopBoardAlightTransferCosts()
+   * See RaptorTransitData.getStopBoardAlightTransferCosts()
    */
   @Nullable
   private final int[] stopBoardAlightTransferCosts;
@@ -48,10 +48,9 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     this.boardAndTransferCost = transferCostOnly + boardCostOnly;
     this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
 
-    this.transitFactors =
-      transitReluctanceFactors == null
-        ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
-        : new IndexBasedFactorStrategy(transitReluctanceFactors);
+    this.transitFactors = transitReluctanceFactors == null
+      ? new SingleValueFactorStrategy(GeneralizedCostParameters.DEFAULT_TRANSIT_RELUCTANCE)
+      : new IndexBasedFactorStrategy(transitReluctanceFactors);
 
     this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
   }
@@ -111,10 +110,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   ) {
     int cost =
       boardCost +
-      transitFactors.factor(trip.transitReluctanceFactorIndex()) *
-      transitTime +
-      waitFactor *
-      alightSlack;
+      transitFactors.factor(trip.transitReluctanceFactorIndex()) * transitTime +
+      waitFactor * alightSlack;
 
     // Add transfer cost on all alighting events.
     // If it turns out to be the last one this cost will be removed during costEgress phase.
@@ -135,10 +132,8 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
     if (minNumTransfers > -1) {
       return (
         boardCostOnly +
-        boardAndTransferCost *
-        minNumTransfers +
-        transitFactors.minFactor() *
-        minTravelTime
+        boardAndTransferCost * minNumTransfers +
+        transitFactors.minFactor() * minTravelTime
       );
     } else {
       // Remove cost that was added during alighting similar as we do in the costEgress() method

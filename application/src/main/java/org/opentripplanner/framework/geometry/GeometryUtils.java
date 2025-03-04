@@ -228,7 +228,8 @@ public class GeometryUtils {
       org.geojson.LineString geoJsonLineString = (org.geojson.LineString) geoJsonGeom;
       return gf.createLineString(convertPath(geoJsonLineString.getCoordinates()));
     } else if (geoJsonGeom instanceof org.geojson.MultiLineString) {
-      org.geojson.MultiLineString geoJsonMultiLineString = (org.geojson.MultiLineString) geoJsonGeom;
+      org.geojson.MultiLineString geoJsonMultiLineString =
+        (org.geojson.MultiLineString) geoJsonGeom;
       LineString[] jtsLineStrings = new LineString[geoJsonMultiLineString.getCoordinates().size()];
       int i = 0;
       for (List<LngLatAlt> geoJsonPath : geoJsonMultiLineString.getCoordinates()) {
@@ -281,5 +282,16 @@ public class GeometryUtils {
     }
 
     return Arrays.stream(envelopes);
+  }
+
+  /**
+   * Returns the sum of the distances in between the pairs of coordinates in meters.
+   */
+  public static double sumDistances(List<Coordinate> coordinates) {
+    double distance = 0;
+    for (int i = 1; i < coordinates.size(); i++) {
+      distance += SphericalDistanceLibrary.distance(coordinates.get(i - 1), coordinates.get(i));
+    }
+    return distance;
   }
 }

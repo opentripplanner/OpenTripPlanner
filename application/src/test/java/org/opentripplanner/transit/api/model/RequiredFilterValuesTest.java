@@ -9,24 +9,18 @@ class RequiredFilterValuesTest {
 
   @Test
   void testEmptyIsInvalid() {
-    IllegalArgumentException e = assertThrows(
-      IllegalArgumentException.class,
-      () -> {
-        FilterValues.ofRequired("empty", List.of());
-      }
-    );
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> {
+      FilterValues.ofRequired("empty", List.of());
+    });
     assertEquals("Filter empty values must not be empty.", e.getMessage());
   }
 
   @Test
   void testNullIsInvalid() {
     List<String> nullList = null;
-    IllegalArgumentException e = assertThrows(
-      IllegalArgumentException.class,
-      () -> {
-        FilterValues.ofRequired("null", nullList);
-      }
-    );
+    IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> {
+      FilterValues.ofRequired("null", nullList);
+    });
     assertEquals("Filter null values must not be empty.", e.getMessage());
   }
 }

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 
 class TestCaseBuilder {
 
@@ -11,14 +11,14 @@ class TestCaseBuilder {
   int stopIndexA = RaptorConstants.NOT_SET;
   int stopIndexB = RaptorConstants.NOT_SET;
   boolean txFromAToB = false;
-  final List<PassThroughPoint> points = new ArrayList<>();
+  final List<RaptorViaLocation> points = new ArrayList<>();
 
   TestCaseBuilder(String description) {
     this.description = description;
   }
 
   TestCaseBuilder points(int... stops) {
-    points.add(new PassThroughPoint("PT" + (points.size() + 1), stops));
+    points.add(RaptorViaLocation.passThrough("PT").addPassThroughStops(stops).build());
     return this;
   }
 

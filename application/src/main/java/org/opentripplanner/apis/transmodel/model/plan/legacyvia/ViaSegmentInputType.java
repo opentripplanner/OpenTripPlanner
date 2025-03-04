@@ -10,16 +10,14 @@ import org.opentripplanner.apis.transmodel.model.plan.FilterInputType;
 public class ViaSegmentInputType {
 
   public static GraphQLInputObjectType create() {
-    final GraphQLInputObjectType streetModes = GraphQLInputObjectType
-      .newInputObject()
+    final GraphQLInputObjectType streetModes = GraphQLInputObjectType.newInputObject()
       .name("StreetModes")
       .description(
         "Input format for specifying which modes will be allowed for this search. " +
         "If this element is not present, it will default to all to foot."
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("accessMode")
           .description(
             "The mode used to get from the origin to the access stops in the transit " +
@@ -30,8 +28,7 @@ public class ViaSegmentInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("egressMode")
           .description(
             "The mode used to get from the egress stops in the transit network to" +
@@ -42,8 +39,7 @@ public class ViaSegmentInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("directMode")
           .description(
             "The mode used to get from the origin to the destination directly, " +
@@ -55,20 +51,17 @@ public class ViaSegmentInputType {
       )
       .build();
 
-    return GraphQLInputObjectType
-      .newInputObject()
+    return GraphQLInputObjectType.newInputObject()
       .name("ViaSegmentInput")
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("modes")
           .description("The set of access/egress/direct modes to be used for this search.")
           .type(streetModes)
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("filters")
           .description(
             "A list of filters for which trips should be included. A trip will be included if it " +

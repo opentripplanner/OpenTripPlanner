@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.spi.ExtraMcRouterSearch;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -32,15 +32,22 @@ public class SorlandsbanenNorwayService {
   private static final double SOUTH_BORDER_LIMIT = 59.1;
   private static final int MIN_DISTANCE_LIMIT = 120_000;
 
-
   @Nullable
-  public ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(RouteRequest request, AccessEgresses accessEgresses, TransitLayer transitLayer) {
+  public ExtraMcRouterSearch<TripSchedule> createExtraMcRouterSearch(
+    RouteRequest request,
+    AccessEgresses accessEgresses,
+    RaptorTransitData raptorTransitData
+  ) {
     WgsCoordinate from = findStopCoordinate(
       request.from(),
       accessEgresses.getAccesses(),
-      transitLayer
+      raptorTransitData
     );
-    WgsCoordinate to = findStopCoordinate(request.to(), accessEgresses.getEgresses(), transitLayer);
+    WgsCoordinate to = findStopCoordinate(
+      request.to(),
+      accessEgresses.getEgresses(),
+      raptorTransitData
+    );
 
     if (from.isNorthOf(SOUTH_BORDER_LIMIT) && to.isNorthOf(SOUTH_BORDER_LIMIT)) {
       return null;
@@ -53,15 +60,21 @@ public class SorlandsbanenNorwayService {
 
     return new ExtraMcRouterSearch<>() {
       @Override
-      public RaptorTransitDataProvider<TripSchedule> createTransitDataAlternativeSearch(RaptorTransitDataProvider<TripSchedule> transitDataMainSearch) {
+      public RaptorTransitDataProvider<TripSchedule> createTransitDataAlternativeSearch(
+        RaptorTransitDataProvider<TripSchedule> transitDataMainSearch
+      ) {
         return new RaptorRoutingRequestTransitData(
-          (RaptorRoutingRequestTransitData)transitDataMainSearch,
+          (RaptorRoutingRequestTransitData) transitDataMainSearch,
           new CoachCostCalculator<>(transitDataMainSearch.multiCriteriaCostCalculator())
         );
       }
 
       @Override
-      public BiFunction<Collection<RaptorPath<TripSchedule>>, Collection<RaptorPath<TripSchedule>>, Collection<RaptorPath<TripSchedule>>> merger() {
+      public BiFunction<
+        Collection<RaptorPath<TripSchedule>>,
+        Collection<RaptorPath<TripSchedule>>,
+        Collection<RaptorPath<TripSchedule>>
+      > merger() {
         return new MergePaths<>();
       }
     };
@@ -78,7 +91,7 @@ public class SorlandsbanenNorwayService {
   private static WgsCoordinate findStopCoordinate(
     GenericLocation location,
     Collection<? extends RoutingAccessEgress> accessEgress,
-    TransitLayer transitLayer
+    RaptorTransitData raptorTransitData
   ) {
     if (location.lat != null) {
       return new WgsCoordinate(location.lat, location.lng);
@@ -86,7 +99,7 @@ public class SorlandsbanenNorwayService {
 
     StopLocation firstStop = null;
     for (RoutingAccessEgress it : accessEgress) {
-      StopLocation stop = transitLayer.getStopByIndex(it.stop());
+      StopLocation stop = raptorTransitData.getStopByIndex(it.stop());
       if (stop.getId().equals(location.stopId)) {
         return stop.getCoordinate();
       }

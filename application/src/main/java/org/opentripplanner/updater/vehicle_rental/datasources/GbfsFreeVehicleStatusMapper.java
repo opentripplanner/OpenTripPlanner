@@ -9,13 +9,22 @@ import javax.annotation.Nullable;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSBike;
 import org.mobilitydata.gbfs.v2_3.free_bike_status.GBFSRentalUris;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.transit.model.basic.Distance;
+import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.logging.Throttle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GbfsFreeVehicleStatusMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsFreeVehicleStatusMapper.class);
+  private static final Throttle LOG_THROTTLE = Throttle.ofOneMinute();
 
   private final VehicleRentalSystem system;
 
@@ -41,18 +50,41 @@ public class GbfsFreeVehicleStatusMapper {
       rentalVehicle.name = new NonLocalizedString(getName(vehicle));
       rentalVehicle.longitude = vehicle.getLon();
       rentalVehicle.latitude = vehicle.getLat();
-      rentalVehicle.vehicleType =
-        vehicleTypes.getOrDefault(
-          vehicle.getVehicleTypeId(),
-          RentalVehicleType.getDefaultType(system.systemId)
-        );
+      rentalVehicle.vehicleType = vehicleTypes.getOrDefault(
+        vehicle.getVehicleTypeId(),
+        RentalVehicleType.getDefaultType(system.systemId)
+      );
       rentalVehicle.isReserved = vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false;
       rentalVehicle.isDisabled = vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false;
-      rentalVehicle.lastReported =
-        vehicle.getLastReported() != null
-          ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
-          : null;
-      rentalVehicle.currentRangeMeters = vehicle.getCurrentRangeMeters();
+      rentalVehicle.lastReported = vehicle.getLastReported() != null
+        ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
+        : null;
+
+      var fuelRatio = Ratio.ofBoxed(vehicle.getCurrentFuelPercent(), validationErrorMessage ->
+        LOG_THROTTLE.throttle(() ->
+          LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
+        )
+      ).orElse(null);
+      var rangeMeters = Distance.ofMetersBoxed(vehicle.getCurrentRangeMeters(), error -> {
+        LOG_THROTTLE.throttle(() ->
+          LOG.warn(
+            "Current range meter value not valid: {} - {}",
+            vehicle.getCurrentRangeMeters(),
+            error
+          )
+        );
+      }).orElse(null);
+      // if the propulsion type has an engine current_range_meters is required
+      if (
+        vehicle.getVehicleTypeId() != null &&
+        vehicleTypes.get(vehicle.getVehicleTypeId()) != null &&
+        vehicleTypes.get(vehicle.getVehicleTypeId()).propulsionType !=
+        RentalVehicleType.PropulsionType.HUMAN &&
+        rangeMeters == null
+      ) {
+        return null;
+      }
+      rentalVehicle.fuel = new RentalVehicleFuel(fuelRatio, rangeMeters);
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {

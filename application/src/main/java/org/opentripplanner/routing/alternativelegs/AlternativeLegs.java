@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegConstructionSupport;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -136,8 +137,8 @@ public class AlternativeLegs {
     // TODO: What should we have here
     ZoneId timeZone = transitService.getTimeZone();
 
-    Comparator<TripTimeOnDate> comparator = Comparator.comparing((TripTimeOnDate tts) ->
-      tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
+    Comparator<TripTimeOnDate> comparator = Comparator.comparing(
+      (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
     );
 
     if (direction == NavigationDirection.PREVIOUS) {
@@ -243,6 +244,9 @@ public class AlternativeLegs {
       .withServiceDate(serviceDay)
       .withZoneId(timeZone)
       .withTripOnServiceDate(tripOnServiceDate)
+      .withDistanceMeters(
+        LegConstructionSupport.computeDistanceMeters(pattern, boardingPosition, alightingPosition)
+      )
       .build();
   }
 
@@ -254,20 +258,17 @@ public class AlternativeLegs {
     List<StopLocation> stops = tripPattern.getStops();
 
     // Find out all alighting positions
-    var alightingPositions = IntStream
-      .iterate(stops.size() - 1, i -> i - 1)
+    var alightingPositions = IntStream.iterate(stops.size() - 1, i -> i - 1)
       .limit(stops.size())
       .filter(i -> destinations.contains(stops.get(i)) && tripPattern.canAlight(i))
       .toArray();
 
     // Find out all boarding positions
-    return IntStream
-      .range(0, stops.size())
+    return IntStream.range(0, stops.size())
       .filter(i -> origins.contains(stops.get(i)) && tripPattern.canBoard(i))
       .boxed()
       .flatMap(boardingPosition ->
-        Arrays
-          .stream(alightingPositions)
+        Arrays.stream(alightingPositions)
           // Filter out the impossible combinations
           .filter(alightingPosition -> boardingPosition < alightingPosition)
           .min()

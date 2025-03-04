@@ -7,11 +7,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingEntrance;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -23,6 +25,7 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
   @Override
   protected Collection<KeyValue> map(Vertex input) {
     List<KeyValue> baseProps = List.of(
+      kv("elevation", findElevationForVertex(input)),
       kv("class", input.getClass().getSimpleName()),
       kv("label", input.getLabel().toString())
     );
@@ -60,5 +63,27 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
       ret.add(TraverseMode.WALK);
     }
     return ret;
+  }
+
+  private Double findElevationForVertex(Vertex v) {
+    return Stream.concat(
+      v
+        .getIncomingStreetEdges()
+        .stream()
+        .filter(StreetEdge::hasElevationExtension)
+        .map(streetEdge ->
+          streetEdge
+            .getElevationProfile()
+            .getCoordinate(streetEdge.getElevationProfile().size() - 1)
+            .y
+        ),
+      v
+        .getOutgoingStreetEdges()
+        .stream()
+        .filter(StreetEdge::hasElevationExtension)
+        .map(streetEdge -> streetEdge.getElevationProfile().getCoordinate(0).y)
+    )
+      .findAny()
+      .orElse(null);
   }
 }

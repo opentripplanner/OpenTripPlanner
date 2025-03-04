@@ -28,56 +28,52 @@ public class IslandPruningConfig {
   public static IslandPruningConfig fromSubConfig(NodeAdapter config) {
     IslandPruningConfig islandPruning = new IslandPruningConfig();
 
-    islandPruning.pruningThresholdIslandWithStops =
-      config
-        .of("islandWithStopsMaxSize")
-        .since(V2_3)
-        .summary("When a graph island with stops in it should be pruned.")
-        .description(
-          """
+    islandPruning.pruningThresholdIslandWithStops = config
+      .of("islandWithStopsMaxSize")
+      .since(V2_3)
+      .summary("When a graph island with stops in it should be pruned.")
+      .description(
+        """
         This field indicates the pruning threshold for islands with stops. Any such island under this
         edge count will be pruned.
         """
-        )
-        .asInt(2);
+      )
+      .asInt(2);
 
-    islandPruning.pruningThresholdIslandWithoutStops =
-      config
-        .of("islandWithoutStopsMaxSize")
-        .since(V2_3)
-        .summary("When a graph island without stops should be pruned.")
-        .description(
-          """
+    islandPruning.pruningThresholdIslandWithoutStops = config
+      .of("islandWithoutStopsMaxSize")
+      .since(V2_3)
+      .summary("When a graph island without stops should be pruned.")
+      .description(
+        """
         This field indicates the pruning threshold for islands without stops. Any such island under
         this edge count will be pruned.
         """
-        )
-        .asInt(10);
+      )
+      .asInt(10);
 
-    islandPruning.adaptivePruningDistance =
-      config
-        .of("adaptivePruningDistance")
-        .since(V2_3)
-        .summary("Search distance for analyzing islands in pruning.")
-        .description(
-          """
+    islandPruning.adaptivePruningDistance = config
+      .of("adaptivePruningDistance")
+      .since(V2_3)
+      .summary("Search distance for analyzing islands in pruning.")
+      .description(
+        """
         The distance after which disconnected sub graph is considered as real island in pruning heuristics.
         """
-        )
-        .asInt(250);
+      )
+      .asInt(250);
 
-    islandPruning.adaptivePruningFactor =
-      config
-        .of("adaptivePruningFactor")
-        .since(V2_3)
-        .summary("Defines how much pruning thresholds grow maximally by distance.")
-        .description(
-          """
+    islandPruning.adaptivePruningFactor = config
+      .of("adaptivePruningFactor")
+      .since(V2_3)
+      .summary("Defines how much pruning thresholds grow maximally by distance.")
+      .description(
+        """
         Expands the pruning thresholds as the distance of an island from the rest of the graph gets smaller.
         Even fairly large disconnected sub graphs should be removed if they are badly entangled with other graph.
         """
-        )
-        .asDouble(50);
+      )
+      .asDouble(50);
 
     return islandPruning;
   }

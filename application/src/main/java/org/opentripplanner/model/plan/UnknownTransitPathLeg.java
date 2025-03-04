@@ -4,10 +4,12 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -91,13 +93,13 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
-  public int getGeneralizedCost() {
-    return RaptorCostCalculator.ZERO_COST;
+  public Set<TransitAlert> getTransitAlerts() {
+    return Set.of();
   }
 
   @Override
-  public void setFareProducts(List<FareProductUse> products) {
-    throw new UnsupportedOperationException();
+  public int getGeneralizedCost() {
+    return RaptorCostCalculator.ZERO_COST;
   }
 
   @Override
@@ -115,8 +117,7 @@ public class UnknownTransitPathLeg implements Leg {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(UnknownTransitPathLeg.class)
+    return ToStringBuilder.of(UnknownTransitPathLeg.class)
       .addObj("from", from)
       .addObj("to", to)
       .addTime("startTime", startTime)

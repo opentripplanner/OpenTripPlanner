@@ -29,8 +29,7 @@ public class EnvironmentVariableReplacerTest {
    */
   @BeforeEach
   public void setup() {
-    Map.Entry<String, String> envVar = System
-      .getenv()
+    Map.Entry<String, String> envVar = System.getenv()
       .entrySet()
       .stream()
       .filter(e -> e.getKey().matches("\\w+") && e.getValue().length() < 30)
@@ -121,13 +120,11 @@ public class EnvironmentVariableReplacerTest {
    */
   @Test
   public void testMissingEnvironmentVariable() {
-    assertThrows(
-      OtpAppException.class,
-      () ->
-        ConfigFileLoader.nodeFromString(
-          "None existing env.var: '${none_existing_env_variable}'.",
-          "test"
-        )
+    assertThrows(OtpAppException.class, () ->
+      ConfigFileLoader.nodeFromString(
+        "None existing env.var: '${none_existing_env_variable}'.",
+        "test"
+      )
     );
   }
 }

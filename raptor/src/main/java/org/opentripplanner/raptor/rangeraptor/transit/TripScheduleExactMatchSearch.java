@@ -56,8 +56,7 @@ public final class TripScheduleExactMatchSearch<T extends RaptorTripSchedule>
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripScheduleExactMatchSearch.class)
+    return ToStringBuilder.of(TripScheduleExactMatchSearch.class)
       .addNum("slack", slack)
       .addObj("delegate", delegate)
       .toString();

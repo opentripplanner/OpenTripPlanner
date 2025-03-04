@@ -210,8 +210,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     Trip trip = trip("1", route("flex").build());
 
-    var flexTrip = UnscheduledTrip
-      .of(id("flex-1"))
+    var flexTrip = UnscheduledTrip.of(id("flex-1"))
       .withStopTimes(List.of(fromStopTime, toStopTime))
       .withTrip(trip)
       .build();
@@ -246,7 +245,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       flexPath
     );
 
-    FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
+    FlexibleTransitLeg leg = FlexibleTransitLeg.of()
+      .withFlexTripEdge(edge)
+      .withStartTime(newTime(start))
+      .withEndTime(newTime(end))
+      .withGeneralizedCost(legCost)
+      .build();
 
     legs.add(leg);
     c1 += legCost;
@@ -440,8 +444,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy trip */
   private static Trip trip(String id, Route route) {
-    return TimetableRepositoryForTest
-      .trip(id)
+    return TimetableRepositoryForTest.trip(id)
       .withRoute(route)
       .withHeadsign(I18NString.of("Trip headsign %s".formatted(id)))
       .build();
@@ -498,8 +501,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     StopPattern stopPattern = new StopPattern(stopTimes);
     final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    TripPattern tripPattern = TripPattern
-      .of(route.getId())
+    TripPattern tripPattern = TripPattern.of(route.getId())
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
@@ -507,38 +509,38 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     ScheduledTransitLeg leg;
 
-    if (headwaySecs != null) {
-      leg =
-        new FrequencyTransitLegBuilder()
-          .withTripTimes(tripTimes)
-          .withTripPattern(tripPattern)
-          .withBoardStopIndexInPattern(fromStopIndex)
-          .withAlightStopIndexInPattern(toStopIndex)
-          .withStartTime(newTime(start))
-          .withEndTime(newTime(end))
-          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
-          .withZoneId(UTC)
-          .withTransferFromPreviousLeg(transferFromPreviousLeg)
-          .withGeneralizedCost(legCost)
-          .withFrequencyHeadwayInSeconds(headwaySecs)
-          .build();
-    } else {
-      leg =
-        new ScheduledTransitLegBuilder()
-          .withTripTimes(tripTimes)
-          .withTripPattern(tripPattern)
-          .withBoardStopIndexInPattern(fromStopIndex)
-          .withAlightStopIndexInPattern(toStopIndex)
-          .withStartTime(newTime(start))
-          .withEndTime(newTime(end))
-          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
-          .withZoneId(UTC)
-          .withTransferFromPreviousLeg(transferFromPreviousLeg)
-          .withGeneralizedCost(legCost)
-          .build();
-    }
+    var distance = speed(trip.getMode()) * (end - start);
 
-    leg.setDistanceMeters(speed(leg.getMode()) * (end - start));
+    if (headwaySecs != null) {
+      leg = new FrequencyTransitLegBuilder()
+        .withTripTimes(tripTimes)
+        .withTripPattern(tripPattern)
+        .withBoardStopIndexInPattern(fromStopIndex)
+        .withAlightStopIndexInPattern(toStopIndex)
+        .withStartTime(newTime(start))
+        .withEndTime(newTime(end))
+        .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+        .withZoneId(UTC)
+        .withTransferFromPreviousLeg(transferFromPreviousLeg)
+        .withGeneralizedCost(legCost)
+        .withDistanceMeters(distance)
+        .withFrequencyHeadwayInSeconds(headwaySecs)
+        .build();
+    } else {
+      leg = new ScheduledTransitLegBuilder()
+        .withTripTimes(tripTimes)
+        .withTripPattern(tripPattern)
+        .withBoardStopIndexInPattern(fromStopIndex)
+        .withAlightStopIndexInPattern(toStopIndex)
+        .withStartTime(newTime(start))
+        .withEndTime(newTime(end))
+        .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+        .withZoneId(UTC)
+        .withTransferFromPreviousLeg(transferFromPreviousLeg)
+        .withGeneralizedCost(legCost)
+        .withDistanceMeters(distance)
+        .build();
+    }
 
     legs.add(leg);
     c1 += legCost;
@@ -558,8 +560,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost,
     List<WalkStep> walkSteps
   ) {
-    StreetLeg leg = StreetLeg
-      .create()
+    StreetLeg leg = StreetLeg.create()
       .withMode(mode)
       .withStartTime(newTime(startTime))
       .withEndTime(newTime(endTime))

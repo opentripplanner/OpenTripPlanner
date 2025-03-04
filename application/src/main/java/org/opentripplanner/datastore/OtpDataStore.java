@@ -106,8 +106,11 @@ public class OtpDataStore {
     buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
 
     if (config.stopConsolidation() != null) {
-      stopConsolidation =
-        findSingleSource(config.stopConsolidation(), config.stopConsolidation().toString(), GTFS);
+      stopConsolidation = findSingleSource(
+        config.stopConsolidation(),
+        config.stopConsolidation().toString(),
+        GTFS
+      );
     }
 
     addAll(Arrays.asList(streetGraph, graph, buildReportDir));

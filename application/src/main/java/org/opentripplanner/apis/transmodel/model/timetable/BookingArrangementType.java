@@ -6,6 +6,7 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import org.opentripplanner.apis.transmodel.mapping.BookingInfoMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.framework.TransmodelScalars;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -15,12 +16,10 @@ import org.opentripplanner.transit.model.timetable.booking.BookingTime;
 public class BookingArrangementType {
 
   public static GraphQLObjectType create() {
-    GraphQLOutputType contactType = GraphQLObjectType
-      .newObject()
+    GraphQLOutputType contactType = GraphQLObjectType.newObject()
       .name("Contact")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("contactPerson")
           .description("Name of person to contact")
           .type(Scalars.GraphQLString) //
@@ -28,8 +27,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("email")
           .description("Email adress for contact")
           .type(Scalars.GraphQLString) //
@@ -37,8 +35,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("url")
           .description("Url for contact")
           .type(Scalars.GraphQLString) //
@@ -46,8 +43,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("phone")
           .description("Phone number for contact")
           .type(Scalars.GraphQLString) //
@@ -55,8 +51,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("furtherDetails")
           .description("Textual description of how to get in contact")
           .type(Scalars.GraphQLString) //
@@ -65,12 +60,10 @@ public class BookingArrangementType {
       )
       .build();
 
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("BookingArrangement")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bookingMethods")
           .description("How should service be booked?")
           .type(new GraphQLList(EnumTypes.BOOKING_METHOD))
@@ -78,8 +71,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latestBookingTime")
           .description("Latest time the service can be booked. ISO 8601 timestamp")
           .type(TransmodelScalars.LOCAL_TIME_SCALAR)
@@ -90,8 +82,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latestBookingDay")
           .description("How many days prior to the travel the service needs to be booked")
           .type(Scalars.GraphQLInt)
@@ -102,44 +93,15 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bookWhen")
           .description("Time constraints for booking")
           .type(EnumTypes.PURCHASE_WHEN)
-          .dataFetcher(environment -> {
-            BookingInfo bookingInfo = bookingInfo(environment);
-            if (bookingInfo.getMinimumBookingNotice().isPresent()) {
-              return null;
-            }
-            BookingTime latestBookingTime = bookingInfo.getLatestBookingTime();
-            BookingTime earliestBookingTime = bookingInfo.getEarliestBookingTime();
-
-            // Try to deduce the original enum from stored values
-            if (earliestBookingTime == null) {
-              if (latestBookingTime == null) {
-                return "timeOfTravelOnly";
-              } else if (latestBookingTime.getDaysPrior() == 1) {
-                return "untilPreviousDay";
-              } else if (latestBookingTime.getDaysPrior() == 0) {
-                return "advanceAndDayOfTravel";
-              } else {
-                return "other";
-              }
-            } else if (
-              earliestBookingTime.getDaysPrior() == 0 &&
-              (latestBookingTime == null || latestBookingTime.getDaysPrior() == 0)
-            ) {
-              return "dayOfTravelOnly";
-            } else {
-              return "other";
-            }
-          })
+          .dataFetcher(environment -> BookingInfoMapper.mapToBookWhen(bookingInfo(environment)))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("minimumBookingPeriod")
           .description("Minimum period in advance service can be booked as a ISO 8601 duration")
           .type(Scalars.GraphQLString)
@@ -147,8 +109,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bookingNote")
           .description("Textual description of booking arrangement for service")
           .type(Scalars.GraphQLString)
@@ -156,8 +117,7 @@ public class BookingArrangementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bookingContact")
           .description("Who should ticket be contacted for booking")
           .type(contactType)

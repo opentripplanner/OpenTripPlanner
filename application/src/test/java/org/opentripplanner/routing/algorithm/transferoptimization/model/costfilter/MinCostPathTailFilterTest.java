@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 
 import java.util.List;
 import java.util.Objects;
@@ -15,10 +14,8 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
 
 class MinCostPathTailFilterTest implements RaptorTestConstants {
 
-  private static final TransferWaitTimeCostCalculator WAIT_TIME_CALC = new TransferWaitTimeCostCalculator(
-    1.0,
-    5.0
-  );
+  private static final TransferWaitTimeCostCalculator WAIT_TIME_CALC =
+    new TransferWaitTimeCostCalculator(1.0, 5.0);
 
   private final A v01 = new A("A", 0, 11);
   private final A v10 = new A("B", 1, 10);
@@ -30,8 +27,9 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
     // filter empty set
     assertEquals(
       Set.of(),
-      new MinCostPathTailFilter<TestTripSchedule>(List.of(OptimizedPathTail::generalizedCost))
-        .filterIntermediateResult(Set.of(), 0)
+      new MinCostPathTailFilter<TestTripSchedule>(
+        List.of(OptimizedPathTail::generalizedCost)
+      ).filterIntermediateResult(Set.of(), 0)
     );
   }
 
@@ -80,7 +78,7 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
     public final int y;
 
     private A(String name, int x, int y) {
-      super(SLACK_PROVIDER, C1_CALCULATOR, T00_00, WAIT_TIME_CALC, null, 0.0, null);
+      super(SLACK_PROVIDER, COST_CALCULATOR, T00_00, WAIT_TIME_CALC, null, 0.0, null);
       this.name = name;
       this.x = x;
       this.y = y;

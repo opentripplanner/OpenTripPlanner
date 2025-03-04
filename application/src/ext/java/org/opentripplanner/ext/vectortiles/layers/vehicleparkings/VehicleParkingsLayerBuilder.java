@@ -21,7 +21,10 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
-  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParking>>> mappers = Map.ofEntries(
+  static Map<
+    VehicleParkingsLayerBuilder.MapperType,
+    Function<Locale, PropertyMapper<VehicleParking>>
+  > mappers = Map.ofEntries(
     entry(
       VehicleParkingsLayerBuilder.MapperType.Stadtnavi,
       StadtnaviVehicleParkingPropertyMapper::create
@@ -46,7 +49,8 @@ public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     return service
-      .listVehicleParkings().stream()
+      .listVehicleParkings()
+      .stream()
       .map(vehicleParking -> {
         Coordinate coordinate = vehicleParking.getCoordinate().asJtsCoordinate();
         Point point = GeometryUtils.getGeometryFactory().createPoint(coordinate);
