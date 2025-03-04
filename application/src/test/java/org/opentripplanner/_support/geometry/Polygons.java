@@ -68,8 +68,7 @@ public class Polygons {
   public static org.geojson.Polygon toGeoJson(Polygon polygon) {
     var ret = new org.geojson.Polygon();
 
-    var coordinates = Arrays
-      .stream(polygon.getCoordinates())
+    var coordinates = Arrays.stream(polygon.getCoordinates())
       .map(c -> new LngLatAlt(c.x, c.y))
       .toList();
     ret.add(coordinates);

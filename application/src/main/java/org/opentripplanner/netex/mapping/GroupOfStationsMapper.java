@@ -59,9 +59,9 @@ class GroupOfStationsMapper {
         .getValue();
       name = stations.get(idFactory.createId(ref.getRef())).getName();
     }
-    GroupOfStationsBuilder groupOfStations = GroupOfStations
-      .of(idFactory.createId(groupOfStopPlaces.getId()))
-      .withName(name);
+    GroupOfStationsBuilder groupOfStations = GroupOfStations.of(
+      idFactory.createId(groupOfStopPlaces.getId())
+    ).withName(name);
 
     // TODO Map PurposeOfGrouping from NeTEx
 

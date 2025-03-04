@@ -207,12 +207,10 @@ public class TransitRouter {
       try {
         // TODO: This is not using {@link OtpRequestThreadFactory} which mean we do not get
         //       log-trace-parameters-propagation and graceful timeout handling here.
-        CompletableFuture
-          .allOf(
-            CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess())),
-            CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress()))
-          )
-          .join();
+        CompletableFuture.allOf(
+          CompletableFuture.runAsync(() -> accessList.addAll(fetchAccess())),
+          CompletableFuture.runAsync(() -> egressList.addAll(fetchEgress()))
+        ).join();
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
@@ -272,9 +270,7 @@ public class TransitRouter {
       .accessEgress();
 
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
-    int stopCountLimit = accessEgressPreferences
-      .maxStopCountForMode()
-      .getOrDefault(mode, accessEgressPreferences.defaultMaxStopCount());
+    int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);
 
     var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,

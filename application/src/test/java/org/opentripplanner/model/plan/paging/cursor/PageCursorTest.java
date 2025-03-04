@@ -45,8 +45,7 @@ class PageCursorTest implements PlanTestConstants {
   private static final Instant EDT = Instant.parse(EDT_STR);
   private static final Instant LAT = Instant.parse(LAT_STR);
   private static final Duration SEARCH_WINDOW = Duration.parse("PT2h");
-  private static final Itinerary PAGE_CUT = TestItineraryBuilder
-    .newItinerary(A, 0)
+  private static final Itinerary PAGE_CUT = TestItineraryBuilder.newItinerary(A, 0)
     .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
     .bus(23, 0, 50, B)
     .build();
@@ -60,10 +59,22 @@ class PageCursorTest implements PlanTestConstants {
     originalTimeZone = TimeZone.getDefault();
     TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
 
-    subjectDepartAfter =
-      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null);
-    subjectArriveBy =
-      new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW, PAGE_CUT);
+    subjectDepartAfter = new PageCursor(
+      NEXT_PAGE,
+      STREET_AND_ARRIVAL_TIME,
+      EDT,
+      null,
+      SEARCH_WINDOW,
+      null
+    );
+    subjectArriveBy = new PageCursor(
+      PREVIOUS_PAGE,
+      STREET_AND_DEPARTURE_TIME,
+      EDT,
+      LAT,
+      SEARCH_WINDOW,
+      PAGE_CUT
+    );
   }
 
   @AfterEach

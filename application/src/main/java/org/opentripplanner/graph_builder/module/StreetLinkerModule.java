@@ -95,7 +95,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
       stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(timetableRepository);
     }
 
-    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
+      timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
@@ -111,9 +112,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
       StopLinkType linkType = StopLinkType.WALK_ONLY;
 
       if (
-        (
-          OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(tStop.getStop())
-        ) ||
+        (OTPFeature.FlexRouting.isOn() &&
+          stopLocationsUsedForFlexTrips.contains(tStop.getStop())) ||
         stopLocationsUsedForCarsAllowedTrips.contains(tStop.getStop())
       ) {
         linkType = StopLinkType.WALK_AND_CAR;
@@ -276,9 +276,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private void linkStationCentroids(Graph graph) {
     BiFunction<Vertex, StreetVertex, List<Edge>> stationAndStreetVertexLinker = (
-        theStation,
-        streetVertex
-      ) ->
+      theStation,
+      streetVertex
+    ) ->
       List.of(
         StreetStationCentroidLink.createStreetStationLink(
           (StationCentroidVertex) theStation,

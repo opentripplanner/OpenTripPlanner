@@ -46,7 +46,8 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
 
   @BeforeEach
   public void setup() {
@@ -68,8 +69,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   static List<RaptorModuleTestCase> flexTransferFlexTestCases() {
     var path = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:10 0:20 10m Tₓ1 C₁1_140]";
     var stdPathRev = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:20 0:30 10m Tₓ1]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
@@ -96,8 +96,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
       "Flex 2m 1x Open(0:12 0:16) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:12 0:22 10m Tₓ1 C₁1_140]";
     var stdPathRev =
       "Flex 2m 1x Open(0:12 0:16) ~ B ~ Walk 5m ~ C ~ Flex 2m 1x [0:16 0:26 10m Tₓ1]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
@@ -121,8 +120,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
 
   static List<RaptorModuleTestCase> flexTransferFlexOpeningHoursTestCases() {
     var path = "Flex 2m 1x ~ B ~ Walk 5m ~ C ~ Flex 2m 1x Open(0:22 0:26) ";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
@@ -148,8 +146,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   static List<RaptorModuleTestCase> flexAndWalkToFlexTestCases() {
     var path = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:10 0:20 10m Tₓ1 C₁1_140]";
     var stdPathRev = "Flex+Walk 7m 1x ~ C ~ Flex 2m 1x [0:20 0:30 10m Tₓ1]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()
@@ -174,8 +171,7 @@ public class F04_AccessEgressWithRidesNoTransitTest implements RaptorTestConstan
   static List<RaptorModuleTestCase> flexToFlexAndWalkTestCases() {
     var path = "Flex 2m 1x ~ C ~ Flex+Walk 7m 1x [0:10 0:20 10m Tₓ1 C₁1_140]";
     var stdPathRev = "Flex 2m 1x ~ C ~ Flex+Walk 7m 1x [0:20 0:30 10m Tₓ1]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(requestBuilder ->
         requestBuilder
           .searchParams()

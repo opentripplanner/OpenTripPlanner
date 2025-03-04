@@ -13,8 +13,7 @@ public class TableTest {
   @Test
   public void buildAndPrintTable() {
     // Test various normalization cases
-    var builder = Table
-      .of()
+    var builder = Table.of()
       .withAlights(Left, Center, Right)
       .withHeaders("LEFT", "CENTER", "RIGHT")
       .addRow(" SPACE ", " Long-value\t", 2)
@@ -23,11 +22,11 @@ public class TableTest {
 
     var expected =
       """
-        LEFT      |    CENTER    |    RIGHT
-        SPACE     |  Long-value  |        2
-        NL Before | NL in middle | NL after
-                  |     Short    |      123
-        """;
+      LEFT      |    CENTER    |    RIGHT
+      SPACE     |  Long-value  |        2
+      NL Before | NL in middle | NL after
+                |     Short    |      123
+      """;
 
     // Both the builder and the Table returns the same table as toString()
     assertEquals(expected, builder.toString());
@@ -36,8 +35,7 @@ public class TableTest {
 
   @Test
   public void printTableWhileGoing() {
-    Table table = Table
-      .of()
+    Table table = Table.of()
       .withAlights(Left, Center, Right)
       .withHeaders("LEFT", "CENTER", "RIGHT")
       .withMinWidths(5, 8, 0)
@@ -52,8 +50,7 @@ public class TableTest {
 
   @Test
   public void tableAsMarkdown() {
-    var table = Table
-      .of()
+    var table = Table.of()
       .withHeaders("A", "B", "Total")
       .withAlights(Center, Center, Center)
       .addRow(100, 2, 102)
@@ -65,29 +62,27 @@ public class TableTest {
 
     assertEquals(
       """
-        |   A   | B | Total |
-        |:-----:|:-:|:-----:|
-        |  100  | 2 |  102  |
-        |  One  |   |       |
-        | (A¦B) | ¦ |       |
-        """,
+      |   A   | B | Total |
+      |:-----:|:-:|:-----:|
+      |  100  | 2 |  102  |
+      |  One  |   |       |
+      | (A¦B) | ¦ |       |
+      """,
       result
     );
   }
 
   @Test
   public void tableWithTooFewAlignsFails() {
-    assertThrows(
-      IllegalStateException.class,
-      () -> Table.of().withHeaders("A", "B").withAlights(Center).build()
+    assertThrows(IllegalStateException.class, () ->
+      Table.of().withHeaders("A", "B").withAlights(Center).build()
     );
   }
 
   @Test
   public void tableWithTooFewMinWidths() {
-    assertThrows(
-      IllegalStateException.class,
-      () -> Table.of().withHeaders("A", "B").withMinWidths(20).build()
+    assertThrows(IllegalStateException.class, () ->
+      Table.of().withHeaders("A", "B").withMinWidths(20).build()
     );
   }
 }

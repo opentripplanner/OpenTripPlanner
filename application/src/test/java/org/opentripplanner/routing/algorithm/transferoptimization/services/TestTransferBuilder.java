@@ -154,9 +154,9 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set an uniq id: pattern + the first stop departure time
-    return TimetableRepositoryForTest
-      .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
-      .build();
+    return TimetableRepositoryForTest.trip(
+      trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0))
+    ).build();
   }
 
   private ConstrainedTransfer buildConstrainedTransfer() {

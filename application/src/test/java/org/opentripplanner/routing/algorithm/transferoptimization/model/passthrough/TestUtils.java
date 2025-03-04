@@ -22,13 +22,8 @@ class TestUtils implements RaptorTestConstants {
   private static final int TRANSFER_COST_SEC = 0;
   private static final double WAIT_RELUCTANCE = 1.0;
 
-  private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_COST_SEC,
-    TRANSFER_COST_SEC,
-    WAIT_RELUCTANCE,
-    null,
-    null
-  );
+  private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
+    new DefaultCostCalculator<>(BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null);
 
   static TestPathBuilder pathBuilder() {
     return new TestPathBuilder(TestTransitData.SLACK_PROVIDER, COST_CALCULATOR);

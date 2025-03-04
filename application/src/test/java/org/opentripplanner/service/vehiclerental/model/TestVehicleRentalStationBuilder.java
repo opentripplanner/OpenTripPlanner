@@ -53,24 +53,23 @@ public class TestVehicleRentalStationBuilder {
   }
 
   public TestVehicleRentalStationBuilder withSystem(String id, String url) {
-    this.system =
-      new VehicleRentalSystem(
-        id,
-        null,
-        null,
-        null,
-        null,
-        url,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      );
+    this.system = new VehicleRentalSystem(
+      id,
+      null,
+      null,
+      null,
+      null,
+      url,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
     return this;
   }
 

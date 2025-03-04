@@ -16,7 +16,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 class DateScalarFactoryTest {
 
   private static final GraphQLScalarType GTFS_SCALAR = DateScalarFactory.createGtfsDateScalar();
-  private static final GraphQLScalarType TRANSMODEL_SCALAR = DateScalarFactory.createTransmodelDateScalar();
+  private static final GraphQLScalarType TRANSMODEL_SCALAR =
+    DateScalarFactory.createTransmodelDateScalar();
   private static final List<String> INVALID_DATES = List.of(
     "2024-05",
     "2024",
@@ -39,8 +40,7 @@ class DateScalarFactoryTest {
   }
 
   static Stream<Arguments> invalidCases() {
-    return INVALID_DATES
-      .stream()
+    return INVALID_DATES.stream()
       .flatMap(date ->
         Stream.of(Arguments.of(GTFS_SCALAR, date), Arguments.of(TRANSMODEL_SCALAR, date))
       );

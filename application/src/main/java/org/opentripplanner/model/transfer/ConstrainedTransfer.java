@@ -102,10 +102,8 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
    */
   public int getSpecificityRanking() {
     return (
-      from.getSpecificityRanking() *
-      FROM_RANKING_COEFFICIENT +
-      to.getSpecificityRanking() *
-      TO_RANKING_COEFFICIENT
+      from.getSpecificityRanking() * FROM_RANKING_COEFFICIENT +
+      to.getSpecificityRanking() * TO_RANKING_COEFFICIENT
     );
   }
 
@@ -131,8 +129,7 @@ public final class ConstrainedTransfer implements RaptorConstrainedTransfer, Ser
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(ConstrainedTransfer.class)
+    return ToStringBuilder.of(ConstrainedTransfer.class)
       .addObj("from", from)
       .addObj("to", to)
       .addObj("constraint", constraint)

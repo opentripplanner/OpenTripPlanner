@@ -228,7 +228,8 @@ public class GeometryUtils {
       org.geojson.LineString geoJsonLineString = (org.geojson.LineString) geoJsonGeom;
       return gf.createLineString(convertPath(geoJsonLineString.getCoordinates()));
     } else if (geoJsonGeom instanceof org.geojson.MultiLineString) {
-      org.geojson.MultiLineString geoJsonMultiLineString = (org.geojson.MultiLineString) geoJsonGeom;
+      org.geojson.MultiLineString geoJsonMultiLineString =
+        (org.geojson.MultiLineString) geoJsonGeom;
       LineString[] jtsLineStrings = new LineString[geoJsonMultiLineString.getCoordinates().size()];
       int i = 0;
       for (List<LngLatAlt> geoJsonPath : geoJsonMultiLineString.getCoordinates()) {

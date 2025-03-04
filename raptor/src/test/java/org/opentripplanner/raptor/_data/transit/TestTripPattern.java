@@ -84,8 +84,7 @@ public class TestTripPattern implements RaptorTripPattern {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestTripPattern.class)
+    return ToStringBuilder.of(TestTripPattern.class)
       .addStr("name", name)
       .addInts("stops", stopIndexes)
       .addObj("restrictions", restrictions)

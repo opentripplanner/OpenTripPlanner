@@ -27,8 +27,7 @@ class InvalidInputTest implements RealtimeTestConstants {
   @ParameterizedTest
   @MethodSource("cases")
   void invalidTripDate(LocalDate date) {
-    var tripInput = TripInput
-      .of(TRIP_1_ID)
+    var tripInput = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A1, "0:00:10", "0:00:11")
       .addStop(STOP_B1, "0:00:20", "0:00:21")
       .build();

@@ -72,10 +72,8 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     // computing the linestring from the graph path is a surprisingly expensive operation
     // so we delay it until it's actually needed. since most flex paths are never shown to the user
     // this improves performance quite a bit.
-    return new FlexPath(
-      distance,
-      duration,
-      () -> GeometryUtils.concatenateLineStrings(path.edges, Edge::getGeometry)
+    return new FlexPath(distance, duration, () ->
+      GeometryUtils.concatenateLineStrings(path.edges, Edge::getGeometry)
     );
   }
 
@@ -83,8 +81,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.setArriveBy(reverseDirection);
 
-    return StreetSearchBuilder
-      .of()
+    return StreetSearchBuilder.of()
       .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(routingRequest)

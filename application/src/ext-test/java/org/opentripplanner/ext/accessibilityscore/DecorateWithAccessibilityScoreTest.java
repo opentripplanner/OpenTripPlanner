@@ -19,9 +19,8 @@ import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
 
   private static final int ID = 1;
-  private static final DecorateWithAccessibilityScore DECORATOR = new DecorateWithAccessibilityScore(
-    WheelchairPreferences.DEFAULT.maxSlope()
-  );
+  private static final DecorateWithAccessibilityScore DECORATOR =
+    new DecorateWithAccessibilityScore(WheelchairPreferences.DEFAULT.maxSlope());
 
   static List<Arguments> accessibilityScoreTestCase() {
     return List.of(

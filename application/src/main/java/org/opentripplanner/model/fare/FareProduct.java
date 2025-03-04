@@ -48,8 +48,7 @@ public record FareProduct(
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(FareProduct.class)
+    return ToStringBuilder.of(FareProduct.class)
       .addStr("id", id.toString())
       .addStr("name", name)
       .addObj("amount", price)

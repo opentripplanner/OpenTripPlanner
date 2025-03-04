@@ -19,14 +19,11 @@ public abstract class CachingRideHailingService implements RideHailingService {
   // This value should be no longer than 30 minutes (according to Uber API docs) TODO check Lyft time limit
   private static final Duration CACHE_DURATION = Duration.ofMinutes(2);
 
-  private final Cache<WgsCoordinate, List<ArrivalTime>> arrivalTimeCache = CacheBuilder
-    .newBuilder()
+  private final Cache<WgsCoordinate, List<ArrivalTime>> arrivalTimeCache = CacheBuilder.newBuilder()
     .expireAfterWrite(CACHE_DURATION)
     .build();
-  private final Cache<RideEstimateRequest, List<RideEstimate>> rideEstimateCache = CacheBuilder
-    .newBuilder()
-    .expireAfterWrite(CACHE_DURATION)
-    .build();
+  private final Cache<RideEstimateRequest, List<RideEstimate>> rideEstimateCache =
+    CacheBuilder.newBuilder().expireAfterWrite(CACHE_DURATION).build();
 
   /**
    * Get the next arrivals for a specific location.
@@ -34,9 +31,8 @@ public abstract class CachingRideHailingService implements RideHailingService {
   @Override
   public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate, boolean wheelchairAccessible)
     throws ExecutionException {
-    return arrivalTimeCache.get(
-      coordinate.roundToApproximate10m(),
-      () -> queryArrivalTimes(coordinate, wheelchairAccessible)
+    return arrivalTimeCache.get(coordinate.roundToApproximate10m(), () ->
+      queryArrivalTimes(coordinate, wheelchairAccessible)
     );
   }
 

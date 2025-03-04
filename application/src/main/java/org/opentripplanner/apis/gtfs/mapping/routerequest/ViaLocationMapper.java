@@ -24,8 +24,7 @@ class ViaLocationMapper {
   static final String FIELD_COORDINATE = "coordinate";
 
   static List<ViaLocation> mapToViaLocations(@Nullable List<Map<String, Map<String, Object>>> via) {
-    return ListUtils
-      .nullSafeImmutableList(via)
+    return ListUtils.nullSafeImmutableList(via)
       .stream()
       .map(ViaLocationMapper::mapViaLocation)
       .toList();

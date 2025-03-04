@@ -75,9 +75,8 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithoutIdsOrCoordinates() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, null));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -88,9 +87,8 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocationsWithAnEmptyListOfIds() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of()));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -133,9 +131,8 @@ class TripViaLocationMapperTest {
       FIELD_PASS_THROUGH,
       mapOf(FIELD_STOP_LOCATION_IDS, List.of())
     );
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A pass-through via-location must have at least one stop location.",
@@ -149,20 +146,17 @@ class TripViaLocationMapperTest {
       entry(FIELD_VISIT, visitInput("A", D1m, List.of("F:99"), null)),
       entry(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT))
     );
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "Only one entry in 'via @oneOf' is allowed. Set: 'visit', 'passThrough'",
       ex.getMessage()
     );
 
-    ex =
-      assertThrows(
-        IllegalArgumentException.class,
-        () -> TripViaLocationMapper.mapToViaLocations(List.of(Map.of()))
-      );
+    ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(Map.of()))
+    );
     assertEquals(
       "No entries in 'via @oneOf'. One of 'visit', 'passThrough' must be set.",
       ex.getMessage()

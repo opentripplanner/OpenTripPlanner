@@ -21,7 +21,8 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
  */
 @FunctionalInterface
 public interface SingleCriteriaComparator {
-  DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
+  DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR =
+    new DefaultTransitGroupPriorityCalculator();
 
   /**
    * The left criteria dominates the right criteria. Note! The right criteria may dominate
@@ -48,8 +49,7 @@ public interface SingleCriteriaComparator {
   @SuppressWarnings("OptionalGetWithoutIsPresent")
   static SingleCriteriaComparator compareTransitGroupsPriority() {
     return (left, right) ->
-      GROUP_PRIORITY_CALCULATOR
-        .dominanceFunction()
+      GROUP_PRIORITY_CALCULATOR.dominanceFunction()
         .leftDominateRight(left.getGeneralizedCost2().get(), right.getGeneralizedCost2().get());
   }
 

@@ -36,8 +36,7 @@ class StatesToWalkStepsMapperTest {
 
   @Test
   void enterStation() {
-    final TestStateBuilder builder = TestStateBuilder
-      .ofWalking()
+    final TestStateBuilder builder = TestStateBuilder.ofWalking()
       .streetEdge()
       .enterStation("Lichterfelde-Ost");
     var walkSteps = buildWalkSteps(builder);
@@ -49,8 +48,7 @@ class StatesToWalkStepsMapperTest {
 
   @Test
   void exitStation() {
-    final TestStateBuilder builder = TestStateBuilder
-      .ofWalking()
+    final TestStateBuilder builder = TestStateBuilder.ofWalking()
       .streetEdge()
       .exitStation("Lichterfelde-Ost");
     var walkSteps = buildWalkSteps(builder);

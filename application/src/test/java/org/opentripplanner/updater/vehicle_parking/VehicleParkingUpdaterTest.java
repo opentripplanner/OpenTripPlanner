@@ -75,8 +75,12 @@ class VehicleParkingUpdaterTest {
         return null;
       }
     };
-    vehicleParkingUpdater =
-      new VehicleParkingUpdater(parameters, dataSource, graph.getLinker(), parkingRepository);
+    vehicleParkingUpdater = new VehicleParkingUpdater(
+      parameters,
+      dataSource,
+      graph.getLinker(),
+      parkingRepository
+    );
   }
 
   @Test
@@ -113,16 +117,20 @@ class VehicleParkingUpdaterTest {
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
 
     vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
-    vehicleParkings =
-      List.of(VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces));
+    vehicleParkings = List.of(
+      VehicleParkingTestUtil.createParkingWithEntrances("1", 0.0001, 0, vehiclePlaces)
+    );
 
     when(dataSource.getUpdates()).thenReturn(vehicleParkings);
     runUpdaterOnce();
 
     assertVehicleParkingsInGraph(1);
 
-    vehicleParkingInGraph =
-      parkingRepository.listVehicleParkings().stream().findFirst().orElseThrow();
+    vehicleParkingInGraph = parkingRepository
+      .listVehicleParkings()
+      .stream()
+      .findFirst()
+      .orElseThrow();
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getAvailability());
     assertEquals(vehiclePlaces, vehicleParkingInGraph.getCapacity());
   }
@@ -149,8 +157,7 @@ class VehicleParkingUpdaterTest {
 
   @Test
   void addNotOperatingVehicleParkingTest() {
-    var vehicleParking = StreetModelForTest
-      .vehicleParking()
+    var vehicleParking = StreetModelForTest.vehicleParking()
       .state(VehicleParkingState.CLOSED)
       .build();
 
@@ -165,8 +172,7 @@ class VehicleParkingUpdaterTest {
   void updateNotOperatingVehicleParkingTest() {
     var vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(1).build();
 
-    var vehicleParking = StreetModelForTest
-      .vehicleParking()
+    var vehicleParking = StreetModelForTest.vehicleParking()
       .availability(vehiclePlaces)
       .state(VehicleParkingState.CLOSED)
       .build();
@@ -183,12 +189,10 @@ class VehicleParkingUpdaterTest {
 
     vehiclePlaces = VehicleParkingSpaces.builder().bicycleSpaces(2).build();
 
-    vehicleParking =
-      StreetModelForTest
-        .vehicleParking()
-        .availability(vehiclePlaces)
-        .state(VehicleParkingState.CLOSED)
-        .build();
+    vehicleParking = StreetModelForTest.vehicleParking()
+      .availability(vehiclePlaces)
+      .state(VehicleParkingState.CLOSED)
+      .build();
 
     when(dataSource.getUpdates()).thenReturn(List.of(vehicleParking));
     runUpdaterOnce();
@@ -203,8 +207,7 @@ class VehicleParkingUpdaterTest {
 
   @Test
   void deleteNotOperatingVehicleParkingTest() {
-    var vehicleParking = StreetModelForTest
-      .vehicleParking()
+    var vehicleParking = StreetModelForTest.vehicleParking()
       .state(VehicleParkingState.CLOSED)
       .build();
 

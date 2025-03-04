@@ -38,8 +38,10 @@ import org.slf4j.LoggerFactory;
 public class VehicleParkingUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleParkingUpdater.class);
-  private final Map<VehicleParking, List<VehicleParkingEntranceVertex>> verticesByPark = new HashMap<>();
-  private final Map<VehicleParking, List<DisposableEdgeCollection>> tempEdgesByPark = new HashMap<>();
+  private final Map<VehicleParking, List<VehicleParkingEntranceVertex>> verticesByPark =
+    new HashMap<>();
+  private final Map<VehicleParking, List<DisposableEdgeCollection>> tempEdgesByPark =
+    new HashMap<>();
   private final DataSource<VehicleParking> source;
   private final List<VehicleParking> oldVehicleParkings = new ArrayList<>();
   private final VertexLinker linker;
@@ -84,10 +86,9 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     private final Set<VehicleParking> updatedVehicleParkings;
 
     private VehicleParkingGraphWriterRunnable(List<VehicleParking> updatedVehicleParkings) {
-      this.oldVehicleParkingsById =
-        oldVehicleParkings
-          .stream()
-          .collect(Collectors.toMap(VehicleParking::getId, Function.identity()));
+      this.oldVehicleParkingsById = oldVehicleParkings
+        .stream()
+        .collect(Collectors.toMap(VehicleParking::getId, Function.identity()));
       this.updatedVehicleParkings = new HashSet<>(updatedVehicleParkings);
     }
 

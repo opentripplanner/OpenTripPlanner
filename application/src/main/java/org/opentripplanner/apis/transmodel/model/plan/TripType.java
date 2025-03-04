@@ -23,13 +23,11 @@ public class TripType {
     GraphQLObjectType routingErrorType,
     GraphQLScalarType dateTimeScalar
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Trip")
       .description("Description of a travel between two places.")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("dateTime")
           .description("The time and date of travel")
           .type(dateTimeScalar)
@@ -37,8 +35,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("metadata")
           .description("The trip request metadata.")
           .type(tripMetadataType)
@@ -46,8 +43,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("fromPlace")
           .description("The origin")
           .type(new GraphQLNonNull(placeType))
@@ -55,8 +51,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("toPlace")
           .description("The destination")
           .type(new GraphQLNonNull(placeType))
@@ -64,8 +59,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPatterns")
           .description("A list of possible trip patterns")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
@@ -73,8 +67,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("messageEnums")
           .description("A list of possible error messages as enum")
           .deprecate("Use routingErrors instead")
@@ -88,8 +81,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("messageStrings")
           .deprecate("Use routingErrors instead")
           .description("A list of possible error messages in cleartext")
@@ -106,8 +98,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("routingErrors")
           .description("A list of routing errors, and fields which caused them")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(routingErrorType))))
@@ -115,18 +106,15 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("debugOutput")
           .description("Information about the timings for the trip generation")
           .type(
             new GraphQLNonNull(
-              GraphQLObjectType
-                .newObject()
+              GraphQLObjectType.newObject()
                 .name("debugOutput")
                 .field(
-                  GraphQLFieldDefinition
-                    .newFieldDefinition()
+                  GraphQLFieldDefinition.newFieldDefinition()
                     .name("totalTime")
                     .type(ExtendedScalars.GraphQLLong)
                     .build()
@@ -138,8 +126,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("previousPageCursor")
           .description(
             "Use the cursor to get the previous page of results. Use this cursor for " +
@@ -155,8 +142,7 @@ public class TripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("nextPageCursor")
           .description(
             "Use the cursor to get the next page of results. Use this cursor for " +

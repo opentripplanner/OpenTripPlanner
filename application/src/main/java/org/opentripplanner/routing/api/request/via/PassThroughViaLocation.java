@@ -29,8 +29,7 @@ public class PassThroughViaLocation extends AbstractViaLocation {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PassThroughViaLocation.class)
+    return ToStringBuilder.of(PassThroughViaLocation.class)
       .addObj("label", label())
       .addCol("stopLocationIds", stopLocationIds())
       .toString();

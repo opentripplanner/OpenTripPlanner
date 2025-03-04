@@ -46,7 +46,8 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
   // There are 5 possible trips
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -73,8 +74,7 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
       "Walk 2m 0:09 0:11 C₁240 ~ A 0s ~ BUS R1 0:11 .. [0:09 0:42 33m Tₓ0 C₁2_760]"
     );
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r ->
         r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8m)
       )
@@ -109,8 +109,7 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
       "Walk 2m 0:17 0:19 C₁240 ~ A 0s ~ BUS R1 0:19 .. [0:17 0:50 33m Tₓ0 C₁2_760]"
     );
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r ->
         r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8m)
       )
@@ -142,8 +141,7 @@ public class L01_TimePenaltyAccessTest implements RaptorTestConstants {
     var p = Pattern.compile("(.+BUS R1 \\d+:\\d+).+(\\[.+)");
 
     String[] lines = path.split("\n");
-    return Stream
-      .of(lines)
+    return Stream.of(lines)
       .map(s -> {
         var m = p.matcher(s);
         return m.find() ? m.group(1) + " .. " + m.group(2) : s;

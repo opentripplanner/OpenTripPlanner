@@ -107,9 +107,10 @@ class TripTimesUpdater {
     Integer delay = null;
     Integer firstUpdatedIndex = null;
 
-    final long today = ServiceDateUtils
-      .asStartOfService(updateServiceDate, timeZone)
-      .toEpochSecond();
+    final long today = ServiceDateUtils.asStartOfService(
+      updateServiceDate,
+      timeZone
+    ).toEpochSecond();
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;
@@ -122,9 +123,10 @@ class TripTimesUpdater {
       }
 
       if (match) {
-        GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship = update.hasScheduleRelationship()
-          ? update.getScheduleRelationship()
-          : GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED;
+        GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship =
+          update.hasScheduleRelationship()
+            ? update.getScheduleRelationship()
+            : GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED;
         // Handle each schedule relationship case
         if (
           scheduleRelationship ==
@@ -227,18 +229,12 @@ class TripTimesUpdater {
     // the first SCHEDULED stop sequence included in the GTFS-RT feed.
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
       if (
-        (
-          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA &&
-          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, true)
-        ) ||
-        (
-          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED &&
-          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, false)
-        ) ||
-        (
-          backwardsDelayPropagationType == BackwardsDelayPropagationType.ALWAYS &&
-          newTimes.adjustTimesBeforeAlways(firstUpdatedIndex)
-        )
+        (backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA &&
+          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, true)) ||
+        (backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED &&
+          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, false)) ||
+        (backwardsDelayPropagationType == BackwardsDelayPropagationType.ALWAYS &&
+          newTimes.adjustTimesBeforeAlways(firstUpdatedIndex))
       ) {
         LOG.debug(
           "Propagated delay from stop index {} backwards on trip {}.",
@@ -264,9 +260,9 @@ class TripTimesUpdater {
     if (tripUpdate.hasVehicle()) {
       var vehicleDescriptor = tripUpdate.getVehicle();
       if (vehicleDescriptor.hasWheelchairAccessible()) {
-        GtfsRealtimeMapper
-          .mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
-          .ifPresent(newTimes::updateWheelchairAccessibility);
+        GtfsRealtimeMapper.mapWheelchairAccessible(
+          vehicleDescriptor.getWheelchairAccessible()
+        ).ifPresent(newTimes::updateWheelchairAccessibility);
       }
     }
 

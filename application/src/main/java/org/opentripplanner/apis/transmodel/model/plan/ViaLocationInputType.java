@@ -68,56 +68,56 @@ public class ViaLocationInputType {
     """;
   private static final String DOC_COORDINATE = "A coordinate to route through.";
 
-  static final GraphQLInputObjectType VISIT_VIA_LOCATION_INPUT = GraphQLInputObjectType
-    .newInputObject()
-    .name(INPUT_VISIT_VIA_LOCATION)
-    .description(DOC_VISIT_VIA_LOCATION)
-    .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(GraphQLString))
-    .field(b ->
-      b
-        .name(FIELD_MINIMUM_WAIT_TIME)
-        .description(DOC_MINIMUM_WAIT_TIME)
-        .type(TransmodelScalars.DURATION_SCALAR)
-        .defaultValueLiteral(StringValue.of(Duration.ZERO.toString()))
-    )
-    .field(b ->
-      b
-        .name(FIELD_STOP_LOCATION_IDS)
-        .description(DOC_STOP_LOCATION_IDS)
-        .type(optionalListOfNonNullStrings())
-    )
-    .field(b ->
-      b.name(FIELD_COORDINATE).description(DOC_COORDINATE).type(CoordinateInputType.INPUT_TYPE)
-    )
-    .build();
+  static final GraphQLInputObjectType VISIT_VIA_LOCATION_INPUT =
+    GraphQLInputObjectType.newInputObject()
+      .name(INPUT_VISIT_VIA_LOCATION)
+      .description(DOC_VISIT_VIA_LOCATION)
+      .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(GraphQLString))
+      .field(b ->
+        b
+          .name(FIELD_MINIMUM_WAIT_TIME)
+          .description(DOC_MINIMUM_WAIT_TIME)
+          .type(TransmodelScalars.DURATION_SCALAR)
+          .defaultValueLiteral(StringValue.of(Duration.ZERO.toString()))
+      )
+      .field(b ->
+        b
+          .name(FIELD_STOP_LOCATION_IDS)
+          .description(DOC_STOP_LOCATION_IDS)
+          .type(optionalListOfNonNullStrings())
+      )
+      .field(b ->
+        b.name(FIELD_COORDINATE).description(DOC_COORDINATE).type(CoordinateInputType.INPUT_TYPE)
+      )
+      .build();
 
-  static final GraphQLInputObjectType PASS_THROUGH_VIA_LOCATION_INPUT = GraphQLInputObjectType
-    .newInputObject()
-    .name(INPUT_PASS_THROUGH_VIA_LOCATION)
-    .description(DOC_PASS_THROUGH_VIA_LOCATION)
-    .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(GraphQLString))
-    .field(b ->
-      // This is NOT nonNull, because we might add other parameters later, like 'list of line-ids'
-      b
-        .name(FIELD_STOP_LOCATION_IDS)
-        .description(DOC_STOP_LOCATION_IDS)
-        .type(requiredListOfNonNullStrings())
-    )
-    .build();
+  static final GraphQLInputObjectType PASS_THROUGH_VIA_LOCATION_INPUT =
+    GraphQLInputObjectType.newInputObject()
+      .name(INPUT_PASS_THROUGH_VIA_LOCATION)
+      .description(DOC_PASS_THROUGH_VIA_LOCATION)
+      .field(b -> b.name(FIELD_LABEL).description(DOC_LABEL).type(GraphQLString))
+      .field(b ->
+        // This is NOT nonNull, because we might add other parameters later, like 'list of line-ids'
+        b
+          .name(FIELD_STOP_LOCATION_IDS)
+          .description(DOC_STOP_LOCATION_IDS)
+          .type(requiredListOfNonNullStrings())
+      )
+      .build();
 
-  public static final GraphQLInputObjectType VIA_LOCATION_INPUT = GraphQLInputObjectType
-    .newInputObject()
-    .name(INPUT_VIA_LOCATION)
-    .description(DOC_VIA_LOCATION)
-    .withDirective(OneOfDirective)
-    .field(b -> b.name(FIELD_VISIT).description(DOC_FIELD_VISIT).type(VISIT_VIA_LOCATION_INPUT))
-    .field(b ->
-      b
-        .name(FIELD_PASS_THROUGH)
-        .description(DOC_FIELD_PASS_THROUGH)
-        .type(PASS_THROUGH_VIA_LOCATION_INPUT)
-    )
-    .build();
+  public static final GraphQLInputObjectType VIA_LOCATION_INPUT =
+    GraphQLInputObjectType.newInputObject()
+      .name(INPUT_VIA_LOCATION)
+      .description(DOC_VIA_LOCATION)
+      .withDirective(OneOfDirective)
+      .field(b -> b.name(FIELD_VISIT).description(DOC_FIELD_VISIT).type(VISIT_VIA_LOCATION_INPUT))
+      .field(b ->
+        b
+          .name(FIELD_PASS_THROUGH)
+          .description(DOC_FIELD_PASS_THROUGH)
+          .type(PASS_THROUGH_VIA_LOCATION_INPUT)
+      )
+      .build();
 
   private static GraphQLInputType requiredListOfNonNullStrings() {
     return new GraphQLNonNull(optionalListOfNonNullStrings());

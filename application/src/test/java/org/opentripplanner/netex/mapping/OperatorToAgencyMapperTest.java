@@ -28,9 +28,10 @@ public class OperatorToAgencyMapperTest {
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
-    o =
-      new OperatorToAgencyMapper(DataImportIssueStore.NOOP, MappingSupport.ID_FACTORY)
-        .mapOperator(operator);
+    o = new OperatorToAgencyMapper(
+      DataImportIssueStore.NOOP,
+      MappingSupport.ID_FACTORY
+    ).mapOperator(operator);
 
     // Then expect
     assertEquals(ID, o.getId().getId());
@@ -48,9 +49,10 @@ public class OperatorToAgencyMapperTest {
 
     // When mapped
     org.opentripplanner.transit.model.organization.Operator o;
-    o =
-      new OperatorToAgencyMapper(DataImportIssueStore.NOOP, MappingSupport.ID_FACTORY)
-        .mapOperator(operator);
+    o = new OperatorToAgencyMapper(
+      DataImportIssueStore.NOOP,
+      MappingSupport.ID_FACTORY
+    ).mapOperator(operator);
 
     // Then expect
     assertEquals(ID, o.getId().getId());

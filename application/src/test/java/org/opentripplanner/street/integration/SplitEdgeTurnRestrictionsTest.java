@@ -32,8 +32,7 @@ import org.opentripplanner.test.support.ResourceLoader;
  */
 public class SplitEdgeTurnRestrictionsTest {
 
-  static final Instant dateTime = LocalDateTime
-    .of(2020, 3, 3, 7, 0)
+  static final Instant dateTime = LocalDateTime.of(2020, 3, 3, 7, 0)
     .atZone(ZoneIds.BERLIN)
     .toInstant();
   // Deufringen

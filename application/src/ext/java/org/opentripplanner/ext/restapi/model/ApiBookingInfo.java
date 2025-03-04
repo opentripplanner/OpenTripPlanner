@@ -92,8 +92,7 @@ public class ApiBookingInfo implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(getClass())
+    return ToStringBuilder.of(getClass())
       .addObj("contactInfo", contactInfo)
       .addCol("bookingMethods", bookingMethods)
       .addObj("earliestBookingTime", earliestBookingTime)

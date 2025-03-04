@@ -96,7 +96,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(defaultMaxTransferDuration);
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
-    Set<StopLocation> carsAllowedStops = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> carsAllowedStops =
+      timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -285,7 +286,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           }
         }
         // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
-        Duration carsAllowedStopMaxTransferDuration = transferParameters.carsAllowedStopMaxTransferDuration();
+        Duration carsAllowedStopMaxTransferDuration =
+          transferParameters.carsAllowedStopMaxTransferDuration();
         if (carsAllowedStopMaxTransferDuration != null) {
           carsAllowedStopTransferRequests.add(transferProfile);
           carsAllowedStopNearbyStopFinderForMode.put(

@@ -45,12 +45,11 @@ public class PathDiff<T extends RaptorTripSchedule> {
 
   private PathDiff(RaptorPath<T> path) {
     this.path = path;
-    this.walkDuration =
-      path
-        .legStream()
-        .filter(l -> l.isAccessLeg() || l.isTransferLeg() || l.isEgressLeg())
-        .mapToInt(PathLeg::duration)
-        .sum();
+    this.walkDuration = path
+      .legStream()
+      .filter(l -> l.isAccessLeg() || l.isTransferLeg() || l.isEgressLeg())
+      .mapToInt(PathLeg::duration)
+      .sum();
     this.routes.addAll(path.transitLegs().map(l -> l.trip().pattern().debugInfo()).toList());
     this.stops.addAll(path.listStops());
   }
@@ -68,8 +67,7 @@ public class PathDiff<T extends RaptorTripSchedule> {
 
     // Walk* is access + transfer + egress time, independent of street mode - could be flex
     // or bycycle as well.
-    TableBuilder tbl = Table
-      .of()
+    TableBuilder tbl = Table.of()
       .withAlights(Center, Right, Right, Right, Right, Right, Right, Left)
       .withHeaders("STATUS", "TX", "Duration", "Cost", "Walk*", "Start", "End", "Path");
 

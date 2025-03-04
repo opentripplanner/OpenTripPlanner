@@ -50,8 +50,7 @@ class StationMapper {
           )
       );
     }
-    StationBuilder builder = Station
-      .of(mapAgencyAndId(rhs.getId()))
+    StationBuilder builder = Station.of(mapAgencyAndId(rhs.getId()))
       .withCoordinate(WgsCoordinateMapper.mapToDomain(rhs))
       .withCode(rhs.getCode());
 

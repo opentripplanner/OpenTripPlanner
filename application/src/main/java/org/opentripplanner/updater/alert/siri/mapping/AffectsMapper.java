@@ -140,7 +140,8 @@ public class AffectsMapper {
         );
       }
 
-      final FramedVehicleJourneyRefStructure framedVehicleJourneyRef = affectedVehicleJourney.getFramedVehicleJourneyRef();
+      final FramedVehicleJourneyRefStructure framedVehicleJourneyRef =
+        affectedVehicleJourney.getFramedVehicleJourneyRef();
       if (framedVehicleJourneyRef != null) {
         selectors.addAll(
           mapTripSelectors(
@@ -151,7 +152,8 @@ public class AffectsMapper {
         );
       }
 
-      final List<DatedVehicleJourneyRef> datedVehicleJourneyReves = affectedVehicleJourney.getDatedVehicleJourneyReves();
+      final List<DatedVehicleJourneyRef> datedVehicleJourneyReves =
+        affectedVehicleJourney.getDatedVehicleJourneyReves();
       if (isNotEmpty(datedVehicleJourneyReves)) {
         for (DatedVehicleJourneyRef datedVehicleJourneyRef : datedVehicleJourneyReves) {
           // Lookup provided reference as if it is a DSJ

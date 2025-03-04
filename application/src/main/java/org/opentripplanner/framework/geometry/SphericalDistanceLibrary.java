@@ -163,7 +163,7 @@ public abstract class SphericalDistanceLibrary {
    * poles.
    */
   public static double metersToDegrees(double distanceMeters) {
-    return 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
+    return (360 * distanceMeters) / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
   }
 
   /**
@@ -172,7 +172,7 @@ public abstract class SphericalDistanceLibrary {
    * converge toward the poles.
    */
   public static double degreesLatitudeToMeters(double degreesLatitude) {
-    return (2 * Math.PI * RADIUS_OF_EARTH_IN_M) * degreesLatitude / 360;
+    return ((2 * Math.PI * RADIUS_OF_EARTH_IN_M) * degreesLatitude) / 360;
   }
 
   /**
@@ -182,7 +182,7 @@ public abstract class SphericalDistanceLibrary {
    * the number of degree of longitude for a given distance depends on the exact latitude.
    */
   public static double metersToLonDegrees(double distanceMeters, double latDeg) {
-    double dLatDeg = 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
+    double dLatDeg = (360 * distanceMeters) / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
     /*
      * The computation below ensure that minCosLat is the minimum value of cos(lat) for lat in
      * the range [lat-dLat, lat+dLat].

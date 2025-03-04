@@ -104,22 +104,20 @@ class SearchParamsTest {
 
   @Test
   void addBothViaAndPassThroughIsNotSupported() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () ->
-        new RaptorRequestBuilder<TestTripSchedule>()
-          .searchParams()
-          .earliestDepartureTime(1)
-          .latestArrivalTime(1200)
-          .addAccessPaths(TestAccessEgress.walk(1, 30))
-          .addEgressPaths(TestAccessEgress.walk(7, 30))
-          .addViaLocations(
-            List.of(
-              RaptorViaLocation.via("Via").addViaStop(5).build(),
-              RaptorViaLocation.passThrough("PassThrough").addPassThroughStop(5).build()
-            )
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      new RaptorRequestBuilder<TestTripSchedule>()
+        .searchParams()
+        .earliestDepartureTime(1)
+        .latestArrivalTime(1200)
+        .addAccessPaths(TestAccessEgress.walk(1, 30))
+        .addEgressPaths(TestAccessEgress.walk(7, 30))
+        .addViaLocations(
+          List.of(
+            RaptorViaLocation.via("Via").addViaStop(5).build(),
+            RaptorViaLocation.passThrough("PassThrough").addPassThroughStop(5).build()
           )
-          .build()
+        )
+        .build()
     );
     assertEquals(
       "Combining pass-through and regular via-vist it is not allowed: [" +

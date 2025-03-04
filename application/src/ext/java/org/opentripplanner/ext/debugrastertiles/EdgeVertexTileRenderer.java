@@ -234,12 +234,12 @@ public class EdgeVertexTileRenderer implements TileRenderer {
   }
 
   public interface EdgeVertexRenderer {
-    Comparator<Vertex> defaultVertexComparator = Comparator
-      .comparing((Vertex v) -> v instanceof StreetVertex)
-      .reversed();
-    Comparator<Edge> defaultEdgeComparator = Comparator
-      .comparing((Edge e) -> e.getGeometry() != null)
-      .thenComparing(e -> e instanceof StreetEdge);
+    Comparator<Vertex> defaultVertexComparator = Comparator.comparing((Vertex v) ->
+      v instanceof StreetVertex
+    ).reversed();
+    Comparator<Edge> defaultEdgeComparator = Comparator.comparing(
+      (Edge e) -> e.getGeometry() != null
+    ).thenComparing(e -> e instanceof StreetEdge);
 
     /**
      * @param e The edge being rendered.

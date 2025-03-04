@@ -20,13 +20,13 @@ class GroupOfStationsTest {
 
   private static final Station STATION = TEST_MODEL.station("1:station").build();
 
-  private static final StopLocation STOP_LOCATION = TEST_MODEL
-    .stop("1:stop", 1d, 1d)
+  private static final StopLocation STOP_LOCATION = TEST_MODEL.stop("1:stop", 1d, 1d)
     .withParentStation(STATION)
     .build();
 
-  private static final GroupOfStations subject = GroupOfStations
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final GroupOfStations subject = GroupOfStations.of(
+    TimetableRepositoryForTest.id(ID)
+  )
     .withName(NAME)
     .addChildStation(STATION)
     .build();

@@ -16,8 +16,7 @@ class OperatorTest {
   private static final String URL = "http://info.aaa.com";
   private static final String PHONE = "+47 95566333";
 
-  private static final Operator subject = Operator
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final Operator subject = Operator.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withPhone(PHONE)

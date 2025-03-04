@@ -93,8 +93,7 @@ public class AStarTest {
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
-    ShortestPathTree tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -124,8 +123,7 @@ public class AStarTest {
     request.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
-    ShortestPathTree tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -175,8 +173,7 @@ public class AStarTest {
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -219,8 +216,7 @@ public class AStarTest {
     );
     TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
-    ShortestPathTree tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(from)
@@ -260,8 +256,7 @@ public class AStarTest {
 
     Vertex v1 = graph.getVertex("56th_24th");
     Vertex v2 = graph.getVertex("leary_20th");
-    ShortestPathTree tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setTerminationStrategy(strategy)
       .setRequest(request)

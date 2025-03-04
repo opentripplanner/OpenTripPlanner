@@ -27,18 +27,15 @@ public class FilterTest {
   static final String AGENCY_ID_2 = "RUT:Agency:2";
   static final String AGENCY_ID_3 = "RUT:Agency:3";
 
-  static final Agency AGENCY_1 = TimetableRepositoryForTest
-    .agency("A")
+  static final Agency AGENCY_1 = TimetableRepositoryForTest.agency("A")
     .copy()
     .withId(id(AGENCY_ID_1))
     .build();
-  static final Agency AGENCY_2 = TimetableRepositoryForTest
-    .agency("B")
+  static final Agency AGENCY_2 = TimetableRepositoryForTest.agency("B")
     .copy()
     .withId(id(AGENCY_ID_2))
     .build();
-  static final Agency AGENCY_3 = TimetableRepositoryForTest
-    .agency("C")
+  static final Agency AGENCY_3 = TimetableRepositoryForTest.agency("C")
     .copy()
     .withId(id(AGENCY_ID_3))
     .build();
@@ -61,24 +58,24 @@ public class FilterTest {
   final String GROUP_OF_Routes_ID_1 = "RUT:GroupOfLines:1";
   final String GROUP_OF_Routes_ID_2 = "RUT:GroupOfLines:2";
 
-  final GroupOfRoutes GROUP_OF_ROUTES_1 = TimetableRepositoryForTest
-    .groupOfRoutes(GROUP_OF_Routes_ID_1)
-    .build();
-  final GroupOfRoutes GROUP_OF_ROUTES_2 = TimetableRepositoryForTest
-    .groupOfRoutes(GROUP_OF_Routes_ID_2)
-    .build();
+  final GroupOfRoutes GROUP_OF_ROUTES_1 = TimetableRepositoryForTest.groupOfRoutes(
+    GROUP_OF_Routes_ID_1
+  ).build();
+  final GroupOfRoutes GROUP_OF_ROUTES_2 = TimetableRepositoryForTest.groupOfRoutes(
+    GROUP_OF_Routes_ID_2
+  ).build();
 
   @Test
   @DisplayName(
     """
     Filter test 1
-    
+
     filters: [
       {
         select: [ {A} ]
       }
     ]
-    
+
     -> A
     """
   )
@@ -88,22 +85,18 @@ public class FilterTest {
     Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filterRequest = TransitFilterRequest
-      .of()
+    var filterRequest = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
@@ -118,13 +111,13 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 2
-    
+
     filters: [
       {
         not: [ {A} ]
       }
     ]
-        
+
     -> S - A
     """
   )
@@ -134,22 +127,18 @@ public class FilterTest {
     Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_3).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filterRequest = TransitFilterRequest
-      .of()
+    var filterRequest = TransitFilterRequest.of()
       .addNot(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .build();
 
@@ -163,61 +152,52 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 3
-    
+
     filters: [
       {
         select: [ {A}, {B} ]
       }
     ]
-        
+
     -> A ∪ B
     """
   )
   public void testThree() {
-    Route route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.BUS)
       .withNetexSubmode("schoolBus")
       .build();
-    Route route2 = TimetableRepositoryForTest
-      .route(ROUTE_ID_2)
+    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
       .withAgency(AGENCY_2)
       .withMode(TransitMode.RAIL)
       .withNetexSubmode("railShuttle")
       .build();
-    Route route3 = TimetableRepositoryForTest
-      .route(ROUTE_ID_3)
+    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
       .withAgency(AGENCY_3)
       .withMode(TransitMode.TRAM)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filterRequest = TransitFilterRequest
-      .of()
+    var filterRequest = TransitFilterRequest.of()
       .addSelect(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS, SubMode.of("schoolBus"))))
           .build()
       )
       .addSelect(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withTransportModes(
             List.of(new MainAndSubMode(TransitMode.RAIL, SubMode.of("railShuttle")))
           )
@@ -235,7 +215,7 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 4
-    
+
     filters: [
       {
         select: [ {A} ]
@@ -244,7 +224,7 @@ public class FilterTest {
         select: [ {B} ]
       }
     ]
-    
+
     -> A ∪ B
     """
   )
@@ -254,27 +234,22 @@ public class FilterTest {
     Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter1 = TransitFilterRequest
-      .of()
+    var filter1 = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
-    var filter2 = TransitFilterRequest
-      .of()
+    var filter2 = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_2))).build())
       .build();
 
@@ -288,7 +263,7 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 5
-      
+
     filters: [
       {
         select: [ {A} ]
@@ -297,7 +272,7 @@ public class FilterTest {
         not: [ {B} ]
       }
     ]
-        
+
     -> A ∪ (S - B)
     """
   )
@@ -306,23 +281,19 @@ public class FilterTest {
     Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter1 = TransitFilterRequest
-      .of()
+    var filter1 = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
-    var filter2 = TransitFilterRequest
-      .of()
+    var filter2 = TransitFilterRequest.of()
       .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_1))).build())
       .build();
 
@@ -335,14 +306,14 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 6
-    
+
     filters: [
       {
         select: [ {A} ]
         not: [ {B} ]
       }
     ]
-        
+
     -> A - B
     """
   )
@@ -352,22 +323,18 @@ public class FilterTest {
     Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_1).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filterRequest = TransitFilterRequest
-      .of()
+    var filterRequest = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
@@ -382,7 +349,7 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 7
-        
+
     filters: [
       {
         select: [ {A} ]
@@ -392,7 +359,7 @@ public class FilterTest {
         not: [ {C} ]
       }
     ]
-        
+
     -> A ∪ (B - C)
     """
   )
@@ -402,27 +369,22 @@ public class FilterTest {
     Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3).withAgency(AGENCY_2).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter1 = TransitFilterRequest
-      .of()
+    var filter1 = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .build();
 
-    var filter2 = TransitFilterRequest
-      .of()
+    var filter2 = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_2))).build())
       .addNot(SelectRequest.of().withRoutes(List.of(id(ROUTE_ID_3))).build())
       .build();
@@ -437,53 +399,45 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 8
-    
+
     filters: [
       {
         select: [ {A,B} ]
       }
     ]
-        
+
     -> A ∩ B
     """
   )
   public void testEight() {
-    final Route route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    final Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
-    final Route route2 = TimetableRepositoryForTest
-      .route(ROUTE_ID_2)
+    final Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
       .withMode(TransitMode.RAIL)
       .withAgency(AGENCY_1)
       .build();
-    final Route route3 = TimetableRepositoryForTest
-      .route(ROUTE_ID_3)
+    final Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_2)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter = TransitFilterRequest
-      .of()
+    var filter = TransitFilterRequest.of()
       .addSelect(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withAgencies(List.of(id(AGENCY_ID_1)))
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
@@ -501,63 +455,53 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 9
-        
+
     filters: [
       {
         select: [ {A,B} ]
         not: [ {C} ]
       }
     ]
-        
+
     -> (A ∩ B) - C
     """
   )
   public void testNine() {
-    Route route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.BUS)
       .build();
-    Route route2 = TimetableRepositoryForTest
-      .route(ROUTE_ID_2)
+    Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.RAIL)
       .build();
-    Route route3 = TimetableRepositoryForTest
-      .route(ROUTE_ID_3)
+    Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
       .withAgency(AGENCY_1)
       .withMode(TransitMode.BUS)
       .build();
-    Route route4 = TimetableRepositoryForTest
-      .route(ROUTE_ID_4)
+    Route route4 = TimetableRepositoryForTest.route(ROUTE_ID_4)
       .withAgency(AGENCY_2)
       .withMode(TransitMode.BUS)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_4, route4)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_4, route4)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter = TransitFilterRequest
-      .of()
+    var filter = TransitFilterRequest.of()
       .addSelect(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withAgencies(List.of(id(AGENCY_ID_1)))
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .build()
@@ -577,60 +521,51 @@ public class FilterTest {
   @DisplayName(
     """
     Filter test 10
-    
+
     filters: [
       {
         select: [ {A} ]
         not: [ {B, C} ]
       }
     ]
-        
+
     -> A - (B ∩ C)
     """
   )
   public void testTen() {
-    final Route route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    final Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
-    final Route route2 = TimetableRepositoryForTest
-      .route(ROUTE_ID_2)
+    final Route route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
       .withMode(TransitMode.RAIL)
       .withAgency(AGENCY_1)
       .build();
-    final Route route3 = TimetableRepositoryForTest
-      .route(ROUTE_ID_3)
+    final Route route3 = TimetableRepositoryForTest.route(ROUTE_ID_3)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
     final Route route4 = TimetableRepositoryForTest.route(ROUTE_ID_4).withAgency(AGENCY_2).build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_3, route3)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_3, route3)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_4, route4)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_4, route4)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter = TransitFilterRequest
-      .of()
+    var filter = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withAgencies(List.of(id(AGENCY_ID_1))).build())
       .addNot(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS)))
           .withRoutes(List.of(id(ROUTE_ID_3)))
           .build()
@@ -646,30 +581,25 @@ public class FilterTest {
 
   @Test
   void testDifferentSubModesInRoute() {
-    final Route route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    final Route route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withMode(TransitMode.BUS)
       .withAgency(AGENCY_1)
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .withNetexSubmode(LOCAL_BUS)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route1)
         .withStopPattern(STOP_PATTERN)
         .withNetexSubmode(NIGHT_BUS)
         .build()
     );
 
-    var filter = TransitFilterRequest
-      .of()
+    var filter = TransitFilterRequest.of()
       .addNot(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withTransportModes(List.of(new MainAndSubMode(TransitMode.BUS, NIGHT_BUS)))
           .build()
       )
@@ -696,31 +626,25 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesSelectFunctionality() {
-    var route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    var route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1))
       .build();
-    var route2 = TimetableRepositoryForTest
-      .route(ROUTE_ID_2)
+    var route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2))
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter = TransitFilterRequest
-      .of()
+    var filter = TransitFilterRequest.of()
       .addSelect(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withGroupOfRoutes(List.of(FeedScopedId.parse("F:" + GROUP_OF_Routes_ID_1)))
           .build()
       )
@@ -734,31 +658,25 @@ public class FilterTest {
 
   @Test
   public void testGroupOfLinesExcludeFunctionality() {
-    var route1 = TimetableRepositoryForTest
-      .route(ROUTE_ID_1)
+    var route1 = TimetableRepositoryForTest.route(ROUTE_ID_1)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_1))
       .build();
-    var route2 = TimetableRepositoryForTest
-      .route(ROUTE_ID_2)
+    var route2 = TimetableRepositoryForTest.route(ROUTE_ID_2)
       .withGroupOfRoutes(List.of(GROUP_OF_ROUTES_2))
       .build();
 
     var patterns = List.of(
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_1, route1)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_1, route1)
         .withStopPattern(STOP_PATTERN)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern(JOURNEY_PATTERN_ID_2, route2)
+      TimetableRepositoryForTest.tripPattern(JOURNEY_PATTERN_ID_2, route2)
         .withStopPattern(STOP_PATTERN)
         .build()
     );
 
-    var filter = TransitFilterRequest
-      .of()
+    var filter = TransitFilterRequest.of()
       .addNot(
-        SelectRequest
-          .of()
+        SelectRequest.of()
           .withGroupOfRoutes(List.of(FeedScopedId.parse("F:" + GROUP_OF_Routes_ID_1)))
           .build()
       )

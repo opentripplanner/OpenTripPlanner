@@ -115,7 +115,7 @@ public class SidewalkNamer implements EdgeNamer {
       "Assigned names to {} of {} of sidewalks ({}%)",
       namesApplied.get(),
       unnamedSidewalks.size(),
-      DoubleUtils.roundTo2Decimals((double) namesApplied.get() / unnamedSidewalks.size() * 100)
+      DoubleUtils.roundTo2Decimals(((double) namesApplied.get() / unnamedSidewalks.size()) * 100)
     );
 
     LOG.info(progress.completeMessage());
@@ -228,8 +228,7 @@ public class SidewalkNamer implements EdgeNamer {
     private double length(Geometry intersection) {
       return switch (intersection) {
         case LineString ls -> SphericalDistanceLibrary.length(ls);
-        case MultiLineString mls -> GeometryUtils
-          .getLineStrings(mls)
+        case MultiLineString mls -> GeometryUtils.getLineStrings(mls)
           .stream()
           .mapToDouble(this::intersectionLength)
           .sum();

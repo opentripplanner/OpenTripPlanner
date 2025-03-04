@@ -101,13 +101,11 @@ public class TestTripSchedule implements TripSchedule {
   @Override
   public String toString() {
     if (Arrays.equals(arrivalTimes, departureTimes)) {
-      return ToStringBuilder
-        .of(TestTripSchedule.class)
+      return ToStringBuilder.of(TestTripSchedule.class)
         .addServiceTimeSchedule("times", arrivalTimes)
         .toString();
     }
-    return ToStringBuilder
-      .of(TestTripSchedule.class)
+    return ToStringBuilder.of(TestTripSchedule.class)
       .addServiceTimeSchedule("arrivals", arrivalTimes)
       .addServiceTimeSchedule("departures", departureTimes)
       .toString();

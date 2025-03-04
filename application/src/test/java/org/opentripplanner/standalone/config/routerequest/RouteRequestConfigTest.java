@@ -75,15 +75,15 @@ class RouteRequestConfigTest {
   public void testAccessEgressPenalty() {
     var nodeAdapter = newNodeAdapterForTest(
       """
-      {
-	  "accessEgress": {
-	      "penalty": {
-		  "FLEXIBLE" : { "timePenalty": "2m + 1.1t", "costFactor": 1.7 },
-		      "CAR" : { "timePenalty": "0s + 4t" }
-	      }
-	  }
+         {
+      "accessEgress": {
+          "penalty": {
+       "FLEXIBLE" : { "timePenalty": "2m + 1.1t", "costFactor": 1.7 },
+           "CAR" : { "timePenalty": "0s + 4t" }
+          }
       }
-      """
+         }
+         """
     );
 
     var subject = RouteRequestConfig.mapRouteRequest(nodeAdapter);

@@ -200,8 +200,9 @@ public class RouteRequest implements Cloneable, Serializable {
       if (pageCursor.latestArrivalTime() == null) {
         arriveBy = false;
       }
-      this.dateTime =
-        arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime();
+      this.dateTime = arriveBy
+        ? pageCursor.latestArrivalTime()
+        : pageCursor.earliestDepartureTime();
       journey.setModes(journey.modes().copyOf().withDirectMode(StreetMode.NOT_SET).build());
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
@@ -364,12 +365,11 @@ public class RouteRequest implements Cloneable, Serializable {
    * default route request is configured before the {@link TransitRoutingConfig}.
    */
   public void initMaxSearchWindow(Duration maxSearchWindow) {
-    this.maxSearchWindow =
-      ObjectUtils.requireNotInitialized(
-        "maxSearchWindow",
-        this.maxSearchWindow,
-        Objects.requireNonNull(maxSearchWindow)
-      );
+    this.maxSearchWindow = ObjectUtils.requireNotInitialized(
+      "maxSearchWindow",
+      this.maxSearchWindow,
+      Objects.requireNonNull(maxSearchWindow)
+    );
   }
 
   public Locale locale() {
@@ -461,8 +461,7 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(RouteRequest.class)
+    return ToStringBuilder.of(RouteRequest.class)
       .addObj("from", from)
       .addObj("to", to)
       .addDateTime("dateTime", dateTime)
