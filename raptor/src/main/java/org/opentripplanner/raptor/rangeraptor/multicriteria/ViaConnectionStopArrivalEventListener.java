@@ -56,9 +56,9 @@ public final class ViaConnectionStopArrivalEventListener<T extends RaptorTripSch
    * Factory method for creating a {@link org.opentripplanner.raptor.util.paretoset.ParetoSet}
    * listener used to copy the state when arriving at a "via point" into the next Raptor "leg".
    */
-  public static <
-    T extends RaptorTripSchedule
-  > List<ViaConnectionStopArrivalEventListener<T>> createEventListeners(
+  public static <T extends RaptorTripSchedule> List<
+    ViaConnectionStopArrivalEventListener<T>
+  > createEventListeners(
     @Nullable ViaConnections viaConnections,
     McStopArrivalFactory<T> stopArrivalFactory,
     McStopArrivals<T> nextLegStopArrivals,

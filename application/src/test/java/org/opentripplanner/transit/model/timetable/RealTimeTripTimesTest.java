@@ -271,8 +271,10 @@ class RealTimeTripTimesTest {
     );
 
     assertFalse(updatedTripTimes.interpolateMissingTimes());
-    error =
-      assertThrows(DataValidationException.class, updatedTripTimes::validateNonIncreasingTimes);
+    error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()

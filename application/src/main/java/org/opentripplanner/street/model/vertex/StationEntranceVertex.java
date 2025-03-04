@@ -49,8 +49,7 @@ public class StationEntranceVertex extends OsmVertex {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(StationEntranceVertex.class)
+    return ToStringBuilder.of(StationEntranceVertex.class)
       .addNum("nodeId", nodeId)
       .addStr("code", code)
       .toString();

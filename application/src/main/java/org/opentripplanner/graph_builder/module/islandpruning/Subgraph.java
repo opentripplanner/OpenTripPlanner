@@ -90,7 +90,7 @@ class Subgraph {
   // distances between graph edges. This is good enough for our heuristics.
   double distanceFromOtherGraph(StreetIndex index, double searchRadius) {
     Vertex v = getRepresentativeVertex();
-    double xscale = Math.cos(v.getCoordinate().y * Math.PI / 180);
+    double xscale = Math.cos((v.getCoordinate().y * Math.PI) / 180);
     double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(searchRadius);
 
     Envelope envelope = new Envelope();

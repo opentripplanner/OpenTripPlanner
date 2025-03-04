@@ -7,8 +7,7 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 
 class ModeInputType {
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("Modes")
     .description(
       "Input format for specifying which modes will be allowed for this search. " +
@@ -16,8 +15,7 @@ class ModeInputType {
       "of foot and all transport modes will be allowed."
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("accessMode")
         .description(
           "The mode used to get from the origin to the access stops in the transit " +
@@ -28,8 +26,7 @@ class ModeInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("egressMode")
         .description(
           "The mode used to get from the egress stops in the transit network to" +
@@ -40,8 +37,7 @@ class ModeInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("directMode")
         .description(
           "The mode used to get from the origin to the destination directly, " +
@@ -52,8 +48,7 @@ class ModeInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("transportModes")
         .description(
           "The allowed modes for the transit part of the trip. Use an empty list to " +

@@ -39,8 +39,9 @@ class TransmodelGraph {
   final ExecutorService threadPool;
 
   TransmodelGraph(GraphQLSchema schema) {
-    this.threadPool =
-      Executors.newCachedThreadPool(OtpRequestThreadFactory.of("transmodel-api-%d"));
+    this.threadPool = Executors.newCachedThreadPool(
+      OtpRequestThreadFactory.of("transmodel-api-%d")
+    );
     this.indexSchema = schema;
   }
 
@@ -88,11 +89,10 @@ class TransmodelGraph {
     Instrumentation instrumentation = new MaxFieldsInResultInstrumentation(maxNumberOfResultFields);
 
     if (OTPFeature.ActuatorAPI.isOn()) {
-      instrumentation =
-        new ChainedInstrumentation(
-          new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, tracingTags),
-          instrumentation
-        );
+      instrumentation = new ChainedInstrumentation(
+        new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, tracingTags),
+        instrumentation
+      );
     }
     return instrumentation;
   }
@@ -114,8 +114,7 @@ class TransmodelGraph {
     String operationName,
     TransmodelRequestContext transmodelRequestContext
   ) {
-    return ExecutionInput
-      .newExecutionInput()
+    return ExecutionInput.newExecutionInput()
       .query(query)
       .operationName(operationName)
       .context(transmodelRequestContext)
@@ -128,8 +127,7 @@ class TransmodelGraph {
     Instrumentation instrumentation,
     ExecutionStrategy executionStrategy
   ) {
-    return GraphQL
-      .newGraphQL(indexSchema)
+    return GraphQL.newGraphQL(indexSchema)
       .instrumentation(instrumentation)
       .queryExecutionStrategy(executionStrategy)
       .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())

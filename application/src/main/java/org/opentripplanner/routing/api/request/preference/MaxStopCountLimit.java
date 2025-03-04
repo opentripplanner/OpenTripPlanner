@@ -53,8 +53,7 @@ public class MaxStopCountLimit {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(MaxStopCountLimit.class)
+    return ToStringBuilder.of(MaxStopCountLimit.class)
       .addNum("defaultLimit", defaultLimit, DEFAULT_LIMIT)
       .addObj("limitsForModes", limitsForModes, DEFAULT_FOR_MODES)
       .toString();

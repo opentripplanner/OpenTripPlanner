@@ -167,7 +167,8 @@ public class SiriEtBuilder {
       if (serviceDate != null) {
         dataFrameRefStructure.setValue(DateTimeFormatter.ISO_LOCAL_DATE.format(serviceDate));
       }
-      FramedVehicleJourneyRefStructure framedVehicleJourneyRefStructure = new FramedVehicleJourneyRefStructure();
+      FramedVehicleJourneyRefStructure framedVehicleJourneyRefStructure =
+        new FramedVehicleJourneyRefStructure();
       framedVehicleJourneyRefStructure.setDataFrameRef(dataFrameRefStructure);
       framedVehicleJourneyRefStructure.setDatedVehicleJourneyRef(vehicleJourneyRef);
       return framedVehicleJourneyRefStructure;

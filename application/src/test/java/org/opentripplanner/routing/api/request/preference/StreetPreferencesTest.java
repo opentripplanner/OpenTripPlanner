@@ -21,8 +21,7 @@ class StreetPreferencesTest {
   private static final IntersectionTraversalModel INTERSECTION_TRAVERSAL_MODEL =
     IntersectionTraversalModel.CONSTANT;
 
-  private final StreetPreferences subject = StreetPreferences
-    .of()
+  private final StreetPreferences subject = StreetPreferences.of()
     .withDrivingDirection(DRIVING_DIRECTION)
     .withTurnReluctance(TURN_RELUCTANCE)
     .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))

@@ -37,16 +37,14 @@ public final class VehicleParkingPreferences implements Serializable {
 
   private VehicleParkingPreferences(Builder builder) {
     this.unpreferredVehicleParkingTagCost = builder.unpreferredVehicleParkingTagCost;
-    this.filter =
-      new VehicleParkingFilter(
-        builder.bannedVehicleParkingTags,
-        builder.requiredVehicleParkingTags
-      );
-    this.preferred =
-      new VehicleParkingFilter(
-        builder.notPreferredVehicleParkingTags,
-        builder.preferredVehicleParkingTags
-      );
+    this.filter = new VehicleParkingFilter(
+      builder.bannedVehicleParkingTags,
+      builder.requiredVehicleParkingTags
+    );
+    this.preferred = new VehicleParkingFilter(
+      builder.notPreferredVehicleParkingTags,
+      builder.preferredVehicleParkingTags
+    );
     this.time = builder.time;
     this.cost = builder.cost;
   }
@@ -115,8 +113,7 @@ public final class VehicleParkingPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VehicleParkingPreferences.class)
+    return ToStringBuilder.of(VehicleParkingPreferences.class)
       .addObj(
         "unpreferredVehicleParkingTagCost",
         unpreferredVehicleParkingTagCost,
@@ -157,26 +154,30 @@ public final class VehicleParkingPreferences implements Serializable {
     }
 
     public Builder withBannedVehicleParkingTags(Set<String> bannedVehicleParkingTags) {
-      this.bannedVehicleParkingTags =
-        List.of(new VehicleParkingSelect.TagsSelect(bannedVehicleParkingTags));
+      this.bannedVehicleParkingTags = List.of(
+        new VehicleParkingSelect.TagsSelect(bannedVehicleParkingTags)
+      );
       return this;
     }
 
     public Builder withRequiredVehicleParkingTags(Set<String> requiredVehicleParkingTags) {
-      this.requiredVehicleParkingTags =
-        List.of(new VehicleParkingSelect.TagsSelect(requiredVehicleParkingTags));
+      this.requiredVehicleParkingTags = List.of(
+        new VehicleParkingSelect.TagsSelect(requiredVehicleParkingTags)
+      );
       return this;
     }
 
     public Builder withPreferredVehicleParkingTags(Set<String> preferredVehicleParkingTags) {
-      this.preferredVehicleParkingTags =
-        List.of(new VehicleParkingSelect.TagsSelect(preferredVehicleParkingTags));
+      this.preferredVehicleParkingTags = List.of(
+        new VehicleParkingSelect.TagsSelect(preferredVehicleParkingTags)
+      );
       return this;
     }
 
     public Builder withNotPreferredVehicleParkingTags(Set<String> notPreferredVehicleParkingTags) {
-      this.notPreferredVehicleParkingTags =
-        List.of(new VehicleParkingSelect.TagsSelect(notPreferredVehicleParkingTags));
+      this.notPreferredVehicleParkingTags = List.of(
+        new VehicleParkingSelect.TagsSelect(notPreferredVehicleParkingTags)
+      );
       return this;
     }
 

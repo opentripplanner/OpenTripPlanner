@@ -199,15 +199,14 @@ public class VertexLinker {
         tempEdges
       );
       if (streetVertices.isEmpty()) {
-        streetVertices =
-          linkToStreetEdges(
-            vertex,
-            traverseModes,
-            direction,
-            scope,
-            MAX_SEARCH_RADIUS_METERS,
-            tempEdges
-          );
+        streetVertices = linkToStreetEdges(
+          vertex,
+          traverseModes,
+          direction,
+          scope,
+          MAX_SEARCH_RADIUS_METERS,
+          tempEdges
+        );
       }
 
       for (StreetVertex streetVertex : streetVertices) {
@@ -294,7 +293,7 @@ public class VertexLinker {
   }
 
   private static double getXscale(Vertex vertex) {
-    return Math.cos(vertex.getLat() * Math.PI / 180);
+    return Math.cos((vertex.getLat() * Math.PI) / 180);
   }
 
   private Set<StreetVertex> linkToCandidateEdges(

@@ -46,8 +46,10 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     super(parameters.url(), JSON_PARSE_PATH, parameters.httpHeaders());
     this.feedId = parameters.feedId();
     this.staticTags = parameters.tags();
-    this.osmOpeningHoursParser =
-      new OsmOpeningHoursParser(openingHoursCalendarService, parameters.timeZone());
+    this.osmOpeningHoursParser = new OsmOpeningHoursParser(
+      openingHoursCalendarService,
+      parameters.timeZone()
+    );
     this.url = parameters.url();
   }
 
@@ -96,8 +98,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
       .map(c -> hasPlaces(capacity.getWheelchairAccessibleCarSpaces()))
       .orElse(false);
 
-    return VehicleParking
-      .builder()
+    return VehicleParking.builder()
       .id(vehicleParkId)
       .name(new NonLocalizedString(jsonNode.path("name").asText()))
       .state(state)
@@ -142,8 +143,7 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     Integer wheelchairAccessibleCarSpaces,
     Integer bicycleSpaces
   ) {
-    return VehicleParkingSpaces
-      .builder()
+    return VehicleParkingSpaces.builder()
       .bicycleSpaces(bicycleSpaces)
       .carSpaces(carSpaces)
       .wheelchairAccessibleCarSpaces(wheelchairAccessibleCarSpaces)
@@ -179,13 +179,12 @@ abstract class ParkAPIUpdater extends GenericJsonDataSource<VehicleParking> {
     if (jsonNode.has("id")) {
       id = jsonNode.path("id").asText();
     } else {
-      id =
-        String.format(
-          "%s/%f/%f",
-          jsonNode.get("name"),
-          jsonNode.path("coords").path("lng").asDouble(),
-          jsonNode.path("coords").path("lat").asDouble()
-        );
+      id = String.format(
+        "%s/%f/%f",
+        jsonNode.get("name"),
+        jsonNode.path("coords").path("lng").asDouble(),
+        jsonNode.path("coords").path("lat").asDouble()
+      );
     }
     return new FeedScopedId(feedId, id);
   }

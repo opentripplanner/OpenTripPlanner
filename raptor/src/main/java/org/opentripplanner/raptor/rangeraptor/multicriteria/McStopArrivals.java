@@ -140,11 +140,9 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
 
   private StopArrivalParetoSet<T> findOrCreateSet(final int stop) {
     if (arrivals[stop] == null) {
-      arrivals[stop] =
-        StopArrivalParetoSet
-          .of(comparator)
-          .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-          .build();
+      arrivals[stop] = StopArrivalParetoSet.of(comparator)
+        .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
+        .build();
     }
     return arrivals[stop];
   }
@@ -154,12 +152,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
   ) {
     for (ViaConnectionStopArrivalEventListener<T> it : viaConnectionListeners) {
       int stop = it.fromStop();
-      this.arrivals[stop] =
-        StopArrivalParetoSet
-          .of(comparator)
-          .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-          .withNextLegListener(it)
-          .build();
+      this.arrivals[stop] = StopArrivalParetoSet.of(comparator)
+        .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
+        .withNextLegListener(it)
+        .build();
     }
   }
 
@@ -179,12 +175,10 @@ public final class McStopArrivals<T extends RaptorTripSchedule> {
       .byStop()
       .forEachEntry((stop, list) -> {
         // The factory is creating the actual "glue"
-        this.arrivals[stop] =
-          StopArrivalParetoSet
-            .of(comparator)
-            .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
-            .withEgressListener(list, paths)
-            .build();
+        this.arrivals[stop] = StopArrivalParetoSet.of(comparator)
+          .withDebugListener(debugHandlerFactory.paretoSetStopArrivalListener(stop))
+          .withEgressListener(list, paths)
+          .build();
         return true;
       });
   }

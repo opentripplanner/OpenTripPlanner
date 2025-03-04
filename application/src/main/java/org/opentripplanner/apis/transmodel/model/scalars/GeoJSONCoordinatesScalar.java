@@ -27,8 +27,7 @@ public class GeoJSONCoordinatesScalar {
 
   private static final String DOCUMENTATION =
     "List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]";
-  private static final GraphQLScalarType INSTANCE = GraphQLScalarType
-    .newScalar()
+  private static final GraphQLScalarType INSTANCE = GraphQLScalarType.newScalar()
     .name("Coordinates")
     .description(DOCUMENTATION)
     .coercing(
@@ -57,11 +56,10 @@ public class GeoJSONCoordinatesScalar {
           Coordinate[] coordinates = new Coordinate[coordinateList.size()];
 
           for (int i = 0; i < coordinateList.size(); i++) {
-            coordinates[i] =
-              new Coordinate(
-                coordinateList.get(i).get(0).doubleValue(),
-                coordinateList.get(i).get(1).doubleValue()
-              );
+            coordinates[i] = new Coordinate(
+              coordinateList.get(i).get(0).doubleValue(),
+              coordinateList.get(i).get(1).doubleValue()
+            );
           }
 
           return coordinates;
@@ -78,11 +76,10 @@ public class GeoJSONCoordinatesScalar {
 
               FloatValue longitude = (FloatValue) v.getValues().get(0);
               FloatValue latitude = (FloatValue) v.getValues().get(1);
-              coordinates[i] =
-                new Coordinate(
-                  longitude.getValue().doubleValue(),
-                  latitude.getValue().doubleValue()
-                );
+              coordinates[i] = new Coordinate(
+                longitude.getValue().doubleValue(),
+                latitude.getValue().doubleValue()
+              );
             }
             return coordinates;
           }

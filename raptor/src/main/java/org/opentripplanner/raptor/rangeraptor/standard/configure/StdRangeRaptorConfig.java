@@ -106,17 +106,16 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private StdRangeRaptorWorkerState<T> resolveState() {
     if (state == null) {
-      this.state =
-        oneOf(
-          new StdRangeRaptorWorkerState<>(
-            ctx.calculator(),
-            resolveBestTimes(),
-            createStopArrivals(),
-            resolveBestNumberOfTransfers(),
-            resolveArrivedAtDestinationCheck()
-          ),
-          StdWorkerState.class
-        );
+      this.state = oneOf(
+        new StdRangeRaptorWorkerState<>(
+          ctx.calculator(),
+          resolveBestTimes(),
+          createStopArrivals(),
+          resolveBestNumberOfTransfers(),
+          resolveArrivedAtDestinationCheck()
+        ),
+        StdWorkerState.class
+      );
     }
     return (StdRangeRaptorWorkerState<T>) state;
   }
@@ -218,13 +217,12 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private StdStopArrivals<T> resolveStopArrivals() {
     if (stopArrivals == null) {
-      this.stopArrivals =
-        withBestNumberOfTransfers(
-          oneOf(
-            new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.lifeCycle()),
-            StdStopArrivals.class
-          )
-        );
+      this.stopArrivals = withBestNumberOfTransfers(
+        oneOf(
+          new StdStopArrivals<T>(ctx.nRounds(), ctx.nStops(), ctx.lifeCycle()),
+          StdStopArrivals.class
+        )
+      );
     }
     return stopArrivals;
   }

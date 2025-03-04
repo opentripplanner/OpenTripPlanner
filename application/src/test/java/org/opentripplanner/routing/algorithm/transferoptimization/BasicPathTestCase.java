@@ -173,33 +173,37 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final String LINE_21 = "L21";
   public static final String LINE_31 = "L31";
 
-  public static final TestTripSchedule TRIP_1 = TestTripSchedule
-    .schedule(TestTripPattern.pattern(LINE_11, STOP_A, STOP_B))
+  public static final TestTripSchedule TRIP_1 = TestTripSchedule.schedule(
+    TestTripPattern.pattern(LINE_11, STOP_A, STOP_B)
+  )
     .times(L11_START, L11_END)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final TestTripSchedule TRIP_2 = TestTripSchedule
-    .schedule(TestTripPattern.pattern(LINE_21, STOP_C, STOP_D))
+  public static final TestTripSchedule TRIP_2 = TestTripSchedule.schedule(
+    TestTripPattern.pattern(LINE_21, STOP_C, STOP_D)
+  )
     .times(L21_START, L21_END)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final TestTripSchedule TRIP_3 = TestTripSchedule
-    .schedule(TestTripPattern.pattern(LINE_31, STOP_D, STOP_E))
+  public static final TestTripSchedule TRIP_3 = TestTripSchedule.schedule(
+    TestTripPattern.pattern(LINE_31, STOP_D, STOP_E)
+  )
     // The early arrival and late departure should not have any effect on tests
     .arrivals(VERY_EARLY, L31_END)
     .departures(L31_START, VERY_LATE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_C1_SEC,
-    TRANSFER_C1_SEC,
-    WAIT_RELUCTANCE,
-    TRANSIT_RELUCTANCE,
-    STOP_C1S
-  );
+  public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR =
+    new DefaultCostCalculator<>(
+      BOARD_C1_SEC,
+      TRANSFER_C1_SEC,
+      WAIT_RELUCTANCE,
+      TRANSIT_RELUCTANCE,
+      STOP_C1S
+    );
 
   public static final int TOTAL_C1 =
     ACCESS_C1 + LINE_11_C1 + TX_C1 + LINE_21_C1 + LINE_31_C1 + EGRESS_C1;

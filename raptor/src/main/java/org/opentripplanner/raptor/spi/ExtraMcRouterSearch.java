@@ -35,5 +35,9 @@ public interface ExtraMcRouterSearch<T extends RaptorTripSchedule> {
    * You must provide a merge strategy to merge the main result (first argument) with the
    * alternative result(second argument). Make sure the end result does not have any duplicates.
    */
-  BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> merger();
+  BiFunction<
+    Collection<RaptorPath<T>>,
+    Collection<RaptorPath<T>>,
+    Collection<RaptorPath<T>>
+  > merger();
 }

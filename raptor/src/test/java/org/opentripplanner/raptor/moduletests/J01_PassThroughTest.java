@@ -193,10 +193,12 @@ class J01_PassThroughTest {
     // First one includes one pass-through stop point.
     // Second one include the second pass-through point.
     // Both arrive at the desired destination so normally there should not be any transfers.
-    var r1 = route("R1", STOP_A, STOP_B, STOP_C, STOP_F)
-      .withTimetable(schedule("0:02 0:05 0:10 0:20"));
-    var r2 = route("R2", STOP_C, STOP_D, STOP_E, STOP_F)
-      .withTimetable(schedule("0:15 0:20 0:30 0:50"));
+    var r1 = route("R1", STOP_A, STOP_B, STOP_C, STOP_F).withTimetable(
+      schedule("0:02 0:05 0:10 0:20")
+    );
+    var r2 = route("R2", STOP_C, STOP_D, STOP_E, STOP_F).withTimetable(
+      schedule("0:15 0:20 0:30 0:50")
+    );
 
     data.withRoutes(r1, r2);
     data.withTransferCost(100);
@@ -224,10 +226,12 @@ class J01_PassThroughTest {
 
     // Create two routes.
     // Both include all the desired pass-through stop points but only one of them have correct order.
-    var r1 = route("R1", STOP_A, STOP_B, STOP_C, STOP_D)
-      .withTimetable(schedule("0:05 0:10 0:15 0:20"));
-    var r2 = route("R2", STOP_A, STOP_C, STOP_B, STOP_D)
-      .withTimetable(schedule("0:05 0:10 0:15 0:17"));
+    var r1 = route("R1", STOP_A, STOP_B, STOP_C, STOP_D).withTimetable(
+      schedule("0:05 0:10 0:15 0:20")
+    );
+    var r2 = route("R2", STOP_A, STOP_C, STOP_B, STOP_D).withTimetable(
+      schedule("0:05 0:10 0:15 0:17")
+    );
 
     data.withRoutes(r1, r2);
 

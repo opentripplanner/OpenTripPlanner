@@ -50,15 +50,13 @@ public class TimetableHelperTest {
 
   @BeforeEach
   public void setUp() {
-    Station station = Station
-      .of(SCOPED_STATION_ID)
+    Station station = Station.of(SCOPED_STATION_ID)
       .withName(new NonLocalizedString(STATION_NAME))
       .withCoordinate(0.0, 0.0)
       .build();
 
     var stopTime = new StopTime();
-    RegularStop stop = SiteRepository
-      .of()
+    RegularStop stop = SiteRepository.of()
       .regularStop(SCOPED_STOP_ID)
       .withCoordinate(0.0, 0.0)
       .withParentStation(station)
@@ -67,8 +65,7 @@ public class TimetableHelperTest {
 
     Agency agency = Agency.of(SCOPED_AGENCY_ID).withName(AGENCY_NAME).withTimezone("CET").build();
 
-    Route route = Route
-      .of(SCOPED_LINE_ID)
+    Route route = Route.of(SCOPED_LINE_ID)
       .withShortName(LINE_SHORT_NAME)
       .withAgency(agency)
       .withMode(TransitMode.FUNICULAR)
@@ -82,8 +79,7 @@ public class TimetableHelperTest {
   public void testApplyUpdates_MapPredictionInaccurate_EstimatedCall() {
     // Arrange
 
-    CallWrapper estimatedCall = TestCall
-      .of()
+    CallWrapper estimatedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withCancellation(false)
       .withOccupancy(OccupancyEnumeration.SEATS_AVAILABLE)
@@ -101,8 +97,7 @@ public class TimetableHelperTest {
   public void testApplyUpdates_CancellationPriorityOverPredictionInaccurate_EstimatedCall() {
     // Arrange
 
-    CallWrapper estimatedCall = TestCall
-      .of()
+    CallWrapper estimatedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withCancellation(true)
       .withOccupancy(OccupancyEnumeration.FULL)
@@ -122,8 +117,7 @@ public class TimetableHelperTest {
     // Arrange
 
     ZonedDateTime actualTime = START_OF_SERVICE.plus(Duration.ofHours(1));
-    CallWrapper recordedCall = TestCall
-      .of()
+    CallWrapper recordedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withPredictionInaccurate(true)
       .withOccupancy(OccupancyEnumeration.FULL)
@@ -143,8 +137,7 @@ public class TimetableHelperTest {
   public void testApplyUpdates_PredictionInaccuratePriorityOverRecorded() {
     // Arrange
 
-    CallWrapper recordedCall = TestCall
-      .of()
+    CallWrapper recordedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withPredictionInaccurate(true)
       .withOccupancy(OccupancyEnumeration.FULL)
@@ -163,8 +156,7 @@ public class TimetableHelperTest {
   public void testApplyUpdates_ActualTimeResultsInRecorded() {
     // Arrange
 
-    CallWrapper recordedCall = TestCall
-      .of()
+    CallWrapper recordedCall = TestCall.of()
       .withStopPointRef(STOP_ID)
       .withPredictionInaccurate(false)
       .withOccupancy(OccupancyEnumeration.STANDING_AVAILABLE)

@@ -150,8 +150,7 @@ public class Transfer {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(Transfer.class)
+    return ToStringBuilder.of(Transfer.class)
       .addNum("toStop", toStop)
       .addNum("distance", distanceMeters, "m")
       .toString();

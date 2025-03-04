@@ -10,8 +10,7 @@ import javax.annotation.Nullable;
  * Tupple of main- and sub-mode.
  */
 public record MainAndSubMode(TransitMode mainMode, @Nullable SubMode subMode) {
-  private static final List<MainAndSubMode> ALL = Stream
-    .of(TransitMode.values())
+  private static final List<MainAndSubMode> ALL = Stream.of(TransitMode.values())
     .map(MainAndSubMode::new)
     .toList();
 

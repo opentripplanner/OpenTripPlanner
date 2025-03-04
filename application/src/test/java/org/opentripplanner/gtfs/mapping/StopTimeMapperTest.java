@@ -63,8 +63,9 @@ public class StopTimeMapperTest {
   private static final Trip TRIP = new GtfsTestData().trip;
 
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
-  private static final List<LngLatAlt> ZONE_COORDINATES = Arrays
-    .stream(Polygons.BERLIN.getCoordinates())
+  private static final List<LngLatAlt> ZONE_COORDINATES = Arrays.stream(
+    Polygons.BERLIN.getCoordinates()
+  )
     .map(c -> new LngLatAlt(c.x, c.y))
     .toList();
 

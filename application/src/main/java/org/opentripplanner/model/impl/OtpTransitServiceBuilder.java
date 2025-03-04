@@ -80,7 +80,8 @@ public class OtpTransitServiceBuilder {
 
   private final SiteRepositoryBuilder siteRepositoryBuilder;
 
-  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
+  private final Multimap<AbstractTransitEntity, Notice> noticeAssignments =
+    ArrayListMultimap.create();
 
   private final EntityById<Operator> operatorsById = new DefaultEntityById<>();
 
@@ -114,7 +115,8 @@ public class OtpTransitServiceBuilder {
 
   private final EntityById<Branding> brandingsById = new DefaultEntityById<>();
 
-  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap.create();
+  private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId =
+    ArrayListMultimap.create();
 
   private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 

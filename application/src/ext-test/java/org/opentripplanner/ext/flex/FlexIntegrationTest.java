@@ -42,9 +42,9 @@ public class FlexIntegrationTest {
 
   public static final GenericLocation OUTSIDE_FLEX_ZONE = new GenericLocation(33.7552, -84.4631);
   public static final GenericLocation INSIDE_FLEX_ZONE = new GenericLocation(33.8694, -84.6233);
-  static Instant dateTime = ZonedDateTime
-    .parse("2021-12-02T12:00:00-05:00[America/New_York]")
-    .toInstant();
+  static Instant dateTime = ZonedDateTime.parse(
+    "2021-12-02T12:00:00-05:00[America/New_York]"
+  ).toInstant();
 
   static Graph graph;
 
@@ -207,8 +207,7 @@ public class FlexIntegrationTest {
       DataImportIssueStore.NOOP,
       Duration.ofMinutes(10),
       List.of(req)
-    )
-      .buildGraph();
+    ).buildGraph();
 
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());

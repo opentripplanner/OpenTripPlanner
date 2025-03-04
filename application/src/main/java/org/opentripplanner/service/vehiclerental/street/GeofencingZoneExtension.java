@@ -31,10 +31,8 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
     if (state.isRentingVehicle()) {
       return (
         zone.traversalBanned() &&
-        (
-          state.unknownRentalNetwork() ||
-          zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
-        )
+        (state.unknownRentalNetwork() ||
+          zone.id().getFeedId().equals(state.getVehicleRentalNetwork()))
       );
     } else {
       return false;

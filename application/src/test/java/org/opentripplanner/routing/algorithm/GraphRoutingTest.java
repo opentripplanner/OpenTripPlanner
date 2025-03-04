@@ -228,8 +228,7 @@ public abstract class GraphRoutingTest {
 
     // -- Transit network (pathways, linking)
     public Entrance entranceEntity(String id, double latitude, double longitude) {
-      return Entrance
-        .of(TimetableRepositoryForTest.id(id))
+      return Entrance.of(TimetableRepositoryForTest.id(id))
         .withName(new NonLocalizedString(id))
         .withCode(id)
         .withCoordinate(latitude, longitude)
@@ -445,8 +444,7 @@ public abstract class GraphRoutingTest {
       List<VehicleParkingEntranceCreator> entrances,
       String... tags
     ) {
-      var vehicleParking = VehicleParking
-        .builder()
+      var vehicleParking = VehicleParking.builder()
         .id(TimetableRepositoryForTest.id(id))
         .coordinate(new WgsCoordinate(y, x))
         .bicyclePlaces(bicyclePlaces)

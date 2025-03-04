@@ -144,8 +144,7 @@ public final class CarPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(CarPreferences.class)
+    return ToStringBuilder.of(CarPreferences.class)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addObj("boardCost", boardCost, DEFAULT.boardCost)
       .addObj("parking", parking, DEFAULT.parking)

@@ -26,8 +26,7 @@ public class TestBanning {
   public void testSetBannedOnRequest() {
     Collection<TripPattern> patterns = getTestPatterns();
 
-    var filterRequest = TransitFilterRequest
-      .of()
+    var filterRequest = TransitFilterRequest.of()
       .addNot(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
       .addNot(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
       .build();
@@ -43,8 +42,7 @@ public class TestBanning {
   public void testSetWhiteListedOnRequest() {
     Collection<TripPattern> patterns = getTestPatterns();
 
-    var filterRequest = TransitFilterRequest
-      .of()
+    var filterRequest = TransitFilterRequest.of()
       .addSelect(SelectRequest.of().withRoutes(List.of(id("RUT:Route:1"))).build())
       .addSelect(SelectRequest.of().withAgencies(List.of(id("RUT:Agency:2"))).build())
       .build();
@@ -56,13 +54,11 @@ public class TestBanning {
   }
 
   private List<TripPattern> getTestPatterns() {
-    Agency agency1 = TimetableRepositoryForTest
-      .agency("A")
+    Agency agency1 = TimetableRepositoryForTest.agency("A")
       .copy()
       .withId(id("RUT:Agency:1"))
       .build();
-    Agency agency2 = TimetableRepositoryForTest
-      .agency("B")
+    Agency agency2 = TimetableRepositoryForTest.agency("B")
       .copy()
       .withId(id("RUT:Agency:2"))
       .build();
@@ -73,16 +69,13 @@ public class TestBanning {
 
     final StopPattern stopPattern = TimetableRepositoryForTest.of().stopPattern(2);
     return List.of(
-      TimetableRepositoryForTest
-        .tripPattern("RUT:JourneyPattern:1", route1)
+      TimetableRepositoryForTest.tripPattern("RUT:JourneyPattern:1", route1)
         .withStopPattern(stopPattern)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern("RUT:JourneyPattern:2", route2)
+      TimetableRepositoryForTest.tripPattern("RUT:JourneyPattern:2", route2)
         .withStopPattern(stopPattern)
         .build(),
-      TimetableRepositoryForTest
-        .tripPattern("RUT:JourneyPattern:3", route3)
+      TimetableRepositoryForTest.tripPattern("RUT:JourneyPattern:3", route3)
         .withStopPattern(stopPattern)
         .build()
     );

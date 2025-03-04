@@ -163,9 +163,10 @@ public class StreetIndex {
   public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
     return edgeSpatialIndex
       .query(envelope, Scope.PERMANENT)
-      .filter(e ->
-        e.isReachableFromGraph() &&
-        envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
+      .filter(
+        e ->
+          e.isReachableFromGraph() &&
+          envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
       )
       .toList();
   }
@@ -191,13 +192,12 @@ public class StreetIndex {
       if (location.stopId != null && location.getCoordinate() == null) {
         var coordinate = siteRepository.getCoordinateById(location.stopId);
         if (coordinate != null) {
-          location =
-            new GenericLocation(
-              location.label,
-              location.stopId,
-              coordinate.latitude(),
-              coordinate.longitude()
-            );
+          location = new GenericLocation(
+            location.label,
+            location.stopId,
+            coordinate.latitude(),
+            coordinate.longitude()
+          );
         }
       }
     } else {

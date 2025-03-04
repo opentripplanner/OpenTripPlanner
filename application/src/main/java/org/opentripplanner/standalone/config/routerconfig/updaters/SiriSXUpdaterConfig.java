@@ -14,9 +14,9 @@ public class SiriSXUpdaterConfig {
     Use the file protocol to set a directory for reading updates from a directory. The file
     loader will look for xml files: '*.xml' in the configured directory. The files are
     renamed by the loader when processed:
-    
+
     &nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
-    
+
     """;
 
   public static SiriSXUpdaterParameters create(String configRef, NodeAdapter c) {

@@ -34,9 +34,9 @@ class TripPatternForDateTest {
   );
 
   static Stream<Arguments> testCases() {
-    return Stream
-      .of(List.of(new FrequencyEntry(new Frequency(), tripTimes)), List.of())
-      .map(Arguments::of);
+    return Stream.of(List.of(new FrequencyEntry(new Frequency(), tripTimes)), List.of()).map(
+      Arguments::of
+    );
   }
 
   @ParameterizedTest(name = "trip with frequencies {0} should be correctly filtered")
@@ -45,8 +45,7 @@ class TripPatternForDateTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    RoutingTripPattern tripPattern = TripPattern
-      .of(TimetableRepositoryForTest.id("P1"))
+    RoutingTripPattern tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
       .withRoute(ROUTE)
       .withStopPattern(stopPattern)
       .build()

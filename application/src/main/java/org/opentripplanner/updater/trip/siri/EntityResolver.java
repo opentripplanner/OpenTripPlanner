@@ -126,7 +126,8 @@ public class EntityResolver {
   public FeedScopedId resolveDatedServiceJourneyId(
     EstimatedVehicleJourney estimatedVehicleJourney
   ) {
-    DatedVehicleJourneyRef datedVehicleJourneyRef = estimatedVehicleJourney.getDatedVehicleJourneyRef();
+    DatedVehicleJourneyRef datedVehicleJourneyRef =
+      estimatedVehicleJourney.getDatedVehicleJourneyRef();
     if (datedVehicleJourneyRef != null) {
       return resolveId(datedVehicleJourneyRef.getValue());
     }
@@ -230,8 +231,7 @@ public class EntityResolver {
       }
     }
 
-    var datetime = CallWrapper
-      .of(vehicleJourney)
+    var datetime = CallWrapper.of(vehicleJourney)
       .stream()
       .findFirst()
       .map(CallWrapper::getAimedDepartureTime);

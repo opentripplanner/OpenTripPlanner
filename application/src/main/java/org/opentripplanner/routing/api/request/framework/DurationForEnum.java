@@ -68,8 +68,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
   @Override
   public String toString() {
-    var builder = ValueObjectToStringBuilder
-      .of()
+    var builder = ValueObjectToStringBuilder.of()
       .addText("DurationFor" + type.getSimpleName() + "{")
       .addText("default:")
       .addDuration(defaultValue);

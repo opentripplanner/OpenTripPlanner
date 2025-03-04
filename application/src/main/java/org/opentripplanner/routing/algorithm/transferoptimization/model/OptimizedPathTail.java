@@ -51,13 +51,13 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   ) {
     super(slackProvider, iterationDepartureTime, costCalculator, stopNameResolver, null);
     this.waitTimeCostCalculator = waitTimeCostCalculator;
-    this.stopPriorityCostCalculator =
-      (stopBoardAlightTransferCosts != null && extraStopBoardAlightCostsFactor > 0.01)
-        ? new StopPriorityCostCalculator(
-          extraStopBoardAlightCostsFactor,
-          stopBoardAlightTransferCosts
-        )
-        : null;
+    this.stopPriorityCostCalculator = (stopBoardAlightTransferCosts != null &&
+        extraStopBoardAlightCostsFactor > 0.01)
+      ? new StopPriorityCostCalculator(
+        extraStopBoardAlightCostsFactor,
+        stopBoardAlightTransferCosts
+      )
+      : null;
   }
 
   private OptimizedPathTail(OptimizedPathTail<T> other) {
@@ -215,16 +215,19 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
     if (skipCostCalc()) {
       return;
     }
-    this.generalizedCost =
-      legsAsStream().mapToInt(it -> it.c1(costCalculator(), slackProvider())).sum();
+    this.generalizedCost = legsAsStream()
+      .mapToInt(it -> it.c1(costCalculator(), slackProvider()))
+      .sum();
   }
 
   /*private methods */
 
   private void addTransferPriorityCost(PathBuilderLeg<T> pathLeg) {
     boolean transferExist = pathLeg.isTransit() && pathLeg.nextTransitLeg() != null;
-    this.transferPriorityCost +=
-      OptimizedPath.priorityCost(transferExist, pathLeg::constrainedTransferAfterLeg);
+    this.transferPriorityCost += OptimizedPath.priorityCost(
+      transferExist,
+      pathLeg::constrainedTransferAfterLeg
+    );
   }
 
   /**

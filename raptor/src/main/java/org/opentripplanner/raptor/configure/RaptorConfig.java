@@ -106,8 +106,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
 
     if (request.searchParams().isVisitViaSearch()) {
       for (SearchContextViaLeg<T> cxLeg : context.legs().reversed()) {
-        var c = new McRangeRaptorConfig<>(cxLeg, passThroughPointsService)
-          .connectWithNextLegArrivals(nextStopArrivals);
+        var c = new McRangeRaptorConfig<>(
+          cxLeg,
+          passThroughPointsService
+        ).connectWithNextLegArrivals(nextStopArrivals);
         var w = createWorker(cxLeg, c.state(), c.strategy());
         worker = RangeRaptorWorkerComposite.of(w, worker);
         nextStopArrivals = c.stopArrivals();

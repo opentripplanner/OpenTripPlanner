@@ -48,12 +48,9 @@ class HttpTripUpdateSource {
     updateIncrementality = FULL_DATASET;
     try {
       // Decode message
-      feedMessage =
-        otpHttpClient.getAndMap(
-          URI.create(url),
-          this.headers.asMap(),
-          is -> FeedMessage.parseFrom(is, registry)
-        );
+      feedMessage = otpHttpClient.getAndMap(URI.create(url), this.headers.asMap(), is ->
+        FeedMessage.parseFrom(is, registry)
+      );
       feedEntityList = feedMessage.getEntityList();
 
       // Change fullDataset value if this is an incremental update
@@ -81,8 +78,7 @@ class HttpTripUpdateSource {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addStr("feedId", feedId)
       .addStr("url", url)
       .toString();

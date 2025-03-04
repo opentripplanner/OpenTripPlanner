@@ -12,8 +12,7 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class UpdatedTimesTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_INPUT = TripInput
-    .of(TRIP_1_ID)
+  private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();
@@ -68,14 +67,13 @@ class UpdatedTimesTest implements RealtimeTestConstants {
   }
 
   private static SiriEtBuilder updatedJourneyBuilder(RealtimeTestEnvironment env) {
-    return new SiriEtBuilder(env.getDateTimeHelper())
-      .withEstimatedCalls(builder ->
-        builder
-          .call(STOP_A1)
-          .departAimedExpected("00:00:11", "00:00:15")
-          .call(STOP_B1)
-          .arriveAimedExpected("00:00:20", "00:00:25")
-      );
+    return new SiriEtBuilder(env.getDateTimeHelper()).withEstimatedCalls(builder ->
+      builder
+        .call(STOP_A1)
+        .departAimedExpected("00:00:11", "00:00:15")
+        .call(STOP_B1)
+        .arriveAimedExpected("00:00:20", "00:00:25")
+    );
   }
 
   private static void assertTripUpdated(RealtimeTestEnvironment env) {

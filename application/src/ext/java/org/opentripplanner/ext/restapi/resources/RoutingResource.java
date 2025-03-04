@@ -769,27 +769,23 @@ public abstract class RoutingResource {
         setIfNotNull(bannedTrips, journey.transit()::setBannedTripsFromString);
 
         // Excluded entities
-        setIfNotNull(
-          bannedAgencies,
-          s -> filterBuilder.addNot(SelectRequest.of().withAgenciesFromString(s).build())
+        setIfNotNull(bannedAgencies, s ->
+          filterBuilder.addNot(SelectRequest.of().withAgenciesFromString(s).build())
         );
 
-        setIfNotNull(
-          bannedRoutes,
-          s -> filterBuilder.addNot(SelectRequest.of().withRoutesFromString(s).build())
+        setIfNotNull(bannedRoutes, s ->
+          filterBuilder.addNot(SelectRequest.of().withRoutesFromString(s).build())
         );
 
         // Included entities
         var selectors = new ArrayList<SelectRequest.Builder>();
 
-        setIfNotNull(
-          whiteListedAgencies,
-          s -> selectors.add(SelectRequest.of().withAgenciesFromString(s))
+        setIfNotNull(whiteListedAgencies, s ->
+          selectors.add(SelectRequest.of().withAgenciesFromString(s))
         );
 
-        setIfNotNull(
-          whiteListedRoutes,
-          s -> selectors.add(SelectRequest.of().withRoutesFromString(s))
+        setIfNotNull(whiteListedRoutes, s ->
+          selectors.add(SelectRequest.of().withRoutesFromString(s))
         );
 
         List<MainAndSubMode> tModes;

@@ -116,8 +116,7 @@ class SiriFuzzyTripMatcherTest {
   }
 
   private static TripInput tripInput(String trip1Id) {
-    return TripInput
-      .of(trip1Id)
+    return TripInput.of(trip1Id)
       .addStop(STOP_A1, "0:10:00", "0:10:00")
       .addStop(STOP_B1, "0:20:00", "0:20:00")
       .build();

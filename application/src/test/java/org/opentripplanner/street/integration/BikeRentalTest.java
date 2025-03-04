@@ -587,22 +587,17 @@ public class BikeRentalTest extends GraphRoutingTest {
     boolean useAvailabilityInformation,
     int keepRentedBicycleCost
   ) {
-    return runStreetSearchAndCreateDescriptor(
-      fromVertex,
-      toVertex,
-      arriveBy,
-      options -> {
-        options.withPreferences(preferences ->
-          preferences.withBike(bike ->
-            bike.withRental(rental -> {
-              rental.withUseAvailabilityInformation(useAvailabilityInformation);
-              rental.withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
-              rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
-            })
-          )
-        );
-      }
-    );
+    return runStreetSearchAndCreateDescriptor(fromVertex, toVertex, arriveBy, options -> {
+      options.withPreferences(preferences ->
+        preferences.withBike(bike ->
+          bike.withRental(rental -> {
+            rental.withUseAvailabilityInformation(useAvailabilityInformation);
+            rental.withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
+            rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
+          })
+        )
+      );
+    });
   }
 
   private List<String> runStreetSearchAndCreateDescriptor(
@@ -641,8 +636,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     RouteRequest options,
     StreetMode streetMode
   ) {
-    var tree = StreetSearchBuilder
-      .of()
+    var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(new StreetRequest(streetMode))

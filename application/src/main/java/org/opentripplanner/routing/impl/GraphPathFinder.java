@@ -83,8 +83,7 @@ public class GraphPathFinder {
   ) {
     StreetPreferences preferences = request.preferences().street();
 
-    StreetSearchBuilder aStar = StreetSearchBuilder
-      .of()
+    StreetSearchBuilder aStar = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .setSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(

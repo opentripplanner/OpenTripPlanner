@@ -79,8 +79,7 @@ public class WorldEnvelope implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(WorldEnvelope.class)
+    return ToStringBuilder.of(WorldEnvelope.class)
       .addObj("lowerLeft", lowerLeft)
       .addObj("upperRight", upperRight)
       .addObj("meanCenter", meanCenter)

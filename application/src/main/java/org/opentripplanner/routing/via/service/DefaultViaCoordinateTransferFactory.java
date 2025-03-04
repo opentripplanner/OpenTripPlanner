@@ -63,21 +63,20 @@ public class DefaultViaCoordinateTransferFactory implements ViaCoordinateTransfe
 
       var m = mapTransferMode(request.journey().modes().transferMode);
 
-      tempEdges =
-        graph
-          .getLinker()
-          .linkVertexForRequest(
-            viaVertex,
-            new TraverseModeSet(m),
-            LinkingDirection.BIDIRECTIONAL,
-            (via, street) -> {
-              var v = (TemporaryStreetLocation) via;
-              return List.of(
-                TemporaryFreeEdge.createTemporaryFreeEdge(street, v),
-                TemporaryFreeEdge.createTemporaryFreeEdge(v, street)
-              );
-            }
-          );
+      tempEdges = graph
+        .getLinker()
+        .linkVertexForRequest(
+          viaVertex,
+          new TraverseModeSet(m),
+          LinkingDirection.BIDIRECTIONAL,
+          (via, street) -> {
+            var v = (TemporaryStreetLocation) via;
+            return List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(street, v),
+              TemporaryFreeEdge.createTemporaryFreeEdge(v, street)
+            );
+          }
+        );
 
       var toStops = findNearbyStops(nearbyStopFinder, viaVertex, request, false);
       var fromStops = findNearbyStops(nearbyStopFinder, viaVertex, request, true);

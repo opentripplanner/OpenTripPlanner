@@ -51,8 +51,10 @@ public class TripCalendarBuilderTest {
   private static final String SJ_2 = "SJ-2";
   private static final String SJ_3 = "SJ-3";
 
-  private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
-  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS =
+    new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS =
+    new HierarchicalMapById<>();
   public static final String OD_1 = "OD-1";
 
   private final DataImportIssueStore issueStore = DataImportIssueStore.NOOP;

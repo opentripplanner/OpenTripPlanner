@@ -70,8 +70,7 @@ public class GrizzlyServer {
     // will use a more efficient fixed-size thread pool implementation.
     // TODO we should probably use Grizzly async processing rather than tying up the HTTP handler threads.
     int nHandlerThreads = getMaxThreads();
-    ThreadPoolConfig threadPoolConfig = ThreadPoolConfig
-      .defaultConfig()
+    ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
       .setPoolName("grizzly")
       .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("grizzly-%d").build())
       .setCorePoolSize(nHandlerThreads)

@@ -17,15 +17,13 @@ public class TransferTestData {
   static final int POS_3 = 3;
   static final int ANY_POS = 999;
 
-  static final RegularStop STOP_A = TEST_MODEL
-    .stop("A", 60.0, 11.0)
+  static final RegularStop STOP_A = TEST_MODEL.stop("A", 60.0, 11.0)
     .build()
     .copy()
     .withParentStation(STATION)
     .build();
   static final RegularStop STOP_B = TEST_MODEL.stop("B", 60.0, 11.0).build();
-  static final RegularStop STOP_S = TEST_MODEL
-    .stop("S", 60.0, 11.0)
+  static final RegularStop STOP_S = TEST_MODEL.stop("S", 60.0, 11.0)
     .build()
     .copy()
     .withParentStation(STATION)

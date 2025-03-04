@@ -36,8 +36,10 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     RealtimeVehicleRepository realtimeVehicleRepository
   ) {
     super(params);
-    this.vehiclePositionSource =
-      new GtfsRealtimeHttpVehiclePositionSource(params.url(), params.headers());
+    this.vehiclePositionSource = new GtfsRealtimeHttpVehiclePositionSource(
+      params.url(),
+      params.headers()
+    );
     this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.feedId = params.feedId();
     this.fuzzyTripMatching = params.fuzzyTripMatching();

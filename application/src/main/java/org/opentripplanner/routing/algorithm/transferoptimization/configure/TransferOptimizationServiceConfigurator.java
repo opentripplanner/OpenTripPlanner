@@ -58,9 +58,9 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   /**
    * Scope: Request
    */
-  public static <
-    T extends RaptorTripSchedule
-  > OptimizeTransferService<T> createOptimizeTransferService(
+  public static <T extends RaptorTripSchedule> OptimizeTransferService<
+    T
+  > createOptimizeTransferService(
     IntFunction<StopLocation> stopLookup,
     RaptorStopNameResolver stopNameResolver,
     TransferService transferService,
@@ -77,8 +77,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       stopBoardAlightTransferCosts,
       config,
       viaLocations
-    )
-      .createOptimizeTransferService();
+    ).createOptimizeTransferService();
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {
@@ -148,8 +147,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     var filter = new MinCostPathTailFilterFactory<T>(
       config.optimizeTransferPriority(),
       config.optimizeTransferWaitTime()
-    )
-      .createFilter();
+    ).createFilter();
 
     if (!viaLocations.isEmpty()) {
       filter = new PassThroughPathTailFilter<>(filter, viaLocations);

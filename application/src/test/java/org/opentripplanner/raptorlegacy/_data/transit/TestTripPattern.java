@@ -148,8 +148,7 @@ public class TestTripPattern implements DefaultTripPattern {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestTripPattern.class)
+    return ToStringBuilder.of(TestTripPattern.class)
       .addStr("name", name)
       .addInts("stops", stopIndexes)
       .addInts("restrictions", restrictions)

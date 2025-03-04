@@ -204,17 +204,15 @@ public class GroupByDistanceTest implements PlanTestConstants {
 
   @Test
   public void illegalRangeForPUpperBound() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
+    assertThrows(IllegalArgumentException.class, () ->
+      new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.991)
     );
   }
 
   @Test
   public void illegalRangeForPLowerBound() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
+    assertThrows(IllegalArgumentException.class, () ->
+      new GroupByDistance(newItinerary(A).bus(21, T11_01, T11_02, E).build(), 0.499)
     );
   }
 
