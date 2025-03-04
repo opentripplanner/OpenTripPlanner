@@ -24,8 +24,7 @@ final class PageCursorSerializer {
   private static final String CUT_N_TRANSFERS_FIELD = "cutTx";
   private static final String CUT_COST_FIELD = "cutCost";
 
-  private static final TokenSchema SCHEMA_TOKEN = TokenSchema
-    .ofVersion(VERSION)
+  private static final TokenSchema SCHEMA_TOKEN = TokenSchema.ofVersion(VERSION)
     .addEnum(TYPE_FIELD)
     .addTimeInstant(EDT_FIELD)
     .addTimeInstant(LAT_FIELD)
@@ -43,8 +42,7 @@ final class PageCursorSerializer {
 
   @Nullable
   public static String encode(PageCursor cursor) {
-    var tokenBuilder = SCHEMA_TOKEN
-      .encode()
+    var tokenBuilder = SCHEMA_TOKEN.encode()
       .withEnum(TYPE_FIELD, cursor.type())
       .withTimeInstant(EDT_FIELD, cursor.earliestDepartureTime())
       .withTimeInstant(LAT_FIELD, cursor.latestArrivalTime())
@@ -86,14 +84,13 @@ final class PageCursorSerializer {
       var cutDepartureTime = token.getTimeInstant(CUT_DEPARTURE_TIME_FIELD);
 
       if (cutDepartureTime != null) {
-        itineraryPageCut =
-          new DeduplicationPageCut(
-            cutDepartureTime,
-            token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
-            token.getInt(CUT_COST_FIELD),
-            token.getInt(CUT_N_TRANSFERS_FIELD),
-            token.getBoolean(CUT_ON_STREET_FIELD)
-          );
+        itineraryPageCut = new DeduplicationPageCut(
+          cutDepartureTime,
+          token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
+          token.getInt(CUT_COST_FIELD),
+          token.getInt(CUT_N_TRANSFERS_FIELD),
+          token.getBoolean(CUT_ON_STREET_FIELD)
+        );
       }
 
       // Add logic to read in data from next version here.

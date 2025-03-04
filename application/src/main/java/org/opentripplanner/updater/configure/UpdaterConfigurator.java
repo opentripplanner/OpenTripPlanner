@@ -87,8 +87,7 @@ public class UpdaterConfigurator {
       timetableRepository,
       snapshotManager,
       updatersParameters
-    )
-      .configure();
+    ).configure();
   }
 
   private void configure() {
@@ -152,7 +151,8 @@ public class UpdaterConfigurator {
    * @return a list of GraphUpdaters created from the configuration
    */
   private List<GraphUpdater> createUpdatersFromConfig() {
-    OpeningHoursCalendarService openingHoursCalendarService = graph.getOpeningHoursCalendarService();
+    OpeningHoursCalendarService openingHoursCalendarService =
+      graph.getOpeningHoursCalendarService();
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
@@ -230,10 +230,8 @@ public class UpdaterConfigurator {
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      LocalDate.now(timetableRepository.getTimeZone())
     );
   }
 

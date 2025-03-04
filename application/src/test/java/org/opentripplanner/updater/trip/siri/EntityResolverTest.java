@@ -19,8 +19,7 @@ class EntityResolverTest {
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final RegularStop STOP_1 = TEST_MODEL.stop("stop-1").build();
   private static final RegularStop STOP_2 = TEST_MODEL.stop("stop-2").build();
-  private static final SiteRepository SITE_REPOSITORY = TEST_MODEL
-    .siteRepositoryBuilder()
+  private static final SiteRepository SITE_REPOSITORY = TEST_MODEL.siteRepositoryBuilder()
     .withRegularStops(List.of(STOP_1, STOP_2))
     .build();
   private static final String FEED_ID = STOP_1.getId().getFeedId();

@@ -126,8 +126,7 @@ class TestConstrainedTransfer
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestConstrainedTransfer.class)
+    return ToStringBuilder.of(TestConstrainedTransfer.class)
       .addObj("sourceTrip", sourceTrip)
       .addNum("sourceStopPos", sourceStopPos)
       .addObj("targetTrip", targetTrip)

@@ -27,9 +27,12 @@ public final class ConstrainedBoardingSearch
    */
   private static final int ABORT_SEARCH_AFTER_N_VALID_NORMAL_TRIPS = 5;
 
-  private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY = new ConstrainedBoardingSearchForward();
-  private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY = new ConstrainedBoardingSearchReverse();
-  public static final RaptorConstrainedBoardingSearch<TripSchedule> NOOP_SEARCH = new NoopRaptorConstrainedBoardingSearch();
+  private static final ConstrainedBoardingSearchStrategy FORWARD_STRATEGY =
+    new ConstrainedBoardingSearchForward();
+  private static final ConstrainedBoardingSearchStrategy REVERSE_STRATEGY =
+    new ConstrainedBoardingSearchReverse();
+  public static final RaptorConstrainedBoardingSearch<TripSchedule> NOOP_SEARCH =
+    new NoopRaptorConstrainedBoardingSearch();
 
   /** Handle forward and reverse specific tasks */
   private final ConstrainedBoardingSearchStrategy searchStrategy;
@@ -163,7 +166,7 @@ public final class ConstrainedBoardingSearch
     boolean useNextNormalTrip = false;
 
     var index = searchStrategy.scheduleIndexIterator(timetable);
-    outer:while (index.hasNext()) {
+    outer: while (index.hasNext()) {
       onTripIndex = index.next();
       var it = timetable.getTripSchedule(onTripIndex);
 
@@ -181,13 +184,12 @@ public final class ConstrainedBoardingSearch
       for (TransferForPattern tx : transfers) {
         onTripTxConstraint = (TransferConstraint) tx.getTransferConstraint();
 
-        onTripEarliestBoardTime =
-          onTripTxConstraint.calculateTransferTargetTime(
-            sourceTransitArrivalTime,
-            transferSlack,
-            () -> earliestBoardTime,
-            searchStrategy.direction()
-          );
+        onTripEarliestBoardTime = onTripTxConstraint.calculateTransferTargetTime(
+          sourceTransitArrivalTime,
+          transferSlack,
+          () -> earliestBoardTime,
+          searchStrategy.direction()
+        );
 
         if (!onTripTxConstraint.isFacilitated()) {
           if (searchStrategy.timeIsBefore(time, onTripEarliestBoardTime)) {

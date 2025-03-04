@@ -25,8 +25,7 @@ class DelayedTest implements RealtimeTestConstants {
 
   @Test
   void singleStopDelay() {
-    var TRIP_INPUT = TripInput
-      .of(TRIP_1_ID)
+    var TRIP_INPUT = TripInput.of(TRIP_1_ID)
       .addStop(STOP_A1, "0:00:10", "0:00:11")
       .addStop(STOP_B1, "0:00:20", "0:00:21")
       .build();
@@ -72,8 +71,7 @@ class DelayedTest implements RealtimeTestConstants {
    */
   @Test
   void complexDelay() {
-    var tripInput = TripInput
-      .of(TRIP_2_ID)
+    var tripInput = TripInput.of(TRIP_2_ID)
       .addStop(STOP_A1, "0:01:00", "0:01:01")
       .addStop(STOP_B1, "0:01:10", "0:01:11")
       .addStop(STOP_C1, "0:01:20", "0:01:21")

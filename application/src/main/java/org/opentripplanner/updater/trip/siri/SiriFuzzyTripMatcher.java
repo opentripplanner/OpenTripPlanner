@@ -108,8 +108,10 @@ public class SiriFuzzyTripMatcher {
       var lineRef = journey.getLineRef().getValue();
       Route route = entityResolver.resolveRoute(lineRef);
       if (route != null) {
-        trips =
-          trips.stream().filter(trip -> trip.getRoute().equals(route)).collect(Collectors.toSet());
+        trips = trips
+          .stream()
+          .filter(trip -> trip.getRoute().equals(route))
+          .collect(Collectors.toSet());
       }
     }
 

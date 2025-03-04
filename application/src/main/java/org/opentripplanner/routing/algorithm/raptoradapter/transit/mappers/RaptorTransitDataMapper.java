@@ -75,8 +75,10 @@ public class RaptorTransitDataMapper {
 
     TransferIndexGenerator transferIndexGenerator = null;
     if (OTPFeature.TransferConstraints.isOn()) {
-      transferIndexGenerator =
-        new TransferIndexGenerator(transitService.getTransferService().listAll(), allTripPatterns);
+      transferIndexGenerator = new TransferIndexGenerator(
+        transitService.getTransferService().listAll(),
+        allTripPatterns
+      );
       constrainedTransfers = transferIndexGenerator.generateTransfers();
     }
 

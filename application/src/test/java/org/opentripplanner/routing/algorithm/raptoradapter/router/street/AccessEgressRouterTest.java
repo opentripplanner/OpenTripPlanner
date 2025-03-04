@@ -47,25 +47,29 @@ class AccessEgressRouterTest extends GraphRoutingTest {
           biStreet(C, D, 100);
           biStreet(farAway, A, 1000000);
 
-          var centroidRoutingStation = stationEntity(
-            "CentroidRoutingStation",
-            b -> b.withCoordinate(A.toWgsCoordinate()).withShouldRouteToCentroid(true)
+          var centroidRoutingStation = stationEntity("CentroidRoutingStation", b ->
+            b.withCoordinate(A.toWgsCoordinate()).withShouldRouteToCentroid(true)
           );
           var centroidRoutingStationVertex = stationCentroid(centroidRoutingStation);
 
-          var noCentroidRoutingStation = stationEntity(
-            "NoCentroidRoutingStation",
-            b -> b.withCoordinate(D.toWgsCoordinate())
+          var noCentroidRoutingStation = stationEntity("NoCentroidRoutingStation", b ->
+            b.withCoordinate(D.toWgsCoordinate())
           );
           var noCentroidRoutingStationVertex = stationCentroid(noCentroidRoutingStation);
 
           // StopForCentroidRoutingStation is a child of centroidRoutingStation
-          stopForCentroidRoutingStation =
-            stop("StopForCentroidRoutingStation", B.toWgsCoordinate(), centroidRoutingStation);
+          stopForCentroidRoutingStation = stop(
+            "StopForCentroidRoutingStation",
+            B.toWgsCoordinate(),
+            centroidRoutingStation
+          );
 
           // StopForNoCentroidRoutingStation is a child of noCentroidRoutingStation
-          stopForNoCentroidRoutingStation =
-            stop("StopForNoCentroidRoutingStation", C.toWgsCoordinate(), noCentroidRoutingStation);
+          stopForNoCentroidRoutingStation = stop(
+            "StopForNoCentroidRoutingStation",
+            C.toWgsCoordinate(),
+            noCentroidRoutingStation
+          );
 
           biLink(A, centroidRoutingStationVertex);
           biLink(B, stopForCentroidRoutingStation);
@@ -237,8 +241,9 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   }
 
   private void assertAcessEgresses(Set<String> expected, Collection<NearbyStop> actual) {
-    assertThat(actual.stream().map(this::nearbyStopDescription))
-      .containsExactlyElementsIn(expected);
+    assertThat(actual.stream().map(this::nearbyStopDescription)).containsExactlyElementsIn(
+      expected
+    );
   }
 
   private Collection<NearbyStop> findAccessEgressFromTo(

@@ -39,13 +39,12 @@ public class UnroutableTest {
 
     var osmDataFile = ResourceLoader.of(UnroutableTest.class).file("bridge_construction.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(osmDataFile, true);
-    OsmModule osmBuilder = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    OsmModule osmBuilder = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withAreaVisibility(true)
       .build();
     osmBuilder.buildGraph();
@@ -63,8 +62,7 @@ public class UnroutableTest {
 
     Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
     Vertex to = graph.getVertex(VertexLabel.osm(40446276));
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())

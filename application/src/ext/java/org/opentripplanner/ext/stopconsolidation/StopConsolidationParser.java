@@ -37,10 +37,11 @@ public class StopConsolidationParser {
       var groups = entries
         .stream()
         .collect(
-          ImmutableListMultimap.<StopGroupEntry, String, StopGroupEntry>flatteningToImmutableListMultimap(
-            x -> x.groupId,
-            Stream::of
-          )
+          ImmutableListMultimap.<
+              StopGroupEntry,
+              String,
+              StopGroupEntry
+            >flatteningToImmutableListMultimap(x -> x.groupId, Stream::of)
         );
 
       return groups

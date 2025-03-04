@@ -54,11 +54,10 @@ public class InterlineProcessor {
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
     this.transitServiceStart = calendarServiceData.getFirstDate().orElse(null);
-    this.daysInTransitService =
-      calendarServiceData
-        .getLastDate()
-        .map(lastDate -> (int) ChronoUnit.DAYS.between(transitServiceStart, lastDate) + 1)
-        .orElse(0);
+    this.daysInTransitService = calendarServiceData
+      .getLastDate()
+      .map(lastDate -> (int) ChronoUnit.DAYS.between(transitServiceStart, lastDate) + 1)
+      .orElse(0);
     this.calendarServiceData = calendarServiceData;
   }
 
@@ -110,8 +109,9 @@ public class InterlineProcessor {
     var toTrip = p.getValue().to();
     return staySeatedNotAllowed
       .stream()
-      .noneMatch(t ->
-        t.fromTrip().getId().equals(fromTrip.getId()) && t.toTrip().getId().equals(toTrip.getId())
+      .noneMatch(
+        t ->
+          t.fromTrip().getId().equals(fromTrip.getId()) && t.toTrip().getId().equals(toTrip.getId())
       );
   }
 

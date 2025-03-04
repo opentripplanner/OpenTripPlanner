@@ -19,15 +19,13 @@ public class TripPatternType {
     GraphQLObjectType timePenaltyType,
     GraphQLScalarType dateTimeScalar
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("TripPattern")
       .description(
         "List of legs constituting a suggested sequence of rides and links for a specific trip."
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("startTime")
           .description("Time that the trip departs.")
           .type(dateTimeScalar)
@@ -36,8 +34,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("endTime")
           .description("Time that the trip arrives.")
           .type(dateTimeScalar)
@@ -46,8 +43,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("aimedStartTime")
           .description("The aimed date and time the trip starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
@@ -62,8 +58,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("expectedStartTime")
           .description("The expected, real-time adjusted date and time the trip starts.")
           .type(new GraphQLNonNull(dateTimeScalar))
@@ -71,8 +66,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("aimedEndTime")
           .description("The aimed date and time the trip ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
@@ -87,8 +81,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("expectedEndTime")
           .description("The expected, real-time adjusted date and time the trip ends.")
           .type(new GraphQLNonNull(dateTimeScalar))
@@ -96,8 +89,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("duration")
           .description("Duration of the trip, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
@@ -105,8 +97,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("directDuration")
           .description("NOT IMPLEMENTED.")
           .type(ExtendedScalars.GraphQLLong)
@@ -114,8 +105,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("waitingTime")
           .description("How much time is spent waiting for transit to arrive, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
@@ -123,8 +113,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("distance")
           .description("Total distance for the trip, in meters. NOT IMPLEMENTED")
           .type(Scalars.GraphQLFloat)
@@ -132,8 +121,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("walkTime")
           .description("How much time is spent walking, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
@@ -141,8 +129,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("streetDistance")
           .description(
             "How far the user has to walk, bike and/or drive in meters. It includes " +
@@ -153,8 +140,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("walkDistance")
           .deprecate("Replaced by `streetDistance`.")
           .type(Scalars.GraphQLFloat)
@@ -162,8 +148,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("legs")
           .description(
             "A list of legs. Each leg is either a walking (cycling, car) " +
@@ -176,8 +161,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("systemNotices")
           .description("Get all system notices.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(systemNoticeType))))
@@ -185,8 +169,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("generalizedCost")
           .description("Generalized cost or weight of the itinerary. Used for debugging.")
           .type(Scalars.GraphQLInt)
@@ -194,8 +177,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("generalizedCost2")
           .description(
             "A second cost or weight of the itinerary. Some use-cases like pass-through " +
@@ -206,8 +188,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("waitTimeOptimizedCost")
           .description(
             "A cost calculated to distribute wait-time and avoid very " +
@@ -218,8 +199,7 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transferPriorityCost")
           .description(
             "A cost calculated to favor transfer with higher priority. This " +
@@ -230,17 +210,16 @@ public class TripPatternType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("timePenalty")
           .description(
             """
-              A time and cost penalty applied to access and egress to favor regular scheduled
-              transit over potentially faster options with FLEX, Car, bike and scooter.
-              
-              Note! This field is meant for debugging only. The field can be removed without notice
-              in the future.
-              """
+            A time and cost penalty applied to access and egress to favor regular scheduled
+            transit over potentially faster options with FLEX, Car, bike and scooter.
+
+            Note! This field is meant for debugging only. The field can be removed without notice
+            in the future.
+            """
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(timePenaltyType))))
           .dataFetcher(env -> TripPlanTimePenaltyDto.of(itinerary(env)))

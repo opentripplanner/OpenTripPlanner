@@ -19,17 +19,19 @@ public class StopLocationMatcherFactoryTest {
 
   @BeforeEach
   void setup() {
-    stop1 =
-      RegularStop
-        .of(new FeedScopedId("agency", "stopId"), new AtomicInteger()::getAndIncrement)
-        .withName(I18NString.of("name"))
-        .build();
+    stop1 = RegularStop.of(
+      new FeedScopedId("agency", "stopId"),
+      new AtomicInteger()::getAndIncrement
+    )
+      .withName(I18NString.of("name"))
+      .build();
 
-    stop2 =
-      RegularStop
-        .of(new FeedScopedId("otherAgency", "otherStopId"), new AtomicInteger()::getAndIncrement)
-        .withName(I18NString.of("otherName"))
-        .build();
+    stop2 = RegularStop.of(
+      new FeedScopedId("otherAgency", "otherStopId"),
+      new AtomicInteger()::getAndIncrement
+    )
+      .withName(I18NString.of("otherName"))
+      .build();
   }
 
   @Test

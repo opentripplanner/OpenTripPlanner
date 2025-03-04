@@ -113,12 +113,11 @@ public final class CompactLineStringUtils {
     if (lineString == null) {
       return null;
     }
-    lineString =
-      GeometryUtils.addStartEndCoordinatesToLineString(
-        new Coordinate(0.0, 0.0),
-        lineString,
-        new Coordinate(0.0, 0.0)
-      );
+    lineString = GeometryUtils.addStartEndCoordinatesToLineString(
+      new Coordinate(0.0, 0.0),
+      lineString,
+      new Coordinate(0.0, 0.0)
+    );
     return compactLineString(0.0, 0.0, 0.0, 0.0, lineString, reverse);
   }
 

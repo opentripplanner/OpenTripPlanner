@@ -46,38 +46,34 @@ class ModifiedTripBuilderTest {
   private static final Station STATION_B = TEST_MODEL.station("B").build();
   private static final Station STATION_C = TEST_MODEL.station("C").build();
 
-  private static final RegularStop STOP_A_1 = TEST_MODEL
-    .stop("A_1")
+  private static final RegularStop STOP_A_1 = TEST_MODEL.stop("A_1")
     .withParentStation(STATION_A)
     .build();
-  private static final RegularStop STOP_A_2 = TEST_MODEL
-    .stop("A_2")
+  private static final RegularStop STOP_A_2 = TEST_MODEL.stop("A_2")
     .withParentStation(STATION_A)
     .build();
-  private static final RegularStop STOP_B_1 = TEST_MODEL
-    .stop("B_1")
+  private static final RegularStop STOP_B_1 = TEST_MODEL.stop("B_1")
     .withParentStation(STATION_B)
     .build();
-  private static final RegularStop STOP_C_1 = TEST_MODEL
-    .stop("C_1")
+  private static final RegularStop STOP_C_1 = TEST_MODEL.stop("C_1")
     .withParentStation(STATION_C)
     .build();
   private static final RegularStop STOP_D = TEST_MODEL.stop("D").build();
 
-  private static final Route ROUTE = TimetableRepositoryForTest
-    .route("ROUTE_ID")
+  private static final Route ROUTE = TimetableRepositoryForTest.route("ROUTE_ID")
     .withAgency(AGENCY)
     .build();
 
-  private static final TripPattern PATTERN = TimetableRepositoryForTest
-    .tripPattern("PATTERN_ID", ROUTE)
+  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern(
+    "PATTERN_ID",
+    ROUTE
+  )
     .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A_1, STOP_B_1, STOP_C_1))
     .build();
 
   private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("CAL_1");
 
-  private static final Trip TRIP = TimetableRepositoryForTest
-    .trip("TRIP")
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("TRIP")
     .withRoute(ROUTE)
     .withServiceId(SERVICE_ID)
     .build();
@@ -118,8 +114,7 @@ class ModifiedTripBuilderTest {
   );
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
-  private final SiteRepository siteRepository = TEST_MODEL
-    .siteRepositoryBuilder()
+  private final SiteRepository siteRepository = TEST_MODEL.siteRepositoryBuilder()
     .withRegularStop(STOP_A_1)
     .withRegularStop(STOP_A_2)
     .withRegularStop(STOP_B_1)
@@ -155,11 +150,10 @@ class ModifiedTripBuilderTest {
     timetableRepository.index();
 
     // Create the entity resolver only after the model has been indexed
-    entityResolver =
-      new EntityResolver(
-        new DefaultTransitService(timetableRepository),
-        TimetableRepositoryForTest.FEED_ID
-      );
+    entityResolver = new EntityResolver(
+      new DefaultTransitService(timetableRepository),
+      TimetableRepositoryForTest.FEED_ID
+    );
   }
 
   @Test
@@ -175,8 +169,7 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(result.isFailure());
     assertEquals(UpdateError.UpdateErrorType.TOO_FEW_STOPS, result.failureValue().errorType());
@@ -216,8 +209,7 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
@@ -236,22 +228,19 @@ class ModifiedTripBuilderTest {
       timetableRepository.getTimeZone(),
       entityResolver,
       List.of(
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_A_1.getId().getId())
           .withAimedDepartureTime(zonedDateTime(10, 0))
           .withExpectedDepartureTime(zonedDateTime(10, 1))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_B_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 10))
           .withExpectedArrivalTime(zonedDateTime(10, 11))
           .withAimedDepartureTime(zonedDateTime(10, 12))
           .withExpectedDepartureTime(zonedDateTime(10, 13))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_C_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 20))
           .withExpectedArrivalTime(zonedDateTime(10, 22))
@@ -261,8 +250,7 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
@@ -287,22 +275,19 @@ class ModifiedTripBuilderTest {
       timetableRepository.getTimeZone(),
       entityResolver,
       List.of(
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_A_1.getId().getId())
           .withAimedDepartureTime(zonedDateTime(10, 0))
           .withExpectedDepartureTime(zonedDateTime(10, 1))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_B_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 10))
           .withExpectedArrivalTime(zonedDateTime(10, 12))
           .withAimedDepartureTime(zonedDateTime(10, 12))
           .withExpectedDepartureTime(zonedDateTime(10, 10))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_C_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 20))
           .withExpectedArrivalTime(zonedDateTime(10, 22))
@@ -312,8 +297,7 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertFalse(result.isSuccess(), "Update should fail");
     UpdateError updateError = result.failureValue();
@@ -336,22 +320,19 @@ class ModifiedTripBuilderTest {
       timetableRepository.getTimeZone(),
       entityResolver,
       List.of(
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_A_1.getId().getId())
           .withAimedDepartureTime(zonedDateTime(10, 0))
           .withExpectedDepartureTime(zonedDateTime(9, 58))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_B_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 10))
           .withExpectedArrivalTime(zonedDateTime(10, 11))
           .withAimedDepartureTime(zonedDateTime(10, 12))
           .withExpectedDepartureTime(zonedDateTime(10, 13))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_C_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 20))
           .withExpectedArrivalTime(zonedDateTime(10, 22))
@@ -361,8 +342,7 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
@@ -387,22 +367,19 @@ class ModifiedTripBuilderTest {
       timetableRepository.getTimeZone(),
       entityResolver,
       List.of(
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_A_2.getId().getId())
           .withAimedDepartureTime(zonedDateTime(10, 0))
           .withExpectedDepartureTime(zonedDateTime(10, 1))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_B_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 10))
           .withExpectedArrivalTime(zonedDateTime(10, 11))
           .withAimedDepartureTime(zonedDateTime(10, 12))
           .withExpectedDepartureTime(zonedDateTime(10, 13))
           .build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_C_1.getId().getId())
           .withAimedArrivalTime(zonedDateTime(10, 20))
           .withExpectedArrivalTime(zonedDateTime(10, 22))
@@ -412,8 +389,7 @@ class ModifiedTripBuilderTest {
       null,
       false,
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(result.isSuccess(), "Update should succeed");
 
@@ -537,8 +513,7 @@ class ModifiedTripBuilderTest {
       PATTERN,
       List.of(
         TestCall.of().withStopPointRef(STOP_A_1.getId().getId()).build(),
-        TestCall
-          .of()
+        TestCall.of()
           .withStopPointRef(STOP_B_1.getId().getId())
           .withDepartureBoardingActivity(DepartureBoardingActivityEnumeration.NO_BOARDING)
           .build(),

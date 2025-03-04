@@ -20,8 +20,7 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class ExtraJourneyTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_1_INPUT = TripInput
-    .of(TRIP_1_ID)
+  private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")

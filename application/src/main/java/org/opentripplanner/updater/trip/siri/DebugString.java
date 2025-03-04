@@ -18,8 +18,7 @@ public class DebugString {
       return null;
     }
 
-    return ToStringBuilder
-      .of(estimatedVehicleJourney.getClass())
+    return ToStringBuilder.of(estimatedVehicleJourney.getClass())
       .addStr(
         "EstimatedVehicleJourneyCode",
         estimatedVehicleJourney.getEstimatedVehicleJourneyCode()
@@ -29,15 +28,11 @@ public class DebugString {
         estimatedVehicleJourney.getDatedVehicleJourneyRef(),
         DatedVehicleJourneyRef::getValue
       )
-      .addObjOp(
-        "FramedVehicleJourney",
-        estimatedVehicleJourney.getFramedVehicleJourneyRef(),
-        it ->
-          ToStringBuilder
-            .of(it.getClass())
-            .addStr("VehicleJourney", it.getDatedVehicleJourneyRef())
-            .addObjOp("Date", it.getDataFrameRef(), DataFrameRefStructure::getValue)
-            .toString()
+      .addObjOp("FramedVehicleJourney", estimatedVehicleJourney.getFramedVehicleJourneyRef(), it ->
+        ToStringBuilder.of(it.getClass())
+          .addStr("VehicleJourney", it.getDatedVehicleJourneyRef())
+          .addObjOp("Date", it.getDataFrameRef(), DataFrameRefStructure::getValue)
+          .toString()
       )
       .addObjOp(
         "Operator",

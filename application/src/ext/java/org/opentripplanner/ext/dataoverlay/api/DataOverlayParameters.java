@@ -35,7 +35,7 @@ public class DataOverlayParameters implements Serializable {
   private final Map<Parameter, Double> values;
 
   public DataOverlayParameters(Map<Parameter, Double> values) {
-    // Make a defencive copy to protect the map entries, this make this class immutable
+    // Make a defensive copy to protect the map entries, this makes the class immutable
     // and thread safe
     this.values = Map.copyOf(values);
   }

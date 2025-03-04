@@ -228,8 +228,7 @@ class AddedTripBuilder {
     tripTimes.validateNonIncreasingTimes();
     tripTimes.setServiceCode(transitService.getServiceCode(trip.getServiceId()));
 
-    TripPattern pattern = TripPattern
-      .of(getTripPatternId.apply(trip))
+    TripPattern pattern = TripPattern.of(getTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode())
@@ -265,8 +264,7 @@ class AddedTripBuilder {
       return DataValidationExceptionMapper.toResult(e, dataSource);
     }
 
-    var tripOnServiceDate = TripOnServiceDate
-      .of(tripId)
+    var tripOnServiceDate = TripOnServiceDate.of(tripId)
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .withReplacementFor(replacedTrips)
@@ -400,9 +398,9 @@ class AddedTripBuilder {
 
     // Update pickup / dropoff
     PickDropMapper.mapPickUpType(call, stopTime.getPickupType()).ifPresent(stopTime::setPickupType);
-    PickDropMapper
-      .mapDropOffType(call, stopTime.getDropOffType())
-      .ifPresent(stopTime::setDropOffType);
+    PickDropMapper.mapDropOffType(call, stopTime.getDropOffType()).ifPresent(
+      stopTime::setDropOffType
+    );
 
     return stopTime;
   }

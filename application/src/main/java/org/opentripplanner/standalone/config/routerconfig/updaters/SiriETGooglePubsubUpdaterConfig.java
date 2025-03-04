@@ -24,11 +24,11 @@ public class SiriETGooglePubsubUpdaterConfig {
         .summary("The Google Cloud project that hosts the PubSub subscription.")
         .description(
           """
-        During startup, the updater creates a PubSub subscription that listens
-        to the PubSub topic that publishes SIRI-ET updates.
-        This parameter specifies in which Google Cloud project the subscription will be created.
-        The topic and the subscription can be hosted in two different projects.
-        """
+          During startup, the updater creates a PubSub subscription that listens
+          to the PubSub topic that publishes SIRI-ET updates.
+          This parameter specifies in which Google Cloud project the subscription will be created.
+          The topic and the subscription can be hosted in two different projects.
+          """
         )
         .asString(),
       c
@@ -59,9 +59,9 @@ public class SiriETGooglePubsubUpdaterConfig {
         .summary("Wait this amount of time before trying to reconnect to the PubSub subscription.")
         .description(
           """
-            In case of a network error, the updater will try periodically to reconnect to the
-            Google PubSub subscription.
-            """
+          In case of a network error, the updater will try periodically to reconnect to the
+          Google PubSub subscription.
+          """
         )
         .asDuration(RECONNECT_PERIOD),
       c

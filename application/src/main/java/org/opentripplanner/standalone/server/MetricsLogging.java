@@ -57,37 +57,32 @@ public class MetricsLogging {
         timetableRepository.getRaptorTransitData().getTransferCache().getTransferCache(),
         "raptorTransfersCache",
         List.of(Tag.of("cache", "raptorTransfers"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
     }
     new ExecutorServiceMetrics(
       ForkJoinPool.commonPool(),
       "commonPool",
       List.of(Tag.of("pool", "commonPool"))
-    )
-      .bindTo(Metrics.globalRegistry);
+    ).bindTo(Metrics.globalRegistry);
 
     if (timetableRepository.getUpdaterManager() != null) {
       new ExecutorServiceMetrics(
         timetableRepository.getUpdaterManager().getPollingUpdaterPool(),
         "pollingGraphUpdaters",
         List.of(Tag.of("pool", "pollingGraphUpdaters"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
         timetableRepository.getUpdaterManager().getNonPollingUpdaterPool(),
         "nonPollingGraphUpdaters",
         List.of(Tag.of("pool", "nonPollingGraphUpdaters"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
 
       new ExecutorServiceMetrics(
         timetableRepository.getUpdaterManager().getScheduler(),
         "graphUpdateScheduler",
         List.of(Tag.of("pool", "graphUpdateScheduler"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
     }
 
     if (raptorConfig.isMultiThreaded()) {
@@ -95,8 +90,7 @@ public class MetricsLogging {
         raptorConfig.threadPool(),
         "raptorHeuristics",
         List.of(Tag.of("pool", "raptorHeuristics"))
-      )
-        .bindTo(Metrics.globalRegistry);
+      ).bindTo(Metrics.globalRegistry);
     }
 
     final Map<String, Long> issueCount = issueSummary.asMap();

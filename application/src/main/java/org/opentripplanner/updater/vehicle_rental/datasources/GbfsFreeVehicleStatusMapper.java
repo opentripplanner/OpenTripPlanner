@@ -50,41 +50,30 @@ public class GbfsFreeVehicleStatusMapper {
       rentalVehicle.name = new NonLocalizedString(getName(vehicle));
       rentalVehicle.longitude = vehicle.getLon();
       rentalVehicle.latitude = vehicle.getLat();
-      rentalVehicle.vehicleType =
-        vehicleTypes.getOrDefault(
-          vehicle.getVehicleTypeId(),
-          RentalVehicleType.getDefaultType(system.systemId)
-        );
+      rentalVehicle.vehicleType = vehicleTypes.getOrDefault(
+        vehicle.getVehicleTypeId(),
+        RentalVehicleType.getDefaultType(system.systemId)
+      );
       rentalVehicle.isReserved = vehicle.getIsReserved() != null ? vehicle.getIsReserved() : false;
       rentalVehicle.isDisabled = vehicle.getIsDisabled() != null ? vehicle.getIsDisabled() : false;
-      rentalVehicle.lastReported =
-        vehicle.getLastReported() != null
-          ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
-          : null;
+      rentalVehicle.lastReported = vehicle.getLastReported() != null
+        ? Instant.ofEpochSecond((long) (double) vehicle.getLastReported())
+        : null;
 
-      var fuelRatio = Ratio
-        .ofBoxed(
-          vehicle.getCurrentFuelPercent(),
-          validationErrorMessage ->
-            LOG_THROTTLE.throttle(() ->
-              LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
-            )
+      var fuelRatio = Ratio.ofBoxed(vehicle.getCurrentFuelPercent(), validationErrorMessage ->
+        LOG_THROTTLE.throttle(() ->
+          LOG.warn("'currentFuelPercent' is not valid. Details: {}", validationErrorMessage)
         )
-        .orElse(null);
-      var rangeMeters = Distance
-        .ofMetersBoxed(
-          vehicle.getCurrentRangeMeters(),
-          error -> {
-            LOG_THROTTLE.throttle(() ->
-              LOG.warn(
-                "Current range meter value not valid: {} - {}",
-                vehicle.getCurrentRangeMeters(),
-                error
-              )
-            );
-          }
-        )
-        .orElse(null);
+      ).orElse(null);
+      var rangeMeters = Distance.ofMetersBoxed(vehicle.getCurrentRangeMeters(), error -> {
+        LOG_THROTTLE.throttle(() ->
+          LOG.warn(
+            "Current range meter value not valid: {} - {}",
+            vehicle.getCurrentRangeMeters(),
+            error
+          )
+        );
+      }).orElse(null);
       // if the propulsion type has an engine current_range_meters is required
       if (
         vehicle.getVehicleTypeId() != null &&

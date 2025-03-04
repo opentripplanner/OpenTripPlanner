@@ -12,8 +12,7 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 class BookingInfoTest {
 
   public static final String URL = "http://booking.otp.org";
-  public static final ContactInfo CONTACT = ContactInfo
-    .of()
+  public static final ContactInfo CONTACT = ContactInfo.of()
     .withBookingUrl(URL)
     .withContactPerson("Jo Contact")
     .build();
@@ -24,8 +23,7 @@ class BookingInfoTest {
 
   @Test
   void testBookingInfoWithLatestBookingTime() {
-    var subject = BookingInfo
-      .of()
+    var subject = BookingInfo.of()
       .withContactInfo(CONTACT)
       .withBookingMethods(BOOKING_METHODS)
       .withLatestBookingTime(BOOKING_TIME_NOON)
@@ -51,8 +49,7 @@ class BookingInfoTest {
   @Test
   void testBookingInfoWithMinBookingNotice() {
     Duration minimumBookingNotice = Duration.ofMinutes(45);
-    var subject = BookingInfo
-      .of()
+    var subject = BookingInfo.of()
       .withBookingMethods(BOOKING_METHODS)
       .withMinimumBookingNotice(minimumBookingNotice)
       .build();

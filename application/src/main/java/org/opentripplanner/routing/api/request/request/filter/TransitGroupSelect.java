@@ -40,10 +40,9 @@ public class TransitGroupSelect {
   private TransitGroupSelect(Builder builder) {
     // Sort and keep only unique entries, this make this
     // implementation consistent for eq/hc/toString.
-    this.modes =
-      List.copyOf(
-        builder.modes.stream().sorted(Comparator.comparingInt(Enum::ordinal)).distinct().toList()
-      );
+    this.modes = List.copyOf(
+      builder.modes.stream().sorted(Comparator.comparingInt(Enum::ordinal)).distinct().toList()
+    );
     this.subModeRegexp = List.copyOf(builder.subModeRegexp.stream().sorted().distinct().toList());
     this.agencyIds = List.copyOf(builder.agencyIds.stream().sorted().distinct().toList());
     this.routeIds = List.copyOf(builder.routeIds.stream().sorted().distinct().toList());
@@ -95,8 +94,7 @@ public class TransitGroupSelect {
   public String toString() {
     return isEmpty()
       ? "TransitGroupSelect{ EMPTY }"
-      : ToStringBuilder
-        .of(TransitGroupSelect.class)
+      : ToStringBuilder.of(TransitGroupSelect.class)
         .addCol("modes", modes)
         .addCol("subModeRegexp", subModeRegexp)
         .addCol("agencyIds", agencyIds)

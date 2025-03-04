@@ -61,17 +61,14 @@ public class OutsideSearchWindowFilterTest implements PlanTestConstants {
   private static Stream<Itinerary> onStreetTestCases() {
     int t9_28 = time("9:28");
     int t9_38 = time("9:38");
-    return Stream
-      .of(
-        newItinerary(A, t9_28).walk(D2m, B),
-        newItinerary(A, t9_38).walk(D12m, B),
-        newItinerary(A, t9_28).bicycle(t9_28, t9_38, B),
-        newItinerary(A, t9_28).flex(t9_28, t9_38, B),
-        newItinerary(A, t9_28).flex(t9_38, time("9:48"), B),
-        newItinerary(A, time("9:20")).flex(time("9:20"), t9_28, B).walk(D12m, C)
-      )
-      // results from the street & flex routers are not aware of the search window
-      .map(b -> b.withIsSearchWindowAware(false).build());
+    return Stream.of(
+      newItinerary(A, t9_28).walk(D2m, B),
+      newItinerary(A, t9_38).walk(D12m, B),
+      newItinerary(A, t9_28).bicycle(t9_28, t9_38, B),
+      newItinerary(A, t9_28).flex(t9_28, t9_38, B),
+      newItinerary(A, t9_28).flex(t9_38, time("9:48"), B),
+      newItinerary(A, time("9:20")).flex(time("9:20"), t9_28, B).walk(D12m, C)
+    ).map(b -> b.withIsSearchWindowAware(false).build()); // results from the street & flex routers are not aware of the search window
   }
 
   @ParameterizedTest

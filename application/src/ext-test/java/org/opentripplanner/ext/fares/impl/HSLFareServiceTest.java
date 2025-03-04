@@ -53,19 +53,16 @@ public class HSLFareServiceTest implements PlanTestConstants {
   private static List<Arguments> createTestCases() {
     List<Arguments> args = new LinkedList<>();
 
-    Agency agency1 = Agency
-      .of(new FeedScopedId(FEED_ID, "AG1"))
+    Agency agency1 = Agency.of(new FeedScopedId(FEED_ID, "AG1"))
       .withName("Agency 1")
       .withTimezone("Europe/Helsinki")
       .build();
-    Agency agency2 = Agency
-      .of(new FeedScopedId(FEED_ID, "AG2"))
+    Agency agency2 = Agency.of(new FeedScopedId(FEED_ID, "AG2"))
       .withName("Agency 2")
       .withTimezone("Europe/Helsinki")
       .build();
 
-    Agency agency3 = Agency
-      .of(new FeedScopedId("FEED2", "AG3"))
+    Agency agency3 = Agency.of(new FeedScopedId("FEED2", "AG3"))
       .withName("Agency 3")
       .withTimezone("Europe/Helsinki")
       .build();
@@ -101,57 +98,48 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     // Fare attributes
 
-    FareAttribute fareAttributeAB = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "AB"))
+    FareAttribute fareAttributeAB = FareAttribute.of(new FeedScopedId(FEED_ID, "AB"))
       .setPrice(AB_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeBC = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "BC"))
+    FareAttribute fareAttributeBC = FareAttribute.of(new FeedScopedId(FEED_ID, "BC"))
       .setPrice(BC_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeCD = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "CD"))
+    FareAttribute fareAttributeCD = FareAttribute.of(new FeedScopedId(FEED_ID, "CD"))
       .setPrice(CD_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeD = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "D"))
+    FareAttribute fareAttributeD = FareAttribute.of(new FeedScopedId(FEED_ID, "D"))
       .setPrice(D_PRICE)
       .setTransferDuration(fiveMinutes)
       //.setAgency(agency1.getId().getId())
       .build();
 
-    FareAttribute fareAttributeABC = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "ABC"))
+    FareAttribute fareAttributeABC = FareAttribute.of(new FeedScopedId(FEED_ID, "ABC"))
       .setPrice(ABC_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeBCD = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "BCD"))
+    FareAttribute fareAttributeBCD = FareAttribute.of(new FeedScopedId(FEED_ID, "BCD"))
       .setPrice(BCD_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeABCD = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "ABCD"))
+    FareAttribute fareAttributeABCD = FareAttribute.of(new FeedScopedId(FEED_ID, "ABCD"))
       .setPrice(ABCD_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
-    FareAttribute fareAttributeD2 = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "D2"))
+    FareAttribute fareAttributeD2 = FareAttribute.of(new FeedScopedId(FEED_ID, "D2"))
       .setPrice(Money.euros(0))
       .setAgency(agency2.getId())
       .build();
 
-    FareAttribute fareAttributeAgency3 = FareAttribute
-      .of(new FeedScopedId("FEED2", "attribute"))
+    FareAttribute fareAttributeAgency3 = FareAttribute.of(new FeedScopedId("FEED2", "attribute"))
       .setPrice(Money.euros(0))
       .setAgency(agency3.getId())
       .build();
@@ -210,22 +198,19 @@ public class HSLFareServiceTest implements PlanTestConstants {
       )
     );
 
-    Route routeAgency1 = Route
-      .of(new FeedScopedId(FEED_ID, "R1"))
+    Route routeAgency1 = Route.of(new FeedScopedId(FEED_ID, "R1"))
       .withAgency(agency1)
       .withLongName(new NonLocalizedString("Route agency 1"))
       .withMode(TransitMode.BUS)
       .build();
 
-    Route routeAgency2 = Route
-      .of(new FeedScopedId(FEED_ID, "R2"))
+    Route routeAgency2 = Route.of(new FeedScopedId(FEED_ID, "R2"))
       .withAgency(agency2)
       .withLongName(new NonLocalizedString("Route agency 2"))
       .withMode(TransitMode.BUS)
       .build();
 
-    Route routeAgency3 = Route
-      .of(new FeedScopedId("FEED2", "R3"))
+    Route routeAgency3 = Route.of(new FeedScopedId("FEED2", "R3"))
       .withAgency(agency3)
       .withLongName(new NonLocalizedString("Route agency 3"))
       .withMode(TransitMode.BUS)
@@ -434,8 +419,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
   @Test
   void unknownFare() {
-    FareAttribute fareAttributeAB = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "AB"))
+    FareAttribute fareAttributeAB = FareAttribute.of(new FeedScopedId(FEED_ID, "AB"))
       .setPrice(euros(2.80f))
       .setTransferDuration(60 * 5)
       .build();

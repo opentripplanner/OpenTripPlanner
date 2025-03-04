@@ -58,22 +58,21 @@ class SiriAzureUpdaterTest {
     when(mockConfig.isFuzzyTripMatching()).thenReturn(true);
 
     // Create a spy on AbstractAzureSiriUpdater with the mock configuration
-    updater =
-      spy(
-        new SiriAzureUpdater(
-          mockConfig,
-          new SiriAzureMessageHandler() {
-            @Override
-            public void setup(WriteToGraphCallback writeToGraphCallback) {}
+    updater = spy(
+      new SiriAzureUpdater(
+        mockConfig,
+        new SiriAzureMessageHandler() {
+          @Override
+          public void setup(WriteToGraphCallback writeToGraphCallback) {}
 
-            @Override
-            @Nullable
-            public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
-              return null;
-            }
+          @Override
+          @Nullable
+          public Future<?> handleMessage(ServiceDelivery serviceDelivery, String messageId) {
+            return null;
           }
-        )
-      );
+        }
+      )
+    );
 
     task = mock(SiriAzureUpdater.CheckedRunnable.class);
   }
@@ -167,9 +166,9 @@ class SiriAzureUpdaterTest {
       .run();
 
     doAnswer(invocation -> {
-        latch.countDown();
-        return null;
-      })
+      latch.countDown();
+      return null;
+    })
       .when(updater)
       .sleep(anyInt());
 
@@ -225,11 +224,11 @@ class SiriAzureUpdaterTest {
       .run();
 
     doAnswer(invocation -> {
-        if (invocation.getArgument(0).equals(1000)) {
-          latch.countDown();
-        }
-        return null;
-      })
+      if (invocation.getArgument(0).equals(1000)) {
+        latch.countDown();
+      }
+      return null;
+    })
       .when(updater)
       .sleep(anyInt());
 

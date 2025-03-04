@@ -30,17 +30,11 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-    20,
-    60,
-    1.0,
-    null,
-    null
-  );
+  private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
+    new DefaultCostCalculator<>(20, 60, 1.0, null, null);
 
-  public static final PathTailFilter<TestTripSchedule> FILTER_CHAIN = MinCostPathTailFilterFactory.ofCostFunction(
-    OptimizedPathTail::generalizedCost
-  );
+  public static final PathTailFilter<TestTripSchedule> FILTER_CHAIN =
+    MinCostPathTailFilterFactory.ofCostFunction(OptimizedPathTail::generalizedCost);
 
   private final int STOP_TIME_ONE = TimeUtils.time("10:00");
   private final int STOP_TIME_TWO = TimeUtils.time("10:20");
@@ -60,8 +54,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     this::stopIndexToName
   );
 
-  private final TestTripSchedule TRIP = TestTripSchedule
-    .schedule()
+  private final TestTripSchedule TRIP = TestTripSchedule.schedule()
     .pattern("L1", STOP_A, STOP_C, STOP_E)
     .times(STOP_TIME_ONE, STOP_TIME_TWO, STOP_TIME_THREE)
     .build();

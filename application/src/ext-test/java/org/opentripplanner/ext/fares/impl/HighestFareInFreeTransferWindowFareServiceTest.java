@@ -27,8 +27,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 
 class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstants {
 
-  static Agency agency = Agency
-    .of(id("agency"))
+  static Agency agency = Agency.of(id("agency"))
     .withName("Houston")
     .withTimezone("America/Chicago")
     .build();
@@ -61,8 +60,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // $1 fares
     var oneDollar = Money.usDollars(1.0f);
-    FareAttribute oneDollarFareAttribute = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "oneDollarAttribute"))
+    FareAttribute oneDollarFareAttribute = FareAttribute.of(
+      new FeedScopedId(FEED_ID, "oneDollarAttribute")
+    )
       .setPrice(oneDollar)
       .build();
     FareRuleSet oneDollarRouteBasedFares = new FareRuleSet(oneDollarFareAttribute);
@@ -72,8 +72,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
     // $2 fares
     var twoDollars = Money.usDollars(2.0f);
-    FareAttribute twoDollarFareAttribute = FareAttribute
-      .of(new FeedScopedId(FEED_ID, "twoDollarAttribute"))
+    FareAttribute twoDollarFareAttribute = FareAttribute.of(
+      new FeedScopedId(FEED_ID, "twoDollarAttribute")
+    )
       .setPrice(twoDollars)
       .build();
 
@@ -207,11 +208,12 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     // a two transit leg itinerary with an interlined transfer where the second route costs more than the first
     // route, but both are within the free transfer window and the fare service is configured with the
     // analyzeInterlinedTransfers set to true should calculate the second route cost
-    FareService fareServiceWithAnalyzedInterlinedTransfersConfig = new HighestFareInFreeTransferWindowFareService(
-      defaultFareRules,
-      Duration.ofMinutes(150),
-      true
-    );
+    FareService fareServiceWithAnalyzedInterlinedTransfersConfig =
+      new HighestFareInFreeTransferWindowFareService(
+        defaultFareRules,
+        Duration.ofMinutes(150),
+        true
+      );
 
     args.add(
       Arguments.of(
@@ -227,8 +229,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
 
   private static Route route(String id, String name) {
     NonLocalizedString lName = new NonLocalizedString(name);
-    return Route
-      .of(id(id))
+    return Route.of(id(id))
       .withLongName(lName)
       .withAgency(agency)
       .withMode(TransitMode.BUS)

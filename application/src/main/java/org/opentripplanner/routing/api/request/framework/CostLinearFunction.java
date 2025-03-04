@@ -34,9 +34,9 @@ public final class CostLinearFunction extends AbstractLinearFunction<Cost> {
   }
 
   public static CostLinearFunction of(String text) {
-    return LinearFunctionSerialization
-      .parse(text, (Duration a, Double b) -> of(Cost.fromDuration(a), b))
-      .orElseThrow();
+    return LinearFunctionSerialization.parse(text, (Duration a, Double b) ->
+      of(Cost.fromDuration(a), b)
+    ).orElseThrow();
   }
 
   public Cost calculate(Cost cost) {

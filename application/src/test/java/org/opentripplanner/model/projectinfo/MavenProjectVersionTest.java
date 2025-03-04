@@ -10,25 +10,23 @@ public class MavenProjectVersionTest {
 
   @Test
   public void parse() {
-    List
-      .of(
-        new TC("1", 1, 0, 0, ""),
-        new TC("1.2", 1, 2, 0, ""),
-        new TC("1.2.3", 1, 2, 3, ""),
-        new TC("1-567", 1, 0, 0, "567"),
-        new TC("1.2-567", 1, 2, 0, "567"),
-        new TC("1.2.3-567", 1, 2, 3, "567"),
-        new TC("1-rc-1", 1, 0, 0, "rc-1"),
-        new TC("1.2.3-entur-31", 1, 2, 3, "entur-31"),
-        new TC("1.2.3-SNAPSHOT", 1, 2, 3, "SNAPSHOT")
-      )
-      .forEach(tc -> {
-        MavenProjectVersion v = MavenProjectVersion.parse(tc.input);
-        assertEquals(tc.major, v.major, tc.input);
-        assertEquals(tc.minor, v.minor, tc.input);
-        assertEquals(tc.patch, v.patch, tc.input);
-        assertEquals(tc.qualifier, v.qualifier, tc.input);
-      });
+    List.of(
+      new TC("1", 1, 0, 0, ""),
+      new TC("1.2", 1, 2, 0, ""),
+      new TC("1.2.3", 1, 2, 3, ""),
+      new TC("1-567", 1, 0, 0, "567"),
+      new TC("1.2-567", 1, 2, 0, "567"),
+      new TC("1.2.3-567", 1, 2, 3, "567"),
+      new TC("1-rc-1", 1, 0, 0, "rc-1"),
+      new TC("1.2.3-entur-31", 1, 2, 3, "entur-31"),
+      new TC("1.2.3-SNAPSHOT", 1, 2, 3, "SNAPSHOT")
+    ).forEach(tc -> {
+      MavenProjectVersion v = MavenProjectVersion.parse(tc.input);
+      assertEquals(tc.major, v.major, tc.input);
+      assertEquals(tc.minor, v.minor, tc.input);
+      assertEquals(tc.patch, v.patch, tc.input);
+      assertEquals(tc.qualifier, v.qualifier, tc.input);
+    });
   }
 
   @Test

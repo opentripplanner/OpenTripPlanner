@@ -44,12 +44,10 @@ class AddedTripBuilderTest {
 
   private static final Agency AGENCY = TimetableRepositoryForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
-  private static final Operator OPERATOR = Operator
-    .of(TimetableRepositoryForTest.id("OPERATOR_ID"))
+  private static final Operator OPERATOR = Operator.of(TimetableRepositoryForTest.id("OPERATOR_ID"))
     .withName("OPERATOR_NAME")
     .build();
-  private static final Route REPLACED_ROUTE = TimetableRepositoryForTest
-    .route("REPLACED_ROUTE")
+  private static final Route REPLACED_ROUTE = TimetableRepositoryForTest.route("REPLACED_ROUTE")
     .withAgency(AGENCY)
     .withOperator(OPERATOR)
     .build();
@@ -68,8 +66,7 @@ class AddedTripBuilderTest {
   private static final RegularStop STOP_B = MODEL_TEST.stop("B").build();
   private static final RegularStop STOP_C = MODEL_TEST.stop("C").build();
   private static final RegularStop STOP_D = MODEL_TEST.stop("D").build();
-  private final SiteRepository SITE_REPOSITORY = MODEL_TEST
-    .siteRepositoryBuilder()
+  private final SiteRepository SITE_REPOSITORY = MODEL_TEST.siteRepositoryBuilder()
     .withRegularStop(STOP_A)
     .withRegularStop(STOP_B)
     .withRegularStop(STOP_C)
@@ -88,8 +85,10 @@ class AddedTripBuilderTest {
   void setUp() {
     // Add entities to transit model for the entity resolver
     TRANSIT_MODEL.addAgency(AGENCY);
-    final TripPattern pattern = TimetableRepositoryForTest
-      .tripPattern("REPLACED_ROUTE_PATTERN_ID", REPLACED_ROUTE)
+    final TripPattern pattern = TimetableRepositoryForTest.tripPattern(
+      "REPLACED_ROUTE_PATTERN_ID",
+      REPLACED_ROUTE
+    )
       .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_B))
       .build();
     TRANSIT_MODEL.addTripPattern(pattern.getId(), pattern);
@@ -109,11 +108,10 @@ class AddedTripBuilderTest {
     transitService = new DefaultTransitService(TRANSIT_MODEL);
 
     // Create the entity resolver only after the model has been indexed
-    ENTITY_RESOLVER =
-      new EntityResolver(
-        new DefaultTransitService(TRANSIT_MODEL),
-        TimetableRepositoryForTest.FEED_ID
-      );
+    ENTITY_RESOLVER = new EntityResolver(
+      new DefaultTransitService(TRANSIT_MODEL),
+      TimetableRepositoryForTest.FEED_ID
+    );
   }
 
   @Test
@@ -137,8 +135,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
@@ -250,8 +247,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(firstAddedTrip.isSuccess(), "Trip creation should succeed");
     assertTrue(firstAddedTrip.successValue().routeCreation());
@@ -279,8 +275,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(secondAddedTrip.isSuccess(), "Trip creation should succeed");
 
@@ -322,8 +317,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
@@ -357,8 +351,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isSuccess(), "Trip creation should succeed");
 
@@ -402,8 +395,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
@@ -416,14 +408,12 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripFailOnNonIncreasingDwellTime() {
     List<CallWrapper> calls = List.of(
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_A.getId().getId())
         .withAimedDepartureTime(zonedDateTime(10, 20))
         .withExpectedDepartureTime(zonedDateTime(10, 20))
         .build(),
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_B.getId().getId())
         .withAimedArrivalTime(zonedDateTime(10, 30))
         .withExpectedArrivalTime(zonedDateTime(10, 31))
@@ -431,8 +421,7 @@ class AddedTripBuilderTest {
         .withExpectedDepartureTime(zonedDateTime(10, 29))
         .build(),
       // Expected to arrive one minute prior to irrelevant aimed departure time
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_C.getId().getId())
         .withAimedArrivalTime(zonedDateTime(10, 40))
         .withExpectedArrivalTime(zonedDateTime(10, 40))
@@ -458,8 +447,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
@@ -472,8 +460,7 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripFailOnTooFewCalls() {
     List<CallWrapper> calls = List.of(
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_A.getId().getId())
         .withAimedDepartureTime(zonedDateTime(10, 20))
         .withExpectedDepartureTime(zonedDateTime(10, 20))
@@ -498,8 +485,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
@@ -512,14 +498,12 @@ class AddedTripBuilderTest {
   @Test
   void testAddedTripFailOnUnknownStop() {
     List<CallWrapper> calls = List.of(
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef("UNKNOWN_STOP_REF")
         .withAimedDepartureTime(zonedDateTime(10, 20))
         .withExpectedDepartureTime(zonedDateTime(10, 20))
         .build(),
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_B.getId().getId())
         .withAimedArrivalTime(zonedDateTime(10, 30))
         .withExpectedArrivalTime(zonedDateTime(10, 31))
@@ -546,8 +530,7 @@ class AddedTripBuilderTest {
       HEADSIGN,
       List.of(),
       "DATASOURCE"
-    )
-      .build();
+    ).build();
 
     assertTrue(addedTrip.isFailure(), "Trip creation should fail");
     assertEquals(
@@ -573,8 +556,7 @@ class AddedTripBuilderTest {
     String subMode
   ) {
     // Arrange
-    var route = Route
-      .of(TimetableRepositoryForTest.id(LINE_REF))
+    var route = Route.of(TimetableRepositoryForTest.id(LINE_REF))
       .withShortName(SHORT_NAME)
       .withAgency(AGENCY)
       .withMode(TransitMode.valueOf(replacedRouteMode))
@@ -594,15 +576,13 @@ class AddedTripBuilderTest {
   private static List<CallWrapper> getCalls(int hour) {
     return List.of(
       // Departed one minute early, prior to irrelevant aimed arrival time
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_A.getId().getId())
         .withAimedDepartureTime(zonedDateTime(hour, 20))
         .withExpectedDepartureTime(zonedDateTime(hour, 20))
         .withActualDepartureTime(zonedDateTime(hour, 19))
         .build(),
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_B.getId().getId())
         .withAimedArrivalTime(zonedDateTime(hour, 30))
         .withExpectedArrivalTime(zonedDateTime(hour, 29))
@@ -610,8 +590,7 @@ class AddedTripBuilderTest {
         .withExpectedDepartureTime(zonedDateTime(hour, 31))
         .build(),
       // Expected to arrive one minute prior to irrelevant aimed departure time
-      TestCall
-        .of()
+      TestCall.of()
         .withStopPointRef(STOP_C.getId().getId())
         .withAimedArrivalTime(zonedDateTime(hour, 40))
         .withExpectedArrivalTime(zonedDateTime(hour, 41))
