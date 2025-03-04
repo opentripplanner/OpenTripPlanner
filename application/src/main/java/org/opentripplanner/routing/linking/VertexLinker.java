@@ -710,18 +710,23 @@ public class VertexLinker {
     DisposableEdgeCollection tempEdges
   ) {
     Area hit = null;
-    for (Area area : ag.getAreas()) {
-      Geometry polygon = area.getGeometry();
-      Geometry intersection = polygon.intersection(line);
-      if (intersection.getLength() > 0.000001) {
-        hit = area;
-        break;
+    var areas = ag.getAreas();
+    if (areas.size() == 1) {
+      hit = areas.getFirst();
+    } else {
+      // If more than one area intersects, we pick first one for the name & properties
+      for (Area area : areas) {
+        Geometry polygon = area.getGeometry();
+        Geometry intersection = polygon.intersection(line);
+        if (intersection.getLength() > 0.000001) {
+          hit = area;
+          break;
+        }
       }
     }
+    // we alread know that the edge is inside the areaGroup and hit != null, but test anyway
     if (hit != null) {
-      // If more than one area intersects, we pick one by random for the name & properties
       double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
-
       // apply consistent NoThru restrictions
       // if all joining edges are nothru, then the new edge should be as well
       var incomingNoThruModes = getNoThruModes(to.getIncoming());
