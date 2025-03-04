@@ -345,7 +345,7 @@ public class DebugStyleSpec {
         .vectorSourceLayer(edges)
         .group(WALK_SAFETY_GROUP)
         .typeSymbol()
-        .lineText("bicycleSafetyFactor")
+        .lineText("walkSafetyFactor")
         .textOffset(1)
         .edgeFilter(EDGES_TO_DISPLAY)
         .minZoom(17)
