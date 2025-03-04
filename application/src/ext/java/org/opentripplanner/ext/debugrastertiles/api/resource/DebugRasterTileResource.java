@@ -72,9 +72,9 @@ public class DebugRasterTileResource {
   }
 
   /**
-   * Gets all layer names
+   * Returns all layers.
    * <p>
-   * Used in fronted to create layer chooser
+   * Used in the classic debug client to create a layer menu.
    */
   @GET
   @Path("layers")
