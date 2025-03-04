@@ -152,8 +152,7 @@ public class DurationUtils {
     if (durations == null || durations.isBlank()) {
       return List.of();
     }
-    return Arrays
-      .stream(durations.split("[,;\\s]+"))
+    return Arrays.stream(durations.split("[,;\\s]+"))
       .map(DurationUtils::duration)
       .collect(Collectors.toList());
   }

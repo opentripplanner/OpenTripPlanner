@@ -19,22 +19,17 @@ class ItineraryFilterPreferencesTest {
   private static final double GROUP_SIMILARITY_KEEP_ONE = 0.8;
   private static final double GROUP_SIMILARITY_KEEP_THREE = 0.5;
   private static final double MIN_BIKE_PARKING_DISTANCE = 2000.0;
-  private static final CostLinearFunction NON_TRANSIT_GENERALIZED_COST_LIMIT = CostLinearFunction.of(
-    Duration.ofSeconds(4),
-    5.0
-  );
+  private static final CostLinearFunction NON_TRANSIT_GENERALIZED_COST_LIMIT =
+    CostLinearFunction.of(Duration.ofSeconds(4), 5.0);
   private static final double PARK_AND_RIDE_DURATION_RATIO = 0.44;
-  private static final TransitGeneralizedCostFilterParams TRANSIT_GENERALIZED_COST_LIMIT = new TransitGeneralizedCostFilterParams(
-    CostLinearFunction.of(Duration.ofSeconds(4), 5.0),
-    3.0
-  );
+  private static final TransitGeneralizedCostFilterParams TRANSIT_GENERALIZED_COST_LIMIT =
+    new TransitGeneralizedCostFilterParams(CostLinearFunction.of(Duration.ofSeconds(4), 5.0), 3.0);
   private static final CostLinearFunction TRANSIT_BEST_STREET_COST_LIMIT = CostLinearFunction.of(
     Duration.ofSeconds(30),
     1.3
   );
 
-  private final ItineraryFilterPreferences subject = ItineraryFilterPreferences
-    .of()
+  private final ItineraryFilterPreferences subject = ItineraryFilterPreferences.of()
     .withAccessibilityScore(ACCESSIBILITY_SCORE)
     .withBikeRentalDistanceRatio(BIKE_RENTAL_DISTANCE_RATIO)
     .withDebug(DEBUG)

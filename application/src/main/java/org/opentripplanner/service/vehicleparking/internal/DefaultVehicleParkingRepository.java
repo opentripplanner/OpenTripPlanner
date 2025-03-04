@@ -31,7 +31,8 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
    * <p>
    * The volatile keyword is used to ensure safe publication by clearing CPU caches.
    */
-  private volatile ImmutableListMultimap<VehicleParkingGroup, VehicleParking> vehicleParkingGroups = ImmutableListMultimap.of();
+  private volatile ImmutableListMultimap<VehicleParkingGroup, VehicleParking> vehicleParkingGroups =
+    ImmutableListMultimap.of();
 
   /**
    * Does atomic update of {@link VehicleParking} and index of {@link VehicleParkingGroup} in this
@@ -43,9 +44,8 @@ public class DefaultVehicleParkingRepository implements VehicleParkingRepository
     Collection<VehicleParking> parkingToAdd,
     Collection<VehicleParking> parkingToRemove
   ) {
-    Multimap<VehicleParkingGroup, VehicleParking> updatedVehicleParkingGroups = ArrayListMultimap.create(
-      vehicleParkingGroups
-    );
+    Multimap<VehicleParkingGroup, VehicleParking> updatedVehicleParkingGroups =
+      ArrayListMultimap.create(vehicleParkingGroups);
     parkingToRemove.forEach(vehicleParking -> {
       var vehicleParkingGroup = vehicleParking.getVehicleParkingGroup();
       if (vehicleParkingGroup != null) {

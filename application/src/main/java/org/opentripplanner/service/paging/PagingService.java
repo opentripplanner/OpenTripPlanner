@@ -55,12 +55,11 @@ public class PagingService {
 
     this.pageCursorInput = pageCursorInput;
     this.itineraries = Objects.requireNonNull(itineraries);
-    this.searchWindowAdjuster =
-      createSearchWindowAdjuster(
-        pagingSearchWindowAdjustments,
-        minSearchWindowSize,
-        maxSearchWindowSize
-      );
+    this.searchWindowAdjuster = createSearchWindowAdjuster(
+      pagingSearchWindowAdjustments,
+      minSearchWindowSize,
+      maxSearchWindowSize
+    );
   }
 
   public PageCursor nextPageCursor() {
@@ -161,8 +160,9 @@ public class PagingService {
 
   private PageCursorFactory pageCursorFactory() {
     if (pageCursorFactory == null) {
-      this.pageCursorFactory =
-        mapIntoPageCursorFactory(pageCursor == null ? null : pageCursor.type());
+      this.pageCursorFactory = mapIntoPageCursorFactory(
+        pageCursor == null ? null : pageCursor.type()
+      );
     }
     return pageCursorFactory;
   }
@@ -177,13 +177,12 @@ public class PagingService {
 
     assertRequestPrerequisites();
 
-    factory =
-      factory.withOriginalSearch(
-        currentPageType,
-        earliestDepartureTime,
-        latestArrivalTime,
-        searchWindowUsed
-      );
+    factory = factory.withOriginalSearch(
+      currentPageType,
+      earliestDepartureTime,
+      latestArrivalTime,
+      searchWindowUsed
+    );
 
     if (pageCursorInput != null) {
       factory = factory.withRemovedItineraries(pageCursorInput);
@@ -209,8 +208,7 @@ public class PagingService {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PagingService.class)
+    return ToStringBuilder.of(PagingService.class)
       .addDuration("searchWindowUsed", searchWindowUsed)
       .addDateTime("earliestDepartureTime", earliestDepartureTime)
       .addDateTime("latestArrivalTime", latestArrivalTime)

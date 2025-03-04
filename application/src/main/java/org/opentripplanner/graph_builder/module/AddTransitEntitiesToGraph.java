@@ -53,7 +53,8 @@ public class AddTransitEntitiesToGraph {
   private final OtpTransitService otpTransitService;
 
   // Map of all station elements and their vertices in the graph
-  private final Map<StationElement<?, ?>, StationElementVertex> stationElementNodes = new HashMap<>();
+  private final Map<StationElement<?, ?>, StationElementVertex> stationElementNodes =
+    new HashMap<>();
 
   private final int subwayAccessTime;
   private final VertexFactory vertexFactory;
@@ -78,8 +79,9 @@ public class AddTransitEntitiesToGraph {
     Graph graph,
     TimetableRepository timetableRepository
   ) {
-    new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph)
-      .applyToGraph(timetableRepository);
+    new AddTransitEntitiesToGraph(otpTransitService, subwayAccessTime, graph).applyToGraph(
+      timetableRepository
+    );
   }
 
   private void applyToGraph(TimetableRepository timetableRepository) {
@@ -199,8 +201,7 @@ public class AddTransitEntitiesToGraph {
           // the GTFS spec allows you to define a pathway which has neither traversal time, distance
           // nor steps. This would lead to traversal costs of 0, so we compute the distance from the
           // vertices as fallback.
-          double distance = Optional
-            .of(pathway.getLength())
+          double distance = Optional.of(pathway.getLength())
             .filter(l -> l > 0)
             .orElseGet(() -> distance(fromVertex.getCoordinate(), toVertex.getCoordinate()));
 

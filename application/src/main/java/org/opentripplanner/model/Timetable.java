@@ -154,8 +154,7 @@ public class Timetable implements Serializable {
     Collection<TripTimes> scheduledTripTimes,
     Collection<FrequencyEntry> frequencies
   ) {
-    return Optional
-      .ofNullable(getRepresentativeTripTimes(scheduledTripTimes, frequencies))
+    return Optional.ofNullable(getRepresentativeTripTimes(scheduledTripTimes, frequencies))
       .map(TripTimes::getTrip)
       .map(Trip::getDirection)
       .orElse(Direction.UNKNOWN);

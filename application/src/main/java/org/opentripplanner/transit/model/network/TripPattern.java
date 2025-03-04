@@ -132,8 +132,10 @@ public final class TripPattern
       }
       this.scheduledTimetable = builder.getScheduledTimetable();
     } else {
-      this.scheduledTimetable =
-        builder.getScheduledTimetableBuilder().withTripPattern(this).build();
+      this.scheduledTimetable = builder
+        .getScheduledTimetableBuilder()
+        .withTripPattern(this)
+        .build();
     }
 
     this.originalTripPattern = builder.getOriginalTripPattern();
@@ -181,8 +183,7 @@ public final class TripPattern
     if (hopGeometries != null) {
       return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
-      return GeometryUtils
-        .getGeometryFactory()
+      return GeometryUtils.getGeometryFactory()
         .createLineString(
           new Coordinate[] {
             coordinate(stopPattern.getStop(stopPosInPattern)),

@@ -34,10 +34,12 @@ class OsmConfigTest {
 
   @Test
   void mapMissingOsmDefaultParameters() {
-    NodeAdapter nodeAdapter = newNodeAdapterForTest("""
+    NodeAdapter nodeAdapter = newNodeAdapterForTest(
+      """
       {
       }
-      """);
+      """
+    );
 
     var subject = OsmConfig.mapOsmDefaults(nodeAdapter, "osmDefaults");
 
@@ -134,10 +136,12 @@ class OsmConfigTest {
 
   @Test
   void mapOsmExtractWithNoDefaults() {
-    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest("""
+    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest(
+      """
       {
       }
-      """);
+      """
+    );
 
     var defaults = OsmConfig.mapOsmDefaults(noDefaultsAdapter, "osmDefaults");
 

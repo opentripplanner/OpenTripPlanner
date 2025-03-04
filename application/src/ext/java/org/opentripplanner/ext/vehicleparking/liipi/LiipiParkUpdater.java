@@ -43,37 +43,33 @@ public class LiipiParkUpdater implements DataSource<VehicleParking> {
     OpeningHoursCalendarService openingHoursCalendarService
   ) {
     String feedId = parameters.feedId();
-    vehicleParkingMapper =
-      new LiipiParkToVehicleParkingMapper(
-        feedId,
-        openingHoursCalendarService,
-        parameters.timeZone()
-      );
+    vehicleParkingMapper = new LiipiParkToVehicleParkingMapper(
+      feedId,
+      openingHoursCalendarService,
+      parameters.timeZone()
+    );
     vehicleParkingGroupMapper = new LiipiHubToVehicleParkingGroupMapper(feedId);
     parkPatchMapper = new LiipiParkUtilizationToPatchMapper(feedId);
     var otpHttpClientFactory = new OtpHttpClientFactory();
-    facilitiesDownloader =
-      new LiipiFacilitiesDownloader(
-        parameters.facilitiesUrl(),
-        JSON_PARSE_PATH,
-        vehicleParkingMapper::parsePark,
-        otpHttpClientFactory
-      );
-    hubsDownloader =
-      new LiipiHubsDownloader(
-        parameters.hubsUrl(),
-        JSON_PARSE_PATH,
-        vehicleParkingGroupMapper::parseHub,
-        otpHttpClientFactory
-      );
-    utilizationsDownloader =
-      new JsonDataListDownloader<>(
-        parameters.utilizationsUrl(),
-        "",
-        parkPatchMapper::parseUtilization,
-        Map.of(),
-        otpHttpClientFactory.create(LOG)
-      );
+    facilitiesDownloader = new LiipiFacilitiesDownloader(
+      parameters.facilitiesUrl(),
+      JSON_PARSE_PATH,
+      vehicleParkingMapper::parsePark,
+      otpHttpClientFactory
+    );
+    hubsDownloader = new LiipiHubsDownloader(
+      parameters.hubsUrl(),
+      JSON_PARSE_PATH,
+      vehicleParkingGroupMapper::parseHub,
+      otpHttpClientFactory
+    );
+    utilizationsDownloader = new JsonDataListDownloader<>(
+      parameters.utilizationsUrl(),
+      "",
+      parkPatchMapper::parseUtilization,
+      Map.of(),
+      otpHttpClientFactory.create(LOG)
+    );
     this.facilitiesFrequencySec = parameters.facilitiesFrequencySec();
   }
 

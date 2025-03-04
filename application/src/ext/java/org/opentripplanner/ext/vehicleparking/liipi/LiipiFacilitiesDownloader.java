@@ -25,7 +25,11 @@ public class LiipiFacilitiesDownloader {
   private static final ObjectMapper mapper = new ObjectMapper();
 
   private final String jsonParsePath;
-  private final BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser;
+  private final BiFunction<
+    JsonNode,
+    Map<FeedScopedId, VehicleParkingGroup>,
+    VehicleParking
+  > facilitiesParser;
   private final String url;
   private final OtpHttpClient otpHttpClient;
 
@@ -50,22 +54,18 @@ public class LiipiFacilitiesDownloader {
     }
 
     try {
-      return otpHttpClient.getAndMap(
-        URI.create(url),
-        Map.of(),
-        is -> {
-          try {
-            return parseJSON(is, hubForPark);
-          } catch (IllegalArgumentException e) {
-            LOG.warn("Error parsing facilities from {}", url, e);
-          } catch (JsonProcessingException e) {
-            LOG.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
-          } catch (IOException e) {
-            LOG.warn("Error reading facilities from {}", url, e);
-          }
-          return null;
+      return otpHttpClient.getAndMap(URI.create(url), Map.of(), is -> {
+        try {
+          return parseJSON(is, hubForPark);
+        } catch (IllegalArgumentException e) {
+          LOG.warn("Error parsing facilities from {}", url, e);
+        } catch (JsonProcessingException e) {
+          LOG.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
+        } catch (IOException e) {
+          LOG.warn("Error reading facilities from {}", url, e);
         }
-      );
+        return null;
+      });
     } catch (OtpHttpClientException e) {
       LOG.warn("Failed to get data from url {}", url);
       return null;

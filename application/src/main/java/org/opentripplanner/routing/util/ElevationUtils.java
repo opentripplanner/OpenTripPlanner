@@ -134,13 +134,8 @@ public class ElevationUtils {
       double hypotenuse = Math.sqrt(rise * rise + run * run);
       double energy =
         hypotenuse *
-        (
-          ENERGY_PER_METER_ON_FLAT +
-          ENERGY_SLOPE_FACTOR *
-          slope_or_zero *
-          slope_or_zero *
-          slope_or_zero
-        );
+        (ENERGY_PER_METER_ON_FLAT +
+          ENERGY_SLOPE_FACTOR * slope_or_zero * slope_or_zero * slope_or_zero);
       slopeWorkCost += energy;
       double slopeSpeedCoef = slopeSpeedCoefficient(slope, coordinates[i].y);
       slopeSpeedEffectiveLength += run / slopeSpeedCoef;

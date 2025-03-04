@@ -42,7 +42,8 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
   private static final int C1_ONE_SEC = RaptorCostConverter.toRaptorCost(1);
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -50,8 +51,9 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
   @BeforeEach
   void setup() {
     data.withRoute(
-      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-        .withTimetable(schedule("0:10, 0:12, 0:14, 0:16, 0:20"))
+      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F).withTimetable(
+        schedule("0:10, 0:12, 0:14, 0:16, 0:20")
+      )
     );
     // We will test board- and alight-slack in a separate test
     data.withSlackProvider(new DefaultSlackProvider(TRANSFER_SLACK, 0, 0));
@@ -79,8 +81,7 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
   static List<RaptorModuleTestCase> testCases() {
     String expFlexAccess = "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m Tₓ2]";
     String expWalkAccess = "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m Tₓ0]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       // TODO - Why do we get only one result here - when there is 3 different pareto-optimal
       //      - paths
       .add(TC_MIN_DURATION, "[0:00 0:11 11m Tₓ0]")

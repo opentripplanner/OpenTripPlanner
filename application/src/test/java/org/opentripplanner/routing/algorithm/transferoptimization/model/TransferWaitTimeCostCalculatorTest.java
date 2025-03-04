@@ -104,13 +104,10 @@ public class TransferWaitTimeCostCalculatorTest {
 
   @Test
   public void calculateTxCostWithNoMinSafeTxTimeThrowsException() {
-    assertThrows(
-      IllegalStateException.class,
-      () -> {
-        var subject = new TransferWaitTimeCostCalculator(1.0, 2.0);
-        subject.calculateOptimizedWaitCost(d20m);
-      }
-    );
+    assertThrows(IllegalStateException.class, () -> {
+      var subject = new TransferWaitTimeCostCalculator(1.0, 2.0);
+      subject.calculateOptimizedWaitCost(d20m);
+    });
   }
 
   @Test

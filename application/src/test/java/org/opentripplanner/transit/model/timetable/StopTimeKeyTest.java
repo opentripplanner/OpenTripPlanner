@@ -12,9 +12,10 @@ class StopTimeKeyTest {
   private static final String ID = "1";
   private static final int STOP_SEQUENCE_NUMBER = 1;
 
-  private static final StopTimeKey subject = StopTimeKey
-    .of(TimetableRepositoryForTest.id(ID), STOP_SEQUENCE_NUMBER)
-    .build();
+  private static final StopTimeKey subject = StopTimeKey.of(
+    TimetableRepositoryForTest.id(ID),
+    STOP_SEQUENCE_NUMBER
+  ).build();
 
   @Test
   void copy() {

@@ -55,8 +55,10 @@ class ParkingProcessor {
   ) {
     this.issueStore = issueStore;
     this.getVertexForOsmNode = getVertexForOsmNode;
-    this.osmOpeningHoursParser =
-      new OsmOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
+    this.osmOpeningHoursParser = new OsmOpeningHoursParser(
+      graph.getOpeningHoursCalendarService(),
+      issueStore
+    );
     this.vertexFactory = new VertexFactory(graph);
     this.vehicleParkingHelper = new VehicleParkingHelper(graph);
   }
@@ -259,11 +261,8 @@ class ParkingProcessor {
       }
     }
 
-    List<VehicleParking.VehicleParkingEntranceCreator> entrances = createParkingEntrancesFromAccessVertices(
-      accessVertices,
-      creativeName,
-      entity
-    );
+    List<VehicleParking.VehicleParkingEntranceCreator> entrances =
+      createParkingEntrancesFromAccessVertices(accessVertices, creativeName, entity);
 
     if (entrances.isEmpty()) {
       entrances = createArtificialEntrances(group, creativeName, entity, isCarParkAndRide);
@@ -339,17 +338,15 @@ class ParkingProcessor {
       carCapacity.isPresent() ||
       wheelchairAccessibleCarCapacity.isPresent()
     ) {
-      vehicleParkingSpaces =
-        VehicleParkingSpaces
-          .builder()
-          .bicycleSpaces(bicycleCapacity.isPresent() ? bicycleCapacity.getAsInt() : null)
-          .carSpaces(carCapacity.isPresent() ? carCapacity.getAsInt() : null)
-          .wheelchairAccessibleCarSpaces(
-            wheelchairAccessibleCarCapacity.isPresent()
-              ? wheelchairAccessibleCarCapacity.getAsInt()
-              : null
-          )
-          .build();
+      vehicleParkingSpaces = VehicleParkingSpaces.builder()
+        .bicycleSpaces(bicycleCapacity.isPresent() ? bicycleCapacity.getAsInt() : null)
+        .carSpaces(carCapacity.isPresent() ? carCapacity.getAsInt() : null)
+        .wheelchairAccessibleCarSpaces(
+          wheelchairAccessibleCarCapacity.isPresent()
+            ? wheelchairAccessibleCarCapacity.getAsInt()
+            : null
+        )
+        .build();
     }
 
     var bicyclePlaces = !isCarParkAndRide || bicycleCapacity.orElse(0) > 0;
@@ -382,8 +379,7 @@ class ParkingProcessor {
       tags.add("osm:surveillance");
     }
 
-    return VehicleParking
-      .builder()
+    return VehicleParking.builder()
       .id(id)
       .name(creativeName)
       .coordinate(new WgsCoordinate(coordinate))
@@ -404,14 +400,15 @@ class ParkingProcessor {
     I18NString creativeName = osmEntity.getAssumedName();
     if (creativeName == null) {
       // ... otherwise resort to "CreativeNamer"s
-      creativeName =
-        osmEntity.getOsmProvider().getWayPropertySet().getCreativeNameForWay(osmEntity);
+      creativeName = osmEntity
+        .getOsmProvider()
+        .getWayPropertySet()
+        .getCreativeNameForWay(osmEntity);
     }
     if (creativeName == null) {
-      creativeName =
-        new NonLocalizedString(
-          "Park & Ride (%s/%d)".formatted(osmEntity.getClass().getSimpleName(), osmEntity.getId())
-        );
+      creativeName = new NonLocalizedString(
+        "Park & Ride (%s/%d)".formatted(osmEntity.getClass().getSimpleName(), osmEntity.getId())
+      );
     }
     return creativeName;
   }
@@ -421,13 +418,14 @@ class ParkingProcessor {
   }
 
   private OptionalInt parseCapacity(OsmEntity element, String capacityTag) {
-    return element.parseIntOrBoolean(
-      capacityTag,
-      v -> issueStore.add(new InvalidVehicleParkingCapacity(element, v))
+    return element.parseIntOrBoolean(capacityTag, v ->
+      issueStore.add(new InvalidVehicleParkingCapacity(element, v))
     );
   }
 
-  private List<VehicleParking.VehicleParkingEntranceCreator> createParkingEntrancesFromAccessVertices(
+  private List<
+    VehicleParking.VehicleParkingEntranceCreator
+  > createParkingEntrancesFromAccessVertices(
     Set<VertexAndName> accessVertices,
     I18NString vehicleParkingName,
     OsmEntity entity

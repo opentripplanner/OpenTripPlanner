@@ -17,8 +17,7 @@ class MultiLineToStringBuilderTest {
         number : 500
       }
       """.trim(),
-      MultiLineToStringBuilder
-        .of("Test")
+      MultiLineToStringBuilder.of("Test")
         .add("foo", "bar")
         .add("number", 500)
         .add("null", null)
@@ -42,16 +41,15 @@ class MultiLineToStringBuilderTest {
   void testAddColNl() {
     assertEquals(
       """
-        Test {
-          foo : [
-            A new line
-            for each entry
-            in list!
-          ]
-        }
-        """.trim(),
-      MultiLineToStringBuilder
-        .of("Test")
+      Test {
+        foo : [
+          A new line
+          for each entry
+          in list!
+        ]
+      }
+      """.trim(),
+      MultiLineToStringBuilder.of("Test")
         .addColNl("foo", List.of("A new line", "for each entry", "in list!"))
         // These are not added:
         .addColNl("null", null)

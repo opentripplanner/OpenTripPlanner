@@ -11,8 +11,7 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class NotMonitoredTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_1_INPUT = TripInput
-    .of(TRIP_1_ID)
+  private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();

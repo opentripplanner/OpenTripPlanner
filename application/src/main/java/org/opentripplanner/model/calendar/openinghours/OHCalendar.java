@@ -69,8 +69,7 @@ public class OHCalendar implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(OHCalendar.class)
+    return ToStringBuilder.of(OHCalendar.class)
       .addObj("zoneId", zoneId)
       .addCol("openingHours", openingHours)
       .toString();

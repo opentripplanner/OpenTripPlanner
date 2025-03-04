@@ -118,8 +118,10 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
 
     this.configRef = Objects.requireNonNull(config.configRef(), "configRef must not be null");
-    this.authenticationType =
-      Objects.requireNonNull(config.getAuthenticationType(), "authenticationType must not be null");
+    this.authenticationType = Objects.requireNonNull(
+      config.getAuthenticationType(),
+      "authenticationType must not be null"
+    );
     this.topicName = Objects.requireNonNull(config.getTopicName(), "topicName must not be null");
     this.updaterType = Objects.requireNonNull(config.getType(), "type must not be null");
     this.timeout = config.getTimeout();
@@ -127,18 +129,16 @@ public class SiriAzureUpdater implements GraphUpdater {
     this.prefetchCount = config.getPrefetchCount();
 
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      this.fullyQualifiedNamespace =
-        Objects.requireNonNull(
-          config.getFullyQualifiedNamespace(),
-          "fullyQualifiedNamespace must not be null when using FederatedIdentity authentication"
-        );
+      this.fullyQualifiedNamespace = Objects.requireNonNull(
+        config.getFullyQualifiedNamespace(),
+        "fullyQualifiedNamespace must not be null when using FederatedIdentity authentication"
+      );
       this.serviceBusUrl = null;
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      this.serviceBusUrl =
-        Objects.requireNonNull(
-          config.getServiceBusUrl(),
-          "serviceBusUrl must not be null when using SharedAccessKey authentication"
-        );
+      this.serviceBusUrl = Objects.requireNonNull(
+        config.getServiceBusUrl(),
+        "serviceBusUrl must not be null when using SharedAccessKey authentication"
+      );
       this.fullyQualifiedNamespace = null;
     } else {
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
@@ -193,19 +193,16 @@ public class SiriAzureUpdater implements GraphUpdater {
 
       setPrimed();
 
-      ApplicationShutdownSupport.addShutdownHook(
-        "azure-siri-updater-shutdown",
-        () -> {
-          LOG.info("Calling shutdownHook on AbstractAzureSiriUpdater");
-          if (eventProcessor != null) {
-            eventProcessor.close();
-          }
-          if (serviceBusAdmin != null) {
-            serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
-            LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
-          }
+      ApplicationShutdownSupport.addShutdownHook("azure-siri-updater-shutdown", () -> {
+        LOG.info("Calling shutdownHook on AbstractAzureSiriUpdater");
+        if (eventProcessor != null) {
+          eventProcessor.close();
         }
-      );
+        if (serviceBusAdmin != null) {
+          serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+          LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
+        }
+      });
     } catch (ServiceBusException e) {
       LOG.error("Service Bus encountered an error during setup: {}", e.getMessage(), e);
     } catch (URISyntaxException e) {
@@ -299,15 +296,13 @@ public class SiriAzureUpdater implements GraphUpdater {
   private void setupSubscription() throws ServiceBusException, URISyntaxException {
     // Client with permissions to create subscription
     if (authenticationType == AuthenticationType.FederatedIdentity) {
-      serviceBusAdmin =
-        new ServiceBusAdministrationClientBuilder()
-          .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
-          .buildAsyncClient();
+      serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
+        .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
+        .buildAsyncClient();
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
-      serviceBusAdmin =
-        new ServiceBusAdministrationClientBuilder()
-          .connectionString(serviceBusUrl)
-          .buildAsyncClient();
+      serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
+        .connectionString(serviceBusUrl)
+        .buildAsyncClient();
     }
 
     // Set options
@@ -357,17 +352,16 @@ public class SiriAzureUpdater implements GraphUpdater {
       throw new IllegalArgumentException("Unsupported authentication type: " + authenticationType);
     }
 
-    eventProcessor =
-      clientBuilder
-        .processor()
-        .topicName(topicName)
-        .subscriptionName(subscriptionName)
-        .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
-        .disableAutoComplete() // Receive and delete does not need autocomplete
-        .prefetchCount(prefetchCount)
-        .processError(this::errorConsumer)
-        .processMessage(this::handleMessage)
-        .buildProcessorClient();
+    eventProcessor = clientBuilder
+      .processor()
+      .topicName(topicName)
+      .subscriptionName(subscriptionName)
+      .receiveMode(ServiceBusReceiveMode.RECEIVE_AND_DELETE)
+      .disableAutoComplete() // Receive and delete does not need autocomplete
+      .prefetchCount(prefetchCount)
+      .processError(this::errorConsumer)
+      .processMessage(this::handleMessage)
+      .buildProcessorClient();
 
     eventProcessor.start();
     LOG.info(

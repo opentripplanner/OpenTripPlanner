@@ -34,8 +34,7 @@ public class TableTestReport {
   /* private methods */
 
   private static TableBuilder newTable() {
-    return Table
-      .of()
+    return Table.of()
       .withAlights(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left)
       .withHeaders(
         "STATUS",

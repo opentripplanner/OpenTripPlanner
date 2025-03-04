@@ -18,8 +18,6 @@ import org.opentripplanner.ext.restapi.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.ext.restapi.model.ElevationMetadata;
 import org.opentripplanner.ext.restapi.model.TripPlannerResponse;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,14 +60,12 @@ public class PlannerResource extends RoutingResource {
 
     // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
     TripPlannerResponse response = new TripPlannerResponse(uriInfo);
-    RouteRequest request = null;
-    RoutingResponse res = null;
     try {
       /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
-      request = super.buildRequest(uriInfo.getQueryParameters());
+      var request = super.buildRequest(uriInfo.getQueryParameters());
 
       // Route
-      res = serverContext.routingService().route(request);
+      var res = serverContext.routingService().route(request);
 
       // Map to API
       // TODO VIA (Leonard) - we should store the default showIntermediateStops somewhere
@@ -89,8 +85,8 @@ public class PlannerResource extends RoutingResource {
 
       /* Populate up the elevation metadata */
       response.elevationMetadata = new ElevationMetadata();
-      response.elevationMetadata.ellipsoidToGeoidDifference =
-        serverContext.graph().ellipsoidToGeoidDifference;
+      response.elevationMetadata.ellipsoidToGeoidDifference = serverContext.graph()
+        .ellipsoidToGeoidDifference;
       response.elevationMetadata.geoidElevation = request.preferences().system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();

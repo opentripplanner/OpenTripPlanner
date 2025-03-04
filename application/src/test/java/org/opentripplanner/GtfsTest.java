@@ -110,8 +110,7 @@ public abstract class GtfsTest {
     }
     routingRequest.setWheelchair(wheelchairAccessible);
 
-    RequestModesBuilder requestModesBuilder = RequestModes
-      .of()
+    RequestModesBuilder requestModesBuilder = RequestModes.of()
       .withDirectMode(NOT_SET)
       .withAccessMode(WALK)
       .withTransferMode(WALK)
@@ -230,8 +229,11 @@ public abstract class GtfsTest {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       LocalDate::now
     );
-    tripUpdateAdapter =
-      new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, LocalDate::now);
+    tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      LocalDate::now
+    );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
@@ -253,7 +255,11 @@ public abstract class GtfsTest {
       );
       alertsUpdateHandler.update(feedMessage, null);
     } catch (FileNotFoundException exception) {}
-    serverContext =
-      TestServerContext.createServerContext(graph, timetableRepository, snapshotManager, null);
+    serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      snapshotManager,
+      null
+    );
   }
 }

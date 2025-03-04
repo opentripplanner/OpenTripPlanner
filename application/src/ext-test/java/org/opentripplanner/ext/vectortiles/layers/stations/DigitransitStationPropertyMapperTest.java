@@ -26,8 +26,7 @@ public class DigitransitStationPropertyMapperTest {
 
     var mapper = DigitransitStationPropertyMapper.create(transitService, Locale.US);
 
-    var station = Station
-      .of(id("a-station"))
+    var station = Station.of(id("a-station"))
       .withCoordinate(1, 1)
       .withName(I18NString.of("A station"))
       .build();

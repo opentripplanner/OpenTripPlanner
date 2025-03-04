@@ -39,13 +39,17 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
   private static final RaptorAccessEgress FLEX_1x_8m = flex(STOP, D8m, 1, C1);
   private static final RaptorAccessEgress FLEX_2x_8m = flex(STOP, D8m, 2, C1);
   private static final RaptorAccessEgress FLEX_AND_WALK_1x_8m = flexAndWalk(STOP, D8m, 1, C1);
-  private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress
-    .walk(STOP, D8m, C1)
-    .openingHours(T00_00, T01_00);
+  private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m = TestAccessEgress.walk(
+    STOP,
+    D8m,
+    C1
+  ).openingHours(T00_00, T01_00);
 
-  private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m_OTHER = TestAccessEgress
-    .walk(STOP, D8m, C1)
-    .openingHours(T00_10, T01_00);
+  private static final RaptorAccessEgress WALK_W_OPENING_HOURS_8m_OTHER = TestAccessEgress.walk(
+    STOP,
+    D8m,
+    C1
+  ).openingHours(T00_10, T01_00);
 
   @Test
   void removeNonOptimalPathsForStandardRaptorTest() {

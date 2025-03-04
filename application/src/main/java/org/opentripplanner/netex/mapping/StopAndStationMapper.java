@@ -74,15 +74,14 @@ class StopAndStationMapper {
     boolean noTransfersOnIsolatedStops,
     Set<FeedScopedId> routeToCentroidStopPlaceIds
   ) {
-    this.stationMapper =
-      new StationMapper(
-        issueStore,
-        idFactory,
-        defaultTimeZone,
-        noTransfersOnIsolatedStops,
-        routeToCentroidStopPlaceIds,
-        siteRepositoryBuilder
-      );
+    this.stationMapper = new StationMapper(
+      issueStore,
+      idFactory,
+      defaultTimeZone,
+      noTransfersOnIsolatedStops,
+      routeToCentroidStopPlaceIds,
+      siteRepositoryBuilder
+    );
     this.quayMapper = new QuayMapper(idFactory, issueStore, siteRepositoryBuilder);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
@@ -241,11 +240,10 @@ class StopAndStationMapper {
     var defaultWheelChairBoarding = Accessibility.NO_INFORMATION;
 
     if (stopPlace != null) {
-      defaultWheelChairBoarding =
-        WheelChairMapper.wheelchairAccessibility(
-          stopPlace.getAccessibilityAssessment(),
-          Accessibility.NO_INFORMATION
-        );
+      defaultWheelChairBoarding = WheelChairMapper.wheelchairAccessibility(
+        stopPlace.getAccessibilityAssessment(),
+        Accessibility.NO_INFORMATION
+      );
     }
 
     return WheelChairMapper.wheelchairAccessibility(

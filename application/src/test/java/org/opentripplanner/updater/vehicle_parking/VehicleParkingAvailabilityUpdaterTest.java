@@ -27,20 +27,21 @@ import org.opentripplanner.updater.spi.GraphUpdater;
 
 class VehicleParkingAvailabilityUpdaterTest {
 
-  private static final VehicleParkingUpdaterParameters PARAMETERS = VehicleParkingUpdaterConfig.create(
-    "ref",
-    newNodeAdapterForTest(
-      """
-      {
-        "type" : "vehicle-parking",
-        "feedId" : "parking",
-        "sourceType" : "siri-fm",
-        "frequency": "0s",
-        "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
-      }
-    """
-    )
-  );
+  private static final VehicleParkingUpdaterParameters PARAMETERS =
+    VehicleParkingUpdaterConfig.create(
+      "ref",
+      newNodeAdapterForTest(
+        """
+          {
+            "type" : "vehicle-parking",
+            "feedId" : "parking",
+            "sourceType" : "siri-fm",
+            "frequency": "0s",
+            "url" : "https://transmodel.api.opendatahub.com/siri-lite/fm/parking"
+          }
+        """
+      )
+    );
 
   private static final FeedScopedId ID = id("parking1");
   private static final AvailabiltyUpdate DEFAULT_UPDATE = new AvailabiltyUpdate(ID, 8);
@@ -108,8 +109,7 @@ class VehicleParkingAvailabilityUpdaterTest {
   }
 
   private static VehicleParking.VehicleParkingBuilder parkingBuilder() {
-    return VehicleParking
-      .builder()
+    return VehicleParking.builder()
       .id(ID)
       .name(I18NString.of("parking"))
       .coordinate(WgsCoordinate.GREENWICH);
@@ -120,10 +120,8 @@ class VehicleParkingAvailabilityUpdaterTest {
 
       private static final Graph GRAPH = new Graph();
       private static final TimetableRepository TRANSIT_MODEL = new TimetableRepository();
-      public static final DefaultRealTimeUpdateContext REAL_TIME_UPDATE_CONTEXT = new DefaultRealTimeUpdateContext(
-        GRAPH,
-        TRANSIT_MODEL
-      );
+      public static final DefaultRealTimeUpdateContext REAL_TIME_UPDATE_CONTEXT =
+        new DefaultRealTimeUpdateContext(GRAPH, TRANSIT_MODEL);
 
       public GraphUpdaterMock(List<GraphUpdater> updaters) {
         super(REAL_TIME_UPDATE_CONTEXT, updaters);

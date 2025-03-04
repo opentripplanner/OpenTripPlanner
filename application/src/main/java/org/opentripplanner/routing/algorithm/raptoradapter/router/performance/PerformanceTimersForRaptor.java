@@ -25,10 +25,12 @@ public class PerformanceTimersForRaptor implements RaptorTimers {
     this.routingTags = routingTags;
     var tags = MicrometerUtils.mapTimingTags(routingTags);
     timerRoute = Timer.builder("raptor." + namePrefix + ".route").tags(tags).register(registry);
-    findTransitPerRound =
-      Timer.builder("raptor." + namePrefix + ".minute.transit").tags(tags).register(registry);
-    findTransfersPerRound =
-      Timer.builder("raptor." + namePrefix + ".minute.transfers").tags(tags).register(registry);
+    findTransitPerRound = Timer.builder("raptor." + namePrefix + ".minute.transit")
+      .tags(tags)
+      .register(registry);
+    findTransfersPerRound = Timer.builder("raptor." + namePrefix + ".minute.transfers")
+      .tags(tags)
+      .register(registry);
   }
 
   public Timer timerRoute() {

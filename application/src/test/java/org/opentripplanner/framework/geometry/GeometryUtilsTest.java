@@ -90,7 +90,8 @@ public class GeometryUtilsTest {
     referenceCoordinates[8][0] = coordinates;
 
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    CoordinateSequenceFactory coordinateSequenceFactory = geometryFactory.getCoordinateSequenceFactory();
+    CoordinateSequenceFactory coordinateSequenceFactory =
+      geometryFactory.getCoordinateSequenceFactory();
     CoordinateSequence sequence = coordinateSequenceFactory.create(coordinates);
     LineString geometry = new LineString(sequence, geometryFactory);
 
@@ -246,17 +247,15 @@ public class GeometryUtilsTest {
 
   @Test
   void toEnvelopes() {
-    Coordinate[] coordinates = List
-      .of(
-        new Coordinate(0, 0),
-        new Coordinate(1, 1),
-        new Coordinate(2, 2),
-        new Coordinate(3, 3),
-        new Coordinate(4, 4),
-        new Coordinate(5, 5),
-        new Coordinate(6, 6)
-      )
-      .toArray(new Coordinate[0]);
+    Coordinate[] coordinates = List.of(
+      new Coordinate(0, 0),
+      new Coordinate(1, 1),
+      new Coordinate(2, 2),
+      new Coordinate(3, 3),
+      new Coordinate(4, 4),
+      new Coordinate(5, 5),
+      new Coordinate(6, 6)
+    ).toArray(new Coordinate[0]);
 
     LineString line = GeometryUtils.makeLineString(coordinates);
 

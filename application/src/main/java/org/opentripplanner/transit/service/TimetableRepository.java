@@ -111,7 +111,8 @@ public class TimetableRepository implements Serializable {
    * An optionally present second RaptorTransitData representing the contents of this TimetableRepository plus
    * the results of realtime updates in the latest TimetableSnapshot.
    */
-  private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData = new ConcurrentPublished<>();
+  private final transient ConcurrentPublished<RaptorTransitData> realtimeRaptorTransitData =
+    new ConcurrentPublished<>();
 
   private final transient Deduplicator deduplicator;
 
@@ -354,10 +355,8 @@ public class TimetableRepository implements Serializable {
       Collection<ZoneId> zones = getAgencyTimeZones();
       if (zones.size() > 1) {
         throw new IllegalStateException(
-          (
-            "The graph contains agencies with different time zones: %s. " +
-            "Please configure the one to be used in the %s"
-          ).formatted(zones, BUILD_CONFIG_FILENAME)
+          ("The graph contains agencies with different time zones: %s. " +
+            "Please configure the one to be used in the %s").formatted(zones, BUILD_CONFIG_FILENAME)
         );
       }
     }

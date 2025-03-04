@@ -23,8 +23,7 @@ import org.opentripplanner.transit.service.SiteRepository;
 
 public class PlaceTest {
 
-  private static final Geometry GEOMETRY = GeometryUtils
-    .getGeometryFactory()
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
     .createPoint(new Coordinate(11, 60));
 
   @Test
@@ -79,8 +78,7 @@ public class PlaceTest {
   @ParameterizedTest(name = "Flex stop name of {0} should lead to a place name of {1}")
   @MethodSource("flexStopCases")
   public void flexStop(I18NString stopName, String expectedPlaceName) {
-    var stop = SiteRepository
-      .of()
+    var stop = SiteRepository.of()
       .areaStop(new FeedScopedId("1", "stop_id"))
       .withGeometry(GEOMETRY)
       .withName(stopName)

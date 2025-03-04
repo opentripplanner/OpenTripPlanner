@@ -10,18 +10,10 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  */
 public class TemporarySplitterVertex extends SplitterVertex implements TemporaryVertex {
 
-  private final boolean endVertex;
   private boolean wheelchairAccessible;
 
-  public TemporarySplitterVertex(
-    String label,
-    double x,
-    double y,
-    StreetEdge streetEdge,
-    boolean endVertex
-  ) {
+  public TemporarySplitterVertex(String label, double x, double y, StreetEdge streetEdge) {
     super(label, x, y, streetEdge.getName());
-    this.endVertex = endVertex;
     this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
   }
 
@@ -35,11 +27,6 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
   public void addIncoming(Edge edge) {
     // Removed check for edge being temporary
     super.addIncoming(edge);
-  }
-
-  @Override
-  public boolean isEndVertex() {
-    return endVertex;
   }
 
   public boolean isWheelchairAccessible() {

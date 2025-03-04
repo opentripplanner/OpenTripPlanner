@@ -9,13 +9,11 @@ import java.util.Map;
 public class MultilingualStringType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("MultilingualString")
       .description("Text with language")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("value")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .dataFetcher(environment ->
@@ -24,8 +22,7 @@ public class MultilingualStringType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("language")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((Map.Entry<String, String>) environment.getSource()).getKey()

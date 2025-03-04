@@ -15,9 +15,9 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class InvalidStopPointRefTest implements RealtimeTestConstants {
 
   private static Stream<Arguments> cases() {
-    return Stream
-      .of("", " ", "   ", "\n", "null", "\t", null)
-      .flatMap(id -> Stream.of(Arguments.of(id, true), Arguments.of(id, false)));
+    return Stream.of("", " ", "   ", "\n", "null", "\t", null).flatMap(id ->
+      Stream.of(Arguments.of(id, true), Arguments.of(id, false))
+    );
   }
 
   @ParameterizedTest(name = "invalid id of ''{0}'', extraJourney={1}")

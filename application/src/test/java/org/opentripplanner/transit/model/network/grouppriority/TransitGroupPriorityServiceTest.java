@@ -80,8 +80,7 @@ class TransitGroupPriorityServiceTest {
 
   @Test
   void lookupTransitGroupIdByAgency() {
-    var select = TransitGroupSelect
-      .of()
+    var select = TransitGroupSelect.of()
       .addModes(List.of(TransitMode.BUS, TransitMode.RAIL))
       .build();
 

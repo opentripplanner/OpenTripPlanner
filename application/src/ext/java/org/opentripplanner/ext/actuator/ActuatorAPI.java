@@ -32,27 +32,26 @@ public class ActuatorAPI {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   public Response actuator(@Context UriInfo uriInfo) {
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity(
         String.format(
           """
-            {
-              "_links" : {
-                "self" : {
-                  "href" : "%1$s",
-                  "templated" : false
-                },
-                "health" : {
-                  "href" : "%1$s/health",
-                  "templated" : false
-                },
-                "prometheus" : {
-                  "href" : "%1$s/prometheus",
-                  "templated" : false
-                }
+          {
+            "_links" : {
+              "self" : {
+                "href" : "%1$s",
+                "templated" : false
+              },
+              "health" : {
+                "href" : "%1$s/health",
+                "templated" : false
+              },
+              "prometheus" : {
+                "href" : "%1$s/prometheus",
+                "templated" : false
               }
-            }""",
+            }
+          }""",
           uriInfo.getRequestUri().toString().replace("$/", "")
         )
       )
@@ -74,8 +73,7 @@ public class ActuatorAPI {
       if (!listUnprimedUpdaters.isEmpty()) {
         LOG.info("Graph ready, waiting for updaters: {}", listUnprimedUpdaters);
         throw new WebApplicationException(
-          Response
-            .status(Response.Status.NOT_FOUND)
+          Response.status(Response.Status.NOT_FOUND)
             .entity("Graph ready, waiting for updaters: " + listUnprimedUpdaters + "\n")
             .type("text/plain")
             .build()
@@ -83,8 +81,7 @@ public class ActuatorAPI {
       }
     }
 
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity("{\n" + "  \"status\" : \"UP\"" + "\n}")
       .type("application/json")
       .build();
@@ -104,8 +101,7 @@ public class ActuatorAPI {
       ? CONTENT_TYPE_OPENMETRICS_100
       : CONTENT_TYPE_004;
 
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity(prometheusRegistry.scrape(contentType))
       .type(contentType)
       .build();

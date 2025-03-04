@@ -16,13 +16,11 @@ public class RentalVehicleType {
     GraphQLOutputType vehicleTypeType,
     GraphQLInterfaceType placeInterface
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .withInterface(placeInterface)
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
@@ -31,24 +29,21 @@ public class RentalVehicleType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("vehicleType")
           .type(new GraphQLNonNull(vehicleTypeType))
           .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).vehicleType)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("network")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).getNetwork())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
           .dataFetcher(environment ->
@@ -57,8 +52,7 @@ public class RentalVehicleType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
           .dataFetcher(environment -> ((VehicleRentalVehicle) environment.getSource()).getLatitude()
@@ -66,8 +60,7 @@ public class RentalVehicleType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("currentRangeMeters")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment ->

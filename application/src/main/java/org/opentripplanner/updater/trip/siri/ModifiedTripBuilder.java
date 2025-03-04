@@ -257,13 +257,13 @@ class ModifiedTripBuilder {
         final int stopIndex = i;
         builder.stops.with(stopIndex, callStop);
 
-        PickDropMapper
-          .mapPickUpType(call, builder.pickups.original(stopIndex))
-          .ifPresent(value -> builder.pickups.with(stopIndex, value));
+        PickDropMapper.mapPickUpType(call, builder.pickups.original(stopIndex)).ifPresent(value ->
+          builder.pickups.with(stopIndex, value)
+        );
 
-        PickDropMapper
-          .mapDropOffType(call, builder.dropoffs.original(stopIndex))
-          .ifPresent(value -> builder.dropoffs.with(stopIndex, value));
+        PickDropMapper.mapDropOffType(call, builder.dropoffs.original(stopIndex)).ifPresent(value ->
+          builder.dropoffs.with(stopIndex, value)
+        );
 
         alreadyVisited.add(call);
         break;

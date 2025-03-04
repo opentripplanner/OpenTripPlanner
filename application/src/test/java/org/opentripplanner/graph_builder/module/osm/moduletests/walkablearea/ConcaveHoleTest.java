@@ -61,14 +61,12 @@ public class ConcaveHoleTest {
     var outerRingId = 1000;
     var holeId = 1001;
 
-    var relation = RelationBuilder
-      .ofMultiPolygon()
+    var relation = RelationBuilder.ofMultiPolygon()
       .withWayMember(outerRingId, "outer")
       .withWayMember(holeId, "inner")
       .build();
 
-    var provider = TestOsmProvider
-      .of()
+    var provider = TestOsmProvider.of()
       .addAreaFromNodes(outerRingId, outerRing)
       .addAreaFromNodes(holeId, hole)
       .addWayFromNodes(outside0, inside0)
@@ -77,13 +75,12 @@ public class ConcaveHoleTest {
       .build();
 
     var graph = new Graph(new Deduplicator());
-    var osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
       .build();

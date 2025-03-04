@@ -37,8 +37,12 @@ public class WayPropertySet {
   private static final Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
   /** Sets 1.0 as default safety value for all permissions. */
-  private final TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> DEFAULT_SAFETY_RESOLVER =
-    ((permission, speedLimit, osmWay) -> 1.0);
+  private final TriFunction<
+    StreetTraversalPermission,
+    Float,
+    OsmEntity,
+    Double
+  > DEFAULT_SAFETY_RESOLVER = ((permission, speedLimit, osmWay) -> 1.0);
 
   private final List<WayPropertyPicker> wayProperties;
 
@@ -64,9 +68,19 @@ public class WayPropertySet {
    */
   public float maxUsedCarSpeed = 0f;
   /** Resolves walk safety value for each {@link StreetTraversalPermission}. */
-  private TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultWalkSafetyForPermission;
+  private TriFunction<
+    StreetTraversalPermission,
+    Float,
+    OsmEntity,
+    Double
+  > defaultWalkSafetyForPermission;
   /** Resolves bicycle safety value for each {@link StreetTraversalPermission}. */
-  private TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultBicycleSafetyForPermission;
+  private TriFunction<
+    StreetTraversalPermission,
+    Float,
+    OsmEntity,
+    Double
+  > defaultBicycleSafetyForPermission;
   /** The WayProperties applied to all ways that do not match any WayPropertyPicker. */
   private final WayProperties defaultProperties;
   private final DataImportIssueStore issueStore;
@@ -236,8 +250,9 @@ public class WayPropertySet {
       }
     }
 
-    if (way.hasTag("maxspeed") && speed == null) speed =
-      getMetersSecondFromSpeed(way.getTag("maxspeed"));
+    if (way.hasTag("maxspeed") && speed == null) speed = getMetersSecondFromSpeed(
+      way.getTag("maxspeed")
+    );
 
     if (speed != null) {
       // Too low (less than 5 km/h) or too high speed limit indicates an error in the data,
@@ -431,7 +446,12 @@ public class WayPropertySet {
    * provide a default for each permission. Safety can vary based on car speed limit on a way.
    */
   public void setDefaultBicycleSafetyForPermission(
-    TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultBicycleSafetyForPermission
+    TriFunction<
+      StreetTraversalPermission,
+      Float,
+      OsmEntity,
+      Double
+    > defaultBicycleSafetyForPermission
   ) {
     if (!this.defaultBicycleSafetyForPermission.equals(DEFAULT_SAFETY_RESOLVER)) {
       throw new IllegalStateException("A custom default cycling safety resolver was already set");

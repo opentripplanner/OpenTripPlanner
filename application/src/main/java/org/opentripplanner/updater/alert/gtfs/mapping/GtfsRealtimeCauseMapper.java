@@ -40,10 +40,9 @@ public class GtfsRealtimeCauseMapper {
       case MEDICAL_EMERGENCY:
         return AlertCause.MEDICAL_EMERGENCY;
       case UNKNOWN_CAUSE:
-      default:
-        {
-          return AlertCause.UNKNOWN_CAUSE;
-        }
+      default: {
+        return AlertCause.UNKNOWN_CAUSE;
+      }
     }
   }
 }
