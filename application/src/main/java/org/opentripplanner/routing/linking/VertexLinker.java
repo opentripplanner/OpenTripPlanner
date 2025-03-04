@@ -382,7 +382,7 @@ public class VertexLinker {
     return closesEdges;
   }
 
-  /** Split the edge if necessary return the closest vertex */
+  /* Snap a vertex to and edge if necessary, create required linking and return the applied entry vertex */
   private StreetVertex link(
     Vertex vertex,
     StreetEdge edge,
@@ -392,73 +392,83 @@ public class VertexLinker {
     DisposableEdgeCollection tempEdges,
     Set<AreaGroup> linkedAreas
   ) {
-    // TODO: we've already built this line string, we should save it
-    LineString orig = edge.getGeometry();
-    LineString transformed = equirectangularProject(orig, xScale);
-    LocationIndexedLine il = new LocationIndexedLine(transformed);
-    LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xScale, vertex.getLat()));
-    double length = SphericalDistanceLibrary.length(orig);
-
     IntersectionVertex start = null;
-    boolean snapped = true;
+    boolean added = false;
+    boolean split = false;
 
-    // if we're very close to one end of the line or the other, or endwise, don't bother to split,
-    // cut to the chase and link directly
-    // We use a really tiny epsilon here because we only want points that actually snap to exactly the same location on the
-    // street to use the same vertices. Otherwise the order the stops are loaded in will affect where they are snapped.
-    if (
-      ll.getSegmentIndex() == 0 &&
-      (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)
-    ) {
-      start = (IntersectionVertex) edge.getFromVertex();
-    }
-    // -1 converts from count to index. Because of the fencepost problem, npoints - 1 is the "segment"
-    // past the last point
-    else if (ll.getSegmentIndex() == orig.getNumPoints() - 1) {
-      start = (IntersectionVertex) edge.getToVertex();
-    }
-    // nPoints - 2: -1 to correct for index vs count, -1 to account for fencepost problem
-    else if (
-      ll.getSegmentIndex() == orig.getNumPoints() - 2 &&
-      (ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
-    ) {
-      start = (IntersectionVertex) edge.getToVertex();
-    } else {
-      snapped = false;
-      boolean split = true;
-      // if vertex is inside an area, no need to snap to nearest edge and split it
-      if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
-        AreaGroup ag = aEdge.getArea();
-        if (linkedAreas.contains(ag)) {
-          return null;
-        }
-        if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
-          linkedAreas.add(ag);
-          if (vertex instanceof IntersectionVertex iv) {
-            start = iv;
-          } else {
-            start = splitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
-          }
-          split = false;
-        }
-      }
-      if (split) {
-        // split the edge, get the split vertex
-        start = split(edge, ll, scope, direction, tempEdges);
-      }
-    }
-
+    // if vertex is inside an area, no need to snap to nearest edge and split it
     if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
-      if (!snapped || !aEdge.getArea().visibilityVertices().contains(start)) {
-        addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
+      AreaGroup ag = aEdge.getArea();
+
+      if (linkedAreas.contains(ag)) {
+        // do not link many times to the same area
+        return null;
+      }
+      if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+        // vertex is inside an area
+        linkedAreas.add(ag);
+        if (vertex instanceof IntersectionVertex iv) {
+          start = iv;
+        } else {
+          start = createSplitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+        }
+      } else {
+        // vertex is outside an area. Split the current area edge and connect
+        // split point to area visibility points to achieve optimal paths
+        start = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
+        split = true;
+      }
+      if (!ag.visibilityVertices().contains(start)) {
+        added = addAreaVertex(start, ag, scope, tempEdges);
+      } else {
+        added = true;
       }
     }
+    if (!added && !split) {
+      start = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
+    }
+
     // TODO Consider moving this code
     if (OTPFeature.FlexRouting.isOn()) {
       FlexLocationAdder.addFlexLocations(edge, start, siteRepository);
     }
 
     return start;
+  }
+
+  /**
+   * Check if an edge needs splitting and split if necessary
+   */
+  private IntersectionVertex findSplitVertex(
+    Vertex vertex,
+    StreetEdge edge,
+    double xScale,
+    Scope scope,
+    LinkingDirection direction,
+    DisposableEdgeCollection tempEdges
+  ) {
+    LineString geom = edge.getGeometry();
+    LineString transformed = equirectangularProject(geom, xScale);
+    LocationIndexedLine il = new LocationIndexedLine(transformed);
+    LinearLocation ll = il.project(new Coordinate(vertex.getLon() * xScale, vertex.getLat()));
+    double length = SphericalDistanceLibrary.length(geom);
+
+    // if we're very close to one end of the edge, don't split
+    if (
+      ll.getSegmentIndex() == 0 &&
+      (ll.getSegmentFraction() < 1e-8 || ll.getSegmentFraction() * length < 0.1)
+    ) {
+      return (IntersectionVertex) edge.getFromVertex();
+    } else if (ll.getSegmentIndex() == geom.getNumPoints() - 1) {
+      return (IntersectionVertex) edge.getToVertex();
+    } else if (
+      ll.getSegmentIndex() == geom.getNumPoints() - 2 &&
+      (ll.getSegmentFraction() > 1 - 1e-8 || (1 - ll.getSegmentFraction()) * length < 0.1)
+    ) {
+      return (IntersectionVertex) edge.getToVertex();
+    }
+    // split the edge and return the split vertex
+    return split(edge, ll.getCoordinate(geom), scope, direction, tempEdges);
   }
 
   /**
@@ -473,17 +483,18 @@ public class VertexLinker {
    */
   private SplitterVertex split(
     StreetEdge originalEdge,
-    LinearLocation ll,
+    Coordinate splitPoint,
     Scope scope,
     LinkingDirection direction,
     DisposableEdgeCollection tempEdges
   ) {
-    LineString geometry = originalEdge.getGeometry();
-
-    // create the geometries
-    Coordinate splitPoint = ll.getCoordinate(geometry);
-
-    SplitterVertex v = splitVertex(originalEdge, scope, direction, splitPoint.x, splitPoint.y);
+    SplitterVertex v = createSplitVertex(
+      originalEdge,
+      scope,
+      direction,
+      splitPoint.x,
+      splitPoint.y
+    );
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
@@ -510,11 +521,10 @@ public class VertexLinker {
         graph.removeEdge(originalEdge);
       }
     }
-
     return v;
   }
 
-  private SplitterVertex splitVertex(
+  private SplitterVertex createSplitVertex(
     StreetEdge originalEdge,
     Scope scope,
     LinkingDirection direction,
@@ -546,8 +556,6 @@ public class VertexLinker {
   private static class DistanceTo<T> {
 
     T item;
-    // Possible optimization: store squared lat to skip thousands of sqrt operations
-    // However we're using JTS distance functions that probably won't allow us to skip the final sqrt call.
     double distanceDegreesLat;
 
     public DistanceTo(T item, double distanceDegreesLat) {
@@ -593,7 +601,6 @@ public class VertexLinker {
    * Safely add a vertex to an area. This creates edges to all visibility vertices
    * unless those edges would cross one of the area boundary edges
    */
-
   private boolean addAreaVertex(
     IntersectionVertex newVertex,
     AreaGroup areaGroup,
@@ -632,16 +639,9 @@ public class VertexLinker {
       }
     }
     for (IntersectionVertex v : visibilityVertices) {
-      LineString newGeometry = GEOMETRY_FACTORY.createLineString(
-        new Coordinate[] { newVertex.getCoordinate(), v.getCoordinate() }
-      );
-      // ensure that new edge does not leave the bounds of the area or hit any holes
-      if (!polygon.contains(newGeometry)) {
-        continue;
+      if (addVisibilityEdges(newVertex, v, areaGroup, scope, tempEdges)) {
+        added++;
       }
-      // add connecting edges
-      createEdges(newVertex, v, areaGroup, scope, tempEdges);
-      added++;
     }
     // return false if new vertex could not be connected without intersecting the boundary
     // this happens when the added vertex is outside the area or all visibility edges are blocked
@@ -675,7 +675,8 @@ public class VertexLinker {
     return modes;
   }
 
-  private void createEdges(
+  /* Check if and edge candiate does not cross the area boundary and add it if it does not */
+  private boolean addVisibilityEdges(
     IntersectionVertex from,
     IntersectionVertex to,
     AreaGroup ag,
@@ -684,12 +685,30 @@ public class VertexLinker {
   ) {
     // Check that vertices are not yet linked
     if (from.isConnected(to)) {
-      return;
+      return true;
     }
     LineString line = GEOMETRY_FACTORY.createLineString(
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
+    // ensure that new edge does not leave the bounds of the area or hit any holes
+    if (!ag.getGeometry().contains(line)) {
+      return false;
+    }
+    // add connecting edges
+    createEdges(line, from, to, ag, scope, tempEdges);
 
+    return true;
+  }
+
+  /* Create a new visibility edge pair within an AreaGroup */
+  private void createEdges(
+    LineString line,
+    IntersectionVertex from,
+    IntersectionVertex to,
+    AreaGroup ag,
+    Scope scope,
+    DisposableEdgeCollection tempEdges
+  ) {
     Area hit = null;
     for (Area area : ag.getAreas()) {
       Geometry polygon = area.getGeometry();
