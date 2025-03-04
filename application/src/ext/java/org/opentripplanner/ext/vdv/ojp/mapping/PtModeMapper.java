@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.ojp;
+package org.opentripplanner.ext.vdv.ojp.mapping;
 
 import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
 import org.opentripplanner.transit.model.basic.TransitMode;
