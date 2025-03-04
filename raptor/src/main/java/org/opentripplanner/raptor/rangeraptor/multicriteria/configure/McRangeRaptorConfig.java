@@ -113,15 +113,14 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    */
   public McStopArrivals<T> stopArrivals() {
     if (arrivals == null) {
-      this.arrivals =
-        new McStopArrivals<>(
-          context().nStops(),
-          contextLeg.egressPaths(),
-          createViaConnectionListeners(),
-          createDestinationArrivalPaths(),
-          createFactoryParetoComparator(),
-          context().debugFactory()
-        );
+      this.arrivals = new McStopArrivals<>(
+        context().nStops(),
+        contextLeg.egressPaths(),
+        createViaConnectionListeners(),
+        createDestinationArrivalPaths(),
+        createFactoryParetoComparator(),
+        context().debugFactory()
+      );
     }
     return arrivals;
   }
@@ -160,24 +159,24 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private McRangeRaptorWorkerState<T> createState(Heuristics heuristics) {
     if (state == null) {
-      state =
-        new McRangeRaptorWorkerState<>(
-          stopArrivals(),
-          createDestinationArrivalPaths(),
-          createHeuristicsProvider(heuristics),
-          createStopArrivalFactory(),
-          context().costCalculator(),
-          context().calculator(),
-          context().lifeCycle()
-        );
+      state = new McRangeRaptorWorkerState<>(
+        stopArrivals(),
+        createDestinationArrivalPaths(),
+        createHeuristicsProvider(heuristics),
+        createStopArrivalFactory(),
+        context().costCalculator(),
+        context().calculator(),
+        context().lifeCycle()
+      );
     }
     return state;
   }
 
   private McStopArrivalFactory<T> createStopArrivalFactory() {
     if (stopArrivalFactory == null) {
-      this.stopArrivalFactory =
-        includeC2() ? new StopArrivalFactoryC2<>() : new StopArrivalFactoryC1<>();
+      this.stopArrivalFactory = includeC2()
+        ? new StopArrivalFactoryC2<>()
+        : new StopArrivalFactoryC1<>();
     }
     return stopArrivalFactory;
   }

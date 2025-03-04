@@ -37,7 +37,8 @@ public class EmissionsModuleTest {
   void testMultipleGtfsDataReading() {
     inputData.put(GTFS, new FileDataSource(CO2_GTFS_ZIP, GTFS));
     inputData.put(GTFS, new FileDataSource(CO2_GTFS, GTFS));
-    Iterable<ConfiguredDataSource<GtfsFeedParameters>> configuredDataSource = getGtfsConfiguredDatasource();
+    Iterable<ConfiguredDataSource<GtfsFeedParameters>> configuredDataSource =
+      getGtfsConfiguredDatasource();
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
     EmissionsModule emissionsModule = new EmissionsModule(
       configuredDataSource,

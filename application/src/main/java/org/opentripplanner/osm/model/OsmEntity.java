@@ -555,10 +555,8 @@ public class OsmEntity {
     String parkAndRide = getTag("park_ride");
     return (
       isParking() &&
-      (
-        (parkingType != null && parkingType.contains("park_and_ride")) ||
-        (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no"))
-      )
+      ((parkingType != null && parkingType.contains("park_and_ride")) ||
+        (parkAndRide != null && !parkAndRide.equalsIgnoreCase("no")))
     );
   }
 
@@ -605,12 +603,10 @@ public class OsmEntity {
    */
   public boolean isEntrance() {
     return (
-      (
-        isTag("railway", "subway_entrance") ||
+      (isTag("railway", "subway_entrance") ||
         isTag("highway", "elevator") ||
         isTag("entrance", "yes") ||
-        isTag("entrance", "main")
-      ) &&
+        isTag("entrance", "main")) &&
       !isTag("access", "private") &&
       !isTag("access", "no")
     );

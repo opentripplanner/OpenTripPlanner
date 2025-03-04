@@ -58,25 +58,19 @@ class BitSetPassThroughPointsServiceTest {
   void passThroughPointTest(int expectedSeqNr, boolean isPassThroughPoint, int stopIndex) {
     assertEquals(isPassThroughPoint, SUBJECT.isPassThroughPoint(stopIndex));
     AtomicBoolean c2Updated = new AtomicBoolean(false);
-    SUBJECT.updateC2Value(
-      expectedSeqNr - 1,
-      newC2 -> {
-        assertEquals(expectedSeqNr, newC2);
-        c2Updated.set(true);
-      }
-    );
+    SUBJECT.updateC2Value(expectedSeqNr - 1, newC2 -> {
+      assertEquals(expectedSeqNr, newC2);
+      c2Updated.set(true);
+    });
     assertTrue(c2Updated.get(), "The c2 update is not performed");
-    SUBJECT.updateC2Value(
-      expectedSeqNr - 2,
-      newC2 -> fail("A visited pass-through-point should not increase the c2. New C2: " + newC2)
+    SUBJECT.updateC2Value(expectedSeqNr - 2, newC2 ->
+      fail("A visited pass-through-point should not increase the c2. New C2: " + newC2)
     );
-    SUBJECT.updateC2Value(
-      expectedSeqNr,
-      newC2 ->
-        fail(
-          "A pass-through-point where the previous point is not visited should not increase the C2. New C2: " +
-          newC2
-        )
+    SUBJECT.updateC2Value(expectedSeqNr, newC2 ->
+      fail(
+        "A pass-through-point where the previous point is not visited should not increase the C2. New C2: " +
+        newC2
+      )
     );
     assertTrue(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION));
     assertFalse(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION - 1));

@@ -21,7 +21,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class AccessEgressPreferences implements Serializable {
 
-  private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST = createDefaultCarPenalty();
+  private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST =
+    createDefaultCarPenalty();
 
   public static final AccessEgressPreferences DEFAULT = new AccessEgressPreferences();
 
@@ -80,8 +81,7 @@ public final class AccessEgressPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(AccessEgressPreferences.class)
+    return ToStringBuilder.of(AccessEgressPreferences.class)
       .addObj("penalty", penalty, DEFAULT.penalty)
       .addObj("maxDuration", maxDuration, DEFAULT.maxDuration)
       .addObj("maxStopCount", maxStopCountLimit, DEFAULT.maxStopCountLimit)

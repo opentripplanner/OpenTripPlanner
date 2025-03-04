@@ -38,10 +38,9 @@ public class GtfsRealtimeEffectMapper {
       case ACCESSIBILITY_ISSUE:
         return AlertEffect.ACCESSIBILITY_ISSUE;
       case UNKNOWN_EFFECT:
-      default:
-        {
-          return AlertEffect.UNKNOWN_EFFECT;
-        }
+      default: {
+        return AlertEffect.UNKNOWN_EFFECT;
+      }
     }
   }
 }

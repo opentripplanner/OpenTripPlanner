@@ -35,8 +35,10 @@ public abstract class StationElement<
     super(builder.getId());
     // Required fields
     this.name = builder.name();
-    this.wheelchairAccessibility =
-      Objects.requireNonNullElse(builder.wheelchairAccessibility(), Accessibility.NO_INFORMATION);
+    this.wheelchairAccessibility = Objects.requireNonNullElse(
+      builder.wheelchairAccessibility(),
+      Accessibility.NO_INFORMATION
+    );
 
     // Optional fields
     this.coordinate = builder.coordinate();

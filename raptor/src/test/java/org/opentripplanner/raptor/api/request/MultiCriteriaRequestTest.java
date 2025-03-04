@@ -13,8 +13,7 @@ class MultiCriteriaRequestTest {
 
   private static final RelaxFunction RELAX_C1 = GeneralizedCostRelaxFunction.of(2.0, 600);
 
-  private final MultiCriteriaRequest<RaptorTripSchedule> subject = MultiCriteriaRequest
-    .of()
+  private final MultiCriteriaRequest<RaptorTripSchedule> subject = MultiCriteriaRequest.of()
     .withRelaxC1(RELAX_C1)
     .build();
 

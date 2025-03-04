@@ -20,17 +20,20 @@ public class LifeCycleEventPublisher {
   @SuppressWarnings("unchecked")
   public LifeCycleEventPublisher(LifeCycleSubscriptions subscriptions) {
     this.onRouteSearchListeners = subscriptions.onRouteSearchListeners.toArray(Consumer[]::new);
-    this.setupIterationListeners =
-      subscriptions.setupIterationListeners.toArray(IntConsumer[]::new);
-    this.prepareForNextRoundListeners =
-      subscriptions.prepareForNextRoundListeners.toArray(IntConsumer[]::new);
+    this.setupIterationListeners = subscriptions.setupIterationListeners.toArray(
+      IntConsumer[]::new
+    );
+    this.prepareForNextRoundListeners = subscriptions.prepareForNextRoundListeners.toArray(
+      IntConsumer[]::new
+    );
     this.transitsForRoundCompleteListeners =
       subscriptions.transitsForRoundCompleteListeners.toArray(Runnable[]::new);
     this.transfersForRoundCompleteListeners =
       subscriptions.transfersForRoundCompleteListeners.toArray(Runnable[]::new);
     this.roundCompleteListeners = subscriptions.roundCompleteListeners.toArray(Consumer[]::new);
-    this.iterationCompleteListeners =
-      subscriptions.iterationCompleteListeners.toArray(Runnable[]::new);
+    this.iterationCompleteListeners = subscriptions.iterationCompleteListeners.toArray(
+      Runnable[]::new
+    );
     subscriptions.close();
   }
 

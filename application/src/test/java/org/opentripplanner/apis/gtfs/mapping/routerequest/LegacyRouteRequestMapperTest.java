@@ -59,18 +59,17 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
     var routeRequest = new RouteRequest();
-    context =
-      new GraphQLRequestContext(
-        new TestRoutingService(List.of()),
-        transitService,
-        new DefaultFareService(),
-        new DefaultVehicleRentalService(),
-        new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
-        new DefaultRealtimeVehicleService(transitService),
-        SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-        GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
-        routeRequest
-      );
+    context = new GraphQLRequestContext(
+      new TestRoutingService(List.of()),
+      transitService,
+      new DefaultFareService(),
+      new DefaultVehicleRentalService(),
+      new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
+      new DefaultRealtimeVehicleService(transitService),
+      SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
+      GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
+      routeRequest
+    );
   }
 
   @Test
@@ -209,8 +208,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   }
 
   static Stream<Arguments> noTriangleCases() {
-    return Arrays
-      .stream(GraphQLTypes.GraphQLOptimizeType.values())
+    return Arrays.stream(GraphQLTypes.GraphQLOptimizeType.values())
       .filter(value -> value != GraphQLTypes.GraphQLOptimizeType.TRIANGLE)
       .map(Arguments::of);
   }
@@ -293,8 +291,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
+    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query("")
       .operationName("plan")
       .context(context)
@@ -305,8 +302,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       .executionInput(executionInput)
       .executionId(ExecutionId.from(this.getClass().getName()))
       .build();
-    return DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
       .build();
   }

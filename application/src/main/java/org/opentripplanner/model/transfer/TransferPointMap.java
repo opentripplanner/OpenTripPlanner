@@ -46,15 +46,13 @@ class TransferPointMap<E> {
   E computeIfAbsent(TransferPoint point, Supplier<E> creator) {
     if (point.isTripTransferPoint()) {
       var tp = point.asTripTransferPoint();
-      return tripMap.computeIfAbsent(
-        new TripKey(tp.getTrip(), tp.getStopPositionInPattern()),
-        k -> creator.get()
+      return tripMap.computeIfAbsent(new TripKey(tp.getTrip(), tp.getStopPositionInPattern()), k ->
+        creator.get()
       );
     } else if (point.isRouteStopTransferPoint()) {
       var rp = point.asRouteStopTransferPoint();
-      return routeStopMap.computeIfAbsent(
-        new RouteStopKey(rp.getRoute(), rp.getStop()),
-        k -> creator.get()
+      return routeStopMap.computeIfAbsent(new RouteStopKey(rp.getRoute(), rp.getStop()), k ->
+        creator.get()
       );
     } else if (point.isRouteStationTransferPoint()) {
       var rp = point.asRouteStationTransferPoint();
@@ -76,14 +74,13 @@ class TransferPointMap<E> {
    * List all elements which matches any of the transfer points added to the map.
    */
   List<E> get(Trip trip, StopLocation stop, int stopPointInPattern) {
-    return Stream
-      .of(
-        tripMap.get(new TripKey(trip, stopPointInPattern)),
-        routeStopMap.get(new RouteStopKey(trip.getRoute(), stop)),
-        routeStationMap.get(new RouteStationKey(trip.getRoute(), stop.getParentStation())),
-        stopMap.get(stop),
-        stationMap.get(stop.getParentStation())
-      )
+    return Stream.of(
+      tripMap.get(new TripKey(trip, stopPointInPattern)),
+      routeStopMap.get(new RouteStopKey(trip.getRoute(), stop)),
+      routeStationMap.get(new RouteStationKey(trip.getRoute(), stop.getParentStation())),
+      stopMap.get(stop),
+      stationMap.get(stop.getParentStation())
+    )
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
   }

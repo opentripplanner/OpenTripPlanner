@@ -29,20 +29,17 @@ public class DebugHandlerFactory<T extends RaptorTripSchedule> {
   private final DebugLogger logger;
 
   public DebugHandlerFactory(DebugRequest request, WorkerLifeCycle lifeCycle) {
-    this.stopHandler =
-      isDebug(request.stopArrivalListener())
-        ? new DebugHandlerStopArrivalAdapter(request, lifeCycle)
-        : null;
+    this.stopHandler = isDebug(request.stopArrivalListener())
+      ? new DebugHandlerStopArrivalAdapter(request, lifeCycle)
+      : null;
 
-    this.pathHandler =
-      isDebug(request.pathFilteringListener())
-        ? new DebugHandlerPathAdapter(request, lifeCycle)
-        : null;
+    this.pathHandler = isDebug(request.pathFilteringListener())
+      ? new DebugHandlerPathAdapter(request, lifeCycle)
+      : null;
 
-    this.patternRideHandler =
-      isDebug(request.patternRideDebugListener())
-        ? new DebugHandlerPatternRideAdapter(request, lifeCycle)
-        : null;
+    this.patternRideHandler = isDebug(request.patternRideDebugListener())
+      ? new DebugHandlerPatternRideAdapter(request, lifeCycle)
+      : null;
 
     this.logger = request.logger();
     lifeCycle.onRouteSearch(logger::setSearchDirection);

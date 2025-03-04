@@ -141,8 +141,12 @@ public class ConstantsForTests {
         var osmProvider = new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
         var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-        var osmModule = OsmModule
-          .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
+        var osmModule = OsmModule.of(
+          osmProvider,
+          graph,
+          osmInfoRepository,
+          vehicleParkingRepository
+        )
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
           .build();
@@ -180,8 +184,7 @@ public class ConstantsForTests {
         DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
         List.of(new RouteRequest())
-      )
-        .buildGraph();
+      ).buildGraph();
 
       graph.index(timetableRepository.getSiteRepository());
 
@@ -201,9 +204,12 @@ public class ConstantsForTests {
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-      var osmModule = OsmModule
-        .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
-        .build();
+      var osmModule = OsmModule.of(
+        osmProvider,
+        graph,
+        osmInfoRepository,
+        vehicleParkingRepository
+      ).build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {

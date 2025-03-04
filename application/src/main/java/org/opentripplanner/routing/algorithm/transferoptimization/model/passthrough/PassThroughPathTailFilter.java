@@ -94,8 +94,7 @@ public class PassThroughPathTailFilter<T extends RaptorTripSchedule> implements 
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PassThroughPathTailFilter.class)
+    return ToStringBuilder.of(PassThroughPathTailFilter.class)
       .addObj("c2Calculator", c2Calculator)
       .addObj("filterChain", filterChain)
       .toString();

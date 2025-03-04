@@ -90,16 +90,14 @@ class SiriTripPatternCache {
     // Create TripPattern if it doesn't exist yet
     if (tripPattern == null) {
       var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
-      tripPattern =
-        TripPattern
-          .of(id)
-          .withRoute(trip.getRoute())
-          .withMode(trip.getMode())
-          .withNetexSubmode(trip.getNetexSubMode())
-          .withStopPattern(stopPattern)
-          .withCreatedByRealtimeUpdater(true)
-          .withOriginalTripPattern(originalTripPattern)
-          .build();
+      tripPattern = TripPattern.of(id)
+        .withRoute(trip.getRoute())
+        .withMode(trip.getMode())
+        .withNetexSubmode(trip.getNetexSubMode())
+        .withStopPattern(stopPattern)
+        .withCreatedByRealtimeUpdater(true)
+        .withOriginalTripPattern(originalTripPattern)
+        .build();
       // TODO: Add pattern to timetableRepository index?
 
       // Add pattern to cache

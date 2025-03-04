@@ -43,8 +43,9 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     this.sourceNetworkName = networkName;
     this.language = language;
     this.headers = headers;
-    this.parametersForNetwork =
-      networkParameters.stream().collect(Collectors.toMap(NetworkParameters::network, it -> it));
+    this.parametersForNetwork = networkParameters
+      .stream()
+      .collect(Collectors.toMap(NetworkParameters::network, it -> it));
     this.defaultNetwork = parametersForNetwork.get(DEFAULT_NETWORK_NAME);
   }
 

@@ -46,15 +46,15 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
-    this.snapshotManager =
-      new TimetableSnapshotManager(
-        null,
-        TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
-        () -> SERVICE_DATE
-      );
+    this.snapshotManager = new TimetableSnapshotManager(
+      null,
+      TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
+      () -> SERVICE_DATE
+    );
     siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
-    gtfsAdapter =
-      new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () -> SERVICE_DATE);
+    gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      SERVICE_DATE
+    );
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
   }
 
@@ -181,16 +181,15 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     List<EstimatedTimetableDeliveryStructure> updates,
     boolean fuzzyMatching
   ) {
-    UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching)
-      .applyUpdate(
-        updates,
-        DIFFERENTIAL,
-        new DefaultRealTimeUpdateContext(
-          new Graph(),
-          timetableRepository,
-          snapshotManager.getTimetableSnapshotBuffer()
-        )
-      );
+    UpdateResult updateResult = getEstimatedTimetableHandler(fuzzyMatching).applyUpdate(
+      updates,
+      DIFFERENTIAL,
+      new DefaultRealTimeUpdateContext(
+        new Graph(),
+        timetableRepository,
+        snapshotManager.getTimetableSnapshotBuffer()
+      )
+    );
     commitTimetableSnapshot();
     return updateResult;
   }

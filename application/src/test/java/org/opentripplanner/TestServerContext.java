@@ -66,8 +66,11 @@ public class TestServerContext {
       request = routerConfig.routingRequestDefaults();
     }
     if (snapshotManager == null) {
-      snapshotManager =
-        new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now);
+      snapshotManager = new TimetableSnapshotManager(
+        null,
+        TimetableSnapshotParameters.DEFAULT,
+        LocalDate::now
+      );
     }
 
     timetableRepository.index();
@@ -114,8 +117,7 @@ public class TestServerContext {
   /** Static factory method to create a service for test purposes. */
   public static WorldEnvelopeService createWorldEnvelopeService() {
     var repository = new DefaultWorldEnvelopeRepository();
-    var envelope = WorldEnvelope
-      .of()
+    var envelope = WorldEnvelope.of()
       .expandToIncludeStreetEntities(0, 0)
       .expandToIncludeStreetEntities(1, 1)
       .build();

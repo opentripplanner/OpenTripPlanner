@@ -84,8 +84,7 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
       meterRegistry,
       viaTransferResolver,
       lookUpStopIndex
-    )
-      .doMap();
+    ).doMap();
   }
 
   private RaptorRequest<T> doMap() {

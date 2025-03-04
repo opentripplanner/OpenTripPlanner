@@ -20,13 +20,11 @@ public class DefaultCostCalculatorTest {
   private static final int STOP_B = 1;
   private static final String ANY_SCHEDULE = "10:00 11:00";
 
-  private static final TestTripSchedule TRIP_1 = TestTripSchedule
-    .schedule(ANY_SCHEDULE)
+  private static final TestTripSchedule TRIP_1 = TestTripSchedule.schedule(ANY_SCHEDULE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_1)
     .build();
 
-  private static final TestTripSchedule TRIP_2 = TestTripSchedule
-    .schedule(ANY_SCHEDULE)
+  private static final TestTripSchedule TRIP_2 = TestTripSchedule.schedule(ANY_SCHEDULE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_2)
     .build();
 

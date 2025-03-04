@@ -104,10 +104,11 @@ public class OrcaFareServiceTest {
     var rideCost = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(fp ->
-        fp.medium().name().equals("electronic") &&
-        fp.category().name().equals("regular") &&
-        fp.name().equals("rideCost")
+      .filter(
+        fp ->
+          fp.medium().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("rideCost")
       )
       .findFirst();
     if (rideCost.isEmpty()) {
@@ -118,10 +119,11 @@ public class OrcaFareServiceTest {
     var transfer = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(fp ->
-        fp.medium().name().equals("electronic") &&
-        fp.category().name().equals("regular") &&
-        fp.name().equals("transfer")
+      .filter(
+        fp ->
+          fp.medium().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("transfer")
       )
       .findFirst();
     Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
@@ -404,11 +406,10 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
 
     // Also make sure that PT's 500 and 501 get regular Pierce fare and not ST's fare
-    rides =
-      List.of(
-        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
-        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
-      );
+    rides = List.of(
+      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
+      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
+    );
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.senior, TWO_DOLLARS);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
@@ -661,8 +662,7 @@ public class OrcaFareServiceTest {
   ) {
     // Use the agency ID as feed ID to make sure that we have a new feed ID for each different agency
     // This tests to make sure we are calculating transfers across feeds correctly.
-    Agency agency = Agency
-      .of(new FeedScopedId(agencyId, agencyId))
+    Agency agency = Agency.of(new FeedScopedId(agencyId, agencyId))
       .withName(agencyId)
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
@@ -686,8 +686,7 @@ public class OrcaFareServiceTest {
     if (routeLongName != null) {
       longName = new NonLocalizedString(routeLongName);
     }
-    Route route = Route
-      .of(routeFeedScopeId)
+    Route route = Route.of(routeFeedScopeId)
       .withAgency(agency)
       .withShortName(shortName)
       .withLongName(longName)

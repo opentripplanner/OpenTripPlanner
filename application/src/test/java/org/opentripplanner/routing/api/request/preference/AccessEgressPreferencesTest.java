@@ -21,8 +21,7 @@ public class AccessEgressPreferencesTest {
     3.5
   );
 
-  private final AccessEgressPreferences subject = AccessEgressPreferences
-    .of()
+  private final AccessEgressPreferences subject = AccessEgressPreferences.of()
     .withPenalty(Map.of(StreetMode.CAR_TO_PARK, CAR_TO_PARK_PENALTY))
     .withMaxDuration(MAX_ACCESS_EGRESS, Map.of())
     .withMaxStopCount(MAX_DEFAULT_STOP_COUNT, Map.of(StreetMode.CAR, MAX_CAR_STOP_COUNT))

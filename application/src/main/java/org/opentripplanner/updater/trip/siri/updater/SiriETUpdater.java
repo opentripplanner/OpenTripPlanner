@@ -49,8 +49,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     LOG.info("Creating SIRI-ET updater running every {}: {}", pollingPeriod(), updateSource);
 
-    estimatedTimetableHandler =
-      new EstimatedTimetableHandler(adapter, config.fuzzyTripMatching(), feedId);
+    estimatedTimetableHandler = new EstimatedTimetableHandler(
+      adapter,
+      config.fuzzyTripMatching(),
+      feedId
+    );
 
     this.metricsConsumer = metricsConsumer;
   }
@@ -71,7 +74,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
         // Mark this updater as primed after last page of updates. Copy moreData into a final
         // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
-        List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
+        List<EstimatedTimetableDeliveryStructure> etds =
+          serviceDelivery.getEstimatedTimetableDeliveries();
         if (etds != null) {
           saveResultOnGraph.execute(context -> {
             var result = estimatedTimetableHandler.applyUpdate(etds, incrementality, context);
@@ -88,8 +92,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SiriETUpdater.class)
+    return ToStringBuilder.of(SiriETUpdater.class)
       .addStr("source", updateSource.toString())
       .addDuration("frequency", pollingPeriod())
       .toString();

@@ -36,8 +36,7 @@ public class CompositeUtil {
   ) {
     Objects.requireNonNull(children);
 
-    var list = Arrays
-      .stream(children)
+    var list = Arrays.stream(children)
       .filter(Objects::nonNull)
       .flatMap(it -> isComposite.test(it) ? listCompositeChildren.apply(it).stream() : Stream.of(it)
       )

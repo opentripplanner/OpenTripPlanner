@@ -24,18 +24,18 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
   );
-  private static final TripPattern PATTERN = TimetableRepositoryForTest
-    .of()
+  private static final TripPattern PATTERN = TimetableRepositoryForTest.of()
     .pattern(TransitMode.BUS)
     .build();
-  private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG = new ScheduledTransitLegBuilder<>()
-    .withZoneId(ZoneIds.BERLIN)
-    .withServiceDate(LocalDate.of(2025, 1, 15))
-    .withTripPattern(PATTERN)
-    .withBoardStopIndexInPattern(0)
-    .withDistanceMeters(1000)
-    .withAlightStopIndexInPattern(1)
-    .build();
+  private static final ScheduledTransitLeg SCHEDULED_TRANSIT_LEG =
+    new ScheduledTransitLegBuilder<>()
+      .withZoneId(ZoneIds.BERLIN)
+      .withServiceDate(LocalDate.of(2025, 1, 15))
+      .withTripPattern(PATTERN)
+      .withBoardStopIndexInPattern(0)
+      .withDistanceMeters(1000)
+      .withAlightStopIndexInPattern(1)
+      .build();
   private static final List<FareProductUse> FARES = List.of(FARE_PRODUCT_USE);
 
   @Test
@@ -86,8 +86,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
   @Test
   void copyAttributesFromScheduledLeg() {
-    var leg = SCHEDULED_TRANSIT_LEG
-      .copy()
+    var leg = SCHEDULED_TRANSIT_LEG.copy()
       .withFareProducts(FARES)
       .withAlerts(Set.of(ALERTS))
       .build();

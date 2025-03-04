@@ -77,14 +77,13 @@ public class UpdatersConfig implements UpdatersParameters {
         rootAdapter
       );
 
-    timetableUpdates =
-      timetableUpdates(
-        rootAdapter
-          .of("timetableUpdates")
-          .since(V2_2)
-          .summary("Global configuration for timetable updaters.")
-          .asObject()
-      );
+    timetableUpdates = timetableUpdates(
+      rootAdapter
+        .of("timetableUpdates")
+        .since(V2_2)
+        .summary("Global configuration for timetable updaters.")
+        .asObject()
+    );
 
     rootAdapter
       .of("updaters")

@@ -39,8 +39,7 @@ public final class TripTransferPoint implements TransferPoint, Serializable {
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
+    return ValueObjectToStringBuilder.of()
       .addText("TripTP{")
       .addObj(trip.getId())
       .addText(", stopPos ")

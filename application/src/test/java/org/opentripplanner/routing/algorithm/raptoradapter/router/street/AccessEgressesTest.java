@@ -18,13 +18,11 @@ class AccessEgressesTest {
   private static final RoutingAccessEgress ACCESS_A = new DefaultAccessEgress(
     1,
     TestStateBuilder.ofWalking().build()
-  )
-    .withPenalty(new TimeAndCost(D3m, Cost.ZERO));
+  ).withPenalty(new TimeAndCost(D3m, Cost.ZERO));
   private static final RoutingAccessEgress ACCESS_B = new DefaultAccessEgress(
     1,
     TestStateBuilder.ofWalking().build()
-  )
-    .withPenalty(new TimeAndCost(D7m, Cost.ZERO));
+  ).withPenalty(new TimeAndCost(D7m, Cost.ZERO));
   private static final RoutingAccessEgress ACCESS_C = new DefaultAccessEgress(
     1,
     TestStateBuilder.ofWalking().build()

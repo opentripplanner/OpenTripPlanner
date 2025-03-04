@@ -96,8 +96,7 @@ public class TurnRestrictionTest {
 
     request.withPreferences(preferences -> preferences.withWalk(w -> w.withSpeed(1.0)));
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(topRight)
@@ -126,8 +125,7 @@ public class TurnRestrictionTest {
     var request = new RouteRequest();
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setFrom(topRight)
@@ -155,8 +153,7 @@ public class TurnRestrictionTest {
   public void testForwardAsCar() {
     var request = new RouteRequest();
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(StreetMode.CAR))

@@ -73,8 +73,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
       return List.of();
     }
 
-    var streetSearchRequest = StreetSearchRequestMapper
-      .mapToTransferRequest(routeRequest)
+    var streetSearchRequest = StreetSearchRequestMapper.mapToTransferRequest(routeRequest)
       .withArriveBy(reverseDirection)
       .withMode(streetRequest.mode())
       .build();

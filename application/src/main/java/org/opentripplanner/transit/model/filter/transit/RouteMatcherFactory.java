@@ -88,10 +88,7 @@ public class RouteMatcherFactory {
     return new NullSafeWrapperMatcher<>(
       "longName",
       Route::getLongName,
-      new CaseInsensitiveStringPrefixMatcher<>(
-        "name",
-        name,
-        route -> route.getLongName().toString()
+      new CaseInsensitiveStringPrefixMatcher<>("name", name, route -> route.getLongName().toString()
       )
     );
   }

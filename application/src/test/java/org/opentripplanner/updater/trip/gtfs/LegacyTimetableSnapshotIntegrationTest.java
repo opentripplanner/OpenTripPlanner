@@ -148,73 +148,67 @@ public class LegacyTimetableSnapshotIntegrationTest {
 
     // exception if we try to modify a snapshot
     TimetableSnapshot snapshot = resolver.commit();
-    assertThrows(
-      ConcurrentModificationException.class,
-      () -> {
-        updateSnapshot(snapshot, pattern, tripUpdate, yesterday);
-      }
-    );
+    assertThrows(ConcurrentModificationException.class, () -> {
+      updateSnapshot(snapshot, pattern, tripUpdate, yesterday);
+    });
   }
 
   @Test
   public void testCommit() {
-    assertThrows(
-      ConcurrentModificationException.class,
-      () -> {
-        LocalDate today = LocalDate.now(timeZone);
-        LocalDate yesterday = today.minusDays(1);
-        TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
+    assertThrows(ConcurrentModificationException.class, () -> {
+      LocalDate today = LocalDate.now(timeZone);
+      LocalDate yesterday = today.minusDays(1);
+      TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
 
-        TimetableSnapshot resolver = new TimetableSnapshot();
+      TimetableSnapshot resolver = new TimetableSnapshot();
 
-        // only return a new snapshot if there are changes
-        TimetableSnapshot snapshot = resolver.commit();
-        assertNull(snapshot);
+      // only return a new snapshot if there are changes
+      TimetableSnapshot snapshot = resolver.commit();
+      assertNull(snapshot);
 
-        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+      TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
-        tripDescriptorBuilder.setTripId("1.1");
-        tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
+      tripDescriptorBuilder.setTripId("1.1");
+      tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
 
-        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+      TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
-        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+      tripUpdateBuilder.setTrip(tripDescriptorBuilder);
 
-        var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
-        stopTimeUpdateBuilder.setStopSequence(2);
-        stopTimeUpdateBuilder.setScheduleRelationship(
-          TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
-        );
-        stopTimeUpdateBuilder.setDeparture(
-          TripUpdate.StopTimeEvent.newBuilder().setDelay(10).build()
-        );
+      var stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+      stopTimeUpdateBuilder.setStopSequence(2);
+      stopTimeUpdateBuilder.setScheduleRelationship(
+        TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED
+      );
+      stopTimeUpdateBuilder.setDeparture(
+        TripUpdate.StopTimeEvent.newBuilder().setDelay(10).build()
+      );
 
-        TripUpdate tripUpdate = tripUpdateBuilder.build();
+      TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        // add a new timetable for today, commit, and everything should match
-        assertTrue(updateSnapshot(resolver, pattern, tripUpdate, today).isSuccess());
-        snapshot = resolver.commit();
-        assertEquals(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
-        assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
+      // add a new timetable for today, commit, and everything should match
+      assertTrue(updateSnapshot(resolver, pattern, tripUpdate, today).isSuccess());
+      snapshot = resolver.commit();
+      assertEquals(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
+      assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
 
-        // add a new timetable for today, don't commit, and everything should not match
-        assertTrue(updateSnapshot(resolver, pattern, tripUpdate, today).isSuccess());
-        assertNotSame(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
-        assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
+      // add a new timetable for today, don't commit, and everything should not match
+      assertTrue(updateSnapshot(resolver, pattern, tripUpdate, today).isSuccess());
+      assertNotSame(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
+      assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
 
-        // add a new timetable for today, on another day, and things should still not match
-        assertTrue(updateSnapshot(resolver, pattern, tripUpdate, yesterday).isSuccess());
-        assertNotSame(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
+      // add a new timetable for today, on another day, and things should still not match
+      assertTrue(updateSnapshot(resolver, pattern, tripUpdate, yesterday).isSuccess());
+      assertNotSame(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
 
-        // commit, and things should match
-        snapshot = resolver.commit();
-        assertEquals(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
-        assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
+      // commit, and things should match
+      snapshot = resolver.commit();
+      assertEquals(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
+      assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
 
-        // exception if we try to commit to a snapshot
-        snapshot.commit();
-      }
-    );
+      // exception if we try to commit to a snapshot
+      snapshot.commit();
+    });
   }
 
   @Test

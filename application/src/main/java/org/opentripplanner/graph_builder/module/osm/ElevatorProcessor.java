@@ -112,11 +112,11 @@ class ElevatorProcessor {
     while (elevators.hasNext()) {
       OsmWay elevatorWay = elevators.next();
 
-      List<Long> nodes = Arrays
-        .stream(elevatorWay.getNodeRefs().toArray())
-        .filter(nodeRef ->
-          vertexGenerator.intersectionNodes().containsKey(nodeRef) &&
-          vertexGenerator.intersectionNodes().get(nodeRef) != null
+      List<Long> nodes = Arrays.stream(elevatorWay.getNodeRefs().toArray())
+        .filter(
+          nodeRef ->
+            vertexGenerator.intersectionNodes().containsKey(nodeRef) &&
+            vertexGenerator.intersectionNodes().get(nodeRef) != null
         )
         .boxed()
         .toList();
@@ -223,17 +223,15 @@ class ElevatorProcessor {
   }
 
   private OptionalInt parseDuration(OsmEntity element) {
-    return element.getTagAsInt(
-      "duration",
-      v ->
-        issueStore.add(
-          Issue.issue(
-            "InvalidDuration",
-            "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
-            element.getId(),
-            v
-          )
+    return element.getTagAsInt("duration", v ->
+      issueStore.add(
+        Issue.issue(
+          "InvalidDuration",
+          "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
+          element.getId(),
+          v
         )
+      )
     );
   }
 }

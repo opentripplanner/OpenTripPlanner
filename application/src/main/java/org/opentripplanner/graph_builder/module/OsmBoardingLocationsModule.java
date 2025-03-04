@@ -127,7 +127,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private Envelope getEnvelope(TransitStopVertex ts) {
     Envelope envelope = new Envelope(ts.getCoordinate());
 
-    double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
+    double xscale = Math.cos((ts.getCoordinate().y * Math.PI) / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
     return envelope;
   }

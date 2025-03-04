@@ -48,7 +48,8 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
     "Walk 10s ~ B ~ BUS R1 0:14 0:38 ~ F ~ Walk 1s [0:13:50 0:38:01 24m11s Tₓ0]";
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -56,8 +57,9 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
   @BeforeEach
   void setup() {
     data.withRoute(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-        .withTimetable(schedule("0:10 0:14 0:18 0:30 0:34 0:38"))
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F).withTimetable(
+        schedule("0:10 0:14 0:18 0:30 0:34 0:38")
+      )
     );
 
     requestBuilder
@@ -82,8 +84,7 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
     var expected =
       "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s Tₓ0 C₁1_840]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("20m20s", TX_0, T00_00, T01_00)
       // A test on the standard profile is included to demonstrate that the min-travel-duration
       // and the standard give different results. The boarding stop is different.

@@ -15,8 +15,7 @@ class LocalizedStringTest {
         "corner",
         TranslatedString.getI18NString("First", "de", "erste"),
         TranslatedString.getI18NString("Second", "de", "zweite")
-      )
-        .toString()
+      ).toString()
     );
   }
 
@@ -28,8 +27,7 @@ class LocalizedStringTest {
         "corner",
         TranslatedString.getI18NString("First", "de", "Erste"),
         TranslatedString.getI18NString("Second", "de", "Zweite")
-      )
-        .toString(Locale.GERMANY)
+      ).toString(Locale.GERMANY)
     );
   }
 
@@ -41,8 +39,7 @@ class LocalizedStringTest {
         "corner",
         TranslatedString.getI18NString("First", "de", "erste"),
         TranslatedString.getI18NString("Second", "de", "zweite")
-      )
-        .toString(Locale.CHINESE)
+      ).toString(Locale.CHINESE)
     );
   }
 
@@ -56,8 +53,11 @@ class LocalizedStringTest {
     assertEquals("névtelen", new LocalizedString("unnamedStreet").toString(new Locale("hu")));
     assertEquals(
       "A (B része)",
-      new LocalizedString("partOf", new NonLocalizedString("A"), new NonLocalizedString("B"))
-        .toString(new Locale("hu"))
+      new LocalizedString(
+        "partOf",
+        new NonLocalizedString("A"),
+        new NonLocalizedString("B")
+      ).toString(new Locale("hu"))
     );
   }
 }

@@ -15,21 +15,18 @@ public class CoordinateInputType {
   static final String LATITUDE = "latitude";
   static final String LONGITUDE = "longitude";
 
-  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("InputCoordinates")
     .description("Input type for coordinates in the WGS84 system")
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name(LATITUDE)
         .description("The latitude of the place.")
         .type(new GraphQLNonNull(Scalars.GraphQLFloat))
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name(LONGITUDE)
         .description("The longitude of the place.")
         .type(new GraphQLNonNull(Scalars.GraphQLFloat))

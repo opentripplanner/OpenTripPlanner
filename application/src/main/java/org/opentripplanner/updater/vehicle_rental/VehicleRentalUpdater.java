@@ -72,11 +72,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     LOG.info("Setting up vehicle rental updater for {}.", source);
 
     this.source = source;
-    this.nameForLogging =
-      ObjectUtils.ifNotNull(
-        parameters.sourceParameters().network(),
-        parameters.sourceParameters().url()
-      );
+    this.nameForLogging = ObjectUtils.ifNotNull(
+      parameters.sourceParameters().network(),
+      parameters.sourceParameters().url()
+    );
     this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
 
     // Creation of network linker library will not modify the graph
@@ -190,12 +189,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
               )
             );
           }
-          Set<RentalFormFactor> formFactors = Stream
-            .concat(
-              station.getAvailablePickupFormFactors(false).stream(),
-              station.getAvailableDropoffFormFactors(false).stream()
-            )
-            .collect(Collectors.toSet());
+          Set<RentalFormFactor> formFactors = Stream.concat(
+            station.getAvailablePickupFormFactors(false).stream(),
+            station.getAvailableDropoffFormFactors(false).stream()
+          ).collect(Collectors.toSet());
           for (RentalFormFactor formFactor : formFactors) {
             tempEdges.addEdge(
               VehicleRentalEdge.createVehicleRentalEdge(vehicleRentalVertex, formFactor)

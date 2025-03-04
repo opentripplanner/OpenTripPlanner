@@ -37,8 +37,7 @@ public class Issue implements DataImportIssue {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addStr("type", type)
       .addStr("message", getMessage())
       .toString();

@@ -36,13 +36,12 @@ public final class RaptorViaLocation {
   ) {
     this.label = label;
     this.passThroughSearch = passThroughSearch;
-    this.minimumWaitTime =
-      IntUtils.requireInRange(
-        (int) minimumWaitTime.toSeconds(),
-        (int) MIN_WAIT_TIME.toSeconds(),
-        (int) MAX_WAIT_TIME.toSeconds(),
-        "minimumWaitTime"
-      );
+    this.minimumWaitTime = IntUtils.requireInRange(
+      (int) minimumWaitTime.toSeconds(),
+      (int) MIN_WAIT_TIME.toSeconds(),
+      (int) MAX_WAIT_TIME.toSeconds(),
+      "minimumWaitTime"
+    );
     this.connections = validateConnections(connections);
   }
 

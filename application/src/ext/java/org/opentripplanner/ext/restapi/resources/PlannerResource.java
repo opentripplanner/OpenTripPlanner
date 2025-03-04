@@ -85,8 +85,8 @@ public class PlannerResource extends RoutingResource {
 
       /* Populate up the elevation metadata */
       response.elevationMetadata = new ElevationMetadata();
-      response.elevationMetadata.ellipsoidToGeoidDifference =
-        serverContext.graph().ellipsoidToGeoidDifference;
+      response.elevationMetadata.ellipsoidToGeoidDifference = serverContext.graph()
+        .ellipsoidToGeoidDifference;
       response.elevationMetadata.geoidElevation = request.preferences().system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();

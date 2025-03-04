@@ -111,14 +111,10 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       allLegsInProductFeed &&
-      (
-        transitLegs.size() == 1 ||
-        (
-          pwt.products().stream().anyMatch(p -> p.coversDuration(i.getTransitDuration())) &&
-          appliesToAllLegs(pwt.legRule(), transitLegs)
-        ) ||
-        coversItineraryWithFreeTransfers(i, pwt)
-      )
+      (transitLegs.size() == 1 ||
+        (pwt.products().stream().anyMatch(p -> p.coversDuration(i.getTransitDuration())) &&
+          appliesToAllLegs(pwt.legRule(), transitLegs)) ||
+        coversItineraryWithFreeTransfers(i, pwt))
     );
   }
 
@@ -235,9 +231,8 @@ public final class GtfsFaresV2Service implements Serializable {
       .toList();
 
     return (
-      (
-        isNull(rule.networkId()) && networksWithRules.stream().noneMatch(routesNetworkIds::contains)
-      ) ||
+      (isNull(rule.networkId()) &&
+        networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
       routesNetworkIds.contains(rule.networkId())
     );
   }

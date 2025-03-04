@@ -36,11 +36,10 @@ public class DebugRasterTileResource {
   private final TileRendererManager tileRendererManager;
 
   public DebugRasterTileResource(@Context OtpServerRequestContext serverContext) {
-    this.tileRendererManager =
-      new TileRendererManager(
-        serverContext.graph(),
-        serverContext.defaultRouteRequest().preferences().wheelchair()
-      );
+    this.tileRendererManager = new TileRendererManager(
+      serverContext.graph(),
+      serverContext.defaultRouteRequest().preferences().wheelchair()
+    );
   }
 
   @GET
@@ -61,7 +60,7 @@ public class DebugRasterTileResource {
 
     MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
     ByteArrayOutputStream baos = new ByteArrayOutputStream(
-      image.getWidth() * image.getHeight() / 4
+      (image.getWidth() * image.getHeight()) / 4
     );
     ImageIO.write(image, format.type, baos);
     CacheControl cc = new CacheControl();

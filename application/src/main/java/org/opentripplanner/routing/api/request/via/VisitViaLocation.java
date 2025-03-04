@@ -29,12 +29,11 @@ public class VisitViaLocation extends AbstractViaLocation {
     List<WgsCoordinate> coordinates
   ) {
     super(label, stopLocationIds);
-    this.minimumWaitTime =
-      DurationUtils.requireNonNegative(
-        minimumWaitTime == null ? Duration.ZERO : minimumWaitTime,
-        MINIMUM_WAIT_TIME_MAX_LIMIT,
-        "minimumWaitTime"
-      );
+    this.minimumWaitTime = DurationUtils.requireNonNegative(
+      minimumWaitTime == null ? Duration.ZERO : minimumWaitTime,
+      MINIMUM_WAIT_TIME_MAX_LIMIT,
+      "minimumWaitTime"
+    );
     this.coordinates = List.copyOf(coordinates);
 
     if (stopLocationIds().isEmpty() && coordinates().isEmpty()) {
@@ -67,8 +66,7 @@ public class VisitViaLocation extends AbstractViaLocation {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VisitViaLocation.class)
+    return ToStringBuilder.of(VisitViaLocation.class)
       .addObj("label", label())
       .addDuration("minimumWaitTime", minimumWaitTime, Duration.ZERO)
       .addCol("stopLocationIds", stopLocationIds())

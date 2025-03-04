@@ -137,18 +137,16 @@ class RouteRequestTest {
   void testTooLongSearchWindow() {
     RouteRequest request = new RouteRequest();
     request.initMaxSearchWindow(DURATION_24_HOURS);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> request.setSearchWindow(DURATION_24_HOURS_AND_ONE_MINUTE)
+    assertThrows(IllegalArgumentException.class, () ->
+      request.setSearchWindow(DURATION_24_HOURS_AND_ONE_MINUTE)
     );
   }
 
   @Test
   void testNegativeSearchWindow() {
     RouteRequest request = new RouteRequest();
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> request.setSearchWindow(DURATION_MINUS_ONE_MINUTE)
+    assertThrows(IllegalArgumentException.class, () ->
+      request.setSearchWindow(DURATION_MINUS_ONE_MINUTE)
     );
   }
 

@@ -104,8 +104,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(MultiCriteriaRequest.class)
+    return ToStringBuilder.of(MultiCriteriaRequest.class)
       .addObj("relaxC1", relaxC1, RelaxFunction.NORMAL)
       .addObj("transitPriorityCalculator", transitPriorityCalculator)
       .addNum("relaxCostAtDestination", relaxCostAtDestination)
@@ -165,8 +164,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
     @Override
     public String toString() {
-      return ToStringBuilder
-        .of(MultiCriteriaRequest.Builder.class)
+      return ToStringBuilder.of(MultiCriteriaRequest.Builder.class)
         .addObj("relaxC1", relaxC1)
         .addObj("transitPriorityCalculator", transitPriorityCalculator)
         .addNum("relaxCostAtDestination", relaxCostAtDestination)

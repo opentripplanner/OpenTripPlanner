@@ -259,8 +259,7 @@ public class SearchParams {
   @Override
   public String toString() {
     var dft = defaults();
-    return ToStringBuilder
-      .of(SearchParams.class)
+    return ToStringBuilder.of(SearchParams.class)
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, dft.earliestDepartureTime)
       .addServiceTime("latestArrivalTime", latestArrivalTime, dft.latestArrivalTime)
       .addDurationSec("searchWindow", searchWindowInSeconds, dft.searchWindowInSeconds)

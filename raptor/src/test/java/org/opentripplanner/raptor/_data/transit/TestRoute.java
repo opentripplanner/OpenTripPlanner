@@ -17,12 +17,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
   private final TestTripPattern pattern;
   private final List<TestTripSchedule> schedules = new ArrayList<>();
-  private final TestConstrainedBoardingSearch transferConstraintsForwardSearch = new TestConstrainedBoardingSearch(
-    true
-  );
-  private final TestConstrainedBoardingSearch transferConstraintsReverseSearch = new TestConstrainedBoardingSearch(
-    false
-  );
+  private final TestConstrainedBoardingSearch transferConstraintsForwardSearch =
+    new TestConstrainedBoardingSearch(true);
+  private final TestConstrainedBoardingSearch transferConstraintsReverseSearch =
+    new TestConstrainedBoardingSearch(false);
 
   private TestRoute(TestTripPattern pattern) {
     this.pattern = pattern;
@@ -95,8 +93,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
   }
 
   public TestRoute withTimetable(String timetable) {
-    Arrays
-      .stream(timetable.split("\\n"))
+    Arrays.stream(timetable.split("\\n"))
       .filter(StringUtils::hasValue)
       .map(s -> TestTripSchedule.schedule(s).pattern(pattern).build())
       .forEach(schedules::add);
@@ -105,8 +102,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestRoute.class)
+    return ToStringBuilder.of(TestRoute.class)
       .addObj("pattern", pattern)
       .addObj("schedules", schedules)
       .toString();
@@ -183,8 +179,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
     public TestRoute timetable(String timetable) {
       timetable = timetable.trim();
       int end = timetable.indexOf('\n');
-      var stopIndexes = Arrays
-        .stream(timetable.substring(0, end).split("\\s+"))
+      var stopIndexes = Arrays.stream(timetable.substring(0, end).split("\\s+"))
         .mapToInt(RaptorTestConstants::stopNameToIndex)
         .toArray();
       return route(name, stopIndexes).withTimetable(timetable.substring(end + 1));

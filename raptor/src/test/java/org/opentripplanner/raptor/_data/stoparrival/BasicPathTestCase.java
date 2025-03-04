@@ -192,18 +192,21 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final String LINE_21 = "L21";
   public static final String LINE_31 = "L31";
 
-  public static final TestTripSchedule TRIP_1 = TestTripSchedule
-    .schedule(pattern(LINE_11, STOP_A, STOP_B))
+  public static final TestTripSchedule TRIP_1 = TestTripSchedule.schedule(
+    pattern(LINE_11, STOP_A, STOP_B)
+  )
     .times(L11_START, L11_END)
     .build();
 
-  public static final TestTripSchedule TRIP_2 = TestTripSchedule
-    .schedule(pattern(LINE_21, STOP_C, STOP_D))
+  public static final TestTripSchedule TRIP_2 = TestTripSchedule.schedule(
+    pattern(LINE_21, STOP_C, STOP_D)
+  )
     .times(L21_START, L21_END)
     .build();
 
-  public static final TestTripSchedule TRIP_3 = TestTripSchedule
-    .schedule(pattern(LINE_31, STOP_D, STOP_E))
+  public static final TestTripSchedule TRIP_3 = TestTripSchedule.schedule(
+    pattern(LINE_31, STOP_D, STOP_E)
+  )
     // The early arrival and late departure should not have any effect on tests
     .arrivals(VERY_EARLY, L31_END)
     .departures(L31_START, VERY_LATE)

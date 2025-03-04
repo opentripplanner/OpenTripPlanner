@@ -191,9 +191,9 @@ class RaptorRequestMapperTest {
       ),
       Arguments.of(
         """
-          VIA_VISIT is not allowed together VIA_PASS_THROUGH, an error is expected.
-          Other features are ignored.
-          """,
+        VIA_VISIT is not allowed together VIA_PASS_THROUGH, an error is expected.
+        Other features are ignored.
+        """,
         List.of(VIA_VISIT, VIA_PASS_THROUGH, TRANSIT_GROUP_PRIORITY, RELAX_COST_DEST),
         List.of(),
         "A mix of via-locations and pass-through is not allowed in this version."
@@ -221,9 +221,9 @@ class RaptorRequestMapperTest {
       ),
       Arguments.of(
         """
-          TRANSIT_GROUP_PRIORITY cannot be combined with other features, override RELAX_COST_DEST
-          VIA_PASS_THROUGH and VIA_VISIT override VIA_VISIT (see above)
-          """,
+        TRANSIT_GROUP_PRIORITY cannot be combined with other features, override RELAX_COST_DEST
+        VIA_PASS_THROUGH and VIA_VISIT override VIA_VISIT (see above)
+        """,
         List.of(TRANSIT_GROUP_PRIORITY, RELAX_COST_DEST),
         List.of(TRANSIT_GROUP_PRIORITY),
         null

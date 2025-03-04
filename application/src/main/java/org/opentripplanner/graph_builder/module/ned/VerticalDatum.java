@@ -98,18 +98,10 @@ public class VerticalDatum {
     double gridXFraction = longitudeNormalized * columns - x1;
     double gridYFraction = latitudeNormalized * rows - y1;
     return (
-      datum[y1][x1] *
-      gridXFraction *
-      gridYFraction +
-      datum[y1][x1 + 1] *
-      (1 - gridXFraction) *
-      gridYFraction +
-      datum[y1 + 1][x1] *
-      gridXFraction *
-      (1 - gridYFraction) +
-      datum[y1 + 1][x1 + 1] *
-      (1 - gridXFraction) *
-      (1 - gridYFraction)
+      datum[y1][x1] * gridXFraction * gridYFraction +
+      datum[y1][x1 + 1] * (1 - gridXFraction) * gridYFraction +
+      datum[y1 + 1][x1] * gridXFraction * (1 - gridYFraction) +
+      datum[y1 + 1][x1 + 1] * (1 - gridXFraction) * (1 - gridYFraction)
     );
   }
 

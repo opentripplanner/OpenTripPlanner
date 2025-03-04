@@ -20,9 +20,10 @@ class CoordinateInputTypeTest {
   void mapToWgsCoordinate() {
     assertEquals(
       new WgsCoordinate(LATITUDE_VALUE, LONGITUDE_VALUE),
-      CoordinateInputType
-        .mapToWgsCoordinate("c", Map.of("c", CoordinateInputType.mapForTest(COORDINATE)))
-        .get()
+      CoordinateInputType.mapToWgsCoordinate(
+        "c",
+        Map.of("c", CoordinateInputType.mapForTest(COORDINATE))
+      ).get()
     );
   }
 
