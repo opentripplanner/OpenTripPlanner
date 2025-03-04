@@ -250,6 +250,28 @@ class DefaultTransitServiceTest {
   }
 
   @Test
+  void getTripTimesOnNoServiceDayWithUseScheduleOption() {
+    Instant midnight = ServiceDateUtils
+      .asStartOfService(SERVICE_DATE, service.getTimeZone())
+      .toInstant();
+
+    assertEquals(
+      Optional.of(
+        List.of(
+          new TripTimeOnDate(REALTIME_TRIP_TIMES, 0, REAL_TIME_PATTERN, SERVICE_DATE, midnight),
+          new TripTimeOnDate(REALTIME_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
+        )
+      ),
+      service.getTripTimeOnDates(TRIP, SERVICE_DATE, true)
+    );
+  }
+
+  @Test
+  void getTripTimesOnNoServiceDay() {
+    assertEquals(Optional.empty(), service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE));
+  }
+
+  @Test
   void getScheduledTripTimesForAddedTrip() {
     assertEquals(Optional.empty(), service.getScheduledTripTimes(ADDED_TRIP));
   }
