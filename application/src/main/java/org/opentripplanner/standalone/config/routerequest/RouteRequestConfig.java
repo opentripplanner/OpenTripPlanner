@@ -27,6 +27,7 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
+import org.opentripplanner.routing.api.request.preference.MaxStopCountLimit;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -544,7 +545,7 @@ does not exist.
               Safety limit to prevent access to and egress from too many stops.
               """
               )
-              .asInt(dftAccessEgress.defaultMaxStopCount()),
+              .asInt(dftAccessEgress.maxStopCountLimit().defaultLimit()),
             cae
               .of("maxStopCountForMode")
               .since(V2_7)
