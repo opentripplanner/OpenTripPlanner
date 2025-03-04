@@ -79,8 +79,7 @@ public class VdvService {
         "Number of departures must be less than " + MAX_DEPARTURES
       );
     }
-    var request = TripTimeOnDateRequest
-      .of(stopLocations)
+    var request = TripTimeOnDateRequest.of(stopLocations)
       .withTime(params.time)
       .withArrivalDeparture(params.arrivalDeparture)
       .withTimeWindow(params.timeWindow)

@@ -54,10 +54,8 @@ public class TriasResource {
     var vdvService = new VdvService(context.transitService(), context.graphFinder());
 
     IdResolver idResolver = idResolver(context.triasApiConfig());
-    var mapper = new StopEventResponseMapper(
-      zoneId,
-      idResolver,
-      feedId -> Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang)
+    var mapper = new StopEventResponseMapper(zoneId, idResolver, feedId ->
+      Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang)
     );
     this.ojpService = new OjpService(vdvService, idResolver, mapper, zoneId);
   }
@@ -99,8 +97,7 @@ public class TriasResource {
   }
 
   private static AbstractFunctionalServiceRequestStructure findRequest(OJP ojp) {
-    return Optional
-      .ofNullable(ojp.getOJPRequest())
+    return Optional.ofNullable(ojp.getOJPRequest())
       .map(s -> s.getServiceRequest())
       .stream()
       .flatMap(s -> s.getAbstractFunctionalServiceRequest().stream())
@@ -157,9 +154,10 @@ public class TriasResource {
 
   private static Response classpathResource(String name) throws IOException {
     final String resource = "explorer/" + name;
-    var res = Objects
-      .requireNonNull(TriasResource.class.getResource(resource), "%s not found".formatted(resource))
-      .openStream();
+    var res = Objects.requireNonNull(
+      TriasResource.class.getResource(resource),
+      "%s not found".formatted(resource)
+    ).openStream();
     return Response.ok(res).build();
   }
 }

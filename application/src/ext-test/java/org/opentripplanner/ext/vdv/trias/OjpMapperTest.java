@@ -53,8 +53,10 @@ class OjpMapperTest {
     TEST_MODEL.stopTimesEvery5Minutes(5, TRIP, START_TIME),
     new Deduplicator()
   );
-  private static final TripPattern TRIP_PATTERN = TimetableRepositoryForTest
-    .tripPattern("tp1", ROUTE)
+  private static final TripPattern TRIP_PATTERN = TimetableRepositoryForTest.tripPattern(
+    "tp1",
+    ROUTE
+  )
     .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_1, STOP_2))
     .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(TRIP_TIMES))
     .build();
@@ -66,9 +68,9 @@ class OjpMapperTest {
     SERVICE_DATE.atStartOfDay(ZoneIds.BERLIN).toInstant()
   );
 
-  private static final ZonedDateTime timestamp = OffsetDateTime
-    .parse("2025-02-10T14:24:02+01:00")
-    .atZoneSameInstant(ZoneIds.BERLIN);
+  private static final ZonedDateTime timestamp = OffsetDateTime.parse(
+    "2025-02-10T14:24:02+01:00"
+  ).atZoneSameInstant(ZoneIds.BERLIN);
   private static final Function<String, Optional<String>> RESOLVE_FEED_LANG = feedId ->
     Optional.of("de");
   private static final Duration WALK_TIME = Duration.ofMinutes(10);

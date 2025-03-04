@@ -157,16 +157,14 @@ class TripTimeOnDateMatcherFactoryTest {
   }
 
   private static TripPattern pattern(Route route) {
-    return TimetableRepositoryForTest
-      .tripPattern("p1", route)
+    return TimetableRepositoryForTest.tripPattern("p1", route)
       .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP, STOP))
       .build();
   }
 
   private static TripTimeOnDate tripTimeOnDate(Route route1) {
     final TripPattern pattern = pattern(route1);
-    var tripTimes = ScheduledTripTimes
-      .of()
+    var tripTimes = ScheduledTripTimes.of()
       .withTrip(TimetableRepositoryForTest.trip("t1").withRoute(route1).build())
       .withArrivalTimes("10:00 10:05")
       .withDepartureTimes("10:00 10:05")

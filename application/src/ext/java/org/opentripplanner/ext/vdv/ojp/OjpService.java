@@ -74,9 +74,9 @@ public class OjpService {
   protected VdvService.StopEventRequestParams extractStopEventParams(
     OJPStopEventRequestStructure ser
   ) {
-    var time = Optional
-      .ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId))
-      .orElse(ZonedDateTime.now(zoneId));
+    var time = Optional.ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId)).orElse(
+      ZonedDateTime.now(zoneId)
+    );
     int numResults = params(ser).map(s -> s.getNumberOfResults()).map(i -> i.intValue()).orElse(1);
 
     var arrivalDeparture = arrivalDeparture(ser);

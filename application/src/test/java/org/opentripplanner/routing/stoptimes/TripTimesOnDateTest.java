@@ -16,21 +16,18 @@ import org.opentripplanner.utils.time.TimeUtils;
 
 public class TripTimesOnDateTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_INPUT1 = TripInput
-    .of("t1")
+  private static final TripInput TRIP_INPUT1 = TripInput.of("t1")
     .addStop(STOP_A1, "12:00", "12:01")
     .addStop(STOP_B1, "12:10", "12:11")
     .addStop(STOP_C1, "12:20", "12:21")
     .build();
-  private static final TripInput TRIP_INPUT2 = TripInput
-    .of("t2")
+  private static final TripInput TRIP_INPUT2 = TripInput.of("t2")
     .addStop(STOP_D1, "12:00", "12:01")
     .addStop(STOP_E, "12:10", "12:11")
     .addStop(STOP_F, "12:20", "12:21")
     .build();
 
-  private static final TripInput TRIP_INPUT3 = TripInput
-    .of("t3")
+  private static final TripInput TRIP_INPUT3 = TripInput.of("t3")
     .addStop(STOP_F, "12:15", "12:15")
     .addStop(STOP_E, "12:20", "12:20")
     .build();
@@ -65,8 +62,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void tooLate() {
-    var transitService = RealtimeTestEnvironment
-      .of()
+    var transitService = RealtimeTestEnvironment.of()
       .addTrip(TRIP_INPUT1)
       .build()
       .getTransitService();
@@ -81,8 +77,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void shortWindow() {
-    var transitService = RealtimeTestEnvironment
-      .of()
+    var transitService = RealtimeTestEnvironment.of()
       .addTrip(TRIP_INPUT1)
       .build()
       .getTransitService();
@@ -90,8 +85,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
     var instant = instant("11:00");
     var result = StopTimesHelper.findTripTimeOnDate(
       transitService,
-      TripTimeOnDateRequest
-        .of(List.of(STOP_A1))
+      TripTimeOnDateRequest.of(List.of(STOP_A1))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(59))
         .build()
@@ -101,8 +95,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void longerWindow() {
-    var transitService = RealtimeTestEnvironment
-      .of()
+    var transitService = RealtimeTestEnvironment.of()
       .addTrip(TRIP_INPUT1)
       .build()
       .getTransitService();
@@ -110,8 +103,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
     var instant = instant("11:00");
     var result = StopTimesHelper.findTripTimeOnDate(
       transitService,
-      TripTimeOnDateRequest
-        .of(List.of(STOP_A1))
+      TripTimeOnDateRequest.of(List.of(STOP_A1))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(60))
         .build()
@@ -121,8 +113,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
   @Test
   void several() {
-    var transitService = RealtimeTestEnvironment
-      .of()
+    var transitService = RealtimeTestEnvironment.of()
       .addTrip(TRIP_INPUT2, TRIP_INPUT3)
       .build()
       .getTransitService();
@@ -130,8 +121,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
     var instant = instant("12:10");
     var result = StopTimesHelper.findTripTimeOnDate(
       transitService,
-      TripTimeOnDateRequest
-        .of(List.of(STOP_F))
+      TripTimeOnDateRequest.of(List.of(STOP_F))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(60))
         .build()
