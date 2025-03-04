@@ -56,35 +56,32 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           C = intersection("C", 47.520, 19.00);
           D = intersection("D", 47.530, 19.00);
 
-          BP1 =
-            vehicleParking(
-              "BP1",
-              47.520,
-              18.999,
-              true,
-              false,
-              List.of(vehicleParkingEntrance(C, "BP1 Entrance", false, true))
-            );
+          BP1 = vehicleParking(
+            "BP1",
+            47.520,
+            18.999,
+            true,
+            false,
+            List.of(vehicleParkingEntrance(C, "BP1 Entrance", false, true))
+          );
 
-          PR1 =
-            vehicleParking(
-              "PR1",
-              47.510,
-              18.999,
-              false,
-              true,
-              List.of(vehicleParkingEntrance(B, "PR1 Entrance", true, true))
-            );
+          PR1 = vehicleParking(
+            "PR1",
+            47.510,
+            18.999,
+            false,
+            true,
+            List.of(vehicleParkingEntrance(B, "PR1 Entrance", true, true))
+          );
 
-          PR2 =
-            vehicleParking(
-              "PR2",
-              47.530,
-              18.999,
-              false,
-              true,
-              List.of(vehicleParkingEntrance(D, "PR2 Entrance", true, true))
-            );
+          PR2 = vehicleParking(
+            "PR2",
+            47.530,
+            18.999,
+            false,
+            true,
+            List.of(vehicleParkingEntrance(D, "PR2 Entrance", true, true))
+          );
 
           biLink(A, S1);
           biLink(A, BR1);
@@ -97,20 +94,16 @@ class StreetGraphFinderTest extends GraphRoutingTest {
           street(C, D, 100, StreetTraversalPermission.ALL);
 
           tripPattern(
-            TP1 =
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP1"))
-                .withRoute(R1)
-                .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
-                .build()
+            TP1 = TripPattern.of(TimetableRepositoryForTest.id("TP1"))
+              .withRoute(R1)
+              .withStopPattern(new StopPattern(List.of(st(S1), st(S2))))
+              .build()
           );
           tripPattern(
-            TP2 =
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP2"))
-                .withRoute(R2)
-                .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
-                .build()
+            TP2 = TripPattern.of(TimetableRepositoryForTest.id("TP2"))
+              .withRoute(R2)
+              .withStopPattern(new StopPattern(List.of(st(S1), st(S3))))
+              .build()
           );
         }
       }

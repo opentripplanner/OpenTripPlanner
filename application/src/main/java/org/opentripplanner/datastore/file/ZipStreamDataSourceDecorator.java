@@ -197,8 +197,7 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
           byteArray.length,
           entry.getLastModifiedTime().toMillis(),
           false
-        )
-          .withBytes(byteArray)
+        ).withBytes(byteArray)
       );
     } else {
       LOG.info(

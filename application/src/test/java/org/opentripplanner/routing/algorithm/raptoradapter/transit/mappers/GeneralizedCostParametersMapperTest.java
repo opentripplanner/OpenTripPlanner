@@ -43,9 +43,10 @@ class GeneralizedCostParametersMapperTest {
     var routingRequest = new RouteRequest();
     routingRequest.journey().transit().setUnpreferredAgencies(List.of(unpreferredAgency));
 
-    BitSet unpreferredPatterns = GeneralizedCostParametersMapper
-      .map(routingRequest, data.getPatterns())
-      .unpreferredPatterns();
+    BitSet unpreferredPatterns = GeneralizedCostParametersMapper.map(
+      routingRequest,
+      data.getPatterns()
+    ).unpreferredPatterns();
 
     for (var pattern : data.getPatterns()) {
       assertEquals(
@@ -68,9 +69,9 @@ class GeneralizedCostParametersMapperTest {
 
   private static TestRoute testTripPattern(FeedScopedId agencyId, FeedScopedId routeId) {
     return TestRoute.route(
-      TestTripPattern
-        .pattern(1, 2)
-        .withRoute(route(routeId).withAgency(agency(agencyId.getId())).build())
+      TestTripPattern.pattern(1, 2).withRoute(
+        route(routeId).withAgency(agency(agencyId.getId())).build()
+      )
     );
   }
 }

@@ -29,14 +29,11 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
     int alightStopPosition
   ) {
     double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
-    LineString geometry = GeometryUtils
-      .getGeometryFactory()
+    LineString geometry = GeometryUtils.getGeometryFactory()
       .createLineString(new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() });
 
-    return new FlexPath(
-      (int) distance,
-      (int) (distance / flexSpeed) + DIRECT_EXTRA_TIME,
-      () -> geometry
+    return new FlexPath((int) distance, (int) (distance / flexSpeed) + DIRECT_EXTRA_TIME, () ->
+      geometry
     );
   }
 }

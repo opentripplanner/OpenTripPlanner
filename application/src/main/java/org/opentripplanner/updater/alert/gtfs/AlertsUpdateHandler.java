@@ -79,8 +79,7 @@ public class AlertsUpdateHandler {
     GtfsRealtime.Alert alert,
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher
   ) {
-    TransitAlertBuilder alertBuilder = TransitAlert
-      .of(new FeedScopedId(feedId, id))
+    TransitAlertBuilder alertBuilder = TransitAlert.of(new FeedScopedId(feedId, id))
       .withDescriptionText(deBuffer(alert.getDescriptionText()))
       .withHeaderText(deBuffer(alert.getHeaderText()))
       .withUrl(deBuffer(alert.getUrl()))

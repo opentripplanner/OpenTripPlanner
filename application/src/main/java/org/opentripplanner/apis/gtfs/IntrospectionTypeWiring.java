@@ -44,58 +44,53 @@ class IntrospectionTypeWiring {
       throw new IllegalArgumentException("Type %s is not object type".formatted(type.getName()));
     }
 
-    return TypeRuntimeWiring
-      .newTypeWiring(clazz.getSimpleName().replaceAll("Impl$", ""))
+    return TypeRuntimeWiring.newTypeWiring(clazz.getSimpleName().replaceAll("Impl$", ""))
       .dataFetchers(
-        Arrays
-          .stream(clazz.getDeclaredMethods())
+        Arrays.stream(clazz.getDeclaredMethods())
           .filter(isMethodPublic)
           .filter(isMethodReturnTypeDataFetcher)
           .collect(
-            Collectors.toMap(
-              Method::getName,
-              method -> {
-                String fieldName = method.getName();
-                try {
-                  DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
-                  if (dataFetcher == null) {
-                    throw new RuntimeException(
-                      String.format(
-                        "Data fetcher %s for type %s is null",
-                        fieldName,
-                        clazz.getSimpleName()
-                      )
-                    );
-                  }
-                  if (
-                    OTPFeature.AsyncGraphQLFetchers.isOn() &&
-                    objectType
-                      .getFieldDefinitions()
-                      .stream()
-                      .filter(fieldDefinition -> fieldDefinition.getName().equals(fieldName))
-                      .anyMatch(fieldDefinition ->
-                        fieldDefinition
-                          .getDirectives()
-                          .stream()
-                          .anyMatch(directive -> directive.getName().equals("async"))
-                      )
-                  ) {
-                    return AsyncDataFetcher.async(dataFetcher);
-                  }
-
-                  return dataFetcher;
-                } catch (IllegalAccessException | InvocationTargetException error) {
+            Collectors.toMap(Method::getName, method -> {
+              String fieldName = method.getName();
+              try {
+                DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
+                if (dataFetcher == null) {
                   throw new RuntimeException(
                     String.format(
-                      "Data fetcher %s for type %s threw error",
+                      "Data fetcher %s for type %s is null",
                       fieldName,
                       clazz.getSimpleName()
-                    ),
-                    error
+                    )
                   );
                 }
+                if (
+                  OTPFeature.AsyncGraphQLFetchers.isOn() &&
+                  objectType
+                    .getFieldDefinitions()
+                    .stream()
+                    .filter(fieldDefinition -> fieldDefinition.getName().equals(fieldName))
+                    .anyMatch(fieldDefinition ->
+                      fieldDefinition
+                        .getDirectives()
+                        .stream()
+                        .anyMatch(directive -> directive.getName().equals("async"))
+                    )
+                ) {
+                  return AsyncDataFetcher.async(dataFetcher);
+                }
+
+                return dataFetcher;
+              } catch (IllegalAccessException | InvocationTargetException error) {
+                throw new RuntimeException(
+                  String.format(
+                    "Data fetcher %s for type %s threw error",
+                    fieldName,
+                    clazz.getSimpleName()
+                  ),
+                  error
+                );
               }
-            )
+            })
           )
       )
       .build();

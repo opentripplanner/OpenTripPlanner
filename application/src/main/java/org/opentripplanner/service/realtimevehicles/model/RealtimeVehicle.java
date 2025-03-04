@@ -47,8 +47,7 @@ public class RealtimeVehicle {
   private final OccupancyStatus occupancyStatus;
 
   RealtimeVehicle(RealtimeVehicleBuilder builder) {
-    var stopRelationship = Optional
-      .ofNullable(builder.stop())
+    var stopRelationship = Optional.ofNullable(builder.stop())
       .map(s -> new StopRelationship(s, builder.stopStatus()))
       .orElse(null);
     this.vehicleId = builder.vehicleId();

@@ -93,30 +93,30 @@ public class PathParetoSetComparators {
     };
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorStandardArrivalTime() {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorStandardArrivalTime() {
     return (l, r) -> compareArrivalTime(l, r) || compareNumberOfTransfers(l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorStandardDepartureTime() {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorStandardDepartureTime() {
     return (l, r) -> compareDepartureTime(l, r) || compareNumberOfTransfers(l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorTimetable() {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorTimetable() {
     return (l, r) ->
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC1() {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorTimetableAndC1() {
     return (l, r) ->
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
@@ -125,9 +125,9 @@ public class PathParetoSetComparators {
       compareC1(l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorTimetableAndRelaxedC1(final RelaxFunction relaxCost) {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorTimetableAndRelaxedC1(final RelaxFunction relaxCost) {
     return (l, r) ->
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
@@ -136,9 +136,9 @@ public class PathParetoSetComparators {
       compareC1(relaxCost, l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorArrivalTimeAndC1() {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorArrivalTimeAndC1() {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
@@ -146,9 +146,9 @@ public class PathParetoSetComparators {
       compareC1(l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorDepartureTimeAndC1() {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorDepartureTimeAndC1() {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
@@ -156,9 +156,9 @@ public class PathParetoSetComparators {
       compareC1(l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorArrivalTimeAndRelaxedC1(RelaxFunction relaxCost) {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorArrivalTimeAndRelaxedC1(RelaxFunction relaxCost) {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
@@ -166,9 +166,9 @@ public class PathParetoSetComparators {
       compareC1(relaxCost, l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorDepartureTimeAndRelaxedC1(RelaxFunction relaxCost) {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorDepartureTimeAndRelaxedC1(RelaxFunction relaxCost) {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
@@ -176,9 +176,9 @@ public class PathParetoSetComparators {
       compareC1(relaxCost, l, r);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC1AndC2(DominanceFunction c2Comp) {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorTimetableAndC1AndC2(DominanceFunction c2Comp) {
     return (l, r) ->
       compareIterationDepartureTime(l, r) ||
       compareArrivalTime(l, r) ||
@@ -188,9 +188,9 @@ public class PathParetoSetComparators {
       c2Comp.leftDominateRight(l.c2(), r.c2());
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorTimetableAndRelaxedC1IfC2IsOptimal(
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorTimetableAndRelaxedC1IfC2IsOptimal(
     RelaxFunction relaxCost,
     DominanceFunction c2Comp
   ) {
@@ -202,9 +202,9 @@ public class PathParetoSetComparators {
       compareC1RelaxedIfC2IsOptimal(l, r, relaxCost, c2Comp);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorWithC1AndC2(DominanceFunction c2Comp) {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorWithC1AndC2(DominanceFunction c2Comp) {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
@@ -213,9 +213,9 @@ public class PathParetoSetComparators {
       c2Comp.leftDominateRight(l.c2(), r.c2());
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorDepartureTimeAndC1AndC2(DominanceFunction c2Comp) {
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorDepartureTimeAndC1AndC2(DominanceFunction c2Comp) {
     return (l, r) ->
       compareDepartureTime(l, r) ||
       compareNumberOfTransfers(l, r) ||
@@ -224,9 +224,9 @@ public class PathParetoSetComparators {
       c2Comp.leftDominateRight(l.c2(), r.c2());
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(
     RelaxFunction relaxCost,
     DominanceFunction c2Comp
   ) {
@@ -237,9 +237,9 @@ public class PathParetoSetComparators {
       compareC1RelaxedIfC2IsOptimal(l, r, relaxCost, c2Comp);
   }
 
-  private static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<RaptorPath<T>> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
+  private static <T extends RaptorTripSchedule> ParetoComparator<
+    RaptorPath<T>
+  > comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
     RelaxFunction relaxCost,
     DominanceFunction c2Comp
   ) {

@@ -12,8 +12,7 @@ class ElevatorPreferencesTest {
   public static final int BOARD_TIME = 60;
   public static final int HOP_COST = 200;
   public static final int HOP_TIME = 120;
-  private final ElevatorPreferences subject = ElevatorPreferences
-    .of()
+  private final ElevatorPreferences subject = ElevatorPreferences.of()
     .withBoardCost(BOARD_COST)
     .withBoardTime(BOARD_TIME)
     .withHopCost(HOP_COST)

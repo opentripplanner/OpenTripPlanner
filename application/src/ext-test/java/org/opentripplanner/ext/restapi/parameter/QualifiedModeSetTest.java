@@ -43,8 +43,7 @@ public class QualifiedModeSetTest {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK");
     assertEquals(Set.of(new QualifiedMode("WALK")), modeSet.qModes);
     assertEquals(
-      RequestModes
-        .of()
+      RequestModes.of()
         .withAccessMode(WALK)
         .withEgressMode(WALK)
         .withDirectMode(WALK)
@@ -89,8 +88,7 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      RequestModes
-        .of()
+      RequestModes.of()
         .withAccessMode(BIKE_TO_PARK)
         .withEgressMode(WALK)
         .withDirectMode(BIKE_TO_PARK)
@@ -105,8 +103,7 @@ public class QualifiedModeSetTest {
     QualifiedModeSet modeSet = new QualifiedModeSet("WALK,BICYCLE,WALK");
     assertEquals(Set.of(new QualifiedMode("WALK"), new QualifiedMode("BICYCLE")), modeSet.qModes);
     assertEquals(
-      RequestModes
-        .of()
+      RequestModes.of()
         .withAccessMode(BIKE)
         .withEgressMode(BIKE)
         .withDirectMode(BIKE)
@@ -118,9 +115,8 @@ public class QualifiedModeSetTest {
 
   @Test
   public void multipleNonWalkModes() {
-    assertThrows(
-      IllegalStateException.class,
-      () -> new QualifiedModeSet("WALK,BICYCLE,CAR").getRequestModes()
+    assertThrows(IllegalStateException.class, () ->
+      new QualifiedModeSet("WALK,BICYCLE,CAR").getRequestModes()
     );
   }
 
@@ -136,8 +132,7 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      RequestModes
-        .of()
+      RequestModes.of()
         .withAccessMode(FLEXIBLE)
         .withEgressMode(FLEXIBLE)
         .withDirectMode(FLEXIBLE)
@@ -155,8 +150,7 @@ public class QualifiedModeSetTest {
       modeSet.qModes
     );
     assertEquals(
-      RequestModes
-        .of()
+      RequestModes.of()
         .withAccessMode(BIKE_TO_PARK)
         .withEgressMode(FLEXIBLE)
         .withDirectMode(BIKE_TO_PARK)

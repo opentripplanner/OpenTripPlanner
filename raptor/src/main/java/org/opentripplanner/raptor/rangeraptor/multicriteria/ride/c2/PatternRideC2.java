@@ -46,11 +46,9 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
    *   </li>
    * <p>
    */
-  public static <
-    T extends RaptorTripSchedule
-  > ParetoComparator<PatternRideC2<T>> paretoComparatorRelativeCost(
-    DominanceFunction dominanceFunctionC2
-  ) {
+  public static <T extends RaptorTripSchedule> ParetoComparator<
+    PatternRideC2<T>
+  > paretoComparatorRelativeCost(DominanceFunction dominanceFunctionC2) {
     return (l, r) ->
       l.tripSortIndex != r.tripSortIndex ||
       l.relativeC1 < r.relativeC1 ||
@@ -59,8 +57,7 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PatternRideC2.class)
+    return ToStringBuilder.of(PatternRideC2.class)
       .addNum("prevArrival", prevArrival.stop())
       .addNum("boardStop", boardStopIndex)
       .addNum("boardPos", boardPos)

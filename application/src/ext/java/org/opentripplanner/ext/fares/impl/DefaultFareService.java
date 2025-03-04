@@ -147,13 +147,11 @@ public class DefaultFareService implements FareService {
       .entrySet()
       .stream()
       .collect(
-        Collectors.toMap(
-          Map.Entry::getKey,
-          rules ->
-            rules
-              .getValue()
-              .stream()
-              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        Collectors.toMap(Map.Entry::getKey, rules ->
+          rules
+            .getValue()
+            .stream()
+            .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
         )
       );
     return fareRulesByTypeAndFeed.get(fareType).get(feedId);
@@ -199,9 +197,11 @@ public class DefaultFareService implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
-      var product = FareProduct
-        .of(fareId, fareType.name(), Money.ofFractionalAmount(currency, cost))
-        .build();
+      var product = FareProduct.of(
+        fareId,
+        fareType.name(),
+        Money.ofFractionalAmount(currency, cost)
+      ).build();
 
       List<Leg> applicableLegs = new ArrayList<>();
       for (int i = start; i <= via; ++i) {
@@ -313,9 +313,9 @@ public class DefaultFareService implements FareService {
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
     Money finalBestFare = bestFare;
-    return Optional
-      .ofNullable(bestAttribute)
-      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
+    return Optional.ofNullable(bestAttribute).map(attribute ->
+      new FareAndId(finalBestFare, attribute.getId())
+    );
   }
 
   /**

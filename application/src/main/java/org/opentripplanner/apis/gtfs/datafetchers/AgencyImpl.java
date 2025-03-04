@@ -47,8 +47,9 @@ public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
                 .forEach(alerts::add);
               break;
             case ROUTES:
-              getRoutes(environment)
-                .forEach(route -> alerts.addAll(alertService.getRouteAlerts(route.getId())));
+              getRoutes(environment).forEach(route ->
+                alerts.addAll(alertService.getRouteAlerts(route.getId()))
+              );
               break;
           }
         });

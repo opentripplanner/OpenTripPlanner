@@ -106,8 +106,7 @@ public class SameEdgeAdjuster {
    * ignored.
    */
   private static Set<StreetEdge> getConnectedParentEdges(Vertex loc) {
-    return Stream
-      .concat(loc.getIncoming().stream(), loc.getOutgoing().stream())
+    return Stream.concat(loc.getIncoming().stream(), loc.getOutgoing().stream())
       .filter(it -> it instanceof TemporaryPartialStreetEdge)
       .map(it -> ((TemporaryPartialStreetEdge) it).getParentEdge())
       .collect(Collectors.toSet());

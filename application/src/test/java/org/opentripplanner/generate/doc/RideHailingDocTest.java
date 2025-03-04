@@ -81,8 +81,7 @@ public class RideHailingDocTest {
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
     buf.addSection("##### Example configuration");
-    var root = TemplateUtil
-      .jsonExampleBuilder(node.rawNode())
+    var root = TemplateUtil.jsonExampleBuilder(node.rawNode())
       .wrapInArray()
       .wrapInObject(CONFIG_PROP)
       .build();

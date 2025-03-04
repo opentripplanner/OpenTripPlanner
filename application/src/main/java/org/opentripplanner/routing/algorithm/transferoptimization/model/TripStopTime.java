@@ -79,8 +79,7 @@ public final class TripStopTime<T extends RaptorTripSchedule> implements StopTim
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
+    return ValueObjectToStringBuilder.of()
       .addText("[")
       .addNum(stop())
       .addText(" ")

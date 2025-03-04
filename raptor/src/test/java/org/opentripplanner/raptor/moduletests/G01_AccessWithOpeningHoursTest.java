@@ -57,7 +57,8 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   private static final String EXP_24_25 = " ~ B ~ BUS R1 0:25+1d 0:40+1d ~ E ~ Walk 1m ";
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -65,17 +66,16 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     data.withRoute(
-      route("R1", STOP_B, STOP_E)
-        .withTimetable(
-          schedule("00:15 00:30"),
-          schedule("00:20 00:35"),
-          schedule("00:25 00:40"),
-          schedule("00:30 00:45"),
-          schedule("24:15 24:30"),
-          schedule("24:20 24:35"),
-          // Not within time-limit 24:42 (need 2 min for egress)
-          schedule("24:25 24:40")
-        )
+      route("R1", STOP_B, STOP_E).withTimetable(
+        schedule("00:15 00:30"),
+        schedule("00:20 00:35"),
+        schedule("00:25 00:40"),
+        schedule("00:30 00:45"),
+        schedule("24:15 24:30"),
+        schedule("24:20 24:35"),
+        // Not within time-limit 24:42 (need 2 min for egress)
+        schedule("24:25 24:40")
+      )
     );
     requestBuilder.searchParams().addEgressPaths(walk(STOP_E, D1m));
 
@@ -263,8 +263,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
   }
 
   private static List<RaptorModuleTestCase> closedTestCase() {
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r ->
         r
           .searchParams()
@@ -291,8 +290,7 @@ public class G01_AccessWithOpeningHoursTest implements RaptorTestConstants {
     int earliestDepartureTime,
     int latestArrivalTime
   ) {
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("18m", TX_0, earliestDepartureTime, latestArrivalTime);
   }
 }

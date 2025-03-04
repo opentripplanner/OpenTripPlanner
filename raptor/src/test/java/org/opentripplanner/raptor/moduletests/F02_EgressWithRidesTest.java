@@ -40,7 +40,8 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
   private static final int D1m59s = DurationUtils.durationInSeconds("1m59s");
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -48,8 +49,9 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
   @BeforeEach
   void setup() {
     data.withRoute(
-      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-        .withTimetable(schedule("0:10, 0:12, 0:14, 0:16, 0:18"))
+      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F).withTimetable(
+        schedule("0:10, 0:12, 0:14, 0:16, 0:18")
+      )
     );
     // We will test board- and alight-slack in a separate test
     data.withSlackProvider(new DefaultSlackProvider(60, 0, 0));
@@ -76,8 +78,7 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
     var bestCost = prefix + "0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s Tₓ2 C₁1_378]";
     var bestTxAndTime = prefix + "0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m Tₓ1 C₁1_740]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .add(TC_MIN_DURATION, "[0:00 0:09 9m Tₓ2]", "[0:00 0:11 11m Tₓ1]", "[0:00 0:19 19m Tₓ0]")
       .add(TC_MIN_DURATION_REV, "[0:21 0:30 9m Tₓ0]")
       .add(standard().not(TC_STANDARD_REV_ONE), withoutCost(bestArrivalTime))

@@ -31,10 +31,9 @@ public class SeverityMapper {
       case VERY_SEVERE:
         return "verySevere";
       case WARNING:
-      default:
-        {
-          return "normal";
-        }
+      default: {
+        return "normal";
+      }
     }
   }
 }

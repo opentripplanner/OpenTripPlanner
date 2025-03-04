@@ -28,8 +28,7 @@ class IslandPruningUtils {
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-      var osmModule = OsmModule
-        .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
+      var osmModule = OsmModule.of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
         .withEdgeNamer(new TestNamer())
         .build();
 

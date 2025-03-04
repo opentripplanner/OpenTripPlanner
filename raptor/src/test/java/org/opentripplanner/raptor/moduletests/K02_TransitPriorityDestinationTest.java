@@ -42,7 +42,8 @@ public class K02_TransitPriorityDestinationTest {
   private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -56,14 +57,18 @@ public class K02_TransitPriorityDestinationTest {
     // they are in different groups), but not L3 (which certainly is in its own group but
     // its cost is outside the range allowed by the slack).
     data.withRoutes(
-      route(TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build())
-        .withTimetable(schedule("00:02 00:12")),
-      route(TestTripPattern.of("U1", STOP_B, STOP_D).priorityGroup(GROUP_A).build())
-        .withTimetable(schedule("00:02 00:12:01")),
-      route(TestTripPattern.of("L2", STOP_B, STOP_E).priorityGroup(GROUP_B).build())
-        .withTimetable(schedule("00:02 00:13")),
-      route(TestTripPattern.of("L3", STOP_B, STOP_F).priorityGroup(GROUP_C).build())
-        .withTimetable(schedule("00:02 00:14"))
+      route(TestTripPattern.of("L1", STOP_B, STOP_C).priorityGroup(GROUP_A).build()).withTimetable(
+        schedule("00:02 00:12")
+      ),
+      route(TestTripPattern.of("U1", STOP_B, STOP_D).priorityGroup(GROUP_A).build()).withTimetable(
+        schedule("00:02 00:12:01")
+      ),
+      route(TestTripPattern.of("L2", STOP_B, STOP_E).priorityGroup(GROUP_B).build()).withTimetable(
+        schedule("00:02 00:13")
+      ),
+      route(TestTripPattern.of("L3", STOP_B, STOP_F).priorityGroup(GROUP_C).build()).withTimetable(
+        schedule("00:02 00:14")
+      )
     );
 
     requestBuilder

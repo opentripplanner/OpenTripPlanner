@@ -201,7 +201,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
     if (next != null) {
       if (next.isTransfer()) {
-        next.timeShiftTransferTime(slackProvider);
+        next.setTransferTimeBasedOnPreviousLeg(slackProvider);
         if (next.next().isEgress()) {
           next.timeShiftThisAndNextLeg(slackProvider, iterationDepartureTime);
         }
@@ -527,7 +527,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  private void timeShiftTransferTime(RaptorSlackProvider slackProvider) {
+  private void setTransferTimeBasedOnPreviousLeg(RaptorSlackProvider slackProvider) {
     int newFromTime;
     if (prev.isTransit()) {
       newFromTime =

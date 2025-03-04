@@ -192,8 +192,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(MqttGtfsRealtimeUpdater.class)
+    return ToStringBuilder.of(MqttGtfsRealtimeUpdater.class)
       .addStr("url", url)
       .addStr("topic", topic)
       .addStr("feedId", feedId)

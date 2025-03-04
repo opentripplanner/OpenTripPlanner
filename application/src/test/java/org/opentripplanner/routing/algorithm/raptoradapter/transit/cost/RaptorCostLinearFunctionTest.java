@@ -33,14 +33,14 @@ class RaptorCostLinearFunctionTest {
   static Stream<Arguments> calculateRaptorCostTestCases() {
     return TestTableParser.of(
       """
-        # expectedRaptorCost | timeSeconds
-          1700               | 0
-          1950               | 1
-          2200               | 2
-          5450               | 15
-          5700               | 16
-         16950               | 61
-        """
+      # expectedRaptorCost | timeSeconds
+        1700               | 0
+        1950               | 1
+        2200               | 2
+        5450               | 15
+        5700               | 16
+       16950               | 61
+      """
     );
   }
 

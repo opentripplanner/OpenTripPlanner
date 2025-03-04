@@ -31,7 +31,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class A01_SingleRouteTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -69,8 +70,7 @@ public class A01_SingleRouteTest implements RaptorTestConstants {
 
   static List<RaptorModuleTestCase> testCases() {
     var path = "Walk 30s ~ B ~ BUS R1 0:01 0:05 ~ D ~ Walk 20s [0:00:30 0:05:20 4m50s Tₓ0 C₁940]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("4m50s", TX_0, T00_00, T00_10)
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)

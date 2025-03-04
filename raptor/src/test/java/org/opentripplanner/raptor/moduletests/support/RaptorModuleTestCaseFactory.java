@@ -58,8 +58,7 @@ public class RaptorModuleTestCaseFactory {
         earliestDepartureTime,
         earliestDepartureTime + durationSec,
         nTransfers
-      )
-        .toString()
+      ).toString()
     );
     add(
       TC_MIN_DURATION_REV,
@@ -67,8 +66,7 @@ public class RaptorModuleTestCaseFactory {
         latestArrivalTime,
         latestArrivalTime - durationSec,
         nTransfers
-      )
-        .toString()
+      ).toString()
     );
     return this;
   }

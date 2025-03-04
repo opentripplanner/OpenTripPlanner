@@ -32,8 +32,7 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
 
   static final Comparator<ItinerarySortKey> DEPARTURE_TIME_COMP = comparing(
     ItinerarySortKey::startTimeAsInstant
-  )
-    .reversed();
+  ).reversed();
 
   static final Comparator<ItinerarySortKey> GENERALIZED_COST_COMP = comparingInt(
     ItinerarySortKey::getGeneralizedCostIncludingPenalty

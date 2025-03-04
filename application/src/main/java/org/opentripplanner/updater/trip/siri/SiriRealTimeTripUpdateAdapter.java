@@ -47,7 +47,8 @@ public class SiriRealTimeTripUpdateAdapter {
    * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
    */
-  private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
+  private final SiriTripPatternIdGenerator tripPatternIdGenerator =
+    new SiriTripPatternIdGenerator();
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-real-time
    * messages.
@@ -68,10 +69,14 @@ public class SiriRealTimeTripUpdateAdapter {
     TimetableSnapshotManager snapshotManager
   ) {
     this.snapshotManager = snapshotManager;
-    this.transitEditorService =
-      new DefaultTransitService(timetableRepository, snapshotManager.getTimetableSnapshotBuffer());
-    this.tripPatternCache =
-      new SiriTripPatternCache(tripPatternIdGenerator, transitEditorService::findPattern);
+    this.transitEditorService = new DefaultTransitService(
+      timetableRepository,
+      snapshotManager.getTimetableSnapshotBuffer()
+    );
+    this.tripPatternCache = new SiriTripPatternCache(
+      tripPatternIdGenerator,
+      transitEditorService::findPattern
+    );
   }
 
   /**
@@ -132,14 +137,12 @@ public class SiriRealTimeTripUpdateAdapter {
       shouldAddNewTrip = shouldAddNewTrip(journey, entityResolver);
       Result<TripUpdate, UpdateError> result;
       if (shouldAddNewTrip) {
-        result =
-          new AddedTripBuilder(
-            journey,
-            transitService,
-            entityResolver,
-            tripPatternIdGenerator::generateUniqueTripPatternId
-          )
-            .build();
+        result = new AddedTripBuilder(
+          journey,
+          transitService,
+          entityResolver,
+          tripPatternIdGenerator::generateUniqueTripPatternId
+        ).build();
       } else {
         result = handleModifiedTrip(fuzzyTripMatcher, entityResolver, journey);
       }
@@ -253,8 +256,7 @@ public class SiriRealTimeTripUpdateAdapter {
       serviceDate,
       transitEditorService.getTimeZone(),
       entityResolver
-    )
-      .build();
+    ).build();
     if (updateResult.isFailure()) {
       return updateResult.toFailureResult();
     }
@@ -283,8 +285,11 @@ public class SiriRealTimeTripUpdateAdapter {
       pattern = tripUpdate.addedTripPattern();
     } else {
       // Get cached trip pattern or create one if it doesn't exist yet
-      pattern =
-        tripPatternCache.getOrCreateTripPattern(tripUpdate.stopPattern(), trip, serviceDate);
+      pattern = tripPatternCache.getOrCreateTripPattern(
+        tripUpdate.stopPattern(),
+        trip,
+        serviceDate
+      );
     }
 
     // Add new trip times to buffer, making protective copies as needed. Bubble success/error up.

@@ -20,16 +20,13 @@ public class MinSafeTransferTimeCalculatorTest implements RaptorTestConstants {
 
   private static final TestPathBuilder PATH_BUILDER = new TestPathBuilder(COST_CALCULATOR);
 
-  private final MinSafeTransferTimeCalculator<TestTripSchedule> subject = new MinSafeTransferTimeCalculator<>(
-    SLACK_PROVIDER
-  );
-  RaptorPath<TestTripSchedule> path_1_bus_leg = PATH_BUILDER
-    .access(time("10:00:15"), STOP_A, D2m)
+  private final MinSafeTransferTimeCalculator<TestTripSchedule> subject =
+    new MinSafeTransferTimeCalculator<>(SLACK_PROVIDER);
+  RaptorPath<TestTripSchedule> path_1_bus_leg = PATH_BUILDER.access(time("10:00:15"), STOP_A, D2m)
     .bus("L11", time("10:03"), TRANSIT_TIME, STOP_B)
     .egress(D2m);
 
-  RaptorPath<TestTripSchedule> path_3_bus_legs = PATH_BUILDER
-    .access(time("10:00:15"), STOP_A, D2m)
+  RaptorPath<TestTripSchedule> path_3_bus_legs = PATH_BUILDER.access(time("10:00:15"), STOP_A, D2m)
     .bus("L1", time("10:03"), TRANSIT_TIME, STOP_B)
     .walk(D2m, STOP_C)
     .bus("L2", time("10:45"), TRANSIT_TIME, STOP_D)

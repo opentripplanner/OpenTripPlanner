@@ -35,15 +35,13 @@ class GtfsGraphQLIndex {
     Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
 
     if (OTPFeature.ActuatorAPI.isOn()) {
-      instrumentation =
-        new ChainedInstrumentation(
-          new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, List.of()),
-          instrumentation
-        );
+      instrumentation = new ChainedInstrumentation(
+        new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, List.of()),
+        instrumentation
+      );
     }
 
-    GraphQL graphQL = GraphQL
-      .newGraphQL(requestContext.schema())
+    GraphQL graphQL = GraphQL.newGraphQL(requestContext.schema())
       .instrumentation(instrumentation)
       .defaultDataFetcherExceptionHandler(new LoggingDataFetcherExceptionHandler())
       .build();
@@ -52,8 +50,7 @@ class GtfsGraphQLIndex {
       variables = new HashMap<>();
     }
 
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
+    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query(query)
       .operationName(operationName)
       .context(requestContext)
@@ -86,8 +83,7 @@ class GtfsGraphQLIndex {
       requestContext
     );
 
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity(GraphQLResponseSerializer.serialize(executionResult))
       .build();
   }

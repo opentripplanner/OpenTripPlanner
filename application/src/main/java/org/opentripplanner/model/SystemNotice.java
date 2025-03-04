@@ -41,8 +41,7 @@ public class SystemNotice {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SystemNotice.class)
+    return ToStringBuilder.of(SystemNotice.class)
       .addStr("tag", tag)
       .addStr("text", text)
       .toString();

@@ -32,8 +32,7 @@ class DecorateWithRideHailingTest implements PlanTestConstants {
   );
   RideHailingService failingService = new FailingRideHailingService();
 
-  Itinerary i = TestItineraryBuilder
-    .newItinerary(A)
+  Itinerary i = TestItineraryBuilder.newItinerary(A)
     .drive(T11_30, PlanTestConstants.T11_50, B)
     .build();
 

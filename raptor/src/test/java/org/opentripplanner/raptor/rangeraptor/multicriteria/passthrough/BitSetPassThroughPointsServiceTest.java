@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 
 class BitSetPassThroughPointsServiceTest {
@@ -31,7 +31,10 @@ class BitSetPassThroughPointsServiceTest {
   private static final int STOP_31 = 6;
 
   private static final PassThroughPointsService SUBJECT = BitSetPassThroughPointsService.of(
-    List.of(new PassThroughPoint("PT1", STOPS_1), new PassThroughPoint("PT2", STOPS_2))
+    List.of(
+      RaptorViaLocation.passThrough("PT1").addPassThroughStops(STOPS_1).build(),
+      RaptorViaLocation.passThrough("PT2").addPassThroughStops(STOPS_2).build()
+    )
   );
   /**
    * We expect the c2 value at the destination to be the same as the number of pass-through
@@ -55,25 +58,19 @@ class BitSetPassThroughPointsServiceTest {
   void passThroughPointTest(int expectedSeqNr, boolean isPassThroughPoint, int stopIndex) {
     assertEquals(isPassThroughPoint, SUBJECT.isPassThroughPoint(stopIndex));
     AtomicBoolean c2Updated = new AtomicBoolean(false);
-    SUBJECT.updateC2Value(
-      expectedSeqNr - 1,
-      newC2 -> {
-        assertEquals(expectedSeqNr, newC2);
-        c2Updated.set(true);
-      }
-    );
+    SUBJECT.updateC2Value(expectedSeqNr - 1, newC2 -> {
+      assertEquals(expectedSeqNr, newC2);
+      c2Updated.set(true);
+    });
     assertTrue(c2Updated.get(), "The c2 update is not performed");
-    SUBJECT.updateC2Value(
-      expectedSeqNr - 2,
-      newC2 -> fail("A visited pass-through-point should not increase the c2. New C2: " + newC2)
+    SUBJECT.updateC2Value(expectedSeqNr - 2, newC2 ->
+      fail("A visited pass-through-point should not increase the c2. New C2: " + newC2)
     );
-    SUBJECT.updateC2Value(
-      expectedSeqNr,
-      newC2 ->
-        fail(
-          "A pass-through-point where the previous point is not visited should not increase the C2. New C2: " +
-          newC2
-        )
+    SUBJECT.updateC2Value(expectedSeqNr, newC2 ->
+      fail(
+        "A pass-through-point where the previous point is not visited should not increase the C2. New C2: " +
+        newC2
+      )
     );
     assertTrue(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION));
     assertFalse(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION - 1));

@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  *  TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and the flow
  *             between them. The NeTEx and a GTFS version of this should be merged. Having NeTex and GTFS
  *             specific indexes inside is ok. With the increased usage of DatedServiceJourneys, this should probably
- *             be part of the main model - not a separate cashe. It is possible that this class works when it comes to
+ *             be part of the main model - not a separate cache. It is possible that this class works when it comes to
  *             the thread-safety, but just by looking at a few lines of code I see problems - a strategy needs to be
  *             analysed, designed and documented.
  */
@@ -90,16 +90,14 @@ class SiriTripPatternCache {
     // Create TripPattern if it doesn't exist yet
     if (tripPattern == null) {
       var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
-      tripPattern =
-        TripPattern
-          .of(id)
-          .withRoute(trip.getRoute())
-          .withMode(trip.getMode())
-          .withNetexSubmode(trip.getNetexSubMode())
-          .withStopPattern(stopPattern)
-          .withCreatedByRealtimeUpdater(true)
-          .withOriginalTripPattern(originalTripPattern)
-          .build();
+      tripPattern = TripPattern.of(id)
+        .withRoute(trip.getRoute())
+        .withMode(trip.getMode())
+        .withNetexSubmode(trip.getNetexSubMode())
+        .withStopPattern(stopPattern)
+        .withCreatedByRealtimeUpdater(true)
+        .withOriginalTripPattern(originalTripPattern)
+        .build();
       // TODO: Add pattern to timetableRepository index?
 
       // Add pattern to cache

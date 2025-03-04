@@ -153,13 +153,11 @@ public class OsmWay extends OsmEntity {
   public boolean isRoutableArea() {
     return (
       !isTag("area", "no") &&
-      (
-        isTag("area", "yes") ||
+      (isTag("area", "yes") ||
         isParking() ||
         isBikeParking() ||
         isBoardingArea() ||
-        isIndoorRoutable()
-      ) &&
+        isIndoorRoutable()) &&
       getNodeRefs().size() > 2
     );
   }
