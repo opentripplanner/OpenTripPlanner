@@ -382,8 +382,7 @@ public class TripTimeOnDate {
       return List.of();
     } else {
       // IntStream.range is (inclusive, exclusive)
-      return IntStream
-        .range(stopIndex + 1, tripTimes.getNumStops())
+      return IntStream.range(stopIndex + 1, tripTimes.getNumStops())
         .mapToObj(this::atStopIndex)
         .toList();
     }

@@ -82,8 +82,7 @@ class TripTimeOnDateTest implements PlanTestConstants {
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00");
     var stops = stopTimes.stream().map(StopTime::getStop).map(RegularStop.class::cast).toList();
-    var pattern = TEST_MODEL
-      .pattern(TransitMode.BUS)
+    var pattern = TEST_MODEL.pattern(TransitMode.BUS)
       .withStopPattern(TimetableRepositoryForTest.stopPattern(stops))
       .build();
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
