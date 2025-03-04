@@ -19,7 +19,7 @@ class ModeInputType {
         .name("accessMode")
         .description(
           "The mode used to get from the origin to the access stops in the transit " +
-          "network the transit network (first-mile). If the element is not present or null," +
+          "network (first-mile). If the element is not present or null," +
           "only transit that can be immediately boarded from the origin will be used."
         )
         .type(EnumTypes.STREET_MODE)
