@@ -86,8 +86,7 @@ public class TripTimeOnDateHelper {
     TripPattern tripPattern = transitLeg.getTripPattern();
     Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
     LocalDate serviceDate = transitLeg.getServiceDate();
-    return IntStream
-      .range(0, tripPattern.numberOfStops())
+    return IntStream.range(0, tripPattern.numberOfStops())
       .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
       )
       .collect(Collectors.toList());
@@ -105,8 +104,7 @@ public class TripTimeOnDateHelper {
     TripPattern tripPattern = transitLeg.getTripPattern();
     Instant serviceDateMidnight = transitLeg.getServiceDateMidnight();
     LocalDate serviceDate = transitLeg.getServiceDate();
-    return IntStream
-      .range(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern())
+    return IntStream.range(leg.getBoardStopPosInPattern() + 1, leg.getAlightStopPosInPattern())
       .mapToObj(i -> new TripTimeOnDate(tripTimes, i, tripPattern, serviceDate, serviceDateMidnight)
       )
       .collect(Collectors.toList());

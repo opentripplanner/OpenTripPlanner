@@ -13,12 +13,10 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 public class QuayAtDistanceType {
 
   public static GraphQLObjectType createQD(GraphQLOutputType quayType, Relay relay) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("QuayAtDistance")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
@@ -34,16 +32,14 @@ public class QuayAtDistanceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(quayType)
           .dataFetcher(environment -> ((NearbyStop) environment.getSource()).stop)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("distance")
           .type(Scalars.GraphQLFloat)
           .description("The distance in meters to the given quay.")

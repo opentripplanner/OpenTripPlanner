@@ -175,16 +175,14 @@ public class MapperTest {
     assertEquals(ALL, useSidepathProps.getPermission());
     assertEquals(4.9, useSidepathProps.bicycleSafety().forward(), epsilon);
 
-    var useSidepathForward = WayTestData
-      .southeastLaBonitaWay()
+    var useSidepathForward = WayTestData.southeastLaBonitaWay()
       .addTag("bicycle:forward", "use_sidepath");
     var useSidepathForwardProps = wps.getDataForWay(useSidepathForward);
     assertEquals(ALL, useSidepathForwardProps.getPermission());
     assertEquals(4.9, useSidepathForwardProps.bicycleSafety().forward(), epsilon);
     assertEquals(0.98, useSidepathForwardProps.bicycleSafety().back(), epsilon);
 
-    var useSidepathBackward = WayTestData
-      .southeastLaBonitaWay()
+    var useSidepathBackward = WayTestData.southeastLaBonitaWay()
       .addTag("bicycle:backward", "use_sidepath");
     var useSidepathBackwardProps = wps.getDataForWay(useSidepathBackward);
     assertEquals(ALL, useSidepathBackwardProps.getPermission());
@@ -228,7 +226,7 @@ public class MapperTest {
    * Convert kilometers per hour to meters per second
    */
   private float kmhAsMs(float kmh) {
-    return kmh * 1000 / 3600;
+    return (kmh * 1000) / 3600;
   }
 
   /**

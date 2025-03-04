@@ -104,10 +104,12 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     RangeRaptorWorker<T> worker = null;
     McStopArrivals<T> nextStopArrivals = null;
 
-    if (request.searchParams().hasViaLocations()) {
+    if (request.searchParams().isVisitViaSearch()) {
       for (SearchContextViaLeg<T> cxLeg : context.legs().reversed()) {
-        var c = new McRangeRaptorConfig<>(cxLeg, passThroughPointsService)
-          .connectWithNextLegArrivals(nextStopArrivals);
+        var c = new McRangeRaptorConfig<>(
+          cxLeg,
+          passThroughPointsService
+        ).connectWithNextLegArrivals(nextStopArrivals);
         var w = createWorker(cxLeg, c.state(), c.strategy());
         worker = RangeRaptorWorkerComposite.of(w, worker);
         nextStopArrivals = c.stopArrivals();
@@ -163,7 +165,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
   /* private factory methods */
 
   private static PassThroughPointsService createPassThroughPointsService(RaptorRequest<?> request) {
-    return McRangeRaptorConfig.passThroughPointsService(request.multiCriteria());
+    return McRangeRaptorConfig.createPassThroughPointsService(
+      request.searchParams().isPassThroughSearch(),
+      request.searchParams().viaLocations()
+    );
   }
 
   private RangeRaptorWorker<T> createWorker(

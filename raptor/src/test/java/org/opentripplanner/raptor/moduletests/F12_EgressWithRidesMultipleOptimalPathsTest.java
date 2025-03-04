@@ -71,7 +71,8 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     RaptorConfig.defaultConfigForTest()
   );
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
 
   @BeforeEach
   public void setup() {
@@ -98,8 +99,7 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   }
 
   static List<RaptorModuleTestCase> withFlexAsBestOptionTestCases() {
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       // with Flex egress as the best destination arrival-time
       .withRequest(r ->
         r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, C1_10m), walk(STOP_C, D7m))
@@ -121,8 +121,7 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   }
 
   static List<RaptorModuleTestCase> withWalkingAsBestOptionTestCase() {
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       // with walk egress as the best destination arrival-time
       .withRequest(r ->
         r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, C1_10m), walk(STOP_C, D5m))

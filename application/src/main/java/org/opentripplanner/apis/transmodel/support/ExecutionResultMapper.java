@@ -13,21 +13,17 @@ import org.opentripplanner.framework.http.OtpHttpStatus;
  */
 public class ExecutionResultMapper {
 
-  private static final ErrorClassification API_PROCESSING_TIMEOUT = ErrorClassification.errorClassification(
-    "ApiProcessingTimeout"
-  );
+  private static final ErrorClassification API_PROCESSING_TIMEOUT =
+    ErrorClassification.errorClassification("ApiProcessingTimeout");
 
-  private static final ErrorClassification RESPONSE_TOO_LARGE = ErrorClassification.errorClassification(
-    "ResponseTooLarge"
-  );
+  private static final ErrorClassification RESPONSE_TOO_LARGE =
+    ErrorClassification.errorClassification("ResponseTooLarge");
 
-  private static final ErrorClassification BAD_REQUEST_ERROR = ErrorClassification.errorClassification(
-    "BadRequestError"
-  );
+  private static final ErrorClassification BAD_REQUEST_ERROR =
+    ErrorClassification.errorClassification("BadRequestError");
 
-  private static final ErrorClassification INTERNAL_SERVER_ERROR = ErrorClassification.errorClassification(
-    "InternalServerError"
-  );
+  private static final ErrorClassification INTERNAL_SERVER_ERROR =
+    ErrorClassification.errorClassification("InternalServerError");
 
   public static Response okResponse(ExecutionResult result) {
     return Response.ok(GraphQLResponseSerializer.serialize(result)).build();
@@ -54,8 +50,7 @@ public class ExecutionResultMapper {
   }
 
   public static Response response(ExecutionResult result, Response.StatusType status) {
-    return Response
-      .status(status.getStatusCode())
+    return Response.status(status.getStatusCode())
       .entity(GraphQLResponseSerializer.serialize(result))
       .build();
   }

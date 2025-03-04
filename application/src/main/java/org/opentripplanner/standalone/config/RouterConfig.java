@@ -57,13 +57,12 @@ public class RouterConfig implements Serializable {
   /** protected to give unit-test access */
   RouterConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
-    this.configVersion =
-      root
-        .of("configVersion")
-        .since(V2_1)
-        .summary("Deployment version of the *" + ROUTER_CONFIG_FILENAME + "*.")
-        .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
-        .asString(null);
+    this.configVersion = root
+      .of("configVersion")
+      .since(V2_1)
+      .summary("Deployment version of the *" + ROUTER_CONFIG_FILENAME + "*.")
+      .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
+      .asString(null);
 
     this.server = new ServerConfig("server", root);
     this.transmodelApi = new TransmodelAPIConfig("transmodelApi", root);

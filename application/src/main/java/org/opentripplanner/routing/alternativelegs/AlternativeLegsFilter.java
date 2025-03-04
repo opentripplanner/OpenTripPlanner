@@ -7,17 +7,20 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 public enum AlternativeLegsFilter {
   NO_FILTER((Leg leg) -> (TripPattern tripPattern) -> true),
-  SAME_AGENCY((Leg leg) ->
-    (TripPattern tripPattern) -> leg.getAgency().equals(tripPattern.getRoute().getAgency())
+  SAME_AGENCY(
+    (Leg leg) ->
+      (TripPattern tripPattern) -> leg.getAgency().equals(tripPattern.getRoute().getAgency())
   ),
-  SAME_ROUTE((Leg leg) -> (TripPattern tripPattern) -> leg.getRoute().equals(tripPattern.getRoute())
+  SAME_ROUTE(
+    (Leg leg) -> (TripPattern tripPattern) -> leg.getRoute().equals(tripPattern.getRoute())
   ),
-  SAME_MODE((Leg leg) ->
-    (TripPattern tripPattern) -> leg.getTrip().getMode().equals(tripPattern.getMode())
+  SAME_MODE(
+    (Leg leg) -> (TripPattern tripPattern) -> leg.getTrip().getMode().equals(tripPattern.getMode())
   ),
-  SAME_SUBMODE((Leg leg) ->
-    (TripPattern tripPattern) ->
-      leg.getTrip().getNetexSubMode().equals(tripPattern.getNetexSubmode())
+  SAME_SUBMODE(
+    (Leg leg) ->
+      (TripPattern tripPattern) ->
+        leg.getTrip().getNetexSubMode().equals(tripPattern.getNetexSubmode())
   );
 
   public final Function<Leg, Predicate<TripPattern>> predicateGenerator;

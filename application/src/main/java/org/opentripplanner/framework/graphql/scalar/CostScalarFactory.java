@@ -30,8 +30,7 @@ public class CostScalarFactory {
   }
 
   private static GraphQLScalarType createCostScalar() {
-    return GraphQLScalarType
-      .newScalar()
+    return GraphQLScalarType.newScalar()
       .name(TYPENAME)
       .description(DOCUMENTATION)
       .coercing(createCoercing())

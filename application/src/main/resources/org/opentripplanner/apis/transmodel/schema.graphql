@@ -2258,10 +2258,10 @@ A visit-via-location is a physical visit to one of the stop locations or coordin
 on-board visit does not count, the traveler must alight or board at the given stop for it to to
 be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
 in the street network from a stop and back to another stop to join the transit network.
-
-NOTE! Coordinates are NOT supported yet.
 """
 input TripVisitViaLocationInput {
+  "A coordinate to route through."
+  coordinate: InputCoordinates
   "The label/name of the location. This is pass-through information and is not used in routing."
   label: String
   """
@@ -2274,7 +2274,7 @@ input TripVisitViaLocationInput {
   stop place or a group of stop places. It is enough to visit ONE of the locations
   listed.
   """
-  stopLocationIds: [String!]!
+  stopLocationIds: [String!]
 }
 
 "Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known. The location also contain information about the minimum and maximum time the user is willing to stay at the via location."

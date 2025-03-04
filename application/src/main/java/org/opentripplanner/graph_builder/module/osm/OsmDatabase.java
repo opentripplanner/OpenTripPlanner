@@ -107,10 +107,12 @@ public class OsmDatabase {
   private final Map<OsmEntity, OsmLevel> wayLevels = new HashMap<>();
 
   /* Set of turn restrictions for each turn "from" way ID */
-  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap.create();
+  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
+    ArrayListMultimap.create();
 
   /* Set of turn restrictions for each turn "to" way ID */
-  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
+  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay =
+    ArrayListMultimap.create();
 
   /*
    * Map of all transit stop nodes that lie within an area and which are connected to the area by
@@ -218,11 +220,9 @@ public class OsmDatabase {
       carParkingNodes.put(node.getId(), node);
     }
     if (
-      !(
-        waysNodeIds.contains(node.getId()) ||
+      !(waysNodeIds.contains(node.getId()) ||
         areaNodeIds.contains(node.getId()) ||
-        node.isBoardingLocation()
-      )
+        node.isBoardingLocation())
     ) {
       return;
     }
@@ -279,8 +279,7 @@ public class OsmDatabase {
     }
 
     if (
-      relation.isMultiPolygon() &&
-      (relation.isRoutable() || relation.isParkAndRide()) ||
+      (relation.isMultiPolygon() && (relation.isRoutable() || relation.isParkAndRide())) ||
       relation.isBikeParking()
     ) {
       // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
@@ -647,12 +646,22 @@ public class OsmDatabase {
       OsmLevel level = OsmLevel.DEFAULT;
       if (way.hasTag("level")) { // TODO: floating-point levels &c.
         levelName = way.getTag("level");
-        level =
-          OsmLevel.fromString(levelName, OsmLevel.Source.LEVEL_TAG, noZeroLevels, issueStore, way);
+        level = OsmLevel.fromString(
+          levelName,
+          OsmLevel.Source.LEVEL_TAG,
+          noZeroLevels,
+          issueStore,
+          way
+        );
       } else if (way.hasTag("layer")) {
         levelName = way.getTag("layer");
-        level =
-          OsmLevel.fromString(levelName, OsmLevel.Source.LAYER_TAG, noZeroLevels, issueStore, way);
+        level = OsmLevel.fromString(
+          levelName,
+          OsmLevel.Source.LAYER_TAG,
+          noZeroLevels,
+          issueStore,
+          way
+        );
       }
       if (level == null || (!level.reliable)) {
         issueStore.add(new LevelAmbiguous(levelName, way));
@@ -676,7 +685,7 @@ public class OsmDatabase {
    * Create areas from single ways.
    */
   private void processSingleWayAreas() {
-    AREA:for (OsmWay way : singleWayAreas) {
+    AREA: for (OsmWay way : singleWayAreas) {
       if (processedAreas.contains(way)) {
         continue;
       }
@@ -709,15 +718,13 @@ public class OsmDatabase {
    * the used ways.
    */
   private void processMultipolygonRelations() {
-    RELATION:for (OsmRelation relation : relationsById.valueCollection()) {
+    RELATION: for (OsmRelation relation : relationsById.valueCollection()) {
       if (processedAreas.contains(relation)) {
         continue;
       }
       if (
-        !(
-          relation.isMultiPolygon() &&
-          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking())
-        )
+        !(relation.isMultiPolygon() &&
+          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking()))
       ) {
         continue;
       }
@@ -887,48 +894,56 @@ public class OsmDatabase {
 
     TurnRestrictionTag tag;
     if (relation.isTag("restriction", "no_right_turn")) {
-      tag =
-        new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.RIGHT, relation.getId());
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.RIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "no_left_turn")) {
-      tag =
-        new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.LEFT, relation.getId());
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.LEFT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "no_straight_on")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.NO_TURN,
-          Direction.STRAIGHT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.STRAIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "no_u_turn")) {
       tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U, relation.getId());
     } else if (relation.isTag("restriction", "only_straight_on")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.ONLY_TURN,
-          Direction.STRAIGHT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.STRAIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_right_turn")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.ONLY_TURN,
-          Direction.RIGHT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.RIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_left_turn")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.ONLY_TURN,
-          Direction.LEFT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.LEFT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_u_turn")) {
-      tag =
-        new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U, relation.getId());
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.U,
+        relation.getId()
+      );
     } else {
       issueStore.add(new TurnRestrictionUnknown(relation, relation.getTag("restriction")));
       return;
@@ -943,14 +958,13 @@ public class OsmDatabase {
       relation.hasTag("hour_off")
     ) {
       try {
-        tag.time =
-          RepeatingTimePeriod.parseFromOsmTurnRestriction(
-            relation.getTag("day_on"),
-            relation.getTag("day_off"),
-            relation.getTag("hour_on"),
-            relation.getTag("hour_off"),
-            relation.getOsmProvider()::getZoneId
-          );
+        tag.time = RepeatingTimePeriod.parseFromOsmTurnRestriction(
+          relation.getTag("day_on"),
+          relation.getTag("day_off"),
+          relation.getTag("hour_on"),
+          relation.getTag("hour_off"),
+          relation.getOsmProvider()::getZoneId
+        );
       } catch (NumberFormatException e) {
         LOG.info("Unparseable turn restriction: {}", relation.getId());
       }

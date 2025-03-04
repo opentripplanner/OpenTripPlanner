@@ -115,13 +115,11 @@ class TestPagingModel {
     itinerary(T09_00_PLUS_1d, T09_30_PLUS_1d, COST_HIGH, TX_1, TRANSIT)
   );
 
-  static final List<Itinerary> ITINERARIES_CASE_B_DEPART_AFTER = ITINERARIES_CASE_B
-    .stream()
+  static final List<Itinerary> ITINERARIES_CASE_B_DEPART_AFTER = ITINERARIES_CASE_B.stream()
     .sorted(SortOrderComparator.comparator(STREET_AND_ARRIVAL_TIME))
     .toList();
 
-  static final List<Itinerary> ITINERARIES_CASE_B_ARRIVE_BY = ITINERARIES_CASE_B
-    .stream()
+  static final List<Itinerary> ITINERARIES_CASE_B_ARRIVE_BY = ITINERARIES_CASE_B.stream()
     .sorted(SortOrderComparator.comparator(SortOrder.STREET_AND_DEPARTURE_TIME))
     .toList();
 

@@ -77,8 +77,10 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       if (freeTransferWindowEndTimeEpochSeconds == -1) {
         // the new transfer window end time should be calculated by adding the ride's start time (which is in
         // seconds past the epoch) and the number of equivalent seconds in the free transfer window minutes.
-        freeTransferWindowEndTimeEpochSeconds =
-          leg.getStartTime().plus(freeTransferWindow).toEpochSecond();
+        freeTransferWindowEndTimeEpochSeconds = leg
+          .getStartTime()
+          .plus(freeTransferWindow)
+          .toEpochSecond();
       }
 
       currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));

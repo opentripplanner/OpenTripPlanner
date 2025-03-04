@@ -27,6 +27,7 @@ public interface RaptorTestConstants {
   int D3m = durationInSeconds("3m");
   int D4m = durationInSeconds("4m");
   int D5m = durationInSeconds("5m");
+  int D10m = durationInSeconds("10m");
   int D24h = durationInSeconds("24h");
 
   /**

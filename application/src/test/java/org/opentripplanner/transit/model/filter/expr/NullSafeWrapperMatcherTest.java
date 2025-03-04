@@ -20,10 +20,8 @@ class NullSafeWrapperMatcherTest {
 
   @Test
   void testFailsWithoutNullSafeWrapperMatcher() {
-    var matcher = new CaseInsensitiveStringPrefixMatcher<>(
-      "string",
-      "here's a string",
-      s -> s.toString()
+    var matcher = new CaseInsensitiveStringPrefixMatcher<>("string", "here's a string", s ->
+      s.toString()
     );
     assertThrows(NullPointerException.class, () -> matcher.match(null));
   }

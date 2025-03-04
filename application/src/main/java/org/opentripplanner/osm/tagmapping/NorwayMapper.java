@@ -151,7 +151,8 @@ class NorwayMapper extends OsmTagMapper {
       // 30 km/h or lower, or lower road class than unclassified
       if (
         this.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)
-      ) return cycleSafetyVeryLowTraffic; else return cycleSafetyLowTraffic;
+      ) return cycleSafetyVeryLowTraffic;
+      else return cycleSafetyLowTraffic;
     };
 
     props.setDefaultBicycleSafetyForPermission((permission, speedLimit, way) ->

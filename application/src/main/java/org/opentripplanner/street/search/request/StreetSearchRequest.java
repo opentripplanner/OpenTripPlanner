@@ -1,6 +1,7 @@
 package org.opentripplanner.street.search.request;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -52,7 +53,7 @@ public class StreetSearchRequest implements AStarRequest {
    * Constructor only used for creating a default instance.
    */
   private StreetSearchRequest() {
-    this.startTime = Instant.now();
+    this.startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
     this.preferences = new RoutingPreferences();
     this.mode = StreetMode.WALK;
     this.arriveBy = false;
@@ -64,7 +65,7 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
-    this.startTime = builder.startTime;
+    this.startTime = builder.startTime.truncatedTo(ChronoUnit.SECONDS);
     this.preferences = builder.preferences;
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;

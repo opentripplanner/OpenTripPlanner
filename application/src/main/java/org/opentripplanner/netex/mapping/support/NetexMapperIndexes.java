@@ -37,10 +37,9 @@ public class NetexMapperIndexes {
     } else {
       // Cached by level(shared files, shared group files and group files). If any entries exist at
       // the current level, then they will hide entries at a higher level.
-      this.datedServiceJourneysBySjId =
-        index.getDatedServiceJourneys().localKeys().isEmpty()
-          ? parent.datedServiceJourneysBySjId
-          : indexDSJBySJId(index.getDatedServiceJourneys());
+      this.datedServiceJourneysBySjId = index.getDatedServiceJourneys().localKeys().isEmpty()
+        ? parent.datedServiceJourneysBySjId
+        : indexDSJBySJId(index.getDatedServiceJourneys());
 
       // Feed global instances. These fields contain mapping from a netex id to a OTP domain
       // model object, hence we are not adding a lot of data to memory - only the id to object

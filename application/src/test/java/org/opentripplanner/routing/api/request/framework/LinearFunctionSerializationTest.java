@@ -24,21 +24,21 @@ class LinearFunctionSerializationTest {
   static Stream<Arguments> parseTestCases() {
     return TestTableParser.of(
       """
-        #        INPUT    ||       EXPECTED
-        #                 ||  CONSTANT | COEFFICIENT
-                   0+0t   ||       0s  |   0.0
-             1+0.0111 t   ||       1s  |   0.01
-          120 + 0.111 t   ||       2m  |   0.11
-          120 + 0.111 t   ||       2m  |   0.11
-             12.0 + 0 t   ||      12s  |   0.0
-         2h3m + 1.111 t   ||     2h3m  |   1.11
-         2h3m + 2.111 t   ||     2h3m  |   2.1
-           3h + 5.111 t   ||       3h  |   5.1
-            7m + 10.1 x   ||       7m  |  10.0
-          PT7s + 10.1 x   ||       7s  |  10.0
-          0.1 + 10.1 x   ||       0s  |  10.0
-          0.5 + 10.1 x   ||       1s  |  10.0
-        """
+      #        INPUT    ||       EXPECTED
+      #                 ||  CONSTANT | COEFFICIENT
+                 0+0t   ||       0s  |   0.0
+           1+0.0111 t   ||       1s  |   0.01
+        120 + 0.111 t   ||       2m  |   0.11
+        120 + 0.111 t   ||       2m  |   0.11
+           12.0 + 0 t   ||      12s  |   0.0
+       2h3m + 1.111 t   ||     2h3m  |   1.11
+       2h3m + 2.111 t   ||     2h3m  |   2.1
+         3h + 5.111 t   ||       3h  |   5.1
+          7m + 10.1 x   ||       7m  |  10.0
+        PT7s + 10.1 x   ||       7s  |  10.0
+        0.1 + 10.1 x   ||       0s  |  10.0
+        0.5 + 10.1 x   ||       1s  |  10.0
+      """
     );
   }
 
@@ -72,18 +72,16 @@ class LinearFunctionSerializationTest {
 
   @Test
   void parseIllegalArgument() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> LinearFunctionSerialization.parse("foo", fail())
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      LinearFunctionSerialization.parse("foo", fail())
     );
     assertEquals("Unable to parse function: 'foo'", ex.getMessage());
   }
 
   @Test
   void parseIllegalDuration() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> LinearFunctionSerialization.parse("600ss + 1.3 t", fail())
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      LinearFunctionSerialization.parse("600ss + 1.3 t", fail())
     );
     assertEquals("Unable to parse duration: '600ss'", ex.getMessage());
   }

@@ -43,8 +43,7 @@ final class BasicStopTime implements StopTime {
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
+    return ValueObjectToStringBuilder.of()
       .addText("[")
       .addNum(stop)
       .addServiceTime(time)

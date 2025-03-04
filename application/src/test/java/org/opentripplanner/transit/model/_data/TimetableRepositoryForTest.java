@@ -59,8 +59,7 @@ public class TimetableRepositoryForTest {
   public static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
 
   // This is used to create valid objects - do not use it for verification
-  private static final Polygon ANY_POLYGON = GeometryUtils
-    .getGeometryFactory()
+  private static final Polygon ANY_POLYGON = GeometryUtils.getGeometryFactory()
     .createPolygon(
       new Coordinate[] {
         Coordinates.of(61.0, 10.0),
@@ -70,21 +69,20 @@ public class TimetableRepositoryForTest {
       }
     );
 
-  public static final Agency AGENCY = Agency
-    .of(id("A1"))
+  public static final Agency AGENCY = Agency.of(id("A1"))
     .withName("Agency Test")
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https://www.agency.com")
     .build();
 
-  public static final Agency OTHER_AGENCY = Agency
-    .of(id("AX"))
+  public static final Agency OTHER_AGENCY = Agency.of(id("AX"))
     .withName("Other Agency Test")
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https://www.otheragency.com")
     .build();
-  public static final Agency OTHER_FEED_AGENCY = Agency
-    .of(FeedScopedId.ofNullable("F2", "other.feed-agency"))
+  public static final Agency OTHER_FEED_AGENCY = Agency.of(
+    FeedScopedId.ofNullable("F2", "other.feed-agency")
+  )
     .withName("Other feed agency")
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https:/www.otherfeedagency.com")
@@ -158,8 +156,7 @@ public class TimetableRepositoryForTest {
   }
 
   public StationBuilder station(String idAndName) {
-    return Station
-      .of(new FeedScopedId(FEED_ID, idAndName))
+    return Station.of(new FeedScopedId(FEED_ID, idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withCode(idAndName)
       .withCoordinate(60.0, 10.0)
@@ -230,8 +227,7 @@ public class TimetableRepositoryForTest {
    */
   public List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, String time) {
     var startTime = TimeUtils.time(time);
-    return IntStream
-      .range(0, count)
+    return IntStream.range(0, count)
       .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + (seq * 60 * 5)))
       .toList();
   }
@@ -264,13 +260,13 @@ public class TimetableRepositoryForTest {
    * Create {@link TripPatternBuilder} fully set up with the given mode.
    */
   public TripPatternBuilder pattern(TransitMode mode) {
-    return tripPattern(mode.name(), route(mode.name()).withMode(mode).build())
-      .withStopPattern(stopPattern(3));
+    return tripPattern(mode.name(), route(mode.name()).withMode(mode).build()).withStopPattern(
+      stopPattern(3)
+    );
   }
 
   public UnscheduledTrip unscheduledTrip(String id, StopLocation... stops) {
-    var stopTimes = Arrays
-      .stream(stops)
+    var stopTimes = Arrays.stream(stops)
       .map(s -> {
         var st = new StopTime();
         st.setStop(s);
@@ -284,16 +280,14 @@ public class TimetableRepositoryForTest {
   }
 
   public UnscheduledTrip unscheduledTrip(String id, List<StopTime> stopTimes) {
-    return UnscheduledTrip
-      .of(id(id))
+    return UnscheduledTrip.of(id(id))
       .withTrip(trip("flex-trip").build())
       .withStopTimes(stopTimes)
       .build();
   }
 
   public ScheduledDeviatedTrip scheduledDeviatedTrip(String id, StopTime... stopTimes) {
-    return ScheduledDeviatedTrip
-      .of(id(id))
+    return ScheduledDeviatedTrip.of(id(id))
       .withTrip(trip("flex-trip").build())
       .withStopTimes(Arrays.asList(stopTimes))
       .build();

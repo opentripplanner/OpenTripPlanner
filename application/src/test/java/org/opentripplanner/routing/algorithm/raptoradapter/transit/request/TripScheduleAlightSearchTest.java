@@ -53,14 +53,12 @@ public class TripScheduleAlightSearchTest implements RaptorTestConstants {
 
   private final TestTripPattern pattern = pattern("R1", STOP_A, STOP_B);
 
-  private TestRoute route = TestRoute
-    .route(pattern)
-    .withTimetable(
-      // Trips in service
-      schedule().arrivals(TIME_A1, TIME_A2),
-      schedule().arrivals(TIME_B1, TIME_B2),
-      schedule().arrivals(TIME_C1, TIME_C2)
-    );
+  private TestRoute route = TestRoute.route(pattern).withTimetable(
+    // Trips in service
+    schedule().arrivals(TIME_A1, TIME_A2),
+    schedule().arrivals(TIME_B1, TIME_B2),
+    schedule().arrivals(TIME_C1, TIME_C2)
+  );
 
   private final TestTripSchedule tripA = route.timetable().getTripSchedule(TRIP_A);
   private final TestTripSchedule tripB = route.timetable().getTripSchedule(TRIP_B);

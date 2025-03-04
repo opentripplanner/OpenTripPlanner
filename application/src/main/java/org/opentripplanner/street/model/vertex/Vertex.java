@@ -217,8 +217,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    * @see org.opentripplanner.framework.geometry.WgsCoordinate#sameLocation(WgsCoordinate)
    **/
   public boolean sameLocation(Vertex other) {
-    return new WgsCoordinate(getLat(), getLon())
-      .sameLocation(new WgsCoordinate(other.getLat(), other.getLon()));
+    return new WgsCoordinate(getLat(), getLon()).sameLocation(
+      new WgsCoordinate(other.getLat(), other.getLon())
+    );
   }
 
   public boolean rentalTraversalBanned(State currentState) {

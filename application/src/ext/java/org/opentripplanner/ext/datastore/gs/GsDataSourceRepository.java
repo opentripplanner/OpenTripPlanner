@@ -94,11 +94,9 @@ public class GsDataSourceRepository implements DataSourceRepository {
       StorageOptions.Builder builder = StorageOptions.getDefaultInstance().toBuilder();
 
       if (credentialsFilename != null) {
-        GoogleCredentials credentials = GoogleCredentials
-          .fromStream(new FileInputStream(credentialsFilename))
-          .createScoped(
-            Collections.singletonList("https://www.googleapis.com/auth/cloud-platform")
-          );
+        GoogleCredentials credentials = GoogleCredentials.fromStream(
+          new FileInputStream(credentialsFilename)
+        ).createScoped(Collections.singletonList("https://www.googleapis.com/auth/cloud-platform"));
         builder.setCredentials(credentials);
       }
       return builder.build().getService();

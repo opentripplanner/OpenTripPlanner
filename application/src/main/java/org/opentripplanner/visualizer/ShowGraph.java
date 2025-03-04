@@ -258,8 +258,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     if (ctrlPressed || mouseButton == RIGHT) {
       zoom(dy * 0.01, startDrag);
     } else {
-      double tx = modelBounds.getWidth() * dx / getWidth();
-      double ty = modelBounds.getHeight() * dy / getHeight();
+      double tx = (modelBounds.getWidth() * dx) / getWidth();
+      double ty = (modelBounds.getHeight() * dy) / getHeight();
       modelBounds.translate(tx, ty);
     }
     dragX = c.x;
@@ -757,18 +757,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   private void drawVertices() {
     /* turn off vertex display when zoomed out */
     final double METERS_PER_DEGREE_LAT = 111111.111111;
-    boolean closeEnough = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 5);
+    boolean closeEnough = ((modelBounds.getHeight() * METERS_PER_DEGREE_LAT) / this.width < 5);
     /* Draw selected visible vertices */
     for (Vertex v : visibleVertices) {
       if (
         drawTransitStopVertices &&
         closeEnough &&
-        (
-          v instanceof TransitStopVertex ||
+        (v instanceof TransitStopVertex ||
           v instanceof TransitPathwayNodeVertex ||
           v instanceof TransitEntranceVertex ||
-          v instanceof TransitBoardingAreaVertex
-        )
+          v instanceof TransitBoardingAreaVertex)
       ) {
         fill(60, 60, 200); // Make transit stops blue dots
         drawVertex(v, 7);
@@ -783,17 +781,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       }
       if (
         drawStreetVertices &&
-        (
-          (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) ||
-          (
-            v instanceof ElevatorOnboardVertex ||
+        ((v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) ||
+          (v instanceof ElevatorOnboardVertex ||
             v instanceof ElevatorOffboardVertex ||
             v instanceof ExitVertex ||
             v instanceof TemporaryVertex ||
             v instanceof SplitterVertex ||
-            v instanceof StreetLocation
-          )
-        )
+            v instanceof StreetLocation))
       ) {
         if (v instanceof IntersectionVertex && ((IntersectionVertex) v).hasCyclingTrafficLight()) {
           fill(120, 60, 60); // Make traffic lights red dots
@@ -922,9 +916,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     int drawStart = 0;
     int drawCount = 0;
     while (drawStart < DECIMATE && drawStart < visibleStreetEdges.size()) {
-      if (drawFast) drawEdgeFast(visibleStreetEdges.get(drawIndex)); else drawEdge(
-        visibleStreetEdges.get(drawIndex)
-      );
+      if (drawFast) drawEdgeFast(visibleStreetEdges.get(drawIndex));
+      else drawEdge(visibleStreetEdges.get(drawIndex));
       drawIndex += DECIMATE;
       drawCount += 1;
       if (drawCount % BLOCK_SIZE == 0 && millis() - startMillis > FRAME_TIME) {
@@ -1189,7 +1182,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
       aa = aa % RAMPLEN; //make sure aa fits within the color ramp
       int hueIndex = aa / HUELEN; //establish the hue
       int hue = hueIndex * (HUELEN / NHUES); //convert that to a hue value
-      int saturation = HUELEN - aa % HUELEN;
+      int saturation = HUELEN - (aa % HUELEN);
 
       return color(hue, saturation, BRIGHTNESS);
     }

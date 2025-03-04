@@ -132,9 +132,10 @@ public class VehicleRentalStation implements VehicleRentalPlace {
 
   @Override
   public boolean isCarStation() {
-    return Stream
-      .concat(vehicleTypesAvailable.keySet().stream(), vehicleSpacesAvailable.keySet().stream())
-      .anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalFormFactor.CAR));
+    return Stream.concat(
+      vehicleTypesAvailable.keySet().stream(),
+      vehicleSpacesAvailable.keySet().stream()
+    ).anyMatch(rentalVehicleType -> rentalVehicleType.formFactor.equals(RentalFormFactor.CAR));
   }
 
   @Override

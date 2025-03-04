@@ -17,10 +17,8 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 class ParkingProcessorTest {
 
-  private static final IntersectionVertex INTERSECTION_VERTEX = StreetModelForTest.intersectionVertex(
-    1,
-    1
-  );
+  private static final IntersectionVertex INTERSECTION_VERTEX =
+    StreetModelForTest.intersectionVertex(1, 1);
   private static final ParkingProcessor PROCESSOR = new ParkingProcessor(
     new Graph(),
     DataImportIssueStore.NOOP,

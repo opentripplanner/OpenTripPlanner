@@ -1,11 +1,12 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
+import java.util.List;
 import java.util.function.IntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
@@ -34,7 +35,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private final int[] stopBoardAlightTransferCosts;
 
   private final TransferOptimizationParameters config;
-  private final MultiCriteriaRequest<T> multiCriteriaRequest;
+  private final List<RaptorViaLocation> viaLocations;
 
   private TransferOptimizationServiceConfigurator(
     IntFunction<StopLocation> stopLookup,
@@ -43,7 +44,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     RaptorTransitDataProvider<T> transitDataProvider,
     int[] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
-    MultiCriteriaRequest<T> multiCriteriaRequest
+    List<RaptorViaLocation> viaLocations
   ) {
     this.stopLookup = stopLookup;
     this.stopNameResolver = stopNameResolver;
@@ -51,22 +52,22 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     this.transitDataProvider = transitDataProvider;
     this.stopBoardAlightTransferCosts = stopBoardAlightTransferCosts;
     this.config = config;
-    this.multiCriteriaRequest = multiCriteriaRequest;
+    this.viaLocations = viaLocations;
   }
 
   /**
    * Scope: Request
    */
-  public static <
-    T extends RaptorTripSchedule
-  > OptimizeTransferService<T> createOptimizeTransferService(
+  public static <T extends RaptorTripSchedule> OptimizeTransferService<
+    T
+  > createOptimizeTransferService(
     IntFunction<StopLocation> stopLookup,
     RaptorStopNameResolver stopNameResolver,
     TransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
     @Nullable int[] stopBoardAlightTransferCosts,
     TransferOptimizationParameters config,
-    MultiCriteriaRequest<T> multiCriteriaRequest
+    List<RaptorViaLocation> viaLocations
   ) {
     return new TransferOptimizationServiceConfigurator<T>(
       stopLookup,
@@ -75,9 +76,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       transitDataProvider,
       stopBoardAlightTransferCosts,
       config,
-      multiCriteriaRequest
-    )
-      .createOptimizeTransferService();
+      viaLocations
+    ).createOptimizeTransferService();
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {
@@ -147,11 +147,10 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     var filter = new MinCostPathTailFilterFactory<T>(
       config.optimizeTransferPriority(),
       config.optimizeTransferWaitTime()
-    )
-      .createFilter();
+    ).createFilter();
 
-    if (multiCriteriaRequest.hasPassThroughPoints()) {
-      filter = new PassThroughPathTailFilter<>(filter, multiCriteriaRequest.passThroughPoints());
+    if (!viaLocations.isEmpty()) {
+      filter = new PassThroughPathTailFilter<>(filter, viaLocations);
     }
     return filter;
   }

@@ -60,8 +60,9 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
     this.config = config;
     this.transitData = transitData;
     this.originalRequest = originalRequest;
-    this.dynamicSearchWindowCalculator =
-      config.searchWindowCalculator().withSearchParams(originalRequest.searchParams());
+    this.dynamicSearchWindowCalculator = config
+      .searchWindowCalculator()
+      .withSearchParams(originalRequest.searchParams());
     this.extraMcSearch = extraMcSearch;
 
     this.fwdHeuristics = new HeuristicSearchTask<>(FORWARD, "Forward", config, transitData);
@@ -138,13 +139,12 @@ public class RangeRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
     // Create worker
     if (request.profile().is(MULTI_CRITERIA)) {
-      raptorRouter =
-        config.createRangeRaptorWithMcWorker(
-          transitData,
-          request,
-          getDestinationHeuristics(),
-          extraMcSearch
-        );
+      raptorRouter = config.createRangeRaptorWithMcWorker(
+        transitData,
+        request,
+        getDestinationHeuristics(),
+        extraMcSearch
+      );
     } else {
       raptorRouter = config.createRangeRaptorWithStdWorker(transitData, request);
     }
