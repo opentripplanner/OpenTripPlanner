@@ -2256,8 +2256,9 @@ public class GraphQLTypes {
 
     public GraphQLPlanVisitViaLocationInput(Map<String, Object> args) {
       if (args != null) {
-        this.coordinate =
-          new GraphQLPlanCoordinateInput((Map<String, Object>) args.get("coordinate"));
+        this.coordinate = new GraphQLPlanCoordinateInput(
+          (Map<String, Object>) args.get("coordinate")
+        );
         this.label = (String) args.get("label");
         this.minimumWaitTime = (java.time.Duration) args.get("minimumWaitTime");
         this.stopLocationIds = (List<String>) args.get("stopLocationIds");
