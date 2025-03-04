@@ -49,8 +49,7 @@ public class TokenDefinition {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TokenDefinition.class)
+    return ToStringBuilder.of(TokenDefinition.class)
       .addNum("version", version, 0)
       .addCol("fields", listFields())
       .toString();

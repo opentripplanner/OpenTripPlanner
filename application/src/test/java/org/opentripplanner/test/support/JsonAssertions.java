@@ -29,15 +29,25 @@ public class JsonAssertions {
     try {
       var actualNode = MAPPER.readTree(actual.toString());
       var exp = MAPPER.readTree(expected);
-      assertEquals(
-        exp,
-        actualNode,
-        () ->
-          "Expected '%s' but actual was '%s'".formatted(
-              JsonSupport.prettyPrint(exp),
-              JsonSupport.prettyPrint(actualNode)
-            )
+      assertEquals(exp, actualNode, () ->
+        "Expected '%s' but actual was '%s'".formatted(
+            JsonSupport.prettyPrint(exp),
+            JsonSupport.prettyPrint(actualNode)
+          )
       );
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Check that two JSONs are equal.
+   */
+  public static boolean isEqualJson(String expected, JsonNode actual) {
+    try {
+      var actualNode = MAPPER.readTree(actual.toString());
+      var exp = MAPPER.readTree(expected);
+      return exp.equals(actualNode);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

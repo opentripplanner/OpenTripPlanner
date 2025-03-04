@@ -14,23 +14,20 @@ public class GroupOfLinesType {
   private static final String NAME = "GroupOfLines";
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .description(
         "Additional (optional) grouping of lines for particular purposes such as e.g. fare harmonisation or public presentation."
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(env -> TransitIdMapper.mapEntityIDToApi(env.getSource()))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("privateCode")
           .description("For internal use by operator/authority.")
           .type(Scalars.GraphQLString)
@@ -38,8 +35,7 @@ public class GroupOfLinesType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("shortName")
           .description("Short name for group of lines.")
           .type(Scalars.GraphQLString)
@@ -47,8 +43,7 @@ public class GroupOfLinesType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .description("Full name for group of lines.")
           .type(Scalars.GraphQLString)
@@ -56,8 +51,7 @@ public class GroupOfLinesType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .description("Description of group of lines")
           .type(Scalars.GraphQLString)
@@ -65,8 +59,7 @@ public class GroupOfLinesType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("lines")
           .description("All lines part of this group of lines")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(LineType.REF))))

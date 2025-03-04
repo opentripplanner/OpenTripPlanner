@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_FLEX_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KC_METRO_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KITSAP_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
@@ -103,10 +104,11 @@ public class OrcaFareServiceTest {
     var rideCost = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(fp ->
-        fp.medium().name().equals("electronic") &&
-        fp.category().name().equals("regular") &&
-        fp.name().equals("rideCost")
+      .filter(
+        fp ->
+          fp.medium().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("rideCost")
       )
       .findFirst();
     if (rideCost.isEmpty()) {
@@ -117,10 +119,11 @@ public class OrcaFareServiceTest {
     var transfer = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(fp ->
-        fp.medium().name().equals("electronic") &&
-        fp.category().name().equals("regular") &&
-        fp.name().equals("transfer")
+      .filter(
+        fp ->
+          fp.medium().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("transfer")
       )
       .findFirst();
     Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
@@ -133,11 +136,11 @@ public class OrcaFareServiceTest {
   void calculateFareForSingleAgency() {
     List<Leg> rides = List.of(getLeg(COMM_TRANS_AGENCY_ID, "400", 0));
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, TWO_DOLLARS);
+    calculateFare(rides, FareType.senior, usDollars(1.25f));
     calculateFare(rides, FareType.youth, ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(1.25f));
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicSenior, usDollars(1.25f));
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
   }
 
@@ -170,11 +173,16 @@ public class OrcaFareServiceTest {
    */
   @Test
   void calculateFareByLeg() {
-    List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0), getLeg(COMM_TRANS_AGENCY_ID, 2));
+    List<Leg> rides = List.of(
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
+      getLeg(COMM_TRANS_AGENCY_ID, 2),
+      getLeg(COMM_TRANS_FLEX_AGENCY_ID, 3)
+    );
     var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
 
     assertLegFareEquals(349, rides.get(0), fares, false);
     assertLegFareEquals(0, rides.get(1), fares, true);
+    assertLegFareEquals(0, rides.get(2), fares, true);
   }
 
   /**
@@ -398,11 +406,10 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
 
     // Also make sure that PT's 500 and 501 get regular Pierce fare and not ST's fare
-    rides =
-      List.of(
-        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
-        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
-      );
+    rides = List.of(
+      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
+      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
+    );
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.senior, TWO_DOLLARS);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
@@ -655,8 +662,7 @@ public class OrcaFareServiceTest {
   ) {
     // Use the agency ID as feed ID to make sure that we have a new feed ID for each different agency
     // This tests to make sure we are calculating transfers across feeds correctly.
-    Agency agency = Agency
-      .of(new FeedScopedId(agencyId, agencyId))
+    Agency agency = Agency.of(new FeedScopedId(agencyId, agencyId))
       .withName(agencyId)
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
@@ -680,8 +686,7 @@ public class OrcaFareServiceTest {
     if (routeLongName != null) {
       longName = new NonLocalizedString(routeLongName);
     }
-    Route route = Route
-      .of(routeFeedScopeId)
+    Route route = Route.of(routeFeedScopeId)
       .withAgency(agency)
       .withShortName(shortName)
       .withLongName(longName)

@@ -64,12 +64,12 @@ public class PlaceMapper {
     if (domain.stop != null) {
       api.stopId = FeedScopedIdMapper.mapToApi(domain.stop.getId());
       api.stopCode = domain.stop.getCode();
-      api.platformCode =
-        domain.stop instanceof RegularStop ? ((RegularStop) domain.stop).getPlatformCode() : null;
-      api.zoneId =
-        domain.stop instanceof RegularStop
-          ? ((RegularStop) domain.stop).getFirstZoneAsString()
-          : null;
+      api.platformCode = domain.stop instanceof RegularStop
+        ? ((RegularStop) domain.stop).getPlatformCode()
+        : null;
+      api.zoneId = domain.stop instanceof RegularStop
+        ? ((RegularStop) domain.stop).getFirstZoneAsString()
+        : null;
     }
 
     if (domain.coordinate != null) {
@@ -101,8 +101,7 @@ public class PlaceMapper {
       return null;
     }
 
-    return ApiVehicleParkingSpaces
-      .builder()
+    return ApiVehicleParkingSpaces.builder()
       .bicycleSpaces(parkingSpaces.getBicycleSpaces())
       .carSpaces(parkingSpaces.getCarSpaces())
       .wheelchairAccessibleCarSpaces(parkingSpaces.getWheelchairAccessibleCarSpaces())
@@ -115,8 +114,7 @@ public class PlaceMapper {
     var vp = vehicleParkingWithEntrance.getVehicleParking();
     var e = vehicleParkingWithEntrance.getEntrance();
 
-    return ApiVehicleParkingWithEntrance
-      .builder()
+    return ApiVehicleParkingWithEntrance.builder()
       .id(FeedScopedIdMapper.mapToApi(vp.getId()))
       .name(i18NStringMapper.mapToApi(vp.getName()))
       .entranceId(FeedScopedIdMapper.mapToApi(e.getEntranceId()))

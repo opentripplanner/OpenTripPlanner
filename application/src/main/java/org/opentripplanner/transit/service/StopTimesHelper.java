@@ -99,9 +99,10 @@ class StopTimesHelper {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
     var servicesRunning = transitService.getServiceCodesRunningForDate(serviceDate);
-    Instant midnight = ServiceDateUtils
-      .asStartOfService(serviceDate, transitService.getTimeZone())
-      .toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(
+      serviceDate,
+      transitService.getTimeZone()
+    ).toInstant();
 
     for (TripPattern pattern : transitService.findPatterns(stop, true)) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
@@ -214,12 +215,11 @@ class StopTimesHelper {
     // ways to do it.
     //
     // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
-    MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue
-      .orderedBy(
-        Comparator.comparing((TripTimeOnDate tts) ->
-          tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
-        )
+    MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue.orderedBy(
+      Comparator.comparing(
+        (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
       )
+    )
       .maximumSize(numberOfDepartures)
       .create();
 

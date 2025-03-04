@@ -4,7 +4,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 public class AreaEdgeBuilder extends StreetEdgeBuilder<AreaEdgeBuilder> {
 
-  private AreaEdgeList area;
+  private AreaGroup area;
 
   @Override
   public AreaEdge buildAndConnect() {
@@ -21,11 +21,11 @@ public class AreaEdgeBuilder extends StreetEdgeBuilder<AreaEdgeBuilder> {
     return (IntersectionVertex) super.toVertex();
   }
 
-  public AreaEdgeList area() {
+  public AreaGroup area() {
     return area;
   }
 
-  public AreaEdgeBuilder withArea(AreaEdgeList area) {
+  public AreaEdgeBuilder withArea(AreaGroup area) {
     this.area = area;
     return this;
   }

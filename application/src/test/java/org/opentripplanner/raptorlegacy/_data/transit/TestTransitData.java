@@ -1,9 +1,5 @@
 package org.opentripplanner.raptorlegacy._data.transit;
 
-import static org.opentripplanner.raptorlegacy._data.transit.TestRoute.route;
-import static org.opentripplanner.raptorlegacy._data.transit.TestTripPattern.pattern;
-import static org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule.schedule;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -17,8 +13,6 @@ import org.opentripplanner.raptor.api.model.RaptorConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
@@ -47,16 +41,13 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Trans
 public class TestTransitData
   implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
-  public static final TransferConstraint TX_GUARANTEED = TransferConstraint
-    .of()
+  public static final TransferConstraint TX_GUARANTEED = TransferConstraint.of()
     .guaranteed()
     .build();
-  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint
-    .of()
+  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint.of()
     .notAllowed()
     .build();
-  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint
-    .of()
+  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint.of()
     .minTransferTime(3600)
     .build();
 
@@ -201,21 +192,6 @@ public class TestTransitData
     return routes.get(index);
   }
 
-  public void debugToStdErr(RaptorRequestBuilder<TestTripSchedule> request, boolean dryRun) {
-    var debug = request.debug();
-
-    if (debug.stops().isEmpty()) {
-      debug.addStops(stopsVisited());
-    }
-    var logger = new SystemErrDebugLogger(true, dryRun);
-
-    debug
-      .stopArrivalListener(logger::stopArrivalLister)
-      .patternRideDebugListener(logger::patternRideLister)
-      .pathFilteringListener(logger::pathFilteringListener)
-      .logger(logger);
-  }
-
   public TestTransitData withRoute(TestRoute route) {
     this.routes.add(route);
     int routeIndex = this.routes.indexOf(route);
@@ -229,19 +205,6 @@ public class TestTransitData
     return this;
   }
 
-  /**
-   * Same as:
-   * <pre>
-   * withRoute(
-   *   route(pattern(routeName, stopIndexes))
-   *     .withTimetable(schedule().times(times))
-   * )
-   * </pre>
-   */
-  public TestTransitData withTransit(String routeName, String times, int... stopIndexes) {
-    return withRoute(route(pattern(routeName, stopIndexes)).withTimetable(schedule().times(times)));
-  }
-
   public TestTransitData withRoutes(TestRoute... routes) {
     for (TestRoute route : routes) {
       withRoute(route);
@@ -249,10 +212,12 @@ public class TestTransitData
     return this;
   }
 
-  public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
+  public TestTransitData withTransfer(int fromStop, DefaultRaptorTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersFromStop.get(fromStop).add(transfer);
-    transfersToStop.get(transfer.stop()).add(DefaultRaptorTransfer.reverseOf(fromStop, transfer));
+    transfersToStop
+      .get(transfer.stop())
+      .add(((DefaultRaptorTransfer) transfer).reverseOf(fromStop));
     return this;
   }
 
@@ -303,15 +268,6 @@ public class TestTransitData
       )
     );
     return this;
-  }
-
-  public TestTransitData withStopBoardAlightTransferCost(int stop, int boardAlightTransferCost) {
-    stopBoardAlightTransferCosts[stop] = boardAlightTransferCost;
-    return this;
-  }
-
-  public GeneralizedCostParametersBuilder mcCostParamsBuilder() {
-    return costParamsBuilder;
   }
 
   public ConstrainedTransfer findConstrainedTransfer(
@@ -371,15 +327,5 @@ public class TestTransitData
       transfersToStop.add(new ArrayList<>());
       routeIndexesByStopIndex.add(new HashSet<>());
     }
-  }
-
-  private List<Integer> stopsVisited() {
-    final List<Integer> stops = new ArrayList<>();
-    for (int i = 0; i < routeIndexesByStopIndex.size(); i++) {
-      if (!routeIndexesByStopIndex.get(i).isEmpty()) {
-        stops.add(i);
-      }
-    }
-    return stops;
   }
 }

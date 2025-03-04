@@ -38,8 +38,7 @@ public class VectorTileResponseFactory {
       .map(LayerParameters::name)
       .collect(Collectors.toSet());
     if (!availableLayerNames.containsAll(requestedLayers)) {
-      return Response
-        .status(Response.Status.NOT_FOUND)
+      return Response.status(Response.Status.NOT_FOUND)
         .header(HttpHeaders.CONTENT_TYPE, HttpUtils.TEXT_PLAIN)
         .entity(
           "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s.".formatted(
@@ -68,8 +67,7 @@ public class VectorTileResponseFactory {
     if (cacheMaxSeconds != Integer.MAX_VALUE) {
       cacheControl.setMaxAge(cacheMaxSeconds);
     }
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .cacheControl(cacheControl)
       .entity(mvtBuilder.build().toByteArray())
       .build();

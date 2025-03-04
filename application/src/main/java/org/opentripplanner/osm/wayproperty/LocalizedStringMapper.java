@@ -12,7 +12,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.resources.ResourceBundleSingleton;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 class LocalizedStringMapper {
 
@@ -45,7 +45,7 @@ class LocalizedStringMapper {
    *            from properties Files
    * @param way OSM way from which tag values are read
    */
-  LocalizedString map(String key, OsmWithTags way) {
+  LocalizedString map(String key, OsmEntity way) {
     List<I18NString> lparams = new ArrayList<>(4);
     //Which tags do we want from way
     List<String> tagNames = getTagNames(key);

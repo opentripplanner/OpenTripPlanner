@@ -19,7 +19,6 @@ import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -311,16 +310,14 @@ public class StreetEdge
 
   public String toString() {
     var nameString = name != null ? name.toString() : null;
-    return buildToString(
-      nameString,
-      b ->
-        b
-          .append(", length=")
-          .append(this.getDistanceMeters())
-          .append(", carSpeed=")
-          .append(this.getCarSpeed())
-          .append(", permission=")
-          .append(this.getPermission())
+    return buildToString(nameString, b ->
+      b
+        .append(", length=")
+        .append(this.getDistanceMeters())
+        .append(", carSpeed=")
+        .append(this.getCarSpeed())
+        .append(", permission=")
+        .append(this.getPermission())
     );
   }
 
@@ -611,12 +608,12 @@ public class StreetEdge
    * TODO change everything to clockwise from North
    */
   public int getInAngle() {
-    return IntUtils.round(this.inAngle * 180 / 128.0);
+    return IntUtils.round((this.inAngle * 180) / 128.0);
   }
 
   /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
   public int getOutAngle() {
-    return IntUtils.round(this.outAngle * 180 / 128.0);
+    return IntUtils.round((this.outAngle * 180) / 128.0);
   }
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
@@ -721,7 +718,7 @@ public class StreetEdge
     StreetEdge e1 = null;
     StreetEdge e2 = null;
 
-    if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
+    if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb1 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex((StreetVertex) fromv)
@@ -734,7 +731,7 @@ public class StreetEdge
       copyRentalRestrictionsToSplitEdge(e1);
       tempEdges.addEdge(e1);
     }
-    if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
+    if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BIDIRECTIONAL) {
       var seb2 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex(v)
@@ -896,8 +893,7 @@ public class StreetEdge
       toDistance
     );
 
-    StreetElevationExtensionBuilder
-      .of(seb)
+    StreetElevationExtensionBuilder.of(seb)
       .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
       .withElevationProfile(partialElevationProfileFromParent)
       .build()
@@ -1102,15 +1098,14 @@ public class StreetEdge
   }
 
   private void setGeometry(LineString geometry) {
-    this.compactGeometry =
-      CompactLineStringUtils.compactLineString(
-        fromv.getLon(),
-        fromv.getLat(),
-        tov.getLon(),
-        tov.getLat(),
-        isBack() ? geometry.reverse() : geometry,
-        isBack()
-      );
+    this.compactGeometry = CompactLineStringUtils.compactLineString(
+      fromv.getLon(),
+      fromv.getLat(),
+      tov.getLon(),
+      tov.getLat(),
+      isBack() ? geometry.reverse() : geometry,
+      isBack()
+    );
   }
 
   private double getDistanceWithElevation() {
@@ -1169,7 +1164,7 @@ public class StreetEdge
         default -> otherTraversalCosts(preferences, traverseMode, walkingBike, speed);
       };
 
-    int time = (int) Math.ceil(traversalCosts.time());
+    long time_ms = (long) Math.ceil(1000.0 * traversalCosts.time());
     var weight = traversalCosts.weight();
 
     /* Compute turn cost. */
@@ -1201,29 +1196,27 @@ public class StreetEdge
        * the backEdge, rather than of the current edge.
        */
       if (arriveBy && tov instanceof IntersectionVertex traversedVertex) { // arrive-by search
-        turnDuration =
-          s0
-            .intersectionTraversalCalculator()
-            .computeTraversalDuration(
-              traversedVertex,
-              this,
-              backPSE,
-              backMode,
-              (float) speed,
-              (float) backSpeed
-            );
+        turnDuration = s0
+          .intersectionTraversalCalculator()
+          .computeTraversalDuration(
+            traversedVertex,
+            this,
+            backPSE,
+            backMode,
+            (float) speed,
+            (float) backSpeed
+          );
       } else if (!arriveBy && fromv instanceof IntersectionVertex traversedVertex) { // depart-after search
-        turnDuration =
-          s0
-            .intersectionTraversalCalculator()
-            .computeTraversalDuration(
-              traversedVertex,
-              backPSE,
-              this,
-              traverseMode,
-              (float) backSpeed,
-              (float) speed
-            );
+        turnDuration = s0
+          .intersectionTraversalCalculator()
+          .computeTraversalDuration(
+            traversedVertex,
+            backPSE,
+            this,
+            traverseMode,
+            (float) backSpeed,
+            (float) speed
+          );
       } else {
         // In case this is a temporary edge not connected to an IntersectionVertex
         LOG.debug("Not computing turn duration for edge {}", this);
@@ -1234,7 +1227,7 @@ public class StreetEdge
         s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
-      time += (int) Math.ceil(turnDuration);
+      time_ms += (long) Math.ceil(1000.0 * turnDuration);
       weight += preferences.street().turnReluctance() * turnDuration;
     }
 
@@ -1246,7 +1239,7 @@ public class StreetEdge
       weight += costExtension.calculateExtraCost(s0, length_mm, traverseMode);
     }
 
-    s1.incrementTimeInSeconds(time);
+    s1.incrementTimeInMilliseconds(time_ms);
 
     s1.incrementWeight(weight);
 
@@ -1283,7 +1276,7 @@ public class StreetEdge
       : pref.scooter().optimizeType();
     switch (optimizeType) {
       case SAFEST_STREETS -> {
-        weight = bicycleSafetyFactor * getDistanceMeters() / speed;
+        weight = (bicycleSafetyFactor * getDistanceMeters()) / speed;
         if (bicycleSafetyFactor <= SAFEST_STREETS_SAFETY_FACTOR) {
           // safest streets are treated as even safer than they really are
           weight *= 0.66;
@@ -1345,20 +1338,17 @@ public class StreetEdge
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;
         weight =
-          getEffectiveWalkSafetyDistance() *
-          preferences.walk().safetyFactor() +
-          getEffectiveWalkDistance() *
-          (1 - preferences.walk().safetyFactor());
+          getEffectiveWalkSafetyDistance() * preferences.walk().safetyFactor() +
+          getEffectiveWalkDistance() * (1 - preferences.walk().safetyFactor());
         weight /= speed;
       }
 
-      weight *=
-        StreetEdgeReluctanceCalculator.computeReluctance(
-          preferences,
-          traverseMode,
-          walkingBike,
-          isStairs()
-        );
+      weight *= StreetEdgeReluctanceCalculator.computeReluctance(
+        preferences,
+        traverseMode,
+        walkingBike,
+        isStairs()
+      );
     }
 
     return new TraversalCosts(time, weight);
@@ -1434,7 +1424,7 @@ public class StreetEdge
      * 180 degrees exists as a negative rather than a positive due to the integer range.
      */
     private static byte convertRadianToByte(double angleRadians) {
-      return (byte) Math.round(angleRadians * 128 / Math.PI + 128);
+      return (byte) Math.round((angleRadians * 128) / Math.PI + 128);
     }
   }
 }

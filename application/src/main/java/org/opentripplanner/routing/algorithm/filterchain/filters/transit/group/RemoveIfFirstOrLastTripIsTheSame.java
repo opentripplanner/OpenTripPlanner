@@ -23,7 +23,7 @@ public class RemoveIfFirstOrLastTripIsTheSame implements RemoveItineraryFlagger 
     List<Itinerary> filtered = new ArrayList<>();
     List<GroupBySameFirstOrLastTrip> groups = new ArrayList<>();
 
-    OUTER_LOOP:for (Itinerary it : itineraries) {
+    OUTER_LOOP: for (Itinerary it : itineraries) {
       GroupBySameFirstOrLastTrip currentGroup = new GroupBySameFirstOrLastTrip(it);
 
       for (GroupBySameFirstOrLastTrip group : groups) {

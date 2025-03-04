@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.SafetyFeatures;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -50,7 +50,7 @@ public class NorwayMapperTest {
         var expectedSafety = expectedBicycleSafetyMatrix[i][j];
         if (!Double.isNaN(expectedSafety)) {
           var maxspeed = expectedMaxspeeds[j];
-          var way = new OsmWithTags();
+          var way = new OsmEntity();
           way.addTag("highway", highway);
           way.addTag("maxspeed", String.valueOf(maxspeed));
           argumentsList.add(Arguments.of(way, expectedSafety));
@@ -66,7 +66,7 @@ public class NorwayMapperTest {
     for (int i = 0; i < expectedHighways.length; i++) {
       var highway = expectedHighways[i];
       var expectedSafety = expectedBicycleSafety[i];
-      var way = new OsmWithTags();
+      var way = new OsmEntity();
       way.addTag("highway", highway);
       argumentsList.add(Arguments.of(way, expectedSafety));
     }
@@ -78,10 +78,10 @@ public class NorwayMapperTest {
     for (var i = 0; i < 4; i++) {
       var highway = expectedHighways[i];
       for (var maxspeed : expectedMaxspeeds) {
-        var mainRoad = new OsmWithTags();
+        var mainRoad = new OsmEntity();
         mainRoad.addTag("highway", highway);
         mainRoad.addTag("maxspeed", String.valueOf(maxspeed));
-        var linkRoad = new OsmWithTags();
+        var linkRoad = new OsmEntity();
         linkRoad.addTag("highway", highway.concat("_link"));
         linkRoad.addTag("maxspeed", String.valueOf(maxspeed));
         argumentsList.add(Arguments.of(mainRoad, linkRoad));
@@ -92,7 +92,7 @@ public class NorwayMapperTest {
 
   @ParameterizedTest(name = "{0} should have a score of {1}")
   @MethodSource("createExpectedBicycleSafetyForMaxspeedCases")
-  public void testBicycleSafetyForMaxspeed(OsmWithTags way, Double expected) {
+  public void testBicycleSafetyForMaxspeed(OsmEntity way, Double expected) {
     var result = wps.getDataForWay(way).bicycleSafety();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
     assertEquals(expectedSafetyFeatures, result);
@@ -100,7 +100,7 @@ public class NorwayMapperTest {
 
   @ParameterizedTest
   @MethodSource("createBicycleSafetyWithoutExplicitMaxspeed")
-  public void testBicycleSafetyWithoutMaxspeed(OsmWithTags way, Double expected) {
+  public void testBicycleSafetyWithoutMaxspeed(OsmEntity way, Double expected) {
     var result = wps.getDataForWay(way).bicycleSafety();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
     assertEquals(expectedSafetyFeatures, result);
@@ -108,7 +108,7 @@ public class NorwayMapperTest {
 
   @ParameterizedTest
   @MethodSource("createLinkRoadLikeMainCases")
-  public void testBicycleSafetyLikeLinkRoad(OsmWithTags mainRoad, OsmWithTags linkRoad) {
+  public void testBicycleSafetyLikeLinkRoad(OsmEntity mainRoad, OsmEntity linkRoad) {
     var resultMain = wps.getDataForWay(mainRoad).bicycleSafety();
     var resultLink = wps.getDataForWay(linkRoad).bicycleSafety();
 
@@ -117,7 +117,7 @@ public class NorwayMapperTest {
 
   @Test
   public void testTrunkIsWalkable() {
-    var way = new OsmWithTags();
+    var way = new OsmEntity();
     way.addTag("highway", "trunk");
 
     assertEquals(StreetTraversalPermission.ALL, wps.getDataForWay(way).getPermission());
@@ -126,13 +126,13 @@ public class NorwayMapperTest {
   @Test
   public void testMtbScaleNone() {
     // https://www.openstreetmap.org/way/302610220
-    var way1 = new OsmWithTags();
+    var way1 = new OsmEntity();
     way1.addTag("highway", "path");
     way1.addTag("mtb:scale", "3");
 
     assertEquals(StreetTraversalPermission.NONE, wps.getDataForWay(way1).getPermission());
 
-    var way2 = new OsmWithTags();
+    var way2 = new OsmEntity();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "3");
 
@@ -141,13 +141,13 @@ public class NorwayMapperTest {
 
   @Test
   public void testMtbScalePedestrian() {
-    var way1 = new OsmWithTags();
+    var way1 = new OsmEntity();
     way1.addTag("highway", "path");
     way1.addTag("mtb:scale", "1");
 
     assertEquals(StreetTraversalPermission.PEDESTRIAN, wps.getDataForWay(way1).getPermission());
 
-    var way2 = new OsmWithTags();
+    var way2 = new OsmEntity();
     way2.addTag("highway", "track");
     way2.addTag("mtb:scale", "1");
 
@@ -156,13 +156,13 @@ public class NorwayMapperTest {
 
   @Test
   public void testMotorroad() {
-    var way1 = new OsmWithTags();
+    var way1 = new OsmEntity();
     way1.addTag("highway", "trunk");
     way1.addTag("motorroad", "yes");
 
     assertEquals(StreetTraversalPermission.CAR, wps.getDataForWay(way1).getPermission());
 
-    var way2 = new OsmWithTags();
+    var way2 = new OsmEntity();
     way2.addTag("highway", "primary");
     way2.addTag("motorroad", "yes");
 

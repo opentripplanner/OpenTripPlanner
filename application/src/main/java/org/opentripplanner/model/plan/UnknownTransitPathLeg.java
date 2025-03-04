@@ -117,8 +117,7 @@ public class UnknownTransitPathLeg implements Leg {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(UnknownTransitPathLeg.class)
+    return ToStringBuilder.of(UnknownTransitPathLeg.class)
       .addObj("from", from)
       .addObj("to", to)
       .addTime("startTime", startTime)

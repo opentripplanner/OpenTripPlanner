@@ -77,8 +77,7 @@ class StreetEdgeWheelchairCostTest {
     };
 
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-    StreetElevationExtensionBuilder
-      .of(edge)
+    StreetElevationExtensionBuilder.of(edge)
       .withElevationProfile(elev)
       .withComputed(true)
       .build()
@@ -89,8 +88,7 @@ class StreetEdgeWheelchairCostTest {
     req.withWheelchair(true);
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        WheelchairPreferences
-          .of()
+        WheelchairPreferences.of()
           .withTripOnlyAccessible()
           .withStopOnlyAccessible()
           .withElevatorOnlyAccessible()
@@ -130,8 +128,7 @@ class StreetEdgeWheelchairCostTest {
     req.withWheelchair(true);
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        WheelchairPreferences
-          .of()
+        WheelchairPreferences.of()
           .withTripOnlyAccessible()
           .withStopOnlyAccessible()
           .withElevatorOnlyAccessible()
@@ -177,8 +174,7 @@ class StreetEdgeWheelchairCostTest {
     req.withWheelchair(true);
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        WheelchairPreferences
-          .of()
+        WheelchairPreferences.of()
           .withTripOnlyAccessible()
           .withStopOnlyAccessible()
           .withElevatorOnlyAccessible()

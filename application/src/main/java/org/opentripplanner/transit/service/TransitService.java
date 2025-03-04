@@ -67,6 +67,16 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
  *   copy-on-write and shares a lot of objects with any other RaptorTransitData instances.
  */
 public interface TransitService {
+  /**
+   * @return empty if the trip doesn't exist in the timetable (e.g. real-time added)
+   */
+  Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip);
+
+  /**
+   * @return empty if the trip doesn't run on the date specified
+   */
+  Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate);
+
   Collection<String> listFeedIds();
 
   Collection<Agency> listAgencies();
@@ -270,7 +280,6 @@ public interface TransitService {
    * Return the timetable for a given trip pattern and date, taking into account real-time updates.
    * If no real-times update are applied, fall back to scheduled data.
    */
-  @Nullable
   Timetable findTimetable(TripPattern tripPattern, LocalDate serviceDate);
 
   /**

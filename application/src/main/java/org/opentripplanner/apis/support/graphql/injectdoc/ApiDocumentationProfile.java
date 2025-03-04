@@ -10,7 +10,7 @@ public enum ApiDocumentationProfile implements DocumentedEnum<ApiDocumentationPr
     """
     List of available custom documentation profiles. A profile is used to inject custom
     documentation like type and field description or a deprecated reason.
-    
+
     Currently, ONLY the Transmodel API supports this feature.
     """;
 

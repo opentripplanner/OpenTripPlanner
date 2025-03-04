@@ -102,8 +102,7 @@ public class DataOverlayConfig implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DataOverlayConfig.class)
+    return ToStringBuilder.of(DataOverlayConfig.class)
       .addStr("fileName", fileName)
       .addStr("latitudeVariable", latitudeVariable)
       .addStr("longitudeVariable", longitudeVariable)

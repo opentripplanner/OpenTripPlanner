@@ -22,28 +22,23 @@ class RouteMatcherFactoryTest {
 
   @BeforeEach
   void setup() {
-    route1 =
-      Route
-        .of(new FeedScopedId("feedId", "routeId"))
-        .withAgency(TimetableRepositoryForTest.agency("AGENCY"))
-        .withMode(TransitMode.BUS)
-        .withShortName("ROUTE1")
-        .withLongName(I18NString.of("ROUTE1LONG"))
-        .build();
-    route2 =
-      Route
-        .of(new FeedScopedId("otherFeedId", "otherRouteId"))
-        .withAgency(TimetableRepositoryForTest.agency("OTHER_AGENCY"))
-        .withMode(TransitMode.RAIL)
-        .withShortName("ROUTE2")
-        .withLongName(I18NString.of("ROUTE2LONG"))
-        .build();
+    route1 = Route.of(new FeedScopedId("feedId", "routeId"))
+      .withAgency(TimetableRepositoryForTest.agency("AGENCY"))
+      .withMode(TransitMode.BUS)
+      .withShortName("ROUTE1")
+      .withLongName(I18NString.of("ROUTE1LONG"))
+      .build();
+    route2 = Route.of(new FeedScopedId("otherFeedId", "otherRouteId"))
+      .withAgency(TimetableRepositoryForTest.agency("OTHER_AGENCY"))
+      .withMode(TransitMode.RAIL)
+      .withShortName("ROUTE2")
+      .withLongName(I18NString.of("ROUTE2LONG"))
+      .build();
   }
 
   @Test
   void testAgencies() {
-    FindRoutesRequest request = FindRoutesRequest
-      .of()
+    FindRoutesRequest request = FindRoutesRequest.of()
       .withAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of("AGENCY")))
       .build();
 
@@ -54,8 +49,7 @@ class RouteMatcherFactoryTest {
 
   @Test
   void testTransitModes() {
-    FindRoutesRequest request = FindRoutesRequest
-      .of()
+    FindRoutesRequest request = FindRoutesRequest.of()
       .withTransitModes(FilterValues.ofEmptyIsEverything("transitModes", List.of(TransitMode.BUS)))
       .build();
 
@@ -75,8 +69,7 @@ class RouteMatcherFactoryTest {
 
   @Test
   void testShortNames() {
-    FindRoutesRequest request = FindRoutesRequest
-      .of()
+    FindRoutesRequest request = FindRoutesRequest.of()
       .withShortNames(FilterValues.ofEmptyIsEverything("publicCodes", List.of("ROUTE1", "ROUTE3")))
       .build();
 
@@ -125,8 +118,7 @@ class RouteMatcherFactoryTest {
 
   @Test
   void testAll() {
-    FindRoutesRequest request = FindRoutesRequest
-      .of()
+    FindRoutesRequest request = FindRoutesRequest.of()
       .withAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of("AGENCY")))
       .withTransitModes(FilterValues.ofEmptyIsEverything("transitModes", List.of(TransitMode.BUS)))
       .withShortName("ROUTE1")

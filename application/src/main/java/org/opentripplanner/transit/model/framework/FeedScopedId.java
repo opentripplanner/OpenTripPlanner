@@ -63,8 +63,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         "The input string '%s' contains invisible characters which is not allowed.".formatted(s)
       );
     }
-    return Arrays
-      .stream(s.split(","))
+    return Arrays.stream(s.split(","))
       .map(String::strip)
       .filter(i -> !i.isBlank())
       .map(FeedScopedId::parse)

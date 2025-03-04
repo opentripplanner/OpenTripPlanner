@@ -4,7 +4,6 @@ import static java.time.Duration.ofMinutes;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -22,27 +21,25 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public final class AccessEgressPreferences implements Serializable {
 
-  private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST = createDefaultCarPenalty();
+  private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST =
+    createDefaultCarPenalty();
 
   public static final AccessEgressPreferences DEFAULT = new AccessEgressPreferences();
 
   private final TimeAndCostPenaltyForEnum<StreetMode> penalty;
   private final DurationForEnum<StreetMode> maxDuration;
-  private final int defaultMaxStopCount;
-  private final Map<StreetMode, Integer> maxStopCountForMode;
+  private final MaxStopCountLimit maxStopCountLimit;
 
   private AccessEgressPreferences() {
     this.maxDuration = durationForStreetModeOf(ofMinutes(45));
     this.penalty = DEFAULT_TIME_AND_COST;
-    this.defaultMaxStopCount = 500;
-    this.maxStopCountForMode = Map.of();
+    this.maxStopCountLimit = new MaxStopCountLimit();
   }
 
   private AccessEgressPreferences(Builder builder) {
     this.maxDuration = builder.maxDuration;
     this.penalty = builder.penalty;
-    this.defaultMaxStopCount = builder.defaultMaxStopCount;
-    this.maxStopCountForMode = Collections.unmodifiableMap(builder.maxStopCountForMode);
+    this.maxStopCountLimit = builder.maxStopCountLimit;
   }
 
   public static Builder of() {
@@ -61,12 +58,8 @@ public final class AccessEgressPreferences implements Serializable {
     return maxDuration;
   }
 
-  public int defaultMaxStopCount() {
-    return defaultMaxStopCount;
-  }
-
-  public Map<StreetMode, Integer> maxStopCountForMode() {
-    return maxStopCountForMode;
+  public MaxStopCountLimit maxStopCountLimit() {
+    return maxStopCountLimit;
   }
 
   @Override
@@ -77,24 +70,21 @@ public final class AccessEgressPreferences implements Serializable {
     return (
       penalty.equals(that.penalty) &&
       maxDuration.equals(that.maxDuration) &&
-      defaultMaxStopCount == that.defaultMaxStopCount &&
-      maxStopCountForMode.equals(that.maxStopCountForMode)
+      maxStopCountLimit.equals(that.maxStopCountLimit)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(penalty, maxDuration, defaultMaxStopCount, maxStopCountForMode);
+    return Objects.hash(penalty, maxDuration, maxStopCountLimit);
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(AccessEgressPreferences.class)
+    return ToStringBuilder.of(AccessEgressPreferences.class)
       .addObj("penalty", penalty, DEFAULT.penalty)
       .addObj("maxDuration", maxDuration, DEFAULT.maxDuration)
-      .addObj("defaultMaxStopCount", defaultMaxStopCount, DEFAULT.defaultMaxStopCount)
-      .addObj("maxStopCountForMode", maxStopCountForMode, DEFAULT.maxStopCountForMode)
+      .addObj("maxStopCount", maxStopCountLimit, DEFAULT.maxStopCountLimit)
       .toString();
   }
 
@@ -103,15 +93,13 @@ public final class AccessEgressPreferences implements Serializable {
     private final AccessEgressPreferences original;
     private TimeAndCostPenaltyForEnum<StreetMode> penalty;
     private DurationForEnum<StreetMode> maxDuration;
-    private Map<StreetMode, Integer> maxStopCountForMode;
-    private int defaultMaxStopCount;
+    private MaxStopCountLimit maxStopCountLimit;
 
     public Builder(AccessEgressPreferences original) {
       this.original = original;
       this.maxDuration = original.maxDuration;
       this.penalty = original.penalty;
-      this.defaultMaxStopCount = original.defaultMaxStopCount;
-      this.maxStopCountForMode = original.maxStopCountForMode;
+      this.maxStopCountLimit = original.maxStopCountLimit;
     }
 
     public Builder withMaxDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
@@ -124,13 +112,18 @@ public final class AccessEgressPreferences implements Serializable {
       return withMaxDuration(b -> b.withDefault(defaultValue).withValues(values));
     }
 
+    public Builder withMaxStopCount(Consumer<MaxStopCountLimit.Builder> body) {
+      this.maxStopCountLimit = this.maxStopCountLimit.copyOf().apply(body).build();
+      return this;
+    }
+
     public Builder withMaxStopCount(
       int defaultMaxStopCount,
       Map<StreetMode, Integer> maxStopCountForMode
     ) {
-      this.defaultMaxStopCount = defaultMaxStopCount;
-      this.maxStopCountForMode = maxStopCountForMode;
-      return this;
+      return withMaxStopCount(b ->
+        b.withDefaultLimit(defaultMaxStopCount).withLimitsForModes(maxStopCountForMode)
+      );
     }
 
     public Builder withPenalty(Consumer<TimeAndCostPenaltyForEnum.Builder<StreetMode>> body) {

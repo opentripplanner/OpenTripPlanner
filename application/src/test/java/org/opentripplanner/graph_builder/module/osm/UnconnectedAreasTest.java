@@ -163,13 +163,12 @@ public class UnconnectedAreasTest {
     var graph = new Graph(deduplicator);
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     DefaultOsmProvider provider = new DefaultOsmProvider(RESOURCE_LOADER.file(osmFileName), false);
-    OsmModule loader = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    OsmModule loader = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withIssueStore(issueStore)
       .withAreaVisibility(true)
       .withStaticParkAndRide(true)

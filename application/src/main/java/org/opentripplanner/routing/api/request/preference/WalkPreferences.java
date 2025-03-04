@@ -144,8 +144,7 @@ public final class WalkPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(WalkPreferences.class)
+    return ToStringBuilder.of(WalkPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addObj("boardCost", boardCost, DEFAULT.boardCost)

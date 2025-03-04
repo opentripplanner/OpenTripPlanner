@@ -47,8 +47,7 @@ class PlannerResourceTest {
     var req = resource.buildRequest(queryParams);
     assertFalse(req.journey().transit().enabled());
     assertEquals(
-      RequestModes
-        .of()
+      RequestModes.of()
         .withDirectMode(BIKE_RENTAL)
         .withEgressMode(BIKE_RENTAL)
         .withAccessMode(BIKE_RENTAL)

@@ -48,6 +48,6 @@ public class WalkStepTest {
   }
 
   private double degreesToRadians(double deg) {
-    return deg * Math.PI / 180;
+    return (deg * Math.PI) / 180;
   }
 }

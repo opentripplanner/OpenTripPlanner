@@ -79,13 +79,12 @@ public class SpeedTest {
     this.config = config;
     this.timetableRepository = timetableRepository;
 
-    this.tcIO =
-      new CsvFileSupport(
-        opts.rootDir(),
-        TRAVEL_SEARCH_FILENAME,
-        config.feedId,
-        opts.replaceExpectedResultsFiles()
-      );
+    this.tcIO = new CsvFileSupport(
+      opts.rootDir(),
+      TRAVEL_SEARCH_FILENAME,
+      config.feedId,
+      opts.replaceExpectedResultsFiles()
+    );
 
     // Read Test-case definitions and expected results from file
     this.testCaseDefinitions = tcIO.readTestCaseDefinitions();
@@ -111,29 +110,30 @@ public class SpeedTest {
       RaptorEnvironmentFactory.create(config.transitRoutingParams.searchThreadPoolSize())
     );
 
-    this.serverContext =
-      new DefaultServerRequestContext(
-        DebugUiConfig.DEFAULT,
-        config.flexConfig,
-        graph,
-        timer.getRegistry(),
-        raptorConfig,
-        TestServerContext.createRealtimeVehicleService(transitService),
-        List.of(),
-        config.request,
-        TestServerContext.createStreetLimitationParametersService(),
-        config.transitRoutingParams,
-        new DefaultTransitService(timetableRepository),
-        VectorTileConfig.DEFAULT,
-        TestServerContext.createVehicleParkingService(),
-        TestServerContext.createVehicleRentalService(),
-        TestServerContext.createWorldEnvelopeService(),
-        TestServerContext.createEmissionsService(),
-        null,
-        null,
-        null,
-        null
-      );
+    this.serverContext = new DefaultServerRequestContext(
+      DebugUiConfig.DEFAULT,
+      config.flexConfig,
+      graph,
+      timer.getRegistry(),
+      raptorConfig,
+      TestServerContext.createRealtimeVehicleService(transitService),
+      List.of(),
+      config.request,
+      TestServerContext.createStreetLimitationParametersService(),
+      config.transitRoutingParams,
+      new DefaultTransitService(timetableRepository),
+      VectorTileConfig.DEFAULT,
+      TestServerContext.createVehicleParkingService(),
+      TestServerContext.createVehicleRentalService(),
+      TestServerContext.createViaTransferResolver(graph, transitService),
+      TestServerContext.createWorldEnvelopeService(),
+      TestServerContext.createEmissionsService(),
+      null,
+      null,
+      null,
+      null,
+      null
+    );
     // Creating raptor transit data should be integrated into the TimetableRepository, but for now
     // we do it manually here
     createRaptorTransitData(timetableRepository, config.transitRoutingParams);
@@ -278,8 +278,7 @@ public class SpeedTest {
   }
 
   private TestCases createTestCases() {
-    return TestCases
-      .of()
+    return TestCases.of()
       .withSkipCost(opts.skipCost())
       .withIncludeIds(opts.testCaseIds())
       .withIncludeCategories(opts.includeCategories())

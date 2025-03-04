@@ -38,11 +38,10 @@ class StopTimesHelperTest {
     var tt = originalPattern.getScheduledTimetable();
     var newTripTimes = tt.getTripTimes(0).copyScheduledTimes();
     newTripTimes.cancelTrip();
-    pattern =
-      originalPattern
-        .copy()
-        .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
-        .build();
+    pattern = originalPattern
+      .copy()
+      .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
+      .build();
     // replace the original pattern by the updated pattern in the transit model
     timetableRepository.addTripPattern(pattern.getId(), pattern);
     timetableRepository.index();

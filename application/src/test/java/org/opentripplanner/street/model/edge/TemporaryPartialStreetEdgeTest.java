@@ -133,8 +133,7 @@ public class TemporaryPartialStreetEdgeTest {
       tempEdges
     );
 
-    StreetSearchRequest request = StreetSearchRequest
-      .of()
+    StreetSearchRequest request = StreetSearchRequest.of()
       .withMode(StreetMode.CAR)
       .withPreferences(p -> p.withStreet(s -> s.withTurnReluctance(1.0)))
       .build();

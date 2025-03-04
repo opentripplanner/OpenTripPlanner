@@ -228,12 +228,14 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     chain.filter(List.of(i1, i2, i3));
 
     // Then transitAlertService should have been called with stop and route ids
-    Mockito
-      .verify(transitAlertService, Mockito.atLeastOnce())
-      .getStopAlerts(A.stop.getId(), StopCondition.FIRST_DEPARTURE);
-    Mockito
-      .verify(transitAlertService, Mockito.atLeastOnce())
-      .getStopAlerts(E.stop.getId(), StopCondition.ARRIVING);
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(
+      A.stop.getId(),
+      StopCondition.FIRST_DEPARTURE
+    );
+    Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getStopAlerts(
+      E.stop.getId(),
+      StopCondition.ARRIVING
+    );
     Mockito.verify(transitAlertService, Mockito.atLeastOnce()).getRouteAlerts(BUS_ROUTE.getId());
   }
 

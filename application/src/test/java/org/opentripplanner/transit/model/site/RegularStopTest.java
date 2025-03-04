@@ -35,8 +35,7 @@ class RegularStopTest {
   public static final ZoneId TIME_ZONE = ZoneId.of(TimetableRepositoryForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
 
-  private static final RegularStop subject = SiteRepository
-    .of()
+  private static final RegularStop subject = SiteRepository.of()
     .regularStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
