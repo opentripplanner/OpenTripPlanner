@@ -15,12 +15,10 @@ public class ErrorMapper {
       .withOJPResponse(
         new OJPResponseStructure()
           .withServiceDelivery(
-            ServiceDeliveryMapper
-              .serviceDelivery(timestamp)
-              .withErrorCondition(
-                new ServiceDeliveryStructure.ErrorCondition()
-                  .withDescription(new ErrorDescriptionStructure().withValue(value))
-              )
+            ServiceDeliveryMapper.serviceDelivery(timestamp).withErrorCondition(
+              new ServiceDeliveryStructure.ErrorCondition()
+                .withDescription(new ErrorDescriptionStructure().withValue(value))
+            )
           )
       );
   }

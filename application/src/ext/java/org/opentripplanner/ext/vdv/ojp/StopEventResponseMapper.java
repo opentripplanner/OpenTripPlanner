@@ -77,9 +77,9 @@ public class StopEventResponseMapper {
     var sed = new OJPStopEventDeliveryStructure().withStatus(true);
     stopEvents.forEach(sed::withRest);
 
-    var serviceDelivery = ServiceDeliveryMapper
-      .serviceDelivery(timestamp)
-      .withAbstractFunctionalServiceDelivery(StopEventResponseMapper.jaxbElement(sed));
+    var serviceDelivery = ServiceDeliveryMapper.serviceDelivery(
+      timestamp
+    ).withAbstractFunctionalServiceDelivery(StopEventResponseMapper.jaxbElement(sed));
 
     var response = new OJPResponseStructure().withServiceDelivery(serviceDelivery);
     return new OJP().withOJPResponse(response);
