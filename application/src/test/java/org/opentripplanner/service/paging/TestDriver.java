@@ -8,6 +8,7 @@ import org.opentripplanner._support.debug.TestDebug;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.paging.cursor.DefaultPageCursorInput;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
@@ -111,7 +112,9 @@ final class TestDriver {
   }
 
   ItinerarySortKey expectedCut() {
-    return results == null ? null : results.pageCut();
+    return results != null && results.numItinerariesFilterResults() != null
+      ? results.numItinerariesFilterResults().pageCut()
+      : null;
   }
 
   TestDriver newPage(PageCursor cursor) {
@@ -164,7 +167,12 @@ final class TestDriver {
 
     // Filter nResults
     var filterResultBox = new Box<PageCursorInput>();
-    var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries, filterResultBox::set);
+    var maxNumFilter = new NumItinerariesFilter(
+      nResults,
+      cropItineraries,
+      it ->
+        filterResultBox.set(DefaultPageCursorInput.of().withNumItinerariesFilterResults(it).build())
+    );
     kept = maxNumFilter.removeMatchesForTest(kept);
 
     return new TestDriver(

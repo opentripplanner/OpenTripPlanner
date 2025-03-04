@@ -16,15 +16,16 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.grouppriority.TransitGroupPriorityItineraryDecorator;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
+import org.opentripplanner.model.plan.paging.cursor.DefaultPageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
-import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
@@ -68,9 +69,11 @@ public class RoutingWorker {
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
   private SearchParams raptorSearchParamsUsed = null;
-  private PageCursorInput pageCursorInput = null;
+  private NumItinerariesFilterResults numItinerariesFilterResults = null;
+  private RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
+    // Applying the page cursor modifies the request by removing the direct mode, for example.
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
@@ -92,14 +95,6 @@ public class RoutingWorker {
 
   public RoutingResponse route() {
     OTPRequestTimeoutException.checkForTimeout();
-
-    // If no direct mode is set, then we set one.
-    // See {@link FilterTransitWhenDirectModeIsEmpty}
-    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      request.journey().direct().mode()
-    );
-
-    request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -147,9 +142,9 @@ public class RoutingWorker {
         serverContext,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
-        emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
-        it -> pageCursorInput = it
+        it -> numItinerariesFilterResults = it,
+        it -> removeTransitIfStreetOnlyIsBetterResults = it
       );
 
       filteredItineraries = filterChain.filter(itineraries);
@@ -165,9 +160,6 @@ public class RoutingWorker {
     }
 
     this.debugTimingAggregator.finishedFiltering();
-
-    // Restore original directMode.
-    request.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
@@ -304,7 +296,11 @@ public class RoutingWorker {
       serverContext.raptorTuningParameters(),
       request,
       raptorSearchParamsUsed,
-      pageCursorInput,
+      DefaultPageCursorInput
+        .of()
+        .withNumItinerariesFilterResults(numItinerariesFilterResults)
+        .withRemoveTransitIfStreetOnlyIsBetterResults(removeTransitIfStreetOnlyIsBetterResults)
+        .build(),
       itineraries
     );
   }

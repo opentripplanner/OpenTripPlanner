@@ -37,8 +37,8 @@ public class Token {
     return (Duration) get(fieldName, TokenType.DURATION);
   }
 
-  public int getInt(String fieldName) {
-    return (int) get(fieldName, TokenType.INT);
+  public Integer getInt(String fieldName) {
+    return (Integer) get(fieldName, TokenType.INT);
   }
 
   public String getString(String fieldName) {

@@ -1,6 +1,8 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
+import java.util.OptionalInt;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 final class PageCursorSerializer {
 
-  private static final byte VERSION = 1;
   private static final Logger LOG = LoggerFactory.getLogger(PageCursor.class);
 
   private static final String TYPE_FIELD = "Type";
@@ -23,9 +24,10 @@ final class PageCursorSerializer {
   private static final String CUT_ARRIVAL_TIME_FIELD = "cutArrivalTime";
   private static final String CUT_N_TRANSFERS_FIELD = "cutTx";
   private static final String CUT_COST_FIELD = "cutCost";
+  private static final String GENERALIZED_COST_MAX_LIMIT = "generalizedCostMaxLimit";
 
-  private static final TokenSchema SCHEMA_TOKEN = TokenSchema
-    .ofVersion(VERSION)
+  private static final TokenSchema SCHEMA_TOKEN_VERSION_1 = TokenSchema
+    .ofVersion(1)
     .addEnum(TYPE_FIELD)
     .addTimeInstant(EDT_FIELD)
     .addTimeInstant(LAT_FIELD)
@@ -37,13 +39,31 @@ final class PageCursorSerializer {
     .addInt(CUT_N_TRANSFERS_FIELD)
     .addInt(CUT_COST_FIELD)
     .build();
+  private static final TokenSchema SCHEMA_TOKEN_VERSION_2 = TokenSchema
+    .ofVersion(2)
+    .addEnum(TYPE_FIELD)
+    .addTimeInstant(EDT_FIELD)
+    .addTimeInstant(LAT_FIELD)
+    .addDuration(SEARCH_WINDOW_FIELD)
+    .addEnum(SORT_ORDER_FIELD)
+    .addBoolean(CUT_ON_STREET_FIELD)
+    .addTimeInstant(CUT_DEPARTURE_TIME_FIELD)
+    .addTimeInstant(CUT_ARRIVAL_TIME_FIELD)
+    .addInt(CUT_N_TRANSFERS_FIELD)
+    .addInt(CUT_COST_FIELD)
+    .addInt(GENERALIZED_COST_MAX_LIMIT)
+    .build();
+  private static final TokenSchema[] SCHEMA_TOKENS = {
+    SCHEMA_TOKEN_VERSION_2,
+    SCHEMA_TOKEN_VERSION_1,
+  };
 
   /** private constructor to prevent instantiating this utility class */
   private PageCursorSerializer() {}
 
   @Nullable
   public static String encode(PageCursor cursor) {
-    var tokenBuilder = SCHEMA_TOKEN
+    var tokenBuilder = SCHEMA_TOKEN_VERSION_2
       .encode()
       .withEnum(TYPE_FIELD, cursor.type())
       .withTimeInstant(EDT_FIELD, cursor.earliestDepartureTime())
@@ -61,6 +81,13 @@ final class PageCursorSerializer {
         .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
     }
 
+    if (cursor.containsGeneralizedCostMaxLimit()) {
+      tokenBuilder.withInt(
+        GENERALIZED_COST_MAX_LIMIT,
+        cursor.generalizedCostMaxLimit().toSeconds()
+      );
+    }
+
     return tokenBuilder.build();
   }
 
@@ -69,45 +96,63 @@ final class PageCursorSerializer {
     if (StringUtils.hasNoValueOrNullAsString(cursor)) {
       return null;
     }
-    try {
-      ItinerarySortKey itineraryPageCut = null;
-      var token = SCHEMA_TOKEN.decode(cursor);
+    for (var tokenSchema : SCHEMA_TOKENS) {
+      try {
+        ItinerarySortKey itineraryPageCut = null;
+        var token = tokenSchema.decode(cursor);
 
-      // This throws an exception if an enum is serialized which is not in the code.
-      // This is a forward compatibility issue. To avoid this, add the value enum, role out.
-      // Start using the enum, roll out again.
-      PageType type = token.getEnum(TYPE_FIELD, PageType.class).orElseThrow();
-      var edt = token.getTimeInstant(EDT_FIELD);
-      var lat = token.getTimeInstant(LAT_FIELD);
-      var searchWindow = token.getDuration(SEARCH_WINDOW_FIELD);
-      var originalSortOrder = token.getEnum(SORT_ORDER_FIELD, SortOrder.class).orElseThrow();
+        // This throws an exception if an enum is serialized which is not in the code.
+        // This is a forward compatibility issue. To avoid this, add the value enum, role out.
+        // Start using the enum, roll out again.
+        PageType type = token.getEnum(TYPE_FIELD, PageType.class).orElseThrow();
+        var edt = token.getTimeInstant(EDT_FIELD);
+        var lat = token.getTimeInstant(LAT_FIELD);
+        var searchWindow = token.getDuration(SEARCH_WINDOW_FIELD);
+        var originalSortOrder = token.getEnum(SORT_ORDER_FIELD, SortOrder.class).orElseThrow();
 
-      // We use the departure time to determine if the cut is present or not
-      var cutDepartureTime = token.getTimeInstant(CUT_DEPARTURE_TIME_FIELD);
+        // We use the departure time to determine if the cut is present or not
+        var cutDepartureTime = token.getTimeInstant(CUT_DEPARTURE_TIME_FIELD);
 
-      if (cutDepartureTime != null) {
-        itineraryPageCut =
-          new DeduplicationPageCut(
-            cutDepartureTime,
-            token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
-            token.getInt(CUT_COST_FIELD),
-            token.getInt(CUT_N_TRANSFERS_FIELD),
-            token.getBoolean(CUT_ON_STREET_FIELD)
-          );
+        if (cutDepartureTime != null) {
+          itineraryPageCut =
+            new DeduplicationPageCut(
+              cutDepartureTime,
+              token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
+              token.getInt(CUT_COST_FIELD),
+              token.getInt(CUT_N_TRANSFERS_FIELD),
+              token.getBoolean(CUT_ON_STREET_FIELD)
+            );
+        }
+
+        // Add logic to read in data from next version here.
+        // if(token.version() > 1) { /* get v2 here */}
+
+        Cost generalizedCostMaxLimit = null;
+        if (token.version() > 1) {
+          Integer generalizedCostMaxLimitField = token.getInt(GENERALIZED_COST_MAX_LIMIT);
+          if (generalizedCostMaxLimitField != null) {
+            generalizedCostMaxLimit = Cost.costOfSeconds(generalizedCostMaxLimitField);
+          }
+        }
+
+        return new PageCursor(
+          type,
+          originalSortOrder,
+          edt,
+          lat,
+          searchWindow,
+          itineraryPageCut,
+          generalizedCostMaxLimit
+        );
+      } catch (Exception e) {
+        String details = e.getMessage();
+        if (StringUtils.hasValue(details)) {
+          LOG.warn("Unable to decode page cursor: '{}'. Details: {}", cursor, details);
+        } else {
+          LOG.warn("Unable to decode page cursor: '{}'.", cursor);
+        }
       }
-
-      // Add logic to read in data from next version here.
-      // if(token.version() > 1) { /* get v2 here */}
-
-      return new PageCursor(type, originalSortOrder, edt, lat, searchWindow, itineraryPageCut);
-    } catch (Exception e) {
-      String details = e.getMessage();
-      if (StringUtils.hasValue(details)) {
-        LOG.warn("Unable to decode page cursor: '{}'. Details: {}", cursor, details);
-      } else {
-        LOG.warn("Unable to decode page cursor: '{}'.", cursor);
-      }
-      return null;
     }
+    return null;
   }
 }
