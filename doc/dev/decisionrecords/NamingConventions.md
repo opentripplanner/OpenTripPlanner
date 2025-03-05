@@ -62,6 +62,12 @@ them.
 | `setStop(Stop stop)`                        | Set a mutable Stop reference. Avoid if not part of natural lifecycle. Use `initStop(...)` if possible. |
 | `getStop() : Stop`                          | Old style accessor. Use the shorter form `stop() : Stop`.                                              |
 
+
+## Variables
+
+We follow the Java standard of using camelCase with a lower-case first letter for variable names. However, variables of numeric types may include units as an underscore-separated suffix. For example, `length_mm` or `duration_msec`. The reason is that case is significant in metric prefixes (e.g. `M` for mega- versus `m` for milli-). The underscore also reinforces that these are units rather than part of the base variable name.
+
+
 ## Service, Model and Repository
 
 ![MainModelOverview](../images/ServiceModelOverview.png)

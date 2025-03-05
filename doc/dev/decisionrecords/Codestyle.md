@@ -170,10 +170,6 @@ non-null if they are not marked as `@Nullable`. However, there are places where 
 annotation is missing even if it should have been used. Those can be updated to use the `@Nullable`
 annotation.
 
-### Units in Variable Identifiers
-
-Variables of numeric types may include units as an underscore-separated suffix to the variable name. For example: `length_mm` or `duration_msec`. The reason for this exception to standard camelCase naming is that case is significant in metric prefixes (e.g. `M` for mega- versus `m` for milli-). It also reinforces that these are units rather than part of the base variable name.
-
 ## JavaScript
 
 As of [#206](https://github.com/opentripplanner/OpenTripPlanner/issues/206), we follow
