@@ -82,15 +82,15 @@ class TripTimesUpdater {
 
     var feedScopedTripId = new FeedScopedId(timetable.getPattern().getFeedId(), tripId);
 
-    int tripIndex = timetable.getTripIndex(tripId);
-    if (tripIndex == -1) {
+    var tripTimes = timetable.getTripTimes(feedScopedTripId);
+    if (tripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
       return Result.failure(new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN));
     } else {
-      LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
+      LOG.trace("tripId {} found in timetable.", tripId);
     }
 
-    RealTimeTripTimes newTimes = timetable.getTripTimes(tripIndex).copyScheduledTimes();
+    RealTimeTripTimes newTimes = tripTimes.copyScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.

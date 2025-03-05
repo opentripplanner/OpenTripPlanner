@@ -117,6 +117,11 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     return Optional.empty();
   }
 
+  @Override
+  public String getName() {
+    return "Traversal permissions";
+  }
+
   private Color getColor(StreetTraversalPermission permissions) {
     /*
      * We use the trick that there are 3 main traversal modes (WALK, BIKE and CAR) and 3 color

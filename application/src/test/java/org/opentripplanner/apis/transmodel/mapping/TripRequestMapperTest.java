@@ -87,7 +87,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
       timetableRepository.addTripPattern(pattern.getId(), pattern);
-      final int serviceCode = pattern.getScheduledTimetable().getTripTimes(0).getServiceCode();
+      final int serviceCode = pattern
+        .getScheduledTimetable()
+        .getTripTimes()
+        .getFirst()
+        .getServiceCode();
       timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });

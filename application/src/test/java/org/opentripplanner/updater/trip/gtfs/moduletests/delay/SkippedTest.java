@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -140,38 +141,29 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 
-    int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(tripId);
-    assertTrue(
-      originalTripIndexScheduled > -1,
-      "Original trip should be found in scheduled time table"
-    );
-    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
-      originalTripIndexScheduled
-    );
+    var tripTimes = originalTimetableScheduled.getTripTimes(id(tripId));
+    assertNotNull(tripTimes, "Original trip should be found in scheduled time table");
     assertFalse(
-      originalTripTimesScheduled.isCanceledOrDeleted(),
+      tripTimes.isCanceledOrDeleted(),
       "Original trip times should not be canceled in scheduled time table"
     );
 
     assertEquals(
       "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
-      TripTimesStringBuilder.encodeTripTimes(originalTripTimesScheduled, originalTripPattern)
+      TripTimesStringBuilder.encodeTripTimes(tripTimes, originalTripPattern)
     );
 
-    int originalTripIndexForToday = originalTimetableForToday.getTripIndex(tripId);
-    assertTrue(
-      originalTripIndexForToday > -1,
+    var scheduledTripTimes = originalTimetableForToday.getTripTimes(id(tripId));
+    assertNotNull(
+      scheduledTripTimes,
       "Original trip should be found in time table for service date"
     );
-    var originalTripTimesForToday = originalTimetableForToday.getTripTimes(
-      originalTripIndexForToday
-    );
     assertTrue(
-      originalTripTimesForToday.isDeleted(),
+      scheduledTripTimes.isDeleted(),
       "Original trip times should be deleted in time table for service date"
     );
     // original trip should be deleted
-    assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
+    assertEquals(RealTimeState.DELETED, scheduledTripTimes.getRealTimeState());
   }
 
   private static void assertNewTripTimesIsUpdated(RealtimeTestEnvironment env, String tripId) {
@@ -184,25 +176,16 @@ class SkippedTest implements RealtimeTestConstants {
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 
-    int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(tripId);
+    var tripTimes = originalTimetableScheduled.getTripTimes(id(tripId));
 
-    assertTrue(
-      originalTripIndexScheduled > -1,
-      "Original trip should be found in scheduled time table"
-    );
-    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
-      originalTripIndexScheduled
-    );
+    assertNotNull(tripTimes, "Original trip should be found in scheduled time table");
     assertFalse(
-      originalTripTimesScheduled.isCanceledOrDeleted(),
+      tripTimes.isCanceledOrDeleted(),
       "Original trip times should not be canceled in scheduled time table"
     );
-    assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
-    int originalTripIndexForToday = originalTimetableForToday.getTripIndex(tripId);
+    assertEquals(RealTimeState.SCHEDULED, tripTimes.getRealTimeState());
+    var tt = originalTimetableForToday.getTripTimes(id(tripId));
 
-    assertTrue(
-      originalTripIndexForToday > -1,
-      "Original trip should be found in time table for service date"
-    );
+    assertNotNull(tt, "Original trip should be found in time table for service date");
   }
 }

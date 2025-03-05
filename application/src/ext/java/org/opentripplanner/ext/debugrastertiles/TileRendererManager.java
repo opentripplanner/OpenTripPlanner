@@ -89,4 +89,13 @@ public class TileRendererManager {
     LOG.debug("Rendered tile at {} in {} ms", mapTile.bbox(), System.currentTimeMillis() - start);
     return image;
   }
+
+  /**
+   * Gets all renderers
+   * <p>
+   * Used to return list of renderers to client. Could be also used to show legend.
+   */
+  public Map<String, TileRenderer> getRenderers() {
+    return renderers;
+  }
 }
