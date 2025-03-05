@@ -78,6 +78,7 @@ class OjpMapperTest {
   @Test
   void test() throws JAXBException {
     var mapper = new StopEventResponseMapper(
+      Set.of(),
       ZoneIds.BERLIN,
       new UseFeedIdResolver(),
       RESOLVE_FEED_LANG
@@ -85,8 +86,7 @@ class OjpMapperTest {
 
     var ojp = mapper.mapStopTimesInPattern(
       List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)),
-      timestamp,
-      Set.of()
+      timestamp
     );
 
     var context = JAXBContext.newInstance(OJP.class);
@@ -106,14 +106,14 @@ class OjpMapperTest {
   @Test
   void ojpToTrias() {
     var mapper = new StopEventResponseMapper(
+      Set.of(),
       ZoneIds.BERLIN,
       new UseFeedIdResolver(),
       RESOLVE_FEED_LANG
     );
     var ojp = mapper.mapStopTimesInPattern(
       List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)),
-      timestamp,
-      Set.of()
+      timestamp
     );
     OjpToTriasTransformer.transform(ojp, new PrintWriter(System.out));
   }
