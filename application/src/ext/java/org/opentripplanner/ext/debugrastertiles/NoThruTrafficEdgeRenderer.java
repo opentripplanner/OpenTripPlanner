@@ -60,4 +60,9 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
   public Optional<VertexVisualAttributes> renderVertex(Vertex v) {
     return Optional.empty();
   }
+
+  @Override
+  public String getName() {
+    return "No thru traffic";
+  }
 }

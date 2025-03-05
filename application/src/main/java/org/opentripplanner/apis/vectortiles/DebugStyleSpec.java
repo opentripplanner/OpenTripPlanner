@@ -88,7 +88,8 @@ public class DebugStyleSpec {
   };
   private static final String EDGES_GROUP = "Edges";
   private static final String ELEVATION_GROUP = "Elevation";
-  private static final String SAFETY_GROUP = "Safety";
+  private static final String WALK_SAFETY_GROUP = "Walk safety";
+  private static final String BICYCLE_SAFETY_GROUP = "Bicycle safety";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
   private static final String PERMISSIONS_GROUP = "Permissions";
@@ -134,7 +135,8 @@ public class DebugStyleSpec {
         backgroundLayers(extraRasterSources),
         wheelchair(edges),
         noThruTraffic(edges),
-        safety(edges),
+        bicycleSafety(edges),
+        walkSafety(edges),
         traversalPermissions(edges),
         edges(edges),
         elevation(edges, vertices),
@@ -300,10 +302,10 @@ public class DebugStyleSpec {
     );
   }
 
-  private static List<StyleBuilder> safety(VectorSourceLayer edges) {
+  private static List<StyleBuilder> bicycleSafety(VectorSourceLayer edges) {
     return List.of(
       StyleBuilder.ofId("bicycle-safety")
-        .group(SAFETY_GROUP)
+        .group(BICYCLE_SAFETY_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
         .log2LineColorFromProperty("bicycleSafetyFactor", 80)
@@ -313,8 +315,23 @@ public class DebugStyleSpec {
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
+      StyleBuilder.ofId("bicycle-safety-text")
+        .vectorSourceLayer(edges)
+        .group(BICYCLE_SAFETY_GROUP)
+        .typeSymbol()
+        .lineText("bicycleSafetyFactor")
+        .textOffset(1)
+        .edgeFilter(EDGES_TO_DISPLAY)
+        .minZoom(17)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> walkSafety(VectorSourceLayer edges) {
+    return List.of(
       StyleBuilder.ofId("walk-safety")
-        .group(SAFETY_GROUP)
+        .group(WALK_SAFETY_GROUP)
         .typeLine()
         .vectorSourceLayer(edges)
         .log2LineColorFromProperty("walkSafetyFactor", 80)
@@ -324,19 +341,9 @@ public class DebugStyleSpec {
         .minZoom(6)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden(),
-      StyleBuilder.ofId("bicycle-safety-text")
-        .vectorSourceLayer(edges)
-        .group(SAFETY_GROUP)
-        .typeSymbol()
-        .lineText("bicycleSafetyFactor")
-        .textOffset(1)
-        .edgeFilter(EDGES_TO_DISPLAY)
-        .minZoom(17)
-        .maxZoom(MAX_ZOOM)
-        .intiallyHidden(),
       StyleBuilder.ofId("walk-safety-text")
         .vectorSourceLayer(edges)
-        .group(SAFETY_GROUP)
+        .group(WALK_SAFETY_GROUP)
         .typeSymbol()
         .lineText("walkSafetyFactor")
         .textOffset(1)
