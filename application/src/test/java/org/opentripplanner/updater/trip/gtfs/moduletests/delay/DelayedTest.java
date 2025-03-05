@@ -3,12 +3,15 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.delay;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
@@ -22,6 +25,7 @@ class DelayedTest implements RealtimeTestConstants {
 
   private static final int DELAY = 1;
   private static final int STOP_SEQUENCE = 1;
+  private static final FeedScopedId TRIP_ID = id(TRIP_1_ID);
 
   @Test
   void singleStopDelay() {
@@ -40,21 +44,17 @@ class DelayedTest implements RealtimeTestConstants {
     assertEquals(1, result.successful());
 
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
-    int trip1Index = pattern1.getScheduledTimetable().getTripIndex(id(TRIP_1_ID));
 
     var snapshot = env.getTimetableSnapshot();
     var trip1Realtime = snapshot.resolve(pattern1, SERVICE_DATE);
     var trip1Scheduled = snapshot.resolve(pattern1, null);
 
     assertNotSame(trip1Realtime, trip1Scheduled);
-    assertNotSame(trip1Realtime.getTripTimes(trip1Index), trip1Scheduled.getTripTimes(trip1Index));
-    assertEquals(DELAY, trip1Realtime.getTripTimes(trip1Index).getArrivalDelay(STOP_SEQUENCE));
-    assertEquals(DELAY, trip1Realtime.getTripTimes(trip1Index).getDepartureDelay(STOP_SEQUENCE));
+    assertNotSame(trip1Realtime.getTripTimes(TRIP_ID), trip1Scheduled.getTripTimes(TRIP_ID));
+    assertEquals(DELAY, trip1Realtime.getTripTimes(TRIP_ID).getArrivalDelay(STOP_SEQUENCE));
+    assertEquals(DELAY, trip1Realtime.getTripTimes(TRIP_ID).getDepartureDelay(STOP_SEQUENCE));
 
-    assertEquals(
-      RealTimeState.SCHEDULED,
-      trip1Scheduled.getTripTimes(trip1Index).getRealTimeState()
-    );
+    assertEquals(RealTimeState.SCHEDULED, trip1Scheduled.getTripTimes(TRIP_ID).getRealTimeState());
 
     assertEquals(
       "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
@@ -96,25 +96,16 @@ class DelayedTest implements RealtimeTestConstants {
 
     assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 
-    final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(TRIP_2_ID);
-    assertTrue(
-      originalTripIndexScheduled > -1,
-      "Original trip should be found in scheduled time table"
-    );
-    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
-      originalTripIndexScheduled
-    );
+    var tripTimes = originalTimetableScheduled.getTripTimes(id(TRIP_2_ID));
+    assertNotNull(tripTimes, "Original trip should be found in scheduled time table");
     assertFalse(
-      originalTripTimesScheduled.isCanceledOrDeleted(),
+      tripTimes.isCanceledOrDeleted(),
       "Original trip times should not be canceled in scheduled time table"
     );
-    assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
+    assertEquals(RealTimeState.SCHEDULED, tripTimes.getRealTimeState());
 
-    final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(TRIP_2_ID);
-    assertTrue(
-      originalTripIndexForToday > -1,
-      "Original trip should be found in time table for service date"
-    );
+    var realtimeTt = originalTimetableForToday.getTripTimes(id(TRIP_2_ID));
+    assertNotNull(realtimeTt, "Original trip should be found in time table for service date");
 
     assertEquals(
       "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",

@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.cancellation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
@@ -45,8 +46,6 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
       .build();
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
-    final int tripIndex1 = pattern1.getScheduledTimetable().getTripIndex(id(TRIP_1_ID));
-
     var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, TIME_ZONE).build();
     assertSuccess(env.applyTripUpdate(update));
 
@@ -54,9 +53,9 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
     var forToday = snapshot.resolve(pattern1, SERVICE_DATE);
     var schedule = snapshot.resolve(pattern1, null);
     assertNotSame(forToday, schedule);
-    assertNotSame(forToday.getTripTimes(tripIndex1), schedule.getTripTimes(tripIndex1));
+    assertNotSame(forToday.getTripTimes(id(TRIP_1_ID)), schedule.getTripTimes(id(TRIP_1_ID)));
 
-    var tripTimes = forToday.getTripTimes(tripIndex1);
+    var tripTimes = forToday.getTripTimes(id(TRIP_1_ID));
 
     assertEquals(state, tripTimes.getRealTimeState());
     assertTrue(tripTimes.isCanceledOrDeleted());
@@ -107,14 +106,14 @@ public class CancellationDeletionTest implements RealtimeTestConstants {
 
     assertNotSame(forToday, schedule);
 
-    final int forTodayAddedTripIndex = forToday.getTripIndex(addedTripId);
-    assertTrue(
-      forTodayAddedTripIndex > -1,
+    var realtimeTripTimes = forToday.getTripTimes(id(addedTripId));
+    assertNotNull(
+      realtimeTripTimes,
       "Added trip should be found in time table for the service date"
     );
-    assertEquals(state, forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState());
+    assertEquals(state, realtimeTripTimes.getRealTimeState());
 
-    final int scheduleTripIndex = schedule.getTripIndex(addedTripId);
-    assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
+    var scheduledTripTimes = schedule.getTripTimes(id(addedTripId));
+    assertNull(scheduledTripTimes, "Added trip should not be found in scheduled time table");
   }
 }

@@ -27,8 +27,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // TODO OTP2 instances of this class are still mutable after construction with a builder, this will be refactored in a subsequent step
 /**
@@ -57,8 +55,6 @@ import org.slf4j.LoggerFactory;
 public final class TripPattern
   extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
   implements Cloneable, LogInfo {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private final Route route;
 

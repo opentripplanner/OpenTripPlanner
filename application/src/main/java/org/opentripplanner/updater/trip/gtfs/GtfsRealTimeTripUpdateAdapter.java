@@ -935,17 +935,15 @@ public class GtfsRealTimeTripUpdateAdapter {
     if (pattern != null) {
       // Cancel scheduled trip times for this trip in this pattern
       final Timetable timetable = pattern.getScheduledTimetable();
-      final int tripIndex = timetable.getTripIndex(tripId);
-      if (tripIndex == -1) {
+      var tripTimes = timetable.getTripTimes(tripId);
+      if (tripTimes == null) {
         debug(
           tripId,
           serviceDate,
           "Could not cancel scheduled trip because it's not in the timetable"
         );
       } else {
-        final RealTimeTripTimes newTripTimes = timetable
-          .getTripTimes(tripIndex)
-          .copyScheduledTimes();
+        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         switch (cancelationType) {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
@@ -981,13 +979,11 @@ public class GtfsRealTimeTripUpdateAdapter {
     if (isPreviouslyAddedTrip(tripId, pattern, serviceDate)) {
       // Cancel trip times for this trip in this pattern
       final Timetable timetable = snapshotManager.resolve(pattern, serviceDate);
-      final int tripIndex = timetable.getTripIndex(tripId);
-      if (tripIndex == -1) {
+      var tripTimes = timetable.getTripTimes(tripId);
+      if (tripTimes == null) {
         debug(tripId, serviceDate, "Could not cancel previously added trip on {}", serviceDate);
       } else {
-        final RealTimeTripTimes newTripTimes = timetable
-          .getTripTimes(tripIndex)
-          .copyScheduledTimes();
+        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         switch (cancelationType) {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();

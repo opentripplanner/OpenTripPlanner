@@ -74,7 +74,8 @@ class RealtimeResolverTest {
       .asScheduledTransitLeg()
       .getTripPattern()
       .getScheduledTimetable()
-      .getTripTimes(0)
+      .getTripTimes()
+      .getFirst()
       .getArrivalDelay(1);
     assertEquals(123, leg1ArrivalDelay);
     assertEquals(0, legs.get(0).getTransitAlerts().size());
@@ -128,7 +129,7 @@ class RealtimeResolverTest {
   private static TripPattern delay(TripPattern pattern1, int seconds) {
     var originalTimeTable = pattern1.getScheduledTimetable();
 
-    var delayedTripTimes = delay(originalTimeTable.getTripTimes(0), seconds);
+    var delayedTripTimes = delay(originalTimeTable.getTripTimes().getFirst(), seconds);
     var delayedTimetable = Timetable.of()
       .withTripPattern(pattern1)
       .addTripTimes(delayedTripTimes)
@@ -166,7 +167,7 @@ class RealtimeResolverTest {
     patterns.forEach(pattern -> {
       timetableRepository.addTripPattern(pattern.getId(), pattern);
 
-      var serviceCode = pattern.getScheduledTimetable().getTripTimes(0).getServiceCode();
+      var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
       timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
 
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
