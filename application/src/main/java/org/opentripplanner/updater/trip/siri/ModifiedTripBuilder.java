@@ -182,7 +182,6 @@ class ModifiedTripBuilder {
    * Full cancellation of a trip.
    */
   private Result<TripUpdate, UpdateError> cancelTrip(RealTimeTripTimes newTimes) {
-    LOG.debug("Trip is cancelled");
     newTimes.cancelTrip();
     return Result.success(
       new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
