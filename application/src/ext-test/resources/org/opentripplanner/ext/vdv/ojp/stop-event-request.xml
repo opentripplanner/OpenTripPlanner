@@ -39,6 +39,7 @@
                     <ojp:StopEventType>departure</ojp:StopEventType>
                     <ojp:IncludePreviousCalls>true</ojp:IncludePreviousCalls>
                     <ojp:IncludeOnwardCalls>true</ojp:IncludeOnwardCalls>
+                    <ojp:UseRealtimeData>full</ojp:UseRealtimeData>
                 </ojp:Params>
             </ojp:OJPStopEventRequest>
         </siri:ServiceRequest>

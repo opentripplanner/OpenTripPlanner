@@ -29,7 +29,6 @@ import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
 import org.opentripplanner.ext.vdv.ojp.OjpService;
 import org.opentripplanner.ext.vdv.ojp.mapping.ErrorMapper;
 import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
@@ -54,10 +53,7 @@ public class TriasResource {
     var vdvService = new VdvService(context.transitService(), context.graphFinder());
 
     IdResolver idResolver = idResolver(context.triasApiConfig());
-    var mapper = new StopEventResponseMapper(zoneId, idResolver, feedId ->
-      Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang)
-    );
-    this.ojpService = new OjpService(vdvService, idResolver, mapper, zoneId);
+    this.ojpService = new OjpService(vdvService, idResolver, zoneId);
   }
 
   private IdResolver idResolver(TriasApiConfig triasApiConfig) {

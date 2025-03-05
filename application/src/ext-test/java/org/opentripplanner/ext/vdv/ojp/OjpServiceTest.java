@@ -15,12 +15,10 @@ import de.vdv.ojp20.siri.LineDirectionStructure;
 import de.vdv.ojp20.siri.LineRefStructure;
 import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
-import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.rutebanken.time.XmlDateTime;
 
@@ -28,12 +26,7 @@ class OjpServiceTest {
 
   private static final ZonedDateTime ZDT = ZonedDateTime.parse("2025-02-17T14:24:02+01:00");
   private static final UseFeedIdResolver ID_RESOLVER = new UseFeedIdResolver();
-  private static final OjpService SERVICE = new OjpService(
-    null,
-    ID_RESOLVER,
-    new StopEventResponseMapper(ZoneIds.BERLIN, ID_RESOLVER, l -> Optional.of("de")),
-    ZoneIds.BERLIN
-  );
+  private static final OjpService SERVICE = new OjpService(null, ID_RESOLVER, ZoneIds.BERLIN);
 
   private static final FeedScopedId LINE_ID = id("line1");
   private static final FeedScopedId AGENCY_ID = id("line1");

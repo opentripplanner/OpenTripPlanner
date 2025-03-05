@@ -81,9 +81,18 @@
                   </xsl:element>
                 </xsl:if>
                 <xsl:if test="//trias:IncludeRealtimeData">
-                  <xsl:element name="IncludeRealtimeData">
-                    <xsl:value-of select="//trias:IncludeRealtimeData"/>
-                  </xsl:element>
+                  <xsl:choose>
+                    <xsl:when test="//trias:IncludeRealtimeData='true'">
+                      <xsl:element name="UseRealtimeData">
+                        <xsl:text>full</xsl:text>
+                      </xsl:element>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:element name="UseRealtimeData">
+                        <xsl:text>none</xsl:text>
+                      </xsl:element>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </xsl:if>
                 <xsl:if test="//trias:TimeWindow">
                   <xsl:element name="TimeWindow">

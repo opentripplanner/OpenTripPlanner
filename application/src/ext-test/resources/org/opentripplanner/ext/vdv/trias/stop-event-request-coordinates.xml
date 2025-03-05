@@ -21,7 +21,7 @@
                     <StopEventType>departure</StopEventType>
                     <IncludePreviousCalls>true</IncludePreviousCalls>
                     <IncludeOnwardCalls>true</IncludeOnwardCalls>
-                    <IncludeRealtimeData>true</IncludeRealtimeData>
+                    <IncludeRealtimeData>false</IncludeRealtimeData>
                 </Params>
             </StopEventRequest>
         </RequestPayload>
