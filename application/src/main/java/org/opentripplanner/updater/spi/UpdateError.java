@@ -49,6 +49,7 @@ public record UpdateError(
     NO_UPDATES,
     NO_TRIP_ID,
     TOO_FEW_STOPS,
+    TOO_MANY_STOPS,
     NO_VALID_STOPS,
     // the stop cannot be found in the site repository
     UNKNOWN_STOP,

@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.siri;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.STOP_MISMATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_MANY_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
@@ -107,8 +108,12 @@ class ModifiedTripBuilder {
       return cancelTrip(newTimes);
     }
 
-    if (calls.size() < 2) {
+    if (calls.size() < existingTripTimes.getNumStops()) {
       return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
+    }
+
+    if (calls.size() > existingTripTimes.getNumStops()) {
+      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_MANY_STOPS, dataSource);
     }
 
     var result = createStopPattern(pattern, calls, entityResolver);
