@@ -56,7 +56,7 @@ public class VdvService {
     StopEventRequestParams params
   ) {
     var calls = finder
-      .findClosestStops(coordinate.asJtsCoordinate(), 1000)
+      .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
       .stream()
       .flatMap(nearbyStop ->
         this.findTripTimesOnDate(nearbyStop.stop, params)
@@ -108,6 +108,7 @@ public class VdvService {
     Instant time,
     ArrivalDeparture arrivalDeparture,
     Duration timeWindow,
+    int maximumWalkDistance,
     int numDepartures,
     Set<FeedScopedId> includedAgencies,
     Set<FeedScopedId> includedRoutes,
