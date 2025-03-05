@@ -3,6 +3,7 @@ package org.opentripplanner.ext.vdv.ojp;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
 import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
+import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
 
 import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.ModeFilterStructure;
@@ -13,6 +14,7 @@ import de.vdv.ojp20.PlaceContextStructure;
 import de.vdv.ojp20.PlaceRefStructure;
 import de.vdv.ojp20.StopEventParamStructure;
 import de.vdv.ojp20.StopEventTypeEnumeration;
+import de.vdv.ojp20.UseRealtimeDataEnumeration;
 import de.vdv.ojp20.siri.StopPointRefStructure;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -38,18 +40,11 @@ public class OjpService {
   private static final Duration DEFAULT_TIME_WINDOW = Duration.ofHours(2);
   private final VdvService vdvService;
   private final IdResolver idResolver;
-  private final StopEventResponseMapper mapper;
   private final ZoneId zoneId;
 
-  public OjpService(
-    VdvService vdvService,
-    IdResolver idResolver,
-    StopEventResponseMapper mapper,
-    ZoneId zoneId
-  ) {
+  public OjpService(VdvService vdvService, IdResolver idResolver, ZoneId zoneId) {
     this.vdvService = vdvService;
     this.idResolver = idResolver;
-    this.mapper = mapper;
     this.zoneId = zoneId;
   }
 
@@ -65,12 +60,14 @@ public class OjpService {
     } else if (coordinate.isPresent()) {
       callsAtStop = vdvService.findTripTimesOnDate(coordinate.get(), params);
     }
-
-    return mapper.mapStopTimesInPattern(
-      callsAtStop,
-      ZonedDateTime.now(),
-      mapOptionalFeatures(ser.getParams())
+    var optional = mapOptionalFeatures(ser.getParams());
+    var mapper = new StopEventResponseMapper(
+      optional,
+      zoneId,
+      idResolver,
+      vdvService::resolveLanguage
     );
+    return mapper.mapStopTimesInPattern(callsAtStop, ZonedDateTime.now());
   }
 
   protected VdvService.StopEventRequestParams extractStopEventParams(
@@ -176,6 +173,9 @@ public class OjpService {
     }
     if (TRUE.equals(params.isIncludeOnwardCalls())) {
       res.add(ONWARD_CALLS);
+    }
+    if (UseRealtimeDataEnumeration.NONE != params.getUseRealtimeData()) {
+      res.add(REALTIME_DATA);
     }
     return res;
   }

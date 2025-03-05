@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.vdv.ojp.mapping;
 
+import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
+
 import de.vdv.ojp20.CallAtNearStopStructure;
 import de.vdv.ojp20.CallAtStopStructure;
 import de.vdv.ojp20.DatedJourneyStructure;
@@ -48,29 +50,29 @@ public class StopEventResponseMapper {
   public enum OptionalFeature {
     PREVIOUS_CALLS,
     ONWARD_CALLS,
+    REALTIME_DATA,
   }
 
   private static final String OJP_NAMESPACE = "http://www.vdv.de/ojp";
+  private final Set<OptionalFeature> optionalFeatures;
   private final ZoneId zoneId;
 
   public StopEventResponseMapper(
+    Set<OptionalFeature> optionalFeatures,
     ZoneId zoneId,
     IdResolver idResolver,
     Function<String, Optional<String>> resolveFeedLanguage
   ) {
+    this.optionalFeatures = optionalFeatures;
     this.zoneId = zoneId;
     this.idResolver = idResolver;
     this.resolveFeedLanguage = resolveFeedLanguage;
   }
 
-  public OJP mapStopTimesInPattern(
-    List<CallAtStop> tripTimesOnDate,
-    ZonedDateTime timestamp,
-    Set<OptionalFeature> optionalFeatures
-  ) {
+  public OJP mapStopTimesInPattern(List<CallAtStop> tripTimesOnDate, ZonedDateTime timestamp) {
     List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
       .stream()
-      .map(call -> this.stopEventResult(call, optionalFeatures))
+      .map(call -> this.stopEventResult(call))
       .map(StopEventResponseMapper::jaxbElement)
       .toList();
 
@@ -85,7 +87,7 @@ public class StopEventResponseMapper {
     return new OJP().withOJPResponse(response);
   }
 
-  private StopEventResultStructure stopEventResult(CallAtStop call, Set<OptionalFeature> features) {
+  private StopEventResultStructure stopEventResult(CallAtStop call) {
     var callAtNearStop = new CallAtNearStopStructure()
       .withCallAtStop(callAtStop(call.tripTimeOnDate()))
       .withWalkDuration(call.walkTime());
@@ -93,13 +95,13 @@ public class StopEventResponseMapper {
     var stopEvent = new StopEventStructure()
       .withThisCall(callAtNearStop)
       .withService(datedJourney(call.tripTimeOnDate()));
-    if (features.contains(OptionalFeature.PREVIOUS_CALLS)) {
+    if (optionalFeatures.contains(OptionalFeature.PREVIOUS_CALLS)) {
       call
         .tripTimeOnDate()
         .previousTimes()
         .forEach(previous -> stopEvent.withPreviousCall(callAtNearStop(previous)));
     }
-    if (features.contains(OptionalFeature.ONWARD_CALLS)) {
+    if (optionalFeatures.contains(OptionalFeature.ONWARD_CALLS)) {
       call
         .tripTimeOnDate()
         .nextTimes()
@@ -179,6 +181,7 @@ public class StopEventResponseMapper {
       .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledDepartureAt(zoneId)));
     tripTimeOnDate
       .realtimeDepartureAt(zoneId)
+      .filter(d -> optionalFeatures.contains(REALTIME_DATA))
       .ifPresent(time -> departure.withEstimatedTime(new XmlDateTime(time)));
     return departure;
   }
@@ -189,6 +192,7 @@ public class StopEventResponseMapper {
 
     tripTimeOnDate
       .realtimeArrivalAt(zoneId)
+      .filter(d -> optionalFeatures.contains(REALTIME_DATA))
       .ifPresent(time -> arrival.withEstimatedTime(new XmlDateTime(time)));
     return arrival;
   }

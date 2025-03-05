@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.model.FilterValues;
@@ -28,6 +30,10 @@ public class VdvService {
   public VdvService(TransitService transitService, GraphFinder finder) {
     this.transitService = transitService;
     this.finder = finder;
+  }
+
+  public Optional<String> resolveLanguage(String feedId) {
+    return Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang);
   }
 
   public List<CallAtStop> findTripTimesOnDate(FeedScopedId stopId, StopEventRequestParams params)
