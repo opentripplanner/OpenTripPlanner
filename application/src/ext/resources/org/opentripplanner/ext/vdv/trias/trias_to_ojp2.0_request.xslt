@@ -58,6 +58,16 @@
                     <xsl:value-of select="//trias:DepArrTime"/>
                   </xsl:element>
                 </xsl:if>
+                <xsl:if test="//trias:IndividualTransportOptions">
+                  <IndividualTransportOption>
+                    <ItModeAndModeOfOperation>
+                      <PersonalMode>foot</PersonalMode>
+                    </ItModeAndModeOfOperation>
+                    <MaxDistance>
+                      <xsl:value-of select="//trias:MaxDistance"/>
+                    </MaxDistance>
+                  </IndividualTransportOption>
+                </xsl:if>
               </Location>
               <Params>
                 <xsl:if test="//trias:NumberOfResults">

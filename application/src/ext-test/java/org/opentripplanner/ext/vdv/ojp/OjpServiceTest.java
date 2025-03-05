@@ -6,14 +6,18 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
+import de.vdv.ojp20.IndividualTransportOptionStructure;
+import de.vdv.ojp20.ItModesStructure;
 import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.ModeFilterStructure;
 import de.vdv.ojp20.OJPStopEventRequestStructure;
+import de.vdv.ojp20.PersonalModesEnumeration;
 import de.vdv.ojp20.PlaceContextStructure;
 import de.vdv.ojp20.StopEventParamStructure;
 import de.vdv.ojp20.siri.LineDirectionStructure;
 import de.vdv.ojp20.siri.LineRefStructure;
 import de.vdv.ojp20.siri.VehicleModesOfTransportEnumeration;
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -29,7 +33,6 @@ class OjpServiceTest {
   private static final OjpService SERVICE = new OjpService(null, ID_RESOLVER, ZoneIds.BERLIN);
 
   private static final FeedScopedId LINE_ID = id("line1");
-  private static final FeedScopedId AGENCY_ID = id("line1");
 
   @Test
   void defaultCase() {
@@ -40,6 +43,35 @@ class OjpServiceTest {
     assertThat(params.excludedAgencies()).isEmpty();
     assertThat(params.includedModes()).isEmpty();
     assertThat(params.excludedModes()).isEmpty();
+    assertEquals(OjpService.DEFAULT_RADIUS_METERS, params.maximumWalkDistance());
+    assertEquals(OjpService.DEFAULT_NUM_DEPARTURES, params.numDepartures());
+  }
+
+  @Test
+  void maxDistance() {
+    var params = SERVICE.extractStopEventParams(
+      new OJPStopEventRequestStructure()
+        .withLocation(
+          new PlaceContextStructure()
+            .withDepArrTime(new XmlDateTime(ZDT))
+            .withIndividualTransportOption(
+              new IndividualTransportOptionStructure()
+                .withItModeAndModeOfOperation(
+                  new ItModesStructure().withPersonalMode(PersonalModesEnumeration.FOOT)
+                )
+                .withMaxDistance(BigInteger.TEN)
+            )
+        )
+    );
+    assertEquals(10, params.maximumWalkDistance());
+  }
+
+  @Test
+  void numDepartures() {
+    var params = SERVICE.extractStopEventParams(
+      stopEvent(new StopEventParamStructure().withNumberOfResults(BigInteger.TWO))
+    );
+    assertEquals(2, params.numDepartures());
   }
 
   @Test

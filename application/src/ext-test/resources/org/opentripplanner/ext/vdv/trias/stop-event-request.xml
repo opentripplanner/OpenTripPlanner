@@ -10,6 +10,10 @@
                         <StopPointRef>8507000</StopPointRef>
                     </LocationRef>
                     <DepArrTime>2025-02-13T13:03:36</DepArrTime>
+                    <IndividualTransportOptions>
+                        <Mode>walk</Mode>
+                        <MaxDistance>999</MaxDistance>
+                    </IndividualTransportOptions>
                 </Location>
                 <Params>
                     <PtModeFilter>

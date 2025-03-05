@@ -12,6 +12,12 @@
                         <siri:StopPointRef>8507000</siri:StopPointRef>
                     </ojp:PlaceRef>
                     <ojp:DepArrTime>2025-02-13T13:03:36</ojp:DepArrTime>
+                    <ojp:IndividualTransportOption>
+                        <ojp:ItModeAndModeOfOperation>
+                            <ojp:PersonalMode>foot</ojp:PersonalMode>
+                        </ojp:ItModeAndModeOfOperation>
+                        <ojp:MaxDistance>999</ojp:MaxDistance>
+                    </ojp:IndividualTransportOption>
                 </ojp:Location>
                 <ojp:Params>
                     <ojp:ModeFilter>

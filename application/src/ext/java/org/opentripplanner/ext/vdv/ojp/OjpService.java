@@ -10,12 +10,14 @@ import de.vdv.ojp20.ModeFilterStructure;
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPStopEventRequestStructure;
 import de.vdv.ojp20.OperatorFilterStructure;
+import de.vdv.ojp20.PersonalModesEnumeration;
 import de.vdv.ojp20.PlaceContextStructure;
 import de.vdv.ojp20.PlaceRefStructure;
 import de.vdv.ojp20.StopEventParamStructure;
 import de.vdv.ojp20.StopEventTypeEnumeration;
 import de.vdv.ojp20.UseRealtimeDataEnumeration;
 import de.vdv.ojp20.siri.StopPointRefStructure;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,6 +39,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class OjpService {
 
+  public static final int DEFAULT_RADIUS_METERS = 1000;
+  public static final int DEFAULT_NUM_DEPARTURES = 1;
   private static final Duration DEFAULT_TIME_WINDOW = Duration.ofHours(2);
   private final VdvService vdvService;
   private final IdResolver idResolver;
@@ -76,7 +80,10 @@ public class OjpService {
     var time = Optional.ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId)).orElse(
       ZonedDateTime.now(zoneId)
     );
-    int numResults = params(ser).map(s -> s.getNumberOfResults()).map(i -> i.intValue()).orElse(1);
+    int numResults = params(ser)
+      .map(s -> s.getNumberOfResults())
+      .map(i -> i.intValue())
+      .orElse(DEFAULT_NUM_DEPARTURES);
 
     var arrivalDeparture = arrivalDeparture(ser);
     var timeWindow = timeWindow(ser);
@@ -86,11 +93,25 @@ public class OjpService {
     Set<FeedScopedId> excludedRoutes = lineFilter(ser, f -> isExclude(f.isExclude()));
     Set<TransitMode> includedModes = modeFilter(ser, m -> !isExclude(m.isExclude()));
     Set<TransitMode> excludedModes = modeFilter(ser, m -> isExclude(m.isExclude()));
+    int maxWalkDistance = Optional.ofNullable(ser.getLocation())
+      .flatMap(l ->
+        l
+          .getIndividualTransportOption()
+          .stream()
+          .filter(
+            o -> o.getItModeAndModeOfOperation().getPersonalMode() == PersonalModesEnumeration.FOOT
+          )
+          .findFirst()
+          .flatMap(o -> Optional.ofNullable(o.getMaxDistance()))
+      )
+      .map(BigInteger::intValue)
+      .orElse(DEFAULT_RADIUS_METERS);
 
     return new VdvService.StopEventRequestParams(
       time.toInstant(),
       arrivalDeparture,
       timeWindow,
+      maxWalkDistance,
       numResults,
       selectedAgencies,
       selectedRoutes,
