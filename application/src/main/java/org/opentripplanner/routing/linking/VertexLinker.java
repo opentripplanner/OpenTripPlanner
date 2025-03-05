@@ -322,7 +322,7 @@ public class VertexLinker {
     Set<AreaGroup> linkedAreas = new HashSet<>();
     return closestEdges
       .stream()
-      .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
+      .map(ce -> snapAndLink(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
       .filter(Objects::nonNull)
       .collect(Collectors.toSet());
   }
@@ -383,7 +383,7 @@ public class VertexLinker {
   }
 
   /* Snap a vertex to and edge if necessary, create required linking and return the applied entry vertex */
-  private StreetVertex link(
+  private StreetVertex snapAndLink(
     Vertex vertex,
     StreetEdge edge,
     double xScale,
@@ -675,7 +675,7 @@ public class VertexLinker {
     return modes;
   }
 
-  /* Check if and edge candiate does not cross the area boundary and add it if it does not */
+  /* Check if an edge candiate does not cross the area boundary and add it if it does not */
   private boolean addVisibilityEdges(
     IntersectionVertex from,
     IntersectionVertex to,
