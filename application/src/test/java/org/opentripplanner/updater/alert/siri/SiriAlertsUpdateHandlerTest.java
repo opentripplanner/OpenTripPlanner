@@ -91,8 +91,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     }
     if (alertsUpdateHandler == null) {
       transitAlertService = new TransitAlertServiceImpl(timetableRepository);
-      alertsUpdateHandler =
-        new SiriAlertsUpdateHandler(FEED_ID, transitAlertService, Duration.ZERO);
+      alertsUpdateHandler = new SiriAlertsUpdateHandler(
+        FEED_ID,
+        transitAlertService,
+        Duration.ZERO
+      );
     }
   }
 
@@ -650,13 +653,12 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     assertTrue(matchesEntity(transitAlert, lineRef));
     assertEquals(situationNumber, transitAlert.getId().getId());
 
-    ptSituation =
-      createPtSituationElement(
-        situationNumber,
-        startTime,
-        endTime,
-        createAffectsLine(lineRef.getId(), null)
-      );
+    ptSituation = createPtSituationElement(
+      situationNumber,
+      startTime,
+      endTime,
+      createAffectsLine(lineRef.getId(), null)
+    );
 
     ptSituation.setProgress(WorkflowStatusEnumeration.CLOSED);
 
@@ -876,7 +878,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     PtSituationElement element = new PtSituationElement();
     element.setCreationTime(ZonedDateTime.now());
     element.setProgress(WorkflowStatusEnumeration.OPEN);
-    if (startTime != null | endTime != null) {
+    if ((startTime != null) | (endTime != null)) {
       HalfOpenTimestampOutputRangeStructure period = new HalfOpenTimestampOutputRangeStructure();
 
       if (startTime != null) {
@@ -960,7 +962,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
   private ServiceDelivery createServiceDelivery(List<PtSituationElement> situationElement) {
     ServiceDelivery delivery = new ServiceDelivery();
     SituationExchangeDeliveryStructure sxDeliveries = new SituationExchangeDeliveryStructure();
-    SituationExchangeDeliveryStructure.Situations situations = new SituationExchangeDeliveryStructure.Situations();
+    SituationExchangeDeliveryStructure.Situations situations =
+      new SituationExchangeDeliveryStructure.Situations();
     situations.getPtSituationElements().addAll(situationElement);
     sxDeliveries.setSituations(situations);
     delivery.getSituationExchangeDeliveries().add(sxDeliveries);
@@ -1026,9 +1029,11 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     String... stopIds
   ) {
     AffectsScopeStructure affects = new AffectsScopeStructure();
-    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
+    AffectsScopeStructure.VehicleJourneys vehicleJourneys =
+      new AffectsScopeStructure.VehicleJourneys();
     AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
-    FramedVehicleJourneyRefStructure framedVehicleJourneyRef = new FramedVehicleJourneyRefStructure();
+    FramedVehicleJourneyRefStructure framedVehicleJourneyRef =
+      new FramedVehicleJourneyRefStructure();
     framedVehicleJourneyRef.setDatedVehicleJourneyRef(datedVehicleJourney);
     if (dataFrameValue != null) {
       DataFrameRefStructure dataFrameRef = new DataFrameRefStructure();
@@ -1068,7 +1073,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     String... stopIds
   ) {
     AffectsScopeStructure affects = new AffectsScopeStructure();
-    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
+    AffectsScopeStructure.VehicleJourneys vehicleJourneys =
+      new AffectsScopeStructure.VehicleJourneys();
     AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
 
     VehicleJourneyRef vehicleJourney = new VehicleJourneyRef();
@@ -1094,7 +1100,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     String... stopIds
   ) {
     AffectsScopeStructure affects = new AffectsScopeStructure();
-    AffectsScopeStructure.VehicleJourneys vehicleJourneys = new AffectsScopeStructure.VehicleJourneys();
+    AffectsScopeStructure.VehicleJourneys vehicleJourneys =
+      new AffectsScopeStructure.VehicleJourneys();
     AffectedVehicleJourneyStructure affectedVehicleJourney = new AffectedVehicleJourneyStructure();
 
     DatedVehicleJourneyRef datedVehicleJourney = new DatedVehicleJourneyRef();
@@ -1147,7 +1154,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
-    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork = new AffectsScopeStructure.Networks.AffectedNetwork();
+    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork =
+      new AffectsScopeStructure.Networks.AffectedNetwork();
     AffectedLineStructure affectedLine = new AffectedLineStructure();
     LineRef lineRef = new LineRef();
     lineRef.setValue(line);
@@ -1217,7 +1225,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
-    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork = new AffectsScopeStructure.Networks.AffectedNetwork();
+    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork =
+      new AffectsScopeStructure.Networks.AffectedNetwork();
     AffectedLineStructure affectedLine = new AffectedLineStructure();
     LineRef lineRef = new LineRef();
     lineRef.setValue(line);
@@ -1286,7 +1295,8 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AffectsScopeStructure affects = new AffectsScopeStructure();
 
     AffectsScopeStructure.Networks networks = new AffectsScopeStructure.Networks();
-    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork = new AffectsScopeStructure.Networks.AffectedNetwork();
+    AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork =
+      new AffectsScopeStructure.Networks.AffectedNetwork();
     AffectedLineStructure affectedLine = new AffectedLineStructure();
     LineRef lineRef = new LineRef();
     lineRef.setValue(line);

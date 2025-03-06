@@ -76,10 +76,8 @@ public class SiriAlertsUpdateHandler {
         int expiredCounter = 0;
         for (PtSituationElement sxElement : situations.getPtSituationElements()) {
           boolean expireSituation =
-            (
-              sxElement.getProgress() != null &&
-              sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED)
-            );
+            (sxElement.getProgress() != null &&
+              sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
 
           if (sxElement.getSituationNumber() == null) {
             continue;
@@ -185,8 +183,11 @@ public class SiriAlertsUpdateHandler {
     }
 
     alert.addEntites(
-      new AffectsMapper(feedId, context.siriFuzzyTripMatcher(), context.transitService())
-        .mapAffects(situation.getAffects())
+      new AffectsMapper(
+        feedId,
+        context.siriFuzzyTripMatcher(),
+        context.transitService()
+      ).mapAffects(situation.getAffects())
     );
 
     if (alert.entities().isEmpty()) {
@@ -219,8 +220,7 @@ public class SiriAlertsUpdateHandler {
    * provided in the SIRI PtSituation.
    */
   private TransitAlertBuilder createAlertWithTexts(PtSituationElement situation) {
-    return TransitAlert
-      .of(new FeedScopedId(feedId, situation.getSituationNumber().getValue()))
+    return TransitAlert.of(new FeedScopedId(feedId, situation.getSituationNumber().getValue()))
       .withDescriptionText(mapTranslatedString(situation.getDescriptions()))
       .withDetailText(mapTranslatedString(situation.getDetails()))
       .withAdviceText(mapTranslatedString(situation.getAdvices()))

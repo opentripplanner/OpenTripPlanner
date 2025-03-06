@@ -40,8 +40,9 @@ public class PageCursorFactory {
     Instant lat,
     Duration searchWindow
   ) {
-    this.currentPageType =
-      pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
+    this.currentPageType = pageType == null
+      ? resolvePageTypeForTheFirstSearch(sortOrder)
+      : pageType;
 
     this.currentEdt = edt;
     this.currentLat = lat;
@@ -79,8 +80,7 @@ public class PageCursorFactory {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PageCursorFactory.class)
+    return ToStringBuilder.of(PageCursorFactory.class)
       .addEnum("sortOrder", sortOrder)
       .addEnum("currentPageType", currentPageType)
       .addDateTime("currentEdt", currentEdt)
@@ -130,19 +130,25 @@ public class PageCursorFactory {
       }
     }
     // TODO - insert generalizedCostMaxLimit here
-    prevCursor =
-      new PageCursor(
-        PREVIOUS_PAGE,
-        sortOrder,
-        prevEdt,
-        currentLat,
-        newSearchWindow,
-        itineraryPageCut,
-        null
-      );
+    prevCursor = new PageCursor(
+      PREVIOUS_PAGE,
+      sortOrder,
+      prevEdt,
+      currentLat,
+      newSearchWindow,
+      itineraryPageCut,
+      null
+    );
     // TODO - insert generalizedCostMaxLimit here
-    nextCursor =
-      new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut, null);
+    nextCursor = new PageCursor(
+      NEXT_PAGE,
+      sortOrder,
+      nextEdt,
+      null,
+      newSearchWindow,
+      itineraryPageCut,
+      null
+    );
   }
 
   private Instant edtBeforeNewSw() {

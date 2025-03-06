@@ -11,8 +11,7 @@ import org.opentripplanner.osm.model.OsmEntity;
  */
 public interface OsmSpecifier {
   static Condition[] parseConditions(String spec, String separator) {
-    return Arrays
-      .stream(spec.split(separator))
+    return Arrays.stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");

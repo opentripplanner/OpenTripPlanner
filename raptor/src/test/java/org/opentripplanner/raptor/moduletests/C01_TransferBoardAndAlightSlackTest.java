@@ -38,7 +38,8 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -50,16 +51,16 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
 
     data.withRoute(
       // Pattern arrive at stop 2 at 0:03:00
-      route(pattern("R1", STOP_B, STOP_C))
-        .withTimetable(schedule().departures("00:02:11 00:03:11").arrDepOffset(D10s))
+      route(pattern("R1", STOP_B, STOP_C)).withTimetable(
+        schedule().departures("00:02:11 00:03:11").arrDepOffset(D10s)
+      )
     );
     data.withRoute(
       // earliest-departure-time: 0:03:00 + 10s + 1m + 30s = 0:04:40
-      route(pattern("R2", STOP_C, STOP_D))
-        .withTimetable(
-          schedule().departures("00:04:40 00:05:10").arrDepOffset(D10s), // Missed by 1 second
-          schedule().departures("00:04:41 00:05:11").arrDepOffset(D10s) // Exact match
-        )
+      route(pattern("R2", STOP_C, STOP_D)).withTimetable(
+        schedule().departures("00:04:40 00:05:10").arrDepOffset(D10s), // Missed by 1 second
+        schedule().departures("00:04:41 00:05:11").arrDepOffset(D10s) // Exact match
+      )
     );
     requestBuilder
       .searchParams()
@@ -80,8 +81,7 @@ public class C01_TransferBoardAndAlightSlackTest implements RaptorTestConstants 
       "~ Walk 20s " +
       "[0:01:11 0:05:31 4m20s Tₓ1 C₁1_510]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("4m20s", TX_1, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)

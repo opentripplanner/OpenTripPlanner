@@ -22,7 +22,8 @@ public final class TransferOptimizationPreferences
   private final double backTravelWaitTimeFactor;
   private final double extraStopBoardAlightCostsFactor;
 
-  public static final TransferOptimizationPreferences DEFAULT = new TransferOptimizationPreferences();
+  public static final TransferOptimizationPreferences DEFAULT =
+    new TransferOptimizationPreferences();
 
   private TransferOptimizationPreferences() {
     this.optimizeTransferWaitTime = true;
@@ -35,8 +36,9 @@ public final class TransferOptimizationPreferences
     this.optimizeTransferWaitTime = builder.optimizeTransferWaitTime;
     this.minSafeWaitTimeFactor = Units.reluctance(builder.minSafeWaitTimeFactor);
     this.backTravelWaitTimeFactor = Units.reluctance(builder.backTravelWaitTimeFactor);
-    this.extraStopBoardAlightCostsFactor =
-      Units.reluctance(builder.extraStopBoardAlightCostsFactor);
+    this.extraStopBoardAlightCostsFactor = Units.reluctance(
+      builder.extraStopBoardAlightCostsFactor
+    );
   }
 
   public static Builder of() {
@@ -97,8 +99,7 @@ public final class TransferOptimizationPreferences
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TransferOptimizationPreferences.class)
+    return ToStringBuilder.of(TransferOptimizationPreferences.class)
       .addBoolIfTrue("skipOptimizeWaitTime", !optimizeTransferWaitTime)
       .addNum("minSafeWaitTimeFactor", minSafeWaitTimeFactor, DEFAULT.minSafeWaitTimeFactor)
       .addNum(

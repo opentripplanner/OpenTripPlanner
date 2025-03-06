@@ -41,11 +41,8 @@ class OffsetDateTimeParserTest {
   @ParameterizedTest
   @MethodSource("failedCases")
   void failed(String input) {
-    Assertions.assertThrows(
-      ParseException.class,
-      () -> {
-        OffsetDateTimeParser.parseLeniently(input);
-      }
-    );
+    Assertions.assertThrows(ParseException.class, () -> {
+      OffsetDateTimeParser.parseLeniently(input);
+    });
   }
 }

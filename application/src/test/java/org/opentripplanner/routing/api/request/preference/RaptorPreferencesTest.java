@@ -23,15 +23,13 @@ class RaptorPreferencesTest {
   private static final SearchDirection SEARCH_DIRECTION = SearchDirection.REVERSE;
   private static final RaptorProfile PROFILE = RaptorProfile.STANDARD;
   private static final Set<Optimization> OPTIMIZATIONS = Set.of(Optimization.PARALLEL);
-  private static final Instant TIME_LIMIT = LocalDate
-    .of(2020, Month.JUNE, 9)
+  private static final Instant TIME_LIMIT = LocalDate.of(2020, Month.JUNE, 9)
     .atStartOfDay(ZoneIds.UTC)
     .toInstant();
 
   private static final double RELAX_GENERALIZED_COST_AT_DESTINATION = 1.2;
 
-  private final RaptorPreferences subject = RaptorPreferences
-    .of()
+  private final RaptorPreferences subject = RaptorPreferences.of()
     .withSearchDirection(SEARCH_DIRECTION)
     .withProfile(PROFILE)
     .withOptimizations(OPTIMIZATIONS)
@@ -46,9 +44,8 @@ class RaptorPreferencesTest {
 
   @Test
   void optimizationsShouldNotBeModifiable() {
-    assertThrows(
-      UnsupportedOperationException.class,
-      () -> subject.optimizations().add(Optimization.PARALLEL)
+    assertThrows(UnsupportedOperationException.class, () ->
+      subject.optimizations().add(Optimization.PARALLEL)
     );
   }
 
@@ -94,20 +91,17 @@ class RaptorPreferencesTest {
     );
     assertEquals(
       1.0,
-      RaptorPreferences
-        .of()
+      RaptorPreferences.of()
         .withRelaxGeneralizedCostAtDestination(1.0)
         .build()
         .relaxGeneralizedCostAtDestination()
         .orElseThrow()
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> RaptorPreferences.of().withRelaxGeneralizedCostAtDestination(0.99).build()
+    assertThrows(IllegalArgumentException.class, () ->
+      RaptorPreferences.of().withRelaxGeneralizedCostAtDestination(0.99).build()
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> RaptorPreferences.of().withRelaxGeneralizedCostAtDestination(2.01).build()
+    assertThrows(IllegalArgumentException.class, () ->
+      RaptorPreferences.of().withRelaxGeneralizedCostAtDestination(2.01).build()
     );
   }
 

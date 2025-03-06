@@ -30,7 +30,10 @@ import org.rutebanken.netex.model.WaterSubmodeEnumeration;
 
 class TransportModeMapperTest {
 
-  private static final Map<AllVehicleModesOfTransportEnumeration, TransportSubmodeStructure> VALID_SUBMODE_STRUCTURES = Map.of(
+  private static final Map<
+    AllVehicleModesOfTransportEnumeration,
+    TransportSubmodeStructure
+  > VALID_SUBMODE_STRUCTURES = Map.of(
     AllVehicleModesOfTransportEnumeration.AIR,
     new TransportSubmodeStructure().withAirSubmode(AirSubmodeEnumeration.DOMESTIC_FLIGHT),
     AllVehicleModesOfTransportEnumeration.BUS,
@@ -54,9 +57,8 @@ class TransportModeMapperTest {
       .withWaterSubmode(WaterSubmodeEnumeration.INTERNATIONAL_PASSENGER_FERRY)
   );
 
-  private static final EnumSet<AllVehicleModesOfTransportEnumeration> SUPPORTED_MODES = EnumSet.copyOf(
-    VALID_SUBMODE_STRUCTURES.keySet()
-  );
+  private static final EnumSet<AllVehicleModesOfTransportEnumeration> SUPPORTED_MODES =
+    EnumSet.copyOf(VALID_SUBMODE_STRUCTURES.keySet());
 
   private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
@@ -117,18 +119,15 @@ class TransportModeMapperTest {
 
   @Test
   void unsupportedMode() {
-    EnumSet
-      .complementOf(SUPPORTED_MODES)
-      .forEach(mode -> {
-        assertThrows(UnsupportedModeException.class, () -> transportModeMapper.map(mode, null));
-      });
+    EnumSet.complementOf(SUPPORTED_MODES).forEach(mode -> {
+      assertThrows(UnsupportedModeException.class, () -> transportModeMapper.map(mode, null));
+    });
 
     assertThrows(UnsupportedModeException.class, () -> transportModeMapper.map(null, null));
   }
 
   private static List<Arguments> createSubModeTestCases() {
-    return VALID_SUBMODE_STRUCTURES
-      .entrySet()
+    return VALID_SUBMODE_STRUCTURES.entrySet()
       .stream()
       .map(entry -> Arguments.of(entry.getKey(), entry.getValue()))
       .toList();

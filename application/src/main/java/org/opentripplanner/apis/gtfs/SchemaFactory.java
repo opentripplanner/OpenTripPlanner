@@ -112,8 +112,7 @@ public class SchemaFactory {
       URL url = Objects.requireNonNull(SchemaFactory.class.getResource("schema.graphqls"));
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
-      RuntimeWiring runtimeWiring = RuntimeWiring
-        .newRuntimeWiring()
+      RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
         .scalar(GraphQLScalars.DURATION_SCALAR)
         .scalar(GraphQLScalars.POLYLINE_SCALAR)
         .scalar(GraphQLScalars.GEOJSON_SCALAR)
@@ -128,8 +127,7 @@ public class SchemaFactory {
         .scalar(ExtendedScalars.GraphQLLong)
         .scalar(ExtendedScalars.Locale)
         .scalar(
-          ExtendedScalars
-            .newAliasedScalar("Speed")
+          ExtendedScalars.newAliasedScalar("Speed")
             .aliasedScalar(ExtendedScalars.NonNegativeFloat)
             .build()
         )

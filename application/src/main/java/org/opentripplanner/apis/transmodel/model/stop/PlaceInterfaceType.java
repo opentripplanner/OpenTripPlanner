@@ -13,27 +13,23 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class PlaceInterfaceType {
 
   public static GraphQLInterfaceType create() {
-    return GraphQLInterfaceType
-      .newInterface()
+    return GraphQLInterfaceType.newInterface()
       .name("PlaceInterface")
       .description("Interface for places, i.e. quays, stop places, parks")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
           .build()

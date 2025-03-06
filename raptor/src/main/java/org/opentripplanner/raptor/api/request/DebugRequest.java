@@ -84,8 +84,7 @@ public record DebugRequest(
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DebugRequest.class)
+    return ToStringBuilder.of(DebugRequest.class)
       .addCol("stops", stops)
       .addCol("path", path)
       .addNum("startAtStopIndex", debugPathFromStopIndex, 0)

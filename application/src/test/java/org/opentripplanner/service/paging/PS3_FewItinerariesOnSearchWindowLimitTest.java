@@ -98,8 +98,12 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
 
     if (arriveBy) {
       expectedSortOrder = SortOrder.STREET_AND_DEPARTURE_TIME;
-      driver =
-        model.arriveByDriver(currTime, LATEST_ARRIVAL_TIME, SEARCH_WINDOW, NUM_OF_ITINERARIES);
+      driver = model.arriveByDriver(
+        currTime,
+        LATEST_ARRIVAL_TIME,
+        SEARCH_WINDOW,
+        NUM_OF_ITINERARIES
+      );
     } else {
       expectedSortOrder = SortOrder.STREET_AND_ARRIVAL_TIME;
       driver = model.departAfterDriver(currTime, SEARCH_WINDOW, NUM_OF_ITINERARIES);

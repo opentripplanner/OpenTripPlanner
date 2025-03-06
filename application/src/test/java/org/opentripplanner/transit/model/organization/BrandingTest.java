@@ -18,8 +18,7 @@ public class BrandingTest {
   private static final String DESCRIPTION = "test_description";
   private static final String IMAGE = "test_image";
 
-  Branding subject = Branding
-    .of(TimetableRepositoryForTest.id(ID))
+  Branding subject = Branding.of(TimetableRepositoryForTest.id(ID))
     .withShortName(SHORT_NAME)
     .withName(NAME)
     .withUrl(URL)

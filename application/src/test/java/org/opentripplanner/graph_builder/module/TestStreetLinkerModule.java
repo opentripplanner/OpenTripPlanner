@@ -24,7 +24,6 @@ public class TestStreetLinkerModule {
       timetableRepository,
       DataImportIssueStore.NOOP,
       false
-    )
-      .buildGraph();
+    ).buildGraph();
   }
 }

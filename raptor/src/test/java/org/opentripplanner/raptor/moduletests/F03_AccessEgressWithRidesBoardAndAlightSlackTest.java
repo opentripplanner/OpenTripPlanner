@@ -33,7 +33,8 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -45,18 +46,17 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
 
     data.withRoute(
       // Pattern arrive at stop 2 at 0:03:00
-      route(pattern("R1", STOP_B, STOP_C))
-        .withTimetable(
-          // First trip is too early: It takes 2m to get to the point of boarding:
-          // --> 00:00:00 + flex 30s + slack(1m + 30s) = 00:02:00
-          schedule().departures("0:03:29, 0:05:29"),
-          // This is the trip we expect to board
-          schedule().departures("0:04:00, 0:10:00").arrivals("0, 00:06:00"),
-          // REVERSE SEARCH: The last trip arrives too late: It takes 1m40s to get to the
-          // point of "boarding" in the reverse search:
-          // --> 00:10:00 - (flex 20s + slack(1m + 10s)) = 00:08:30  (arrival time)
-          schedule().arrivals("0:04:51, 0:06:51")
-        )
+      route(pattern("R1", STOP_B, STOP_C)).withTimetable(
+        // First trip is too early: It takes 2m to get to the point of boarding:
+        // --> 00:00:00 + flex 30s + slack(1m + 30s) = 00:02:00
+        schedule().departures("0:03:29, 0:05:29"),
+        // This is the trip we expect to board
+        schedule().departures("0:04:00, 0:10:00").arrivals("0, 00:06:00"),
+        // REVERSE SEARCH: The last trip arrives too late: It takes 1m40s to get to the
+        // point of "boarding" in the reverse search:
+        // --> 00:10:00 - (flex 20s + slack(1m + 10s)) = 00:08:30  (arrival time)
+        schedule().arrivals("0:04:51, 0:06:51")
+      )
     );
     requestBuilder
       .searchParams()
@@ -76,8 +76,7 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
     var path =
       "Flex+Walk 2m 1x ~ B ~ BUS R1 0:04 0:06 ~ C ~ Flex 2m 1x " +
       "[0:00:30 0:09:10 8m40s Tₓ2 C₁1_360]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       // TODO - Alight slack is missing
       //.add(TC_MIN_DURATION, "[0:00 0:08:30 8m30s 2tx]")
       // TODO - Board slack is missing

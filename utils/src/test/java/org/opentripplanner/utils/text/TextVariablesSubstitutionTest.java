@@ -43,9 +43,8 @@ class TextVariablesSubstitutionTest {
     assertEquals("A B", insertVariables("${a} ${b}", map::get, this::errorHandler));
     assertEquals("AB", insertVariables("${ab}", map::get, this::errorHandler));
     assertEquals("AB - A - B", insertVariables("${ab2}", map::get, this::errorHandler));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> insertVariables("${c}", map::get, this::errorHandler)
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      insertVariables("${c}", map::get, this::errorHandler)
     );
     assertEquals("c", ex.getMessage());
   }

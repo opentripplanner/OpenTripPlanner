@@ -2,10 +2,13 @@ package org.opentripplanner.updater.trip.gtfs.moduletests.addition;
 
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.ADDED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
@@ -128,12 +131,10 @@ class AddedTest implements RealtimeTestConstants {
     var snapshot = env.getTimetableSnapshot();
 
     TransitService transitService = env.getTransitService();
-    Trip trip = transitService.getTrip(TimetableRepositoryForTest.id(ADDED_TRIP_ID));
+    Trip trip = transitService.getTrip(id(ADDED_TRIP_ID));
     assertNotNull(trip);
     assertNotNull(transitService.findPattern(trip));
-    assertNotNull(
-      transitService.getTripOnServiceDate(TimetableRepositoryForTest.id(ADDED_TRIP_ID))
-    );
+    assertNotNull(transitService.getTripOnServiceDate(id(ADDED_TRIP_ID)));
 
     var stopA = env.timetableRepository.getSiteRepository().getRegularStop(STOP_A1.getId());
     // Get the trip pattern of the added trip which goes through stopA
@@ -148,18 +149,12 @@ class AddedTest implements RealtimeTestConstants {
 
     assertNotSame(forToday, schedule);
 
-    final int forTodayAddedTripIndex = forToday.getTripIndex(tripId);
-    assertTrue(
-      forTodayAddedTripIndex > -1,
-      "Added trip should be found in time table for service date"
-    );
-    assertEquals(
-      RealTimeState.ADDED,
-      forToday.getTripTimes(forTodayAddedTripIndex).getRealTimeState()
-    );
+    var tripTimes = forToday.getTripTimes(id(tripId));
+    assertNotNull(tripTimes, "Added trip should be found in time table for service date");
+    assertEquals(RealTimeState.ADDED, tripTimes.getRealTimeState());
 
-    final int scheduleTripIndex = schedule.getTripIndex(tripId);
-    assertEquals(-1, scheduleTripIndex, "Added trip should not be found in scheduled time table");
+    var scheduledTripTimes = schedule.getTripTimes(id(tripId));
+    assertNull(scheduledTripTimes, "Added trip should not be found in scheduled time table");
     return tripPattern;
   }
 }

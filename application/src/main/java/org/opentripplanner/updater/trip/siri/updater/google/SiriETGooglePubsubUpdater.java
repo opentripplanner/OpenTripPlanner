@@ -29,18 +29,20 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   ) {
     configRef = config.configRef();
 
-    asyncEstimatedTimetableSource =
-      new GooglePubsubEstimatedTimetableSource(
-        config.dataInitializationUrl(),
-        config.reconnectPeriod(),
-        config.initialGetDataTimeout(),
-        config.subscriptionProjectName(),
-        config.topicProjectName(),
-        config.topicName()
-      );
+    asyncEstimatedTimetableSource = new GooglePubsubEstimatedTimetableSource(
+      config.dataInitializationUrl(),
+      config.reconnectPeriod(),
+      config.initialGetDataTimeout(),
+      config.subscriptionProjectName(),
+      config.topicProjectName(),
+      config.topicName()
+    );
 
-    estimatedTimetableHandler =
-      new EstimatedTimetableHandler(adapter, config.fuzzyTripMatching(), config.feedId());
+    estimatedTimetableHandler = new EstimatedTimetableHandler(
+      adapter,
+      config.fuzzyTripMatching(),
+      config.feedId()
+    );
 
     updateResultConsumer = TripUpdateMetrics.streaming(config);
   }
@@ -52,11 +54,12 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   @Override
   public void run() {
-    AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor = new AsyncEstimatedTimetableProcessor(
-      estimatedTimetableHandler,
-      saveResultOnGraph,
-      updateResultConsumer
-    );
+    AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor =
+      new AsyncEstimatedTimetableProcessor(
+        estimatedTimetableHandler,
+        saveResultOnGraph,
+        updateResultConsumer
+      );
     asyncEstimatedTimetableSource.start(asyncEstimatedTimetableProcessor::processSiriData);
   }
 

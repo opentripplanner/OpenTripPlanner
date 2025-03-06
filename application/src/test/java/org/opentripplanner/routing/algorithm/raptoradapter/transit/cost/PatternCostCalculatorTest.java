@@ -43,13 +43,14 @@ public class PatternCostCalculatorTest {
   private static final FeedScopedId UNPREFERRED_AGENCY_ID = id("contoso-travels");
   private static final Agency UNPREFERRED_AGENCY = agency(UNPREFERRED_AGENCY_ID.getId());
 
-  protected static final RaptorCostCalculator<TestTripSchedule> DEFAULT_COST_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_COST_SEC,
-    TRANSFER_COST_SEC,
-    WAIT_RELUCTANCE_FACTOR,
-    null,
-    null
-  );
+  protected static final RaptorCostCalculator<TestTripSchedule> DEFAULT_COST_CALCULATOR =
+    new DefaultCostCalculator<>(
+      BOARD_COST_SEC,
+      TRANSFER_COST_SEC,
+      WAIT_RELUCTANCE_FACTOR,
+      null,
+      null
+    );
 
   @Test
   @DisplayName("cost mapper should create penalty map")
@@ -98,13 +99,13 @@ public class PatternCostCalculatorTest {
   private static Stream<Arguments> preferencesPenaltyForRouteTestCases() {
     return TestTableParser.of(
       """
-        #    unpreferred    |  expected
-        #  agency | route   | extra-cost
-             -    |    -    |     0
-             -    |    x    |   230000
-             x    |    -    |   230000
-             x    |    x    |   230000
-        """
+      #    unpreferred    |  expected
+      #  agency | route   | extra-cost
+           -    |    -    |     0
+           -    |    x    |   230000
+           x    |    -    |   230000
+           x    |    x    |   230000
+      """
     );
   }
 
@@ -180,8 +181,7 @@ public class PatternCostCalculatorTest {
      * @return Test schedule
      */
     TestTripSchedule createSchedule() {
-      return TestTripSchedule
-        .schedule("12:00 12:01")
+      return TestTripSchedule.schedule("12:00 12:01")
         .pattern(pattern(unPreferredRoute, unPreferredAgency))
         .build();
     }

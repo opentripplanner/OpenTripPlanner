@@ -21,15 +21,11 @@ class ArrivalParetoSetComparatorFactoryTest {
   private static final int ARRIVAL_TIME_EARLY = 12;
   private static final int ARRIVAL_TIME_LATE = 13;
 
-  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1 = ArrivalParetoSetComparatorFactory.factory(
-    RelaxFunction.NORMAL,
-    null
-  );
+  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1 =
+    ArrivalParetoSetComparatorFactory.factory(RelaxFunction.NORMAL, null);
 
-  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1AndC2 = ArrivalParetoSetComparatorFactory.factory(
-    RelaxFunction.NORMAL,
-    (left, right) -> left > right
-  );
+  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1AndC2 =
+    ArrivalParetoSetComparatorFactory.factory(RelaxFunction.NORMAL, (left, right) -> left > right);
 
   @Test
   void compareArrivalTimeRoundAndCost() {

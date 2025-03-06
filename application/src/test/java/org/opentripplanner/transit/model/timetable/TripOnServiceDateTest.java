@@ -18,8 +18,9 @@ class TripOnServiceDateTest {
   );
   public static final LocalDate SERVICE_DATE = LocalDate.now();
   public static final String TRIP_ID = "tripId";
-  private static final TripOnServiceDate subject = TripOnServiceDate
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final TripOnServiceDate subject = TripOnServiceDate.of(
+    TimetableRepositoryForTest.id(ID)
+  )
     .withTrip(TimetableRepositoryForTest.trip(TRIP_ID).build())
     .withServiceDate(SERVICE_DATE)
     .withTripAlteration(TRIP_ALTERATION)

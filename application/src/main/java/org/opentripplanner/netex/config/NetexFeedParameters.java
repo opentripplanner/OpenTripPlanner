@@ -170,8 +170,7 @@ public class NetexFeedParameters implements DataSourceConfig {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(NetexFeedParameters.class)
+    return ToStringBuilder.of(NetexFeedParameters.class)
       .addObj("source", source, null)
       .addObj("feedId", feedId, DEFAULT.feedId)
       .addStr("sharedFilePattern", sharedFilePattern, DEFAULT.sharedFilePattern)

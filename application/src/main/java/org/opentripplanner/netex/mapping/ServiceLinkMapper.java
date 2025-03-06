@@ -97,7 +97,8 @@ class ServiceLinkMapper {
     for (int i = 0; i < linksInJourneyPattern.size(); i++) {
       var linkInLinkSequence = linksInJourneyPattern.get(i);
       if (
-        linkInLinkSequence instanceof ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
+        linkInLinkSequence instanceof
+        ServiceLinkInJourneyPattern_VersionedChildStructure serviceLinkInJourneyPattern
       ) {
         String serviceLinkRef = serviceLinkInJourneyPattern.getServiceLinkRef().getRef();
         ServiceLink serviceLink = serviceLinkById.lookup(serviceLinkRef);

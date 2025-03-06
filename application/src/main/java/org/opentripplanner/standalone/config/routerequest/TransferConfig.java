@@ -43,7 +43,7 @@ class TransferConfig {
             The extra buffer time/safety margin added to transfers to make sure the connection is safe, time
             wise. We recommend allowing the end-user to set this, and use `board-/alight-slack` to enforce
             agency policies. This time is in addition to how long it might take to walk, board and alight.
-            
+
             It is useful for passengers on long distance travel, and people with mobility issues, but can be set
             close to zero for everyday commuters and short distance searches in high-frequency transit areas.
             """
@@ -67,36 +67,36 @@ class TransferConfig {
             .summary("Optimize where a transfer between to trip happens. ")
             .description(
               """
-The main purpose of transfer optimization is to handle cases where it is possible to transfer
-between two routes at more than one point (pair of stops). The transfer optimization ensures that
-transfers occur at the best possible location. By post-processing all paths returned by the router,
-OTP can apply sophisticated calculations that are too slow or not algorithmically valid within
-Raptor. Transfers are optimized is done after the Raptor search and before the paths are passed
-to the itinerary-filter-chain.
+              The main purpose of transfer optimization is to handle cases where it is possible to transfer
+              between two routes at more than one point (pair of stops). The transfer optimization ensures that
+              transfers occur at the best possible location. By post-processing all paths returned by the router,
+              OTP can apply sophisticated calculations that are too slow or not algorithmically valid within
+              Raptor. Transfers are optimized is done after the Raptor search and before the paths are passed
+              to the itinerary-filter-chain.
 
-To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on).
-You should leave this on unless there is a critical issue with it. The OTPFeature
-`GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
-              
-The optimized transfer service will try to, in order:
-              
-1. Use transfer priority. This includes stay-seated and guaranteed transfers.
-2. Use the transfers with the best distribution of the wait-time, and avoid very short transfers.
-3. Avoid back-travel
-4. Boost stop-priority to select preferred and recommended stops.
-              
-If two paths have the same transfer priority level, then we break the tie by looking at waiting 
-times. The goal is to maximize the wait-time for each stop, avoiding situations where there is 
-little time available to make the transfer. This is balanced with the generalized-cost. The cost
-is adjusted with a new cost for wait-time (optimized-wait-time-cost).
-              
-The defaults should work fine, but if you have results with short wait-times dominating a better 
-option or "back-travel", then try to increase the `minSafeWaitTimeFactor`, 
-`backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
+              To toggle transfer optimization on or off use the OTPFeature `OptimizeTransfers` (default is on).
+              You should leave this on unless there is a critical issue with it. The OTPFeature
+              `GuaranteedTransfers` will toggle on and off the priority optimization (part of OptimizeTransfers).
 
-For details on the logic/design see [transfer optimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
-package documentation.
-"""
+              The optimized transfer service will try to, in order:
+
+              1. Use transfer priority. This includes stay-seated and guaranteed transfers.
+              2. Use the transfers with the best distribution of the wait-time, and avoid very short transfers.
+              3. Avoid back-travel
+              4. Boost stop-priority to select preferred and recommended stops.
+
+              If two paths have the same transfer priority level, then we break the tie by looking at waiting
+              times. The goal is to maximize the wait-time for each stop, avoiding situations where there is
+              little time available to make the transfer. This is balanced with the generalized-cost. The cost
+              is adjusted with a new cost for wait-time (optimized-wait-time-cost).
+
+              The defaults should work fine, but if you have results with short wait-times dominating a better
+              option or "back-travel", then try to increase the `minSafeWaitTimeFactor`,
+              `backTravelWaitTimeFactor` and/or `extraStopBoardAlightCostsFactor`.
+
+              For details on the logic/design see [transfer optimization](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/routing/algorithm/transferoptimization/package.md)
+              package documentation.
+              """
             )
             .asObject()
         )
@@ -105,8 +105,7 @@ package documentation.
 
   private static TransferOptimizationPreferences mapTransferOptimization(NodeAdapter c) {
     var dft = TransferOptimizationPreferences.DEFAULT;
-    return TransferOptimizationPreferences
-      .of()
+    return TransferOptimizationPreferences.of()
       .withOptimizeTransferWaitTime(
         c
           .of("optimizeTransferWaitTime")

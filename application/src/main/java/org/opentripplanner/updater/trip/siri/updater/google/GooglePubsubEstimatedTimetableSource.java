@@ -122,20 +122,23 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
     this.initialGetDataTimeout = initialGetDataTimeout;
 
     String subscriptionId = buildSubscriptionId();
-    subscriptionName =
-      ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId).toString();
-    subscriber =
-      Subscriber.newBuilder(subscriptionName, new EstimatedTimetableMessageReceiver()).build();
+    subscriptionName = ProjectSubscriptionName.of(
+      subscriptionProjectName,
+      subscriptionId
+    ).toString();
+    subscriber = Subscriber.newBuilder(
+      subscriptionName,
+      new EstimatedTimetableMessageReceiver()
+    ).build();
     this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
 
-    retry =
-      new OtpRetryBuilder()
-        .withName("SIRI-ET Google PubSub Updater setup")
-        .withMaxAttempts(RETRY_MAX_ATTEMPTS)
-        .withInitialRetryInterval(RETRY_INITIAL_DELAY)
-        .withBackoffMultiplier(RETRY_BACKOFF)
-        .build();
+    retry = new OtpRetryBuilder()
+      .withName("SIRI-ET Google PubSub Updater setup")
+      .withMaxAttempts(RETRY_MAX_ATTEMPTS)
+      .withInitialRetryInterval(RETRY_INITIAL_DELAY)
+      .withBackoffMultiplier(RETRY_BACKOFF)
+      .build();
 
     addShutdownHook();
   }
@@ -196,8 +199,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private void createSubscription() {
     try (SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
       subscriptionAdminClient.createSubscription(
-        Subscription
-          .newBuilder()
+        Subscription.newBuilder()
           .setTopic(topic.toString())
           .setName(subscriptionName)
           .setPushConfig(pushConfig)
@@ -206,8 +208,7 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
             com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
           )
           .setExpirationPolicy(
-            ExpirationPolicy
-              .newBuilder()
+            ExpirationPolicy.newBuilder()
               // How long will the subscription exist when no longer in use - minimum 1 day
               .setTtl(com.google.protobuf.Duration.newBuilder().setSeconds(86400).build())
               .build()
@@ -315,16 +316,13 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
    * Shut down the PubSub subscriber at server shutdown.
    */
   private void addShutdownHook() {
-    ApplicationShutdownSupport.addShutdownHook(
-      "siri-et-google-pubsub-shutdown",
-      () -> {
-        if (subscriber != null) {
-          LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
-          subscriber.stopAsync();
-        }
-        deleteSubscription();
+    ApplicationShutdownSupport.addShutdownHook("siri-et-google-pubsub-shutdown", () -> {
+      if (subscriber != null) {
+        LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
+        subscriber.stopAsync();
       }
-    );
+      deleteSubscription();
+    });
   }
 
   private String getTimeSinceStartupString() {
@@ -352,14 +350,13 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
   private void logPubsubMessage(ServiceDelivery serviceDelivery) {
     int numberOfUpdatedTrips = 0;
     try {
-      numberOfUpdatedTrips =
-        serviceDelivery
-          .getEstimatedTimetableDeliveries()
-          .getFirst()
-          .getEstimatedJourneyVersionFrames()
-          .getFirst()
-          .getEstimatedVehicleJourneies()
-          .size();
+      numberOfUpdatedTrips = serviceDelivery
+        .getEstimatedTimetableDeliveries()
+        .getFirst()
+        .getEstimatedJourneyVersionFrames()
+        .getFirst()
+        .getEstimatedVehicleJourneies()
+        .size();
     } catch (Exception e) {
       //ignore
     }
@@ -372,9 +369,10 @@ public class GooglePubsubEstimatedTimetableSource implements AsyncEstimatedTimet
         numberOfMessages,
         numberOfUpdates,
         FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-        Duration
-          .between(serviceDelivery.getResponseTimestamp().toInstant(), Instant.now())
-          .toMillis(),
+        Duration.between(
+          serviceDelivery.getResponseTimestamp().toInstant(),
+          Instant.now()
+        ).toMillis(),
         getTimeSinceStartupString()
       );
     }

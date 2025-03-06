@@ -57,8 +57,7 @@ public class ReportResource {
   @GET
   @Path("/graph.json")
   public Response stats(@Context OtpServerRequestContext serverRequestContext) {
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity(cachedStats.get(() -> GraphReportBuilder.build(serverRequestContext)))
       .type("application/json")
       .build();

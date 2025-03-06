@@ -64,8 +64,7 @@ public class TripToTripTransfer<T extends RaptorTripSchedule> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripToTripTransfer.class)
+    return ToStringBuilder.of(TripToTripTransfer.class)
       .addObj("from", from)
       .addObj("to", to)
       .addObj("transfer", pathTransfer)

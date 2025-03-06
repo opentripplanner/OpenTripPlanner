@@ -82,15 +82,15 @@ class TripTimesUpdater {
 
     var feedScopedTripId = new FeedScopedId(timetable.getPattern().getFeedId(), tripId);
 
-    int tripIndex = timetable.getTripIndex(tripId);
-    if (tripIndex == -1) {
+    var tripTimes = timetable.getTripTimes(feedScopedTripId);
+    if (tripTimes == null) {
       LOG.debug("tripId {} not found in pattern.", tripId);
       return Result.failure(new UpdateError(feedScopedTripId, TRIP_NOT_FOUND_IN_PATTERN));
     } else {
-      LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
+      LOG.trace("tripId {} found in timetable.", tripId);
     }
 
-    RealTimeTripTimes newTimes = timetable.getTripTimes(tripIndex).copyScheduledTimes();
+    RealTimeTripTimes newTimes = tripTimes.copyScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -107,9 +107,10 @@ class TripTimesUpdater {
     Integer delay = null;
     Integer firstUpdatedIndex = null;
 
-    final long today = ServiceDateUtils
-      .asStartOfService(updateServiceDate, timeZone)
-      .toEpochSecond();
+    final long today = ServiceDateUtils.asStartOfService(
+      updateServiceDate,
+      timeZone
+    ).toEpochSecond();
 
     for (int i = 0; i < numStops; i++) {
       boolean match = false;
@@ -122,9 +123,10 @@ class TripTimesUpdater {
       }
 
       if (match) {
-        GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship = update.hasScheduleRelationship()
-          ? update.getScheduleRelationship()
-          : GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED;
+        GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship =
+          update.hasScheduleRelationship()
+            ? update.getScheduleRelationship()
+            : GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SCHEDULED;
         // Handle each schedule relationship case
         if (
           scheduleRelationship ==
@@ -227,18 +229,12 @@ class TripTimesUpdater {
     // the first SCHEDULED stop sequence included in the GTFS-RT feed.
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
       if (
-        (
-          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA &&
-          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, true)
-        ) ||
-        (
-          backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED &&
-          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, false)
-        ) ||
-        (
-          backwardsDelayPropagationType == BackwardsDelayPropagationType.ALWAYS &&
-          newTimes.adjustTimesBeforeAlways(firstUpdatedIndex)
-        )
+        (backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED_NO_DATA &&
+          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, true)) ||
+        (backwardsDelayPropagationType == BackwardsDelayPropagationType.REQUIRED &&
+          newTimes.adjustTimesBeforeWhenRequired(firstUpdatedIndex, false)) ||
+        (backwardsDelayPropagationType == BackwardsDelayPropagationType.ALWAYS &&
+          newTimes.adjustTimesBeforeAlways(firstUpdatedIndex))
       ) {
         LOG.debug(
           "Propagated delay from stop index {} backwards on trip {}.",
@@ -264,9 +260,9 @@ class TripTimesUpdater {
     if (tripUpdate.hasVehicle()) {
       var vehicleDescriptor = tripUpdate.getVehicle();
       if (vehicleDescriptor.hasWheelchairAccessible()) {
-        GtfsRealtimeMapper
-          .mapWheelchairAccessible(vehicleDescriptor.getWheelchairAccessible())
-          .ifPresent(newTimes::updateWheelchairAccessibility);
+        GtfsRealtimeMapper.mapWheelchairAccessible(
+          vehicleDescriptor.getWheelchairAccessible()
+        ).ifPresent(newTimes::updateWheelchairAccessibility);
       }
     }
 

@@ -30,10 +30,12 @@ class DemConfigTest {
 
   @Test
   void mapMissingDemDefaultParameters() {
-    NodeAdapter nodeAdapter = newNodeAdapterForTest("""
+    NodeAdapter nodeAdapter = newNodeAdapterForTest(
+      """
       {
       }
-      """);
+      """
+    );
 
     var subject = DemConfig.mapDemDefaultsConfig(nodeAdapter, "demDefaults");
 
@@ -122,10 +124,12 @@ class DemConfigTest {
 
   @Test
   void mapDemExtractWithNoDefaults() {
-    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest("""
+    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest(
+      """
       {
       }
-      """);
+      """
+    );
 
     var defaults = DemConfig.mapDemDefaultsConfig(noDefaultsAdapter, "demDefaults");
 

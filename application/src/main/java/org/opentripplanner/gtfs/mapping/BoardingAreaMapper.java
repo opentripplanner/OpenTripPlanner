@@ -19,7 +19,8 @@ class BoardingAreaMapper {
 
   static final String DEFAULT_NAME = "Boarding area";
 
-  private final Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas =
+    new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, RegularStop> stationLookUp;
@@ -50,8 +51,7 @@ class BoardingAreaMapper {
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
-    var builder = BoardingArea
-      .of(base.getId())
+    var builder = BoardingArea.of(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())
       .withWheelchairAccessibility(base.getWheelchairAccessibility())

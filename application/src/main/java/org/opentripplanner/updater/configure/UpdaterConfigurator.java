@@ -4,8 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
-import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
+import org.opentripplanner.ext.siri.updater.azure.SiriAzureUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
@@ -88,8 +87,7 @@ public class UpdaterConfigurator {
       timetableRepository,
       snapshotManager,
       updatersParameters
-    )
-      .configure();
+    ).configure();
   }
 
   private void configure() {
@@ -153,7 +151,8 @@ public class UpdaterConfigurator {
    * @return a list of GraphUpdaters created from the configuration
    */
   private List<GraphUpdater> createUpdatersFromConfig() {
-    OpeningHoursCalendarService openingHoursCalendarService = graph.getOpeningHoursCalendarService();
+    OpeningHoursCalendarService openingHoursCalendarService =
+      graph.getOpeningHoursCalendarService();
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
@@ -217,10 +216,10 @@ public class UpdaterConfigurator {
       }
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
-      updaters.add(new SiriAzureETUpdater(configItem, provideSiriAdapter()));
+      updaters.add(SiriAzureUpdater.createETUpdater(configItem, provideSiriAdapter()));
     }
     for (var configItem : updatersParameters.getSiriAzureSXUpdaterParameters()) {
-      updaters.add(new SiriAzureSXUpdater(configItem, timetableRepository));
+      updaters.add(SiriAzureUpdater.createSXUpdater(configItem, timetableRepository));
     }
 
     return updaters;
@@ -231,10 +230,8 @@ public class UpdaterConfigurator {
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      () -> LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      LocalDate.now(timetableRepository.getTimeZone())
     );
   }
 

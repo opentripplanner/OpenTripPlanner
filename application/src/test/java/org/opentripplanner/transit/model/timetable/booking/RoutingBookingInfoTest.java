@@ -49,8 +49,7 @@ class RoutingBookingInfoTest {
   ) {
     int searchTimeSec = searchTime.toSecondOfDay();
 
-    var subject = RoutingBookingInfo
-      .of(requestedBookingTime.toSecondOfDay())
+    var subject = RoutingBookingInfo.of(requestedBookingTime.toSecondOfDay())
       .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
       .withLatestBookingTime(new BookingTime(LATEST_BOOKING_TIME_13_00, 0))
       .build();
@@ -65,8 +64,7 @@ class RoutingBookingInfoTest {
     int t11_35 = TimeUtils.time("11:35");
     int t11_55 = TimeUtils.time("11:35") + (int) MINIMUM_BOOKING_NOTICE_20m.toSeconds();
 
-    var subject = RoutingBookingInfo
-      .of(t11_35)
+    var subject = RoutingBookingInfo.of(t11_35)
       .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
       .build();
 
@@ -87,8 +85,7 @@ class RoutingBookingInfoTest {
 
     assertSame(
       RoutingBookingInfo.unrestricted(),
-      RoutingBookingInfo
-        .of(RoutingBookingInfo.NOT_SET)
+      RoutingBookingInfo.of(RoutingBookingInfo.NOT_SET)
         .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
         .build()
     );
@@ -100,8 +97,7 @@ class RoutingBookingInfoTest {
 
   @Test
   void testToString() {
-    var subject = RoutingBookingInfo
-      .of(TimeUtils.time("11:35"))
+    var subject = RoutingBookingInfo.of(TimeUtils.time("11:35"))
       .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
       .withLatestBookingTime(new BookingTime(LATEST_BOOKING_TIME_13_00, 0))
       .build();
@@ -118,8 +114,7 @@ class RoutingBookingInfoTest {
       TimeUtils.time("11:35"),
       BookingInfo.of().withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m).build()
     );
-    var same = RoutingBookingInfo
-      .of(TimeUtils.time("11:35"))
+    var same = RoutingBookingInfo.of(TimeUtils.time("11:35"))
       .withMinimumBookingNotice(MINIMUM_BOOKING_NOTICE_20m)
       .build();
 

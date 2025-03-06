@@ -33,10 +33,9 @@ class EscalatorProcessor {
   }
 
   public void buildEscalatorEdge(OsmWay escalatorWay, double length) {
-    List<Long> nodes = Arrays
-      .stream(escalatorWay.getNodeRefs().toArray())
-      .filter(nodeRef ->
-        intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
+    List<Long> nodes = Arrays.stream(escalatorWay.getNodeRefs().toArray())
+      .filter(
+        nodeRef -> intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
       )
       .boxed()
       .toList();

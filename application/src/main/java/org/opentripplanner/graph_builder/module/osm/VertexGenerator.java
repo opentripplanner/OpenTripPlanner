@@ -86,13 +86,12 @@ class VertexGenerator {
         var refs = node.getMultiTagValues(boardingAreaRefTags);
         if (!refs.isEmpty()) {
           String name = node.getTag("name");
-          iv =
-            vertexFactory.osmBoardingLocation(
-              coordinate,
-              label,
-              refs,
-              NonLocalizedString.ofNullable(name)
-            );
+          iv = vertexFactory.osmBoardingLocation(
+            coordinate,
+            label,
+            refs,
+            NonLocalizedString.ofNullable(name)
+          );
         }
       }
 
@@ -108,13 +107,12 @@ class VertexGenerator {
       }
 
       if (iv == null) {
-        iv =
-          vertexFactory.osm(
-            coordinate,
-            node,
-            node.hasHighwayTrafficLight(),
-            node.hasCrossingTrafficLight()
-          );
+        iv = vertexFactory.osm(
+          coordinate,
+          node,
+          node.hasHighwayTrafficLight(),
+          node.hasCrossingTrafficLight()
+        );
       }
 
       intersectionNodes.put(nid, iv);

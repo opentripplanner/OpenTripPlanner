@@ -105,8 +105,9 @@ public class TestPathBuilder implements RaptorTestConstants {
     int toTime = fromTime + duration;
     int fromStop = currentStop();
 
-    TestTripSchedule trip = TestTripSchedule
-      .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
+    TestTripSchedule trip = TestTripSchedule.schedule(
+      TestTripPattern.pattern(patternName, fromStop, toStop)
+    )
       .arrDepOffset(BOARD_ALIGHT_OFFSET)
       .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
       .build();
@@ -141,13 +142,12 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   private void reset(int startTime) {
     this.startTime = startTime;
-    this.builder =
-      PathBuilder.tailPathBuilder(
-        slackProvider,
-        startTime,
-        costCalculator,
-        RaptorStopNameResolver.nullSafe(null),
-        null
-      );
+    this.builder = PathBuilder.tailPathBuilder(
+      slackProvider,
+      startTime,
+      costCalculator,
+      RaptorStopNameResolver.nullSafe(null),
+      null
+    );
   }
 }

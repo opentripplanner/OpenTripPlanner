@@ -139,16 +139,14 @@ public class ViaRoutingWorker {
   }
 
   private Optional<ZonedDateTime> firstArrival(RoutingResponse response) {
-    return Optional
-      .ofNullable(response.getTripPlan())
+    return Optional.ofNullable(response.getTripPlan())
       .map(t -> t.itineraries)
       .flatMap(i -> i.stream().min(Comparator.comparing(Itinerary::endTime)))
       .map(Itinerary::endTime);
   }
 
   private Optional<ZonedDateTime> lastArrival(RoutingResponse response) {
-    return Optional
-      .ofNullable(response.getTripPlan())
+    return Optional.ofNullable(response.getTripPlan())
       .map(t -> t.itineraries)
       .flatMap(i -> i.stream().max(Comparator.comparing(Itinerary::endTime)))
       .map(Itinerary::endTime);

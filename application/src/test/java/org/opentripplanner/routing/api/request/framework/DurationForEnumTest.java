@@ -20,8 +20,7 @@ class DurationForEnumTest {
   private static final Duration DEFAULT = Duration.ofSeconds(7);
   private static final Duration WALK_VALUE = Duration.ofSeconds(3);
 
-  private final DurationForEnum<StreetMode> subject = DurationForEnum
-    .of(StreetMode.class)
+  private final DurationForEnum<StreetMode> subject = DurationForEnum.of(StreetMode.class)
     .withDefault(DEFAULT)
     .withValues(Map.of(StreetMode.WALK, WALK_VALUE))
     .build();
@@ -33,8 +32,7 @@ class DurationForEnumTest {
     // Assert modes are in order of the enum ordinal
     assertEquals(
       "DurationForStreetMode{default:7s, BIKE:3s, SCOOTER_RENTAL:1s, CAR:4s, FLEXIBLE:2s}",
-      DurationForEnum
-        .of(StreetMode.class)
+      DurationForEnum.of(StreetMode.class)
         .withDefault(DEFAULT)
         .withValues(Map.of(StreetMode.SCOOTER_RENTAL, Duration.ofSeconds(1)))
         .withValues(Map.of(StreetMode.CAR, Duration.ofSeconds(4)))
@@ -50,9 +48,8 @@ class DurationForEnumTest {
     assertEquals(DEFAULT, subject.defaultValue());
     assertEquals(DEFAULT.toSeconds(), subject.defaultValueSeconds());
 
-    assertThrows(
-      NullPointerException.class,
-      () -> DurationForEnum.of(StreetMode.class).withDefault(null).build()
+    assertThrows(NullPointerException.class, () ->
+      DurationForEnum.of(StreetMode.class).withDefault(null).build()
     );
   }
 
@@ -70,8 +67,7 @@ class DurationForEnumTest {
 
   @Test
   void equalsAndHashCode() {
-    var sameValue = DurationForEnum
-      .of(StreetMode.class)
+    var sameValue = DurationForEnum.of(StreetMode.class)
       .withDefault(DEFAULT)
       .with(StreetMode.WALK, WALK_VALUE)
       .build();
@@ -113,8 +109,10 @@ class DurationForEnumTest {
     assertEquals(D10s, copy.valueOf(StreetMode.WALK));
 
     // with no "real" changes -> return original
-    copy =
-      subject.copyOf().apply(b -> b.withDefault(DEFAULT).with(StreetMode.WALK, WALK_VALUE)).build();
+    copy = subject
+      .copyOf()
+      .apply(b -> b.withDefault(DEFAULT).with(StreetMode.WALK, WALK_VALUE))
+      .build();
     assertSame(subject, copy);
   }
 }
