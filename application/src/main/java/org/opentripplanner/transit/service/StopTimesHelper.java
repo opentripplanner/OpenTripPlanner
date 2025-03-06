@@ -86,17 +86,13 @@ class StopTimesHelper {
     return result;
   }
 
-  public static List<TripTimeOnDate> findTripTimeOnDate(
-    TransitService transitService,
-    TripTimeOnDateRequest request
-  ) {
+  public List<TripTimeOnDate> findTripTimeOnDate(TripTimeOnDateRequest request) {
     Matcher<TripTimeOnDate> matcher = TripTimeOnDateMatcherFactory.of(request);
     return request
       .stopLocations()
       .stream()
       .flatMap(stopLocation ->
         stopTimesForStop(
-          transitService,
           stopLocation,
           request.time(),
           request.timeWindow(),

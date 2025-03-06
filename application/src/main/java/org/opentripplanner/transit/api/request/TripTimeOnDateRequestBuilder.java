@@ -3,11 +3,11 @@ package org.opentripplanner.transit.api.request;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 
 public class TripTimeOnDateRequestBuilder {
 
