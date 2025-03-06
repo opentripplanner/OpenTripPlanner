@@ -34,8 +34,7 @@ class FilterMapperTest {
     var select = SelectRequest.of().withRoutes(List.of(ROUTE_ID1)).build();
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
     var actual = FilterMapper.map(List.of(transitFilter));
-    var expected = TripRequest
-      .of()
+    var expected = TripRequest.of()
       .withIncludedRoutes(FilterValues.ofEmptyIsNothing(INCLUDED_ROUTES, Set.of(ROUTE_ID1)))
       .withExcludedRoutes(FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, Set.of(ROUTE_ID1)))
       .build();
@@ -48,8 +47,7 @@ class FilterMapperTest {
     var select = SelectRequest.of().withAgencies(List.of(AGENCY_ID1)).build();
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
     var actual = FilterMapper.map(List.of(transitFilter));
-    var expected = TripRequest
-      .of()
+    var expected = TripRequest.of()
       .withIncludedAgencies(FilterValues.ofEmptyIsNothing(INCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
       .withExcludedAgencies(FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
       .build();
@@ -60,21 +58,18 @@ class FilterMapperTest {
   @Test
   void combinations() {
     var selectRoutes = SelectRequest.of().withRoutes(List.of(ROUTE_ID1)).build();
-    var routeFilter = TransitFilterRequest
-      .of()
+    var routeFilter = TransitFilterRequest.of()
       .addSelect(selectRoutes)
       .addNot(selectRoutes)
       .build();
     var selectAgencies = SelectRequest.of().withAgencies(List.of(AGENCY_ID1)).build();
-    var agencyFilter = TransitFilterRequest
-      .of()
+    var agencyFilter = TransitFilterRequest.of()
       .addSelect(selectAgencies)
       .addNot(selectAgencies)
       .build();
 
     var actual = FilterMapper.map(List.of(routeFilter, agencyFilter));
-    var expected = TripRequest
-      .of()
+    var expected = TripRequest.of()
       .withIncludedAgencies(FilterValues.ofEmptyIsNothing(INCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
       .withExcludedAgencies(FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
       .withIncludedRoutes(FilterValues.ofEmptyIsNothing(INCLUDED_ROUTES, Set.of(ROUTE_ID1)))

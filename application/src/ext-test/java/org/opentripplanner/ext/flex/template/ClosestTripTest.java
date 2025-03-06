@@ -29,8 +29,7 @@ import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class ClosestTripTest {
 
-  private static final UnscheduledTrip FLEX_TRIP = UnscheduledTrip
-    .of(id("123"))
+  private static final UnscheduledTrip FLEX_TRIP = UnscheduledTrip.of(id("123"))
     .withStopTimes(List.of(area("10:00", "11:00"), area("10:00", "11:00")))
     .withTrip(TimetableRepositoryForTest.trip("123").build())
     .build();
@@ -43,32 +42,33 @@ class ClosestTripTest {
     new TIntHashSet()
   );
   private static final StopLocation STOP = FLEX_TRIP.getStop(0);
-  private static final FlexAccessEgressCallbackAdapter ADAPTER = new FlexAccessEgressCallbackAdapter() {
-    @Override
-    public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
-      return null;
-    }
+  private static final FlexAccessEgressCallbackAdapter ADAPTER =
+    new FlexAccessEgressCallbackAdapter() {
+      @Override
+      public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+        return null;
+      }
 
-    @Override
-    public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
-      return List.of();
-    }
+      @Override
+      public Collection<PathTransfer> getTransfersFromStop(StopLocation stop) {
+        return List.of();
+      }
 
-    @Override
-    public Collection<PathTransfer> getTransfersToStop(StopLocation stop) {
-      return List.of();
-    }
+      @Override
+      public Collection<PathTransfer> getTransfersToStop(StopLocation stop) {
+        return List.of();
+      }
 
-    @Override
-    public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
-      return List.of(FLEX_TRIP);
-    }
+      @Override
+      public Collection<FlexTrip<?, ?>> getFlexTripsByStop(StopLocation stopLocation) {
+        return List.of(FLEX_TRIP);
+      }
 
-    @Override
-    public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
-      return true;
-    }
-  };
+      @Override
+      public boolean isDateActive(FlexServiceDate date, FlexTrip<?, ?> trip) {
+        return true;
+      }
+    };
 
   @Test
   void doNotFilter() {
@@ -82,8 +82,7 @@ class ClosestTripTest {
 
   @Test
   void filter() {
-    var request = TripRequest
-      .of()
+    var request = TripRequest.of()
       .withExcludedAgencies(
         FilterValues.ofEmptyIsNothing(
           "excludedAgencies",

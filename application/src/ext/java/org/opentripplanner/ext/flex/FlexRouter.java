@@ -76,11 +76,10 @@ public class FlexRouter {
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
-    this.matcher =
-      TripMatcherFactory.of(
-        filterRequest,
-        transitService.getCalendarService()::getServiceDatesForServiceId
-      );
+    this.matcher = TripMatcherFactory.of(
+      filterRequest,
+      transitService.getCalendarService()::getServiceDatesForServiceId
+    );
     this.callbackService = new CallbackAdapter();
     this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       transitService.getTimeZone(),

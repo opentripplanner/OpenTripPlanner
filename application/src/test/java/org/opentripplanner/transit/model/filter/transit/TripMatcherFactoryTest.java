@@ -33,32 +33,32 @@ public class TripMatcherFactoryTest {
     tripRut = Trip.of(id("RUT:route:trip:1"))
       .withRoute(
         Route.of(RUTER_ROUTE1_ID)
-            .withAgency(Agency.of(RUTER1_ID).withName("RUT").withTimezone("Europe/Oslo").build())
+          .withAgency(Agency.of(RUTER1_ID).withName("RUT").withTimezone("Europe/Oslo").build())
           .withMode(TransitMode.BUS)
           .withShortName("BUS")
           .build()
       )
-        .withServiceId(id("RUT:route:trip:1"))
+      .withServiceId(id("RUT:route:trip:1"))
       .build();
     tripRut2 = Trip.of(id("RUT:route:trip:2"))
       .withRoute(
         Route.of(id("RUT:route:2"))
-            .withAgency(Agency.of(RUTER2_ID).withName("RUT").withTimezone("Europe/Oslo").build())
+          .withAgency(Agency.of(RUTER2_ID).withName("RUT").withTimezone("Europe/Oslo").build())
           .withMode(TransitMode.BUS)
           .withShortName("BUS")
           .build()
       )
-        .withServiceId(id("RUT:route:trip:2"))
+      .withServiceId(id("RUT:route:trip:2"))
       .build();
     tripAkt = Trip.of(id("AKT:route:trip:1"))
       .withRoute(
         Route.of(id("AKT:route:1"))
-            .withAgency(Agency.of(AKT_ID).withName("AKT").withTimezone("Europe/Oslo").build())
+          .withAgency(Agency.of(AKT_ID).withName("AKT").withTimezone("Europe/Oslo").build())
           .withMode(TransitMode.BUS)
           .withShortName("BUS")
           .build()
       )
-        .withServiceId(id("AKT:route:trip:1"))
+      .withServiceId(id("AKT:route:trip:1"))
       .build();
   }
 
@@ -77,8 +77,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchExcludeRouteId() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withExcludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(RUTER_ROUTE1_ID)))
       .build();
 
@@ -115,8 +114,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchExcludeAgencyId() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(RUTER1_ID)))
       .build();
 
@@ -129,8 +127,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testIncludeNoAgencies() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withIncludedAgencies(FilterValues.ofEmptyIsNothing("agencies", List.of()))
       .build();
 
@@ -143,8 +140,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testDisjointAgencyFilters() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withIncludedAgencies(FilterValues.ofEmptyIsNothing("agencies", List.of(RUTER1_ID)))
       .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(AKT_ID)))
       .build();
@@ -158,8 +154,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testIntersectingAgencyFilters() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withIncludedAgencies(
         FilterValues.ofEmptyIsNothing("agencies", List.of(RUTER1_ID, RUTER2_ID, AKT_ID))
       )

@@ -95,8 +95,7 @@ public class TripRequest {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripRequest.class)
+    return ToStringBuilder.of(TripRequest.class)
       .addObj("includedAgencies", includedAgencies)
       .addObj("includedRoutes", includedRoutes)
       .addObj("excludedAgencies", excludedAgencies)
