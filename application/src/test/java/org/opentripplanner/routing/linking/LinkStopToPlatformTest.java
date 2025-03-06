@@ -118,7 +118,7 @@ public class LinkStopToPlatformTest {
    * Link stop outside platform area to platform.
    */
   @Test
-  public void testLinkStopOutsideArea() {
+  void testLinkStopOutsideArea() {
     // test platform is a simple rectangle. It creates a graph of 8 edges.
     Coordinate[] platform = {
       new Coordinate(10, 60.001),
@@ -143,29 +143,32 @@ public class LinkStopToPlatformTest {
   }
 
   /**
-   * Link stop inside platform area to platform. Connects stop with visibility points.
+   * Link stop inside platform area to platform.
+   * Connects stop with visibility points and to closest edge.
    */
   @Test
-  public void testLinkStopInsideArea() {
+  void testLinkStopInsideArea() {
     // test platform is a simple rectangle. It creates a graph of 8 edges.
     Coordinate[] platform = {
-      new Coordinate(10, 60.002),
-      new Coordinate(10.004, 60.002),
-      new Coordinate(10.004, 60),
+      new Coordinate(10, 60.004),
+      new Coordinate(10.008, 60.004),
+      new Coordinate(10.008, 60),
       new Coordinate(10, 60),
     };
     // add entrance to every corner of the platform (this array defines indices)
     int[] visibilityPoints = { 0, 1, 2, 3 };
 
-    // place one stop inside the platform, near bottom left corner
-    Coordinate[] stops = { new Coordinate(10.001, 60.001) };
+    // place one stop inside the platform, near bottom edge mid point
+    Coordinate[] stops = { new Coordinate(10.004, 60.001) };
 
     Graph graph = prepareTest(platform, visibilityPoints, stops);
     linkStops(graph);
 
     // stop links to a new street vertex with 2 edges
     // new vertex connects to all 4 visibility points with 4*2 new edges
-    assertEquals(18, graph.getEdges().size());
+    // new vertex connects to the closest edge pair split points with 2*2 edges
+    // edge pair splits to 2 edges more
+    assertEquals(24, graph.getEdges().size());
 
     // transit stop is connected in one rectangle corner only to walk no thru trafic edges
     // verify that new area edge connection is also walk no thru
@@ -185,7 +188,7 @@ public class LinkStopToPlatformTest {
    * Connections to other vertices are not created.
    */
   @Test
-  public void testLinkStopNearPlatformVertex() {
+  void testLinkStopNearPlatformVertex() {
     Coordinate[] platform = {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
@@ -210,7 +213,7 @@ public class LinkStopToPlatformTest {
    * Stops will get linked directly.
    */
   @Test
-  public void testLinkTwoStopsInsideArea() {
+  void testLinkTwoStopsInsideArea() {
     Coordinate[] platform = {
       new Coordinate(10, 60.002),
       new Coordinate(10.004, 60.002),
@@ -227,9 +230,11 @@ public class LinkStopToPlatformTest {
     linkStops(graph);
 
     // stops are linked with 2 new street vertices with 2 edges each (+4)
-    // new vertices connects to original 4 visibility points with 2*4*2 new edges (+16)
+    // new vertices connect to original 4 visibility points with 2*4*2 new edges (+16)
     // stops are also linked directly (+2)
-    assertEquals(30, graph.getEdges().size());
+    // each stop links bidirectionally to closest edge pair (+ 2*2*2)
+    // closest edge pairs split into two (+ 2*2)
+    assertEquals(42, graph.getEdges().size());
 
     // verify direct linking
     List<TransitStopVertex> transitStops = graph.getVerticesOfType(TransitStopVertex.class);
