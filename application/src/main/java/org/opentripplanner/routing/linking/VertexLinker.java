@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.linking;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -314,12 +315,11 @@ public class VertexLinker {
     if (candidateEdges.isEmpty()) {
       return Set.of();
     }
-
     Set<DistanceTo<StreetEdge>> closestEdges = getClosestEdgesPerMode(
       traverseModes,
       candidateEdges
     );
-    Set<AreaGroup> linkedAreas = new HashSet<>();
+    HashMap<AreaGroup, IntersectionVertex> linkedAreas = new HashMap<>();
     return closestEdges
       .stream()
       .map(ce -> snapAndLink(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
@@ -390,10 +390,9 @@ public class VertexLinker {
     Scope scope,
     LinkingDirection direction,
     DisposableEdgeCollection tempEdges,
-    Set<AreaGroup> linkedAreas
+    HashMap<AreaGroup, IntersectionVertex> linkedAreas
   ) {
     IntersectionVertex start = null;
-    boolean added = false;
 
     // Always consider linking to closest point on the edge
     IntersectionVertex split = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
@@ -401,28 +400,31 @@ public class VertexLinker {
     // check if vertex is inside an area
     if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
       AreaGroup ag = aEdge.getArea();
-
-      if (
-        !linkedAreas.contains(ag) &&
-        ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))
-      ) {
-        // vertex is inside an area
-        linkedAreas.add(ag);
-        if (vertex instanceof IntersectionVertex iv) {
-          start = iv;
-        } else {
-          start = createSplitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+      var added = false;
+      // is area already linked ?
+      start = linkedAreas.get(ag);
+      if (start == null) {
+        if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
+          // vertex is inside an area
+          if (vertex instanceof IntersectionVertex iv) {
+            start = iv;
+          } else {
+            start = createSplitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+          }
+          linkedAreas.put(ag, start);
         }
-        // try connecting the vertex to the edge snapped split point, because
-        // connections to visibility vertices do not always provide an optimal route
-        addVisibilityEdges(start, split, ag, scope, tempEdges);
+      }
+      if (start != null) {
+        // vertex is inside the area. try connecting the vertex to the edge's split point, because
+        // connections to visibility vertices may fail or do not always provide an optimal route
+        added = addVisibilityEdges(start, split, ag, scope, tempEdges);
       } else {
         // vertex is outside an area. Use split point for area connections
         start = split;
       }
       // connect start point to area visibility points to achieve optimal paths
       if (!ag.visibilityVertices().contains(start)) {
-        addAreaVertex(start, ag, scope, tempEdges);
+        addAreaVertex(start, ag, scope, tempEdges, added);
       }
     } else {
       start = split;
@@ -585,7 +587,7 @@ public class VertexLinker {
    * Link a new vertex permanently with area geometry
    */
   public boolean addPermanentAreaVertex(IntersectionVertex newVertex, AreaGroup areaGroup) {
-    return addAreaVertex(newVertex, areaGroup, Scope.PERMANENT, null);
+    return addAreaVertex(newVertex, areaGroup, Scope.PERMANENT, null, true);
   }
 
   /**
@@ -598,14 +600,15 @@ public class VertexLinker {
   }
 
   /**
-   * Safely add a vertex to an area. This creates edges to all visibility vertices
+   * Add a vertex to an area. This creates edges to all visibility vertices
    * unless those edges would cross one of the area boundary edges
    */
   private boolean addAreaVertex(
     IntersectionVertex newVertex,
     AreaGroup areaGroup,
     Scope scope,
-    DisposableEdgeCollection tempEdges
+    DisposableEdgeCollection tempEdges,
+    boolean force
   ) {
     Geometry polygon = areaGroup.getGeometry();
 
@@ -620,7 +623,7 @@ public class VertexLinker {
       // take min. 10 closest visibility points
       var appliedCount = (long) Math.max(
         10,
-        Math.floor(maxAreaNodes * maxAreaNodes / areaComplexity)
+        Math.floor(2 * maxAreaNodes * maxAreaNodes / areaComplexity)
       );
       if (appliedCount < totalCount) {
         LOG.info(
@@ -647,6 +650,15 @@ public class VertexLinker {
     // this happens when the added vertex is outside the area or all visibility edges are blocked
     if (added == 0) {
       LOG.error("Area visibility connections failed");
+      if (force) {
+        var nearest = areaGroup
+          .visibilityVertices()
+          .stream()
+          .sorted((v1, v2) -> distSquared(v1, newVertex).compareTo(distSquared(v2, newVertex)))
+          .findFirst()
+          .get();
+        return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges);
+      }
       return false;
     } else if (scope == Scope.PERMANENT) {
       // marking the new vertex as visibilityVertex enables  direct connections to it
