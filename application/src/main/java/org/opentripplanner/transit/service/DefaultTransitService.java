@@ -465,7 +465,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public List<TripTimeOnDate> findTripTimeOnDate(TripTimeOnDateRequest request) {
-    return StopTimesHelper.findTripTimeOnDate(this, request);
+    return stopTimesHelper.findTripTimeOnDate(request);
   }
 
   /**

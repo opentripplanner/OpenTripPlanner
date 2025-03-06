@@ -33,9 +33,9 @@ import org.opentripplanner.ext.vdv.id.IdResolver;
 import org.opentripplanner.ext.vdv.ojp.mapping.PtModeMapper;
 import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 
 public class OjpService {
 
