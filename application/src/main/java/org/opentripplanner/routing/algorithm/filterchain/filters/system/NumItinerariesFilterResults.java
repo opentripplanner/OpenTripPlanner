@@ -58,8 +58,7 @@ class NumItinerariesFilterResults implements PageCursorInput {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(NumItinerariesFilterResults.class)
+    return ToStringBuilder.of(NumItinerariesFilterResults.class)
       .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
       .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
       .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)

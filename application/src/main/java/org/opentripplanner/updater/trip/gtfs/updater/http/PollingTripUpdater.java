@@ -89,8 +89,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addObj("updateSource", updateSource)
       .addStr("feedId", feedId)
       .addBool("fuzzyTripMatching", fuzzyTripMatching)

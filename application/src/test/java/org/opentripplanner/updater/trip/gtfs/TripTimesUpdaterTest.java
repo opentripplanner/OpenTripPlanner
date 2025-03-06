@@ -47,7 +47,7 @@ public class TripTimesUpdaterTest {
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static Timetable timetable;
   private static String feedId;
-  private static int trip_1_1_index;
+  private static FeedScopedId tripId;
 
   @BeforeAll
   public static void setUp() throws Exception {
@@ -61,9 +61,9 @@ public class TripTimesUpdaterTest {
       pattern.scheduledTripsAsStream().forEach(trip -> patternIndex.put(trip.getId(), pattern));
     }
 
-    TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, TRIP_ID));
+    tripId = new FeedScopedId(feedId, TRIP_ID);
+    TripPattern pattern = patternIndex.get(tripId);
     timetable = pattern.getScheduledTimetable();
-    trip_1_1_index = timetable.getTripIndex(new FeedScopedId(feedId, TRIP_ID));
   }
 
   @Test
@@ -168,13 +168,12 @@ public class TripTimesUpdaterTest {
     );
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setTime(
-      LocalDateTime
-        .of(2009, Month.AUGUST.getValue() - 1 + 1, 7, 0, 2, 0, 0)
+      LocalDateTime.of(2009, Month.AUGUST.getValue() - 1 + 1, 7, 0, 2, 0, 0)
         .atZone(ZoneId.of("America/New_York"))
         .toEpochSecond()
     );
     var tripUpdate = tripUpdateBuilder.build();
-    assertEquals(20 * 60, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
+    assertEquals(20 * 60, timetable.getTripTimes(tripId).getArrivalTime(2));
     var result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
       timetable,
       tripUpdate,
@@ -189,7 +188,7 @@ public class TripTimesUpdaterTest {
       var updatedTripTimes = p.getTripTimes();
       assertNotNull(updatedTripTimes);
       timetable = timetable.copyOf().addOrUpdateTripTimes(updatedTripTimes).build();
-      assertEquals(20 * 60 + 120, timetable.getTripTimes(trip_1_1_index).getArrivalTime(2));
+      assertEquals(20 * 60 + 120, timetable.getTripTimes(tripId).getArrivalTime(2));
     });
 
     // update trip arrival time incorrectly
@@ -202,14 +201,13 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
     stopTimeEventBuilder.setDelay(0);
     tripUpdate = tripUpdateBuilder.build();
-    result =
-      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
-        timetable,
-        tripUpdate,
-        TIME_ZONE,
-        SERVICE_DATE,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
 
     assertTrue(result.isSuccess());
 
@@ -232,14 +230,13 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder.setDelay(1);
     tripUpdate = tripUpdateBuilder.build();
 
-    result =
-      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
-        timetable,
-        tripUpdate,
-        TIME_ZONE,
-        SERVICE_DATE,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
 
     assertTrue(result.isSuccess());
 
@@ -260,14 +257,13 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    result =
-      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
-        timetable,
-        tripUpdate,
-        TIME_ZONE,
-        SERVICE_DATE,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
 
     assertTrue(result.isSuccess());
 
@@ -287,14 +283,13 @@ public class TripTimesUpdaterTest {
     stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
     stopTimeEventBuilder.setDelay(120);
     tripUpdate = tripUpdateBuilder.build();
-    result =
-      TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
-        timetable,
-        tripUpdate,
-        TIME_ZONE,
-        SERVICE_DATE,
-        BackwardsDelayPropagationType.REQUIRED_NO_DATA
-      );
+    result = TripTimesUpdater.createUpdatedTripTimesFromGTFSRT(
+      timetable,
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
 
     assertTrue(result.isSuccess());
 

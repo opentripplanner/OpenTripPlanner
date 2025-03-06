@@ -25,7 +25,6 @@ public class TestStreetLinkerModule {
       DataImportIssueStore.NOOP,
       false,
       0
-    )
-      .buildGraph();
+    ).buildGraph();
   }
 }

@@ -57,13 +57,12 @@ class TripMapper {
     lhs.withShortName(rhs.getTripShortName());
     I18NString tripHeadsign = null;
     if (rhs.getTripHeadsign() != null) {
-      tripHeadsign =
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Trip.class,
-          "tripHeadsign",
-          rhs.getId().getId(),
-          rhs.getTripHeadsign()
-        );
+      tripHeadsign = translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Trip.class,
+        "tripHeadsign",
+        rhs.getId().getId(),
+        rhs.getTripHeadsign()
+      );
     }
     lhs.withHeadsign(tripHeadsign);
     lhs.withDirection(directionMapper.map(rhs.getDirectionId(), lhs.getId()));

@@ -49,14 +49,12 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   private final int START_TIME_T1 = time("10:00:20");
 
   // Given
-  TestTripSchedule trip1 = TestTripSchedule
-    .schedule()
+  TestTripSchedule trip1 = TestTripSchedule.schedule()
     .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
     .times("10:02 10:10 10:15 10:20 10:25 10:30")
     .build();
 
-  TestTripSchedule trip2 = TestTripSchedule
-    .schedule()
+  TestTripSchedule trip2 = TestTripSchedule.schedule()
     .pattern("T2", STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
     .times("10:13 10:18 10:24 10:30 10:36 10:40")
     .build();
@@ -139,8 +137,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     TransferPriority expPriority,
     String expItinerary
   ) {
-    var original = OptimizePathDomainServiceTest
-      .pathBuilder()
+    var original = OptimizePathDomainServiceTest.pathBuilder()
       .access(START_TIME_T1, STOP_A)
       .bus(trip1, STOP_B)
       .walk(D1m, STOP_C)

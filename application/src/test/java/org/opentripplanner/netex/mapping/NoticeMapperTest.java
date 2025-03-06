@@ -35,13 +35,12 @@ public class NoticeMapperTest {
 
     // And when other instance with same id is mapped, the first one is returned
     // from cache - ignoring all properties except the id
-    otpNotice =
-      mapper.map(
-        new Notice()
-          .withId(NOTICE_ID)
-          .withPublicCode("Albatross")
-          .withText(new MultilingualString().withValue("Different text"))
-      );
+    otpNotice = mapper.map(
+      new Notice()
+        .withId(NOTICE_ID)
+        .withPublicCode("Albatross")
+        .withText(new MultilingualString().withValue("Different text"))
+    );
 
     // Then
     assertEquals(NOTICE_ID, otpNotice.getId().getId());

@@ -63,8 +63,7 @@ class ElevationProfileTest {
 
   @Test
   void removeDuplicateSteps() {
-    var p = ElevationProfile
-      .of()
+    var p = ElevationProfile.of()
       .step(0, 0)
       .step(0, 0)
       .step(1, 1)
@@ -120,8 +119,7 @@ class ElevationProfileTest {
 
   @Test
   void calculateElevationChange() {
-    var p = ElevationProfile
-      .of()
+    var p = ElevationProfile.of()
       .step(1, 10.0)
       .step(2, 11.0)
       .step(3, 10.5)

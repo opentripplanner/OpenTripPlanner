@@ -33,49 +33,50 @@ public class GbfsStationStatusMapper {
     }
     GBFSStation status = statusLookup.get(station.getStationId());
 
-    station.vehiclesAvailable =
-      status.getNumBikesAvailable() != null ? status.getNumBikesAvailable() : 0;
+    station.vehiclesAvailable = status.getNumBikesAvailable() != null
+      ? status.getNumBikesAvailable()
+      : 0;
 
-    station.vehicleTypesAvailable =
-      status.getVehicleTypesAvailable() != null
-        ? status
-          .getVehicleTypesAvailable()
-          .stream()
-          .filter(e -> containsVehicleType(e, status))
-          .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
-        : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.vehiclesAvailable);
+    station.vehicleTypesAvailable = status.getVehicleTypesAvailable() != null
+      ? status
+        .getVehicleTypesAvailable()
+        .stream()
+        .filter(e -> containsVehicleType(e, status))
+        .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
+      : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.vehiclesAvailable);
 
-    station.vehiclesDisabled =
-      status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;
+    station.vehiclesDisabled = status.getNumBikesDisabled() != null
+      ? status.getNumBikesDisabled()
+      : 0;
 
-    station.spacesAvailable =
-      status.getNumDocksAvailable() != null ? status.getNumDocksAvailable() : Integer.MAX_VALUE;
+    station.spacesAvailable = status.getNumDocksAvailable() != null
+      ? status.getNumDocksAvailable()
+      : Integer.MAX_VALUE;
 
-    station.vehicleSpacesAvailable =
-      status.getVehicleDocksAvailable() != null
-        ? status
-          .getVehicleDocksAvailable()
-          .stream()
-          .flatMap(available ->
-            available
-              .getVehicleTypeIds()
-              .stream()
-              .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
-          )
-          .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
-        : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
+    station.vehicleSpacesAvailable = status.getVehicleDocksAvailable() != null
+      ? status
+        .getVehicleDocksAvailable()
+        .stream()
+        .flatMap(available ->
+          available
+            .getVehicleTypeIds()
+            .stream()
+            .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
+        )
+        .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
+      : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
 
-    station.spacesDisabled =
-      status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
+    station.spacesDisabled = status.getNumDocksDisabled() != null
+      ? status.getNumDocksDisabled()
+      : 0;
 
     station.isInstalled = status.getIsInstalled() != null ? status.getIsInstalled() : true;
     station.isRenting = status.getIsRenting() != null ? status.getIsRenting() : true;
     station.isReturning = status.getIsReturning() != null ? status.getIsReturning() : true;
 
-    station.lastReported =
-      status.getLastReported() != null
-        ? Instant.ofEpochSecond(status.getLastReported().longValue())
-        : null;
+    station.lastReported = status.getLastReported() != null
+      ? Instant.ofEpochSecond(status.getLastReported().longValue())
+      : null;
   }
 
   private boolean containsVehicleType(

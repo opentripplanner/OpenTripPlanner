@@ -38,8 +38,7 @@ public class TimeSlopeSafetyTriangleTest {
     double expSafety,
     String description
   ) {
-    var subject = TimeSlopeSafetyTriangle
-      .of()
+    var subject = TimeSlopeSafetyTriangle.of()
       .withTime(inTime)
       .withSlope(inSlope)
       .withSafety(inSafety)
@@ -52,8 +51,7 @@ public class TimeSlopeSafetyTriangleTest {
   @Test
   public void testBuildWithDefaultValue() {
     // Set som arbitrary values for the default instance
-    var expected = TimeSlopeSafetyTriangle
-      .of()
+    var expected = TimeSlopeSafetyTriangle.of()
       .withTime(1.0)
       .withSlope(2.0)
       .withSafety(3.0)

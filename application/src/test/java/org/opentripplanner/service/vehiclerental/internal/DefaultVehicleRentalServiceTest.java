@@ -27,12 +27,8 @@ class DefaultVehicleRentalServiceTest {
       .build();
     defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalVehicle);
 
-    List<VehicleRentalStation> vehicleRentalStationForEnvelope = defaultVehicleRentalService.getVehicleRentalStationForEnvelope(
-      0,
-      0,
-      10,
-      10
-    );
+    List<VehicleRentalStation> vehicleRentalStationForEnvelope =
+      defaultVehicleRentalService.getVehicleRentalStationForEnvelope(0, 0, 10, 10);
     assertEquals(1, vehicleRentalStationForEnvelope.size());
     assertEquals(vehicleRentalStation, vehicleRentalStationForEnvelope.get(0));
   }

@@ -22,6 +22,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
@@ -258,7 +259,7 @@ public class LinkStopToPlatformTest {
       linker.linkVertexPermanently(
         tStop,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (vertex, streetVertex) ->
           List.of(
             StreetTransitStopLink.createStreetTransitStopLink(

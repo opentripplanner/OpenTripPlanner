@@ -52,11 +52,12 @@ public class QualifiedModeSet implements Serializable {
 
     List<QualifiedMode> filteredModes = qModes
       .stream()
-      .filter(m ->
-        m.mode == ApiRequestMode.WALK ||
-        m.mode == ApiRequestMode.BICYCLE ||
-        m.mode == ApiRequestMode.SCOOTER ||
-        m.mode == ApiRequestMode.CAR
+      .filter(
+        m ->
+          m.mode == ApiRequestMode.WALK ||
+          m.mode == ApiRequestMode.BICYCLE ||
+          m.mode == ApiRequestMode.SCOOTER ||
+          m.mode == ApiRequestMode.CAR
       )
       .toList();
 

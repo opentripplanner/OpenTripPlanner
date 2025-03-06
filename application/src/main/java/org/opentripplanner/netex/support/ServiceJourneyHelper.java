@@ -22,8 +22,7 @@ public class ServiceJourneyHelper {
 
   private static int elapsedTimeSinceMidnight(LocalTime time, int dayOffset) {
     Objects.requireNonNull(time);
-    return (int) Duration
-      .between(LocalTime.MIDNIGHT, time)
+    return (int) Duration.between(LocalTime.MIDNIGHT, time)
       .plus(Duration.ofDays(dayOffset))
       .toSeconds();
   }

@@ -69,8 +69,9 @@ public record DecorateWithEmission(EmissionsService emissionsService)
         feedScopedRouteId
       );
       if (co2EmissionsForRoute.isPresent()) {
-        co2Emissions =
-          co2Emissions.plus(co2EmissionsForRoute.get().getCo2().multiply(leg.getDistanceMeters()));
+        co2Emissions = co2Emissions.plus(
+          co2EmissionsForRoute.get().getCo2().multiply(leg.getDistanceMeters())
+        );
       } else {
         // Partial results would not give an accurate representation of the emissions.
         return Optional.empty();

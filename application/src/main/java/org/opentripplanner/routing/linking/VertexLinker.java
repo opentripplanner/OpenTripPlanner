@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -205,15 +206,14 @@ public class VertexLinker {
         tempEdges
       );
       if (streetVertices.isEmpty()) {
-        streetVertices =
-          linkToStreetEdges(
-            vertex,
-            traverseModes,
-            direction,
-            scope,
-            MAX_SEARCH_RADIUS_METERS,
-            tempEdges
-          );
+        streetVertices = linkToStreetEdges(
+          vertex,
+          traverseModes,
+          direction,
+          scope,
+          MAX_SEARCH_RADIUS_METERS,
+          tempEdges
+        );
       }
 
       for (StreetVertex streetVertex : streetVertices) {
@@ -300,7 +300,7 @@ public class VertexLinker {
   }
 
   private static double getXscale(Vertex vertex) {
-    return Math.cos(vertex.getLat() * Math.PI / 180);
+    return Math.cos((vertex.getLat() * Math.PI) / 180);
   }
 
   private Set<StreetVertex> linkToCandidateEdges(
@@ -409,7 +409,7 @@ public class VertexLinker {
           if (vertex instanceof IntersectionVertex iv) {
             start = iv;
           } else {
-            start = createSplitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+            start = createSplitVertex(aEdge, scope, vertex.getLon(), vertex.getLat());
           }
           linkedAreas.put(ag, start);
         }
@@ -490,13 +490,7 @@ public class VertexLinker {
     LinkingDirection direction,
     DisposableEdgeCollection tempEdges
   ) {
-    SplitterVertex v = createSplitVertex(
-      originalEdge,
-      scope,
-      direction,
-      splitPoint.x,
-      splitPoint.y
-    );
+    SplitterVertex v = createSplitVertex(originalEdge, scope, splitPoint.x, splitPoint.y);
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
@@ -529,7 +523,6 @@ public class VertexLinker {
   private SplitterVertex createSplitVertex(
     StreetEdge originalEdge,
     Scope scope,
-    LinkingDirection direction,
     double x,
     double y
   ) {
@@ -541,8 +534,7 @@ public class VertexLinker {
         uniqueSplitLabel,
         x,
         y,
-        originalEdge,
-        direction == LinkingDirection.OUTGOING
+        originalEdge
       );
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
@@ -623,15 +615,14 @@ public class VertexLinker {
       // take min. 10 closest visibility points
       var appliedCount = (long) Math.max(
         10,
-        Math.floor(2 * maxAreaNodes * maxAreaNodes / areaComplexity)
+        Math.floor((2 * maxAreaNodes * maxAreaNodes) / areaComplexity)
       );
       if (appliedCount < totalCount) {
-        visibilityVertices =
-          visibilityVertices
-            .stream()
-            .sorted((v1, v2) -> distSquared(v1, newVertex).compareTo(distSquared(v2, newVertex)))
-            .limit(appliedCount)
-            .collect(Collectors.toSet());
+        visibilityVertices = visibilityVertices
+          .stream()
+          .sorted((v1, v2) -> distSquared(v1, newVertex).compareTo(distSquared(v2, newVertex)))
+          .limit(appliedCount)
+          .collect(Collectors.toSet());
       }
     }
     for (IntersectionVertex v : visibilityVertices) {

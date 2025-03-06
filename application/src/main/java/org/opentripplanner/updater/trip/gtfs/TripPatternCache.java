@@ -58,16 +58,14 @@ class TripPatternCache {
       // Generate unique code for trip pattern
       var id = generateUniqueTripPatternCode(trip);
 
-      tripPattern =
-        TripPattern
-          .of(id)
-          .withRoute(route)
-          .withMode(trip.getMode())
-          .withNetexSubmode(trip.getNetexSubMode())
-          .withStopPattern(stopPattern)
-          .withCreatedByRealtimeUpdater(true)
-          .withOriginalTripPattern(originalTripPattern)
-          .build();
+      tripPattern = TripPattern.of(id)
+        .withRoute(route)
+        .withMode(trip.getMode())
+        .withNetexSubmode(trip.getNetexSubMode())
+        .withStopPattern(stopPattern)
+        .withCreatedByRealtimeUpdater(true)
+        .withOriginalTripPattern(originalTripPattern)
+        .build();
 
       // Add pattern to cache
       cache.put(stopPattern, tripPattern);

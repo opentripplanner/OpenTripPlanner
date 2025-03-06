@@ -62,9 +62,10 @@ public class NoticeAssignmentMapperTest {
       new HashMap<>()
     );
 
-    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
-      noticeAssignment
-    );
+    Multimap<
+      AbstractTransitEntity,
+      org.opentripplanner.transit.model.basic.Notice
+    > noticesByElement = noticeAssignmentMapper.map(noticeAssignment);
 
     org.opentripplanner.transit.model.basic.Notice notice2 = noticesByElement
       .get(route)
@@ -113,9 +114,10 @@ public class NoticeAssignmentMapperTest {
       stopTimesById
     );
 
-    Multimap<AbstractTransitEntity, org.opentripplanner.transit.model.basic.Notice> noticesByElement = noticeAssignmentMapper.map(
-      noticeAssignment
-    );
+    Multimap<
+      AbstractTransitEntity,
+      org.opentripplanner.transit.model.basic.Notice
+    > noticesByElement = noticeAssignmentMapper.map(noticeAssignment);
 
     org.opentripplanner.transit.model.basic.Notice notice2a = noticesByElement
       .get(stopTime1.getId())

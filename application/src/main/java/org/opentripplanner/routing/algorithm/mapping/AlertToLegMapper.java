@@ -86,9 +86,8 @@ public class AlertToLegMapper {
           Collection<TransitAlert> alerts = getAlertsForStopAndRoute(stop, routeId, stopConditions);
           alerts.addAll(getAlertsForStopAndTrip(stop, tripId, serviceDate, stopConditions));
           alerts.addAll(
-            getAlertsForRelatedStops(
-              stop,
-              id -> transitAlertService.getStopAlerts(id, stopConditions)
+            getAlertsForRelatedStops(stop, id ->
+              transitAlertService.getStopAlerts(id, stopConditions)
             )
           );
 
@@ -141,9 +140,8 @@ public class AlertToLegMapper {
     FeedScopedId routeId,
     Set<StopCondition> stopConditions
   ) {
-    return getAlertsForRelatedStops(
-      stop,
-      id -> transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions)
+    return getAlertsForRelatedStops(stop, id ->
+      transitAlertService.getStopAndRouteAlerts(id, routeId, stopConditions)
     );
   }
 
@@ -153,9 +151,8 @@ public class AlertToLegMapper {
     LocalDate serviceDate,
     Set<StopCondition> stopConditions
   ) {
-    return getAlertsForRelatedStops(
-      stop,
-      id -> transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate, stopConditions)
+    return getAlertsForRelatedStops(stop, id ->
+      transitAlertService.getStopAndTripAlerts(id, tripId, serviceDate, stopConditions)
     );
   }
 

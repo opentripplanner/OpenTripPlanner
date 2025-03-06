@@ -19,8 +19,7 @@ class AgencyTest {
   private static final String FARE_URL = "http://fare.aaa.com";
   private static final String LANG = "image";
 
-  private static final Agency subject = Agency
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final Agency subject = Agency.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withUrl(URL)
     .withTimezone(TIMEZONE)

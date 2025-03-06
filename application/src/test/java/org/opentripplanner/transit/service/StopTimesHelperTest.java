@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.stoptimes;
+package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,8 +15,6 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 class StopTimesHelperTest {
 
@@ -25,6 +23,7 @@ class StopTimesHelperTest {
   private static final LocalDate serviceDate = LocalDate.of(2021, Month.JULY, 26);
   private static FeedScopedId stopId;
   private static TripPattern pattern;
+  private static StopTimesHelper stopTimesHelper;
 
   @BeforeAll
   public static void setUp() throws Exception {
@@ -37,17 +36,17 @@ class StopTimesHelperTest {
       transitService.getTrip(new FeedScopedId(feedId, "5.1"))
     );
     var tt = originalPattern.getScheduledTimetable();
-    var newTripTimes = tt.getTripTimes(0).copyScheduledTimes();
+    var newTripTimes = tt.getTripTimes().getFirst().copyScheduledTimes();
     newTripTimes.cancelTrip();
-    pattern =
-      originalPattern
-        .copy()
-        .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
-        .build();
+    pattern = originalPattern
+      .copy()
+      .withScheduledTimeTableBuilder(builder -> builder.addOrUpdateTripTimes(newTripTimes))
+      .build();
     // replace the original pattern by the updated pattern in the transit model
     timetableRepository.addTripPattern(pattern.getId(), pattern);
     timetableRepository.index();
     transitService = new DefaultTransitService(timetableRepository);
+    stopTimesHelper = new StopTimesHelper(transitService);
   }
 
   /**
@@ -55,8 +54,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_zeroRequestedNumberOfDeparture() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
@@ -73,8 +71,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_oneDeparture() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
@@ -108,8 +105,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_allDepartures() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
@@ -124,8 +120,7 @@ class StopTimesHelperTest {
 
   @Test
   void stopTimesForStop_noCanceledDepartures() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(24),
@@ -143,8 +138,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_noDepartures() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
       Duration.ofHours(6),
@@ -161,8 +155,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_nextDay() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
       Duration.ofHours(36),
@@ -197,8 +190,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForPatternAtStop_oneDayFromMidnight() {
-    var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
-      transitService,
+    var stopTimes = stopTimesHelper.stopTimesForPatternAtStop(
       transitService.getRegularStop(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
@@ -223,8 +215,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForPatternAtStop_oneDayFromMidday() {
-    var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
-      transitService,
+    var stopTimes = stopTimesHelper.stopTimesForPatternAtStop(
       transitService.getRegularStop(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).plusHours(12).toInstant(),
@@ -250,8 +241,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForPatternAtStop_twoDaysFromMidnight() {
-    var stopTimes = StopTimesHelper.stopTimesForPatternAtStop(
-      transitService,
+    var stopTimes = stopTimesHelper.stopTimesForPatternAtStop(
       transitService.getRegularStop(stopId),
       pattern,
       serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
@@ -283,8 +273,7 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStopServiceDate() {
-    var result = StopTimesHelper.stopTimesForStop(
-      transitService,
+    var result = stopTimesHelper.stopTimesForStop(
       transitService.getRegularStop(stopId),
       serviceDate,
       ArrivalDeparture.BOTH,

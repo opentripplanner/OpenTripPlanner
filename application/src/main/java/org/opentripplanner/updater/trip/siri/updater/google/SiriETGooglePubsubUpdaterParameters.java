@@ -33,8 +33,7 @@ public record SiriETGooglePubsubUpdaterParameters(
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SiriETGooglePubsubUpdaterParameters.class)
+    return ToStringBuilder.of(SiriETGooglePubsubUpdaterParameters.class)
       .addObj("configRef", configRef, null)
       .addObj("feedId", feedId, null)
       .addObj("subscriptionProjectName", subscriptionProjectName)

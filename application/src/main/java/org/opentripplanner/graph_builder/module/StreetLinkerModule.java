@@ -10,11 +10,11 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideEntranceRemoved;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingHelper;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetStationCentroidLink;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -99,7 +99,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
       stopLocationsUsedForFlexTrips = getStopLocationsUsedForFlexTrips(timetableRepository);
     }
 
-    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> stopLocationsUsedForCarsAllowedTrips =
+      timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     for (TransitStopVertex tStop : vertices) {
       // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
@@ -115,9 +116,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
       StopLinkType linkType = StopLinkType.WALK_ONLY;
 
       if (
-        (
-          OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(tStop.getStop())
-        ) ||
+        (OTPFeature.FlexRouting.isOn() &&
+          stopLocationsUsedForFlexTrips.contains(tStop.getStop())) ||
         stopLocationsUsedForCarsAllowedTrips.contains(tStop.getStop())
       ) {
         linkType = StopLinkType.WALK_AND_CAR;
@@ -164,7 +164,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       .linkVertexPermanently(
         tStop,
         WALK_ONLY,
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (transitVertex, streetVertex) -> {
           var linkEdges = createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex);
 
@@ -191,7 +191,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       .linkVertexPermanently(
         tStop,
         CAR_ONLY,
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         (transitVertex, streetVertex) ->
           createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
       );
@@ -217,7 +217,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           vehicleParkingVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -238,7 +238,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           vehicleParkingVertex,
           new TraverseModeSet(TraverseMode.CAR),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleParkingLink.createStreetVehicleParkingLink(
@@ -262,7 +262,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           tEntrance,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetTransitEntranceLink.createStreetTransitEntranceLink(
@@ -280,9 +280,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   private void linkStationCentroids(Graph graph) {
     BiFunction<Vertex, StreetVertex, List<Edge>> stationAndStreetVertexLinker = (
-        theStation,
-        streetVertex
-      ) ->
+      theStation,
+      streetVertex
+    ) ->
       List.of(
         StreetStationCentroidLink.createStreetStationLink(
           (StationCentroidVertex) theStation,
@@ -300,7 +300,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         .linkVertexPermanently(
           station,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           stationAndStreetVertexLinker
         );
     }

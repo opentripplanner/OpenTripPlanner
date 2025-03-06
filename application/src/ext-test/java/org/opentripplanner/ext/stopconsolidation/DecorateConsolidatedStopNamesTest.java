@@ -33,8 +33,7 @@ class DecorateConsolidatedStopNamesTest {
   void changeNames() {
     var filter = defaultFilter();
 
-    var itinerary = TestItineraryBuilder
-      .newItinerary(PLACE_C)
+    var itinerary = TestItineraryBuilder.newItinerary(PLACE_C)
       .bus(TestStopConsolidationModel.ROUTE, 1, T11_05, T11_12, PLACE_C)
       .bus(1, T11_05, T11_12, PlanTestConstants.E)
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
@@ -61,8 +60,7 @@ class DecorateConsolidatedStopNamesTest {
   void removeTransferAtConsolidatedStop() {
     final var filter = defaultFilter();
 
-    var itinerary = TestItineraryBuilder
-      .newItinerary(PLACE_C)
+    var itinerary = TestItineraryBuilder.newItinerary(PLACE_C)
       .bus(TestStopConsolidationModel.ROUTE, 1, T11_05, T11_12, PLACE_C)
       .walk(1, PLACE_C)
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
@@ -78,8 +76,7 @@ class DecorateConsolidatedStopNamesTest {
   void keepRegularTransfer() {
     final var filter = defaultFilter();
 
-    var itinerary = TestItineraryBuilder
-      .newItinerary(PLACE_C)
+    var itinerary = TestItineraryBuilder.newItinerary(PLACE_C)
       .bus(TestStopConsolidationModel.ROUTE, 1, T11_05, T11_12, PLACE_C)
       .walk(1, PlanTestConstants.E)
       .bus(1, T11_05, T11_12, PlanTestConstants.F)

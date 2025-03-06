@@ -33,8 +33,7 @@ class AreaStopTest {
   private static final AreaStop subject = areaStopBuilder().withGeometry(GEOMETRY).build();
 
   private static AreaStopBuilder areaStopBuilder() {
-    return SiteRepository
-      .of()
+    return SiteRepository.of()
       .areaStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .withDescription(DESCRIPTION)

@@ -24,10 +24,9 @@ public class GtfsRealtimeSeverityMapper {
       case SEVERE:
         return AlertSeverity.SEVERE;
       case UNKNOWN_SEVERITY:
-      default:
-        {
-          return AlertSeverity.UNKNOWN_SEVERITY;
-        }
+      default: {
+        return AlertSeverity.UNKNOWN_SEVERITY;
+      }
     }
   }
 }

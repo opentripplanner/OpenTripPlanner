@@ -36,19 +36,19 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 /**
  * FEATURE UNDER TEST
  *
- * Raptor should be able to handle route request with one or more via locations.
- * If a stop is specified as via location in the request, then all the results returned
- * from raptor should include the stop. The stop should be a alight, board or intermediate
+ * Raptor should be able to handle route request with one or more via locations transfering at a
+ * given set of stops. If a stop is specified as via location in the request, then all the results
+ * returned from raptor should include the stop. The stop should be a alight, board or intermediate
  * stop of one of the trips in the path.
  *
- * It should be possible to specify more than one connection. The result should include the
- * via locations in the order as they were specified in the request. Only alternatives that pass
+ * It should be possible to specify more than one connection. The result should include the via
+ * locations in the order as they were specified in the request. Only alternatives that pass
  * through all via locations should be included in the result.
  *
  * To support stations and other collections of stops, Raptor should also support multiple via
  * connections in one via location.
  */
-class J02_ViaSearchTest {
+class J02_ViaStopSearchTest {
 
   static final List<RaptorViaLocation> VIA_LOCATION_STOP_B = List.of(viaLocation("B", STOP_B));
   static final List<RaptorViaLocation> VIA_LOCATION_STOP_C = List.of(viaLocation("C", STOP_C));
@@ -97,8 +97,10 @@ class J02_ViaSearchTest {
     var data = new TestTransitData();
 
     data.withRoutes(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_D)
-        .withTimetable(schedule("0:02 0:10 0:20 0:30"), schedule("0:12 0:20 0:30 0:40"))
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D).withTimetable(
+        schedule("0:02 0:10 0:20 0:30"),
+        schedule("0:12 0:20 0:30 0:40")
+      )
     );
 
     var requestBuilder = prepareRequest();
@@ -163,13 +165,12 @@ class J02_ViaSearchTest {
     var data = new TestTransitData();
 
     data.withRoutes(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_D)
-        .withTimetable(
-          schedule("0:02 0:05 0:10 0:15"),
-          // We add another trip to allow riding trip one - via B - then ride trip two, this
-          // is not a pareto-optimal solution and should only appear if there is something wrong.
-          schedule("0:12 0:15 0:20 0:25")
-        )
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D).withTimetable(
+        schedule("0:02 0:05 0:10 0:15"),
+        // We add another trip to allow riding trip one - via B - then ride trip two, this
+        // is not a pareto-optimal solution and should only appear if there is something wrong.
+        schedule("0:12 0:15 0:20 0:25")
+      )
     );
 
     var requestBuilder = prepareRequest();
@@ -208,12 +209,11 @@ class J02_ViaSearchTest {
     var data = new TestTransitData();
 
     data.withRoutes(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_D)
-        .withTimetable(
-          schedule("0:02 0:05 0:10 0:20"),
-          // We add another trip to check that we do not transfer to the other trip at some point.
-          schedule("0:12 0:15 0:20 0:25")
-        )
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D).withTimetable(
+        schedule("0:02 0:05 0:10 0:20"),
+        // We add another trip to check that we do not transfer to the other trip at some point.
+        schedule("0:12 0:15 0:20 0:25")
+      )
     );
 
     var requestBuilder = prepareRequest();
@@ -250,12 +250,14 @@ class J02_ViaSearchTest {
     // The second one includes the second via point.
     // Both arrive at the desired destination, so normally there should not be any transfers.
     data.withRoutes(
-      route("R2", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-        .withTimetable(
-          schedule("0:02 0:05 0:10 0:15 0:20 0:25"),
-          schedule("0:12 0:15 0:20 0:25 0:30 0:35"),
-          schedule("0:22 0:25 0:30 0:35 0:40 0:45")
-        )
+      route("R2").timetable(
+        """
+        A    B    C    D    E    F
+        0:02 0:05 0:10 0:15 0:20 0:25
+        0:12 0:15 0:20 0:25 0:30 0:35
+        0:22 0:25 0:30 0:35 0:40 0:45
+        """
+      )
     );
 
     data.withTransferCost(100);
@@ -286,8 +288,18 @@ class J02_ViaSearchTest {
     var data = new TestTransitData();
 
     data.withRoute(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_B, STOP_C, STOP_B, STOP_C, STOP_B, STOP_D)
-        .withTimetable(schedule("0:05 0:10 0:15 0:20 0:25 0:30 0:35 0:40 0:45"))
+      route(
+        "R1",
+        STOP_A,
+        STOP_B,
+        STOP_C,
+        STOP_B,
+        STOP_C,
+        STOP_B,
+        STOP_C,
+        STOP_B,
+        STOP_D
+      ).withTimetable(schedule("0:05 0:10 0:15 0:20 0:25 0:30 0:35 0:40 0:45"))
     );
 
     var requestBuilder = prepareRequest();
@@ -346,8 +358,11 @@ class J02_ViaSearchTest {
     var data = new TestTransitData();
     data.withRoutes(
       route("R1", STOP_A, STOP_B).withTimetable(schedule("0:02:00 0:04:00")),
-      route("R2", STOP_B, STOP_C)
-        .withTimetable(schedule("0:05:44 0:10"), schedule("0:05:45 0:11"), schedule("0:05:46 0:12"))
+      route("R2", STOP_B, STOP_C).withTimetable(
+        schedule("0:05:44 0:10"),
+        schedule("0:05:45 0:11"),
+        schedule("0:05:46 0:12")
+      )
     );
 
     var requestBuilder = prepareRequest();

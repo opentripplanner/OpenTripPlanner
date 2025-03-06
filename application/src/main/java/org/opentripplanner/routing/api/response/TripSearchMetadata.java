@@ -84,8 +84,7 @@ public class TripSearchMetadata {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripSearchMetadata.class)
+    return ToStringBuilder.of(TripSearchMetadata.class)
       .addDuration("searchWindowUsed", searchWindowUsed)
       .addObj("nextDateTime", nextDateTime)
       .addObj("prevDateTime", prevDateTime)

@@ -21,9 +21,8 @@ class NoopPassThroughPointsServiceTest {
 
   @Test
   void updateC2Value() {
-    assertThrows(
-      UnsupportedOperationException.class,
-      () -> PassThroughPointsService.NOOP.updateC2Value(1000, i -> fail())
+    assertThrows(UnsupportedOperationException.class, () ->
+      PassThroughPointsService.NOOP.updateC2Value(1000, i -> fail())
     );
   }
 

@@ -20,11 +20,10 @@ class OtpRetryTest {
   @BeforeEach
   void beforeEach() {
     hasRetried = new CompletableFuture<>();
-    otpRetryBuilder =
-      new OtpRetryBuilder()
-        .withName("Test-retry")
-        .withInitialRetryInterval(Duration.ZERO)
-        .withOnRetry(() -> hasRetried.complete(true));
+    otpRetryBuilder = new OtpRetryBuilder()
+      .withName("Test-retry")
+      .withInitialRetryInterval(Duration.ZERO)
+      .withOnRetry(() -> hasRetried.complete(true));
   }
 
   @Test
@@ -42,12 +41,10 @@ class OtpRetryTest {
   @Test
   void testInitialFailureNoRetryAttempt() {
     OtpRetry retry = otpRetryBuilder.withMaxAttempts(0).build();
-    assertThrows(
-      OtpRetryException.class,
-      () ->
-        retry.execute(() -> {
-          throw new RuntimeException("Failed retry");
-        })
+    assertThrows(OtpRetryException.class, () ->
+      retry.execute(() -> {
+        throw new RuntimeException("Failed retry");
+      })
     );
     assertFalse(hasRetried.isDone());
   }
@@ -55,12 +52,10 @@ class OtpRetryTest {
   @Test
   void testInitialFailureAndOneRetryAttempt() {
     OtpRetry retry = otpRetryBuilder.withMaxAttempts(1).build();
-    assertThrows(
-      OtpRetryException.class,
-      () ->
-        retry.execute(() -> {
-          throw new RuntimeException("Failed retry");
-        })
+    assertThrows(OtpRetryException.class, () ->
+      retry.execute(() -> {
+        throw new RuntimeException("Failed retry");
+      })
     );
     assertTrue(hasRetried.isDone());
   }
@@ -72,12 +67,10 @@ class OtpRetryTest {
       .withMaxAttempts(2)
       .withOnRetry(retryCounter::incrementAndGet)
       .build();
-    assertThrows(
-      OtpRetryException.class,
-      () ->
-        retry.execute(() -> {
-          throw new RuntimeException("Failed retry");
-        })
+    assertThrows(OtpRetryException.class, () ->
+      retry.execute(() -> {
+        throw new RuntimeException("Failed retry");
+      })
     );
     assertEquals(2, retryCounter.get());
   }
@@ -99,12 +92,10 @@ class OtpRetryTest {
       .withMaxAttempts(1)
       .withRetryableException(IOException.class::isInstance)
       .build();
-    assertThrows(
-      OtpRetryException.class,
-      () ->
-        retry.execute(() -> {
-          throw new RuntimeException("Failed retry");
-        })
+    assertThrows(OtpRetryException.class, () ->
+      retry.execute(() -> {
+        throw new RuntimeException("Failed retry");
+      })
     );
     assertFalse(hasRetried.isDone());
   }

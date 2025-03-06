@@ -50,8 +50,8 @@ public class TileRendererManager {
       public Envelope expandPixels(double marginXPixels, double marginYPixels) {
         Envelope retval = new Envelope(bbox);
         retval.expandBy(
-          marginXPixels / mapTile.width() * (bbox.getMaxX() - bbox.getMinX()),
-          marginYPixels / mapTile.height() * (bbox.getMaxY() - bbox.getMinY())
+          (marginXPixels / mapTile.width()) * (bbox.getMaxX() - bbox.getMinX()),
+          (marginYPixels / mapTile.height()) * (bbox.getMaxY() - bbox.getMinY())
         );
         return retval;
       }
@@ -79,7 +79,8 @@ public class TileRendererManager {
       -context.bbox.getMinY() - context.bbox.getHeight()
     );
     context.transform.scale(xScale, -yScale);
-    context.metersPerPixel = Math.toRadians(context.bbox.getHeight()) * 6371000 / mapTile.height();
+    context.metersPerPixel =
+      (Math.toRadians(context.bbox.getHeight()) * 6371000) / mapTile.height();
     context.tileWidth = mapTile.width();
     context.tileHeight = mapTile.height();
 
@@ -87,5 +88,14 @@ public class TileRendererManager {
     renderer.renderTile(context);
     LOG.debug("Rendered tile at {} in {} ms", mapTile.bbox(), System.currentTimeMillis() - start);
     return image;
+  }
+
+  /**
+   * Gets all renderers
+   * <p>
+   * Used to return list of renderers to client. Could be also used to show legend.
+   */
+  public Map<String, TileRenderer> getRenderers() {
+    return renderers;
   }
 }

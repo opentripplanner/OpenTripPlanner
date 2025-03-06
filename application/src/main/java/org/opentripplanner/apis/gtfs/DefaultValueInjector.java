@@ -233,32 +233,28 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     builder
       .enumListReq(
         "PlanModesInput.direct",
-        StreetModeMapper
-          .getStreetModesForApi(journey.direct().mode())
+        StreetModeMapper.getStreetModesForApi(journey.direct().mode())
           .stream()
           .map(mode -> (Enum) DirectModeMapper.map(mode))
           .toList()
       )
       .enumListReq(
         "PlanTransitModesInput.access",
-        StreetModeMapper
-          .getStreetModesForApi(journey.access().mode())
+        StreetModeMapper.getStreetModesForApi(journey.access().mode())
           .stream()
           .map(mode -> (Enum) AccessModeMapper.map(mode))
           .toList()
       )
       .enumListReq(
         "PlanTransitModesInput.egress",
-        StreetModeMapper
-          .getStreetModesForApi(journey.egress().mode())
+        StreetModeMapper.getStreetModesForApi(journey.egress().mode())
           .stream()
           .map(mode -> (Enum) EgressModeMapper.map(mode))
           .toList()
       )
       .enumListReq(
         "PlanTransitModesInput.transfer",
-        StreetModeMapper
-          .getStreetModesForApi(journey.transfer().mode())
+        StreetModeMapper.getStreetModesForApi(journey.transfer().mode())
           .stream()
           .map(mode -> (Enum) TransferModeMapper.map(mode))
           .toList()
@@ -354,8 +350,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
   }
 
   private static ArrayValue mapTransitModes(Map<TransitMode, Double> reluctanceForMode) {
-    var modesWithReluctance = Arrays
-      .stream(GraphQLTypes.GraphQLTransitMode.values())
+    var modesWithReluctance = Arrays.stream(GraphQLTypes.GraphQLTransitMode.values())
       .map(mode -> mapTransitMode(mode, reluctanceForMode.get(TransitModeMapper.map(mode))))
       .toList();
     return ArrayValue.newArrayValue().values(modesWithReluctance).build();
@@ -365,22 +360,18 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     GraphQLTypes.GraphQLTransitMode mode,
     @Nullable Double reluctance
   ) {
-    var objectBuilder = ObjectValue
-      .newObjectValue()
+    var objectBuilder = ObjectValue.newObjectValue()
       .objectField(
         ObjectField.newObjectField().name("mode").value(EnumValue.of(mode.name())).build()
       );
     if (reluctance != null) {
       objectBuilder.objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name("cost")
           .value(
-            ObjectValue
-              .newObjectValue()
+            ObjectValue.newObjectValue()
               .objectField(
-                ObjectField
-                  .newObjectField()
+                ObjectField.newObjectField()
                   .name("reluctance")
                   .value(FloatValue.of(reluctance))
                   .build()
@@ -399,29 +390,24 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     Function<VehicleRoutingOptimizeType, Enum> typeMapper
   ) {
     var optimizationField = type == VehicleRoutingOptimizeType.TRIANGLE
-      ? ObjectField
-        .newObjectField()
+      ? ObjectField.newObjectField()
         .name("triangle")
         .value(
-          ObjectValue
-            .newObjectValue()
+          ObjectValue.newObjectValue()
             .objectField(
-              ObjectField
-                .newObjectField()
+              ObjectField.newObjectField()
                 .name("flatness")
                 .value(FloatValue.of(triangle.slope()))
                 .build()
             )
             .objectField(
-              ObjectField
-                .newObjectField()
+              ObjectField.newObjectField()
                 .name("safety")
                 .value(FloatValue.of(triangle.safety()))
                 .build()
             )
             .objectField(
-              ObjectField
-                .newObjectField()
+              ObjectField.newObjectField()
                 .name("time")
                 .value(FloatValue.of(triangle.time()))
                 .build()
@@ -429,8 +415,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
             .build()
         )
         .build()
-      : ObjectField
-        .newObjectField()
+      : ObjectField.newObjectField()
         .name("type")
         .value(EnumValue.of(typeMapper.apply(type).name()))
         .build();
@@ -441,8 +426,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     var arrayBuilder = ArrayValue.newArrayValue();
     if (!filter.not().isEmpty() || !filter.select().isEmpty()) {
       arrayBuilder.value(
-        ObjectValue
-          .newObjectValue()
+        ObjectValue.newObjectValue()
           .objectField(mapVehicleParkingSelects("not", filter.not()))
           .objectField(mapVehicleParkingSelects("select", filter.select()))
           .build()
@@ -458,15 +442,12 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     var selects = selectList
       .stream()
       .map(select ->
-        (Value) ObjectValue
-          .newObjectValue()
+        (Value) ObjectValue.newObjectValue()
           .objectField(
-            ObjectField
-              .newObjectField()
+            ObjectField.newObjectField()
               .name("tags")
               .value(
-                ArrayValue
-                  .newArrayValue()
+                ArrayValue.newArrayValue()
                   .values(select.tags().stream().map(tag -> (Value) StringValue.of(tag)).toList())
                   .build()
               )
@@ -475,8 +456,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
           .build()
       )
       .toList();
-    return ObjectField
-      .newObjectField()
+    return ObjectField.newObjectField()
       .name(fieldName)
       .value(ArrayValue.newArrayValue().values(selects).build())
       .build();
@@ -516,8 +496,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     public DefaultMappingBuilder enumListReq(String key, List<Enum> valueList) {
       defaultValueForKey.put(
         key,
-        ArrayValue
-          .newArrayValue()
+        ArrayValue.newArrayValue()
           .values((valueList.stream().map(value -> (Value) new EnumValue(value.name())).toList()))
           .build()
       );
@@ -537,8 +516,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     public DefaultMappingBuilder arrayStringsReq(String key, Collection<String> values) {
       defaultValueForKey.put(
         key,
-        ArrayValue
-          .newArrayValue()
+        ArrayValue.newArrayValue()
           .values(values.stream().map(value -> (Value) StringValue.of(value)).toList())
           .build()
       );
@@ -549,8 +527,7 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
       if (values != null) {
         defaultValueForKey.put(
           key,
-          ArrayValue
-            .newArrayValue()
+          ArrayValue.newArrayValue()
             .values(values.stream().map(value -> (Value) StringValue.of(value)).toList())
             .build()
         );

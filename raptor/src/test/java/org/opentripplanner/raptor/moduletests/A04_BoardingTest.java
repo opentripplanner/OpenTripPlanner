@@ -47,7 +47,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class A04_BoardingTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -60,8 +61,9 @@ public class A04_BoardingTest implements RaptorTestConstants {
     data.withRoute(route("L1_3", STOP_A, STOP_D).withTimetable(schedule("0:12 0:18")));
 
     data.withRoute(
-      route("L2", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G)
-        .withTimetable(schedule("0:20 0:21 0:22 0:30 0:31 0:32"))
+      route("L2", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G).withTimetable(
+        schedule("0:20 0:21 0:22 0:30 0:31 0:32")
+      )
     );
 
     // There is three possible paths from trip L2 to the destination. These paths are used to test
@@ -81,8 +83,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("23m", TX_2, T00_00, T01_00)
       // A test on the standard profile is included to demonstrate that the
       // min-travel-duration and the standard give different results. The L2

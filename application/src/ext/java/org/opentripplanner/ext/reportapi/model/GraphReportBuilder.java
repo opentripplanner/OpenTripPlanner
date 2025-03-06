@@ -13,21 +13,18 @@ public class GraphReportBuilder {
     var graph = context.graph();
     var constrainedTransfers = transitService.getTransferService().listAll();
 
-    var constrainedTransferCounts = countValues(
-      constrainedTransfers,
-      transfer -> {
-        var transferConstraint = transfer.getTransferConstraint();
-        if (transferConstraint.isMinTransferTimeSet()) {
-          return "minTransferTime";
-        } else if (transferConstraint.isStaySeated()) {
-          return "staySeated";
-        } else if (transferConstraint.isGuaranteed()) {
-          return "guaranteed";
-        } else if (transferConstraint.isNotAllowed()) {
-          return "notAllowed";
-        } else return "unknown";
-      }
-    );
+    var constrainedTransferCounts = countValues(constrainedTransfers, transfer -> {
+      var transferConstraint = transfer.getTransferConstraint();
+      if (transferConstraint.isMinTransferTimeSet()) {
+        return "minTransferTime";
+      } else if (transferConstraint.isStaySeated()) {
+        return "staySeated";
+      } else if (transferConstraint.isGuaranteed()) {
+        return "guaranteed";
+      } else if (transferConstraint.isNotAllowed()) {
+        return "notAllowed";
+      } else return "unknown";
+    });
 
     var stopCounts = countValues(
       transitService.listStopLocations(),

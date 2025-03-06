@@ -95,9 +95,9 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   @Test
   public void testCarParkLinking() {
     var setup = (BiFunction<Double, Double, Consumer<RouteRequest>>) (
-        Double latitude,
-        Double longitude
-      ) ->
+      Double latitude,
+      Double longitude
+    ) ->
       (RouteRequest rr) -> {
         rr.setFrom(new GenericLocation(latitude, longitude));
         rr.setTo(new GenericLocation(latitude, longitude));

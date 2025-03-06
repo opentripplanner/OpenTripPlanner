@@ -31,20 +31,16 @@ public class SortOrderComparatorTest implements PlanTestConstants {
     rail.setGeneralizedCost(0);
 
     // Depart-after-sort
-    result =
-      Stream
-        .of(walk, bicycle, bus, rail)
-        .sorted(defaultComparatorDepartAfter())
-        .collect(Collectors.toList());
+    result = Stream.of(walk, bicycle, bus, rail)
+      .sorted(defaultComparatorDepartAfter())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(walk, bicycle, bus, rail), toStr(result));
 
     // Arrive-by-sort
-    result =
-      Stream
-        .of(walk, bicycle, bus, rail)
-        .sorted(defaultComparatorArriveBy())
-        .collect(Collectors.toList());
+    result = Stream.of(walk, bicycle, bus, rail)
+      .sorted(defaultComparatorArriveBy())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(bicycle, walk, rail, bus), toStr(result));
   }
@@ -63,14 +59,16 @@ public class SortOrderComparatorTest implements PlanTestConstants {
     iD.setGeneralizedCost(0);
 
     // Depart-after-sort
-    result =
-      Stream.of(iD, iB, iA, iC).sorted(defaultComparatorDepartAfter()).collect(Collectors.toList());
+    result = Stream.of(iD, iB, iA, iC)
+      .sorted(defaultComparatorDepartAfter())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(iA, iB, iC, iD), toStr(result));
 
     // Arrive-by-sort
-    result =
-      Stream.of(iB, iD, iC, iA).sorted(defaultComparatorArriveBy()).collect(Collectors.toList());
+    result = Stream.of(iB, iD, iC, iA)
+      .sorted(defaultComparatorArriveBy())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(iA, iC, iB, iD), toStr(result));
   }
@@ -89,8 +87,9 @@ public class SortOrderComparatorTest implements PlanTestConstants {
     iC.setGeneralizedCost(100);
 
     // Verify depart-after sort on arrival-time, then cost
-    result =
-      Stream.of(iB, iA, iC).sorted(defaultComparatorDepartAfter()).collect(Collectors.toList());
+    result = Stream.of(iB, iA, iC)
+      .sorted(defaultComparatorDepartAfter())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(iB, iA, iC), toStr(result));
 
@@ -115,8 +114,9 @@ public class SortOrderComparatorTest implements PlanTestConstants {
     iC.setGeneralizedCost(100);
 
     // Verify depart-after sort on generalized-cost, then transfers
-    result =
-      Stream.of(iB, iA, iC).sorted(defaultComparatorDepartAfter()).collect(Collectors.toList());
+    result = Stream.of(iB, iA, iC)
+      .sorted(defaultComparatorDepartAfter())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(iA, iB, iC), toStr(result));
 
@@ -140,8 +140,9 @@ public class SortOrderComparatorTest implements PlanTestConstants {
     iC.setGeneralizedCost(100);
 
     // Verify depart-after sort on arrival-time, then cost
-    result =
-      Stream.of(iB, iA, iC).sorted(defaultComparatorDepartAfter()).collect(Collectors.toList());
+    result = Stream.of(iB, iA, iC)
+      .sorted(defaultComparatorDepartAfter())
+      .collect(Collectors.toList());
 
     assertEquals(toStr(iB, iA, iC), toStr(result));
 

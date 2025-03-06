@@ -25,10 +25,9 @@ public class TestElevationUtils {
     costs = ElevationUtils.getSlopeCosts(seq, false);
     assertEquals(1.00498756211208902702, costs.lengthMultiplier);
 
-    seq =
-      factory.create(
-        new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 2), new Coordinate(15, 1) }
-      );
+    seq = factory.create(
+      new Coordinate[] { new Coordinate(0, 1), new Coordinate(10, 2), new Coordinate(15, 1) }
+    );
     costs = ElevationUtils.getSlopeCosts(seq, false);
     assertEquals(1.00992634231424500668, costs.lengthMultiplier);
   }
@@ -119,8 +118,11 @@ public class TestElevationUtils {
     if (expectedCoordinates == null) {
       assertNull(partialElevationProfile);
     } else {
-      var expectedElevationProfile = new PackedCoordinateSequence.Double(expectedCoordinates, 2, 0)
-        .toCoordinateArray();
+      var expectedElevationProfile = new PackedCoordinateSequence.Double(
+        expectedCoordinates,
+        2,
+        0
+      ).toCoordinateArray();
       var actualElevationProfile = partialElevationProfile != null
         ? partialElevationProfile.toCoordinateArray()
         : null;

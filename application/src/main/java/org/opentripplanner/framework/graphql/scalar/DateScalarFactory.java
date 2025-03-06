@@ -39,8 +39,7 @@ public class DateScalarFactory {
     String scalarName,
     @Nullable String description
   ) {
-    return GraphQLScalarType
-      .newScalar()
+    return GraphQLScalarType.newScalar()
       .name(scalarName)
       .description(description)
       .coercing(
