@@ -242,7 +242,7 @@ class DefaultTransitServiceTest {
   }
 
   @Test
-  void getTripTimesOnNoServiceDayWithUseScheduleOption() {
+  void getTripTimeOnDateWithNoServiceAndFallbackToNextScheduledDate() {
     Instant midnight = ServiceDateUtils.asStartOfService(
       SERVICE_DATE,
       service.getTimeZone()
