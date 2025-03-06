@@ -17,7 +17,8 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
 class McMaxLimitFilterTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
+  private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR =
+    new DefaultTransitGroupPriorityCalculator();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);

@@ -34,10 +34,10 @@ class ServiceCalendarFrameParserTest {
       OBJECT_FACTORY.createOperatingPeriodsInFrame_RelStructure()
     );
 
-    OperatingPeriod_VersionStructure operatingPeriod = OBJECT_FACTORY
-      .createOperatingPeriod_VersionStructure()
-      .withFromDate(FROM_DATE)
-      .withToDate(TO_DATE);
+    OperatingPeriod_VersionStructure operatingPeriod =
+      OBJECT_FACTORY.createOperatingPeriod_VersionStructure()
+        .withFromDate(FROM_DATE)
+        .withToDate(TO_DATE);
     serviceCalendarFrame
       .getOperatingPeriods()
       .getOperatingPeriodOrUicOperatingPeriod()
@@ -55,8 +55,7 @@ class ServiceCalendarFrameParserTest {
       .getServiceCalendar()
       .setOperatingPeriods(OBJECT_FACTORY.createOperatingPeriods_RelStructure());
 
-    OperatingPeriod operatingPeriod = OBJECT_FACTORY
-      .createOperatingPeriod()
+    OperatingPeriod operatingPeriod = OBJECT_FACTORY.createOperatingPeriod()
       .withFromDate(FROM_DATE)
       .withToDate(TO_DATE);
     JAXBElement<?> jaxbOperatingPeriod = OBJECT_FACTORY.createOperatingPeriod(operatingPeriod);

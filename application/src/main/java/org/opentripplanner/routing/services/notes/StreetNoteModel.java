@@ -26,13 +26,17 @@ public class StreetNoteModel implements Serializable {
    * Notes for street edges. No need to synchronize access to the map as they will not be concurrent
    * write access (no notes for temporary edges, we use notes from parent).
    */
-  private final SetMultimap<Edge, StreetNoteAndMatcher> notesForEdge = HashMultimap.<Edge, StreetNoteAndMatcher>create();
+  private final SetMultimap<Edge, StreetNoteAndMatcher> notesForEdge = HashMultimap.<
+      Edge,
+      StreetNoteAndMatcher
+    >create();
 
   /**
    * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
    * are identical).
    */
-  private final transient Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers = new HashMap<>();
+  private final transient Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers =
+    new HashMap<>();
 
   StreetNoteModel() {}
 

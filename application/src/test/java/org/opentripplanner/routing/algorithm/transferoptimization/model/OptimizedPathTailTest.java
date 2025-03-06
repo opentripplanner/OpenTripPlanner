@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
-import org.opentripplanner.raptorlegacy._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.transferoptimization.BasicPathTestCase;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder;
 
 class OptimizedPathTailTest implements RaptorTestConstants {
@@ -26,13 +26,21 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   private final TransitPathLeg<TestTripSchedule> t3 = t2.nextTransitLeg();
 
   @SuppressWarnings("ConstantConditions")
-  private final TripToTripTransfer<TestTripSchedule> tx23 = TestTransferBuilder
-    .tx(t2.trip(), STOP_D, t3.trip(), STOP_D)
+  private final TripToTripTransfer<TestTripSchedule> tx23 = TestTransferBuilder.tx(
+    t2.trip(),
+    STOP_D,
+    t3.trip(),
+    STOP_D
+  )
     .staySeated()
     .build();
 
-  private final TripToTripTransfer<TestTripSchedule> tx12 = TestTransferBuilder
-    .tx(t1.trip(), STOP_B, t2.trip(), STOP_C)
+  private final TripToTripTransfer<TestTripSchedule> tx12 = TestTransferBuilder.tx(
+    t1.trip(),
+    STOP_B,
+    t2.trip(),
+    STOP_C
+  )
     .walk(D2m)
     .build();
 

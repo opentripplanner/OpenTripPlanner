@@ -75,8 +75,7 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
 
   @Override
   public RentalRestrictionExtension remove(RentalRestrictionExtension toRemove) {
-    var newExts = Arrays
-      .stream(extensions)
+    var newExts = Arrays.stream(extensions)
       .filter(e -> !e.equals(toRemove))
       .toArray(RentalRestrictionExtension[]::new);
     if (newExts.length == 0) {
@@ -98,8 +97,7 @@ public final class CompositeRentalRestrictionExtension implements RentalRestrict
 
   @Override
   public Set<String> noDropOffNetworks() {
-    return Arrays
-      .stream(extensions)
+    return Arrays.stream(extensions)
       .flatMap(e -> e.noDropOffNetworks().stream())
       .collect(Collectors.toSet());
   }

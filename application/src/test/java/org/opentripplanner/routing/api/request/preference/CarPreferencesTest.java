@@ -20,8 +20,7 @@ class CarPreferencesTest {
   public static final int RENTAL_PICKUP_TIME = 30;
   public static final int PARK_COST = 30;
 
-  private final CarPreferences subject = CarPreferences
-    .of()
+  private final CarPreferences subject = CarPreferences.of()
     .withReluctance(RELUCTANCE)
     .withBoardCost(BOARD_COST)
     .withPickupTime(Duration.ofSeconds(PICKUP_TIME))

@@ -289,16 +289,14 @@ class StreetEdgeGeofencingTest {
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
-      final State tierState = Arrays
-        .stream(states)
+      final State tierState = Arrays.stream(states)
         .filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork()))
         .findFirst()
         .get();
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
 
-      final State birdState = Arrays
-        .stream(states)
+      final State birdState = Arrays.stream(states)
         .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
         .findFirst()
         .get();
@@ -321,16 +319,14 @@ class StreetEdgeGeofencingTest {
       assertEquals(BICYCLE, unknownNetworkState.currentMode());
       assertNull(unknownNetworkState.getVehicleRentalNetwork());
 
-      final State tierState = Arrays
-        .stream(states)
+      final State tierState = Arrays.stream(states)
         .filter(s -> NETWORK_TIER.equals(s.getVehicleRentalNetwork()))
         .findFirst()
         .get();
       assertEquals(RENTING_FLOATING, tierState.getVehicleRentalState());
       assertEquals(BICYCLE, tierState.currentMode());
 
-      final State birdState = Arrays
-        .stream(states)
+      final State birdState = Arrays.stream(states)
         .filter(s -> NETWORK_BIRD.equals(s.getVehicleRentalNetwork()))
         .findFirst()
         .get();
@@ -410,8 +406,7 @@ class StreetEdgeGeofencingTest {
       // this is the state that starts inside a restricted zone
       // (no drop off, no traversal or outside business area)
       // and is walking towards finding a rental vehicle
-      return State
-        .getInitialStates(Set.of(vertex), req)
+      return State.getInitialStates(Set.of(vertex), req)
         .stream()
         .filter(s -> s.getVehicleRentalState() == HAVE_RENTED)
         .findAny()
@@ -419,8 +414,7 @@ class StreetEdgeGeofencingTest {
     }
 
     private static StreetSearchRequest defaultArriveByRequest() {
-      return StreetSearchRequest
-        .of()
+      return StreetSearchRequest.of()
         .withPreferences(p ->
           p.withBike(b -> b.withRental(r -> r.withAllowedNetworks(Set.of(NETWORK_TIER))))
         )
@@ -433,8 +427,7 @@ class StreetEdgeGeofencingTest {
       Set<String> allowedNetworks,
       Set<String> bannedNetworks
     ) {
-      return StreetSearchRequest
-        .of()
+      return StreetSearchRequest.of()
         .withPreferences(p ->
           p.withBike(b ->
             b.withRental(r ->
@@ -464,8 +457,7 @@ class StreetEdgeGeofencingTest {
   }
 
   private State initialState(Vertex startVertex, String network, boolean arriveBy) {
-    var req = StreetSearchRequest
-      .of()
+    var req = StreetSearchRequest.of()
       .withMode(StreetMode.SCOOTER_RENTAL)
       .withArriveBy(arriveBy)
       .build();

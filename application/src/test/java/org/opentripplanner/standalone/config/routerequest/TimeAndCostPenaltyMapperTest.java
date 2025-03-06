@@ -23,9 +23,11 @@ class TimeAndCostPenaltyMapperTest {
 
   @Test
   void mapMissingTimePenalty() {
-    var node = newNodeAdapterForTest("""
+    var node = newNodeAdapterForTest(
+      """
       { "costFactor": 3.4 }
-      """);
+      """
+    );
     var ex = assertThrows(IllegalArgumentException.class, () -> TimeAndCostPenaltyMapper.map(node));
     assertEquals(
       "When time-penalty is zero, the costFactor have no effect and should be zero as well.",

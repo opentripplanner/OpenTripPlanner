@@ -27,7 +27,7 @@ public class TransitGroupPriorityConfig {
         Hence, two paths with a different set of group-ids will BOTH be optimal unless the cost is
         worse than the relaxation specified in the `relaxTransitGroupPriority` parameter. This is
         only available in the TransmodelAPI for now.
-        
+
         Unmatched patterns are put in the BASE priority-group.
         """
       )
@@ -67,8 +67,7 @@ public class TransitGroupPriorityConfig {
   }
 
   private static TransitGroupSelect mapTransitGroupSelect(NodeAdapter c) {
-    return TransitGroupSelect
-      .of()
+    return TransitGroupSelect.of()
       .addModes(
         c
           .of("modes")

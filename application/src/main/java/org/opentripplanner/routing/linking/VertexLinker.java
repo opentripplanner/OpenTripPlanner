@@ -21,11 +21,12 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
-import org.opentripplanner.street.model.edge.AreaEdgeList;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
@@ -198,15 +199,14 @@ public class VertexLinker {
         tempEdges
       );
       if (streetVertices.isEmpty()) {
-        streetVertices =
-          linkToStreetEdges(
-            vertex,
-            traverseModes,
-            direction,
-            scope,
-            MAX_SEARCH_RADIUS_METERS,
-            tempEdges
-          );
+        streetVertices = linkToStreetEdges(
+          vertex,
+          traverseModes,
+          direction,
+          scope,
+          MAX_SEARCH_RADIUS_METERS,
+          tempEdges
+        );
       }
 
       for (StreetVertex streetVertex : streetVertices) {
@@ -293,7 +293,7 @@ public class VertexLinker {
   }
 
   private static double getXscale(Vertex vertex) {
-    return Math.cos(vertex.getLat() * Math.PI / 180);
+    return Math.cos((vertex.getLat() * Math.PI) / 180);
   }
 
   private Set<StreetVertex> linkToCandidateEdges(
@@ -313,7 +313,7 @@ public class VertexLinker {
       traverseModes,
       candidateEdges
     );
-    Set<AreaEdgeList> linkedAreas = new HashSet<>();
+    Set<AreaGroup> linkedAreas = new HashSet<>();
     return closestEdges
       .stream()
       .map(ce -> link(vertex, ce.item, xscale, scope, direction, tempEdges, linkedAreas))
@@ -384,7 +384,7 @@ public class VertexLinker {
     Scope scope,
     LinkingDirection direction,
     DisposableEdgeCollection tempEdges,
-    Set<AreaEdgeList> linkedAreas
+    Set<AreaGroup> linkedAreas
   ) {
     // TODO: we've already built this line string, we should save it
     LineString orig = edge.getGeometry();
@@ -422,7 +422,7 @@ public class VertexLinker {
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
       if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
-        AreaEdgeList ael = aEdge.getArea();
+        AreaGroup ael = aEdge.getArea();
         if (ael.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
           // do not relink again to the area when many edges are equally close
           if (!linkedAreas.add(ael)) {
@@ -431,7 +431,7 @@ public class VertexLinker {
           if (vertex instanceof IntersectionVertex iv) {
             start = iv;
           } else {
-            start = splitVertex(aEdge, scope, direction, vertex.getLon(), vertex.getLat());
+            start = splitVertex(aEdge, scope, vertex.getLon(), vertex.getLat());
           }
           split = false;
         }
@@ -477,7 +477,7 @@ public class VertexLinker {
     // create the geometries
     Coordinate splitPoint = ll.getCoordinate(geometry);
 
-    SplitterVertex v = splitVertex(originalEdge, scope, direction, splitPoint.x, splitPoint.y);
+    SplitterVertex v = splitVertex(originalEdge, scope, splitPoint.x, splitPoint.y);
 
     // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
     // existing vertices
@@ -508,13 +508,7 @@ public class VertexLinker {
     return v;
   }
 
-  private SplitterVertex splitVertex(
-    StreetEdge originalEdge,
-    Scope scope,
-    LinkingDirection direction,
-    double x,
-    double y
-  ) {
+  private SplitterVertex splitVertex(StreetEdge originalEdge, Scope scope, double x, double y) {
     SplitterVertex v;
     String uniqueSplitLabel = "split_" + graph.nextSplitNumber++;
 
@@ -523,8 +517,7 @@ public class VertexLinker {
         uniqueSplitLabel,
         x,
         y,
-        originalEdge,
-        direction == LinkingDirection.OUTGOING
+        originalEdge
       );
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
@@ -570,8 +563,8 @@ public class VertexLinker {
   /**
    * Link a new vertex permanently with area geometry
    */
-  public void addPermanentAreaVertex(IntersectionVertex newVertex, AreaEdgeList edgeList) {
-    addAreaVertex(newVertex, edgeList, Scope.PERMANENT, null);
+  public void addPermanentAreaVertex(IntersectionVertex newVertex, AreaGroup areaGroup) {
+    addAreaVertex(newVertex, areaGroup, Scope.PERMANENT, null);
   }
 
   /**
@@ -581,12 +574,12 @@ public class VertexLinker {
 
   public void addAreaVertex(
     IntersectionVertex newVertex,
-    AreaEdgeList edgeList,
+    AreaGroup areaGroup,
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
-    List<NamedArea> areas = edgeList.getAreas();
-    Geometry origPolygon = edgeList.getGeometry();
+    List<Area> areas = areaGroup.getAreas();
+    Geometry origPolygon = areaGroup.getGeometry();
     Geometry polygon = origPolygon.union(origPolygon.getBoundary()).buffer(0.000001);
 
     // Due to truncating of precision in storage of the edge geometry, the new split vertex
@@ -600,11 +593,11 @@ public class VertexLinker {
     int added = 0;
 
     // if area is too complex, consider only part of visibility nodes
-    float skip_ratio = (float) MAX_AREA_LINKS / (float) edgeList.visibilityVertices().size();
+    float skip_ratio = (float) MAX_AREA_LINKS / (float) areaGroup.visibilityVertices().size();
     int i = 0;
     float sum_i = 0;
 
-    for (IntersectionVertex v : edgeList.visibilityVertices()) {
+    for (IntersectionVertex v : areaGroup.visibilityVertices()) {
       sum_i += skip_ratio;
       if (Math.floor(sum_i) < i + 1) {
         continue;
@@ -621,20 +614,20 @@ public class VertexLinker {
         continue;
       }
 
-      // check to see if this splits multiple NamedAreas. This code is rather similar to
+      // check to see if this splits multiple Areas. This code is rather similar to
       // code in OSMGBI, but the data structures are different
-      createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
+      createSegments(newVertex, v, areaGroup, areas, scope, tempEdges);
       added++;
     }
     // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
     // area calculation to be done after stop linking
     if (added == 0) {
-      for (IntersectionVertex v : edgeList.visibilityVertices()) {
-        createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
+      for (IntersectionVertex v : areaGroup.visibilityVertices()) {
+        createSegments(newVertex, v, areaGroup, areas, scope, tempEdges);
       }
     }
     if (scope == Scope.PERMANENT) {
-      edgeList.addVisibilityVertex(newVertex);
+      areaGroup.addVisibilityVertices(Set.of(newVertex));
     }
   }
 
@@ -661,8 +654,8 @@ public class VertexLinker {
   private void createSegments(
     IntersectionVertex from,
     IntersectionVertex to,
-    AreaEdgeList ael,
-    List<NamedArea> areas,
+    AreaGroup ag,
+    List<Area> areas,
     Scope scope,
     DisposableEdgeCollection tempEdges
   ) {
@@ -674,9 +667,9 @@ public class VertexLinker {
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
 
-    NamedArea hit = null;
-    for (NamedArea area : areas) {
-      Geometry polygon = area.getPolygon();
+    Area hit = null;
+    for (Area area : areas) {
+      Geometry polygon = area.getGeometry();
       Geometry intersection = polygon.intersection(line);
       if (intersection.getLength() > 0.000001) {
         hit = area;
@@ -699,7 +692,7 @@ public class VertexLinker {
         .withMeterLength(length)
         .withPermission(hit.getPermission())
         .withBack(false)
-        .withArea(ael);
+        .withArea(ag);
       for (TraverseMode tm : outgoingNoThruModes) {
         areaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
       }
@@ -716,7 +709,7 @@ public class VertexLinker {
         .withMeterLength(length)
         .withPermission(hit.getPermission())
         .withBack(true)
-        .withArea(ael);
+        .withArea(ag);
       for (TraverseMode tm : incomingNoThruModes) {
         reverseAreaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
       }

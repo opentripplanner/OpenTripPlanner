@@ -6,8 +6,7 @@ import graphql.schema.GraphQLInputObjectType;
 
 public class LocationInputType {
 
-  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("Location")
     .description(
       "Input format for specifying a location through either a place reference (id), coordinates " +
@@ -15,8 +14,7 @@ public class LocationInputType {
       "coordinates will only be used if place is not known."
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("name")
         .description(
           "The name of the location. This is pass-through information" +
@@ -26,8 +24,7 @@ public class LocationInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("place")
         .description(
           "The id of an element in the OTP model. Currently supports" +
@@ -37,8 +34,7 @@ public class LocationInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("coordinates")
         .description(
           "Coordinates for the location. This can be used alone or as" +

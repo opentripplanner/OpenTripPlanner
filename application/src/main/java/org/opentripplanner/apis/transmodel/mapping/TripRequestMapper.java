@@ -32,40 +32,28 @@ public class TripRequestMapper {
 
     callWith.argument("locale", (String v) -> request.setLocale(Locale.forLanguageTag(v)));
 
-    callWith.argument(
-      "from",
-      (Map<String, Object> v) -> request.setFrom(GenericLocationMapper.toGenericLocation(v))
+    callWith.argument("from", (Map<String, Object> v) ->
+      request.setFrom(GenericLocationMapper.toGenericLocation(v))
     );
-    callWith.argument(
-      "to",
-      (Map<String, Object> v) -> request.setTo(GenericLocationMapper.toGenericLocation(v))
+    callWith.argument("to", (Map<String, Object> v) ->
+      request.setTo(GenericLocationMapper.toGenericLocation(v))
     );
-    callWith.argument(
-      "passThroughPoints",
-      (List<Map<String, Object>> v) -> {
-        request.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
-      }
-    );
-    callWith.argument(
-      TripQuery.TRIP_VIA_PARAMETER,
-      (List<Map<String, Object>> v) -> {
-        request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
-      }
+    callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
+      request.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+    });
+    callWith.argument(TripQuery.TRIP_VIA_PARAMETER, (List<Map<String, Object>> v) -> {
+      request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
+    });
+
+    callWith.argument("dateTime", millisSinceEpoch ->
+      request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
-    callWith.argument(
-      "dateTime",
-      millisSinceEpoch -> request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+    callWith.argument("bookingTime", millisSinceEpoch ->
+      request.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
-    callWith.argument(
-      "bookingTime",
-      millisSinceEpoch -> request.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
-    );
-
-    callWith.argument(
-      "searchWindow",
-      (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))
+    callWith.argument("searchWindow", (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))
     );
     callWith.argument("pageCursor", request::setPageCursorFromEncoded);
     callWith.argument("timetableView", request::setTimetableView);
@@ -73,26 +61,18 @@ public class TripRequestMapper {
     callWith.argument("numTripPatterns", request::setNumItineraries);
     callWith.argument("arriveBy", request::setArriveBy);
 
-    callWith.argument(
-      "preferred.authorities",
-      (Collection<String> authorities) ->
-        request.journey().transit().setPreferredAgencies(mapIDsToDomainNullSafe(authorities))
+    callWith.argument("preferred.authorities", (Collection<String> authorities) ->
+      request.journey().transit().setPreferredAgencies(mapIDsToDomainNullSafe(authorities))
     );
-    callWith.argument(
-      "unpreferred.authorities",
-      (Collection<String> authorities) ->
-        request.journey().transit().setUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
+    callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
+      request.journey().transit().setUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
     );
 
-    callWith.argument(
-      "preferred.lines",
-      (List<String> lines) ->
-        request.journey().transit().setPreferredRoutes(mapIDsToDomainNullSafe(lines))
+    callWith.argument("preferred.lines", (List<String> lines) ->
+      request.journey().transit().setPreferredRoutes(mapIDsToDomainNullSafe(lines))
     );
-    callWith.argument(
-      "unpreferred.lines",
-      (List<String> lines) ->
-        request.journey().transit().setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
+    callWith.argument("unpreferred.lines", (List<String> lines) ->
+      request.journey().transit().setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
     );
 
     if (GqlUtil.hasArgument(environment, "modes")) {
@@ -102,10 +82,8 @@ public class TripRequestMapper {
     }
 
     var bannedTrips = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "banned.serviceJourneys",
-      (Collection<String> serviceJourneys) ->
-        bannedTrips.addAll(mapIDsToDomainNullSafe(serviceJourneys))
+    callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
+      bannedTrips.addAll(mapIDsToDomainNullSafe(serviceJourneys))
     );
     if (!bannedTrips.isEmpty()) {
       request.journey().transit().setBannedTrips(bannedTrips);

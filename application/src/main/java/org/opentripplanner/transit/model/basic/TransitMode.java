@@ -75,10 +75,10 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case TROLLEYBUS -> "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";
       case MONORAIL -> "Used for any rail system that runs on a single rail.";
       case CARPOOL -> """
-       Private car trips shared with others.
-       
-       This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
-       """;
+      Private car trips shared with others.
+
+      This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
+      """;
       case TAXI -> "Using a taxi service";
     };
   }

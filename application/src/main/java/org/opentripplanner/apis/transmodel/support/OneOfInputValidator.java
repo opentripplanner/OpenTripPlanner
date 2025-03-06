@@ -30,8 +30,7 @@ public class OneOfInputValidator {
     String inputTypeName,
     String... definedFields
   ) {
-    var fieldsInInput = Arrays
-      .stream(definedFields)
+    var fieldsInInput = Arrays.stream(definedFields)
       .map(k -> map.containsKey(k) ? k : null)
       .filter(Objects::nonNull)
       .toList();

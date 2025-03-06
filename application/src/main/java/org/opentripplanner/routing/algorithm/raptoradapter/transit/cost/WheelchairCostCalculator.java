@@ -82,12 +82,11 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule>
     int[] costIndex = new int[Accessibility.values().length];
 
     for (var it : Accessibility.values()) {
-      costIndex[it.ordinal()] =
-        switch (it) {
-          case POSSIBLE -> RaptorCostCalculator.ZERO_COST;
-          case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.unknownCost());
-          case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(requirements.inaccessibleCost());
-        };
+      costIndex[it.ordinal()] = switch (it) {
+        case POSSIBLE -> RaptorCostCalculator.ZERO_COST;
+        case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.unknownCost());
+        case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(requirements.inaccessibleCost());
+      };
     }
     return costIndex;
   }

@@ -150,8 +150,7 @@ class InterlineProcessorTest implements PlanTestConstants {
   }
 
   private static TripPattern tripPattern(String tripId, String blockId, String serviceId) {
-    var trip = TimetableRepositoryForTest
-      .trip(tripId)
+    var trip = TimetableRepositoryForTest.trip(tripId)
       .withGtfsBlockId(blockId)
       .withServiceId(new FeedScopedId("1", serviceId))
       .build();
@@ -164,8 +163,7 @@ class InterlineProcessorTest implements PlanTestConstants {
     var stopPattern = new StopPattern(stopTimes);
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    return TripPattern
-      .of(TimetableRepositoryForTest.id(tripId))
+    return TripPattern.of(TimetableRepositoryForTest.id(tripId))
       .withRoute(trip.getRoute())
       .withStopPattern(stopPattern)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))

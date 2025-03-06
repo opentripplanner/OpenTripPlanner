@@ -20,6 +20,8 @@ You can add cross-references to a stop's id or code on all OSM entities (nodes, 
 have one of the following tag combinations:
 
 - `public_transport=platform`
+- `railway=platform`
+- `highway=platform`
 - `highway=bus_stop`
 - `railway=tram_stop`
 - `railway=station`

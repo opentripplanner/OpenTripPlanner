@@ -26,8 +26,7 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 public class DatedServiceJourneyQuery {
 
   public static GraphQLFieldDefinition createGetById(GraphQLOutputType datedServiceJourneyType) {
-    return GraphQLFieldDefinition
-      .newFieldDefinition()
+    return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourney")
       .type(datedServiceJourneyType)
       .description("Get a single dated service journey based on its id")
@@ -41,52 +40,44 @@ public class DatedServiceJourneyQuery {
   }
 
   public static GraphQLFieldDefinition createQuery(GraphQLOutputType datedServiceJourneyType) {
-    return GraphQLFieldDefinition
-      .newFieldDefinition()
+    return GraphQLFieldDefinition.newFieldDefinition()
       .name("datedServiceJourneys")
       .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(datedServiceJourneyType))))
       .description("Get all dated service journeys, matching the filters")
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("lines")
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("serviceJourneys")
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("privateCodes")
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("operatingDays")
           .type(
             new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(TransmodelScalars.DATE_SCALAR)))
           )
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("alterations")
           .type(new GraphQLList(new GraphQLNonNull(EnumTypes.SERVICE_ALTERATION)))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("authorities")
           .type(new GraphQLList(new GraphQLNonNull(Scalars.GraphQLString)))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("replacementFor")
           .description(
             "Get all DatedServiceJourneys, which are replacing any of the given DatedServiceJourneys ids"
@@ -126,22 +117,23 @@ public class DatedServiceJourneyQuery {
           environment.<List<TripAlteration>>getArgument("alterations")
         );
 
-        TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder = TripOnServiceDateRequest
-          .of(operatingDays)
-          .withAgencies(authorities)
-          .withRoutes(lines)
-          .withServiceJourneys(serviceJourneys)
-          .withReplacementFor(replacementFor);
+        TripOnServiceDateRequestBuilder tripOnServiceDateRequestBuilder =
+          TripOnServiceDateRequest.of(operatingDays)
+            .withAgencies(authorities)
+            .withRoutes(lines)
+            .withServiceJourneys(serviceJourneys)
+            .withReplacementFor(replacementFor);
 
         tripOnServiceDateRequestBuilder =
           tripOnServiceDateRequestBuilder.withNetexInternalPlanningCodes(privateCodes);
 
-        tripOnServiceDateRequestBuilder =
-          tripOnServiceDateRequestBuilder.withAlterations(alterations);
+        tripOnServiceDateRequestBuilder = tripOnServiceDateRequestBuilder.withAlterations(
+          alterations
+        );
 
-        return GqlUtil
-          .getTransitService(environment)
-          .findTripsOnServiceDate(tripOnServiceDateRequestBuilder.build());
+        return GqlUtil.getTransitService(environment).findTripsOnServiceDate(
+          tripOnServiceDateRequestBuilder.build()
+        );
       })
       .build();
   }

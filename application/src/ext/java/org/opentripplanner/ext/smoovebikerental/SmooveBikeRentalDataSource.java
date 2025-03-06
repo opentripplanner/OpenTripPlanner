@@ -47,24 +47,23 @@ public class SmooveBikeRentalDataSource
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     overloadingAllowed = config.overloadingAllowed();
-    system =
-      new VehicleRentalSystem(
-        networkName,
-        "fi",
-        "Helsinki/Espoo",
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        "Europe/Helsinki",
-        null,
-        null,
-        null
-      );
+    system = new VehicleRentalSystem(
+      networkName,
+      "fi",
+      "Helsinki/Espoo",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "Europe/Helsinki",
+      null,
+      null,
+      null
+    );
   }
 
   /**

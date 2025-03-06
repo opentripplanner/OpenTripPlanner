@@ -18,8 +18,7 @@ public class DurationScalarFactory {
   private DurationScalarFactory() {}
 
   public static GraphQLScalarType createDurationScalar() {
-    return GraphQLScalarType
-      .newScalar()
+    return GraphQLScalarType.newScalar()
       .name("Duration")
       .description(DOCUMENTATION)
       .coercing(new DurationCoercing())

@@ -52,8 +52,7 @@ class Ring {
   public Ring(TLongList osmNodes, TLongObjectMap<OsmNode> _nodes) {
     // The collection needs to be mutable, so collect into an ArrayList
     this(
-      LongStream
-        .of(osmNodes.toArray())
+      LongStream.of(osmNodes.toArray())
         .mapToObj(_nodes::get)
         .collect(Collectors.toCollection(ArrayList::new))
     );
@@ -77,7 +76,8 @@ class Ring {
     OsmNode prev = nodes.get((i + n - 1) % n);
     OsmNode next = nodes.get((i + 1) % n);
     return (
-      (cur.lon - prev.lon) * (next.lat - cur.lat) - (cur.lat - prev.lat) * (next.lon - cur.lon) > 0
+      (cur.lon - prev.lon) * (next.lat - cur.lat) - (cur.lat - prev.lat) * (next.lon - cur.lon) >
+      0.00000000001
     );
   }
 

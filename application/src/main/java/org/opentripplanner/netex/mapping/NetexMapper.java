@@ -258,8 +258,7 @@ public class NetexMapper {
       .forEach(gol -> {
         GroupOfRoutes model = mapper.mapGroupOfRoutes(gol);
 
-        Optional
-          .ofNullable(gol.getMembers())
+        Optional.ofNullable(gol.getMembers())
           .stream()
           .map(LineRefs_RelStructure::getLineRef)
           .filter(Objects::nonNull)

@@ -46,22 +46,20 @@ import org.opentripplanner.transit.service.TimetableRepository;
  */
 public class GraphSerializationTest {
 
-  static Class<?>[] IGNORED_CLASSES = Set
-    .of(
-      // Skip AtomicInteger, it does not implement equals/hashCode
-      AtomicInteger.class,
-      ThreadPoolExecutor.class,
-      WeakValueHashMap.class,
-      Method.class,
-      JarFile.class,
-      SoftReference.class,
-      Class.class,
-      org.slf4j.Logger.class,
-      ch.qos.logback.classic.Logger.class,
-      HashGridSpatialIndex.class,
-      Deduplicator.class
-    )
-    .toArray(Class[]::new);
+  static Class<?>[] IGNORED_CLASSES = Set.of(
+    // Skip AtomicInteger, it does not implement equals/hashCode
+    AtomicInteger.class,
+    ThreadPoolExecutor.class,
+    WeakValueHashMap.class,
+    Method.class,
+    JarFile.class,
+    SoftReference.class,
+    Class.class,
+    org.slf4j.Logger.class,
+    ch.qos.logback.classic.Logger.class,
+    HashGridSpatialIndex.class,
+    Deduplicator.class
+  ).toArray(Class[]::new);
 
   /**
    * Tests GTFS based graph serialization to file.
@@ -124,8 +122,7 @@ public class GraphSerializationTest {
    */
   @Test
   public void compareGraphToItself() {
-    TestOtpModel cachedPortlandGraph = ConstantsForTests
-      .getInstance()
+    TestOtpModel cachedPortlandGraph = ConstantsForTests.getInstance()
       .getCachedPortlandGraph()
       .index();
     Graph originalGraph = cachedPortlandGraph.graph();

@@ -84,10 +84,8 @@ public class GraphPathToItineraryMapper {
   public static boolean isFloatingRentalDropoff(State state) {
     return (
       !state.isRentingVehicle() &&
-      (
-        state.getBackState() != null &&
-        state.getBackState().getVehicleRentalState() == RENTING_FLOATING
-      )
+      (state.getBackState() != null &&
+        state.getBackState().getVehicleRentalState() == RENTING_FLOATING)
     );
   }
 
@@ -267,8 +265,7 @@ public class GraphPathToItineraryMapper {
   ) {
     var elevations = encodeElevationProfile(edge, distanceOffset, heightOffset);
     if (elevations.isEmpty()) {
-      return ElevationProfile
-        .of()
+      return ElevationProfile.of()
         .stepYUnknown(distanceOffset)
         .stepYUnknown(distanceOffset + edge.getDistanceMeters())
         .build();
@@ -336,8 +333,7 @@ public class GraphPathToItineraryMapper {
     ZonedDateTime endTime = toState.getTime().atZone(timeZone);
     int generalizedCost = (int) (toState.getWeight() - fromState.getWeight());
 
-    return FlexibleTransitLeg
-      .of()
+    return FlexibleTransitLeg.of()
       .withFlexTripEdge(flexEdge)
       .withStartTime(startTime)
       .withEndTime(endTime)
@@ -390,8 +386,7 @@ public class GraphPathToItineraryMapper {
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
-    StreetLegBuilder leg = StreetLeg
-      .create()
+    StreetLegBuilder leg = StreetLeg.create()
       .withMode(resolveMode(states))
       .withStartTime(startTimeState.getTime().atZone(timeZone))
       .withEndTime(lastState.getTime().atZone(timeZone))

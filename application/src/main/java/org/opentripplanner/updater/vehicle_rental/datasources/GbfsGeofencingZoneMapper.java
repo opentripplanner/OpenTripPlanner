@@ -70,8 +70,7 @@ class GbfsGeofencingZoneMapper {
    * Some zones don't have a name, so we use the hash of the geometry as a fallback.
    */
   private static String fallbackId(Geometry geom) {
-    return Hashing
-      .murmur3_32_fixed()
+    return Hashing.murmur3_32_fixed()
       .hashBytes(geom.toString().getBytes(StandardCharsets.UTF_8))
       .toString();
   }

@@ -9,21 +9,18 @@ import org.opentripplanner.transit.model.basic.Notice;
 public class NoticeType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Notice")
       .field(GqlUtil.newTransitIdField())
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("text")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((Notice) environment.getSource()).text())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("publicCode")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((Notice) environment.getSource()).publicCode())

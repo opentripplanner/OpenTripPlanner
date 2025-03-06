@@ -44,11 +44,10 @@ public class TestRouteData {
   public TestRouteData(Route route, List<RegularStop> stops, List<String> times) {
     final Deduplicator deduplicator = new Deduplicator();
     this.route = route;
-    this.trips =
-      times
-        .stream()
-        .map(it -> parseTripInfo(route.getName(), it, stops, deduplicator))
-        .collect(Collectors.toList());
+    this.trips = times
+      .stream()
+      .map(it -> parseTripInfo(route.getName(), it, stops, deduplicator))
+      .collect(Collectors.toList());
 
     List<StopTime> stopTimesFistTrip = firstTrip().getStopTimes();
     // Get TripTimes in same order as the trips
@@ -57,13 +56,11 @@ public class TestRouteData {
       .map(tripTimesByTrip::get)
       .collect(Collectors.toList());
 
-    tripPattern =
-      TripPattern
-        .of(TimetableRepositoryForTest.id("TP:" + route))
-        .withRoute(this.route)
-        .withStopPattern(new StopPattern(stopTimesFistTrip))
-        .withScheduledTimeTableBuilder(builder -> builder.addAllTripTimes(tripTimes))
-        .build();
+    tripPattern = TripPattern.of(TimetableRepositoryForTest.id("TP:" + route))
+      .withRoute(this.route)
+      .withStopPattern(new StopPattern(stopTimesFistTrip))
+      .withScheduledTimeTableBuilder(builder -> builder.addAllTripTimes(tripTimes))
+      .build();
 
     RoutingTripPattern routingTripPattern = tripPattern.getRoutingTripPattern();
 
@@ -166,8 +163,7 @@ public class TestRouteData {
     List<RegularStop> stops,
     Deduplicator deduplicator
   ) {
-    var trip = Trip
-      .of(TimetableRepositoryForTest.id(route + "-" + stopTimesByTrip.size() + 1))
+    var trip = Trip.of(TimetableRepositoryForTest.id(route + "-" + stopTimesByTrip.size() + 1))
       .withRoute(this.route)
       .build();
     var stopTimes = stopTimes(trip, stops, tripTimes);
@@ -260,8 +256,7 @@ public class TestRouteData {
     }
 
     public TestRouteData build() {
-      var routeBuilder = TimetableRepositoryForTest
-        .route(route)
+      var routeBuilder = TimetableRepositoryForTest.route(route)
         .withMode(mode)
         .withShortName(route);
       if (agency != null) {

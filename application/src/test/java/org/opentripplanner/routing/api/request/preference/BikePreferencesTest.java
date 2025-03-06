@@ -12,8 +12,7 @@ class BikePreferencesTest {
   public static final double SPEED = 2.0;
   public static final double RELUCTANCE = 1.2;
   public static final int BOARD_COST = 660;
-  public static final TimeSlopeSafetyTriangle TRIANGLE = TimeSlopeSafetyTriangle
-    .of()
+  public static final TimeSlopeSafetyTriangle TRIANGLE = TimeSlopeSafetyTriangle.of()
     .withSlope(1)
     .build();
   public static final VehicleRoutingOptimizeType OPTIMIZE_TYPE =
@@ -21,8 +20,7 @@ class BikePreferencesTest {
   public static final int RENTAL_PICKUP_TIME = 30;
   public static final int PARK_COST = 30;
 
-  private final BikePreferences subject = BikePreferences
-    .of()
+  private final BikePreferences subject = BikePreferences.of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
     .withBoardCost(BOARD_COST)
@@ -103,21 +101,18 @@ class BikePreferencesTest {
 
   @Test
   void testForcedTriangleOptimization() {
-    var trianglePreferences = BikePreferences
-      .of()
+    var trianglePreferences = BikePreferences.of()
       .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
       .build();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, trianglePreferences.optimizeType());
 
-    var conflictingPreferences = BikePreferences
-      .of()
+    var conflictingPreferences = BikePreferences.of()
       .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
       .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
       .build();
     assertEquals(VehicleRoutingOptimizeType.TRIANGLE, conflictingPreferences.optimizeType());
 
-    var emptyTrianglePreferences = BikePreferences
-      .of()
+    var emptyTrianglePreferences = BikePreferences.of()
       .withOptimizeType(VehicleRoutingOptimizeType.SAFE_STREETS)
       .withForcedOptimizeTriangle(it -> it.build())
       .build();

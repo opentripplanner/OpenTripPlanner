@@ -144,8 +144,7 @@ public class Place {
       VertexType.VEHICLEPARKING,
       null,
       null,
-      VehicleParkingWithEntrance
-        .builder()
+      VehicleParkingWithEntrance.builder()
         .vehicleParking(vertex.getVehicleParking())
         .entrance(vertex.getParkingEntrance())
         .realtime(realTime)
@@ -184,8 +183,7 @@ public class Place {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(Place.class)
+    return ToStringBuilder.of(Place.class)
       .addObj("name", name)
       .addObj("stop", stop)
       .addObj("coordinate", coordinate)

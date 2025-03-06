@@ -30,8 +30,10 @@ public final class PagingSearchWindowAdjuster {
   ) {
     this.minSearchWindow = minSearchWindow;
     this.maxSearchWindow = maxSearchWindow;
-    this.pagingSearchWindowAdjustments =
-      pagingSearchWindowAdjustments.stream().mapToInt(d -> (int) d.toMinutes()).toArray();
+    this.pagingSearchWindowAdjustments = pagingSearchWindowAdjustments
+      .stream()
+      .mapToInt(d -> (int) d.toMinutes())
+      .toArray();
   }
 
   /**
@@ -81,8 +83,7 @@ public final class PagingSearchWindowAdjuster {
       return normalizeSearchWindow(
         // Multiply minutes with 60 to get seconds
         (int) searchWindowUsed.getSeconds() +
-        60 *
-        pagingSearchWindowAdjustments[nActualItinerariesFound]
+        60 * pagingSearchWindowAdjustments[nActualItinerariesFound]
       );
     }
     // No change

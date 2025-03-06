@@ -209,8 +209,7 @@ class MissingElevationHandlerTest {
 
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
-    StreetElevationExtensionBuilder
-      .of(edge)
+    StreetElevationExtensionBuilder.of(edge)
       .withElevationProfile(profile)
       .withComputed(true)
       .build()

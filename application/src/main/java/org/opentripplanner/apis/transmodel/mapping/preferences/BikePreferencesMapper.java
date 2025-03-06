@@ -23,13 +23,10 @@ public class BikePreferencesMapper {
     callWith.argument("bicycleOptimisationMethod", bike::withOptimizeType);
 
     // WALK reluctance is used for backwards compatibility, then overridden
-    callWith.argument(
-      "walkReluctance",
-      r -> {
-        bike.withReluctance((double) r);
-        bike.withWalking(w -> w.withReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r));
-      }
-    );
+    callWith.argument("walkReluctance", r -> {
+      bike.withReluctance((double) r);
+      bike.withWalking(w -> w.withReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r));
+    });
 
     // TODO: Override WALK reluctance with BIKE reluctance
     // callWith.argument("bike.reluctance", r -> {

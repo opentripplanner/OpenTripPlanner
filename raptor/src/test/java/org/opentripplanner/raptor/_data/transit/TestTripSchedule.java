@@ -64,13 +64,11 @@ public class TestTripSchedule implements RaptorTripSchedule {
   @Override
   public String toString() {
     if (Arrays.equals(arrivalTimes, departureTimes)) {
-      return ToStringBuilder
-        .of(TestTripSchedule.class)
+      return ToStringBuilder.of(TestTripSchedule.class)
         .addServiceTimeSchedule("times", arrivalTimes)
         .toString();
     }
-    return ToStringBuilder
-      .of(TestTripSchedule.class)
+    return ToStringBuilder.of(TestTripSchedule.class)
       .addServiceTimeSchedule("arrivals", arrivalTimes)
       .addServiceTimeSchedule("departures", departureTimes)
       .toString();
@@ -168,8 +166,7 @@ public class TestTripSchedule implements RaptorTripSchedule {
     }
 
     public TestTripSchedule.Builder[] repeat(int nTimes, int everySeconds) {
-      return IntStream
-        .range(0, nTimes)
+      return IntStream.range(0, nTimes)
         .mapToObj(i -> copy().shiftTimes(i * everySeconds))
         .toArray(Builder[]::new);
     }

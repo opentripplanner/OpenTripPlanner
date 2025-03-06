@@ -92,7 +92,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
               """
               Configures if a vehicle rented from a station must be returned to another one or can
               be kept at the end of the trip.
-              
+
               See the regular [GBFS documentation](../UpdaterConfig.md#gbfs-vehicle-rental-systems) for more information.
               """
             )

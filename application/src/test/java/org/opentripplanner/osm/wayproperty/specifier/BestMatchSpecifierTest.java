@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 class BestMatchSpecifierTest extends SpecifierTest {
 
@@ -61,7 +61,7 @@ class BestMatchSpecifierTest extends SpecifierTest {
     name = "way {0} with specifier {1} should have a backward score {2} and forward score {3}"
   )
   @MethodSource("leftRightTestCases")
-  void leftRight(OsmWithTags way, OsmSpecifier spec, int expectedBackward, int expectedForward) {
+  void leftRight(OsmEntity way, OsmSpecifier spec, int expectedBackward, int expectedForward) {
     var result = spec.matchScores(way);
     assertEquals(expectedBackward, result.backward());
     assertEquals(expectedForward, result.forward());

@@ -30,9 +30,10 @@ public class StopConsolidationDocTest {
   public void updateDoc() {
     NodeAdapter node = readConfig();
 
-    var lines = ResourceLoader
-      .of(this)
-      .lines("/org/opentripplanner/ext/stopconsolidation/consolidated-stops.csv", 6);
+    var lines = ResourceLoader.of(this).lines(
+      "/org/opentripplanner/ext/stopconsolidation/consolidated-stops.csv",
+      6
+    );
 
     // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
@@ -40,7 +41,8 @@ public class StopConsolidationDocTest {
 
     var joined = String.join("\n", lines);
 
-    var csvExample = """
+    var csvExample =
+      """
       ```
       %s
       ```

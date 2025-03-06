@@ -38,9 +38,8 @@ class CostLinearFunctionTest {
   @Test
   void negativeDurationNotAllowed() {
     assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of("-2m + 1.0 t"));
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> CostLinearFunction.of(DurationUtils.duration("-2m"), 1.0)
+    assertThrows(IllegalArgumentException.class, () ->
+      CostLinearFunction.of(DurationUtils.duration("-2m"), 1.0)
     );
   }
 
@@ -54,9 +53,8 @@ class CostLinearFunctionTest {
   @Test
   void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
     assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of(D2m, -0.01));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> CostLinearFunction.of(Duration.ZERO, 100.1)
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      CostLinearFunction.of(Duration.ZERO, 100.1)
     );
     assertEquals("The value is not in range[0.0, 100.0]: 100.1", ex.getMessage());
   }

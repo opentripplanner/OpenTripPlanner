@@ -37,7 +37,8 @@ class SearchContextTest implements RaptorTestConstants {
   private final RaptorAccessEgress PATH_B = TestAccessEgress.walk(STOP_B, D1m);
   private final RaptorAccessEgress PATH_C_30s = TestAccessEgress.walk(STOP_C, D30s);
   private final RaptorAccessEgress PATH_C_40s = TestAccessEgress.walk(STOP_C, D40s);
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
 
   @BeforeEach
   void setup() {

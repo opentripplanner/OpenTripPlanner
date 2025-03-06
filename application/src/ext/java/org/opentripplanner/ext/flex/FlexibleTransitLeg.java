@@ -230,8 +230,7 @@ public class FlexibleTransitLeg implements TransitLeg {
    */
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(FlexibleTransitLeg.class)
+    return ToStringBuilder.of(FlexibleTransitLeg.class)
       .addObj("from", getFrom())
       .addObj("to", getTo())
       .addTime("startTime", startTime)

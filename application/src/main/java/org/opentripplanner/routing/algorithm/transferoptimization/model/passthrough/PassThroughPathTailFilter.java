@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -55,10 +55,10 @@ public class PassThroughPathTailFilter<T extends RaptorTripSchedule> implements 
 
   public PassThroughPathTailFilter(
     PathTailFilter<T> filterChain,
-    List<PassThroughPoint> passThroughPoints
+    List<RaptorViaLocation> viaLocations
   ) {
     this.filterChain = filterChain;
-    this.c2Calculator = new PathTailC2Calculator(passThroughPoints);
+    this.c2Calculator = new PathTailC2Calculator(viaLocations);
   }
 
   @Override
@@ -94,8 +94,7 @@ public class PassThroughPathTailFilter<T extends RaptorTripSchedule> implements 
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PassThroughPathTailFilter.class)
+    return ToStringBuilder.of(PassThroughPathTailFilter.class)
       .addObj("c2Calculator", c2Calculator)
       .addObj("filterChain", filterChain)
       .toString();

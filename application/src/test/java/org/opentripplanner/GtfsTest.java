@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.routing.api.request.StreetMode.NOT_SET;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
-import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
+import static org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
@@ -51,10 +51,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
-import org.opentripplanner.updater.alert.AlertsUpdateHandler;
-import org.opentripplanner.updater.trip.GtfsRealTimeTripUpdateAdapter;
+import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {
@@ -110,8 +110,7 @@ public abstract class GtfsTest {
     }
     routingRequest.setWheelchair(wheelchairAccessible);
 
-    RequestModesBuilder requestModesBuilder = RequestModes
-      .of()
+    RequestModesBuilder requestModesBuilder = RequestModes.of()
       .withDirectMode(NOT_SET)
       .withAccessMode(WALK)
       .withTransferMode(WALK)
@@ -230,8 +229,11 @@ public abstract class GtfsTest {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       LocalDate::now
     );
-    tripUpdateAdapter =
-      new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, LocalDate::now);
+    tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      LocalDate::now
+    );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
     alertsUpdateHandler.setFeedId(feedId.getId());
@@ -253,7 +255,11 @@ public abstract class GtfsTest {
       );
       alertsUpdateHandler.update(feedMessage, null);
     } catch (FileNotFoundException exception) {}
-    serverContext =
-      TestServerContext.createServerContext(graph, timetableRepository, snapshotManager, null);
+    serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      snapshotManager,
+      null
+    );
   }
 }

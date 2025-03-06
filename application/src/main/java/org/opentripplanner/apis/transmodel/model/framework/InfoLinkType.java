@@ -9,12 +9,10 @@ import org.opentripplanner.routing.alertpatch.AlertUrl;
 public class InfoLinkType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("infoLink")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("uri")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .description("URI")
@@ -25,8 +23,7 @@ public class InfoLinkType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("label")
           .type(Scalars.GraphQLString)
           .description("Label")

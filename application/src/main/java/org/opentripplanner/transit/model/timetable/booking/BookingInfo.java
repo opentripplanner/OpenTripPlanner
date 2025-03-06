@@ -125,8 +125,7 @@ public class BookingInfo implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(BookingInfo.class)
+    return ToStringBuilder.of(BookingInfo.class)
       .addObj("contactInfo", contactInfo)
       .addObj("bookingMethods", bookingMethods)
       .addObj("earliestBookingTime", earliestBookingTime)

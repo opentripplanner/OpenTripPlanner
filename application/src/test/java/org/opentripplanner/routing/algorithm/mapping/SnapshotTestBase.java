@@ -85,8 +85,10 @@ public abstract class SnapshotTestBase {
   protected OtpServerRequestContext serverContext() {
     if (serverContext == null) {
       TestOtpModel model = getGraph();
-      serverContext =
-        TestServerContext.createServerContext(model.graph(), model.timetableRepository());
+      serverContext = TestServerContext.createServerContext(
+        model.graph(),
+        model.timetableRepository()
+      );
     }
 
     return serverContext;
@@ -108,8 +110,7 @@ public abstract class SnapshotTestBase {
 
     RouteRequest request = serverContext.defaultRouteRequest();
     request.setDateTime(
-      LocalDateTime
-        .of(year, month, day, hour, minute, second)
+      LocalDateTime.of(year, month, day, hour, minute, second)
         .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
         .toInstant()
     );
@@ -183,9 +184,8 @@ public abstract class SnapshotTestBase {
 
     logDebugInformationOnFailure(request, () -> assertFalse(departByItineraries.isEmpty()));
 
-    logDebugInformationOnFailure(
-      departAt,
-      () -> expectItinerariesToMatchSnapshot(departByItineraries)
+    logDebugInformationOnFailure(departAt, () ->
+      expectItinerariesToMatchSnapshot(departByItineraries)
     );
 
     RouteRequest arriveBy = request.clone();
@@ -197,13 +197,11 @@ public abstract class SnapshotTestBase {
     var departAtItinerary = departByItineraries.get(0);
     var arriveByItinerary = arriveByItineraries.get(0);
 
-    logDebugInformationOnFailure(
-      arriveBy,
-      () ->
-        assertEquals(
-          asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
-          asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
-        )
+    logDebugInformationOnFailure(arriveBy, () ->
+      assertEquals(
+        asJsonString(itineraryMapper.mapItinerary(departAtItinerary)),
+        asJsonString(itineraryMapper.mapItinerary(arriveByItinerary))
+      )
     );
   }
 
@@ -271,8 +269,7 @@ public abstract class SnapshotTestBase {
   }
 
   private String createDebugUrlForRequest(RouteRequest request) {
-    var dateTime = Instant
-      .ofEpochSecond(request.dateTime().getEpochSecond())
+    var dateTime = Instant.ofEpochSecond(request.dateTime().getEpochSecond())
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
@@ -288,18 +285,16 @@ public abstract class SnapshotTestBase {
 
     var transitModes = mapModes(transportModes);
 
-    var modes = Stream
-      .concat(
-        Stream
-          .of(
-            asQualifiedMode(request.journey().direct().mode(), false),
-            asQualifiedMode(request.journey().access().mode(), false),
-            asQualifiedMode(request.journey().egress().mode(), true)
-          )
-          .filter(Objects::nonNull)
-          .map(QualifiedMode::toString),
-        transitModes.stream().map(ApiRequestMode::name)
+    var modes = Stream.concat(
+      Stream.of(
+        asQualifiedMode(request.journey().direct().mode(), false),
+        asQualifiedMode(request.journey().access().mode(), false),
+        asQualifiedMode(request.journey().egress().mode(), true)
       )
+        .filter(Objects::nonNull)
+        .map(QualifiedMode::toString),
+      transitModes.stream().map(ApiRequestMode::name)
+    )
       .distinct()
       .collect(Collectors.joining(","));
 
@@ -377,21 +372,20 @@ public abstract class SnapshotTestBase {
 
       objectMapper.addMixIn(ApiLeg.class, ApiLegMixin.class);
 
-      pp =
-        new DefaultPrettyPrinter("") {
-          @Override
-          public DefaultPrettyPrinter withSeparators(Separators separators) {
-            this._separators = separators;
-            this._objectFieldValueSeparatorWithSpaces =
-              separators.getObjectFieldValueSeparator() + " ";
-            return this;
-          }
+      pp = new DefaultPrettyPrinter("") {
+        @Override
+        public DefaultPrettyPrinter withSeparators(Separators separators) {
+          this._separators = separators;
+          this._objectFieldValueSeparatorWithSpaces =
+            separators.getObjectFieldValueSeparator() + " ";
+          return this;
+        }
 
-          @Override
-          public DefaultPrettyPrinter createInstance() {
-            return this;
-          }
-        };
+        @Override
+        public DefaultPrettyPrinter createInstance() {
+          return this;
+        }
+      };
 
       DefaultPrettyPrinter.Indenter lfOnlyIndenter = new DefaultIndenter("  ", "\n");
       pp.indentArraysWith(lfOnlyIndenter);

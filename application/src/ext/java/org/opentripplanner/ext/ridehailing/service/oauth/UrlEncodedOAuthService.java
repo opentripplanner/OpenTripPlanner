@@ -21,8 +21,7 @@ public class UrlEncodedOAuthService extends CachingOAuthService {
 
   @Override
   protected HttpRequest oauthTokenRequest() {
-    return HttpRequest
-      .newBuilder(uri)
+    return HttpRequest.newBuilder(uri)
       .POST(HttpRequest.BodyPublishers.ofString(authRequest.toRequestParamString()))
       .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
       .build();

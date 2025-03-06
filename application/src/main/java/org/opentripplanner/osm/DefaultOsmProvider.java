@@ -88,8 +88,7 @@ public class DefaultOsmProvider implements OsmProvider {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DefaultOsmProvider.class)
+    return ToStringBuilder.of(DefaultOsmProvider.class)
       .addObj("source", source)
       .addBool("cacheDataInMem", cacheDataInMem)
       .toString();

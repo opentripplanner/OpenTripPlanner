@@ -64,8 +64,7 @@ class VisitViaLocationTest {
     var ids = subject.stopLocationIds();
     var cs = subject.coordinates();
 
-    AssertEqualsAndHashCode
-      .verify(subject)
+    AssertEqualsAndHashCode.verify(subject)
       .sameAs(new VisitViaLocation(l, mwt, ids, cs))
       .differentFrom(
         new VisitViaLocation("other", mwt, ids, cs),

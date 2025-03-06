@@ -52,12 +52,10 @@ public final class AccessEgressFunctions {
    * </ol>
    */
   private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
-    (
-      (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
+    ((l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
       r.hasOpeningHours() ||
       l.numberOfRides() < r.numberOfRides() ||
-      l.durationInSeconds() < r.durationInSeconds()
-    );
+      l.durationInSeconds() < r.durationInSeconds());
 
   /**
    * Filter Multi-criteria Raptor access and egress paths. This can be used to wash

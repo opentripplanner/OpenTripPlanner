@@ -56,7 +56,8 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     RaptorConfig.defaultConfigForTest()
   );
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
 
   @BeforeEach
   public void setup() {
@@ -98,8 +99,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     // Min-Duration 19m
     var flexAndTransit = startFlexAccess + endL2AndWalk + "[0:03 0:23 20m Tₓ1 C₁2_640]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D3m)))
       .addMinDuration("19m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexTransferTransit, flexAndTransit))
@@ -131,8 +131,7 @@ public class F11_AccessWithRidesMultipleOptimalPathsTest implements RaptorTestCo
     // Min-Duration 17m
     var flexAndTransit = startFlexAccess + endL2AndWalk + "[0:03 0:21 18m Tₓ1 C₁2_400]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r -> r.searchParams().addEgressPaths(free(STOP_F), walk(STOP_E, D1m)))
       .addMinDuration("17m", TX_1, T00_02, T00_30)
       .add(standard().manyIterations(), withoutCost(flexAndTransit))

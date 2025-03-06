@@ -119,12 +119,13 @@ class FlexStopsMapperTest {
     63.596915083462335,
     10.878374152208456
   );
-  private static final KeyListStructure KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS = new KeyListStructure()
-    .withKeyValue(
-      new KeyValueStructure()
-        .withKey("FlexibleStopAreaType")
-        .withValue("UnrestrictedPublicTransportAreas")
-    );
+  private static final KeyListStructure KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS =
+    new KeyListStructure()
+      .withKeyValue(
+        new KeyValueStructure()
+          .withKey("FlexibleStopAreaType")
+          .withValue("UnrestrictedPublicTransportAreas")
+      );
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private final SiteRepositoryBuilder siteRepositoryBuilder = testModel.siteRepositoryBuilder();

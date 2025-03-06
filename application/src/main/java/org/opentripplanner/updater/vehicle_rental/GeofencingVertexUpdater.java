@@ -73,8 +73,7 @@ class GeofencingVertexUpdater {
         .map(GeofencingZone::geometry)
         .toArray(Geometry[]::new);
 
-      var unionOfBusinessAreas = GeometryUtils
-        .getGeometryFactory()
+      var unionOfBusinessAreas = GeometryUtils.getGeometryFactory()
         .createGeometryCollection(polygons)
         .union();
 

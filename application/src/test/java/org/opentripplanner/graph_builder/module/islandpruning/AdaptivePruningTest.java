@@ -22,14 +22,13 @@ public class AdaptivePruningTest {
 
   @BeforeAll
   static void setup() {
-    graph =
-      buildOsmGraph(
-        ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"),
-        5,
-        0,
-        20,
-        30
-      );
+    graph = buildOsmGraph(
+      ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"),
+      5,
+      0,
+      20,
+      30
+    );
   }
 
   @Test

@@ -195,8 +195,7 @@ class PathwayEdgeTest {
       preferences
         .withWalk(builder -> builder.withSpeed(10))
         .withWheelchair(
-          WheelchairPreferences
-            .of()
+          WheelchairPreferences.of()
             .withTripOnlyAccessible()
             .withStopOnlyAccessible()
             .withElevatorOnlyAccessible()

@@ -42,20 +42,16 @@ class IntUtilsTest {
     IntUtils.requireInRange(1, 1, 1, "single-element-range");
     IntUtils.requireInRange(-2, -2, 1, "negative-start");
     IntUtils.requireInRange(-1, -2, -1, "negative-end");
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> IntUtils.requireInRange(1, 2, 1, "invalid-range")
+    assertThrows(IllegalArgumentException.class, () ->
+      IntUtils.requireInRange(1, 2, 1, "invalid-range")
     );
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> IntUtils.requireInRange(1, 2, 3, "value-too-small")
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      IntUtils.requireInRange(1, 2, 3, "value-too-small")
     );
     assertEquals("The 'value-too-small' is not in range[2, 3]: 1", ex.getMessage());
-    ex =
-      assertThrows(
-        IllegalArgumentException.class,
-        () -> IntUtils.requireInRange(4, 0, 3, "value-too-big")
-      );
+    ex = assertThrows(IllegalArgumentException.class, () ->
+      IntUtils.requireInRange(4, 0, 3, "value-too-big")
+    );
     assertEquals("The 'value-too-big' is not in range[0, 3]: 4", ex.getMessage());
   }
 
@@ -94,9 +90,7 @@ class IntUtilsTest {
     assertEquals(7, requireNotNegative(7, "ok"));
     assertEquals(0, requireNotNegative(0, "ok"));
 
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> requireNotNegative(-1, "too-small")
+    var ex = assertThrows(IllegalArgumentException.class, () -> requireNotNegative(-1, "too-small")
     );
     assertEquals("Negative value not expected for 'too-small': -1", ex.getMessage());
 

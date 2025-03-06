@@ -11,7 +11,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
@@ -19,7 +19,7 @@ class OsmTagMapperTest {
 
   @Test
   void isMotorThroughTrafficExplicitlyDisallowed() {
-    OsmWithTags o = new OsmWithTags();
+    OsmEntity o = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     assertFalse(osmTagMapper.isMotorVehicleThroughTrafficExplicitlyDisallowed(o));
@@ -60,7 +60,7 @@ class OsmTagMapperTest {
 
   @Test
   void testAccessNo() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "no");
@@ -72,7 +72,7 @@ class OsmTagMapperTest {
 
   @Test
   void testAccessPrivate() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -84,7 +84,7 @@ class OsmTagMapperTest {
 
   @Test
   void testFootModifier() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -97,7 +97,7 @@ class OsmTagMapperTest {
 
   @Test
   void testVehicleDenied() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("vehicle", "destination");
@@ -109,7 +109,7 @@ class OsmTagMapperTest {
 
   @Test
   void testVehicleDeniedMotorVehiclePermissive() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("vehicle", "destination");
@@ -122,7 +122,7 @@ class OsmTagMapperTest {
 
   @Test
   void testVehicleDeniedBicyclePermissive() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("vehicle", "destination");
@@ -135,7 +135,7 @@ class OsmTagMapperTest {
 
   @Test
   void testMotorcycleModifier() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -148,7 +148,7 @@ class OsmTagMapperTest {
 
   @Test
   void testBicycleModifier() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -161,7 +161,7 @@ class OsmTagMapperTest {
 
   @Test
   void testBicyclePermissive() {
-    OsmWithTags tags = new OsmWithTags();
+    OsmEntity tags = new OsmEntity();
     OsmTagMapper osmTagMapper = new OsmTagMapper();
 
     tags.addTag("access", "private");
@@ -172,7 +172,7 @@ class OsmTagMapperTest {
     assertTrue(osmTagMapper.isWalkThroughTrafficExplicitlyDisallowed(tags));
   }
 
-  public static List<OsmWithTags> roadCases() {
+  public static List<OsmEntity> roadCases() {
     return List.of(
       WayTestData.carTunnel(),
       WayTestData.southwestMayoStreet(),
@@ -184,7 +184,7 @@ class OsmTagMapperTest {
 
   @ParameterizedTest
   @MethodSource("roadCases")
-  void motorroad(OsmWithTags way) {
+  void motorroad(OsmEntity way) {
     final WayPropertySet wps = wayProperySet();
 
     assertEquals(ALL, wps.getDataForWay(way).getPermission());
@@ -202,8 +202,8 @@ class OsmTagMapperTest {
     assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(Locale.of("FI")));
   }
 
-  public OsmWithTags way(String key, String value) {
-    var way = new OsmWithTags();
+  public OsmEntity way(String key, String value) {
+    var way = new OsmEntity();
     way.addTag(key, value);
     return way;
   }

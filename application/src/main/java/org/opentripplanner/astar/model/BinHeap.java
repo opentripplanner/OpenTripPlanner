@@ -34,13 +34,13 @@ public class BinHeap<T> {
   }
 
   public double peek_min_key() {
-    if (size > 0) return prio[1]; else throw new IllegalStateException(
-      "An empty queue does not have a minimum key."
-    );
+    if (size > 0) return prio[1];
+    else throw new IllegalStateException("An empty queue does not have a minimum key.");
   }
 
   public T peek_min() {
-    if (size > 0) return elem[1]; else return null;
+    if (size > 0) return elem[1];
+    else return null;
   }
 
   public void rekey(T e, double p) {

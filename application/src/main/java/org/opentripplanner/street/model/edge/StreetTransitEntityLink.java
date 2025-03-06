@@ -89,14 +89,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         // floating rental vehicles.
         else if (
           s0.isRentingVehicleFromStation() &&
-          !(
-            s0.mayKeepRentedVehicleAtDestination() &&
+          !(s0.mayKeepRentedVehicleAtDestination() &&
             s0
               .getRequest()
               .preferences()
               .rental(s0.getRequest().mode())
-              .allowArrivingInRentedVehicleAtDestination()
-          )
+              .allowArrivingInRentedVehicleAtDestination())
         ) {
           yield State.empty();
         }

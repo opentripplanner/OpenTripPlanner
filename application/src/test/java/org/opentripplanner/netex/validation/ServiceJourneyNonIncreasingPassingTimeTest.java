@@ -26,7 +26,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
     netexEntityIndex.serviceJourneyById.add(serviceJourney);
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -49,7 +50,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
     netexEntityIndex.serviceJourneyById.add(serviceJourney);
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -68,7 +70,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     TimetabledPassingTime timetabledPassingTime = getFirstPassingTime(serviceJourney);
     timetabledPassingTime.withArrivalTime(timetabledPassingTime.getDepartureTime().plusMinutes(1));
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
     netexEntityIndex.serviceJourneyById.add(serviceJourney);
@@ -96,7 +99,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       .withEarliestDepartureTime(LocalTime.MIDNIGHT)
       .withLatestArrivalTime(LocalTime.MIDNIGHT.plusMinutes(1));
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
     netexEntityIndex.serviceJourneyById.addAll(serviceJourneyById.localValues());
@@ -124,7 +128,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     TimetabledPassingTime timetabledPassingTime = getFirstPassingTime(serviceJourney);
     timetabledPassingTime.withArrivalTime(null).withDepartureTime(null);
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
     netexEntityIndex.serviceJourneyById.addAll(serviceJourneyById.localValues());
@@ -163,7 +168,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       .withEarliestDepartureTime(LocalTime.MIDNIGHT.plusMinutes(1))
       .withLatestArrivalTime(LocalTime.MIDNIGHT);
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
     netexEntityIndex.serviceJourneyById.addAll(serviceJourneyById.localValues());
@@ -197,7 +203,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     netexEntityIndex.journeyPatternsById.add(journeyPattern);
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -250,7 +257,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       null
     );
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -281,7 +289,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       null
     );
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -312,7 +321,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       null
     );
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -353,7 +363,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       getSecondScheduledStopPointRef(journeyPattern),
       null
     );
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -395,7 +406,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       getSecondScheduledStopPointRef(journeyPattern),
       null
     );
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(
@@ -432,7 +444,8 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       null
     );
 
-    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime = new ServiceJourneyNonIncreasingPassingTime();
+    ServiceJourneyNonIncreasingPassingTime serviceJourneyNonIncreasingPassingTime =
+      new ServiceJourneyNonIncreasingPassingTime();
     serviceJourneyNonIncreasingPassingTime.setup(netexEntityIndex.readOnlyView());
 
     assertEquals(

@@ -17,8 +17,7 @@ class AreaStopPropertyMapperTest {
     SiteRepository.of()
   );
   private static final AreaStop STOP = MODEL.areaStop("123").build();
-  private static final Route ROUTE_WITH_COLOR = TimetableRepositoryForTest
-    .route("123")
+  private static final Route ROUTE_WITH_COLOR = TimetableRepositoryForTest.route("123")
     .withColor("ffffff")
     .build();
   private static final Route ROUTE_WITHOUT_COLOR = TimetableRepositoryForTest.route("456").build();

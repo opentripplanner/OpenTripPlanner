@@ -76,8 +76,7 @@ public class ItineraryFares {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addObj("itineraryProducts", itineraryProducts)
       .addObj("legProducts", legProducts)
       .toString();

@@ -45,13 +45,11 @@ public class PtSituationElementType {
     GraphQLScalarType dateTimeScalar,
     Relay relay
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .description("Simple public transport situation element")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
@@ -60,30 +58,26 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("authority")
           .type(authorityType)
           .description("Get affected authority for this situation element")
           .deprecate("Use affects instead")
           .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
-              .getAgency(
-                ((TransitAlert) environment.getSource()).entities()
-                  .stream()
-                  .filter(EntitySelector.Agency.class::isInstance)
-                  .map(EntitySelector.Agency.class::cast)
-                  .findAny()
-                  .map(EntitySelector.Agency::agencyId)
-                  .orElse(null)
-              )
+            GqlUtil.getTransitService(environment).getAgency(
+              ((TransitAlert) environment.getSource()).entities()
+                .stream()
+                .filter(EntitySelector.Agency.class::isInstance)
+                .map(EntitySelector.Agency.class::cast)
+                .findAny()
+                .map(EntitySelector.Agency::agencyId)
+                .orElse(null)
+            )
           )
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("lines")
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .deprecate("Use affects instead")
@@ -100,8 +94,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .deprecate("Use affects instead")
@@ -118,8 +111,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .deprecate("Use affects instead")
@@ -137,8 +129,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPlaces")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopPlaceType))))
           .deprecate("Use affects instead")
@@ -159,8 +150,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("affects")
           .description("Get all affected entities for the situation")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(affectsType))))
@@ -168,8 +158,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("summary")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Summary of situation in all different translations available")
@@ -189,8 +178,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Description of situation in all different translations available")
@@ -210,8 +198,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("advice")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Advice of situation in all different translations available")
@@ -228,8 +215,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("infoLinks")
           .type(new GraphQLList(new GraphQLNonNull(infoLinkType)))
           .description("Optional links to more information.")
@@ -243,8 +229,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("validityPeriod")
           .type(validityPeriodType)
           .description("Period this situation is in effect")
@@ -261,8 +246,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("reportType")
           .type(EnumTypes.REPORT_TYPE)
           .description("ReportType of this situation")
@@ -270,8 +254,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("situationNumber")
           .type(Scalars.GraphQLString)
           .description("Operator's internal id for this situation")
@@ -279,8 +262,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("severity")
           .type(EnumTypes.SEVERITY)
           .description("Severity of this situation ")
@@ -290,8 +272,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("priority")
           .type(Scalars.GraphQLInt)
           .description("Priority of this situation ")
@@ -299,8 +280,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("creationTime")
           .type(dateTimeScalar)
           .description("Timestamp for when the situation was created.")
@@ -311,8 +291,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("versionedAtTime")
           .type(dateTimeScalar)
           .description("Timestamp when the situation element was updated.")
@@ -323,8 +302,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("version")
           .type(Scalars.GraphQLInt)
           .description("Operator's version number for the situation element.")
@@ -332,8 +310,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("participant")
           .type(Scalars.GraphQLString)
           .description("Codespace of the data source.")
@@ -341,8 +318,7 @@ public class PtSituationElementType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("reportAuthority")
           .type(authorityType)
           .description(
@@ -356,8 +332,7 @@ public class PtSituationElementType {
             if (codespace == null) {
               return null;
             }
-            return GqlUtil
-              .getTransitService(environment)
+            return GqlUtil.getTransitService(environment)
               .listAgencies()
               .stream()
               .filter(agency -> agency.getId().getFeedId().equals(feedId))

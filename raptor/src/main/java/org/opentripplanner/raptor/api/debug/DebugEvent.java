@@ -109,8 +109,7 @@ public class DebugEvent<E> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DebugEvent.class)
+    return ToStringBuilder.of(DebugEvent.class)
       .addEnum("action", action)
       .addServiceTime("iterationStartTime", iterationStartTime)
       .addObj("element", element)

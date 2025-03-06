@@ -121,12 +121,9 @@ public class ToStringBuilderTest {
     assertEquals(
       "ToStringBuilderTest{}",
       subject()
-        .addObjOpSafe(
-          "obj",
-          () -> {
-            throw new IllegalStateException("Ignore");
-          }
-        )
+        .addObjOpSafe("obj", () -> {
+          throw new IllegalStateException("Ignore");
+        })
         .toString()
     );
   }
@@ -260,9 +257,10 @@ public class ToStringBuilderTest {
 
   @Test
   public void addDateTime() {
-    var time = ZonedDateTime
-      .of(LocalDateTime.of(2012, 1, 28, 23, 45, 12), TIME_ZONE_ID_PARIS)
-      .toInstant();
+    var time = ZonedDateTime.of(
+      LocalDateTime.of(2012, 1, 28, 23, 45, 12),
+      TIME_ZONE_ID_PARIS
+    ).toInstant();
     assertEquals(
       "ToStringBuilderTest{t: 2012-01-28T22:45:12Z}",
       subject().addDateTime("t", time).toString()

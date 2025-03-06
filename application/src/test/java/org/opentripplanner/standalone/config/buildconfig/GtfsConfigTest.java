@@ -42,10 +42,12 @@ class GtfsConfigTest {
 
   @Test
   void mapMissingGtfsDefaultParameters() {
-    NodeAdapter nodeAdapter = newNodeAdapterForTest("""
+    NodeAdapter nodeAdapter = newNodeAdapterForTest(
+      """
       {
       }
-      """);
+      """
+    );
 
     var subject = GtfsConfig.mapGtfsDefaultParameters(nodeAdapter, "gtfsDefaults");
 
@@ -141,10 +143,12 @@ class GtfsConfigTest {
 
   @Test
   void mapGtfsFeedWithNoDefaults() {
-    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest("""
+    NodeAdapter noDefaultsAdapter = newNodeAdapterForTest(
+      """
       {
       }
-      """);
+      """
+    );
 
     var defaults = GtfsConfig.mapGtfsDefaultParameters(noDefaultsAdapter, "gtfsDefaults");
 

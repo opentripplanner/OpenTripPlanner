@@ -18,8 +18,7 @@ class RelaxCostTypeTest {
   @Test
   void valueOf() {
     assertEquals(
-      ObjectValue
-        .newObjectValue()
+      ObjectValue.newObjectValue()
         .objectField(ObjectField.newObjectField().name(RATIO).value(FloatValue.of(1.0)).build())
         .objectField(
           ObjectField.newObjectField().name(CONSTANT).value(StringValue.of("0s")).build()
@@ -29,8 +28,7 @@ class RelaxCostTypeTest {
       RelaxCostType.valueOf(CostLinearFunction.NORMAL).toString()
     );
     assertEquals(
-      ObjectValue
-        .newObjectValue()
+      ObjectValue.newObjectValue()
         .objectField(ObjectField.newObjectField().name(RATIO).value(FloatValue.of(1.3)).build())
         .objectField(
           ObjectField.newObjectField().name(CONSTANT).value(StringValue.of("1m7s")).build()

@@ -98,8 +98,7 @@ class MissingElevationHandler {
     var pq = new BinHeap<ElevationRepairState>();
 
     elevations.forEach(
-      (
-        (vertex, elevation) -> {
+      ((vertex, elevation) -> {
           vertex
             .getIncoming()
             .forEach(edge -> {
@@ -131,8 +130,7 @@ class MissingElevationHandler {
                 );
               }
             });
-        }
-      )
+        })
     );
 
     return pq;
@@ -254,8 +252,7 @@ class MissingElevationHandler {
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
     try {
-      StreetElevationExtensionBuilder
-        .of(edge)
+      StreetElevationExtensionBuilder.of(edge)
         .withElevationProfile(profile)
         .withComputed(true)
         .build()

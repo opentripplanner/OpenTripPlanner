@@ -28,8 +28,10 @@ class TimetableSnapshotManagerTest {
   private static final LocalDate YESTERDAY = TODAY.minusDays(1);
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final TripPattern PATTERN = TimetableRepositoryForTest
-    .tripPattern("pattern", TimetableRepositoryForTest.route("r1").build())
+  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern(
+    "pattern",
+    TimetableRepositoryForTest.route("r1").build()
+  )
     .withStopPattern(
       TimetableRepositoryForTest.stopPattern(
         TEST_MODEL.stop("1").build(),
@@ -38,8 +40,7 @@ class TimetableSnapshotManagerTest {
     )
     .build();
   private static final RealTimeTripTimes TRIP_TIMES = RealTimeTripTimes.of(
-    ScheduledTripTimes
-      .of()
+    ScheduledTripTimes.of()
       .withArrivalTimes("00:00 00:01")
       .withTrip(TimetableRepositoryForTest.trip("trip").build())
       .build()

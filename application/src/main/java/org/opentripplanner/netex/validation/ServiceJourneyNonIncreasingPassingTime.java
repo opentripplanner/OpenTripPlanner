@@ -36,7 +36,8 @@ class ServiceJourneyNonIncreasingPassingTime
   @Override
   public Status validate(ServiceJourney sj) {
     ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj, index);
-    List<StopTimeAdaptor> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
+    List<StopTimeAdaptor> orderedPassingTimes =
+      serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
 
     var previousPassingTime = orderedPassingTimes.get(0);
     if (!previousPassingTime.isComplete()) {

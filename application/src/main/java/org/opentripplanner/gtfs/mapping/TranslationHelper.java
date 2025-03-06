@@ -116,8 +116,7 @@ final class TranslationHelper {
 
     // Fields with default name are initialized with an empty string.
     // Without any configuration, no annotation is used.
-    String csvFieldName = Optional
-      .ofNullable(field.getAnnotation(CsvField.class))
+    String csvFieldName = Optional.ofNullable(field.getAnnotation(CsvField.class))
       .map(CsvField::name)
       .orElse("");
 

@@ -54,7 +54,7 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       "~ BUS L1 10:02 10:07 5m C₁438 ~ B 15s " +
       "~ Walk 2m 10:07:15 10:09:15 C₁210 " +
       "[10:00:15 10:09:15 9m Tₓ0 C₁768]",
-      path.toStringDetailed(this::stopIndexToName)
+      path.toStringDetailed(RaptorTestConstants::stopIndexToName)
     );
   }
 
@@ -84,10 +84,13 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       )
       .egress(BasicPathTestCase.EGRESS_DURATION);
 
-    assertEquals(BasicPathTestCase.BASIC_PATH_AS_STRING, path.toString(this::stopIndexToName));
+    assertEquals(
+      BasicPathTestCase.BASIC_PATH_AS_STRING,
+      path.toString(RaptorTestConstants::stopIndexToName)
+    );
     assertEquals(
       BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING,
-      path.toStringDetailed(this::stopIndexToName)
+      path.toStringDetailed(RaptorTestConstants::stopIndexToName)
     );
     assertEquals(BasicPathTestCase.TOTAL_C1, path.c1());
     assertTrue(path.isC2Set());

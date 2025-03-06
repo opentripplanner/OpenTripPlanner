@@ -42,60 +42,48 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
     // Version 3 - BYTE, @deprecated DURATION, INT
     builder = builder.newVersion().deprecate(DURATION_FIELD);
     TEST_CASES.add(
-      testCase(
-        builder,
-        "(v3, 17, 31)",
-        it ->
-          it
-            .encode()
-            .withInt(INT_FIELD, INT_VALUE)
-            .withByte(BYTE_FIELD, BYTE_VALUE)
-            .withDuration(DURATION_FIELD, DURATION_VALUE)
+      testCase(builder, "(v3, 17, 31)", it ->
+        it
+          .encode()
+          .withInt(INT_FIELD, INT_VALUE)
+          .withByte(BYTE_FIELD, BYTE_VALUE)
+          .withDuration(DURATION_FIELD, DURATION_VALUE)
       )
     );
 
     // Version 4 - BYTE, INT, STRING
     builder = builder.newVersion().addString(STRING_FIELD);
     TEST_CASES.add(
-      testCase(
-        builder,
-        "(v4, 17, 31, text)",
-        it ->
-          it
-            .encode()
-            .withInt(INT_FIELD, INT_VALUE)
-            .withByte(BYTE_FIELD, BYTE_VALUE)
-            .withString(STRING_FIELD, STRING_VALUE)
+      testCase(builder, "(v4, 17, 31, text)", it ->
+        it
+          .encode()
+          .withInt(INT_FIELD, INT_VALUE)
+          .withByte(BYTE_FIELD, BYTE_VALUE)
+          .withString(STRING_FIELD, STRING_VALUE)
       )
     );
 
     // Version 5 - @deprecated BYTE, INT, STRING, TIME_INSTANT
     builder = builder.newVersion().deprecate(BYTE_FIELD).addTimeInstant(TIME_INSTANT_FIELD);
     TEST_CASES.add(
-      testCase(
-        builder,
-        "(v5, 31, text, 2023-10-23T10:00:59Z)",
-        it ->
-          it
-            .encode()
-            .withInt(INT_FIELD, INT_VALUE)
-            .withByte(BYTE_FIELD, BYTE_VALUE)
-            .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
-            .withString(STRING_FIELD, STRING_VALUE)
+      testCase(builder, "(v5, 31, text, 2023-10-23T10:00:59Z)", it ->
+        it
+          .encode()
+          .withInt(INT_FIELD, INT_VALUE)
+          .withByte(BYTE_FIELD, BYTE_VALUE)
+          .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
+          .withString(STRING_FIELD, STRING_VALUE)
       )
     );
     // Version 6 - INT, STRING, TIME_INSTANT
     builder = builder.newVersion();
     TEST_CASES.add(
-      testCase(
-        builder,
-        "(v6, 31, text, 2023-10-23T10:00:59Z)",
-        it ->
-          it
-            .encode()
-            .withInt(INT_FIELD, INT_VALUE)
-            .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
-            .withString(STRING_FIELD, STRING_VALUE)
+      testCase(builder, "(v6, 31, text, 2023-10-23T10:00:59Z)", it ->
+        it
+          .encode()
+          .withInt(INT_FIELD, INT_VALUE)
+          .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
+          .withString(STRING_FIELD, STRING_VALUE)
       )
     );
   }
@@ -107,8 +95,9 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
   @ParameterizedTest
   @MethodSource(value = "testCases")
   void testDecodeBackwardsCompatibility(TestCase testCase) {
-    allTestCasesFrom(testCase)
-      .forEach(s -> assertEquals(testCase.expected(), s.decode(testCase.token()).toString()));
+    allTestCasesFrom(testCase).forEach(s ->
+      assertEquals(testCase.expected(), s.decode(testCase.token()).toString())
+    );
   }
 
   @ParameterizedTest
@@ -123,8 +112,7 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
 
   @Test
   void testMerge() {
-    var merged = TokenSchema
-      .ofVersion(6)
+    var merged = TokenSchema.ofVersion(6)
       .addInt(INT_FIELD)
       .addString(STRING_FIELD)
       .addTimeInstant(TIME_INSTANT_FIELD)
@@ -153,8 +141,7 @@ class AdvancedTokenSchemaTest implements TestTokenSchemaConstants {
    * List of all test-cases including the given test-case until the end of all test-cases
    */
   private static Stream<TokenSchema> allTestCasesFrom(TestCase testCase) {
-    return TEST_CASES
-      .subList(TEST_CASES.indexOf(testCase), TEST_CASES.size() - 1)
+    return TEST_CASES.subList(TEST_CASES.indexOf(testCase), TEST_CASES.size() - 1)
       .stream()
       .map(TestCase::subject);
   }

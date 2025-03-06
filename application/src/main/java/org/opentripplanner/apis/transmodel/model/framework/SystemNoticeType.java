@@ -8,8 +8,7 @@ import org.opentripplanner.model.SystemNotice;
 public class SystemNoticeType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("SystemNotice")
       .description(
         """
@@ -19,21 +18,19 @@ public class SystemNoticeType {
         them from the result. This make it possible to inspect the itinerary-filter-chain. A
         SystemNotice only have english text, because the primary user are technical staff, like
         testers and developers.
-        
+
         **NOTE!** _A SystemNotice is for debugging the system, avoid putting logic on it in the
         client. The tags and usage may change without notice._"""
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tag")
           .type(Scalars.GraphQLString)
           .dataFetcher(env -> ((SystemNotice) env.getSource()).tag())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("text")
           .type(Scalars.GraphQLString)
           .dataFetcher(env -> ((SystemNotice) env.getSource()).text())

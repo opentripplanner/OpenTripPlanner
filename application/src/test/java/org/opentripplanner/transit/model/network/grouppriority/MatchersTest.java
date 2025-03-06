@@ -13,14 +13,12 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class MatchersTest {
 
-  private final TestRouteData r1 = TestRouteData
-    .rail("R1")
+  private final TestRouteData r1 = TestRouteData.rail("R1")
     .withSubmode("express")
     .withAgency("A1")
     .build();
   private final TestRouteData b1 = TestRouteData.bus("B2").withAgency("A2").build();
-  private final TestRouteData f1 = TestRouteData
-    .ferry("F1")
+  private final TestRouteData f1 = TestRouteData.ferry("F1")
     .withAgency("A1")
     .withSubmode("localFerry")
     .build();
@@ -103,8 +101,7 @@ class MatchersTest {
   @Test
   void testAnd() {
     var subject = Matchers.of(
-      TransitGroupSelect
-        .of()
+      TransitGroupSelect.of()
         .addSubModeRegexp(List.of("express"))
         .addRouteIds(List.of(r1routeId))
         .addModes(List.of(TransitMode.RAIL, TransitMode.TRAM))
@@ -125,8 +122,7 @@ class MatchersTest {
   @Test
   void testToString() {
     var subject = Matchers.of(
-      TransitGroupSelect
-        .of()
+      TransitGroupSelect.of()
         .addModes(List.of(TransitMode.BUS, TransitMode.TRAM))
         .addAgencyIds(List.of(anyId, r1agencyId))
         .addRouteIds(List.of(r1routeId))

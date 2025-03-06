@@ -32,8 +32,7 @@ public class IndexVariable implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(IndexVariable.class)
+    return ToStringBuilder.of(IndexVariable.class)
       .addStr("name", name)
       .addStr("displayName", displayName)
       .addStr("variable", variable)

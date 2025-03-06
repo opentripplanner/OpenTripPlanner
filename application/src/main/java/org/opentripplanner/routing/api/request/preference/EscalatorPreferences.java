@@ -60,8 +60,7 @@ public class EscalatorPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(EscalatorPreferences.class)
+    return ToStringBuilder.of(EscalatorPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .toString();

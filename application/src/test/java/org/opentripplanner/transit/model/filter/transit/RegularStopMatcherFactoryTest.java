@@ -15,15 +15,15 @@ class RegularStopMatcherFactoryTest {
 
   @BeforeAll
   static void setup() {
-    stop1 =
-      RegularStop
-        .of(new FeedScopedId("agency", "stopId"), new AtomicInteger()::getAndIncrement)
-        .build();
+    stop1 = RegularStop.of(
+      new FeedScopedId("agency", "stopId"),
+      new AtomicInteger()::getAndIncrement
+    ).build();
 
-    stop2 =
-      RegularStop
-        .of(new FeedScopedId("otherAgency", "otherStopId"), new AtomicInteger()::getAndIncrement)
-        .build();
+    stop2 = RegularStop.of(
+      new FeedScopedId("otherAgency", "otherStopId"),
+      new AtomicInteger()::getAndIncrement
+    ).build();
   }
 
   @Test

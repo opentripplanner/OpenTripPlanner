@@ -110,10 +110,8 @@ public class ServiceDateIntervalTest {
 
   @Test
   public void intersectionFailsIfAUnionDoNotExist() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () ->
-        new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.plusDays(1), d2))
+    assertThrows(IllegalArgumentException.class, () ->
+      new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.plusDays(1), d2))
     );
   }
 

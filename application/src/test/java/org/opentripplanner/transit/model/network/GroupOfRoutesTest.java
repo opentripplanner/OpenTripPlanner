@@ -17,8 +17,7 @@ public class GroupOfRoutesTest {
   private static final String NAME = "test_name";
   private static final String DESCRIPTION = "description";
 
-  private static final GroupOfRoutes subject = GroupOfRoutes
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final GroupOfRoutes subject = GroupOfRoutes.of(TimetableRepositoryForTest.id(ID))
     .withPrivateCode(PRIVATE_CODE)
     .withShortName(SHORT_NAME)
     .withName(NAME)

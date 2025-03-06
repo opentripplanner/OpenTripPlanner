@@ -14,8 +14,6 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * visit does not count. The traveler must alight or board at the given stop for it to to be
  * accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point in
  * the street network from a stop and back to another stop to join the transit network.
- * <p>
- * TODO: NOTE! Coordinates are NOT supported yet.
  */
 public class VisitViaLocation extends AbstractViaLocation {
 
@@ -31,12 +29,11 @@ public class VisitViaLocation extends AbstractViaLocation {
     List<WgsCoordinate> coordinates
   ) {
     super(label, stopLocationIds);
-    this.minimumWaitTime =
-      DurationUtils.requireNonNegative(
-        minimumWaitTime == null ? Duration.ZERO : minimumWaitTime,
-        MINIMUM_WAIT_TIME_MAX_LIMIT,
-        "minimumWaitTime"
-      );
+    this.minimumWaitTime = DurationUtils.requireNonNegative(
+      minimumWaitTime == null ? Duration.ZERO : minimumWaitTime,
+      MINIMUM_WAIT_TIME_MAX_LIMIT,
+      "minimumWaitTime"
+    );
     this.coordinates = List.copyOf(coordinates);
 
     if (stopLocationIds().isEmpty() && coordinates().isEmpty()) {
@@ -69,8 +66,7 @@ public class VisitViaLocation extends AbstractViaLocation {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VisitViaLocation.class)
+    return ToStringBuilder.of(VisitViaLocation.class)
       .addObj("label", label())
       .addDuration("minimumWaitTime", minimumWaitTime, Duration.ZERO)
       .addCol("stopLocationIds", stopLocationIds())

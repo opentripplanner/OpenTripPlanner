@@ -31,8 +31,7 @@ class DefaultAccessEgressTest {
 
   @Test
   void durationInSeconds() {
-    // TODO - The value is ?
-    int expected = 118215;
+    int expected = (int) LAST_STATE.getElapsedTimeSeconds();
     assertEquals(expected, subject.durationInSeconds());
     assertEquals(expected, subjectWithPenalty.durationInSeconds());
   }
@@ -100,13 +99,6 @@ class DefaultAccessEgressTest {
     var carRentalState = TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build();
     subject = new DefaultAccessEgress(0, carRentalState);
     assertFalse(subject.isWalkOnly());
-  }
-
-  @Test
-  void hasPenalty() {
-    assertFalse(subject.hasPenalty());
-    assertFalse(subject.withPenalty(TimeAndCost.ZERO).hasPenalty());
-    assertTrue(subjectWithPenalty.hasPenalty());
   }
 
   @Test

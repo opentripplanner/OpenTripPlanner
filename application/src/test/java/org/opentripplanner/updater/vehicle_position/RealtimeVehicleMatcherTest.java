@@ -71,8 +71,7 @@ public class RealtimeVehicleMatcherTest {
   @Test
   @DisplayName("If the vehicle position has no start_date we need to guess the service day")
   public void inferStartDate() {
-    var posWithoutServiceDate = VehiclePosition
-      .newBuilder()
+    var posWithoutServiceDate = VehiclePosition.newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
       .setStopId("stop-1")
       .setPosition(
@@ -143,8 +142,7 @@ public class RealtimeVehicleMatcherTest {
       FEATURES
     );
 
-    var pos = VehiclePosition
-      .newBuilder()
+    var pos = VehiclePosition.newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
       .setCurrentStopSequence(20)
       .build();
@@ -162,8 +160,7 @@ public class RealtimeVehicleMatcherTest {
 
   @Test
   void invalidStopSequence() {
-    var posWithInvalidSequence = VehiclePosition
-      .newBuilder()
+    var posWithInvalidSequence = VehiclePosition.newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
       .setCurrentStopSequence(99)
       .setPosition(
@@ -378,8 +375,7 @@ public class RealtimeVehicleMatcherTest {
 
   private static TripPattern tripPattern(Trip trip, List<StopTime> stopTimes) {
     var stopPattern = new StopPattern(stopTimes);
-    var pattern = TripPattern
-      .of(trip.getId())
+    var pattern = TripPattern.of(trip.getId())
       .withStopPattern(stopPattern)
       .withRoute(ROUTE)
       .withScheduledTimeTableBuilder(builder ->
@@ -390,8 +386,7 @@ public class RealtimeVehicleMatcherTest {
   }
 
   private static VehiclePosition vehiclePosition(String tripId1) {
-    return VehiclePosition
-      .newBuilder()
+    return VehiclePosition.newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).setStartDate("20220314").build())
       .setStopId("stop-1")
       .setPosition(

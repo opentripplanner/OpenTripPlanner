@@ -21,8 +21,7 @@ public interface ItinerarySortKey {
   boolean isOnStreetAllTheWay();
 
   default String keyAsString() {
-    return ValueObjectToStringBuilder
-      .of()
+    return ValueObjectToStringBuilder.of()
       .addText("[")
       .addTime(startTimeAsInstant())
       .addText(", ")

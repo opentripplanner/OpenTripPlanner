@@ -27,28 +27,24 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
       } else if (ex instanceof NotFoundException) {
         header = "FOUR ZERO FOUR\n\n";
       }
-      return Response
-        .fromResponse(((WebApplicationException) ex).getResponse())
+      return Response.fromResponse(((WebApplicationException) ex).getResponse())
         .entity(header + ex.getMessage())
         .build();
     }
     if (ex instanceof OtpAppException) {
-      return Response
-        .status(Response.Status.INTERNAL_SERVER_ERROR)
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .entity("OTP Application error: " + ex.getMessage())
         .type("text/plain")
         .build();
     }
     if (ex instanceof OTPRequestTimeoutException) {
-      return Response
-        .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY)
+      return Response.status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY)
         .entity("OTP API Processing Timeout")
         .type("text/plain")
         .build();
     }
     if (ex instanceof JsonParseException || ex instanceof MismatchedInputException) {
-      return Response
-        .status(Response.Status.BAD_REQUEST)
+      return Response.status(Response.Status.BAD_REQUEST)
         .entity(ex.getMessage())
         .type("text/plain")
         .build();
@@ -57,8 +53,7 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
     // Show the exception in the server log
     LOG.error("Unhandled exception", ex);
     // Return the short form message to the client
-    return Response
-      .serverError()
+    return Response.serverError()
       .entity(ex.toString() + " " + ex.getMessage())
       .type("text/plain")
       .build();

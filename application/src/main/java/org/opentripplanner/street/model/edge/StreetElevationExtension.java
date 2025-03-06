@@ -132,8 +132,7 @@ public class StreetElevationExtension implements Serializable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(StreetElevationExtension.class)
+    return ToStringBuilder.of(StreetElevationExtension.class)
       .addBoolIfTrue("flattened", flattened)
       .addNum("distanceMeters", distanceMeters)
       .addNum("effectiveBicycleSafetyFactor", effectiveBicycleSafetyDistance)

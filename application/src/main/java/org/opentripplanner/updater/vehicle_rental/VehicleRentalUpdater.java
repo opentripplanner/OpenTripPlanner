@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
@@ -22,6 +21,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
@@ -72,11 +72,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     LOG.info("Setting up vehicle rental updater for {}.", source);
 
     this.source = source;
-    this.nameForLogging =
-      ObjectUtils.ifNotNull(
-        parameters.sourceParameters().network(),
-        parameters.sourceParameters().url()
-      );
+    this.nameForLogging = ObjectUtils.ifNotNull(
+      parameters.sourceParameters().network(),
+      parameters.sourceParameters().url()
+    );
     this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
 
     // Creation of network linker library will not modify the graph
@@ -164,7 +163,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
           DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
             vehicleRentalVertex,
             new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BOTH_WAYS,
+            LinkingDirection.BIDIRECTIONAL,
             (vertex, streetVertex) ->
               List.of(
                 StreetVehicleRentalLink.createStreetVehicleRentalLink(
@@ -190,12 +189,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
               )
             );
           }
-          Set<RentalFormFactor> formFactors = Stream
-            .concat(
-              station.getAvailablePickupFormFactors(false).stream(),
-              station.getAvailableDropoffFormFactors(false).stream()
-            )
-            .collect(Collectors.toSet());
+          Set<RentalFormFactor> formFactors = Stream.concat(
+            station.getAvailablePickupFormFactors(false).stream(),
+            station.getAvailableDropoffFormFactors(false).stream()
+          ).collect(Collectors.toSet());
           for (RentalFormFactor formFactor : formFactors) {
             tempEdges.addEdge(
               VehicleRentalEdge.createVehicleRentalEdge(vehicleRentalVertex, formFactor)

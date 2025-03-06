@@ -38,18 +38,14 @@ class AuthorityToAgencyMapper {
     String shortName = MultilingualStringMapper.nullableValueOf(source.getShortName());
     String agencyName = StringUtils.hasValue(name) ? name : shortName;
 
-    AgencyBuilder target = Agency
-      .of(idFactory.createId(source.getId()))
+    AgencyBuilder target = Agency.of(idFactory.createId(source.getId()))
       .withName(agencyName)
       .withTimezone(timeZone);
 
-    withOptional(
-      source.getContactDetails(),
-      c -> {
-        target.withUrl(c.getUrl());
-        target.withPhone(c.getPhone());
-      }
-    );
+    withOptional(source.getContactDetails(), c -> {
+      target.withUrl(c.getUrl());
+      target.withPhone(c.getPhone());
+    });
     return target.build();
   }
 
@@ -58,8 +54,7 @@ class AuthorityToAgencyMapper {
    * {@code "Dummy-" + timeZone}.
    */
   Agency createDummyAgency() {
-    return Agency
-      .of(idFactory.createId(dummyAgencyId))
+    return Agency.of(idFactory.createId(dummyAgencyId))
       .withName("N/A")
       .withTimezone(timeZone)
       .withUrl("N/A")

@@ -26,12 +26,10 @@ public class AffectsType {
     GraphQLOutputType serviceJourneyType,
     GraphQLOutputType datedServiceJourneyType
   ) {
-    GraphQLObjectType affectedStopPlace = GraphQLObjectType
-      .newObject()
+    GraphQLObjectType affectedStopPlace = GraphQLObjectType.newObject()
       .name("AffectedStopPlace")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(quayType)
           .dataFetcher(environment -> {
@@ -41,8 +39,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPlace")
           .type(stopPlaceType)
           .dataFetcher(environment -> {
@@ -52,8 +49,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopConditions")
           .type(
             new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EnumTypes.STOP_CONDITION_ENUM)))
@@ -62,12 +58,10 @@ public class AffectsType {
       )
       .build();
 
-    GraphQLObjectType affectedLine = GraphQLObjectType
-      .newObject()
+    GraphQLObjectType affectedLine = GraphQLObjectType.newObject()
       .name("AffectedLine")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("line")
           .type(lineType)
           .dataFetcher(environment -> {
@@ -78,12 +72,10 @@ public class AffectsType {
       )
       .build();
 
-    GraphQLObjectType affectedServiceJourney = GraphQLObjectType
-      .newObject()
+    GraphQLObjectType affectedServiceJourney = GraphQLObjectType.newObject()
       .name("AffectedServiceJourney")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourney")
           .type(serviceJourneyType)
           .dataFetcher(environment -> {
@@ -93,36 +85,30 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")
           .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment -> environment.<EntitySelector.Trip>getSource().serviceDate())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("datedServiceJourney")
           .type(datedServiceJourneyType)
           .dataFetcher(environment -> {
             EntitySelector.Trip entitySelector = environment.getSource();
-            return GqlUtil
-              .getTransitService(environment)
-              .getTripOnServiceDate(
-                new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
-              );
+            return GqlUtil.getTransitService(environment).getTripOnServiceDate(
+              new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
+            );
           })
           .build()
       )
       .build();
 
-    GraphQLObjectType affectedStopPlaceOnLine = GraphQLObjectType
-      .newObject()
+    GraphQLObjectType affectedStopPlaceOnLine = GraphQLObjectType.newObject()
       .name("AffectedStopPlaceOnLine")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(quayType)
           .dataFetcher(environment -> {
@@ -132,8 +118,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPlace")
           .type(stopPlaceType)
           .dataFetcher(environment -> {
@@ -143,8 +128,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("line")
           .type(lineType)
           .dataFetcher(environment -> {
@@ -154,8 +138,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopConditions")
           .type(
             new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EnumTypes.STOP_CONDITION_ENUM)))
@@ -164,12 +147,10 @@ public class AffectsType {
       )
       .build();
 
-    GraphQLObjectType affectedStopPlaceOnServiceJourney = GraphQLObjectType
-      .newObject()
+    GraphQLObjectType affectedStopPlaceOnServiceJourney = GraphQLObjectType.newObject()
       .name("AffectedStopPlaceOnServiceJourney")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .type(quayType)
           .dataFetcher(environment -> {
@@ -179,8 +160,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPlace")
           .type(stopPlaceType)
           .dataFetcher(environment -> {
@@ -190,8 +170,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourney")
           .type(serviceJourneyType)
           .dataFetcher(environment -> {
@@ -201,8 +180,7 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")
           .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
@@ -211,23 +189,19 @@ public class AffectsType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("datedServiceJourney")
           .type(datedServiceJourneyType)
           .dataFetcher(environment -> {
             EntitySelector.StopAndTrip entitySelector = environment.getSource();
-            return GqlUtil
-              .getTransitService(environment)
-              .getTripOnServiceDate(
-                new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
-              );
+            return GqlUtil.getTransitService(environment).getTripOnServiceDate(
+              new TripIdAndServiceDate(entitySelector.tripId(), entitySelector.serviceDate())
+            );
           })
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopConditions")
           .type(
             new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(EnumTypes.STOP_CONDITION_ENUM)))
@@ -236,12 +210,10 @@ public class AffectsType {
       )
       .build();
 
-    GraphQLObjectType affectedUnknown = GraphQLObjectType
-      .newObject()
+    GraphQLObjectType affectedUnknown = GraphQLObjectType.newObject()
       .name("AffectedUnknown")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> {
@@ -258,8 +230,7 @@ public class AffectsType {
       )
       .build();
 
-    return GraphQLUnionType
-      .newUnionType()
+    return GraphQLUnionType.newUnionType()
       .name(NAME)
       .possibleType(affectedStopPlace)
       .possibleType(affectedLine)

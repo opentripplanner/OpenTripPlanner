@@ -82,20 +82,22 @@ public class TestTableParser {
     assertEquals(List.of(List.of(1, 1.2)), toLists("1 | 1.2"));
     assertEquals(
       List.of(List.of(1, 7)),
-      toLists("""
-      # input | output
-            1 |      7
-      """)
+      toLists(
+        """
+        # input | output
+              1 |      7
+        """
+      )
     );
     assertEquals(
       List.of(List.of(1, 2, 3, 6, 6), List.of(1, 2, 4, 7, 8)),
       toLists(
         """
-      # input      ||  result
-      # a | b | c  || a+b+c | a*b*c
-        1 | 2 | 3  ||   6   |   6    # Expect sum and product to be the same
-        1 | 2 | 4  ||   7   |   8    # Product is larger
-      """
+        # input      ||  result
+        # a | b | c  || a+b+c | a*b*c
+          1 | 2 | 3  ||   6   |   6    # Expect sum and product to be the same
+          1 | 2 | 4  ||   7   |   8    # Product is larger
+        """
       )
     );
   }

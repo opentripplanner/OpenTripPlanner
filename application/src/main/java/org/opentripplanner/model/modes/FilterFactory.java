@@ -70,8 +70,9 @@ class FilterFactory {
     }
     // else ignore empty list
 
-    var subModeFiltersByMainMode = stream(map, AllowMainAndSubModeFilter.class)
-      .collect(Collectors.groupingBy(AllowMainAndSubModeFilter::mainMode));
+    var subModeFiltersByMainMode = stream(map, AllowMainAndSubModeFilter.class).collect(
+      Collectors.groupingBy(AllowMainAndSubModeFilter::mainMode)
+    );
 
     var mainModes = mainModeFilters.isEmpty()
       ? EnumSet.noneOf(TransitMode.class)

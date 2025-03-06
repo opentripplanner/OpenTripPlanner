@@ -67,7 +67,8 @@ class TripPatternMapper {
 
   private final ReadOnlyHierarchicalMap<String, Route> routeById;
 
-  private final Multimap<String, ServiceJourney> serviceJourneysByPatternId = ArrayListMultimap.create();
+  private final Multimap<String, ServiceJourney> serviceJourneysByPatternId =
+    ArrayListMultimap.create();
 
   private final ReadOnlyHierarchicalMapById<OperatingDay> operatingDayById;
 
@@ -114,38 +115,35 @@ class TripPatternMapper {
     this.otpRouteById = otpRouteById;
     this.operatingDayById = operatingDayById;
     this.datedServiceJourneysBySJId = datedServiceJourneysBySJId;
-    this.tripMapper =
-      new TripMapper(
-        idFactory,
-        issueStore,
-        operatorById,
-        otpRouteById,
-        routeById,
-        journeyPatternById,
-        serviceIds
-      );
-    this.stopTimesMapper =
-      new StopTimesMapper(
-        issueStore,
-        idFactory,
-        stopById,
-        areaStopById,
-        groupStopById,
-        destinationDisplayById,
-        quayIdByStopPointRef,
-        flexibleStopPlaceIdByStopPointRef,
-        flexibleLineById,
-        routeById
-      );
-    this.serviceLinkMapper =
-      new ServiceLinkMapper(
-        idFactory,
-        serviceLinkById,
-        quayIdByStopPointRef,
-        stopById,
-        issueStore,
-        maxStopToShapeSnapDistance
-      );
+    this.tripMapper = new TripMapper(
+      idFactory,
+      issueStore,
+      operatorById,
+      otpRouteById,
+      routeById,
+      journeyPatternById,
+      serviceIds
+    );
+    this.stopTimesMapper = new StopTimesMapper(
+      issueStore,
+      idFactory,
+      stopById,
+      areaStopById,
+      groupStopById,
+      destinationDisplayById,
+      quayIdByStopPointRef,
+      flexibleStopPlaceIdByStopPointRef,
+      flexibleLineById,
+      routeById
+    );
+    this.serviceLinkMapper = new ServiceLinkMapper(
+      idFactory,
+      serviceLinkById,
+      quayIdByStopPointRef,
+      stopById,
+      issueStore,
+      maxStopToShapeSnapDistance
+    );
     this.deduplicator = deduplicator;
 
     this.datedServiceJourneyById = datedServiceJourneyById;
@@ -244,8 +242,7 @@ class TripPatternMapper {
       );
     }
 
-    var tripPattern = TripPattern
-      .of(idFactory.createId(journeyPattern.getId()))
+    var tripPattern = TripPattern.of(idFactory.createId(journeyPattern.getId()))
       .withRoute(lookupRoute(journeyPattern))
       .withStopPattern(stopPattern)
       .withMode(trips.get(0).getMode())
@@ -342,8 +339,7 @@ class TripPatternMapper {
       .filter(Objects::nonNull)
       .toList();
 
-    return TripOnServiceDate
-      .of(id)
+    return TripOnServiceDate.of(id)
       .withTrip(trip)
       .withServiceDate(serviceDate)
       .withTripAlteration(alteration)
@@ -396,9 +392,8 @@ class TripPatternMapper {
   ) {
     return deduplicator.deduplicateObject(
       Trip.class,
-      tripMapper.mapServiceJourney(
-        serviceJourney,
-        () -> findTripHeadsign(journeyPattern, serviceJourney)
+      tripMapper.mapServiceJourney(serviceJourney, () ->
+        findTripHeadsign(journeyPattern, serviceJourney)
       )
     );
   }

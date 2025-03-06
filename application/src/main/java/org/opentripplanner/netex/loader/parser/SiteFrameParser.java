@@ -144,9 +144,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         .getKeyList()
         .getKeyValue()
         .stream()
-        .anyMatch(keyValueStructure ->
-          keyValueStructure.getKey().equals("IS_PARENT_STOP_PLACE") &&
-          keyValueStructure.getValue().equals("true")
+        .anyMatch(
+          keyValueStructure ->
+            keyValueStructure.getKey().equals("IS_PARENT_STOP_PLACE") &&
+            keyValueStructure.getValue().equals("true")
         )
     );
   }

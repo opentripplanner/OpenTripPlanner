@@ -57,8 +57,7 @@ class BookingInfoMapperTest {
 
   @Test
   void latestBookingTime() {
-    var info = BookingInfo
-      .of()
+    var info = BookingInfo.of()
       .withEarliestBookingTime(BOOKING_TIME_ZERO_DAYS_PRIOR)
       .withLatestBookingTime(BOOKING_TIME_ZERO_DAYS_PRIOR)
       .build();
@@ -67,16 +66,14 @@ class BookingInfoMapperTest {
 
   @Test
   void earliestBookingTimeZero() {
-    var info = BookingInfo
-      .of()
+    var info = BookingInfo.of()
       .withEarliestBookingTime(new BookingTime(LocalTime.of(10, 0), 10))
       .build();
     assertEquals("other", mapToBookWhen(info));
   }
 
   private static BookingInfo daysPrior(int daysPrior) {
-    return BookingInfo
-      .of()
+    return BookingInfo.of()
       .withLatestBookingTime(new BookingTime(LocalTime.of(10, 0), daysPrior))
       .build();
   }

@@ -28,8 +28,7 @@ public class EnumMapper {
       return Optional.empty();
     }
     var name = text.toUpperCase().replace('-', '_');
-    return Arrays
-      .stream(type.getEnumConstants())
+    return Arrays.stream(type.getEnumConstants())
       .filter(it -> it.name().toUpperCase().equals(name))
       .findFirst();
   }

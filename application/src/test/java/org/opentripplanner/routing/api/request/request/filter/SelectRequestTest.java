@@ -61,8 +61,7 @@ class SelectRequestTest {
   }
 
   static SelectRequest notModesSelect(MainAndSubMode... modes) {
-    return SelectRequest
-      .of()
+    return SelectRequest.of()
       .withTransportModes(MainAndSubMode.notMainModes(Arrays.asList(modes)))
       .build();
   }

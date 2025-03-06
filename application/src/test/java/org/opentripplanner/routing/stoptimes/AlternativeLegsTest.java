@@ -45,8 +45,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    )
-      .getLeg(transitService);
+    ).getLeg(transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -79,8 +78,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_B,
       STOP_ID_C,
       null
-    )
-      .getLeg(transitService);
+    ).getLeg(transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -113,8 +111,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_Y,
       null
-    )
-      .getLeg(transitService);
+    ).getLeg(transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,
@@ -141,8 +138,7 @@ class AlternativeLegsTest extends GtfsTest {
       STOP_ID_X,
       STOP_ID_B,
       null
-    )
-      .getLeg(transitService);
+    ).getLeg(transitService);
 
     final List<ScheduledTransitLeg> alternativeLegs = AlternativeLegs.getAlternativeLegs(
       originalLeg,

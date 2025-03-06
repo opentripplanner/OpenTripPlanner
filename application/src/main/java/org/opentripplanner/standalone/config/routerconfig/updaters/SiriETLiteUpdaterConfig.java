@@ -4,7 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
-import org.opentripplanner.updater.siri.updater.lite.SiriETLiteUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 
 public class SiriETLiteUpdaterConfig {
 

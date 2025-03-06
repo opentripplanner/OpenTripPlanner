@@ -11,13 +11,11 @@ public class StopToStopGeometryType {
     GraphQLOutputType linkGeometryType,
     GraphQLOutputType quayType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("StopToStopGeometry")
       .description("List of coordinates between two stops as a polyline")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("pointsOnLink")
           .description(
             "A list of coordinates encoded as a polyline string between two stops (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html)"
@@ -27,8 +25,7 @@ public class StopToStopGeometryType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("fromQuay")
           .description("Origin Quay")
           .type(quayType)
@@ -36,8 +33,7 @@ public class StopToStopGeometryType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("toQuay")
           .description("Destination Quay")
           .type(quayType)

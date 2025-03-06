@@ -107,8 +107,7 @@ public class ScheduledDeviatedTrip
 
   @Override
   public Set<StopLocation> getStops() {
-    return Arrays
-      .stream(stopTimes)
+    return Arrays.stream(stopTimes)
       .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
       .collect(Collectors.toSet());
   }

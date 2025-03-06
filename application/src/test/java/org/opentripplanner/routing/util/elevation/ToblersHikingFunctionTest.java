@@ -50,7 +50,7 @@ public class ToblersHikingFunctionTest {
       // Set the horizontal distance to 300 meters
       this.dx = 300.0;
       // Calculate the height:
-      this.dh = dx * slopeAnglePercentage / 100.0;
+      this.dh = (dx * slopeAnglePercentage) / 100.0;
 
       this.expected = expected;
     }

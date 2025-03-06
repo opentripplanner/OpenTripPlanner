@@ -66,14 +66,12 @@ class GbfsFeedLoaderTest {
 
   @Test
   void getV22FeedWithWrongLanguage() {
-    assertThrows(
-      RuntimeException.class,
-      () ->
-        new GbfsFeedLoader(
-          "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
-          HttpHeaders.empty(),
-          LANGUAGE_EN
-        )
+    assertThrows(RuntimeException.class, () ->
+      new GbfsFeedLoader(
+        "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
+        HttpHeaders.empty(),
+        LANGUAGE_EN
+      )
     );
   }
 
@@ -129,8 +127,7 @@ class GbfsFeedLoaderTest {
       "https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs",
       HttpHeaders.empty(),
       null
-    )
-      .update();
+    ).update();
   }
 
   @Test

@@ -79,8 +79,7 @@ public enum SpeedTestProfile {
   }
 
   public static SpeedTestProfile[] parse(String profiles) {
-    return Arrays
-      .stream(profiles.split(","))
+    return Arrays.stream(profiles.split(","))
       .map(SpeedTestProfile::parseOne)
       .toArray(SpeedTestProfile[]::new);
   }
@@ -120,8 +119,7 @@ public enum SpeedTestProfile {
         "Profile is not valid: '" +
         value +
         "'\nProfiles:\n\t" +
-        Arrays
-          .stream(values())
+        Arrays.stream(values())
           .map(SpeedTestProfile::description)
           .collect(Collectors.joining("\n\t"))
           .replace('.', ' ')

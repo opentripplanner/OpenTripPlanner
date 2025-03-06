@@ -36,22 +36,16 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class ConstrainedBoardingSearchTest {
 
   private static final FeedScopedId ID = TimetableRepositoryForTest.id("ID");
-  private static final TransferConstraint GUARANTEED_CONSTRAINT = TransferConstraint
-    .of()
+  private static final TransferConstraint GUARANTEED_CONSTRAINT = TransferConstraint.of()
     .guaranteed()
     .build();
-  private static final TransferConstraint NOT_ALLOWED_CONSTRAINT = TransferConstraint
-    .of()
+  private static final TransferConstraint NOT_ALLOWED_CONSTRAINT = TransferConstraint.of()
     .notAllowed()
     .build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT = TransferConstraint
-    .of()
-    .minTransferTime(600)
-    .build();
-  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT = TransferConstraint
-    .of()
-    .minTransferTime(0)
-    .build();
+  private static final TransferConstraint MIN_TRANSFER_TIME_10_MIN_CONSTRAINT =
+    TransferConstraint.of().minTransferTime(600).build();
+  private static final TransferConstraint MIN_TRANSFER_TIME_0_MIN_CONSTRAINT =
+    TransferConstraint.of().minTransferTime(0).build();
   private static final StopTransferPoint STOP_B_TX_POINT = new StopTransferPoint(STOP_B);
   private static final StopTransferPoint STOP_C_TX_POINT = new StopTransferPoint(STOP_C);
 
@@ -109,27 +103,25 @@ public class ConstrainedBoardingSearchTest {
    */
   @BeforeEach
   void setup() {
-    route1 =
-      TestRouteData.of(
-        "R1",
-        TransitMode.RAIL,
-        List.of(STOP_A, STOP_B, STOP_C),
-        "10:00 10:10 10:20",
-        "10:05 10:15 10:25"
-      );
+    route1 = TestRouteData.of(
+      "R1",
+      TransitMode.RAIL,
+      List.of(STOP_A, STOP_B, STOP_C),
+      "10:00 10:10 10:20",
+      "10:05 10:15 10:25"
+    );
 
-    route2 =
-      TestRouteData.of(
-        "R2",
-        TransitMode.BUS,
-        List.of(STOP_B, STOP_C, STOP_D),
-        "10:15 10:30 10:40",
-        "10:20 10:35 10:45",
-        "10:25 10:40 10:50",
-        "10:30 10:45 10:55",
-        "10:35 10:50 11:00",
-        "10:40 10:55 11:05"
-      );
+    route2 = TestRouteData.of(
+      "R2",
+      TransitMode.BUS,
+      List.of(STOP_B, STOP_C, STOP_D),
+      "10:15 10:30 10:40",
+      "10:20 10:35 10:45",
+      "10:25 10:40 10:50",
+      "10:30 10:45 10:55",
+      "10:35 10:50 11:00",
+      "10:40 10:55 11:05"
+    );
 
     this.pattern1 = route1.getTripPattern();
     this.pattern2 = route2.getTripPattern();
@@ -160,12 +152,11 @@ public class ConstrainedBoardingSearchTest {
     assertFalse(subject.transferExistSourceStop(toStopPos));
 
     // Reverse -
-    subject =
-      new ConstrainedBoardingSearch(
-        false,
-        constrainedTransfers.toStop(routingPattern1.patternIndex()),
-        constrainedTransfers.fromStop(routingPattern1.patternIndex())
-      );
+    subject = new ConstrainedBoardingSearch(
+      false,
+      constrainedTransfers.toStop(routingPattern1.patternIndex()),
+      constrainedTransfers.fromStop(routingPattern1.patternIndex())
+    );
     assertTrue(subject.transferExistTargetStop(fromStopPos));
     assertFalse(subject.transferExistSourceStop(fromStopPos));
   }

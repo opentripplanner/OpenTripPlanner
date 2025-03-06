@@ -105,11 +105,9 @@ public class HSLFareService extends DefaultFareService {
         }
         if (
           isSpecialRoute ||
-          (
-            ruleSet.getRoutes().contains(leg.getRoute().getId()) &&
+          (ruleSet.getRoutes().contains(leg.getRoute().getId()) &&
             ruleSet.getContains().contains(leg.getFrom().stop.getFirstZoneAsString()) &&
-            ruleSet.getContains().contains(leg.getTo().stop.getFirstZoneAsString())
-          )
+            ruleSet.getContains().contains(leg.getTo().stop.getFirstZoneAsString()))
         ) {
           // check validity of this special rule and that it is the cheapest applicable one
           FareAttribute attribute = ruleSet.getFareAttribute();
@@ -182,7 +180,10 @@ public class HSLFareService extends DefaultFareService {
             }
           }
           Money newFare = attribute.getPrice();
-          if (newFare.lessThan(bestFare)) {
+          if (
+            newFare.lessThan(bestFare) ||
+            (newFare.equals(bestFare) && ruleSet.getContains().equals(zones))
+          ) {
             bestAttribute = attribute;
             bestFare = newFare;
           }
@@ -194,8 +195,8 @@ public class HSLFareService extends DefaultFareService {
     }
     LOG.debug("HSL {} best for {}", bestAttribute, legs);
     final Money finalBestFare = bestFare;
-    return Optional
-      .ofNullable(bestAttribute)
-      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
+    return Optional.ofNullable(bestAttribute).map(attribute ->
+      new FareAndId(finalBestFare, attribute.getId())
+    );
   }
 }

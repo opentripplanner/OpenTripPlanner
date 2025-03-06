@@ -26,14 +26,13 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
     OtpHttpClient otpHttpClient
   ) {
     this.url = url;
-    jsonDataListDownloader =
-      new JsonDataListDownloader<>(
-        url,
-        jsonParsePath,
-        this::parseElement,
-        headers.asMap(),
-        otpHttpClient
-      );
+    jsonDataListDownloader = new JsonDataListDownloader<>(
+      url,
+      jsonParsePath,
+      this::parseElement,
+      headers.asMap(),
+      otpHttpClient
+    );
   }
 
   @Override

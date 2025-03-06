@@ -127,8 +127,7 @@ public class GeneralizedCostParameters {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(GeneralizedCostParameters.class)
+    return ToStringBuilder.of(GeneralizedCostParameters.class)
       .addNum("boardCost", boardCost, DEFAULTS.boardCost)
       .addNum("transferCost", transferCost, DEFAULTS.transferCost)
       .addNum("waitReluctanceFactor", waitReluctanceFactor, DEFAULTS.waitReluctanceFactor)

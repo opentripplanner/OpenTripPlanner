@@ -22,15 +22,13 @@ public class PlanPlaceType {
     GraphQLOutputType rentalVehicleType,
     GraphQLOutputType quayType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Place")
       .description(
         "Common super class for all places (stop places, quays, car parks, bike parks and bike rental stations )"
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .description(
             "For transit quays, the name of the quay. For points of interest, the name of the POI."
@@ -42,8 +40,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("vertexType")
           .description(
             "Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit quay) Mostly used for better localization of bike sharing and P+R station names"
@@ -53,8 +50,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .description("The latitude of the place.")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
@@ -70,8 +66,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .description("The longitude of the place.")
           .type(new GraphQLNonNull(Scalars.GraphQLFloat))
@@ -87,8 +82,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quay")
           .description("The quay related to the place.")
           .type(quayType)
@@ -100,8 +94,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("flexibleArea")
           .description("The flexible area related to the place.")
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
@@ -113,8 +106,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeRentalStation")
           .type(bikeRentalStationType)
           .description("The bike rental station related to the place")
@@ -127,8 +119,7 @@ public class PlanPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("rentalVehicle")
           .type(rentalVehicleType)
           .description("The rental vehicle related to the place")

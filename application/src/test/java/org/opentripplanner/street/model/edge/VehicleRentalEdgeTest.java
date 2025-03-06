@@ -196,8 +196,7 @@ class VehicleRentalEdgeTest {
   class StartedReverseSearchInNoGeofencingZone {
 
     private static final String NETWORK = "tier";
-    private static final StreetSearchRequest SEARCH_REQUEST = StreetSearchRequest
-      .of()
+    private static final StreetSearchRequest SEARCH_REQUEST = StreetSearchRequest.of()
       .withMode(StreetMode.SCOOTER_RENTAL)
       .withArriveBy(true)
       .build();
@@ -208,14 +207,13 @@ class VehicleRentalEdgeTest {
       RENTAL_PLACE.latitude = 1;
       RENTAL_PLACE.longitude = 1;
       RENTAL_PLACE.id = new FeedScopedId(NETWORK, "123");
-      RENTAL_PLACE.vehicleType =
-        new RentalVehicleType(
-          new FeedScopedId(NETWORK, "scooter"),
-          "scooter",
-          RentalFormFactor.SCOOTER,
-          RentalVehicleType.PropulsionType.ELECTRIC,
-          100000d
-        );
+      RENTAL_PLACE.vehicleType = new RentalVehicleType(
+        new FeedScopedId(NETWORK, "scooter"),
+        "scooter",
+        RentalFormFactor.SCOOTER,
+        RentalVehicleType.PropulsionType.ELECTRIC,
+        100000d
+      );
     }
 
     @Test
@@ -269,8 +267,7 @@ class VehicleRentalEdgeTest {
     boolean useRealtime,
     boolean banNetwork
   ) {
-    var station = TestVehicleRentalStationBuilder
-      .of()
+    var station = TestVehicleRentalStationBuilder.of()
       .withVehicles(vehicles)
       .withSpaces(spaces)
       .withOverloadingAllowed(overloadingAllowed)
@@ -283,22 +280,18 @@ class VehicleRentalEdgeTest {
 
     Set<String> bannedNetworks = banNetwork ? Set.of(station.getNetwork()) : Set.of();
 
-    this.request =
-      StreetSearchRequest
-        .of()
-        .withMode(mode)
-        .withPreferences(preferences ->
-          preferences
-            .withBike(bike ->
-              bike.withRental(rental ->
-                rental
-                  .withUseAvailabilityInformation(useRealtime)
-                  .withBannedNetworks(bannedNetworks)
-              )
+    this.request = StreetSearchRequest.of()
+      .withMode(mode)
+      .withPreferences(preferences ->
+        preferences
+          .withBike(bike ->
+            bike.withRental(rental ->
+              rental.withUseAvailabilityInformation(useRealtime).withBannedNetworks(bannedNetworks)
             )
-            .build()
-        )
-        .build();
+          )
+          .build()
+      )
+      .build();
   }
 
   private void initFreeFloatingEdgeAndRequest(
@@ -314,20 +307,18 @@ class VehicleRentalEdgeTest {
       ? Set.of(this.vertex.getStation().getNetwork())
       : Set.of();
 
-    this.request =
-      StreetSearchRequest
-        .of()
-        .withMode(mode)
-        .withPreferences(preferences ->
-          preferences
-            .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-            .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
-            .withScooter(scooter ->
-              scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
-            )
-            .build()
-        )
-        .build();
+    this.request = StreetSearchRequest.of()
+      .withMode(mode)
+      .withPreferences(preferences ->
+        preferences
+          .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+          .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+          .withScooter(scooter ->
+            scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
+          )
+          .build()
+      )
+      .build();
   }
 
   private State[] rent() {

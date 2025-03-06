@@ -69,39 +69,31 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
 
     // TODO: We expect a pattern only containing trips or frequencies, fix ability to merge
     if (hasFrequencies()) {
-      this.startOfRunningPeriod =
-        ServiceDateUtils
-          .asDateTime(
-            serviceDate,
-            frequencies
-              .stream()
-              .mapToInt(frequencyEntry -> frequencyEntry.startTime)
-              .min()
-              .orElseThrow()
-          )
-          .toLocalDate();
+      this.startOfRunningPeriod = ServiceDateUtils.asDateTime(
+        serviceDate,
+        frequencies
+          .stream()
+          .mapToInt(frequencyEntry -> frequencyEntry.startTime)
+          .min()
+          .orElseThrow()
+      ).toLocalDate();
 
-      this.endOfRunningPeriod =
-        ServiceDateUtils
-          .asDateTime(
-            serviceDate,
-            frequencies
-              .stream()
-              .mapToInt(frequencyEntry -> frequencyEntry.endTime)
-              .max()
-              .orElseThrow()
-          )
-          .toLocalDate();
+      this.endOfRunningPeriod = ServiceDateUtils.asDateTime(
+        serviceDate,
+        frequencies.stream().mapToInt(frequencyEntry -> frequencyEntry.endTime).max().orElseThrow()
+      ).toLocalDate();
     } else {
       // These depend on the tripTimes array being sorted
       var first = tripTimes.get(0);
-      this.startOfRunningPeriod =
-        ServiceDateUtils.asDateTime(serviceDate, first.getDepartureTime(0)).toLocalDate();
+      this.startOfRunningPeriod = ServiceDateUtils.asDateTime(
+        serviceDate,
+        first.getDepartureTime(0)
+      ).toLocalDate();
       var last = tripTimes.get(tripTimes.size() - 1);
-      this.endOfRunningPeriod =
-        ServiceDateUtils
-          .asDateTime(serviceDate, last.getArrivalTime(last.getNumStops() - 1))
-          .toLocalDate();
+      this.endOfRunningPeriod = ServiceDateUtils.asDateTime(
+        serviceDate,
+        last.getArrivalTime(last.getNumStops() - 1)
+      ).toLocalDate();
       assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }
   }

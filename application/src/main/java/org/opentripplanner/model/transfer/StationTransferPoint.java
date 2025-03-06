@@ -32,8 +32,7 @@ public final class StationTransferPoint implements TransferPoint, Serializable {
   }
 
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
+    return ValueObjectToStringBuilder.of()
       .addText("StationTP{")
       .addObj(station.getId())
       .addText("}")

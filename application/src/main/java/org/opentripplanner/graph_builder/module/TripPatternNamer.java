@@ -112,7 +112,7 @@ public class TripPatternNamer implements GraphBuilderModule {
           vias.put(stop, pattern);
         }
       }
-      PATTERN:for (TripPattern pattern : routeTripPatterns) {
+      PATTERN: for (TripPattern pattern : routeTripPatterns) {
         if (pattern.getName() != null) {
           continue;
         }
@@ -170,8 +170,7 @@ public class TripPatternNamer implements GraphBuilderModule {
           sb.append(" express");
         } else {
           // The final fallback: reference a specific trip ID.
-          Optional
-            .ofNullable(pattern.getScheduledTimetable().getRepresentativeTripTimes())
+          Optional.ofNullable(pattern.getScheduledTimetable().getRepresentativeTripTimes())
             .map(TripTimes::getTrip)
             .ifPresent(value -> sb.append(" like trip ").append(value.getId()));
         }

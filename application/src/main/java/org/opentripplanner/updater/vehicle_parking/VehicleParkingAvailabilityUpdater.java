@@ -58,11 +58,10 @@ public class VehicleParkingAvailabilityUpdater extends PollingGraphUpdater {
 
     private AvailabilityUpdater(List<AvailabiltyUpdate> updates) {
       this.updates = List.copyOf(updates);
-      this.parkingById =
-        repository
-          .listVehicleParkings()
-          .stream()
-          .collect(Collectors.toUnmodifiableMap(VehicleParking::getId, Function.identity()));
+      this.parkingById = repository
+        .listVehicleParkings()
+        .stream()
+        .collect(Collectors.toUnmodifiableMap(VehicleParking::getId, Function.identity()));
     }
 
     @Override

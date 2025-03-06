@@ -11,10 +11,8 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 
 class RemoveItinerariesWithShortStreetLegTest implements PlanTestConstants {
 
-  private final RemoveItinerariesWithShortStreetLeg subject = new RemoveItinerariesWithShortStreetLeg(
-    500,
-    BICYCLE
-  );
+  private final RemoveItinerariesWithShortStreetLeg subject =
+    new RemoveItinerariesWithShortStreetLeg(500, BICYCLE);
 
   @Test
   void noBikeDoesNothing() {

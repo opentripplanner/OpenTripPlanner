@@ -109,8 +109,7 @@ public class LiipiParkToVehicleParkingMapper {
       var openingHoursCalendar = parseOpeningHours(openingHoursByDayType);
       VehicleParkingGroup vehicleParkingGroup = hubForPark.get(vehicleParkId);
 
-      return VehicleParking
-        .builder()
+      return VehicleParking.builder()
         .id(vehicleParkId)
         .name(name)
         .state(state)
@@ -159,8 +158,7 @@ public class LiipiParkToVehicleParkingMapper {
     Integer wheelchairAccessibleCarSpaces,
     Integer bicycleSpaces
   ) {
-    return VehicleParkingSpaces
-      .builder()
+    return VehicleParkingSpaces.builder()
       .bicycleSpaces(bicycleSpaces)
       .carSpaces(carSpaces)
       .wheelchairAccessibleCarSpaces(wheelchairAccessibleCarSpaces)

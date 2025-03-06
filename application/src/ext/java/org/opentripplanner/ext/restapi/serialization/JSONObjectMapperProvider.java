@@ -54,11 +54,10 @@ public class JSONObjectMapperProvider implements ContextResolver<ObjectMapper> {
     // Our module includes a single class-serializer relationship.
     // Constructors are available for both unnamed, unversioned throwaway modules
     // and named, versioned reusable modules.
-    mapper =
-      new ObjectMapper()
-        .registerModule(FeedScopedIdSerializer.makeModule())
-        .registerModule(new JtsModule())
-        .setSerializationInclusion(Include.NON_NULL); // skip null fields
+    mapper = new ObjectMapper()
+      .registerModule(FeedScopedIdSerializer.makeModule())
+      .registerModule(new JtsModule())
+      .setSerializationInclusion(Include.NON_NULL); // skip null fields
   }
 
   /**

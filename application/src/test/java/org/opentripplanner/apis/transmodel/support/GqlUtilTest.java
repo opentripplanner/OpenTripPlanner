@@ -20,17 +20,15 @@ public class GqlUtilTest {
   private static final String TEST_ARGUMENT = "testArgument";
 
   static {
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
+    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query("")
       .locale(Locale.ENGLISH)
       .build();
 
-    executionContext =
-      newExecutionContextBuilder()
-        .executionInput(executionInput)
-        .executionId(ExecutionId.from("GqlUtilTest"))
-        .build();
+    executionContext = newExecutionContextBuilder()
+      .executionInput(executionInput)
+      .executionId(ExecutionId.from("GqlUtilTest"))
+      .build();
   }
 
   @Test
@@ -48,43 +46,38 @@ public class GqlUtilTest {
   @Test
   void testGetPositiveNonNullIntegerArgumentWithNegativeValue() {
     var env = buildEnvWithTestValue(-1);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
+    assertThrows(IllegalArgumentException.class, () ->
+      GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
 
   @Test
   void testGetPositiveNonNullIntegerArgumentWithNullValue() {
     var env = buildEnvWithTestValue(null);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
+    assertThrows(IllegalArgumentException.class, () ->
+      GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
 
   @Test
   void testGetPositiveNonNullIntegerArgumentWithoutValue() {
     var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext).build();
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
+    assertThrows(IllegalArgumentException.class, () ->
+      GqlUtil.getPositiveNonNullIntegerArgument(env, TEST_ARGUMENT)
     );
   }
 
   private static DataFetchingEnvironment buildEnvWithTestValue(Integer value) {
     Map<String, Object> argsMap = new HashMap<>();
     argsMap.put(TEST_ARGUMENT, value);
-    return DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .arguments(argsMap)
       .build();
   }
 
   @Test
   void testGetLocaleWithLangArgument() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .locale(Locale.ENGLISH)
       .arguments(Map.of("lang", "fr"))
       .build();
@@ -96,8 +89,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetLocaleWithLanguageArgument() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .locale(Locale.ENGLISH)
       .arguments(Map.of("language", "fr"))
       .build();
@@ -109,8 +101,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetLocaleWithBothArguments() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .locale(Locale.ENGLISH)
       .arguments(Map.of("lang", "de", "language", "fr"))
       .build();
@@ -122,8 +113,7 @@ public class GqlUtilTest {
 
   @Test
   void testGetLocaleWithoutArguments() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .locale(Locale.ENGLISH)
       .build();
 

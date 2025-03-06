@@ -21,8 +21,7 @@ class VehicleRentalPreferencesTest {
   public static final Set<String> ALLOWED_NETWORKS = Set.of("foo");
   public static final Set<String> BANNED_NETWORKS = Set.of("bar");
 
-  private final VehicleRentalPreferences subject = VehicleRentalPreferences
-    .of()
+  private final VehicleRentalPreferences subject = VehicleRentalPreferences.of()
     .withPickupTime(PICKUP_TIME)
     .withPickupCost(PICKUP_COST)
     .withDropOffTime(DROPOFF_TIME)

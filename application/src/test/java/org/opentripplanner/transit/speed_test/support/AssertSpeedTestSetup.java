@@ -29,7 +29,7 @@ public class AssertSpeedTestSetup {
           "testDate":                 %s (speed-test-config.json)
           "transitServiceStart":      %s (%s)
           "transitServiceEnd":        %s (%s)
-        
+
         """.formatted(
             numberOfPatternForTestDate,
             config.testDate,

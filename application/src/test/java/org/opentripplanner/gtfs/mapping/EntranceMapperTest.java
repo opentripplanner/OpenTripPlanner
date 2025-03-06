@@ -45,9 +45,8 @@ public class EntranceMapperTest {
 
   private static final Stop STOP = new Stop();
 
-  private final EntranceMapper subject = new EntranceMapper(
-    new TranslationHelper(),
-    stationId -> null
+  private final EntranceMapper subject = new EntranceMapper(new TranslationHelper(), stationId ->
+    null
   );
 
   static {

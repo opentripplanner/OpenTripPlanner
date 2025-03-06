@@ -42,13 +42,11 @@ public class StopsLayerTest {
     false
   );
 
-  private static final Station STATION = Station
-    .of(id("station1"))
+  private static final Station STATION = Station.of(id("station1"))
     .withCoordinate(WgsCoordinate.GREENWICH)
     .withName(I18NString.of("A Station"))
     .build();
-  private static final RegularStop STOP = SiteRepository
-    .of()
+  private static final RegularStop STOP = SiteRepository.of()
     .regularStop(new FeedScopedId("F", "name"))
     .withName(NAME_TRANSLATIONS)
     .withDescription(DESC_TRANSLATIONS)

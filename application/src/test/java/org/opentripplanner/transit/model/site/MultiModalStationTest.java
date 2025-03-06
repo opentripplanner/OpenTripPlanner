@@ -23,8 +23,9 @@ class MultiModalStationTest {
   private static final Station STATION_2 = TEST_MODEL.station("1:2").build();
 
   public static final Set<Station> CHILD_STATIONS = Set.of(STATION_1, STATION_2);
-  private static final MultiModalStation subject = MultiModalStation
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final MultiModalStation subject = MultiModalStation.of(
+    TimetableRepositoryForTest.id(ID)
+  )
     .withName(NAME)
     .withChildStations(CHILD_STATIONS)
     .withCoordinate(new WgsCoordinate(1, 1))

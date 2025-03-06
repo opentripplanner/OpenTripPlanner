@@ -161,9 +161,12 @@ public class LinkingTest {
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
-    var osmModule = OsmModule
-      .of(provider, graph, osmInfoRepository, vehicleParkingRepository)
-      .build();
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      osmInfoRepository,
+      vehicleParkingRepository
+    ).build();
 
     osmModule.buildGraph();
     return new TestOtpModel(graph, timetableRepository);

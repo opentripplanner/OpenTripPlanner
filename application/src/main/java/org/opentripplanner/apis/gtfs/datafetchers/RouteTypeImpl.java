@@ -29,10 +29,11 @@ public class RouteTypeImpl implements GraphQLDataFetchers.GraphQLRouteType {
       return getTransitService(environment)
         .listRoutes()
         .stream()
-        .filter(route ->
-          route.getId().getFeedId().equals(getSource(environment).getFeedId()) &&
-          route.getGtfsType() == getSource(environment).getRouteType() &&
-          (agency == null || route.getAgency().equals(agency))
+        .filter(
+          route ->
+            route.getId().getFeedId().equals(getSource(environment).getFeedId()) &&
+            route.getGtfsType() == getSource(environment).getRouteType() &&
+            (agency == null || route.getAgency().equals(agency))
         )
         .collect(Collectors.toList());
     };

@@ -21,8 +21,7 @@ class WalkPreferencesTest {
   private static final double SAFETY_FACTOR = 0.5111;
   private static final double EXPECTED_SAFETY_FACTOR = 0.51;
 
-  private final WalkPreferences subject = WalkPreferences
-    .of()
+  private final WalkPreferences subject = WalkPreferences.of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
     .withBoardCost(BOARD_COST)
@@ -82,8 +81,7 @@ class WalkPreferencesTest {
     var sameSafetyFactor = 0.5;
     var sameEscalatorReluctance = 2.45;
     var sameBoardCost = 60;
-    var firstEqual = WalkPreferences
-      .of()
+    var firstEqual = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
@@ -91,8 +89,7 @@ class WalkPreferencesTest {
       .withEscalator(escalator -> escalator.withReluctance(sameEscalatorReluctance))
       .withBoardCost(sameBoardCost)
       .build();
-    var secondEqual = WalkPreferences
-      .of()
+    var secondEqual = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
@@ -104,8 +101,7 @@ class WalkPreferencesTest {
 
     // Test that changing speed means preferences are not equal
     var notSameSpeed = sameSpeed + 1;
-    var differentSpeedPreferences = WalkPreferences
-      .of()
+    var differentSpeedPreferences = WalkPreferences.of()
       .withSpeed(notSameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
@@ -117,8 +113,7 @@ class WalkPreferencesTest {
 
     // Test that changing reluctance means preferences are not equal
     var notSameReluctance = sameReluctance + 1;
-    var differentReluctancePreferences = WalkPreferences
-      .of()
+    var differentReluctancePreferences = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(notSameReluctance)
       .withStairsReluctance(sameStairsReluctance)
@@ -130,8 +125,7 @@ class WalkPreferencesTest {
 
     // Test that changing stairs reluctance means preferences are not equal
     var notSameStairsReluctance = sameStairsReluctance + 1;
-    var differentStairsReluctancePreferences = WalkPreferences
-      .of()
+    var differentStairsReluctancePreferences = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(notSameStairsReluctance)
@@ -143,8 +137,7 @@ class WalkPreferencesTest {
 
     // Test that changing safety factor means preferences are not equal
     var notSameSafetyFactor = sameSafetyFactor + 0.1;
-    var differentSafetyFactorPreferences = WalkPreferences
-      .of()
+    var differentSafetyFactorPreferences = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
@@ -156,8 +149,7 @@ class WalkPreferencesTest {
 
     // Test that changing escalator reluctance means preferences are not equal
     var notSameEscalatorReluctance = sameEscalatorReluctance + 1;
-    var differentEscalatorReluctancePreferences = WalkPreferences
-      .of()
+    var differentEscalatorReluctancePreferences = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)
@@ -169,8 +161,7 @@ class WalkPreferencesTest {
 
     // Test that changing board cost means preferences are not equal
     var notSameBoardCost = sameBoardCost + 1;
-    var differentBoardCostPreferences = WalkPreferences
-      .of()
+    var differentBoardCostPreferences = WalkPreferences.of()
       .withSpeed(sameSpeed)
       .withReluctance(sameReluctance)
       .withStairsReluctance(sameStairsReluctance)

@@ -8,12 +8,10 @@ import org.opentripplanner.apis.transmodel.model.siri.sx.ValidityPeriod;
 public class ValidityPeriodType {
 
   public static GraphQLObjectType create(GraphQLScalarType dateTimeScalar) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("ValidityPeriod")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("startTime")
           .type(dateTimeScalar)
           .description("Start of validity period")
@@ -24,8 +22,7 @@ public class ValidityPeriodType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("endTime")
           .type(dateTimeScalar)
           .description("End of validity period. Will return 'null' if validity is open-ended.")

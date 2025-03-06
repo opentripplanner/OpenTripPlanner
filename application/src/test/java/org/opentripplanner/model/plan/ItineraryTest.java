@@ -97,8 +97,7 @@ public class ItineraryTest implements PlanTestConstants {
 
   @Test
   void testDerivedFieldsWithWalAccessAndTwoTransitLegs() {
-    Itinerary itinerary = TestItineraryBuilder
-      .newItinerary(A, T11_02)
+    Itinerary itinerary = TestItineraryBuilder.newItinerary(A, T11_02)
       .walk(D1m, B)
       .bus(21, T11_05, T11_10, C)
       .rail(110, T11_15, T11_30, D)

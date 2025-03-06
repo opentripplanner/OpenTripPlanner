@@ -39,8 +39,7 @@ class TripPatternTest {
     makeLineString(STOP_B.getCoordinate(), STOP_Y.getCoordinate(), STOP_C.getCoordinate())
   );
 
-  private static final TripPattern subject = TripPattern
-    .of(id(ID))
+  private static final TripPattern subject = TripPattern.of(id(ID))
     .withName(NAME)
     .withRoute(ROUTE)
     .withStopPattern(STOP_PATTERN)
@@ -74,8 +73,7 @@ class TripPatternTest {
 
   @Test
   void hopGeometryForReplacementPattern() {
-    var pattern = TripPattern
-      .of(id("replacement"))
+    var pattern = TripPattern.of(id("replacement"))
       .withName("replacement")
       .withRoute(ROUTE)
       .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_A, STOP_B, STOP_X, STOP_Y))
@@ -124,8 +122,7 @@ class TripPatternTest {
 
   @Test
   void shouldResolveMode() {
-    var patternWithoutExplicitMode = TripPattern
-      .of(id(ID))
+    var patternWithoutExplicitMode = TripPattern.of(id(ID))
       .withRoute(ROUTE)
       .withStopPattern(STOP_PATTERN)
       .build();

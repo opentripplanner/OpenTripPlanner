@@ -278,8 +278,7 @@ class RouteMapperTest {
   }
 
   private Agency createAgency() {
-    return TimetableRepositoryForTest
-      .agency("Ruter AS")
+    return TimetableRepositoryForTest.agency("Ruter AS")
       .copy()
       .withId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID))
       .build();

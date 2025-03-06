@@ -9,16 +9,10 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
 
   private TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
     super((Vertex) from, to);
-    if (from.isEndVertex()) {
-      throw new IllegalStateException("A temporary edge is directed away from an end vertex");
-    }
   }
 
   private TemporaryFreeEdge(Vertex from, TemporaryVertex to) {
     super(from, (Vertex) to);
-    if (!to.isEndVertex()) {
-      throw new IllegalStateException("A temporary edge is directed towards a start vertex");
-    }
   }
 
   public static TemporaryFreeEdge createTemporaryFreeEdge(TemporaryVertex from, Vertex to) {

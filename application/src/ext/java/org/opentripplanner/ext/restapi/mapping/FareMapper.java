@@ -63,15 +63,13 @@ public class FareMapper {
   }
 
   private static ApiFareQualifier toApiFareQualifier(@Nullable FareMedium nullable) {
-    return Optional
-      .ofNullable(nullable)
+    return Optional.ofNullable(nullable)
       .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
 
   private static ApiFareQualifier toApiFareQualifier(@Nullable RiderCategory nullable) {
-    return Optional
-      .ofNullable(nullable)
+    return Optional.ofNullable(nullable)
       .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
@@ -81,7 +79,8 @@ public class FareMapper {
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {
-    if (product.isEmpty()) return null; else {
+    if (product.isEmpty()) return null;
+    else {
       return product
         .stream()
         .map(p ->

@@ -21,12 +21,10 @@ public record HeuristicAtStop(int minTravelDuration, int minNumTransfers, int mi
   public String toString() {
     return this == UNREACHED
       ? "[]"
-      : (
-        "[" +
+      : ("[" +
         (DurationUtils.durationToStr(minTravelDuration) + " ") +
         (minNumTransfers + "tx ") +
         OtpNumberFormat.formatCostCenti(minCost) +
-        "]"
-      );
+        "]");
   }
 }

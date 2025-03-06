@@ -38,7 +38,8 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
 
   @BeforeEach
   public void setup() {
@@ -70,8 +71,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       "Walk 1m " +
       "[0:04 0:16 12m Tₓ1 C₁2_040]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       // Zero transfers is wrong, it is caused by the egress stop(C) being reached by transfer
       // with 0tx(before boarding), so 0 transfers is stored in BestNumberOfTransfers for stop C.
       // Then since the path is computed after, not during, the Raptor search this fails combine

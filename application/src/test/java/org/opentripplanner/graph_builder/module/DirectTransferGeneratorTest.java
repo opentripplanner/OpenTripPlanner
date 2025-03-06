@@ -72,8 +72,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(timetableRepository.getAllPathTransfers());
   }
@@ -94,8 +93,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
@@ -126,8 +124,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
@@ -162,8 +159,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(timetableRepository.getAllPathTransfers());
   }
@@ -185,8 +181,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
@@ -217,8 +212,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(timetableRepository.getAllPathTransfers());
   }
@@ -244,8 +238,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
@@ -283,8 +276,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       MAX_TRANSFER_DURATION,
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTrue(timetableRepository.getAllPathTransfers().isEmpty());
   }
@@ -314,8 +306,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       MAX_TRANSFER_DURATION,
       transferRequests,
       transferParametersForMode
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
@@ -349,8 +340,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       MAX_TRANSFER_DURATION,
       transferRequests,
       transferParametersForMode
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(timetableRepository.getAllPathTransfers(), tr(S0, 100, List.of(V0, V11), S11));
   }
@@ -386,8 +376,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       MAX_TRANSFER_DURATION,
       transferRequests,
       transferParametersForMode
-    )
-      .buildGraph();
+    ).buildGraph();
 
     var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
@@ -441,8 +430,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       Duration.ofSeconds(30),
       transferRequests,
       transferParametersForMode
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
@@ -472,8 +460,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       DataImportIssueStore.NOOP,
       Duration.ofSeconds(30),
       transferRequests
-    )
-      .buildGraph();
+    ).buildGraph();
 
     assertTransfers(
       timetableRepository.getAllPathTransfers(),
@@ -516,8 +503,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       MAX_TRANSFER_DURATION,
       transferRequests,
       transferParametersForMode
-    )
-      .buildGraph();
+    ).buildGraph();
 
     var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
@@ -565,8 +551,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       MAX_TRANSFER_DURATION,
       transferRequests,
       transferParametersForMode
-    )
-      .buildGraph();
+    ).buildGraph();
 
     var walkTransfers = timetableRepository.findTransfers(StreetMode.WALK);
     var bikeTransfers = timetableRepository.findTransfers(StreetMode.BIKE);
@@ -605,9 +590,8 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
       new Builder() {
         @Override
         public void build() {
-          var station = stationEntity(
-            "1",
-            builder -> builder.withTransfersNotAllowed(withNoTransfersOnStations)
+          var station = stationEntity("1", builder ->
+            builder.withTransfersNotAllowed(withNoTransfersOnStations)
           );
 
           S0 = stop("S0", 47.495, 19.001, station);
@@ -650,8 +634,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             var agency = TimetableRepositoryForTest.agency("Agency");
 
             tripPattern(
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP1"))
+              TripPattern.of(TimetableRepositoryForTest.id("TP1"))
                 .withRoute(route("R1", TransitMode.BUS, agency))
                 .withStopPattern(
                   new StopPattern(List.of(st(S11, !withBoardingConstraint, true), st(S12), st(S13)))
@@ -660,8 +643,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             );
 
             tripPattern(
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP2"))
+              TripPattern.of(TimetableRepositoryForTest.id("TP2"))
                 .withRoute(route("R2", TransitMode.BUS, agency))
                 .withStopPattern(new StopPattern(List.of(st(S21), st(S22), st(S23))))
                 .build()
@@ -672,17 +654,14 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             var agency = TimetableRepositoryForTest.agency("FerryAgency");
 
             tripPattern(
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP3"))
+              TripPattern.of(TimetableRepositoryForTest.id("TP3"))
                 .withRoute(route("R3", TransitMode.FERRY, agency))
                 .withStopPattern(new StopPattern(List.of(st(S11), st(S21))))
                 .withScheduledTimeTableBuilder(builder ->
                   builder.addTripTimes(
-                    ScheduledTripTimes
-                      .of()
+                    ScheduledTripTimes.of()
                       .withTrip(
-                        TimetableRepositoryForTest
-                          .trip("carsAllowedTrip")
+                        TimetableRepositoryForTest.trip("carsAllowedTrip")
                           .withCarsAllowed(CarAccess.ALLOWED)
                           .build()
                       )
@@ -694,17 +673,14 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             );
 
             tripPattern(
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP4"))
+              TripPattern.of(TimetableRepositoryForTest.id("TP4"))
                 .withRoute(route("R4", TransitMode.FERRY, agency))
                 .withStopPattern(new StopPattern(List.of(st(S0), st(S13))))
                 .withScheduledTimeTableBuilder(builder ->
                   builder.addTripTimes(
-                    ScheduledTripTimes
-                      .of()
+                    ScheduledTripTimes.of()
                       .withTrip(
-                        TimetableRepositoryForTest
-                          .trip("carsAllowedTrip")
+                        TimetableRepositoryForTest.trip("carsAllowedTrip")
                           .withCarsAllowed(CarAccess.ALLOWED)
                           .build()
                       )
@@ -716,17 +692,14 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
             );
 
             tripPattern(
-              TripPattern
-                .of(TimetableRepositoryForTest.id("TP5"))
+              TripPattern.of(TimetableRepositoryForTest.id("TP5"))
                 .withRoute(route("R5", TransitMode.FERRY, agency))
                 .withStopPattern(new StopPattern(List.of(st(S12), st(S22))))
                 .withScheduledTimeTableBuilder(builder ->
                   builder.addTripTimes(
-                    ScheduledTripTimes
-                      .of()
+                    ScheduledTripTimes.of()
                       .withTrip(
-                        TimetableRepositoryForTest
-                          .trip("carsAllowedTrip")
+                        TimetableRepositoryForTest.trip("carsAllowedTrip")
                           .withCarsAllowed(CarAccess.ALLOWED)
                           .build()
                       )
@@ -808,8 +781,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
     @Override
     public String toString() {
-      return ToStringBuilder
-        .of(getClass())
+      return ToStringBuilder.of(getClass())
         .addObj("from", from)
         .addObj("to", to)
         .addNum("distanceMeters", distanceMeters)

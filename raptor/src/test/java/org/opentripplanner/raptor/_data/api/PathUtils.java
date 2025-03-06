@@ -15,8 +15,6 @@ import org.opentripplanner.raptor.api.response.RaptorResponse;
  */
 public class PathUtils {
 
-  private static final RaptorTestConstants TRANSLATOR = new RaptorTestConstants() {};
-
   /** Util class, private constructor */
   private PathUtils() {}
 
@@ -25,7 +23,7 @@ public class PathUtils {
   }
 
   public static String pathsToString(Collection<? extends RaptorPath<?>> paths) {
-    return pathsToString(paths, p -> p.toString(TRANSLATOR::stopIndexToName));
+    return pathsToString(paths, p -> p.toString(RaptorTestConstants::stopIndexToName));
   }
 
   public static String pathsToStringDetailed(RaptorResponse<?> response) {
@@ -33,7 +31,7 @@ public class PathUtils {
   }
 
   public static String pathsToStringDetailed(Collection<? extends RaptorPath<?>> paths) {
-    return pathsToString(paths, p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
+    return pathsToString(paths, p -> p.toStringDetailed(RaptorTestConstants::stopIndexToName));
   }
 
   public static String join(String... paths) {

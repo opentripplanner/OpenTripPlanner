@@ -16,7 +16,7 @@ public class PassThroughViaLocation extends AbstractViaLocation {
     super(label, stopLocationIds);
     if (stopLocationIds.isEmpty()) {
       throw new IllegalArgumentException(
-        "A pass through via location must have at least one stop location." +
+        "A pass-through via-location must have at least one stop location." +
         (label == null ? "" : " Label: " + label)
       );
     }
@@ -29,8 +29,7 @@ public class PassThroughViaLocation extends AbstractViaLocation {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PassThroughViaLocation.class)
+    return ToStringBuilder.of(PassThroughViaLocation.class)
       .addObj("label", label())
       .addCol("stopLocationIds", stopLocationIds())
       .toString();

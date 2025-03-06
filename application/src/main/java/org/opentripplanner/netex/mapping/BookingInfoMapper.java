@@ -85,7 +85,8 @@ public class BookingInfoMapper {
       if (serviceJourney != null && serviceJourney.getFlexibleServiceProperties() != null) {
         this.hasBookingInfo = true;
         this.serviceJourneyRef = ref("ServiceJourney", serviceJourney);
-        FlexibleServiceProperties flexibleServiceProperties = serviceJourney.getFlexibleServiceProperties();
+        FlexibleServiceProperties flexibleServiceProperties =
+          serviceJourney.getFlexibleServiceProperties();
         setIfNotEmpty(
           flexibleServiceProperties.getBookingContact(),
           flexibleServiceProperties.getBookingMethods(),
@@ -174,8 +175,7 @@ public class BookingInfoMapper {
         return null;
       }
 
-      ContactInfo contactInfo = ContactInfo
-        .of()
+      ContactInfo contactInfo = ContactInfo.of()
         .withContactPerson(
           contactStructure.getContactPerson() != null
             ? contactStructure.getContactPerson().getValue()
@@ -220,8 +220,7 @@ public class BookingInfoMapper {
       }
 
       String bookingInfoMessage = bookingNote != null ? bookingNote.getValue() : null;
-      return BookingInfo
-        .of()
+      return BookingInfo.of()
         .withContactInfo(contactInfo)
         .withBookingMethods(filteredBookingMethods)
         .withEarliestBookingTime(otpEarliestBookingTime)

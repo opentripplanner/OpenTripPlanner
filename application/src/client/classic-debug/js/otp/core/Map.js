@@ -62,14 +62,14 @@ otp.core.Map = otp.Class({
         //debug layers can be enabled in config.js or as URL query:
         //?debug_layers=true
         if (otp.config.debug_layers === true) {
-            var url = otp.config.hostname + '/' + otp.config.restService + '/inspector/layers';
+            var url = otp.config.hostname + '/otp/debugrastertiles/layers';
             $.ajax(url, {
                 dataType: 'JSON',
                 success: function(data) {
                     var layers = {};
                     data.layers.map(function(layer) {
                         this.layer_control.addOverlay(new L.TileLayer(
-                            otp.config.hostname + '/' + otp.config.restService + '/inspector/tile/' + layer.key + '/{z}/{x}/{y}.png',
+                            otp.config.hostname + '/otp/debugrastertiles/' + layer.key + '/{z}/{x}/{y}.png',
                             { maxZoom : 22}), layer.name);
                     }, this_);
 

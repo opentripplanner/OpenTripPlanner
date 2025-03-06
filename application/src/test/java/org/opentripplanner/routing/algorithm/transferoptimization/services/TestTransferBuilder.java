@@ -7,7 +7,7 @@ import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfers;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -142,7 +142,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
     var pathTransfer = fromStopIndex == toStopIndex
       ? null
-      : TestTransfer.transfer(toStopIndex, walkDurationSec);
+      : TestTransfers.transfer(toStopIndex, walkDurationSec);
 
     return new TripToTripTransfer<>(
       departure(fromTrip, fromStopIndex),
@@ -154,9 +154,9 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
   private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
     // Set an uniq id: pattern + the first stop departure time
-    return TimetableRepositoryForTest
-      .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
-      .build();
+    return TimetableRepositoryForTest.trip(
+      trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0))
+    ).build();
   }
 
   private ConstrainedTransfer buildConstrainedTransfer() {

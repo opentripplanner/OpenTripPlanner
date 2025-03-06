@@ -11,13 +11,11 @@ public class TariffZoneType {
   private static final String NAME = "TariffZone";
 
   public static GraphQLObjectType createTZ() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .field(GqlUtil.newTransitIdField())
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((FareZone) environment.getSource()).getName())

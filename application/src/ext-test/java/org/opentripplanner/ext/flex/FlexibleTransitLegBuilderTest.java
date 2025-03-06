@@ -33,8 +33,7 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
     LocalDate.of(2025, 1, 15),
     new FlexPath(1000, 600, () -> GeometryUtils.makeLineString(1, 1, 2, 2))
   );
-  private static final TransitAlert ALERT = TransitAlert
-    .of(id("alert"))
+  private static final TransitAlert ALERT = TransitAlert.of(id("alert"))
     .withHeaderText(I18NString.of("alert 1"))
     .build();
   private static final Duration TIME_SHIFT = Duration.ofHours(5);
@@ -57,14 +56,10 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
     var expectedType = RuntimeException.class;
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withStartTime(null).build());
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withEndTime(null).build());
-    assertThrows(
-      expectedType,
-      () -> new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
+    assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withFlexTripEdge(null).build()
     );
     assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withAlerts(null).build());
-    assertThrows(
-      expectedType,
-      () -> new FlexibleTransitLegBuilder().withFareProducts(null).build()
+    assertThrows(expectedType, () -> new FlexibleTransitLegBuilder().withFareProducts(null).build()
     );
   }
 

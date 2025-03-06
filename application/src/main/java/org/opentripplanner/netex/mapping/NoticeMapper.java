@@ -28,12 +28,10 @@ class NoticeMapper {
     Notice otpNotice = cache.get(id);
 
     if (otpNotice == null) {
-      otpNotice =
-        Notice
-          .of(id)
-          .withPublicCode(netexNotice.getPublicCode())
-          .withText(netexNotice.getText().getValue())
-          .build();
+      otpNotice = Notice.of(id)
+        .withPublicCode(netexNotice.getPublicCode())
+        .withText(netexNotice.getText().getValue())
+        .build();
 
       cache.add(otpNotice);
     }

@@ -56,32 +56,30 @@ public class VehicleParkingsLayerTest {
       .on(LocalDate.of(2022, Month.APRIL, 1))
       .add();
 
-    vehicleParking =
-      VehicleParking
-        .builder()
-        .id(ID)
-        .name(
-          TranslatedString.getI18NString(
-            Map.of("", "default name", "de", "deutscher Name"),
-            false,
-            false
-          )
+    vehicleParking = VehicleParking.builder()
+      .id(ID)
+      .name(
+        TranslatedString.getI18NString(
+          Map.of("", "default name", "de", "deutscher Name"),
+          false,
+          false
         )
-        .coordinate(new WgsCoordinate(2, 1))
-        .bicyclePlaces(true)
-        .carPlaces(true)
-        .wheelchairAccessibleCarPlaces(false)
-        .imageUrl("image")
-        .detailsUrl("details")
-        .note(TranslatedString.getI18NString("default note", "DE", "deutsche Notiz"))
-        .tags(List.of("tag1", "tag2"))
-        .openingHoursCalendar(calBuilder.build())
-        .state(VehicleParkingState.OPERATIONAL)
-        .capacity(VehicleParkingSpaces.builder().bicycleSpaces(5).carSpaces(6).build())
-        .availability(
-          VehicleParkingSpaces.builder().wheelchairAccessibleCarSpaces(1).bicycleSpaces(1).build()
-        )
-        .build();
+      )
+      .coordinate(new WgsCoordinate(2, 1))
+      .bicyclePlaces(true)
+      .carPlaces(true)
+      .wheelchairAccessibleCarPlaces(false)
+      .imageUrl("image")
+      .detailsUrl("details")
+      .note(TranslatedString.getI18NString("default note", "DE", "deutsche Notiz"))
+      .tags(List.of("tag1", "tag2"))
+      .openingHoursCalendar(calBuilder.build())
+      .state(VehicleParkingState.OPERATIONAL)
+      .capacity(VehicleParkingSpaces.builder().bicycleSpaces(5).carSpaces(6).build())
+      .availability(
+        VehicleParkingSpaces.builder().wheelchairAccessibleCarSpaces(1).bicycleSpaces(1).build()
+      )
+      .build();
   }
 
   @Test

@@ -123,10 +123,8 @@ public class RaptorSearchWindowCalculator {
       // Set the search window using the min-travel-time.
       int v = roundStep(
         minSearchWindow.toSeconds() +
-        minTransitTimeCoefficient *
-        heuristicMinTransitTime +
-        minWaitTimeCoefficient *
-        heuristicMinWaitTime
+        minTransitTimeCoefficient * heuristicMinTransitTime +
+        minWaitTimeCoefficient * heuristicMinWaitTime
       );
 
       // Set an upper bound to the search window

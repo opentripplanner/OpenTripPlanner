@@ -19,10 +19,8 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class StationsLayerBuilder extends LayerBuilder<Station> {
 
-  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<Station>>> mappers = Map.of(
-    MapperType.Digitransit,
-    DigitransitStationPropertyMapper::create
-  );
+  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<Station>>> mappers =
+    Map.of(MapperType.Digitransit, DigitransitStationPropertyMapper::create);
   private final TransitService transitService;
 
   public StationsLayerBuilder(

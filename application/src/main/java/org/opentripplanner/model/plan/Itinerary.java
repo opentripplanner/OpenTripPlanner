@@ -324,17 +324,16 @@ public class Itinerary implements ItinerarySortKey {
    * NOTE: The itinerary is mutable so the transformation is done in-place!
    */
   public void transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
-    legs =
-      legs
-        .stream()
-        .map(l -> {
-          if (l instanceof TransitLeg tl) {
-            return mapper.apply(tl);
-          } else {
-            return l;
-          }
-        })
-        .toList();
+    legs = legs
+      .stream()
+      .map(l -> {
+        if (l instanceof TransitLeg tl) {
+          return mapper.apply(tl);
+        } else {
+          return l;
+        }
+      })
+      .toList();
   }
 
   public Stream<StreetLeg> getStreetLegs() {
@@ -646,8 +645,7 @@ public class Itinerary implements ItinerarySortKey {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(Itinerary.class)
+    return ToStringBuilder.of(Itinerary.class)
       .addStr("from", firstLeg().getFrom().toStringShort())
       .addStr("to", lastLeg().getTo().toStringShort())
       .addTime("start", firstLeg().getStartTime())

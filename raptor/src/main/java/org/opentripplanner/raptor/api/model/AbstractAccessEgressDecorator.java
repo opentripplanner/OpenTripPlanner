@@ -1,6 +1,8 @@
 package org.opentripplanner.raptor.api.model;
 
+import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nullable;
 
 /**
@@ -18,6 +20,13 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
 
   public static RaptorAccessEgress accessEgressWithExtraSlack(
     RaptorAccessEgress delegate,
+    Duration slack
+  ) {
+    return accessEgressWithExtraSlack(delegate, (int) slack.toSeconds());
+  }
+
+  public static RaptorAccessEgress accessEgressWithExtraSlack(
+    RaptorAccessEgress delegate,
     int slack
   ) {
     return new AbstractAccessEgressDecorator(delegate) {
@@ -26,6 +35,18 @@ public class AbstractAccessEgressDecorator implements RaptorAccessEgress {
         return super.durationInSeconds() + slack;
       }
     };
+  }
+
+  @SuppressWarnings({ "ReassignedVariable", "unchecked" })
+  static <T extends RaptorAccessEgress> Optional<T> findType(RaptorAccessEgress it, Class<T> type) {
+    while (!type.isAssignableFrom(it.getClass())) {
+      if (it instanceof AbstractAccessEgressDecorator d) {
+        it = d.delegate();
+      } else {
+        throw new IllegalStateException("Unexpected type: " + type + ". Type not found in:" + it);
+      }
+    }
+    return Optional.of((T) it);
   }
 
   protected RaptorAccessEgress delegate() {

@@ -32,7 +32,6 @@ import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -43,6 +42,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -141,8 +141,12 @@ public class ConstantsForTests {
         var osmProvider = new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false);
         var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
         var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-        var osmModule = OsmModule
-          .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
+        var osmModule = OsmModule.of(
+          osmProvider,
+          graph,
+          osmInfoRepository,
+          vehicleParkingRepository
+        )
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
           .build();
@@ -180,8 +184,7 @@ public class ConstantsForTests {
         DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
         List.of(new RouteRequest())
-      )
-        .buildGraph();
+      ).buildGraph();
 
       graph.index(timetableRepository.getSiteRepository());
 
@@ -201,9 +204,12 @@ public class ConstantsForTests {
       var osmProvider = new DefaultOsmProvider(osmFile, true);
       var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
       var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-      var osmModule = OsmModule
-        .of(osmProvider, graph, osmInfoRepository, vehicleParkingRepository)
-        .build();
+      var osmModule = OsmModule.of(
+        osmProvider,
+        graph,
+        osmInfoRepository,
+        vehicleParkingRepository
+      ).build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
@@ -353,7 +359,7 @@ public class ConstantsForTests {
         linker.linkVertexPermanently(
           stationVertex,
           new TraverseModeSet(TraverseMode.WALK),
-          LinkingDirection.BOTH_WAYS,
+          LinkingDirection.BIDIRECTIONAL,
           (vertex, streetVertex) ->
             List.of(
               StreetVehicleRentalLink.createStreetVehicleRentalLink(

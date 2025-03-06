@@ -10,7 +10,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import java.util.Set;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -37,11 +37,12 @@ class FinlandMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    TriFunction<StreetTraversalPermission, Float, OsmWithTags, Double> defaultWalkSafetyForPermission = (
-        permission,
-        speedLimit,
-        way
-      ) ->
+    TriFunction<
+      StreetTraversalPermission,
+      Float,
+      OsmEntity,
+      Double
+    > defaultWalkSafetyForPermission = (permission, speedLimit, way) ->
       switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {
           // ~35kph or under
@@ -212,7 +213,7 @@ class FinlandMapper extends OsmTagMapper {
   }
 
   @Override
-  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String bicycle = way.getTag("bicycle");
     return (
       isVehicleThroughTrafficExplicitlyDisallowed(way) ||
@@ -221,13 +222,13 @@ class FinlandMapper extends OsmTagMapper {
   }
 
   @Override
-  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String foot = way.getTag("foot");
     return isGeneralNoThroughTraffic(way) || doesTagValueDisallowThroughTraffic(foot);
   }
 
   @Override
-  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     if (super.isMotorVehicleThroughTrafficExplicitlyDisallowed(way)) {
       return true;
     }

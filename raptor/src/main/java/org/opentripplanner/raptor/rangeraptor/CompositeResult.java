@@ -24,7 +24,11 @@ class CompositeResult<T extends RaptorTripSchedule> implements RaptorRouterResul
   CompositeResult(
     RaptorRouterResult<T> mainResult,
     RaptorRouterResult<T> alternativeResult,
-    BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> merger
+    BiFunction<
+      Collection<RaptorPath<T>>,
+      Collection<RaptorPath<T>>,
+      Collection<RaptorPath<T>>
+    > merger
   ) {
     this.result = merger.apply(mainResult.extractPaths(), alternativeResult.extractPaths());
   }

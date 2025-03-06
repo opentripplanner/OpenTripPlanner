@@ -119,8 +119,7 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
     }
     stopsFound = new ArrayList<>(stopsFound);
 
-    var streetSearch = StreetSearchBuilder
-      .of()
+    var streetSearch = StreetSearchBuilder.of()
       .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(durationLimit))
       .setDominanceFunction(new DominanceFunctions.MinimumWeight())
       .setRequest(request)
@@ -153,7 +152,8 @@ public class StreetNearbyStopFinder implements NearbyStopFinder {
         }
         if (
           OTPFeature.FlexRouting.isOn() &&
-          targetVertex instanceof StreetVertex streetVertex && !streetVertex.areaStops().isEmpty()
+          targetVertex instanceof StreetVertex streetVertex &&
+          !streetVertex.areaStops().isEmpty()
         ) {
           for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
             // This is for a simplification, so that we only return one vertex from each

@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 class DefaultTransitGroupPriorityCalculatorTest {
 
-  private final DefaultTransitGroupPriorityCalculator subject = new DefaultTransitGroupPriorityCalculator();
+  private final DefaultTransitGroupPriorityCalculator subject =
+    new DefaultTransitGroupPriorityCalculator();
 
   @Test
   void mergeGroupIds() {

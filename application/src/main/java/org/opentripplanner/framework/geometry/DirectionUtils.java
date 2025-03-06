@@ -47,7 +47,7 @@ public final class DirectionUtils {
     }
 
     double az = getAzimuth(coord0, coord1);
-    return az * Math.PI / 180;
+    return (az * Math.PI) / 180;
   }
 
   /**
@@ -76,6 +76,6 @@ public final class DirectionUtils {
     }
 
     double az = getAzimuth(coord0, coord1);
-    return az * Math.PI / 180;
+    return (az * Math.PI) / 180;
   }
 }

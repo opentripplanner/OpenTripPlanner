@@ -41,8 +41,7 @@ class RelativeTime {
    * for most days are midnight, but in when time is adjusted for day-light-saving it is not.
    */
   public ZonedDateTime toZonedDateTime(LocalDate date, ZoneId zoneId) {
-    return ServiceDateUtils
-      .asStartOfService(date, zoneId)
+    return ServiceDateUtils.asStartOfService(date, zoneId)
       .plusDays(days)
       .plusSeconds(time.toSecondOfDay());
   }

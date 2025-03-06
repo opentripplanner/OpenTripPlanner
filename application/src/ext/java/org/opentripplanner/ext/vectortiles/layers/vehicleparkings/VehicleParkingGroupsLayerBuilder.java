@@ -17,7 +17,10 @@ import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 
 public class VehicleParkingGroupsLayerBuilder extends LayerBuilder<VehicleParkingAndGroup> {
 
-  static Map<VehicleParkingGroupsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParkingAndGroup>>> mappers = Map.of(
+  static Map<
+    VehicleParkingGroupsLayerBuilder.MapperType,
+    Function<Locale, PropertyMapper<VehicleParkingAndGroup>>
+  > mappers = Map.of(
     VehicleParkingGroupsLayerBuilder.MapperType.Digitransit,
     DigitransitVehicleParkingGroupPropertyMapper::create
   );

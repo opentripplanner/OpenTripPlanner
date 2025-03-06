@@ -66,17 +66,22 @@ public class NetexTestDataSample {
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private final JourneyPattern journeyPattern;
-  private final HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById = new HierarchicalMapById<>();
-  private final HierarchicalMapById<DestinationDisplay> destinationDisplayById = new HierarchicalMapById<>();
+  private final HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById =
+    new HierarchicalMapById<>();
+  private final HierarchicalMapById<DestinationDisplay> destinationDisplayById =
+    new HierarchicalMapById<>();
   private final EntityById<RegularStop> stopsById = new DefaultEntityById<>();
   private final HierarchicalMap<String, String> quayIdByStopPointRef = new HierarchicalMap<>();
   private final List<TimetabledPassingTime> timetabledPassingTimes = new ArrayList<>();
-  private final HierarchicalMapById<ServiceJourney> serviceJourneyById = new HierarchicalMapById<>();
+  private final HierarchicalMapById<ServiceJourney> serviceJourneyById =
+    new HierarchicalMapById<>();
   private final HierarchicalMapById<Route> routesById = new HierarchicalMapById<>();
   private final HierarchicalMapById<OperatingDay> operatingDaysById = new HierarchicalMapById<>();
-  private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneyBySjId = ArrayListMultimap.create();
+  private final ArrayListMultimap<String, DatedServiceJourney> datedServiceJourneyBySjId =
+    ArrayListMultimap.create();
 
-  private final EntityById<org.opentripplanner.transit.model.network.Route> otpRouteByid = new DefaultEntityById<>();
+  private final EntityById<org.opentripplanner.transit.model.network.Route> otpRouteByid =
+    new DefaultEntityById<>();
 
   public NetexTestDataSample() {
     final int[] stopTimes = { 0, 4, 10, 15 };
@@ -144,16 +149,15 @@ public class NetexTestDataSample {
     }
 
     // Create Journey Pattern with route and points
-    journeyPattern =
-      new JourneyPattern()
-        .withId("RUT:JourneyPattern:1")
-        .withRouteRef(routeRef)
-        .withPointsInSequence(
-          new PointsInJourneyPattern_RelStructure()
-            .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
-              pointsInLink
-            )
-        );
+    journeyPattern = new JourneyPattern()
+      .withId("RUT:JourneyPattern:1")
+      .withRouteRef(routeRef)
+      .withPointsInSequence(
+        new PointsInJourneyPattern_RelStructure()
+          .withPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern(
+            pointsInLink
+          )
+      );
     journeyPatternById.add(journeyPattern);
 
     // Create a new Service Journey with line, dayType, journeyPattern and timetable from above

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -11,10 +12,12 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RouteRequestTest {
 
@@ -134,19 +137,28 @@ class RouteRequestTest {
   void testTooLongSearchWindow() {
     RouteRequest request = new RouteRequest();
     request.initMaxSearchWindow(DURATION_24_HOURS);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> request.setSearchWindow(DURATION_24_HOURS_AND_ONE_MINUTE)
+    assertThrows(IllegalArgumentException.class, () ->
+      request.setSearchWindow(DURATION_24_HOURS_AND_ONE_MINUTE)
     );
   }
 
   @Test
   void testNegativeSearchWindow() {
     RouteRequest request = new RouteRequest();
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> request.setSearchWindow(DURATION_MINUS_ONE_MINUTE)
+    assertThrows(IllegalArgumentException.class, () ->
+      request.setSearchWindow(DURATION_MINUS_ONE_MINUTE)
     );
+  }
+
+  @Test
+  void allowTransferOptimization() {
+    RouteRequest request = new RouteRequest();
+    assertTrue(request.allowTransferOptimization());
+
+    request.setViaLocations(
+      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), List.of()))
+    );
+    assertFalse(request.allowTransferOptimization());
   }
 
   private GenericLocation randomLocation() {

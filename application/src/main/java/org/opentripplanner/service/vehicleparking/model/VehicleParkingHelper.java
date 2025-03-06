@@ -73,10 +73,8 @@ public class VehicleParkingHelper {
 
     var usableForCarParking =
       from.getVehicleParking().hasAnyCarPlaces() &&
-      (
-        (from.isCarAccessible() && to.isWalkAccessible()) ||
-        (from.isWalkAccessible() && to.isCarAccessible())
-      );
+      ((from.isCarAccessible() && to.isWalkAccessible()) ||
+        (from.isWalkAccessible() && to.isCarAccessible()));
 
     return usableForBikeParking || usableForCarParking;
   }

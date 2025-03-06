@@ -1,16 +1,16 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import java.util.List;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 
 class PathTailC2Calculator {
 
-  private final List<PassThroughPoint> passThroughPoints;
+  private final List<RaptorViaLocation> viaLocations;
 
-  PathTailC2Calculator(List<PassThroughPoint> passThroughPoints) {
-    this.passThroughPoints = passThroughPoints;
+  PathTailC2Calculator(List<RaptorViaLocation> viaLocations) {
+    this.viaLocations = viaLocations;
   }
 
   int calculateC2(OptimizedPathTail<?> tail) {
@@ -33,10 +33,10 @@ class PathTailC2Calculator {
     var curr = findFirstLegWithC2Set(tail);
 
     if (curr.isEgress()) {
-      ptpIter = PassThroughPointsIterator.tailIterator(passThroughPoints);
+      ptpIter = PassThroughPointsIterator.tailIterator(viaLocations);
       curr.c2(ptpIter.currC2());
     } else {
-      ptpIter = PassThroughPointsIterator.tailIterator(passThroughPoints, curr.c2());
+      ptpIter = PassThroughPointsIterator.tailIterator(viaLocations, curr.c2());
     }
 
     while (curr != tail) {

@@ -12,13 +12,11 @@ public class TripMetadataType {
   private TripMetadataType() {}
 
   public static GraphQLObjectType create(GraphQLScalarType dateTimeScalar) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("TripSearchData")
       .description("Trips search metadata.")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("searchWindowUsed")
           .description(
             "This is the time window used by the raptor search. The input searchWindow " +
@@ -33,8 +31,7 @@ public class TripMetadataType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("nextDateTime")
           .description(
             "This is the suggested search time for the \"next page\" or time " +
@@ -48,8 +45,7 @@ public class TripMetadataType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("prevDateTime")
           .description(
             "This is the suggested search time for the \"previous page\" or " +

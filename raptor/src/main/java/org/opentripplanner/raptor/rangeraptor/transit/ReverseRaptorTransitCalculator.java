@@ -43,10 +43,10 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
   ) {
     this.latestArrivalTime = latestArrivalTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
-    this.earliestAcceptableDepartureTime =
-      earliestAcceptableDepartureTime == RaptorConstants.TIME_NOT_SET
-        ? unreachedTime()
-        : earliestAcceptableDepartureTime;
+    this.earliestAcceptableDepartureTime = earliestAcceptableDepartureTime ==
+      RaptorConstants.TIME_NOT_SET
+      ? unreachedTime()
+      : earliestAcceptableDepartureTime;
     this.iterationStep = iterationStep;
   }
 

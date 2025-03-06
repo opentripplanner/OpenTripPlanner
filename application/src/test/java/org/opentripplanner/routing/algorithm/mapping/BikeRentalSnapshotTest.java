@@ -120,8 +120,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request
       .journey()
       .setModes(
-        RequestModes
-          .of()
+        RequestModes.of()
           .withAccessMode(StreetMode.BIKE_RENTAL)
           .withEgressMode(StreetMode.WALK)
           .withDirectMode(StreetMode.NOT_SET)
@@ -147,8 +146,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     request
       .journey()
       .setModes(
-        RequestModes
-          .of()
+        RequestModes.of()
           .withAccessMode(StreetMode.WALK)
           .withEgressMode(StreetMode.BIKE_RENTAL)
           .withTransferMode(StreetMode.WALK)

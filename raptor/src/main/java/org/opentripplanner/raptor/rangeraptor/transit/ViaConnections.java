@@ -10,17 +10,17 @@ import org.opentripplanner.raptor.api.request.RaptorViaConnection;
 
 public class ViaConnections {
 
-  private final TIntObjectMap<List<RaptorViaConnection>> byFromStop;
+  private final TIntObjectMap<List<RaptorViaConnection>> groupByFromStop;
 
   public ViaConnections(Collection<RaptorViaConnection> viaConnections) {
-    this.byFromStop = new TIntObjectHashMap<>();
+    this.groupByFromStop = new TIntObjectHashMap<>();
     viaConnections
       .stream()
       .collect(groupingBy(RaptorViaConnection::fromStop))
-      .forEach(byFromStop::put);
+      .forEach(groupByFromStop::put);
   }
 
   public TIntObjectMap<List<RaptorViaConnection>> byFromStop() {
-    return byFromStop;
+    return groupByFromStop;
   }
 }

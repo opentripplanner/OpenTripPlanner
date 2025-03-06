@@ -43,8 +43,7 @@ public class ParameterBinding implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(Parameter.class)
+    return ToStringBuilder.of(Parameter.class)
       .addEnum("name", name)
       .addStr("variable", variable)
       .addStr("formula", formula)

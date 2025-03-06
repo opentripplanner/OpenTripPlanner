@@ -21,8 +21,7 @@ class StreetEdgeBuilderTest {
   private static final I18NString NAME = I18NString.of("street-edge-name");
 
   private static final double LENGTH = 10.5;
-  private static final LineString GEOMETRY = GeometryUtils
-    .getGeometryFactory()
+  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory()
     .createLineString(new Coordinate[] { FROM_VERTEX.getCoordinate(), TO_VERTEX.getCoordinate() });
 
   private static final boolean WHEELCHAIR_ACCESSIBLE = false;

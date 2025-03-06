@@ -67,9 +67,9 @@ public class GenericDataFile {
       }
 
       DateUnit dateUnit = new DateUnit(time.getUnitsString());
-      Optional<Instant> dateOrigin = Optional
-        .ofNullable(dateUnit.getDateOrigin())
-        .map(Date::toInstant);
+      Optional<Instant> dateOrigin = Optional.ofNullable(dateUnit.getDateOrigin()).map(
+        Date::toInstant
+      );
 
       if (dateOrigin.isEmpty()) {
         error = String.format("Missing origin date from %s file", file.getAbsolutePath());

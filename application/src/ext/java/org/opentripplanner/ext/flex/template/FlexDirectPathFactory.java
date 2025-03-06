@@ -49,15 +49,13 @@ public class FlexDirectPathFactory {
       callbackService,
       accessPathCalculator,
       maxTransferDuration
-    )
-      .calculateFlexAccessTemplates(streetAccesses, dates);
+    ).calculateFlexAccessTemplates(streetAccesses, dates);
 
     var flexEgressTemplates = new FlexEgressFactory(
       callbackService,
       egressPathCalculator,
       maxTransferDuration
-    )
-      .calculateFlexEgressTemplates(streetEgresses, dates);
+    ).calculateFlexEgressTemplates(streetEgresses, dates);
 
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
@@ -78,8 +76,9 @@ public class FlexDirectPathFactory {
         flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          createDirectGraphPath(template, egress, arriveBy, requestTime)
-            .ifPresent(directFlexPaths::add);
+          createDirectGraphPath(template, egress, arriveBy, requestTime).ifPresent(
+            directFlexPaths::add
+          );
         }
       }
     }
@@ -154,10 +153,10 @@ public class FlexDirectPathFactory {
 
       // Time-shift departure so the minimum-booking-notice restriction is honored.
       var bookingInfo = trip.getPickupBookingInfo(accessBoardStopPosition);
-      firstStopDepartureTime =
-        RoutingBookingInfo
-          .of(requestedBookingTime, bookingInfo)
-          .earliestDepartureTime(firstStopDepartureTime);
+      firstStopDepartureTime = RoutingBookingInfo.of(
+        requestedBookingTime,
+        bookingInfo
+      ).earliestDepartureTime(firstStopDepartureTime);
 
       int earliestDepartureTime = trip.earliestDepartureTime(
         firstStopDepartureTime,

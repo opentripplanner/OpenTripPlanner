@@ -14,7 +14,8 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 
 public class FeedInfoMapperTest {
 
-  private static final org.onebusaway.gtfs.model.FeedInfo FEED_INFO = new org.onebusaway.gtfs.model.FeedInfo();
+  private static final org.onebusaway.gtfs.model.FeedInfo FEED_INFO =
+    new org.onebusaway.gtfs.model.FeedInfo();
 
   private static final String ID = "45";
 

@@ -95,8 +95,7 @@ public class SystemPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SystemPreferences.class)
+    return ToStringBuilder.of(SystemPreferences.class)
       .addCol("tags", tags, DEFAULT.tags)
       .addObj("dataOverlay", dataOverlay, DEFAULT.dataOverlay)
       .addBoolIfTrue("geoidElevation", geoidElevation)

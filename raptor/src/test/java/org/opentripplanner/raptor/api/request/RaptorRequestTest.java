@@ -19,8 +19,7 @@ class RaptorRequestTest {
 
   public static final int STOP_A = 1;
   public static final int STOP_B = 5;
-  private final RaptorRequest<RaptorTripSchedule> subject = RaptorRequest
-    .defaults()
+  private final RaptorRequest<RaptorTripSchedule> subject = RaptorRequest.defaults()
     .mutate()
     .profile(STANDARD)
     .searchDirection(REVERSE)

@@ -49,12 +49,11 @@ public final class RaptorPreferences implements Serializable {
     this.profile = Objects.requireNonNull(builder.profile);
     this.searchDirection = Objects.requireNonNull(builder.searchDirection);
     this.timeLimit = builder.timeLimit;
-    this.relaxGeneralizedCostAtDestination =
-      Units.normalizedOptionalFactor(
-        builder.relaxGeneralizedCostAtDestination,
-        MIN_RELAX_COST_AT_DESTINATION,
-        MAX_RELAX_COST_AT_DESTINATION
-      );
+    this.relaxGeneralizedCostAtDestination = Units.normalizedOptionalFactor(
+      builder.relaxGeneralizedCostAtDestination,
+      MIN_RELAX_COST_AT_DESTINATION,
+      MAX_RELAX_COST_AT_DESTINATION
+    );
   }
 
   public static Builder of() {
@@ -126,8 +125,7 @@ public final class RaptorPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(RaptorPreferences.class)
+    return ToStringBuilder.of(RaptorPreferences.class)
       .addCol("optimizations", optimizations, DEFAULT.optimizations)
       .addEnum("profile", profile, DEFAULT.profile)
       .addEnum("searchDirection", searchDirection, DEFAULT.searchDirection)
@@ -161,10 +159,9 @@ public final class RaptorPreferences implements Serializable {
     }
 
     public Builder withOptimizations(Collection<Optimization> optimizations) {
-      this.optimizations =
-        optimizations.isEmpty()
-          ? EnumSet.noneOf(Optimization.class)
-          : EnumSet.copyOf(optimizations);
+      this.optimizations = optimizations.isEmpty()
+        ? EnumSet.noneOf(Optimization.class)
+        : EnumSet.copyOf(optimizations);
       return this;
     }
 

@@ -22,20 +22,17 @@ public class TransferConstraintTest {
   private final TransferConstraint STAY_SEATED = TransferConstraint.of().staySeated().build();
   private final TransferConstraint GUARANTEED = TransferConstraint.of().guaranteed().build();
   private final TransferConstraint NOT_ALLOWED = TransferConstraint.of().notAllowed().build();
-  private final TransferConstraint MAX_WAIT_TIME = TransferConstraint
-    .of()
+  private final TransferConstraint MAX_WAIT_TIME = TransferConstraint.of()
     .guaranteed()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
-  private final TransferConstraint EVERYTHING = TransferConstraint
-    .of()
+  private final TransferConstraint EVERYTHING = TransferConstraint.of()
     .staySeated()
     .guaranteed()
     .preferred()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
-  private final TransferConstraint MIN_TX_TIME = TransferConstraint
-    .of()
+  private final TransferConstraint MIN_TX_TIME = TransferConstraint.of()
     .minTransferTime(D3m)
     .build();
 

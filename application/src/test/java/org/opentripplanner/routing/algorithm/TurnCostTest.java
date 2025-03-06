@@ -201,8 +201,7 @@ public class TurnCostTest {
     Vertex to,
     int expectedDuration
   ) {
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(streetMode))

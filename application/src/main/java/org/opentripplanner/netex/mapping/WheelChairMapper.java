@@ -26,8 +26,7 @@ public class WheelChairMapper {
       defaultValue = Accessibility.NO_INFORMATION;
     }
 
-    return Optional
-      .ofNullable(accessibilityAssessment)
+    return Optional.ofNullable(accessibilityAssessment)
       .map(AccessibilityAssessment::getLimitations)
       .map(AccessibilityLimitations_RelStructure::getAccessibilityLimitation)
       .map(AccessibilityLimitation::getWheelchairAccess)

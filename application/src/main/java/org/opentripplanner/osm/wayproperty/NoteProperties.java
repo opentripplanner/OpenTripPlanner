@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.note.StreetNoteMatcher;
@@ -22,7 +22,7 @@ public class NoteProperties {
     this.noteMatcher = noteMatcher;
   }
 
-  public StreetNoteAndMatcher generateNote(OsmWithTags way) {
+  public StreetNoteAndMatcher generateNote(OsmEntity way) {
     I18NString text;
     //TODO: this could probably be made without patternMatch for {} since all notes (at least currently) have {note} as notePattern
     if (patternMatcher.matcher(notePattern).matches()) {

@@ -28,18 +28,15 @@ class TimePenaltyTest {
   @Test
   void negativeDurationNotAllowed() {
     assertThrows(IllegalArgumentException.class, () -> TimePenalty.of("-2m + 1.0 t"));
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TimePenalty.of(DurationUtils.duration("-2m"), 1.0)
+    assertThrows(IllegalArgumentException.class, () ->
+      TimePenalty.of(DurationUtils.duration("-2m"), 1.0)
     );
   }
 
   @Test
   void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
     assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(D2m, -0.01));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TimePenalty.of(Duration.ZERO, 100.1)
+    var ex = assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(Duration.ZERO, 100.1)
     );
     assertEquals("The value is not in range[0.0, 100.0]: 100.1", ex.getMessage());
   }

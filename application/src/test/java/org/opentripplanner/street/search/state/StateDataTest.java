@@ -13,9 +13,9 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 class StateDataTest {
 
   static Stream<Arguments> cases() {
-    return Arrays
-      .stream(StreetMode.values())
-      .flatMap(mode -> Stream.of(Arguments.of(true, mode), Arguments.of(false, mode)));
+    return Arrays.stream(StreetMode.values()).flatMap(mode ->
+      Stream.of(Arguments.of(true, mode), Arguments.of(false, mode))
+    );
   }
 
   @ParameterizedTest(name = "arriveBy={0}, streetMode={1}")

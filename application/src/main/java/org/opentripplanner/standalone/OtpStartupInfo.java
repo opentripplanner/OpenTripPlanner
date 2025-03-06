@@ -43,9 +43,8 @@ public class OtpStartupInfo {
       projectInfo().getVersionString(),
       javaVersion()
     );
-    ApplicationShutdownSupport.addShutdownHook(
-      "server-shutdown-info",
-      () -> LOG.info("OTP SHUTTING DOWN - {} - {}", cliTaskInfo, projectInfo().getVersionString())
+    ApplicationShutdownSupport.addShutdownHook("server-shutdown-info", () ->
+      LOG.info("OTP SHUTTING DOWN - {} - {}", cliTaskInfo, projectInfo().getVersionString())
     );
     LOG.info(NEW_LINE + "{}", info());
   }

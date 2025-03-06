@@ -23,13 +23,9 @@ public class Ratio {
    * {@link IllegalArgumentException} if the ratio is not valid.
    */
   public static Ratio of(double ratio) {
-    return of(
-      ratio,
-      errMsg -> {
-        throw new IllegalArgumentException(errMsg);
-      }
-    )
-      .orElseThrow();
+    return of(ratio, errMsg -> {
+      throw new IllegalArgumentException(errMsg);
+    }).orElseThrow();
   }
 
   public static Optional<Ratio> of(double ratio, Consumer<String> validationErrorHandler) {

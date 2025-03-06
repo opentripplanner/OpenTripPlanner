@@ -42,12 +42,14 @@ public class DatedServiceJourneyMapperTest {
 
     // Date is filtered by ServiceAlteration
     dsjList.add(
-      createDatedServiceJourney("ID-C", OP_DAY_3, SJ_1)
-        .withServiceAlteration(ServiceAlterationEnumeration.CANCELLATION)
+      createDatedServiceJourney("ID-C", OP_DAY_3, SJ_1).withServiceAlteration(
+        ServiceAlterationEnumeration.CANCELLATION
+      )
     );
     dsjList.add(
-      createDatedServiceJourney("ID-B", OP_DAY_2, SJ_1)
-        .withServiceAlteration(ServiceAlterationEnumeration.EXTRA_JOURNEY)
+      createDatedServiceJourney("ID-B", OP_DAY_2, SJ_1).withServiceAlteration(
+        ServiceAlterationEnumeration.EXTRA_JOURNEY
+      )
     );
 
     opDaysById.add(createOperatingDay(OP_DAY_1, LD1));

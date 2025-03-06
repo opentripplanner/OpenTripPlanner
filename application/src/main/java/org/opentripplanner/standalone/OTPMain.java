@@ -160,8 +160,7 @@ public class OTPMain {
         app.emissionsDataModel(),
         app.stopConsolidationRepository(),
         app.streetLimitationParameters()
-      )
-        .save(app.graphOutputDataSource());
+      ).save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
     }
@@ -237,17 +236,14 @@ public class OTPMain {
     TimetableRepository timetableRepository,
     RaptorConfig<?> raptorConfig
   ) {
-    ApplicationShutdownSupport.addShutdownHook(
-      "server-shutdown",
-      () -> {
-        LOG.info("OTP shutdown started...");
-        UpdaterConfigurator.shutdownGraph(timetableRepository);
-        raptorConfig.shutdown();
-        WeakCollectionCleaner.DEFAULT.exit();
-        DeferredAuthorityFactory.exit();
-        LOG.info("OTP shutdown: resources released...");
-      }
-    );
+    ApplicationShutdownSupport.addShutdownHook("server-shutdown", () -> {
+      LOG.info("OTP shutdown started...");
+      UpdaterConfigurator.shutdownGraph(timetableRepository);
+      raptorConfig.shutdown();
+      WeakCollectionCleaner.DEFAULT.exit();
+      DeferredAuthorityFactory.exit();
+      LOG.info("OTP shutdown: resources released...");
+    });
   }
 
   private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {

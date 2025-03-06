@@ -65,8 +65,8 @@ public class BikeRentalTest extends GraphRoutingTest {
           D = intersection("D", 47.530, 19.000);
           E1 = entrance("E1", 47.530, 19.001);
 
-          T1 = streetLocation("T1", 47.500, 18.999, false);
-          T2 = streetLocation("T1", 47.530, 18.999, true);
+          T1 = streetLocation("T1", 47.500, 18.999);
+          T2 = streetLocation("T1", 47.530, 18.999);
 
           B1 = vehicleRentalStation("B1", 47.510, 19.001);
           B2 = vehicleRentalStation("B2", 47.520, 19.001);
@@ -587,22 +587,17 @@ public class BikeRentalTest extends GraphRoutingTest {
     boolean useAvailabilityInformation,
     int keepRentedBicycleCost
   ) {
-    return runStreetSearchAndCreateDescriptor(
-      fromVertex,
-      toVertex,
-      arriveBy,
-      options -> {
-        options.withPreferences(preferences ->
-          preferences.withBike(bike ->
-            bike.withRental(rental -> {
-              rental.withUseAvailabilityInformation(useAvailabilityInformation);
-              rental.withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
-              rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
-            })
-          )
-        );
-      }
-    );
+    return runStreetSearchAndCreateDescriptor(fromVertex, toVertex, arriveBy, options -> {
+      options.withPreferences(preferences ->
+        preferences.withBike(bike ->
+          bike.withRental(rental -> {
+            rental.withUseAvailabilityInformation(useAvailabilityInformation);
+            rental.withArrivingInRentalVehicleAtDestinationCost(keepRentedBicycleCost);
+            rental.withAllowArrivingInRentedVehicleAtDestination(keepRentedBicycleCost > 0);
+          })
+        )
+      );
+    });
   }
 
   private List<String> runStreetSearchAndCreateDescriptor(
@@ -641,8 +636,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     RouteRequest options,
     StreetMode streetMode
   ) {
-    var tree = StreetSearchBuilder
-      .of()
+    var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(new StreetRequest(streetMode))

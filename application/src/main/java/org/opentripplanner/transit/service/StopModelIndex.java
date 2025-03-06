@@ -28,7 +28,8 @@ class SiteRepositoryIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiteRepositoryIndex.class);
 
-  private final HashGridSpatialIndex<RegularStop> regularStopSpatialIndex = new HashGridSpatialIndex<>();
+  private final HashGridSpatialIndex<RegularStop> regularStopSpatialIndex =
+    new HashGridSpatialIndex<>();
   private final Map<Station, MultiModalStation> multiModalStationForStations = new HashMap<>();
   private final HashGridSpatialIndex<AreaStop> locationIndex = new HashGridSpatialIndex<>();
   private final StopLocation[] stopsByIndex;
@@ -110,9 +111,11 @@ class SiteRepositoryIndex {
     if (c > 0) {
       double p = (100.0 * c) / stopsByIndex.length;
       // Log this as warning if more than 5% of the space is null
-      LOG
-        .atLevel(p >= 5.0 ? Level.WARN : Level.INFO)
-        .log("The stop index contains holes in it. {} of {} is null.", c, stopsByIndex.length);
+      LOG.atLevel(p >= 5.0 ? Level.WARN : Level.INFO).log(
+        "The stop index contains holes in it. {} of {} is null.",
+        c,
+        stopsByIndex.length
+      );
     }
   }
 }

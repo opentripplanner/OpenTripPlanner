@@ -4,7 +4,7 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 
-public record UnconnectedArea(AreaGroup areaGroup) implements DataImportIssue {
+public record UnconnectedArea(OsmAreaGroup areaGroup) implements DataImportIssue {
   private static final String FMT = "Area %s has no connection to street network";
   private static final String HTMLFMT =
     "Area <a href='%s'>'%s'</a> has no connection to street network";

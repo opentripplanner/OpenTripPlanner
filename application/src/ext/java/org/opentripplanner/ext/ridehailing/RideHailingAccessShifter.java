@@ -52,8 +52,6 @@ public class RideHailingAccessShifter {
           } else {
             return null;
           }
-          // if it is an egress leg, we pretend that it arrives on time,
-          // and we don't need to time-shift
         } else {
           return ae;
         }

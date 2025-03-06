@@ -68,8 +68,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
   @Override
   public String toString() {
-    var builder = ValueObjectToStringBuilder
-      .of()
+    var builder = ValueObjectToStringBuilder.of()
       .addText("DurationFor" + type.getSimpleName() + "{")
       .addText("default:")
       .addDuration(defaultValue);
@@ -152,7 +151,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
 
     /**
      * Build a copy of the current values, excluding the defaultValue from the map. This
-     * ensures equality and make a defencive copy of the builder values. Hence, the builder
+     * ensures equality and makes a defensive copy of the builder values. Hence, the builder
      * can be used to generate new values if desired.
      * */
     Map<E, Duration> copyValueForEnum() {
@@ -185,7 +184,7 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
     public DurationForEnum<E> build() {
       var it = new DurationForEnum<>(this);
 
-      // Return original if not change, subscriber is not notified
+      // Return the original if there are no changes, the subscriber is not notified.
       if (original != null && original.equals(it)) {
         return original;
       }

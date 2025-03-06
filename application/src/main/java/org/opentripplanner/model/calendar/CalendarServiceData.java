@@ -89,9 +89,8 @@ public class CalendarServiceData implements Serializable {
 
   private void addDatesToServiceIdsByDate(FeedScopedId serviceId, List<LocalDate> serviceDates) {
     for (LocalDate serviceDate : serviceDates) {
-      Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(
-        serviceDate,
-        k -> new HashSet<>()
+      Set<FeedScopedId> serviceIds = serviceIdsByDate.computeIfAbsent(serviceDate, k ->
+        new HashSet<>()
       );
       serviceIds.add(serviceId);
     }

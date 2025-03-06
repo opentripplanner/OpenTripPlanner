@@ -35,7 +35,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -76,8 +77,7 @@ public class G03_AccessWithOpeningHoursMultipleOptionsTest implements RaptorTest
       "~ Walk 2m 0:25 0:27 C₁240 " +
       "[0:13 0:27 14m Tₓ0 C₁1_620]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("13m", TX_0, T00_00, T00_30)
       .add(TC_STANDARD, PathUtils.withoutCost(expA, expB))
       .add(TC_STANDARD_ONE, PathUtils.withoutCost(expA))

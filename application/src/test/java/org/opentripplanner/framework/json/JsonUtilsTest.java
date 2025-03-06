@@ -22,9 +22,11 @@ class JsonUtilsTest {
     assertTrue(JsonUtils.asText(NullNode.getInstance(), "any").isEmpty());
     assertTrue(JsonUtils.asText(new TextNode("foo"), "bar").isEmpty());
 
-    JsonNode node = MAPPER.readTree("""
-    { "foo" : "bar", "array" : [] }
-    """);
+    JsonNode node = MAPPER.readTree(
+      """
+      { "foo" : "bar", "array" : [] }
+      """
+    );
 
     Optional<String> result = JsonUtils.asText(node, "foo");
     assertTrue(result.isPresent());

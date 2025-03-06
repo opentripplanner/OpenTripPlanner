@@ -74,20 +74,21 @@ public class RoutingWorker {
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
-    this.debugTimingAggregator =
-      new DebugTimingAggregator(
-        serverContext.meterRegistry(),
-        request.preferences().system().tags()
-      );
+    this.debugTimingAggregator = new DebugTimingAggregator(
+      serverContext.meterRegistry(),
+      request.preferences().system().tags()
+    );
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
-    this.additionalSearchDays =
-      createAdditionalSearchDays(serverContext.raptorTuningParameters(), zoneId, request);
-    this.transitGroupPriorityService =
-      TransitGroupPriorityService.of(
-        request.preferences().transit().relaxTransitGroupPriority(),
-        request.journey().transit().priorityGroupsByAgency(),
-        request.journey().transit().priorityGroupsGlobal()
-      );
+    this.additionalSearchDays = createAdditionalSearchDays(
+      serverContext.raptorTuningParameters(),
+      zoneId,
+      request
+    );
+    this.transitGroupPriorityService = TransitGroupPriorityService.of(
+      request.preferences().transit().relaxTransitGroupPriority(),
+      request.journey().transit().priorityGroupsByAgency(),
+      request.journey().transit().priorityGroupsGlobal()
+    );
   }
 
   public RoutingResponse route() {
@@ -110,13 +111,11 @@ public class RoutingWorker {
       // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
       //       log-trace-parameters-propagation and graceful timeout handling here.
       try {
-        CompletableFuture
-          .allOf(
-            CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
-            CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
-            CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
-          )
-          .join();
+        CompletableFuture.allOf(
+          CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
+          CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
+          CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
+        ).join();
       } catch (CompletionException e) {
         RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }

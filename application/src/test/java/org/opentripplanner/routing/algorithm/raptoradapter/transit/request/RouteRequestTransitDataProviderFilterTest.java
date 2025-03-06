@@ -61,12 +61,9 @@ class RouteRequestTransitDataProviderFilterTest {
 
   private static final WheelchairPreferences DEFAULT_ACCESSIBILITY = WheelchairPreferences.DEFAULT;
 
-  private static final AccessibilityPreferences RELAXED_ACCESSIBILITY_PREFERENCE = AccessibilityPreferences.ofCost(
-    0,
-    10
-  );
-  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = WheelchairPreferences
-    .of()
+  private static final AccessibilityPreferences RELAXED_ACCESSIBILITY_PREFERENCE =
+    AccessibilityPreferences.ofCost(0, 10);
+  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = WheelchairPreferences.of()
     .withTrip(RELAXED_ACCESSIBILITY_PREFERENCE)
     .withStop(RELAXED_ACCESSIBILITY_PREFERENCE)
     .withElevator(RELAXED_ACCESSIBILITY_PREFERENCE)
@@ -101,8 +98,7 @@ class RouteRequestTransitDataProviderFilterTest {
     stopTimeEnd.setStop(lastStop);
 
     var stopPattern = new StopPattern(List.of(stopTimeStart, stopTimeEnd));
-    var tripPattern = TripPattern
-      .of(TimetableRepositoryForTest.id("P1"))
+    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
       .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
@@ -152,8 +148,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var stopTime3 = getStopTime("TEST:3", PickDrop.NONE);
     var stopTime4 = getStopTime("TEST:4", PickDrop.SCHEDULED);
     var stopPattern = new StopPattern(List.of(stopTime1, stopTime2, stopTime3, stopTime4));
-    var tripPattern = TripPattern
-      .of(TimetableRepositoryForTest.id("P1"))
+    var tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
       .withRoute(TimetableRepositoryForTest.route("1").build())
       .withStopPattern(stopPattern)
       .build()
@@ -234,8 +229,7 @@ class RouteRequestTransitDataProviderFilterTest {
       false,
       Set.of(),
       List.of(
-        TransitFilterRequest
-          .of()
+        TransitFilterRequest.of()
           .addNot(SelectRequest.of().withRoutes(List.of(ROUTE.getId())).build())
           .build()
       )
@@ -365,17 +359,14 @@ class RouteRequestTransitDataProviderFilterTest {
       false,
       Set.of(),
       List.of(
-        TransitFilterRequest
-          .of()
+        TransitFilterRequest.of()
           .addSelect(
-            SelectRequest
-              .of()
+            SelectRequest.of()
               .withAgencies(List.of(TimetableRepositoryForTest.AGENCY.getId()))
               .build()
           )
           .addNot(
-            SelectRequest
-              .of()
+            SelectRequest.of()
               .withTransportModes(
                 List.of(
                   new MainAndSubMode(
@@ -929,8 +920,7 @@ class RouteRequestTransitDataProviderFilterTest {
     var stopTime = new StopTime();
     stopTime.setStop(STOP_FOR_TEST);
     StopPattern stopPattern = new StopPattern(List.of(stopTime));
-    RoutingTripPattern tripPattern = TripPattern
-      .of(TimetableRepositoryForTest.id("P1"))
+    RoutingTripPattern tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build()
@@ -951,8 +941,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
   private List<TransitFilter> filterForModes(Collection<MainAndSubMode> modes) {
     return List.of(
-      TransitFilterRequest
-        .of()
+      TransitFilterRequest.of()
         .addSelect(SelectRequest.of().withTransportModes(List.copyOf(modes)).build())
         .build()
     );
@@ -963,8 +952,7 @@ class RouteRequestTransitDataProviderFilterTest {
     List<FeedScopedId> agencyIds
   ) {
     return List.of(
-      TransitFilterRequest
-        .of()
+      TransitFilterRequest.of()
         .addSelect(SelectRequest.of().withTransportModes(List.copyOf(modes)).build())
         .build(),
       TransitFilterRequest.of().addNot(SelectRequest.of().withAgencies(agencyIds).build()).build()
@@ -976,8 +964,7 @@ class RouteRequestTransitDataProviderFilterTest {
     List<FeedScopedId> agencyIds
   ) {
     return List.of(
-      TransitFilterRequest
-        .of()
+      TransitFilterRequest.of()
         .addSelect(SelectRequest.of().withTransportModes(List.copyOf(modes)).build())
         .addNot(SelectRequest.of().withAgencies(agencyIds).build())
         .build()
@@ -994,8 +981,7 @@ class RouteRequestTransitDataProviderFilterTest {
     Accessibility wheelchairBoarding,
     TripAlteration tripAlteration
   ) {
-    Trip trip = Trip
-      .of(tripId)
+    Trip trip = Trip.of(tripId)
       .withRoute(route)
       .withMode(mode)
       .withNetexSubmode(submode)
@@ -1033,8 +1019,7 @@ class RouteRequestTransitDataProviderFilterTest {
     double lat,
     double lon
   ) {
-    return TEST_MODEL
-      .stop(idAndName)
+    return TEST_MODEL.stop(idAndName)
       .withCoordinate(new WgsCoordinate(lat, lon))
       .withWheelchairAccessibility(wheelchair)
       .build();

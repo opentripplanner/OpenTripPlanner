@@ -86,24 +86,22 @@ public class OtpHttpClientFactory implements AutoCloseable {
     Objects.requireNonNull(timeout);
     Objects.requireNonNull(connectionTtl);
 
-    PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder
-      .create()
-      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
-      .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
-      .setConnPoolPolicy(PoolReusePolicy.LIFO)
-      .setMaxConnTotal(maxConnections)
-      .setDefaultConnectionConfig(
-        ConnectionConfig
-          .custom()
-          .setSocketTimeout(Timeout.of(timeout))
-          .setConnectTimeout(Timeout.of(timeout))
-          .setTimeToLive(TimeValue.of(connectionTtl))
-          .build()
-      )
-      .build();
+    PoolingHttpClientConnectionManager connectionManager =
+      PoolingHttpClientConnectionManagerBuilder.create()
+        .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
+        .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
+        .setConnPoolPolicy(PoolReusePolicy.LIFO)
+        .setMaxConnTotal(maxConnections)
+        .setDefaultConnectionConfig(
+          ConnectionConfig.custom()
+            .setSocketTimeout(Timeout.of(timeout))
+            .setConnectTimeout(Timeout.of(timeout))
+            .setTimeToLive(TimeValue.of(connectionTtl))
+            .build()
+        )
+        .build();
 
-    HttpClientBuilder httpClientBuilder = HttpClients
-      .custom()
+    HttpClientBuilder httpClientBuilder = HttpClients.custom()
       .setUserAgent("OpenTripPlanner")
       .setConnectionManager(connectionManager)
       .setDefaultRequestConfig(requestConfig(timeout));
@@ -128,8 +126,7 @@ public class OtpHttpClientFactory implements AutoCloseable {
    * Configures the request with a custom timeout.
    */
   private static RequestConfig requestConfig(Duration timeout) {
-    return RequestConfig
-      .custom()
+    return RequestConfig.custom()
       .setResponseTimeout(Timeout.of(timeout))
       .setConnectionRequestTimeout(Timeout.of(timeout))
       .setProtocolUpgradeEnabled(false)

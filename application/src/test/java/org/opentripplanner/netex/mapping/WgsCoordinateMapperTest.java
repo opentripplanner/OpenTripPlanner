@@ -48,9 +48,8 @@ public class WgsCoordinateMapperTest {
   @Test
   public void handleCoordinatesWithMissingLatitude() {
     SimplePoint_VersionStructure p;
-    p =
-      new SimplePoint_VersionStructure()
-        .withLocation(new LocationStructure().withLongitude(LONGITUDE));
+    p = new SimplePoint_VersionStructure()
+      .withLocation(new LocationStructure().withLongitude(LONGITUDE));
 
     assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
@@ -58,9 +57,8 @@ public class WgsCoordinateMapperTest {
   @Test
   public void handleCoordinatesWithMissingLongitude() {
     SimplePoint_VersionStructure p;
-    p =
-      new SimplePoint_VersionStructure()
-        .withLocation(new LocationStructure().withLatitude(LATITUDE));
+    p = new SimplePoint_VersionStructure()
+      .withLocation(new LocationStructure().withLatitude(LATITUDE));
     assertThrows(IllegalArgumentException.class, () -> WgsCoordinateMapper.mapToDomain(p));
   }
 }

@@ -263,8 +263,7 @@ public class TripPatternForDates
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripPatternForDates.class)
+    return ToStringBuilder.of(TripPatternForDates.class)
       .addObj("pattern", debugInfo())
       .addServiceTimeSchedule("offsets", offsets)
       .addNum("nTrips", numberOfTripSchedules)

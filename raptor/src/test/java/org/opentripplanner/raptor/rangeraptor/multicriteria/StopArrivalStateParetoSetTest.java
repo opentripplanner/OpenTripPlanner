@@ -28,9 +28,9 @@ public class StopArrivalStateParetoSetTest {
   private static final int ROUND_1 = 1;
   private static final int ROUND_2 = 2;
   private static final int ROUND_3 = 3;
-  private static final RaptorTripSchedule ANY_TRIP = TestTripSchedule
-    .schedule("10:00 10:30")
-    .build();
+  private static final RaptorTripSchedule ANY_TRIP = TestTripSchedule.schedule(
+    "10:00 10:30"
+  ).build();
 
   // In this test, each stop is used to identify the pareto vector - it is just one
   // ParetoSet "subject" with multiple "stops" in it. The stop has no effect on
@@ -45,7 +45,8 @@ public class StopArrivalStateParetoSetTest {
   // Make sure all "base" arrivals have the same cost
   private static final int BASE_C1 = 1;
 
-  private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY = new StopArrivalFactoryC1<>();
+  private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY =
+    new StopArrivalFactoryC1<>();
   private static final McStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = newAccessStopState(
     999,
     5,
@@ -65,13 +66,13 @@ public class StopArrivalStateParetoSetTest {
     20,
     BASE_C1
   );
-  public static final ArrivalParetoSetComparatorFactory<McStopArrival<RaptorTripSchedule>> COMPARATOR_FACTORY = ArrivalParetoSetComparatorFactory.factory(
-    RelaxFunction.NORMAL,
-    null
-  );
+  public static final ArrivalParetoSetComparatorFactory<
+    McStopArrival<RaptorTripSchedule>
+  > COMPARATOR_FACTORY = ArrivalParetoSetComparatorFactory.factory(RelaxFunction.NORMAL, null);
 
   private static Stream<Arguments> testCases() {
-    ParetoComparator<McStopArrival<RaptorTripSchedule>> comparator = COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost();
+    ParetoComparator<McStopArrival<RaptorTripSchedule>> comparator =
+      COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost();
     return Stream.of(
       Arguments.of("Stop Arrival - regular", StopArrivalParetoSet.of(comparator).build()),
       Arguments.of(
@@ -161,7 +162,8 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesNotAffectDominance() {
-    ParetoComparator<McStopArrival<RaptorTripSchedule>> comparator = COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost();
+    ParetoComparator<McStopArrival<RaptorTripSchedule>> comparator =
+      COMPARATOR_FACTORY.compareArrivalTimeRoundAndCost();
     var subject = StopArrivalParetoSet.of(comparator).build();
     subject.add(newAccessStopState(STOP_1, 20, ANY));
     subject.add(newTransitStopState(ROUND_1, STOP_2, 10, ANY));
@@ -177,8 +179,9 @@ public class StopArrivalStateParetoSetTest {
    */
   @Test
   public void testTransitAndTransferDoesAffectDominanceForStopArrivalsWithEgress() {
-    var subject = StopArrivalParetoSet
-      .of(COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival())
+    var subject = StopArrivalParetoSet.of(
+      COMPARATOR_FACTORY.compareArrivalTimeRoundCostAndOnBoardArrival()
+    )
       .withEgressListener(List.of(), null)
       .build();
     subject.add(newAccessStopState(STOP_1, 20, ANY));

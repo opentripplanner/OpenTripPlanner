@@ -24,8 +24,7 @@ public interface OtpArchitectureModules {
   Package DATASTORE = OTP_ROOT.subPackage("datastore");
   Package FRAMEWORK = OTP_ROOT.subPackage("framework");
   Module GEO_UTILS = Module.of(JTS_GEOM, FRAMEWORK.subPackage("geometry"));
-  Package RAPTOR_ADAPTER = OTP_ROOT
-    .subPackage("routing")
+  Package RAPTOR_ADAPTER = OTP_ROOT.subPackage("routing")
     .subPackage("algorithm")
     .subPackage("raptoradapter");
   Package RAPTOR_ADAPTER_API = RAPTOR_ADAPTER.subPackage("api");

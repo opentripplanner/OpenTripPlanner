@@ -52,10 +52,8 @@ public class GeneralizedCostParametersMapper {
       for (var pattern : patternIndex) {
         if (
           pattern != null &&
-          (
-            unpreferredRoutes.contains(pattern.route().getId()) ||
-            unpreferredAgencies.contains(pattern.route().getAgency().getId())
-          )
+          (unpreferredRoutes.contains(pattern.route().getId()) ||
+            unpreferredAgencies.contains(pattern.route().getAgency().getId()))
         ) {
           unpreferredPatterns.set(pattern.patternIndex());
         }

@@ -227,7 +227,7 @@ public class ProgressTracker {
     long ii = stepCounter.get();
     Duration totalTime = Duration.between(startTime, Instant.now());
     // Add 1 millisecond to prevent / by zero.
-    String stepsPerSecond = toStr(Math.round(1000d * ii / (totalTime.toMillis() + 1)));
+    String stepsPerSecond = toStr(Math.round((1000d * ii) / (totalTime.toMillis() + 1)));
     return String.format(
       "%s progress tracking complete. %s done in %s (%s per second). ",
       actionName,

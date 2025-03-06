@@ -30,8 +30,7 @@ public class StopArrivalFactoryC2Test {
   private static final int RIDE_C2 = 5;
   private static final TestAccessEgress ACCESS = TestAccessEgress.walk(STOP_A, ACCESS_DURATION);
 
-  private static final TestTripSchedule TRIP = TestTripSchedule
-    .schedule("10:03 10:10")
+  private static final TestTripSchedule TRIP = TestTripSchedule.schedule("10:03 10:10")
     .pattern(TestTripPattern.pattern("Line A", STOP_A, STOP_B))
     .build();
 

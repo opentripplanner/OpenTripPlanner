@@ -70,8 +70,7 @@ class ResultPrinter {
     int nTestCasesSuccess = testCases.numberOfTestCasesWithSuccess();
 
     String totalTimeSec = msToSecondsStr(testCases.stream().mapToInt(TestCase::totalTimeMs).sum());
-    var summary = Table
-      .of()
+    var summary = Table.of()
       .withHeaders(testCases.stream().map(TestCase::id).toList())
       .addRow(testCases.stream().map(TestCase::numberOfResults).toList())
       .addRow(testCases.stream().map(TestCase::transitTimeMs).toList())

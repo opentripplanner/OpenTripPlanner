@@ -108,8 +108,7 @@ public class DebugRaptor implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DebugRaptor.class)
+    return ToStringBuilder.of(DebugRaptor.class)
       .addObj("stops", toString(stops, FIRST_STOP_INDEX))
       .addObj("path", toString(path, debugPathFromStopIndex))
       .addCol("eventType", eventTypes)

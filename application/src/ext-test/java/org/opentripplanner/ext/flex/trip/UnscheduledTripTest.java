@@ -48,20 +48,16 @@ class UnscheduledTripTest {
 
     private static final StopTime SCHEDULED_STOP = FlexStopTimesForTest.regularStop("10:00");
     private static final StopTime UNSCHEDULED_STOP = FlexStopTimesForTest.area("10:10", "10:20");
-    private static final StopTime CONTINUOUS_PICKUP_STOP = FlexStopTimesForTest.regularStopWithContinuousPickup(
-      "10:30"
-    );
-    private static final StopTime CONTINUOUS_DROP_OFF_STOP = FlexStopTimesForTest.regularStopWithContinuousDropOff(
-      "10:40"
-    );
+    private static final StopTime CONTINUOUS_PICKUP_STOP =
+      FlexStopTimesForTest.regularStopWithContinuousPickup("10:30");
+    private static final StopTime CONTINUOUS_DROP_OFF_STOP =
+      FlexStopTimesForTest.regularStopWithContinuousDropOff("10:40");
 
     // disallowed by the GTFS spec
-    private static final StopTime FLEX_AND_CONTINUOUS_PICKUP_STOP = FlexStopTimesForTest.areaWithContinuousPickup(
-      "10:50"
-    );
-    private static final StopTime FLEX_AND_CONTINUOUS_DROP_OFF_STOP = FlexStopTimesForTest.areaWithContinuousDropOff(
-      "11:00"
-    );
+    private static final StopTime FLEX_AND_CONTINUOUS_PICKUP_STOP =
+      FlexStopTimesForTest.areaWithContinuousPickup("10:50");
+    private static final StopTime FLEX_AND_CONTINUOUS_DROP_OFF_STOP =
+      FlexStopTimesForTest.areaWithContinuousDropOff("11:00");
 
     static List<List<StopTime>> notUnscheduled() {
       return List.of(
@@ -116,8 +112,7 @@ class UnscheduledTripTest {
     toStopTime.setFlexWindowStart(T11_00);
     toStopTime.setFlexWindowEnd(T15_00);
 
-    var trip = UnscheduledTrip
-      .of(id("UNSCHEDULED"))
+    var trip = UnscheduledTrip.of(id("UNSCHEDULED"))
       .withStopTimes(List.of(fromStopTime, toStopTime))
       .build();
 
@@ -141,8 +136,7 @@ class UnscheduledTripTest {
     toStopTime.setFlexWindowStart(T10_00);
     toStopTime.setFlexWindowEnd(T14_00);
 
-    var trip = UnscheduledTrip
-      .of(id("UNSCHEDULED"))
+    var trip = UnscheduledTrip.of(id("UNSCHEDULED"))
       .withStopTimes(List.of(fromStopTime, toStopTime))
       .build();
 
@@ -166,8 +160,7 @@ class UnscheduledTripTest {
     toStopTime.setStop(REGULAR_STOP);
     toStopTime.setArrivalTime(T14_00);
 
-    var trip = UnscheduledTrip
-      .of(id("UNSCHEDULED"))
+    var trip = UnscheduledTrip.of(id("UNSCHEDULED"))
       .withStopTimes(List.of(fromStopTime, toStopTime))
       .build();
 
@@ -537,8 +530,7 @@ class UnscheduledTripTest {
     second.setPickupType(NONE);
     var third = area(AREA_STOP3, "10:20", "10:25");
 
-    var trip = TestCase
-      .tc(first, third)
+    var trip = TestCase.tc(first, third)
       .withStopTimes(List.of(first, second, third))
       .build()
       .trip();
@@ -601,8 +593,7 @@ class UnscheduledTripTest {
 
     @Override
     public String toString() {
-      return ToStringBuilder
-        .of(TestCase.class)
+      return ToStringBuilder.of(TestCase.class)
         .addObj(
           "expected",
           expectedDescription +

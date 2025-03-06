@@ -114,8 +114,7 @@ class ServiceLinkMapperTest {
     );
     stopPatternBuilder = StopPattern.create(3);
 
-    Station parentStation = Station
-      .of(ID_FACTORY.createId("NSR:StopArea:1"))
+    Station parentStation = Station.of(ID_FACTORY.createId("NSR:StopArea:1"))
       .withName(NonLocalizedString.ofNullable("Parent Station"))
       .withCoordinate(59.908, 10.745)
       .build();
@@ -132,15 +131,14 @@ class ServiceLinkMapperTest {
       stopsById.add(stop);
     }
 
-    serviceLinkMapper =
-      new ServiceLinkMapper(
-        ID_FACTORY,
-        serviceLinksById,
-        quayIdByStopPointRef,
-        stopsById,
-        issueStore,
-        150
-      );
+    serviceLinkMapper = new ServiceLinkMapper(
+      ID_FACTORY,
+      serviceLinksById,
+      quayIdByStopPointRef,
+      stopsById,
+      issueStore,
+      150
+    );
   }
 
   @Test
@@ -270,9 +268,8 @@ class ServiceLinkMapperTest {
       .withValue(coordinates);
     LinkSequenceProjection linkSequenceProjection = new LinkSequenceProjection()
       .withLineString(new LineStringType().withPosList(directPositionListType));
-    JAXBElement<LinkSequenceProjection_VersionStructure> linkSequenceProjection_versionStructure = MappingSupport.createJaxbElement(
-      linkSequenceProjection
-    );
+    JAXBElement<LinkSequenceProjection_VersionStructure> linkSequenceProjection_versionStructure =
+      MappingSupport.createJaxbElement(linkSequenceProjection);
     Projections_RelStructure projections_relStructure = new Projections_RelStructure()
       .withProjectionRefOrProjection(linkSequenceProjection_versionStructure);
 

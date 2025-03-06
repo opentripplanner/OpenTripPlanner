@@ -6,7 +6,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -28,10 +28,10 @@ public class GermanyMapperTest {
 
     @Test
     void testBikeSafety() {
-      OsmWithTags way;
+      OsmEntity way;
 
       // way 361961158
-      way = new OsmWithTags();
+      way = new OsmEntity();
       way.addTag("bicycle", "yes");
       way.addTag("foot", "designated");
       way.addTag("footway", "sidewalk");
@@ -44,7 +44,7 @@ public class GermanyMapperTest {
 
     @Test
     void cyclewayOpposite() {
-      var way = new OsmWithTags();
+      var way = new OsmEntity();
       way.addTag("cycleway", "opposite");
       way.addTag("highway", "residential");
       way.addTag("lit", "yes");
@@ -67,7 +67,7 @@ public class GermanyMapperTest {
     @Test
     void bikePath() {
       // way332589799 (Radschnellweg BW1)
-      var way = new OsmWithTags();
+      var way = new OsmEntity();
       way.addTag("bicycle", "designated");
       way.addTag("class:bicycle", "2");
       way.addTag("class:bicycle:roadcycling", "1");
@@ -87,7 +87,7 @@ public class GermanyMapperTest {
 
     @Test
     void track() {
-      var way = new OsmWithTags();
+      var way = new OsmEntity();
       way.addTag("highway", "track");
       way.addTag("motor_vehicle", "agricultural");
       way.addTag("surface", "asphalt");
@@ -101,7 +101,7 @@ public class GermanyMapperTest {
   @Test
   void testPermissions() {
     // https://www.openstreetmap.org/way/124263424
-    var way = new OsmWithTags();
+    var way = new OsmEntity();
     way.addTag("highway", "track");
     way.addTag("tracktype", "grade1");
     assertEquals(
@@ -110,7 +110,7 @@ public class GermanyMapperTest {
     );
 
     // https://www.openstreetmap.org/way/5155805
-    way = new OsmWithTags();
+    way = new OsmEntity();
     way.addTag("access:lanes:forward", "yes|no");
     way.addTag("bicycle:lanes:forward", "|designated");
     way.addTag("change:lanes:forward", "not_right|no");
@@ -144,16 +144,16 @@ public class GermanyMapperTest {
       // https://www.openstreetmap.org/way/26443041 is part of both an lcn and rcn but that shouldn't mean that
       // it is to be more heavily favoured than other ways that are part of just one.
 
-      var both = new OsmWithTags();
+      var both = new OsmEntity();
       both.addTag("highway", "residential");
       both.addTag("rcn", "yes");
       both.addTag("lcn", "yes");
 
-      var justLcn = new OsmWithTags();
+      var justLcn = new OsmEntity();
       justLcn.addTag("lcn", "yes");
       justLcn.addTag("highway", "residential");
 
-      var residential = new OsmWithTags();
+      var residential = new OsmEntity();
       residential.addTag("highway", "residential");
 
       assertEquals(
@@ -172,25 +172,25 @@ public class GermanyMapperTest {
       // https://www.openstreetmap.org/way/22201321 was tagged as bicycle_road without lcn
       // make it so all ways tagged as some kind of cyclestreets are considered as equally safe
 
-      var both = new OsmWithTags();
+      var both = new OsmEntity();
       both.addTag("highway", "residential");
       both.addTag("bicycle_road", "yes");
       both.addTag("cyclestreet", "yes");
       both.addTag("lcn", "yes");
 
-      var justBicycleRoad = new OsmWithTags();
+      var justBicycleRoad = new OsmEntity();
       justBicycleRoad.addTag("bicycle_road", "yes");
       justBicycleRoad.addTag("highway", "residential");
 
-      var justCyclestreet = new OsmWithTags();
+      var justCyclestreet = new OsmEntity();
       justCyclestreet.addTag("cyclestreet", "yes");
       justCyclestreet.addTag("highway", "residential");
 
-      var justLcn = new OsmWithTags();
+      var justLcn = new OsmEntity();
       justLcn.addTag("lcn", "yes");
       justLcn.addTag("highway", "residential");
 
-      var residential = new OsmWithTags();
+      var residential = new OsmEntity();
       residential.addTag("highway", "residential");
 
       assertEquals(
@@ -226,13 +226,13 @@ public class GermanyMapperTest {
   @Test
   void setCorrectPermissionsForRoundabouts() {
     // https://www.openstreetmap.org/way/184185551
-    var residential = new OsmWithTags();
+    var residential = new OsmEntity();
     residential.addTag("highway", "residential");
     residential.addTag("junction", "roundabout");
     assertEquals(wps.getDataForWay(residential).getPermission(), StreetTraversalPermission.ALL);
 
     //https://www.openstreetmap.org/way/31109939
-    var primary = new OsmWithTags();
+    var primary = new OsmEntity();
     primary.addTag("highway", "primary");
     primary.addTag("junction", "roundabout");
     assertEquals(
@@ -244,7 +244,7 @@ public class GermanyMapperTest {
   @Test
   void setCorrectBikeSafetyValuesForBothDirections() {
     // https://www.openstreetmap.org/way/13420871
-    var residential = new OsmWithTags();
+    var residential = new OsmEntity();
     residential.addTag("highway", "residential");
     residential.addTag("lit", "yes");
     residential.addTag("maxspeed", "30");
@@ -260,7 +260,7 @@ public class GermanyMapperTest {
   @Test
   void setCorrectPermissionsForSteps() {
     // https://www.openstreetmap.org/way/64359102
-    var steps = new OsmWithTags();
+    var steps = new OsmEntity();
     steps.addTag("highway", "steps");
     assertEquals(wps.getDataForWay(steps).getPermission(), StreetTraversalPermission.PEDESTRIAN);
   }
@@ -268,7 +268,7 @@ public class GermanyMapperTest {
   @Test
   void testGermanAutobahnSpeed() {
     // https://www.openstreetmap.org/way/10879847
-    var alzentalstr = new OsmWithTags();
+    var alzentalstr = new OsmEntity();
     alzentalstr.addTag("highway", "residential");
     alzentalstr.addTag("lit", "yes");
     alzentalstr.addTag("maxspeed", "30");
@@ -276,7 +276,7 @@ public class GermanyMapperTest {
     alzentalstr.addTag("surface", "asphalt");
     assertEquals(8.33333969116211, wps.getCarSpeedForWay(alzentalstr, false), epsilon);
 
-    var autobahn = new OsmWithTags();
+    var autobahn = new OsmEntity();
     autobahn.addTag("highway", "motorway");
     autobahn.addTag("maxspeed", "none");
     assertEquals(33.33000183105469, wps.getCarSpeedForWay(autobahn, false), epsilon);
@@ -287,9 +287,9 @@ public class GermanyMapperTest {
    */
   @Test
   public void testArea() {
-    OsmWithTags way;
+    OsmEntity way;
 
-    way = new OsmWithTags();
+    way = new OsmEntity();
     way.addTag("public_transport", "platform");
     way.addTag("area", "yes");
     assertEquals(wps.getDataForWay(way).getPermission(), PEDESTRIAN);

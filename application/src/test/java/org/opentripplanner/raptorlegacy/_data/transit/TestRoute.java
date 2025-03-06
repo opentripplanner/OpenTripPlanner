@@ -22,12 +22,10 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
   private final TestTripPattern pattern;
   private final List<TestTripSchedule> schedules = new ArrayList<>();
-  private final TestConstrainedBoardingSearch transferConstraintsForwardSearch = new TestConstrainedBoardingSearch(
-    true
-  );
-  private final TestConstrainedBoardingSearch transferConstraintsReverseSearch = new TestConstrainedBoardingSearch(
-    false
-  );
+  private final TestConstrainedBoardingSearch transferConstraintsForwardSearch =
+    new TestConstrainedBoardingSearch(true);
+  private final TestConstrainedBoardingSearch transferConstraintsReverseSearch =
+    new TestConstrainedBoardingSearch(false);
 
   private TestRoute(TestTripPattern pattern) {
     this.pattern = pattern;
@@ -97,8 +95,7 @@ public class TestRoute implements RaptorRoute<TestTripSchedule>, RaptorTimeTable
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestRoute.class)
+    return ToStringBuilder.of(TestRoute.class)
       .addObj("pattern", pattern)
       .addObj("schedules", schedules)
       .toString();

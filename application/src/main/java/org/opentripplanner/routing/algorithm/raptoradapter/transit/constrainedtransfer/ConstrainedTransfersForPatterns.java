@@ -47,8 +47,7 @@ public class ConstrainedTransfersForPatterns {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ConstrainedTransfersForPatterns.class)
+    return ToStringBuilder.of(ConstrainedTransfersForPatterns.class)
       .addCol("to", transfersToStop)
       .addCol("from", transfersFromStop)
       .toString();

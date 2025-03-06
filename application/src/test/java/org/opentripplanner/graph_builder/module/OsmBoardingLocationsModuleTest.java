@@ -49,12 +49,19 @@ class OsmBoardingLocationsModuleTest {
     return Stream.of(
       Arguments.of(
         false,
-        Stream
-          .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
+        Stream.of(
+          302563833L,
+          3223067049L,
+          302563836L,
+          3223067680L,
+          302563834L,
+          768590748L,
+          302563839L
+        )
           .map(VertexLabel::osm)
           .collect(Collectors.toSet())
       ),
-      Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
+      Arguments.of(true, Set.of(VertexLabel.osm(768590748)))
     );
   }
 
@@ -67,9 +74,9 @@ class OsmBoardingLocationsModuleTest {
   )
   @MethodSource("herrenbergTestCases")
   void addAndLinkBoardingLocations(boolean areaVisibility, Set<String> linkedVertices) {
-    File file = ResourceLoader
-      .of(OsmBoardingLocationsModuleTest.class)
-      .file("herrenberg-minimal.osm.pbf");
+    File file = ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file(
+      "herrenberg-minimal.osm.pbf"
+    );
     RegularStop platform = testModel
       .stop("de:08115:4512:4:101")
       .withCoordinate(48.59328, 8.86128)
@@ -94,8 +101,7 @@ class OsmBoardingLocationsModuleTest {
     );
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-    var osmModule = OsmModule
-      .of(provider, graph, osmInfoRepository, vehicleParkingRepository)
+    var osmModule = OsmModule.of(provider, graph, osmInfoRepository, vehicleParkingRepository)
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)
       .build();
@@ -198,16 +204,15 @@ class OsmBoardingLocationsModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule
-      .of(
-        new DefaultOsmProvider(
-          ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
-          false
-        ),
-        graph,
-        osmInfoRepository,
-        new DefaultVehicleParkingRepository()
-      )
+    var osmModule = OsmModule.of(
+      new DefaultOsmProvider(
+        ResourceLoader.of(OsmBoardingLocationsModuleTest.class).file("moorgate.osm.pbf"),
+        false
+      ),
+      graph,
+      osmInfoRepository,
+      new DefaultVehicleParkingRepository()
+    )
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
       .build();
     osmModule.buildGraph();
@@ -298,8 +303,7 @@ class OsmBoardingLocationsModuleTest {
       graph,
       new DefaultOsmInfoGraphBuildService(osmInfoRepository),
       timetableRepository
-    )
-      .buildGraph();
+    ).buildGraph();
 
     var boardingLocations = graph.getVerticesOfType(OsmBoardingLocationVertex.class);
 
@@ -353,10 +357,12 @@ class OsmBoardingLocationsModuleTest {
     assertConnections(splitVertex, begin, end);
 
     if (splitVertex != begin && splitVertex != end) {
-      var forwardEdges = getEdge(begin, splitVertex)
-        .flatMap(first -> getEdge(splitVertex, end).map(second -> List.of(first, second)));
-      var backwardEdges = getEdge(end, splitVertex)
-        .flatMap(first -> getEdge(splitVertex, begin).map(second -> List.of(first, second)));
+      var forwardEdges = getEdge(begin, splitVertex).flatMap(first ->
+        getEdge(splitVertex, end).map(second -> List.of(first, second))
+      );
+      var backwardEdges = getEdge(end, splitVertex).flatMap(first ->
+        getEdge(splitVertex, begin).map(second -> List.of(first, second))
+      );
       for (var edgeList : List.of(forwardEdges, backwardEdges)) {
         edgeList.ifPresent(edges ->
           assertEquals(
@@ -388,11 +394,9 @@ class OsmBoardingLocationsModuleTest {
     OsmBoardingLocationVertex busBoardingLocation,
     Set<Class<? extends Edge>> expected
   ) {
-    Stream
-      .of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing())
-      .forEach(edges ->
-        assertEquals(expected, edges.stream().map(Edge::getClass).collect(Collectors.toSet()))
-      );
+    Stream.of(busBoardingLocation.getIncoming(), busBoardingLocation.getOutgoing()).forEach(edges ->
+      assertEquals(expected, edges.stream().map(Edge::getClass).collect(Collectors.toSet()))
+    );
   }
 
   private static Optional<StreetEdge> getEdge(Vertex from, Vertex to) {

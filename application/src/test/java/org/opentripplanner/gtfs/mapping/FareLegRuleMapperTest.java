@@ -56,24 +56,21 @@ class FareLegRuleMapperTest {
     return testCases
       .stream()
       .map(tc ->
-        dynamicTest(
-          tc.toString(),
-          () -> {
-            var obaRule = new FareLegRule();
-            obaRule.setFareProductId(fp.getFareProductId());
-            obaRule.setDistanceType(tc.distanceType);
-            obaRule.setMinDistance(tc.minDistance);
-            obaRule.setMaxDistance(tc.maxDistance);
+        dynamicTest(tc.toString(), () -> {
+          var obaRule = new FareLegRule();
+          obaRule.setFareProductId(fp.getFareProductId());
+          obaRule.setDistanceType(tc.distanceType);
+          obaRule.setMinDistance(tc.minDistance);
+          obaRule.setMaxDistance(tc.maxDistance);
 
-            var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
-            assertEquals(1, mappedRules.size());
+          var mappedRules = List.copyOf(ruleMapper.map(List.of(obaRule)));
+          assertEquals(1, mappedRules.size());
 
-            var otpRule = mappedRules.get(0);
-            assertEquals(otpRule.fareDistance(), tc.expectedDistance);
-            assert (otpRule.fareProducts().size() == 1);
-            assert (otpRule.fareProducts().contains(internalProduct));
-          }
-        )
+          var otpRule = mappedRules.get(0);
+          assertEquals(otpRule.fareDistance(), tc.expectedDistance);
+          assert (otpRule.fareProducts().size() == 1);
+          assert (otpRule.fareProducts().contains(internalProduct));
+        })
       );
   }
 

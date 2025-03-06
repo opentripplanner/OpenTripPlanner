@@ -24,28 +24,48 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
    */
   private final State lastState;
 
-  public DefaultAccessEgress(int stop, State lastState) {
+  /**
+   * This is public to allow unit-tests full control over the field values.
+   */
+  public DefaultAccessEgress(
+    int stop,
+    int durationInSeconds,
+    int generalizedCost,
+    TimeAndCost penalty,
+    State lastState
+  ) {
     this.stop = stop;
-    this.durationInSeconds = (int) lastState.getElapsedTimeSeconds();
-    this.generalizedCost = RaptorCostConverter.toRaptorCost(lastState.getWeight());
-    this.lastState = lastState;
-    this.timePenalty = RaptorConstants.TIME_NOT_SET;
-    this.penalty = TimeAndCost.ZERO;
+    this.durationInSeconds = durationInSeconds;
+    this.generalizedCost = generalizedCost;
+    this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
+    this.penalty = penalty;
+    this.lastState = Objects.requireNonNull(lastState);
+  }
+
+  public DefaultAccessEgress(int stop, State lastState) {
+    this(
+      stop,
+      (int) lastState.getElapsedTimeSeconds(),
+      RaptorCostConverter.toRaptorCost(lastState.getWeight()),
+      TimeAndCost.ZERO,
+      lastState
+    );
   }
 
   protected DefaultAccessEgress(RoutingAccessEgress other, TimeAndCost penalty) {
-    if (other.hasPenalty()) {
-      throw new IllegalStateException("Can not add penalty twice...");
-    }
-    this.stop = other.stop();
-    this.durationInSeconds = other.durationInSeconds();
     // In the API we have a cost associated with the time-penalty. In Raptor, there is no
     // association between the time-penalty and the cost. So, we add the time-penalty cost to
     // the generalized cost here. In logic later on, we will remove it.
-    this.generalizedCost = other.c1() + penalty.cost().toCentiSeconds();
-    this.timePenalty = penalty.isZero() ? RaptorConstants.TIME_NOT_SET : penalty.timeInSeconds();
-    this.penalty = penalty;
-    this.lastState = other.getLastState();
+    this(
+      other.stop(),
+      other.durationInSeconds(),
+      other.c1() + penalty.cost().toCentiSeconds(),
+      penalty,
+      other.getLastState()
+    );
+    if (other.penalty() != TimeAndCost.ZERO) {
+      throw new IllegalStateException("Can not add penalty twice...");
+    }
   }
 
   @Override
@@ -81,11 +101,6 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   @Override
   public boolean isWalkOnly() {
     return lastState.containsOnlyWalkMode();
-  }
-
-  @Override
-  public boolean hasPenalty() {
-    return !penalty.isZero();
   }
 
   @Override

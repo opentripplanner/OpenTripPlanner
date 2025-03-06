@@ -131,8 +131,7 @@ class VehicleParkingEdgeTest {
     boolean carPlaces,
     VehicleParkingSpaces availability
   ) {
-    return StreetModelForTest
-      .vehicleParking()
+    return StreetModelForTest.vehicleParking()
       .id(TimetableRepositoryForTest.id("VehicleParking"))
       .bicyclePlaces(bicyclePlaces)
       .carPlaces(carPlaces)

@@ -37,64 +37,53 @@ class LuceneIndexTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
-  static final Agency BVG = Agency
-    .of(id("bvg"))
+  static final Agency BVG = Agency.of(id("bvg"))
     .withName("BVG")
     .withTimezone("Europe/Berlin")
     .build();
 
   // Berlin
-  static final Station BERLIN_HAUPTBAHNHOF_STATION = TEST_MODEL
-    .station("Hauptbahnhof")
+  static final Station BERLIN_HAUPTBAHNHOF_STATION = TEST_MODEL.station("Hauptbahnhof")
     .withCoordinate(52.52495, 13.36952)
     .build();
-  static final Station ALEXANDERPLATZ_STATION = TEST_MODEL
-    .station("Alexanderplatz")
+  static final Station ALEXANDERPLATZ_STATION = TEST_MODEL.station("Alexanderplatz")
     .withCoordinate(52.52277, 13.41046)
     .build();
 
-  static final RegularStop ALEXANDERPLATZ_BUS = TEST_MODEL
-    .stop("Alexanderplatz Bus")
+  static final RegularStop ALEXANDERPLATZ_BUS = TEST_MODEL.stop("Alexanderplatz Bus")
     .withCoordinate(52.52277, 13.41046)
     .withVehicleType(BUS)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
 
-  static final RegularStop ALEXANDERPLATZ_RAIL = TEST_MODEL
-    .stop("Alexanderplatz S-Bahn")
+  static final RegularStop ALEXANDERPLATZ_RAIL = TEST_MODEL.stop("Alexanderplatz S-Bahn")
     .withCoordinate(52.52157, 13.41123)
     .withVehicleType(TransitMode.RAIL)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
-  static final RegularStop LICHTERFELDE_OST_1 = TEST_MODEL
-    .stop("Lichterfelde Ost")
+  static final RegularStop LICHTERFELDE_OST_1 = TEST_MODEL.stop("Lichterfelde Ost")
     .withId(id("lichterfelde-gleis-1"))
     .withCoordinate(52.42986, 13.32808)
     .build();
-  static final RegularStop LICHTERFELDE_OST_2 = TEST_MODEL
-    .stop("Lichterfelde Ost")
+  static final RegularStop LICHTERFELDE_OST_2 = TEST_MODEL.stop("Lichterfelde Ost")
     .withId(id("lichterfelde-gleis-2"))
     .withCoordinate(52.42985, 13.32807)
     .build();
-  static final RegularStop WESTHAFEN = TEST_MODEL
-    .stop("Westhafen")
+  static final RegularStop WESTHAFEN = TEST_MODEL.stop("Westhafen")
     .withVehicleType(null)
     .withCoordinate(52.42985, 13.32807)
     .build();
 
   // Atlanta
-  static final Station FIVE_POINTS_STATION = TEST_MODEL
-    .station("Five Points")
+  static final Station FIVE_POINTS_STATION = TEST_MODEL.station("Five Points")
     .withCoordinate(33.753899, -84.39156)
     .build();
 
-  static final RegularStop ARTS_CENTER = TEST_MODEL
-    .stop("Arts Center")
+  static final RegularStop ARTS_CENTER = TEST_MODEL.stop("Arts Center")
     .withCode("4456")
     .withCoordinate(52.52277, 13.41046)
     .build();
-  static final RegularStop ARTHUR = TEST_MODEL
-    .stop("Arthur Langford Jr Pl SW at 220")
+  static final RegularStop ARTHUR = TEST_MODEL.stop("Arthur Langford Jr Pl SW at 220")
     .withCoordinate(52.52277, 13.41046)
     .build();
 
@@ -109,28 +98,28 @@ class LuceneIndexTest {
   @BeforeAll
   static void setup() {
     var siteRepository = TEST_MODEL.siteRepositoryBuilder();
-    List
-      .of(
-        ALEXANDERPLATZ_BUS,
-        ALEXANDERPLATZ_RAIL,
-        LICHTERFELDE_OST_1,
-        LICHTERFELDE_OST_2,
-        WESTHAFEN,
-        ARTS_CENTER,
-        ARTHUR,
-        MERIDIAN_N1,
-        MERIDIAN_N2,
-        MERIDIAN_AVE
-      )
-      .forEach(siteRepository::withRegularStop);
-    List
-      .of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
-      .forEach(siteRepository::withStation);
+    List.of(
+      ALEXANDERPLATZ_BUS,
+      ALEXANDERPLATZ_RAIL,
+      LICHTERFELDE_OST_1,
+      LICHTERFELDE_OST_2,
+      WESTHAFEN,
+      ARTS_CENTER,
+      ARTHUR,
+      MERIDIAN_N1,
+      MERIDIAN_N2,
+      MERIDIAN_AVE
+    ).forEach(siteRepository::withRegularStop);
+    List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION).forEach(
+      siteRepository::withStation
+    );
     var timetableRepository = new TimetableRepository(siteRepository.build(), new Deduplicator());
     timetableRepository.index();
     var transitService = new DefaultTransitService(timetableRepository) {
-      private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap
-        .<StopLocation, TransitMode>builder()
+      private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap.<
+          StopLocation,
+          TransitMode
+        >builder()
         .putAll(WESTHAFEN, FERRY, BUS)
         .build();
 

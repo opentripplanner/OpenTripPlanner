@@ -257,13 +257,12 @@ class AccessPathsTest implements RaptorTestConstants {
     );
     assertTrue(accessPaths.hasTimeDependentAccess(), "Time dependent access is better.");
 
-    accessPaths =
-      AccessPaths.create(
-        60,
-        List.of(WALK_FAST, walk(STOP_A, 50).openingHours(1200, 2400)),
-        STANDARD,
-        REVERSE
-      );
+    accessPaths = AccessPaths.create(
+      60,
+      List.of(WALK_FAST, walk(STOP_A, 50).openingHours(1200, 2400)),
+      STANDARD,
+      REVERSE
+    );
     assertFalse(accessPaths.hasTimeDependentAccess(), "Time dependent access is worse.");
   }
 

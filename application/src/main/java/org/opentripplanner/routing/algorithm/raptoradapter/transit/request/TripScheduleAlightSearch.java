@@ -122,8 +122,7 @@ public final class TripScheduleAlightSearch<T extends RaptorTripSchedule>
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripScheduleAlightSearch.class)
+    return ToStringBuilder.of(TripScheduleAlightSearch.class)
       .addObj("nTrips", nTrips)
       .addObj("latestAlightTime", latestAlightTime)
       .addObj("stopPos", stopPositionInPattern)

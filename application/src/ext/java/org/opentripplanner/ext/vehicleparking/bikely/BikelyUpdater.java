@@ -38,8 +38,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   private static final String JSON_PARSE_PATH = "result";
   private static final Currency NOK = Currency.getInstance("NOK");
   private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
-  private static final ObjectNode POST_PARAMS = OBJECT_MAPPER
-    .createObjectNode()
+  private static final ObjectNode POST_PARAMS = OBJECT_MAPPER.createObjectNode()
     .put("groupPins", true)
     .put("lonMin", 0)
     .put("lonMax", 0)
@@ -55,28 +54,26 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
 
   @Override
   public boolean update() {
-    this.lots =
-      httpClient.postJsonAndMap(
-        parameters.url(),
-        POST_PARAMS,
-        Duration.ofSeconds(30),
-        parameters.httpHeaders().asMap(),
-        is -> {
-          try {
-            var lots = new ArrayList<VehicleParking>();
-            OBJECT_MAPPER
-              .readTree(is)
-              .path(JSON_PARSE_PATH)
-              .forEach(node -> lots.add(parseElement(node)));
+    this.lots = httpClient.postJsonAndMap(
+      parameters.url(),
+      POST_PARAMS,
+      Duration.ofSeconds(30),
+      parameters.httpHeaders().asMap(),
+      is -> {
+        try {
+          var lots = new ArrayList<VehicleParking>();
+          OBJECT_MAPPER.readTree(is)
+            .path(JSON_PARSE_PATH)
+            .forEach(node -> lots.add(parseElement(node)));
 
-            return lots.stream().filter(Objects::nonNull).toList();
-          } catch (Exception e) {
-            LOG.error("Could not get Bikely updates", e);
-          }
-
-          return List.of();
+          return lots.stream().filter(Objects::nonNull).toList();
+        } catch (Exception e) {
+          LOG.error("Could not get Bikely updates", e);
         }
-      );
+
+        return List.of();
+      }
+    );
 
     return true;
   }
@@ -111,8 +108,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
           .walkAccessible(true)
           .carAccessible(false);
 
-      return VehicleParking
-        .builder()
+      return VehicleParking.builder()
         .id(vehicleParkId)
         .name(name)
         .bicyclePlaces(true)
@@ -149,6 +145,7 @@ public class BikelyUpdater implements DataSource<VehicleParking> {
   }
 
   private static VehicleParkingState toState(boolean isUnderMaintenance) {
-    if (isUnderMaintenance) return VehicleParkingState.TEMPORARILY_CLOSED; else return OPERATIONAL;
+    if (isUnderMaintenance) return VehicleParkingState.TEMPORARILY_CLOSED;
+    else return OPERATIONAL;
   }
 }

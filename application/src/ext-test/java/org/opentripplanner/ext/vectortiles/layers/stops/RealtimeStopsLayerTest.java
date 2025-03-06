@@ -39,24 +39,20 @@ public class RealtimeStopsLayerTest {
   public void setUp() {
     var name = I18NString.of("name");
     var desc = I18NString.of("desc");
-    stop =
-      SiteRepository
-        .of()
-        .regularStop(new FeedScopedId("F", "name"))
-        .withName(name)
-        .withDescription(desc)
-        .withCoordinate(50, 10)
-        .withTimeZone(ZoneIds.HELSINKI)
-        .build();
-    stop2 =
-      SiteRepository
-        .of()
-        .regularStop(new FeedScopedId("F", "name"))
-        .withName(name)
-        .withDescription(desc)
-        .withCoordinate(51, 10)
-        .withTimeZone(ZoneIds.HELSINKI)
-        .build();
+    stop = SiteRepository.of()
+      .regularStop(new FeedScopedId("F", "name"))
+      .withName(name)
+      .withDescription(desc)
+      .withCoordinate(50, 10)
+      .withTimeZone(ZoneIds.HELSINKI)
+      .build();
+    stop2 = SiteRepository.of()
+      .regularStop(new FeedScopedId("F", "name"))
+      .withName(name)
+      .withDescription(desc)
+      .withCoordinate(51, 10)
+      .withTimeZone(ZoneIds.HELSINKI)
+      .build();
   }
 
   @Test
@@ -80,8 +76,7 @@ public class RealtimeStopsLayerTest {
       .build();
     var startDate = ZonedDateTime.now(ZoneIds.HELSINKI).minusDays(1).toEpochSecond();
     var endDate = ZonedDateTime.now(ZoneIds.HELSINKI).plusDays(1).toEpochSecond();
-    var alert = TransitAlert
-      .of(stop.getId())
+    var alert = TransitAlert.of(stop.getId())
       .addEntity(new EntitySelector.Stop(stop.getId()))
       .addTimePeriod(new TimePeriod(startDate, endDate))
       .withEffect(AlertEffect.NO_SERVICE)

@@ -25,8 +25,7 @@ class PathwayNodeTest {
   public static final WgsCoordinate COORDINATE = new WgsCoordinate(0, 0);
   private static final StopLevel LEVEL = new StopLevel("level", 0);
   private static final Accessibility WHEELCHAIR_ACCESSIBILITY = Accessibility.POSSIBLE;
-  private static final PathwayNode subject = PathwayNode
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final PathwayNode subject = PathwayNode.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withCode(CODE)

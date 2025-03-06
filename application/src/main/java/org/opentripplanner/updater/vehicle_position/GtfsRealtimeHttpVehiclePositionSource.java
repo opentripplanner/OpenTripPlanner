@@ -51,8 +51,7 @@ public class GtfsRealtimeHttpVehiclePositionSource {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(GtfsRealtimeHttpVehiclePositionSource.class)
+    return ToStringBuilder.of(GtfsRealtimeHttpVehiclePositionSource.class)
       .addObj("url", url)
       .toString();
   }

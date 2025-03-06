@@ -5,8 +5,7 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 
 public class BannedInputType {
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("InputBanned")
     .description(
       "Filter trips by disallowing lines involving certain elements. If both lines and " +

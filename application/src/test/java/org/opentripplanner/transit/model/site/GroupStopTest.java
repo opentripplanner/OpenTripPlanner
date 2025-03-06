@@ -24,11 +24,12 @@ class GroupStopTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static final StopLocation STOP_LOCATION = TEST_MODEL
-    .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
-    .build();
-  private static final GroupStop subject = SiteRepository
-    .of()
+  private static final StopLocation STOP_LOCATION = TEST_MODEL.stop(
+    "1:stop",
+    Coordinates.BERLIN.getX(),
+    Coordinates.BERLIN.getY()
+  ).build();
+  private static final GroupStop subject = SiteRepository.of()
     .groupStop(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .addLocation(STOP_LOCATION)
@@ -36,15 +37,18 @@ class GroupStopTest {
 
   @Test
   void testGroupStopGeometry() {
-    StopLocation stopLocation1 = TEST_MODEL
-      .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
-      .build();
-    StopLocation stopLocation2 = TEST_MODEL
-      .stop("2:stop", Coordinates.HAMBURG.getX(), Coordinates.HAMBURG.getY())
-      .build();
+    StopLocation stopLocation1 = TEST_MODEL.stop(
+      "1:stop",
+      Coordinates.BERLIN.getX(),
+      Coordinates.BERLIN.getY()
+    ).build();
+    StopLocation stopLocation2 = TEST_MODEL.stop(
+      "2:stop",
+      Coordinates.HAMBURG.getX(),
+      Coordinates.HAMBURG.getY()
+    ).build();
 
-    GroupStop groupStop = SiteRepository
-      .of()
+    GroupStop groupStop = SiteRepository.of()
       .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .addLocation(stopLocation1)
@@ -60,12 +64,13 @@ class GroupStopTest {
 
   @Test
   void testGroupStopEncompassingAreaGeometry() {
-    StopLocation stopLocation = TEST_MODEL
-      .stop("1:stop", Coordinates.BERLIN.getX(), Coordinates.BERLIN.getY())
-      .build();
+    StopLocation stopLocation = TEST_MODEL.stop(
+      "1:stop",
+      Coordinates.BERLIN.getX(),
+      Coordinates.BERLIN.getY()
+    ).build();
 
-    GroupStop groupStop = SiteRepository
-      .of()
+    GroupStop groupStop = SiteRepository.of()
       .groupStop(TimetableRepositoryForTest.id(ID))
       .withName(NAME)
       .addLocation(stopLocation)

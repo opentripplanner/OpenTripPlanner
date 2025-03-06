@@ -100,8 +100,7 @@ public class GroupBySimilarity {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(GroupBySimilarity.class)
+    return ToStringBuilder.of(GroupBySimilarity.class)
       .addNum("groupByP", groupByP)
       .addNum("maxNumOfItinerariesPerGroup", maxNumOfItinerariesPerGroup)
       .addBoolIfTrue("nestedGroupingByAllSameStations", nestedGroupingByAllSameStations)

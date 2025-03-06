@@ -87,12 +87,9 @@ class WheelchairConfigTest {
       "{\"unknownCost\": 200, \"inaccessibleCost\": 100, \"onlyConsiderAccessible\": true}"
     );
 
-    assertThrows(
-      IllegalStateException.class,
-      () -> {
-        var builder = ofOnlyAccessible().copyOfWithDefaultCosts(DEFAULT_COSTS);
-        WheelchairConfig.mapAccessibilityPreferences(nodeAdapter, builder);
-      }
-    );
+    assertThrows(IllegalStateException.class, () -> {
+      var builder = ofOnlyAccessible().copyOfWithDefaultCosts(DEFAULT_COSTS);
+      WheelchairConfig.mapAccessibilityPreferences(nodeAdapter, builder);
+    });
   }
 }

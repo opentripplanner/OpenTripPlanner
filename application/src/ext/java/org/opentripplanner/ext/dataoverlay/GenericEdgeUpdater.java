@@ -159,12 +159,13 @@ class GenericEdgeUpdater {
   ) {
     EdgeGenQuality<Number> edgeGenQuality = new EdgeGenQuality<>();
 
-    getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, propertyName)
-      .forEach(sample -> {
+    getClosestSamples(fromLongitude, fromLatitude, toLongitude, toLatitude, propertyName).forEach(
+      sample -> {
         for (int time = 0; time < sample.size(); time++) {
           edgeGenQuality.addPropertyValueSample(time, (Number) sample.get(time));
         }
-      });
+      }
+    );
 
     return edgeGenQuality.getPropertyValueAverage((int) dataFile.getTimeArray().getSize());
   }

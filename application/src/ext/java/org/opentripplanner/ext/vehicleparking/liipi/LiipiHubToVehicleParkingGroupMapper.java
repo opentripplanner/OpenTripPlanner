@@ -54,8 +54,7 @@ public class LiipiHubToVehicleParkingGroupMapper {
         ? new NonLocalizedString(hubId.getId())
         : TranslatedString.getI18NString(translations, true, false);
       Geometry geometry = GEOMETRY_PARSER.geometryFromJson(jsonNode.path("location"));
-      var vehicleParkingGroup = VehicleParkingGroup
-        .of(hubId)
+      var vehicleParkingGroup = VehicleParkingGroup.of(hubId)
         .withName(name)
         .withCoordinate(new WgsCoordinate(geometry.getCentroid()))
         .build();
