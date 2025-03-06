@@ -39,7 +39,7 @@ public class ExpressionBuilder<T> {
     return this;
   }
 
-  public <V> ExpressionBuilder<T> noMatches(
+  public <V> ExpressionBuilder<T> matchesAll(
     FilterValues<V> filterValues,
     Function<V, Matcher<T>> matcherProvider
   ) {

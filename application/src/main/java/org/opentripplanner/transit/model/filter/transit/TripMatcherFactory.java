@@ -39,8 +39,8 @@ public class TripMatcherFactory {
 
     expr.atLeastOneMatch(request.includedAgencies(), TripMatcherFactory::includeAgencyId);
     expr.atLeastOneMatch(request.includedRoutes(), TripMatcherFactory::includeRouteId);
-    expr.noMatches(request.excludedAgencies(), TripMatcherFactory::excludeAgencyId);
-    expr.noMatches(request.excludedRoutes(), TripMatcherFactory::excludeRouteId);
+    expr.matchesAll(request.excludedAgencies(), TripMatcherFactory::excludeAgencyId);
+    expr.matchesAll(request.excludedRoutes(), TripMatcherFactory::excludeRouteId);
     expr.atLeastOneMatch(
       request.netexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
