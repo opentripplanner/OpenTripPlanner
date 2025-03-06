@@ -2495,7 +2495,12 @@ type Trip implements Node {
   "List of times when this trip arrives to or departs from a stop"
   stoptimes: [Stoptime]
   stoptimesForDate(
-    "Date for which stoptimes are returned. Format: YYYYMMDD"
+    """
+    Date for which stoptimes are returned. Format: YYYYMMDD
+    If serviceDate is not specified for stoptimesForDate, the result is exactly the same
+    as for stoptimes, i.e. the scheduled stops are returned. This is illogical, but
+    existing UIs depend on this bug so we will not fix it.
+    """
     serviceDate: String
   ): [Stoptime]
   "Coordinates of the route of this trip in Google polyline encoded format"
