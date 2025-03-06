@@ -74,9 +74,9 @@ public interface TransitService {
   Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip);
 
   /**
-   * @return if the trip doesn't run on the date specified, return schedule if
-   * useScheduledWhenNonRunning is true, empty otherwise. Logically this is confusing,
-   * but existing UIs depend on this.
+   * @return if the trip doesn't run on the specified service date, return trip times from
+   * the next scheduled service date if fallbackToNextScheduledDate is true, empty
+   * otherwise. Logically this is confusing, but existing API users depend on this.
    */
   Optional<List<TripTimeOnDate>> getTripTimeOnDates(
     Trip trip,
