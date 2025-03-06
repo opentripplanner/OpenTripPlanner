@@ -1,9 +1,16 @@
 package org.opentripplanner.transit.api.request;
 
+import static org.opentripplanner.transit.api.request.TripRequest.EXCLUDED_AGENCIES;
+import static org.opentripplanner.transit.api.request.TripRequest.EXCLUDED_ROUTES;
+import static org.opentripplanner.transit.api.request.TripRequest.INCLUDED_AGENCIES;
+import static org.opentripplanner.transit.api.request.TripRequest.INCLUDED_ROUTES;
+
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 
 public class TripRequestBuilder {
 
@@ -36,23 +43,23 @@ public class TripRequestBuilder {
 
   TripRequestBuilder() {}
 
-  public TripRequestBuilder withIncludedAgencies(FilterValues<FeedScopedId> agencies) {
-    this.includedAgencies = agencies;
+  public TripRequestBuilder withIncludedAgencies(Collection<FeedScopedId> agencies) {
+    this.includedAgencies = FilterValues.ofEmptyIsEverything(INCLUDED_AGENCIES, agencies);
     return this;
   }
 
-  public TripRequestBuilder withIncludedRoutes(FilterValues<FeedScopedId> routes) {
-    this.includedRoutes = routes;
+  public TripRequestBuilder withIncludedRoutes(Collection<FeedScopedId> routes) {
+    this.includedRoutes = FilterValues.ofEmptyIsEverything(INCLUDED_ROUTES, routes);
     return this;
   }
 
-  public TripRequestBuilder withExcludedAgencies(FilterValues<FeedScopedId> agencies) {
-    this.excludedAgencies = agencies;
+  public TripRequestBuilder withExcludedAgencies(Collection<FeedScopedId> agencies) {
+    this.excludedAgencies = FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, agencies);
     return this;
   }
 
-  public TripRequestBuilder withExcludedRoutes(FilterValues<FeedScopedId> routes) {
-    this.excludedRoutes = routes;
+  public TripRequestBuilder withExcludedRoutes(Collection<FeedScopedId> routes) {
+    this.excludedRoutes = FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, routes);
     return this;
   }
 

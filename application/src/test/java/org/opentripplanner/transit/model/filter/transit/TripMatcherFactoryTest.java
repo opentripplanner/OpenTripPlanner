@@ -64,9 +64,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchIncludeRouteId() {
-    TripRequest request = TripRequest.of()
-      .withIncludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(RUTER_ROUTE1_ID)))
-      .build();
+    TripRequest request = TripRequest.of().withIncludedRoutes(List.of(RUTER_ROUTE1_ID)).build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
@@ -77,9 +75,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchExcludeRouteId() {
-    TripRequest request = TripRequest.of()
-      .withExcludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(RUTER_ROUTE1_ID)))
-      .build();
+    TripRequest request = TripRequest.of().withExcludedRoutes(List.of(RUTER_ROUTE1_ID)).build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
@@ -101,9 +97,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchIncludeAgencyId() {
-    TripRequest request = TripRequest.of()
-      .withIncludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(RUTER1_ID)))
-      .build();
+    TripRequest request = TripRequest.of().withIncludedAgencies(List.of(RUTER1_ID)).build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
@@ -114,9 +108,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchExcludeAgencyId() {
-    TripRequest request = TripRequest.of()
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(RUTER1_ID)))
-      .build();
+    TripRequest request = TripRequest.of().withExcludedAgencies(List.of(RUTER1_ID)).build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
@@ -127,9 +119,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testIncludeNoAgencies() {
-    TripRequest request = TripRequest.of()
-      .withIncludedAgencies(FilterValues.ofEmptyIsNothing("agencies", List.of()))
-      .build();
+    TripRequest request = TripRequest.of().withIncludedAgencies(List.of()).build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
@@ -141,8 +131,8 @@ public class TripMatcherFactoryTest {
   @Test
   void testDisjointAgencyFilters() {
     TripRequest request = TripRequest.of()
-      .withIncludedAgencies(FilterValues.ofEmptyIsNothing("agencies", List.of(RUTER1_ID)))
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(AKT_ID)))
+      .withIncludedAgencies(List.of(RUTER1_ID))
+      .withExcludedAgencies(List.of(AKT_ID))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
@@ -155,10 +145,8 @@ public class TripMatcherFactoryTest {
   @Test
   void testIntersectingAgencyFilters() {
     TripRequest request = TripRequest.of()
-      .withIncludedAgencies(
-        FilterValues.ofEmptyIsNothing("agencies", List.of(RUTER1_ID, RUTER2_ID, AKT_ID))
-      )
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything("agencies", List.of(AKT_ID)))
+      .withIncludedAgencies(List.of(RUTER1_ID, RUTER2_ID, AKT_ID))
+      .withExcludedAgencies(List.of(AKT_ID))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());

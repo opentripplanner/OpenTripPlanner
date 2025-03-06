@@ -14,6 +14,11 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class TripRequest {
 
+  public static final String INCLUDED_AGENCIES = "includedAgencies";
+  public static final String INCLUDED_ROUTES = "includedRoutes";
+  public static final String EXCLUDED_AGENCIES = "excludedAgencies";
+  public static final String EXCLUDED_ROUTES = "excludedRoutes";
+
   private final FilterValues<FeedScopedId> includedAgencies;
   private final FilterValues<FeedScopedId> includedRoutes;
 

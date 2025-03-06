@@ -83,12 +83,7 @@ class ClosestTripTest {
   @Test
   void filter() {
     var request = TripRequest.of()
-      .withExcludedAgencies(
-        FilterValues.ofEmptyIsNothing(
-          "excludedAgencies",
-          List.of(FLEX_TRIP.getTrip().getRoute().getAgency().getId())
-        )
-      )
+      .withExcludedAgencies(List.of(FLEX_TRIP.getTrip().getRoute().getAgency().getId()))
       .build();
 
     var matcher = TripMatcherFactory.of(request, id -> Set.of(DATE));

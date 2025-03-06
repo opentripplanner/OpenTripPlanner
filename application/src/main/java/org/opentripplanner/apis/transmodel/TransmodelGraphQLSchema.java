@@ -1216,14 +1216,8 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            var authorities = FilterValues.ofEmptyIsEverything(
-              "authorities",
-              mapIDsToDomainNullSafe(environment.getArgument("authorities"))
-            );
-            var lineIds = FilterValues.ofEmptyIsEverything(
-              "lines",
-              mapIDsToDomainNullSafe(environment.getArgument("lines"))
-            );
+            var authorities = mapIDsToDomainNullSafe(environment.getArgument("authorities"));
+            var lineIds = mapIDsToDomainNullSafe(environment.getArgument("lines"));
             var privateCodes = FilterValues.ofEmptyIsEverything(
               "privateCodes",
               toListNullSafe(environment.<List<String>>getArgument("privateCodes"))

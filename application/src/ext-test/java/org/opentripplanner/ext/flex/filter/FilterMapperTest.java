@@ -1,10 +1,6 @@
 package org.opentripplanner.ext.flex.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.flex.filter.FilterMapper.EXCLUDED_AGENCIES;
-import static org.opentripplanner.ext.flex.filter.FilterMapper.EXCLUDED_ROUTES;
-import static org.opentripplanner.ext.flex.filter.FilterMapper.INCLUDED_AGENCIES;
-import static org.opentripplanner.ext.flex.filter.FilterMapper.INCLUDED_ROUTES;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.List;
@@ -13,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -35,8 +30,8 @@ class FilterMapperTest {
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
     var actual = FilterMapper.map(List.of(transitFilter));
     var expected = TripRequest.of()
-      .withIncludedRoutes(FilterValues.ofEmptyIsNothing(INCLUDED_ROUTES, Set.of(ROUTE_ID1)))
-      .withExcludedRoutes(FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, Set.of(ROUTE_ID1)))
+      .withIncludedRoutes(Set.of(ROUTE_ID1))
+      .withExcludedRoutes(Set.of(ROUTE_ID1))
       .build();
 
     assertEquals(expected, actual);
@@ -48,8 +43,8 @@ class FilterMapperTest {
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
     var actual = FilterMapper.map(List.of(transitFilter));
     var expected = TripRequest.of()
-      .withIncludedAgencies(FilterValues.ofEmptyIsNothing(INCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
+      .withIncludedAgencies(Set.of(AGENCY_ID1))
+      .withExcludedAgencies(Set.of(AGENCY_ID1))
       .build();
 
     assertEquals(expected, actual);
@@ -70,10 +65,10 @@ class FilterMapperTest {
 
     var actual = FilterMapper.map(List.of(routeFilter, agencyFilter));
     var expected = TripRequest.of()
-      .withIncludedAgencies(FilterValues.ofEmptyIsNothing(INCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
-      .withExcludedAgencies(FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, Set.of(AGENCY_ID1)))
-      .withIncludedRoutes(FilterValues.ofEmptyIsNothing(INCLUDED_ROUTES, Set.of(ROUTE_ID1)))
-      .withExcludedRoutes(FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, Set.of(ROUTE_ID1)))
+      .withIncludedAgencies(Set.of(AGENCY_ID1))
+      .withExcludedAgencies(Set.of(AGENCY_ID1))
+      .withIncludedRoutes(Set.of(ROUTE_ID1))
+      .withExcludedRoutes(Set.of(ROUTE_ID1))
       .build();
 
     assertEquals(expected, actual);

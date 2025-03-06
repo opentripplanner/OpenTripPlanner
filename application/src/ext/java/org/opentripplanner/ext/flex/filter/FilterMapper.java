@@ -16,10 +16,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class FilterMapper {
 
-  public static final String INCLUDED_AGENCIES = "includedAgencies";
-  public static final String INCLUDED_ROUTES = "includedRoutes";
-  public static final String EXCLUDED_AGENCIES = "excludedAgencies";
-  public static final String EXCLUDED_ROUTES = "excludedRoutes";
   private final Set<FeedScopedId> excludedAgencies = new HashSet<>();
   private final Set<FeedScopedId> excludedRoutes = new HashSet<>();
   private final Set<FeedScopedId> selectedAgencies = new HashSet<>();
@@ -45,20 +41,16 @@ public class FilterMapper {
       }
     }
     if (!selectedAgencies.isEmpty()) {
-      builder.withIncludedAgencies(
-        FilterValues.ofEmptyIsNothing(INCLUDED_AGENCIES, selectedAgencies)
-      );
+      builder.withIncludedAgencies(selectedAgencies);
     }
     if (!selectedRoutes.isEmpty()) {
-      builder.withIncludedRoutes(FilterValues.ofEmptyIsNothing(INCLUDED_ROUTES, selectedRoutes));
+      builder.withIncludedRoutes(selectedRoutes);
     }
     if (!excludedAgencies.isEmpty()) {
-      builder.withExcludedAgencies(
-        FilterValues.ofEmptyIsEverything(EXCLUDED_AGENCIES, excludedAgencies)
-      );
+      builder.withExcludedAgencies(excludedAgencies);
     }
     if (!excludedRoutes.isEmpty()) {
-      builder.withExcludedRoutes(FilterValues.ofEmptyIsEverything(EXCLUDED_ROUTES, excludedRoutes));
+      builder.withExcludedRoutes(excludedRoutes);
     }
     return builder.build();
   }
