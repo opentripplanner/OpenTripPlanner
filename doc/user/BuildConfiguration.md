@@ -635,6 +635,7 @@ Reusing elevation data from previous builds
 When set to true, the elevation module will create a file cache for calculated elevation data.
 Subsequent graph builds can reuse the data in this file.
 
+
 After building the graph, a file called `cached_elevations.obj` will be written to the cache
 directory. By default, this file is not written during graph builds. There is also a graph build
 parameter called `readCachedElevations` which is set to `true` by default.
