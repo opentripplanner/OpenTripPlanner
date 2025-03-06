@@ -75,7 +75,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   public void buildGraph() {
     timetableRepository.index();
     graph.index(timetableRepository.getSiteRepository());
-    graph.getLinker().setAddExtraEdgesToAreas(this.areaVisibility);
+    graph.getLinker().setAreaVisibility(this.areaVisibility);
     graph.getLinker().setMaxAreaNodes(this.maxAreaNodes);
 
     if (graph.hasStreets) {

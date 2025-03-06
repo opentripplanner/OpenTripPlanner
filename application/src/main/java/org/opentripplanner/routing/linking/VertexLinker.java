@@ -136,7 +136,7 @@ public class VertexLinker {
     removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
-  public void setAddExtraEdgesToAreas(Boolean areaVisibility) {
+  public void setAreaVisibility(Boolean areaVisibility) {
     this.areaVisibility = areaVisibility;
   }
 
