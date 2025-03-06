@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.stoptimes;
+package org.opentripplanner.transit.service;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,13 +35,11 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   @Test
   void onFirstStop() {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
-
     var transitService = env.getTransitService();
 
     var instant = instant("12:00");
     {
-      var result = StopTimesHelper.findTripTimeOnDate(
-        transitService,
+      var result = transitService.findTripTimeOnDate(
         TripTimeOnDateRequest.of(List.of(STOP_A1)).withTime(instant).build()
       );
 
@@ -50,8 +48,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       assertEquals(instant("12:01"), tt.departure());
     }
     {
-      var result = StopTimesHelper.findTripTimeOnDate(
-        transitService,
+      var result = transitService.findTripTimeOnDate(
         TripTimeOnDateRequest.of(List.of(STOP_B1)).withTime(instant).build()
       );
       assertThat(result).hasSize(1);
@@ -67,9 +64,10 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .build()
       .getTransitService();
 
+    var helper = new StopTimesHelper(transitService);
+
     var instant = instant("18:00");
-    var result = StopTimesHelper.findTripTimeOnDate(
-      transitService,
+    var result = transitService.findTripTimeOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A1)).withTime(instant).build()
     );
     assertThat(result).isEmpty();
@@ -83,8 +81,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .getTransitService();
 
     var instant = instant("11:00");
-    var result = StopTimesHelper.findTripTimeOnDate(
-      transitService,
+    var result = transitService.findTripTimeOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A1))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(59))
@@ -101,8 +98,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .getTransitService();
 
     var instant = instant("11:00");
-    var result = StopTimesHelper.findTripTimeOnDate(
-      transitService,
+    var result = transitService.findTripTimeOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A1))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(60))
@@ -119,8 +115,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .getTransitService();
 
     var instant = instant("12:10");
-    var result = StopTimesHelper.findTripTimeOnDate(
-      transitService,
+    var result = transitService.findTripTimeOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_F))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(60))
