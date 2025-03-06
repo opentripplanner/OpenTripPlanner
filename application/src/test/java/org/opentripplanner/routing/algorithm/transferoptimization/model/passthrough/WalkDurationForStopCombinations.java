@@ -4,7 +4,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.utils.lang.IntUtils;
 
 /**
@@ -24,11 +24,11 @@ class WalkDurationForStopCombinations {
   }
 
   WalkDurationForStopCombinations withPassThroughPoints(
-    Collection<PassThroughPoint> points,
+    Collection<RaptorViaLocation> viaLocations,
     int passThroughPointExtraCost
   ) {
     var passThroughStops = new BitSet();
-    points.stream().map(PassThroughPoint::asBitSet).forEach(passThroughStops::or);
+    viaLocations.stream().map(RaptorViaLocation::asBitSet).forEach(passThroughStops::or);
 
     for (int i = 0; i < stopCost.length; i++) {
       if (passThroughStops.get(i)) {

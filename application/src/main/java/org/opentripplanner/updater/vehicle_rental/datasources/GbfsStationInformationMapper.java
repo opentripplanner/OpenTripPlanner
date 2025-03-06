@@ -63,37 +63,36 @@ public class GbfsStationInformationMapper {
     rentalStation.crossStreet = station.getCrossStreet();
     rentalStation.regionId = station.getRegionId();
     rentalStation.postCode = station.getPostCode();
-    rentalStation.isVirtualStation =
-      station.getIsVirtualStation() != null ? station.getIsVirtualStation() : false;
-    rentalStation.isValetStation =
-      station.getIsValetStation() != null ? station.getIsValetStation() : false;
+    rentalStation.isVirtualStation = station.getIsVirtualStation() != null
+      ? station.getIsVirtualStation()
+      : false;
+    rentalStation.isValetStation = station.getIsValetStation() != null
+      ? station.getIsValetStation()
+      : false;
     // TODO: Convert geometry
     // rentalStation.stationArea = station.getStationArea();
-    rentalStation.capacity =
-      station.getCapacity() != null ? station.getCapacity().intValue() : null;
+    rentalStation.capacity = station.getCapacity() != null
+      ? station.getCapacity().intValue()
+      : null;
 
-    rentalStation.vehicleTypeAreaCapacity =
-      station.getVehicleCapacity() != null && vehicleTypes != null
-        ? station
-          .getVehicleCapacity()
-          .getAdditionalProperties()
-          .entrySet()
-          .stream()
-          .collect(
-            Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue())
-          )
-        : null;
-    rentalStation.vehicleTypeDockCapacity =
-      station.getVehicleTypeCapacity() != null && vehicleTypes != null
-        ? station
-          .getVehicleTypeCapacity()
-          .getAdditionalProperties()
-          .entrySet()
-          .stream()
-          .collect(
-            Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue())
-          )
-        : null;
+    rentalStation.vehicleTypeAreaCapacity = station.getVehicleCapacity() != null &&
+      vehicleTypes != null
+      ? station
+        .getVehicleCapacity()
+        .getAdditionalProperties()
+        .entrySet()
+        .stream()
+        .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue()))
+      : null;
+    rentalStation.vehicleTypeDockCapacity = station.getVehicleTypeCapacity() != null &&
+      vehicleTypes != null
+      ? station
+        .getVehicleTypeCapacity()
+        .getAdditionalProperties()
+        .entrySet()
+        .stream()
+        .collect(Collectors.toMap(e -> vehicleTypes.get(e.getKey()), e -> e.getValue().intValue()))
+      : null;
 
     rentalStation.isArrivingInRentalVehicleAtDestinationAllowed =
       allowKeepingRentedVehicleAtDestination;

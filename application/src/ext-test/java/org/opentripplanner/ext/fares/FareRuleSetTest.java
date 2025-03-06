@@ -20,8 +20,7 @@ class FareRuleSetTest {
   @BeforeEach
   void setUp() {
     FeedScopedId id = new FeedScopedId("feed", "fare1");
-    FareAttribute fareAttribute = FareAttribute
-      .of(id)
+    FareAttribute fareAttribute = FareAttribute.of(id)
       .setPrice(TWO_FIFTY)
       .setPaymentMethod(1)
       .setTransfers(1)
@@ -175,8 +174,7 @@ class FareRuleSetTest {
 
   @Test
   void testMatchesWithJourneyDuration() {
-    FareAttribute journeyFare = FareAttribute
-      .of(new FeedScopedId("feed", "journey"))
+    FareAttribute journeyFare = FareAttribute.of(new FeedScopedId("feed", "journey"))
       .setPrice(Money.usDollars(3.00f))
       .setPaymentMethod(1)
       .setJourneyDuration(7200)

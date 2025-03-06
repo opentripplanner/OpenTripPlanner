@@ -26,8 +26,7 @@ public class QueryTypeImplTest {
   @BeforeAll
   public static void setUp() {
     var entityOne = new EntitySelector.Route(ROUTE_ID);
-    var alertOne = TransitAlert
-      .of(ROUTE_ID)
+    var alertOne = TransitAlert.of(ROUTE_ID)
       .withDescriptionText(new NonLocalizedString("foo desc"))
       .withHeaderText(new NonLocalizedString("foo header"))
       .addEntity(entityOne)
@@ -36,8 +35,7 @@ public class QueryTypeImplTest {
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .build();
     var entityTwo = new EntitySelector.Stop(STOP_ID);
-    var alertTwo = TransitAlert
-      .of(STOP_ID)
+    var alertTwo = TransitAlert.of(STOP_ID)
       .withDescriptionText(new NonLocalizedString("bar desc"))
       .withHeaderText(new NonLocalizedString("bar header"))
       .addEntity(entityTwo)

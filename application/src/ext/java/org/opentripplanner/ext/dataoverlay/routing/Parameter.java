@@ -38,8 +38,7 @@ public class Parameter {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(Parameter.class)
+    return ToStringBuilder.of(Parameter.class)
       .addObj("binding", binding)
       .addNum("threshold", threshold)
       .addNum("penalty", penalty)

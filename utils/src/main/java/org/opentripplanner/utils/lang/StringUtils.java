@@ -88,8 +88,7 @@ public class StringUtils {
     if (value.length() >= width) {
       return value;
     }
-    return StringUtils
-      .append(new StringBuilder(), ch, width - value.length())
+    return StringUtils.append(new StringBuilder(), ch, width - value.length())
       .append(value)
       .toString();
   }

@@ -64,7 +64,8 @@ class WalkableAreaBuilder {
 
   private final VertexGenerator vertexBuilder;
 
-  private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<>();
+  private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate =
+    new HashMap<>();
 
   private final boolean platformEntriesLinking;
 
@@ -100,16 +101,15 @@ class WalkableAreaBuilder {
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
     this.boardingLocationRefTags = boardingLocationRefTags;
-    this.platformLinkingPoints =
-      platformEntriesLinking
-        ? graph
-          .getVertices()
-          .stream()
-          .filter(OsmVertex.class::isInstance)
-          .map(OsmVertex.class::cast)
-          .filter(this::isPlatformLinkingPoint)
-          .collect(Collectors.toList())
-        : List.of();
+    this.platformLinkingPoints = platformEntriesLinking
+      ? graph
+        .getVertices()
+        .stream()
+        .filter(OsmVertex.class::isInstance)
+        .map(OsmVertex.class::cast)
+        .filter(this::isPlatformLinkingPoint)
+        .collect(Collectors.toList())
+      : List.of();
   }
 
   /**
@@ -145,8 +145,7 @@ class WalkableAreaBuilder {
       var vertices = edges
         .stream()
         .flatMap(v ->
-          Stream
-            .of(v.getFromVertex(), v.getToVertex())
+          Stream.of(v.getFromVertex(), v.getToVertex())
             .filter(IntersectionVertex.class::isInstance)
             .map(IntersectionVertex.class::cast)
         )
@@ -369,8 +368,7 @@ class WalkableAreaBuilder {
     RouteRequest options = new RouteRequest();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
-      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
-        .of()
+      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunctions.EarliestArrival())
         .setRequest(options)

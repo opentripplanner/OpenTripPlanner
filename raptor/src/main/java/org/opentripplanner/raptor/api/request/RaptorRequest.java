@@ -179,8 +179,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
   @Override
   public String toString() {
     var defaults = RaptorRequest.defaults();
-    return ToStringBuilder
-      .of(RaptorRequest.class)
+    return ToStringBuilder.of(RaptorRequest.class)
       .addEnum("profile", profile)
       .addBoolIfTrue("reverse", searchDirection.isInReverse())
       .addCol("optimizations", optimizations, defaults.optimizations())

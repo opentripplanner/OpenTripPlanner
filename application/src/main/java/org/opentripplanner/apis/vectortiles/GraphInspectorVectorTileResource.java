@@ -180,15 +180,11 @@ public class GraphInspectorVectorTileResource {
     OtpServerRequestContext context
   ) {
     return switch (layerParameters.type()) {
-      case RegularStop -> new StopLayerBuilder<>(
-        layerParameters,
-        locale,
-        e -> context.transitService().findRegularStopsByBoundingBox(e)
+      case RegularStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
+        context.transitService().findRegularStopsByBoundingBox(e)
       );
-      case AreaStop -> new StopLayerBuilder<>(
-        layerParameters,
-        locale,
-        e -> context.transitService().findAreaStops(e)
+      case AreaStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
+        context.transitService().findAreaStops(e)
       );
       case GroupStop -> new GroupStopLayerBuilder(
         layerParameters,

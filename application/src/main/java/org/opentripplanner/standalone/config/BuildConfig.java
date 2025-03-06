@@ -204,320 +204,296 @@ public class BuildConfig implements OtpDataStoreConfig {
   public BuildConfig(NodeAdapter root, boolean logUnusedParams) {
     this.root = root;
     // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
-    areaVisibility =
-      root
-        .of("areaVisibility")
-        .since(V1_5)
-        .summary("Perform visibility calculations.")
-        .description(
-          """
-            If this is `true` OTP attempts to calculate a path straight through an OSM area using the 
-            shortest way rather than around the edge of it. (These calculations can be time consuming).
-            """
-        )
-        .asBoolean(false);
-    configVersion =
-      root
-        .of("configVersion")
-        .since(V2_1)
-        .summary("Deployment version of the *" + BUILD_CONFIG_FILENAME + "*.")
-        .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
-        .asString(null);
-    dataImportReport =
-      root
-        .of("dataImportReport")
-        .since(V2_0)
-        .summary("Generate nice HTML report of Graph errors/warnings")
-        .description("The reports are stored in the same location as the graph.")
-        .asBoolean(false);
-    distanceBetweenElevationSamples =
-      root
-        .of("distanceBetweenElevationSamples")
-        .since(V2_0)
-        .summary("The distance between elevation samples in meters.")
-        .description(
-          "The default is the approximate resolution of 1/3 arc-second NED data. This should not " +
-          "be smaller than the horizontal resolution of the height data used."
-        )
-        .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
+    areaVisibility = root
+      .of("areaVisibility")
+      .since(V1_5)
+      .summary("Perform visibility calculations.")
+      .description(
+        """
+        If this is `true` OTP attempts to calculate a path straight through an OSM area using the
+        shortest way rather than around the edge of it. (These calculations can be time consuming).
+        """
+      )
+      .asBoolean(false);
+    configVersion = root
+      .of("configVersion")
+      .since(V2_1)
+      .summary("Deployment version of the *" + BUILD_CONFIG_FILENAME + "*.")
+      .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
+      .asString(null);
+    dataImportReport = root
+      .of("dataImportReport")
+      .since(V2_0)
+      .summary("Generate nice HTML report of Graph errors/warnings")
+      .description("The reports are stored in the same location as the graph.")
+      .asBoolean(false);
+    distanceBetweenElevationSamples = root
+      .of("distanceBetweenElevationSamples")
+      .since(V2_0)
+      .summary("The distance between elevation samples in meters.")
+      .description(
+        "The default is the approximate resolution of 1/3 arc-second NED data. This should not " +
+        "be smaller than the horizontal resolution of the height data used."
+      )
+      .asDouble(CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
     elevationBucket = S3BucketConfig.fromConfig(root, "elevationBucket");
-    embedRouterConfig =
-      root
-        .of("embedRouterConfig")
-        .since(V2_0)
-        .summary(
-          "Embed the Router config in the graph, which allows it to be sent to a server fully " +
-          "configured over the wire."
-        )
-        .asBoolean(true);
-    includeEllipsoidToGeoidDifference =
-      root
-        .of("includeEllipsoidToGeoidDifference")
-        .since(V2_0)
-        .summary(
-          "Include the Ellipsoid to Geoid difference in the calculations of every point along " +
-          "every StreetWithElevationEdge."
-        )
-        .description(
-          """
-When set to true (it is false by default), the elevation module will include the Ellipsoid to
-Geoid difference in the calculations of every point along every StreetWithElevationEdge in the
-graph.
+    embedRouterConfig = root
+      .of("embedRouterConfig")
+      .since(V2_0)
+      .summary(
+        "Embed the Router config in the graph, which allows it to be sent to a server fully " +
+        "configured over the wire."
+      )
+      .asBoolean(true);
+    includeEllipsoidToGeoidDifference = root
+      .of("includeEllipsoidToGeoidDifference")
+      .since(V2_0)
+      .summary(
+        "Include the Ellipsoid to Geoid difference in the calculations of every point along " +
+        "every StreetWithElevationEdge."
+      )
+      .description(
+        """
+        When set to true (it is false by default), the elevation module will include the Ellipsoid to
+        Geoid difference in the calculations of every point along every StreetWithElevationEdge in the
+        graph.
 
-NOTE: if this is set to true for graph building, make sure to not set the value of
-`RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
-all of the elevation values in the street edges.
-"""
-        )
-        .asBoolean(false);
+        NOTE: if this is set to true for graph building, make sure to not set the value of
+        `RoutingResource#geoidElevation` to true otherwise OTP will add this geoid value again to
+        all of the elevation values in the street edges.
+        """
+      )
+      .asBoolean(false);
 
     islandPruning = IslandPruningConfig.fromConfig(root);
 
-    maxDataImportIssuesPerFile =
-      root
-        .of("maxDataImportIssuesPerFile")
-        .since(V2_0)
-        .summary("When to split the import report.")
-        .description(
-          """
-              If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
-              be split in multiple files. Since browsers have problems opening large HTML files.
-            """
-        )
-        .asInt(1000);
-    maxTransferDuration =
-      root
-        .of("maxTransferDuration")
-        .since(V2_1)
-        .summary(
-          "Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph."
-        )
-        .asDuration(Duration.ofMinutes(30));
+    maxDataImportIssuesPerFile = root
+      .of("maxDataImportIssuesPerFile")
+      .since(V2_0)
+      .summary("When to split the import report.")
+      .description(
+        """
+          If the number of issues is larger then `maxDataImportIssuesPerFile`, then the files will
+          be split in multiple files. Since browsers have problems opening large HTML files.
+        """
+      )
+      .asInt(1000);
+    maxTransferDuration = root
+      .of("maxTransferDuration")
+      .since(V2_1)
+      .summary(
+        "Transfers up to this duration with a mode-specific speed value will be pre-calculated and included in the Graph."
+      )
+      .asDuration(Duration.ofMinutes(30));
     transferParametersForMode = TransferConfig.map(root, "transferParametersForMode");
-    maxStopToShapeSnapDistance =
-      root
-        .of("maxStopToShapeSnapDistance")
-        .since(V2_1)
-        .summary("Maximum distance between route shapes and their stops.")
-        .description(
-          """
+    maxStopToShapeSnapDistance = root
+      .of("maxStopToShapeSnapDistance")
+      .since(V2_1)
+      .summary("Maximum distance between route shapes and their stops.")
+      .description(
+        """
         This field is used for mapping routes geometry shapes. It determines max distance between shape
         points and their stop sequence. If mapper cannot find any stops within this radius it will
         default to simple stop-to-stop geometry instead.
         """
-        )
-        .asDouble(150);
-    multiThreadElevationCalculations =
-      root
-        .of("multiThreadElevationCalculations")
-        .since(V2_0)
-        .summary("Configuring multi-threading during elevation calculations.")
-        .description(
-          """
+      )
+      .asDouble(150);
+    multiThreadElevationCalculations = root
+      .of("multiThreadElevationCalculations")
+      .since(V2_0)
+      .summary("Configuring multi-threading during elevation calculations.")
+      .description(
+        """
           For unknown reasons that seem to depend on data and machine settings, it might be faster
           to use a single processor. If multi-threading is activated, parallel streams will be used
           to calculate the elevations.
         """
-        )
-        .asBoolean(false);
-    osmCacheDataInMem =
-      root
-        .of("osmCacheDataInMem")
-        .since(V2_0)
-        .summary("If OSM data should be cached in memory during processing.")
-        .description(
-          """
-      When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
-      for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
-      to cache the entire osm file im memory. The trade off is of course that OTP might use more
-      memory while loading osm data. You can use this parameter to choose what is best for your
-      deployment depending on your infrastructure. Set the parameter to `true` to cache the
-      data, and to `false` to read the stream from the source each time.
-      """
-        )
-        .asBoolean(false);
-    platformEntriesLinking =
-      root
-        .of("platformEntriesLinking")
-        .since(V2_0)
-        .summary("Link unconnected entries to public transport platforms.")
-        .asBoolean(false);
-    readCachedElevations =
-      root
-        .of("readCachedElevations")
-        .since(V2_0)
-        .summary("Whether to read cached elevation data.")
-        .description(
-          """
+      )
+      .asBoolean(false);
+    osmCacheDataInMem = root
+      .of("osmCacheDataInMem")
+      .since(V2_0)
+      .summary("If OSM data should be cached in memory during processing.")
+      .description(
+        """
+        When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS, one
+        for WAYS and last one for NODES. Instead of reading the data source 3 times it might be faster
+        to cache the entire osm file im memory. The trade off is of course that OTP might use more
+        memory while loading osm data. You can use this parameter to choose what is best for your
+        deployment depending on your infrastructure. Set the parameter to `true` to cache the
+        data, and to `false` to read the stream from the source each time.
+        """
+      )
+      .asBoolean(false);
+    platformEntriesLinking = root
+      .of("platformEntriesLinking")
+      .since(V2_0)
+      .summary("Link unconnected entries to public transport platforms.")
+      .asBoolean(false);
+    readCachedElevations = root
+      .of("readCachedElevations")
+      .since(V2_0)
+      .summary("Whether to read cached elevation data.")
+      .description(
+        """
         When set to true, the elevation module will attempt to read this file in
         order to reuse calculations of elevation data for various coordinate sequences instead of
         recalculating them all over again.
         """
-        )
-        .asBoolean(true);
-    staticBikeParkAndRide =
-      root
-        .of("staticBikeParkAndRide")
-        .since(V1_5)
-        .summary("Whether we should create bike P+R stations from OSM data.")
-        .asBoolean(false);
-    staticParkAndRide =
-      root
-        .of("staticParkAndRide")
-        .since(V1_5)
-        .summary("Whether we should create car P+R stations from OSM data.")
-        .asBoolean(true);
-    subwayAccessTime =
-      root
-        .of("subwayAccessTime")
-        .since(V1_5)
-        .summary(
-          "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
-        )
-        .description(
-          """
-Note! The preferred way to do this is to update the OSM data.
-See [In-station navigation](In-Station-Navigation.md).
+      )
+      .asBoolean(true);
+    staticBikeParkAndRide = root
+      .of("staticBikeParkAndRide")
+      .since(V1_5)
+      .summary("Whether we should create bike P+R stations from OSM data.")
+      .asBoolean(false);
+    staticParkAndRide = root
+      .of("staticParkAndRide")
+      .since(V1_5)
+      .summary("Whether we should create car P+R stations from OSM data.")
+      .asBoolean(true);
+    subwayAccessTime = root
+      .of("subwayAccessTime")
+      .since(V1_5)
+      .summary(
+        "Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street."
+      )
+      .description(
+        """
+        Note! The preferred way to do this is to update the OSM data.
+        See [In-station navigation](In-Station-Navigation.md).
 
-The ride locations for some modes of transport such as subways can be slow to reach from the street.
-When planning a trip, we need to allow additional time to reach these locations to properly inform
-the passenger. For example, this helps avoid suggesting short bus rides between two subway rides as
-a way to improve travel time. You can specify how long it takes to reach a subway platform.
+        The ride locations for some modes of transport such as subways can be slow to reach from the street.
+        When planning a trip, we need to allow additional time to reach these locations to properly inform
+        the passenger. For example, this helps avoid suggesting short bus rides between two subway rides as
+        a way to improve travel time. You can specify how long it takes to reach a subway platform.
 
-This setting does not generalize to other modes like airplanes because you often need much longer time
-to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
-(perhaps 1 hour). Use [`boardSlackForMode`](RouteRequest.md#rd_boardSlackForMode) and
-[`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.
-"""
-        )
-        .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+        This setting does not generalize to other modes like airplanes because you often need much longer time
+        to check in to a flight (2-3 hours for international flights) than to alight and exit the airport
+        (perhaps 1 hour). Use [`boardSlackForMode`](RouteRequest.md#rd_boardSlackForMode) and
+        [`alightSlackForMode`](RouteRequest.md#rd_alightSlackForMode) for this.
+        """
+      )
+      .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
 
     // Time Zone dependent config
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone
       // will just shift the period with one day, so the consequences is limited.
-      transitModelTimeZone =
-        root
-          .of("transitModelTimeZone")
-          .since(V2_2)
-          .summary("Time zone for the graph.")
-          .description(
-            "This is used to store the timetables in the transit model, and to interpret times in incoming requests."
-          )
-          .asZoneId(null);
+      transitModelTimeZone = root
+        .of("transitModelTimeZone")
+        .since(V2_2)
+        .summary("Time zone for the graph.")
+        .description(
+          "This is used to store the timetables in the transit model, and to interpret times in incoming requests."
+        )
+        .asZoneId(null);
       var confZone = ObjectUtils.ifNotNull(transitModelTimeZone, ZoneId.systemDefault());
-      transitServiceStart =
-        root
-          .of("transitServiceStart")
-          .since(V2_0)
-          .summary("Limit the import of transit services to the given START date.")
-          .description(
-            """
-See [Limit the transit service period](#limit-transit-service-period) for an introduction.
+      transitServiceStart = root
+        .of("transitServiceStart")
+        .since(V2_0)
+        .summary("Limit the import of transit services to the given START date.")
+        .description(
+          """
+          See [Limit the transit service period](#limit-transit-service-period) for an introduction.
 
-The date is inclusive. If set, any transit service on a day BEFORE the given date is dropped and
-will not be part of the graph. Use an absolute date or a period relative to the date the graph is
-build(BUILD_DAY).
+          The date is inclusive. If set, any transit service on a day BEFORE the given date is dropped and
+          will not be part of the graph. Use an absolute date or a period relative to the date the graph is
+          build(BUILD_DAY).
 
-Use an empty string to make unbounded.
-"""
-          )
-          .asDateOrRelativePeriod("-P1Y", confZone);
-      transitServiceEnd =
-        root
-          .of("transitServiceEnd")
-          .since(V2_0)
-          .summary("Limit the import of transit services to the given end date.")
-          .description(
-            """
-See [Limit the transit service period](#limit-transit-service-period) for an introduction.
+          Use an empty string to make unbounded.
+          """
+        )
+        .asDateOrRelativePeriod("-P1Y", confZone);
+      transitServiceEnd = root
+        .of("transitServiceEnd")
+        .since(V2_0)
+        .summary("Limit the import of transit services to the given end date.")
+        .description(
+          """
+          See [Limit the transit service period](#limit-transit-service-period) for an introduction.
 
-The date is inclusive. If set, any transit service on a day AFTER the given date is dropped and
-will not be part of the graph. Use an absolute date or a period relative to the date the graph is
-build(BUILD_DAY).
+          The date is inclusive. If set, any transit service on a day AFTER the given date is dropped and
+          will not be part of the graph. Use an absolute date or a period relative to the date the graph is
+          build(BUILD_DAY).
 
-Use an empty string to make it unbounded.
-"""
-          )
-          .asDateOrRelativePeriod("P3Y", confZone);
+          Use an empty string to make it unbounded.
+          """
+        )
+        .asDateOrRelativePeriod("P3Y", confZone);
     }
 
-    transitRouteToStationCentroid =
-      root
-        .of("transitRouteToStationCentroid")
-        .since(V2_7)
-        .summary("List stations that should route to centroid.")
-        .description(
-          """
-This field contains a list of station ids for which street legs will start/end at the station
-centroid instead of the child stops.
+    transitRouteToStationCentroid = root
+      .of("transitRouteToStationCentroid")
+      .since(V2_7)
+      .summary("List stations that should route to centroid.")
+      .description(
+        """
+        This field contains a list of station ids for which street legs will start/end at the station
+        centroid instead of the child stops.
 
-When searching from/to a station the default behaviour is to route from/to any of the stations child
-stops. This can cause strange results for stations that have stops spread over a large area.
+        When searching from/to a station the default behaviour is to route from/to any of the stations child
+        stops. This can cause strange results for stations that have stops spread over a large area.
 
-For some stations you might instead wish to use the centroid of the station as the
-origin/destination. In this case the centroid will be used both for direct street search and for
-access/egress street search where the station is used as the start/end of the access/egress. But
-transit that starts/ends at the station will work as usual without any additional street leg from/to
-the centroid.
-"""
-        )
-        .asFeedScopedIds(List.of());
+        For some stations you might instead wish to use the centroid of the station as the
+        origin/destination. In this case the centroid will be used both for direct street search and for
+        access/egress street search where the station is used as the start/end of the access/egress. But
+        transit that starts/ends at the station will work as usual without any additional street leg from/to
+        the centroid.
+        """
+      )
+      .asFeedScopedIds(List.of());
 
-    writeCachedElevations =
-      root
-        .of("writeCachedElevations")
-        .since(V2_0)
-        .summary("Reusing elevation data from previous builds")
-        .description(
-          """
-When set to true, the elevation module will create a file cache for calculated elevation data.
-Subsequent graph builds can reuse the data in this file.
-  
-After building the graph, a file called `cached_elevations.obj` will be written to the cache
-directory. By default, this file is not written during graph builds. There is also a graph build
-parameter called `readCachedElevations` which is set to `true` by default.
+    writeCachedElevations = root
+      .of("writeCachedElevations")
+      .since(V2_0)
+      .summary("Reusing elevation data from previous builds")
+      .description(
+        """
+        When set to true, the elevation module will create a file cache for calculated elevation data.
+        Subsequent graph builds can reuse the data in this file.
 
-In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from
-the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden
-via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US
-states, the time it took with using this pre-downloaded and precalculated data became roughly 9
-minutes.
+        After building the graph, a file called `cached_elevations.obj` will be written to the cache
+        directory. By default, this file is not written during graph builds. There is also a graph build
+        parameter called `readCachedElevations` which is set to `true` by default.
 
-The cached data is a lookup table where the coordinate sequences of respective street edges are
-used as keys for calculated data. It is assumed that all of the other input data except for the
-OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation
-data is changed, or different configuration values for `elevationUnitMultiplier` or
-`includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation data
-should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to
-become stale and not include new OSM ways. Therefore, periodic update of this cached data is
-recommended.
-"""
-        )
-        .asBoolean(false);
-    maxAreaNodes =
-      root
-        .of("maxAreaNodes")
-        .since(V2_1)
-        .summary(
-          "Visibility calculations for an area will not be done if there are more nodes than this limit."
-        )
-        .asInt(150);
-    maxElevationPropagationMeters =
-      root
-        .of("maxElevationPropagationMeters")
-        .since(V1_5)
-        .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
-        .asInt(2000);
-    boardingLocationTags =
-      root
-        .of("boardingLocationTags")
-        .since(V2_2)
-        .summary(
-          "What OSM tags should be looked on for the source of matching stops to platforms and stops."
-        )
-        .description("[Detailed documentation](BoardingLocations.md)")
-        .asStringSet(List.copyOf(Set.of("ref")));
+        In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from
+        the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overridden
+        via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US
+        states, the time it took with using this pre-downloaded and precalculated data became roughly 9
+        minutes.
+
+        The cached data is a lookup table where the coordinate sequences of respective street edges are
+        used as keys for calculated data. It is assumed that all of the other input data except for the
+        OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation
+        data is changed, or different configuration values for `elevationUnitMultiplier` or
+        `includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation data
+        should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to
+        become stale and not include new OSM ways. Therefore, periodic update of this cached data is
+        recommended.
+        """
+      )
+      .asBoolean(false);
+    maxAreaNodes = root
+      .of("maxAreaNodes")
+      .since(V2_1)
+      .summary(
+        "Visibility calculations for an area will not be done if there are more nodes than this limit."
+      )
+      .asInt(150);
+    maxElevationPropagationMeters = root
+      .of("maxElevationPropagationMeters")
+      .since(V1_5)
+      .summary("The maximum distance to propagate elevation to vertices which have no elevation.")
+      .asInt(2000);
+    boardingLocationTags = root
+      .of("boardingLocationTags")
+      .since(V2_2)
+      .summary(
+        "What OSM tags should be looked on for the source of matching stops to platforms and stops."
+      )
+      .description("[Detailed documentation](BoardingLocations.md)")
+      .asStringSet(List.copyOf(Set.of("ref")));
 
     var localFileNamePatternsConfig = root
       .of("localFileNamePatterns")
@@ -525,118 +501,107 @@ recommended.
       .summary("Patterns for matching OTP file types in the base directory")
       .description(
         """
-When scanning the base directory for inputs, each file's name is checked against patterns to
-detect what kind of file it is.
+        When scanning the base directory for inputs, each file's name is checked against patterns to
+        detect what kind of file it is.
 
-OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
-that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
-seeking within files to guess what they are. Therefore, like all other file types GTFS is now
-detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
-Netex data is also often supplied in a ZIP file.        
-"""
+        OTP1 used to peek inside ZIP files and read the CSV tables to guess if a ZIP was indeed GTFS. Now
+        that we support remote input files (cloud storage or arbitrary URLs) not all data sources allow
+        seeking within files to guess what they are. Therefore, like all other file types GTFS is now
+        detected from a filename pattern. It is not sufficient to look for the `.zip` extension because
+        Netex data is also often supplied in a ZIP file.
+        """
       )
       .asObject();
-    gtfsLocalFilePattern =
-      localFileNamePatternsConfig
-        .of("gtfs")
-        .since(V2_0)
-        .summary("Patterns for matching GTFS zip-files or directories.")
-        .description(
-          """
-            If the filename contains the given pattern it is considered a match. 
-            Any legal Java Regular expression is allowed.
-            """
-        )
-        .asPattern(DEFAULT_GTFS_PATTERN);
-    netexLocalFilePattern =
-      localFileNamePatternsConfig
-        .of("netex")
-        .since(V2_0)
-        .summary("Patterns for matching NeTEx zip files or directories.")
-        .description(
-          """
-            If the filename contains the given
-            pattern it is considered a match. Any legal Java Regular expression is allowed.
-            """
-        )
-        .asPattern(DEFAULT_NETEX_PATTERN);
-    osmLocalFilePattern =
-      localFileNamePatternsConfig
-        .of("osm")
-        .since(V2_0)
-        .summary("Pattern for matching Open Street Map input files.")
-        .description(
-          """
-            If the filename contains the given pattern
-            it is considered a match. Any legal Java Regular expression is allowed.
-            """
-        )
-        .asPattern(DEFAULT_OSM_PATTERN);
-    demLocalFilePattern =
-      localFileNamePatternsConfig
-        .of("dem")
-        .since(V2_0)
-        .summary("Pattern for matching elevation DEM files.")
-        .description(
-          """
-            If the filename contains the given pattern it is
-            considered a match. Any legal Java Regular expression is allowed.
-            """
-        )
-        .asPattern(DEFAULT_DEM_PATTERN);
+    gtfsLocalFilePattern = localFileNamePatternsConfig
+      .of("gtfs")
+      .since(V2_0)
+      .summary("Patterns for matching GTFS zip-files or directories.")
+      .description(
+        """
+        If the filename contains the given pattern it is considered a match.
+        Any legal Java Regular expression is allowed.
+        """
+      )
+      .asPattern(DEFAULT_GTFS_PATTERN);
+    netexLocalFilePattern = localFileNamePatternsConfig
+      .of("netex")
+      .since(V2_0)
+      .summary("Patterns for matching NeTEx zip files or directories.")
+      .description(
+        """
+        If the filename contains the given
+        pattern it is considered a match. Any legal Java Regular expression is allowed.
+        """
+      )
+      .asPattern(DEFAULT_NETEX_PATTERN);
+    osmLocalFilePattern = localFileNamePatternsConfig
+      .of("osm")
+      .since(V2_0)
+      .summary("Pattern for matching Open Street Map input files.")
+      .description(
+        """
+        If the filename contains the given pattern
+        it is considered a match. Any legal Java Regular expression is allowed.
+        """
+      )
+      .asPattern(DEFAULT_OSM_PATTERN);
+    demLocalFilePattern = localFileNamePatternsConfig
+      .of("dem")
+      .since(V2_0)
+      .summary("Pattern for matching elevation DEM files.")
+      .description(
+        """
+        If the filename contains the given pattern it is
+        considered a match. Any legal Java Regular expression is allowed.
+        """
+      )
+      .asPattern(DEFAULT_DEM_PATTERN);
 
-    gsCredentials =
-      root
-        .of("gsCredentials")
-        .since(V2_0)
-        .summary(
-          "Local file system path to Google Cloud Platform service accounts credentials file."
-        )
-        .description(
-          """
-            The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
-            need to provide a path the the service credentials. Environment variables in the path are
-            resolved.
-                  
-            This is a path to a file on the local file system, not an URI.
-            """
-        )
-        .asString(null);
-    graph =
-      root
-        .of("graph")
-        .since(V2_0)
-        .summary("URI to the graph object file for reading and writing.")
-        .description("The file is created or overwritten if OTP saves the graph to the file.")
-        .asUri(null);
-    streetGraph =
-      root
-        .of("streetGraph")
-        .since(V2_0)
-        .summary("URI to the street graph object file for reading and writing.")
-        .description("The file is created or overwritten if OTP saves the graph to the file")
-        .asUri(null);
-    buildReportDir =
-      root
-        .of("buildReportDir")
-        .since(V2_0)
-        .summary("URI to the directory where the graph build report should be written to.")
-        .description(
-          """
-      The html report is written into this directory. If the directory exist, any existing files are deleted. 
-      If it does not exist, it is created.
-      """
-        )
-        .asUri(null);
+    gsCredentials = root
+      .of("gsCredentials")
+      .since(V2_0)
+      .summary("Local file system path to Google Cloud Platform service accounts credentials file.")
+      .description(
+        """
+        The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
+        need to provide a path the the service credentials. Environment variables in the path are
+        resolved.
 
-    stopConsolidation =
-      root
-        .of("stopConsolidationFile")
-        .since(V2_5)
-        .summary(
-          "Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation."
-        )
-        .asUri(null);
+        This is a path to a file on the local file system, not an URI.
+        """
+      )
+      .asString(null);
+    graph = root
+      .of("graph")
+      .since(V2_0)
+      .summary("URI to the graph object file for reading and writing.")
+      .description("The file is created or overwritten if OTP saves the graph to the file.")
+      .asUri(null);
+    streetGraph = root
+      .of("streetGraph")
+      .since(V2_0)
+      .summary("URI to the street graph object file for reading and writing.")
+      .description("The file is created or overwritten if OTP saves the graph to the file")
+      .asUri(null);
+    buildReportDir = root
+      .of("buildReportDir")
+      .since(V2_0)
+      .summary("URI to the directory where the graph build report should be written to.")
+      .description(
+        """
+        The html report is written into this directory. If the directory exist, any existing files are deleted.
+        If it does not exist, it is created.
+        """
+      )
+      .asUri(null);
+
+    stopConsolidation = root
+      .of("stopConsolidationFile")
+      .since(V2_5)
+      .summary(
+        "Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation."
+      )
+      .asUri(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
@@ -646,8 +611,12 @@ Netex data is also often supplied in a ZIP file.
 
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
-    transitFeeds =
-      TransitFeedConfig.mapTransitFeeds(root, "transitFeeds", netexDefaults, gtfsDefaults);
+    transitFeeds = TransitFeedConfig.mapTransitFeeds(
+      root,
+      "transitFeeds",
+      netexDefaults,
+      gtfsDefaults
+    );
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");

@@ -20,12 +20,11 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
 
   ElevationEdgeRenderer(Graph graph) {
     if (graph.hasElevation) {
-      colorPalette =
-        new DefaultScalarColorPalette(
-          graph.minElevation,
-          (graph.minElevation + graph.maxElevation) / 2,
-          graph.maxElevation
-        );
+      colorPalette = new DefaultScalarColorPalette(
+        graph.minElevation,
+        (graph.minElevation + graph.maxElevation) / 2,
+        graph.maxElevation
+      );
     } else {
       colorPalette = new DefaultScalarColorPalette(0, 0, 0);
     }
@@ -46,6 +45,11 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
     } else {
       return Optional.empty();
     }
+  }
+
+  @Override
+  public String getName() {
+    return "Elevation";
   }
 
   @Override
@@ -79,24 +83,23 @@ class ElevationEdgeRenderer implements EdgeVertexRenderer {
   }
 
   private Double findElevationForVertex(Vertex v) {
-    return Stream
-      .concat(
-        v
-          .getIncomingStreetEdges()
-          .stream()
-          .filter(StreetEdge::hasElevationExtension)
-          .map(streetEdge ->
-            streetEdge
-              .getElevationProfile()
-              .getCoordinate(streetEdge.getElevationProfile().size() - 1)
-              .y
-          ),
-        v
-          .getOutgoingStreetEdges()
-          .stream()
-          .filter(StreetEdge::hasElevationExtension)
-          .map(streetEdge -> streetEdge.getElevationProfile().getCoordinate(0).y)
-      )
+    return Stream.concat(
+      v
+        .getIncomingStreetEdges()
+        .stream()
+        .filter(StreetEdge::hasElevationExtension)
+        .map(streetEdge ->
+          streetEdge
+            .getElevationProfile()
+            .getCoordinate(streetEdge.getElevationProfile().size() - 1)
+            .y
+        ),
+      v
+        .getOutgoingStreetEdges()
+        .stream()
+        .filter(StreetEdge::hasElevationExtension)
+        .map(streetEdge -> streetEdge.getElevationProfile().getCoordinate(0).y)
+    )
       .findAny()
       .orElse(null);
   }

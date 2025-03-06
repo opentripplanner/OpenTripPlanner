@@ -28,10 +28,8 @@ class FilterMapper {
     RouteRequest request
   ) {
     if (
-      !(
-        GqlUtil.hasArgument(environment, "modes") &&
-        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")
-      ) &&
+      !(GqlUtil.hasArgument(environment, "modes") &&
+        ((Map<String, Object>) environment.getArgument("modes")).containsKey("transportModes")) &&
       !GqlUtil.hasArgument(environment, "whiteListed") &&
       !GqlUtil.hasArgument(environment, "banned")
     ) {
@@ -41,18 +39,16 @@ class FilterMapper {
     var filterRequestBuilder = TransitFilterRequest.of();
 
     var bannedAgencies = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "banned.authorities",
-      (Collection<String> authorities) -> bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+    callWith.argument("banned.authorities", (Collection<String> authorities) ->
+      bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
     );
     if (!bannedAgencies.isEmpty()) {
       filterRequestBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
     }
 
     var bannedLines = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "banned.lines",
-      (List<String> lines) -> bannedLines.addAll(mapIDsToDomainNullSafe(lines))
+    callWith.argument("banned.lines", (List<String> lines) ->
+      bannedLines.addAll(mapIDsToDomainNullSafe(lines))
     );
     if (!bannedLines.isEmpty()) {
       filterRequestBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
@@ -61,19 +57,16 @@ class FilterMapper {
     var selectors = new ArrayList<SelectRequest.Builder>();
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "whiteListed.authorities",
-      (Collection<String> authorities) ->
-        whiteListedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+    callWith.argument("whiteListed.authorities", (Collection<String> authorities) ->
+      whiteListedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
     );
     if (!whiteListedAgencies.isEmpty()) {
       selectors.add(SelectRequest.of().withAgencies(whiteListedAgencies));
     }
 
     var whiteListedLines = new ArrayList<FeedScopedId>();
-    callWith.argument(
-      "whiteListed.lines",
-      (List<String> lines) -> whiteListedLines.addAll(mapIDsToDomainNullSafe(lines))
+    callWith.argument("whiteListed.lines", (List<String> lines) ->
+      whiteListedLines.addAll(mapIDsToDomainNullSafe(lines))
     );
     if (!whiteListedLines.isEmpty()) {
       selectors.add(SelectRequest.of().withRoutes(whiteListedLines));

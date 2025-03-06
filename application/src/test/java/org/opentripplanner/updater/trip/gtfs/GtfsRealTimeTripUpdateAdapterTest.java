@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 import static org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 
@@ -52,8 +54,9 @@ public class GtfsRealTimeTripUpdateAdapterTest {
     transitService = new DefaultTransitService(timetableRepository);
 
     feedId = transitService.listFeedIds().stream().findFirst().get();
-    snapshotManager =
-      new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, () -> SERVICE_DATE);
+    snapshotManager = new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, () ->
+      SERVICE_DATE
+    );
   }
 
   @Test
@@ -70,16 +73,18 @@ public class GtfsRealTimeTripUpdateAdapterTest {
       tripDescriptorBuilder.setScheduleRelationship(ScheduleRelationship.REPLACEMENT);
       tripDescriptorBuilder.setStartDate(ServiceDateUtils.asCompactString(SERVICE_DATE));
 
-      final long midnightSecondsSinceEpoch = ServiceDateUtils
-        .asStartOfService(SERVICE_DATE, transitService.getTimeZone())
-        .toEpochSecond();
+      final long midnightSecondsSinceEpoch = ServiceDateUtils.asStartOfService(
+        SERVICE_DATE,
+        transitService.getTimeZone()
+      ).toEpochSecond();
 
       final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
       tripUpdateBuilder.setTrip(tripDescriptorBuilder);
 
       { // Stop O
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder =
+          tripUpdateBuilder.addStopTimeUpdateBuilder();
         stopTimeUpdateBuilder.setScheduleRelationship(
           StopTimeUpdate.ScheduleRelationship.SCHEDULED
         );
@@ -93,14 +98,16 @@ public class GtfsRealTimeTripUpdateAdapterTest {
         }
 
         { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+          final StopTimeEvent.Builder departureBuilder =
+            stopTimeUpdateBuilder.getDepartureBuilder();
           departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (30 * 60));
           departureBuilder.setDelay(0);
         }
       }
 
       { // Stop C
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder =
+          tripUpdateBuilder.addStopTimeUpdateBuilder();
         stopTimeUpdateBuilder.setScheduleRelationship(
           StopTimeUpdate.ScheduleRelationship.SCHEDULED
         );
@@ -114,14 +121,16 @@ public class GtfsRealTimeTripUpdateAdapterTest {
         }
 
         { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+          final StopTimeEvent.Builder departureBuilder =
+            stopTimeUpdateBuilder.getDepartureBuilder();
           departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (45 * 60));
           departureBuilder.setDelay(0);
         }
       }
 
       { // Stop D
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder =
+          tripUpdateBuilder.addStopTimeUpdateBuilder();
         stopTimeUpdateBuilder.setScheduleRelationship(SKIPPED);
         stopTimeUpdateBuilder.setStopId("D");
         stopTimeUpdateBuilder.setStopSequence(40);
@@ -133,14 +142,16 @@ public class GtfsRealTimeTripUpdateAdapterTest {
         }
 
         { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+          final StopTimeEvent.Builder departureBuilder =
+            stopTimeUpdateBuilder.getDepartureBuilder();
           departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (51 * 60));
           departureBuilder.setDelay(0);
         }
       }
 
       { // Stop P
-        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder =
+          tripUpdateBuilder.addStopTimeUpdateBuilder();
         stopTimeUpdateBuilder.setScheduleRelationship(
           StopTimeUpdate.ScheduleRelationship.SCHEDULED
         );
@@ -154,7 +165,8 @@ public class GtfsRealTimeTripUpdateAdapterTest {
         }
 
         { // Departure
-          final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+          final StopTimeEvent.Builder departureBuilder =
+            stopTimeUpdateBuilder.getDepartureBuilder();
           departureBuilder.setTime(midnightSecondsSinceEpoch + (12 * 3600) + (55 * 60));
           departureBuilder.setDelay(0);
         }
@@ -192,35 +204,25 @@ public class GtfsRealTimeTripUpdateAdapterTest {
 
       assertNotSame(originalTimetableForToday, originalTimetableScheduled);
 
-      final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(
-        modifiedTripId
+      var original = originalTimetableScheduled.getTripTimes(
+        new FeedScopedId(feedId, modifiedTripId)
       );
-      assertTrue(
-        originalTripIndexScheduled > -1,
-        "Original trip should be found in scheduled time table"
-      );
-      final TripTimes originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
-        originalTripIndexScheduled
-      );
+      assertNotNull(original, "Original trip should be found in scheduled time table");
       assertFalse(
-        originalTripTimesScheduled.isCanceledOrDeleted(),
+        original.isCanceledOrDeleted(),
         "Original trip times should not be canceled in scheduled time table"
       );
-      assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
+      assertEquals(RealTimeState.SCHEDULED, original.getRealTimeState());
 
-      final int originalTripIndexForToday = originalTimetableForToday.getTripIndex(modifiedTripId);
-      assertTrue(
-        originalTripIndexForToday > -1,
-        "Original trip should be found in time table for service date"
+      var originalTT = originalTimetableForToday.getTripTimes(
+        new FeedScopedId(feedId, modifiedTripId)
       );
-      final TripTimes originalTripTimesForToday = originalTimetableForToday.getTripTimes(
-        originalTripIndexForToday
-      );
+      assertNotNull(originalTT, "Original trip should be found in time table for service date");
       assertTrue(
-        originalTripTimesForToday.isDeleted(),
+        originalTT.isDeleted(),
         "Original trip times should be deleted in time table for service date"
       );
-      assertEquals(RealTimeState.DELETED, originalTripTimesForToday.getRealTimeState());
+      assertEquals(RealTimeState.DELETED, originalTT.getRealTimeState());
     }
 
     // New trip pattern
@@ -236,31 +238,20 @@ public class GtfsRealTimeTripUpdateAdapterTest {
 
       assertNotSame(newTimetableForToday, newTimetableScheduled);
 
-      final int newTimetableForTodayModifiedTripIndex = newTimetableForToday.getTripIndex(
-        modifiedTripId
-      );
-      assertTrue(
-        newTimetableForTodayModifiedTripIndex > -1,
-        "New trip should be found in time table for service date"
-      );
-      assertEquals(
-        RealTimeState.MODIFIED,
-        newTimetableForToday.getTripTimes(newTimetableForTodayModifiedTripIndex).getRealTimeState()
-      );
+      var tripTimes = newTimetableForToday.getTripTimes(new FeedScopedId(feedId, modifiedTripId));
+      assertNotNull(tripTimes, "New trip should be found in time table for service date");
+      assertEquals(RealTimeState.MODIFIED, tripTimes.getRealTimeState());
 
-      assertEquals(
-        -1,
-        newTimetableScheduled.getTripIndex(modifiedTripId),
+      assertNull(
+        newTimetableScheduled.getTripTimes(id(modifiedTripId)),
         "New trip should not be found in scheduled time table"
       );
     }
   }
 
   private GtfsRealTimeTripUpdateAdapter defaultUpdater() {
-    return new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      () -> SERVICE_DATE
+    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      SERVICE_DATE
     );
   }
 }

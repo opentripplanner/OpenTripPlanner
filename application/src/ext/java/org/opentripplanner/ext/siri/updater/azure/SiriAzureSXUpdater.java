@@ -26,8 +26,11 @@ public class SiriAzureSXUpdater implements TransitAlertProvider, SiriAzureMessag
     TimetableRepository timetableRepository
   ) {
     this.transitAlertService = new TransitAlertServiceImpl(timetableRepository);
-    this.updateHandler =
-      new SiriAlertsUpdateHandler(config.feedId(), transitAlertService, Duration.ZERO);
+    this.updateHandler = new SiriAlertsUpdateHandler(
+      config.feedId(),
+      transitAlertService,
+      Duration.ZERO
+    );
   }
 
   @Override

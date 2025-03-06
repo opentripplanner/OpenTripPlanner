@@ -18,8 +18,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 public class JourneyWhiteListed {
 
-  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("InputWhiteListed")
     .description(
       "Filter trips by only allowing lines involving certain " +
@@ -46,8 +45,9 @@ public class JourneyWhiteListed {
       this.authorityIds = Set.of();
       this.lineIds = Set.of();
     } else {
-      this.authorityIds =
-        Set.copyOf(TransitIdMapper.mapIDsToDomainNullSafe(whiteList.get("authorities")));
+      this.authorityIds = Set.copyOf(
+        TransitIdMapper.mapIDsToDomainNullSafe(whiteList.get("authorities"))
+      );
       this.lineIds = Set.copyOf(TransitIdMapper.mapIDsToDomainNullSafe(whiteList.get("lines")));
     }
   }

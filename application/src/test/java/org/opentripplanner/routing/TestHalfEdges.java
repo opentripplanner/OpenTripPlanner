@@ -76,46 +76,42 @@ public class TestHalfEdges {
     bl = factory.intersection("bl", -74.01, 40.0);
     br = factory.intersection("br", -74.00, 40.0);
 
-    top =
-      new StreetEdgeBuilder<>()
-        .withFromVertex(tl)
-        .withToVertex(tr)
-        .withGeometry(GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01))
-        .withName("top")
-        .withMeterLength(1500)
-        .withPermission(StreetTraversalPermission.ALL)
-        .withBack(false)
-        .buildAndConnect();
-    bottom =
-      new StreetEdgeBuilder<>()
-        .withFromVertex(br)
-        .withToVertex(bl)
-        .withGeometry(GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0))
-        .withName("bottom")
-        .withMeterLength(1500)
-        .withPermission(StreetTraversalPermission.ALL)
-        .withBack(false)
-        .buildAndConnect();
-    left =
-      new StreetEdgeBuilder<>()
-        .withFromVertex(bl)
-        .withToVertex(tl)
-        .withGeometry(GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01))
-        .withName("left")
-        .withMeterLength(1500)
-        .withPermission(StreetTraversalPermission.ALL)
-        .withBack(false)
-        .buildAndConnect();
-    right =
-      new StreetEdgeBuilder<>()
-        .withFromVertex(br)
-        .withToVertex(tr)
-        .withGeometry(GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01))
-        .withName("right")
-        .withMeterLength(1500)
-        .withPermission(StreetTraversalPermission.PEDESTRIAN)
-        .withBack(false)
-        .buildAndConnect();
+    top = new StreetEdgeBuilder<>()
+      .withFromVertex(tl)
+      .withToVertex(tr)
+      .withGeometry(GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01))
+      .withName("top")
+      .withMeterLength(1500)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    bottom = new StreetEdgeBuilder<>()
+      .withFromVertex(br)
+      .withToVertex(bl)
+      .withGeometry(GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0))
+      .withName("bottom")
+      .withMeterLength(1500)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    left = new StreetEdgeBuilder<>()
+      .withFromVertex(bl)
+      .withToVertex(tl)
+      .withGeometry(GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01))
+      .withName("left")
+      .withMeterLength(1500)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    right = new StreetEdgeBuilder<>()
+      .withFromVertex(br)
+      .withToVertex(tr)
+      .withGeometry(GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01))
+      .withName("right")
+      .withMeterLength(1500)
+      .withPermission(StreetTraversalPermission.PEDESTRIAN)
+      .withBack(false)
+      .buildAndConnect();
 
     @SuppressWarnings("unused")
     StreetEdge topBack = new StreetEdgeBuilder<>()
@@ -137,26 +133,24 @@ public class TestHalfEdges {
       .withPermission(StreetTraversalPermission.ALL)
       .withBack(true)
       .buildAndConnect();
-    leftBack =
-      new StreetEdgeBuilder<>()
-        .withFromVertex(tl)
-        .withToVertex(bl)
-        .withGeometry(left.getGeometry().reverse())
-        .withName("leftBack")
-        .withMeterLength(1500)
-        .withPermission(StreetTraversalPermission.ALL)
-        .withBack(true)
-        .buildAndConnect();
-    rightBack =
-      new StreetEdgeBuilder<>()
-        .withFromVertex(tr)
-        .withToVertex(br)
-        .withGeometry(right.getGeometry().reverse())
-        .withName("rightBack")
-        .withMeterLength(1500)
-        .withPermission(StreetTraversalPermission.ALL)
-        .withBack(true)
-        .buildAndConnect();
+    leftBack = new StreetEdgeBuilder<>()
+      .withFromVertex(tl)
+      .withToVertex(bl)
+      .withGeometry(left.getGeometry().reverse())
+      .withName("leftBack")
+      .withMeterLength(1500)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(true)
+      .buildAndConnect();
+    rightBack = new StreetEdgeBuilder<>()
+      .withFromVertex(tr)
+      .withToVertex(br)
+      .withGeometry(right.getGeometry().reverse())
+      .withName("rightBack")
+      .withMeterLength(1500)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(true)
+      .buildAndConnect();
 
     var s1 = testModel.stop("fleem station", 40.0099999, -74.005).build();
     var s2 = testModel.stop("morx station", 40.0099999, -74.002).build();
@@ -221,13 +215,11 @@ public class TestHalfEdges {
 
     assertEquals(2, edges.size());
 
-    long startTime = LocalDateTime
-      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+    long startTime = LocalDateTime.of(2009, Month.DECEMBER, 1, 12, 34, 25)
       .atZone(ZoneIds.NEW_YORK)
       .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
@@ -238,8 +230,7 @@ public class TestHalfEdges {
     GraphPath<State, Edge, Vertex> pathBr = spt1.getPath(end);
     assertNotNull(pathBr, "There must be a path from br to end");
 
-    ShortestPathTree<State, Edge, Vertex> spt2 = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> spt2 = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
@@ -254,8 +245,7 @@ public class TestHalfEdges {
       "path from bottom to end must be longer than path from top to end"
     );
 
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
@@ -273,15 +263,13 @@ public class TestHalfEdges {
     }
 
     options.setArriveBy(true);
-    spt =
-      StreetSearchBuilder
-        .of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic())
-        .setRequest(options)
-        .setStreetRequest(options.journey().direct())
-        .setFrom(start)
-        .setTo(end)
-        .getShortestPathTree();
+    spt = StreetSearchBuilder.of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(start)
+      .setTo(end)
+      .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from start to end (looking back)");
@@ -304,34 +292,30 @@ public class TestHalfEdges {
 
     options = new RouteRequest();
     options.journey().direct().setMode(StreetMode.BIKE);
-    start =
-      StreetIndex.createTemporaryStreetLocationForTest(
-        "start1",
-        new NonLocalizedString("start1"),
-        filter(turns, StreetEdge.class),
-        new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()),
-        false,
-        tempEdges
-      );
-    end =
-      StreetIndex.createTemporaryStreetLocationForTest(
-        "end1",
-        new NonLocalizedString("end1"),
-        filter(turns, StreetEdge.class),
-        new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()),
-        true,
-        tempEdges
-      );
+    start = StreetIndex.createTemporaryStreetLocationForTest(
+      "start1",
+      new NonLocalizedString("start1"),
+      filter(turns, StreetEdge.class),
+      new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()),
+      false,
+      tempEdges
+    );
+    end = StreetIndex.createTemporaryStreetLocationForTest(
+      "end1",
+      new NonLocalizedString("end1"),
+      filter(turns, StreetEdge.class),
+      new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()),
+      true,
+      tempEdges
+    );
 
-    spt =
-      StreetSearchBuilder
-        .of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic())
-        .setRequest(options)
-        .setStreetRequest(options.journey().direct())
-        .setFrom(start)
-        .setTo(end)
-        .getShortestPathTree();
+    spt = StreetSearchBuilder.of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setRequest(options)
+      .setStreetRequest(options.journey().direct())
+      .setFrom(start)
+      .setTo(end)
+      .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom along the right");
@@ -347,33 +331,29 @@ public class TestHalfEdges {
     assertEquals(nVertices, graph.getVertices().size());
     assertEquals(nEdges, graph.getEdges().size());
 
-    start =
-      StreetIndex.createTemporaryStreetLocationForTest(
-        "start2",
-        new NonLocalizedString("start2"),
-        filter(turns, StreetEdge.class),
-        new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()),
-        false,
-        tempEdges
-      );
-    end =
-      StreetIndex.createTemporaryStreetLocationForTest(
-        "end2",
-        new NonLocalizedString("end2"),
-        filter(turns, StreetEdge.class),
-        new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()),
-        true,
-        tempEdges
-      );
+    start = StreetIndex.createTemporaryStreetLocationForTest(
+      "start2",
+      new NonLocalizedString("start2"),
+      filter(turns, StreetEdge.class),
+      new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()),
+      false,
+      tempEdges
+    );
+    end = StreetIndex.createTemporaryStreetLocationForTest(
+      "end2",
+      new NonLocalizedString("end2"),
+      filter(turns, StreetEdge.class),
+      new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()),
+      true,
+      tempEdges
+    );
 
-    spt =
-      StreetSearchBuilder
-        .of()
-        .setHeuristic(new EuclideanRemainingWeightHeuristic())
-        .setRequest(options)
-        .setFrom(start)
-        .setTo(end)
-        .getShortestPathTree();
+    spt = StreetSearchBuilder.of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setRequest(options)
+      .setFrom(start)
+      .setTo(end)
+      .getShortestPathTree();
 
     path = spt.getPath(start);
     assertNotNull(path, "There must be a path from top to bottom");
@@ -426,13 +406,11 @@ public class TestHalfEdges {
 
     assertEquals(3, edges.size());
 
-    long startTime = LocalDateTime
-      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+    long startTime = LocalDateTime.of(2009, Month.DECEMBER, 1, 12, 34, 25)
       .atZone(ZoneIds.NEW_YORK)
       .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
@@ -482,13 +460,11 @@ public class TestHalfEdges {
     Collection<Edge> edges = end.getIncoming();
     assertEquals(1, edges.size());
 
-    long startTime = LocalDateTime
-      .of(2009, Month.DECEMBER, 1, 12, 34, 25)
+    long startTime = LocalDateTime.of(2009, Month.DECEMBER, 1, 12, 34, 25)
       .atZone(ZoneIds.NEW_YORK)
       .toEpochSecond();
     options.setDateTime(Instant.ofEpochSecond(startTime));
-    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setStreetRequest(options.journey().direct())
@@ -567,15 +543,14 @@ public class TestHalfEdges {
 
     req.withWheelchair(true);
 
-    start =
-      StreetIndex.createTemporaryStreetLocationForTest(
-        "start",
-        new NonLocalizedString("start"),
-        filter(turns, StreetEdge.class),
-        new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()),
-        false,
-        tempEdges
-      );
+    start = StreetIndex.createTemporaryStreetLocationForTest(
+      "start",
+      new NonLocalizedString("start"),
+      filter(turns, StreetEdge.class),
+      new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()),
+      false,
+      tempEdges
+    );
 
     traversedOne = new State(start, req.build());
     for (Edge e : start.getOutgoing()) {
@@ -603,21 +578,23 @@ public class TestHalfEdges {
     assertTrue(graphFinder.findClosestStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
 
     // test that the closest vertex finder returns the closest vertex
-    TemporaryStreetLocation some = (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
-      new Coordinate(-74.00, 40.00),
-      StreetMode.WALK,
-      true,
-      tempEdges
-    );
+    TemporaryStreetLocation some =
+      (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
+        new Coordinate(-74.00, 40.00),
+        StreetMode.WALK,
+        true,
+        tempEdges
+      );
     assertNotNull(some);
 
     // test that the closest vertex finder correctly splits streets
-    TemporaryStreetLocation start = (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
-      new Coordinate(-74.01, 40.004),
-      StreetMode.WALK,
-      false,
-      tempEdges
-    );
+    TemporaryStreetLocation start =
+      (TemporaryStreetLocation) finder.createVertexForCoordinateForTest(
+        new Coordinate(-74.01, 40.004),
+        StreetMode.WALK,
+        false,
+        tempEdges
+      );
     assertNotNull(start);
     assertTrue(
       start.isWheelchairAccessible(),
@@ -658,8 +635,7 @@ public class TestHalfEdges {
     ) {
       assertNotNull(container.getFromVertices());
       assertNotNull(container.getToVertices());
-      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
-        .of()
+      ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
         .setVerticesContainer(container)

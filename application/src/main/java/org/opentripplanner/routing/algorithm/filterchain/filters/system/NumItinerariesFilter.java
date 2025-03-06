@@ -30,8 +30,9 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
   ) {
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
-    this.pageCursorInputSubscriber =
-      pageCursorInputSubscriber == null ? IGNORE_SUBSCRIBER : pageCursorInputSubscriber;
+    this.pageCursorInputSubscriber = pageCursorInputSubscriber == null
+      ? IGNORE_SUBSCRIBER
+      : pageCursorInputSubscriber;
   }
 
   @Override

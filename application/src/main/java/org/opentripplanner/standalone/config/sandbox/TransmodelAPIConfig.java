@@ -24,31 +24,28 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
       .summary("Configuration for the Transmodel GraphQL API.")
       .asObject();
 
-    hideFeedId =
-      c
-        .of("hideFeedId")
-        .summary("Hide the FeedId in all API output, and add it to input.")
-        .description(
-          "Only turn this feature on if you have unique ids across all feeds, without the " +
-          "feedId prefix."
-        )
-        .asBoolean(false);
-    tracingHeaderTags =
-      c
-        .of("tracingHeaderTags")
-        .summary("Used to group requests when monitoring OTP.")
-        .asStringList(Set.of());
+    hideFeedId = c
+      .of("hideFeedId")
+      .summary("Hide the FeedId in all API output, and add it to input.")
+      .description(
+        "Only turn this feature on if you have unique ids across all feeds, without the " +
+        "feedId prefix."
+      )
+      .asBoolean(false);
+    tracingHeaderTags = c
+      .of("tracingHeaderTags")
+      .summary("Used to group requests when monitoring OTP.")
+      .asStringList(Set.of());
 
-    maxNumberOfResultFields =
-      c
-        .of("maxNumberOfResultFields")
-        .since(V2_6)
-        .summary("The maximum number of fields in a GraphQL result")
-        .description(
-          "Enforce rate limiting based on query complexity; Queries that return too much data are" +
-          " cancelled."
-        )
-        .asInt(1_000_000);
+    maxNumberOfResultFields = c
+      .of("maxNumberOfResultFields")
+      .since(V2_6)
+      .summary("The maximum number of fields in a GraphQL result")
+      .description(
+        "Enforce rate limiting based on query complexity; Queries that return too much data are" +
+        " cancelled."
+      )
+      .asInt(1_000_000);
   }
 
   @Override

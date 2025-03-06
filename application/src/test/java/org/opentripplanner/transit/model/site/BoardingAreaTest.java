@@ -17,13 +17,11 @@ class BoardingAreaTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
   private static final I18NString DESCRIPTION = new NonLocalizedString("description");
-  private static final RegularStop PARENT_STOP = TimetableRepositoryForTest
-    .of()
+  private static final RegularStop PARENT_STOP = TimetableRepositoryForTest.of()
     .stop("stopId")
     .build();
 
-  private static final BoardingArea subject = BoardingArea
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final BoardingArea subject = BoardingArea.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withParentStop(PARENT_STOP)

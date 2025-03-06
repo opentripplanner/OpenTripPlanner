@@ -2,8 +2,10 @@ package org.opentripplanner.utils.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.utils.collection.ListUtils.first;
 import static org.opentripplanner.utils.collection.ListUtils.last;
+import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElements;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -60,6 +62,18 @@ class ListUtilsTest {
   void ofNullable() {
     assertEquals(List.of(), ListUtils.ofNullable(null));
     assertEquals(List.of("A"), ListUtils.ofNullable("A"));
+  }
+
+  @Test
+  void testRequireAtLeastNElements() {
+    var zeroElements = List.of();
+    var oneElement = List.of("w");
+    requireAtLeastNElements(zeroElements, 0);
+    requireAtLeastNElements(oneElement, 1);
+
+    assertThrows(NullPointerException.class, () -> requireAtLeastNElements(null, 0));
+    assertThrows(IllegalArgumentException.class, () -> requireAtLeastNElements(zeroElements, 1));
+    assertThrows(IllegalArgumentException.class, () -> requireAtLeastNElements(oneElement, 2));
   }
 
   private record Wrapper(int i, String string) {}

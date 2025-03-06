@@ -31,19 +31,16 @@ class RaptorTransitDataTest {
     stopTime.setStop(stop);
     var stopPattern = new StopPattern(List.of(stopTime));
     var route = TimetableRepositoryForTest.route("1").build();
-    TRIP_PATTERN =
-      TripPattern
-        .of(TimetableRepositoryForTest.id("P1"))
-        .withRoute(route)
-        .withStopPattern(stopPattern)
-        .build()
-        .getRoutingTripPattern();
-    TRIP_TIMES =
-      TripTimesFactory.tripTimes(
-        TimetableRepositoryForTest.trip("1").withRoute(route).build(),
-        List.of(new StopTime()),
-        new Deduplicator()
-      );
+    TRIP_PATTERN = TripPattern.of(TimetableRepositoryForTest.id("P1"))
+      .withRoute(route)
+      .withStopPattern(stopPattern)
+      .build()
+      .getRoutingTripPattern();
+    TRIP_TIMES = TripTimesFactory.tripTimes(
+      TimetableRepositoryForTest.trip("1").withRoute(route).build(),
+      List.of(new StopTime()),
+      new Deduplicator()
+    );
   }
 
   @Test

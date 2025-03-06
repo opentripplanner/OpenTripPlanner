@@ -9,15 +9,13 @@ import org.opentripplanner.model.TripTimeOnDate;
 public class DestinationDisplayType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("DestinationDisplay")
       .description(
         "An advertised destination of a specific journey pattern, usually displayed on a head sign or at other on-board locations."
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("frontText")
           .description("Name of destination to show on front of vehicle.")
           .type(Scalars.GraphQLString)
@@ -25,8 +23,7 @@ public class DestinationDisplayType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("via")
           .description(
             "Intermediary destinations which the vehicle will pass before reaching its final destination."

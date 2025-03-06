@@ -19,8 +19,7 @@ public class LocalTimeScalarFactory {
   private LocalTimeScalarFactory() {}
 
   public static GraphQLScalarType createLocalTimeScalar() {
-    return GraphQLScalarType
-      .newScalar()
+    return GraphQLScalarType.newScalar()
       .name("LocalTime")
       .description(DATE_SCALAR_DESCRIPTION)
       .coercing(

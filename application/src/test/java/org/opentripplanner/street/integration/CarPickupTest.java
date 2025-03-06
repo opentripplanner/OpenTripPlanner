@@ -175,8 +175,7 @@ public class CarPickupTest extends GraphRoutingTest {
     var options = new RouteRequest();
     options.setArriveBy(arriveBy);
 
-    var tree = StreetSearchBuilder
-      .of()
+    var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(options)
       .setRequest(options)

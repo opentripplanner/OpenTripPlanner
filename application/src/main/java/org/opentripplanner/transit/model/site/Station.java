@@ -51,8 +51,10 @@ public class Station
     this.name = Objects.requireNonNull(builder.getName());
     this.coordinate = Objects.requireNonNull(builder.getCoordinate());
     this.shouldRouteToCentroid = builder.shouldRouteToCentroid();
-    this.priority =
-      Objects.requireNonNullElse(builder.getPriority(), StopTransferPriority.defaultValue());
+    this.priority = Objects.requireNonNullElse(
+      builder.getPriority(),
+      StopTransferPriority.defaultValue()
+    );
     this.transfersNotAllowed = builder.isTransfersNotAllowed();
 
     // Optional fields

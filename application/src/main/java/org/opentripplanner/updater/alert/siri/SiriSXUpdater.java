@@ -61,19 +61,21 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     this.originalRequestorRef = requestorRef;
     this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
     this.transitAlertService = new TransitAlertServiceImpl(timetableRepository);
-    this.updateHandler =
-      new SiriAlertsUpdateHandler(config.feedId(), transitAlertService, config.earlyStart());
+    this.updateHandler = new SiriAlertsUpdateHandler(
+      config.feedId(),
+      transitAlertService,
+      config.earlyStart()
+    );
     siriHttpLoader = siriLoader;
 
-    retry =
-      new OtpRetryBuilder()
-        .withName("SIRI-SX Update")
-        .withMaxAttempts(RETRY_MAX_ATTEMPTS)
-        .withInitialRetryInterval(RETRY_INITIAL_DELAY)
-        .withBackoffMultiplier(RETRY_BACKOFF)
-        .withRetryableException(OtpHttpClientException.class::isInstance)
-        .withOnRetry(this::updateRequestorRef)
-        .build();
+    retry = new OtpRetryBuilder()
+      .withName("SIRI-SX Update")
+      .withMaxAttempts(RETRY_MAX_ATTEMPTS)
+      .withInitialRetryInterval(RETRY_INITIAL_DELAY)
+      .withBackoffMultiplier(RETRY_BACKOFF)
+      .withRetryableException(OtpHttpClientException.class::isInstance)
+      .withOnRetry(this::updateRequestorRef)
+      .build();
 
     LOG.info("Creating SIRI-SX updater running every {}: {}", pollingPeriod(), url);
   }
@@ -89,8 +91,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SiriSXUpdater.class)
+    return ToStringBuilder.of(SiriSXUpdater.class)
       .addStr("url", url)
       .addDuration("frequency", pollingPeriod())
       .toString();

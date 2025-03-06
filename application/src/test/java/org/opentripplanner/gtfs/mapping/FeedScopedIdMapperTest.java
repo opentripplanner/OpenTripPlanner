@@ -24,9 +24,8 @@ public class FeedScopedIdMapperTest {
 
   @Test
   public void testMapAgencyAndIdWithNulls() throws Exception {
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> mapAgencyAndId(new org.onebusaway.gtfs.model.AgencyAndId())
+    assertThrows(IllegalArgumentException.class, () ->
+      mapAgencyAndId(new org.onebusaway.gtfs.model.AgencyAndId())
     );
   }
 }

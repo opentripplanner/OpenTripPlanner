@@ -158,8 +158,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     request.setWheelchair(requireWheelChairAccessible);
     request.setArriveBy(arriveBy);
 
-    var tree = StreetSearchBuilder
-      .of()
+    var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(streetMode))

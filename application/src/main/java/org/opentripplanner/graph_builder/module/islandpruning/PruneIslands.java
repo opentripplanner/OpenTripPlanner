@@ -334,8 +334,7 @@ public class PruneIslands implements GraphBuilderModule {
         if (State.isEmpty(states)) {
           continue;
         }
-        Arrays
-          .stream(states)
+        Arrays.stream(states)
           .map(State::getVertex)
           .forEach(out -> {
             var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());

@@ -18,7 +18,6 @@ import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildService;
 import org.opentripplanner.service.osminfo.model.Platform;
@@ -27,6 +26,7 @@ import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -127,7 +127,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private Envelope getEnvelope(TransitStopVertex ts) {
     Envelope envelope = new Envelope(ts.getCoordinate());
 
-    double xscale = Math.cos(ts.getCoordinate().y * Math.PI / 180);
+    double xscale = Math.cos((ts.getCoordinate().y * Math.PI) / 180);
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
     return envelope;
   }
@@ -212,7 +212,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       for (var vertex : linker.linkToSpecificStreetEdgesPermanently(
         boardingLocation,
         new TraverseModeSet(TraverseMode.WALK),
-        LinkingDirection.BOTH_WAYS,
+        LinkingDirection.BIDIRECTIONAL,
         platformEdgeList.getValue().stream().map(StreetEdge.class::cast).collect(Collectors.toSet())
       )) {
         linkBoardingLocationToStop(ts, stop.getCode(), vertex);
@@ -243,7 +243,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           linker.linkVertexPermanently(
             boardingLocation,
             new TraverseModeSet(TraverseMode.WALK),
-            LinkingDirection.BOTH_WAYS,
+            LinkingDirection.BIDIRECTIONAL,
             (osmBoardingLocationVertex, splitVertex) ->
               getConnectingEdges(boardingLocation, osmBoardingLocationVertex, splitVertex)
           );

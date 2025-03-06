@@ -61,7 +61,7 @@ class OsmArea {
     try {
       // now, ring grouping
       // first, find outermost rings
-      OUTER:for (Ring outer : outerRings) {
+      OUTER: for (Ring outer : outerRings) {
         for (Ring possibleContainer : outerRings) {
           if (outer != possibleContainer && outer.jtsPolygon.within(possibleContainer.jtsPolygon)) {
             continue OUTER;
@@ -167,8 +167,7 @@ class OsmArea {
     for (Ring ring : outermostRings) {
       polygons.add(ring.jtsPolygon);
     }
-    MultiPolygon jtsMultiPolygon = GeometryUtils
-      .getGeometryFactory()
+    MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory()
       .createMultiPolygon(polygons.toArray(new Polygon[0]));
     var validOp = new IsValidOp(jtsMultiPolygon);
     if (!validOp.isValid()) {

@@ -566,7 +566,65 @@
         "visibility" : "none"
       },
       "metadata" : {
-        "group" : "Safety"
+        "group" : "Bicycle safety"
+      }
+    },
+    {
+      "id" : "bicycle-safety-text",
+      "source" : "vectorSource",
+      "source-layer" : "edges",
+      "type" : "symbol",
+      "minzoom" : 17,
+      "maxzoom" : 23,
+      "paint" : {
+        "text-color" : "#000",
+        "text-halo-color" : "#fff",
+        "text-halo-blur" : 4,
+        "text-halo-width" : 3
+      },
+      "filter" : [
+        "in",
+        "class",
+        "StreetEdge",
+        "AreaEdge",
+        "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
+        "TemporaryPartialStreetEdge",
+        "TemporaryFreeEdge"
+      ],
+      "layout" : {
+        "symbol-placement" : "line-center",
+        "symbol-spacing" : 1000,
+        "text-field" : "{bicycleSafetyFactor}",
+        "text-font" : [
+          "KlokanTech Noto Sans Regular"
+        ],
+        "text-size" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          10,
+          6.0,
+          24,
+          12.0
+        ],
+        "text-max-width" : 100,
+        "text-keep-upright" : true,
+        "text-rotation-alignment" : "map",
+        "text-overlap" : "never",
+        "text-offset" : [
+          0,
+          1.0
+        ],
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Bicycle safety"
       }
     },
     {
@@ -652,65 +710,7 @@
         "visibility" : "none"
       },
       "metadata" : {
-        "group" : "Safety"
-      }
-    },
-    {
-      "id" : "bicycle-safety-text",
-      "source" : "vectorSource",
-      "source-layer" : "edges",
-      "type" : "symbol",
-      "minzoom" : 17,
-      "maxzoom" : 23,
-      "paint" : {
-        "text-color" : "#000",
-        "text-halo-color" : "#fff",
-        "text-halo-blur" : 4,
-        "text-halo-width" : 3
-      },
-      "filter" : [
-        "in",
-        "class",
-        "StreetEdge",
-        "AreaEdge",
-        "EscalatorEdge",
-        "PathwayEdge",
-        "ElevatorHopEdge",
-        "TemporaryPartialStreetEdge",
-        "TemporaryFreeEdge"
-      ],
-      "layout" : {
-        "symbol-placement" : "line-center",
-        "symbol-spacing" : 1000,
-        "text-field" : "{bicycleSafetyFactor}",
-        "text-font" : [
-          "KlokanTech Noto Sans Regular"
-        ],
-        "text-size" : [
-          "interpolate",
-          [
-            "linear"
-          ],
-          [
-            "zoom"
-          ],
-          10,
-          6.0,
-          24,
-          12.0
-        ],
-        "text-max-width" : 100,
-        "text-keep-upright" : true,
-        "text-rotation-alignment" : "map",
-        "text-overlap" : "never",
-        "text-offset" : [
-          0,
-          1.0
-        ],
-        "visibility" : "none"
-      },
-      "metadata" : {
-        "group" : "Safety"
+        "group" : "Walk safety"
       }
     },
     {
@@ -768,7 +768,7 @@
         "visibility" : "none"
       },
       "metadata" : {
-        "group" : "Safety"
+        "group" : "Walk safety"
       }
     },
     {

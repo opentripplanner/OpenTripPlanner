@@ -24,8 +24,9 @@ class MultiModalStationMapper {
 
   @Nullable
   MultiModalStation map(StopPlace stopPlace, Collection<Station> childStations) {
-    MultiModalStationBuilder multiModalStation = MultiModalStation
-      .of(idFactory.createId(stopPlace.getId()))
+    MultiModalStationBuilder multiModalStation = MultiModalStation.of(
+      idFactory.createId(stopPlace.getId())
+    )
       .withChildStations(childStations)
       .withName(
         NonLocalizedString.ofNullable(stopPlace.getName(), MultilingualString::getValue, "N/A")

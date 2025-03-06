@@ -32,21 +32,19 @@ public class SimpleAreaTest {
     var outside0 = node(5, new WgsCoordinate(-1, 0));
     var outside1 = node(6, new WgsCoordinate(6, 5));
 
-    var provider = TestOsmProvider
-      .of()
+    var provider = TestOsmProvider.of()
       .addAreaFromNodes(area)
       .addWayFromNodes(outside0, inside0)
       .addWayFromNodes(outside1, inside1)
       .build();
 
     var graph = new Graph(new Deduplicator());
-    var osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withAreaVisibility(true)
       .withMaxAreaNodes(10)
       .build();
