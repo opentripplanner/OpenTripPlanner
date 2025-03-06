@@ -626,13 +626,6 @@ public class VertexLinker {
         Math.floor(2 * maxAreaNodes * maxAreaNodes / areaComplexity)
       );
       if (appliedCount < totalCount) {
-        LOG.info(
-          "polygon = {}, maxNodes = {}, visi reduced {} -> {}",
-          areaComplexity,
-          maxAreaNodes,
-          totalCount,
-          appliedCount
-        );
         visibilityVertices =
           visibilityVertices
             .stream()
@@ -649,7 +642,6 @@ public class VertexLinker {
     // return false if new vertex could not be connected without intersecting the boundary
     // this happens when the added vertex is outside the area or all visibility edges are blocked
     if (added == 0) {
-      LOG.error("Area visibility connections failed");
       if (force) {
         var nearest = areaGroup
           .visibilityVertices()
