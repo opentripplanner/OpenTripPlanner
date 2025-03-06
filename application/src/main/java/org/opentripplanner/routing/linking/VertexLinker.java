@@ -424,7 +424,7 @@ public class VertexLinker {
       }
       // connect start point to area visibility points to achieve optimal paths
       if (!ag.visibilityVertices().contains(start)) {
-        addAreaVertex(start, ag, scope, tempEdges, added);
+        addAreaVertex(start, ag, scope, tempEdges, added == false);
       }
     } else {
       start = split;
