@@ -129,6 +129,17 @@ public class TripMatcherFactoryTest {
   }
 
   @Test
+  void testIncludeNoRoutes() {
+    TripRequest request = TripRequest.of().withIncludedRoutes(List.of()).build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertFalse(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
+  }
+
+  @Test
   void testDisjointAgencyFilters() {
     TripRequest request = TripRequest.of()
       .withIncludedAgencies(List.of(RUTER1_ID))

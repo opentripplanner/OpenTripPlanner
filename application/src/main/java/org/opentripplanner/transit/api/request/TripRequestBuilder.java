@@ -38,12 +38,12 @@ public class TripRequestBuilder {
   TripRequestBuilder() {}
 
   public TripRequestBuilder withIncludedAgencies(Collection<FeedScopedId> agencies) {
-    this.includedAgencies = FilterValues.ofEmptyIsEverything("includedAgencies", agencies);
+    this.includedAgencies = FilterValues.ofEmptyIsNothing("includedAgencies", agencies);
     return this;
   }
 
   public TripRequestBuilder withIncludedRoutes(Collection<FeedScopedId> routes) {
-    this.includedRoutes = FilterValues.ofEmptyIsEverything("includedRoutes", routes);
+    this.includedRoutes = FilterValues.ofEmptyIsNothing("includedRoutes", routes);
     return this;
   }
 
