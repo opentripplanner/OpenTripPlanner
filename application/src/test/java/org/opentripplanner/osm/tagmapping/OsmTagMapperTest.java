@@ -210,7 +210,7 @@ class OsmTagMapperTest {
     var way = way("indoor", "area");
     assertEquals("indoor area", wps.getCreativeNameForWay(way).toString());
     assertEquals("Innenbereich", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
-    assertEquals("sisätilat", wps.getCreativeNameForWay(way).toString(FI));
+    assertEquals("sisätila", wps.getCreativeNameForWay(way).toString(FI));
   }
 
   public OsmEntity way(String key, String value) {
