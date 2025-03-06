@@ -2497,9 +2497,8 @@ type Trip implements Node {
   stoptimesForDate(
     """
     Date for which stoptimes are returned. Format: YYYYMMDD
-    If serviceDate is not specified for stoptimesForDate, the result is exactly the same
-    as for stoptimes, i.e. the scheduled stops are returned. This is illogical, but
-    existing UIs depend on this bug so we will not fix it.
+    If `serviceDate` is not specified and the trip is not running today, the result is exactly the same
+    as for `stoptimes`, i.e. the scheduled stop times from the next scheduled date are returned.
     """
     serviceDate: String
   ): [Stoptime]
