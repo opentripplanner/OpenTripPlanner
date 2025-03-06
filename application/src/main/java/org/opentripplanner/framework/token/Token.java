@@ -30,10 +30,6 @@ public class Token {
     return (boolean) get(fieldName, TokenType.BOOLEAN);
   }
 
-  public byte getByte(String fieldName) {
-    return (byte) get(fieldName, TokenType.BYTE);
-  }
-
   public Duration getDuration(String fieldName) {
     return (Duration) get(fieldName, TokenType.DURATION);
   }
@@ -62,7 +58,7 @@ public class Token {
   public <T extends Enum<T>> Optional<T> getEnum(String fieldName, Class<T> enumClass) {
     try {
       String value = (String) get(fieldName, TokenType.ENUM);
-      if(value == null) {
+      if (value == null) {
         return Optional.empty();
       }
       return Optional.of(Enum.valueOf(enumClass, value));

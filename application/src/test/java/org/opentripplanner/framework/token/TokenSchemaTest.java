@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.DayOfWeek;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,9 +20,6 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
     .addBoolean(BOOLEAN_FALSE_FIELD)
     .build();
 
-  private static final TokenSchema BYTE_SCHEMA = TokenSchema.ofVersion(1)
-    .addByte(BYTE_FIELD)
-    .build();
   private static final TokenSchema DURATION_SCHEMA = TokenSchema.ofVersion(2)
     .addDuration(DURATION_FIELD)
     .build();
@@ -50,13 +46,6 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
 
     var tokenResult = BOOLEAN_SCHEMA.decode(token);
     assertFalse(tokenResult.getBoolean(BOOLEAN_FALSE_FIELD));
-  }
-
-  @Test
-  public void encodeAndDecodeByte() {
-    var token = BYTE_SCHEMA.encode().withByte(BYTE_FIELD, (byte) 17).build();
-    assertEquals(BYTE_ENCODED, token);
-    assertEquals(BYTE_VALUE, BYTE_SCHEMA.decode(token).getByte(BYTE_FIELD));
   }
 
   @Test
@@ -108,16 +97,16 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
     assertEquals("Unknown field: 'foo'", ex.getMessage());
 
     Assertions.assertThrows(NullPointerException.class, () ->
-      BYTE_SCHEMA.encode().withString(null, "A")
+      INT_SCHEMA.encode().withString(null, "A")
     );
   }
 
   @Test
   public void encodeFieldValueWithTypeMismatch() {
     var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
-      STRING_SCHEMA.encode().withByte(STRING_FIELD, (byte) 12)
+      STRING_SCHEMA.encode().withInt(STRING_FIELD, (byte) 12)
     );
-    assertEquals("The defined type for 'AStr' is STRING not BYTE.", ex.getMessage());
+    assertEquals("The defined type for 'AStr' is STRING not INT.", ex.getMessage());
   }
 
   @Test
@@ -130,8 +119,8 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
   @Test
   public void testToString() {
     assertEquals(
-      "TokenSchema{definition: TokenDefinition{version: 1, fields: [AByte:BYTE]}}",
-      BYTE_SCHEMA.toString()
+      "TokenSchema{definition: TokenDefinition{version: 1, fields: [ABoolTrue:BOOLEAN, ABoolFalse:BOOLEAN]}}",
+      BOOLEAN_SCHEMA.toString()
     );
     assertEquals(
       "TokenSchema{definition: TokenDefinition{version: 3, fields: [ANum:INT]}}",
@@ -153,13 +142,13 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
 
   @Test
   void testDefinitionEqualsAndHashCode() {
-    var subject = BYTE_SCHEMA.currentDefinition();
-    var same = TokenSchema.ofVersion(1).addByte(BYTE_FIELD).build().currentDefinition();
+    var subject = INT_SCHEMA.currentDefinition();
+    var same = TokenSchema.ofVersion(3).addInt(INT_FIELD).build().currentDefinition();
 
     assertEquals(subject, same);
     assertEquals(subject.hashCode(), same.hashCode());
 
-    assertNotEquals(subject, INT_SCHEMA.currentDefinition());
-    assertNotEquals(subject.hashCode(), INT_SCHEMA.currentDefinition().hashCode());
+    assertNotEquals(subject, BOOLEAN_SCHEMA.currentDefinition());
+    assertNotEquals(subject.hashCode(), BOOLEAN_SCHEMA.currentDefinition().hashCode());
   }
 }
