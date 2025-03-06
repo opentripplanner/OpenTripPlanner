@@ -81,7 +81,7 @@ public interface TransitService {
   Optional<List<TripTimeOnDate>> getTripTimeOnDates(
     Trip trip,
     LocalDate serviceDate,
-    boolean useScheduledWhenNonRunning
+    boolean fallbackToNextScheduledDate
   );
 
   /**

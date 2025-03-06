@@ -123,7 +123,7 @@ public class DefaultTransitService implements TransitEditorService {
   public Optional<List<TripTimeOnDate>> getTripTimeOnDates(
     Trip trip,
     LocalDate serviceDate,
-    boolean useScheduledWhenNonRunning
+    boolean fallbackToNextScheduledDate
   ) {
     TripPattern pattern = findPattern(trip, serviceDate);
 
@@ -134,7 +134,7 @@ public class DefaultTransitService implements TransitEditorService {
     if (times == null) {
       return Optional.empty();
     } else if (!this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())) {
-      if (useScheduledWhenNonRunning) {
+      if (fallbackToNextScheduledDate) {
         // Technically not returning empty here is incorrect, you should use getScheduledTripTimes
         // above instead if you want this, but it has been the behavior for a very long time, and
         // at least one longstanding front end will fail without this.
