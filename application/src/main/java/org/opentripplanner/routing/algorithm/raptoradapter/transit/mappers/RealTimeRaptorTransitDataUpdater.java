@@ -45,15 +45,22 @@ public class RealTimeRaptorTransitDataUpdater {
    * Cache the TripPatternForDates indexed on the original TripPatterns in order to avoid this
    * expensive operation being done each time the update method is called.
    */
-  private final Map<LocalDate, Map<TripPattern, TripPatternForDate>> tripPatternsStartingOnDateMapCache = new HashMap<>();
+  private final Map<
+    LocalDate,
+    Map<TripPattern, TripPatternForDate>
+  > tripPatternsStartingOnDateMapCache = new HashMap<>();
 
   /**
    * Cache the TripPatternForDate currently in use for a trip and service date. Only one TripPatternForDate is allowed
    * for a trip id and service date. This cache is used to clean up extra tripPatternsForDate.
    */
-  private final Map<TripIdAndServiceDate, TripPatternForDate> tripPatternsForTripIdAndServiceDateCache = new HashMap<>();
+  private final Map<
+    TripIdAndServiceDate,
+    TripPatternForDate
+  > tripPatternsForTripIdAndServiceDateCache = new HashMap<>();
 
-  private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache = new HashMap<>();
+  private final Map<LocalDate, Set<TripPatternForDate>> tripPatternsRunningOnDateMapCache =
+    new HashMap<>();
 
   public RealTimeRaptorTransitDataUpdater(TimetableRepository timetableRepository) {
     this.timetableRepository = timetableRepository;
@@ -137,10 +144,8 @@ public class RealTimeRaptorTransitDataUpdater {
             triptimes.getTrip().getId(),
             timetable.getServiceDate()
           );
-          TripPatternForDate previousTripPatternForDate = tripPatternsForTripIdAndServiceDateCache.put(
-            id,
-            newTripPatternForDate
-          );
+          TripPatternForDate previousTripPatternForDate =
+            tripPatternsForTripIdAndServiceDateCache.put(id, newTripPatternForDate);
           if (previousTripPatternForDate != null) {
             previouslyUsedPatterns.add(previousTripPatternForDate);
           } else {
@@ -157,9 +162,8 @@ public class RealTimeRaptorTransitDataUpdater {
     // Now loop through all running period dates of old and new TripPatternsForDate and update
     // the tripPatternsByRunningPeriodDate accordingly
     for (LocalDate date : datesToBeUpdated) {
-      tripPatternsRunningOnDateMapCache.computeIfAbsent(
-        date,
-        p -> new HashSet<>(realtimeRaptorTransitData.getTripPatternsRunningOnDateCopy(date))
+      tripPatternsRunningOnDateMapCache.computeIfAbsent(date, p ->
+        new HashSet<>(realtimeRaptorTransitData.getTripPatternsRunningOnDateCopy(date))
       );
 
       // Remove old cached tripPatterns where tripTimes are no longer running

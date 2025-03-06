@@ -64,9 +64,8 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
   @Nested
   class AccessEgressPenalties {
 
-    private static final RemoveTransitIfStreetOnlyIsBetter FLAGGER = new RemoveTransitIfStreetOnlyIsBetter(
-      CostLinearFunction.of(Duration.ZERO, 1.0)
-    );
+    private static final RemoveTransitIfStreetOnlyIsBetter FLAGGER =
+      new RemoveTransitIfStreetOnlyIsBetter(CostLinearFunction.of(Duration.ZERO, 1.0));
 
     @Test
     void keepBusWithLowCostAndPenalty() {

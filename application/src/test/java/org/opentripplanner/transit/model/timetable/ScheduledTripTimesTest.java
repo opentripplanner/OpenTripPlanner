@@ -37,8 +37,7 @@ class ScheduledTripTimesTest {
     TIMEPOINTS.set(1);
   }
 
-  private final ScheduledTripTimes subject = ScheduledTripTimes
-    .of()
+  private final ScheduledTripTimes subject = ScheduledTripTimes.of()
     .withArrivalTimes("10:00 11:00 12:00")
     .withDepartureTimes("10:01 11:02 12:03")
     .withServiceCode(SERVICE_CODE)
@@ -102,15 +101,12 @@ class ScheduledTripTimesTest {
 
   @Test
   void validateLastArrivalTimeIsNotMoreThan20DaysAfterFirstDepartureTime() {
-    var ex = assertThrows(
-      DataValidationException.class,
-      () ->
-        ScheduledTripTimes
-          .of()
-          .withDepartureTimes("10:00 12:00 10:00:01+20d")
-          .withServiceCode(SERVICE_CODE)
-          .withTrip(TRIP)
-          .build()
+    var ex = assertThrows(DataValidationException.class, () ->
+      ScheduledTripTimes.of()
+        .withDepartureTimes("10:00 12:00 10:00:01+20d")
+        .withServiceCode(SERVICE_CODE)
+        .withTrip(TRIP)
+        .build()
     );
     assertEquals(
       "The arrivalTime is not in range[-12h, 20d]. Time: 10:00:01+20d, stop-pos: 2, trip: F:Trip-1.",

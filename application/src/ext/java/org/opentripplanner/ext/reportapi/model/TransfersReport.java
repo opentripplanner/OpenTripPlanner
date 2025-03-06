@@ -139,10 +139,9 @@ public class TransfersReport {
 
     if (trip != null) {
       var tt = pattern.getScheduledTimetable().getTripTimes(trip);
-      r.time =
-        boarding
-          ? tt.getScheduledDepartureTime(stopPosition)
-          : tt.getScheduledArrivalTime(stopPosition);
+      r.time = boarding
+        ? tt.getScheduledDepartureTime(stopPosition)
+        : tt.getScheduledArrivalTime(stopPosition);
     }
   }
 

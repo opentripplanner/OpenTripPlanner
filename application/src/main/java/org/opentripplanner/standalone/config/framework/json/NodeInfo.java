@@ -157,8 +157,7 @@ public record NodeInfo(
 
   @Override
   public String toString() {
-    var builder = ValueObjectToStringBuilder
-      .of()
+    var builder = ValueObjectToStringBuilder.of()
       .addText(name)
       .addText(" : ")
       .addText(typeDescription());

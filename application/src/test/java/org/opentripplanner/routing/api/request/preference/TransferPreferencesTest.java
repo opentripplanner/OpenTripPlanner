@@ -14,13 +14,10 @@ class TransferPreferencesTest {
   private static final double WAIT_RELUCTANCE = 0.95;
   private static final int MAX_TRANSFERS = 17;
   private static final int MAX_ADDITIONAL_TRANSFERS = 7;
-  private static final TransferOptimizationPreferences OPTIMIZATION = TransferOptimizationPreferences
-    .of()
-    .withBackTravelWaitTimeFactor(2.5)
-    .build();
+  private static final TransferOptimizationPreferences OPTIMIZATION =
+    TransferOptimizationPreferences.of().withBackTravelWaitTimeFactor(2.5).build();
   private static final int NONPREFERRED_COST = 30_000;
-  private final TransferPreferences subject = TransferPreferences
-    .of()
+  private final TransferPreferences subject = TransferPreferences.of()
     .withCost(COST)
     .withSlack(SLACK)
     .withWaitReluctance(WAIT_RELUCTANCE)

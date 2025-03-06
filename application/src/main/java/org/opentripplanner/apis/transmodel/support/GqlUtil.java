@@ -49,8 +49,7 @@ public class GqlUtil {
   }
 
   public static GraphQLFieldDefinition newTransitIdField() {
-    return GraphQLFieldDefinition
-      .newFieldDefinition()
+    return GraphQLFieldDefinition.newFieldDefinition()
       .name("id")
       .type(new GraphQLNonNull(Scalars.GraphQLID))
       .dataFetcher(env -> TransitIdMapper.mapEntityIDToApi(env.getSource()))
@@ -58,8 +57,7 @@ public class GqlUtil {
   }
 
   public static GraphQLInputObjectField newIdListInputField(String name, String description) {
-    return GraphQLInputObjectField
-      .newInputObjectField()
+    return GraphQLInputObjectField.newInputObjectField()
       .name(name)
       .description(description)
       .type(new GraphQLList(Scalars.GraphQLID))

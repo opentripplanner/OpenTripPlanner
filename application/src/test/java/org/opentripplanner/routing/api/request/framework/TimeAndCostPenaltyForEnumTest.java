@@ -16,8 +16,7 @@ class TimeAndCostPenaltyForEnumTest {
     "11s + 1.2t",
     COST_FACTOR
   );
-  private final TimeAndCostPenaltyForEnum<Fish> subject = TimeAndCostPenaltyForEnum
-    .of(Fish.class)
+  private final TimeAndCostPenaltyForEnum<Fish> subject = TimeAndCostPenaltyForEnum.of(Fish.class)
     .with(Fish.PERCH, PERCH_PENALTY)
     .build();
 
@@ -60,8 +59,7 @@ class TimeAndCostPenaltyForEnumTest {
   @Test
   void testEqualsAndHashCode() {
     var same = TimeAndCostPenaltyForEnum.of(Fish.class).with(Fish.PERCH, PERCH_PENALTY).build();
-    var other = TimeAndCostPenaltyForEnum
-      .of(Fish.class)
+    var other = TimeAndCostPenaltyForEnum.of(Fish.class)
       .with(Fish.COD, new TimeAndCostPenalty(TimePenalty.of("1s + 1.0  t"), 1.5))
       .build();
 
@@ -76,8 +74,7 @@ class TimeAndCostPenaltyForEnumTest {
 
   @Test
   void testOf() {
-    var c = TimeAndCostPenaltyForEnum
-      .of(Fish.class)
+    var c = TimeAndCostPenaltyForEnum.of(Fish.class)
       .with(Fish.COD, TimeAndCostPenalty.of("1s + 3t", 0.2))
       .build();
     assertEquals(
@@ -96,8 +93,7 @@ class TimeAndCostPenaltyForEnumTest {
 
   @Test
   void testBuilderWithMap() {
-    var c = TimeAndCostPenaltyForEnum
-      .of(Fish.class)
+    var c = TimeAndCostPenaltyForEnum.of(Fish.class)
       .withValues(Map.of(Fish.PERCH, TimeAndCostPenalty.of("2s + 4t", 2.0)))
       .build();
 
@@ -109,8 +105,7 @@ class TimeAndCostPenaltyForEnumTest {
 
   @Test
   void testBuildApply() {
-    var c = TimeAndCostPenaltyForEnum
-      .of(Fish.class)
+    var c = TimeAndCostPenaltyForEnum.of(Fish.class)
       .apply(b -> b.with(Fish.PERCH, TimeAndCostPenalty.of("3s + 5t", 0.1)))
       .build();
 

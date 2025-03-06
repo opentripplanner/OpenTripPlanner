@@ -227,9 +227,8 @@ class RouteRequestMapperBicycleTest {
       )
     );
     var allowedEnv = executionContext(bikeArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
+    assertThrows(IllegalArgumentException.class, () ->
+      RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
     );
 
     bikeArgs = createArgsCopy(RouteRequestMapperTest.ARGS);

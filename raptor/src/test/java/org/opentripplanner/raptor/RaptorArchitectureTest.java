@@ -69,8 +69,7 @@ public class RaptorArchitectureTest {
     API_PATH.dependsOn(OTP_UTILS, API_MODEL).verify();
     var debug = API.subPackage("debug").dependsOn(OTP_UTILS).verify();
     var view = API.subPackage("view").dependsOn(OTP_UTILS, API_MODEL).verify();
-    var request = API
-      .subPackage("request")
+    var request = API.subPackage("request")
       .dependsOn(OTP_UTILS, debug, API_MODEL, API_PATH, view)
       .verify();
     API.subPackage("response").dependsOn(OTP_UTILS, API_MODEL, API_PATH, request).verify();
@@ -99,9 +98,13 @@ public class RaptorArchitectureTest {
     RR_DEBUG.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_LIFECYCLE.dependsOn(RR_SHARED_PACKAGES).verify();
     RR_TRANSIT.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE).verify();
-    RR_CONTEXT
-      .dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_LIFECYCLE, RR_SUPPORT, RR_TRANSIT)
-      .verify();
+    RR_CONTEXT.dependsOn(
+      RR_SHARED_PACKAGES,
+      RR_DEBUG,
+      RR_LIFECYCLE,
+      RR_SUPPORT,
+      RR_TRANSIT
+    ).verify();
     RR_PATH.dependsOn(RR_SHARED_PACKAGES, RR_DEBUG, RR_TRANSIT, RAPTOR_PATH).verify();
     RR_PATH_CONFIGURE.dependsOn(RR_SHARED_PACKAGES, RR_CONTEXT, RR_PATH).verify();
     RANGE_RAPTOR.dependsOn(RR_SHARED_PACKAGES, RR_INTERNAL_API, RR_LIFECYCLE, RR_TRANSIT).verify();
@@ -109,16 +112,13 @@ public class RaptorArchitectureTest {
 
   @Test
   void enforcePackageDependenciesInStandardRangeRaptorImplementation() {
-    var stdInternalApi = RR_STANDARD
-      .subPackage("internalapi")
+    var stdInternalApi = RR_STANDARD.subPackage("internalapi")
       .dependsOn(RAPTOR_API, RAPTOR_SPI, RR_INTERNAL_API)
       .verify();
-    var stdBestTimes = RR_STANDARD
-      .subPackage("besttimes")
+    var stdBestTimes = RR_STANDARD.subPackage("besttimes")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi)
       .verify();
-    var stdStopArrivals = RR_STANDARD
-      .subPackage("stoparrivals")
+    var stdStopArrivals = RR_STANDARD.subPackage("stoparrivals")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi)
       .verify();
     var stdStopArrivalsView = stdStopArrivals
@@ -129,105 +129,92 @@ public class RaptorArchitectureTest {
       .subPackage("path")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi, stdStopArrivalsView)
       .verify();
-    var stdDebug = RR_STANDARD
-      .subPackage("debug")
+    var stdDebug = RR_STANDARD.subPackage("debug")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi, stdStopArrivalsView)
       .verify();
 
-    var RR_STANDARD_HEURISTIC = RR_STANDARD
-      .subPackage("heuristics")
+    var RR_STANDARD_HEURISTIC = RR_STANDARD.subPackage("heuristics")
       .dependsOn(RR_SHARED_PACKAGES, stdInternalApi, stdBestTimes)
       .verify();
 
     RR_STANDARD.dependsOn(RR_SHARED_PACKAGES, stdInternalApi, stdBestTimes).verify();
 
-    RR_STD_CONFIGURE
-      .dependsOn(
-        RR_SHARED_PACKAGES,
-        RR_CONTEXT,
-        RR_PATH_CONFIGURE,
-        stdInternalApi,
-        stdBestTimes,
-        stdStopArrivals,
-        stdStopArrivalsView,
-        stdStopArrivalsPath,
-        stdDebug,
-        RR_STANDARD_HEURISTIC,
-        RR_STANDARD
-      )
-      .verify();
+    RR_STD_CONFIGURE.dependsOn(
+      RR_SHARED_PACKAGES,
+      RR_CONTEXT,
+      RR_PATH_CONFIGURE,
+      stdInternalApi,
+      stdBestTimes,
+      stdStopArrivals,
+      stdStopArrivalsView,
+      stdStopArrivalsPath,
+      stdDebug,
+      RR_STANDARD_HEURISTIC,
+      RR_STANDARD
+    ).verify();
   }
 
   @Test
   @Disabled
   void enforcePackageDependenciesInMultiCriteriaImplementation() {
-    var mcArrivals = RR_MULTI_CRITERIA
-      .subPackage("arrivals")
+    var mcArrivals = RR_MULTI_CRITERIA.subPackage("arrivals")
       .dependsOn(RR_SHARED_PACKAGES)
       .verify();
     var mcArrivalsC1 = mcArrivals
       .subPackage("c1")
       .dependsOn(mcArrivals, RR_SHARED_PACKAGES)
       .verify();
-    var mcRide = RR_MULTI_CRITERIA
-      .subPackage("ride")
+    var mcRide = RR_MULTI_CRITERIA.subPackage("ride")
       .dependsOn(mcArrivals, RR_SHARED_PACKAGES)
       .verify();
     var mcRideC1 = mcRide
       .subPackage("c1")
       .dependsOn(mcArrivals, mcRide, RR_SHARED_PACKAGES)
       .verify();
-    var mcHeuristics = RR_MULTI_CRITERIA
-      .subPackage("heuristic")
+    var mcHeuristics = RR_MULTI_CRITERIA.subPackage("heuristic")
       .dependsOn(RR_SHARED_PACKAGES, mcArrivals)
       .verify();
     RR_MULTI_CRITERIA.dependsOn(RR_SHARED_PACKAGES, mcArrivals, mcRide, mcHeuristics).verify();
 
-    RR_MC_CONFIGURE
-      .dependsOn(
-        RR_SHARED_PACKAGES,
-        RR_CONTEXT,
-        RR_PATH_CONFIGURE,
-        mcHeuristics,
-        mcArrivals,
-        mcArrivalsC1,
-        mcRideC1,
-        RR_MULTI_CRITERIA
-      )
-      .verify();
+    RR_MC_CONFIGURE.dependsOn(
+      RR_SHARED_PACKAGES,
+      RR_CONTEXT,
+      RR_PATH_CONFIGURE,
+      mcHeuristics,
+      mcArrivals,
+      mcArrivalsC1,
+      mcRideC1,
+      RR_MULTI_CRITERIA
+    ).verify();
   }
 
   @Test
   void enforcePackageDependenciesInRaptorService() {
-    SERVICE
-      .dependsOn(
-        OTP_UTILS,
-        RAPTOR_API,
-        RAPTOR_SPI,
-        RAPTOR_UTIL,
-        CONFIGURE,
-        RR_INTERNAL_API,
-        RR_TRANSIT,
-        RANGE_RAPTOR
-      )
-      .verify();
+    SERVICE.dependsOn(
+      OTP_UTILS,
+      RAPTOR_API,
+      RAPTOR_SPI,
+      RAPTOR_UTIL,
+      CONFIGURE,
+      RR_INTERNAL_API,
+      RR_TRANSIT,
+      RANGE_RAPTOR
+    ).verify();
   }
 
   @Test
   void enforcePackageDependenciesInConfigure() {
-    CONFIGURE
-      .dependsOn(
-        OTP_UTILS,
-        RAPTOR_API,
-        RAPTOR_SPI,
-        RANGE_RAPTOR,
-        RR_INTERNAL_API,
-        RR_TRANSIT,
-        RR_CONTEXT,
-        RR_STD_CONFIGURE,
-        RR_MC_CONFIGURE
-      )
-      .verify();
+    CONFIGURE.dependsOn(
+      OTP_UTILS,
+      RAPTOR_API,
+      RAPTOR_SPI,
+      RANGE_RAPTOR,
+      RR_INTERNAL_API,
+      RR_TRANSIT,
+      RR_CONTEXT,
+      RR_STD_CONFIGURE,
+      RR_MC_CONFIGURE
+    ).verify();
   }
 
   @Test

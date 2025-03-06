@@ -21,18 +21,20 @@ public class WheelchairCostCalculatorTest {
   private static final int TRANSFER_COST_SEC = 2;
   private static final double WAIT_RELUCTANCE_FACTOR = 0.5;
 
-  private final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator = new DefaultCostCalculator<>(
-    BOARD_COST_SEC,
-    TRANSFER_COST_SEC,
-    WAIT_RELUCTANCE_FACTOR,
-    null,
-    null
-  );
+  private final DefaultCostCalculator<TestTripSchedule> defaultCostCalculator =
+    new DefaultCostCalculator<>(
+      BOARD_COST_SEC,
+      TRANSFER_COST_SEC,
+      WAIT_RELUCTANCE_FACTOR,
+      null,
+      null
+    );
 
-  private final WheelchairCostCalculator<TestTripSchedule> wheelchairCostCalculator = new WheelchairCostCalculator<>(
-    defaultCostCalculator,
-    AccessibilityPreferences.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST)
-  );
+  private final WheelchairCostCalculator<TestTripSchedule> wheelchairCostCalculator =
+    new WheelchairCostCalculator<>(
+      defaultCostCalculator,
+      AccessibilityPreferences.ofCost(UNKNOWN_ACCESSIBILITY_COST, INACCESSIBLE_TRIP_COST)
+    );
   private final TestTripSchedule.Builder scheduleBuilder = TestTripSchedule.schedule("12:00 12:01");
 
   static Stream<Arguments> testCases() {

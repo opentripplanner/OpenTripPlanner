@@ -77,8 +77,7 @@ class TripPatternForDatesTest {
     stopTime2.setDepartureTime(300);
     stopTime2.setStopSequence(1);
     StopPattern stopPattern = new StopPattern(List.of(stopTime1, stopTime2));
-    RoutingTripPattern tripPattern = TripPattern
-      .of(TimetableRepositoryForTest.id("P1"))
+    RoutingTripPattern tripPattern = TripPattern.of(TimetableRepositoryForTest.id("P1"))
       .withRoute(ROUTE)
       .withStopPattern(stopPattern)
       .build()

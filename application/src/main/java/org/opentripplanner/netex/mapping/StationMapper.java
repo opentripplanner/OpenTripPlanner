@@ -58,15 +58,13 @@ class StationMapper {
 
   Station map(StopPlace stopPlace) {
     var id = idFactory.createId(stopPlace.getId());
-    return siteRepositoryBuilder.computeStationIfAbsent(
-      id,
-      it -> mapStopPlaceToStation(it, stopPlace)
+    return siteRepositoryBuilder.computeStationIfAbsent(id, it ->
+      mapStopPlaceToStation(it, stopPlace)
     );
   }
 
   Station mapStopPlaceToStation(FeedScopedId id, StopPlace stopPlace) {
-    var builder = Station
-      .of(id)
+    var builder = Station.of(id)
       .withName(resolveName(stopPlace))
       .withCoordinate(mapCoordinate(stopPlace))
       .withShouldRouteToCentroid(shouldRouteToCentroid(id))
@@ -75,8 +73,7 @@ class StationMapper {
       )
       .withPriority(StopTransferPriorityMapper.mapToDomain(stopPlace.getWeighting()))
       .withTimezone(
-        Optional
-          .ofNullable(stopPlace.getLocale())
+        Optional.ofNullable(stopPlace.getLocale())
           .map(LocaleStructure::getTimeZone)
           .map(zoneId -> ofZoneId(stopPlace.getId(), zoneId))
           .orElse(defaultTimeZone)
@@ -145,8 +142,10 @@ class StationMapper {
         "Station %s does not contain any coordinates.",
         stopPlace.getId() + " " + stopPlace.getName()
       );
-      List<WgsCoordinate> coordinates = JAXBUtils
-        .streamJAXBElementValue(Quay.class, stopPlace.getQuays().getQuayRefOrQuay())
+      List<WgsCoordinate> coordinates = JAXBUtils.streamJAXBElementValue(
+        Quay.class,
+        stopPlace.getQuays().getQuayRefOrQuay()
+      )
         .map(Zone_VersionStructure::getCentroid)
         .filter(Objects::nonNull)
         .map(WgsCoordinateMapper::mapToDomain)

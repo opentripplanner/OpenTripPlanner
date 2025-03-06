@@ -183,7 +183,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     assertEquals(3, pattern.numberOfStops());
 
-    var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
+    var tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
     var arrivalTime = tripTimes.getArrivalTime(1);
 
     assertEquals(StopTime.MISSING_VALUE, arrivalTime);

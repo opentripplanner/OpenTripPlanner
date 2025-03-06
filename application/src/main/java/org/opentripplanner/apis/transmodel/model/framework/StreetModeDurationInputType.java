@@ -27,20 +27,17 @@ public class StreetModeDurationInputType {
   private static final String FIELD_DURATION = "duration";
 
   public static GraphQLInputObjectType create() {
-    return GraphQLInputObjectType
-      .newInputObject()
+    return GraphQLInputObjectType.newInputObject()
       .name("StreetModeDurationInput")
       .description("A combination of street mode and corresponding duration")
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(FIELD_STREET_MODE)
           .type(new GraphQLNonNull(EnumTypes.STREET_MODE))
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(FIELD_DURATION)
           .type(new GraphQLNonNull(TransmodelScalars.DURATION_SCALAR))
       )
@@ -50,8 +47,7 @@ public class StreetModeDurationInputType {
   public static Value mapDurationForStreetModeGraphQLValue(
     DurationForEnum<StreetMode> durationForStreetMode
   ) {
-    List<Value> list = EnumTypes.STREET_MODE
-      .getValues()
+    List<Value> list = EnumTypes.STREET_MODE.getValues()
       .stream()
       .map(gqlModeType -> {
         var mode = (StreetMode) gqlModeType.getValue();
@@ -65,18 +61,15 @@ public class StreetModeDurationInputType {
   }
 
   static Value mapModeDuration(GraphQLEnumValueDefinition gqlModeType, Duration duration) {
-    return ObjectValue
-      .newObjectValue()
+    return ObjectValue.newObjectValue()
       .objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name(FIELD_STREET_MODE)
           .value(EnumValue.of(gqlModeType.getName()))
           .build()
       )
       .objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name(FIELD_DURATION)
           .value(StringValue.newStringValue(duration.toString()).build())
           .build()

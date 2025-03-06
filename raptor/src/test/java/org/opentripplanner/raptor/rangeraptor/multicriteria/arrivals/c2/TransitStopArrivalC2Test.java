@@ -23,16 +23,13 @@ class TransitStopArrivalC2Test {
     ACCESS_DURATION
   );
   private static final int ACCESS_C1 = ACCESS_WALK.c1();
-  private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrivalC2<>(
-    ACCESS_DEPARTURE_TIME,
-    ACCESS_WALK
-  );
+  private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL =
+    new AccessStopArrivalC2<>(ACCESS_DEPARTURE_TIME, ACCESS_WALK);
   private static final int TRANSIT_TO_STOP = 101;
   private static final int TRANSIT_BOARD_TIME = 9 * 60 * 60;
   private static final int TRANSIT_LEG_DURATION = 1200;
   private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
-  private static final RaptorTripSchedule TRANSIT_TRIP = TestTripSchedule
-    .schedule(pattern("T1", 0))
+  private static final RaptorTripSchedule TRANSIT_TRIP = TestTripSchedule.schedule(pattern("T1", 0))
     .arrivals(TRANSIT_ALIGHT_TIME)
     .build();
   private static final int TRANSIT_TRAVEL_DURATION =

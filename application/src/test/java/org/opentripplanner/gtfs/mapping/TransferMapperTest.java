@@ -84,24 +84,26 @@ public class TransferMapperTest {
   void prepare() {
     ROUTE_MAPPER = new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper());
 
-    TRIP_MAPPER =
-      new TripMapper(ROUTE_MAPPER, new DirectionMapper(ISSUE_STORE), TRANSLATION_HELPER);
+    TRIP_MAPPER = new TripMapper(
+      ROUTE_MAPPER,
+      new DirectionMapper(ISSUE_STORE),
+      TRANSLATION_HELPER
+    );
 
     STATION_MAPPER = new StationMapper(TRANSLATION_HELPER, StopTransferPriority.ALLOWED);
 
-    STOP_TIME_MAPPER =
-      new StopTimeMapper(
-        STOP_MAPPER,
-        LOCATION_MAPPER,
-        LOCATION_GROUP_MAPPER,
-        new TripMapper(
-          new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, TRANSLATION_HELPER),
-          new DirectionMapper(ISSUE_STORE),
-          TRANSLATION_HELPER
-        ),
-        BOOKING_RULE_MAPPER,
-        new TranslationHelper()
-      );
+    STOP_TIME_MAPPER = new StopTimeMapper(
+      STOP_MAPPER,
+      LOCATION_MAPPER,
+      LOCATION_GROUP_MAPPER,
+      new TripMapper(
+        new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, TRANSLATION_HELPER),
+        new DirectionMapper(ISSUE_STORE),
+        TRANSLATION_HELPER
+      ),
+      BOOKING_RULE_MAPPER,
+      new TranslationHelper()
+    );
 
     tripStopTimes = new TripStopTimes();
 
@@ -239,8 +241,7 @@ public class TransferMapperTest {
       tripStopTimes,
       false,
       ISSUE_STORE
-    )
-      .map(transfer);
+    ).map(transfer);
 
     assertNotNull(result);
     assertNotNull(result.getFrom());

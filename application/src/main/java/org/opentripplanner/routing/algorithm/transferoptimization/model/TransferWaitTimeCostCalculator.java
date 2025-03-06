@@ -160,7 +160,7 @@ public class TransferWaitTimeCostCalculator {
   }
 
   double avoidShortWaitTimeCost(int waitTime) {
-    return n * t0 / (1d + (n - 1d) * Math.log1p(a * waitTime));
+    return (n * t0) / (1d + (n - 1d) * Math.log1p(a * waitTime));
   }
 
   double avoidBackTravelCost(int waitTime) {

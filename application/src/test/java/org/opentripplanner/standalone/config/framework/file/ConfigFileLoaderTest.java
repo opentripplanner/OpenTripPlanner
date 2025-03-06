@@ -58,8 +58,7 @@ class ConfigFileLoaderTest {
     //        and a value with less than 30 characters (avoid long values like paths for
     //        readability). We will use this to insert it in the JSON and later see if the
     //        ConfigLoader is able to replace the placeholder with the expected value.
-    Map.Entry<String, String> envVar = System
-      .getenv()
+    Map.Entry<String, String> envVar = System.getenv()
       .entrySet()
       .stream()
       .filter(e -> e.getKey().matches("\\w+") && e.getValue().length() < 30)
@@ -90,10 +89,8 @@ class ConfigFileLoaderTest {
    */
   @Test
   public void testMissingEnvironmentVariable() {
-    assertThrows(
-      OtpAppException.class,
-      () ->
-        ConfigFileLoader.nodeFromString(json("{ key: '${none_existing_env_variable}' }"), "test")
+    assertThrows(OtpAppException.class, () ->
+      ConfigFileLoader.nodeFromString(json("{ key: '${none_existing_env_variable}' }"), "test")
     );
   }
 

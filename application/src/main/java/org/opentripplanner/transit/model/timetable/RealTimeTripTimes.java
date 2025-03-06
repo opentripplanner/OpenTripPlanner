@@ -384,8 +384,10 @@ public final class RealTimeTripTimes implements TripTimes {
   }
 
   public void setServiceCode(int serviceCode) {
-    this.scheduledTripTimes =
-      scheduledTripTimes.copyOfNoDuplication().withServiceCode(serviceCode).build();
+    this.scheduledTripTimes = scheduledTripTimes
+      .copyOfNoDuplication()
+      .withServiceCode(serviceCode)
+      .build();
   }
 
   @Override

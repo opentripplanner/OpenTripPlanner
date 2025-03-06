@@ -16,14 +16,12 @@ public class OperatorType {
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Operator")
       .description("Organisation providing public transport services.")
       .field(GqlUtil.newTransitIdField())
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .build()
@@ -32,8 +30,7 @@ public class OperatorType {
         GraphQLFieldDefinition.newFieldDefinition().name("url").type(Scalars.GraphQLString).build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("phone")
           .type(Scalars.GraphQLString)
           .build()
@@ -44,14 +41,12 @@ public class OperatorType {
       //                        .type(brandingType)
       //                        .build())
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("lines")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
           .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
+            GqlUtil.getTransitService(environment)
               .listRoutes()
               .stream()
               .filter(route -> Objects.equals(route.getOperator(), environment.getSource()))
@@ -60,14 +55,12 @@ public class OperatorType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourney")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
+            GqlUtil.getTransitService(environment)
               .listTrips()
               .stream()
               .filter(trip -> Objects.equals(trip.getOperator(), environment.getSource()))

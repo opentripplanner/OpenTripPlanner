@@ -18,8 +18,7 @@ public class RelaxCostType {
   public static final String RATIO = "ratio";
   public static final String CONSTANT = "constant";
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("RelaxCostInput")
     .description(
       """
@@ -33,8 +32,7 @@ public class RelaxCostType {
       """
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name(RATIO)
         .description("The factor to multiply with the 'other cost'. Minimum value is 1.0.")
         .defaultValueLiteral(FloatValue.of(1.0))
@@ -42,8 +40,7 @@ public class RelaxCostType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name(CONSTANT)
         .description(
           "The constant value to add to the limit. Must be a positive number. The value is " +
@@ -57,14 +54,12 @@ public class RelaxCostType {
     .build();
 
   public static ObjectValue valueOf(CostLinearFunction value) {
-    return ObjectValue
-      .newObjectValue()
+    return ObjectValue.newObjectValue()
       .objectField(
         ObjectField.newObjectField().name(RATIO).value(FloatValue.of(value.coefficient())).build()
       )
       .objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name(CONSTANT)
           // We only use this to display the default value (this is an input type), so using
           // the lenient OTP version of duration is ok - it is slightly more readable.

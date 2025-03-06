@@ -25,69 +25,56 @@ public class TripMatcherFactoryTest {
 
   @BeforeEach
   void setup() {
-    tripRut =
-      Trip
-        .of(new FeedScopedId("F", "RUT:route:trip:1"))
-        .withRoute(
-          Route
-            .of(new FeedScopedId("F", "RUT:route:1"))
-            .withAgency(
-              Agency
-                .of(new FeedScopedId("F", "RUT:1"))
-                .withName("RUT")
-                .withTimezone("Europe/Oslo")
-                .build()
-            )
-            .withMode(TransitMode.BUS)
-            .withShortName("BUS")
-            .build()
-        )
-        .withServiceId(new FeedScopedId("F", "RUT:route:trip:1"))
-        .build();
-    tripRut2 =
-      Trip
-        .of(new FeedScopedId("F", "RUT:route:trip:2"))
-        .withRoute(
-          Route
-            .of(new FeedScopedId("F", "RUT:route:2"))
-            .withAgency(
-              Agency
-                .of(new FeedScopedId("F", "RUT:2"))
-                .withName("RUT")
-                .withTimezone("Europe/Oslo")
-                .build()
-            )
-            .withMode(TransitMode.BUS)
-            .withShortName("BUS")
-            .build()
-        )
-        .withServiceId(new FeedScopedId("F", "RUT:route:trip:2"))
-        .build();
-    tripAkt =
-      Trip
-        .of(new FeedScopedId("F", "AKT:route:trip:1"))
-        .withRoute(
-          Route
-            .of(new FeedScopedId("F", "AKT:route:1"))
-            .withAgency(
-              Agency
-                .of(new FeedScopedId("F", "AKT"))
-                .withName("AKT")
-                .withTimezone("Europe/Oslo")
-                .build()
-            )
-            .withMode(TransitMode.BUS)
-            .withShortName("BUS")
-            .build()
-        )
-        .withServiceId(new FeedScopedId("F", "AKT:route:trip:1"))
-        .build();
+    tripRut = Trip.of(new FeedScopedId("F", "RUT:route:trip:1"))
+      .withRoute(
+        Route.of(new FeedScopedId("F", "RUT:route:1"))
+          .withAgency(
+            Agency.of(new FeedScopedId("F", "RUT:1"))
+              .withName("RUT")
+              .withTimezone("Europe/Oslo")
+              .build()
+          )
+          .withMode(TransitMode.BUS)
+          .withShortName("BUS")
+          .build()
+      )
+      .withServiceId(new FeedScopedId("F", "RUT:route:trip:1"))
+      .build();
+    tripRut2 = Trip.of(new FeedScopedId("F", "RUT:route:trip:2"))
+      .withRoute(
+        Route.of(new FeedScopedId("F", "RUT:route:2"))
+          .withAgency(
+            Agency.of(new FeedScopedId("F", "RUT:2"))
+              .withName("RUT")
+              .withTimezone("Europe/Oslo")
+              .build()
+          )
+          .withMode(TransitMode.BUS)
+          .withShortName("BUS")
+          .build()
+      )
+      .withServiceId(new FeedScopedId("F", "RUT:route:trip:2"))
+      .build();
+    tripAkt = Trip.of(new FeedScopedId("F", "AKT:route:trip:1"))
+      .withRoute(
+        Route.of(new FeedScopedId("F", "AKT:route:1"))
+          .withAgency(
+            Agency.of(new FeedScopedId("F", "AKT"))
+              .withName("AKT")
+              .withTimezone("Europe/Oslo")
+              .build()
+          )
+          .withMode(TransitMode.BUS)
+          .withShortName("BUS")
+          .build()
+      )
+      .withServiceId(new FeedScopedId("F", "AKT:route:trip:1"))
+      .build();
   }
 
   @Test
   void testMatchRouteId() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withRoutes(
         FilterValues.ofEmptyIsEverything("routes", List.of(new FeedScopedId("F", "RUT:route:1")))
       )
@@ -113,8 +100,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchAgencyId() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withAgencies(
         FilterValues.ofEmptyIsEverything("agencies", List.of(new FeedScopedId("F", "RUT:1")))
       )
@@ -129,8 +115,7 @@ public class TripMatcherFactoryTest {
 
   @Test
   void testMatchServiceDates() {
-    TripRequest request = TripRequest
-      .of()
+    TripRequest request = TripRequest.of()
       .withServiceDates(
         FilterValues.ofEmptyIsEverything(
           "operatingDays",

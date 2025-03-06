@@ -9,20 +9,17 @@ import org.opentripplanner.transit.model.organization.Branding;
 public class BrandingType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Branding")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(Scalars.GraphQLID)
           .dataFetcher(env -> TransitIdMapper.mapEntityIDToApi(env.getSource()))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .description("Full name to be used for branding.")
           .type(Scalars.GraphQLString)
@@ -30,8 +27,7 @@ public class BrandingType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("shortName")
           .description("Short name to be used for branding.")
           .type(Scalars.GraphQLString)
@@ -39,8 +35,7 @@ public class BrandingType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .description("Description of branding.")
           .type(Scalars.GraphQLString)
@@ -48,8 +43,7 @@ public class BrandingType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("url")
           .description("URL to be used for branding")
           .type(Scalars.GraphQLString)
@@ -57,8 +51,7 @@ public class BrandingType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("image")
           .description("URL to an image be used for branding")
           .type(Scalars.GraphQLString)

@@ -47,7 +47,8 @@ public class GeometryProcessor {
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
   private final OtpTransitServiceBuilder transitService;
   // this is a thread-safe implementation
-  private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new ConcurrentHashMap<>();
+  private final Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey =
+    new ConcurrentHashMap<>();
   // this is a thread-safe implementation
   private final Map<FeedScopedId, LineString> geometriesByShapeId = new ConcurrentHashMap<>();
   // this is a thread-safe implementation
@@ -63,8 +64,9 @@ public class GeometryProcessor {
     DataImportIssueStore issueStore
   ) {
     this.transitService = transitService;
-    this.maxStopToShapeSnapDistance =
-      maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0
+      ? maxStopToShapeSnapDistance
+      : 150;
     this.issueStore = issueStore;
   }
 
@@ -367,17 +369,16 @@ public class GeometryProcessor {
       LineString line = getLineStringForShapeId(shapeId);
       LocationIndexedLine lol = new LocationIndexedLine(line);
 
-      geometry =
-        getSegmentGeometry(
-          shapeId,
-          lol,
-          startIndex,
-          endIndex,
-          startDistance,
-          endDistance,
-          st0,
-          st1
-        );
+      geometry = getSegmentGeometry(
+        shapeId,
+        lol,
+        startIndex,
+        endIndex,
+        startDistance,
+        endDistance,
+        st0,
+        st1
+      );
 
       return geometry;
     }

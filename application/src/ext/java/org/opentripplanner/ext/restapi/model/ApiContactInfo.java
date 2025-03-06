@@ -63,8 +63,7 @@ public class ApiContactInfo implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(getClass())
+    return ToStringBuilder.of(getClass())
       .addStr("contactPerson", contactPerson)
       .addStr("phoneNumber", phoneNumber)
       .addStr("eMail", eMail)

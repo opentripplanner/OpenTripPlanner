@@ -48,14 +48,12 @@ class LocationMapperTest {
     mapper.map(gtfsLocation);
 
     assertEquals(
-      List
-        .of(
-          Issue.issue(
-            "InvalidFlexAreaGeometry",
-            "GTFS flex location 1:zone-3 has an invalid geometry: Self-intersection at (lat: 1.0, lon: 2.0)"
-          )
+      List.of(
+        Issue.issue(
+          "InvalidFlexAreaGeometry",
+          "GTFS flex location 1:zone-3 has an invalid geometry: Self-intersection at (lat: 1.0, lon: 2.0)"
         )
-        .toString(),
+      ).toString(),
       issueStore.listIssues().toString()
     );
   }

@@ -15,39 +15,32 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
   // Token field names. These are used to reference a specific field value in the
   // token to avoid index errors. They are not part of the serialized token.
 
-  private static final TokenSchema BOOLEAN_SCHEMA = TokenSchema
-    .ofVersion(1)
+  private static final TokenSchema BOOLEAN_SCHEMA = TokenSchema.ofVersion(1)
     .addBoolean(BOOLEAN_TRUE_FIELD)
     .addBoolean(BOOLEAN_FALSE_FIELD)
     .build();
 
-  private static final TokenSchema BYTE_SCHEMA = TokenSchema
-    .ofVersion(1)
+  private static final TokenSchema BYTE_SCHEMA = TokenSchema.ofVersion(1)
     .addByte(BYTE_FIELD)
     .build();
-  private static final TokenSchema DURATION_SCHEMA = TokenSchema
-    .ofVersion(2)
+  private static final TokenSchema DURATION_SCHEMA = TokenSchema.ofVersion(2)
     .addDuration(DURATION_FIELD)
     .build();
-  private static final TokenSchema ENUM_SCHEMA = TokenSchema
-    .ofVersion(3)
+  private static final TokenSchema ENUM_SCHEMA = TokenSchema.ofVersion(3)
     .addEnum(ENUM_FIELD)
     .build();
   private static final TokenSchema INT_SCHEMA = TokenSchema.ofVersion(3).addInt(INT_FIELD).build();
-  private static final TokenSchema STRING_SCHEMA = TokenSchema
-    .ofVersion(7)
+  private static final TokenSchema STRING_SCHEMA = TokenSchema.ofVersion(7)
     .addString(STRING_FIELD)
     .build();
-  private static final TokenSchema TIME_INSTANT_SCHEMA = TokenSchema
-    .ofVersion(13)
+  private static final TokenSchema TIME_INSTANT_SCHEMA = TokenSchema.ofVersion(13)
     .addTimeInstant(TIME_INSTANT_FIELD)
     .build();
 
   @Test
   public void encodeBoolean() {
     // Add in opposite order of Schema, test naming fields work
-    var token = BOOLEAN_SCHEMA
-      .encode()
+    var token = BOOLEAN_SCHEMA.encode()
       .withBoolean(BOOLEAN_FALSE_FIELD, false)
       .withBoolean(BOOLEAN_TRUE_FIELD, true)
       .build();
@@ -96,8 +89,7 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
 
   @Test
   public void encodeTimeInstant() {
-    var token = TIME_INSTANT_SCHEMA
-      .encode()
+    var token = TIME_INSTANT_SCHEMA.encode()
       .withTimeInstant(TIME_INSTANT_FIELD, TIME_INSTANT_VALUE)
       .build();
     assertEquals(TIME_INSTANT_ENCODED, token);
@@ -109,32 +101,27 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
 
   @Test
   public void encodeUndefinedFields() {
-    var ex = Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> INT_SCHEMA.encode().withString("foo", "A")
+    var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
+      INT_SCHEMA.encode().withString("foo", "A")
     );
     assertEquals("Unknown field: 'foo'", ex.getMessage());
 
-    Assertions.assertThrows(
-      NullPointerException.class,
-      () -> BYTE_SCHEMA.encode().withString(null, "A")
+    Assertions.assertThrows(NullPointerException.class, () ->
+      BYTE_SCHEMA.encode().withString(null, "A")
     );
   }
 
   @Test
   public void encodeFieldValueWithTypeMismatch() {
-    var ex = Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> STRING_SCHEMA.encode().withByte(STRING_FIELD, (byte) 12)
+    var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
+      STRING_SCHEMA.encode().withByte(STRING_FIELD, (byte) 12)
     );
     assertEquals("The defined type for 'AStr' is STRING not BYTE.", ex.getMessage());
   }
 
   @Test
   public void decodeUndefinedToken() {
-    var ex = Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> INT_SCHEMA.decode("foo")
+    var ex = Assertions.assertThrows(IllegalArgumentException.class, () -> INT_SCHEMA.decode("foo")
     );
     assertEquals("Token is not valid. Unable to parse token: 'foo'.", ex.getMessage());
   }

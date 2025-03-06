@@ -43,8 +43,7 @@ class VehicleParkingMapper {
       );
       return null;
     }
-    return VehicleParking
-      .builder()
+    return VehicleParking.builder()
       .id(idFactory.createId(parking.getId()))
       .name(NonLocalizedString.ofNullable(parking.getName().getValue()))
       .coordinate(WgsCoordinateMapper.mapToDomain(parking.getCentroid()))

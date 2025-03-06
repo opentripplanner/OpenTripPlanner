@@ -30,8 +30,7 @@ public class TripPlan {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TripPlan.class)
+    return ToStringBuilder.of(TripPlan.class)
       .addObj("date", date)
       .addObj("from", from)
       .addObj("to", to)

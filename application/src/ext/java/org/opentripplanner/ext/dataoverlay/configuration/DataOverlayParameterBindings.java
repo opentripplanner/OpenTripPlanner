@@ -20,8 +20,7 @@ public class DataOverlayParameterBindings implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DataOverlayParameterBindings.class)
+    return ToStringBuilder.of(DataOverlayParameterBindings.class)
       .addCol("parameters", parameters)
       .toString();
   }

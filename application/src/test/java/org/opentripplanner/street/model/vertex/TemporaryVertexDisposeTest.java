@@ -247,11 +247,6 @@ public class TemporaryVertexDisposeTest {
     private TempVertex(String label) {
       super(label);
     }
-
-    @Override
-    public boolean isEndVertex() {
-      throw new IllegalStateException("The `isEndVertex` is not used by dispose logic.");
-    }
   }
 
   private static class E extends FreeEdge {

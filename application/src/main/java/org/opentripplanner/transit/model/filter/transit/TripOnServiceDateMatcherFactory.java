@@ -65,10 +65,8 @@ public class TripOnServiceDateMatcherFactory {
   }
 
   static Matcher<TripOnServiceDate> netexInternalPlanningCode(String code) {
-    return new EqualityMatcher<>(
-      "netexInternalPlanningCode",
-      code,
-      t -> t.getTrip().getNetexInternalPlanningCode()
+    return new EqualityMatcher<>("netexInternalPlanningCode", code, t ->
+      t.getTrip().getNetexInternalPlanningCode()
     );
   }
 

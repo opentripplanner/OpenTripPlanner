@@ -30,12 +30,16 @@ import org.opentripplanner.transit.model.basic.Money;
 class DefaultFareServiceTest implements PlanTestConstants {
 
   private static final Money TEN_DOLLARS = Money.usDollars(10);
-  private static final FareProduct OTHER_FEED_PRODUCT = FareProduct
-    .of(OTHER_FEED_ATTRIBUTE.getId(), "regular", TEN_DOLLARS)
-    .build();
-  private static final FareProduct AIRPORT_TO_CITY_CENTER_PRODUCT = FareProduct
-    .of(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), "regular", TEN_DOLLARS)
-    .build();
+  private static final FareProduct OTHER_FEED_PRODUCT = FareProduct.of(
+    OTHER_FEED_ATTRIBUTE.getId(),
+    "regular",
+    TEN_DOLLARS
+  ).build();
+  private static final FareProduct AIRPORT_TO_CITY_CENTER_PRODUCT = FareProduct.of(
+    AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(),
+    "regular",
+    TEN_DOLLARS
+  ).build();
 
   @Test
   void noRules() {
@@ -92,13 +96,11 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6",
-          FareProduct
-            .of(
-              FREE_TRANSFERS_IN_CITY_SET.getFareAttribute().getId(),
-              "regular",
-              TEN_DOLLARS.plus(TEN_DOLLARS)
-            )
-            .build()
+          FareProduct.of(
+            FREE_TRANSFERS_IN_CITY_SET.getFareAttribute().getId(),
+            "regular",
+            TEN_DOLLARS.plus(TEN_DOLLARS)
+          ).build()
         )
       ),
       firstProducts

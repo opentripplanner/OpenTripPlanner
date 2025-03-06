@@ -32,7 +32,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -72,8 +73,7 @@ public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTest
       "~ Walk 1m Open(0:22 0:24) 0:22 0:23 C₁240 " +
       "[0:08 0:23 15m Tₓ0 C₁1_680]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .add(TC_STANDARD, withoutCost(expA, expB))
       //.add(TC_STANDARD_ONE, withoutCost(expA))
       // TODO - Find out why the reverse Standard profiles does not return anything

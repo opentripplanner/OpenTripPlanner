@@ -25,6 +25,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 
 public class GtfsRealtimeFuzzyTripMatcherTest {
 
@@ -54,8 +55,10 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
     TEST_MODEL.stopTimesEvery5Minutes(5, TRIP, START_TIME),
     new Deduplicator()
   );
-  private static final TripPattern TRIP_PATTERN = TimetableRepositoryForTest
-    .tripPattern("tp1", ROUTE)
+  private static final TripPattern TRIP_PATTERN = TimetableRepositoryForTest.tripPattern(
+    "tp1",
+    ROUTE
+  )
     .withStopPattern(TimetableRepositoryForTest.stopPattern(STOP_1, STOP_2))
     .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(TRIP_TIMES))
     .build();
@@ -120,8 +123,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   @Test
   void noMatch() {
     // Test matching with "real time", when schedule uses time greater than 24:00
-    var trip = TripDescriptor
-      .newBuilder()
+    var trip = TripDescriptor.newBuilder()
       .setRouteId("4")
       .setDirectionId(0)
       .setStartTime("12:00:00")
@@ -129,13 +131,11 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
       .build();
     // No departure at this time
     assertFalse(trip.hasTripId());
-    trip =
-      TripDescriptor
-        .newBuilder()
-        .setRouteId("1")
-        .setStartTime("06:47:00")
-        .setStartDate("20090915")
-        .build();
+    trip = TripDescriptor.newBuilder()
+      .setRouteId("1")
+      .setStartTime("06:47:00")
+      .setStartDate("20090915")
+      .build();
     // Missing direction id
     assertFalse(trip.hasTripId());
   }
@@ -173,8 +173,7 @@ public class GtfsRealtimeFuzzyTripMatcherTest {
   }
 
   private static TripDescriptor.Builder matchingTripUpdate() {
-    return TripDescriptor
-      .newBuilder()
+    return TripDescriptor.newBuilder()
       .setRouteId(ROUTE_ID)
       .setDirectionId(2)
       .setStartTime(START_TIME)

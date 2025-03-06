@@ -15,8 +15,7 @@ import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 
 class ScheduledFlexPathCalculatorTest {
 
-  private static final ScheduledDeviatedTrip TRIP = ScheduledDeviatedTrip
-    .of(id("123"))
+  private static final ScheduledDeviatedTrip TRIP = ScheduledDeviatedTrip.of(id("123"))
     .withStopTimes(
       List.of(
         regularStop("10:00", "10:01"),

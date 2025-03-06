@@ -21,6 +21,9 @@ group from simple to complex tests (`01` to `99`).
 - `G` - Access and egress with opening hours/time restrictions
 - `H` - Combining the above advanced features
 - `I` - Heuristic test
+- `J` - Via search
+- `K` - Transit priority
+- `L` - Time penalty
  
 
 

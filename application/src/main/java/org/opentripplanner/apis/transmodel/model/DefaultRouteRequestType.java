@@ -18,13 +18,11 @@ public class DefaultRouteRequestType {
   private GraphQLObjectType createGraphQLType() {
     var preferences = request.preferences();
 
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("RoutingParameters")
       .description("The default parameters used in travel searches.")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("walkSpeed")
           .description("Max walk speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
@@ -32,8 +30,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeSpeed")
           .description("Max bike speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
@@ -41,8 +38,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("carSpeed")
           .deprecate("This parameter is no longer configurable.")
           .description("Max car speed along streets, in meters per second")
@@ -51,8 +47,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("maxDirectStreetDuration")
           .description(
             "This is the maximum duration in seconds for a direct street search. " +
@@ -64,8 +59,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("wheelChairAccessible")
           .description("Whether the trip must be wheelchair accessible.")
           .type(Scalars.GraphQLBoolean)
@@ -73,8 +67,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("numItineraries")
           .description("The maximum number of itineraries to return.")
           .type(Scalars.GraphQLInt)
@@ -82,8 +75,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("maxSlope")
           .description("The maximum slope of streets for wheelchair trips.")
           .type(Scalars.GraphQLFloat)
@@ -91,8 +83,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("showIntermediateStops")
           .deprecate("Deprecated. This parameter is always enabled")
           .description(
@@ -104,8 +95,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transferPenalty")
           .description(
             "An extra penalty added on transfers (i.e. all boardings except the first one)."
@@ -115,8 +105,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("walkReluctance")
           .description(
             "A multiplier for how bad walking is, compared to being in transit for equal lengths of time."
@@ -126,8 +115,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stairsReluctance")
           .description("Used instead of walkReluctance for stairs.")
           .type(Scalars.GraphQLFloat)
@@ -135,8 +123,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("turnReluctance")
           .description("Multiplicative factor on expected turning time.")
           .type(Scalars.GraphQLFloat)
@@ -144,8 +131,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorBoardTime")
           .description("How long does it take to get on an elevator, on average.")
           .type(Scalars.GraphQLInt)
@@ -153,8 +139,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorBoardCost")
           .description("What is the cost of boarding a elevator?")
           .type(Scalars.GraphQLInt)
@@ -162,8 +147,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorHopTime")
           .description("How long does it take to advance one floor on an elevator?")
           .type(Scalars.GraphQLInt)
@@ -171,8 +155,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("elevatorHopCost")
           .description("What is the cost of travelling one floor on an elevator?")
           .type(Scalars.GraphQLInt)
@@ -180,8 +163,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeRentalPickupTime")
           .description("Time to rent a bike.")
           .type(Scalars.GraphQLInt)
@@ -189,8 +171,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeRentalPickupCost")
           .description("Cost to rent a bike.")
           .type(Scalars.GraphQLInt)
@@ -198,8 +179,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeRentalDropOffTime")
           .description("Time to drop-off a rented bike.")
           .type(Scalars.GraphQLInt)
@@ -207,8 +187,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeRentalDropOffCost")
           .description("Cost to drop-off a rented bike.")
           .type(Scalars.GraphQLInt)
@@ -216,8 +195,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeParkTime")
           .description("Time to park a bike.")
           .type(Scalars.GraphQLInt)
@@ -225,8 +203,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeParkCost")
           .description("Cost to park a bike.")
           .type(Scalars.GraphQLInt)
@@ -234,8 +211,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("carDropOffTime")
           .description(
             "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
@@ -245,8 +221,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("waitReluctance")
           .description(
             "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
@@ -256,8 +231,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("walkBoardCost")
           .description(
             "This prevents unnecessary transfers by adding a cost for boarding a vehicle."
@@ -267,8 +241,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikeBoardCost")
           .description(
             "Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot."
@@ -278,8 +251,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("otherThanPreferredRoutesPenalty")
           .description(
             "Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing to wait for preferred route."
@@ -289,8 +261,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transferSlack")
           .description(
             "A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another."
@@ -300,8 +271,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
@@ -309,8 +279,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("boardSlackList")
           .description(TransportModeSlack.slackByGroupDescription("boardSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
@@ -318,8 +287,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
@@ -327,8 +295,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("alightSlackList")
           .description(TransportModeSlack.slackByGroupDescription("alightSlack"))
           .type(TransportModeSlack.SLACK_LIST_OUTPUT_TYPE)
@@ -336,8 +303,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("maxTransfers")
           .description("Maximum number of transfers returned in a trip plan.")
           .type(Scalars.GraphQLInt)
@@ -345,8 +311,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("maxAdditionalTransfers")
           .description(
             "Maximum number of transfers allowed in addition to the result with least number of transfers"
@@ -356,8 +321,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("reverseOptimizeOnTheFly")
           .deprecate("NOT IN USE IN OTP2.")
           .type(Scalars.GraphQLBoolean)
@@ -365,8 +329,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("compactLegsByReversedSearch")
           .deprecate("NOT IN USE IN OTP2.")
           .type(Scalars.GraphQLBoolean)
@@ -374,8 +337,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("carDecelerationSpeed")
           .description("The deceleration speed of an automobile, in meters per second per second.")
           .type(Scalars.GraphQLFloat)
@@ -383,8 +345,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("carAccelerationSpeed")
           .description("The acceleration speed of an automobile, in meters per second per second.")
           .type(Scalars.GraphQLFloat)
@@ -392,8 +353,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("ignoreRealTimeUpdates")
           .description("When true, real-time updates are ignored during this search.")
           .type(Scalars.GraphQLBoolean)
@@ -401,8 +361,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("includedPlannedCancellations")
           .description(
             "When true, service journeys cancelled in scheduled route data will be included during this search."
@@ -412,8 +371,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("disableRemainingWeightHeuristic")
           .description("If true, the remaining weight heuristic is disabled.")
           .type(Scalars.GraphQLBoolean)
@@ -421,8 +379,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("allowBikeRental")
           .description("")
           .type(Scalars.GraphQLBoolean)
@@ -431,8 +388,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("parkAndRide")
           .type(Scalars.GraphQLBoolean)
           .deprecate("Parking is specified by modes")
@@ -440,8 +396,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("kissAndRide")
           .type(Scalars.GraphQLBoolean)
           .deprecate("Parking is specified by modes")
@@ -449,8 +404,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("debugItineraryFilter")
           .type(Scalars.GraphQLBoolean)
           .deprecate("Use `itineraryFilter.debug` instead.")
@@ -458,8 +412,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("onlyTransitTrips")
           .description("Accept only paths that use transit (no street-only paths).")
           .deprecate("This is replaced by modes input object")
@@ -468,8 +421,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("disableAlertFiltering")
           .description("Option to disable the default filtering of GTFS-RT alerts by time.")
           .type(Scalars.GraphQLBoolean)
@@ -478,8 +430,7 @@ public class DefaultRouteRequestType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("geoIdElevation")
           .description(
             "Whether to apply the ellipsoid->geoid offset to all elevations in the response."

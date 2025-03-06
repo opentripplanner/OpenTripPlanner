@@ -29,8 +29,9 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
     rail.setGeneralizedCost(600 + 1);
 
     // When: sorting
-    result =
-      Stream.of(walk, bus, rail).sorted(generalizedCostComparator()).collect(Collectors.toList());
+    result = Stream.of(walk, bus, rail)
+      .sorted(generalizedCostComparator())
+      .collect(Collectors.toList());
 
     // Then: expect rail(1/3 of walk time), bus(2/3 of walk time) and walk
     assertEquals(toStr(List.of(walk, rail, bus)), toStr(result));
@@ -55,8 +56,9 @@ public class SortOnGeneralizedCostTest implements PlanTestConstants {
     bus2.setGeneralizedCost(300);
 
     // When: sorting
-    result =
-      Stream.of(bus2, walk, bus1).sorted(generalizedCostComparator()).collect(Collectors.toList());
+    result = Stream.of(bus2, walk, bus1)
+      .sorted(generalizedCostComparator())
+      .collect(Collectors.toList());
 
     // Then: expect bus to be better than walking
     assertEquals(toStr(List.of(walk, bus1, bus2)), toStr(result));

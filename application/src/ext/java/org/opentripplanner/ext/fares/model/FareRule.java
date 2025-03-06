@@ -59,8 +59,7 @@ public final class FareRule implements Serializable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(FareRule.class)
+    return ToStringBuilder.of(FareRule.class)
       .addObjOp("route", route, AbstractTransitEntity::getId)
       .addObj("originId", originId)
       .addObj("containsId", containsId)

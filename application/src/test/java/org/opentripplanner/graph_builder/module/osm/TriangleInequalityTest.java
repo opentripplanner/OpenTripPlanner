@@ -39,9 +39,8 @@ public class TriangleInequalityTest {
 
   private static Graph graph;
 
-  private final IntersectionTraversalCalculator calculator = new ConstantIntersectionTraversalCalculator(
-    10.0
-  );
+  private final IntersectionTraversalCalculator calculator =
+    new ConstantIntersectionTraversalCalculator(10.0);
 
   private Vertex start;
   private Vertex end;
@@ -52,13 +51,12 @@ public class TriangleInequalityTest {
 
     File file = ResourceLoader.of(TriangleInequalityTest.class).file("NYC_small.osm.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
-    OsmModule osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    OsmModule osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withAreaVisibility(true)
       .build();
     osmModule.buildGraph();
@@ -163,8 +161,7 @@ public class TriangleInequalityTest {
     Vertex u,
     Vertex v
   ) {
-    return StreetSearchBuilder
-      .of()
+    return StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setOriginBackEdge(startBackEdge)
       .setRequest(options)
@@ -202,8 +199,7 @@ public class TriangleInequalityTest {
       prototypeOptions.journey().transit().setFilters(filters);
     }
 
-    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
-      .of()
+    ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
       .setRequest(prototypeOptions)

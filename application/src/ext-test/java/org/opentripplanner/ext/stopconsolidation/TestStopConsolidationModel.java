@@ -25,13 +25,13 @@ class TestStopConsolidationModel {
     STOP_C
   );
   static final String SECONDARY_FEED_ID = "secondary";
-  static final Agency AGENCY = TimetableRepositoryForTest
-    .agency("agency")
+  static final Agency AGENCY = TimetableRepositoryForTest.agency("agency")
     .copy()
     .withId(new FeedScopedId(SECONDARY_FEED_ID, "agency"))
     .build();
-  static final Route ROUTE = TimetableRepositoryForTest
-    .route(new FeedScopedId(SECONDARY_FEED_ID, "route-33"))
+  static final Route ROUTE = TimetableRepositoryForTest.route(
+    new FeedScopedId(SECONDARY_FEED_ID, "route-33")
+  )
     .withAgency(AGENCY)
     .build();
   static final RegularStop STOP_D = testModel
@@ -39,8 +39,7 @@ class TestStopConsolidationModel {
     .withId(new FeedScopedId(SECONDARY_FEED_ID, "secondary-stop-D"))
     .build();
 
-  static final TripPattern PATTERN = TripPattern
-    .of(id("123"))
+  static final TripPattern PATTERN = TripPattern.of(id("123"))
     .withRoute(ROUTE)
     .withStopPattern(STOP_PATTERN)
     .build();

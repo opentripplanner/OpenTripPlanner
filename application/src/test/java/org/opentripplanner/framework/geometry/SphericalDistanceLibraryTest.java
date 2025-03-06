@@ -22,7 +22,8 @@ class SphericalDistanceLibraryTest {
     coordinates[4] = new Coordinate(0, 0);
 
     GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-    CoordinateSequenceFactory coordinateSequenceFactory = geometryFactory.getCoordinateSequenceFactory();
+    CoordinateSequenceFactory coordinateSequenceFactory =
+      geometryFactory.getCoordinateSequenceFactory();
     CoordinateSequence sequence = coordinateSequenceFactory.create(coordinates);
     LineString line = new LineString(sequence, geometryFactory);
     double length = SphericalDistanceLibrary.length(line);

@@ -51,13 +51,11 @@ public final class TripPatternBuilder
     this.scheduledTimetable = original.getScheduledTimetable();
     this.createdByRealtimeUpdate = original.isCreatedByRealtimeUpdater();
     this.originalTripPattern = original.getOriginalTripPattern();
-    this.hopGeometries =
-      original.getGeometry() == null
-        ? null
-        : IntStream
-          .range(0, original.numberOfStops() - 1)
-          .mapToObj(original::getHopGeometry)
-          .toList();
+    this.hopGeometries = original.getGeometry() == null
+      ? null
+      : IntStream.range(0, original.numberOfStops() - 1)
+        .mapToObj(original::getHopGeometry)
+        .toList();
   }
 
   public TripPatternBuilder withName(String name) {
@@ -242,8 +240,7 @@ public final class TripPatternBuilder
       } else {
         // Create new straight-line geometry for hop
         hopGeometries.add(
-          GeometryUtils
-            .getGeometryFactory()
+          GeometryUtils.getGeometryFactory()
             .createLineString(
               new Coordinate[] {
                 stopPattern.getStop(i).getCoordinate().asJtsCoordinate(),

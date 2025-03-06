@@ -143,8 +143,7 @@ public final class BestTimes {
   @Override
   public String toString() {
     final int unreachedTime = calculator.unreachedTime();
-    return ToStringBuilder
-      .of(BestTimes.class)
+    return ToStringBuilder.of(BestTimes.class)
       .addIntArraySize("times", times, unreachedTime)
       .addIntArraySize("transitArrivalTimes", transitArrivalTimes, unreachedTime)
       .addBitSetSize("reachedCurrentRound", reachedCurrentRound)

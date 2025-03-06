@@ -36,53 +36,46 @@ public class DatedServiceJourneyType {
     GraphQLType estimatedCallType,
     GraphQLType quayType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .description("A planned journey on a specific day")
       .field(GqlUtil.newTransitIdField())
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("operatingDay")
           .description(
             "The date this service runs. The date used is based on the service date as opposed to calendar date."
           )
           .type(TransmodelScalars.DATE_SCALAR)
           .dataFetcher(environment ->
-            Optional
-              .of(tripOnServiceDate(environment))
+            Optional.of(tripOnServiceDate(environment))
               .map(TripOnServiceDate::getServiceDate)
               .orElse(null)
           )
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourney")
           .description("The service journey this Dated Service Journey is based on")
           .type(new GraphQLNonNull(serviceJourneyType))
           .dataFetcher(environment -> (tripOnServiceDate(environment).getTrip()))
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tripAlteration")
           .description("Alterations specified on the Trip in the planned data")
           .type(EnumTypes.SERVICE_ALTERATION)
           .dataFetcher(environment -> tripOnServiceDate(environment).getTripAlteration())
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("replacementFor")
           .description("List of the dated service journeys this dated service journeys replaces")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(REF))))
           .dataFetcher(environment -> tripOnServiceDate(environment).getReplacementFor())
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("journeyPattern")
           .description("JourneyPattern for the dated service journey.")
           .type(journeyPatternType)
@@ -90,22 +83,19 @@ public class DatedServiceJourneyType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
           .description("Quays visited by the dated service journey.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("first")
               .description("Only fetch the first n quays on the service journey")
               .type(Scalars.GraphQLInt)
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("last")
               .description("Only fetch the last n quays on the service journey")
               .type(Scalars.GraphQLInt)
@@ -140,8 +130,7 @@ public class DatedServiceJourneyType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("estimatedCalls")
           .type(new GraphQLList(estimatedCallType))
           .withDirective(TransmodelDirectives.TIMING_DATA)
@@ -151,8 +140,7 @@ public class DatedServiceJourneyType {
           )
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
-            return GqlUtil
-              .getTransitService(environment)
+            return GqlUtil.getTransitService(environment)
               .getTripTimeOnDates(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
               .orElse(null);
           })

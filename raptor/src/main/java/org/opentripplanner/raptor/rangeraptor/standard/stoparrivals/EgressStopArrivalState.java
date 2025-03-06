@@ -73,8 +73,7 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
 
   @Override
   public String toString() {
-    var builder = ToStringBuilder
-      .of(EgressStopArrivalState.class)
+    var builder = ToStringBuilder.of(EgressStopArrivalState.class)
       .addNum("stop", stop)
       .addNum("round", round);
     // Add super type fields

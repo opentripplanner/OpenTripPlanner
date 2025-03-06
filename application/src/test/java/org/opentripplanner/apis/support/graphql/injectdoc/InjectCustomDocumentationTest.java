@@ -48,15 +48,13 @@ class InjectCustomDocumentationTest {
   }
 
   private static RuntimeWiring buildRuntimeWiring() {
-    return RuntimeWiring
-      .newRuntimeWiring()
+    return RuntimeWiring.newRuntimeWiring()
       .type("QueryType", b -> b.dataFetcher("listE", e -> List.of()))
       .type("En", b -> b.enumValues(n -> n))
       .type("AB", b -> b.typeResolver(it -> null))
       .type("AC", b -> b.typeResolver(it -> null))
       .scalar(
-        GraphQLScalarType
-          .newScalar()
+        GraphQLScalarType.newScalar()
           .name("Duration")
           .coercing(new Coercing<String, String>() {})
           .build()
@@ -69,32 +67,30 @@ class InjectCustomDocumentationTest {
    * value is the same as the key for easy recognition.
    */
   static Map<String, String> text() {
-    return Stream
-      .of(
-        "AB.description",
-        "AC.description.append",
-        "AType.description",
-        "AType.a.description",
-        "AType.b.deprecated",
-        "BType.description",
-        "BType.a.description",
-        "BType.a.deprecated",
-        "CType.description.append",
-        "CType.a.description.append",
-        "CType.b.deprecated.append",
-        "QueryType.findAB.description",
-        "QueryType.getAC.deprecated",
-        "AEnum.description",
-        "AEnum.E1.description",
-        "AEnum.E2.deprecated",
-        "AEnum.E3.deprecated",
-        "Duration.description",
-        "InputType.description",
-        "InputType.a.description",
-        "InputType.b.deprecated",
-        "InputType.c.deprecated"
-      )
-      .collect(Collectors.toMap(e -> e, e -> e));
+    return Stream.of(
+      "AB.description",
+      "AC.description.append",
+      "AType.description",
+      "AType.a.description",
+      "AType.b.deprecated",
+      "BType.description",
+      "BType.a.description",
+      "BType.a.deprecated",
+      "CType.description.append",
+      "CType.a.description.append",
+      "CType.b.deprecated.append",
+      "QueryType.findAB.description",
+      "QueryType.getAC.deprecated",
+      "AEnum.description",
+      "AEnum.E1.description",
+      "AEnum.E2.deprecated",
+      "AEnum.E3.deprecated",
+      "Duration.description",
+      "InputType.description",
+      "InputType.a.description",
+      "InputType.b.deprecated",
+      "InputType.c.deprecated"
+    ).collect(Collectors.toMap(e -> e, e -> e));
   }
 
   @Test

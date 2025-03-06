@@ -33,8 +33,7 @@ public class VersionControlInfo implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VersionControlInfo.class)
+    return ToStringBuilder.of(VersionControlInfo.class)
       .addStr("commit", commit)
       .addStr("branch", branch)
       .addStr("commitTime", commitTime)

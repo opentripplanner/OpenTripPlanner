@@ -104,9 +104,8 @@ public class OptimizedPath<T extends RaptorTripSchedule>
   private static int priorityCost(PathLeg<?> leg) {
     // Only calculate priority cost for transit legs which are followed by at least one
     // other transit leg.
-    return priorityCost(
-      leg.isTransitLeg() && leg.nextTransitLeg() != null,
-      () -> leg.asTransitLeg().getConstrainedTransferAfterLeg()
+    return priorityCost(leg.isTransitLeg() && leg.nextTransitLeg() != null, () ->
+      leg.asTransitLeg().getConstrainedTransferAfterLeg()
     );
   }
 

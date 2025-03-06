@@ -19,28 +19,24 @@ public class InterchangeType {
     GraphQLOutputType lineType,
     GraphQLOutputType serviceJourneyType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Interchange")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("staySeated")
           .type(Scalars.GraphQLBoolean)
           .dataFetcher(env -> constraint(env).isStaySeated())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("guaranteed")
           .type(Scalars.GraphQLBoolean)
           .dataFetcher(env -> constraint(env).isGuaranteed())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("priority")
           .description(
             "The transfer priority is used to decide where a transfer should " +
@@ -53,8 +49,7 @@ public class InterchangeType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("maximumWaitTime")
           .description(
             "Maximum time after scheduled departure time the connecting " +
@@ -66,8 +61,7 @@ public class InterchangeType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("FromLine")
           .deprecate("This is the same as using the `fromServiceJourney { line }` field.")
           .type(lineType)
@@ -75,8 +69,7 @@ public class InterchangeType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("ToLine")
           .deprecate("This is the same as using the `toServiceJourney { line }` field.")
           .type(lineType)
@@ -84,24 +77,21 @@ public class InterchangeType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("fromServiceJourney")
           .type(serviceJourneyType)
           .dataFetcher(env -> transferTrip(env, ConstrainedTransfer::getFrom))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("toServiceJourney")
           .type(serviceJourneyType)
           .dataFetcher(env -> transferTrip(env, ConstrainedTransfer::getTo))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("FromServiceJourney")
           .type(serviceJourneyType)
           .deprecate("Use fromServiceJourney instead")
@@ -109,8 +99,7 @@ public class InterchangeType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("ToServiceJourney")
           .type(serviceJourneyType)
           .deprecate("Use toServiceJourney instead")

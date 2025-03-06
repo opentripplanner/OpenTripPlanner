@@ -132,8 +132,7 @@ public final class StreetPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(StreetPreferences.class)
+    return ToStringBuilder.of(StreetPreferences.class)
       .addNum("turnReluctance", turnReluctance, DEFAULT.turnReluctance)
       .addEnum("drivingDirection", drivingDirection, DEFAULT.drivingDirection)
       .addDuration("routingTimeout", routingTimeout, DEFAULT.routingTimeout())

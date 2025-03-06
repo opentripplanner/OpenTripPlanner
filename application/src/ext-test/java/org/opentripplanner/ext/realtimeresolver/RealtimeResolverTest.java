@@ -57,8 +57,7 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(List.of(delayedPattern, patterns.get(1)), serviceDate);
 
     // Put an alert on stop3
-    var alert = TransitAlert
-      .of(stop3.getId())
+    var alert = TransitAlert.of(stop3.getId())
       .addEntity(new EntitySelector.StopAndRoute(stop3.getId(), route2.getId()))
       .addTimePeriod(new TimePeriod(0, 0))
       .build();
@@ -75,7 +74,8 @@ class RealtimeResolverTest {
       .asScheduledTransitLeg()
       .getTripPattern()
       .getScheduledTimetable()
-      .getTripTimes(0)
+      .getTripTimes()
+      .getFirst()
       .getArrivalDelay(1);
     assertEquals(123, leg1ArrivalDelay);
     assertEquals(0, legs.get(0).getTransitAlerts().size());
@@ -129,9 +129,8 @@ class RealtimeResolverTest {
   private static TripPattern delay(TripPattern pattern1, int seconds) {
     var originalTimeTable = pattern1.getScheduledTimetable();
 
-    var delayedTripTimes = delay(originalTimeTable.getTripTimes(0), seconds);
-    var delayedTimetable = Timetable
-      .of()
+    var delayedTripTimes = delay(originalTimeTable.getTripTimes().getFirst(), seconds);
+    var delayedTimetable = Timetable.of()
       .withTripPattern(pattern1)
       .addTripTimes(delayedTripTimes)
       .build();
@@ -141,12 +140,10 @@ class RealtimeResolverTest {
 
   private static TripTimes delay(TripTimes tt, int seconds) {
     var delayed = tt.copyScheduledTimes();
-    IntStream
-      .range(0, delayed.getNumStops())
-      .forEach(i -> {
-        delayed.updateArrivalDelay(i, seconds);
-        delayed.updateDepartureDelay(i, seconds);
-      });
+    IntStream.range(0, delayed.getNumStops()).forEach(i -> {
+      delayed.updateArrivalDelay(i, seconds);
+      delayed.updateDepartureDelay(i, seconds);
+    });
     return delayed;
   }
 
@@ -170,7 +167,7 @@ class RealtimeResolverTest {
     patterns.forEach(pattern -> {
       timetableRepository.addTripPattern(pattern.getId(), pattern);
 
-      var serviceCode = pattern.getScheduledTimetable().getTripTimes(0).getServiceCode();
+      var serviceCode = pattern.getScheduledTimetable().getTripTimes().getFirst().getServiceCode();
       timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
 
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));

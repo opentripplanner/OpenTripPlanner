@@ -19,15 +19,14 @@ public class TestRoutingService implements RoutingService {
   private final RoutingResponse routingResponse;
 
   public TestRoutingService(List<Itinerary> results) {
-    routingResponse =
-      new RoutingResponse(
-        new TripPlan(PlanTestConstants.A, PlanTestConstants.B, instant, results),
-        null,
-        null,
-        null,
-        List.of(),
-        new DebugTimingAggregator()
-      );
+    routingResponse = new RoutingResponse(
+      new TripPlan(PlanTestConstants.A, PlanTestConstants.B, instant, results),
+      null,
+      null,
+      null,
+      List.of(),
+      new DebugTimingAggregator()
+    );
   }
 
   @Override

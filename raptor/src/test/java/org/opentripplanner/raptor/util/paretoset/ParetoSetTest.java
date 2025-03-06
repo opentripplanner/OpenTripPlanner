@@ -54,10 +54,11 @@ public class ParetoSetTest {
 
   @Test
   public void addVector() {
-    ParetoSet<TestVector> set = new ParetoSet<>((l, r) ->
-      l.v1 < r.v1 || // less than
-      l.v2 != r.v2 || // different dominates
-      l.v3 + 2 < r.v3 // at least 2 less than
+    ParetoSet<TestVector> set = new ParetoSet<>(
+      (l, r) ->
+        l.v1 < r.v1 || // less than
+        l.v2 != r.v2 || // different dominates
+        l.v3 + 2 < r.v3 // at least 2 less than
     );
 
     // When one element is added
@@ -242,8 +243,8 @@ public class ParetoSetTest {
   @Test
   public void testRelaxedCriteriaAcceptingTenPercentExtra() {
     // Given a set and function
-    ParetoSet<TestVector> set = new ParetoSet<>((l, r) ->
-      l.v1 < r.v1 || l.v2 <= IntUtils.round(r.v2 * 1.1)
+    ParetoSet<TestVector> set = new ParetoSet<>(
+      (l, r) -> l.v1 < r.v1 || l.v2 <= IntUtils.round(r.v2 * 1.1)
     );
 
     // Add some values
@@ -260,8 +261,8 @@ public class ParetoSetTest {
   public void testFourCriteria() {
     // Given a set with one element with 2 criteria: [5, 5]
     // and the pareto function is: <, !=, >, <+2
-    ParetoSet<TestVector> set = new ParetoSet<>((l, r) ->
-      l.v1 < r.v1 || l.v2 != r.v2 || l.v3 > r.v3 || l.v4 < r.v4 + 2
+    ParetoSet<TestVector> set = new ParetoSet<>(
+      (l, r) -> l.v1 < r.v1 || l.v2 != r.v2 || l.v3 > r.v3 || l.v4 < r.v4 + 2
     );
     TestVector v0 = new TestVector("V0", 5, 5, 5, 5);
 
@@ -426,8 +427,7 @@ public class ParetoSetTest {
   }
 
   private static String names(Iterable<TestVector> set) {
-    return StreamSupport
-      .stream(set.spliterator(), false)
+    return StreamSupport.stream(set.spliterator(), false)
       .map(it -> it == null ? "null" : it.name)
       .collect(Collectors.joining(" "));
   }

@@ -22,15 +22,14 @@ class StationMapperTest {
 
   @BeforeEach
   void setUp() {
-    stationMapper =
-      new StationMapper(
-        DataImportIssueStore.NOOP,
-        new FeedScopedIdFactory("FEED_ID"),
-        ZoneId.of("UTC"),
-        false,
-        Set.of(),
-        SiteRepository.of()
-      );
+    stationMapper = new StationMapper(
+      DataImportIssueStore.NOOP,
+      new FeedScopedIdFactory("FEED_ID"),
+      ZoneId.of("UTC"),
+      false,
+      Set.of(),
+      SiteRepository.of()
+    );
   }
 
   @Test

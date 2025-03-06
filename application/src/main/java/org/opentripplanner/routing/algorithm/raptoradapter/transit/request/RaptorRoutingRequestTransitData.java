@@ -102,30 +102,26 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
 
     var mcCostParams = GeneralizedCostParametersMapper.map(request, patternIndex);
 
-    this.generalizedCostCalculator =
-      CostCalculatorFactory.createCostCalculator(
-        mcCostParams,
-        raptorTransitData.getStopBoardAlightTransferCosts()
-      );
+    this.generalizedCostCalculator = CostCalculatorFactory.createCostCalculator(
+      mcCostParams,
+      raptorTransitData.getStopBoardAlightTransferCosts()
+    );
 
-    this.slackProvider =
-      new SlackProvider(
-        (int) request.preferences().transfer().slack().toSeconds(),
-        request.preferences().transit().boardSlack(),
-        request.preferences().transit().alightSlack()
-      );
+    this.slackProvider = new SlackProvider(
+      (int) request.preferences().transfer().slack().toSeconds(),
+      request.preferences().transit().boardSlack(),
+      request.preferences().transit().alightSlack()
+    );
 
-    this.validTransitDataStartTime =
-      ServiceDateUtils.secondsSinceStartOfTime(
-        this.transitSearchTimeZero,
-        this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
-      );
+    this.validTransitDataStartTime = ServiceDateUtils.secondsSinceStartOfTime(
+      this.transitSearchTimeZero,
+      this.transitSearchTimeZero.minusDays(additionalPastSearchDays).toInstant()
+    );
     // The +1 is due to the validity being to the end of the day
-    this.validTransitDataEndTime =
-      ServiceDateUtils.secondsSinceStartOfTime(
-        this.transitSearchTimeZero,
-        this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
-      );
+    this.validTransitDataEndTime = ServiceDateUtils.secondsSinceStartOfTime(
+      this.transitSearchTimeZero,
+      this.transitSearchTimeZero.plusDays(additionalFutureSearchDays + 1).toInstant()
+    );
   }
 
   public RaptorRoutingRequestTransitData(

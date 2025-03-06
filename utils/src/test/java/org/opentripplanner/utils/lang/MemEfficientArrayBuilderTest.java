@@ -25,8 +25,7 @@ class MemEfficientArrayBuilderTest {
 
   @Test
   void with() {
-    var smallWeekend = MemEfficientArrayBuilder
-      .of(WEEKEND)
+    var smallWeekend = MemEfficientArrayBuilder.of(WEEKEND)
       .with(0, DayOfWeek.THURSDAY)
       .with(1, DayOfWeek.FRIDAY)
       .build();

@@ -114,9 +114,8 @@ public class TimetableSnapshotTest {
     TripPattern pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     TripTimes tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
     RealTimeTripUpdate realTimeTripUpdate = new RealTimeTripUpdate(pattern, tripTimes, today);
-    assertThrows(
-      ConcurrentModificationException.class,
-      () -> committedSnapshot.update(realTimeTripUpdate)
+    assertThrows(ConcurrentModificationException.class, () ->
+      committedSnapshot.update(realTimeTripUpdate)
     );
   }
 
@@ -135,18 +134,16 @@ public class TimetableSnapshotTest {
   @Test
   void testCannotPurgeReadOnlyTimetableSnapshot() {
     TimetableSnapshot committedSnapshot = createCommittedSnapshot();
-    assertThrows(
-      ConcurrentModificationException.class,
-      () -> committedSnapshot.purgeExpiredData(null)
+    assertThrows(ConcurrentModificationException.class, () ->
+      committedSnapshot.purgeExpiredData(null)
     );
   }
 
   @Test
   void testCannotRevertReadOnlyTimetableSnapshot() {
     TimetableSnapshot committedSnapshot = createCommittedSnapshot();
-    assertThrows(
-      ConcurrentModificationException.class,
-      () -> committedSnapshot.revertTripToScheduledTripPattern(null, null)
+    assertThrows(ConcurrentModificationException.class, () ->
+      committedSnapshot.revertTripToScheduledTripPattern(null, null)
     );
   }
 

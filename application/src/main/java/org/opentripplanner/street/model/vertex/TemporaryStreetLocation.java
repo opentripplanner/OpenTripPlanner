@@ -1,54 +1,44 @@
 package org.opentripplanner.street.model.vertex;
 
+import java.util.concurrent.atomic.AtomicLong;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
 
+/**
+ * A temporary vertex which can be used as the origin(outgoing edges),  destination(incoming
+ * edges) or via point(in-/out-going edges). There is no constraint on adding incoming/outgoing
+ * edges. For a temporary request scoped vertex with both incoming and outgoing edges, there
+ * needs to be something that excludes it from other parallel searches. One way to do this is to
+ * add a small cost to the temporary edges so that the alternative permanent edges have a small
+ * advantage.
+ */
 public final class TemporaryStreetLocation extends StreetLocation implements TemporaryVertex {
 
-  private final boolean endVertex;
+  private static final AtomicLong idCounter = new AtomicLong(0);
 
-  public TemporaryStreetLocation(
-    String id,
-    Coordinate nearestPoint,
-    I18NString name,
-    boolean endVertex
-  ) {
-    super(id, nearestPoint, name);
-    this.endVertex = endVertex;
+  public TemporaryStreetLocation(Coordinate nearestPoint, I18NString name) {
+    super("TempVertex-" + idCounter.incrementAndGet(), nearestPoint, name);
   }
 
   @Override
   public void addOutgoing(Edge edge) {
-    if (edge instanceof TemporaryEdge) {
-      if (endVertex) {
-        throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
-      } else {
-        addRentalRestriction(edge.getToVertex().rentalRestrictions());
-        super.addOutgoing(edge);
-      }
-    } else {
-      throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
-    }
+    assertConnectToTemporaryEdge(edge);
+    addRentalRestriction(edge.getToVertex().rentalRestrictions());
+    super.addOutgoing(edge);
   }
 
   @Override
   public void addIncoming(Edge edge) {
-    if (edge instanceof TemporaryEdge) {
-      if (endVertex) {
-        addRentalRestriction(edge.getFromVertex().rentalRestrictions());
-        super.addIncoming(edge);
-      } else {
-        throw new UnsupportedOperationException("Can't add incoming edge to start vertex");
-      }
-    } else {
-      throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
-    }
+    assertConnectToTemporaryEdge(edge);
+    super.addIncoming(edge);
+    addRentalRestriction(edge.getFromVertex().rentalRestrictions());
   }
 
-  @Override
-  public boolean isEndVertex() {
-    return endVertex;
+  private static void assertConnectToTemporaryEdge(Edge edge) {
+    if (!(edge instanceof TemporaryEdge)) {
+      throw new UnsupportedOperationException("Can't add permanent edge to temporary vertex");
+    }
   }
 }

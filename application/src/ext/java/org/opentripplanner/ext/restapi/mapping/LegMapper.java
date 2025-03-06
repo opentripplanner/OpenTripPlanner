@@ -68,22 +68,20 @@ public class LegMapper {
     api.endTime = GregorianCalendar.from(domain.getEndTime());
 
     // Set the arrival and departure times, even if this is redundant information
-    api.from =
-      placeMapper.mapPlace(
-        domain.getFrom(),
-        arrivalTimeFromPlace,
-        domain.getStartTime(),
-        domain.getBoardStopPosInPattern(),
-        domain.getBoardingGtfsStopSequence()
-      );
-    api.to =
-      placeMapper.mapPlace(
-        domain.getTo(),
-        domain.getEndTime(),
-        departureTimeToPlace,
-        domain.getAlightStopPosInPattern(),
-        domain.getAlightGtfsStopSequence()
-      );
+    api.from = placeMapper.mapPlace(
+      domain.getFrom(),
+      arrivalTimeFromPlace,
+      domain.getStartTime(),
+      domain.getBoardStopPosInPattern(),
+      domain.getBoardingGtfsStopSequence()
+    );
+    api.to = placeMapper.mapPlace(
+      domain.getTo(),
+      domain.getEndTime(),
+      departureTimeToPlace,
+      domain.getAlightStopPosInPattern(),
+      domain.getAlightGtfsStopSequence()
+    );
 
     api.departureDelay = domain.getDepartureDelay();
     api.arrivalDelay = domain.getArrivalDelay();
@@ -133,18 +131,19 @@ public class LegMapper {
     api.legGeometry = EncodedPolyline.encode(domain.getLegGeometry());
     api.legElevation = mapElevation(domain.getElevationProfile());
     api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
-    api.alerts =
-      concatenateAlerts(
-        streetNoteMaperMapper.mapToApi(domain.getStreetNotes()),
-        alertMapper.mapToApi(domain.getTransitAlerts())
-      );
+    api.alerts = concatenateAlerts(
+      streetNoteMaperMapper.mapToApi(domain.getStreetNotes()),
+      alertMapper.mapToApi(domain.getTransitAlerts())
+    );
     api.boardRule = getBoardAlightMessage(domain.getBoardRule());
     api.alightRule = getBoardAlightMessage(domain.getAlightRule());
 
-    api.pickupBookingInfo =
-      BookingInfoMapper.mapBookingInfoForPickup(domain.getPickupBookingInfo());
-    api.dropOffBookingInfo =
-      BookingInfoMapper.mapBookingInfoForDropOff(domain.getDropOffBookingInfo());
+    api.pickupBookingInfo = BookingInfoMapper.mapBookingInfoForPickup(
+      domain.getPickupBookingInfo()
+    );
+    api.dropOffBookingInfo = BookingInfoMapper.mapBookingInfoForDropOff(
+      domain.getDropOffBookingInfo()
+    );
 
     api.rentedBike = domain.getRentedVehicle();
     api.walkingBike = domain.getWalkingBike();

@@ -71,8 +71,6 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.opentripplanner.utils.collection.CollectionsView;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of the Transit Service and Transit Editor Service.
@@ -82,7 +80,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultTransitService implements TransitEditorService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DefaultTransitService.class);
   private final TimetableRepository timetableRepository;
 
   private final TimetableRepositoryIndex timetableRepositoryIndex;
@@ -133,9 +130,10 @@ public class DefaultTransitService implements TransitEditorService {
     ) {
       return Optional.empty();
     } else {
-      Instant midnight = ServiceDateUtils
-        .asStartOfService(serviceDate, this.getTimeZone())
-        .toInstant();
+      Instant midnight = ServiceDateUtils.asStartOfService(
+        serviceDate,
+        this.getTimeZone()
+      ).toInstant();
       return Optional.of(TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight));
     }
   }
@@ -400,9 +398,8 @@ public class DefaultTransitService implements TransitEditorService {
       timetableRepositoryIndex.getPatternsForRoute(route)
     );
     if (timetableSnapshot != null) {
-      Collection<TripPattern> realTimeAddedPatternForRoute = timetableSnapshot.getRealTimeAddedPatternForRoute(
-        route
-      );
+      Collection<TripPattern> realTimeAddedPatternForRoute =
+        timetableSnapshot.getRealTimeAddedPatternForRoute(route);
       tripPatterns.addAll(realTimeAddedPatternForRoute);
     }
     return tripPatterns;
@@ -603,9 +600,8 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public TripOnServiceDate getTripOnServiceDate(TripIdAndServiceDate tripIdAndServiceDate) {
     if (timetableSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate = timetableSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(
-        tripIdAndServiceDate
-      );
+      TripOnServiceDate tripOnServiceDate =
+        timetableSnapshot.getRealTimeAddedTripOnServiceDateForTripAndDay(tripIdAndServiceDate);
       if (tripOnServiceDate != null) {
         return tripOnServiceDate;
       }
@@ -737,9 +733,8 @@ public class DefaultTransitService implements TransitEditorService {
       .getSiteRepository()
       .findRegularStops(request.envelope());
 
-    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(
-      request,
-      stop -> !findPatterns(stop, true).isEmpty()
+    Matcher<RegularStop> matcher = RegularStopMatcherFactory.of(request, stop ->
+      !findPatterns(stop, true).isEmpty()
     );
     return stops.stream().filter(matcher::match).toList();
   }
@@ -759,8 +754,7 @@ public class DefaultTransitService implements TransitEditorService {
   public List<TransitMode> findTransitModes(StopLocationsGroup station) {
     return sortByOccurrenceAndReduce(
       station.getChildStops().stream().flatMap(this::getPatternModesOfStop)
-    )
-      .toList();
+    ).toList();
   }
 
   @Override

@@ -64,8 +64,7 @@ public class RoutingResponse {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(RoutingResponse.class)
+    return ToStringBuilder.of(RoutingResponse.class)
       .addObj("tripPlan", tripPlan)
       .addObj("nextPageCursor", nextPageCursor)
       .addObj("previousPageCursor", previousPageCursor)

@@ -27,8 +27,6 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 // TODO OTP2 instances of this class are still mutable after construction with a builder, this will be refactored in a subsequent step
 /**
@@ -57,8 +55,6 @@ import org.slf4j.LoggerFactory;
 public final class TripPattern
   extends AbstractTransitEntity<TripPattern, TripPatternBuilder>
   implements Cloneable, LogInfo {
-
-  private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private final Route route;
 
@@ -136,8 +132,10 @@ public final class TripPattern
       }
       this.scheduledTimetable = builder.getScheduledTimetable();
     } else {
-      this.scheduledTimetable =
-        builder.getScheduledTimetableBuilder().withTripPattern(this).build();
+      this.scheduledTimetable = builder
+        .getScheduledTimetableBuilder()
+        .withTripPattern(this)
+        .build();
     }
 
     this.originalTripPattern = builder.getOriginalTripPattern();
@@ -185,8 +183,7 @@ public final class TripPattern
     if (hopGeometries != null) {
       return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
-      return GeometryUtils
-        .getGeometryFactory()
+      return GeometryUtils.getGeometryFactory()
         .createLineString(
           new Coordinate[] {
             coordinate(stopPattern.getStop(stopPosInPattern)),

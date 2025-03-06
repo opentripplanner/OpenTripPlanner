@@ -13,10 +13,8 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 class FlexPathTest {
 
   private static final int THIRTY_MINS_IN_SECONDS = (int) Duration.ofMinutes(30).toSeconds();
-  private static final FlexPath PATH = new FlexPath(
-    10_000,
-    THIRTY_MINS_IN_SECONDS,
-    () -> LineStrings.SIMPLE
+  private static final FlexPath PATH = new FlexPath(10_000, THIRTY_MINS_IN_SECONDS, () ->
+    LineStrings.SIMPLE
   );
 
   static List<Arguments> cases() {

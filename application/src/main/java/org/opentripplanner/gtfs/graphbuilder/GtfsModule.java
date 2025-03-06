@@ -196,8 +196,7 @@ public class GtfsModule implements GraphBuilderModule {
             gtfsBundle.maxInterlineDistance(),
             issueStore,
             calendarServiceData
-          )
-            .run(otpTransitService.getTripPatterns());
+          ).run(otpTransitService.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesService, otpTransitService);
@@ -264,8 +263,7 @@ public class GtfsModule implements GraphBuilderModule {
       true,
       removeRepeatedStops,
       issueStore
-    )
-      .run();
+    ).run();
   }
 
   /**

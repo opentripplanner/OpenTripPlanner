@@ -27,7 +27,5 @@ public interface RoutingAccessEgress extends RaptorAccessEgress {
    */
   boolean isWalkOnly();
 
-  boolean hasPenalty();
-
   TimeAndCost penalty();
 }

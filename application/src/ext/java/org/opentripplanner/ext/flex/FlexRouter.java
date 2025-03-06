@@ -71,18 +71,21 @@ public class FlexRouter {
     this.streetEgresses = egressTransfers;
     this.flexIndex = transitService.getFlexIndex();
     this.callbackService = new CallbackAdapter();
-    this.graphPathToItineraryMapper =
-      new GraphPathToItineraryMapper(
-        transitService.getTimeZone(),
-        graph.streetNotesService,
-        graph.ellipsoidToGeoidDifference
-      );
+    this.graphPathToItineraryMapper = new GraphPathToItineraryMapper(
+      transitService.getTimeZone(),
+      graph.streetNotesService,
+      graph.ellipsoidToGeoidDifference
+    );
 
     if (graph.hasStreets) {
-      this.accessFlexPathCalculator =
-        new StreetFlexPathCalculator(false, flexParameters.maxFlexTripDuration());
-      this.egressFlexPathCalculator =
-        new StreetFlexPathCalculator(true, flexParameters.maxFlexTripDuration());
+      this.accessFlexPathCalculator = new StreetFlexPathCalculator(
+        false,
+        flexParameters.maxFlexTripDuration()
+      );
+      this.egressFlexPathCalculator = new StreetFlexPathCalculator(
+        true,
+        flexParameters.maxFlexTripDuration()
+      );
     } else {
       // this is only really useful in tests. in real world scenarios you're unlikely to get useful
       // results if you don't have streets
@@ -94,17 +97,15 @@ public class FlexRouter {
     LocalDate searchDate = LocalDate.ofInstant(requestedTime, tz);
     this.startOfTime = ServiceDateUtils.asStartOfService(searchDate, tz);
     this.requestedTime = ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedTime);
-    this.requestedBookingTime =
-      requestedBookingTime == null
-        ? RoutingBookingInfo.NOT_SET
-        : ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedBookingTime);
-    this.dates =
-      createFlexServiceDates(
-        transitService,
-        additionalPastSearchDays,
-        additionalFutureSearchDays,
-        searchDate
-      );
+    this.requestedBookingTime = requestedBookingTime == null
+      ? RoutingBookingInfo.NOT_SET
+      : ServiceDateUtils.secondsSinceStartOfTime(startOfTime, requestedBookingTime);
+    this.dates = createFlexServiceDates(
+      transitService,
+      additionalPastSearchDays,
+      additionalFutureSearchDays,
+      searchDate
+    );
   }
 
   public List<Itinerary> createFlexOnlyItineraries(boolean arriveBy) {
@@ -115,8 +116,7 @@ public class FlexRouter {
       accessFlexPathCalculator,
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration()
-    )
-      .calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
+    ).calculateDirectFlexPaths(streetAccesses, streetEgresses, dates, requestedTime, arriveBy);
 
     var itineraries = new ArrayList<Itinerary>();
 
@@ -140,8 +140,7 @@ public class FlexRouter {
       callbackService,
       accessFlexPathCalculator,
       flexParameters.maxTransferDuration()
-    )
-      .createFlexAccesses(streetAccesses, dates);
+    ).createFlexAccesses(streetAccesses, dates);
   }
 
   public Collection<FlexAccessEgress> createFlexEgresses() {
@@ -150,8 +149,7 @@ public class FlexRouter {
       callbackService,
       egressFlexPathCalculator,
       flexParameters.maxTransferDuration()
-    )
-      .createFlexEgresses(streetEgresses, dates);
+    ).createFlexEgresses(streetEgresses, dates);
   }
 
   private List<FlexServiceDate> createFlexServiceDates(

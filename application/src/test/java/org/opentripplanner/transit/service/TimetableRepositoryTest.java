@@ -47,7 +47,8 @@ class TimetableRepositoryTest {
     assertEquals("America/New_York", timetableRepository.getTimeZone().getId());
 
     // Then trip times should be same as in input data
-    TimetableRepositoryIndex timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
+    TimetableRepositoryIndex timetableRepositoryIndex =
+      timetableRepository.getTimetableRepositoryIndex();
     Trip trip = timetableRepositoryIndex.getTripForId(SAMPLE_TRIP_ID);
     Timetable timetable = timetableRepositoryIndex.getPatternForTrip(trip).getScheduledTimetable();
     assertEquals(20 * 60, timetable.getTripTimes(trip).getDepartureTime(0));
@@ -63,11 +64,9 @@ class TimetableRepositoryTest {
           new DefaultFareServiceFactory(),
           null
         ),
-      (
-        "The graph contains agencies with different time zones. " +
+      ("The graph contains agencies with different time zones. " +
         "Please configure the one to be used in the " +
-        BUILD_CONFIG_FILENAME
-      )
+        BUILD_CONFIG_FILENAME)
     );
   }
 
@@ -101,7 +100,8 @@ class TimetableRepositoryTest {
 
     new TimeZoneAdjusterModule(timetableRepository).buildGraph();
 
-    TimetableRepositoryIndex timetableRepositoryIndex = timetableRepository.getTimetableRepositoryIndex();
+    TimetableRepositoryIndex timetableRepositoryIndex =
+      timetableRepository.getTimetableRepositoryIndex();
 
     // Then time zone should match the one provided in the feed
     assertEquals("America/Chicago", timetableRepository.getTimeZone().getId());

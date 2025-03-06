@@ -46,8 +46,7 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithVertexLinkingTest() {
-    var parking = StreetModelForTest
-      .vehicleParking()
+    var parking = StreetModelForTest.vehicleParking()
       .entrance(builder ->
         builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
       )
@@ -65,8 +64,7 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void entranceWithoutVertexLinkingTest() {
-    var parking = StreetModelForTest
-      .vehicleParking()
+    var parking = StreetModelForTest.vehicleParking()
       .entrance(builder ->
         builder
           .entranceId(id("1"))
@@ -99,8 +97,7 @@ public class VehicleParkingLinkingTest {
 
     StreetModelForTest.streetEdge(A, C, StreetTraversalPermission.NONE);
 
-    var parking = StreetModelForTest
-      .vehicleParking()
+    var parking = StreetModelForTest.vehicleParking()
       .entrance(builder ->
         builder
           .entranceId(id("1"))
@@ -123,8 +120,7 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeEntranceWithNonExistingVertexTest() {
-    var vehicleParking = StreetModelForTest
-      .vehicleParking()
+    var vehicleParking = StreetModelForTest.vehicleParking()
       .bicyclePlaces(true)
       .entrance(builder ->
         builder
@@ -158,8 +154,7 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void removeVehicleParkingWithOneEntranceAndNonExistingVertexTest() {
-    var vehicleParking = StreetModelForTest
-      .vehicleParking()
+    var vehicleParking = StreetModelForTest.vehicleParking()
       .bicyclePlaces(true)
       .entrance(builder ->
         builder

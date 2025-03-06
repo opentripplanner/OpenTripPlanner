@@ -21,8 +21,7 @@ public record ParkAndRideEntranceRemoved(VehicleParkingEntrance vehicleParkingEn
 
   @Override
   public Geometry getGeometry() {
-    return GeometryUtils
-      .getGeometryFactory()
+    return GeometryUtils.getGeometryFactory()
       .createPoint(vehicleParkingEntrance.getVertex().getCoordinate());
   }
 }

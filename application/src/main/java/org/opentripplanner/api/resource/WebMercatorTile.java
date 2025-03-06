@@ -20,7 +20,7 @@ public class WebMercatorTile {
   }
 
   private static double tile2lon(int x, int z) {
-    return x / Math.pow(2.0, z) * 360.0 - 180;
+    return (x / Math.pow(2.0, z)) * 360.0 - 180;
   }
 
   private static double tile2lat(int y, int z) {

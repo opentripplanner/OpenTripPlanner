@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import java.util.List;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 
 record TestCase(
@@ -9,7 +9,7 @@ record TestCase(
   int stopIndexA,
   int stopIndexB,
   boolean fromAToB,
-  List<PassThroughPoint> points
+  List<RaptorViaLocation> points
 )
   implements RaptorTestConstants {
   static TestCaseBuilder testCase(String description) {
@@ -61,7 +61,7 @@ record TestCase(
   }
 
   private void appendPoint(StringBuilder buf, int passThroughPointIndex) {
-    points.get(passThroughPointIndex).appendStops(buf, " or ", this::stopIndexToName);
+    buf.append(points.get(passThroughPointIndex).toString(this::stopIndexToName));
   }
 
   boolean contains(int stopIndex) {

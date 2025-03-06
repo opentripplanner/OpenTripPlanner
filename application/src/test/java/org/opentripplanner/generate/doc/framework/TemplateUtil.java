@@ -41,7 +41,7 @@ public class TemplateUtil {
       """
       <!-- %s BEGIN -->
       <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-      
+
       %s
       <!-- %s END -->
       """.trim()
@@ -63,22 +63,19 @@ public class TemplateUtil {
    */
   public static String jsonExample(JsonNode json, String comment) {
     return """
-      ```JSON
-      // %s
-      %s
-      ```
-      """.formatted(
-        comment,
-        JsonSupport.prettyPrint(json)
-      );
+    ```JSON
+    // %s
+    %s
+    ```
+    """.formatted(comment, JsonSupport.prettyPrint(json));
   }
 
   public static String graphQlExample(String query) {
     return """
-      ```graphql
-      %s
-      ```
-      """.formatted(query);
+    ```graphql
+    %s
+    ```
+    """.formatted(query);
   }
 
   /**

@@ -2,7 +2,7 @@ package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -35,7 +35,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public Scores matchScores(OsmWithTags way) {
+  public Scores matchScores(OsmEntity way) {
     int backwardScore = 0, forwardScore = 0;
     int backwardMatches = 0, forwardMatches = 0;
 
@@ -63,7 +63,7 @@ public class BestMatchSpecifier implements OsmSpecifier {
   }
 
   @Override
-  public int matchScore(OsmWithTags way) {
+  public int matchScore(OsmEntity way) {
     int score = 0;
     int matches = 0;
     for (var test : conditions) {

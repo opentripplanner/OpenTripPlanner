@@ -73,8 +73,7 @@ public class TokenSchema {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TokenSchema.class)
+    return ToStringBuilder.of(TokenSchema.class)
       .addObj("definition", currentDefinition())
       .toString();
   }

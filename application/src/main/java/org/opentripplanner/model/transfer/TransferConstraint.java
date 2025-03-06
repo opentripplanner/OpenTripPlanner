@@ -265,8 +265,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
       return "{no constraints}";
     }
 
-    return ToStringBuilder
-      .of()
+    return ToStringBuilder.of()
       .addEnum("priority", priority, ALLOWED)
       .addBoolIfTrue("staySeated", staySeated)
       .addBoolIfTrue("guaranteed", guaranteed)

@@ -79,8 +79,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TransitPathLegSelector.class)
+    return ToStringBuilder.of(TransitPathLegSelector.class)
       .addObj("filter", filter)
       .addCol("remindingLegs", remindingLegs)
       .addCol("selectedLegs", selectedLegs)

@@ -99,24 +99,20 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
                     alert
                       .entities()
                       .stream()
-                      .anyMatch(entity ->
-                        (
-                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
-                          stopAndRoute.routeId().equals(getRoute(environment).getId())
-                        ) ||
-                        (
-                          entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
-                          stopAndTrip.tripId().equals(getSource(environment).getId())
-                        )
+                      .anyMatch(
+                        entity ->
+                          (entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                            stopAndRoute.routeId().equals(getRoute(environment).getId())) ||
+                          (entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                            stopAndTrip.tripId().equals(getSource(environment).getId()))
                       )
                   )
                   .toList()
               );
-              getStops(environment)
-                .forEach(stop -> {
-                  FeedScopedId stopId = ((StopLocation) stop).getId();
-                  alerts.addAll(alertService.getStopAlerts(stopId));
-                });
+              getStops(environment).forEach(stop -> {
+                FeedScopedId stopId = ((StopLocation) stop).getId();
+                alerts.addAll(alertService.getStopAlerts(stopId));
+              });
               break;
           }
         });
@@ -186,8 +182,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       if (geometry == null) {
         return null;
       }
-      return Arrays
-        .stream(geometry.getCoordinateSequence().toCoordinateArray())
+      return Arrays.stream(geometry.getCoordinateSequence().toCoordinateArray())
         .map(coordinate -> Arrays.asList(coordinate.x, coordinate.y))
         .collect(Collectors.toList());
     };
@@ -241,8 +236,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   @Override
   public DataFetcher<String> shapeId() {
     return environment ->
-      Optional
-        .ofNullable(getSource(environment).getShapeId())
+      Optional.ofNullable(getSource(environment).getShapeId())
         .map(FeedScopedId::toString)
         .orElse(null);
   }

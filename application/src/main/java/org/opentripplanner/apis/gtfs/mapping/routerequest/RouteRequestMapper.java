@@ -41,11 +41,11 @@ public class RouteRequestMapper {
     request.setFrom(parseGenericLocation(args.getGraphQLOrigin()));
     request.setTo(parseGenericLocation(args.getGraphQLDestination()));
     request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
-    if (args.getGraphQLSearchWindow() != null) {
-      request.setSearchWindow(
-        DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
-      );
-    }
+    request.setSearchWindow(
+      args.getGraphQLSearchWindow() != null
+        ? DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
+        : null
+    );
 
     if (args.getGraphQLBefore() != null) {
       request.setPageCursorFromEncoded(args.getGraphQLBefore());

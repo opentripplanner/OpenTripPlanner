@@ -13,4 +13,4 @@
 * [ÖPNV und Fahrgemeinschaften intermodal mit dem OpenTripPlanner. FOSSGIS 2019. Holger Bruch. March, 2019](https://www.youtube.com/watch?v=XUiqEdnXEfo)
 
 ## Case studies and reports
-* [Case study by the French MOT about a national OTP instance](https://blog.transport.data.gouv.fr/images/rapport-otp-complet-2024-03-14.pdf)
+* [Study for the French infrastructure and transport administration on national-scale OTP deployment, including server throughput tests (in French).](https://blog.transport.data.gouv.fr/images/rapport-otp-complet-2024-03-14.pdf)

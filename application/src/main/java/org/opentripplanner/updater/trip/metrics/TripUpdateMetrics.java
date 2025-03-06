@@ -14,12 +14,11 @@ public class TripUpdateMetrics {
   protected List<Tag> baseTags;
 
   TripUpdateMetrics(UrlUpdaterParameters parameters) {
-    this.baseTags =
-      List.of(
-        Tag.of("configRef", parameters.configRef()),
-        Tag.of("url", parameters.url()),
-        Tag.of("feedId", parameters.feedId())
-      );
+    this.baseTags = List.of(
+      Tag.of("configRef", parameters.configRef()),
+      Tag.of("url", parameters.url()),
+      Tag.of("feedId", parameters.feedId())
+    );
   }
 
   public static Consumer<UpdateResult> batch(UrlUpdaterParameters parameters) {

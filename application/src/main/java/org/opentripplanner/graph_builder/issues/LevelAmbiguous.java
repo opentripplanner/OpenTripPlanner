@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
-public record LevelAmbiguous(String layerName, OsmWithTags entity) implements DataImportIssue {
+public record LevelAmbiguous(String layerName, OsmEntity entity) implements DataImportIssue {
   private static final String FMT =
     "Could not infer floor number for layer called '%s' at %s. " +
     "Vertical movement will still be possible, but elevator cost might be incorrect. " +

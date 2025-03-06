@@ -50,9 +50,8 @@ class StringUtilsTest {
     for (var it : illegalValues) {
       assertThrows(IllegalArgumentException.class, () -> StringUtils.assertHasValue(it));
 
-      Throwable thrown = assertThrows(
-        IllegalArgumentException.class,
-        () -> StringUtils.assertHasValue(it, "Illegal value %s", it)
+      Throwable thrown = assertThrows(IllegalArgumentException.class, () ->
+        StringUtils.assertHasValue(it, "Illegal value %s", it)
       );
       assertTrue(thrown.getMessage().startsWith("Illegal value " + it));
     }

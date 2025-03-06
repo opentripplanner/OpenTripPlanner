@@ -89,12 +89,11 @@ public class SearchContext<T extends RaptorTripSchedule> {
     this.transitData = transitData;
 
     this.calculator = createCalculator(request, tuningParameters);
-    this.roundTracker =
-      new RoundTracker(
-        nRounds(),
-        request.searchParams().numberOfAdditionalTransfers(),
-        lifeCycle()
-      );
+    this.roundTracker = new RoundTracker(
+      nRounds(),
+      request.searchParams().numberOfAdditionalTransfers(),
+      lifeCycle()
+    );
     this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     this.acceptC2AtDestination = acceptC2AtDestination;
     this.legs = initLegs(accessPaths, viaConnections, egressPaths);

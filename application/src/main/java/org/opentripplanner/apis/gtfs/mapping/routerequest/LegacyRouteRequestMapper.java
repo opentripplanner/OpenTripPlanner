@@ -42,13 +42,11 @@ public class LegacyRouteRequestMapper {
 
     CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
-    callWith.argument(
-      "fromPlace",
-      (String from) -> request.setFrom(LocationStringParser.fromOldStyleString(from))
+    callWith.argument("fromPlace", (String from) ->
+      request.setFrom(LocationStringParser.fromOldStyleString(from))
     );
-    callWith.argument(
-      "toPlace",
-      (String to) -> request.setTo(LocationStringParser.fromOldStyleString(to))
+    callWith.argument("toPlace", (String to) ->
+      request.setTo(LocationStringParser.fromOldStyleString(to))
     );
 
     callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
@@ -128,12 +126,10 @@ public class LegacyRouteRequestMapper {
         callWith.argument("walkSafetyFactor", b::withSafetyFactor);
       });
       // TODO Add support for all debug filter variants
-      callWith.argument(
-        "debugItineraryFilter",
-        (Boolean v) ->
-          preferences.withItineraryFilter(it ->
-            it.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
-          )
+      callWith.argument("debugItineraryFilter", (Boolean v) ->
+        preferences.withItineraryFilter(it ->
+          it.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
+        )
       );
       preferences.withTransit(tr -> {
         callWith.argument("boardSlack", tr::withDefaultBoardSlackSec);
@@ -143,23 +139,20 @@ public class LegacyRouteRequestMapper {
           tr::setOtherThanPreferredRoutesPenalty
         );
         // This is deprecated, if both are set, the proper one will override this
-        callWith.argument(
-          "unpreferred.useUnpreferredRoutesPenalty",
-          (Integer v) -> tr.setUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
+        callWith.argument("unpreferred.useUnpreferredRoutesPenalty", (Integer v) ->
+          tr.setUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
         );
         callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
         callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
-        callWith.argument(
-          "modeWeight",
-          (Map<String, Object> modeWeights) ->
-            tr.setReluctanceForMode(
-              modeWeights
-                .entrySet()
-                .stream()
-                .collect(
-                  Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
-                )
-            )
+        callWith.argument("modeWeight", (Map<String, Object> modeWeights) ->
+          tr.setReluctanceForMode(
+            modeWeights
+              .entrySet()
+              .stream()
+              .collect(
+                Collectors.toMap(e -> TransitMode.valueOf(e.getKey()), e -> (Double) e.getValue())
+              )
+          )
         );
       });
       preferences.withTransfer(tx -> {
@@ -195,16 +188,12 @@ public class LegacyRouteRequestMapper {
     if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
       var filterRequestBuilder = TransitFilterRequest.of();
 
-      callWith.argument(
-        "banned.routes",
-        s ->
-          filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
+      callWith.argument("banned.routes", s ->
+        filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
       );
 
-      callWith.argument(
-        "banned.agencies",
-        s ->
-          filterRequestBuilder.addNot(SelectRequest.of().withAgenciesFromString((String) s).build())
+      callWith.argument("banned.agencies", s ->
+        filterRequestBuilder.addNot(SelectRequest.of().withAgenciesFromString((String) s).build())
       );
 
       callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
@@ -212,17 +201,16 @@ public class LegacyRouteRequestMapper {
       if (hasArgument(environment, "transportModes")) {
         QualifiedModeSet modes = new QualifiedModeSet("WALK");
 
-        modes.qModes =
-          environment
-            .<List<Map<String, String>>>getArgument("transportModes")
-            .stream()
-            .map(transportMode ->
-              new QualifiedMode(
-                transportMode.get("mode") +
-                (transportMode.get("qualifier") == null ? "" : "_" + transportMode.get("qualifier"))
-              )
+        modes.qModes = environment
+          .<List<Map<String, String>>>getArgument("transportModes")
+          .stream()
+          .map(transportMode ->
+            new QualifiedMode(
+              transportMode.get("mode") +
+              (transportMode.get("qualifier") == null ? "" : "_" + transportMode.get("qualifier"))
             )
-            .collect(Collectors.toSet());
+          )
+          .collect(Collectors.toSet());
 
         var requestModes = modes.getRequestModes();
         request.journey().access().setMode(requestModes.accessMode);
@@ -250,9 +238,8 @@ public class LegacyRouteRequestMapper {
       // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
     }
 
-    callWith.argument(
-      "locale",
-      (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
+    callWith.argument("locale", (String v) ->
+      request.setLocale(GraphQLUtils.getLocale(environment, v))
     );
     return request;
   }
@@ -289,21 +276,15 @@ public class LegacyRouteRequestMapper {
   ) {
     callWith.argument("parking.unpreferredCost", parking::withUnpreferredVehicleParkingTagCost);
 
-    callWith.argument(
-      "parking.filters",
-      (Collection<Map<String, Object>> filters) -> {
-        parking.withRequiredVehicleParkingTags(parseSelectFilters(filters));
-        parking.withBannedVehicleParkingTags(parseNotFilters(filters));
-      }
-    );
+    callWith.argument("parking.filters", (Collection<Map<String, Object>> filters) -> {
+      parking.withRequiredVehicleParkingTags(parseSelectFilters(filters));
+      parking.withBannedVehicleParkingTags(parseNotFilters(filters));
+    });
 
-    callWith.argument(
-      "parking.preferred",
-      (Collection<Map<String, Object>> preferred) -> {
-        parking.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
-        parking.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
-      }
-    );
+    callWith.argument("parking.preferred", (Collection<Map<String, Object>> preferred) -> {
+      parking.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
+      parking.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
+    });
   }
 
   private static void setRentalPreferences(
@@ -322,17 +303,14 @@ public class LegacyRouteRequestMapper {
     );
 
     // Deprecated, the next one will override this, if both are set
-    callWith.argument(
-      "allowedBikeRentalNetworks",
-      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
+    callWith.argument("allowedBikeRentalNetworks", (Collection<String> v) ->
+      rental.withAllowedNetworks(new HashSet<>(v))
     );
-    callWith.argument(
-      "allowedVehicleRentalNetworks",
-      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
+    callWith.argument("allowedVehicleRentalNetworks", (Collection<String> v) ->
+      rental.withAllowedNetworks(new HashSet<>(v))
     );
-    callWith.argument(
-      "bannedVehicleRentalNetworks",
-      (Collection<String> v) -> rental.withBannedNetworks(new HashSet<>(v))
+    callWith.argument("bannedVehicleRentalNetworks", (Collection<String> v) ->
+      rental.withBannedNetworks(new HashSet<>(v))
     );
   }
 

@@ -74,14 +74,13 @@ class StopTimeMapper {
 
     I18NString stopHeadsign = null;
     if (rhs.getStopHeadsign() != null) {
-      stopHeadsign =
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.StopTime.class,
-          "stopHeadsign",
-          rhs.getTrip().getId().toString(),
-          Integer.toString(rhs.getStopSequence()),
-          rhs.getStopHeadsign()
-        );
+      stopHeadsign = translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.StopTime.class,
+        "stopHeadsign",
+        rhs.getTrip().getId().toString(),
+        Integer.toString(rhs.getStopSequence()),
+        rhs.getStopHeadsign()
+      );
     }
 
     lhs.setArrivalTime(rhs.getArrivalTime());

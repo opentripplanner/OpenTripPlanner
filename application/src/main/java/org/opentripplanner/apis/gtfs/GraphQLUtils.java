@@ -7,7 +7,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFilterPlaceTy
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
@@ -16,7 +15,6 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class GraphQLUtils {
 
@@ -48,26 +46,6 @@ public class GraphQLUtils {
       case DATE_TIME -> GraphQLInputField.DATE_TIME;
       case FROM_PLACE -> GraphQLInputField.FROM;
       case TO_PLACE, INTERMEDIATE_PLACE -> GraphQLInputField.TO;
-    };
-  }
-
-  public static GraphQLTransitMode toGraphQL(TransitMode mode) {
-    if (mode == null) return null;
-    return switch (mode) {
-      case RAIL -> GraphQLTransitMode.RAIL;
-      case COACH -> GraphQLTransitMode.COACH;
-      case SUBWAY -> GraphQLTransitMode.SUBWAY;
-      case BUS -> GraphQLTransitMode.BUS;
-      case TRAM -> GraphQLTransitMode.TRAM;
-      case FERRY -> GraphQLTransitMode.FERRY;
-      case AIRPLANE -> GraphQLTransitMode.AIRPLANE;
-      case CABLE_CAR -> GraphQLTransitMode.CABLE_CAR;
-      case GONDOLA -> GraphQLTransitMode.GONDOLA;
-      case FUNICULAR -> GraphQLTransitMode.FUNICULAR;
-      case TROLLEYBUS -> GraphQLTransitMode.TROLLEYBUS;
-      case MONORAIL -> GraphQLTransitMode.MONORAIL;
-      case CARPOOL -> GraphQLTransitMode.CARPOOL;
-      case TAXI -> GraphQLTransitMode.TAXI;
     };
   }
 

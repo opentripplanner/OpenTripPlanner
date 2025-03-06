@@ -81,13 +81,13 @@ public class OtpTransitServiceImplTest {
 
     assertEquals(
       """
-        ConstrainedTransfer{from: RouteTP{2, stop D}, to: RouteTP{5, stop I}, constraint: {guaranteed}}
-        ConstrainedTransfer{from: StopTP{F}, to: StopTP{E}, constraint: {minTransferTime: 20m}}
-        ConstrainedTransfer{from: StopTP{K}, to: StopTP{L}, constraint: {priority: RECOMMENDED}}
-        ConstrainedTransfer{from: StopTP{K}, to: StopTP{M}, constraint: {priority: NOT_ALLOWED}}
-        ConstrainedTransfer{from: StopTP{L}, to: StopTP{K}, constraint: {priority: RECOMMENDED}}
-        ConstrainedTransfer{from: StopTP{M}, to: StopTP{K}, constraint: {priority: NOT_ALLOWED}}
-        ConstrainedTransfer{from: TripTP{1.1, stopPos 1}, to: TripTP{2.2, stopPos 0}, constraint: {guaranteed}}""",
+      ConstrainedTransfer{from: RouteTP{2, stop D}, to: RouteTP{5, stop I}, constraint: {guaranteed}}
+      ConstrainedTransfer{from: StopTP{F}, to: StopTP{E}, constraint: {minTransferTime: 20m}}
+      ConstrainedTransfer{from: StopTP{K}, to: StopTP{L}, constraint: {priority: RECOMMENDED}}
+      ConstrainedTransfer{from: StopTP{K}, to: StopTP{M}, constraint: {priority: NOT_ALLOWED}}
+      ConstrainedTransfer{from: StopTP{L}, to: StopTP{K}, constraint: {priority: RECOMMENDED}}
+      ConstrainedTransfer{from: StopTP{M}, to: StopTP{K}, constraint: {priority: NOT_ALLOWED}}
+      ConstrainedTransfer{from: TripTP{1.1, stopPos 1}, to: TripTP{2.2, stopPos 0}, constraint: {guaranteed}}""",
       result
     );
   }

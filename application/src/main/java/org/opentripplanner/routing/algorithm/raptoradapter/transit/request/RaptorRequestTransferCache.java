@@ -123,14 +123,14 @@ public class RaptorRequestTransferCache {
       this.walk = preferences.walk();
       this.bike = transferMode.includesBiking() ? preferences.bike() : BikePreferences.DEFAULT;
       this.street = preferences.street();
-      this.wheelchairPreferences =
-        this.wheelchair ? preferences.wheelchair() : WheelchairPreferences.DEFAULT;
+      this.wheelchairPreferences = this.wheelchair
+        ? preferences.wheelchair()
+        : WheelchairPreferences.DEFAULT;
     }
 
     @Override
     public String toString() {
-      return ToStringBuilder
-        .of(StreetRelevantOptions.class)
+      return ToStringBuilder.of(StreetRelevantOptions.class)
         .addEnum("transferMode", transferMode)
         .addBoolIfTrue("wheelchair", wheelchair)
         .addObj("walk", walk, WalkPreferences.DEFAULT)

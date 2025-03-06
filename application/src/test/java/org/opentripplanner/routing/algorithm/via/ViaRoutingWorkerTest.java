@@ -146,8 +146,7 @@ public class ViaRoutingWorkerTest {
 
     var viaJourneys = List.of(new JourneyRequest(), new JourneyRequest());
 
-    return RouteViaRequest
-      .of(viaLocations, viaJourneys)
+    return RouteViaRequest.of(viaLocations, viaJourneys)
       .withDateTime(dateTime)
       .withFrom(location(fromA))
       .withTo(location(toB))
@@ -160,21 +159,26 @@ public class ViaRoutingWorkerTest {
    */
   void createItinieraries() {
     // Arrive 13
-    s1i1 =
-      newItinerary(fromA).bus(1, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(13, 0), viaC).build();
+    s1i1 = newItinerary(fromA)
+      .bus(1, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(13, 0), viaC)
+      .build();
     // Arrive 14
-    s1i2 =
-      newItinerary(fromA).bus(2, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(14, 0), viaC).build();
+    s1i2 = newItinerary(fromA)
+      .bus(2, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(14, 0), viaC)
+      .build();
 
     // departure 13:15
-    s2i1 =
-      newItinerary(viaC).bus(3, TimeUtils.hm2time(13, 15), TimeUtils.hm2time(15, 0), toB).build();
+    s2i1 = newItinerary(viaC)
+      .bus(3, TimeUtils.hm2time(13, 15), TimeUtils.hm2time(15, 0), toB)
+      .build();
     // departure 13:45
-    s2i2 =
-      newItinerary(viaC).bus(3, TimeUtils.hm2time(13, 45), TimeUtils.hm2time(15, 0), toB).build();
+    s2i2 = newItinerary(viaC)
+      .bus(3, TimeUtils.hm2time(13, 45), TimeUtils.hm2time(15, 0), toB)
+      .build();
     // departure 14:30
-    s2i3 =
-      newItinerary(viaC).bus(3, TimeUtils.hm2time(14, 30), TimeUtils.hm2time(15, 0), toB).build();
+    s2i3 = newItinerary(viaC)
+      .bus(3, TimeUtils.hm2time(14, 30), TimeUtils.hm2time(15, 0), toB)
+      .build();
 
     firstSearch = List.of(s1i1, s1i2);
     secondSearch = List.of(s2i1, s2i2, s2i3);

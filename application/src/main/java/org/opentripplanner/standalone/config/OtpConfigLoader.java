@@ -121,8 +121,7 @@ public class OtpConfigLoader {
   }
 
   private JsonNode loadFromFile(String filename) {
-    return ConfigFileLoader
-      .of()
+    return ConfigFileLoader.of()
       .withConfigDir(configDir)
       .withJsonFallback(jsonFallback)
       .loadFromFile(filename);

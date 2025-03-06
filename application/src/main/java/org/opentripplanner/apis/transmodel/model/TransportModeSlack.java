@@ -48,36 +48,30 @@ public class TransportModeSlack {
 
     INT_TYPE = nonNull(Scalars.GraphQLInt);
     MODE_LIST_TYPE = nonNull(GraphQLList.list(nonNull(TRANSPORT_MODE)));
-    SLACK_INPUT_TYPE =
-      GraphQLInputObjectType
-        .newInputObject()
-        .name("TransportModeSlack")
-        .description("Used to specify board and alight slack for a given modes.")
-        .field(
-          newInputObjectField()
-            .name("slack")
-            .description("The slack used for all given modes.")
-            .type(INT_TYPE)
-            .build()
-        )
-        .field(
-          newInputObjectField()
-            .name("modes")
-            .description("List of modes for which the given slack apply.")
-            .type(MODE_LIST_TYPE)
-            .build()
-        )
-        .build();
-    SLACK_OUTPUT_TYPE =
-      GraphQLObjectType
-        .newObject()
-        .name("TransportModeSlackType")
-        .description("Used to specify board and alight slack for a given modes.")
-        .field(GraphQLFieldDefinition.newFieldDefinition().name("slack").type(INT_TYPE).build())
-        .field(
-          GraphQLFieldDefinition.newFieldDefinition().name("modes").type(MODE_LIST_TYPE).build()
-        )
-        .build();
+    SLACK_INPUT_TYPE = GraphQLInputObjectType.newInputObject()
+      .name("TransportModeSlack")
+      .description("Used to specify board and alight slack for a given modes.")
+      .field(
+        newInputObjectField()
+          .name("slack")
+          .description("The slack used for all given modes.")
+          .type(INT_TYPE)
+          .build()
+      )
+      .field(
+        newInputObjectField()
+          .name("modes")
+          .description("List of modes for which the given slack apply.")
+          .type(MODE_LIST_TYPE)
+          .build()
+      )
+      .build();
+    SLACK_OUTPUT_TYPE = GraphQLObjectType.newObject()
+      .name("TransportModeSlackType")
+      .description("Used to specify board and alight slack for a given modes.")
+      .field(GraphQLFieldDefinition.newFieldDefinition().name("slack").type(INT_TYPE).build())
+      .field(GraphQLFieldDefinition.newFieldDefinition().name("modes").type(MODE_LIST_TYPE).build())
+      .build();
     SLACK_LIST_INPUT_TYPE = GraphQLList.list(SLACK_INPUT_TYPE);
     SLACK_LIST_OUTPUT_TYPE = GraphQLList.list(SLACK_OUTPUT_TYPE);
   }
@@ -109,8 +103,7 @@ public class TransportModeSlack {
   public static List<TransportModeSlack> mapToApiList(DurationForEnum<TransitMode> domain) {
     // Group modes by slack value
     Multimap<Integer, TransitMode> modesBySlack = ArrayListMultimap.create();
-    Arrays
-      .stream(TransitMode.values())
+    Arrays.stream(TransitMode.values())
       .filter(domain::isSet)
       .forEach(m -> modesBySlack.put((int) domain.valueOf(m).toSeconds(), m));
 
@@ -162,8 +155,7 @@ public class TransportModeSlack {
 
   private static String defaultsToString(DurationForEnum<TransitMode> byMode) {
     List<String> groups = new ArrayList<>();
-    Arrays
-      .stream(TransitMode.values())
+    Arrays.stream(TransitMode.values())
       .filter(byMode::isSet)
       .forEach(m -> groups.add(serializeTransportMode(m) + " : " + byMode.valueOf(m)));
     Collections.sort(groups);

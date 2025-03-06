@@ -180,10 +180,9 @@ public class Deduplicator implements DeduplicatorService, Serializable {
       Stream<T> stream = original.stream().map(it -> deduplicateObject(clazz, it));
       // The list may contain nulls, hence the use of the old unmodifiable wrapper
       //noinspection SimplifyStreamApiCallChains
-      canonical =
-        containsNull
-          ? Collections.unmodifiableList(stream.collect(Collectors.toList()))
-          : stream.collect(Collectors.toUnmodifiableList());
+      canonical = containsNull
+        ? Collections.unmodifiableList(stream.collect(Collectors.toList()))
+        : stream.collect(Collectors.toUnmodifiableList());
       canonicalLists.put(canonical, canonical);
     }
 
@@ -196,8 +195,7 @@ public class Deduplicator implements DeduplicatorService, Serializable {
    */
   @Override
   public String toString() {
-    var builder = ToStringBuilder
-      .of(Deduplicator.class)
+    var builder = ToStringBuilder.of(Deduplicator.class)
       .addObj("BitSet", sizeAndCount(canonicalBitSets.size(), BitSet.class), ZERO_COUNT)
       .addObj("int[]", sizeAndCount(canonicalIntArrays.size(), IntArray.class), ZERO_COUNT)
       .addObj("String", sizeAndCount(canonicalStrings.size(), String.class), ZERO_COUNT)

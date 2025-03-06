@@ -37,8 +37,10 @@ public final class FlexAccessEgress {
     this.trip = Objects.requireNonNull(trip);
     this.lastState = lastState;
     this.stopReachedOnBoard = stopReachedOnBoard;
-    this.routingBookingInfo =
-      RoutingBookingInfo.of(requestedBookingTime, trip.getPickupBookingInfo(boardStopPosition));
+    this.routingBookingInfo = RoutingBookingInfo.of(
+      requestedBookingTime,
+      trip.getPickupBookingInfo(boardStopPosition)
+    );
   }
 
   public RegularStop stop() {
@@ -90,8 +92,7 @@ public final class FlexAccessEgress {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(FlexAccessEgress.class)
+    return ToStringBuilder.of(FlexAccessEgress.class)
       .addNum("boardStopPosition", boardStopPosition)
       .addNum("alightStopPosition", alightStopPosition)
       .addObj("durations", pathDurations)

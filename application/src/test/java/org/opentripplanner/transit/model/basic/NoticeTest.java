@@ -15,8 +15,7 @@ class NoticeTest {
   private static final String TEXT = "text";
   private static final String PUBLIC_CODE = "public code";
 
-  private static final Notice subject = Notice
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final Notice subject = Notice.of(TimetableRepositoryForTest.id(ID))
     .withPublicCode(PUBLIC_CODE)
     .withText(TEXT)
     .build();

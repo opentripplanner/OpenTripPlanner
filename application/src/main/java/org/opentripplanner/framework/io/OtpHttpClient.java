@@ -119,18 +119,13 @@ public class OtpHttpClient {
     ObjectMapper objectMapper,
     Class<T> clazz
   ) {
-    return getAndMap(
-      uri,
-      timeout,
-      headers,
-      is -> {
-        try {
-          return objectMapper.readValue(is, clazz);
-        } catch (Exception e) {
-          throw new OtpHttpClientException(e);
-        }
+    return getAndMap(uri, timeout, headers, is -> {
+      try {
+        return objectMapper.readValue(is, clazz);
+      } catch (Exception e) {
+        throw new OtpHttpClientException(e);
       }
-    );
+    });
   }
 
   /**
@@ -154,18 +149,13 @@ public class OtpHttpClient {
     Map<String, String> headers,
     ObjectMapper objectMapper
   ) {
-    return getAndMap(
-      uri,
-      timeout,
-      headers,
-      is -> {
-        try {
-          return objectMapper.readTree(is);
-        } catch (Exception e) {
-          throw new OtpHttpClientException(e);
-        }
+    return getAndMap(uri, timeout, headers, is -> {
+      try {
+        return objectMapper.readTree(is);
+      } catch (Exception e) {
+        throw new OtpHttpClientException(e);
       }
-    );
+    });
   }
 
   /**
@@ -234,11 +224,8 @@ public class OtpHttpClient {
     Map<String, String> headers,
     ResponseMapper<T> contentMapper
   ) {
-    return executeAndMapWithResponseHandler(
-      httpRequest,
-      timeout,
-      headers,
-      response -> mapResponse(response, contentMapper)
+    return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response ->
+      mapResponse(response, contentMapper)
     );
   }
 
@@ -252,17 +239,12 @@ public class OtpHttpClient {
     Map<String, String> headers,
     ResponseMapper<T> contentMapper
   ) {
-    return executeAndMapWithResponseHandler(
-      httpRequest,
-      timeout,
-      headers,
-      response -> {
-        if (response.getCode() == 204) {
-          return Optional.empty();
-        }
-        return Optional.of(mapResponse(response, contentMapper));
+    return executeAndMapWithResponseHandler(httpRequest, timeout, headers, response -> {
+      if (response.getCode() == 204) {
+        return Optional.empty();
       }
-    );
+      return Optional.of(mapResponse(response, contentMapper));
+    });
   }
 
   /**
@@ -374,8 +356,7 @@ public class OtpHttpClient {
    */
 
   private static RequestConfig requestConfig(Duration timeout) {
-    return RequestConfig
-      .custom()
+    return RequestConfig.custom()
       .setResponseTimeout(Timeout.of(timeout))
       .setConnectionRequestTimeout(Timeout.of(timeout))
       .setProtocolUpgradeEnabled(false)

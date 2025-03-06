@@ -28,8 +28,7 @@ public class ItineraryFiltersInputType {
     "groupSimilarityKeepNumOfItineraries";
 
   public static GraphQLInputObjectType create(ItineraryFilterPreferences dft) {
-    return GraphQLInputObjectType
-      .newInputObject()
+    return GraphQLInputObjectType.newInputObject()
       .name("ItineraryFilters")
       .description(
         "Parameters for the OTP Itinerary Filter Chain. These parameters SHOULD be " +
@@ -37,8 +36,7 @@ public class ItineraryFiltersInputType {
         "are made available here to be able to experiment and tune the server."
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(MIN_SAFE_TRANSFER_TIME_FACTOR)
           .type(Scalars.GraphQLFloat)
           .deprecate("This filter is removed, it has undesired side-effects")
@@ -49,23 +47,19 @@ public class ItineraryFiltersInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(TRANSIT_GENERALIZED_COST_LIMIT)
           .type(
-            GraphQLInputObjectType
-              .newInputObject()
+            GraphQLInputObjectType.newInputObject()
               .name("TransitGeneralizedCostFilterParams")
               .field(
-                GraphQLInputObjectField
-                  .newInputObjectField()
+                GraphQLInputObjectField.newInputObjectField()
                   .name("costLimitFunction")
                   .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
                   .build()
               )
               .field(
-                GraphQLInputObjectField
-                  .newInputObjectField()
+                GraphQLInputObjectField.newInputObjectField()
                   .name("intervalRelaxFactor")
                   .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                   .build()
@@ -92,8 +86,7 @@ public class ItineraryFiltersInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(GROUP_SIMILARITY_KEEP_ONE)
           .type(Scalars.GraphQLFloat)
           .description(
@@ -104,8 +97,7 @@ public class ItineraryFiltersInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_THREE)
           .description(
@@ -118,8 +110,7 @@ public class ItineraryFiltersInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
           .name(GROUP_SIMILARITY_KEEP_N_ITINERARIES)
           .deprecate("Use " + GROUP_SIMILARITY_KEEP_THREE + " instead.")
@@ -127,8 +118,7 @@ public class ItineraryFiltersInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .type(Scalars.GraphQLFloat)
           .name(GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER)
           .description(
@@ -141,8 +131,7 @@ public class ItineraryFiltersInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .type(EnumTypes.ITINERARY_FILTER_DEBUG_PROFILE)
           .name(DEBUG)
           .description(
@@ -176,16 +165,13 @@ public class ItineraryFiltersInputType {
       GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER,
       builder::withGroupedOtherThanSameLegsMaxCostMultiplier
     );
-    setField(
-      callWith,
-      TRANSIT_GENERALIZED_COST_LIMIT,
-      (Map<String, ?> v) ->
-        builder.withTransitGeneralizedCostLimit(
-          new TransitGeneralizedCostFilterParams(
-            ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
-            (double) v.get("intervalRelaxFactor")
-          )
+    setField(callWith, TRANSIT_GENERALIZED_COST_LIMIT, (Map<String, ?> v) ->
+      builder.withTransitGeneralizedCostLimit(
+        new TransitGeneralizedCostFilterParams(
+          ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
+          (double) v.get("intervalRelaxFactor")
         )
+      )
     );
     setField(callWith, DEBUG, builder::withDebug);
   }

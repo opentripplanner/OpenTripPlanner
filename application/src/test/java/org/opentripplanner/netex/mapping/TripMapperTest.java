@@ -125,7 +125,8 @@ public class TripMapperTest {
 
     HierarchicalMapById<org.rutebanken.netex.model.Route> routeById = new HierarchicalMapById<>();
     routeById.add(netexRoute);
-    HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById = new HierarchicalMapById<>();
+    HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById =
+      new HierarchicalMapById<>();
     journeyPatternById.add(journeyPattern);
 
     TripMapper tripMapper = new TripMapper(

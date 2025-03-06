@@ -26,19 +26,17 @@ public class EmissionsConfig {
       )
       .asObject();
 
-    this.carAvgCo2PerKm =
-      c
-        .of("carAvgCo2PerKm")
-        .since(V2_5)
-        .summary("The average CO₂ emissions of a car in grams per kilometer.")
-        .asInt(170);
+    this.carAvgCo2PerKm = c
+      .of("carAvgCo2PerKm")
+      .since(V2_5)
+      .summary("The average CO₂ emissions of a car in grams per kilometer.")
+      .asInt(170);
 
-    this.carAvgOccupancy =
-      c
-        .of("carAvgOccupancy")
-        .since(V2_5)
-        .summary("The average number of passengers in a car.")
-        .asDouble(1.3);
+    this.carAvgOccupancy = c
+      .of("carAvgOccupancy")
+      .since(V2_5)
+      .summary("The average number of passengers in a car.")
+      .asDouble(1.3);
   }
 
   public int getCarAvgCo2PerKm() {

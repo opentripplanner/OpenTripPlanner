@@ -95,12 +95,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE).plus(usDollars(3)));
 
     // Local to circulator to express
-    rides =
-      List.of(
-        getLeg(COBB_AGENCY_ID, 0),
-        getLeg(COBB_AGENCY_ID, "BLUE", 1),
-        getLeg(COBB_AGENCY_ID, "101", 1)
-      );
+    rides = List.of(
+      getLeg(COBB_AGENCY_ID, 0),
+      getLeg(COBB_AGENCY_ID, "BLUE", 1),
+      getLeg(COBB_AGENCY_ID, "101", 1)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)));
   }
 
@@ -122,45 +121,41 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
-    rides =
-      List.of(
-        getLeg(MARTA_AGENCY_ID, 0),
-        getLeg(MARTA_AGENCY_ID, 1),
-        getLeg(GCT_AGENCY_ID, 2),
-        getLeg(GCT_AGENCY_ID, 3),
-        getLeg(MARTA_AGENCY_ID, 4),
-        getLeg(COBB_AGENCY_ID, 5)
-      );
+    rides = List.of(
+      getLeg(MARTA_AGENCY_ID, 0),
+      getLeg(MARTA_AGENCY_ID, 1),
+      getLeg(GCT_AGENCY_ID, 2),
+      getLeg(GCT_AGENCY_ID, 3),
+      getLeg(MARTA_AGENCY_ID, 4),
+      getLeg(COBB_AGENCY_ID, 5)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
-    rides =
-      List.of(
-        getLeg(GCT_AGENCY_ID, 0),
-        getLeg(MARTA_AGENCY_ID, 1),
-        getLeg(MARTA_AGENCY_ID, 2),
-        getLeg(MARTA_AGENCY_ID, 3)
-      );
+    rides = List.of(
+      getLeg(GCT_AGENCY_ID, 0),
+      getLeg(MARTA_AGENCY_ID, 1),
+      getLeg(MARTA_AGENCY_ID, 2),
+      getLeg(MARTA_AGENCY_ID, 3)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
-    rides =
-      List.of(
-        getLeg(GCT_AGENCY_ID, 0),
-        getLeg(MARTA_AGENCY_ID, 1),
-        getLeg(MARTA_AGENCY_ID, 2),
-        getLeg(MARTA_AGENCY_ID, 3),
-        // new transfer - only got 3 from GCT
-        getLeg(MARTA_AGENCY_ID, 4)
-      );
+    rides = List.of(
+      getLeg(GCT_AGENCY_ID, 0),
+      getLeg(MARTA_AGENCY_ID, 1),
+      getLeg(MARTA_AGENCY_ID, 2),
+      getLeg(MARTA_AGENCY_ID, 3),
+      // new transfer - only got 3 from GCT
+      getLeg(MARTA_AGENCY_ID, 4)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
-    rides =
-      List.of(
-        getLeg(MARTA_AGENCY_ID, 0),
-        getLeg(MARTA_AGENCY_ID, 1),
-        getLeg(MARTA_AGENCY_ID, 2),
-        getLeg(GCT_AGENCY_ID, 3),
-        getLeg(GCT_AGENCY_ID, 4)
-      );
+    rides = List.of(
+      getLeg(MARTA_AGENCY_ID, 0),
+      getLeg(MARTA_AGENCY_ID, 1),
+      getLeg(MARTA_AGENCY_ID, 2),
+      getLeg(GCT_AGENCY_ID, 3),
+      getLeg(GCT_AGENCY_ID, 4)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
   }
 
@@ -174,14 +169,13 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
-    rides =
-      List.of(
-        getLeg(MARTA_AGENCY_ID, 0),
-        getLeg(GCT_AGENCY_ID, 1),
-        getLeg(GCT_AGENCY_ID, 181),
-        getLeg(MARTA_AGENCY_ID, 181 + 178),
-        getLeg(MARTA_AGENCY_ID, 181 + 179)
-      );
+    rides = List.of(
+      getLeg(MARTA_AGENCY_ID, 0),
+      getLeg(GCT_AGENCY_ID, 1),
+      getLeg(GCT_AGENCY_ID, 181),
+      getLeg(MARTA_AGENCY_ID, 181 + 178),
+      getLeg(MARTA_AGENCY_ID, 181 + 179)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
   }
 
@@ -197,12 +191,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
     );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(STREETCAR_PRICE));
 
-    rides =
-      List.of(
-        getLeg(COBB_AGENCY_ID, 0),
-        getLeg(MARTA_AGENCY_ID, "atlsc", 1),
-        getLeg(COBB_AGENCY_ID, "101", 2)
-      );
+    rides = List.of(
+      getLeg(COBB_AGENCY_ID, 0),
+      getLeg(MARTA_AGENCY_ID, "atlsc", 1),
+      getLeg(COBB_AGENCY_ID, "101", 2)
+    );
     calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)).plus(STREETCAR_PRICE));
   }
 
@@ -263,8 +256,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
   private static Itinerary createItinerary(String agencyId, String shortName, long startTimeMins) {
     var siteRepositoryBuilder = SiteRepository.of();
-    Agency agency = Agency
-      .of(new FeedScopedId(FEED_ID, agencyId))
+    Agency agency = Agency.of(new FeedScopedId(FEED_ID, agencyId))
       .withName(agencyId)
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
@@ -282,8 +274,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     FeedScopedId routeFeedScopeId = new FeedScopedId(FEED_ID, "123");
-    Route route = Route
-      .of(routeFeedScopeId)
+    Route route = Route.of(routeFeedScopeId)
       .withAgency(agency)
       .withShortName(shortName)
       .withLongName(new NonLocalizedString("123"))

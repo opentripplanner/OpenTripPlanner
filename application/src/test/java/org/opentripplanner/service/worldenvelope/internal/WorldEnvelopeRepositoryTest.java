@@ -8,8 +8,7 @@ import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 
 class WorldEnvelopeRepositoryTest {
 
-  private final WorldEnvelope envelope = WorldEnvelope
-    .of()
+  private final WorldEnvelope envelope = WorldEnvelope.of()
     .expandToIncludeStreetEntities(60d, 10d)
     .expandToIncludeStreetEntities(65d, 14d)
     .build();

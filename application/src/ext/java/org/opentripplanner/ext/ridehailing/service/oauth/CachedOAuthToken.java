@@ -24,8 +24,8 @@ public class CachedOAuthToken {
     value = token.access_token();
     // Expire the token one minute before the actual expiry, e.g. to cover
     // long API calls or calls over slow networks near the expiration time.
-    tokenExpirationTime =
-      Instant.now().plus(Duration.ofSeconds(token.expires_in()).minusMinutes(1));
+    tokenExpirationTime = Instant.now()
+      .plus(Duration.ofSeconds(token.expires_in()).minusMinutes(1));
   }
 
   /**

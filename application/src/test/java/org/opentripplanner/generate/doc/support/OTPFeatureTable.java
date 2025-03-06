@@ -14,8 +14,7 @@ public class OTPFeatureTable {
   private static final String NEW_LINE = "\n";
 
   public static String otpFeaturesTable() {
-    var table = Table
-      .of()
+    var table = Table.of()
       .withHeaders("Feature", "Description", "Enabled by default", "Sandbox")
       .withAlights(Left, Left, Center, Center);
 

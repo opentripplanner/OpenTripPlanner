@@ -30,7 +30,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class B02_EgressTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -38,8 +39,9 @@ public class B02_EgressTest implements RaptorTestConstants {
   @BeforeEach
   void setup() {
     data.withRoute(
-      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G)
-        .withTimetable(schedule("0:10, 0:14, 0:18, 0:20, 0:24, 0:28"))
+      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G).withTimetable(
+        schedule("0:10, 0:14, 0:18, 0:20, 0:24, 0:28")
+      )
     );
 
     requestBuilder
@@ -61,8 +63,7 @@ public class B02_EgressTest implements RaptorTestConstants {
     String expStd = "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s Tₓ0]";
     String expStdRevOne =
       "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s Tₓ0]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("17m20s", TX_0, T00_00, T00_30)
       .add(standard().not(TC_STANDARD_REV_ONE), expStd)
       // When we run one iteration the egress "alighting" last is used as long as it

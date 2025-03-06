@@ -17,7 +17,7 @@ public class GraphQLFormattingTest {
   @Test
   public void format() {
     String original = readFile(SCHEMA_FILE);
-    var schema = GtfsGraphQLIndex.buildSchema();
+    var schema = SchemaFactory.createSchema();
     writeFile(SCHEMA_FILE, new SchemaPrinter().print(schema));
     assertFileEquals(original, SCHEMA_FILE);
   }

@@ -101,8 +101,7 @@ class StreetTransitEntityLinkTest {
       req.withWheelchair(true);
       req.withPreferences(p ->
         p.withWheelchair(
-          WheelchairPreferences
-            .of()
+          WheelchairPreferences.of()
             .withTrip(feature)
             .withStop(feature)
             .withElevator(feature)
@@ -123,16 +122,15 @@ class StreetTransitEntityLinkTest {
   class Rental {
 
     static List<State> allowedStates() {
-      return Stream
-        .of(
-          TestStateBuilder.ofScooterRental().pickUpFreeFloatingScooter(),
-          TestStateBuilder.ofBikeRental().pickUpFreeFloatingBike(),
-          // allowing cars into stations is a bit questionable but the alternatives would be quite
-          // computationally expensive
-          TestStateBuilder.ofCarRental().pickUpFreeFloatingCar(),
-          TestStateBuilder.ofWalking(),
-          TestStateBuilder.ofCycling()
-        )
+      return Stream.of(
+        TestStateBuilder.ofScooterRental().pickUpFreeFloatingScooter(),
+        TestStateBuilder.ofBikeRental().pickUpFreeFloatingBike(),
+        // allowing cars into stations is a bit questionable but the alternatives would be quite
+        // computationally expensive
+        TestStateBuilder.ofCarRental().pickUpFreeFloatingCar(),
+        TestStateBuilder.ofWalking(),
+        TestStateBuilder.ofCycling()
+      )
         .map(TestStateBuilder::build)
         .toList();
     }
@@ -144,14 +142,13 @@ class StreetTransitEntityLinkTest {
     }
 
     static List<State> notAllowedStates() {
-      return Stream
-        .of(
-          TestStateBuilder.ofBikeRental().pickUpBikeFromStation(),
-          TestStateBuilder.ofCarRental().pickUpCarFromStation(),
-          // for bike and ride you need to drop the bike at a parking facility first
-          TestStateBuilder.ofBikeAndRide().streetEdge(),
-          TestStateBuilder.parkAndRide().streetEdge()
-        )
+      return Stream.of(
+        TestStateBuilder.ofBikeRental().pickUpBikeFromStation(),
+        TestStateBuilder.ofCarRental().pickUpCarFromStation(),
+        // for bike and ride you need to drop the bike at a parking facility first
+        TestStateBuilder.ofBikeAndRide().streetEdge(),
+        TestStateBuilder.parkAndRide().streetEdge()
+      )
         .map(TestStateBuilder::build)
         .toList();
     }
@@ -181,8 +178,7 @@ class StreetTransitEntityLinkTest {
     Station parent,
     Accessibility wheelchair
   ) {
-    return TEST_MODEL
-      .stop(idAndName)
+    return TEST_MODEL.stop(idAndName)
       .withDescription(NonLocalizedString.ofNullable(desc))
       .withCoordinate(new WgsCoordinate(lat, lon))
       .withWheelchairAccessibility(wheelchair)

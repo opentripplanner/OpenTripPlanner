@@ -109,9 +109,10 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
     Trip trip = getTrip(environment);
     var serviceDate = getSource(environment).getServiceDate();
 
-    Instant midnight = ServiceDateUtils
-      .asStartOfService(serviceDate, transitService.getTimeZone())
-      .toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(
+      serviceDate,
+      transitService.getTimeZone()
+    ).toInstant();
     Timetable timetable = getTimetable(environment, trip, serviceDate);
     return new FromTripTimesArguments(trip, serviceDate, midnight, timetable);
   }

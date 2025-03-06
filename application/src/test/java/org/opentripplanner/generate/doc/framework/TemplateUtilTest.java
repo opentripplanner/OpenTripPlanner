@@ -13,7 +13,8 @@ public class TemplateUtilTest {
 
   @Test
   public void replaceSectionTest() {
-    var body = """
+    var body =
+      """
       Expected line 1.
       Expected line 2.
       """;
@@ -21,14 +22,14 @@ public class TemplateUtilTest {
 
     assertEquals(
       """
-          <!-- TEST BEGIN -->
-          <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-                  
-          Expected line 1.
-          Expected line 2.
-                  
-          <!-- TEST END -->
-          """.trim(),
+      <!-- TEST BEGIN -->
+      <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+      Expected line 1.
+      Expected line 2.
+
+      <!-- TEST END -->
+      """.trim(),
       replaceSection(doc, "TEST", body)
     );
   }

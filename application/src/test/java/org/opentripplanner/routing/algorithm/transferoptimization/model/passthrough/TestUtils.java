@@ -4,7 +4,7 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.RaptorViaLocation;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.api.TestPathBuilder;
@@ -22,13 +22,8 @@ class TestUtils implements RaptorTestConstants {
   private static final int TRANSFER_COST_SEC = 0;
   private static final double WAIT_RELUCTANCE = 1.0;
 
-  private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_COST_SEC,
-    TRANSFER_COST_SEC,
-    WAIT_RELUCTANCE,
-    null,
-    null
-  );
+  private static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
+    new DefaultCostCalculator<>(BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null);
 
   static TestPathBuilder pathBuilder() {
     return new TestPathBuilder(TestTransitData.SLACK_PROVIDER, COST_CALCULATOR);
@@ -55,11 +50,11 @@ class TestUtils implements RaptorTestConstants {
   }
 
   static OptimizePathDomainService<TestTripSchedule> domainService(
-    List<PassThroughPoint> passThroughPoints,
+    List<RaptorViaLocation> viaLocations,
     final List<TripToTripTransfer<TestTripSchedule>>... transfers
   ) {
     var filter = new MinCostPathTailFilterFactory<TestTripSchedule>(false, false).createFilter();
-    filter = new PassThroughPathTailFilter<>(filter, passThroughPoints);
+    filter = new PassThroughPathTailFilter<>(filter, viaLocations);
     var generator = dummyTransferGenerator(transfers);
 
     return new OptimizePathDomainService<>(

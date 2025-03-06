@@ -94,12 +94,10 @@ public class UberService extends CachingRideHailingService {
 
     var finalUri = uri;
     if (uri.getScheme().equalsIgnoreCase("https")) {
-      finalUri =
-        UriBuilder
-          .fromUri(uri)
-          .queryParam("start_latitude", coord.latitude())
-          .queryParam("start_longitude", coord.longitude())
-          .build();
+      finalUri = UriBuilder.fromUri(uri)
+        .queryParam("start_latitude", coord.latitude())
+        .queryParam("start_longitude", coord.longitude())
+        .build();
     }
 
     LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
@@ -137,14 +135,12 @@ public class UberService extends CachingRideHailingService {
 
     var finalUri = uri;
     if (uri.getScheme().equalsIgnoreCase("https")) {
-      finalUri =
-        UriBuilder
-          .fromUri(uri)
-          .queryParam("start_latitude", request.startPosition().latitude())
-          .queryParam("start_longitude", request.startPosition().longitude())
-          .queryParam("end_latitude", request.endPosition().latitude())
-          .queryParam("end_longitude", request.endPosition().longitude())
-          .build();
+      finalUri = UriBuilder.fromUri(uri)
+        .queryParam("start_latitude", request.startPosition().latitude())
+        .queryParam("start_longitude", request.startPosition().longitude())
+        .queryParam("end_latitude", request.endPosition().latitude())
+        .queryParam("end_longitude", request.endPosition().longitude())
+        .build();
     }
 
     LOG.info("Made price estimate request to Uber API at following URL: {}", uri);

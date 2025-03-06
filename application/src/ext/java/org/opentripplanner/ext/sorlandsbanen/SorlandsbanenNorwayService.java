@@ -70,7 +70,11 @@ public class SorlandsbanenNorwayService {
       }
 
       @Override
-      public BiFunction<Collection<RaptorPath<TripSchedule>>, Collection<RaptorPath<TripSchedule>>, Collection<RaptorPath<TripSchedule>>> merger() {
+      public BiFunction<
+        Collection<RaptorPath<TripSchedule>>,
+        Collection<RaptorPath<TripSchedule>>,
+        Collection<RaptorPath<TripSchedule>>
+      > merger() {
         return new MergePaths<>();
       }
     };

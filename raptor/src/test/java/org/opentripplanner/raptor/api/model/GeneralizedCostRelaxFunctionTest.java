@@ -29,21 +29,17 @@ class GeneralizedCostRelaxFunctionTest {
     assertEquals(10585, GeneralizedCostRelaxFunction.of(1.06, 0).relax(10_000));
     assertEquals(10703, GeneralizedCostRelaxFunction.of(1.07, 0).relax(10_000));
 
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GeneralizedCostRelaxFunction.of(MIN_RATIO - 0.1)
+    assertThrows(IllegalArgumentException.class, () ->
+      GeneralizedCostRelaxFunction.of(MIN_RATIO - 0.1)
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GeneralizedCostRelaxFunction.of(MAX_RATIO + 0.01)
+    assertThrows(IllegalArgumentException.class, () ->
+      GeneralizedCostRelaxFunction.of(MAX_RATIO + 0.01)
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GeneralizedCostRelaxFunction.of(1, MIN_SLACK - 1)
+    assertThrows(IllegalArgumentException.class, () ->
+      GeneralizedCostRelaxFunction.of(1, MIN_SLACK - 1)
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> GeneralizedCostRelaxFunction.of(1, MAX_SLACK + 1)
+    assertThrows(IllegalArgumentException.class, () ->
+      GeneralizedCostRelaxFunction.of(1, MAX_SLACK + 1)
     );
   }
 

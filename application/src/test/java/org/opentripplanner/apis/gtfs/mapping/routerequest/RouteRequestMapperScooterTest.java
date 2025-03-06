@@ -174,9 +174,8 @@ class RouteRequestMapperScooterTest {
       )
     );
     var allowedEnv = executionContext(scooterArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
+    assertThrows(IllegalArgumentException.class, () ->
+      RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
     );
 
     scooterArgs = createArgsCopy(RouteRequestMapperTest.ARGS);

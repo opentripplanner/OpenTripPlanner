@@ -96,7 +96,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = createNearbyStopFinder(defaultMaxTransferDuration);
 
     List<TransitStopVertex> stops = graph.getVerticesOfType(TransitStopVertex.class);
-    Set<StopLocation> carsAllowedStops = timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
+    Set<StopLocation> carsAllowedStops =
+      timetableRepository.getStopLocationsUsedForCarsAllowedTrips();
 
     LOG.info("Creating transfers based on requests:");
     transferRequests.forEach(transferProfile -> LOG.info(transferProfile.toString()));
@@ -197,17 +198,17 @@ public class DirectTransferGenerator implements GraphBuilderModule {
    * whether the graph has a street network and if ConsiderPatternsForDirectTransfers feature is
    * enabled.
    */
-  private NearbyStopFinder createNearbyStopFinder(Duration radiusByDuration) {
+  private NearbyStopFinder createNearbyStopFinder(Duration radiusAsDuration) {
     var transitService = new DefaultTransitService(timetableRepository);
     NearbyStopFinder finder;
     if (!graph.hasStreets) {
       LOG.info(
         "Creating direct transfer edges between stops using straight line distance (not streets)..."
       );
-      finder = new StraightLineNearbyStopFinder(transitService, radiusByDuration);
+      finder = new StraightLineNearbyStopFinder(transitService, radiusAsDuration);
     } else {
       LOG.info("Creating direct transfer edges between stops using the street network from OSM...");
-      finder = new StreetNearbyStopFinder(radiusByDuration, 0, null);
+      finder = new StreetNearbyStopFinder(radiusAsDuration, 0, null);
     }
 
     if (OTPFeature.ConsiderPatternsForDirectTransfers.isOn()) {
@@ -285,7 +286,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
           }
         }
         // Create transfers between carsAllowedStops for the specific mode if carsAllowedStopMaxTransferDuration is set in the build config.
-        Duration carsAllowedStopMaxTransferDuration = transferParameters.carsAllowedStopMaxTransferDuration();
+        Duration carsAllowedStopMaxTransferDuration =
+          transferParameters.carsAllowedStopMaxTransferDuration();
         if (carsAllowedStopMaxTransferDuration != null) {
           carsAllowedStopTransferRequests.add(transferProfile);
           carsAllowedStopNearbyStopFinderForMode.put(

@@ -44,8 +44,7 @@ class PathwayMapper {
   }
 
   private Pathway doMap(org.onebusaway.gtfs.model.Pathway rhs) {
-    PathwayBuilder pathway = Pathway
-      .of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()))
+    PathwayBuilder pathway = Pathway.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()))
       .withPathwayMode(PathwayModeMapper.map(rhs.getPathwayMode()))
       .withFromStop(mapStationElement(rhs.getFromStop()))
       .withToStop(mapStationElement(rhs.getToStop()))

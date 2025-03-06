@@ -52,13 +52,13 @@ public class OTPFeatureTest {
     // Given the following config
     String json =
       """
-        {
-          otpFeatures : {
-            APIBikeRental : false,
-            MinimumTransferTimeIsDefinitive : true
-          }
+      {
+        otpFeatures : {
+          APIBikeRental : false,
+          MinimumTransferTimeIsDefinitive : true
         }
-        """;
+      }
+      """;
 
     var configLoader = OtpConfigLoader.fromString(json);
     var config = configLoader.loadOtpConfig();

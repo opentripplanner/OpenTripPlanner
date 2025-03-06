@@ -34,7 +34,8 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -84,8 +85,7 @@ public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ Walk 30s ~ C ~ BUS R2 0:05 0:10 ~ D ~ Walk 30s " +
       "[0:01:10 0:10:40 9m30s Tₓ1 C₁1_260]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       // BUG! 10 minutes is wrong, it should be 9m30s - Raptor may drop optimal paths,
       // because of this!
       .addMinDuration("10m", TX_1, T00_00, T00_30)

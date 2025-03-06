@@ -20,8 +20,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
   private static final String JSON_PARSE_PATH = "features";
-  private static final ObjectReader STRING_LIST_READER = ObjectMappers
-    .ignoringExtraFields()
+  private static final ObjectReader STRING_LIST_READER = ObjectMappers.ignoringExtraFields()
     .readerForListOf(String.class);
   private final BikeepUpdaterParameters params;
 
@@ -43,12 +42,10 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
       List<String> tags = STRING_LIST_READER.readValue(props.path("tags"));
 
-      var availability = VehicleParkingSpaces
-        .builder()
+      var availability = VehicleParkingSpaces.builder()
         .bicycleSpaces(parking.get("available").asInt())
         .build();
-      var capacity = VehicleParkingSpaces
-        .builder()
+      var capacity = VehicleParkingSpaces.builder()
         .bicycleSpaces(parking.get("total").asInt())
         .build();
 
@@ -59,8 +56,7 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
           .walkAccessible(true)
           .carAccessible(true);
 
-      return VehicleParking
-        .builder()
+      return VehicleParking.builder()
         .id(vehicleParkId)
         .name(name)
         .state(VehicleParkingState.OPERATIONAL)
@@ -78,8 +74,7 @@ public class BikeepUpdater extends GenericJsonDataSource<VehicleParking> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addStr("feedId", this.params.feedId())
       .addStr("url", this.params.url().toString())
       .toString();

@@ -21,7 +21,11 @@ public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule>
 
   private final RaptorRouter<T> mainWorker;
   private final RaptorRouter<T> alternativeWorker;
-  private final BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> merger;
+  private final BiFunction<
+    Collection<RaptorPath<T>>,
+    Collection<RaptorPath<T>>,
+    Collection<RaptorPath<T>>
+  > merger;
 
   @Nullable
   private final ExecutorService executorService;
@@ -32,7 +36,11 @@ public class ConcurrentCompositeRaptorRouter<T extends RaptorTripSchedule>
   public ConcurrentCompositeRaptorRouter(
     RaptorRouter<T> mainWorker,
     RaptorRouter<T> alternativeWorker,
-    BiFunction<Collection<RaptorPath<T>>, Collection<RaptorPath<T>>, Collection<RaptorPath<T>>> merger,
+    BiFunction<
+      Collection<RaptorPath<T>>,
+      Collection<RaptorPath<T>>,
+      Collection<RaptorPath<T>>
+    > merger,
     @Nullable ExecutorService executorService,
     @Nullable Function<InterruptedException, RuntimeException> mapInterruptedException
   ) {

@@ -34,15 +34,17 @@ class TransfersMapper {
           int toStopIndex = pathTransfer.to.getIndex();
           Transfer newTransfer;
           if (pathTransfer.getEdges() != null) {
-            newTransfer =
-              new Transfer(toStopIndex, pathTransfer.getEdges(), pathTransfer.getModes());
+            newTransfer = new Transfer(
+              toStopIndex,
+              pathTransfer.getEdges(),
+              pathTransfer.getModes()
+            );
           } else {
-            newTransfer =
-              new Transfer(
-                toStopIndex,
-                (int) Math.ceil(pathTransfer.getDistanceMeters()),
-                pathTransfer.getModes()
-              );
+            newTransfer = new Transfer(
+              toStopIndex,
+              (int) Math.ceil(pathTransfer.getDistanceMeters()),
+              pathTransfer.getModes()
+            );
           }
 
           list.add(newTransfer);

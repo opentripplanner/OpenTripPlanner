@@ -51,7 +51,8 @@ class TimetableRepositoryIndex {
   private final Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
 
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
-  private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay = new HashMap<>();
+  private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay =
+    new HashMap<>();
 
   private final Multimap<GroupOfRoutes, Route> routesForGroupOfRoutes = ArrayListMultimap.create();
 

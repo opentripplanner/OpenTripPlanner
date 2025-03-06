@@ -33,8 +33,7 @@ public class TransmodelMappingUtilTest {
 
   Agency agency(String feedScope, int id) {
     // We use the test builder to make sure we get back an agency with all required fields
-    return TimetableRepositoryForTest
-      .agency("Agency " + id)
+    return TimetableRepositoryForTest.agency("Agency " + id)
       .copy()
       .withId(new FeedScopedId(feedScope, Integer.toString(id)))
       .build();

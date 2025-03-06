@@ -73,8 +73,7 @@ public class RaptorResponse<T extends RaptorTripSchedule> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(RaptorResponse.class)
+    return ToStringBuilder.of(RaptorResponse.class)
       .addObj("paths", paths)
       .addObj("requestUsed", requestUsed)
       .toString();

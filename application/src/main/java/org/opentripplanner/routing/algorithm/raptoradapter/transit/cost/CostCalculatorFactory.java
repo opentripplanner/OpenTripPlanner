@@ -15,21 +15,19 @@ public class CostCalculatorFactory {
     );
 
     if (generalizedCostParameters.wheelchairEnabled()) {
-      calculator =
-        new WheelchairCostCalculator<>(
-          calculator,
-          generalizedCostParameters.wheelchairAccessibility()
-        );
+      calculator = new WheelchairCostCalculator<>(
+        calculator,
+        generalizedCostParameters.wheelchairAccessibility()
+      );
     }
 
     // append RouteCostCalculator to calculator stack if (un)preferred routes exist
     if (!generalizedCostParameters.unpreferredPatterns().isEmpty()) {
-      calculator =
-        new PatternCostCalculator<>(
-          calculator,
-          generalizedCostParameters.unpreferredPatterns(),
-          generalizedCostParameters.unnpreferredCost()
-        );
+      calculator = new PatternCostCalculator<>(
+        calculator,
+        generalizedCostParameters.unpreferredPatterns(),
+        generalizedCostParameters.unnpreferredCost()
+      );
     }
 
     return calculator;

@@ -29,11 +29,10 @@ public class RemoveFilter implements ItineraryListFilter {
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     List<Itinerary> filterInput;
     if (flagger.skipAlreadyFlaggedItineraries()) {
-      filterInput =
-        itineraries
-          .stream()
-          .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
-          .collect(Collectors.toList());
+      filterInput = itineraries
+        .stream()
+        .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
+        .collect(Collectors.toList());
     } else {
       filterInput = itineraries;
     }

@@ -28,36 +28,36 @@ public class ItineraryFiltersConfig {
       )
       .description(
         """
-The purpose of the itinerary filter chain is to post process the result returned by the routing
-search. The filters may modify itineraries, sort them, and filter away less preferable results.
-        
-OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and
-`generalized-cost` as criteria. Use the parameters listed here to reduce/filter the itineraries
-return by the search engine before returning the results to client. There is also a few mandatory
-non-configurable filters removing none optimal results. You may see these filters pop-up in the
-filter debugging.
+        The purpose of the itinerary filter chain is to post process the result returned by the routing
+        search. The filters may modify itineraries, sort them, and filter away less preferable results.
 
-#### Group by similarity filters
+        OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and
+        `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the itineraries
+        return by the search engine before returning the results to client. There is also a few mandatory
+        non-configurable filters removing none optimal results. You may see these filters pop-up in the
+        filter debugging.
 
-The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
-with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
-`groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
+        #### Group by similarity filters
 
-The group-by-filter work by grouping itineraries together and then reducing the number of
-itineraries in each group, keeping the itinerary/itineraries with the best itinerary
-_generalized-cost_. The group-by function first pick all transit legs that account for more than N%
-of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
-legs in one of the keys also exist in the other. Note, one key may have a larger set of legs than the
-other, but they can still be the same. When comparing two legs we compare the `tripId` and make sure
-the legs overlap in place and time. Two legs are the same if both legs ride at least a common
-subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The
-`keepThree` keeps 3 itineraries for each group.
+        The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
+        with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
+        `groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
 
-The grouped itineraries can be further reduced by using `groupedOtherThanSameLegsMaxCostMultiplier`.
-This parameter filters out itineraries, where the legs that are not common for all the grouped
-itineraries have a much higher cost, than the lowest in the group. By default, it filters out
-itineraries that are at least double in cost for the non-grouped legs.
-"""
+        The group-by-filter work by grouping itineraries together and then reducing the number of
+        itineraries in each group, keeping the itinerary/itineraries with the best itinerary
+        _generalized-cost_. The group-by function first pick all transit legs that account for more than N%
+        of the itinerary based on distance traveled. This become the group-key. Two keys are the same if all
+        legs in one of the keys also exist in the other. Note, one key may have a larger set of legs than the
+        other, but they can still be the same. When comparing two legs we compare the `tripId` and make sure
+        the legs overlap in place and time. Two legs are the same if both legs ride at least a common
+        subsection of the same trip. The `keepOne` filter will keep ONE itinerary in each group. The
+        `keepThree` keeps 3 itineraries for each group.
+
+        The grouped itineraries can be further reduced by using `groupedOtherThanSameLegsMaxCostMultiplier`.
+        This parameter filters out itineraries, where the legs that are not common for all the grouped
+        itineraries have a much higher cost, than the lowest in the group. By default, it filters out
+        itineraries that are at least double in cost for the non-grouped legs.
+        """
       )
       .asObject();
 
@@ -102,10 +102,10 @@ itineraries that are at least double in cost for the non-grouped legs.
           )
           .description(
             """
-Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs
-be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries 
-having a higher cost will be filtered.
-"""
+            Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs
+            be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries
+            having a higher cost will be filtered.
+            """
           )
           .asDouble(dft.groupedOtherThanSameLegsMaxCostMultiplier())
       )
@@ -117,13 +117,13 @@ having a higher cost will be filtered.
             .summary("A relative limit for the generalized-cost for transit itineraries.")
             .description(
               """
-The filter compares all itineraries against every other itinerary. If the generalized-cost plus a 
-`transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is 
-dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a 
-*relative cost* for the distance in time between the itineraries. The *relative cost* is the 
-`intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be 
-_1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
-"""
+              The filter compares all itineraries against every other itinerary. If the generalized-cost plus a
+              `transitGeneralizedCostLimit` is higher than the other generalized-cost, then the itinerary is
+              dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
+              *relative cost* for the distance in time between the itineraries. The *relative cost* is the
+              `intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be
+              _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
+              """
             )
             .asObject(),
           dft.transitGeneralizedCostLimit()
@@ -138,16 +138,16 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) 
           )
           .description(
             """
-The max-limit is applied to itineraries with *no transit legs*, however *all* itineraries
-(including those with transit legs) are considered when calculating the minimum cost. The smallest
-generalized-cost value is used as input to the function. The function is used to calculate a
-*max-limit*. The max-limit is then used to filter *non-transit* itineraries by
-*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
-set.
+            The max-limit is applied to itineraries with *no transit legs*, however *all* itineraries
+            (including those with transit legs) are considered when calculating the minimum cost. The smallest
+            generalized-cost value is used as input to the function. The function is used to calculate a
+            *max-limit*. The max-limit is then used to filter *non-transit* itineraries by
+            *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
+            set.
 
-For example if the function is `f(x) = 30m + 2.0 x` and the smallest cost is `30m = 1800s`, then
-all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
-"""
+            For example if the function is `f(x) = 30m + 2.0 x` and the smallest cost is `30m = 1800s`, then
+            all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
+            """
           )
           .asCostLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
@@ -160,14 +160,14 @@ all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` a
           )
           .description(
             """
-The max-limit is applied to itineraries with transit *legs*, and only itineraries
-without transit legs are considered when calculating the minimum cost. The smallest
-generalized-cost value is used as input to the function. The function is used to calculate a
-*max-limit*. The max-limit is then used to filter *transit* itineraries by
-*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
-set. Walking is handled with a different logic: if a transit itinerary has higher cost than
-a plain walk itinerary, it will be removed even if the cost limit function would keep it.
-"""
+            The max-limit is applied to itineraries with transit *legs*, and only itineraries
+            without transit legs are considered when calculating the minimum cost. The smallest
+            generalized-cost value is used as input to the function. The function is used to calculate a
+            *max-limit*. The max-limit is then used to filter *transit* itineraries by
+            *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
+            set. Walking is handled with a different logic: if a transit itinerary has higher cost than
+            a plain walk itinerary, it will be removed even if the cost limit function would keep it.
+            """
           )
           .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
       )
@@ -181,10 +181,10 @@ a plain walk itinerary, it will be removed even if the cost limit function would
           )
           .description(
             """
-This filters out results that consist of a long walk plus a relatively short bike rental leg. A
-value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order
-for the result to be included.
-"""
+            This filters out results that consist of a long walk plus a relatively short bike rental leg. A
+            value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order
+            for the result to be included.
+            """
           )
           .asDouble(dft.bikeRentalDistanceRatio())
       )
@@ -198,10 +198,10 @@ for the result to be included.
           )
           .description(
             """
-This filters out results that consist of driving plus a very long walk leg at the end. A value of
-`0.3` means that a minimum of 30% of the total time must be spent in the car in order for the
-result to be included. However, if there is only a single result, it is never filtered.
-            """
+            This filters out results that consist of driving plus a very long walk leg at the end. A value of
+            `0.3` means that a minimum of 30% of the total time must be spent in the car in order for the
+            result to be included. However, if there is only a single result, it is never filtered.
+                        """
           )
           .asDouble(dft.parkAndRideDurationRatio())
       )
@@ -215,11 +215,11 @@ result to be included. However, if there is only a single result, it is never fi
           )
           .description(
             """
-Trips are considered equal if they have same id and same service day. Non-transit legs are skipped
-during comparison. Before filtering, trips are sorted by their generalized cost. The algorithm loops
-through the list from top to bottom. If an itinerary matches from any other itinerary from above, it is
-removed from list.
-              """
+            Trips are considered equal if they have same id and same service day. Non-transit legs are skipped
+            during comparison. Before filtering, trips are sorted by their generalized cost. The algorithm loops
+            through the list from top to bottom. If an itinerary matches from any other itinerary from above, it is
+            removed from list.
+                          """
           )
           .asBoolean(dft.filterItinerariesWithSameFirstOrLastTrip())
       )
@@ -268,17 +268,17 @@ removed from list.
           .since(V2_7)
           .summary(
             """
-            Filter direct flex results by the search window. The search-window is not used 
+            Filter direct flex results by the search window. The search-window is not used
             during flex routing, but we use one end to align it with transit results."""
           )
           .description(
             """
-            When direct flex is mixed with a transit search in the same request, then the direct 
+            When direct flex is mixed with a transit search in the same request, then the direct
             flex results are filtered by the search window of the transit results.
-            
-            Depart-at searches are filtered by latest-arrival-time and arrive-by searches are 
+
+            Depart-at searches are filtered by latest-arrival-time and arrive-by searches are
             filtered by earliest-departure-time.
-            
+
             Use this configuration to turn this feature off.
             """
           )

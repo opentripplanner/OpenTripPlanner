@@ -105,9 +105,8 @@ public class StreetElevationExtensionBuilder {
     var maxSlope = (float) costs.maxSlope;
     var flattened = costs.flattened;
 
-    float effectiveBicycleSafetyFactor = (float) (
-      bicycleSafetyFactor * costs.lengthMultiplier + costs.slopeSafetyCost / distanceInMeters
-    );
+    float effectiveBicycleSafetyFactor = (float) (bicycleSafetyFactor * costs.lengthMultiplier +
+      costs.slopeSafetyCost / distanceInMeters);
 
     if (
       Double.isInfinite(effectiveBicycleSafetyFactor) || Double.isNaN(effectiveBicycleSafetyFactor)

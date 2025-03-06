@@ -92,8 +92,7 @@ public final class Frequency implements Serializable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(Frequency.class)
+    return ToStringBuilder.of(Frequency.class)
       .addObjOp("trip", trip, AbstractTransitEntity::getId)
       .addServiceTime("start", startTime)
       .addServiceTime("end", endTime)

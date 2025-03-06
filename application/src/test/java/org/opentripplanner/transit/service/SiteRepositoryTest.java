@@ -24,13 +24,11 @@ class SiteRepositoryTest {
 
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
-  private static final Geometry GEOMETRY = GeometryUtils
-    .getGeometryFactory()
+  private static final Geometry GEOMETRY = GeometryUtils.getGeometryFactory()
     .createPoint(COOR_A.asJtsCoordinate());
   public static final NonLocalizedString NAME = NonLocalizedString.ofNullable("Name");
   private static final FeedScopedId ID = TimetableRepositoryForTest.id("A");
-  private static final Station STATION = Station
-    .of(ID)
+  private static final Station STATION = Station.of(ID)
     .withName(NAME)
     .withCoordinate(COOR_B)
     .build();
@@ -50,15 +48,13 @@ class SiteRepositoryTest {
     .withGeometry(GEOMETRY)
     .build();
   private final GroupStop stopGroup = siteRepositoryBuilder.groupStop(ID).addLocation(stop).build();
-  private final MultiModalStation mmStation = MultiModalStation
-    .of(ID)
+  private final MultiModalStation mmStation = MultiModalStation.of(ID)
     .withName(NAME)
     .withChildStations(List.of(STATION))
     .withCoordinate(COOR_B)
     .build();
   private final String expMmStations = List.of(mmStation).toString();
-  private final GroupOfStations groupOfStations = GroupOfStations
-    .of(ID)
+  private final GroupOfStations groupOfStations = GroupOfStations.of(ID)
     .withName(NAME)
     .withCoordinate(COOR_B)
     .addChildStation(STATION)

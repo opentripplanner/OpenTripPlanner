@@ -30,8 +30,7 @@ public abstract class CachingOAuthService implements OAuthService {
       try {
         var request = oauthTokenRequest();
         LOG.info("Requesting new {} access token", request.uri());
-        var response = HttpClient
-          .newHttpClient()
+        var response = HttpClient.newHttpClient()
           .send(request, HttpResponse.BodyHandlers.ofString());
 
         if (response.statusCode() != 200) {

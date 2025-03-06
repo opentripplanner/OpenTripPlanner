@@ -50,10 +50,8 @@ public class GenerateTripPatternsOperation {
 
   // TODO the linked hashset configuration ensures that TripPatterns are created in the same order
   //  as Trips are imported, as a workaround for issue #6067
-  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders = MultimapBuilder
-    .linkedHashKeys()
-    .linkedHashSetValues()
-    .build();
+  private final Multimap<StopPattern, TripPatternBuilder> tripPatternBuilders =
+    MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
   private int freqCount = 0;
@@ -184,8 +182,7 @@ public class GenerateTripPatternsOperation {
       }
     }
     FeedScopedId patternId = generateUniqueIdForTripPattern(route, direction);
-    TripPatternBuilder tripPatternBuilder = TripPattern
-      .of(patternId)
+    TripPatternBuilder tripPatternBuilder = TripPattern.of(patternId)
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withMode(trip.getMode())

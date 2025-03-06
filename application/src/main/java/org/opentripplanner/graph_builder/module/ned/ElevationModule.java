@@ -233,7 +233,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     int nPoints = nPointsEvaluated.get() + nPointsOutsideDEM.get();
     if (nPoints > 0) {
-      double failurePercentage = (double) nPointsOutsideDEM.get() / nPoints * 100.0;
+      double failurePercentage = ((double) nPointsOutsideDEM.get() / nPoints) * 100.0;
       if (failurePercentage > 50) {
         issueStore.add(
           new Graphwide(
@@ -289,8 +289,11 @@ public class ElevationModule implements GraphBuilderModule {
       edgesWithCalculatedElevations
     );
 
-    new MissingElevationHandler(issueStore, elevationsForVertices, maxElevationPropagationMeters)
-      .run();
+    new MissingElevationHandler(
+      issueStore,
+      elevationsForVertices,
+      maxElevationPropagationMeters
+    ).run();
 
     updateElevationMetadata(graph);
 
@@ -529,8 +532,7 @@ public class ElevationModule implements GraphBuilderModule {
 
   private void setEdgeElevationProfile(StreetEdge ee, PackedCoordinateSequence elevPCS) {
     try {
-      StreetElevationExtensionBuilder
-        .of(ee)
+      StreetElevationExtensionBuilder.of(ee)
         .withElevationProfile(elevPCS)
         .withComputed(false)
         .build()
@@ -624,11 +626,10 @@ public class ElevationModule implements GraphBuilderModule {
     int hash = yVal * 104729 + xVal;
     Double difference = geoidDifferenceCache.get(hash);
     if (difference == null) {
-      difference =
-        computeEllipsoidToGeoidDifference(
-          yVal / (1.0 * geoidDifferenceCoordinateValueMultiplier),
-          xVal / (1.0 * geoidDifferenceCoordinateValueMultiplier)
-        );
+      difference = computeEllipsoidToGeoidDifference(
+        yVal / (1.0 * geoidDifferenceCoordinateValueMultiplier),
+        xVal / (1.0 * geoidDifferenceCoordinateValueMultiplier)
+      );
       geoidDifferenceCache.put(hash, difference);
     }
     return difference;

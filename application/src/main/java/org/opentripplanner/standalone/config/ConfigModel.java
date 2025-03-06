@@ -131,12 +131,10 @@ public class ConfigModel {
    */
   public void abortOnUnknownParameters() {
     if (
-      (
-        otpConfig.hasUnknownParameters() ||
+      (otpConfig.hasUnknownParameters() ||
         buildConfig.hasUnknownParameters() ||
         routerConfig.hasUnknownParameters() ||
-        debugUiConfig.hasUnknownParameters()
-      )
+        debugUiConfig.hasUnknownParameters())
     ) {
       throw new OtpAppException(
         "Configuration contains unknown parameters (see above for details). " +

@@ -28,14 +28,14 @@ class DocBuilderTest {
     assertEquals(
       """
       Section
-         
+
       **Label** `code` ∙ Text\s\s\s
       More text\s
-      
+
       <h1 id="anchor">Header</h1>
-         
+
       Paragraph
-         
+
       **Enums** `a` | `bar` | `boo-boo`
       """,
       subject.toDoc()

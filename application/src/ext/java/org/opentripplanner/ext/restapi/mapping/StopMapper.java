@@ -41,8 +41,9 @@ public class StopMapper {
       api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
       api.parentStation = mapToParentStationOldId(domain);
       //api.stopTimezone = stop.getTimezone();
-      api.wheelchairBoarding =
-        WheelchairAccessibilityMapper.mapToApi(domain.getWheelchairAccessibility());
+      api.wheelchairBoarding = WheelchairAccessibilityMapper.mapToApi(
+        domain.getWheelchairAccessibility()
+      );
       //api.direction = stop.getDirection();
     }
     return api;

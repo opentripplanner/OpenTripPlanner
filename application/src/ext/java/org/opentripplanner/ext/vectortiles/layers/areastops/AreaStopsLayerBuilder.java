@@ -15,10 +15,8 @@ import org.opentripplanner.transit.service.TransitService;
 
 public class AreaStopsLayerBuilder extends LayerBuilder<AreaStop> {
 
-  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<AreaStop>>> mappers = Map.of(
-    MapperType.OTPRR,
-    AreaStopPropertyMapper::create
-  );
+  static Map<MapperType, BiFunction<TransitService, Locale, PropertyMapper<AreaStop>>> mappers =
+    Map.of(MapperType.OTPRR, AreaStopPropertyMapper::create);
   private final TransitService transitService;
 
   public AreaStopsLayerBuilder(

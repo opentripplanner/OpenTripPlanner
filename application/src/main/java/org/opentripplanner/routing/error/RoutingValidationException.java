@@ -61,9 +61,10 @@ public class RoutingValidationException extends RuntimeException {
       routingErrors != null &&
       routingErrors
         .stream()
-        .anyMatch(routingError ->
-          routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
-          routingError.inputField == location
+        .anyMatch(
+          routingError ->
+            routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
+            routingError.inputField == location
         )
     );
   }

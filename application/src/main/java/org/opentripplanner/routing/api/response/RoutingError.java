@@ -32,8 +32,7 @@ public class RoutingError {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(RoutingError.class)
+    return ToStringBuilder.of(RoutingError.class)
       .addEnum("code", code)
       .addEnum("inputField", inputField)
       .toString();

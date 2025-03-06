@@ -20,9 +20,8 @@ public class RemoveParkAndRideWithMostlyWalkingTest {
   private static final int T10_10 = TimeUtils.hm2time(10, 10);
   private static final int T10_20 = TimeUtils.hm2time(10, 20);
 
-  private final RemoveParkAndRideWithMostlyWalkingFilter subject = new RemoveParkAndRideWithMostlyWalkingFilter(
-    0.5
-  );
+  private final RemoveParkAndRideWithMostlyWalkingFilter subject =
+    new RemoveParkAndRideWithMostlyWalkingFilter(0.5);
 
   @Test
   public void name() {

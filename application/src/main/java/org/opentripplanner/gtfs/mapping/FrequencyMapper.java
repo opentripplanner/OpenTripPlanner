@@ -11,7 +11,8 @@ class FrequencyMapper {
 
   private final TripMapper tripMapper;
 
-  private final Map<org.onebusaway.gtfs.model.Frequency, Frequency> mappedFrequencys = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.Frequency, Frequency> mappedFrequencys =
+    new HashMap<>();
 
   FrequencyMapper(TripMapper tripMapper) {
     this.tripMapper = tripMapper;

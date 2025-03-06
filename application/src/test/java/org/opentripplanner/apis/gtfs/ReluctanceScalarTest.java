@@ -26,12 +26,11 @@ class ReluctanceScalarTest {
   void testSerialize() {
     var reluctance = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(HALF);
     assertEquals(HALF, reluctance, DELTA);
-    reluctance =
-      (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(HALF.floatValue());
+    reluctance = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
+      .serialize(HALF.floatValue());
     assertEquals(HALF, reluctance, DELTA);
-    assertThrows(
-      CoercingSerializeException.class,
-      () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(TEXT)
+    assertThrows(CoercingSerializeException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().serialize(TEXT)
     );
   }
 
@@ -41,47 +40,35 @@ class ReluctanceScalarTest {
     assertEquals(HALF, reluctanceDouble, DELTA);
     var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(ONE);
     assertEquals(ONE, reluctanceInt, DELTA);
-    assertThrows(
-      CoercingParseValueException.class,
-      () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TEXT)
+    assertThrows(CoercingParseValueException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TEXT)
     );
-    assertThrows(
-      CoercingParseValueException.class,
-      () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TOO_LOW)
+    assertThrows(CoercingParseValueException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TOO_LOW)
     );
-    assertThrows(
-      CoercingParseValueException.class,
-      () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TOO_HIGH)
+    assertThrows(CoercingParseValueException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseValue(TOO_HIGH)
     );
   }
 
   @Test
   void testParseLiteral() {
-    var reluctanceDouble = (Double) GraphQLScalars.RELUCTANCE_SCALAR
-      .getCoercing()
+    var reluctanceDouble = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
       .parseLiteral(new FloatValue(BigDecimal.valueOf(HALF)));
     assertEquals(HALF, reluctanceDouble, DELTA);
-    var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR
-      .getCoercing()
+    var reluctanceInt = (Double) GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
       .parseLiteral(new IntValue(BigInteger.valueOf(ONE)));
     assertEquals(ONE, reluctanceInt, DELTA);
-    assertThrows(
-      CoercingParseLiteralException.class,
-      () -> GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
+    assertThrows(CoercingParseLiteralException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
     );
-    assertThrows(
-      CoercingParseLiteralException.class,
-      () ->
-        GraphQLScalars.RELUCTANCE_SCALAR
-          .getCoercing()
-          .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_HIGH)))
+    assertThrows(CoercingParseLiteralException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
+        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_HIGH)))
     );
-    assertThrows(
-      CoercingParseLiteralException.class,
-      () ->
-        GraphQLScalars.RELUCTANCE_SCALAR
-          .getCoercing()
-          .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_LOW)))
+    assertThrows(CoercingParseLiteralException.class, () ->
+      GraphQLScalars.RELUCTANCE_SCALAR.getCoercing()
+        .parseLiteral(new FloatValue(BigDecimal.valueOf(TOO_LOW)))
     );
   }
 }

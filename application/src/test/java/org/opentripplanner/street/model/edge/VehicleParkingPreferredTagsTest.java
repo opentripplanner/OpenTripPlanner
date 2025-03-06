@@ -62,14 +62,12 @@ class VehicleParkingPreferredTagsTest {
     double expectedCost,
     boolean arriveBy
   ) {
-    var parking = StreetModelForTest
-      .vehicleParking()
+    var parking = StreetModelForTest.vehicleParking()
       .tags(parkingTags)
       .availability(VehicleParkingSpaces.builder().bicycleSpaces(100).build())
       .bicyclePlaces(true)
       .build();
-    var entrance = VehicleParkingEntrance
-      .builder()
+    var entrance = VehicleParkingEntrance.builder()
       .name(new NonLocalizedString("bike parking"))
       .vehicleParking(parking)
       .walkAccessible(true)

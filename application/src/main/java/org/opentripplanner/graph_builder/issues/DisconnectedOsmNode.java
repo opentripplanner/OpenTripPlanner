@@ -3,10 +3,10 @@ package org.opentripplanner.graph_builder.issues;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
-import org.opentripplanner.osm.model.OsmWithTags;
 
-public record DisconnectedOsmNode(OsmNode node, OsmWithTags way, OsmWithTags area)
+public record DisconnectedOsmNode(OsmNode node, OsmEntity way, OsmEntity area)
   implements DataImportIssue {
   private static final String FMT = "Node %s in way %s is coincident but disconnected with area %s";
   private static final String HTMLFMT =

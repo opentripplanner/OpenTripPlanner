@@ -150,8 +150,9 @@
         "com.google.protobuf:protobuf-java",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
-        "com.fasterxml.jackson:{/,}**",
-        "com.fasterxml.jackson.datatype::{/,}**"
+        "com.fasterxml.jackson.core:{/,}**",
+        "com.fasterxml.jackson.datatype:{/,}**",
+        "com.azure:{/,}**"
       ],
       "automerge": true
     },
@@ -180,6 +181,7 @@
       "matchPackageNames": [
         "com.azure:{/,}**"
       ],
+      "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
       "reviewers": ["habrahamsson-skanetrafiken"]
     }

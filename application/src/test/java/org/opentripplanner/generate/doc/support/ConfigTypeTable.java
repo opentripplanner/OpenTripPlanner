@@ -10,8 +10,7 @@ public class ConfigTypeTable {
   private static final String NEW_LINE = "\n";
 
   public static String configTypeTable() {
-    var tbl = Table
-      .of()
+    var tbl = Table.of()
       .withHeaders("Type", "Description", "Examples")
       .withAlights(Table.Align.Left, Table.Align.Left, Table.Align.Left);
 

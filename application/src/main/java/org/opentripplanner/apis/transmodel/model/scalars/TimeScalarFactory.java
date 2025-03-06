@@ -23,13 +23,12 @@ public final class TimeScalarFactory {
   private TimeScalarFactory() {}
 
   public static GraphQLObjectType createSecondsSinceMidnightAsTimeObject() {
-    GraphQLScalarType secondsSinceMidnightAsTimeStringScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeStringScalar();
-    return GraphQLObjectType
-      .newObject()
+    GraphQLScalarType secondsSinceMidnightAsTimeStringScalar =
+      TimeScalarFactory.createSecondsSinceMidnightAsTimeStringScalar();
+    return GraphQLObjectType.newObject()
       .name("TimeAndDayOffset")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("time")
           .description("Local time")
           .type(secondsSinceMidnightAsTimeStringScalar)
@@ -37,8 +36,7 @@ public final class TimeScalarFactory {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("dayOffset")
           .description("Number of days offset from base line time")
           .type(Scalars.GraphQLInt)
@@ -49,8 +47,7 @@ public final class TimeScalarFactory {
   }
 
   public static GraphQLScalarType createSecondsSinceMidnightAsTimeStringScalar() {
-    return GraphQLScalarType
-      .newScalar()
+    return GraphQLScalarType.newScalar()
       .name("Time")
       .description(DOCUMENTATION)
       .coercing(

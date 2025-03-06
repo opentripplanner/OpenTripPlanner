@@ -54,11 +54,6 @@ public interface RaptorTestConstants {
   int STOP_F = 6;
   int STOP_G = 7;
   int STOP_H = 8;
-  int STOP_I = 9;
-  int STOP_J = 10;
-  int STOP_K = 11;
-  int STOP_L = 12;
-  int STOP_M = 13;
 
   int NUM_STOPS = 14;
 
@@ -81,7 +76,12 @@ public interface RaptorTestConstants {
   int ONE_RIDE = 1;
   int TWO_RIDES = 2;
 
-  default String stopIndexToName(int index) {
+  static String stopIndexToName(int index) {
     return Character.toString('A' + index - 1);
+  }
+
+  static int stopNameToIndex(String name) {
+    char ch = name.startsWith("STOP_") ? name.charAt(5) : name.charAt(0);
+    return (int) (ch - 'A' + 1);
   }
 }

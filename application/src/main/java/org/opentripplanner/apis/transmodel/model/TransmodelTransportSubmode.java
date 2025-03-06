@@ -135,8 +135,7 @@ public enum TransmodelTransportSubmode {
   }
 
   public static TransmodelTransportSubmode fromValue(SubMode value) {
-    return Arrays
-      .stream(TransmodelTransportSubmode.values())
+    return Arrays.stream(TransmodelTransportSubmode.values())
       .filter(tp -> tp.getValue().equals(value.name()))
       .findFirst()
       .orElse(null);

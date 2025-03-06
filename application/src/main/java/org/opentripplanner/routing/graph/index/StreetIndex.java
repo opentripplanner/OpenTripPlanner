@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -23,10 +22,10 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
-import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
@@ -102,12 +101,7 @@ public class StreetIndex {
   ) {
     boolean wheelchairAccessible = false;
 
-    TemporaryStreetLocation location = new TemporaryStreetLocation(
-      label,
-      nearestPoint,
-      name,
-      endVertex
-    );
+    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name);
 
     for (StreetEdge street : edges) {
       Vertex fromv = street.getFromVertex();
@@ -169,9 +163,10 @@ public class StreetIndex {
   public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
     return edgeSpatialIndex
       .query(envelope, Scope.PERMANENT)
-      .filter(e ->
-        e.isReachableFromGraph() &&
-        envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
+      .filter(
+        e ->
+          e.isReachableFromGraph() &&
+          envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
       )
       .toList();
   }
@@ -197,13 +192,12 @@ public class StreetIndex {
       if (location.stopId != null && location.getCoordinate() == null) {
         var coordinate = siteRepository.getCoordinateById(location.stopId);
         if (coordinate != null) {
-          location =
-            new GenericLocation(
-              location.label,
-              location.stopId,
-              coordinate.latitude(),
-              coordinate.longitude()
-            );
+          location = new GenericLocation(
+            location.label,
+            location.stopId,
+            coordinate.latitude(),
+            coordinate.longitude()
+          );
         }
       }
     } else {
@@ -377,12 +371,7 @@ public class StreetIndex {
       name = new NonLocalizedString(label);
     }
 
-    TemporaryStreetLocation temporaryStreetLocation = new TemporaryStreetLocation(
-      UUID.randomUUID().toString(),
-      coordinate,
-      name,
-      endVertex
-    );
+    var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
     TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
 

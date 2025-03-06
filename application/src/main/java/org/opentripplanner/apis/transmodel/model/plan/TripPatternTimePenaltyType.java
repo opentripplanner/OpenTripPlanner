@@ -9,20 +9,18 @@ import org.opentripplanner.utils.time.DurationUtils;
 public class TripPatternTimePenaltyType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("TimePenaltyWithCost")
       .description(
         """
         The time-penalty is applied to either the access-legs and/or egress-legs. Both access and
         egress may contain more than one leg; Hence, the penalty is not a field on leg.
-        
+
         Note! This is for debugging only. This type can change without notice.
         """
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("appliedTo")
           .description(
             """
@@ -36,8 +34,7 @@ public class TripPatternTimePenaltyType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("timePenalty")
           .description(
             """
@@ -53,8 +50,7 @@ public class TripPatternTimePenaltyType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("generalizedCostDelta")
           .description(
             """

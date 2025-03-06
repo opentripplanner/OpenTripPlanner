@@ -60,24 +60,23 @@ public class TestFreeFloatingRentalVehicleBuilder {
   }
 
   public TestFreeFloatingRentalVehicleBuilder withSystem(String id, String url) {
-    this.system =
-      new VehicleRentalSystem(
-        id,
-        null,
-        null,
-        null,
-        null,
-        url,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null
-      );
+    this.system = new VehicleRentalSystem(
+      id,
+      null,
+      null,
+      null,
+      null,
+      url,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    );
     return this;
   }
 
@@ -102,23 +101,21 @@ public class TestFreeFloatingRentalVehicleBuilder {
     vehicle.longitude = longitude;
     vehicle.vehicleType = vehicleType;
     vehicle.system = system;
-    vehicle.fuel =
-      new RentalVehicleFuel(
-        currentFuelPercent,
-        Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null)
-      );
+    vehicle.fuel = new RentalVehicleFuel(
+      currentFuelPercent,
+      Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null)
+    );
     return vehicle;
   }
 
   private TestFreeFloatingRentalVehicleBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
-    this.vehicleType =
-      new RentalVehicleType(
-        new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name()),
-        rentalFormFactor.name(),
-        rentalFormFactor,
-        RentalVehicleType.PropulsionType.ELECTRIC,
-        100000d
-      );
+    this.vehicleType = new RentalVehicleType(
+      new FeedScopedId(TestFreeFloatingRentalVehicleBuilder.NETWORK_1, rentalFormFactor.name()),
+      rentalFormFactor.name(),
+      rentalFormFactor,
+      RentalVehicleType.PropulsionType.ELECTRIC,
+      100000d
+    );
     return this;
   }
 }

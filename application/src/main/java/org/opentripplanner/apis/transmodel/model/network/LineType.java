@@ -35,46 +35,40 @@ public class LineType {
     GraphQLOutputType brandingType,
     GraphQLOutputType groupOfLinesType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .description(
         "A group of routes which is generally known to the public by a similar name or number"
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment -> TransitIdMapper.mapEntityIDToApi(getSource(environment)))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("authority")
           .type(authorityType)
           .dataFetcher(environment -> (getSource(environment).getAgency()))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("operator")
           .type(operatorType)
           .dataFetcher(environment -> ((getSource(environment)).getOperator()))
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("branding")
           .type(brandingType)
           .dataFetcher(environment -> (getSource(environment)).getBranding())
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("publicCode")
           .type(Scalars.GraphQLString)
           .description(
@@ -84,24 +78,21 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> (getSource(environment)).getLongName())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transportMode")
           .type(EnumTypes.TRANSPORT_MODE)
           .dataFetcher(environment -> (getSource(environment)).getMode())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transportSubmode")
           .type(EnumTypes.TRANSPORT_SUBMODE)
           .dataFetcher(environment ->
@@ -110,8 +101,7 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> (getSource(environment)).getDescription())
@@ -121,23 +111,20 @@ public class LineType {
         GraphQLFieldDefinition.newFieldDefinition().name("url").type(Scalars.GraphQLString).build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("presentation")
           .type(presentationType)
           .dataFetcher(DataFetchingEnvironment::getSource)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bikesAllowed")
           .type(EnumTypes.BIKES_ALLOWED)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("journeyPatterns")
           .type(new GraphQLList(journeyPatternType))
           .dataFetcher(environment ->
@@ -146,13 +133,11 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
           .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
+            GqlUtil.getTransitService(environment)
               .findPatterns(getSource(environment))
               .stream()
               .map(TripPattern::getStops)
@@ -163,13 +148,11 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourneys")
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
+            GqlUtil.getTransitService(environment)
               .findPatterns(getSource(environment))
               .stream()
               .flatMap(TripPattern::scheduledTripsAsStream)
@@ -179,8 +162,7 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("notices")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(noticeType))))
           .dataFetcher(environment -> {
@@ -190,22 +172,19 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("situations")
           .description("Get all situations active for the line.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(environment ->
-            GqlUtil
-              .getTransitService(environment)
+            GqlUtil.getTransitService(environment)
               .getTransitAlertService()
               .getRouteAlerts((getSource(environment)).getId())
           )
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("flexibleLineType")
           .description("Type of flexible line, or null if line is not flexible.")
           .type(Scalars.GraphQLString)
@@ -213,8 +192,7 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("bookingArrangements")
           .description("Booking arrangements for flexible line.")
           .type(bookingArrangementType)
@@ -225,8 +203,7 @@ public class LineType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("groupOfLines")
           .description("Groups of lines that line is a part of.")
           .type(new GraphQLNonNull(new GraphQLList(groupOfLinesType)))

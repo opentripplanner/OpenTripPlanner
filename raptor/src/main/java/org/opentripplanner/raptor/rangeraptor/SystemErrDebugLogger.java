@@ -40,14 +40,12 @@ public class SystemErrDebugLogger implements DebugLogger {
   private final boolean enableDebugLogging;
   private final boolean eventLoggingDryRun;
   private final NumberFormat numFormat = NumberFormat.getInstance(Locale.FRANCE);
-  private final Table arrivalTable = Table
-    .of()
+  private final Table arrivalTable = Table.of()
     .withAlights(Center, Center, Right, Right, Right, Right, Left, Left)
     .withHeaders("ARRIVAL", "LEG", "RND", "STOP", "ARRIVE", "C₁", "TRIP", "DETAILS")
     .withMinWidths(9, 7, 3, 5, 8, 9, 24, 0)
     .build();
-  private final Table pathTable = Table
-    .of()
+  private final Table pathTable = Table.of()
     .withAlights(Center, Center, Right, Right, Right, Right, Right, Right, Left)
     .withHeaders(">>> PATH", "TR", "FROM", "TO", "START", "END", "DURATION", "C₁", "DETAILS")
     .withMinWidths(9, 2, 5, 5, 8, 8, 8, 9, 0)

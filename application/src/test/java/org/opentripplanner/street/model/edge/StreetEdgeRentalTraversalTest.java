@@ -41,13 +41,11 @@ public class StreetEdgeRentalTraversalTest {
   }
 
   static Stream<Arguments> allowedToTraverse() {
-    return Stream
-      .of(
-        StreetTraversalPermission.ALL,
-        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-        StreetTraversalPermission.BICYCLE
-      )
-      .flatMap(StreetEdgeRentalTraversalTest::baseCases);
+    return Stream.of(
+      StreetTraversalPermission.ALL,
+      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
+      StreetTraversalPermission.BICYCLE
+    ).flatMap(StreetEdgeRentalTraversalTest::baseCases);
   }
 
   @ParameterizedTest(
@@ -75,9 +73,9 @@ public class StreetEdgeRentalTraversalTest {
   }
 
   static Stream<Arguments> noTraversal() {
-    return Stream
-      .of(StreetTraversalPermission.CAR, StreetTraversalPermission.NONE)
-      .flatMap(StreetEdgeRentalTraversalTest::baseCases);
+    return Stream.of(StreetTraversalPermission.CAR, StreetTraversalPermission.NONE).flatMap(
+      StreetEdgeRentalTraversalTest::baseCases
+    );
   }
 
   @ParameterizedTest(

@@ -43,8 +43,7 @@ public class StreetNoteAndMatcher implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(StreetNoteAndMatcher.class)
+    return ToStringBuilder.of(StreetNoteAndMatcher.class)
       .addObj("note", note)
       .addObj("matcher", matcher)
       .toString();

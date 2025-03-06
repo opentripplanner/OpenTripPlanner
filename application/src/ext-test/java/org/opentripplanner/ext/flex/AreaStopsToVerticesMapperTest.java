@@ -29,12 +29,10 @@ class AreaStopsToVerticesMapperTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
-  private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL
-    .areaStop("berlin")
+  private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL.areaStop("berlin")
     .withGeometry(Polygons.BERLIN)
     .build();
-  public static final SiteRepository SITE_REPOSITORY = TEST_MODEL
-    .siteRepositoryBuilder()
+  public static final SiteRepository SITE_REPOSITORY = TEST_MODEL.siteRepositoryBuilder()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 

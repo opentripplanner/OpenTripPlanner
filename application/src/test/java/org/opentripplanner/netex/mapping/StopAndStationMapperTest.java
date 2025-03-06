@@ -213,15 +213,14 @@ class StopAndStationMapperTest {
   void testMapIsolatedStopPlace(boolean isolated) {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
     StopPlace stopPlace;
-    stopPlace =
-      createStopPlace(
-        "NSR:StopPlace:1",
-        "Oslo A",
-        "1",
-        59.909584,
-        10.755165,
-        AllVehicleModesOfTransportEnumeration.TRAM
-      );
+    stopPlace = createStopPlace(
+      "NSR:StopPlace:1",
+      "Oslo A",
+      "1",
+      59.909584,
+      10.755165,
+      AllVehicleModesOfTransportEnumeration.TRAM
+    );
 
     stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
 

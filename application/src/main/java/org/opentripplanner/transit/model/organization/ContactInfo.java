@@ -106,8 +106,7 @@ public class ContactInfo implements TransitObject<ContactInfo, ContactInfoBuilde
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ContactInfo.class)
+    return ToStringBuilder.of(ContactInfo.class)
       .addStr("contactPerson", contactPerson)
       .addStr("phoneNumber", phoneNumber)
       .addStr("eMail", eMail)

@@ -5,8 +5,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.siri.EntityResolver;
-import org.opentripplanner.updater.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.trip.siri.EntityResolver;
+import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
 
 public class DefaultRealTimeUpdateContext implements RealTimeUpdateContext {
 

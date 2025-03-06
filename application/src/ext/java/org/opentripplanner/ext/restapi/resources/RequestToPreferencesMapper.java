@@ -68,9 +68,8 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeSpeed, bike::withSpeed);
       setIfNotNull(req.bikeReluctance, bike::withReluctance);
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
-      setIfNotNull(
-        req.bikeOptimizeType,
-        optimizeType -> bike.withOptimizeType(LegacyVehicleRoutingOptimizeType.map(optimizeType))
+      setIfNotNull(req.bikeOptimizeType, optimizeType ->
+        bike.withOptimizeType(LegacyVehicleRoutingOptimizeType.map(optimizeType))
       );
 
       if (req.bikeOptimizeType == LegacyVehicleRoutingOptimizeType.TRIANGLE) {
@@ -100,9 +99,8 @@ class RequestToPreferencesMapper {
     preferences.withScooter(scooter -> {
       setIfNotNull(req.bikeSpeed, scooter::withSpeed);
       setIfNotNull(req.bikeReluctance, scooter::withReluctance);
-      setIfNotNull(
-        req.bikeOptimizeType,
-        optimizeType -> scooter.withOptimizeType(LegacyVehicleRoutingOptimizeType.map(optimizeType))
+      setIfNotNull(req.bikeOptimizeType, optimizeType ->
+        scooter.withOptimizeType(LegacyVehicleRoutingOptimizeType.map(optimizeType))
       );
 
       if (req.bikeOptimizeType == LegacyVehicleRoutingOptimizeType.TRIANGLE) {
@@ -127,9 +125,8 @@ class RequestToPreferencesMapper {
       if (req.relaxTransitGroupPriority != null) {
         tr.withRelaxTransitGroupPriority(CostLinearFunction.of(req.relaxTransitGroupPriority));
       } else {
-        setIfNotNull(
-          req.relaxTransitSearchGeneralizedCostAtDestination,
-          v -> tr.withRaptor(r -> r.withRelaxGeneralizedCostAtDestination(v))
+        setIfNotNull(req.relaxTransitSearchGeneralizedCostAtDestination, v ->
+          tr.withRaptor(r -> r.withRelaxGeneralizedCostAtDestination(v))
         );
       }
     });
@@ -168,9 +165,8 @@ class RequestToPreferencesMapper {
     setIfNotNull(req.allowedVehicleRentalNetworks, rental::withAllowedNetworks);
     setIfNotNull(req.bannedVehicleRentalNetworks, rental::withBannedNetworks);
 
-    setIfNotNull(
-      req.keepingRentedBicycleAtDestinationCost,
-      cost -> rental.withArrivingInRentalVehicleAtDestinationCost((int) Math.round(cost))
+    setIfNotNull(req.keepingRentedBicycleAtDestinationCost, cost ->
+      rental.withArrivingInRentalVehicleAtDestinationCost((int) Math.round(cost))
     );
     rental.withUseAvailabilityInformation(isPlannedForNow);
   }
@@ -185,9 +181,8 @@ class RequestToPreferencesMapper {
         filter::withGroupedOtherThanSameLegsMaxCostMultiplier
       );
       filter.withTransitGeneralizedCostLimit(mapTransitGeneralizedCostFilterParams(filter));
-      setIfNotNull(
-        req.nonTransitGeneralizedCostLimitFunction,
-        it -> filter.withNonTransitGeneralizedCostLimit(CostLinearFunction.of(it))
+      setIfNotNull(req.nonTransitGeneralizedCostLimitFunction, it ->
+        filter.withNonTransitGeneralizedCostLimit(CostLinearFunction.of(it))
       );
     });
   }

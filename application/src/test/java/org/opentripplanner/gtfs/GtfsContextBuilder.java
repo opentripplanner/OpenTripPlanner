@@ -60,8 +60,9 @@ public class GtfsContextBuilder {
     );
     mapper.mapStopTripAndRouteDataIntoBuilder();
     mapper.mapAndAddTransfersToBuilder();
-    return new GtfsContextBuilder(feedId, transitBuilder)
-      .withDataImportIssueStore(DataImportIssueStore.NOOP);
+    return new GtfsContextBuilder(feedId, transitBuilder).withDataImportIssueStore(
+      DataImportIssueStore.NOOP
+    );
   }
 
   public OtpTransitServiceBuilder getTransitBuilder() {
@@ -138,8 +139,7 @@ public class GtfsContextBuilder {
       true,
       true,
       issueStore
-    )
-      .run();
+    ).run();
   }
 
   private void generateTripPatterns() {
@@ -149,8 +149,7 @@ public class GtfsContextBuilder {
       deduplicator(),
       calendarService().getServiceIds(),
       new GeometryProcessor(transitBuilder, 150, issueStore)
-    )
-      .run();
+    ).run();
   }
 
   private CalendarService calendarService() {

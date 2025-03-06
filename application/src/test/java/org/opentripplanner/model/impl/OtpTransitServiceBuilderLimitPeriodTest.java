@@ -199,8 +199,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     FeedScopedId patternId = TimetableRepositoryForTest.id(
       trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
     );
-    TripPatternBuilder tpb = TripPattern
-      .of(patternId)
+    TripPatternBuilder tpb = TripPattern.of(patternId)
       .withRoute(route)
       .withStopPattern(STOP_PATTERN);
 
@@ -213,8 +212,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   }
 
   private Trip createTrip(String id, FeedScopedId serviceId) {
-    return TimetableRepositoryForTest
-      .trip(id)
+    return TimetableRepositoryForTest.trip(id)
       .withServiceId(serviceId)
       .withDirection(Direction.INBOUND)
       .withRoute(route)

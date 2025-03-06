@@ -37,30 +37,23 @@ public class SiriFmDatasource implements DataSource<AvailabiltyUpdate> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addStr("url", this.params.url().toString())
       .toString();
   }
 
   @Override
   public boolean update() {
-    updates =
-      httpClient.getAndMap(
-        params.url(),
-        headers,
-        resp -> {
-          var siri = SiriXml.parseXml(resp);
+    updates = httpClient.getAndMap(params.url(), headers, resp -> {
+      var siri = SiriXml.parseXml(resp);
 
-          return Stream
-            .ofNullable(siri.getServiceDelivery())
-            .flatMap(sd -> sd.getFacilityMonitoringDeliveries().stream())
-            .flatMap(d -> d.getFacilityConditions().stream())
-            .filter(this::conformsToItalianProfile)
-            .map(this::mapToUpdate)
-            .toList();
-        }
-      );
+      return Stream.ofNullable(siri.getServiceDelivery())
+        .flatMap(sd -> sd.getFacilityMonitoringDeliveries().stream())
+        .flatMap(d -> d.getFacilityConditions().stream())
+        .filter(this::conformsToItalianProfile)
+        .map(this::mapToUpdate)
+        .toList();
+    });
     return true;
   }
 

@@ -159,8 +159,7 @@ public final class VehicleRentalPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VehicleRentalPreferences.class)
+    return ToStringBuilder.of(VehicleRentalPreferences.class)
       .addDuration("pickupTime", pickupTime, DEFAULT.pickupTime)
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addDuration("dropOffTime", dropOffTime, DEFAULT.dropOffTime)
@@ -250,8 +249,9 @@ public final class VehicleRentalPreferences implements Serializable {
     public Builder withArrivingInRentalVehicleAtDestinationCost(
       int arrivingInRentalVehicleAtDestinationCost
     ) {
-      this.arrivingInRentalVehicleAtDestinationCost =
-        Cost.costOfSeconds(arrivingInRentalVehicleAtDestinationCost);
+      this.arrivingInRentalVehicleAtDestinationCost = Cost.costOfSeconds(
+        arrivingInRentalVehicleAtDestinationCost
+      );
       return this;
     }
 

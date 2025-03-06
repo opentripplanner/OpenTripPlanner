@@ -147,39 +147,11 @@ You can also use the interactive GraphQL API client that is built into every ins
 
 ### Debug layers
 
-Adding new renderer is very easy. You just need to create new class (preferably in
-`org.opentripplanner.inspector` package) which implements EdgeVertexRenderer. It is best if class
-name ends with Rendered. To implement this interface you need to write three functions `renderEdge`,
-`renderVertex` and `getName`. Both render functions accepts `EdgeVisualAttributes` object in which
-label of edge/vertex and color can be set. And both return `true` if edge/vertex should be rendered
-and `false` otherwise. `getName` function should return short descriptive name of the class and will
-be shown in layer chooser.
-
-For examples how to write renderers you can look into example renderers which are all
-in `org.opentripplanner.inspector` package.
-
-After your class is written you only need to add it to TileRenderManager:
-
-```java
-//This is how Wheelchair renderer is added
-renderers.put("wheelchair", new EdgeVertexTileRenderer(new WheelchairEdgeRenderer()));
-```
-
-`wheelchair` is internal layer key and should consist of a-zA-Z and -.
-
-By default all the tiles have cache headers to cache them for one hour. This can become problematic
-if you are changing renderers a lot. To disable this change `GraphInspectorTileResource`:
-
-```java
-//This lines
-CacheControl cc = new CacheControl();
-cc.setMaxAge(3600);
-cc.setNoCache(false);
-
-//to this:
-CacheControl cc = new CacheControl();
-cc.setNoCache(true);
-```
+Debug layers are implemented as vector tile layers. New layers can be added by
+editing [DebugStyleSpec](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/apis/vectortiles/DebugStyleSpec.java).
+It might be also necessary to add new information
+to [edges](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/inspector/vector/edge/EdgePropertyMapper.java)
+or [vertices](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/inspector/vector/vertex/VertexPropertyMapper.java).
 
 ### Date format
 

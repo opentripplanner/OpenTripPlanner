@@ -40,8 +40,7 @@ public class JourneyRequest implements Cloneable, Serializable {
   }
 
   public RequestModes modes() {
-    return RequestModes
-      .of()
+    return RequestModes.of()
       .withAccessMode(access.mode())
       .withTransferMode(transfer.mode())
       .withEgressMode(egress.mode())

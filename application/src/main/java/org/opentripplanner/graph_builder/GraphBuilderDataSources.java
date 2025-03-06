@@ -199,10 +199,8 @@ public class GraphBuilderDataSources {
   private boolean uriMatch(URI configURI, URI datasourceURI) {
     return (
       configURI.equals(datasourceURI) ||
-      (
-        !configURI.isAbsolute() &&
-        baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI)
-      )
+      (!configURI.isAbsolute() &&
+        baseDirectory.toPath().resolve(configURI.toString()).toUri().equals(datasourceURI))
     );
   }
 

@@ -80,8 +80,7 @@ public final class ServiceCalendarDate implements Serializable, Comparable<Servi
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ServiceCalendarDate.class)
+    return ToStringBuilder.of(ServiceCalendarDate.class)
       .addObj("serviceId", this.serviceId)
       .addObj("date", this.date)
       .addObj("exception", this.exceptionType)

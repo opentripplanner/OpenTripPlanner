@@ -24,11 +24,8 @@ public final class AccessibilityPreferences {
     NOT_SET,
     NOT_SET
   );
-  private static final AccessibilityPreferences ONLY_CONSIDER_ACCESSIBLE = new AccessibilityPreferences(
-    true,
-    NOT_SET,
-    NOT_SET
-  );
+  private static final AccessibilityPreferences ONLY_CONSIDER_ACCESSIBLE =
+    new AccessibilityPreferences(true, NOT_SET, NOT_SET);
 
   private final boolean onlyConsiderAccessible;
   private final Cost unknownCost;
@@ -122,8 +119,7 @@ public final class AccessibilityPreferences {
       return "OnlyConsiderAccessible";
     }
 
-    return ToStringBuilder
-      .of(AccessibilityPreferences.class)
+    return ToStringBuilder.of(AccessibilityPreferences.class)
       .addObj("unknownCost", unknownCost, defaultCosts.unknownCost)
       .addObj("inaccessibleCost", inaccessibleCost, defaultCosts.inaccessibleCost)
       .toString();

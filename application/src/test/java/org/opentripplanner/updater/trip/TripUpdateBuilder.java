@@ -129,7 +129,8 @@ public class TripUpdateBuilder {
     StopTimeUpdate.ScheduleRelationship scheduleRelationShip,
     DropOffPickupType pickDrop
   ) {
-    final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+    final StopTimeUpdate.Builder stopTimeUpdateBuilder =
+      tripUpdateBuilder.addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationShip);
 
     if (stopId != null) {
@@ -150,8 +151,10 @@ public class TripUpdateBuilder {
       stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
     }
 
-    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder =
+      stopTimeUpdateBuilder.getArrivalBuilder();
+    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder =
+      stopTimeUpdateBuilder.getDepartureBuilder();
 
     if (minutes > NO_VALUE) {
       var epochSeconds = midnight.plusHours(8).plusMinutes(minutes).toEpochSecond();

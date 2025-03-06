@@ -111,18 +111,16 @@ public class StreetEdgeScooterTraversalTest {
 
   @Test
   public void testWalkingBeforeScooter() {
-    StreetEdge e1 = StreetModelForTest
-      .streetEdgeBuilder(
-        StreetModelForTest.V1,
-        StreetModelForTest.V2,
-        100.0,
-        StreetTraversalPermission.ALL
-      )
+    StreetEdge e1 = StreetModelForTest.streetEdgeBuilder(
+      StreetModelForTest.V1,
+      StreetModelForTest.V2,
+      100.0,
+      StreetTraversalPermission.ALL
+    )
       .withCarSpeed(10.0f)
       .buildAndConnect();
 
-    var request = StreetSearchRequest
-      .of()
+    var request = StreetSearchRequest.of()
       .withPreferences(pref -> pref.withWalk(walk -> walk.withReluctance(1)))
       .withMode(StreetMode.SCOOTER_RENTAL);
 
@@ -180,8 +178,7 @@ public class StreetEdgeScooterTraversalTest {
       new Coordinate(length, 0), // slope = -0.1
     };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-    StreetElevationExtensionBuilder
-      .of(testStreet)
+    StreetElevationExtensionBuilder.of(testStreet)
       .withElevationProfile(elev)
       .withComputed(false)
       .build()
@@ -225,8 +222,8 @@ public class StreetEdgeScooterTraversalTest {
     double slopeWeight = result.getWeight();
     double expectedSlopeWeight = slopeWorkLength / SPEED;
     assertEquals(expectedSlopeWeight, slopeWeight - startState.getWeight(), DELTA);
-    assertTrue(length * 1.5 / SPEED < slopeWeight);
-    assertTrue(length * 1.5 * 10 / SPEED > slopeWeight);
+    assertTrue((length * 1.5) / SPEED < slopeWeight);
+    assertTrue((length * 1.5 * 10) / SPEED > slopeWeight);
 
     request.withPreferences(p ->
       p.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSafety(1)))

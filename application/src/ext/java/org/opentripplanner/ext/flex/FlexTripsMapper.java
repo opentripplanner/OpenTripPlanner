@@ -37,8 +37,7 @@ public class FlexTripsMapper {
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
         var timePenalty = builder.getFlexTimePenalty().getOrDefault(trip, TimePenalty.NONE);
         result.add(
-          UnscheduledTrip
-            .of(trip.getId())
+          UnscheduledTrip.of(trip.getId())
             .withTrip(trip)
             .withStopTimes(stopTimes)
             .withTimePenalty(timePenalty)
@@ -69,7 +68,8 @@ public class FlexTripsMapper {
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
     return stopTimes
       .stream()
-      .anyMatch(st -> st.getFlexContinuousPickup() != NONE || st.getFlexContinuousDropOff() != NONE
+      .anyMatch(
+        st -> st.getFlexContinuousPickup() != NONE || st.getFlexContinuousDropOff() != NONE
       );
   }
 }

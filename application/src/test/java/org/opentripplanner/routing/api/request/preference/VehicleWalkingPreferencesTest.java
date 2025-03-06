@@ -65,8 +65,7 @@ class VehicleWalkingPreferencesTest {
   }
 
   private VehicleWalkingPreferences createPreferences() {
-    return VehicleWalkingPreferences
-      .of()
+    return VehicleWalkingPreferences.of()
       .withSpeed(SPEED)
       .withReluctance(RELUCTANCE)
       .withMountDismountTime(MOUNT_DISMOUNT_TIME)

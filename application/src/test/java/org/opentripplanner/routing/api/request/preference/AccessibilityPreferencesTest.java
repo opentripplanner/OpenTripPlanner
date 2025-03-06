@@ -13,7 +13,8 @@ class AccessibilityPreferencesTest {
 
   public static final int UNKNOWN_COST = 190;
   public static final int INACCESSIBLE_COST = 350;
-  private final AccessibilityPreferences subjectOnlyAccessible = AccessibilityPreferences.ofOnlyAccessible();
+  private final AccessibilityPreferences subjectOnlyAccessible =
+    AccessibilityPreferences.ofOnlyAccessible();
   private final AccessibilityPreferences subject = AccessibilityPreferences.ofCost(
     UNKNOWN_COST,
     INACCESSIBLE_COST

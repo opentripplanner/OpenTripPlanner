@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 public class ParetoSetWithMarkerTest {
 
-  private final ParetoSetWithMarker<Vector> subject = new ParetoSetWithMarker<>((l, r) ->
-    l.u < r.u || l.v < r.v
+  private final ParetoSetWithMarker<Vector> subject = new ParetoSetWithMarker<>(
+    (l, r) -> l.u < r.u || l.v < r.v
   );
 
   @Test
@@ -145,8 +145,7 @@ public class ParetoSetWithMarkerTest {
   }
 
   private String toString(Iterable<Vector> elements) {
-    return StreamSupport
-      .stream(elements.spliterator(), false)
+    return StreamSupport.stream(elements.spliterator(), false)
       .map(Objects::toString)
       .reduce((a, b) -> a + ", " + b)
       .orElse("{}");

@@ -180,8 +180,7 @@ public record ScheduledTransitLegReference(
     return (ScheduledTransitLeg) new AlertToLegMapper(
       transitService.getTransitAlertService(),
       transitService::findMultiModalStation
-    )
-      .decorateWithAlerts(leg, false);
+    ).decorateWithAlerts(leg, false);
   }
 
   /**

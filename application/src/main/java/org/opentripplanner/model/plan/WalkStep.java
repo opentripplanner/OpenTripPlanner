@@ -197,8 +197,7 @@ public final class WalkStep {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addEnum("absoluteDirection", absoluteDirection)
       .addEnum("relativeDirection", relativeDirection)
       .addStr("streetName", directionText.toString())

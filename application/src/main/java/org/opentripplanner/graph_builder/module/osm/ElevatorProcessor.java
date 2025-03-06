@@ -10,10 +10,10 @@ import java.util.OptionalInt;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmNode;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -112,11 +112,11 @@ class ElevatorProcessor {
     while (elevators.hasNext()) {
       OsmWay elevatorWay = elevators.next();
 
-      List<Long> nodes = Arrays
-        .stream(elevatorWay.getNodeRefs().toArray())
-        .filter(nodeRef ->
-          vertexGenerator.intersectionNodes().containsKey(nodeRef) &&
-          vertexGenerator.intersectionNodes().get(nodeRef) != null
+      List<Long> nodes = Arrays.stream(elevatorWay.getNodeRefs().toArray())
+        .filter(
+          nodeRef ->
+            vertexGenerator.intersectionNodes().containsKey(nodeRef) &&
+            vertexGenerator.intersectionNodes().get(nodeRef) != null
         )
         .boxed()
         .toList();
@@ -222,18 +222,16 @@ class ElevatorProcessor {
     return nodeRefs.get(0) != nodeRefs.get(nodeRefs.size() - 1);
   }
 
-  private OptionalInt parseDuration(OsmWithTags element) {
-    return element.getTagAsInt(
-      "duration",
-      v ->
-        issueStore.add(
-          Issue.issue(
-            "InvalidDuration",
-            "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
-            element.getId(),
-            v
-          )
+  private OptionalInt parseDuration(OsmEntity element) {
+    return element.getTagAsInt("duration", v ->
+      issueStore.add(
+        Issue.issue(
+          "InvalidDuration",
+          "Duration for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).",
+          element.getId(),
+          v
         )
+      )
     );
   }
 }

@@ -26,9 +26,8 @@ class CostScalarTest {
     assertEquals(THIRTY, cost);
     var costNumber = GraphQLScalars.COST_SCALAR.getCoercing().serialize(THIRTY);
     assertEquals(THIRTY, costNumber);
-    assertThrows(
-      CoercingSerializeException.class,
-      () -> GraphQLScalars.COST_SCALAR.getCoercing().serialize(TEXT)
+    assertThrows(CoercingSerializeException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing().serialize(TEXT)
     );
   }
 
@@ -36,43 +35,32 @@ class CostScalarTest {
   void testParseValue() {
     var cost = GraphQLScalars.COST_SCALAR.getCoercing().parseValue(THIRTY);
     assertEquals(COST_THIRTY, cost);
-    assertThrows(
-      CoercingParseValueException.class,
-      () -> GraphQLScalars.COST_SCALAR.getCoercing().parseValue(TEXT)
+    assertThrows(CoercingParseValueException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing().parseValue(TEXT)
     );
-    assertThrows(
-      CoercingParseValueException.class,
-      () -> GraphQLScalars.COST_SCALAR.getCoercing().parseValue(NEGATIVE_THIRTY)
+    assertThrows(CoercingParseValueException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing().parseValue(NEGATIVE_THIRTY)
     );
-    assertThrows(
-      CoercingParseValueException.class,
-      () -> GraphQLScalars.COST_SCALAR.getCoercing().parseValue(TOO_HIGH)
+    assertThrows(CoercingParseValueException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing().parseValue(TOO_HIGH)
     );
   }
 
   @Test
   void testParseLiteral() {
-    var cost = GraphQLScalars.COST_SCALAR
-      .getCoercing()
+    var cost = GraphQLScalars.COST_SCALAR.getCoercing()
       .parseLiteral(new IntValue(BigInteger.valueOf(THIRTY)));
     assertEquals(COST_THIRTY, cost);
-    assertThrows(
-      CoercingParseLiteralException.class,
-      () -> GraphQLScalars.COST_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
+    assertThrows(CoercingParseLiteralException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing().parseLiteral(new StringValue(TEXT))
     );
-    assertThrows(
-      CoercingParseLiteralException.class,
-      () ->
-        GraphQLScalars.COST_SCALAR
-          .getCoercing()
-          .parseLiteral(new IntValue(BigInteger.valueOf(NEGATIVE_THIRTY)))
+    assertThrows(CoercingParseLiteralException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing()
+        .parseLiteral(new IntValue(BigInteger.valueOf(NEGATIVE_THIRTY)))
     );
-    assertThrows(
-      CoercingParseLiteralException.class,
-      () ->
-        GraphQLScalars.COST_SCALAR
-          .getCoercing()
-          .parseLiteral(new IntValue(BigInteger.valueOf(TOO_HIGH)))
+    assertThrows(CoercingParseLiteralException.class, () ->
+      GraphQLScalars.COST_SCALAR.getCoercing()
+        .parseLiteral(new IntValue(BigInteger.valueOf(TOO_HIGH)))
     );
   }
 }

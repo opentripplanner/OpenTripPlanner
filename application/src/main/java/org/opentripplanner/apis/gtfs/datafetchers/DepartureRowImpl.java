@@ -44,18 +44,16 @@ public class DepartureRowImpl implements GraphQLDataFetchers.GraphQLDepartureRow
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> {
-      GraphQLTypes.GraphQLDepartureRowStoptimesArgs args = new GraphQLTypes.GraphQLDepartureRowStoptimesArgs(
-        environment.getArguments()
-      );
+      GraphQLTypes.GraphQLDepartureRowStoptimesArgs args =
+        new GraphQLTypes.GraphQLDepartureRowStoptimesArgs(environment.getArguments());
 
-      return getSource(environment)
-        .getStoptimes(
-          getTransitService(environment),
-          GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
-          Duration.ofSeconds(args.getGraphQLTimeRange()),
-          args.getGraphQLNumberOfDepartures(),
-          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
-        );
+      return getSource(environment).getStoptimes(
+        getTransitService(environment),
+        GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
+        Duration.ofSeconds(args.getGraphQLTimeRange()),
+        args.getGraphQLNumberOfDepartures(),
+        args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
+      );
     };
   }
 

@@ -99,9 +99,8 @@ public class ServiceJourneyInfo {
       .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
       .stream()
       .collect(
-        Collectors.toMap(
-          EntityStructure::getId,
-          p -> ((StopPointInJourneyPattern) p).getScheduledStopPointRef().getValue().getRef()
+        Collectors.toMap(EntityStructure::getId, p ->
+          ((StopPointInJourneyPattern) p).getScheduledStopPointRef().getValue().getRef()
         )
       );
   }

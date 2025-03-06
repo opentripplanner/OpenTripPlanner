@@ -71,8 +71,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
 
   @Override
   protected Collection<State> createInitialStates(Set<Vertex> originVertices) {
-    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper
-      .map(routeRequest)
+    StreetSearchRequest streetSearchRequest = StreetSearchRequestMapper.map(routeRequest)
       .withMode(streetRequest.mode())
       .withArriveBy(arriveBy())
       .build();
@@ -84,11 +83,10 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   protected void prepareInitialStates(Collection<State> initialStates) {
     if (intersectionTraversalCalculator == null) {
       final StreetPreferences streetPreferences = routeRequest.preferences().street();
-      intersectionTraversalCalculator =
-        IntersectionTraversalCalculator.create(
-          streetPreferences.intersectionTraversalModel(),
-          streetPreferences.drivingDirection()
-        );
+      intersectionTraversalCalculator = IntersectionTraversalCalculator.create(
+        streetPreferences.intersectionTraversalModel(),
+        streetPreferences.drivingDirection()
+      );
     }
 
     for (var state : initialStates) {

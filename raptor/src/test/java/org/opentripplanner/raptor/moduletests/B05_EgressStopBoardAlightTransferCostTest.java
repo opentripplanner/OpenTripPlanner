@@ -28,7 +28,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 public class B05_EgressStopBoardAlightTransferCostTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -56,8 +57,7 @@ public class B05_EgressStopBoardAlightTransferCostTest implements RaptorTestCons
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .add(
         multiCriteria(),
         // We should get both the fastest and the c1-cheapest results

@@ -23,17 +23,14 @@ class FlexPathDurationsTest {
 
   @Test
   void constructor() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> new FlexPathDurations(-1, TRIP_DURATION_SEC, EGRESS_DURATION_SEC, OFFSET)
+    assertThrows(IllegalArgumentException.class, () ->
+      new FlexPathDurations(-1, TRIP_DURATION_SEC, EGRESS_DURATION_SEC, OFFSET)
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> new FlexPathDurations(ACCESS_DURATION_SEC, -1, EGRESS_DURATION_SEC, OFFSET)
+    assertThrows(IllegalArgumentException.class, () ->
+      new FlexPathDurations(ACCESS_DURATION_SEC, -1, EGRESS_DURATION_SEC, OFFSET)
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> new FlexPathDurations(ACCESS_DURATION_SEC, TRIP_DURATION_SEC, -1, OFFSET)
+    assertThrows(IllegalArgumentException.class, () ->
+      new FlexPathDurations(ACCESS_DURATION_SEC, TRIP_DURATION_SEC, -1, OFFSET)
     );
   }
 

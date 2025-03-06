@@ -91,17 +91,16 @@ public class NetexBundle implements Closeable {
 
     // init parser and mapper
     xmlParser = new NetexXmlParser();
-    mapper =
-      new NetexMapper(
-        transitBuilder,
-        feedId,
-        deduplicator,
-        issueStore,
-        ferryIdsNotAllowedForBicycle,
-        routeToCentroidStopPlaceIds,
-        maxStopToShapeSnapDistance,
-        noTransfersOnIsolatedStops
-      );
+    mapper = new NetexMapper(
+      transitBuilder,
+      feedId,
+      deduplicator,
+      issueStore,
+      ferryIdsNotAllowedForBicycle,
+      routeToCentroidStopPlaceIds,
+      maxStopToShapeSnapDistance,
+      noTransfersOnIsolatedStops
+    );
 
     // Load data
     loadFileEntries();

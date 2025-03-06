@@ -54,11 +54,10 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
   }
 
   public GroupStopBuilder withEncompassingAreaGeometries(List<Geometry> geometries) {
-    this.encompassingAreaGeometry =
-      new GeometryCollection(
-        geometries.toArray(new Geometry[0]),
-        GeometryUtils.getGeometryFactory()
-      );
+    this.encompassingAreaGeometry = new GeometryCollection(
+      geometries.toArray(new Geometry[0]),
+      GeometryUtils.getGeometryFactory()
+    );
     return this;
   }
 
@@ -68,10 +67,8 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   public GroupStopBuilder addLocation(StopLocation location) {
     if (
-      !(
-        location.getStopType() == StopType.REGULAR ||
-        location.getStopType() == StopType.FLEXIBLE_AREA
-      )
+      !(location.getStopType() == StopType.REGULAR ||
+        location.getStopType() == StopType.FLEXIBLE_AREA)
     ) {
       throw new RuntimeException(
         String.format(

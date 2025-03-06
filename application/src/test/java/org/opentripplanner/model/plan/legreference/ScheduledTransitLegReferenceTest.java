@@ -63,8 +63,10 @@ class ScheduledTransitLegReferenceTest {
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);
-    TripPattern tripPattern = TimetableRepositoryForTest
-      .tripPattern("1", TimetableRepositoryForTest.route(id("1")).build())
+    TripPattern tripPattern = TimetableRepositoryForTest.tripPattern(
+      "1",
+      TimetableRepositoryForTest.route(id("1")).build()
+    )
       .withStopPattern(TimetableRepositoryForTest.stopPattern(stop1, stop2, stop3))
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
@@ -75,8 +77,7 @@ class ScheduledTransitLegReferenceTest {
     stopIdAtPosition2 = tripPattern.getStop(2).getId();
 
     // build transit model
-    SiteRepository siteRepository = TEST_MODEL
-      .siteRepositoryBuilder()
+    SiteRepository siteRepository = TEST_MODEL.siteRepositoryBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)
@@ -103,8 +104,7 @@ class ScheduledTransitLegReferenceTest {
     );
 
     timetableRepository.addTripOnServiceDate(
-      TripOnServiceDate
-        .of(TRIP_ON_SERVICE_DATE_ID)
+      TripOnServiceDate.of(TRIP_ON_SERVICE_DATE_ID)
         .withTrip(trip)
         .withServiceDate(SERVICE_DATE)
         .build()
@@ -225,18 +225,16 @@ class ScheduledTransitLegReferenceTest {
 
   @Test
   void legReferenceCannotReferToBothTripAndTripOnServiceDate() {
-    assertThrows(
-      IllegalArgumentException.class,
-      () ->
-        new ScheduledTransitLegReference(
-          tripId,
-          SERVICE_DATE,
-          0,
-          NUMBER_OF_STOPS,
-          stopIdAtPosition0,
-          stopIdAtPosition1,
-          TimetableRepositoryForTest.id("trip on date id")
-        )
+    assertThrows(IllegalArgumentException.class, () ->
+      new ScheduledTransitLegReference(
+        tripId,
+        SERVICE_DATE,
+        0,
+        NUMBER_OF_STOPS,
+        stopIdAtPosition0,
+        stopIdAtPosition1,
+        TimetableRepositoryForTest.id("trip on date id")
+      )
     );
   }
 

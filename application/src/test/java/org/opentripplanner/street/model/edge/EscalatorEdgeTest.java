@@ -29,8 +29,7 @@ class EscalatorEdgeTest {
   @MethodSource("args")
   void testWalking(double escalatorReluctance, double expectedWeight) {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, null);
-    var req = StreetSearchRequest
-      .of()
+    var req = StreetSearchRequest.of()
       .withPreferences(p ->
         p.withWalk(w -> w.withEscalator(escalator -> escalator.withReluctance(escalatorReluctance)))
       )

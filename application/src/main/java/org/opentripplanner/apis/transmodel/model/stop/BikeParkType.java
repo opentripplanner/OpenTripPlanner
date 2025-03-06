@@ -13,13 +13,11 @@ public class BikeParkType {
   public static final String NAME = "BikePark";
 
   public static GraphQLObjectType createB(GraphQLInterfaceType placeInterface) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .withInterface(placeInterface)
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(environment ->
@@ -28,8 +26,7 @@ public class BikeParkType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .dataFetcher(environment ->
@@ -38,8 +35,7 @@ public class BikeParkType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("spacesAvailable")
           .type(Scalars.GraphQLInt)
           .dataFetcher(environment -> {
@@ -54,16 +50,14 @@ public class BikeParkType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("realtime")
           .type(Scalars.GraphQLBoolean)
           .dataFetcher(environment -> ((VehicleParking) environment.getSource()).hasRealTimeData())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment ->
@@ -72,8 +66,7 @@ public class BikeParkType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment ->

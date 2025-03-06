@@ -28,8 +28,7 @@ public class RouteRequestDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_PATH, "RouteRequest.md");
   private static final File OUT_FILE = new File(USER_DOC_PATH, "RouteRequest.md");
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final SkipNodes SKIP_NODES = SkipNodes
-    .of()
+  private static final SkipNodes SKIP_NODES = SkipNodes.of()
     .skip("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
     .build();
 
@@ -51,8 +50,7 @@ public class RouteRequestDocTest {
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
     doc = replaceParametersDetails(doc, getParameterDetailsList(node));
 
-    var example = TemplateUtil
-      .jsonExampleBuilder(node.rawNode())
+    var example = TemplateUtil.jsonExampleBuilder(node.rawNode())
       .wrapInObject("routingDefaults")
       .build();
     doc = replaceJsonExample(doc, example, ROUTER_CONFIG_FILENAME);

@@ -35,27 +35,26 @@ class EmissionsTest {
   private static DefaultEmissionsService eService;
   private static DecorateWithEmission decorateWithEmission;
 
-  static final ZonedDateTime TIME = OffsetDateTime
-    .parse("2023-07-20T17:49:06+03:00")
-    .toZonedDateTime();
+  static final ZonedDateTime TIME = OffsetDateTime.parse(
+    "2023-07-20T17:49:06+03:00"
+  ).toZonedDateTime();
 
-  private static final StreetLeg STREET_LEG = StreetLeg
-    .create()
+  private static final StreetLeg STREET_LEG = StreetLeg.create()
     .withMode(TraverseMode.CAR)
     .withDistanceMeters(214.4)
     .withStartTime(TIME)
     .withEndTime(TIME.plusHours(1))
     .build();
 
-  private static final Route ROUTE_WITH_EMISSIONS = TimetableRepositoryForTest
-    .route(id("1"))
-    .build();
-  private static final Route ROUTE_WITH_ZERO_EMISSIONS = TimetableRepositoryForTest
-    .route(id("2"))
-    .build();
-  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TimetableRepositoryForTest
-    .route(id("3"))
-    .build();
+  private static final Route ROUTE_WITH_EMISSIONS = TimetableRepositoryForTest.route(
+    id("1")
+  ).build();
+  private static final Route ROUTE_WITH_ZERO_EMISSIONS = TimetableRepositoryForTest.route(
+    id("2")
+  ).build();
+  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TimetableRepositoryForTest.route(
+    id("3")
+  ).build();
 
   @BeforeAll
   static void SetUp() {
@@ -129,12 +128,10 @@ class EmissionsTest {
     var stopTwo = testModel.stop("1:stop1", 61, 25).build();
     var stopThree = testModel.stop("1:stop1", 62, 25).build();
     var stopPattern = TimetableRepositoryForTest.stopPattern(stopOne, stopTwo, stopThree);
-    var pattern = TimetableRepositoryForTest
-      .tripPattern("1", route)
+    var pattern = TimetableRepositoryForTest.tripPattern("1", route)
       .withStopPattern(stopPattern)
       .build();
-    var trip = Trip
-      .of(FeedScopedId.parse("FOO:BAR"))
+    var trip = Trip.of(FeedScopedId.parse("FOO:BAR"))
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();

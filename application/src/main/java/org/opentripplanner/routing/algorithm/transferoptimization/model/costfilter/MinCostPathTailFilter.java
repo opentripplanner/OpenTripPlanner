@@ -68,8 +68,7 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(MinCostPathTailFilter.class)
+    return ToStringBuilder.of(MinCostPathTailFilter.class)
       .addCol("costFunctions", costFunctions)
       .toString();
   }

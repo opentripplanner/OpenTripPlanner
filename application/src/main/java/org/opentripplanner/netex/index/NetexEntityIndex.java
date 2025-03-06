@@ -156,8 +156,9 @@ public class NetexEntityIndex {
     this.parent = parent;
     this.authoritiesById = new HierarchicalMapById<>(parent.authoritiesById);
     this.dayTypeById = new HierarchicalMapById<>(parent.dayTypeById);
-    this.dayTypeAssignmentByDayTypeId =
-      new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
+    this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(
+      parent.dayTypeAssignmentByDayTypeId
+    );
     this.datedServiceJourneys = new HierarchicalMapById<>(parent.datedServiceJourneys);
     this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
     this.flexibleStopPlaceById = new HierarchicalMapById<>(parent.flexibleStopPlaceById);
@@ -175,14 +176,16 @@ public class NetexEntityIndex {
     this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
     this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
     this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
-    this.flexibleStopPlaceByStopPointRef =
-      new HierarchicalMap<>(parent.flexibleStopPlaceByStopPointRef);
+    this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>(
+      parent.flexibleStopPlaceByStopPointRef
+    );
     this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
     this.routeById = new HierarchicalMapById<>(parent.routeById);
     this.serviceJourneyById = new HierarchicalMapById<>(parent.serviceJourneyById);
     this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
-    this.serviceJourneyInterchangeById =
-      new HierarchicalMapById<>(parent.serviceJourneyInterchangeById);
+    this.serviceJourneyInterchangeById = new HierarchicalMapById<>(
+      parent.serviceJourneyInterchangeById
+    );
     this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
     this.tariffZonesById = new HierarchicalVersionMapById<>(parent.tariffZonesById);
     this.brandingById = new HierarchicalMapById<>(parent.brandingById);
@@ -248,7 +251,10 @@ public class NetexEntityIndex {
        *             mapper is responsible for indexing its data, except for entities by id.
        */
       @Deprecated
-      public ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId() {
+      public ReadOnlyHierarchicalMap<
+        String,
+        Collection<DayTypeAssignment>
+      > getDayTypeAssignmentByDayTypeId() {
         return dayTypeAssignmentByDayTypeId;
       }
 
@@ -308,7 +314,9 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<OperatingPeriod_VersionStructure> getOperatingPeriodById() {
+      public ReadOnlyHierarchicalMapById<
+        OperatingPeriod_VersionStructure
+      > getOperatingPeriodById() {
         return operatingPeriodById;
       }
 
@@ -343,7 +351,9 @@ public class NetexEntityIndex {
       }
 
       @Override
-      public ReadOnlyHierarchicalMapById<ServiceJourneyInterchange> getServiceJourneyInterchangeById() {
+      public ReadOnlyHierarchicalMapById<
+        ServiceJourneyInterchange
+      > getServiceJourneyInterchangeById() {
         return serviceJourneyInterchangeById;
       }
 

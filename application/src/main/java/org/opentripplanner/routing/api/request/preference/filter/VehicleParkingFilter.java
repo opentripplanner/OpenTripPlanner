@@ -66,8 +66,7 @@ public class VehicleParkingFilter implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addCol("not", Arrays.asList(not))
       .addCol("select", Arrays.asList(select))
       .toString();

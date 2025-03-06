@@ -23,27 +23,23 @@ class BookingRuleMapper {
       return null;
     }
 
-    return cachedBookingInfos.computeIfAbsent(
-      rule.getId(),
-      k ->
-        BookingInfo
-          .of()
-          .withContactInfo(contactInfo(rule))
-          .withBookingMethods(bookingMethods())
-          .withEarliestBookingTime(earliestBookingTime(rule))
-          .withLatestBookingTime(latestBookingTime(rule))
-          .withMinimumBookingNotice(minimumBookingNotice(rule))
-          .withMaximumBookingNotice(maximumBookingNotice(rule))
-          .withMessage(message(rule))
-          .withPickupMessage(pickupMessage(rule))
-          .withDropOffMessage(dropOffMessage(rule))
-          .build()
+    return cachedBookingInfos.computeIfAbsent(rule.getId(), k ->
+      BookingInfo.of()
+        .withContactInfo(contactInfo(rule))
+        .withBookingMethods(bookingMethods())
+        .withEarliestBookingTime(earliestBookingTime(rule))
+        .withLatestBookingTime(latestBookingTime(rule))
+        .withMinimumBookingNotice(minimumBookingNotice(rule))
+        .withMaximumBookingNotice(maximumBookingNotice(rule))
+        .withMessage(message(rule))
+        .withPickupMessage(pickupMessage(rule))
+        .withDropOffMessage(dropOffMessage(rule))
+        .build()
     );
   }
 
   private ContactInfo contactInfo(BookingRule rule) {
-    return ContactInfo
-      .of()
+    return ContactInfo.of()
       .withPhoneNumber(rule.getPhoneNumber())
       .withInfoUrl(rule.getInfoUrl())
       .withBookingUrl(rule.getUrl())

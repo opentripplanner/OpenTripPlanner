@@ -105,8 +105,7 @@ public class TripPatternTest {
     var stopPattern = builder.build();
     var route = TimetableRepositoryForTest.route("R1").build();
 
-    return TripPattern
-      .of(new FeedScopedId("Test", "T1"))
+    return TripPattern.of(new FeedScopedId("Test", "T1"))
       .withRoute(route)
       .withStopPattern(stopPattern)
       .withOriginalTripPattern(originalTripPattern)
@@ -132,8 +131,7 @@ public class TripPatternTest {
     coordinates.add(coordinate);
     coordinates.add(new Coordinate(destination.getLon(), destination.getLat()));
 
-    var l1 = GeometryUtils
-      .getGeometryFactory()
+    var l1 = GeometryUtils.getGeometryFactory()
       .createLineString(coordinates.toArray(Coordinate[]::new));
 
     return List.of(l1);

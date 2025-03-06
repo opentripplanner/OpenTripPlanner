@@ -97,12 +97,12 @@ public class VehicleParkingUpdaterConfig {
           .summary("URL of the SIRI-FM Light endpoint.")
           .description(
             """
-          SIRI Light means that it must be available as a HTTP GET request rather than the usual
-          SIRI request mechanism of HTTP POST.
-          
-          The contents must also conform to the [Italian SIRI profile](https://github.com/5Tsrl/siri-italian-profile)
-          which requires SIRI 2.1.
-          """
+            SIRI Light means that it must be available as a HTTP GET request rather than the usual
+            SIRI request mechanism of HTTP POST.
+
+            The contents must also conform to the [Italian SIRI profile](https://github.com/5Tsrl/siri-italian-profile)
+            which requires SIRI 2.1.
+            """
           )
           .asUri(),
         feedId,

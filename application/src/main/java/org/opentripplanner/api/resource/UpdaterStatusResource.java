@@ -38,8 +38,7 @@ public class UpdaterStatusResource {
     if (updaterStatus == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity(updaterStatus.getUpdaterDescriptions())
       .build();
   }

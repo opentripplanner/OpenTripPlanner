@@ -7,10 +7,8 @@ public class ServiceAlterationFilter {
   public static boolean isRunning(ServiceAlterationEnumeration serviceAlteration) {
     return (
       serviceAlteration == null ||
-      (
-        !serviceAlteration.equals(ServiceAlterationEnumeration.CANCELLATION) &&
-        !serviceAlteration.equals(ServiceAlterationEnumeration.REPLACED)
-      )
+      (!serviceAlteration.equals(ServiceAlterationEnumeration.CANCELLATION) &&
+        !serviceAlteration.equals(ServiceAlterationEnumeration.REPLACED))
     );
   }
 }

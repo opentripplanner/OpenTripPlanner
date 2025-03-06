@@ -9,7 +9,8 @@ import org.opentripplanner.raptor.api.request.RaptorTransitGroupPriorityCalculat
 
 public class TestGroupPriorityCalculator implements RaptorTransitGroupPriorityCalculator {
 
-  public static final RaptorTransitGroupPriorityCalculator PRIORITY_CALCULATOR = new TestGroupPriorityCalculator();
+  public static final RaptorTransitGroupPriorityCalculator PRIORITY_CALCULATOR =
+    new TestGroupPriorityCalculator();
 
   public static final int GROUP_A = 0x01;
   public static final int GROUP_B = 0x02;

@@ -90,8 +90,7 @@ public final class ElevatorPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ElevatorPreferences.class)
+    return ToStringBuilder.of(ElevatorPreferences.class)
       .addObj("boardCost", boardCost, DEFAULT.boardCost)
       .addDurationSec("boardTime", boardTime, DEFAULT.boardTime)
       .addObj("hopCost", hopCost, DEFAULT.hopCost)

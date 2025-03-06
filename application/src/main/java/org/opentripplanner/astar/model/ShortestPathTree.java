@@ -102,7 +102,7 @@ public class ShortestPathTree<
       " per vertex max: " +
       maxSize +
       " avg: " +
-      (statesCount * 1.0 / stateSets.size())
+      ((statesCount * 1.0) / stateSets.size())
     );
     List<Integer> nStates = new ArrayList<>(histogram.elementSet());
     Collections.sort(nStates);

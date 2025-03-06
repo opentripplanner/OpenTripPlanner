@@ -227,15 +227,15 @@ public class ParameterBuilder {
     if (node.isMissingNode()) {
       return defaultValue;
     }
-    return parseOptionalEnum(node.asText(), (Class<T>) defaultValue.getClass())
-      .orElse(defaultValue);
+    return parseOptionalEnum(node.asText(), (Class<T>) defaultValue.getClass()).orElse(
+      defaultValue
+    );
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass) {
     info.withOptional().withEnumSet(enumClass);
-    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
-      List.of(),
-      it -> parseOptionalEnum(it.asText(), enumClass)
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
+      parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -247,9 +247,8 @@ public class ParameterBuilder {
       ? (List<T>) defaultValues
       : List.copyOf(defaultValues);
     info.withOptional(dft.toString()).withEnumSet(enumClass);
-    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
-      List.of(),
-      it -> parseOptionalEnum(it.asText(), enumClass)
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(List.of(), it ->
+      parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     // Set is immutable
@@ -642,16 +641,14 @@ public class ParameterBuilder {
   }
 
   private <E extends Enum<E>> E parseRequiredEnum(String value, Class<E> ofType) {
-    return EnumMapper
-      .mapToEnum(value, ofType)
-      .orElseThrow(() -> {
-        throw error(
-          "The parameter value '%s' is not legal. Expected one of %s.".formatted(
-              value,
-              List.of(ofType.getEnumConstants())
-            )
-        );
-      });
+    return EnumMapper.mapToEnum(value, ofType).orElseThrow(() -> {
+      throw error(
+        "The parameter value '%s' is not legal. Expected one of %s.".formatted(
+            value,
+            List.of(ofType.getEnumConstants())
+          )
+      );
+    });
   }
 
   private <E extends Enum<E>> Optional<E> parseOptionalEnum(String value, Class<E> ofType) {

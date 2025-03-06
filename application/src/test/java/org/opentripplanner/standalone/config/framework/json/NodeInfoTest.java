@@ -14,8 +14,7 @@ class NodeInfoTest {
   private static final OtpVersion SINCE = OtpVersion.V2_2;
   private static final String SUMMARY = "Summary";
   private static final String DESCRIPTION = "Description";
-  private final NodeInfo subject = NodeInfo
-    .of()
+  private final NodeInfo subject = NodeInfo.of()
     .withName(NAME)
     .withType(TYPE)
     .withOptional(DEFAULT_VALUE)
@@ -88,8 +87,7 @@ class NodeInfoTest {
   }
 
   private NodeInfoBuilder createBuilder() {
-    return NodeInfo
-      .of()
+    return NodeInfo.of()
       .withType(ConfigType.STRING)
       .withName(NAME)
       .withSummary(SUMMARY)

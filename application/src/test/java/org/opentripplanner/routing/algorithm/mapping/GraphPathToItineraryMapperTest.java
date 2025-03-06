@@ -15,19 +15,17 @@ import org.opentripplanner.street.search.state.TestStateBuilder;
 class GraphPathToItineraryMapperTest {
 
   private static Stream<Arguments> cases() {
-    return Stream
-      .of(
-        TestStateBuilder.ofWalking(),
-        TestStateBuilder.ofCycling(),
-        TestStateBuilder.ofDriving(),
-        TestStateBuilder.ofScooterRental().pickUpFreeFloatingScooter(),
-        TestStateBuilder.ofBikeAndRide(),
-        TestStateBuilder.parkAndRide()
-      )
-      .map(b -> {
-        var state = b.streetEdge().streetEdge().build();
-        return Arguments.argumentSet(state.currentMode().toString(), state);
-      });
+    return Stream.of(
+      TestStateBuilder.ofWalking(),
+      TestStateBuilder.ofCycling(),
+      TestStateBuilder.ofDriving(),
+      TestStateBuilder.ofScooterRental().pickUpFreeFloatingScooter(),
+      TestStateBuilder.ofBikeAndRide(),
+      TestStateBuilder.parkAndRide()
+    ).map(b -> {
+      var state = b.streetEdge().streetEdge().build();
+      return Arguments.argumentSet(state.currentMode().toString(), state);
+    });
   }
 
   @ParameterizedTest

@@ -46,8 +46,7 @@ public class OtpDataStoreTest {
   private static final String GRAPH_FILENAME = "graph.obj";
   private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
   private static final String REPORT_FILENAME = "report";
-  private static final long D2000_01_01 = ZonedDateTime
-    .parse("2000-01-01T12:00+01:00")
+  private static final long D2000_01_01 = ZonedDateTime.parse("2000-01-01T12:00+01:00")
     .toInstant()
     .toEpochMilli();
 

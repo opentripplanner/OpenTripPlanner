@@ -11,7 +11,8 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS ServiceCalendar into the OTP model. */
 class ServiceCalendarMapper {
 
-  private final Map<org.onebusaway.gtfs.model.ServiceCalendar, ServiceCalendar> mappedCalendars = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.ServiceCalendar, ServiceCalendar> mappedCalendars =
+    new HashMap<>();
 
   Collection<ServiceCalendar> map(
     Collection<org.onebusaway.gtfs.model.ServiceCalendar> allServiceCalendars

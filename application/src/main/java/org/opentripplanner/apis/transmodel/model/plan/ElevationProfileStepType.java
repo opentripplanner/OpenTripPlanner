@@ -16,23 +16,18 @@ public class ElevationProfileStepType {
 
   static String makeDescription(String name) {
     return """
-       The %s's elevation profile. All elevation values, including the first one, are in meters 
-       above sea level. The elevation is negative for places below sea level. The profile 
-       includes both the start and end coordinate.
-       """.formatted(
-        name
-      )
-      .stripIndent();
+    The %s's elevation profile. All elevation values, including the first one, are in meters
+    above sea level. The elevation is negative for places below sea level. The profile
+    includes both the start and end coordinate.
+    """.formatted(name).stripIndent();
   }
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .description("Individual step of an elevation profile.")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("distance")
           .description("The horizontal distance from the start of the step, in meters.")
           .type(Scalars.GraphQLFloat)
@@ -40,14 +35,13 @@ public class ElevationProfileStepType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("elevation")
           .description(
             """
-          The elevation at this distance, in meters above sea level. It is negative if the
-          location is below sea level.
-          """.stripIndent()
+            The elevation at this distance, in meters above sea level. It is negative if the
+            location is below sea level.
+            """.stripIndent()
           )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> step(env).y())

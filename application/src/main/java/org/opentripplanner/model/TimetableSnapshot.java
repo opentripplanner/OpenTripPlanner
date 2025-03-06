@@ -143,7 +143,10 @@ public class TimetableSnapshot {
   private final Map<Trip, TripPattern> realTimeAddedPatternForTrip;
   private final Multimap<Route, TripPattern> realTimeAddedPatternsForRoute;
   private final Map<FeedScopedId, TripOnServiceDate> realTimeAddedTripOnServiceDateById;
-  private final Map<TripIdAndServiceDate, TripOnServiceDate> realTimeAddedTripOnServiceDateForTripAndDay;
+  private final Map<
+    TripIdAndServiceDate,
+    TripOnServiceDate
+  > realTimeAddedTripOnServiceDateForTripAndDay;
 
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
@@ -517,9 +520,8 @@ public class TimetableSnapshot {
 
     // Also remove last added trip pattern for days that are purged
     for (
-      Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator = realTimeNewTripPatternsForModifiedTrips
-        .entrySet()
-        .iterator();
+      Iterator<Entry<TripIdAndServiceDate, TripPattern>> iterator =
+        realTimeNewTripPatternsForModifiedTrips.entrySet().iterator();
       iterator.hasNext();
     ) {
       TripIdAndServiceDate tripIdAndServiceDate = iterator.next().getKey();
@@ -658,8 +660,7 @@ public class TimetableSnapshot {
   }
 
   private TripOnServiceDate mapToTripOnServiceDate(TripTimes tripTimes, Timetable timetable) {
-    return TripOnServiceDate
-      .of(tripTimes.getTrip().getId())
+    return TripOnServiceDate.of(tripTimes.getTrip().getId())
       .withServiceDate(timetable.getServiceDate())
       .withTrip(tripTimes.getTrip())
       .build();

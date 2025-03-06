@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -19,7 +20,7 @@ public class StreetLegBuilder {
   private int generalizedCost;
   private LineString geometry;
   private ElevationProfile elevationProfile;
-  private List<WalkStep> walkSteps;
+  private List<WalkStep> walkSteps = List.of();
   private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
@@ -157,7 +158,7 @@ public class StreetLegBuilder {
   }
 
   public StreetLegBuilder withWalkSteps(List<WalkStep> walkSteps) {
-    this.walkSteps = walkSteps;
+    this.walkSteps = Objects.requireNonNull(walkSteps);
     return this;
   }
 

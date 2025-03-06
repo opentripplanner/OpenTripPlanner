@@ -9,7 +9,8 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS ShapePoint into the OTP model. */
 class ShapePointMapper {
 
-  private final Map<org.onebusaway.gtfs.model.ShapePoint, ShapePoint> mappedShapePoints = new HashMap<>();
+  private final Map<org.onebusaway.gtfs.model.ShapePoint, ShapePoint> mappedShapePoints =
+    new HashMap<>();
 
   Collection<ShapePoint> map(Collection<org.onebusaway.gtfs.model.ShapePoint> allShapePoints) {
     return MapUtils.mapToList(allShapePoints, this::map);

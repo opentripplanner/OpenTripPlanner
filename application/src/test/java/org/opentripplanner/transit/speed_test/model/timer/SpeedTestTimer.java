@@ -180,8 +180,7 @@ public class SpeedTestTimer {
       @SuppressWarnings("NullableProblems")
       @Override
       public String name(String name, Meter.Type type, String unit) {
-        return Arrays
-          .stream(name.split("\\."))
+        return Arrays.stream(name.split("\\."))
           .filter(Objects::nonNull)
           .map(this::capitalize)
           .collect(Collectors.joining(" "));

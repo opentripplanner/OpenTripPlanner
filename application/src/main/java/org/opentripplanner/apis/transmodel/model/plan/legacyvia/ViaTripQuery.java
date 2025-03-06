@@ -24,8 +24,7 @@ public class ViaTripQuery {
     GraphQLInputObjectType viaSegmentInputType,
     GraphQLScalarType dateTimeScalar
   ) {
-    return GraphQLFieldDefinition
-      .newFieldDefinition()
+    return GraphQLFieldDefinition.newFieldDefinition()
       .name("viaTrip")
       .description(
         "Via trip search. Find trip patterns traveling via one or more intermediate (via) locations."
@@ -34,8 +33,7 @@ public class ViaTripQuery {
       .type(new GraphQLNonNull(viaTripType))
       .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("dateTime")
           .description(
             "Date and time for the earliest time the user is willing to start the journey " +
@@ -46,8 +44,7 @@ public class ViaTripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("searchWindow")
           .description(
             "The length of the search-window. This parameter is optional." +
@@ -79,8 +76,7 @@ public class ViaTripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("pageCursor")
           .description(
             "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from " +
@@ -91,31 +87,27 @@ public class ViaTripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("from")
           .description("The start location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("to")
           .description("The destination location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("via")
           .description("The locations needed to be visited along the route.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(viaLocationInputType))))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("segments")
           .description(
             "The requests for the individual segments of the search. The first segment is from " +
@@ -126,8 +118,7 @@ public class ViaTripQuery {
           .type(new GraphQLList(new GraphQLNonNull(viaSegmentInputType)))
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("numTripPatterns")
           .description(
             "The maximum number of trip patterns segment to return. Note! This reduces the number " +
@@ -140,8 +131,7 @@ public class ViaTripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("wheelchairAccessible")
           .description(
             "Whether the trip must be wheelchair accessible. Supported for the street part to " +
@@ -152,8 +142,7 @@ public class ViaTripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("locale")
           .description(
             "The preferable language to use for text targeted the end user. Note! The data " +

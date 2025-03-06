@@ -27,8 +27,9 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   private static final int C_ALIGHT_LATE = C_ALIGHT_TIME + 10;
 
   // Given a trip-schedule with board-times [110, 210, -] and alight-times [-, 200, 300].
-  private TestTripSchedule schedule = TestTripSchedule
-    .schedule(pattern("P1", STOP_A, STOP_B, STOP_C))
+  private TestTripSchedule schedule = TestTripSchedule.schedule(
+    pattern("P1", STOP_A, STOP_B, STOP_C)
+  )
     .departures(A_BOARD_TIME, 210, 310)
     .arrivals(100, 200, C_ALIGHT_TIME)
     .build();
@@ -81,8 +82,9 @@ public class TripTimesSearchTest implements RaptorTestConstants {
   @Test
   public void findInLoop() {
     // Stops A - (B - C){2 times} - D
-    var schedule = TestTripSchedule
-      .schedule(pattern("P1", STOP_A, STOP_B, STOP_C, STOP_B, STOP_C, STOP_D))
+    var schedule = TestTripSchedule.schedule(
+      pattern("P1", STOP_A, STOP_B, STOP_C, STOP_B, STOP_C, STOP_D)
+    )
       .times("10:01 10:02 10:03 10:04 10:05 10:06")
       .build();
     // Time at stop
@@ -178,12 +180,12 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     // stops: Start at 1, loop twice: 111, 122, 133, 144, 155, and end at 1155
     // alight times:    [  -, 100, 200, 300, 400, .., 1100] and
     // departure times: [ 10, 110, 210, 310, 410, .., 1110].
-    schedule =
-      TestTripSchedule
-        .schedule(pattern(1, 111, 122, 133, 144, 155, 111, 122, 133, 144, 155, 1155))
-        .departures(10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
-        .arrivals(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
-        .build();
+    schedule = TestTripSchedule.schedule(
+      pattern(1, 111, 122, 133, 144, 155, 111, 122, 133, 144, 155, 1155)
+    )
+      .departures(10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
+      .arrivals(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
+      .build();
 
     BoardAndAlightTime r;
 

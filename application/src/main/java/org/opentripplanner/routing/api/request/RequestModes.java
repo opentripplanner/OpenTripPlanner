@@ -34,8 +34,9 @@ public class RequestModes {
     this.accessMode = (accessMode != null && accessMode.accessAllowed()) ? accessMode : NOT_SET;
     this.egressMode = (egressMode != null && egressMode.egressAllowed()) ? egressMode : NOT_SET;
     this.directMode = directMode != null ? directMode : NOT_SET;
-    this.transferMode =
-      (transferMode != null && transferMode.transferAllowed()) ? transferMode : NOT_SET;
+    this.transferMode = (transferMode != null && transferMode.transferAllowed())
+      ? transferMode
+      : NOT_SET;
   }
 
   public RequestModes(RequestModesBuilder builder) {
@@ -96,8 +97,7 @@ public class RequestModes {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(RequestModes.class)
+    return ToStringBuilder.of(RequestModes.class)
       .addEnum("accessMode", accessMode)
       .addEnum("egressMode", egressMode)
       .addEnum("directMode", directMode)

@@ -68,15 +68,13 @@ class WorldEnvelopeTest {
 
     // WorldEnvelope should normalize to lower-left and upper-right
     // Add lower-right & upper-left the world-envelope
-    var subjectWithoutMedian = WorldEnvelope
-      .of()
+    var subjectWithoutMedian = WorldEnvelope.of()
       .expandToIncludeStreetEntities(lowerLat, rightLon)
       .expandToIncludeStreetEntities(upperLat, leftLon)
       .build();
     // Add the ~middle point between each corner of the envelope + median point
     // We offset the one center value to the "other" side of the median by adding 2.0
-    var subjectWithMedian = WorldEnvelope
-      .of()
+    var subjectWithMedian = WorldEnvelope.of()
       .expandToIncludeTransitEntities(
         List.of(
           new WgsCoordinate(upperLat, centerLon),
@@ -111,8 +109,7 @@ class WorldEnvelopeTest {
   void testWorldEnvelopeToString() {
     assertEquals(
       "WorldEnvelope{lowerLeft: (-10.0, -60.0), upperRight: (40.0, 50.0), meanCenter: (15.0, -5.0)}",
-      WorldEnvelope
-        .of()
+      WorldEnvelope.of()
         .expandToIncludeStreetEntities(S10, E50)
         .expandToIncludeStreetEntities(N40, W60)
         .build()

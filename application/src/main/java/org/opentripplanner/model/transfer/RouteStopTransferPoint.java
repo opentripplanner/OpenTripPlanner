@@ -40,8 +40,7 @@ public final class RouteStopTransferPoint implements TransferPoint, Serializable
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
+    return ValueObjectToStringBuilder.of()
       .addText("RouteTP{")
       .addObj(route.getId())
       .addText(", stop ")

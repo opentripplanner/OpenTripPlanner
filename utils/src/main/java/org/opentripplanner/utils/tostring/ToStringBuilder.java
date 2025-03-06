@@ -286,14 +286,10 @@ public class ToStringBuilder {
    * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
    */
   public ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
-    return addIfNotNull(
-      name,
-      value,
-      a ->
-        Arrays
-          .stream(a)
-          .mapToObj(TimeUtils::timeToStrCompact)
-          .collect(Collectors.joining(" ", "[", "]"))
+    return addIfNotNull(name, value, a ->
+      Arrays.stream(a)
+        .mapToObj(TimeUtils::timeToStrCompact)
+        .collect(Collectors.joining(" ", "[", "]"))
     );
   }
 

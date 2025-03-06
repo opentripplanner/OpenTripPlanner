@@ -27,8 +27,7 @@ class StationTest {
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Station PARENT_STATION = TEST_MODEL.station("stationId").build();
 
-  private static final Station subject = Station
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final Station subject = Station.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withCode(CODE)

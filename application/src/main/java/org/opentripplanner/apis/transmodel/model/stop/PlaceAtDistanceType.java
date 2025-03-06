@@ -26,12 +26,10 @@ public class PlaceAtDistanceType {
   public static final String NAME = "PlaceAtDistance";
 
   public static GraphQLObjectType create(Relay relay, GraphQLInterfaceType placeInterface) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .deprecate("Id is not referable or meaningful and will be removed")
@@ -39,16 +37,14 @@ public class PlaceAtDistanceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("place")
           .type(placeInterface)
           .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).place())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("distance")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).distance())
@@ -93,11 +89,10 @@ public class PlaceAtDistanceType {
 
       if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
         // Remove quays if only stop places are requested
-        places =
-          places
-            .stream()
-            .filter(p -> !(p.place() instanceof RegularStop))
-            .collect(Collectors.toList());
+        places = places
+          .stream()
+          .filter(p -> !(p.place() instanceof RegularStop))
+          .collect(Collectors.toList());
       }
     }
     places.sort(Comparator.comparing(PlaceAtDistance::distance));

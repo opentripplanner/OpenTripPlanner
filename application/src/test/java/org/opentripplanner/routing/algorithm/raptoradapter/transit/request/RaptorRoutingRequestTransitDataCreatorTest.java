@@ -99,8 +99,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   }
 
   private TripTimes createTripTimesForTest() {
-    return ScheduledTripTimes
-      .of()
+    return ScheduledTripTimes.of()
       .withTrip(TimetableRepositoryForTest.trip("Test").build())
       .withDepartureTimes("00:00 02:00")
       .build();
@@ -118,8 +117,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   }
 
   private static RoutingTripPattern createTripPattern(FeedScopedId id) {
-    return TripPattern
-      .of(id)
+    return TripPattern.of(id)
       .withRoute(TimetableRepositoryForTest.route("1").withMode(TransitMode.BUS).build())
       .withStopPattern(new StopPattern(List.of(createStopTime(), createStopTime())))
       .build()

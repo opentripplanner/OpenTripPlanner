@@ -48,13 +48,11 @@ public class PenaltyForStreetModeType {
   private static final String FIELD_COST_FACTOR = "costFactor";
 
   public static GraphQLInputObjectType create() {
-    return GraphQLInputObjectType
-      .newInputObject()
+    return GraphQLInputObjectType.newInputObject()
       .name("PenaltyForStreetMode")
       .description("A combination of street mode and penalty for time and cost.")
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(FIELD_STREET_MODE)
           .type(new GraphQLNonNull(EnumTypes.STREET_MODE))
           .description(
@@ -67,8 +65,7 @@ public class PenaltyForStreetModeType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(FIELD_TIME_PENALTY)
           .type(new GraphQLNonNull(TransmodelScalars.DOUBLE_FUNCTION_SCALAR))
           .description(
@@ -78,19 +75,15 @@ public class PenaltyForStreetModeType {
           )
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name(FIELD_COST_FACTOR)
           .type(Scalars.GraphQLFloat)
           .defaultValueProgrammatic(1.0)
           .description(
             """
-          This is used to take the time-penalty and multiply by the `{fieldCostFactorName}`.
-          The result is added to the generalized-cost.
-      """.replace(
-                "{fieldCostFactorName}",
-                FIELD_COST_FACTOR
-              )
+                This is used to take the time-penalty and multiply by the `{fieldCostFactorName}`.
+                The result is added to the generalized-cost.
+            """.replace("{fieldCostFactorName}", FIELD_COST_FACTOR)
           )
       )
       .build();
@@ -98,8 +91,7 @@ public class PenaltyForStreetModeType {
 
   /** Return a list of access-egress penalties */
   public static Value mapToGraphQLValue(TimeAndCostPenaltyForEnum<StreetMode> accessEgressPenalty) {
-    List<Value> values = EnumTypes.STREET_MODE
-      .getValues()
+    List<Value> values = EnumTypes.STREET_MODE.getValues()
       .stream()
       .map(gqlModeType -> {
         var mode = (StreetMode) gqlModeType.getValue();
@@ -134,25 +126,21 @@ public class PenaltyForStreetModeType {
     GraphQLEnumValueDefinition streetModeGQL,
     TimeAndCostPenalty timeAndCostPenalty
   ) {
-    return ObjectValue
-      .newObjectValue()
+    return ObjectValue.newObjectValue()
       .objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name(FIELD_STREET_MODE)
           .value(EnumValue.of(streetModeGQL.getName()))
           .build()
       )
       .objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name(FIELD_TIME_PENALTY)
           .value(StringValue.newStringValue(timeAndCostPenalty.timePenalty().serialize()).build())
           .build()
       )
       .objectField(
-        ObjectField
-          .newObjectField()
+        ObjectField.newObjectField()
           .name(FIELD_COST_FACTOR)
           .value(FloatValue.of(timeAndCostPenalty.costFactor()))
           .build()

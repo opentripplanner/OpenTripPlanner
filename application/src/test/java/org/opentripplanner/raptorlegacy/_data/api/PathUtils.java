@@ -3,9 +3,7 @@ package org.opentripplanner.raptorlegacy._data.api;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.opentripplanner.raptor.api.path.RaptorPath;
-import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 
 /**
@@ -24,32 +22,12 @@ public class PathUtils {
   /** Util class, private constructor */
   private PathUtils() {}
 
-  public static String pathsToString(RaptorResponse<?> response) {
-    return pathsToString(response.paths());
-  }
-
   public static String pathsToString(Collection<? extends RaptorPath<?>> paths) {
     return pathsToString(paths, p -> p.toString(TRANSLATOR::stopIndexToName));
   }
 
-  public static String pathsToStringDetailed(RaptorResponse<?> response) {
-    return pathsToStringDetailed(response.paths());
-  }
-
   public static String pathsToStringDetailed(Collection<? extends RaptorPath<?>> paths) {
     return pathsToString(paths, p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
-  }
-
-  public static String join(String... paths) {
-    return String.join("\n", paths);
-  }
-
-  public static String withoutCost(String path) {
-    return path.replaceAll(" C₁[\\d_]+", "");
-  }
-
-  public static String[] withoutCost(String... paths) {
-    return Stream.of(paths).map(path -> withoutCost(path)).toList().toArray(new String[0]);
   }
 
   public static String pathsToString(

@@ -72,15 +72,16 @@ public final class Trip extends AbstractTransitEntity<Trip, TripBuilder> impleme
     // Route is done first, it is used as a fallback for some fields
     this.route = requireNonNull(builder.getRoute());
     this.mode = requireNonNullElse(builder.getMode(), route.getMode());
-    this.netexSubmode =
-      builder.getNetexSubmode() != null
-        ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
-        : route.getNetexSubmode();
+    this.netexSubmode = builder.getNetexSubmode() != null
+      ? SubMode.getOrBuildAndCacheForever(builder.getNetexSubmode())
+      : route.getNetexSubmode();
     this.direction = requireNonNullElse(builder.getDirection(), Direction.UNKNOWN);
     this.bikesAllowed = requireNonNullElse(builder.getBikesAllowed(), route.getBikesAllowed());
     this.carsAllowed = requireNonNullElse(builder.getCarsAllowed(), CarAccess.UNKNOWN);
-    this.wheelchairBoarding =
-      requireNonNullElse(builder.getWheelchairBoarding(), Accessibility.NO_INFORMATION);
+    this.wheelchairBoarding = requireNonNullElse(
+      builder.getWheelchairBoarding(),
+      Accessibility.NO_INFORMATION
+    );
     this.netexAlteration = requireNonNullElse(builder.getNetexAlteration(), TripAlteration.PLANNED);
 
     // Optional fields

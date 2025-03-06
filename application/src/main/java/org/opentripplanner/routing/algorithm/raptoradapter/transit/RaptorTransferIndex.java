@@ -93,7 +93,7 @@ public class RaptorTransferIndex {
       for (var forwardTransfer : forwardTransfers.get(fromStop)) {
         reversedTransfers
           .get(forwardTransfer.stop())
-          .add(DefaultRaptorTransfer.reverseOf(fromStop, forwardTransfer));
+          .add(((DefaultRaptorTransfer) forwardTransfer).reverseOf(fromStop));
       }
     }
     return new RaptorTransferIndex(forwardTransfers, reversedTransfers);

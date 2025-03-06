@@ -54,8 +54,7 @@ public class OffsetDateTimeScalarTest {
   @ParameterizedTest
   @MethodSource("offsetDateTimeCases")
   void parseOffsetDateTimeLiteral(OffsetDateTime expected, String input) {
-    var odt = GraphQLScalars.OFFSET_DATETIME_SCALAR
-      .getCoercing()
+    var odt = GraphQLScalars.OFFSET_DATETIME_SCALAR.getCoercing()
       .parseLiteral(new StringValue(input));
     assertEquals(expected, odt);
   }

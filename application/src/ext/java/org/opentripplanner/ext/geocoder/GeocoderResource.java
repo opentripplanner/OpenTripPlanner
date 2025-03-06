@@ -62,8 +62,7 @@ public class GeocoderResource {
     @QueryParam("stops") @DefaultValue("true") boolean stops,
     @QueryParam("clusters") @DefaultValue("false") boolean clusters
   ) {
-    return Response
-      .status(Response.Status.OK)
+    return Response.status(Response.Status.OK)
       .entity(query(query, autocomplete, stops, clusters))
       .build();
   }

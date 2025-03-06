@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,7 +55,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private List<ViaLocation> via = Collections.emptyList();
 
-  private Instant dateTime = Instant.now();
+  private Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
 
   @Nullable
   private Duration maxSearchWindow;
@@ -152,8 +153,14 @@ public class RouteRequest implements Cloneable, Serializable {
     return dateTime;
   }
 
+  /**
+   * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy,
+   * and if we set the millisecond part to a non-zero value, rounding will not be guaranteed
+   * to be the same for departAt and arriveBy queries.
+   * @param dateTime Either a departAt time or an arriveBy time, one second's accuracy
+   */
   public void setDateTime(Instant dateTime) {
-    this.dateTime = dateTime;
+    this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
   }
 
   public void setDateTime(String date, String time, ZoneId tz) {
@@ -193,8 +200,9 @@ public class RouteRequest implements Cloneable, Serializable {
       if (pageCursor.latestArrivalTime() == null) {
         arriveBy = false;
       }
-      this.dateTime =
-        arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime();
+      this.dateTime = arriveBy
+        ? pageCursor.latestArrivalTime()
+        : pageCursor.earliestDepartureTime();
       journey.setModes(journey.modes().copyOf().withDirectMode(StreetMode.NOT_SET).build());
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
@@ -282,6 +290,14 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   /**
+   * TransferOptimization is applied to all results except via-visit requests.
+   * TODO VIA - When the Optimized transfer support this, then this method should be removed.
+   */
+  public boolean allowTransferOptimization() {
+    return !isViaSearch() || via.stream().allMatch(ViaLocation::isPassThroughLocation);
+  }
+
+  /**
    * Return {@code true} if at least one via location is set!
    */
   public boolean isViaSearch() {
@@ -320,7 +336,7 @@ public class RouteRequest implements Cloneable, Serializable {
     return searchWindow;
   }
 
-  public void setSearchWindow(Duration searchWindow) {
+  public void setSearchWindow(@Nullable Duration searchWindow) {
     if (searchWindow != null) {
       if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
         throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
@@ -349,12 +365,11 @@ public class RouteRequest implements Cloneable, Serializable {
    * default route request is configured before the {@link TransitRoutingConfig}.
    */
   public void initMaxSearchWindow(Duration maxSearchWindow) {
-    this.maxSearchWindow =
-      ObjectUtils.requireNotInitialized(
-        "maxSearchWindow",
-        this.maxSearchWindow,
-        Objects.requireNonNull(maxSearchWindow)
-      );
+    this.maxSearchWindow = ObjectUtils.requireNotInitialized(
+      "maxSearchWindow",
+      this.maxSearchWindow,
+      Objects.requireNonNull(maxSearchWindow)
+    );
   }
 
   public Locale locale() {
@@ -446,8 +461,7 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(RouteRequest.class)
+    return ToStringBuilder.of(RouteRequest.class)
       .addObj("from", from)
       .addObj("to", to)
       .addDateTime("dateTime", dateTime)

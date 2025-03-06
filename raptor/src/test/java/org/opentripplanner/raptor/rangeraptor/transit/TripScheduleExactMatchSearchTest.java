@@ -18,13 +18,12 @@ public class TripScheduleExactMatchSearchTest implements RaptorTestConstants {
   private static final int TRIP_TIME = 500;
   private static final boolean FORWARD = true;
   private static final boolean REVERSE = false;
-  private static final TestTripSchedule TRIP_SCHEDULE = TestTripSchedule
-    .schedule()
+  private static final TestTripSchedule TRIP_SCHEDULE = TestTripSchedule.schedule()
     .times(TRIP_TIME)
     .build();
-  private static final TestRoute TIME_TABLE = TestRoute
-    .route("R1", STOP_A)
-    .withTimetable(TRIP_SCHEDULE);
+  private static final TestRoute TIME_TABLE = TestRoute.route("R1", STOP_A).withTimetable(
+    TRIP_SCHEDULE
+  );
 
   private RaptorTripScheduleSearch<TestTripSchedule> subject;
 

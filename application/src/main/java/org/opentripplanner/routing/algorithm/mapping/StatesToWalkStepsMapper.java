@@ -108,14 +108,10 @@ public class StatesToWalkStepsMapper {
     RelativeDirection d1 = lastStep.relativeDirection();
     RelativeDirection d2 = twoBack.relativeDirection();
     return (
-      (
-        (d1 == RelativeDirection.RIGHT || d1 == RelativeDirection.HARD_RIGHT) &&
-        (d2 == RelativeDirection.RIGHT || d2 == RelativeDirection.HARD_RIGHT)
-      ) ||
-      (
-        (d1 == RelativeDirection.LEFT || d1 == RelativeDirection.HARD_LEFT) &&
-        (d2 == RelativeDirection.LEFT || d2 == RelativeDirection.HARD_LEFT)
-      )
+      ((d1 == RelativeDirection.RIGHT || d1 == RelativeDirection.HARD_RIGHT) &&
+        (d2 == RelativeDirection.RIGHT || d2 == RelativeDirection.HARD_RIGHT)) ||
+      ((d1 == RelativeDirection.LEFT || d1 == RelativeDirection.HARD_LEFT) &&
+        (d2 == RelativeDirection.LEFT || d2 == RelativeDirection.HARD_LEFT))
     );
   }
 
@@ -207,8 +203,7 @@ public class StatesToWalkStepsMapper {
       // went on to or off of a roundabout
       edge.isRoundabout() !=
       (roundaboutExit > 0) ||
-      isLink(edge) &&
-      !isLink(backState.getBackEdge())
+      (isLink(edge) && !isLink(backState.getBackEdge()))
     ) {
       // Street name has changed, or we've gone on to or off of a roundabout.
 
@@ -533,8 +528,7 @@ public class StatesToWalkStepsMapper {
     State forwardState,
     StationEntranceVertex vertex
   ) {
-    Entrance entrance = Entrance
-      .of(vertex.id())
+    Entrance entrance = Entrance.of(vertex.id())
       .withCode(vertex.code())
       .withCoordinate(new WgsCoordinate(vertex.getCoordinate()))
       .withWheelchairAccessibility(vertex.wheelchairAccessibility())
@@ -574,8 +568,7 @@ public class StatesToWalkStepsMapper {
   private WalkStepBuilder createWalkStep(State forwardState, State backState) {
     Edge en = forwardState.getBackEdge();
 
-    return WalkStep
-      .builder()
+    return WalkStep.builder()
       .withDirectionText(en.getName())
       .withStartLocation(new WgsCoordinate(backState.getVertex().getCoordinate()))
       .withNameIsDerived(en.nameIsDerived())

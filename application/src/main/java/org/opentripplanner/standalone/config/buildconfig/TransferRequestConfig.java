@@ -16,25 +16,25 @@ public class TransferRequestConfig {
       .summary("Routing requests to use for pre-calculating stop-to-stop transfers.")
       .description(
         """
-It will use the street network if OSM data has already been loaded into the graph. Otherwise it
-will use straight-line distance between stops.
+        It will use the street network if OSM data has already been loaded into the graph. Otherwise it
+        will use straight-line distance between stops.
 
-If not set, the default behavior is to generate stop-to-stop transfers using the default request 
-with street mode set to WALK. Use this to change the default or specify more than one way to 
-transfer.  
+        If not set, the default behavior is to generate stop-to-stop transfers using the default request
+        with street mode set to WALK. Use this to change the default or specify more than one way to
+        transfer.
 
-**Example**
+        **Example**
 
-```JSON
-// build-config.json
-{
-  "transferRequests": [ 
-    { "modes": "WALK" }, 
-    { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }} 
-  ]
-}
-```
-"""
+        ```JSON
+        // build-config.json
+        {
+          "transferRequests": [
+            { "modes": "WALK" },
+            { "modes": "WALK", "wheelchairAccessibility": { "enabled": true }}
+          ]
+        }
+        ```
+        """
       )
       .asObjects(List.of(new RouteRequest()), RouteRequestConfig::mapRouteRequest);
   }

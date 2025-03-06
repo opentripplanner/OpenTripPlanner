@@ -76,11 +76,10 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     var graphWriterThreadFactory = new ThreadFactoryBuilder().setNameFormat("graph-writer").build();
     this.scheduler = Executors.newSingleThreadScheduledExecutor(graphWriterThreadFactory);
     var updaterThreadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
-    this.pollingUpdaterPool =
-      Executors.newScheduledThreadPool(
-        Math.max(MIN_POLLING_UPDATER_THREADS, Runtime.getRuntime().availableProcessors()),
-        updaterThreadFactory
-      );
+    this.pollingUpdaterPool = Executors.newScheduledThreadPool(
+      Math.max(MIN_POLLING_UPDATER_THREADS, Runtime.getRuntime().availableProcessors()),
+      updaterThreadFactory
+    );
     this.nonPollingUpdaterPool = Executors.newCachedThreadPool(updaterThreadFactory);
 
     for (GraphUpdater updater : updaters) {
@@ -265,30 +264,30 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    * mostly idle, and it is short-lived, so the busy-wait is a compromise.
    */
   private void reportReadinessForUpdaters() {
-    Executors
-      .newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("updater-ready").build())
-      .submit(() -> {
-        boolean otpIsShuttingDown = false;
+    Executors.newSingleThreadExecutor(
+      new ThreadFactoryBuilder().setNameFormat("updater-ready").build()
+    ).submit(() -> {
+      boolean otpIsShuttingDown = false;
 
-        while (!otpIsShuttingDown) {
-          try {
-            if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
-              LOG.info(
-                "OTP UPDATERS INITIALIZED ({} updaters) - OTP is ready for routing!",
-                updaterList.size()
-              );
-              return;
-            }
-            //noinspection BusyWait
-            Thread.sleep(1000);
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            otpIsShuttingDown = true;
-            LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
-          } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
+      while (!otpIsShuttingDown) {
+        try {
+          if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
+            LOG.info(
+              "OTP UPDATERS INITIALIZED ({} updaters) - OTP is ready for routing!",
+              updaterList.size()
+            );
+            return;
           }
+          //noinspection BusyWait
+          Thread.sleep(1000);
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          otpIsShuttingDown = true;
+          LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
+        } catch (Exception e) {
+          LOG.error(e.getMessage(), e);
         }
-      });
+      }
+    });
   }
 }
