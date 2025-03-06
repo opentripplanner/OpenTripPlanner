@@ -83,8 +83,7 @@ public class SmokeTest {
 
   static TripPlan basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
     try {
-      var tpr = TripPlanParameters
-        .builder()
+      var tpr = TripPlanParameters.builder()
         .withFrom(req.from())
         .withTo(req.to())
         .withModes(req.modes())

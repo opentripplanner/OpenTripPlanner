@@ -138,8 +138,7 @@ public class SeattleSmokeTest {
 
   @Test
   public void monorailRoute() throws IOException {
-    var modes = SmokeTest.API_CLIENT
-      .routes()
+    var modes = SmokeTest.API_CLIENT.routes()
       .stream()
       .map(Route::mode)
       .map(Objects::toString)
@@ -150,8 +149,7 @@ public class SeattleSmokeTest {
 
   @Test
   public void sharedStop() throws IOException {
-    var tpr = TripPlanParameters
-      .builder()
+    var tpr = TripPlanParameters.builder()
       .withFrom(OLIVE_WAY)
       .withTo(MOUNTAINLAKE_TERRACE)
       .withModes(BUS, WALK)
