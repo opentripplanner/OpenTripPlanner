@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.transit.model.framework.Feed;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -40,21 +41,21 @@ import uk.org.siri.siri20.VehicleJourneyRef;
  */
 public class AffectsMapper {
 
-  private final String feedId;
+  private final Feed feed;
   private final SiriFuzzyTripMatcher siriFuzzyTripMatcher;
   private final TransitService transitService;
 
   private final EntityResolver entityResolver;
 
   public AffectsMapper(
-    String feedId,
+    Feed feed,
     SiriFuzzyTripMatcher siriFuzzyTripMatcher,
     TransitService transitService
   ) {
-    this.feedId = feedId;
+    this.feed = feed;
     this.siriFuzzyTripMatcher = siriFuzzyTripMatcher;
     this.transitService = transitService;
-    this.entityResolver = new EntityResolver(transitService, feedId);
+    this.entityResolver = new EntityResolver(transitService, feed);
   }
 
   public List<EntitySelector> mapAffects(AffectsScopeStructure affectsStructure) {
@@ -199,11 +200,11 @@ public class AffectsMapper {
         for (AffectedStopPointStructure affectedStop : affectedStops) {
           FeedScopedId stop = getStop(
             affectedStop.getStopPointRef().getValue(),
-            feedId,
+            feed,
             transitService
           );
           if (stop == null) {
-            stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
+            stop = feed.scopedId(affectedStop.getStopPointRef().getValue());
           }
           EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
             stop,
@@ -256,17 +257,17 @@ public class AffectsMapper {
               }
             }
           }
-          FeedScopedId affectedRoute = new FeedScopedId(feedId, lineRef.getValue());
+          FeedScopedId affectedRoute = feed.scopedId(lineRef.getValue());
 
           if (!affectedStops.isEmpty()) {
             for (AffectedStopPointStructure affectedStop : affectedStops) {
               FeedScopedId stop = getStop(
                 affectedStop.getStopPointRef().getValue(),
-                feedId,
+                feed,
                 transitService
               );
               if (stop == null) {
-                stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
+                stop = feed.scopedId(affectedStop.getStopPointRef().getValue());
               }
               EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
                 stop,
@@ -305,10 +306,10 @@ public class AffectsMapper {
         continue;
       }
 
-      FeedScopedId stopId = getStop(stopPointRef.getValue(), feedId, transitService);
+      FeedScopedId stopId = getStop(stopPointRef.getValue(), feed, transitService);
 
       if (stopId == null) {
-        stopId = new FeedScopedId(feedId, stopPointRef.getValue());
+        stopId = feed.scopedId(stopPointRef.getValue());
       }
 
       EntitySelector.Stop entitySelector = new EntitySelector.Stop(
@@ -334,10 +335,10 @@ public class AffectsMapper {
         continue;
       }
 
-      FeedScopedId stopId = getStop(stopPlaceRef.getValue(), feedId, transitService);
+      FeedScopedId stopId = getStop(stopPlaceRef.getValue(), feed, transitService);
 
       if (stopId == null) {
-        stopId = new FeedScopedId(feedId, stopPlaceRef.getValue());
+        stopId = feed.scopedId(stopPlaceRef.getValue());
       }
 
       selectors.add(new EntitySelector.Stop(stopId));
@@ -363,7 +364,7 @@ public class AffectsMapper {
       // I leave this for now.
       String agencyId = operatorRef.getValue();
 
-      selectors.add(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
+      selectors.add(new EntitySelector.Agency(feed.scopedId(agencyId)));
     }
 
     return selectors;
@@ -371,10 +372,10 @@ public class AffectsMapper {
 
   private static FeedScopedId getStop(
     String siriStopId,
-    String feedId,
+    Feed feed,
     TransitService transitService
   ) {
-    FeedScopedId id = new FeedScopedId(feedId, siriStopId);
+    FeedScopedId id = feed.scopedId(siriStopId);
     if (transitService.getRegularStop(id) != null) {
       return id;
     } else if (transitService.getStation(id) != null) {

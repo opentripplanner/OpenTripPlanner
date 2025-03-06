@@ -17,6 +17,7 @@ import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.alertpatch.TransitAlertBuilder;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.framework.Feed;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.alert.siri.mapping.AffectsMapper;
@@ -49,7 +50,7 @@ import uk.org.siri.siri20.WorkflowStatusEnumeration;
 public class SiriAlertsUpdateHandler {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
-  private final String feedId;
+  private final Feed feed;
   private final Set<TransitAlert> alerts = new HashSet<>();
   private final TransitAlertService transitAlertService;
   private final Duration earlyStart;
@@ -58,11 +59,11 @@ public class SiriAlertsUpdateHandler {
    * @param earlyStart display the alerts to users this long before their activePeriod begins
    */
   public SiriAlertsUpdateHandler(
-    String feedId,
+    Feed feed,
     TransitAlertService transitAlertService,
     Duration earlyStart
   ) {
-    this.feedId = feedId;
+    this.feed = feed;
     this.transitAlertService = transitAlertService;
     this.earlyStart = earlyStart;
   }
@@ -83,7 +84,7 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
           String situationNumber = sxElement.getSituationNumber().getValue();
-          FeedScopedId id = new FeedScopedId(feedId, situationNumber);
+          FeedScopedId id = feed.scopedId(situationNumber);
 
           if (expireSituation) {
             alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
@@ -184,7 +185,7 @@ public class SiriAlertsUpdateHandler {
 
     alert.addEntites(
       new AffectsMapper(
-        feedId,
+        feed,
         context.siriFuzzyTripMatcher(),
         context.transitService()
       ).mapAffects(situation.getAffects())
@@ -220,7 +221,7 @@ public class SiriAlertsUpdateHandler {
    * provided in the SIRI PtSituation.
    */
   private TransitAlertBuilder createAlertWithTexts(PtSituationElement situation) {
-    return TransitAlert.of(new FeedScopedId(feedId, situation.getSituationNumber().getValue()))
+    return TransitAlert.of(feed.scopedId(situation.getSituationNumber().getValue()))
       .withDescriptionText(mapTranslatedString(situation.getDescriptions()))
       .withDetailText(mapTranslatedString(situation.getDetails()))
       .withAdviceText(mapTranslatedString(situation.getAdvices()))
