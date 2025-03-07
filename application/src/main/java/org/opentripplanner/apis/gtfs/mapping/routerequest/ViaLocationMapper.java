@@ -1,10 +1,11 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
+import static org.opentripplanner.apis.gtfs.mapping.CoordinateMapper.mapCoordinate;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
@@ -40,11 +41,14 @@ class ViaLocationMapper {
         mapStopLocationIds((List<String>) passThrough.get(FIELD_STOP_LOCATION_IDS))
       );
     } else if (visit != null) {
+      var coordinate = visit.get(FIELD_COORDINATE);
       return new VisitViaLocation(
         (String) visit.get(FIELD_LABEL),
         (Duration) visit.get(FIELD_MINIMUM_WAIT_TIME),
         mapStopLocationIds((List<String>) visit.get(FIELD_STOP_LOCATION_IDS)),
-        mapCoordinate(visit.get(FIELD_COORDINATE))
+        coordinate != null
+          ? List.of(mapCoordinate((Map<String, Double>) visit.get(FIELD_COORDINATE)))
+          : List.of()
       );
     } else {
       throw new IllegalArgumentException("ViaLocation must define either pass-through or visit.");
@@ -56,13 +60,5 @@ class ViaLocationMapper {
       return List.of();
     }
     return ids.stream().map(FeedScopedId::parse).toList();
-  }
-
-  private static List<WgsCoordinate> mapCoordinate(@Nullable Object coordinate) {
-    if (coordinate == null) {
-      return List.of();
-    }
-    var map = (Map<String, Object>) coordinate;
-    return List.of(new WgsCoordinate((Double) map.get("latitude"), (Double) map.get("longitude")));
   }
 }
