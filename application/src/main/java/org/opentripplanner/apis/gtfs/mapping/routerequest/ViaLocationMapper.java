@@ -2,10 +2,10 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static org.opentripplanner.apis.gtfs.mapping.CoordinateMapper.mapCoordinate;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
@@ -17,38 +17,29 @@ import org.opentripplanner.utils.collection.ListUtils;
  */
 class ViaLocationMapper {
 
-  static final String FIELD_STOP_LOCATION_IDS = "stopLocationIds";
-  static final String FIELD_LABEL = "label";
-  static final String FIELD_MINIMUM_WAIT_TIME = "minimumWaitTime";
-  static final String FIELD_VISIT = "visit";
-  static final String FIELD_PASS_THROUGH = "passThrough";
-  static final String FIELD_COORDINATE = "coordinate";
-
-  static List<ViaLocation> mapToViaLocations(@Nullable List<Map<String, Map<String, Object>>> via) {
+  static List<ViaLocation> mapToViaLocations(@Nullable List<Map<String, Object>> via) {
     return ListUtils.nullSafeImmutableList(via)
       .stream()
       .map(ViaLocationMapper::mapViaLocation)
       .toList();
   }
 
-  private static ViaLocation mapViaLocation(Map<String, Map<String, Object>> via) {
-    var passThrough = via.get(FIELD_PASS_THROUGH);
-    var visit = via.get(FIELD_VISIT);
+  private static ViaLocation mapViaLocation(Map<String, Object> via) {
+    var viaInput = new GraphQLTypes.GraphQLPlanViaLocationInput(via);
+    var passThrough = viaInput.getGraphQLPassThrough();
+    var visit = viaInput.getGraphQLVisit();
 
-    if (passThrough != null && passThrough.get(FIELD_STOP_LOCATION_IDS) != null) {
+    if (passThrough != null && passThrough.getGraphQLStopLocationIds() != null) {
       return new PassThroughViaLocation(
-        (String) passThrough.get(FIELD_LABEL),
-        mapStopLocationIds((List<String>) passThrough.get(FIELD_STOP_LOCATION_IDS))
+        passThrough.getGraphQLLabel(),
+        mapStopLocationIds(passThrough.getGraphQLStopLocationIds())
       );
     } else if (visit != null) {
-      var coordinate = visit.get(FIELD_COORDINATE);
       return new VisitViaLocation(
-        (String) visit.get(FIELD_LABEL),
-        (Duration) visit.get(FIELD_MINIMUM_WAIT_TIME),
-        mapStopLocationIds((List<String>) visit.get(FIELD_STOP_LOCATION_IDS)),
-        coordinate != null
-          ? List.of(mapCoordinate((Map<String, Double>) visit.get(FIELD_COORDINATE)))
-          : List.of()
+        visit.getGraphQLLabel(),
+        visit.getGraphQLMinimumWaitTime(),
+        mapStopLocationIds(visit.getGraphQLStopLocationIds()),
+        mapCoordinate(visit.getGraphQLCoordinate()).map(List::of).orElse(List.of())
       );
     } else {
       throw new IllegalArgumentException("ViaLocation must define either pass-through or visit.");

@@ -183,7 +183,7 @@ public class RouteRequestMapper {
     );
   }
 
-  static void mapViaPoints(RouteRequest request, List<Map<String, Map<String, Object>>> via) {
+  static void mapViaPoints(RouteRequest request, List<Map<String, Object>> via) {
     request.setViaLocations(ViaLocationMapper.mapToViaLocations(via));
   }
 }

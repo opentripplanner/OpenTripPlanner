@@ -7,12 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.apis.gtfs.SchemaObjectMappersForTests.mapCoordinate;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_COORDINATE;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_LABEL;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_MINIMUM_WAIT_TIME;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_PASS_THROUGH;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_STOP_LOCATION_IDS;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.FIELD_VISIT;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.ViaLocationMapper.mapToViaLocations;
 
 import java.time.Duration;
@@ -22,30 +16,36 @@ import org.junit.jupiter.api.Test;
 
 class ViaLocationMapperTest {
 
-  public static final String LABEL_FIRST = "TestLabel1";
-  public static final String LABEL_THIRD = "TestLabel3";
-  public static final Duration MIN_WAIT_TIME_FIRST = Duration.ofMinutes(5);
-  public static final Duration MIN_WAIT_TIME_THIRD = Duration.ofMinutes(10);
-  public static final List<String> LIST_IDS_INPUT_FIRST = List.of("F:ID1", "F:ID2");
-  public static final List<String> LIST_IDS_INPUT_THIRD = List.of("F:ID3", "F:ID4");
-  public static final double SECOND_LAT = 30.5;
-  public static final double SECOND_LON = 40.2;
-  public static final double THIRD_LAT = 35.5;
-  public static final double THIRD_LON = 45.5;
-  public static final Map<String, Double> COORDINATE_INPUT_SECOND = mapCoordinate(
+  private static final String FIELD_STOP_LOCATION_IDS = "stopLocationIds";
+  private static final String FIELD_LABEL = "label";
+  private static final String FIELD_MINIMUM_WAIT_TIME = "minimumWaitTime";
+  private static final String FIELD_VISIT = "visit";
+  private static final String FIELD_PASS_THROUGH = "passThrough";
+  private static final String FIELD_COORDINATE = "coordinate";
+  private static final String LABEL_FIRST = "TestLabel1";
+  private static final String LABEL_THIRD = "TestLabel3";
+  private static final Duration MIN_WAIT_TIME_FIRST = Duration.ofMinutes(5);
+  private static final Duration MIN_WAIT_TIME_THIRD = Duration.ofMinutes(10);
+  private static final List<String> LIST_IDS_INPUT_FIRST = List.of("F:ID1", "F:ID2");
+  private static final List<String> LIST_IDS_INPUT_THIRD = List.of("F:ID3", "F:ID4");
+  private static final double SECOND_LAT = 30.5;
+  private static final double SECOND_LON = 40.2;
+  private static final double THIRD_LAT = 35.5;
+  private static final double THIRD_LON = 45.5;
+  private static final Map<String, Double> COORDINATE_INPUT_SECOND = mapCoordinate(
     SECOND_LAT,
     SECOND_LON
   );
-  public static final Map<String, Double> COORDINATE_INPUT_THIRD = mapCoordinate(
+  private static final Map<String, Double> COORDINATE_INPUT_THIRD = mapCoordinate(
     THIRD_LAT,
     THIRD_LON
   );
-  public static final String EXPECTED_IDS_AS_STRING_FIRST = "[F:ID1, F:ID2]";
-  public static final String EXPECTED_IDS_AS_STRING_THIRD = "[F:ID3, F:ID4]";
+  private static final String EXPECTED_IDS_AS_STRING_FIRST = "[F:ID1, F:ID2]";
+  private static final String EXPECTED_IDS_AS_STRING_THIRD = "[F:ID3, F:ID4]";
 
   @Test
   void mapToVisitViaLocations() {
-    List<Map<String, Map<String, Object>>> args = List.of(
+    List<Map<String, Object>> args = List.of(
       Map.of(
         FIELD_VISIT,
         Map.ofEntries(
@@ -104,10 +104,7 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToVisitViaLocationsWithBareMinimum() {
-    Map<String, Map<String, Object>> args = Map.of(
-      FIELD_VISIT,
-      Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
-    );
+    Map<String, Object> args = Map.of(FIELD_VISIT, Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1")));
     var inputs = List.of(args);
     var result = mapToViaLocations(inputs);
 
@@ -121,7 +118,7 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToPassThrough() {
-    final Map<String, Map<String, Object>> args = Map.of(
+    final Map<String, Object> args = Map.of(
       FIELD_PASS_THROUGH,
       Map.ofEntries(
         entry(FIELD_LABEL, LABEL_FIRST),
@@ -143,7 +140,7 @@ class ViaLocationMapperTest {
 
   @Test
   void mapToPassThroughWithBareMinimum() {
-    Map<String, Map<String, Object>> args = Map.of(
+    Map<String, Object> args = Map.of(
       FIELD_PASS_THROUGH,
       Map.of(FIELD_STOP_LOCATION_IDS, List.of("F:1"))
     );
