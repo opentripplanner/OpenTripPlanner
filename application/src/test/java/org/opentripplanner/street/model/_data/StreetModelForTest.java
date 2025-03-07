@@ -42,8 +42,7 @@ public class StreetModelForTest {
   }
 
   public static TransitEntranceVertex transitEntranceVertex(String id, double lat, double lon) {
-    var entrance = Entrance
-      .of(id(id))
+    var entrance = Entrance.of(id(id))
       .withCoordinate(new WgsCoordinate(lat, lon))
       .withName(I18NString.of(id))
       .build();
@@ -97,8 +96,7 @@ public class StreetModelForTest {
   }
 
   public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {
-    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder
-      .of()
+    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder.of()
       .withLatitude(-122.575133)
       .withLongitude(45.456773);
     if (formFactor == RentalFormFactor.SCOOTER) {

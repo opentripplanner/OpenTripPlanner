@@ -8,21 +8,18 @@ import org.opentripplanner.transit.model.network.Route;
 public class PresentationType {
 
   public static GraphQLObjectType create() {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Presentation")
       .description("Types describing common presentation properties")
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("colour")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((Route) environment.getSource()).getColor())
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("textColour")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment -> ((Route) environment.getSource()).getTextColor())

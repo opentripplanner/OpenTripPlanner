@@ -101,8 +101,7 @@ public class StreetGraphFinder implements GraphFinder {
         StreetMode.WALK
       )
     ) {
-      StreetSearchBuilder
-        .of()
+      StreetSearchBuilder.of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())

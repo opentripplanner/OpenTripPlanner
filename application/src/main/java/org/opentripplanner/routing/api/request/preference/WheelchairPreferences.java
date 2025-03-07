@@ -152,8 +152,7 @@ public class WheelchairPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(WheelchairPreferences.class)
+    return ToStringBuilder.of(WheelchairPreferences.class)
       .addObjOp("trip", trip, DEFAULT.trip, i -> i.toString(DEFAULT_COSTS))
       .addObjOp("stop", stop, DEFAULT.stop, i -> i.toString(DEFAULT_COSTS))
       .addObjOp("elevator", elevator, DEFAULT.elevator, i -> i.toString(DEFAULT.elevator))
@@ -240,8 +239,9 @@ public class WheelchairPreferences implements Serializable {
     }
 
     public Builder withElevator(Consumer<AccessibilityPreferences.Builder> body) {
-      this.elevator =
-        this.elevator.copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES).apply(body).build();
+      this.elevator = this.elevator.copyOfWithDefaultCosts(DEFAULT_ELEVATOR_PREFERENCES)
+        .apply(body)
+        .build();
       return this;
     }
 

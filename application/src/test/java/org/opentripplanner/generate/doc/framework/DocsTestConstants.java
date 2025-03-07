@@ -26,11 +26,11 @@ public interface DocsTestConstants {
     LOG.warn(
       """
       SKIP TEST - '/doc/user' or '/doc/templates' NOT FOUND
-      
+
           The /doc/user and /doc/templates directories might not be available if you run the tests outside the
           root of the projects. This may happen if the project root is not the working directory,
           if you run tests using jar files or in a Maven multi-module project.
-          
+
       """
     );
     return false;

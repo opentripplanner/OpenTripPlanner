@@ -90,15 +90,14 @@ public class LuceneIndex implements Serializable {
     this.transitService = transitService;
     this.stopClusterMapper = new StopClusterMapper(transitService, stopConsolidationService);
 
-    this.analyzer =
-      new PerFieldAnalyzerWrapper(
-        new StandardAnalyzer(),
-        Map.ofEntries(
-          entry(NAME, new EnglishAnalyzer()),
-          entry(NAME_NGRAM, new EnglishNGramAnalyzer()),
-          entry(SUGGEST, new CompletionAnalyzer(new StandardAnalyzer()))
-        )
-      );
+    this.analyzer = new PerFieldAnalyzerWrapper(
+      new StandardAnalyzer(),
+      Map.ofEntries(
+        entry(NAME, new EnglishAnalyzer()),
+        entry(NAME_NGRAM, new EnglishNGramAnalyzer()),
+        entry(SUGGEST, new CompletionAnalyzer(new StandardAnalyzer()))
+      )
+    );
 
     var directory = new ByteBuffersDirectory();
 
@@ -166,13 +165,15 @@ public class LuceneIndex implements Serializable {
   }
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
-    return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> transitService.getStopLocation(FeedScopedId.parse(document.get(ID))));
+    return matchingDocuments(StopLocation.class, query, autocomplete).map(document ->
+      transitService.getStopLocation(FeedScopedId.parse(document.get(ID)))
+    );
   }
 
   public Stream<StopLocationsGroup> queryStopLocationGroups(String query, boolean autocomplete) {
-    return matchingDocuments(StopLocationsGroup.class, query, autocomplete)
-      .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parse(document.get(ID))));
+    return matchingDocuments(StopLocationsGroup.class, query, autocomplete).map(document ->
+      transitService.getStopLocationsGroup(FeedScopedId.parse(document.get(ID)))
+    );
   }
 
   /**
@@ -192,8 +193,7 @@ public class LuceneIndex implements Serializable {
     var primaryId = FeedScopedId.parse(document.get(ID));
     var primary = stopClusterMapper.toLocation(primaryId);
 
-    var secondaryIds = Arrays
-      .stream(document.getValues(SECONDARY_IDS))
+    var secondaryIds = Arrays.stream(document.getValues(SECONDARY_IDS))
       .map(FeedScopedId::parse)
       .map(stopClusterMapper::toLocation)
       .toList();
@@ -281,15 +281,13 @@ public class LuceneIndex implements Serializable {
 
         var topDocs = searcher.suggest(query, 25, true);
 
-        return Arrays
-          .stream(topDocs.scoreDocs)
-          .map(scoreDoc -> {
-            try {
-              return searcher.storedFields().document(scoreDoc.doc);
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          });
+        return Arrays.stream(topDocs.scoreDocs).map(scoreDoc -> {
+          try {
+            return searcher.storedFields().document(scoreDoc.doc);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
       } else {
         var nameParser = new QueryParser(NAME_NGRAM, analyzer);
         var nameQuery = nameParser.parse(searchTerms);
@@ -326,15 +324,13 @@ public class LuceneIndex implements Serializable {
 
         var topDocs = searcher.search(query, 25);
 
-        return Arrays
-          .stream(topDocs.scoreDocs)
-          .map(scoreDoc -> {
-            try {
-              return searcher.storedFields().document(scoreDoc.doc);
-            } catch (IOException e) {
-              throw new RuntimeException(e);
-            }
-          });
+        return Arrays.stream(topDocs.scoreDocs).map(scoreDoc -> {
+          try {
+            return searcher.storedFields().document(scoreDoc.doc);
+          } catch (IOException e) {
+            throw new RuntimeException(e);
+          }
+        });
       }
     } catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);

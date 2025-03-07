@@ -71,11 +71,15 @@ public class SiteRepository implements Serializable {
     this.stopIndexCounter = assertSameStopIndexCounterIsUsedToCreateBothModels(main, child);
     this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
     this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
-    this.groupOfStationsById =
-      MapUtils.combine(main.groupOfStationsById, child.groupOfStationsById);
+    this.groupOfStationsById = MapUtils.combine(
+      main.groupOfStationsById,
+      child.groupOfStationsById
+    );
     this.groupStopById = MapUtils.combine(main.groupStopById, child.groupStopById);
-    this.multiModalStationById =
-      MapUtils.combine(main.multiModalStationById, child.multiModalStationById);
+    this.multiModalStationById = MapUtils.combine(
+      main.multiModalStationById,
+      child.multiModalStationById
+    );
     this.stationById = MapUtils.combine(main.stationById, child.stationById);
     reindex();
   }

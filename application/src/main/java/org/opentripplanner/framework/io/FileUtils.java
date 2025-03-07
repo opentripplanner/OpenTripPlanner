@@ -64,13 +64,7 @@ public class FileUtils {
           The file(%s) differ from the expected document.
             Expected (line: %3d): %s
             Result   (line: %3d): %s
-          """.formatted(
-              newFile.getAbsolutePath(),
-              i,
-              expected,
-              j,
-              result
-            )
+          """.formatted(newFile.getAbsolutePath(), i, expected, j, result)
         );
       }
       ++i;

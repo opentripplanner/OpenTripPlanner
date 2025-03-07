@@ -72,8 +72,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this.backState = null;
     this.stateData = stateData;
     if (request.arriveBy() && !vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
-      this.stateData.noRentalDropOffZonesAtStartOfReverseSearch =
-        vertex.rentalRestrictions().noDropOffNetworks();
+      this.stateData.noRentalDropOffZonesAtStartOfReverseSearch = vertex
+        .rentalRestrictions()
+        .noDropOffNetworks();
     }
     this.walkDistance = 0;
     this.time_ms = startTime.toEpochMilli();
@@ -221,18 +222,14 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   private boolean vehicleRentalIsFinished() {
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
-      (
-        stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
-        !stateData.insideNoRentalDropOffArea
-      ) ||
-      (
-        getRequest()
+      (stateData.vehicleRentalState == VehicleRentalState.RENTING_FLOATING &&
+        !stateData.insideNoRentalDropOffArea) ||
+      (getRequest()
           .preferences()
           .rental(getRequest().mode())
           .allowArrivingInRentedVehicleAtDestination() &&
         stateData.mayKeepRentedVehicleAtDestination &&
-        stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION
-      )
+        stateData.vehicleRentalState == VehicleRentalState.RENTING_FROM_STATION)
     );
   }
 
@@ -490,8 +487,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(State.class)
+    return ToStringBuilder.of(State.class)
       .addDateTime("time", getTime())
       .addNum("weight", weight)
       .addObj("vertex", vertex)
@@ -526,6 +522,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   private State reversedClone() {
+    // these must be getTime(), not getTimeAccurate(), so that the reversed path (which does not
+    // have arriveBy true anymore) has times which round correctly, as the rounding rules
+    // depend on arriveBy
     StreetSearchRequest reversedRequest = request
       .copyOfReversed(getTime())
       .withPreferences(p -> {

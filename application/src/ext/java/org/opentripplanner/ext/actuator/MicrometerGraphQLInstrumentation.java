@@ -131,8 +131,7 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
   }
 
   private Timer buildQueryTimer(String operationName, String operation) {
-    return Timer
-      .builder(QUERY_TIME_METRIC_NAME)
+    return Timer.builder(QUERY_TIME_METRIC_NAME)
       .description(TIMER_DESCRIPTION)
       .tag(OPERATION_NAME_TAG, operationName)
       .tag(OPERATION, operation)
@@ -141,8 +140,7 @@ public class MicrometerGraphQLInstrumentation implements Instrumentation {
   }
 
   private Timer buildFieldTimer(String operationName, String parent, String field) {
-    return Timer
-      .builder(RESOLVER_TIME_METRIC_NAME)
+    return Timer.builder(RESOLVER_TIME_METRIC_NAME)
       .description(TIMER_DESCRIPTION)
       .tag(OPERATION_NAME_TAG, operationName)
       .tag(PARENT, parent)

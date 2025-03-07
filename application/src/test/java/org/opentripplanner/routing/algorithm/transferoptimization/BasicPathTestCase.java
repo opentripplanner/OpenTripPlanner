@@ -16,7 +16,7 @@ import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
-import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfers;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
@@ -115,7 +115,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   private static final int TX_START = time("10:35:15");
   private static final int TX_END = time("10:39:00");
   public static final int TX_DURATION = TX_END - TX_START;
-  public static final RaptorTransfer TX_TRANSFER = TestTransfer.transfer(STOP_C, TX_DURATION);
+  public static final RaptorTransfer TX_TRANSFER = TestTransfers.transfer(STOP_C, TX_DURATION);
   public static final int TX_C1 = TX_TRANSFER.c1();
 
   // Trip 2 (C ~ BUS L21 11:00 11:23 ~ D)
@@ -173,33 +173,37 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final String LINE_21 = "L21";
   public static final String LINE_31 = "L31";
 
-  public static final TestTripSchedule TRIP_1 = TestTripSchedule
-    .schedule(TestTripPattern.pattern(LINE_11, STOP_A, STOP_B))
+  public static final TestTripSchedule TRIP_1 = TestTripSchedule.schedule(
+    TestTripPattern.pattern(LINE_11, STOP_A, STOP_B)
+  )
     .times(L11_START, L11_END)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final TestTripSchedule TRIP_2 = TestTripSchedule
-    .schedule(TestTripPattern.pattern(LINE_21, STOP_C, STOP_D))
+  public static final TestTripSchedule TRIP_2 = TestTripSchedule.schedule(
+    TestTripPattern.pattern(LINE_21, STOP_C, STOP_D)
+  )
     .times(L21_START, L21_END)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final TestTripSchedule TRIP_3 = TestTripSchedule
-    .schedule(TestTripPattern.pattern(LINE_31, STOP_D, STOP_E))
+  public static final TestTripSchedule TRIP_3 = TestTripSchedule.schedule(
+    TestTripPattern.pattern(LINE_31, STOP_D, STOP_E)
+  )
     // The early arrival and late departure should not have any effect on tests
     .arrivals(VERY_EARLY, L31_END)
     .departures(L31_START, VERY_LATE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_INDEX)
     .build();
 
-  public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_C1_SEC,
-    TRANSFER_C1_SEC,
-    WAIT_RELUCTANCE,
-    TRANSIT_RELUCTANCE,
-    STOP_C1S
-  );
+  public static final RaptorCostCalculator<TestTripSchedule> C1_CALCULATOR =
+    new DefaultCostCalculator<>(
+      BOARD_C1_SEC,
+      TRANSFER_C1_SEC,
+      WAIT_RELUCTANCE,
+      TRANSIT_RELUCTANCE,
+      STOP_C1S
+    );
 
   public static final int TOTAL_C1 =
     ACCESS_C1 + LINE_11_C1 + TX_C1 + LINE_21_C1 + LINE_31_C1 + EGRESS_C1;
@@ -231,7 +235,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       LINE_21_C1,
       leg5
     );
-    var transfer = TestTransfer.transfer(STOP_C, TX_END - TX_START);
+    var transfer = TestTransfers.transfer(STOP_C, TX_END - TX_START);
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,
@@ -262,7 +266,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
 
   public static RaptorPath<TestTripSchedule> flexTripAsPath() {
     PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(FLEX, EGRESS_START, EGRESS_END, EGRESS_C1);
-    var transfer = TestTransfer.transfer(STOP_E, TX_END - TX_START);
+    var transfer = TestTransfers.transfer(STOP_E, TX_END - TX_START);
     PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(
       STOP_B,
       TX_START,

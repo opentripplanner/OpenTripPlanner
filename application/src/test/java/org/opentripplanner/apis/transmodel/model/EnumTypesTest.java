@@ -56,26 +56,23 @@ class EnumTypesTest {
 
   @Test
   void createFromDocumentedEnumMissingValueThrowsException() {
-    assertThrows(
-      IllegalStateException.class,
-      () -> EnumTypes.createFromDocumentedEnum("oof", List.of(EnumTypes.map("Rab", Foo.Bar)))
+    assertThrows(IllegalStateException.class, () ->
+      EnumTypes.createFromDocumentedEnum("oof", List.of(EnumTypes.map("Rab", Foo.Bar)))
     );
   }
 
   @Test
   void createFromDocumentedEnumDuplicateThrowsException() {
-    assertThrows(
-      IllegalStateException.class,
-      () ->
-        EnumTypes.createFromDocumentedEnum(
-          "oof",
-          List.of(
-            EnumTypes.map("Rab", Foo.Bar),
-            EnumTypes.map("Hi", Foo.Hi),
-            // Duplicate: Bar -> throw exception
-            EnumTypes.map("Bar", Foo.Bar)
-          )
+    assertThrows(IllegalStateException.class, () ->
+      EnumTypes.createFromDocumentedEnum(
+        "oof",
+        List.of(
+          EnumTypes.map("Rab", Foo.Bar),
+          EnumTypes.map("Hi", Foo.Hi),
+          // Duplicate: Bar -> throw exception
+          EnumTypes.map("Bar", Foo.Bar)
         )
+      )
     );
   }
 

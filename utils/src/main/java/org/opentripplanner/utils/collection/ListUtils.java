@@ -79,4 +79,16 @@ public class ListUtils {
   public static <T> List<T> nullSafeImmutableList(@Nullable Collection<T> c) {
     return (c == null) ? List.of() : List.copyOf(c);
   }
+
+  /**
+   * Check if a list has at least the given {@code minLimit} number of elements(inclusive).
+   * @throws IllegalStateException if the list has fewer lements.
+   * @throws NumberFormatException if the list is {@code null}
+   */
+  public static <T> List<T> requireAtLeastNElements(List<T> list, int minLimit) {
+    if (list.size() < minLimit) {
+      throw new IllegalArgumentException("The list must have at least " + minLimit + " elements.");
+    }
+    return list;
+  }
 }

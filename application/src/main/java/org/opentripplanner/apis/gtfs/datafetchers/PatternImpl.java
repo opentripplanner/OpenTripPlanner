@@ -72,8 +72,9 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
               );
               break;
             case TRIPS:
-              getTrips(environment)
-                .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+              getTrips(environment).forEach(trip ->
+                alerts.addAll(alertService.getTripAlerts(trip.getId(), null))
+              );
               break;
             case STOPS_ON_PATTERN:
               alerts.addAll(
@@ -85,10 +86,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
                       .entities()
                       .stream()
                       .anyMatch(entity ->
-                        (
-                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
-                          stopAndRoute.routeId().equals(getRoute(environment).getId())
-                        )
+                        (entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                          stopAndRoute.routeId().equals(getRoute(environment).getId()))
                       )
                   )
                   .toList()
@@ -112,10 +111,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
                         .entities()
                         .stream()
                         .anyMatch(entity ->
-                          (
-                            entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
-                            stopAndTrip.tripId().equals(getSource(environment).getId())
-                          )
+                          (entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                            stopAndTrip.tripId().equals(getSource(environment).getId()))
                         )
                     )
                     .toList()
@@ -221,12 +218,12 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
     return environment -> {
       String serviceDate = new GraphQLTypes.GraphQLPatternTripsForDateArgs(
         environment.getArguments()
-      )
-        .getGraphQLServiceDate();
+      ).getGraphQLServiceDate();
 
       try {
-        TIntSet services = getTransitService(environment)
-          .getServiceCodesRunningForDate(ServiceDateUtils.parseString(serviceDate));
+        TIntSet services = getTransitService(environment).getServiceCodesRunningForDate(
+          ServiceDateUtils.parseString(serviceDate)
+        );
         return getSource(environment)
           .getScheduledTimetable()
           .getTripTimes()

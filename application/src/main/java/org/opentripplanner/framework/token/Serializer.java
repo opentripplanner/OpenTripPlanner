@@ -8,7 +8,8 @@ class Serializer {
   private final TokenDefinition definition;
   private final Object[] values;
   private final StringBuilder buf = new StringBuilder();
-  private final CharacterEscapeFormatter tokenFormatter = TokenFormatterConfiguration.tokenFormatter();
+  private final CharacterEscapeFormatter tokenFormatter =
+    TokenFormatterConfiguration.tokenFormatter();
 
   private Serializer(TokenDefinition definition, Object[] values) {
     this.definition = definition;

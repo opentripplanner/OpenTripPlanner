@@ -8,13 +8,11 @@ import graphql.schema.GraphQLNonNull;
 
 public class PassThroughPointInputType {
 
-  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("PassThroughPoint")
     .description("Defines one point which the journey must pass through.")
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("name")
         .description(
           "Optional name of the pass-through point for debugging and logging. It is not used in routing."
@@ -23,8 +21,7 @@ public class PassThroughPointInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("placeIds")
         .description(
           """

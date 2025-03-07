@@ -31,8 +31,7 @@ class RideHailingAccessShifterTest {
   private static final Instant TIME = OffsetDateTime.parse("2023-03-23T17:00:00+01:00").toInstant();
   private static final GenericLocation FROM = new GenericLocation(0d, 0d);
   private static final GenericLocation TO = new GenericLocation(1d, 1d);
-  private static final State DRIVING_STATE = TestStateBuilder
-    .ofDriving()
+  private static final State DRIVING_STATE = TestStateBuilder.ofDriving()
     .streetEdge()
     .streetEdge()
     .build();

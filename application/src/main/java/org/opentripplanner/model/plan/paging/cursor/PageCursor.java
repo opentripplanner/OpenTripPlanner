@@ -62,8 +62,7 @@ public record PageCursor(
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PageCursor.class)
+    return ToStringBuilder.of(PageCursor.class)
       .addEnum("type", type)
       .addEnum("sortOrder", originalSortOrder)
       .addDateTime("edt", earliestDepartureTime)

@@ -13,8 +13,7 @@ class FareZoneTest {
 
   private static final String ID = "1";
   private static final String NAME = "name";
-  private static final FareZone subject = FareZone
-    .of(TimetableRepositoryForTest.id(ID))
+  private static final FareZone subject = FareZone.of(TimetableRepositoryForTest.id(ID))
     .withName(NAME)
     .build();
 

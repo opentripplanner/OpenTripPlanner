@@ -12,6 +12,8 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.geom.TopologyException;
+import org.locationtech.jts.operation.valid.IsValidOp;
+import org.locationtech.jts.operation.valid.TopologyValidationError;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmNode;
@@ -40,7 +42,7 @@ class OsmArea {
     List<TLongList> innerRingNodes = constructRings(innerRingWays);
     List<TLongList> outerRingNodes = constructRings(outerRingWays);
     if (innerRingNodes == null || outerRingNodes == null) {
-      throw new AreaConstructionException();
+      throw new AreaConstructionException("innerRing or outerRing nodes are null");
     }
     ArrayList<TLongList> allRings = new ArrayList<>(innerRingNodes);
     allRings.addAll(outerRingNodes);
@@ -59,7 +61,7 @@ class OsmArea {
     try {
       // now, ring grouping
       // first, find outermost rings
-      OUTER:for (Ring outer : outerRings) {
+      OUTER: for (Ring outer : outerRings) {
         for (Ring possibleContainer : outerRings) {
           if (outer != possibleContainer && outer.jtsPolygon.within(possibleContainer.jtsPolygon)) {
             continue OUTER;
@@ -75,7 +77,7 @@ class OsmArea {
         }
       }
     } catch (TopologyException ex) {
-      throw new AreaConstructionException();
+      throw new AreaConstructionException(ex.getMessage());
     }
 
     // Make outermostRings immutable
@@ -148,7 +150,7 @@ class OsmArea {
 
   /**
    * Try to extract a point which is in  the middle of the area and
-   * also insaide the area geometry.
+   * also inside the area geometry.
    *
    * @return Point geometry inside the area
    */
@@ -165,11 +167,14 @@ class OsmArea {
     for (Ring ring : outermostRings) {
       polygons.add(ring.jtsPolygon);
     }
-    MultiPolygon jtsMultiPolygon = GeometryUtils
-      .getGeometryFactory()
+    MultiPolygon jtsMultiPolygon = GeometryUtils.getGeometryFactory()
       .createMultiPolygon(polygons.toArray(new Polygon[0]));
-    if (!jtsMultiPolygon.isValid()) {
-      throw new AreaConstructionException();
+    var validOp = new IsValidOp(jtsMultiPolygon);
+    if (!validOp.isValid()) {
+      var validationError = validOp.getValidationError();
+      throw new AreaConstructionException(
+        "%s at %s".formatted(validationError.getMessage(), validationError.getCoordinate())
+      );
     }
 
     return jtsMultiPolygon;
@@ -252,5 +257,17 @@ class OsmArea {
     return false;
   }
 
-  public static class AreaConstructionException extends RuntimeException {}
+  public static class AreaConstructionException extends RuntimeException {
+
+    private final String message;
+
+    public AreaConstructionException(String message) {
+      this.message = message;
+    }
+
+    @Override
+    public String getMessage() {
+      return message;
+    }
+  }
 }

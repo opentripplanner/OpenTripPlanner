@@ -10,8 +10,8 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 
 public class DepartureRowImpl implements GraphQLDataFetchers.GraphQLDepartureRow {
@@ -44,18 +44,16 @@ public class DepartureRowImpl implements GraphQLDataFetchers.GraphQLDepartureRow
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> {
-      GraphQLTypes.GraphQLDepartureRowStoptimesArgs args = new GraphQLTypes.GraphQLDepartureRowStoptimesArgs(
-        environment.getArguments()
-      );
+      GraphQLTypes.GraphQLDepartureRowStoptimesArgs args =
+        new GraphQLTypes.GraphQLDepartureRowStoptimesArgs(environment.getArguments());
 
-      return getSource(environment)
-        .getStoptimes(
-          getTransitService(environment),
-          GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
-          Duration.ofSeconds(args.getGraphQLTimeRange()),
-          args.getGraphQLNumberOfDepartures(),
-          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
-        );
+      return getSource(environment).getStoptimes(
+        getTransitService(environment),
+        GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
+        Duration.ofSeconds(args.getGraphQLTimeRange()),
+        args.getGraphQLNumberOfDepartures(),
+        args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
+      );
     };
   }
 

@@ -34,8 +34,7 @@ public class RoutingModeDocTest {
     streetBuilder.header(2, "Street modes", "Street modes");
     streetBuilder.addSection(StreetMode.CAR.typeDescription());
 
-    Arrays
-      .stream(StreetMode.values())
+    Arrays.stream(StreetMode.values())
       .sorted(Comparator.comparing(Enum::name))
       .filter(m -> m != StreetMode.NOT_SET)
       .forEach(m -> {
@@ -51,8 +50,7 @@ public class RoutingModeDocTest {
 
     transitBuilder.addSection(TransitMode.BUS.typeDescription());
 
-    Arrays
-      .stream(TransitMode.values())
+    Arrays.stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
       .forEach(m -> {
         transitBuilder.header(4, m.name(), m.name());

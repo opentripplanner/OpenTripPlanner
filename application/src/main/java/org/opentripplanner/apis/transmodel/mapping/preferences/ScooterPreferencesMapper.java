@@ -16,12 +16,9 @@ public class ScooterPreferencesMapper {
     callWith.argument("bicycleOptimisationMethod", scooter::withOptimizeType);
 
     // WALK reluctance is used for backwards compatibility, then overridden
-    callWith.argument(
-      "walkReluctance",
-      r -> {
-        scooter.withReluctance((double) r);
-      }
-    );
+    callWith.argument("walkReluctance", r -> {
+      scooter.withReluctance((double) r);
+    });
 
     if (scooter.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
       scooter.withOptimizeTriangle(triangle -> {

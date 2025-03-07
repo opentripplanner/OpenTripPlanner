@@ -71,8 +71,10 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     RaptorStopNameResolver stopNameResolver,
     WorkerLifeCycle lifeCycle
   ) {
-    this.paths =
-      new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
+    this.paths = new ParetoSet<>(
+      paretoComparator,
+      debugHandlerFactory.paretoSetDebugPathListener()
+    );
     this.transitCalculator = transitCalculator;
     this.costCalculator = costCalculator;
     this.slackProvider = slackProvider;

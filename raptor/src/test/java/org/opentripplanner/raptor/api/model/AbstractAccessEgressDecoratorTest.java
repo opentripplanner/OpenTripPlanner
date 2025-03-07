@@ -20,14 +20,10 @@ class AbstractAccessEgressDecoratorTest {
     "10:35"
   );
 
-  private final RaptorAccessEgress subject = AbstractAccessEgressDecorator.accessEgressWithExtraSlack(
-    DELEGATE,
-    SLACK
-  );
-  private final RaptorAccessEgress subjectWOpeningHours = AbstractAccessEgressDecorator.accessEgressWithExtraSlack(
-    DELEGATE_W_OPENING_HOURS,
-    SLACK
-  );
+  private final RaptorAccessEgress subject =
+    AbstractAccessEgressDecorator.accessEgressWithExtraSlack(DELEGATE, SLACK);
+  private final RaptorAccessEgress subjectWOpeningHours =
+    AbstractAccessEgressDecorator.accessEgressWithExtraSlack(DELEGATE_W_OPENING_HOURS, SLACK);
 
   private AbstractAccessEgressDecorator subjectCast() {
     return (AbstractAccessEgressDecorator) subject;

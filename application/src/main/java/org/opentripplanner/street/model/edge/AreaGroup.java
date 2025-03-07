@@ -2,11 +2,9 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -52,18 +50,16 @@ public class AreaGroup implements Serializable {
   }
 
   /**
-   * Add a visibility vertex to this edge.
+   * Add a set of visibility vertices to this area group
    */
-  public void addVisibilityVertex(IntersectionVertex toBeAdded) {
-    Objects.requireNonNull(toBeAdded);
+  public void addVisibilityVertices(Set<IntersectionVertex> toAdd) {
     synchronized (this) {
       if (visibilityVertices == EMPTY_SET) {
-        visibilityVertices = Set.of(toBeAdded);
+        visibilityVertices = Set.copyOf(toAdd);
       } else {
-        visibilityVertices =
-          Stream
-            .concat(visibilityVertices.stream(), Stream.of(toBeAdded))
-            .collect(Collectors.toUnmodifiableSet());
+        var temp = new HashSet<>(visibilityVertices);
+        temp.addAll(toAdd);
+        visibilityVertices = Set.copyOf(temp);
       }
     }
   }

@@ -23,8 +23,7 @@ public class PolylineEncoderTest {
 
   @Test
   public void testPolygon() {
-    var polygon = GeometryUtils
-      .getGeometryFactory()
+    var polygon = GeometryUtils.getGeometryFactory()
       .createPolygon(
         new Coordinate[] {
           new Coordinate(0, 0),

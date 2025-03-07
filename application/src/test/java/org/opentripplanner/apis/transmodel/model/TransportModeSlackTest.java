@@ -23,8 +23,7 @@ public class TransportModeSlackTest {
   @Test
   public void mapToApiList() {
     // Given
-    DurationForEnum<TransitMode> domain = DurationForEnum
-      .of(TransitMode.class)
+    DurationForEnum<TransitMode> domain = DurationForEnum.of(TransitMode.class)
       .with(TransitMode.FUNICULAR, D10m)
       .with(TransitMode.CABLE_CAR, D10m)
       .with(TransitMode.RAIL, D30m)

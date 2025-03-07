@@ -73,8 +73,7 @@ public class VehicleParkingSpaces implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VehicleParkingSpaces.class)
+    return ToStringBuilder.of(VehicleParkingSpaces.class)
       .addNum("carSpaces", carSpaces)
       .addNum("wheelchairAccessibleCarSpaces", wheelchairAccessibleCarSpaces)
       .addNum("bicycleSpaces", bicycleSpaces)
