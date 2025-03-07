@@ -243,19 +243,14 @@ class DefaultTransitServiceTest {
 
   @Test
   void getTripTimeOnDateWithNoServiceAndFallbackToNextScheduledDate() {
-    Instant midnight = ServiceDateUtils.asStartOfService(
-      SERVICE_DATE,
-      service.getTimeZone()
-    ).toInstant();
-
     assertEquals(
       Optional.of(
         List.of(
-          new TripTimeOnDate(REALTIME_TRIP_TIMES, 0, REAL_TIME_PATTERN, SERVICE_DATE, midnight),
-          new TripTimeOnDate(REALTIME_TRIP_TIMES, 1, REAL_TIME_PATTERN, SERVICE_DATE, midnight)
+          new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 0, RAIL_PATTERN),
+          new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 1, RAIL_PATTERN)
         )
       ),
-      service.getTripTimeOnDates(TRIP, SERVICE_DATE, true)
+      service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE, true)
     );
   }
 
