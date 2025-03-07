@@ -75,7 +75,7 @@ public interface TransitService {
 
   /**
    * @return if the trip doesn't run on the specified service date, return scheduled trip times,
-   * unmodified by any realtime data, from the next scheduled service date if
+   * unmodified by any realtime data, if
    * fallbackToNextScheduledDate is true, empty otherwise. Logically this is confusing, but
    * existing API users depend on this.
    */
