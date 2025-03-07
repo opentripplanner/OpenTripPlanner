@@ -20,18 +20,17 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
   private final List<FeedScopedIdPair> keySet;
 
   public GroupByAllSameStations(Itinerary itinerary) {
-    keySet =
-      itinerary
-        .getLegs()
-        .stream()
-        .filter(Leg::isTransitLeg)
-        .map(leg ->
-          new FeedScopedIdPair(
-            leg.getFrom().stop.getStationOrStopId(),
-            leg.getTo().stop.getStationOrStopId()
-          )
+    keySet = itinerary
+      .getLegs()
+      .stream()
+      .filter(Leg::isTransitLeg)
+      .map(leg ->
+        new FeedScopedIdPair(
+          leg.getFrom().stop.getStationOrStopId(),
+          leg.getTo().stop.getStationOrStopId()
         )
-        .collect(Collectors.toList());
+      )
+      .collect(Collectors.toList());
   }
 
   @Override

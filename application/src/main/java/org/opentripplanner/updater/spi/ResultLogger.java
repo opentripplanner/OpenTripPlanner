@@ -24,7 +24,7 @@ public class ResultLogger {
         type,
         updateResult.successful(),
         totalUpdates,
-        DoubleUtils.roundTo2Decimals((double) updateResult.successful() / totalUpdates * 100)
+        DoubleUtils.roundTo2Decimals(((double) updateResult.successful() / totalUpdates) * 100)
       );
 
       logUpdateResultErrors(feedId, type, updateResult);

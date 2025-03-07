@@ -68,16 +68,18 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.iterationDepartureTime = iterationDepartureTime;
     this.startTime = accessLeg.fromTime();
     var access = accessLeg.access();
-    this.startTimeInclusivePenalty =
-      access.hasTimePenalty() ? startTime - access.timePenalty() : startTime;
+    this.startTimeInclusivePenalty = access.hasTimePenalty()
+      ? startTime - access.timePenalty()
+      : startTime;
     this.c1 = c1;
     this.accessLeg = accessLeg;
     this.egressLeg = findEgressLeg(accessLeg);
     this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressLeg);
     this.endTime = egressLeg.toTime();
     var egress = egressLeg.egress();
-    this.endTimeInclusivePenalty =
-      egress.hasTimePenalty() ? endTime + egress.timePenalty() : endTime;
+    this.endTimeInclusivePenalty = egress.hasTimePenalty()
+      ? endTime + egress.timePenalty()
+      : endTime;
     this.c2 = c2;
   }
 
@@ -267,8 +269,9 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
               buf.c1(leg.c1());
             }
             if (transitLeg.getConstrainedTransferAfterLeg() != null) {
-              constraintPrevLeg =
-                transitLeg.getConstrainedTransferAfterLeg().getTransferConstraint();
+              constraintPrevLeg = transitLeg
+                .getConstrainedTransferAfterLeg()
+                .getTransferConstraint();
             }
           } else if (leg.isTransferLeg()) {
             buf.walk(leg.duration());

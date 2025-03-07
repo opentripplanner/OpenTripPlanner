@@ -24,8 +24,7 @@ public record TransferParameters(
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(getClass())
+    return ToStringBuilder.of(getClass())
       .addDuration("maxTransferDuration", maxTransferDuration)
       .addDuration("carsAllowedStopMaxTransferDuration", carsAllowedStopMaxTransferDuration)
       .addBool("disableDefaultTransfers", disableDefaultTransfers)

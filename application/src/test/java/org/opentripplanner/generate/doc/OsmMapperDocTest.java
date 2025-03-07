@@ -40,8 +40,7 @@ public class OsmMapperDocTest {
   );
 
   public static List<OsmTagMapperSource> mappers() {
-    return Arrays
-      .stream(OsmTagMapperSource.values())
+    return Arrays.stream(OsmTagMapperSource.values())
       .filter(m -> !SKIP_MAPPERS.contains(m))
       .toList();
   }

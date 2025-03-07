@@ -74,36 +74,28 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
   @Override
   public final void insert(Envelope envelope, final Object item) {
-    visit(
-      envelope,
-      true,
-      (bin, mapKey) -> {
-        /*
-         * Note: here we can end-up having several time the same object in the same bin, if
-         * the client insert multiple times the same object with different envelopes.
-         * However we do filter duplicated when querying, so apart for memory/performance
-         * reasons it should work. If this becomes a problem, we can use a set instead of a
-         * list.
-         */
-        bin.add((T) item);
-        nEntries++;
-        return false;
-      }
-    );
+    visit(envelope, true, (bin, mapKey) -> {
+      /*
+       * Note: here we can end-up having several time the same object in the same bin, if
+       * the client insert multiple times the same object with different envelopes.
+       * However we do filter duplicated when querying, so apart for memory/performance
+       * reasons it should work. If this becomes a problem, we can use a set instead of a
+       * list.
+       */
+      bin.add((T) item);
+      nEntries++;
+      return false;
+    });
     nObjects++;
   }
 
   @Override
   public final List<T> query(Envelope envelope) {
     final Set<T> ret = new HashSet<>(1024);
-    visit(
-      envelope,
-      false,
-      (bin, mapKey) -> {
-        ret.addAll(bin);
-        return false;
-      }
-    );
+    visit(envelope, false, (bin, mapKey) -> {
+      ret.addAll(bin);
+      return false;
+    });
     return new ArrayList<>(ret);
   }
 
@@ -123,18 +115,14 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     // mirroring the more efficient insert logic is not trivial and would require additional
     // testing of the spatial index.
     final IntBox removedCount = new IntBox(0);
-    visit(
-      envelope,
-      false,
-      (bin, mapKey) -> {
-        boolean removed = bin.remove(item);
-        if (removed) {
-          nEntries--;
-          removedCount.inc();
-        }
-        return removed;
+    visit(envelope, false, (bin, mapKey) -> {
+      boolean removed = bin.remove(item);
+      if (removed) {
+        nEntries--;
+        removedCount.inc();
       }
-    );
+      return removed;
+    });
     if (removedCount.get() > 0) {
       nObjects--;
       return true;
@@ -150,14 +138,10 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
       // TODO Cut the segment if longer than bin size
       // to reduce the number of wrong bins
       Envelope env = new Envelope(coord[i], coord[i + 1]);
-      visit(
-        env,
-        true,
-        (bin, mapKey) -> {
-          keys.add(mapKey);
-          return false;
-        }
-      );
+      visit(env, true, (bin, mapKey) -> {
+        keys.add(mapKey);
+        return false;
+      });
     }
     keys.forEach(key -> {
       // Note: bins have been initialized in the previous visit
@@ -188,8 +172,8 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
       this.nBins,
       this.nObjects,
       this.nEntries,
-      this.nEntries * 1.0 / this.nBins,
-      this.nEntries * 1.0 / this.nObjects
+      (this.nEntries * 1.0) / this.nBins,
+      (this.nEntries * 1.0) / this.nObjects
     );
   }
 

@@ -36,7 +36,6 @@ import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -45,6 +44,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 
 public class StopPlaceType {
@@ -60,16 +60,14 @@ public class StopPlaceType {
     GraphQLOutputType ptSituationElementType,
     GraphQLScalarType dateTimeScalar
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name(NAME)
       .description(
         "Named place where public transport may be accessed. May be a building complex (e.g. a station) or an on-street location."
       )
       .withInterface(placeInterface)
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("id")
           .type(new GraphQLNonNull(Scalars.GraphQLID))
           .dataFetcher(env ->
@@ -78,13 +76,11 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("lang")
               .deprecate("Use 'language' instead")
               .description(
@@ -94,8 +90,7 @@ public class StopPlaceType {
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("language")
               .description(
                 "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
@@ -104,16 +99,13 @@ public class StopPlaceType {
               .build()
           )
           .dataFetcher(environment ->
-            (
-              ((MonoOrMultiModalStation) environment.getSource()).getName()
-                .toString(GqlUtil.getLocale(environment))
-            )
+            (((MonoOrMultiModalStation) environment.getSource()).getName()
+                .toString(GqlUtil.getLocale(environment)))
           )
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getLat())
@@ -121,8 +113,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getLon())
@@ -130,8 +121,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment ->
@@ -143,8 +133,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("weighting")
           .description(
             "Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED"
@@ -155,8 +144,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("stopInterchangePriority")
           .description("Specify the priority of interchanges at this stop")
           .type(EnumTypes.STOP_INTERCHANGE_PRIORITY)
@@ -166,8 +154,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tariffZones")
           .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
           .description("NOT IMPLEMENTED")
@@ -175,8 +162,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transportMode")
           .description("The transport modes of quays under this stop place.")
           .type(new GraphQLList(EnumTypes.TRANSPORT_MODE))
@@ -190,8 +176,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("transportSubmode")
           .description("The transport submode serviced by this stop place.")
           .type(new GraphQLList(EnumTypes.TRANSPORT_SUBMODE))
@@ -214,27 +199,24 @@ public class StopPlaceType {
       // TODO stopPlaceType?
 
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("timeZone")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment ->
-            Optional
-              .ofNullable(((MonoOrMultiModalStation) environment.getSource()).getTimezone())
-              .map(ZoneId::getId)
+            Optional.ofNullable(
+              ((MonoOrMultiModalStation) environment.getSource()).getTimezone()
+            ).map(ZoneId::getId)
           )
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("Returns all quays that are children of this stop place")
           .type(new GraphQLList(quayType))
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("filterByInUse")
               .description("If true only quays with at least one visiting line are included.")
               .type(Scalars.GraphQLBoolean)
@@ -244,24 +226,19 @@ public class StopPlaceType {
           .dataFetcher(environment -> {
             var quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
             if (TRUE.equals(environment.getArgument("filterByInUse"))) {
-              quays =
-                quays
-                  .stream()
-                  .filter(stop -> {
-                    return !GqlUtil
-                      .getTransitService(environment)
-                      .findPatterns(stop, true)
-                      .isEmpty();
-                  })
-                  .collect(Collectors.toList());
+              quays = quays
+                .stream()
+                .filter(stop -> {
+                  return !GqlUtil.getTransitService(environment).findPatterns(stop, true).isEmpty();
+                })
+                .collect(Collectors.toList());
             }
             return quays;
           })
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("parent")
           .description("Returns parent stop for this stop")
           .type(new GraphQLTypeReference(NAME))
@@ -271,8 +248,7 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tariffZones")
           .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
           .dataFetcher(environment ->
@@ -284,15 +260,13 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("estimatedCalls")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("List of visits to this stop place as part of vehicle journeys.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("startTime")
               .type(dateTimeScalar)
               .description(
@@ -301,8 +275,7 @@ public class StopPlaceType {
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("timeRange")
               .description(
                 "Duration in seconds from start time to search forward for estimated calls. Must be a positive value. Default value is 24 hours"
@@ -312,8 +285,7 @@ public class StopPlaceType {
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("numberOfDepartures")
               .description("Limit the total number of departures returned.")
               .type(Scalars.GraphQLInt)
@@ -321,8 +293,7 @@ public class StopPlaceType {
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("numberOfDeparturesPerLineAndDestinationDisplay")
               .description(
                 "Limit the number of departures per line and destination display returned. The parameter is only applied " +
@@ -332,16 +303,14 @@ public class StopPlaceType {
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("arrivalDeparture")
               .type(EnumTypes.ARRIVAL_DEPARTURE)
               .defaultValue(ArrivalDeparture.DEPARTURES)
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("whiteListed")
               .description("Whitelisted")
               .description(
@@ -351,16 +320,14 @@ public class StopPlaceType {
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("whiteListedModes")
               .description("Only show estimated calls for selected modes.")
               .type(GraphQLList.list(EnumTypes.TRANSPORT_MODE))
               .build()
           )
           .argument(
-            GraphQLArgument
-              .newArgument()
+            GraphQLArgument.newArgument()
               .name("includeCancelledTrips")
               .description("Indicates that real-time-cancelled trips should also be included.")
               .type(Scalars.GraphQLBoolean)
@@ -416,16 +383,14 @@ public class StopPlaceType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("situations")
           .description(
             "Get all situations active for the stop place. Situations affecting individual quays are not returned, and should be fetched directly from the quay."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ptSituationElementType))))
           .dataFetcher(env ->
-            GqlUtil
-              .getTransitService(env)
+            GqlUtil.getTransitService(env)
               .getTransitAlertService()
               .getStopAlerts(((MonoOrMultiModalStation) env.getSource()).getId())
           )
@@ -466,12 +431,11 @@ public class StopPlaceType {
 
     Stream<TripTimeOnDate> tripTimesStream = stopTimesStream.flatMap(p -> p.times.stream());
 
-    tripTimesStream =
-      JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
-        tripTimesStream,
-        authorityIdsWhiteListed,
-        lineIdsWhiteListed
-      );
+    tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
+      tripTimesStream,
+      authorityIdsWhiteListed,
+      lineIdsWhiteListed
+    );
 
     return limitPerLineAndDestinationDisplay(
       tripTimesStream,

@@ -26,15 +26,13 @@ public class StopsLayerBuilder extends LayerBuilder<RegularStop> {
     Locale locale
   ) {
     super(
-      Map
-        .ofEntries(
-          entry(MapperType.Digitransit, new DigitransitStopPropertyMapper(transitService, locale)),
-          entry(
-            MapperType.DigitransitRealtime,
-            new DigitransitRealtimeStopPropertyMapper(transitService, locale)
-          )
+      Map.ofEntries(
+        entry(MapperType.Digitransit, new DigitransitStopPropertyMapper(transitService, locale)),
+        entry(
+          MapperType.DigitransitRealtime,
+          new DigitransitRealtimeStopPropertyMapper(transitService, locale)
         )
-        .get(MapperType.valueOf(layerParameters.mapper())),
+      ).get(MapperType.valueOf(layerParameters.mapper())),
       layerParameters.name(),
       layerParameters.expansionFactor()
     );

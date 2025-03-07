@@ -61,8 +61,7 @@ class AllowMainAndSubModeFilter implements AllowTransitModeFilter {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(AllowMainAndSubModeFilter.class)
+    return ToStringBuilder.of(AllowMainAndSubModeFilter.class)
       .addEnum("mainMode", mainMode)
       .addObj("subMode", subMode)
       .toString();

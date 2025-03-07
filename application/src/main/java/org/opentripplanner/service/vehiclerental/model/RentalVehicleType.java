@@ -39,16 +39,14 @@ public class RentalVehicleType implements Serializable, Comparable<RentalVehicle
   public static RentalVehicleType getDefaultType(String systemId) {
     return defaultVehicleForSystem.computeIfAbsent(
       systemId,
-      (
-        id ->
+      (id ->
           new RentalVehicleType(
             new FeedScopedId(id, "DEFAULT"),
             "Default vehicle type",
             RentalFormFactor.BICYCLE,
             PropulsionType.HUMAN,
             null
-          )
-      )
+          ))
     );
   }
 

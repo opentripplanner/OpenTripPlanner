@@ -49,13 +49,12 @@ public class ApiRouterInfo {
     this.hasCarPark = mapHasCarPark(vehicleParkingService);
     this.hasParkRide = this.hasCarPark;
     this.hasVehicleParking = mapHasVehicleParking(vehicleParkingService);
-    this.travelOptions =
-      ApiTravelOptionsMaker.makeOptions(
-        graph,
-        vehicleRentalService,
-        vehicleParkingService,
-        transitService
-      );
+    this.travelOptions = ApiTravelOptionsMaker.makeOptions(
+      graph,
+      vehicleRentalService,
+      vehicleParkingService,
+      transitService
+    );
   }
 
   public boolean mapHasBikeSharing(VehicleRentalService service) {

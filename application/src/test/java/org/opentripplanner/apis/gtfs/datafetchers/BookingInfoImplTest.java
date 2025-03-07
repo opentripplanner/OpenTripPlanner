@@ -15,8 +15,7 @@ class BookingInfoImplTest {
 
   private static final BookingInfoImpl SUBJECT = new BookingInfoImpl();
   private static final Duration TEN_MINUTES = Duration.ofMinutes(10);
-  private static final BookingInfo WITH_NOTICE_DURATIONS = BookingInfo
-    .of()
+  private static final BookingInfo WITH_NOTICE_DURATIONS = BookingInfo.of()
     .withMinimumBookingNotice(TEN_MINUTES)
     .withMaximumBookingNotice(TEN_MINUTES)
     .build();
@@ -53,8 +52,7 @@ class BookingInfoImplTest {
     var executionContext = newExecutionContextBuilder()
       .executionId(ExecutionId.from(this.getClass().getName()))
       .build();
-    return DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .source(bookingInfo)
       .build();
   }

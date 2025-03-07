@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType.FIELD_COORDINATE;
 import static org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType.FIELD_LABEL;
 import static org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType.FIELD_MINIMUM_WAIT_TIME;
 import static org.opentripplanner.apis.transmodel.model.plan.ViaLocationInputType.FIELD_PASS_THROUGH;
@@ -18,9 +19,12 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.transmodel.model.framework.CoordinateInputType;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 
 class TripViaLocationMapperTest {
 
+  private static final Duration D1m = Duration.ofMinutes(1);
   private static final String LABEL = "TestLabel";
   private static final Duration MIN_WAIT_TIME = Duration.ofMinutes(5);
   private static final List<String> LIST_IDS_INPUT = List.of("F:ID1", "F:ID2");
@@ -39,7 +43,7 @@ class TripViaLocationMapperTest {
   @Test
   void testMapToVisitViaLocations() {
     Map<String, Object> input = Map.ofEntries(
-      entry(FIELD_VISIT, visitInput(LABEL, MIN_WAIT_TIME, LIST_IDS_INPUT))
+      entry(FIELD_VISIT, visitInput(LABEL, MIN_WAIT_TIME, LIST_IDS_INPUT, null))
     );
     var result = TripViaLocationMapper.mapToViaLocations(List.of(input));
 
@@ -69,21 +73,22 @@ class TripViaLocationMapperTest {
   }
 
   @Test
-  void testMapToVisitViaLocationsWithoutIds() {
+  void testMapToVisitViaLocationsWithoutIdsOrCoordinates() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, null));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
-    assertEquals("'stopLocationIds' is not set!", ex.getMessage());
+    assertEquals(
+      "A via location must have at least one stop location or a coordinate.",
+      ex.getMessage()
+    );
   }
 
   @Test
   void testMapToVisitViaLocationsWithAnEmptyListOfIds() {
     Map<String, Object> input = mapOf(FIELD_VISIT, mapOf(FIELD_STOP_LOCATION_IDS, List.of()));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "A via location must have at least one stop location or a coordinate.",
@@ -121,27 +126,16 @@ class TripViaLocationMapperTest {
   }
 
   @Test
-  void tetMapToPassThroughWithoutIds() {
-    Map<String, Object> input = mapOf(FIELD_PASS_THROUGH, mapOf(FIELD_STOP_LOCATION_IDS, null));
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
-    );
-    assertEquals("'stopLocationIds' is not set!", ex.getMessage());
-  }
-
-  @Test
   void testMapToPassThroughWithAnEmptyListOfIds() {
     Map<String, Object> input = mapOf(
       FIELD_PASS_THROUGH,
       mapOf(FIELD_STOP_LOCATION_IDS, List.of())
     );
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
-      "A pass through via location must have at least one stop location.",
+      "A pass-through via-location must have at least one stop location.",
       ex.getMessage()
     );
   }
@@ -149,23 +143,20 @@ class TripViaLocationMapperTest {
   @Test
   void testOneOf() {
     Map<String, Object> input = Map.ofEntries(
-      entry(FIELD_VISIT, visitInput("A", Duration.ofMinutes(1), List.of("F:99"))),
+      entry(FIELD_VISIT, visitInput("A", D1m, List.of("F:99"), null)),
       entry(FIELD_PASS_THROUGH, passThroughInput(LABEL, LIST_IDS_INPUT))
     );
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> TripViaLocationMapper.mapToViaLocations(List.of(input))
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(input))
     );
     assertEquals(
       "Only one entry in 'via @oneOf' is allowed. Set: 'visit', 'passThrough'",
       ex.getMessage()
     );
 
-    ex =
-      assertThrows(
-        IllegalArgumentException.class,
-        () -> TripViaLocationMapper.mapToViaLocations(List.of(Map.of()))
-      );
+    ex = assertThrows(IllegalArgumentException.class, () ->
+      TripViaLocationMapper.mapToViaLocations(List.of(Map.of()))
+    );
     assertEquals(
       "No entries in 'via @oneOf'. One of 'visit', 'passThrough' must be set.",
       ex.getMessage()
@@ -214,7 +205,12 @@ class TripViaLocationMapperTest {
     assertTrue(result.isEmpty(), REASON_EMPTY_IDS_ALLOWED_PASS_THROUGH);
   }
 
-  private Map<String, Object> visitInput(String label, Duration minWaitTime, List<String> ids) {
+  private Map<String, Object> visitInput(
+    String label,
+    Duration minWaitTime,
+    List<String> ids,
+    WgsCoordinate coordinate
+  ) {
     var map = new HashMap<String, Object>();
     if (label != null) {
       map.put(FIELD_LABEL, label);
@@ -225,11 +221,14 @@ class TripViaLocationMapperTest {
     if (ids != null) {
       map.put(FIELD_STOP_LOCATION_IDS, ids);
     }
+    if (coordinate != null) {
+      map.put(FIELD_COORDINATE, CoordinateInputType.mapForTest(coordinate));
+    }
     return map;
   }
 
   private Map<String, Object> passThroughInput(String label, List<String> ids) {
-    return visitInput(label, null, ids);
+    return visitInput(label, null, ids, null);
   }
 
   /**

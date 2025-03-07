@@ -6,6 +6,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -36,11 +37,10 @@ public class DebugRasterTileResource {
   private final TileRendererManager tileRendererManager;
 
   public DebugRasterTileResource(@Context OtpServerRequestContext serverContext) {
-    this.tileRendererManager =
-      new TileRendererManager(
-        serverContext.graph(),
-        serverContext.defaultRouteRequest().preferences().wheelchair()
-      );
+    this.tileRendererManager = new TileRendererManager(
+      serverContext.graph(),
+      serverContext.defaultRouteRequest().preferences().wheelchair()
+    );
   }
 
   @GET
@@ -61,12 +61,24 @@ public class DebugRasterTileResource {
 
     MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
     ByteArrayOutputStream baos = new ByteArrayOutputStream(
-      image.getWidth() * image.getHeight() / 4
+      (image.getWidth() * image.getHeight()) / 4
     );
     ImageIO.write(image, format.type, baos);
     CacheControl cc = new CacheControl();
     cc.setMaxAge(3600);
     cc.setNoCache(false);
     return Response.ok(baos.toByteArray()).type(format.toString()).cacheControl(cc).build();
+  }
+
+  /**
+   * Returns all layers.
+   * <p>
+   * Used in the classic debug client to create a layer menu.
+   */
+  @GET
+  @Path("layers")
+  @Produces(MediaType.APPLICATION_JSON)
+  public DebugLayersList getLayers() {
+    return new DebugLayersList(tileRendererManager.getRenderers());
   }
 }

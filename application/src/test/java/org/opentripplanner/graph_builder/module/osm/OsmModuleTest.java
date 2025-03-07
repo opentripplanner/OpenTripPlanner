@@ -62,13 +62,12 @@ public class OsmModuleTest {
 
     DefaultOsmProvider provider = new DefaultOsmProvider(file, true);
 
-    OsmModule osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    OsmModule osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withAreaVisibility(true)
       .build();
 
@@ -128,8 +127,7 @@ public class OsmModuleTest {
     var provider = new DefaultOsmProvider(file, true);
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
-    var osmModule = OsmModule
-      .of(provider, gg, osmInfoRepository, vehicleParkingRepository)
+    var osmModule = OsmModule.of(provider, gg, osmInfoRepository, vehicleParkingRepository)
       .withAreaVisibility(true)
       .build();
 
@@ -325,14 +323,12 @@ public class OsmModuleTest {
 
     File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
     DefaultOsmProvider provider = new DefaultOsmProvider(file, false);
-    OsmModule loader = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
-      .build();
+    OsmModule loader = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    ).build();
     loader.buildGraph();
 
     Vertex start = graph.getVertex(VertexLabel.osm(1));
@@ -350,13 +346,11 @@ public class OsmModuleTest {
   private BuildResult buildParkingLots() {
     var graph = new Graph();
     var service = new DefaultVehicleParkingRepository();
-    List<OsmProvider> providers = Stream
-      .of("B+R.osm.pbf", "P+R.osm.pbf")
+    List<OsmProvider> providers = Stream.of("B+R.osm.pbf", "P+R.osm.pbf")
       .map(RESOURCE_LOADER::file)
       .map(f -> (OsmProvider) new DefaultOsmProvider(f, false))
       .toList();
-    var module = OsmModule
-      .of(providers, graph, new DefaultOsmInfoGraphBuildRepository(), service)
+    var module = OsmModule.of(providers, graph, new DefaultOsmInfoGraphBuildRepository(), service)
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)
       .build();
@@ -384,8 +378,7 @@ public class OsmModuleTest {
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
     var vehicleParkingRepository = new DefaultVehicleParkingRepository();
 
-    var loader = OsmModule
-      .of(provider, graph, osmInfoRepository, vehicleParkingRepository)
+    var loader = OsmModule.of(provider, graph, osmInfoRepository, vehicleParkingRepository)
       .withAreaVisibility(!skipVisibility)
       .build();
 

@@ -21,7 +21,10 @@ import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 
 public class VehicleParkingsLayerBuilder extends LayerBuilder<VehicleParking> {
 
-  static Map<VehicleParkingsLayerBuilder.MapperType, Function<Locale, PropertyMapper<VehicleParking>>> mappers = Map.ofEntries(
+  static Map<
+    VehicleParkingsLayerBuilder.MapperType,
+    Function<Locale, PropertyMapper<VehicleParking>>
+  > mappers = Map.ofEntries(
     entry(
       VehicleParkingsLayerBuilder.MapperType.Stadtnavi,
       StadtnaviVehicleParkingPropertyMapper::create

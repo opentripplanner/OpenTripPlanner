@@ -3,6 +3,8 @@ package org.opentripplanner.updater.spi;
 import java.time.Duration;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
@@ -40,7 +42,16 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
-  protected WriteToGraphCallback saveResultOnGraph;
+  private WriteToGraphCallback saveResultOnGraph;
+
+  /**
+   * A Future representing pending completion of most recently submitted task.
+   * If the updater posts several tasks during one polling cycle, the handle will point to the
+   * latest posted task.
+   * Initially null when the polling updater starts.
+   */
+  @Nullable
+  private volatile Future<?> previousTask;
 
   /** Shared configuration code for all polling graph updaters. */
   protected PollingGraphUpdater(PollingGraphUpdaterParameters config) {
@@ -55,6 +66,10 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   @Override
   public final void run() {
     try {
+      if (OTPFeature.WaitForGraphUpdateInPollingUpdaters.isOn()) {
+        waitForPreviousTask();
+      }
+
       // Run concrete polling graph updater's implementation method.
       runPolling();
       if (runOnlyOnce()) {
@@ -113,11 +128,33 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
    */
   protected abstract void runPolling() throws Exception;
 
-  protected final void updateGraph(GraphWriterRunnable task)
-    throws ExecutionException, InterruptedException {
-    var result = saveResultOnGraph.execute(task);
-    if (OTPFeature.WaitForGraphUpdateInPollingUpdaters.isOn()) {
-      result.get();
+  /**
+   * Post an update task to the GraphWriter queue.
+   * This is non-blocking.
+   * This can be called several times during one polling cycle.
+   * This is the sole way for polling updater implementations to submit real-time update tasks,
+   * while technical details about the execution of these tasks
+   * (frequency, concurrency, waiting, ...) are encapsulated in this parent class.
+   */
+  protected final void updateGraph(GraphWriterRunnable task) {
+    previousTask = saveResultOnGraph.execute(task);
+  }
+
+  /**
+   * If the previous task takes longer than the polling interval,
+   * we delay the next polling cycle until the task is complete.
+   * This prevents tasks from piling up.
+   * If the updater sends several tasks during a polling cycle, we wait on the latest posted task.
+   * */
+  private void waitForPreviousTask() throws InterruptedException, ExecutionException {
+    if (previousTask != null && !previousTask.isDone()) {
+      LOG.info("Delaying polling until the previous task is complete");
+      long startBlockingWait = System.currentTimeMillis();
+      previousTask.get();
+      LOG.info(
+        "Resuming polling after waiting an additional {}s",
+        (System.currentTimeMillis() - startBlockingWait) / 1000
+      );
     }
   }
 }

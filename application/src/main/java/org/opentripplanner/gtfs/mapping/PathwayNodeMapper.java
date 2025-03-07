@@ -48,8 +48,7 @@ class PathwayNodeMapper {
     }
 
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
-    var builder = PathwayNode
-      .of(base.getId())
+    var builder = PathwayNode.of(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())
       .withWheelchairAccessibility(base.getWheelchairAccessibility())
@@ -64,15 +63,14 @@ class PathwayNodeMapper {
       )
     );
 
-    builder =
-      builder.withDescription(
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Stop.class,
-          "desc",
-          base.getId().getId(),
-          base.getDescription()
-        )
-      );
+    builder = builder.withDescription(
+      translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Stop.class,
+        "desc",
+        base.getId().getId(),
+        base.getDescription()
+      )
+    );
 
     if (gtfsStop.getParentStation() != null) {
       builder.withParentStation(stationLookUp.apply(base.getParentStationId()));

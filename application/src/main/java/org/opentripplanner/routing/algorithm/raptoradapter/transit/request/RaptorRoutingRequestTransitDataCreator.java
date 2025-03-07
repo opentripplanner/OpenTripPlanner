@@ -111,7 +111,10 @@ class RaptorRoutingRequestTransitDataCreator {
 
     // For each TripPattern, time expand each TripPatternForDate and merge into a single
     // TripPatternForDates
-    for (Map.Entry<RoutingTripPattern, List<TripPatternForDate>> patternEntry : patternForDateByPattern.entrySet()) {
+    for (Map.Entry<
+      RoutingTripPattern,
+      List<TripPatternForDate>
+    > patternEntry : patternForDateByPattern.entrySet()) {
       // Sort by date. We can mutate the array, as it was created above in the grouping.
       TripPatternForDate[] patternsSorted = patternEntry
         .getValue()
@@ -186,9 +189,8 @@ class RaptorRoutingRequestTransitDataCreator {
       filter.tripTimesPredicate(tripTimes, filter.hasSubModeFilters());
     Predicate<TripTimes> tripTimesWithoutSubmodesPredicate = tripTimes ->
       filter.tripTimesPredicate(tripTimes, false);
-    Collection<TripPatternForDate> tripPatternsForDate = raptorTransitData.getTripPatternsForRunningDate(
-      date
-    );
+    Collection<TripPatternForDate> tripPatternsForDate =
+      raptorTransitData.getTripPatternsForRunningDate(date);
     List<TripPatternForDate> result = new ArrayList<>(tripPatternsForDate.size());
     for (TripPatternForDate p : tripPatternsForDate) {
       if (firstDay || p.getStartOfRunningPeriod().equals(date)) {

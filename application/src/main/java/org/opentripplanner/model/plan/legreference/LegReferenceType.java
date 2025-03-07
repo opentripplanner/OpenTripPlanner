@@ -53,8 +53,7 @@ enum LegReferenceType {
    * Return the latest LegReferenceType version for a given leg reference class.
    */
   static Optional<LegReferenceType> forClass(Class<? extends LegReference> legReferenceClass) {
-    return Arrays
-      .stream(LegReferenceType.values())
+    return Arrays.stream(LegReferenceType.values())
       .filter(legReferenceType -> legReferenceType.legReferenceClass.equals(legReferenceClass))
       .reduce((legReferenceType, other) -> {
         if (legReferenceType.version > other.version) {

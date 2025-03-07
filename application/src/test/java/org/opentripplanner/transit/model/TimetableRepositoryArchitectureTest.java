@@ -44,51 +44,45 @@ public class TimetableRepositoryArchitectureTest {
 
   @Test
   void enforceSitePackageDependencies() {
-    SITE
-      .dependsOn(
-        FRAMEWORK_UTILS,
-        JACKSON_ANNOTATIONS,
-        GEO_UTILS,
-        TRANSIT_FRAMEWORK,
-        BASIC,
-        ORGANIZATION
-      )
-      .verify();
+    SITE.dependsOn(
+      FRAMEWORK_UTILS,
+      JACKSON_ANNOTATIONS,
+      GEO_UTILS,
+      TRANSIT_FRAMEWORK,
+      BASIC,
+      ORGANIZATION
+    ).verify();
   }
 
   @Test
   void enforceNetworkPackageDependencies() {
     // TODO OTP2 temporarily allow circular dependency between network and timetable
-    NETWORK
-      .dependsOn(
-        FRAMEWORK_UTILS,
-        GEO_UTILS,
-        TRANSIT_FRAMEWORK,
-        BASIC,
-        ORGANIZATION,
-        SITE,
-        TIMETABLE,
-        LEGACY_MODEL,
-        RAPTOR_API,
-        RAPTOR_ADAPTER_API
-      )
-      .verify();
+    NETWORK.dependsOn(
+      FRAMEWORK_UTILS,
+      GEO_UTILS,
+      TRANSIT_FRAMEWORK,
+      BASIC,
+      ORGANIZATION,
+      SITE,
+      TIMETABLE,
+      LEGACY_MODEL,
+      RAPTOR_API,
+      RAPTOR_ADAPTER_API
+    ).verify();
   }
 
   @Test
   void enforceTimetablePackageDependencies() {
-    TIMETABLE
-      .dependsOn(
-        FRAMEWORK_UTILS,
-        TRANSIT_FRAMEWORK,
-        BASIC,
-        ORGANIZATION,
-        NETWORK,
-        SITE,
-        TIMETABLE_BOOKING,
-        LEGACY_MODEL
-      )
-      .verify();
+    TIMETABLE.dependsOn(
+      FRAMEWORK_UTILS,
+      TRANSIT_FRAMEWORK,
+      BASIC,
+      ORGANIZATION,
+      NETWORK,
+      SITE,
+      TIMETABLE_BOOKING,
+      LEGACY_MODEL
+    ).verify();
   }
 
   @Test

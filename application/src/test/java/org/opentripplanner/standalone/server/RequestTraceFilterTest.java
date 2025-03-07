@@ -12,8 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 class RequestTraceFilterTest {
 
   /** The longest string accepted the check - 512 characters long*/
-  private static final String A_VERY_LONG_STRING = IntStream
-    .range(200, 712)
+  private static final String A_VERY_LONG_STRING = IntStream.range(200, 712)
     .mapToObj(Character::toString)
     .collect(Collectors.joining());
   private static final String A_TOO_LONG_STRING = A_VERY_LONG_STRING + "1";

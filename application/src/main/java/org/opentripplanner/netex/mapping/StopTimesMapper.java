@@ -162,8 +162,11 @@ class StopTimesMapper {
         return null;
       }
 
-      BookingInfo bookingInfo = new BookingInfoMapper(issueStore)
-        .map(stopPoint, serviceJourney, lookUpFlexibleLine(serviceJourney, journeyPattern));
+      BookingInfo bookingInfo = new BookingInfoMapper(issueStore).map(
+        stopPoint,
+        serviceJourney,
+        lookUpFlexibleLine(serviceJourney, journeyPattern)
+      );
       stopTime.setDropOffBookingInfo(bookingInfo);
       stopTime.setPickupBookingInfo(bookingInfo);
 
@@ -318,21 +321,20 @@ class StopTimesMapper {
           currentHeadSign = new NonLocalizedString(destinationDisplay.getFrontText().getValue());
           Vias_RelStructure viaValues = destinationDisplay.getVias();
           if (viaValues != null && viaValues.getVia() != null) {
-            currentHeadSignVias =
-              viaValues
-                .getVia()
-                .stream()
-                .map(Via_VersionedChildStructure::getDestinationDisplayRef)
-                .filter(Objects::nonNull)
-                .map(VersionOfObjectRefStructure::getRef)
-                .filter(Objects::nonNull)
-                .map(destinationDisplayById::lookup)
-                .filter(Objects::nonNull)
-                .map(DestinationDisplay_VersionStructure::getFrontText)
-                .filter(Objects::nonNull)
-                .map(MultilingualString::getValue)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            currentHeadSignVias = viaValues
+              .getVia()
+              .stream()
+              .map(Via_VersionedChildStructure::getDestinationDisplayRef)
+              .filter(Objects::nonNull)
+              .map(VersionOfObjectRefStructure::getRef)
+              .filter(Objects::nonNull)
+              .map(destinationDisplayById::lookup)
+              .filter(Objects::nonNull)
+              .map(DestinationDisplay_VersionStructure::getFrontText)
+              .filter(Objects::nonNull)
+              .map(MultilingualString::getValue)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toList());
 
             if (currentHeadSignVias.isEmpty()) {
               currentHeadSignVias = null;

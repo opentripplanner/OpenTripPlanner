@@ -22,8 +22,7 @@ public class GroupOfRoutesMapper {
    * @return OTP GroupOfRoutes model
    */
   public GroupOfRoutes mapGroupOfRoutes(GroupOfLines gol) {
-    return GroupOfRoutes
-      .of(idFactory.createId(gol.getId()))
+    return GroupOfRoutes.of(idFactory.createId(gol.getId()))
       .withPrivateCode(gol.getPrivateCode() != null ? gol.getPrivateCode().getValue() : null)
       .withShortName(MultilingualStringMapper.nullableValueOf(gol.getShortName()))
       .withName(MultilingualStringMapper.nullableValueOf(gol.getName()))

@@ -20,6 +20,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -52,6 +53,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final VectorTileConfig vectorTileConfig;
   private final VehicleParkingService vehicleParkingService;
   private final VehicleRentalService vehicleRentalService;
+  private final ViaCoordinateTransferFactory viaTransferResolver;
   private final WorldEnvelopeService worldEnvelopeService;
 
   /* Optional fields */
@@ -98,6 +100,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
+    ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable EmissionsService emissionsService,
     @Nullable LuceneIndex luceneIndex,
@@ -120,6 +123,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
+    this.viaTransferResolver = viaTransferResolver;
     this.worldEnvelopeService = worldEnvelopeService;
 
     // Optional fields
@@ -129,6 +133,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.sorlandsbanenService = sorlandsbanenService;
     this.stopConsolidationService = stopConsolidationService;
     this.traverseVisitor = traverseVisitor;
+  }
+
+  @Override
+  public DebugUiConfig debugUiConfig() {
+    return debugUiConfig;
   }
 
   @Override
@@ -240,8 +249,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public DebugUiConfig debugUiConfig() {
-    return debugUiConfig;
+  public ViaCoordinateTransferFactory viaTransferResolver() {
+    return viaTransferResolver;
   }
 
   @Nullable

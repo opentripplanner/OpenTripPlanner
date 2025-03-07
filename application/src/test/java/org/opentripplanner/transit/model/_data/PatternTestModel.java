@@ -16,8 +16,7 @@ public class PatternTestModel {
   public static final Route ROUTE_1 = TimetableRepositoryForTest.route("1").build();
 
   private static final FeedScopedId SERVICE_ID = id("service");
-  private static final Trip TRIP = TimetableRepositoryForTest
-    .trip("t1")
+  private static final Trip TRIP = TimetableRepositoryForTest.trip("t1")
     .withRoute(ROUTE_1)
     .withServiceId(SERVICE_ID)
     .build();
@@ -34,15 +33,13 @@ public class PatternTestModel {
    * Creates a trip pattern that has a stop pattern, trip times and a trip with a service id.
    */
   public static TripPattern pattern() {
-    var tt = ScheduledTripTimes
-      .of()
+    var tt = ScheduledTripTimes.of()
       .withTrip(TRIP)
       .withArrivalTimes("10:00 10:05")
       .withDepartureTimes("10:00 10:05")
       .build();
 
-    return TimetableRepositoryForTest
-      .tripPattern("1", ROUTE_1)
+    return TimetableRepositoryForTest.tripPattern("1", ROUTE_1)
       .withStopPattern(STOP_PATTERN)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tt))
       .build();

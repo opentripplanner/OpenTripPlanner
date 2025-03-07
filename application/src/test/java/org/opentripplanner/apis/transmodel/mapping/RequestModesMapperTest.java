@@ -9,8 +9,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 
 class RequestModesMapperTest {
 
-  private static final RequestModes MODES_NOT_SET = RequestModes
-    .of()
+  private static final RequestModes MODES_NOT_SET = RequestModes.of()
     .withAccessMode(StreetMode.NOT_SET)
     .withEgressMode(StreetMode.NOT_SET)
     .withDirectMode(StreetMode.NOT_SET)
@@ -29,8 +28,7 @@ class RequestModesMapperTest {
   void testMapRequestModesScooterRentalAccessSetReturnsDefaultsForOthers() {
     Map<String, StreetMode> inputModes = Map.of("accessMode", StreetMode.SCOOTER_RENTAL);
 
-    RequestModes wantModes = MODES_NOT_SET
-      .copyOf()
+    RequestModes wantModes = MODES_NOT_SET.copyOf()
       .withAccessMode(StreetMode.SCOOTER_RENTAL)
       .withTransferMode(StreetMode.WALK)
       .withDirectMode(null)
@@ -45,8 +43,7 @@ class RequestModesMapperTest {
   void testMapRequestModesBikeAccessSetReturnsDefaultsForOthers() {
     Map<String, StreetMode> inputModes = Map.of("accessMode", StreetMode.BIKE);
 
-    RequestModes wantModes = MODES_NOT_SET
-      .copyOf()
+    RequestModes wantModes = MODES_NOT_SET.copyOf()
       .withAccessMode(StreetMode.BIKE)
       .withTransferMode(StreetMode.BIKE)
       .withDirectMode(null)
@@ -61,8 +58,7 @@ class RequestModesMapperTest {
   void testMapRequestModesEgressSetReturnsDefaultsForOthers() {
     Map<String, StreetMode> inputModes = Map.of("egressMode", StreetMode.CAR);
 
-    RequestModes wantModes = MODES_NOT_SET
-      .copyOf()
+    RequestModes wantModes = MODES_NOT_SET.copyOf()
       .withEgressMode(StreetMode.CAR)
       .withDirectMode(null)
       .build();

@@ -74,8 +74,7 @@ class VehicleParkingPreferencesTest {
   }
 
   private VehicleParkingPreferences createPreferences() {
-    return VehicleParkingPreferences
-      .of()
+    return VehicleParkingPreferences.of()
       .withPreferredVehicleParkingTags(PREFERRED_TAGS)
       .withNotPreferredVehicleParkingTags(NOT_PREFERRED_TAGS)
       .withUnpreferredVehicleParkingTagCost(UNPREFERRED_COST)
