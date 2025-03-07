@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan.paging.cursor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
@@ -157,7 +158,15 @@ class PageCursorTest implements PlanTestConstants {
     assertNull(PageCursor.decode(null));
     assertNull(PageCursor.decode(""));
     assertNull(PageCursor.decode(" "));
-    assertNull(PageCursor.decode("null"));
-    assertNull(PageCursor.decode("09#$%+1~^§€"));
+    var ex = assertThrows(IllegalArgumentException.class, () -> PageCursor.decode("null"));
+    assertEquals(
+      "Unable to decode page cursor: 'null'. Details: Token is not valid. Unable to parse token: 'null'.",
+      ex.getMessage()
+    );
+    ex = assertThrows(IllegalArgumentException.class, () -> PageCursor.decode("09#$%+1~^§€"));
+    assertEquals(
+      "Unable to decode page cursor: '09#$%+1~^§€'. Details: Illegal base64 character 23",
+      ex.getMessage()
+    );
   }
 }

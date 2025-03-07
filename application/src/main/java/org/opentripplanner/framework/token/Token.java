@@ -7,10 +7,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
- * Given a schema definition and a token version this class holds the values for
- * all fields in a token.
+ * Given a schema definition and a token version this class holds the values for all fields in a
+ * token. The field accessors return an optional value and there is no accessors to get "requiered"
+ * fields. The resbonsibility of enforcing requiered fields is left to the concreate domain
+ * specific representation, like the {@code PageCursor}.
  */
 public class Token {
 
@@ -26,12 +29,13 @@ public class Token {
     return definition.version();
   }
 
-  public boolean getBoolean(String fieldName) {
-    return (boolean) get(fieldName, TokenType.BOOLEAN);
+  public Optional<Boolean> getBoolean(String fieldName) {
+    var value = (Boolean) get(fieldName, TokenType.BOOLEAN);
+    return Optional.ofNullable(value);
   }
 
-  public Duration getDuration(String fieldName) {
-    return (Duration) get(fieldName, TokenType.DURATION);
+  public Optional<Duration> getDuration(String fieldName) {
+    return Optional.ofNullable((Duration) get(fieldName, TokenType.DURATION));
   }
 
   public OptionalInt getInt(String fieldName) {
@@ -39,8 +43,8 @@ public class Token {
     return v == null ? OptionalInt.empty() : OptionalInt.of(v);
   }
 
-  public String getString(String fieldName) {
-    return (String) get(fieldName, TokenType.STRING);
+  public Optional<String> getString(String fieldName) {
+    return Optional.ofNullable((String) get(fieldName, TokenType.STRING));
   }
 
   /**
@@ -67,12 +71,8 @@ public class Token {
     }
   }
 
-  public Instant getTimeInstant(String fieldName) {
-    return (Instant) get(fieldName, TokenType.TIME_INSTANT);
-  }
-
-  private Object get(String fieldName, TokenType type) {
-    return fieldValues.get(definition.getIndex(fieldName, type));
+  public Optional<Instant> getTimeInstant(String fieldName) {
+    return Optional.ofNullable((Instant) get(fieldName, TokenType.TIME_INSTANT));
   }
 
   @Override
@@ -84,5 +84,10 @@ public class Token {
       fieldValues.stream().map(Objects::toString).collect(Collectors.joining(", ")) +
       ')'
     );
+  }
+
+  @Nullable
+  private Object get(String fieldName, TokenType type) {
+    return fieldValues.get(definition.getIndex(fieldName, type));
   }
 }

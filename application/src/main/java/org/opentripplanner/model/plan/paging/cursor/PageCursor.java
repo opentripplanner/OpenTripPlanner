@@ -27,8 +27,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public record PageCursor(
   PageType type,
   SortOrder originalSortOrder,
-  Instant earliestDepartureTime,
-  Instant latestArrivalTime,
+  @Nullable Instant earliestDepartureTime,
+  @Nullable Instant latestArrivalTime,
   Duration searchWindow,
   @Nullable ItinerarySortKey itineraryPageCut,
   @Nullable Cost generalizedCostMaxLimit
@@ -46,6 +46,9 @@ public record PageCursor(
     return PageCursorSerializer.encode(this);
   }
 
+  /**
+   * @throws IllegalArgumentException if cursor can not be decoded
+   */
   @Nullable
   public static PageCursor decode(String cursor) {
     return PageCursorSerializer.decode(cursor);

@@ -26,7 +26,7 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
   private static final TokenSchema ENUM_SCHEMA = TokenSchema.ofVersion(3)
     .addEnum(ENUM_FIELD)
     .build();
-  private static final TokenSchema INT_SCHEMA = TokenSchema.ofVersion(3).addInt(INT_FIELD).build();
+  private static final TokenSchema INT_SCHEMA = TokenSchema.ofVersion(5).addInt(INT_FIELD).build();
   private static final TokenSchema STRING_SCHEMA = TokenSchema.ofVersion(7)
     .addString(STRING_FIELD)
     .build();
@@ -42,17 +42,20 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
       .withBoolean(BOOLEAN_TRUE_FIELD, true)
       .build();
     assertEquals(BOOLEAN_ENCODED, token);
-    assertTrue(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_TRUE_FIELD));
+    assertTrue(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_TRUE_FIELD).orElseThrow());
 
     var tokenResult = BOOLEAN_SCHEMA.decode(token);
-    assertFalse(tokenResult.getBoolean(BOOLEAN_FALSE_FIELD));
+    assertFalse(tokenResult.getBoolean(BOOLEAN_FALSE_FIELD).orElseThrow());
   }
 
   @Test
   public void encodeAndDecodeDuration() {
     var token = DURATION_SCHEMA.encode().withDuration(DURATION_FIELD, DURATION_VALUE).build();
     assertEquals(DURATION_ENCODED, token);
-    assertEquals(DURATION_VALUE, DURATION_SCHEMA.decode(token).getDuration(DURATION_FIELD));
+    assertEquals(
+      DURATION_VALUE,
+      DURATION_SCHEMA.decode(token).getDuration(DURATION_FIELD).orElseThrow()
+    );
   }
 
   @Test
@@ -71,10 +74,34 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
   }
 
   @Test
+  public void decodeMissingValue() {
+    assertTrue(
+      BOOLEAN_SCHEMA.decode(BOOLEAN_SCHEMA.encode().build())
+        .getBoolean(BOOLEAN_TRUE_FIELD)
+        .isEmpty()
+    );
+    assertTrue(
+      DURATION_SCHEMA.decode(DURATION_SCHEMA.encode().build()).getDuration(DURATION_FIELD).isEmpty()
+    );
+    assertTrue(
+      ENUM_SCHEMA.decode(ENUM_SCHEMA.encode().build()).getEnum(ENUM_FIELD, ENUM_CLASS).isEmpty()
+    );
+    assertTrue(INT_SCHEMA.decode(INT_SCHEMA.encode().build()).getInt(INT_FIELD).isEmpty());
+    assertTrue(
+      STRING_SCHEMA.decode(STRING_SCHEMA.encode().build()).getString(STRING_FIELD).isEmpty()
+    );
+    assertTrue(
+      TIME_INSTANT_SCHEMA.decode(TIME_INSTANT_SCHEMA.encode().build())
+        .getTimeInstant(TIME_INSTANT_FIELD)
+        .isEmpty()
+    );
+  }
+
+  @Test
   public void testString() {
     var token = STRING_SCHEMA.encode().withString(STRING_FIELD, STRING_VALUE).build();
     assertEquals(STRING_ENCODED, token);
-    assertEquals(STRING_VALUE, STRING_SCHEMA.decode(token).getString(STRING_FIELD));
+    assertEquals(STRING_VALUE, STRING_SCHEMA.decode(token).getString(STRING_FIELD).orElseThrow());
   }
 
   @Test
@@ -85,7 +112,7 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
     assertEquals(TIME_INSTANT_ENCODED, token);
     assertEquals(
       TIME_INSTANT_VALUE,
-      TIME_INSTANT_SCHEMA.decode(token).getTimeInstant(TIME_INSTANT_FIELD)
+      TIME_INSTANT_SCHEMA.decode(token).getTimeInstant(TIME_INSTANT_FIELD).orElseThrow()
     );
   }
 
@@ -104,7 +131,7 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
   @Test
   public void encodeFieldValueWithTypeMismatch() {
     var ex = Assertions.assertThrows(IllegalArgumentException.class, () ->
-      STRING_SCHEMA.encode().withInt(STRING_FIELD, (byte) 12)
+      STRING_SCHEMA.encode().withInt(STRING_FIELD, 12)
     );
     assertEquals("The defined type for 'AStr' is STRING not INT.", ex.getMessage());
   }
@@ -123,16 +150,20 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
       BOOLEAN_SCHEMA.toString()
     );
     assertEquals(
-      "TokenSchema{definition: TokenDefinition{version: 3, fields: [ANum:INT]}}",
+      "TokenSchema{definition: TokenDefinition{version: 2, fields: [ADur:DURATION]}}",
+      DURATION_SCHEMA.toString()
+    );
+    assertEquals(
+      "TokenSchema{definition: TokenDefinition{version: 3, fields: [EnField:ENUM]}}",
+      ENUM_SCHEMA.toString()
+    );
+    assertEquals(
+      "TokenSchema{definition: TokenDefinition{version: 5, fields: [ANum:INT]}}",
       INT_SCHEMA.toString()
     );
     assertEquals(
       "TokenSchema{definition: TokenDefinition{version: 7, fields: [AStr:STRING]}}",
       STRING_SCHEMA.toString()
-    );
-    assertEquals(
-      "TokenSchema{definition: TokenDefinition{version: 2, fields: [ADur:DURATION]}}",
-      DURATION_SCHEMA.toString()
     );
     assertEquals(
       "TokenSchema{definition: TokenDefinition{version: 13, fields: [ATime:TIME_INSTANT]}}",
@@ -143,7 +174,7 @@ class TokenSchemaTest implements TestTokenSchemaConstants {
   @Test
   void testDefinitionEqualsAndHashCode() {
     var subject = INT_SCHEMA.currentDefinition();
-    var same = TokenSchema.ofVersion(3).addInt(INT_FIELD).build().currentDefinition();
+    var same = TokenSchema.ofVersion(5).addInt(INT_FIELD).build().currentDefinition();
 
     assertEquals(subject, same);
     assertEquals(subject.hashCode(), same.hashCode());

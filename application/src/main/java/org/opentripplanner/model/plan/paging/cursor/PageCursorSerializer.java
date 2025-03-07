@@ -75,7 +75,7 @@ final class PageCursorSerializer {
 
   @Nullable
   public static PageCursor decode(String cursor) {
-    if (StringUtils.hasNoValueOrNullAsString(cursor)) {
+    if (StringUtils.hasNoValue(cursor)) {
       return null;
     }
     try {
@@ -86,21 +86,21 @@ final class PageCursorSerializer {
       // This is a forward compatibility issue. To avoid this, add the value enum, role out.
       // Start using the enum, roll out again.
       PageType type = token.getEnum(TYPE_FIELD, PageType.class).orElseThrow();
-      var edt = token.getTimeInstant(EDT_FIELD);
-      var lat = token.getTimeInstant(LAT_FIELD);
-      var searchWindow = token.getDuration(SEARCH_WINDOW_FIELD);
+      var edt = token.getTimeInstant(EDT_FIELD).orElse(null);
+      var lat = token.getTimeInstant(LAT_FIELD).orElse(null);
+      var searchWindow = token.getDuration(SEARCH_WINDOW_FIELD).orElseThrow();
       var originalSortOrder = token.getEnum(SORT_ORDER_FIELD, SortOrder.class).orElseThrow();
 
       // We use the departure time to determine if the cut is present or not
       var cutDepartureTime = token.getTimeInstant(CUT_DEPARTURE_TIME_FIELD);
 
-      if (cutDepartureTime != null) {
+      if (cutDepartureTime.isPresent()) {
         itineraryPageCut = new DeduplicationPageCut(
-          cutDepartureTime,
-          token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
+          cutDepartureTime.get(),
+          token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD).orElseThrow(),
           token.getInt(CUT_COST_FIELD).orElseThrow(),
           token.getInt(CUT_N_TRANSFERS_FIELD).orElseThrow(),
-          token.getBoolean(CUT_ON_STREET_FIELD)
+          token.getBoolean(CUT_ON_STREET_FIELD).orElseThrow()
         );
       }
 
@@ -124,12 +124,11 @@ final class PageCursorSerializer {
       );
     } catch (Exception e) {
       String details = e.getMessage();
+      String message = "Unable to decode page cursor: '" + cursor + "'.";
       if (StringUtils.hasValue(details)) {
-        LOG.warn("Unable to decode page cursor: '{}'. Details: {}", cursor, details);
-      } else {
-        LOG.warn("Unable to decode page cursor: '{}'.", cursor);
+        message += " Details: " + details;
       }
-      return null;
+      throw new IllegalArgumentException(message, e);
     }
   }
 }

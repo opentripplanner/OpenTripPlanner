@@ -26,7 +26,7 @@ public interface TestTokenSchemaConstants {
   String BOOLEAN_ENCODED = "MXx0cnVlfGZhbHNlfA==";
   String DURATION_ENCODED = "MnwybTEzc3w=";
   String ENUM_ENCODED = "M3xNQVl8";
-  String INT_ENCODED = "M3wzMXw=";
+  String INT_ENCODED = "NXwzMXw=";
   String STRING_ENCODED = "N3x0ZXh0fA==";
   String TIME_INSTANT_ENCODED = "MTN8MjAyMy0xMC0yM1QxMDowMDo1OVp8";
 }
