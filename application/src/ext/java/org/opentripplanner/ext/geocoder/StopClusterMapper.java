@@ -160,17 +160,15 @@ class StopClusterMapper {
     var names = getNames(stopLocations);
     var codes = getCodes(stopLocations);
 
-    return Optional
-      .ofNullable(primary.getName())
-      .map(name ->
-        new LuceneStopCluster(
-          primary.getId().toString(),
-          secondaryIds,
-          names,
-          codes,
-          toCoordinate(primary.getCoordinate())
-        )
-      );
+    return Optional.ofNullable(primary.getName()).map(name ->
+      new LuceneStopCluster(
+        primary.getId().toString(),
+        secondaryIds,
+        names,
+        codes,
+        toCoordinate(primary.getCoordinate())
+      )
+    );
   }
 
   private List<Agency> agenciesForStopLocation(StopLocation stop) {

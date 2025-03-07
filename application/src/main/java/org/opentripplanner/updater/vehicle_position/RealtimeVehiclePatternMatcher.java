@@ -41,11 +41,11 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
+import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -114,14 +114,8 @@ public class RealtimeVehiclePatternMatcher {
       .entrySet()
       .stream()
       .collect(
-        Collectors.toMap(
-          Entry::getKey,
-          e ->
-            e
-              .getValue()
-              .stream()
-              .map(PatternAndRealtimeVehicle::vehicle)
-              .collect(Collectors.toList())
+        Collectors.toMap(Entry::getKey, e ->
+          e.getValue().stream().map(PatternAndRealtimeVehicle::vehicle).collect(Collectors.toList())
         )
       );
 
@@ -179,14 +173,12 @@ public class RealtimeVehiclePatternMatcher {
     // yesterday, today or tomorrow. whichever one has the lowest "distance" to now is guessed to be
     // the service day of the undated vehicle position
     // if this is concerning to you, you should put a start_date in your feed.
-    return Stream
-      .of(yesterday, today, tomorrow)
+    return Stream.of(yesterday, today, tomorrow)
       .flatMap(day -> {
         var startTime = ServiceDateUtils.toZonedDateTime(day, zoneId, start).toInstant();
         var endTime = ServiceDateUtils.toZonedDateTime(day, zoneId, end).toInstant();
 
-        return Stream
-          .of(Duration.between(startTime, now), Duration.between(endTime, now))
+        return Stream.of(Duration.between(startTime, now), Duration.between(endTime, now))
           .map(Duration::abs) // temporal "distances" can be positive and negative
           .map(duration -> new TemporalDistance(day, duration.toSeconds()));
       })
@@ -358,8 +350,7 @@ public class RealtimeVehiclePatternMatcher {
       return UpdateError.result(scopedTripId, TRIP_NOT_FOUND);
     }
 
-    var serviceDate = Optional
-      .of(vehiclePositionWithTripId.getTrip().getStartDate())
+    var serviceDate = Optional.of(vehiclePositionWithTripId.getTrip().getStartDate())
       .map(Strings::emptyToNull)
       .flatMap(ServiceDateUtils::parseStringToOptional)
       .orElseGet(() -> inferServiceDate(trip));

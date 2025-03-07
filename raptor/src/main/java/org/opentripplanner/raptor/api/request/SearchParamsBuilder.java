@@ -188,8 +188,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SearchParams.class)
+    return ToStringBuilder.of(SearchParams.class)
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
       .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
       .addDurationSec("searchWindow", searchWindowInSeconds)

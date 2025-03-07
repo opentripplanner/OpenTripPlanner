@@ -41,8 +41,7 @@ public final class StopArrival {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(StopArrival.class)
+    return ToStringBuilder.of(StopArrival.class)
       .addObj("arrival", arrival)
       .addObj("departure", departure)
       .addObj("place", place)

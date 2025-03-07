@@ -53,15 +53,12 @@ public class TransferCacheTest {
     SpeedTestTimer timer,
     TimetableRepository timetableRepository
   ) {
-    IntStream
-      .range(1, 7)
-      .forEach(reluctance -> {
-        RouteRequest routeRequest = new RouteRequest();
-        routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
-        timer.recordTimer(
-          "transfer_cache_computation",
-          () -> timetableRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
-        );
-      });
+    IntStream.range(1, 7).forEach(reluctance -> {
+      RouteRequest routeRequest = new RouteRequest();
+      routeRequest.withPreferences(b -> b.withWalk(c -> c.withReluctance(reluctance)));
+      timer.recordTimer("transfer_cache_computation", () ->
+        timetableRepository.getRaptorTransitData().initTransferCacheForRequest(routeRequest)
+      );
+    });
   }
 }

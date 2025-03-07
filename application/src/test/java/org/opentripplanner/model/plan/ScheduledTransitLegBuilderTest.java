@@ -21,12 +21,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 class ScheduledTransitLegBuilderTest {
 
-  private static final TransitAlert ALERT = TransitAlert
-    .of(id("alert"))
+  private static final TransitAlert ALERT = TransitAlert.of(id("alert"))
     .withDescriptionText(I18NString.of("alert"))
     .build();
-  private static final TripPattern PATTERN = TimetableRepositoryForTest
-    .of()
+  private static final TripPattern PATTERN = TimetableRepositoryForTest.of()
     .pattern(TransitMode.BUS)
     .build();
   private static final LocalDate DATE = LocalDate.of(2023, 11, 15);

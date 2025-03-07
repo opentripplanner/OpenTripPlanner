@@ -23,8 +23,7 @@ class DeduplicationPageCutTest {
         GENERALIZED_COST,
         NUM_OF_TRANSFERS,
         ON_STREET
-      )
-        .toString()
+      ).toString()
     );
   }
 }

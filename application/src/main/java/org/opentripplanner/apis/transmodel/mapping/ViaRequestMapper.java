@@ -35,17 +35,15 @@ public class ViaRequestMapper {
     List<JourneyRequest> requests;
     if (environment.containsArgument("segments")) {
       List<Map<String, Object>> segments = environment.getArgument("segments");
-      requests =
-        segments
-          .stream()
-          .map(viaRequest -> ViaSegmentMapper.mapViaSegment(request, viaRequest))
-          .toList();
+      requests = segments
+        .stream()
+        .map(viaRequest -> ViaSegmentMapper.mapViaSegment(request, viaRequest))
+        .toList();
     } else {
       requests = Collections.nCopies(vias.size() + 1, request.journey());
     }
 
-    return RouteViaRequest
-      .of(vias, requests)
+    return RouteViaRequest.of(vias, requests)
       .withDateTime(
         Instant.ofEpochMilli(
           environment.getArgumentOrDefault("dateTime", request.dateTime().toEpochMilli())

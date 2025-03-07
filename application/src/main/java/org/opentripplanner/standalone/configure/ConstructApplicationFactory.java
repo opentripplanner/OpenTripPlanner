@@ -21,6 +21,8 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
@@ -62,14 +64,15 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RealtimeVehicleServiceModule.class,
     RealtimeVehicleRepositoryModule.class,
     RideHailingServicesModule.class,
+    SchemaModule.class,
+    SorlandsbanenNorwayModule.class,
+    StopConsolidationServiceModule.class,
+    StreetLimitationParametersServiceModule.class,
     TransitModule.class,
     VehicleParkingServiceModule.class,
     VehicleRentalRepositoryModule.class,
     VehicleRentalServiceModule.class,
-    SorlandsbanenNorwayModule.class,
-    SchemaModule.class,
-    StopConsolidationServiceModule.class,
-    StreetLimitationParametersServiceModule.class,
+    ViaModule.class,
     WorldEnvelopeServiceModule.class,
   }
 )
@@ -99,6 +102,8 @@ public interface ConstructApplicationFactory {
   OtpServerRequestContext createServerContext();
 
   MetricsLogging metricsLogging();
+
+  ViaCoordinateTransferFactory viaTransferResolver();
 
   @Nullable
   StopConsolidationRepository stopConsolidationRepository();

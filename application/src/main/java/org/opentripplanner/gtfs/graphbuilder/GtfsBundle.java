@@ -64,21 +64,20 @@ public class GtfsBundle {
 
   public CsvInputSource getCsvInputSource() {
     if (csvInputSource == null) {
-      csvInputSource =
-        new CsvInputSource() {
-          @Override
-          public boolean hasResource(String s) {
-            return dataSource.content().stream().anyMatch(it -> it.name().equals(s));
-          }
+      csvInputSource = new CsvInputSource() {
+        @Override
+        public boolean hasResource(String s) {
+          return dataSource.content().stream().anyMatch(it -> it.name().equals(s));
+        }
 
-          @Override
-          public InputStream getResource(String s) {
-            return dataSource.entry(s).asInputStream();
-          }
+        @Override
+        public InputStream getResource(String s) {
+          return dataSource.entry(s).asInputStream();
+        }
 
-          @Override
-          public void close() {}
-        };
+        @Override
+        public void close() {}
+      };
     }
     return csvInputSource;
   }

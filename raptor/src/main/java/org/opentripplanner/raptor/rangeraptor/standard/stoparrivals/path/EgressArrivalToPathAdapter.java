@@ -157,8 +157,7 @@ public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule>
 
     @Override
     public String toString() {
-      return ToStringBuilder
-        .of(DestinationArrivalEvent.class)
+      return ToStringBuilder.of(DestinationArrivalEvent.class)
         .addNum("round", round)
         .addBool("stopReachedOnBoard", stopReachedOnBoard)
         .addObj("egressPath", egressPath)

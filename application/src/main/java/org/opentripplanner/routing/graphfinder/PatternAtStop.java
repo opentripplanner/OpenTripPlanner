@@ -7,10 +7,10 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -104,8 +104,7 @@ public class PatternAtStop {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(getClass())
+    return ToStringBuilder.of(getClass())
       .addStr("id", id)
       .addObj("stop", stop)
       .addObj("pattern", pattern)

@@ -14,10 +14,8 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Transfer
 
 class MinCostPathTailFilterTest implements RaptorTestConstants {
 
-  private static final TransferWaitTimeCostCalculator WAIT_TIME_CALC = new TransferWaitTimeCostCalculator(
-    1.0,
-    5.0
-  );
+  private static final TransferWaitTimeCostCalculator WAIT_TIME_CALC =
+    new TransferWaitTimeCostCalculator(1.0, 5.0);
 
   private final A v01 = new A("A", 0, 11);
   private final A v10 = new A("B", 1, 10);
@@ -29,8 +27,9 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
     // filter empty set
     assertEquals(
       Set.of(),
-      new MinCostPathTailFilter<TestTripSchedule>(List.of(OptimizedPathTail::generalizedCost))
-        .filterIntermediateResult(Set.of(), 0)
+      new MinCostPathTailFilter<TestTripSchedule>(
+        List.of(OptimizedPathTail::generalizedCost)
+      ).filterIntermediateResult(Set.of(), 0)
     );
   }
 

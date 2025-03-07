@@ -22,18 +22,16 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 class ScheduledTransitLegTest {
 
-  static final ZonedDateTime TIME = OffsetDateTime
-    .parse("2023-04-17T17:49:06+02:00")
-    .toZonedDateTime();
+  static final ZonedDateTime TIME = OffsetDateTime.parse(
+    "2023-04-17T17:49:06+02:00"
+  ).toZonedDateTime();
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
   private static final Route ROUTE = TimetableRepositoryForTest.route(id("2")).build();
-  private static final TripPattern PATTERN = TimetableRepositoryForTest
-    .tripPattern("1", ROUTE)
+  private static final TripPattern PATTERN = TimetableRepositoryForTest.tripPattern("1", ROUTE)
     .withStopPattern(TEST_MODEL.stopPattern(4))
     .build();
   private static final Trip TRIP = TimetableRepositoryForTest.trip("trip1").build();
-  private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes
-    .of()
+  private static final ScheduledTripTimes TRIP_TIMES = ScheduledTripTimes.of()
     .withArrivalTimes("10:00 11:00 12:00 13:00")
     .withDepartureTimes("10:01 11:02 12:03 13:03")
     .withTrip(TRIP)
@@ -57,8 +55,7 @@ class ScheduledTransitLegTest {
 
   @Test
   void legTimesWithRealTime() {
-    var tt = ScheduledTripTimes
-      .of()
+    var tt = ScheduledTripTimes.of()
       .withArrivalTimes("10:00 11:00 12:00 13:00")
       .withDepartureTimes("10:01 11:02 12:03 13:03")
       .withTrip(TRIP)

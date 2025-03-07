@@ -47,7 +47,7 @@ public class StreetLeg implements Leg {
     this.generalizedCost = builder.getGeneralizedCost();
     this.elevationProfile = builder.getElevationProfile();
     this.legGeometry = builder.getGeometry();
-    this.walkSteps = builder.getWalkSteps();
+    this.walkSteps = Objects.requireNonNull(builder.getWalkSteps());
     this.streetNotes = Set.copyOf(builder.getStreetNotes());
     this.walkingBike = builder.getWalkingBike();
     this.rentedVehicle = builder.getRentedVehicle();
@@ -174,8 +174,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return StreetLegBuilder
-      .of(this)
+    return StreetLegBuilder.of(this)
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
@@ -198,8 +197,7 @@ public class StreetLeg implements Leg {
    */
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(StreetLeg.class)
+    return ToStringBuilder.of(StreetLeg.class)
       .addObj("from", from)
       .addObj("to", to)
       .addTime("startTime", startTime)

@@ -49,7 +49,8 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
   // There are 5 possible trips
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -78,8 +79,7 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
       "BUS R1 0:11 0:41 30m ~ B 0s ~ Walk 2m 0:41 0:43 [0:10 0:43 33m Tₓ0]"
     );
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r ->
         r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8m)
       )
@@ -112,8 +112,7 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
       "BUS R1 0:19 0:49 30m ~ B 0s ~ Walk 2m 0:49 0:51 [0:18 0:51 33m Tₓ0]"
     );
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r ->
         r.searchParams().earliestDepartureTime(edt).latestArrivalTime(lat).searchWindow(D8m)
       )
@@ -146,8 +145,7 @@ public class L01_TimePenaltyEgressTest implements RaptorTestConstants {
 
     // BUS R1 0:18 0:48 30m ~ B 0s ~ Walk 1m 0:48 0:49  .. [0:16 0:49 33m Tₓ0]
     String[] lines = path.split("\n");
-    return Stream
-      .of(lines)
+    return Stream.of(lines)
       .map(s -> {
         int pos = s.indexOf("BUS");
         return pos > 0 ? s.substring(pos) : s;

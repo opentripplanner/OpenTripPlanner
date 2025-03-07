@@ -35,8 +35,7 @@ class TransitPreferencesTest {
   private static final boolean INCLUDE_PLANNED_CANCELLATIONS = true;
   private static final boolean INCLUDE_REALTIME_CANCELLATIONS = true;
 
-  private final TransitPreferences subject = TransitPreferences
-    .of()
+  private final TransitPreferences subject = TransitPreferences.of()
     .setReluctanceForMode(RELUCTANCE_FOR_MODE)
     .setOtherThanPreferredRoutesPenalty(OTHER_THAN_PREFERRED_ROUTES_PENALTY)
     .setUnpreferredCost(UNPREFERRED_COST)

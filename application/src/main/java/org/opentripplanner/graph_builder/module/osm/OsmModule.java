@@ -83,13 +83,12 @@ public class OsmModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.params = params;
     this.osmdb = new OsmDatabase(issueStore);
-    this.vertexGenerator =
-      new VertexGenerator(
-        osmdb,
-        graph,
-        params.boardingAreaRefTags(),
-        params.includeOsmSubwayEntrances()
-      );
+    this.vertexGenerator = new VertexGenerator(
+      osmdb,
+      graph,
+      params.boardingAreaRefTags(),
+      params.includeOsmSubwayEntrances()
+    );
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
     this.streetLimitationParameters = Objects.requireNonNull(streetLimitationParameters);
   }
@@ -287,7 +286,7 @@ public class OsmModule implements GraphBuilderModule {
       issueStore
     );
 
-    WAY:for (OsmWay way : osmdb.getWays()) {
+    WAY: for (OsmWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       setWayName(way);
 
@@ -380,10 +379,8 @@ public class OsmModule implements GraphBuilderModule {
         ) {
           segmentCoordinates.add(osmEndNode.getCoordinate());
 
-          geometry =
-            GeometryUtils
-              .getGeometryFactory()
-              .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
+          geometry = GeometryUtils.getGeometryFactory()
+            .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
           segmentCoordinates.clear();
         } else {
           segmentCoordinates.add(osmEndNode.getCoordinate());
@@ -553,30 +550,28 @@ public class OsmModule implements GraphBuilderModule {
     var permissionsBack = permissionPair.back();
 
     if (permissionsFront.allowsAnything()) {
-      street =
-        getEdgeForStreet(
-          startEndpoint,
-          endEndpoint,
-          way,
-          index,
-          length,
-          permissionsFront,
-          geometry,
-          false
-        );
+      street = getEdgeForStreet(
+        startEndpoint,
+        endEndpoint,
+        way,
+        index,
+        length,
+        permissionsFront,
+        geometry,
+        false
+      );
     }
     if (permissionsBack.allowsAnything()) {
-      backStreet =
-        getEdgeForStreet(
-          endEndpoint,
-          startEndpoint,
-          way,
-          index,
-          length,
-          permissionsBack,
-          backGeometry,
-          true
-        );
+      backStreet = getEdgeForStreet(
+        endEndpoint,
+        startEndpoint,
+        way,
+        index,
+        length,
+        permissionsBack,
+        backGeometry,
+        true
+      );
     }
     if (street != null && backStreet != null) {
       backStreet.shareData(street);

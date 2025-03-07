@@ -69,8 +69,7 @@ public class PathTransfer implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(getClass())
+    return ToStringBuilder.of(getClass())
       .addObj("from", from)
       .addObj("to", to)
       .addNum("distance", distanceMeters)

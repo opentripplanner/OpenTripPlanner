@@ -41,7 +41,8 @@ public class I01_HeuristicTest implements RaptorTestConstants {
   };
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorConfig<TestTripSchedule> config = RaptorConfig.defaultConfigForTest();
 
   /**

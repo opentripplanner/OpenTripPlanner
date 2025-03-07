@@ -63,8 +63,7 @@ public class AccessEgressRouter {
       maxStopCount,
       dataOverlayContext,
       ignoreVertices
-    )
-      .findNearbyStops(originVertices, request, streetRequest, accessOrEgress.isEgress());
+    ).findNearbyStops(originVertices, request, streetRequest, accessOrEgress.isEgress());
 
     var results = ListUtils.combine(zeroDistanceAccessEgress, streetAccessEgress);
     LOG.debug("Found {} {} stops", results.size(), accessOrEgress);

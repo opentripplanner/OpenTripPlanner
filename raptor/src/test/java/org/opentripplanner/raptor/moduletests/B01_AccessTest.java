@@ -32,7 +32,8 @@ import org.opentripplanner.utils.time.DurationUtils;
 public class B01_AccessTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -40,8 +41,9 @@ public class B01_AccessTest implements RaptorTestConstants {
   @BeforeEach
   void setup() {
     data.withRoute(
-      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F)
-        .withTimetable(schedule("0:10 0:14 0:18 0:22 0:25"))
+      route("R1", STOP_B, STOP_C, STOP_D, STOP_E, STOP_F).withTimetable(
+        schedule("0:10 0:14 0:18 0:22 0:25")
+      )
     );
 
     requestBuilder
@@ -68,8 +70,7 @@ public class B01_AccessTest implements RaptorTestConstants {
     var expStdOne =
       "Walk 1s 0:09:59 0:10 ~ B 0s ~ BUS R1 0:10 0:25 15m ~ F 0s ~ Walk 1s 0:25 0:25:01 [0:09:59 0:25:01 15m2s Tₓ0]";
 
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .addMinDuration("14m1s", TX_0, T00_00, T00_30)
       .add(standard().not(TC_STANDARD_ONE), expStd)
       // When we run one iteration the  first access boarding is used as long as it

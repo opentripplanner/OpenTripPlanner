@@ -38,19 +38,21 @@ class EnumMapperTest {
   void docEnumValueList() {
     assertEquals(
       """
-        - `bar` This is Bar
-        - `boo-boo` This is Boo
-          Boo
-       """,
+       - `bar` This is Bar
+       - `boo-boo` This is Boo
+         Boo
+      """,
       EnumMapper.docEnumValueList(Foo.values())
     );
   }
 
   enum Foo implements DocumentedEnum<Foo> {
     Bar("This is Bar"),
-    BOO_BOO("""
+    BOO_BOO(
+      """
       This is Boo
-      Boo""");
+      Boo"""
+    );
 
     private final String doc;
 

@@ -20,8 +20,7 @@ class NetexFeedParametersTest {
   private static final Set<String> FERRY_IDS = Set.of("Ferry:Id");
   private static final String IGNORE_FILE = "[ignoreFl]+";
 
-  private final NetexFeedParameters subject = NetexFeedParameters
-    .of()
+  private final NetexFeedParameters subject = NetexFeedParameters.of()
     .withFeedId(FEED_ID)
     .withSource(new URI(SOURCE_URI))
     .withSharedFilePattern(Pattern.compile(SHARED_FILE))

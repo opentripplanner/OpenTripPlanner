@@ -14,8 +14,10 @@ import org.opentripplanner.model.plan.Itinerary;
  */
 public record TripPlanTimePenaltyDto(String appliesTo, TimeAndCost penalty) {
   static List<TripPlanTimePenaltyDto> of(Itinerary itinerary) {
-    return Stream
-      .of(of("access", itinerary.getAccessPenalty()), of("egress", itinerary.getEgressPenalty()))
+    return Stream.of(
+      of("access", itinerary.getAccessPenalty()),
+      of("egress", itinerary.getEgressPenalty())
+    )
       .filter(Objects::nonNull)
       .toList();
   }

@@ -143,13 +143,14 @@ public class BarrierRoutingTest {
         itineraries
           .stream()
           .flatMap(i -> i.getLegs().stream())
-          .map(l ->
-            () ->
-              assertEquals(
-                mapMode(streetMode),
-                (l instanceof StreetLeg s) ? s.getMode() : null,
-                "Allow only " + streetMode + " legs"
-              )
+          .map(
+            l ->
+              () ->
+                assertEquals(
+                  mapMode(streetMode),
+                  (l instanceof StreetLeg s) ? s.getMode() : null,
+                  "Allow only " + streetMode + " legs"
+                )
           )
     );
   }

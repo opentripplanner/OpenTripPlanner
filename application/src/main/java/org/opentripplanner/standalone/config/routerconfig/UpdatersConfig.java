@@ -44,14 +44,14 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzu
 import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirectoryFetcherConfig;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.UpdatersParameters;
-import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.SiriETUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.SiriSXUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.lite.SiriETLiteUpdaterParameters;
-import org.opentripplanner.updater.siri.updater.lite.SiriSXLiteUpdaterParameters;
-import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
-import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.updater.alert.siri.SiriSXUpdaterParameters;
+import org.opentripplanner.updater.alert.siri.lite.SiriSXLiteUpdaterParameters;
+import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdaterParameters;
+import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.SiriETUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdaterParameters;
+import org.opentripplanner.updater.trip.siri.updater.lite.SiriETLiteUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
@@ -77,14 +77,13 @@ public class UpdatersConfig implements UpdatersParameters {
         rootAdapter
       );
 
-    timetableUpdates =
-      timetableUpdates(
-        rootAdapter
-          .of("timetableUpdates")
-          .since(V2_2)
-          .summary("Global configuration for timetable updaters.")
-          .asObject()
-      );
+    timetableUpdates = timetableUpdates(
+      rootAdapter
+        .of("timetableUpdates")
+        .since(V2_2)
+        .summary("Global configuration for timetable updaters.")
+        .asObject()
+    );
 
     rootAdapter
       .of("updaters")

@@ -100,8 +100,7 @@ public class VehicleParkingEntrance implements Serializable {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(VehicleParkingEntrance.class)
+    return ToStringBuilder.of(VehicleParkingEntrance.class)
       .addObj("entranceId", entranceId)
       .addObj("name", name)
       .addObj("coordinate", coordinate)

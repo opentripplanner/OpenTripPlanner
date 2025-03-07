@@ -83,13 +83,14 @@ public class RaptorPathToItineraryMapperTest {
   private static final int TRANSIT_END = TimeUtils.time("11:00");
   private static final Route ROUTE = TimetableRepositoryForTest.route("route").build();
 
-  public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_COST_SEC,
-    TRANSFER_COST_SEC,
-    WAIT_RELUCTANCE,
-    TRANSIT_RELUCTANCE,
-    STOP_COSTS
-  );
+  public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
+    new DefaultCostCalculator<>(
+      BOARD_COST_SEC,
+      TRANSFER_COST_SEC,
+      WAIT_RELUCTANCE,
+      TRANSIT_RELUCTANCE,
+      STOP_COSTS
+    );
 
   private static final RegularStop S1 = TEST_MODEL.stop("STOP1").build();
   private static final RegularStop S2 = TEST_MODEL.stop("STOP2").build();
@@ -101,8 +102,9 @@ public class RaptorPathToItineraryMapperTest {
     // Arrange
     RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
 
-    RaptorPath<TestTripSchedule> path = createTestTripSchedulePath(getTestTripSchedule())
-      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(lastLegCost)));
+    RaptorPath<TestTripSchedule> path = createTestTripSchedulePath(getTestTripSchedule()).egress(
+      TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(lastLegCost))
+    );
 
     int transitLegCost = path.accessLeg().nextLeg().c1();
     int egressLegCost = path.accessLeg().nextLeg().nextLeg().c1();
@@ -257,8 +259,9 @@ public class RaptorPathToItineraryMapperTest {
   void isSearchWindowAware() {
     var mapper = getRaptorPathToItineraryMapper();
 
-    var path = createTestTripSchedulePath(getTestTripSchedule())
-      .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(100)));
+    var path = createTestTripSchedulePath(getTestTripSchedule()).egress(
+      TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(100))
+    );
     var itinerary = mapper.createItinerary(path);
     assertTrue(itinerary.isSearchWindowAware());
   }
@@ -279,8 +282,7 @@ public class RaptorPathToItineraryMapperTest {
       stopTimes.add(stopTime);
     }
 
-    var builder = TripPattern
-      .of(new FeedScopedId("TestFeed", "TestId"))
+    var builder = TripPattern.of(new FeedScopedId("TestFeed", "TestId"))
       .withRoute(pattern.route())
       .withStopPattern(new StopPattern(stopTimes));
     return builder.build();
@@ -292,8 +294,7 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private RaptorPathToItineraryMapper<TestTripSchedule> getRaptorPathToItineraryMapper() {
-    Instant dateTime = LocalDateTime
-      .of(2022, Month.OCTOBER, 10, 12, 0, 0)
+    Instant dateTime = LocalDateTime.of(2022, Month.OCTOBER, 10, 12, 0, 0)
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
     TimetableRepository timetableRepository = new TimetableRepository();
@@ -312,8 +313,7 @@ public class RaptorPathToItineraryMapperTest {
       new HashMap<>(),
       null,
       null,
-      TEST_MODEL
-        .siteRepositoryBuilder()
+      TEST_MODEL.siteRepositoryBuilder()
         .withRegularStop(S1)
         .withRegularStop(S2)
         .withRegularStop(S3)

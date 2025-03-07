@@ -21,31 +21,25 @@ public class TransitPreferencesMapper {
     );
     transit.withBoardSlack(builder -> {
       callWith.argument("boardSlackDefault", builder::withDefaultSec);
-      callWith.argument(
-        "boardSlackList",
-        (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
+      callWith.argument("boardSlackList", (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
       );
     });
     transit.withAlightSlack(builder -> {
       callWith.argument("alightSlackDefault", builder::withDefaultSec);
-      callWith.argument(
-        "alightSlackList",
-        (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
+      callWith.argument("alightSlackList", (Object v) ->
+        TransportModeSlack.mapIntoDomain(builder, v)
       );
     });
     callWith.argument("ignoreRealtimeUpdates", transit::setIgnoreRealtimeUpdates);
     callWith.argument("includePlannedCancellations", transit::setIncludePlannedCancellations);
     callWith.argument("includeRealtimeCancellations", transit::setIncludeRealtimeCancellations);
-    callWith.argument(
-      "relaxTransitGroupPriority",
-      it ->
-        transit.withRelaxTransitGroupPriority(
-          RelaxCostType.mapToDomain((Map<String, Object>) it, CostLinearFunction.NORMAL)
-        )
+    callWith.argument("relaxTransitGroupPriority", it ->
+      transit.withRelaxTransitGroupPriority(
+        RelaxCostType.mapToDomain((Map<String, Object>) it, CostLinearFunction.NORMAL)
+      )
     );
-    callWith.argument(
-      "relaxTransitSearchGeneralizedCostAtDestination",
-      (Double value) -> transit.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
+    callWith.argument("relaxTransitSearchGeneralizedCostAtDestination", (Double value) ->
+      transit.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
     );
   }
 }

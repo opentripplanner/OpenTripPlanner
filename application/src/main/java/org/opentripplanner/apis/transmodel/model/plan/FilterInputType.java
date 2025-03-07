@@ -7,15 +7,13 @@ import graphql.schema.GraphQLNonNull;
 
 public class FilterInputType {
 
-  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("TripFilterInput")
     .description(
       "A collection of selectors for what lines/trips should be included in / excluded from search"
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("select")
         .description(
           "A list of selectors for what lines/trips should be allowed during search. " +
@@ -26,8 +24,7 @@ public class FilterInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("not")
         .description(
           "A list of selectors for what lines/trips should be excluded during the search. " +

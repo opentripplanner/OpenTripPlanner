@@ -96,9 +96,8 @@ class RouteRequestMapperCarTest {
       )
     );
     var allowedEnv = executionContext(carArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
+    assertThrows(IllegalArgumentException.class, () ->
+      RouteRequestMapper.toRouteRequest(allowedEnv, RouteRequestMapperTest.CONTEXT)
     );
 
     carArgs = createArgsCopy(RouteRequestMapperTest.ARGS);

@@ -145,8 +145,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
         stopBoardAlightTransferCosts,
         extraStopBoardAlightCostsFactor,
         stopNameTranslator
-      )
-        .addTransitTail(last(originalTransitLegs))
+      ).addTransitTail(last(originalTransitLegs))
     );
 
     // Cache accessArrivalTime, any event before the access-arrival-time is safe to ignore
@@ -193,9 +192,9 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     }
 
     // Filter tails one final time
-    tails =
-      new TransitPathLegSelector<>(filter, tails)
-        .next(originalPath.accessLeg().nextTransitLeg().getFromStopPosition());
+    tails = new TransitPathLegSelector<>(filter, tails).next(
+      originalPath.accessLeg().nextTransitLeg().getFromStopPosition()
+    );
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);

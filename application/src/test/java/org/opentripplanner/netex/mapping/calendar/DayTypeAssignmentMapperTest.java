@@ -50,8 +50,10 @@ class DayTypeAssignmentMapperTest {
   private static final Boolean AVAILABLE = TRUE;
   private static final Boolean NOT_AVAILABLE = FALSE;
 
-  private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
-  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS =
+    new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS =
+    new HierarchicalMapById<>();
   public static final String OPERATING_DAY_1 = "OD-1";
   public static final String OPERATING_DAY_2 = "OD-2";
 
