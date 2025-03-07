@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -84,8 +83,7 @@ public class GraphPathFinder {
   ) {
     StreetPreferences preferences = request.preferences().street();
 
-    StreetSearchBuilder aStar = StreetSearchBuilder
-      .of()
+    StreetSearchBuilder aStar = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic(maxCarSpeed))
       .setSkipEdgeStrategy(
         new DurationSkipEdgeStrategy(
@@ -139,7 +137,7 @@ public class GraphPathFinder {
     Set<Vertex> to
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-    Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
+    Instant reqTime = request.dateTime();
 
     List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
 
@@ -151,13 +149,21 @@ public class GraphPathFinder {
         GraphPath<State, Edge, Vertex> graphPath = gpi.next();
         // TODO check, is it possible that arriveBy and time are modifed in-place by the search?
         if (request.arriveBy()) {
-          if (graphPath.states.getLast().getTime().isAfter(reqTime)) {
-            LOG.error("A graph path arrives after the requested time. This implies a bug.");
+          if (graphPath.states.getLast().getTimeAccurate().isAfter(reqTime)) {
+            LOG.error(
+              "A graph path arrives {} after the requested time {}. This implies a bug.",
+              graphPath.states.getLast().getTimeAccurate(),
+              reqTime
+            );
             gpi.remove();
           }
         } else {
-          if (graphPath.states.getFirst().getTime().isBefore(reqTime)) {
-            LOG.error("A graph path leaves before the requested time. This implies a bug.");
+          if (graphPath.states.getFirst().getTimeAccurate().isBefore(reqTime)) {
+            LOG.error(
+              "A graph path leaves {} before the requested time {}. This implies a bug.",
+              graphPath.states.getFirst().getTimeAccurate(),
+              reqTime
+            );
             gpi.remove();
           }
         }

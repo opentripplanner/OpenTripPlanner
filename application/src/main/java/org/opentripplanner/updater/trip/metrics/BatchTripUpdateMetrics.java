@@ -33,16 +33,19 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
 
   public BatchTripUpdateMetrics(UrlUpdaterParameters parameters) {
     super(parameters);
-    this.successfulGauge =
-      getGauge(
-        "successful",
-        "Trip updates that were successfully applied at the most recent update"
-      );
-    this.failureGauge =
-      getGauge("failed", "Trip updates that failed to apply at the most recent update");
+    this.successfulGauge = getGauge(
+      "successful",
+      "Trip updates that were successfully applied at the most recent update"
+    );
+    this.failureGauge = getGauge(
+      "failed",
+      "Trip updates that failed to apply at the most recent update"
+    );
 
-    this.warningsGauge =
-      getGauge("warnings", "Number of warnings when successfully applying trip updates");
+    this.warningsGauge = getGauge(
+      "warnings",
+      "Number of warnings when successfully applying trip updates"
+    );
   }
 
   public void setGauges(UpdateResult result) {
@@ -62,12 +65,11 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
     for (var warningType : result.warnings()) {
       var counter = warningsByType.get(warningType);
       if (Objects.isNull(counter)) {
-        counter =
-          getGauge(
-            "warning_type",
-            "Warning types of the most recent update",
-            Tag.of("warningType", warningType.name())
-          );
+        counter = getGauge(
+          "warning_type",
+          "Warning types of the most recent update",
+          Tag.of("warningType", warningType.name())
+        );
         warningsByType.put(warningType, counter);
       }
       counter.getAndIncrement();
@@ -78,12 +80,11 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
     for (var errorType : result.failures().keySet()) {
       var counter = failuresByType.get(errorType);
       if (Objects.isNull(counter)) {
-        counter =
-          getGauge(
-            "failure_type",
-            "Failure types of the most recent update",
-            Tag.of("errorType", errorType.name())
-          );
+        counter = getGauge(
+          "failure_type",
+          "Failure types of the most recent update",
+          Tag.of("errorType", errorType.name())
+        );
         failuresByType.put(errorType, counter);
       }
       counter.set(result.failures().get(errorType).size());
@@ -103,8 +104,7 @@ public class BatchTripUpdateMetrics extends TripUpdateMetrics {
   private AtomicInteger getGauge(String name, String description, Tag... tags) {
     var finalTags = Tags.concat(Arrays.stream(tags).toList(), baseTags);
     var atomicInt = new AtomicInteger(0);
-    Gauge
-      .builder(METRICS_PREFIX + "." + name, atomicInt::get)
+    Gauge.builder(METRICS_PREFIX + "." + name, atomicInt::get)
       .description(description)
       .tags(finalTags)
       .register(Metrics.globalRegistry);

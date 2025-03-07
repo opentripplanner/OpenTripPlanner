@@ -38,10 +38,12 @@ public class CalendarServiceDataFactoryImpl {
     Collection<ServiceCalendarDate> calendarDates,
     Collection<ServiceCalendar> serviceCalendars
   ) {
-    this.calendarDatesByServiceId =
-      calendarDates.stream().collect(groupingBy(ServiceCalendarDate::getServiceId));
-    this.calendarsByServiceId =
-      serviceCalendars.stream().collect(groupingBy(ServiceCalendar::getServiceId));
+    this.calendarDatesByServiceId = calendarDates
+      .stream()
+      .collect(groupingBy(ServiceCalendarDate::getServiceId));
+    this.calendarsByServiceId = serviceCalendars
+      .stream()
+      .collect(groupingBy(ServiceCalendar::getServiceId));
     this.serviceIds = merge(calendarDatesByServiceId.keySet(), calendarsByServiceId.keySet());
   }
 

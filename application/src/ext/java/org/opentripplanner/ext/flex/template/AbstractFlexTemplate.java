@@ -100,9 +100,9 @@ abstract class AbstractFlexTemplate {
   Stream<FlexAccessEgress> createFlexAccessEgressStream(FlexAccessEgressCallbackAdapter callback) {
     if (transferStop instanceof RegularStop stop) {
       var flexVertex = callback.getStopVertexForStopId(stop.getId());
-      return Stream
-        .of(createFlexAccessEgress(new ArrayList<>(), flexVertex, stop))
-        .filter(Objects::nonNull);
+      return Stream.of(createFlexAccessEgress(new ArrayList<>(), flexVertex, stop)).filter(
+        Objects::nonNull
+      );
     }
     // transferStop is Location Area/Line
     else {
@@ -126,8 +126,7 @@ abstract class AbstractFlexTemplate {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(AbstractFlexTemplate.class)
+    return ToStringBuilder.of(AbstractFlexTemplate.class)
       .addObj("accessEgress", accessEgress)
       .addObj("trip", trip)
       .addNum("boardStopPosition", boardStopPosition)

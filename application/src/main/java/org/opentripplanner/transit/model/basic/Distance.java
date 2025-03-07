@@ -25,13 +25,9 @@ public class Distance {
    * {@link IllegalArgumentException} if the distance is negative.
    */
   private static Distance of(int distanceInMillimeters) {
-    return of(
-      distanceInMillimeters,
-      errMsg -> {
-        throw new IllegalArgumentException(errMsg);
-      }
-    )
-      .orElseThrow();
+    return of(distanceInMillimeters, errMsg -> {
+      throw new IllegalArgumentException(errMsg);
+    }).orElseThrow();
   }
 
   private static Optional<Distance> of(
@@ -98,13 +94,11 @@ public class Distance {
   @Override
   public String toString() {
     if (millimeters > MILLIMETERS_PER_KM) {
-      return ValueObjectToStringBuilder
-        .of()
+      return ValueObjectToStringBuilder.of()
         .addNum((double) this.millimeters / (double) MILLIMETERS_PER_KM, "km")
         .toString();
     } else {
-      return ValueObjectToStringBuilder
-        .of()
+      return ValueObjectToStringBuilder.of()
         .addNum((double) this.millimeters / (double) MILLIMETERS_PER_M, "m")
         .toString();
     }

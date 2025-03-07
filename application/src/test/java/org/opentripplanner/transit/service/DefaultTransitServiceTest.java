@@ -41,8 +41,7 @@ class DefaultTransitServiceTest {
 
   private static TransitService service;
   private static final Station STATION = TEST_MODEL.station("C").build();
-  private static final RegularStop STOP_A = TEST_MODEL
-    .stop("A")
+  private static final RegularStop STOP_A = TEST_MODEL.stop("A")
     .withVehicleType(TRAM)
     .withParentStation(STATION)
     .build();
@@ -57,40 +56,35 @@ class DefaultTransitServiceTest {
     STOP_A,
     STOP_B
   );
-  private static final TripPattern REAL_TIME_PATTERN = TEST_MODEL
-    .pattern(BUS)
+  private static final TripPattern REAL_TIME_PATTERN = TEST_MODEL.pattern(BUS)
     .withStopPattern(REAL_TIME_STOP_PATTERN)
     .withCreatedByRealtimeUpdater(true)
     .build();
 
   static FeedScopedId CALENDAR_ID = TimetableRepositoryForTest.id("CAL_1");
-  static Trip TRIP = TimetableRepositoryForTest
-    .trip("123")
+  static Trip TRIP = TimetableRepositoryForTest.trip("123")
     .withHeadsign(I18NString.of("Trip Headsign"))
     .withServiceId(CALENDAR_ID)
     .build();
-  private static final Trip ADDED_TRIP = TimetableRepositoryForTest
-    .trip("REAL_TIME_ADDED_TRIP")
+  private static final Trip ADDED_TRIP = TimetableRepositoryForTest.trip("REAL_TIME_ADDED_TRIP")
     .withServiceId(CALENDAR_ID)
     .build();
-  private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = ScheduledTripTimes
-    .of()
+  private static final ScheduledTripTimes SCHEDULED_TRIP_TIMES = ScheduledTripTimes.of()
     .withTrip(TRIP)
     .withArrivalTimes(new int[] { 0, 1 })
     .withDepartureTimes(new int[] { 0, 1 })
     .withServiceCode(SERVICE_CODE)
     .build();
 
-  private static final TripPattern RAIL_PATTERN = TEST_MODEL
-    .pattern(RAIL)
+  private static final TripPattern RAIL_PATTERN = TEST_MODEL.pattern(RAIL)
     .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(SCHEDULED_TRIP_TIMES))
     .build();
 
   private static final int DELAY = 120;
-  private static final RealTimeTripTimes REALTIME_TRIP_TIMES = SCHEDULED_TRIP_TIMES.copyScheduledTimes();
+  private static final RealTimeTripTimes REALTIME_TRIP_TIMES =
+    SCHEDULED_TRIP_TIMES.copyScheduledTimes();
   private static final RealTimeTripTimes ADDED_TRIP_TIMES = RealTimeTripTimes.of(
-    ScheduledTripTimes
-      .of()
+    ScheduledTripTimes.of()
       .withTrip(ADDED_TRIP)
       .withArrivalTimes(new int[] { 10, 11 })
       .withDepartureTimes(new int[] { 10, 11 })
@@ -110,8 +104,7 @@ class DefaultTransitServiceTest {
 
   @BeforeAll
   static void setup() {
-    var siteRepository = TEST_MODEL
-      .siteRepositoryBuilder()
+    var siteRepository = TEST_MODEL.siteRepositoryBuilder()
       .withRegularStop(STOP_A)
       .withRegularStop(STOP_B)
       .withStation(STATION)
@@ -147,8 +140,7 @@ class DefaultTransitServiceTest {
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
     RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
-      ScheduledTripTimes
-        .of()
+      ScheduledTripTimes.of()
         .withTrip(TimetableRepositoryForTest.trip("123").build())
         .withDepartureTimes(new int[] { 0, 1 })
         .build()
@@ -165,17 +157,16 @@ class DefaultTransitServiceTest {
 
     var snapshot = timetableSnapshot.commit();
 
-    service =
-      new DefaultTransitService(timetableRepository, snapshot) {
-        @Override
-        public Collection<TripPattern> findPatterns(StopLocation stop) {
-          if (stop.equals(STOP_B)) {
-            return List.of(FERRY_PATTERN, FERRY_PATTERN, RAIL_PATTERN, RAIL_PATTERN, RAIL_PATTERN);
-          } else {
-            return List.of(BUS_PATTERN);
-          }
+    service = new DefaultTransitService(timetableRepository, snapshot) {
+      @Override
+      public Collection<TripPattern> findPatterns(StopLocation stop) {
+        if (stop.equals(STOP_B)) {
+          return List.of(FERRY_PATTERN, FERRY_PATTERN, RAIL_PATTERN, RAIL_PATTERN, RAIL_PATTERN);
+        } else {
+          return List.of(BUS_PATTERN);
         }
-      };
+      }
+    };
   }
 
   @Test
@@ -234,9 +225,10 @@ class DefaultTransitServiceTest {
 
   @Test
   void getRealtimeTripTimes() {
-    Instant midnight = ServiceDateUtils
-      .asStartOfService(SERVICE_DATE, service.getTimeZone())
-      .toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(
+      SERVICE_DATE,
+      service.getTimeZone()
+    ).toInstant();
 
     assertEquals(
       Optional.of(
@@ -261,9 +253,10 @@ class DefaultTransitServiceTest {
 
   @Test
   void getRealtimeTripTimesForAddedTrip() {
-    Instant midnight = ServiceDateUtils
-      .asStartOfService(SERVICE_DATE, service.getTimeZone())
-      .toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(
+      SERVICE_DATE,
+      service.getTimeZone()
+    ).toInstant();
 
     assertEquals(
       Optional.of(

@@ -13,8 +13,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsExistAndIsNotWalking() {
-    var modes = RequestModes
-      .of()
+    var modes = RequestModes.of()
       .withAccessMode(null)
       .withEgressMode(null)
       .withDirectMode(StreetMode.BIKE)
@@ -41,8 +40,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
   public void directModeIsEmpty() {
-    var modes = RequestModes
-      .of()
+    var modes = RequestModes.of()
       .withAccessMode(null)
       .withEgressMode(null)
       .withDirectMode(null)

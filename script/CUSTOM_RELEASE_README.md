@@ -1,7 +1,8 @@
 # README - OTP Custom/Fork Release Scripts
 
-**Note! This describes how you can set up and release OTP in you own GitHub fork, not how OTP in the
+**Note! This describes how you can set up and release OTP in your own GitHub fork, not how OTP in the
 main repo is released.**
+
 
 ## Introduction
 
@@ -52,7 +53,7 @@ to any commit in the release branch. For example merge in bug-fix branches on to
 release tag. Complete the process by running:
 
 ```
-# script/custom-release-extension --release
+# script/custom-release.py --release
 ```
 
 ### Advanced Git flow - roll back
@@ -153,6 +154,47 @@ Avoid using the default `origin`, instead rename your repositories to avoid mist
 # git remote rename origin otp 
 ```
 
+### Setup GitHub Access
+
+The script uses the GitHub GraphQL API to fetch information about pending PRs. This call must
+have a valid access token. The token only need READ access to PUBLIC repositories.
+
+#### Setting GitHub Access token from a workflow (Continuous Integration Pipeline)
+
+Export the `secrets.GITHUB_TOKEN` to the `CUSTOM_RELEASE_GIT_HUB_API_TOKEN` environment variable 
+to run the script in a workflow.
+
+```
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release OTP
+        env:
+          CUSTOM_RELEASE_GIT_HUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CUSTOM_RELEASE_LOG_LEVEL: "info"
+        run: |
+          echo "Start otp release script"
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git remote rename origin entur
+          git remote add otp https://github.com/opentripplanner/OpenTripPlanner.git
+          git fetch --no-tags otp
+          git remote -v
+          echo "Run script/custom-release.py otp/dev-2.x"
+          script/custom-release.py --summary otp/dev-2.x
+```
+
+#### Setting GitHub Access token in on local machine 
+
+1. Create a [Fine-grained personal access tokens](https://github.com/settings/personal-access-tokens)
+   with access to PUBLIC repositories with READ ACCESS only. Copy token.
+2. Add the token to your local terminal configuration(_.bashrc_ or _.zshrc_):
+
+```
+export CUSTOM_RELEASE_GIT_HUB_API_TOKEN=github_pat_Z2y...
+```
+
 
 ### Pending Pull Requests
 
@@ -162,7 +204,7 @@ label all PRs we want to be merged into the next release with `Entur Test`, this
 team member can do the release. This allows us to test features at Entur before the PR is accepted
 and merged in the upstream repo. We combine this with config, and sometimes the OTPFeature toggle
 to turn _on_ new features in over test environment. When the new feature is tested ok, we can 
-enable it by changing the config. 
+enable it by changing the config.
 
 
 ## How To Make A Release

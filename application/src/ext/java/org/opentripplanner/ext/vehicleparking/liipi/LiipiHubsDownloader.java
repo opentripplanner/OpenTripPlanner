@@ -45,22 +45,18 @@ public class LiipiHubsDownloader {
       return null;
     }
     try {
-      return otpHttpClient.getAndMap(
-        URI.create(url),
-        Map.of(),
-        is -> {
-          try {
-            return parseJSON(is);
-          } catch (IllegalArgumentException e) {
-            LOG.warn("Error parsing hubs from {}", url, e);
-          } catch (JsonProcessingException e) {
-            LOG.warn("Error parsing hubs from {} (bad JSON of some sort)", url, e);
-          } catch (IOException e) {
-            LOG.warn("Error reading hubs from {}", url, e);
-          }
-          return null;
+      return otpHttpClient.getAndMap(URI.create(url), Map.of(), is -> {
+        try {
+          return parseJSON(is);
+        } catch (IllegalArgumentException e) {
+          LOG.warn("Error parsing hubs from {}", url, e);
+        } catch (JsonProcessingException e) {
+          LOG.warn("Error parsing hubs from {} (bad JSON of some sort)", url, e);
+        } catch (IOException e) {
+          LOG.warn("Error reading hubs from {}", url, e);
         }
-      );
+        return null;
+      });
     } catch (OtpHttpClientException e) {
       LOG.warn("Failed to get data from url {}", url);
       return null;

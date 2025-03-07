@@ -45,13 +45,14 @@ public final class ItineraryFilterPreferences {
     this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(Duration.ofHours(1), 2.0);
     this.parkAndRideDurationRatio = 0.0;
     this.removeItinerariesWithSameRoutesAndStops = false;
-    this.transitGeneralizedCostLimit =
-      new TransitGeneralizedCostFilterParams(
-        CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
-        0.4
-      );
-    this.removeTransitWithHigherCostThanBestOnStreetOnly =
-      CostLinearFunction.of(Duration.ofMinutes(1), 1.3);
+    this.transitGeneralizedCostLimit = new TransitGeneralizedCostFilterParams(
+      CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
+      0.4
+    );
+    this.removeTransitWithHigherCostThanBestOnStreetOnly = CostLinearFunction.of(
+      Duration.ofMinutes(1),
+      1.3
+    );
     this.filterDirectFlexBySearchWindow = true;
   }
 
@@ -61,18 +62,21 @@ public final class ItineraryFilterPreferences {
     this.debug = builder.debug;
     this.filterItinerariesWithSameFirstOrLastTrip =
       builder.filterItinerariesWithSameFirstOrLastTrip;
-    this.groupedOtherThanSameLegsMaxCostMultiplier =
-      Units.reluctance(builder.groupedOtherThanSameLegsMaxCostMultiplier);
+    this.groupedOtherThanSameLegsMaxCostMultiplier = Units.reluctance(
+      builder.groupedOtherThanSameLegsMaxCostMultiplier
+    );
     this.groupSimilarityKeepOne = Units.reluctance(builder.groupSimilarityKeepOne);
     this.groupSimilarityKeepThree = Units.reluctance(builder.groupSimilarityKeepThree);
     this.minBikeParkingDistance = builder.minBikeParkingDistance;
-    this.nonTransitGeneralizedCostLimit =
-      Objects.requireNonNull(builder.nonTransitGeneralizedCostLimit);
+    this.nonTransitGeneralizedCostLimit = Objects.requireNonNull(
+      builder.nonTransitGeneralizedCostLimit
+    );
     this.parkAndRideDurationRatio = Units.ratio(builder.parkAndRideDurationRatio);
     this.removeItinerariesWithSameRoutesAndStops = builder.removeItinerariesWithSameRoutesAndStops;
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
-    this.removeTransitWithHigherCostThanBestOnStreetOnly =
-      Objects.requireNonNull(builder.removeTransitWithHigherCostThanBestOnStreetOnly);
+    this.removeTransitWithHigherCostThanBestOnStreetOnly = Objects.requireNonNull(
+      builder.removeTransitWithHigherCostThanBestOnStreetOnly
+    );
     this.filterDirectFlexBySearchWindow = builder.filterDirectFlexBySearchWindow;
   }
 
@@ -142,8 +146,7 @@ public final class ItineraryFilterPreferences {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ItineraryFilterPreferences.class)
+    return ToStringBuilder.of(ItineraryFilterPreferences.class)
       .addBoolIfTrue("accessibilityScore", accessibilityScore)
       .addNum("bikeRentalDistanceRatio", bikeRentalDistanceRatio, DEFAULT.bikeRentalDistanceRatio)
       .addEnum("debug", debug, ItineraryFilterDebugProfile.OFF)

@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -72,8 +73,7 @@ public class NearbyStop implements Comparable<NearbyStop> {
       return List.of();
     }
 
-    var streetSearchRequest = StreetSearchRequestMapper
-      .mapToTransferRequest(routeRequest)
+    var streetSearchRequest = StreetSearchRequestMapper.mapToTransferRequest(routeRequest)
       .withArriveBy(reverseDirection)
       .withMode(streetRequest.mode())
       .build();

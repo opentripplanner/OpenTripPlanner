@@ -10,8 +10,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class WheelchairConfig {
 
   static boolean wheelchairEnabled(NodeAdapter root, String parameterName) {
-    return WheelchairConfig
-      .wheelchairRoot(root, parameterName)
+    return WheelchairConfig.wheelchairRoot(root, parameterName)
       .of("enabled")
       .since(V2_0)
       .summary("Enable wheelchair accessibility.")
@@ -81,11 +80,11 @@ public class WheelchairConfig {
           .summary("How much streets with high slope should be avoided.")
           .description(
             """
-              What factor should be given to street edges, which are over the
-              max slope. The penalty is not static but scales with how much you
-              exceed the maximum slope. Set to negative to disable routing on
-              too steep edges.
-              """
+            What factor should be given to street edges, which are over the
+            max slope. The penalty is not static but scales with how much you
+            exceed the maximum slope. Set to negative to disable routing on
+            too steep edges.
+            """
           )
           .asDouble(dft.slopeExceededReluctance())
       )
@@ -96,10 +95,10 @@ public class WheelchairConfig {
           .summary("How much stairs should be avoided.")
           .description(
             """
-              Stairs are not completely excluded for wheelchair users but
-              severely punished. This value determines how much they are
-              punished. This should be a very high value as you want to only
-              include stairs as a last result."""
+            Stairs are not completely excluded for wheelchair users but
+            severely punished. This value determines how much they are
+            punished. This should be a very high value as you want to only
+            include stairs as a last result."""
           )
           .asDouble(dft.stairsReluctance())
       );

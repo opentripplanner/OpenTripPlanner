@@ -278,7 +278,8 @@ public class TripUpdateBuilder {
     @Nullable String headsign,
     int scheduledSeconds
   ) {
-    final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+    final StopTimeUpdate.Builder stopTimeUpdateBuilder =
+      tripUpdateBuilder.addStopTimeUpdateBuilder();
     stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationShip);
 
     if (stopId != null) {
@@ -309,8 +310,10 @@ public class TripUpdateBuilder {
       }
     }
 
-    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder =
+      stopTimeUpdateBuilder.getArrivalBuilder();
+    final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder =
+      stopTimeUpdateBuilder.getDepartureBuilder();
 
     if (secondsFromMidnight > NO_VALUE) {
       var epochSeconds = midnight.plusSeconds(secondsFromMidnight).toEpochSecond();

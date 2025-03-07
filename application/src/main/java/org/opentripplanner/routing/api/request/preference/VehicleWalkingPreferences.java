@@ -108,8 +108,7 @@ public class VehicleWalkingPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(VehicleWalkingPreferences.class)
+    return ToStringBuilder.of(VehicleWalkingPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addObj("mountDismountTime", mountDismountTime, DEFAULT.mountDismountTime)

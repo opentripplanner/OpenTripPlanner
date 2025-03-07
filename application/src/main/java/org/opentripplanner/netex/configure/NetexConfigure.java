@@ -87,12 +87,11 @@ public class NetexConfigure {
     CompositeDataSource source,
     NetexFeedParameters params
   ) {
-    return new NetexDataSourceHierarchy(source)
-      .prepare(
-        params.ignoreFilePattern(),
-        params.sharedFilePattern(),
-        params.sharedGroupFilePattern(),
-        params.groupFilePattern()
-      );
+    return new NetexDataSourceHierarchy(source).prepare(
+      params.ignoreFilePattern(),
+      params.sharedFilePattern(),
+      params.sharedGroupFilePattern(),
+      params.groupFilePattern()
+    );
   }
 }

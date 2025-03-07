@@ -54,13 +54,12 @@ class GenerateTripPatternsOperationTest {
     stopA = timetableRepositoryForTest.stop("stopA").build();
     stopB = timetableRepositoryForTest.stop("stopB").build();
     stopC = timetableRepositoryForTest.stop("stopC").build();
-    siteRepository =
-      timetableRepositoryForTest
-        .siteRepositoryBuilder()
-        .withRegularStop(stopA)
-        .withRegularStop(stopB)
-        .withRegularStop(stopC)
-        .build();
+    siteRepository = timetableRepositoryForTest
+      .siteRepositoryBuilder()
+      .withRegularStop(stopA)
+      .withRegularStop(stopB)
+      .withRegularStop(stopC)
+      .build();
 
     stopTimeA = new StopTime();
     stopTimeA.setStop(stopA);
@@ -70,56 +69,51 @@ class GenerateTripPatternsOperationTest {
     stopTimeC.setStop(stopC);
 
     FeedScopedId serviceId1 = TimetableRepositoryForTest.id("SERVICE_ID_1");
-    trip1 =
-      trip("TRIP_ID_1")
-        .withServiceId(serviceId1)
-        .withMode(TransitMode.RAIL)
-        .withNetexSubmode("SUBMODE_1")
-        .withDirection(Direction.INBOUND)
-        .build();
+    trip1 = trip("TRIP_ID_1")
+      .withServiceId(serviceId1)
+      .withMode(TransitMode.RAIL)
+      .withNetexSubmode("SUBMODE_1")
+      .withDirection(Direction.INBOUND)
+      .build();
 
     // same route, mode, submode and direction as trip1
     FeedScopedId serviceId2 = TimetableRepositoryForTest.id("SERVICE_ID_2");
-    trip2 =
-      trip("TRIP_ID_2")
-        .withServiceId(serviceId2)
-        .withRoute(trip1.getRoute())
-        .withMode(trip1.getMode())
-        .withNetexSubmode(trip1.getNetexSubMode().name())
-        .withDirection(trip1.getDirection())
-        .build();
+    trip2 = trip("TRIP_ID_2")
+      .withServiceId(serviceId2)
+      .withRoute(trip1.getRoute())
+      .withMode(trip1.getMode())
+      .withNetexSubmode(trip1.getNetexSubMode().name())
+      .withDirection(trip1.getDirection())
+      .build();
 
     // same route, direction as trip1, different mode
     FeedScopedId serviceId3 = TimetableRepositoryForTest.id("SERVICE_ID_3");
-    trip3 =
-      trip("TRIP_ID_3")
-        .withServiceId(serviceId3)
-        .withRoute(trip1.getRoute())
-        .withMode(TransitMode.BUS)
-        .withDirection(trip1.getDirection())
-        .build();
+    trip3 = trip("TRIP_ID_3")
+      .withServiceId(serviceId3)
+      .withRoute(trip1.getRoute())
+      .withMode(TransitMode.BUS)
+      .withDirection(trip1.getDirection())
+      .build();
 
     // same route, mode, direction  as trip1, different submode
     FeedScopedId serviceId4 = TimetableRepositoryForTest.id("SERVICE_ID_4");
-    trip4 =
-      trip("TRIP_ID_4")
-        .withServiceId(serviceId4)
-        .withRoute(trip1.getRoute())
-        .withMode(trip1.getMode())
-        .withNetexSubmode("SUMODE_2")
-        .withDirection(trip1.getDirection())
-        .build();
+    trip4 = trip("TRIP_ID_4")
+      .withServiceId(serviceId4)
+      .withRoute(trip1.getRoute())
+      .withMode(trip1.getMode())
+      .withNetexSubmode("SUMODE_2")
+      .withDirection(trip1.getDirection())
+      .build();
 
     // same route, mode  as trip1, different direction
     FeedScopedId serviceId5 = TimetableRepositoryForTest.id("SERVICE_ID_5");
-    trip5 =
-      trip("TRIP_ID_5")
-        .withServiceId(serviceId5)
-        .withRoute(trip1.getRoute())
-        .withMode(trip1.getMode())
-        .withNetexSubmode(trip1.getNetexSubMode().name())
-        .withDirection(Direction.OUTBOUND)
-        .build();
+    trip5 = trip("TRIP_ID_5")
+      .withServiceId(serviceId5)
+      .withRoute(trip1.getRoute())
+      .withMode(trip1.getMode())
+      .withNetexSubmode(trip1.getNetexSubMode().name())
+      .withDirection(Direction.OUTBOUND)
+      .build();
   }
 
   @BeforeEach
@@ -128,8 +122,11 @@ class GenerateTripPatternsOperationTest {
     issueStore = new DefaultDataImportIssueStore();
     transitServiceBuilder = new OtpTransitServiceBuilder(siteRepository, issueStore);
     double maxStopToShapeSnapDistance = 100;
-    geometryProcessor =
-      new GeometryProcessor(transitServiceBuilder, maxStopToShapeSnapDistance, issueStore);
+    geometryProcessor = new GeometryProcessor(
+      transitServiceBuilder,
+      maxStopToShapeSnapDistance,
+      issueStore
+    );
   }
 
   @Test

@@ -10,8 +10,7 @@ import org.opentripplanner.routing.api.request.ViaLocationDeprecated;
 public class ViaLocationInputType {
 
   public static GraphQLInputObjectType create() {
-    return GraphQLInputObjectType
-      .newInputObject()
+    return GraphQLInputObjectType.newInputObject()
       .name("ViaLocationInput")
       .description(
         "Input format for specifying a location through either a place reference (id), " +
@@ -21,8 +20,7 @@ public class ViaLocationInputType {
         "the via location."
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("name")
           .description(
             "The name of the location. This is pass-through information" +
@@ -32,8 +30,7 @@ public class ViaLocationInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("place")
           .description(
             "The id of an element in the OTP model. Currently supports" +
@@ -43,8 +40,7 @@ public class ViaLocationInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("coordinates")
           .description(
             "Coordinates for the location. This can be used alone or as" +
@@ -54,8 +50,7 @@ public class ViaLocationInputType {
           .build()
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("minSlack")
           .defaultValue(ViaLocationDeprecated.DEFAULT_MIN_SLACK)
           .description(
@@ -64,8 +59,7 @@ public class ViaLocationInputType {
           .type(TransmodelScalars.DURATION_SCALAR)
       )
       .field(
-        GraphQLInputObjectField
-          .newInputObjectField()
+        GraphQLInputObjectField.newInputObjectField()
           .name("maxSlack")
           .defaultValue(ViaLocationDeprecated.DEFAULT_MAX_SLACK)
           .description(

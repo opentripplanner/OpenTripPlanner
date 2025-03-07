@@ -28,14 +28,12 @@ import org.opentripplanner.transit.service.TimetableRepository;
 public class PlaceFinderTraverseVisitorTest {
 
   static TimetableRepositoryForTest model = TimetableRepositoryForTest.of();
-  static final Station STATION1 = Station
-    .of(id("S1"))
+  static final Station STATION1 = Station.of(id("S1"))
     .withName(new NonLocalizedString("Station 1"))
     .withCoordinate(1.1, 1.1)
     .build();
 
-  static final Station STATION2 = Station
-    .of(id("S2"))
+  static final Station STATION2 = Station.of(id("S2"))
     .withName(new NonLocalizedString("Station 2"))
     .withCoordinate(1.1, 1.1)
     .build();
@@ -329,19 +327,18 @@ public class PlaceFinderTraverseVisitorTest {
 
     assertEquals(List.of(station), res);
 
-    visitor =
-      new PlaceFinderTraverseVisitor(
-        transitService,
-        null,
-        List.of(PlaceType.VEHICLE_RENT),
-        null,
-        null,
-        null,
-        null,
-        List.of("Network-2"),
-        1,
-        500
-      );
+    visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      null,
+      List.of(PlaceType.VEHICLE_RENT),
+      null,
+      null,
+      null,
+      null,
+      List.of("Network-2"),
+      1,
+      500
+    );
 
     assertEquals(List.of(), visitor.placesFound);
     state1 = TestStateBuilder.ofWalking().rentalStation(station).build();

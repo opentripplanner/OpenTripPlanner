@@ -91,15 +91,15 @@ public class VehicleRentalSourceFactory {
       .summary("If a vehicle should be allowed to be kept at the end of a station-based rental.")
       .description(
         """
-          In some cases it may be useful to not drop off the rented vehicle before arriving at the destination.
-          This is useful if vehicles may only be rented for round trips, or the destination is an intermediate place.
-                  
-          For this to be possible three things need to be configured:
-                         
-           - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
-           - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
-           - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
-          """
+        In some cases it may be useful to not drop off the rented vehicle before arriving at the destination.
+        This is useful if vehicles may only be rented for round trips, or the destination is an intermediate place.
+
+        For this to be possible three things need to be configured:
+
+         - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
+         - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
+         - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
+        """
       )
       .asBoolean(false);
   }
@@ -120,7 +120,7 @@ public class VehicleRentalSourceFactory {
       .description(
         """
         This feature is somewhat experimental and therefore turned off by default for the following reasons:
-        
+
         - It delays start up of OTP. How long is dependent on the complexity of the zones. For example in Oslo it takes 6 seconds to compute while Portland takes 25 seconds.
         - It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug report.
         """

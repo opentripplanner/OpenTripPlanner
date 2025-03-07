@@ -52,15 +52,13 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
   }
 
   void createTrip(TripInput tripInput) {
-    var trip = Trip
-      .of(id(tripInput.id()))
+    var trip = Trip.of(id(tripInput.id()))
       .withRoute(tripInput.route())
       .withHeadsign(tripInput.headsign() == null ? null : I18NString.of(tripInput.headsign()))
       .withServiceId(SERVICE_ID)
       .build();
 
-    var tripOnServiceDate = TripOnServiceDate
-      .of(trip.getId())
+    var tripOnServiceDate = TripOnServiceDate.of(trip.getId())
       .withTrip(trip)
       .withServiceDate(SERVICE_DATE)
       .build();
@@ -71,8 +69,7 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
       timetableRepository.addOperators(List.of(tripInput.route().getOperator()));
     }
 
-    var stopTimes = IntStream
-      .range(0, tripInput.stops().size())
+    var stopTimes = IntStream.range(0, tripInput.stops().size())
       .mapToObj(i -> {
         var stop = tripInput.stops().get(i);
         return createStopTime(trip, i, stop.stop(), stop.arrivalTime(), stop.departureTime());
@@ -81,8 +78,10 @@ public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
-    final TripPattern pattern = TimetableRepositoryForTest
-      .tripPattern(tripInput.id() + "Pattern", tripInput.route())
+    final TripPattern pattern = TimetableRepositoryForTest.tripPattern(
+      tripInput.id() + "Pattern",
+      tripInput.route()
+    )
       .withStopPattern(
         TimetableRepositoryForTest.stopPattern(
           tripInput.stops().stream().map(TripInput.StopCall::stop).toList()

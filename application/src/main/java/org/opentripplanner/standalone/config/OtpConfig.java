@@ -53,19 +53,17 @@ public class OtpConfig {
   public OtpConfig(NodeAdapter nodeAdapter, boolean logUnusedParams) {
     this.root = nodeAdapter;
 
-    this.configVersion =
-      root
-        .of("configVersion")
-        .since(V2_1)
-        .summary("Deployment version of the *" + OtpFileNames.OTP_CONFIG_FILENAME + "*.")
-        .description(CONFIG_VERSION_DESCRIPTION)
-        .asString(null);
-    this.otpFeatures =
-      root
-        .of("otpFeatures")
-        .since(V2_0)
-        .summary("Turn features on/off.")
-        .asEnumMap(OTPFeature.class, Boolean.class);
+    this.configVersion = root
+      .of("configVersion")
+      .since(V2_1)
+      .summary("Deployment version of the *" + OtpFileNames.OTP_CONFIG_FILENAME + "*.")
+      .description(CONFIG_VERSION_DESCRIPTION)
+      .asString(null);
+    this.otpFeatures = root
+      .of("otpFeatures")
+      .since(V2_0)
+      .summary("Turn features on/off.")
+      .asEnumMap(OTPFeature.class, Boolean.class);
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);

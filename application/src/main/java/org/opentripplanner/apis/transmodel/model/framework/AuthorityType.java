@@ -19,16 +19,14 @@ public class AuthorityType {
     GraphQLOutputType lineType,
     GraphQLOutputType ptSituationElementType
   ) {
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("Authority")
       .description(
         "Authority involved in public transportation. An organisation under which the responsibility of organising the transport service in a certain area is placed."
       )
       .field(GqlUtil.newTransitIdField())
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("name")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .build()
@@ -37,8 +35,7 @@ public class AuthorityType {
         GraphQLFieldDefinition.newFieldDefinition().name("url").type(Scalars.GraphQLString).build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("timezone")
           .type(new GraphQLNonNull(Scalars.GraphQLString))
           .build()
@@ -47,22 +44,19 @@ public class AuthorityType {
         GraphQLFieldDefinition.newFieldDefinition().name("lang").type(Scalars.GraphQLString).build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("phone")
           .type(Scalars.GraphQLString)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("fareUrl")
           .type(Scalars.GraphQLString)
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("lines")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(lineType)))
@@ -76,8 +70,7 @@ public class AuthorityType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("situations")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description("Get all situations active for the authority.")

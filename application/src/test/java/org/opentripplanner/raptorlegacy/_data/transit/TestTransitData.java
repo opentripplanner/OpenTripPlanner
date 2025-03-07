@@ -41,16 +41,13 @@ import org.opentripplanner.routing.algorithm.transferoptimization.services.Trans
 public class TestTransitData
   implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
-  public static final TransferConstraint TX_GUARANTEED = TransferConstraint
-    .of()
+  public static final TransferConstraint TX_GUARANTEED = TransferConstraint.of()
     .guaranteed()
     .build();
-  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint
-    .of()
+  public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint.of()
     .notAllowed()
     .build();
-  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint
-    .of()
+  public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint.of()
     .minTransferTime(3600)
     .build();
 
@@ -215,10 +212,12 @@ public class TestTransitData
     return this;
   }
 
-  public TestTransitData withTransfer(int fromStop, TestTransfer transfer) {
+  public TestTransitData withTransfer(int fromStop, DefaultRaptorTransfer transfer) {
     expandNumOfStops(Math.max(fromStop, transfer.stop()));
     transfersFromStop.get(fromStop).add(transfer);
-    transfersToStop.get(transfer.stop()).add(DefaultRaptorTransfer.reverseOf(fromStop, transfer));
+    transfersToStop
+      .get(transfer.stop())
+      .add(((DefaultRaptorTransfer) transfer).reverseOf(fromStop));
     return this;
   }
 
