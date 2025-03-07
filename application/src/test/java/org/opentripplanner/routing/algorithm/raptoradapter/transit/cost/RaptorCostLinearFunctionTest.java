@@ -11,7 +11,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.test.support.TestTableParser;
 
@@ -52,8 +51,8 @@ class RaptorCostLinearFunctionTest {
 
     // Make sure we get the same result with the OTP domain function
     assertEquals(
-      sameInOtpDomain.calculate(Cost.costOfSeconds(timeSeconds)).toSeconds(),
-      RaptorCostConverter.toOtpDomainCost(result)
+      sameInOtpDomain.calculate(Cost.costOfSeconds(timeSeconds)).toCentiSeconds(),
+      result
     );
   }
 
