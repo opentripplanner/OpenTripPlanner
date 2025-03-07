@@ -38,8 +38,7 @@ public class StopInPatternModelTest {
     return builder.build();
   }
 
-  public static final TripPattern PATTERN = TripPattern
-    .of(id(ID))
+  public static final TripPattern PATTERN = TripPattern.of(id(ID))
     .withName(NAME)
     .withRoute(ROUTE)
     .withStopPattern(STOP_PATTERN)
