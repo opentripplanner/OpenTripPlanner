@@ -2659,10 +2659,10 @@ type VehiclePosition {
   heading: Float
   "Human-readable label of the vehicle, eg. a publicly visible number or a license plate"
   label: String
-  "When the position of the vehicle was recorded in seconds since the UNIX epoch."
-  lastUpdated: Long @deprecated(reason: "Use `lastUpdate` instead.")
   "When the position of the vehicle was recorded."
   lastUpdate: OffsetDateTime
+  "When the position of the vehicle was recorded in seconds since the UNIX epoch."
+  lastUpdated: Long @deprecated(reason : "Use `lastUpdate` instead.")
   "Latitude of the vehicle"
   lat: Float
   "Longitude of the vehicle"
