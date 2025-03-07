@@ -400,7 +400,6 @@ public class VertexLinker {
     // check if vertex is inside an area
     if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
       AreaGroup ag = aEdge.getArea();
-      var added = false;
       // is area already linked ?
       start = linkedAreas.get(ag);
       if (start == null) {
@@ -417,14 +416,15 @@ public class VertexLinker {
       if (start != null) {
         // vertex is inside the area. try connecting the vertex to the edge's split point, because
         // connections to visibility vertices may fail or do not always provide an optimal route
-        added = addVisibilityEdges(start, split, ag, scope, tempEdges);
+        // note that by definition, connection to closest edge cannot be blocked and edge can be forced
+        addVisibilityEdges(start, split, ag, scope, tempEdges, true);
       } else {
         // vertex is outside an area. Use split point for area connections
         start = split;
       }
       // connect start point to area visibility points to achieve optimal paths
       if (!ag.visibilityVertices().contains(start)) {
-        addAreaVertex(start, ag, scope, tempEdges, added == false);
+        addAreaVertex(start, ag, scope, tempEdges, false);
       }
     } else {
       start = split;
@@ -626,7 +626,7 @@ public class VertexLinker {
       }
     }
     for (IntersectionVertex v : visibilityVertices) {
-      if (addVisibilityEdges(newVertex, v, areaGroup, scope, tempEdges)) {
+      if (addVisibilityEdges(newVertex, v, areaGroup, scope, tempEdges, false)) {
         added++;
       }
     }
@@ -640,7 +640,7 @@ public class VertexLinker {
           .sorted((v1, v2) -> distSquared(v2, newVertex).compareTo(distSquared(v1, newVertex)))
           .findFirst()
           .get();
-        return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges);
+        return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges, true);
       }
       return false;
     } else if (scope == Scope.PERMANENT) {
@@ -676,7 +676,8 @@ public class VertexLinker {
     IntersectionVertex to,
     AreaGroup ag,
     Scope scope,
-    DisposableEdgeCollection tempEdges
+    DisposableEdgeCollection tempEdges,
+    boolean force
   ) {
     // Check that vertices are not yet linked
     if (from.isConnected(to)) {
@@ -686,7 +687,7 @@ public class VertexLinker {
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
     // ensure that new edge does not leave the bounds of the area or hit any holes
-    if (!ag.getGeometry().contains(line)) {
+    if (!force && !ag.getGeometry().contains(line)) {
       return false;
     }
     // add connecting edges
