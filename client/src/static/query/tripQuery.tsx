@@ -96,6 +96,7 @@ query trip(
         expectedStartTime
         duration
         distance
+        generalizedCost
         legs {
             id
             mode
@@ -106,6 +107,7 @@ query trip(
             realtime
             distance
             duration
+            generalizedCost
             fromPlace {
                 name
                 quay {
