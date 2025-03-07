@@ -74,8 +74,7 @@ class ScheduledTransitLegTest {
   @Test
   void legTimesWithSkippedStop() {
     var rtt = RealTimeTripTimes.of(
-      ScheduledTripTimes
-        .of()
+      ScheduledTripTimes.of()
         .withArrivalTimes("10:00 11:00 12:00 13:00")
         .withDepartureTimes("10:01 11:02 12:03 13:03")
         .withGtfsSequenceOfStopIndex(new int[] { 0, 1, 2, 3 })
