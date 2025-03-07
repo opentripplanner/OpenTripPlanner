@@ -471,7 +471,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     }
     int waitTime = start - lastEndTime(start);
     int legCost = 0;
-    legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
+     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     legCost += cost(1.0f, end - start) + BOARD_COST;
 
     Trip trip = trip(tripId, route);

@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
-import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -46,7 +46,7 @@ public class Itinerary implements ItinerarySortKey {
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
-  private int generalizedCost = UNKNOWN;
+  private Cost generalizedCost = Cost.ZERO;
   private Integer generalizedCost2 = null;
   private TimeAndCost accessPenalty = TimeAndCost.ZERO;
   private TimeAndCost egressPenalty = TimeAndCost.ZERO;
@@ -429,7 +429,7 @@ public class Itinerary implements ItinerarySortKey {
    * -1 indicate that the cost is not set/computed.
    */
   public int getGeneralizedCost() {
-    return generalizedCost;
+    return generalizedCost.toSeconds();
   }
 
   /**
@@ -442,11 +442,11 @@ public class Itinerary implements ItinerarySortKey {
    */
   @Override
   public int getGeneralizedCostIncludingPenalty() {
-    return generalizedCost + penaltyCost(accessPenalty) + penaltyCost(egressPenalty);
+    return generalizedCost.plus(accessPenalty.cost().plus(egressPenalty.cost())).toSeconds();
   }
 
   public void setGeneralizedCost(int generalizedCost) {
-    this.generalizedCost = generalizedCost;
+    this.generalizedCost = Cost.costOfSeconds(generalizedCost);
   }
 
   /**
@@ -655,7 +655,7 @@ public class Itinerary implements ItinerarySortKey {
       .addDuration("nonTransitTime", nonTransitDuration)
       .addDuration("transitTime", transitDuration)
       .addDuration("waitingTime", waitingDuration)
-      .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addObj("generalizedCost", generalizedCost)
       .addNum("generalizedCost2", generalizedCost2)
       .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
@@ -718,14 +718,10 @@ public class Itinerary implements ItinerarySortKey {
     // The generalizedCost2 is printed as is, it is a special cost and the scale depends on the
     // use-case.
     buf.summary(
-      RaptorCostConverter.toRaptorCost(generalizedCost),
+      generalizedCost.toCentiSeconds(),
       getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
     );
 
     return buf.toString();
-  }
-
-  private static int penaltyCost(TimeAndCost penalty) {
-    return penalty.cost().toSeconds();
   }
 }

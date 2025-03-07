@@ -16,7 +16,7 @@ public final class Cost implements Serializable, Comparable<Cost> {
 
   private static final int CENTI_FACTOR = 100;
 
-  public static final Cost ZERO = Cost.costOfSeconds(0);
+  public static final Cost ZERO = new Cost(0);
 
   public static final Cost ONE_HOUR_WITH_TRANSIT = Cost.fromDuration(Duration.ofHours(1));
 
