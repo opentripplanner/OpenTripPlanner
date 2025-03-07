@@ -4,7 +4,9 @@ import static org.opentripplanner.transit.model.timetable.OccupancyStatus.NO_DAT
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +44,21 @@ public class DefaultRealtimeVehicleService
       pattern = pattern.getOriginalTripPattern();
     }
     vehicles.put(pattern, List.copyOf(updates));
+
+    vehicles
+      .values()
+      .stream()
+      .flatMap(Collection::stream)
+      .forEach(v -> {
+        var isOld = v
+          .time()
+          .stream()
+          .allMatch(t -> t.isBefore(Instant.now().minus(Duration.ofHours(1))));
+
+        if (isOld) {
+          System.out.println(v + "is old");
+        }
+      });
   }
 
   @Override

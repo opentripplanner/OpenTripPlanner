@@ -22,7 +22,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(PollingVehiclePositionUpdater.class);
 
   /**
-   * Update streamer
+   * Update source
    */
   private final GtfsRealtimeHttpVehiclePositionSource vehiclePositionSource;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
@@ -53,11 +53,11 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
   }
 
   /**
-   * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates, and
+   * Repeatedly makes blocking calls to a source to retrieve new stop time updates, and
    * applies those updates to the graph.
    */
   @Override
-  public void runPolling() throws InterruptedException, ExecutionException {
+  public void runPolling() {
     // Get update lists from update source
     List<VehiclePosition> updates = vehiclePositionSource.getPositions();
 

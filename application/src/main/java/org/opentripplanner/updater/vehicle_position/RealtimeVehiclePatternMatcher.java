@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * Responsible for converting vehicle positions in memory to exportable ones, and associating each
  * position with a pattern.
  */
-public class RealtimeVehiclePatternMatcher {
+class RealtimeVehiclePatternMatcher {
 
   private static final Logger LOG = LoggerFactory.getLogger(RealtimeVehiclePatternMatcher.class);
 
