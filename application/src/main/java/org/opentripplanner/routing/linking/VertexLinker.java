@@ -620,7 +620,7 @@ public class VertexLinker {
       if (appliedCount < totalCount) {
         visibilityVertices = visibilityVertices
           .stream()
-          .sorted((v1, v2) -> distSquared(v1, newVertex).compareTo(distSquared(v2, newVertex)))
+          .sorted((v1, v2) -> distSquared(v2, newVertex).compareTo(distSquared(v1, newVertex)))
           .limit(appliedCount)
           .collect(Collectors.toSet());
       }
@@ -637,7 +637,7 @@ public class VertexLinker {
         var nearest = areaGroup
           .visibilityVertices()
           .stream()
-          .sorted((v1, v2) -> distSquared(v1, newVertex).compareTo(distSquared(v2, newVertex)))
+          .sorted((v1, v2) -> distSquared(v2, newVertex).compareTo(distSquared(v1, newVertex)))
           .findFirst()
           .get();
         return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges);
