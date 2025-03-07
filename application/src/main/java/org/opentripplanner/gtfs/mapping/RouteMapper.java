@@ -45,13 +45,12 @@ class RouteMapper {
     var lhs = Route.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
     I18NString longName = null;
     if (rhs.getLongName() != null) {
-      longName =
-        translationHelper.getTranslation(
-          org.onebusaway.gtfs.model.Route.class,
-          "longName",
-          rhs.getId().getId(),
-          rhs.getLongName()
-        );
+      longName = translationHelper.getTranslation(
+        org.onebusaway.gtfs.model.Route.class,
+        "longName",
+        rhs.getId().getId(),
+        rhs.getLongName()
+      );
     }
     lhs.withAgency(agencyMapper.map(rhs.getAgency()));
     lhs.withShortName(rhs.getShortName());
@@ -81,9 +80,9 @@ class RouteMapper {
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
     if (rhs.getNetworkId() != null) {
-      var networkId = GroupOfRoutes
-        .of(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId()))
-        .build();
+      var networkId = GroupOfRoutes.of(
+        new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId())
+      ).build();
       lhs.getGroupsOfRoutes().add(networkId);
     }
 

@@ -47,8 +47,7 @@ public class DefaultOsmInfoGraphBuildRepository
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DefaultOsmInfoGraphBuildRepository.class)
+    return ToStringBuilder.of(DefaultOsmInfoGraphBuildRepository.class)
       .addNum("Linear platforms", platforms.size())
       .addNum("Area platforms", areaPlatforms.size())
       .toString();

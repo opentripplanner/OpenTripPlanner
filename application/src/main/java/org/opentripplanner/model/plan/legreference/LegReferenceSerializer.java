@@ -28,9 +28,9 @@ public class LegReferenceSerializer {
     if (legReference == null) {
       return null;
     }
-    LegReferenceType typeEnum = LegReferenceType
-      .forClass(legReference.getClass())
-      .orElseThrow(() -> new IllegalArgumentException("Unknown LegReference type"));
+    LegReferenceType typeEnum = LegReferenceType.forClass(legReference.getClass()).orElseThrow(() ->
+      new IllegalArgumentException("Unknown LegReference type")
+    );
 
     var buf = new ByteArrayOutputStream();
     try (var out = new ObjectOutputStream(buf)) {

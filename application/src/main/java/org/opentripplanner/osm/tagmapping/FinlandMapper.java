@@ -37,11 +37,12 @@ class FinlandMapper extends OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    TriFunction<StreetTraversalPermission, Float, OsmEntity, Double> defaultWalkSafetyForPermission = (
-        permission,
-        speedLimit,
-        way
-      ) ->
+    TriFunction<
+      StreetTraversalPermission,
+      Float,
+      OsmEntity,
+      Double
+    > defaultWalkSafetyForPermission = (permission, speedLimit, way) ->
       switch (permission) {
         case ALL, PEDESTRIAN_AND_CAR -> {
           // ~35kph or under

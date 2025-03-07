@@ -9,12 +9,10 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 
 public class ModeAndSubModeInputType {
 
-  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType
-    .newInputObject()
+  static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()
     .name("TransportModes")
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("transportMode")
         .description(
           "A transportMode that should be allowed for this search. You can further" +
@@ -24,8 +22,7 @@ public class ModeAndSubModeInputType {
         .build()
     )
     .field(
-      GraphQLInputObjectField
-        .newInputObjectField()
+      GraphQLInputObjectField.newInputObjectField()
         .name("transportSubModes")
         .description(
           "The allowed transportSubModes for this search. If this element is not" +

@@ -18,7 +18,8 @@ public class TestConstrainedBoardingSearch
   implements RaptorConstrainedBoardingSearch<TestTripSchedule> {
 
   /** Index of guaranteed transfers by fromStopPos */
-  private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos = new TIntObjectHashMap<>();
+  private final TIntObjectMap<List<TestConstrainedTransfer>> transfersByFromStopPos =
+    new TIntObjectHashMap<>();
   private final BitSet transfersByToStopPosExist = new BitSet();
   private final BiPredicate<Integer, Integer> timeAfterOrEqual;
   private int currentTargetStopPos;
@@ -76,8 +77,7 @@ public class TestConstrainedBoardingSearch
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestConstrainedBoardingSearch.class)
+    return ToStringBuilder.of(TestConstrainedBoardingSearch.class)
       .addNum("currentTargetStopPos", currentTargetStopPos)
       .addObj("index", transfersByFromStopPos)
       .toString();

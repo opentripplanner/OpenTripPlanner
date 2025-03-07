@@ -110,8 +110,7 @@ class TestTripScheduleSearch
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TestTripScheduleSearch.class)
+    return ToStringBuilder.of(TestTripScheduleSearch.class)
       .addBoolIfTrue("REVERSE", direction.isInReverse())
       .addNum("tripIndex", tripIndex, NOT_FOUND)
       .addNum("stopPos", stopPositionInPattern)

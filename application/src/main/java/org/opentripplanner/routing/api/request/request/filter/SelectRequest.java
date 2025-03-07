@@ -96,8 +96,7 @@ public class SelectRequest implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(SelectRequest.class)
+    return ToStringBuilder.of(SelectRequest.class)
       .addObj("transportModes", transportModesToString(), null)
       .addCol("agencies", agencies, List.of())
       .addObj("routes", routes, List.of())

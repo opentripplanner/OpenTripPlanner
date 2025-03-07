@@ -11,8 +11,7 @@ public class BoardAndAlightTimeTest {
 
   @Test
   public void testToString() {
-    RaptorTripSchedule trip = TestTripSchedule
-      .schedule("11:30 11:40 11:50")
+    RaptorTripSchedule trip = TestTripSchedule.schedule("11:30 11:40 11:50")
       .pattern("L1", 2, 5, 3)
       .build();
 

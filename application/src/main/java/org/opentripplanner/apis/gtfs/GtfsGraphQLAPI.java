@@ -57,8 +57,7 @@ public class GtfsGraphQLAPI {
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
       LOG.debug("No query found in body");
-      return Response
-        .status(Response.Status.BAD_REQUEST)
+      return Response.status(Response.Status.BAD_REQUEST)
         .type(MediaType.TEXT_PLAIN_TYPE)
         .entity("No query found in body")
         .build();
@@ -79,8 +78,7 @@ public class GtfsGraphQLAPI {
       try {
         variables = deserializer.readValue((String) queryVariables, Map.class);
       } catch (IOException e) {
-        return Response
-          .status(Response.Status.BAD_REQUEST)
+        return Response.status(Response.Status.BAD_REQUEST)
           .type(MediaType.TEXT_PLAIN_TYPE)
           .entity("Variables must be a valid json object")
           .build();

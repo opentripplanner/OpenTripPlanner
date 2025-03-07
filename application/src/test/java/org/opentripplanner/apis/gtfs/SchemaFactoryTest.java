@@ -87,8 +87,7 @@ public class SchemaFactoryTest {
       .getCodeRegistry()
       .getDataFetcher(
         FieldCoordinates.coordinates("QueryType", fieldName),
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name(fieldName)
           .type(GraphQLObjectType.newObject().name(fieldName).build())
           .build()

@@ -38,11 +38,8 @@ class FeedScopedIdTest {
     }
   )
   void throwExceptionForInvisibleChar(String input) {
-    Assertions.assertThrows(
-      IllegalArgumentException.class,
-      () -> {
-        FeedScopedId.parseList(input);
-      }
-    );
+    Assertions.assertThrows(IllegalArgumentException.class, () -> {
+      FeedScopedId.parseList(input);
+    });
   }
 }

@@ -9,11 +9,11 @@ import org.junit.jupiter.api.Test;
 
 class ExecutionResultMapperTest {
 
-  private static ExecutionResult OK_RESULT_WITH_DATA_AND_ERROR = ExecutionResult
-    .newExecutionResult()
-    .data("Test")
-    .addError(GraphQLError.newError().message("Error").build())
-    .build();
+  private static ExecutionResult OK_RESULT_WITH_DATA_AND_ERROR =
+    ExecutionResult.newExecutionResult()
+      .data("Test")
+      .addError(GraphQLError.newError().message("Error").build())
+      .build();
 
   private static String RESULT_SERIALIZED = quoteReplace(
     "{" +

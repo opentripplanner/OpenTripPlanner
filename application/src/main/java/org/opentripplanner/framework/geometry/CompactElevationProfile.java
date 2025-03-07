@@ -88,11 +88,10 @@ public final class CompactElevationProfile implements Serializable {
     int oiy = 0;
     for (int i = 0; i < c.length; i++) {
       int iy = oiy + coords[i];
-      c[i] =
-        new Coordinate(
-          i == c.length - 1 ? lengthM : i * distanceBetweenSamplesM,
-          iy / FIXED_FLOAT_MULT
-        );
+      c[i] = new Coordinate(
+        i == c.length - 1 ? lengthM : i * distanceBetweenSamplesM,
+        iy / FIXED_FLOAT_MULT
+      );
       oiy = iy;
     }
     return new PackedCoordinateSequence.Double(c, 2);

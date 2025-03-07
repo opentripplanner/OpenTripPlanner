@@ -22,6 +22,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -62,6 +63,8 @@ import org.opentripplanner.transit.service.TransitService;
  */
 @HttpRequestScoped
 public interface OtpServerRequestContext {
+  DebugUiConfig debugUiConfig();
+
   /**
    * A RouteRequest containing default parameters that will be cloned when handling each request.
    */
@@ -125,7 +128,7 @@ public interface OtpServerRequestContext {
 
   VectorTileConfig vectorTileConfig();
 
-  DebugUiConfig debugUiConfig();
+  ViaCoordinateTransferFactory viaTransferResolver();
 
   /* Sandbox modules */
 

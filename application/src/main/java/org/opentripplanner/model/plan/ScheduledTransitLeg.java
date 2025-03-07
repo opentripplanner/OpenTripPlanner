@@ -91,14 +91,12 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
-    this.distanceMeters =
-      DoubleUtils.roundTo2Decimals(
-        Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
-      );
-    this.directDistanceMeters =
-      GeometryUtils.sumDistances(
-        List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
-      );
+    this.distanceMeters = DoubleUtils.roundTo2Decimals(
+      Objects.requireNonNull(builder.distanceMeters(), "distanceMeters")
+    );
+    this.directDistanceMeters = GeometryUtils.sumDistances(
+      List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
+    );
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareProducts = List.copyOf(builder.fareProducts());
   }
@@ -407,8 +405,7 @@ public class ScheduledTransitLeg implements TransitLeg {
    */
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ScheduledTransitLeg.class)
+    return ToStringBuilder.of(ScheduledTransitLeg.class)
       .addObj("from", getFrom())
       .addObj("to", getTo())
       .addTime("startTime", startTime)

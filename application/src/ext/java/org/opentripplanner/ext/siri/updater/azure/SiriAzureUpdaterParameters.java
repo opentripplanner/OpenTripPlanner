@@ -1,11 +1,14 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.Duration;
+import java.util.Optional;
 
 public abstract class SiriAzureUpdaterParameters {
 
   private String configRef;
-  private String type;
+  private final String type;
   private AuthenticationType authenticationType;
   private String fullyQualifiedNamespace;
   private String serviceBusUrl;
@@ -113,4 +116,10 @@ public abstract class SiriAzureUpdaterParameters {
   public void setPrefetchCount(int prefetchCount) {
     this.prefetchCount = prefetchCount;
   }
+
+  /**
+   * Create the url used for fetching initial data. Returns empty if there is no initial data url
+   * configured.
+   */
+  public abstract Optional<URI> buildDataInitializationUrl() throws URISyntaxException;
 }

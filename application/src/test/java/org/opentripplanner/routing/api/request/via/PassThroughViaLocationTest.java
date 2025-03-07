@@ -53,8 +53,7 @@ class PassThroughViaLocationTest {
 
   @Test
   void testEqAndHashCode() {
-    AssertEqualsAndHashCode
-      .verify(subject)
+    AssertEqualsAndHashCode.verify(subject)
       .sameAs(new PassThroughViaLocation(subject.label(), subject.stopLocationIds()))
       .differentFrom(
         new PassThroughViaLocation("Other", subject.stopLocationIds()),

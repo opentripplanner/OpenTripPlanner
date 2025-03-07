@@ -15,8 +15,7 @@ public class QualifiedModeTest {
   @Test
   public void test() {
     Set<Qualifier> ALL_QUALIFIERS = Arrays.stream(Qualifier.values()).collect(Collectors.toSet());
-    String ALL_QUALIFIERS_STR = ALL_QUALIFIERS
-      .stream()
+    String ALL_QUALIFIERS_STR = ALL_QUALIFIERS.stream()
       .map(Enum::name)
       .reduce((i, j) -> i + "_" + j)
       .orElse("X");

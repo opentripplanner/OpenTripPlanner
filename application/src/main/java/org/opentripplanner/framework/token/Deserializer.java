@@ -17,8 +17,9 @@ class Deserializer {
   Deserializer(String token) {
     byte[] bytes = Base64.getUrlDecoder().decode(token);
     var tokenFormatter = TokenFormatterConfiguration.tokenFormatter();
-    this.values =
-      Stream.of(SPLIT_PATTERN.split(new String(bytes), -1)).map(tokenFormatter::decode).toList();
+    this.values = Stream.of(SPLIT_PATTERN.split(new String(bytes), -1))
+      .map(tokenFormatter::decode)
+      .toList();
   }
 
   List<Object> deserialize(TokenDefinition definition) {
