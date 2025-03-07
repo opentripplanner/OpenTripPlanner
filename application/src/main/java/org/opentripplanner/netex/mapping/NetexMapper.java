@@ -535,7 +535,7 @@ public class NetexMapper {
       .forEach(id -> {
         var sspid = idFactory.createId(id);
         var quayId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
-        if (quayId != null && transitBuilder.getStops().containsKey(quayId)) {
+        if (transitBuilder.getStops().containsKey(quayId)) {
           var stop = transitBuilder.getStops().get(quayId);
           transitBuilder.addStopByScheduledStopPoint(sspid, stop);
         } else {
