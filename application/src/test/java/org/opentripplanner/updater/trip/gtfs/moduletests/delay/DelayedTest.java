@@ -145,10 +145,7 @@ class DelayedTest implements RealtimeTestConstants {
 
     var originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
 
-    final int originalTripIndexScheduled = originalTimetableScheduled.getTripIndex(TRIP_2_ID);
-    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(
-      originalTripIndexScheduled
-    );
+    var originalTripTimesScheduled = originalTimetableScheduled.getTripTimes(id(TRIP_2_ID));
     assertEquals(RealTimeState.SCHEDULED, originalTripTimesScheduled.getRealTimeState());
 
     assertEquals(
