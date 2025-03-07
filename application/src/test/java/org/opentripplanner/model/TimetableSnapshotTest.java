@@ -219,9 +219,9 @@ public class TimetableSnapshotTest {
     var pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     var trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
     var scheduledTimetable = pattern.getScheduledTimetable();
-    var updatedTripTimes = Objects
-      .requireNonNull(scheduledTimetable.getTripTimes(trip))
-      .copyScheduledTimes();
+    var updatedTripTimes = Objects.requireNonNull(
+      scheduledTimetable.getTripTimes(trip)
+    ).copyScheduledTimes();
     for (var i = 0; i < updatedTripTimes.getNumStops(); ++i) {
       updatedTripTimes.updateArrivalDelay(i, 30);
       updatedTripTimes.updateDepartureDelay(i, 30);
@@ -247,8 +247,7 @@ public class TimetableSnapshotTest {
     var addedStopTimes = List.of(addedDepartureStopTime, addedArrivalStopTime);
     var addedStopPattern = new StopPattern(addedStopTimes);
     var route = patternIndex.values().stream().findFirst().orElseThrow().getRoute();
-    var addedTripPattern = TripPattern
-      .of(new FeedScopedId(feedId, "1.1"))
+    var addedTripPattern = TripPattern.of(new FeedScopedId(feedId, "1.1"))
       .withRoute(route)
       .withStopPattern(addedStopPattern)
       .withCreatedByRealtimeUpdater(true)
