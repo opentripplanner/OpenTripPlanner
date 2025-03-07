@@ -56,7 +56,7 @@ class GtfsRealtimeHttpVehiclePositionSource {
       .toString();
   }
 
-  public List<VehiclePosition> getPositions(InputStream is) throws IOException {
+  private List<VehiclePosition> getPositions(InputStream is) throws IOException {
     List<VehiclePosition> positions = null;
     List<GtfsRealtime.FeedEntity> feedEntityList;
     GtfsRealtime.FeedMessage feedMessage;
