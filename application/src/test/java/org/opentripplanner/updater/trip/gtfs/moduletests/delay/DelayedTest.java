@@ -119,8 +119,7 @@ class DelayedTest implements RealtimeTestConstants {
 
   @Test
   void delayedAfterNextStopDeparture() {
-    var tripInput = TripInput
-      .of(TRIP_2_ID)
+    var tripInput = TripInput.of(TRIP_2_ID)
       .addStop(STOP_A1, "0:00:00", "0:00:00")
       // 5-minute dwell
       .addStop(STOP_B1, "0:05:00", "0:10:00")
