@@ -82,7 +82,7 @@ public interface TransitService {
   Optional<List<TripTimeOnDate>> getTripTimeOnDates(
     Trip trip,
     LocalDate serviceDate,
-    boolean fallbackToBaseTimetableOnRunningDate
+    boolean fallbackToNextPlannedTimetable
   );
 
   /**
