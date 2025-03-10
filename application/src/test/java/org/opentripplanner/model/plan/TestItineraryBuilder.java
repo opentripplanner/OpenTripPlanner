@@ -148,7 +148,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost, List.of());
     var leg = ((StreetLeg) this.legs.get(0));
-    var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
+    var updatedLeg = leg.copyOf().withRentedVehicle(true).build();
     this.legs.add(0, updatedLeg);
     return this;
   }
