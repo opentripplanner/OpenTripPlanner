@@ -242,7 +242,7 @@ class DefaultTransitServiceTest {
   }
 
   @Test
-  void getTripTimeOnDateWithNoServiceAndFallbackToNextScheduledDate() {
+  void getTripTimeOnDateWithNoServiceAndFallbackToPlannedTimetable() {
     assertEquals(
       Optional.of(
         List.of(
