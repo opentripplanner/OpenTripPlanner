@@ -22,9 +22,9 @@ class StopTimesMapper {
   }
 
   /**
-   * Map the call to a StopTime or return null if the stop cannot be found in the site repository.
+   * Map the call to the aimed StopTime or return null if the stop cannot be found in the site repository.
    */
-  StopTime createStopTime(
+  StopTime createAimedStopTime(
     Trip trip,
     ZonedDateTime departureDate,
     int stopSequence,
