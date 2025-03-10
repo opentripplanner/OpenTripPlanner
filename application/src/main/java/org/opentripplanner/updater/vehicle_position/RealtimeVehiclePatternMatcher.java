@@ -1,15 +1,8 @@
 package org.opentripplanner.updater.vehicle_position;
 
-import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
-import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
-import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimaps;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
@@ -21,19 +14,20 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -43,6 +37,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealtimeFuzzyTripMatcher;
@@ -68,8 +66,6 @@ class RealtimeVehiclePatternMatcher {
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
-
-  private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
   public RealtimeVehiclePatternMatcher(
     String feedId,
@@ -110,25 +106,17 @@ class RealtimeVehiclePatternMatcher {
       .stream()
       .filter(Result::isSuccess)
       .map(Result::successValue)
-      .collect(Collectors.groupingBy(PatternAndRealtimeVehicle::pattern))
-      .entrySet()
-      .stream()
       .collect(
-        Collectors.toMap(Entry::getKey, e ->
-          e.getValue().stream().map(PatternAndRealtimeVehicle::vehicle).collect(Collectors.toList())
+        Multimaps.toMultimap(
+          PatternAndRealtimeVehicle::pattern,
+          PatternAndRealtimeVehicle::vehicle,
+          ArrayListMultimap::create
         )
       );
 
-    vehicles.forEach(repository::setRealtimeVehicles);
-    Set<TripPattern> patternsInCurrentUpdate = vehicles.keySet();
+    repository.setRealtimeVehicles(feedId, vehicles);
 
-    // if there was a vehicle in the previous update but not in the current one, we assume
-    // that the pattern has no more vehicles.
-    var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
-    toDelete.forEach(repository::clearRealtimeVehicles);
-    patternsInPreviousUpdate = patternsInCurrentUpdate;
-
-    if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {
+    if (!vehiclePositions.isEmpty() && vehicles.keySet().isEmpty()) {
       LOG.error(
         "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater is using the correct feedId?",
         feedId
@@ -380,5 +368,5 @@ class RealtimeVehiclePatternMatcher {
     return Result.success(new PatternAndRealtimeVehicle(pattern, newVehicle));
   }
 
-  record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
+  private record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
 }

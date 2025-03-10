@@ -1,22 +1,20 @@
 package org.opentripplanner.service.realtimevehicles.internal;
 
-import static org.opentripplanner.transit.model.timetable.OccupancyStatus.NO_DATA_AVAILABLE;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
+import static org.opentripplanner.transit.model.timetable.OccupancyStatus.NO_DATA_AVAILABLE;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -24,7 +22,7 @@ import org.opentripplanner.transit.service.TransitService;
 public class DefaultRealtimeVehicleService
   implements RealtimeVehicleService, RealtimeVehicleRepository {
 
-  private final Map<TripPattern, List<RealtimeVehicle>> vehicles = new ConcurrentHashMap<>();
+  private ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles = ImmutableListMultimap.of();
 
   private final TransitService transitService;
 
@@ -38,32 +36,20 @@ public class DefaultRealtimeVehicleService
    * a realtime-added one, then the original (scheduled) one is used as the key for the map storing
    * the information.
    */
-  @Override
-  public void setRealtimeVehicles(TripPattern pattern, List<RealtimeVehicle> updates) {
-    if (pattern.getOriginalTripPattern() != null) {
-      pattern = pattern.getOriginalTripPattern();
-    }
-    vehicles.put(pattern, List.copyOf(updates));
+  public void setRealtimeVehicles(String feedId, Multimap<TripPattern, RealtimeVehicle> updates) {
+    Multimap<TripPattern, RealtimeVehicle> temp = ArrayListMultimap.create();
+    temp.putAll(vehicles);
+    // remove all previous updates for this specific feed id
+    vehicles.keys().stream().filter(p -> p.getFeedId().equals(feedId)).forEach(temp::removeAll);
+    // transform keys and put all fresh updates into map
+    updates.forEach((pattern, vehicles) -> {
+      if (pattern.getOriginalTripPattern() != null) {
+        pattern = pattern.getOriginalTripPattern();
+      }
+      temp.put(pattern, vehicles);
+    });
 
-    vehicles
-      .values()
-      .stream()
-      .flatMap(Collection::stream)
-      .forEach(v -> {
-        var isOld = v
-          .time()
-          .stream()
-          .allMatch(t -> t.isBefore(Instant.now().minus(Duration.ofHours(1))));
-
-        if (isOld) {
-          System.out.println(v + "is old");
-        }
-      });
-  }
-
-  @Override
-  public void clearRealtimeVehicles(TripPattern pattern) {
-    vehicles.remove(pattern);
+    vehicles = ImmutableListMultimap.copyOf(temp);
   }
 
   /**
@@ -71,7 +57,7 @@ public class DefaultRealtimeVehicleService
    * then the original (scheduled) one is used for the lookup instead, so you receive the correct
    * result no matter if you use the realtime or static information.
    *
-   * @see DefaultRealtimeVehicleService#setRealtimeVehicles(TripPattern, List)
+   * @see DefaultRealtimeVehicleService#setRealtimeVehicles(String, Multimap)
    */
   @Override
   public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
@@ -79,7 +65,7 @@ public class DefaultRealtimeVehicleService
       pattern = pattern.getOriginalTripPattern();
     }
     // the list is made immutable during insertion, so we can safely return them
-    return vehicles.getOrDefault(pattern, List.of());
+    return vehicles.get(pattern);
   }
 
   @Override
@@ -95,7 +81,7 @@ public class DefaultRealtimeVehicleService
    */
   public OccupancyStatus getOccupancyStatus(FeedScopedId tripId, TripPattern pattern) {
     return vehicles
-      .getOrDefault(pattern, List.of())
+      .get(pattern)
       .stream()
       .filter(vehicle -> tripId.equals(vehicle.trip().getId()))
       .max(Comparator.comparing(vehicle -> vehicle.time().orElse(Instant.MIN)))

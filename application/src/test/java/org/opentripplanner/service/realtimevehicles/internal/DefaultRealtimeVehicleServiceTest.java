@@ -2,9 +2,11 @@ package org.opentripplanner.service.realtimevehicles.internal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.geometry.WgsCoordinate.GREENWICH;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.tripPattern;
 
+import com.google.common.collect.ImmutableListMultimap;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -28,18 +30,22 @@ class DefaultRealtimeVehicleServiceTest {
     .withStopPattern(STOP_PATTERN)
     .build();
   private static final Instant TIME = Instant.ofEpochSecond(1000);
-  private static final List<RealtimeVehicle> VEHICLES = List.of(
-    RealtimeVehicle.builder().withTime(TIME).withCoordinates(GREENWICH).build()
-  );
+  private static final RealtimeVehicle VEHICLE = RealtimeVehicle.builder()
+    .withTime(TIME)
+    .withCoordinates(GREENWICH)
+    .build();
+
+  private static final String FEED_ID = ORIGINAL.getFeedId();
 
   @Test
   void originalPattern() {
     var service = new DefaultRealtimeVehicleService(
       new DefaultTransitService(new TimetableRepository())
     );
-    service.setRealtimeVehicles(ORIGINAL, VEHICLES);
+
+    service.setRealtimeVehicles(FEED_ID, ImmutableListMultimap.of(ORIGINAL, VEHICLE));
     var updates = service.getRealtimeVehicles(ORIGINAL);
-    assertEquals(VEHICLES, updates);
+    assertEquals(List.of(VEHICLE), updates);
   }
 
   @Test
@@ -52,8 +58,8 @@ class DefaultRealtimeVehicleServiceTest {
       .withOriginalTripPattern(ORIGINAL)
       .withCreatedByRealtimeUpdater(true)
       .build();
-    service.setRealtimeVehicles(realtimePattern, VEHICLES);
+    service.setRealtimeVehicles(FEED_ID, ImmutableListMultimap.of(realtimePattern, VEHICLE));
     var updates = service.getRealtimeVehicles(ORIGINAL);
-    assertEquals(VEHICLES, updates);
+    assertEquals(List.of(VEHICLE), updates);
   }
 }

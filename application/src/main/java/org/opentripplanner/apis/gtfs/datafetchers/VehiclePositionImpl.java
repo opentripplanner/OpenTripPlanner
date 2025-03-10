@@ -25,7 +25,7 @@ public class VehiclePositionImpl implements GraphQLDataFetchers.GraphQLVehiclePo
   public DataFetcher<OffsetDateTime> lastUpdate() {
     return env -> {
       var zoneId = env.<GraphQLRequestContext>getContext().transitService().getTimeZone();
-      return getSource(env).time().map(time -> time.atZone(zoneId).toOffsetDateTime()).orElse(null);
+      return getSource(env).time().map(time -> OffsetDateTime.ofInstant(time, zoneId)).orElse(null);
     };
   }
 

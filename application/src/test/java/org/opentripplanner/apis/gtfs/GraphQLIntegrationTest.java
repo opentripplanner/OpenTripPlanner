@@ -17,6 +17,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
 
+import com.google.common.collect.ImmutableListMultimap;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,7 +33,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
@@ -51,7 +51,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -416,7 +415,12 @@ class GraphQLIntegrationTest {
       .withStop(pattern.getStop(0))
       .withStopStatus(IN_TRANSIT_TO)
       .build();
-    realtimeVehicleService.setRealtimeVehicles(pattern, List.of(occypancyVehicle, positionVehicle));
+    realtimeVehicleService.setRealtimeVehicles(
+      pattern.getId().getFeedId(),
+      new ImmutableListMultimap.Builder()
+        .putAll(pattern, List.of(occypancyVehicle, positionVehicle))
+        .build()
+    );
 
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
     defaultVehicleRentalService.addVehicleRentalStation(VEHICLE_RENTAL_STATION);
