@@ -24,12 +24,15 @@ class RentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
     );
 
     if (input instanceof VehicleRentalVehicle vehicle) {
-      var props = List.of(kv("disabled", vehicle.isDisabled));
+      var props = List.of(
+        kv("isReserved", vehicle.isReserved),
+        kv("isDisabled", vehicle.isDisabled)
+      );
       return ListUtils.combine(base, props);
     } else if (input instanceof VehicleRentalStation station) {
       var props = List.of(
-        kv("spacesDisabled", station.spacesDisabled),
-        kv("vehiclesDisabled", station.vehiclesDisabled)
+        kv("isRenting", station.isRenting),
+        kv("isReturning", station.isReturning)
       );
       return ListUtils.combine(base, props);
     }
