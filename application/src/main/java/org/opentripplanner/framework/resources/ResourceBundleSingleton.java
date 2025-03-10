@@ -23,7 +23,7 @@ public enum ResourceBundleSingleton {
       ResourceBundle resourceBundle = ResourceBundle.getBundle(
         "translations",
         locale,
-        new XMLResourceBundleControl()
+        new XmlResourceBundleControl()
       );
       return resourceBundle.getString(key);
     } catch (MissingResourceException e) {

@@ -14,7 +14,7 @@ import java.util.Set;
  * Custom control for reading XML resource bundles. It's pretty strange that this doesn't already
  * exist.
  */
-class XMLResourceBundleControl extends ResourceBundle.Control {
+class XmlResourceBundleControl extends ResourceBundle.Control {
 
   private static final List<String> XML = List.of("xml");
 
@@ -32,7 +32,7 @@ class XMLResourceBundleControl extends ResourceBundle.Control {
       return null;
     }
 
-    return new XMLResourceBundle(stream);
+    return new XmlResourceBundle(stream);
   }
 
   @Override
@@ -44,11 +44,11 @@ class XMLResourceBundleControl extends ResourceBundle.Control {
    * Custom implementation of a resource bundle that reads the standard Java XML properties format.
    * It's pretty strange that this doesn't exist already.
    */
-  static class XMLResourceBundle extends ResourceBundle {
+  static class XmlResourceBundle extends ResourceBundle {
 
     private final Properties props;
 
-    public XMLResourceBundle(InputStream stream) throws IOException {
+    public XmlResourceBundle(InputStream stream) throws IOException {
       props = new Properties();
       props.loadFromXML(stream);
     }

@@ -33,7 +33,7 @@ public class ResourceBundleAdaptor {
    */
   private static ResourceBundle getBundle(String name, Locale l) {
     try {
-      return ResourceBundle.getBundle(name, l, new XMLResourceBundleControl());
+      return ResourceBundle.getBundle(name, l, new XmlResourceBundleControl());
     } catch (MissingResourceException e) {
       LOG.error(
         "Uh oh...no .properties file could be found, so things are most definitely not going to turn out well!!!",
