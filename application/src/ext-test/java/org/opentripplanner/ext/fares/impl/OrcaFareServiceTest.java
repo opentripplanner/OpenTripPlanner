@@ -81,7 +81,7 @@ public class OrcaFareServiceTest {
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
-    var itinerary = Itinerary.createScheduledTransitItinerary(legs, Cost.ZERO);
+    var itinerary = Itinerary.ofScheduledTransit(legs).withGeneralizedCost(Cost.ZERO).build();
     var itineraryFares = orcaFareService.calculateFares(itinerary);
     assertEquals(
       expectedPrice,

@@ -32,7 +32,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
@@ -51,7 +50,6 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -361,7 +359,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    Itinerary i1 = newItinerary(A, T11_00)
+    var i1 = newItinerary(A, T11_00)
       .walk(20, B, List.of(step1, step2, step3))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)

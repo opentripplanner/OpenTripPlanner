@@ -48,13 +48,13 @@ public class Itinerary implements ItinerarySortKey {
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private Integer generalizedCost2 = null;
-  private TimeAndCost accessPenalty = TimeAndCost.ZERO;
-  private TimeAndCost egressPenalty = TimeAndCost.ZERO;
-  private int waitTimeOptimizedCost = UNKNOWN;
-  private int transferPriorityCost = UNKNOWN;
+  private final TimeAndCost accessPenalty;
+  private final TimeAndCost egressPenalty;
+  private final int waitTimeOptimizedCost;
+  private final int transferPriorityCost;
   private boolean tooSloped = false;
   private Double maxSlope = null;
-  private boolean arrivedAtDestinationWithRentedVehicle = false;
+  private final boolean arrivedAtDestinationWithRentedVehicle;
 
   /* Sandbox experimental properties */
   private Float accessibilityScore;
@@ -69,19 +69,24 @@ public class Itinerary implements ItinerarySortKey {
 
   private ItineraryFares fare = ItineraryFares.empty();
 
-  private Itinerary(
-    List<Leg> legs,
-    Cost generalizedCost,
-    @Nullable TimeAndCost accessPenalty,
-    @Nullable TimeAndCost egressPenalty,
-    boolean searchWindowAware
-  ) {
-    setLegs(legs);
-    this.accessPenalty = Objects.requireNonNull(accessPenalty);
-    this.egressPenalty = Objects.requireNonNull(egressPenalty);
+  Itinerary(ItineraryBuilder builder) {
+    this.legs = List.copyOf(builder.legs);
 
-    this.generalizedCost = Objects.requireNonNull(generalizedCost);
-    this.searchWindowAware = searchWindowAware;
+    this.generalizedCost = Objects.requireNonNull(builder.calculateGeneralizedCostWithoutPenalty());
+    this.generalizedCost2 = builder.generalizedCost2;
+
+    this.searchWindowAware = builder.searchWindowAware;
+    this.transferPriorityCost = builder.transferPriorityCost;
+    this.waitTimeOptimizedCost = builder.waitTimeOptimizedCost;
+    this.accessPenalty = Objects.requireNonNull(builder.accessPenalty);
+    this.egressPenalty = Objects.requireNonNull(builder.egressPenalty);
+    this.elevationLost = builder.elevationLost;
+    this.elevationGained = builder.elevationGained;
+    this.tooSloped = builder.tooSloped;
+    this.maxSlope = builder.maxSlope;
+    this.arrivedAtDestinationWithRentedVehicle = builder.arrivedAtDestinationWithRentedVehicle;
+    this.accessibilityScore = builder.accessibilityScore;
+    this.emissionsPerPerson = builder.emissionsPerPerson;
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
@@ -102,32 +107,21 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * Creates an itinerary that contains scheduled transit which is aware of the search window.
-   * @param generalizedCost The total cost of the itinerary including access/egress penalty cost.
    */
-  public static Itinerary createScheduledTransitItinerary(
-    List<Leg> legs,
-    Cost generalizedCost,
-    TimeAndCost accessPenalty,
-    TimeAndCost egressPenalty
-  ) {
-    var c = generalizedCost.minus(accessPenalty.cost().plus(egressPenalty.cost()));
-    return new Itinerary(legs, c, accessPenalty, egressPenalty, true);
-  }
-
-  /**
-   * Same as {@link #createScheduledTransitItinerary(List, Cost)} with zero access/egress time
-   * penalty.
-   */
-  public static Itinerary createScheduledTransitItinerary(List<Leg> legs, Cost generalizedCost) {
-    return new Itinerary(legs, generalizedCost, TimeAndCost.ZERO, TimeAndCost.ZERO, true);
+  public static ItineraryBuilder ofScheduledTransit(List<Leg> legs) {
+    return new ItineraryBuilder(legs, true);
   }
 
   /**
    * Creates an itinerary that creates only street or flex results which are not aware of the
-   * time window.
+   * input request time-window.
    */
-  public static Itinerary createDirectItinerary(List<Leg> legs, Cost generalizedCost) {
-    return new Itinerary(legs, generalizedCost, TimeAndCost.ZERO, TimeAndCost.ZERO, false);
+  public static ItineraryBuilder ofDirect(List<Leg> legs) {
+    return new ItineraryBuilder(legs, false);
+  }
+
+  public ItineraryBuilder copyOf() {
+    return new ItineraryBuilder(this);
   }
 
   /**
@@ -275,13 +269,11 @@ public class Itinerary implements ItinerarySortKey {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    return new Itinerary(
-      timeShiftedLegs,
-      generalizedCost,
-      accessPenalty,
-      egressPenalty,
-      searchWindowAware
-    );
+    return new ItineraryBuilder(timeShiftedLegs, searchWindowAware)
+      .withGeneralizedCost(generalizedCost)
+      .withAccessPenalty(accessPenalty)
+      .withEgressPenalty(egressPenalty)
+      .build();
   }
 
   /** Total duration of the itinerary in seconds */
@@ -489,6 +481,10 @@ public class Itinerary implements ItinerarySortKey {
     return Optional.ofNullable(generalizedCost2);
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setGeneralizedCost2(Integer generalizedCost2) {
     this.generalizedCost2 = generalizedCost2;
   }
@@ -498,27 +494,9 @@ public class Itinerary implements ItinerarySortKey {
     return accessPenalty;
   }
 
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setAccessPenalty(TimeAndCost accessPenalty) {
-    Objects.requireNonNull(accessPenalty);
-    this.accessPenalty = accessPenalty;
-  }
-
   @Nullable
   public TimeAndCost getEgressPenalty() {
     return egressPenalty;
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setEgressPenalty(TimeAndCost egressPenalty) {
-    Objects.requireNonNull(egressPenalty);
-    this.egressPenalty = egressPenalty;
   }
 
   /**
@@ -531,10 +509,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public int getWaitTimeOptimizedCost() {
     return waitTimeOptimizedCost;
-  }
-
-  public void setWaitTimeOptimizedCost(int waitTimeOptimizedCost) {
-    this.waitTimeOptimizedCost = waitTimeOptimizedCost;
   }
 
   /**
@@ -550,10 +524,6 @@ public class Itinerary implements ItinerarySortKey {
     return transferPriorityCost;
   }
 
-  public void setTransferPriorityCost(int transferPriorityCost) {
-    this.transferPriorityCost = transferPriorityCost;
-  }
-
   /**
    * This itinerary has a greater slope than the user requested.
    */
@@ -561,6 +531,9 @@ public class Itinerary implements ItinerarySortKey {
     return tooSloped;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
   public void setTooSloped(boolean tooSloped) {
     this.tooSloped = tooSloped;
   }
@@ -572,6 +545,9 @@ public class Itinerary implements ItinerarySortKey {
     return maxSlope;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
   public void setMaxSlope(Double maxSlope) {
     this.maxSlope = DoubleUtils.roundTo2Decimals(maxSlope);
   }
@@ -582,12 +558,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public boolean isArrivedAtDestinationWithRentedVehicle() {
     return arrivedAtDestinationWithRentedVehicle;
-  }
-
-  public void setArrivedAtDestinationWithRentedVehicle(
-    boolean arrivedAtDestinationWithRentedVehicle
-  ) {
-    this.arrivedAtDestinationWithRentedVehicle = arrivedAtDestinationWithRentedVehicle;
   }
 
   /**

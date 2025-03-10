@@ -69,8 +69,12 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
 
       // transit has slightly lower cost, however it also has a high penalty which is
       // not taken into account when comparing the itineraries
-      var busWithPenalty = newItinerary(A).bus(21, 6, 8, E).build(299);
-      busWithPenalty.setAccessPenalty(new TimeAndCost(Duration.ZERO, Cost.costOfSeconds(360)));
+      var busWithPenalty = newItinerary(A)
+        .bus(21, 6, 8, E)
+        .itineraryBuilder()
+        .withAccessPenalty(new TimeAndCost(Duration.ZERO, Cost.costOfSeconds(360)))
+        .withGeneralizedCost(Cost.costOfSeconds(299 + 360))
+        .build();
 
       // When:
       var itineraries = List.of(walk, busWithPenalty);

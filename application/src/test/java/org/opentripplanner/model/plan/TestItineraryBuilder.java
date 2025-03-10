@@ -73,7 +73,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private Place lastPlace;
   private int lastEndTime;
   private int c1 = 0;
-  private int c2 = NOT_SET;
   private boolean isSearchWindowAware = true;
 
   private TestItineraryBuilder(Place origin, int startTime) {
@@ -403,11 +402,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return this;
   }
 
-  public TestItineraryBuilder withGeneralizedCost2(int c2) {
-    this.c2 = c2;
-    return this;
-  }
-
   public TestItineraryBuilder withIsSearchWindowAware(boolean searchWindowAware) {
     this.isSearchWindowAware = searchWindowAware;
     return this;
@@ -418,26 +412,26 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return build();
   }
 
+  public ItineraryBuilder itineraryBuilder() {
+    ItineraryBuilder builder = isSearchWindowAware
+      ? Itinerary.ofScheduledTransit(legs)
+      : Itinerary.ofDirect(legs);
+
+    builder.withGeneralizedCost(Cost.costOfSeconds(c1));
+
+    return builder;
+  }
+
+  public Itinerary build() {
+    return itineraryBuilder().build();
+  }
+
   /**
    * Override any value set for c1. The given value will be assigned to the itinerary
    * independent of any values set on the legs.
    */
   public Itinerary build(int c1) {
-    this.c1 = c1;
-    return build();
-  }
-
-  public Itinerary build() {
-    Itinerary itinerary;
-    if (isSearchWindowAware) {
-      itinerary = Itinerary.createScheduledTransitItinerary(legs, Cost.costOfSeconds(c1));
-    } else {
-      itinerary = Itinerary.createDirectItinerary(legs, Cost.costOfSeconds(c1));
-    }
-    if (c2 != NOT_SET) {
-      itinerary.setGeneralizedCost2(c2);
-    }
-    return itinerary;
+    return itineraryBuilder().withGeneralizedCost(Cost.costOfSeconds(c1)).build();
   }
 
   /* private methods */

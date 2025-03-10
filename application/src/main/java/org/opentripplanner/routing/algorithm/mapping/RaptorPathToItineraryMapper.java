@@ -150,30 +150,28 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     var accessPenalty = mapAccessEgressPenalty(accessPathLeg.access());
     var egressPenalty = mapAccessEgressPenalty(egressPathLeg.egress());
 
-    var itinerary = Itinerary.createScheduledTransitItinerary(
-      legs,
-      generalizedCost,
-      accessPenalty,
-      egressPenalty
-    );
+    var builder = Itinerary.ofScheduledTransit(legs)
+      .withGeneralizedCost(generalizedCost)
+      .withAccessPenalty(accessPenalty)
+      .withEgressPenalty(egressPenalty);
 
     // Map general itinerary fields
-    itinerary.setArrivedAtDestinationWithRentedVehicle(
+    builder.withArrivedAtDestinationWithRentedVehicle(
       mapped != null && mapped.isArrivedAtDestinationWithRentedVehicle()
     );
 
     if (optimizedPath != null) {
-      itinerary.setWaitTimeOptimizedCost(
+      builder.withWaitTimeOptimizedCost(
         toOtpDomainCost(optimizedPath.generalizedCostWaitTimeOptimized())
       );
-      itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
+      builder.withTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
     if (path.isC2Set()) {
-      itinerary.setGeneralizedCost2(path.c2());
+      builder.withGeneralizedCost2(path.c2());
     }
 
-    return itinerary;
+    return builder.build();
   }
 
   private static <T extends TripSchedule> boolean isPathTransferAtSameStop(
@@ -417,18 +415,17 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   }
 
   private Itinerary mapUnknownRaptorPath(RaptorPath<T> path) {
-    return Itinerary.createScheduledTransitItinerary(
-      List.of(
-        new UnknownTransitPathLeg(
-          mapPlace(request.from()),
-          mapPlace(request.to()),
-          createZonedDateTime(path.startTime()),
-          createZonedDateTime(path.endTime()),
-          path.numberOfTransfers()
-        )
-      ),
-      Cost.costOfCentiSeconds(path.c1())
+    List<Leg> legs = List.of(
+      new UnknownTransitPathLeg(
+        mapPlace(request.from()),
+        mapPlace(request.to()),
+        createZonedDateTime(path.startTime()),
+        createZonedDateTime(path.endTime()),
+        path.numberOfTransfers()
+      )
     );
+    Cost generalizedCost = Cost.costOfCentiSeconds(path.c1());
+    return Itinerary.ofScheduledTransit(legs).withGeneralizedCost(generalizedCost).build();
   }
 
   private Place mapPlace(GenericLocation location) {

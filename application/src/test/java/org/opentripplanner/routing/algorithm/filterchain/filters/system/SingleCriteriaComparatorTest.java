@@ -89,10 +89,19 @@ class SingleCriteriaComparatorTest {
 
   @Test
   void compareTransitPriorityGroups() {
-    var group1 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(1).build();
-    var group2 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(2).build();
+    var group1 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .itineraryBuilder()
+      .withGeneralizedCost2(1)
+      .build();
+    var group2 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .itineraryBuilder()
+      .withGeneralizedCost2(2)
+      .build();
     var group1And2 = newItinerary(A)
       .bus(1, START, END_LOW, C)
+      .itineraryBuilder()
       .withGeneralizedCost2(GROUP_PRIORITY_CALCULATOR.mergeInGroupId(1, 2))
       .build();
 

@@ -160,7 +160,7 @@ class AlternativeLegsTest extends GtfsTest {
         .stream()
         .map(Leg.class::cast)
         .map(List::of)
-        .map(it -> Itinerary.createScheduledTransitItinerary(it, Cost.ZERO))
+        .map(it -> Itinerary.ofScheduledTransit(it).withGeneralizedCost(Cost.ZERO).build())
         .toList()
     );
   }

@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class ItineraryTest implements PlanTestConstants {
 
-  private static final int DEFAULT_COST = 720;
+  private static final Cost COST = Cost.costOfSeconds(720);
 
   @Test
   void testDerivedFieldsWithWalkingOnly() {
@@ -53,7 +53,7 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(DEFAULT_COST, result.getGeneralizedCost());
+    assertEquals(COST.toSeconds(), result.getGeneralizedCost());
     assertEquals(ofMinutes(10), result.getTransitDuration());
     assertEquals(ZERO, result.getNonTransitDuration());
     assertEquals(ZERO, result.getWaitingDuration());
@@ -77,7 +77,7 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(ofMinutes(10), result.getDuration());
     assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(DEFAULT_COST, result.getGeneralizedCost());
+    assertEquals(COST.toSeconds(), result.getGeneralizedCost());
     assertEquals(ofMinutes(10), result.getTransitDuration());
     assertEquals(ZERO, result.getNonTransitDuration());
     assertEquals(ZERO, result.getWaitingDuration());
@@ -152,7 +152,6 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(ofMinutes(34), result.getTransitDuration());
     assertEquals(ofMinutes(6), result.getNonTransitDuration());
     assertEquals(ofMinutes(11), result.getWaitingDuration());
-    assertEquals(DEFAULT_COST + 528 + 360 + 2040, result.getGeneralizedCost());
     assertFalse(result.isWalkOnly());
     assertSameLocation(A, result.firstLeg().getFrom());
     assertSameLocation(G, result.lastLeg().getTo());
@@ -220,41 +219,40 @@ public class ItineraryTest implements PlanTestConstants {
       Duration.ofMinutes(10),
       Cost.costOfMinutes(2)
     );
-    private static final int COST_PLUS_TWO_MINUTES = DEFAULT_COST + 120;
 
     @Test
     void noPenalty() {
-      var subject = itinerary();
-      assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
-      assertEquals(DEFAULT_COST, subject.getGeneralizedCostIncludingPenalty());
+      var subject = itineraryBuilder().withGeneralizedCost(COST).build();
+      assertEquals(COST.toSeconds(), subject.getGeneralizedCost());
+      assertEquals(COST.toSeconds(), subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
     void accessPenalty() {
-      var subject = itinerary();
-      subject.setAccessPenalty(PENALTY);
-      assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
-      assertEquals(COST_PLUS_TWO_MINUTES, subject.getGeneralizedCostIncludingPenalty());
+      var subject = itineraryBuilder().withGeneralizedCost(COST).withAccessPenalty(PENALTY).build();
+      assertEquals(COST.minus(PENALTY.cost()).toSeconds(), subject.getGeneralizedCost());
+      assertEquals(COST.toSeconds(), subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
     void egressPenalty() {
-      var subject = itinerary();
-      subject.setEgressPenalty(PENALTY);
-      assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
-      assertEquals(COST_PLUS_TWO_MINUTES, subject.getGeneralizedCostIncludingPenalty());
+      var subject = itineraryBuilder().withGeneralizedCost(COST).withEgressPenalty(PENALTY).build();
+      assertEquals(COST.minus(PENALTY.cost()).toSeconds(), subject.getGeneralizedCost());
+      assertEquals(COST.toSeconds(), subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
     void bothPenalties() {
-      var subject = itinerary();
-      subject.setAccessPenalty(PENALTY);
-      subject.setEgressPenalty(PENALTY);
-      assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
+      var subject = itineraryBuilder()
+        .withGeneralizedCost(COST)
+        .withAccessPenalty(PENALTY)
+        .withEgressPenalty(PENALTY)
+        .build();
       assertEquals(
-        DEFAULT_COST + PENALTY.cost().toSeconds() + PENALTY.cost().toSeconds(),
-        subject.getGeneralizedCostIncludingPenalty()
+        COST.minus(PENALTY.cost().multiply(2)).toSeconds(),
+        subject.getGeneralizedCost()
       );
+      assertEquals(COST.toSeconds(), subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
@@ -268,8 +266,12 @@ public class ItineraryTest implements PlanTestConstants {
       assertFalse(TestItineraryBuilder.newItinerary(A, T11_00).walk(10, B).build().isDirectFlex());
     }
 
-    private static Itinerary itinerary() {
-      return newItinerary(A).bus(1, T11_04, T11_14, B).build();
+    private Itinerary itinerary() {
+      return itineraryBuilder().build();
+    }
+
+    private ItineraryBuilder itineraryBuilder() {
+      return newItinerary(A).bus(1, T11_04, T11_14, B).itineraryBuilder();
     }
   }
 

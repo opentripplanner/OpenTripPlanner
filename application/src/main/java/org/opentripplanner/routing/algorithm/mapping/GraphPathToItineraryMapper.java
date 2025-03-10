@@ -135,11 +135,13 @@ public class GraphPathToItineraryMapper {
 
     State lastState = path.states.getLast();
     var cost = Cost.costOfSeconds(lastState.weight);
-    var itinerary = Itinerary.createDirectItinerary(legs, cost);
+    var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
 
+    builder.withArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
+
+    // TODO - Set this on the builder, not the itinerary
+    var itinerary = builder.build();
     calculateElevations(itinerary, path.edges);
-
-    itinerary.setArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
 
     return itinerary;
   }

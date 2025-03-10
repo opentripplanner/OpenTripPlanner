@@ -2,14 +2,13 @@ package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.model.plan.Itinerary.createScheduledTransitItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,6 +17,7 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegConstructionSupport;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
@@ -69,57 +69,42 @@ class EmissionsTest {
 
   @Test
   void testGetEmissionsForItinerary() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_EMISSIONS)),
-      Cost.ZERO
-    );
+    var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(2223.902), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
-    Itinerary i = createScheduledTransitItinerary(List.of(STREET_LEG), Cost.ZERO);
+    var i = createItinerary(STREET_LEG);
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(28.0864), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED)),
-      Cost.ZERO
-    );
+    var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED));
     decorateWithEmission.decorate(i);
     assertNull(i.getEmissionsPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS)),
-      Cost.ZERO
-    );
+    var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(0.0), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG),
-      Cost.ZERO
-    );
+    var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(2251.9884), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG),
-      Cost.ZERO
-    );
+    var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG);
     decorateWithEmission.decorate(i);
     var emissionsResult = i.getEmissionsPerPerson() != null
       ? i.getEmissionsPerPerson().getCo2()
@@ -154,5 +139,9 @@ class EmissionsTest {
       .withZoneId(ZoneIds.BERLIN)
       .withDistanceMeters(LegConstructionSupport.computeDistanceMeters(pattern, 0, 2))
       .build();
+  }
+
+  private static Itinerary createItinerary(Leg... legs) {
+    return Itinerary.ofScheduledTransit(Arrays.asList(legs)).withGeneralizedCost(Cost.ZERO).build();
   }
 }
