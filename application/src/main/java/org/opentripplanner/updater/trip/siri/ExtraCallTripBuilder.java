@@ -92,7 +92,7 @@ class ExtraCallTripBuilder {
     // Create the "scheduled version" of the trip
     var aimedStopTimes = new ArrayList<StopTime>();
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
-      StopTime stopTime = stopTimesMapper.createStopTime(
+      StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
         departureDate,
         stopSequence,
