@@ -123,7 +123,6 @@ public interface RaptorAccessEgress {
    */
   int latestArrivalTime(int requestedArrivalTime);
 
-
   /**
    * In a via-search (both pass-through and visit-via) the access/egress may contain one
    * ore more via-locations. If so Raptor needs to know how many via-locations are included
