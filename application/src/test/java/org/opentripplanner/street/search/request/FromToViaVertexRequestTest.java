@@ -41,7 +41,7 @@ class FromToViaVertexRequestTest {
     "Via coordinate",
     Duration.ofMinutes(10),
     List.of(),
-    List.of(WgsCoordinate.GREENWICH)
+    WgsCoordinate.GREENWICH
   );
   private static final Set<Vertex> VIA_VERTICES = Set.of(createVertex("via"));
   private static final FromToViaVertexRequest FROM_TO_VIA_VERTEX_REQUEST =

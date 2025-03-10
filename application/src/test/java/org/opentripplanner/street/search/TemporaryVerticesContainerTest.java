@@ -62,13 +62,13 @@ public class TemporaryVerticesContainerTest {
   // - and *destination* is slightly off 0.7 degrees on road from C to A
   private final GenericLocation to = GenericLocation.fromCoordinate(0.701, 1.001);
   private final List<VisitViaLocation> viaLocations = List.of(
-    new VisitViaLocation("Via1", null, List.of(), List.of(new WgsCoordinate(0.0, 1.5))),
-    new VisitViaLocation("Via2", null, List.of(FeedScopedId.parse("F:1")), List.of()),
+    new VisitViaLocation("Via1", null, List.of(), new WgsCoordinate(0.0, 1.5)),
+    new VisitViaLocation("Via2", null, List.of(FeedScopedId.parse("F:1")), null),
     new VisitViaLocation(
       "Via3",
       null,
       List.of(FeedScopedId.parse("F:2")),
-      List.of(new WgsCoordinate(0.1, 1.9))
+      new WgsCoordinate(0.1, 1.9)
     )
   );
 
@@ -206,7 +206,7 @@ public class TemporaryVerticesContainerTest {
         .withFrom(from, StreetMode.WALK)
         .withTo(to, StreetMode.WALK)
         .withVia(
-          List.of(new VisitViaLocation("Via1", null, List.of(), List.of(new WgsCoordinate(10, 0)))),
+          List.of(new VisitViaLocation("Via1", null, List.of(), new WgsCoordinate(10, 0))),
           EnumSet.of(StreetMode.WALK)
         )
         .build()
@@ -225,7 +225,7 @@ public class TemporaryVerticesContainerTest {
         .withFrom(GenericLocation.fromCoordinate(0, 0.02), StreetMode.WALK)
         .withTo(GenericLocation.fromCoordinate(0, 0.01), StreetMode.WALK)
         .withVia(
-          List.of(new VisitViaLocation("Via1", null, List.of(), List.of(new WgsCoordinate(78, 0)))),
+          List.of(new VisitViaLocation("Via1", null, List.of(), new WgsCoordinate(78, 0))),
           EnumSet.of(StreetMode.WALK)
         )
         .build()

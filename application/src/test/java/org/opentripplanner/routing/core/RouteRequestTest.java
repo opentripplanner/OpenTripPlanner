@@ -38,12 +38,7 @@ class RouteRequestTest {
   private static final GenericLocation FROM = GenericLocation.fromCoordinate(60.0, 10.0);
   private static final GenericLocation TO = GenericLocation.fromCoordinate(59.0, 12.0);
   private static final List<ViaLocation> VIA = List.of(
-    new VisitViaLocation(
-      "Via",
-      Duration.ofMinutes(10),
-      List.of(),
-      List.of(new WgsCoordinate(59.5, 11.0))
-    )
+    new VisitViaLocation("Via", Duration.ofMinutes(10), List.of(), new WgsCoordinate(59.5, 11.0))
   );
   private static final Instant DATE_TIME = LocalDateTime.of(2025, Month.MAY, 17, 11, 15).toInstant(
     ZoneOffset.UTC
@@ -223,7 +218,7 @@ class RouteRequestTest {
       RouteRequest{
         from:(60.0,10.0),
         to:(59.0,12.0),
-        via: [VisitViaLocation{label:Via,minimumWaitTime:10m,coordinates:[(59.5,11.0)]}],
+        via: [VisitViaLocation{label:Via,minimumWaitTime:10m,coordinate:(59.5,11.0)}],
         dateTime:2025-05-17T11:15:00Z,
         arriveBy,
         timetableView:false,
@@ -289,7 +284,7 @@ class RouteRequestTest {
     assertTrue(builder.buildDefault().allowTransferOptimization());
 
     builder.withViaLocations(
-      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), List.of()))
+      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), null))
     );
     assertFalse(builder.buildDefault().allowTransferOptimization());
   }

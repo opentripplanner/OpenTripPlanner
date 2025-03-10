@@ -256,19 +256,20 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         builder.addViaStop(stopIndex);
         viaStops.add(stopIndex);
       }
-      for (var coordinate : input.coordinates()) {
-        var vertices = fromToViaVertexRequest.findVertices(
-          ((VisitViaLocation) input).coordinateLocation()
-        );
+      if (input.coordinate().isPresent()) {
+        var vertices = fromToViaVertexRequest.findVertices(((VisitViaLocation) input).coordinateLocation());
         if (vertices.isEmpty()) {
           LOG.warn(
             "Found no vertices for the visit via location {} which indicates a problem.",
             input
           );
-          continue;
         }
         for (var vertex : vertices) {
-          var viaTransfers = viaTransferResolver.createViaTransfers(request, vertex, coordinate);
+          var viaTransfers = viaTransferResolver.createViaTransfers(
+            request,
+            vertex,
+            input.coordinate().get()
+          );
           for (var it : viaTransfers) {
             // If via-stop and via-transfers are used together then walking from a stop
             // to the coordinate and back is not pareto optimal, using just the stop

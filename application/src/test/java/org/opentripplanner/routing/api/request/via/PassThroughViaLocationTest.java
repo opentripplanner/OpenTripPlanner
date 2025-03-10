@@ -40,7 +40,7 @@ class PassThroughViaLocationTest {
 
   @Test
   void coordinates() {
-    assertEquals("[]", subject.coordinates().toString());
+    assertTrue(subject.coordinate().isEmpty());
   }
 
   @Test

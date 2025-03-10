@@ -75,10 +75,12 @@ class TripViaLocationMapper {
     return c == null ? List.of() : c.stream().map(TransitIdMapper::mapIDToDomain).toList();
   }
 
-  private static List<WgsCoordinate> mapCoordinate(Map<String, Object> map) {
-    return CoordinateInputType.mapToWgsCoordinate(ViaLocationInputType.FIELD_COORDINATE, map)
-      .map(List::of)
-      .orElseGet(List::of);
+  @Nullable
+  private static WgsCoordinate mapCoordinate(Map<String, Object> map) {
+    return CoordinateInputType.mapToWgsCoordinate(
+      ViaLocationInputType.FIELD_COORDINATE,
+      map
+    ).orElse(null);
   }
 
   /**

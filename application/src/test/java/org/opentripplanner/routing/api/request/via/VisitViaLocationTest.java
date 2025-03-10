@@ -21,7 +21,7 @@ class VisitViaLocationTest {
     LABEL,
     MINIMUM_WAIT_TIME,
     List.of(ID),
-    List.of(WgsCoordinate.GREENWICH)
+    WgsCoordinate.GREENWICH
   );
 
   @Test
@@ -46,13 +46,13 @@ class VisitViaLocationTest {
 
   @Test
   void coordinates() {
-    assertEquals("[" + WgsCoordinate.GREENWICH + "]", subject.coordinates().toString());
+    assertEquals(WgsCoordinate.GREENWICH, subject.coordinate().get());
   }
 
   @Test
   void testToString() {
     assertEquals(
-      "VisitViaLocation{label: AName, minimumWaitTime: 5m, stopLocationIds: [F:1], coordinates: [(51.48, 0.0)]}",
+      "VisitViaLocation{label: AName, minimumWaitTime: 5m, stopLocationIds: [F:1], coordinate: (51.48, 0.0)}",
       subject.toString()
     );
   }
@@ -62,15 +62,15 @@ class VisitViaLocationTest {
     var l = subject.label();
     var mwt = subject.minimumWaitTime();
     var ids = subject.stopLocationIds();
-    var cs = subject.coordinates();
+    var cs = subject.coordinate();
 
     AssertEqualsAndHashCode.verify(subject)
-      .sameAs(new VisitViaLocation(l, mwt, ids, cs))
+      .sameAs(new VisitViaLocation(l, mwt, ids, cs.orElse(null)))
       .differentFrom(
-        new VisitViaLocation("other", mwt, ids, cs),
-        new VisitViaLocation(l, Duration.ZERO, ids, cs),
-        new VisitViaLocation(l, mwt, List.of(), cs),
-        new VisitViaLocation(l, mwt, ids, List.of())
+        new VisitViaLocation("other", mwt, ids, cs.orElse(null)),
+        new VisitViaLocation(l, Duration.ZERO, ids, cs.orElse(null)),
+        new VisitViaLocation(l, mwt, List.of(), cs.orElse(null)),
+        new VisitViaLocation(l, mwt, ids, null)
       );
   }
 }
