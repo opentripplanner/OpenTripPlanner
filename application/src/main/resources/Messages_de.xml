@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="TOO_CLOSE">Abstand zwischen Ausgangspunkt und Fahrtziel zu gering.</entry>
+<entry key="GEOCODE_TO_NOT_FOUND">Fahrtziel unbekannt. Können Sie bitte ein Wenig detailierter beschreiben?</entry>
+<entry key="SYSTEM_ERROR">Es tut uns leid, leider steht der Trip-Planer momentan nicht zur Verfügung. Bitte versuchen Sie es zu einem späteren Zeitpunkt nochmal.</entry>
+<entry key="NO_TRANSIT_TIMES">Keine Fahrzeiten verfügbar. Das Datum kann zu weit in der Vergangenheit oder zu weit in der Zukunft liegen oder es gibt keinen Verkehrsbetrieb zu dem von Ihnen gewählten Zeitpunkt.</entry>
+<entry key="PLAN_OK">Success</entry>
+<entry key="TRIANGLE_VALUES_NOT_SET">Wenn OptimizeType gleich TRIANGLE ist, müssen triangleSafetyFactor, triangleSlopeFactor und triangleTimeFactor gesetzt sein.</entry>
+<entry key="OUTSIDE_BOUNDS">Planung nicht möglich. Vielleicht versuchen sie einen Plan außerhalb der Kartengrenzen zu planen.</entry>
+<entry key="UNPROCESSABLE_REQUEST">Der Trip-Planner braucht zu lange oder verbraucht zu viele Ressourcen, um die Anfrage zu bearbeiten</entry>
+<entry key="GEOCODE_INTERMEDIATE_NOT_FOUND">An intermediate destination is unknown. Can you be a bit more descriptive?.</entry>
+<entry key="GEOCODE_FROM_NOT_FOUND">Ausgangspunkt unbekannt. Können Sie bitte ein Wenig detailierter beschreiben?</entry>
+<entry key="BOGUS_PARAMETER">Die Anfrage ist fehlerhaft so dass sie der Server nicht bearbeiten möchte oder kann.</entry>
+<entry key="PATH_NOT_FOUND">Planung nicht möglich. Ihr Start- oder Endpunkt könnte nicht erreichbar sein. Bitte stellen sie sicher, dass ihre Anfrage innerhalb der Kartendaten ist.</entry>
+<entry key="GEOCODE_FROM_TO_NOT_FOUND">Ausgangspunkt und Fahrtziel unbekannt. Können Sie bitte ein Wenig detailierter beschreiben?</entry>
+<entry key="UNDERSPECIFIED_TRIANGLE">Wenn einer der Parameter triangleSafetyFactor, triangleSlopeFactor und triangleTimeFactor gesetzt ist müssen alle bestimmt sein.</entry>
+<entry key="TRIANGLE_NOT_AFFINE">Die Summe von triangleSafetyFactor, triangleSlopeFactor, und triangleTimeFactor muss 1 betragen.</entry>
+<entry key="GRAPH_UNAVAILABLE">We're sorry. The trip planner is temporarily unavailable. Please try again later.</entry>
+<entry key="LOCATION_NOT_ACCESSIBLE">The location was found, but no stops could be found within the search radius.</entry>
+<entry key="TRIANGLE_OPTIMIZE_TYPE_NOT_SET">Wenn triangleSafetyFactor, triangleSlopeFactor und triangleTimeFactor gesetzt sind, dann muss OptimizeType gleich TRIANGLE sein.</entry>
+</properties>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="TOO_CLOSE">Startpunt is binnen een te kleine afstand van de bestemming.</entry>
+<entry key="GEOCODE_TO_NOT_FOUND">Startpunt onbekend. Probeer specifieker te zijn.</entry>
+<entry key="SYSTEM_ERROR">Onze excuses. De routeplanner is momenteel niet beschikbaar. Probeer later opnieuw.</entry>
+<entry key="NO_TRANSIT_TIMES">Geen OV-informatie beschikbaar. De datum is mogelijk te ver in het verleden of te ver in de toekomst. Of er is geen dienst voor uw reis op het moment dat u wilt.</entry>
+<entry key="PLAN_OK">Succes</entry>
+<entry key="TRIANGLE_VALUES_NOT_SET">Als het OptimizeType TRIANGLE is moet triangleSafetyFactor, triangleSlopeFactor en triangleTimeFactor zijn ingesteld.</entry>
+<entry key="OUTSIDE_BOUNDS">Deze reis is niet mogelijk. Mogelijk probeert u een reis te plannen buiten het beschikbare gebied</entry>
+<entry key="UNPROCESSABLE_REQUEST">De routeplanner is te lang bezig met uw verzoek.</entry>
+<entry key="GEOCODE_INTERMEDIATE_NOT_FOUND">An intermediate destination is unknown. Can you be a bit more descriptive?.</entry>
+<entry key="GEOCODE_FROM_NOT_FOUND">Startpunt onbekend. Probeer specifieker te zijn.</entry>
+<entry key="BOGUS_PARAMETER">Uw verzoek bevat fouten die de server niet wil or kan verwerken.</entry>
+<entry key="PATH_NOT_FOUND">Reis is niet mogelijk. Misschien is het startpunt of de bestemming niet veilig toegankelijk. Bijvoorbeeld een straat alleen verbonden met een snelweg.</entry>
+<entry key="GEOCODE_FROM_TO_NOT_FOUND">Zowel startpunt en bestemming zijn onbekend. Probeer specifieker te zijn.</entry>
+<entry key="UNDERSPECIFIED_TRIANGLE">Zowel triangleSafetyFactor, triangleSlopeFactor en triangleTimeFactor moet ingesteld zijn als een van deze ingesteld is.</entry>
+<entry key="GRAPH_UNAVAILABLE">Onze excuses. De routeplanner is momenteel niet beschikbaar. Probeer later opnieuw.</entry>
+<entry key="TRIANGLE_NOT_AFFINE">De som van de waarden van triangleSafetyFactor, triangleSlopeFactor en triangleTimeFactor moet 1 zijn.</entry>
+<entry key="LOCATION_NOT_ACCESSIBLE">The location was found, but no stops could be found within the search radius.</entry>
+<entry key="TRIANGLE_OPTIMIZE_TYPE_NOT_SET">Als triangleSafetyFactor, triangleSlopeFactor en triangleTimeFactor zijn ingesteld moet OptimizeType gelijk zijn aan TRIANGLE</entry>
+</properties>

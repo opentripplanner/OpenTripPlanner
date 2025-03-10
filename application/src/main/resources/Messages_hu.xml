@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="TOO_CLOSE">A kiindulópont a célállomástól csekély távolságon belül van.</entry>
+<entry key="GEOCODE_TO_NOT_FOUND">A célállomás ismeretlen.</entry>
+<entry key="SYSTEM_ERROR">Sajnáljuk. Az útvonaltervező átmenetileg nem elérhető. Kérjük, próbálja újra később.</entry>
+<entry key="NO_TRANSIT_TIMES">Nem állnak rendelkezésre tranzitidők. Előfordulhat, hogy a dátum elmúlt vagy túl messze van a jövőben, illetve előfordulhat, hogy az Ön által választott időpontban nincs tranzitszolgáltatás.</entry>
+<entry key="PLAN_OK">Siker</entry>
+<entry key="TRIANGLE_VALUES_NOT_SET">Ha a OptimizeType TRIANGLE meg kell adni a triangleSafetyFactor, triangleSlopeFactor és triangleTimeFactor értékét.</entry>
+<entry key="OUTSIDE_BOUNDS">Az utazás nem lehetséges. Lehet, hogy a térképadat-határon kívüli utat próbál megtervezni.</entry>
+<entry key="UNPROCESSABLE_REQUEST">Az utazástervező túl sokáig tart a kérés feldolgozásához.</entry>
+<entry key="GEOCODE_INTERMEDIATE_NOT_FOUND">An intermediate destination is unknown. Can you be a bit more descriptive?.</entry>
+<entry key="GEOCODE_FROM_NOT_FOUND">A kiindulópont ismeretlen.</entry>
+<entry key="BOGUS_PARAMETER">A kérés olyan hibákat tartalmaz, amelyeket a szerver nem hajlandó vagy nem képes feldolgozni.</entry>
+<entry key="PATH_NOT_FOUND">Nem található utazás. Előfordulhat, hogy a megadott maximális távolságon belül vagy a megadott időpontban nincs tömegközlekedési szolgáltatás, vagy a kezdő- vagy végpont nem érhető el biztonságosan.</entry>
+<entry key="GEOCODE_FROM_TO_NOT_FOUND">A kiindulópont és a célállomás is ismeretlen.</entry>
+<entry key="UNDERSPECIFIED_TRIANGLE">Mindegyik értéket szükséges megadni: triangleSafetyFactor, triangleSlopeFactor és triangleTimeFactor</entry>
+<entry key="GRAPH_UNAVAILABLE">Sajnáljuk. Az útvonaltervező átmenetileg nem elérhető. Kérjük, próbálja újra később.</entry>
+<entry key="TRIANGLE_NOT_AFFINE">Az összegnek 1-nek kell lennie: triangleSafetyFactor, triangleSlopeFactor és triangleTimeFactor</entry>
+<entry key="LOCATION_NOT_ACCESSIBLE">A helyek megtalálhatóak, de megállók nem található a keresési körzetben.</entry>
+<entry key="TRIANGLE_OPTIMIZE_TYPE_NOT_SET">triangleSafetyFactor, triangleSlopeFactor és triangleTimeFactor megadása esetén az OptimizeType TRIANGLE legyen.</entry>
+</properties>

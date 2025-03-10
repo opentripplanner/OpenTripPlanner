@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="TOO_CLOSE">Origin is within a trivial distance of the destination.</entry>
+<entry key="GEOCODE_TO_NOT_FOUND">Destination is unknown.  Can you be a bit more descriptive?</entry>
+<entry key="SYSTEM_ERROR">We're sorry. The trip planner is temporarily unavailable. Please try again later.</entry>
+<entry key="NO_TRANSIT_TIMES">No transit times available. The date may be past or too far in the future or there may not be transit service for your trip at the time you chose.</entry>
+<entry key="PLAN_OK">Success</entry>
+<entry key="TRIANGLE_VALUES_NOT_SET">If OptimizeType is TRIANGLE, triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must be set</entry>
+<entry key="OUTSIDE_BOUNDS">Trip is not possible. You might be trying to plan a trip outside the map data boundary.</entry>
+<entry key="UNPROCESSABLE_REQUEST">The trip planner is taking too long time or consuming too many resources to process your request.</entry>
+<entry key="GEOCODE_INTERMEDIATE_NOT_FOUND">An intermediate destination is unknown. Can you be a bit more descriptive?.</entry>
+<entry key="GEOCODE_FROM_NOT_FOUND">Origin is unknown. Can you be a bit more descriptive?</entry>
+<entry key="BOGUS_PARAMETER">The request has errors that the server is not willing or able to process.</entry>
+<entry key="PATH_NOT_FOUND">No trip found. There may be no transit service within the maximum specified distance or at the specified time, or your start or end point might not be safely accessible.</entry>
+<entry key="GEOCODE_FROM_TO_NOT_FOUND">Both origin and destination are unknown. Can you be a bit more descriptive?</entry>
+<entry key="UNDERSPECIFIED_TRIANGLE">All of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must be set if any are</entry>
+<entry key="GRAPH_UNAVAILABLE">We're sorry. The trip planner is temporarily unavailable. Please try again later.</entry>
+<entry key="TRIANGLE_NOT_AFFINE">The values of triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor must sum to 1</entry>
+<entry key="LOCATION_NOT_ACCESSIBLE">The location was found, but no stops could be found within the search radius.</entry>
+<entry key="TRIANGLE_OPTIMIZE_TYPE_NOT_SET">If triangleSafetyFactor, triangleSlopeFactor, and triangleTimeFactor are provided, OptimizeType must be TRIANGLE </entry>
+</properties>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="TOO_CLOSE">La destination est trop proche du départ.</entry>
+<entry key="GEOCODE_TO_NOT_FOUND">L'adresse de destination n'est pas reconnue. Veuillez être plus précis.</entry>
+<entry key="SYSTEM_ERROR">Désolé: le calculateur d'itinéraires est temporairement indisponible. Veuillez recommencer ultérieurement.</entry>
+<entry key="NO_TRANSIT_TIMES">Aucun voyage disponible. Soit la date est trop loin dans le futur, soit il n'y a pas de service ce jour. </entry>
+<entry key="PLAN_OK">Effectué</entry>
+<entry key="TRIANGLE_VALUES_NOT_SET">Si le paramètre OptimizeType vaut TRIANGLE, les paramètres (triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor) doivent être spécifiés.</entry>
+<entry key="OUTSIDE_BOUNDS">Impossible de calculer un itinéraire. Vous essayez de planifier un itinéraire hors des limites de la zone couverte.</entry>
+<entry key="UNPROCESSABLE_REQUEST">Le calculateur d'itinéraires prend trop de temps ou de resources pour gérer votre demande.</entry>
+<entry key="GEOCODE_INTERMEDIATE_NOT_FOUND">Une adresse intermédiaire n'est pas reconnue. Veuillez être plus précis.</entry>
+<entry key="GEOCODE_FROM_NOT_FOUND">L'adresse de départ n'est pas reconnue. Veuillez être plus précis.</entry>
+<entry key="BOGUS_PARAMETER">Le serveur ne peut pas prendre en compte la requête, elle contient des paramètres erronés.</entry>
+<entry key="PATH_NOT_FOUND">Impossible de calculer un itinéraire. Veuillez vérifier que le trajet demandé est inclus dans la zone couverte.</entry>
+<entry key="GEOCODE_FROM_TO_NOT_FOUND">Les adresses de départ et destination ne sont pas reconnues. Veuillez être plus précis.</entry>
+<entry key="UNDERSPECIFIED_TRIANGLE">Les paramètres (triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor) doivent être spécifiés tous ensemble.</entry>
+<entry key="GRAPH_UNAVAILABLE">Désolé: le calculateur d'itinéraires est temporairement indisponible. Veuillez recommencer ultérieurement.</entry>
+<entry key="TRIANGLE_NOT_AFFINE">La somme des valeurs des paramètres (triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor) doit être égal à 1.</entry>
+<entry key="LOCATION_NOT_ACCESSIBLE">The location was found, but no stops could be found within the search radius.</entry>
+<entry key="TRIANGLE_OPTIMIZE_TYPE_NOT_SET">Si les paramètres (triangleSafetyFactor, triangleSlopeFactor, triangleTimeFactor) sont utilisés, OptimizeType doit valoir TRIANGLE.</entry>
+</properties>
