@@ -55,7 +55,7 @@ public class StreetLeg implements Leg {
     this.accessibilityScore = builder.getAccessibilityScore();
   }
 
-  public static StreetLegBuilder create() {
+  public static StreetLegBuilder of() {
     return new StreetLegBuilder();
   }
 

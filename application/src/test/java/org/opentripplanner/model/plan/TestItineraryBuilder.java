@@ -560,7 +560,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost,
     List<WalkStep> walkSteps
   ) {
-    StreetLeg leg = StreetLeg.create()
+    StreetLeg leg = StreetLeg.of()
       .withMode(mode)
       .withStartTime(newTime(startTime))
       .withEndTime(newTime(endTime))

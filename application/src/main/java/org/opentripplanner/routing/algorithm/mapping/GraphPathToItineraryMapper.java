@@ -387,7 +387,7 @@ public class GraphPathToItineraryMapper {
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
-    StreetLegBuilder leg = StreetLeg.create()
+    StreetLegBuilder leg = StreetLeg.of()
       .withMode(resolveMode(states))
       .withStartTime(startTimeState.getTime().atZone(timeZone))
       .withEndTime(lastState.getTime().atZone(timeZone))

@@ -40,7 +40,7 @@ class EmissionsTest {
     "2023-07-20T17:49:06+03:00"
   ).toZonedDateTime();
 
-  private static final StreetLeg STREET_LEG = StreetLeg.create()
+  private static final StreetLeg STREET_LEG = StreetLeg.of()
     .withMode(TraverseMode.CAR)
     .withDistanceMeters(214.4)
     .withStartTime(TIME)

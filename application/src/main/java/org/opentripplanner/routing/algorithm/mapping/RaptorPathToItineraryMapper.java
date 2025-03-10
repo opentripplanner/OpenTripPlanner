@@ -298,7 +298,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    */
   private Leg createTransferLegAtSameStop(PathLeg<T> previousLeg, PathLeg<T> nextLeg) {
     var transferStop = Place.forStop(raptorTransitData.getStopByIndex(previousLeg.toStop()));
-    return StreetLeg.create()
+    return StreetLeg.of()
       .withMode(TraverseMode.WALK)
       .withStartTime(createZonedDateTime(previousLeg.toTime()))
       .withEndTime(createZonedDateTime(nextLeg.fromTime()))
@@ -354,7 +354,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     List<Edge> edges = transfer.getEdges();
     if (edges == null || edges.isEmpty()) {
       return List.of(
-        StreetLeg.create()
+        StreetLeg.of()
           .withMode(transferMode)
           .withStartTime(createZonedDateTime(pathLeg.fromTime()))
           .withEndTime(createZonedDateTime(pathLeg.toTime()))
