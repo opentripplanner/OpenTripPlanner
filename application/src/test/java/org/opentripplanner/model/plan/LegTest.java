@@ -179,7 +179,9 @@ public class LegTest implements PlanTestConstants {
     int toStopIndex,
     LocalDate serviceDate
   ) {
-    return leg(b -> b.bus(tripId, START_TIME, START_TIME + 99, fromStopIndex, toStopIndex, B, serviceDate));
+    return leg(b ->
+      b.bus(tripId, START_TIME, START_TIME + 99, fromStopIndex, toStopIndex, B, serviceDate)
+    );
   }
 
   private static Leg leg(Consumer<TestItineraryBuilder> buildOp) {

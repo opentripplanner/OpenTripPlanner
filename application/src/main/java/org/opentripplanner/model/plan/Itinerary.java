@@ -33,20 +33,20 @@ public class Itinerary implements ItinerarySortKey {
 
   /* final primitive properties */
   private final Duration duration;
-  private final Duration transitDuration;
-  private final int numberOfTransfers;
-  private final Duration waitingDuration;
-  private final double nonTransitDistanceMeters;
-  private final boolean walkOnly;
+  private final Cost generalizedCost;
   private final boolean streetOnly;
+  private final int numberOfTransfers;
+  private final Duration transitDuration;
+  private final double nonTransitDistanceMeters;
   private final Duration nonTransitDuration;
   private final Duration walkDuration;
   private final double walkDistanceMeters;
+  private final boolean walkOnly;
+  private final Duration waitingDuration;
 
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
-  private Cost generalizedCost = Cost.ZERO;
   private Integer generalizedCost2 = null;
   private TimeAndCost accessPenalty = TimeAndCost.ZERO;
   private TimeAndCost egressPenalty = TimeAndCost.ZERO;
@@ -69,39 +69,65 @@ public class Itinerary implements ItinerarySortKey {
 
   private ItineraryFares fare = ItineraryFares.empty();
 
-  private Itinerary(List<Leg> legs, boolean searchWindowAware) {
+  private Itinerary(
+    List<Leg> legs,
+    Cost generalizedCost,
+    @Nullable TimeAndCost accessPenalty,
+    @Nullable TimeAndCost egressPenalty,
+    boolean searchWindowAware
+  ) {
     setLegs(legs);
+    this.accessPenalty = Objects.requireNonNull(accessPenalty);
+    this.egressPenalty = Objects.requireNonNull(egressPenalty);
+
+    this.generalizedCost = Objects.requireNonNull(generalizedCost);
     this.searchWindowAware = searchWindowAware;
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
+
     this.duration = totals.totalDuration;
+    this.streetOnly = totals.streetOnly;
     this.numberOfTransfers = totals.transfers();
     this.transitDuration = totals.transitDuration;
     this.nonTransitDuration = totals.nonTransitDuration;
     this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
     this.walkDuration = totals.walkDuration;
     this.walkDistanceMeters = totals.walkDistanceMeters;
-    this.waitingDuration = totals.waitingDuration;
     this.walkOnly = totals.walkOnly;
-    this.streetOnly = totals.streetOnly;
+    this.waitingDuration = totals.waitingDuration;
     this.setElevationGained(totals.totalElevationGained);
     this.setElevationLost(totals.totalElevationLost);
   }
 
   /**
    * Creates an itinerary that contains scheduled transit which is aware of the search window.
+   * @param generalizedCost The total cost of the itinerary including access/egress penalty cost.
    */
-  public static Itinerary createScheduledTransitItinerary(List<Leg> legs) {
-    return new Itinerary(legs, true);
+  public static Itinerary createScheduledTransitItinerary(
+    List<Leg> legs,
+    Cost generalizedCost,
+    TimeAndCost accessPenalty,
+    TimeAndCost egressPenalty
+  ) {
+    var c = generalizedCost.minus(accessPenalty.cost().plus(egressPenalty.cost()));
+    return new Itinerary(legs, c, accessPenalty, egressPenalty, true);
+  }
+
+  /**
+   * Same as {@link #createScheduledTransitItinerary(List, Cost)} with zero access/egress time
+   * penalty.
+   */
+  public static Itinerary createScheduledTransitItinerary(List<Leg> legs, Cost generalizedCost) {
+    return new Itinerary(legs, generalizedCost, TimeAndCost.ZERO, TimeAndCost.ZERO, true);
   }
 
   /**
    * Creates an itinerary that creates only street or flex results which are not aware of the
    * time window.
    */
-  public static Itinerary createDirectItinerary(List<Leg> legs) {
-    return new Itinerary(legs, false);
+  public static Itinerary createDirectItinerary(List<Leg> legs, Cost generalizedCost) {
+    return new Itinerary(legs, generalizedCost, TimeAndCost.ZERO, TimeAndCost.ZERO, false);
   }
 
   /**
@@ -249,9 +275,13 @@ public class Itinerary implements ItinerarySortKey {
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
-    var newItin = new Itinerary(timeShiftedLegs, searchWindowAware);
-    newItin.setGeneralizedCost(getGeneralizedCost());
-    return newItin;
+    return new Itinerary(
+      timeShiftedLegs,
+      generalizedCost,
+      accessPenalty,
+      egressPenalty,
+      searchWindowAware
+    );
   }
 
   /** Total duration of the itinerary in seconds */
@@ -445,10 +475,6 @@ public class Itinerary implements ItinerarySortKey {
     return generalizedCost.plus(accessPenalty.cost().plus(egressPenalty.cost())).toSeconds();
   }
 
-  public void setGeneralizedCost(int generalizedCost) {
-    this.generalizedCost = Cost.costOfSeconds(generalizedCost);
-  }
-
   /**
    * The transit router allows the usage of a second generalized-cost parameter to be used in
    * routing. In Raptor this is called c2, but in OTP it is generalized-cost-2. What this cost
@@ -472,6 +498,10 @@ public class Itinerary implements ItinerarySortKey {
     return accessPenalty;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setAccessPenalty(TimeAndCost accessPenalty) {
     Objects.requireNonNull(accessPenalty);
     this.accessPenalty = accessPenalty;
@@ -482,6 +512,10 @@ public class Itinerary implements ItinerarySortKey {
     return egressPenalty;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setEgressPenalty(TimeAndCost egressPenalty) {
     Objects.requireNonNull(egressPenalty);
     this.egressPenalty = egressPenalty;

@@ -22,6 +22,7 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
@@ -429,11 +430,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
   public Itinerary build() {
     Itinerary itinerary;
     if (isSearchWindowAware) {
-      itinerary = Itinerary.createScheduledTransitItinerary(legs);
+      itinerary = Itinerary.createScheduledTransitItinerary(legs, Cost.costOfSeconds(c1));
     } else {
-      itinerary = Itinerary.createDirectItinerary(legs);
+      itinerary = Itinerary.createDirectItinerary(legs, Cost.costOfSeconds(c1));
     }
-    itinerary.setGeneralizedCost(c1);
     if (c2 != NOT_SET) {
       itinerary.setGeneralizedCost2(c2);
     }
@@ -471,7 +471,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     }
     int waitTime = start - lastEndTime(start);
     int legCost = 0;
-     legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
+    legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     legCost += cost(1.0f, end - start) + BOARD_COST;
 
     Trip trip = trip(tripId, route);

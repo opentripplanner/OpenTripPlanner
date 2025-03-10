@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -159,7 +160,7 @@ class AlternativeLegsTest extends GtfsTest {
         .stream()
         .map(Leg.class::cast)
         .map(List::of)
-        .map(Itinerary:: createScheduledTransitItinerary)
+        .map(it -> Itinerary.createScheduledTransitItinerary(it, Cost.ZERO))
         .toList()
     );
   }

@@ -18,6 +18,7 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Itinerary;
@@ -132,12 +133,12 @@ public class GraphPathToItineraryMapper {
       }
     }
 
-    Itinerary itinerary = Itinerary.createDirectItinerary(legs);
+    State lastState = path.states.getLast();
+    var cost = Cost.costOfSeconds(lastState.weight);
+    var itinerary = Itinerary.createDirectItinerary(legs, cost);
 
     calculateElevations(itinerary, path.edges);
 
-    State lastState = path.states.getLast();
-    itinerary.setGeneralizedCost((int) lastState.weight);
     itinerary.setArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
 
     return itinerary;

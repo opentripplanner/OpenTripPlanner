@@ -14,6 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
@@ -68,14 +69,17 @@ class EmissionsTest {
 
   @Test
   void testGetEmissionsForItinerary() {
-    Itinerary i = createScheduledTransitItinerary(List.of(createTransitLeg(ROUTE_WITH_EMISSIONS)));
+    Itinerary i = createScheduledTransitItinerary(
+      List.of(createTransitLeg(ROUTE_WITH_EMISSIONS)),
+      Cost.ZERO
+    );
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(2223.902), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
-    Itinerary i = createScheduledTransitItinerary(List.of(STREET_LEG));
+    Itinerary i = createScheduledTransitItinerary(List.of(STREET_LEG), Cost.ZERO);
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(28.0864), i.getEmissionsPerPerson().getCo2());
   }
@@ -83,7 +87,8 @@ class EmissionsTest {
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
     Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED))
+      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED)),
+      Cost.ZERO
     );
     decorateWithEmission.decorate(i);
     assertNull(i.getEmissionsPerPerson());
@@ -92,7 +97,8 @@ class EmissionsTest {
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS))
+      List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS)),
+      Cost.ZERO
     );
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(0.0), i.getEmissionsPerPerson().getCo2());
@@ -101,7 +107,8 @@ class EmissionsTest {
   @Test
   void testGetEmissionsForCombinedRoute() {
     Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG)
+      List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG),
+      Cost.ZERO
     );
     decorateWithEmission.decorate(i);
     assertEquals(new Grams(2251.9884), i.getEmissionsPerPerson().getCo2());
@@ -110,7 +117,8 @@ class EmissionsTest {
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
     Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG)
+      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG),
+      Cost.ZERO
     );
     decorateWithEmission.decorate(i);
     var emissionsResult = i.getEmissionsPerPerson() != null

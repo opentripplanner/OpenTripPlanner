@@ -11,6 +11,7 @@ import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.FrequencyTransitLegBuilder;
@@ -98,7 +99,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   public Itinerary createItinerary(RaptorPath<T> path) {
     if (path.isUnknownPath()) {
-      return mapDirectPath(path);
+      return mapUnknownRaptorPath(path);
     }
 
     var optimizedPath = path instanceof OptimizedPath ? (OptimizedPath<TripSchedule>) path : null;
@@ -145,7 +146,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Itinerary mapped = mapEgressLeg(egressPathLeg);
     legs.addAll(mapped == null ? List.of() : mapped.getLegs());
 
-    Itinerary itinerary = Itinerary.createScheduledTransitItinerary(legs);
+    var generalizedCost = Cost.costOfCentiSeconds(path.c1());
+    var accessPenalty = mapAccessEgressPenalty(accessPathLeg.access());
+    var egressPenalty = mapAccessEgressPenalty(egressPathLeg.egress());
+
+    var itinerary = Itinerary.createScheduledTransitItinerary(
+      legs,
+      generalizedCost,
+      accessPenalty,
+      egressPenalty
+    );
 
     // Map general itinerary fields
     itinerary.setArrivedAtDestinationWithRentedVehicle(
@@ -159,21 +169,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
-    var penaltyCost = 0;
-
-    var accessPenalty = mapAccessEgressPenalty(accessPathLeg.access());
-    itinerary.setAccessPenalty(accessPenalty);
-    penaltyCost += accessPenalty.cost().toSeconds();
-
-    var egressPenalty = mapAccessEgressPenalty(egressPathLeg.egress());
-    itinerary.setEgressPenalty(egressPenalty);
-    penaltyCost += egressPenalty.cost().toSeconds();
-
     if (path.isC2Set()) {
       itinerary.setGeneralizedCost2(path.c2());
     }
-
-    itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()) - penaltyCost);
 
     return itinerary;
   }
@@ -418,7 +416,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     return subItinerary.getLegs();
   }
 
-  private Itinerary mapDirectPath(RaptorPath<T> path) {
+  private Itinerary mapUnknownRaptorPath(RaptorPath<T> path) {
     return Itinerary.createScheduledTransitItinerary(
       List.of(
         new UnknownTransitPathLeg(
@@ -428,7 +426,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           createZonedDateTime(path.endTime()),
           path.numberOfTransfers()
         )
-      )
+      ),
+      Cost.costOfCentiSeconds(path.c1())
     );
   }
 
