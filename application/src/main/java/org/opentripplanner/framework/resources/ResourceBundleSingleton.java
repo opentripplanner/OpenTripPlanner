@@ -3,7 +3,6 @@ package org.opentripplanner.framework.resources;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
 
 /**
  * @author mabu
@@ -11,11 +10,7 @@ import java.util.ResourceBundle.Control;
 public enum ResourceBundleSingleton {
   INSTANCE;
 
-  static final ResourceBundle.Control noFallbackControl = Control.getNoFallbackControl(
-    Control.FORMAT_PROPERTIES
-  );
-
-  //in singleton because resurce bundles are cached based on calling class
+  //in singleton because resource bundles are cached based on calling class
   //http://java2go.blogspot.com/2010/03/dont-be-smart-never-implement-resource.html
   public String localize(String key, Locale locale) {
     if (key == null) {
@@ -25,9 +20,8 @@ public enum ResourceBundleSingleton {
       locale = Locale.ROOT;
     }
     try {
-      ResourceBundle resourceBundle;
-      resourceBundle = ResourceBundle.getBundle(
-        "WayProperties",
+      ResourceBundle resourceBundle = ResourceBundle.getBundle(
+        "translations",
         locale,
         new XMLResourceBundleControl()
       );
