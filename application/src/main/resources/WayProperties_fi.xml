@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">kuja</entry>
+  <entry key="name.bicycle_parking">polkupyöräpysäköinti</entry>
+  <entry key="name.bicycle_parking_name">polkupyöräpysäköinti {name}</entry>
+  <entry key="name.bike_path">pyörätie</entry>
+  <entry key="name.bridleway">ratsupolku</entry>
+  <entry key="name.byway">peltotie</entry>
+  <entry key="name.corridor">käytävä</entry>
+  <entry key="name.escalator">liukuportaat</entry>
+  <entry key="name.footbridge">kävelysilta</entry>
+  <entry key="name.indoor_area">sisätila</entry>
+  <entry key="name.link">liittymä</entry>
+  <entry key="name.otp_route_ref">linja {otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">liityntäpysäköinti {name}</entry>
+  <entry key="name.park_and_ride_station">liityntäpysäköinti</entry>
+  <entry key="name.parking_aisle">pysäköintialue</entry>
+  <entry key="name.path">polku</entry>
+  <entry key="name.pedestrian_area">aukio</entry>
+  <entry key="name.pedestrian_path">polku</entry>
+  <entry key="name.platform">laituri</entry>
+  <entry key="name.platform_ref">laituri {ref}</entry>
+  <entry key="name.ramp">ramppi</entry>
+  <entry key="name.road">tie</entry>
+  <entry key="name.service_road">tonttitie</entry>
+  <entry key="name.sidewalk">jalkakäytävä</entry>
+  <entry key="name.steps">rappuset</entry>
+  <entry key="name.track">ajopolku</entry>
+  <entry key="name.underpass">alikulku</entry>
+  <entry key="note.caution">Huomio!</entry>
+  <entry key="note.muddy_surface">Päällystämätön tie -- mutaista!</entry>
+  <entry key="note.toll">Maksullinen tie</entry>
+  <entry key="note.unpaved_surface">Päällystämätön tie</entry>
+
+  <entry key="corner">katujen %s ja %s kulma</entry>
+  <entry key="destination">Määränpää</entry>
+  <entry key="origin">Lähtöpaikka</entry>
+  <entry key="partOf">%s (alueella %s)</entry>
+  <entry key="unnamedStreet">nimetön</entry>
+</properties>

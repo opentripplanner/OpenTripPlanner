@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">gränden</entry>
+  <entry key="name.bicycle_parking">cykelparkering</entry>
+  <entry key="name.bicycle_parking_name">cykelparkering {name}</entry>
+  <entry key="name.bike_path">cykelvägen</entry>
+  <entry key="name.bridleway">ridvägem</entry>
+  <entry key="name.byway">vägen</entry>
+  <entry key="name.corridor">korridor</entry>
+  <entry key="name.escalator">escalator</entry>
+  <entry key="name.footbridge">gångbron</entry>
+  <entry key="name.indoor_area">inomhusomrade</entry>
+  <entry key="name.link">utfarten</entry>
+  <entry key="name.otp_route_ref">linje {otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">infartsparkering {name}</entry>
+  <entry key="name.park_and_ride_station">infartsparkering</entry>
+  <entry key="name.parking_aisle">parkeringsområdet</entry>
+  <entry key="name.path">stigen</entry>
+  <entry key="name.pedestrian_area">torget</entry>
+  <entry key="name.pedestrian_path">gångbanan</entry>
+  <entry key="name.platform">plattformen</entry>
+  <entry key="name.platform_ref">plattform {ref}</entry>
+  <entry key="name.ramp">rampen</entry>
+  <entry key="name.road">vägen</entry>
+  <entry key="name.service_road">vägen</entry>
+  <entry key="name.sidewalk">trottoaren</entry>
+  <entry key="name.steps">trappan</entry>
+  <entry key="name.track">vägen</entry>
+  <entry key="name.underpass">undergången</entry>
+  <entry key="note.caution">Akta!</entry>
+  <entry key="note.muddy_surface">Obelagd väg -- lerigt!</entry>
+  <entry key="note.toll">Vägtull</entry>
+  <entry key="note.unpaved_surface">Obelagd väg</entry>
+
+  <entry key="corner">hörnet av %s och %s</entry>
+  <entry key="partOf">%s (del av %s)</entry>
+  <entry key="unnamedStreet">namnlös</entry>
+</properties>

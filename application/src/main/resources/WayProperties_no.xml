@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">smug</entry>
+  <entry key="name.bicycle_parking">Sykkelparkering</entry>
+  <entry key="name.bicycle_parking_name">Sykkelparkering {name}</entry>
+  <entry key="name.bike_path">sykkelvei</entry>
+  <entry key="name.bridleway">bridleway</entry>
+  <entry key="name.byway">sidevei</entry>
+  <entry key="name.corridor">korridor</entry>
+  <entry key="name.escalator">escalator</entry>
+  <entry key="name.footbridge">gangbro</entry>
+  <entry key="name.indoor_area">innendors omrade</entry>
+  <entry key="name.link">av-/påkjøring</entry>
+  <entry key="name.otp_route_ref">Rute {otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">Innfartsparkering {name}</entry>
+  <entry key="name.park_and_ride_station">Innfartsparkering</entry>
+  <entry key="name.parking_aisle">parkeringsvei</entry>
+  <entry key="name.path">sti</entry>
+  <entry key="name.pedestrian_area">plass</entry>
+  <entry key="name.pedestrian_path">gangvei</entry>
+  <entry key="name.platform">plattform</entry>
+  <entry key="name.platform_ref">Plattform {ref}</entry>
+  <entry key="name.ramp">påkjøring</entry>
+  <entry key="name.road">vei</entry>
+  <entry key="name.service_road">stikkvei</entry>
+  <entry key="name.sidewalk">fortau</entry>
+  <entry key="name.steps">trapp</entry>
+  <entry key="name.track">grusvei</entry>
+  <entry key="name.underpass">undergang</entry>
+  <entry key="note.caution">Forsiktig!</entry>
+  <entry key="note.muddy_surface">Ikke asfaltert -- gjørmete!</entry>
+  <entry key="note.toll">Avgiftsbelagt vei</entry>
+  <entry key="note.unpaved_surface">Ikke asfaltert</entry>
+
+  <entry key="corner">krysset mellom %s og %s</entry>
+  <entry key="partOf">%s (del av %s)</entry>
+  <entry key="price.free">Gratis</entry>
+  <entry key="price.startMain">Første %s time(r) er %s. Deretter %s per %s time(r)</entry>
+  <entry key="unnamedStreet">gate uten navn</entry>
+</properties>

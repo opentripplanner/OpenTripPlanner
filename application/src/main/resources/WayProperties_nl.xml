@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">steegje</entry>
+  <entry key="name.bicycle_parking">Fietsenstalling</entry>
+  <entry key="name.bicycle_parking_name">Fietsenstalling {name}</entry>
+  <entry key="name.bike_path">fietspad</entry>
+  <entry key="name.bridleway">ruiterpad</entry>
+  <entry key="name.byway">byway</entry>
+  <entry key="name.corridor">gang</entry>
+  <entry key="name.escalator">escalator</entry>
+  <entry key="name.footbridge">loopbrug</entry>
+  <entry key="name.indoor_area">binnenruimte</entry>
+  <entry key="name.link">link</entry>
+  <entry key="name.otp_route_ref">Lijn {otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">P+R {name}</entry>
+  <entry key="name.park_and_ride_station">P+R</entry>
+  <entry key="name.parking_aisle">parking gangpad</entry>
+  <entry key="name.path">pad</entry>
+  <entry key="name.pedestrian_area">open ruimte</entry>
+  <entry key="name.pedestrian_path">voetpad</entry>
+  <entry key="name.platform">spoor</entry>
+  <entry key="name.platform_ref">Spoor {ref}</entry>
+  <entry key="name.ramp">helling</entry>
+  <entry key="name.road">weg</entry>
+  <entry key="name.service_road">ventweg</entry>
+  <entry key="name.sidewalk">stoep</entry>
+  <entry key="name.steps">stappen</entry>
+  <entry key="name.track">track</entry>
+  <entry key="name.underpass">onderdoorgang</entry>
+  <entry key="note.caution">Let op!</entry>
+  <entry key="note.muddy_surface">onverharde ondergrond - modderige!</entry>
+  <entry key="note.toll">Tolweg</entry>
+  <entry key="note.unpaved_surface">onverharde ondergrond</entry>
+</properties>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">ruelle</entry>
+  <entry key="name.bicycle_parking">Parking vélo</entry>
+  <entry key="name.bicycle_parking_name">Parking vélo {name}</entry>
+  <entry key="name.bike_path">piste cyclable</entry>
+  <entry key="name.bridleway">sentier équestre</entry>
+  <entry key="name.byway">route secondaire</entry>
+  <entry key="name.corridor">couloir</entry>
+  <entry key="name.escalator">escalator</entry>
+  <entry key="name.footbridge">passerelle</entry>
+  <entry key="name.indoor_area">zone intérieure</entry>
+  <entry key="name.link">bretelle d'accès</entry>
+  <entry key="name.otp_route_ref">Ligne {otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">P+R {name}</entry>
+  <entry key="name.park_and_ride_station">P+R</entry>
+  <entry key="name.parking_aisle">allée de parking</entry>
+  <entry key="name.path">chemin</entry>
+  <entry key="name.pedestrian_area">plateau piétonnier</entry>
+  <entry key="name.pedestrian_path">chemin piétonnier</entry>
+  <entry key="name.platform">plate-forme</entry>
+  <entry key="name.platform_ref">Plate-forme {ref}</entry>
+  <entry key="name.ramp">rampe d'accès</entry>
+  <entry key="name.road">route sans nom</entry>
+  <entry key="name.service_road">route de service</entry>
+  <entry key="name.sidewalk">trottoir</entry>
+  <entry key="name.steps">escalier</entry>
+  <entry key="name.track">chemin</entry>
+  <entry key="name.underpass">tunnel</entry>
+  <entry key="note.caution">Attention!</entry>
+  <entry key="note.muddy_surface">Chemin de terre</entry>
+  <entry key="note.toll">Péage</entry>
+  <entry key="note.unpaved_surface">Surface non revêtue</entry>
+
+  <entry key="corner">intersection de %s et %s</entry>
+  <entry key="partOf">%s (partie de %s)</entry>
+  <entry key="unnamedStreet">rue sans nom</entry>
+</properties>

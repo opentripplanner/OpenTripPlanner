@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">sikátor</entry>
+  <entry key="name.bicycle_parking">kerékpár parkoló</entry>
+  <entry key="name.bicycle_parking_name">kerékpár parkoló: {name}</entry>
+  <entry key="name.bike_path">kerékpárút</entry>
+  <entry key="name.bridleway">nyomvonal</entry>
+  <entry key="name.byway">mellékút</entry>
+  <entry key="name.corridor">folyoso</entry>
+  <entry key="name.escalator">escalator</entry>
+  <entry key="name.footbridge">gyaloghíd</entry>
+  <entry key="name.indoor_area">belteri terulet</entry>
+  <entry key="name.link">összekötő út</entry>
+  <entry key="name.otp_route_ref">{otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">P+R {name}</entry>
+  <entry key="name.park_and_ride_station">P+R</entry>
+  <entry key="name.parking_aisle">parkoló folyosó</entry>
+  <entry key="name.path">path</entry>
+  <entry key="name.pedestrian_area">tér</entry>
+  <entry key="name.pedestrian_path">gyalogút</entry>
+  <entry key="name.platform">kocsiállás / vágány</entry>
+  <entry key="name.platform_ref">{ref}</entry>
+  <entry key="name.ramp">feljáró</entry>
+  <entry key="name.road">út</entry>
+  <entry key="name.service_road">szervizút</entry>
+  <entry key="name.sidewalk">járda</entry>
+  <entry key="name.steps">lépcső</entry>
+  <entry key="name.track">nyomvonal</entry>
+  <entry key="name.underpass">aluljáró</entry>
+  <entry key="note.caution">Vigyázat!</entry>
+  <entry key="note.muddy_surface">burkolatlan felület -- sáros!</entry>
+  <entry key="note.toll">fizetős út</entry>
+  <entry key="note.unpaved_surface">burkolatlan felület</entry>
+
+  <entry key="corner">%s és %s sarok</entry>
+  <entry key="origin">Kiindulási pont</entry>
+  <entry key="destination">Célpont</entry>
+  <entry key="partOf">%s (%s része)</entry>
+  <entry key="price.free">Free of charge</entry>
+  <entry key="price.startMain">First %s hour(s) is %s, afterwards %s per %s hour(s)</entry>
+  <entry key="unnamedStreet">névtelen</entry>
+</properties>

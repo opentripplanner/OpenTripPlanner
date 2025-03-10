@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+  <entry key="name.alley">Gasse</entry>
+  <entry key="name.bicycle_parking">Fahrradabstellplatz</entry>
+  <entry key="name.bicycle_parking_name">Fahrradabstellplatz {name}</entry>
+  <entry key="name.bike_path">Fahrradweg</entry>
+  <entry key="name.bridleway">Reitweg</entry>
+  <entry key="name.byway">Nebenstraße</entry>
+  <entry key="name.corridor">Korridor</entry>
+  <entry key="name.escalator">Rolltreppe</entry>
+  <entry key="name.footbridge">Fußgängerbrücke</entry>
+  <entry key="name.indoor_area">Innenbereich</entry>
+  <entry key="name.link">Verbindung</entry>
+  <entry key="name.otp_route_ref">Route {otp:route_ref}</entry>
+  <entry key="name.park_and_ride_name">P+R {name}</entry>
+  <entry key="name.park_and_ride_station">P+R</entry>
+  <entry key="name.parking_aisle">Parkplatz</entry>
+  <entry key="name.path">Weg</entry>
+  <entry key="name.pedestrian_area">Fußgängerzone</entry>
+  <entry key="name.pedestrian_path">Fußweg</entry>
+  <entry key="name.platform">Plattform</entry>
+  <entry key="name.platform_ref">Plattform {ref}</entry>
+  <entry key="name.ramp">Auffahrrampe</entry>
+  <entry key="name.road">Straße</entry>
+  <entry key="name.service_road">Anliegerstraße</entry>
+  <entry key="name.sidewalk">Bürgersteig</entry>
+  <entry key="name.steps">Stufen</entry>
+  <entry key="name.track">Fahrweg</entry>
+  <entry key="name.underpass">Fußgängertunnel</entry>
+  <entry key="note.caution">Achtung!</entry>
+  <entry key="note.muddy_surface">ungepflasterte Oberfläche -- schlammig!</entry>
+  <entry key="note.toll">Toll road</entry>
+  <entry key="note.unpaved_surface">ungepflasterte Oberfläche</entry>
+
+  <entry key="corner">Kreuzung %s mit %s</entry>
+  <entry key="origin">Origin</entry>
+  <entry key="partOf">%s (Teil von %s)</entry>
+  <entry key="price.free">Free of charge</entry>
+  <entry key="price.startMain">First %s hour(s) is %s, afterwards %s per %s hour(s)</entry>
+  <entry key="unnamedStreet">unbekannte Strasse</entry>
+</properties>
