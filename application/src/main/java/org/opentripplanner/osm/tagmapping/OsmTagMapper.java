@@ -668,6 +668,8 @@ public class OsmTagMapper {
     props.createNames("highway=bridleway", "name.bridleway");
     props.createNames("highway=footway;bicycle=no", "name.pedestrian_path");
     props.createNames("highway=corridor", "name.corridor");
+    props.createNames("indoor=corridor", "name.corridor");
+    props.createNames("indoor=area", "name.indoor_area");
 
     // Platforms
     props.createNames("otp:route_ref=*", "name.otp_route_ref");
@@ -678,6 +680,7 @@ public class OsmTagMapper {
     props.createNames("railway=platform;highway=pedestrian", "name.platform");
     props.createNames("railway=platform;highway=path", "name.platform");
     props.createNames("railway=platform;highway=footway", "name.platform");
+    props.createNames("public_transport=platform", "name.platform");
     props.createNames("highway=platform", "name.platform");
     props.createNames("railway=platform", "name.platform");
     props.createNames("railway=platform;highway=footway;bicycle=no", "name.platform");

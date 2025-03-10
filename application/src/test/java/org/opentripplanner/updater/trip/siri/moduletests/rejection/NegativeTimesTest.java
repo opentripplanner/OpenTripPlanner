@@ -55,7 +55,7 @@ class NegativeTimesTest implements RealtimeTestConstants {
           .call(STOP_B1)
           .arriveAimedActual("00:01:10", "00:01:13")
           .departAimedActual("00:01:11", "00:01:12")
-          .call(STOP_B1)
+          .call(STOP_C1)
           .arriveAimedActual("00:01:20", "00:01:20")
       )
       .buildEstimatedTimetableDeliveries();
