@@ -23,7 +23,6 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.api.request.FindRegularStopsByBoundingBoxRequest;
 import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
@@ -203,6 +202,22 @@ public interface TransitService {
 
   MultiModalStation findMultiModalStation(Station station);
 
+  /**
+   * Fetch upcoming vehicle departures from a stop. It goes though all patterns passing the stop for
+   * the previous, current and next service date. It uses a priority queue to keep track of the next
+   * departures. The queue is shared between all dates, as services from the previous service date
+   * can visit the stop later than the current service date's services. This happens eg. with
+   * sleeper trains.
+   * <p>
+   * TODO: Add frequency based trips
+   *
+   * @param stop                  Stop object to perform the search for
+   * @param startTime             Start time for the search.
+   * @param timeRange             Searches forward for timeRange from startTime
+   * @param numberOfDepartures    Number of departures to fetch per pattern
+   * @param arrivalDeparture      Filter by arrivals, departures, or both
+   * @param includeCancelledTrips If true, cancelled trips will also be included in result.
+   */
   List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
     Instant startTime,
@@ -212,6 +227,13 @@ public interface TransitService {
     boolean includeCancelledTrips
   );
 
+  /**
+   * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
+   * creating complete stop timetables for a single day.
+   *
+   * @param stop        Stop object to perform the search for
+   * @param serviceDate Return all departures for the specified date
+   */
   List<StopTimesInPattern> findStopTimesInPattern(
     StopLocation stop,
     LocalDate serviceDate,
@@ -219,6 +241,24 @@ public interface TransitService {
     boolean includeCancellations
   );
 
+  /**
+   * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop for the
+   * previous, current and next service date. It uses a priority queue to keep track of the next
+   * departures. The queue is shared between all dates, as services from the previous service date
+   * can visit the stop later than the current service date's services.
+   * <p>
+   * TODO: Add frequency based trips
+   *
+   * @param stop                 Stop object to perform the search for
+   * @param pattern              Pattern object to perform the search for
+   * @param startTime            Start time for the search.
+   * @param timeRange            Searches forward for timeRange from startTime
+   * @param numberOfDepartures   Number of departures to fetch per pattern
+   * @param arrivalDeparture     Filter by arrivals, departures, or both
+   * @param includeCancellations If the result should include those trip times where either the entire
+   *                             trip or the stop at the given stop location has been cancelled.
+   *                             Deleted trips are never returned no matter the value of this parameter.
+   */
   List<TripTimeOnDate> findTripTimeOnDate(
     StopLocation stop,
     TripPattern pattern,

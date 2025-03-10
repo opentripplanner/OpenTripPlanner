@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.alternativelegs;
 
-import static org.opentripplanner.routing.stoptimes.StopTimesHelper.skipByTripCancellation;
+import static org.opentripplanner.transit.service.TripTimesHelper.skipByTripCancellation;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
