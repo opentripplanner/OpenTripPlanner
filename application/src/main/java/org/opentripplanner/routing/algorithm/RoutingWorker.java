@@ -163,7 +163,6 @@ public class RoutingWorker {
 
     return RoutingResponseMapper.map(
       request,
-      raptorSearchParamsUsed,
       result.itineraries(),
       result.errors(),
       debugTimingAggregator,

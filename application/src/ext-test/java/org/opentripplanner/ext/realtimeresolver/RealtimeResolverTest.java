@@ -64,9 +64,10 @@ class RealtimeResolverTest {
     transitService.getTransitAlertService().setAlerts(List.of(alert));
 
     var itineraries = List.of(itinerary);
-    RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
 
     assertEquals(1, itineraries.size());
+    itinerary = itineraries.getFirst();
 
     var legs = itinerary.getLegs();
     var leg1ArrivalDelay = legs
@@ -95,7 +96,7 @@ class RealtimeResolverTest {
     var transitService = new DefaultTransitService(model);
 
     var itineraries = List.of(itinerary);
-    RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
 
     assertEquals(1, itineraries.size());
 
@@ -117,7 +118,7 @@ class RealtimeResolverTest {
     var transitService = makeTransitService(patterns, serviceDate);
 
     var itineraries = List.of(staySeatedItinerary);
-    RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
 
     assertEquals(1, itineraries.size());
 
