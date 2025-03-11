@@ -32,7 +32,7 @@ class RoutingResult {
     return new RoutingResult(itineraries, null);
   }
 
-  static RoutingResult failed(List<RoutingError> errors) {
+  static RoutingResult failed(Collection<RoutingError> errors) {
     return new RoutingResult(null, errors);
   }
 
@@ -69,7 +69,7 @@ class RoutingResult {
     }
   }
 
-  void addErrors(List<RoutingError> errors) {
+  void addErrors(Collection<RoutingError> errors) {
     addToIfNotNull(this.errors, errors);
   }
 
