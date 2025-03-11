@@ -40,7 +40,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.FaresToItineraryMapper;
+import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -386,7 +386,7 @@ class GraphQLIntegrationTest {
     i1.setFare(fares);
 
     i1.setFare(fares);
-    FaresToItineraryMapper.addFaresToLegs(fares, i1);
+    ItineraryFaresDecorator.addFaresToLegs(fares, i1);
 
     i1.setAccessibilityScore(0.5f);
 

@@ -15,7 +15,7 @@ public record DecorateWithFare(FareService fareService) implements ItineraryDeco
     var fare = fareService.calculateFares(itinerary);
     if (fare != null) {
       itinerary.setFare(fare);
-      FaresToItineraryMapper.addFaresToLegs(fare, itinerary);
+      ItineraryFaresDecorator.addFaresToLegs(fare, itinerary);
     }
     return itinerary;
   }

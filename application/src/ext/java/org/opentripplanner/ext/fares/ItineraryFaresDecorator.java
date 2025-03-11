@@ -10,7 +10,7 @@ import org.opentripplanner.utils.collection.ListUtils;
 /**
  * Takes fares and applies them to the legs of an itinerary.
  */
-public class FaresToItineraryMapper {
+public class ItineraryFaresDecorator {
 
   public static void addFaresToLegs(ItineraryFares fares, Itinerary i) {
     var itineraryFareUses = fares
