@@ -132,13 +132,9 @@ public class ItineraryBuilder {
     }
   }
 
-  public ItineraryBuilder withTooSloped(boolean tooSloped) {
-    this.tooSloped = tooSloped;
-    return this;
-  }
-
-  public ItineraryBuilder withMaxSlope(Double maxSlope) {
+  public ItineraryBuilder withMaxSlope(double wheelchairPreferencesMaxSlope, double maxSlope) {
     this.maxSlope = maxSlope;
+    this.tooSloped = maxSlope > wheelchairPreferencesMaxSlope;
     return this;
   }
 

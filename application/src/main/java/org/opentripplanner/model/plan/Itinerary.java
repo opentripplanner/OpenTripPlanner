@@ -66,8 +66,8 @@ public class Itinerary implements ItinerarySortKey {
   /* ELEVATION */
   private final double elevationGained_m;
   private final double elevationLost_m;
-  private Double maxSlope;
-  private boolean tooSloped;
+  private final Double maxSlope;
+  private final boolean tooSloped;
 
   /**
    * LEGS
@@ -558,24 +558,10 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  public void setTooSloped(boolean tooSloped) {
-    this.tooSloped = tooSloped;
-  }
-
-  /**
    * The maximum slope for any part of the itinerary.
    */
   public Double getMaxSlope() {
     return maxSlope;
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  public void setMaxSlope(Double maxSlope) {
-    this.maxSlope = DoubleUtils.roundTo2Decimals(maxSlope);
   }
 
   /**
