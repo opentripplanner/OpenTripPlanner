@@ -153,8 +153,8 @@ public class ItineraryBuilder {
     return this;
   }
 
-  public Leg firstLeg() {
-    return legs.getFirst();
+  public List<Leg> legs() {
+    return legs;
   }
 
   /**
