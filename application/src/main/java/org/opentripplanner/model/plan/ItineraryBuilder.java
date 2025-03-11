@@ -1,8 +1,10 @@
 package org.opentripplanner.model.plan;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.model.SystemNotice;
 
 public class ItineraryBuilder {
 
@@ -29,6 +31,9 @@ public class ItineraryBuilder {
   /* LEGS */
   List<Leg> legs;
 
+  /* ITINERARY LIFECYCLE - This is copied over, but not possible to modify in the builder. */
+  final List<SystemNotice> systemNotices;
+
   /* SANDBOX EXPERIMENTAL PROPERTIES */
   Float accessibilityScore;
   Emissions emissionsPerPerson;
@@ -36,10 +41,16 @@ public class ItineraryBuilder {
   ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
     this.legs = legs;
     this.searchWindowAware = searchWindowAware;
+
+    // Initialize Itinerary mutable fields, these are not mutable in this builder, but we need to
+    // initialize them here for the #build(), Itinerary#init() and Itinerary#copyOf() to work
+    // correctly.
+    this.systemNotices = new ArrayList<>();
   }
 
   ItineraryBuilder(Itinerary itinerary) {
-    this(itinerary.getLegs(), itinerary.isSearchWindowAware());
+    this.legs = itinerary.getLegs();
+    this.searchWindowAware = itinerary.isSearchWindowAware();
     this.accessPenalty = itinerary.getAccessPenalty();
     this.egressPenalty = itinerary.getEgressPenalty();
     this.generalizedCost = Cost.costOfSeconds(itinerary.getGeneralizedCostIncludingPenalty());
@@ -57,7 +68,10 @@ public class ItineraryBuilder {
     this.arrivedAtDestinationWithRentedVehicle =
       itinerary.isArrivedAtDestinationWithRentedVehicle();
 
-    /* Sandbox experimental properties */
+    // Itinerary Lifecycle - mutable in itinerary, not mutable here
+    this.systemNotices = itinerary.privateSystemNoticesForBuilder();
+
+    // Sandbox experimental properties
     this.accessibilityScore = itinerary.getAccessibilityScore();
     this.emissionsPerPerson = itinerary.getEmissionsPerPerson();
   }
@@ -140,9 +154,6 @@ public class ItineraryBuilder {
   }
 
   public Itinerary build() {
-    // Remove penalty from "total" generalized-cost
-    var c = generalizedCost.minus(accessPenalty.cost().plus(egressPenalty.cost()));
-
     return new Itinerary(this);
   }
 }

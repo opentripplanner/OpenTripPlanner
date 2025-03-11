@@ -3,7 +3,6 @@ package org.opentripplanner.model.plan;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -84,7 +83,7 @@ public class Itinerary implements ItinerarySortKey {
    * The systemNotices is part of the itinerary "life-cycle" and is intended to be
    * MUTABLE. We add new system-notices as part of the itinerary filter chain.
    */
-  private final List<SystemNotice> systemNotices = new ArrayList<>();
+  private final List<SystemNotice> systemNotices;
 
   /* SANDBOX EXPERIMENTAL PROPERTIES */
 
@@ -108,6 +107,7 @@ public class Itinerary implements ItinerarySortKey {
     this.tooSloped = builder.tooSloped;
     this.maxSlope = builder.maxSlope;
     this.arrivedAtDestinationWithRentedVehicle = builder.arrivedAtDestinationWithRentedVehicle;
+    this.systemNotices = builder.systemNotices;
     this.accessibilityScore = builder.accessibilityScore;
     this.emissionsPerPerson = builder.emissionsPerPerson;
 
@@ -351,6 +351,10 @@ public class Itinerary implements ItinerarySortKey {
    */
   public List<SystemNotice> getSystemNotices() {
     return List.copyOf(systemNotices);
+  }
+
+  List<SystemNotice> privateSystemNoticesForBuilder() {
+    return systemNotices;
   }
 
   /**
