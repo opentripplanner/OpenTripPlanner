@@ -31,45 +31,65 @@ public class Itinerary implements ItinerarySortKey {
 
   public static final int UNKNOWN = -1;
 
-  /* final primitive properties */
+  /* GENERAL */
   private final Duration duration;
-  private final Cost generalizedCost;
-  private final boolean streetOnly;
-  private final int numberOfTransfers;
-  private final Duration transitDuration;
-  private final double nonTransitDistanceMeters;
-  private final Duration nonTransitDuration;
-  private final Duration walkDuration;
-  private final double walkDistanceMeters;
-  private final boolean walkOnly;
-  private final Duration waitingDuration;
+  private final boolean searchWindowAware;
 
-  /* mutable primitive properties */
-  private Double elevationLost = 0.0;
-  private Double elevationGained = 0.0;
+  /* COST AND PENALTY */
+  private final TimeAndCost accessPenalty;
+  private final TimeAndCost egressPenalty;
+  private final Cost generalizedCost;
 
   @Nullable
   private final Integer generalizedCost2;
 
-  private final TimeAndCost accessPenalty;
-  private final TimeAndCost egressPenalty;
-  private final int waitTimeOptimizedCost;
   private final int transferPriorityCost;
-  private boolean tooSloped = false;
-  private Double maxSlope = null;
+  private final int waitTimeOptimizedCost;
+
+  /* TRANSIT */
+  private final int numberOfTransfers;
+  private final Duration transitDuration;
+
+  /* STREET AND WALK */
+  private final double nonTransitDistanceMeters;
+  private final Duration nonTransitDuration;
+  private final boolean streetOnly;
+  private final double walkDistanceMeters;
+  private final Duration walkDuration;
+  private final boolean walkOnly;
+
+  /* RENATL */
   private final boolean arrivedAtDestinationWithRentedVehicle;
 
-  /* Sandbox experimental properties */
-  private Float accessibilityScore;
+  /* WAIT */
+  private final Duration waitingDuration;
 
-  private Emissions emissionsPerPerson;
+  /* ELEVATION */
+  private Double elevationGained;
+  private Double elevationLost;
+  private Double maxSlope;
+  private boolean tooSloped;
 
-  /* other properties */
-
-  private final List<SystemNotice> systemNotices = new ArrayList<>();
-  private final boolean searchWindowAware;
+  /**
+   * LEGS
+   *
+   * TODO Legs should be final, we iterate over them an calculate "total" values in the constructor
+   *      - these totals may easily get out of sync by a mistake if the legs are mutable.
+   */
   private List<Leg> legs;
 
+  /* ITINERARY LIFECYCLE - MUTABLE FIELDS */
+
+  /**
+   * The systemNotices is part of the itinerary "life-cycle" and is intended to be
+   * MUTABLE. We add new system-notices as part of the itinerary filter chain.
+   */
+  private final List<SystemNotice> systemNotices = new ArrayList<>();
+
+  /* SANDBOX EXPERIMENTAL PROPERTIES */
+
+  private Float accessibilityScore;
+  private Emissions emissionsPerPerson;
   private ItineraryFares fare = ItineraryFares.empty();
 
   Itinerary(ItineraryBuilder builder) {
@@ -385,6 +405,12 @@ public class Itinerary implements ItinerarySortKey {
     return (StreetLeg) legs.get(index);
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder. This is particular problematic because
+   *             there is no way to verify that the totals calculated in the constructor is still
+   *             valid.
+   */
+  @Deprecated
   public void setLegs(List<Leg> legs) {
     this.legs = List.copyOf(legs);
   }
@@ -410,6 +436,10 @@ public class Itinerary implements ItinerarySortKey {
     return accessibilityScore;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setAccessibilityScore(Float accessibilityScore) {
     this.accessibilityScore = accessibilityScore;
   }
@@ -430,6 +460,10 @@ public class Itinerary implements ItinerarySortKey {
     return elevationLost;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setElevationLost(Double elevationLost) {
     this.elevationLost = DoubleUtils.roundTo2Decimals(elevationLost);
   }
@@ -442,6 +476,10 @@ public class Itinerary implements ItinerarySortKey {
     return elevationGained;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setElevationGained(Double elevationGained) {
     this.elevationGained = DoubleUtils.roundTo2Decimals(elevationGained);
   }
@@ -588,6 +626,10 @@ public class Itinerary implements ItinerarySortKey {
     return fare;
   }
 
+  /**
+   * @deprecated Replace setters with ItineraryBuilder
+   */
+  @Deprecated
   public void setFare(ItineraryFares fare) {
     this.fare = fare;
   }
@@ -601,8 +643,9 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * The emissions of this itinerary.
+   * @deprecated Replace setters with ItineraryBuilder
    */
+  @Deprecated
   public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
     this.emissionsPerPerson = emissionsPerPerson;
   }

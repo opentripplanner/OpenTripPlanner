@@ -6,38 +6,46 @@ import org.opentripplanner.framework.model.TimeAndCost;
 
 public class ItineraryBuilder {
 
-  List<Leg> legs;
+  /* GENERAL */
+  final boolean searchWindowAware;
 
-  // Cost & penalty
+  /* COST AND PENALTY */
+  TimeAndCost accessPenalty = TimeAndCost.ZERO;
+  TimeAndCost egressPenalty = TimeAndCost.ZERO;
   Cost generalizedCost = null;
   Integer generalizedCost2 = null;
   int transferPriorityCost = Itinerary.UNKNOWN;
   int waitTimeOptimizedCost = Itinerary.UNKNOWN;
-  TimeAndCost accessPenalty = TimeAndCost.ZERO;
-  TimeAndCost egressPenalty = TimeAndCost.ZERO;
 
-  // Elevation
-  Double elevationLost = 0.0;
-  Double elevationGained = 0.0;
-  boolean tooSloped = false;
-  Double maxSlope = null;
-
-  // Flags
+  /* RENATL */
   boolean arrivedAtDestinationWithRentedVehicle = false;
-  boolean searchWindowAware;
 
-  /* Sandbox experimental properties */
+  /* ELEVATION */
+  Double elevationGained = 0.0;
+  Double elevationLost = 0.0;
+  Double maxSlope = null;
+  boolean tooSloped = false;
+
+  /* LEGS */
+  List<Leg> legs;
+
+  /* SANDBOX EXPERIMENTAL PROPERTIES */
   Float accessibilityScore;
   Emissions emissionsPerPerson;
 
+  ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
+    this.legs = legs;
+    this.searchWindowAware = searchWindowAware;
+  }
+
   ItineraryBuilder(Itinerary itinerary) {
     this(itinerary.getLegs(), itinerary.isSearchWindowAware());
+    this.accessPenalty = itinerary.getAccessPenalty();
+    this.egressPenalty = itinerary.getEgressPenalty();
     this.generalizedCost = Cost.costOfSeconds(itinerary.getGeneralizedCostIncludingPenalty());
     this.generalizedCost2 = itinerary.getGeneralizedCost2().orElse(null);
     this.transferPriorityCost = itinerary.getTransferPriorityCost();
     this.waitTimeOptimizedCost = itinerary.getWaitTimeOptimizedCost();
-    this.accessPenalty = itinerary.getAccessPenalty();
-    this.egressPenalty = itinerary.getEgressPenalty();
 
     // Elevation
     this.elevationLost = itinerary.getElevationLost();
@@ -52,11 +60,6 @@ public class ItineraryBuilder {
     /* Sandbox experimental properties */
     this.accessibilityScore = itinerary.getAccessibilityScore();
     this.emissionsPerPerson = itinerary.getEmissionsPerPerson();
-  }
-
-  ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
-    this.legs = legs;
-    this.searchWindowAware = searchWindowAware;
   }
 
   /**
@@ -123,11 +126,6 @@ public class ItineraryBuilder {
     boolean arrivedAtDestinationWithRentedVehicle
   ) {
     this.arrivedAtDestinationWithRentedVehicle = arrivedAtDestinationWithRentedVehicle;
-    return this;
-  }
-
-  public ItineraryBuilder withSearchWindowAware(boolean searchWindowAware) {
-    this.searchWindowAware = searchWindowAware;
     return this;
   }
 
