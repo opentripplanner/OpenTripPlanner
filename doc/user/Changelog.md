@@ -112,6 +112,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Conditionally wait for previous polling task [#6401](https://github.com/opentripplanner/OpenTripPlanner/pull/6401)
 - Reject SIRI messages with invalid stops and missing times [#6499](https://github.com/opentripplanner/OpenTripPlanner/pull/6499)
 - Add default unknown_producer tag value to the producer tag of the StreamingTripUpdateMetrics [#6513](https://github.com/opentripplanner/OpenTripPlanner/pull/6513)
+- Add debug layer for rental entities [#6520](https://github.com/opentripplanner/OpenTripPlanner/pull/6520)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.6.0 (2024-09-18)
