@@ -47,7 +47,10 @@ public class Itinerary implements ItinerarySortKey {
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
-  private Integer generalizedCost2 = null;
+
+  @Nullable
+  private final Integer generalizedCost2;
+
   private final TimeAndCost accessPenalty;
   private final TimeAndCost egressPenalty;
   private final int waitTimeOptimizedCost;
@@ -479,14 +482,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public Optional<Integer> getGeneralizedCost2() {
     return Optional.ofNullable(generalizedCost2);
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setGeneralizedCost2(Integer generalizedCost2) {
-    this.generalizedCost2 = generalizedCost2;
   }
 
   @Nullable
