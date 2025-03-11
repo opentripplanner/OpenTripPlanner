@@ -17,7 +17,7 @@ class RentalPropertyMapper extends PropertyMapper<VehicleRentalPlace> {
   protected Collection<KeyValue> map(VehicleRentalPlace input) {
     var base = List.of(
       kv("class", input.getClass().getSimpleName()),
-      kv("id", input.getName()),
+      kv("id", input.getId()),
       kv("network", input.getNetwork()),
       kv("vehiclesAvailable", input.getVehiclesAvailable()),
       kv("spacesAvailable", input.getSpacesAvailable())
