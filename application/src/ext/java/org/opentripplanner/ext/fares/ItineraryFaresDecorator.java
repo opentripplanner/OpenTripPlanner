@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares;
 
+import java.util.List;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.FareProductAware;
@@ -10,10 +11,23 @@ import org.opentripplanner.utils.collection.ListUtils;
 /**
  * Takes fares and applies them to the legs of an itinerary.
  */
-public class ItineraryFaresDecorator {
+public final class ItineraryFaresDecorator {
 
-  public static void addFaresToLegs(ItineraryFares fares, Itinerary i) {
-    var itineraryFareUses = fares
+  private final ItineraryFares fare;
+  private final List<FareProductUse> itineraryFareUses;
+
+  public ItineraryFaresDecorator(ItineraryFares fare, List<FareProductUse> itineraryFareUses) {
+    this.fare = fare;
+    this.itineraryFareUses = itineraryFareUses;
+  }
+
+  public static Itinerary decorateItineraryWithFare(Itinerary i, ItineraryFares fare) {
+    var legDecorator = new ItineraryFaresDecorator(fare, createItineraryFareUses(i, fare));
+    return i.copyOf().withFare(fare).transformTransitLegs(legDecorator::decorateTransitLeg).build();
+  }
+
+  private static List<FareProductUse> createItineraryFareUses(Itinerary i, ItineraryFares fare) {
+    return fare
       .getItineraryProducts()
       .stream()
       .map(fp -> {
@@ -21,15 +35,14 @@ public class ItineraryFaresDecorator {
         return new FareProductUse(instanceId, fp);
       })
       .toList();
+  }
 
-    i.transformTransitLegs(leg -> {
-      var legUses = fares.getLegProducts().get(leg);
-      var allUses = ListUtils.combine(itineraryFareUses, legUses);
-      if (leg instanceof FareProductAware<TransitLeg> fpa) {
-        return fpa.decorateWithFareProducts(allUses);
-      } else {
-        return leg;
-      }
-    });
+  private TransitLeg decorateTransitLeg(TransitLeg leg) {
+    var legUses = fare.getLegProducts().get(leg);
+    var allUses = ListUtils.combine(itineraryFareUses, legUses);
+
+    return (leg instanceof FareProductAware<TransitLeg> fpa)
+      ? fpa.decorateWithFareProducts(allUses)
+      : leg;
   }
 }

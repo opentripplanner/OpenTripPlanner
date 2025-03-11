@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
@@ -147,6 +148,28 @@ public class ItineraryBuilder {
     return this;
   }
 
+  public Leg firstLeg() {
+    return legs.getFirst();
+  }
+
+  /**
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
+   * legs of this Itinerary.
+   */
+  public ItineraryBuilder transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+    legs = legs
+      .stream()
+      .map(l -> {
+        if (l instanceof TransitLeg tl) {
+          return mapper.apply(tl);
+        } else {
+          return l;
+        }
+      })
+      .toList();
+    return this;
+  }
+
   public ItineraryBuilder withAccessibilityScore(Float accessibilityScore) {
     this.accessibilityScore = accessibilityScore;
     return this;
@@ -155,6 +178,10 @@ public class ItineraryBuilder {
   public ItineraryBuilder withEmissionsPerPerson(Emissions emissionsPerPerson) {
     this.emissionsPerPerson = emissionsPerPerson;
     return this;
+  }
+
+  public ItineraryFares fare() {
+    return fare;
   }
 
   public ItineraryBuilder withFare(ItineraryFares fare) {
