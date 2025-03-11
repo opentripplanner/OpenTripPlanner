@@ -15,25 +15,25 @@ import org.opentripplanner.routing.api.response.RoutingError;
  * itineraries from multiple routers (direct street/transit/flex) into one set. It also has
  * methods to transform the current set of itineraries to a new set, see {@link #transform(Function)}.
  */
-class RouteResult {
+class RoutingResult {
 
   private final List<Itinerary> itineraries = new ArrayList<>();
   private final Set<RoutingError> errors = new HashSet<>();
 
-  RouteResult(Collection<Itinerary> itineraries, Collection<RoutingError> errors) {
+  RoutingResult(Collection<Itinerary> itineraries, Collection<RoutingError> errors) {
     addAll(itineraries, errors);
   }
 
-  static RouteResult empty() {
-    return new RouteResult(null, null);
+  static RoutingResult empty() {
+    return new RoutingResult(null, null);
   }
 
-  static RouteResult ok(List<Itinerary> itineraries) {
-    return new RouteResult(itineraries, null);
+  static RoutingResult ok(List<Itinerary> itineraries) {
+    return new RoutingResult(itineraries, null);
   }
 
-  static RouteResult failed(List<RoutingError> errors) {
-    return new RouteResult(null, errors);
+  static RoutingResult failed(List<RoutingError> errors) {
+    return new RoutingResult(null, errors);
   }
 
   List<Itinerary> itineraries() {
@@ -44,8 +44,8 @@ class RouteResult {
     return errors;
   }
 
-  void merge(RouteResult... others) {
-    for (RouteResult it : others) {
+  void merge(RoutingResult... others) {
+    for (RoutingResult it : others) {
       addAll(it.itineraries, it.errors);
     }
   }

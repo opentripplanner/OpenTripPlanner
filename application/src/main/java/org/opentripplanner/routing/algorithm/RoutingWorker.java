@@ -99,7 +99,7 @@ public class RoutingWorker {
 
     this.debugTimingAggregator.finishedPrecalculating();
 
-    var result = RouteResult.empty();
+    var result = RoutingResult.empty();
 
     if (OTPFeature.ParallelRouting.isOn()) {
       // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
@@ -217,7 +217,7 @@ public class RoutingWorker {
       : Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
   }
 
-  private RouteResult routeDirectStreet() {
+  private RoutingResult routeDirectStreet() {
     // TODO: Add support for via search to the direct-street search and remove this.
     //       The direct search is used to prune away silly transit results and it
     //       would be nice to also support via as a feature in the direct-street
@@ -228,29 +228,29 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      return RouteResult.ok(DirectStreetRouter.route(serverContext, request));
+      return RoutingResult.ok(DirectStreetRouter.route(serverContext, request));
     } catch (RoutingValidationException e) {
-      return RouteResult.failed(e.getRoutingErrors());
+      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectStreetRouter();
     }
   }
 
-  private RouteResult routeDirectFlex() {
+  private RoutingResult routeDirectFlex() {
     if (!OTPFeature.FlexRouting.isOn()) {
-      return RouteResult.ok(List.of());
+      return RoutingResult.ok(List.of());
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      return RouteResult.ok(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
+      return RoutingResult.ok(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
     } catch (RoutingValidationException e) {
-      return RouteResult.failed(e.getRoutingErrors());
+      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
     }
   }
 
-  private RouteResult routeTransit() {
+  private RoutingResult routeTransit() {
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
@@ -262,9 +262,9 @@ public class RoutingWorker {
         debugTimingAggregator
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
-      return RouteResult.ok(transitResults.getItineraries());
+      return RoutingResult.ok(transitResults.getItineraries());
     } catch (RoutingValidationException e) {
-      return RouteResult.failed(e.getRoutingErrors());
+      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedTransitRouter();
     }
