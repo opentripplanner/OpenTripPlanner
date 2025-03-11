@@ -117,7 +117,7 @@ class ScheduledDeviatedTripIntegrationTest {
     var itineraries = router
       .createFlexOnlyItineraries(false)
       .stream()
-      .peek(filter::decorate)
+      .map(filter::decorate)
       .toList();
 
     var itinerary = itineraries.getFirst();

@@ -3,7 +3,6 @@ package org.opentripplanner.ext.stopconsolidation;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
-import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLegBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -24,9 +23,10 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   }
 
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     replaceConsolidatedStops(itinerary);
     removeShortWalkLegs(itinerary);
+    return itinerary;
   }
 
   /**

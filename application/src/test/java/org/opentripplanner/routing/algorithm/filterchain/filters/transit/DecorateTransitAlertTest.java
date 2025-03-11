@@ -29,14 +29,14 @@ class DecorateTransitAlertTest implements PlanTestConstants {
 
     // Given a list with one itinerary
     var i1 = newItinerary(A).bus(31, 0, 30, E).build();
-    decorator.decorate(i1);
+    i1 = decorator.decorate(i1);
 
     // Then: expect correct alerts to be added
     assertEquals(1, i1.getLegs().getFirst().getTransitAlerts().size());
     assertEquals(ID, i1.getLegs().getFirst().getTransitAlerts().iterator().next().getId());
 
     var i2 = newItinerary(B).rail(21, 0, 30, E).build();
-    decorator.decorate(i2);
+    i2 = decorator.decorate(i2);
 
     assertEquals(0, i2.getLegs().getFirst().getTransitAlerts().size());
   }
@@ -51,7 +51,7 @@ class DecorateTransitAlertTest implements PlanTestConstants {
 
     // Given a list with one itinerary
     var i1 = newItinerary(A).bus(31, 0, 30, E).build();
-    decorator.decorate(i1);
+    i1 = decorator.decorate(i1);
 
     // Then: expect correct alerts to be added
     assertEquals(1, i1.getLegs().getFirst().getTransitAlerts().size());

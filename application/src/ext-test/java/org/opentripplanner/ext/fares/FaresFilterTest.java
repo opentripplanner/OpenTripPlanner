@@ -40,7 +40,7 @@ public class FaresFilterTest implements PlanTestConstants {
 
     var filter = new DecorateWithFare((FareService) itinerary -> fares);
 
-    filter.decorate(i1);
+    i1 = filter.decorate(i1);
 
     assertEquals(fares, i1.getFares());
 

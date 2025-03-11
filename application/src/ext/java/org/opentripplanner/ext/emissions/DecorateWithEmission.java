@@ -22,7 +22,7 @@ import org.opentripplanner.utils.lang.Sandbox;
 public record DecorateWithEmission(EmissionsService emissionsService)
   implements ItineraryDecorator {
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     List<TransitLeg> transitLegs = itinerary
       .getLegs()
       .stream()
@@ -33,7 +33,7 @@ public record DecorateWithEmission(EmissionsService emissionsService)
     Optional<Grams> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
 
     if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
-      return;
+      return itinerary;
     }
 
     List<StreetLeg> carLegs = itinerary
@@ -53,6 +53,7 @@ public record DecorateWithEmission(EmissionsService emissionsService)
     } else if (co2ForCar.isPresent()) {
       itinerary.setEmissionsPerPerson(new Emissions(co2ForCar.get()));
     }
+    return itinerary;
   }
 
   private Optional<Grams> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {

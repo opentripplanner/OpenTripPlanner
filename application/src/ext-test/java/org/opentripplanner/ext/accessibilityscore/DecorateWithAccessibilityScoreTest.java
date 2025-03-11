@@ -54,7 +54,7 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
   @ParameterizedTest
   @MethodSource("accessibilityScoreTestCase")
   void accessibilityScoreTest(Itinerary itinerary, float expectedAccessibilityScore) {
-    DECORATOR.decorate(itinerary);
+    itinerary = DECORATOR.decorate(itinerary);
 
     assertEquals(expectedAccessibilityScore, itinerary.getAccessibilityScore());
 
@@ -73,7 +73,7 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
   @ParameterizedTest
   void noScoreForNonWalking(Function<TestItineraryBuilder, TestItineraryBuilder> modifier) {
     var itinerary = modifier.apply(newItinerary(A, 0)).build();
-    DECORATOR.decorate(itinerary);
+    itinerary = DECORATOR.decorate(itinerary);
     assertNull(itinerary.getAccessibilityScore());
     itinerary.getLegs().forEach(l -> assertNull(l.accessibilityScore()));
   }

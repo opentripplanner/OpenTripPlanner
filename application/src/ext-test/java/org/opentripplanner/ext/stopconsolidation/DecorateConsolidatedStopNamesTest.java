@@ -10,7 +10,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.impl.FareModelForTest;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
@@ -46,7 +45,7 @@ class DecorateConsolidatedStopNamesTest {
 
     itinerary.setLegs(legs);
 
-    filter.decorate(itinerary);
+    itinerary = filter.decorate(itinerary);
 
     var updatedLeg = itinerary.getLegs().getFirst();
     assertEquals(STOP_C.getName(), updatedLeg.getFrom().name);
@@ -66,7 +65,7 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    filter.decorate(itinerary);
+    itinerary = filter.decorate(itinerary);
 
     var legs = itinerary.getLegs().stream().map(Leg::getClass).toList();
     assertEquals(List.of(ConsolidatedStopLeg.class, ScheduledTransitLeg.class), legs);
@@ -82,7 +81,7 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    filter.decorate(itinerary);
+    itinerary = filter.decorate(itinerary);
 
     var legs = itinerary.getLegs().stream().map(Leg::getClass).toList();
     assertEquals(

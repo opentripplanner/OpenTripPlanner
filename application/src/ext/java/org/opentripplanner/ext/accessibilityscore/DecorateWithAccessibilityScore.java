@@ -50,8 +50,9 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
   }
 
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     addAccessibilityScore(itinerary);
+    return itinerary;
   }
 
   private static double accessibilityScore(Accessibility wheelchair) {

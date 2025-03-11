@@ -70,42 +70,42 @@ class EmissionsTest {
   @Test
   void testGetEmissionsForItinerary() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
-    decorateWithEmission.decorate(i);
+    i = decorateWithEmission.decorate(i);
     assertEquals(new Grams(2223.902), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
     var i = createItinerary(STREET_LEG);
-    decorateWithEmission.decorate(i);
+    i = decorateWithEmission.decorate(i);
     assertEquals(new Grams(28.0864), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
     var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED));
-    decorateWithEmission.decorate(i);
+    i = decorateWithEmission.decorate(i);
     assertNull(i.getEmissionsPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
-    decorateWithEmission.decorate(i);
+    i = decorateWithEmission.decorate(i);
     assertEquals(new Grams(0.0), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
-    decorateWithEmission.decorate(i);
+    i = decorateWithEmission.decorate(i);
     assertEquals(new Grams(2251.9884), i.getEmissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG);
-    decorateWithEmission.decorate(i);
+    i = decorateWithEmission.decorate(i);
     var emissionsResult = i.getEmissionsPerPerson() != null
       ? i.getEmissionsPerPerson().getCo2()
       : null;

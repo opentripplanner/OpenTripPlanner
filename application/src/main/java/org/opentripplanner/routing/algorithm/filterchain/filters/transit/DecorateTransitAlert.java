@@ -21,7 +21,7 @@ public class DecorateTransitAlert implements ItineraryDecorator {
   }
 
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     final var firstLeg = Box.of(true);
     itinerary.transformTransitLegs(leg -> {
       if (leg.isTransitLeg()) {
@@ -32,5 +32,6 @@ public class DecorateTransitAlert implements ItineraryDecorator {
         return leg;
       }
     });
+    return itinerary;
   }
 }

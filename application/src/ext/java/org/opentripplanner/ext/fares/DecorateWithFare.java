@@ -11,11 +11,12 @@ import org.opentripplanner.routing.fares.FareService;
  */
 public record DecorateWithFare(FareService fareService) implements ItineraryDecorator {
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     var fare = fareService.calculateFares(itinerary);
     if (fare != null) {
       itinerary.setFare(fare);
       FaresToItineraryMapper.addFaresToLegs(fare, itinerary);
     }
+    return itinerary;
   }
 }
