@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -72,12 +71,7 @@ public class Itinerary implements ItinerarySortKey {
   private final Double maxSlope;
   private final boolean tooSloped;
 
-  /**
-   * LEGS
-   *
-   * TODO Legs should be final, we iterate over them an calculate "total" values in the constructor
-   *      - these totals may easily get out of sync by a mistake if the legs are mutable.
-   */
+  /* LEGS */
   private List<Leg> legs;
 
   /* ITINERARY LIFECYCLE - MUTABLE FIELDS */
@@ -368,25 +362,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public List<Leg> getLegs() {
     return legs;
-  }
-
-  /**
-   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
-   * legs of this Itinerary.
-   * <p>
-   * NOTE: The itinerary is mutable so the transformation is done in-place!
-   */
-  public void transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
-    legs = legs
-      .stream()
-      .map(l -> {
-        if (l instanceof TransitLeg tl) {
-          return mapper.apply(tl);
-        } else {
-          return l;
-        }
-      })
-      .toList();
   }
 
   public Stream<StreetLeg> getStreetLegs() {

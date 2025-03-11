@@ -366,7 +366,7 @@ class GraphQLIntegrationTest {
       .carHail(D10m, E)
       .build();
 
-    add10MinuteDelay(i1);
+    i1 = add10MinuteDelay(i1);
 
     var busLeg = i1.getTransitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
@@ -452,18 +452,21 @@ class GraphQLIntegrationTest {
     }
   }
 
-  private static void add10MinuteDelay(Itinerary i1) {
-    i1.transformTransitLegs(tl -> {
-      if (tl instanceof ScheduledTransitLeg stl) {
-        var rtt = (RealTimeTripTimes) stl.getTripTimes();
+  private static Itinerary add10MinuteDelay(Itinerary i1) {
+    return i1
+      .copyOf()
+      .transformTransitLegs(tl -> {
+        if (tl instanceof ScheduledTransitLeg stl) {
+          var rtt = (RealTimeTripTimes) stl.getTripTimes();
 
-        for (var i = 0; i < rtt.getNumStops(); i++) {
-          rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
-          rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+          for (var i = 0; i < rtt.getNumStops(); i++) {
+            rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
+            rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+          }
         }
-      }
-      return tl;
-    });
+        return tl;
+      })
+      .build();
   }
 
   @FilePatternSource(
