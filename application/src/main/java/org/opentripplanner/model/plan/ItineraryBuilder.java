@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.fare.ItineraryFares;
 
 public class ItineraryBuilder {
 
@@ -37,6 +38,7 @@ public class ItineraryBuilder {
   /* SANDBOX EXPERIMENTAL PROPERTIES */
   Float accessibilityScore;
   Emissions emissionsPerPerson;
+  ItineraryFares fare = ItineraryFares.empty();
 
   ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
     this.legs = legs;
@@ -74,6 +76,7 @@ public class ItineraryBuilder {
     // Sandbox experimental properties
     this.accessibilityScore = itinerary.getAccessibilityScore();
     this.emissionsPerPerson = itinerary.getEmissionsPerPerson();
+    this.fare = itinerary.getFares();
   }
 
   /**
@@ -152,6 +155,11 @@ public class ItineraryBuilder {
 
   public ItineraryBuilder withEmissionsPerPerson(Emissions emissionsPerPerson) {
     this.emissionsPerPerson = emissionsPerPerson;
+    return this;
+  }
+
+  public ItineraryBuilder withFare(ItineraryFares fare) {
+    this.fare = fare;
     return this;
   }
 

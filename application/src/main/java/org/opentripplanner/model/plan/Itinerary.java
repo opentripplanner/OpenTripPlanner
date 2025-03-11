@@ -89,7 +89,7 @@ public class Itinerary implements ItinerarySortKey {
 
   private Float accessibilityScore;
   private Emissions emissionsPerPerson;
-  private ItineraryFares fare = ItineraryFares.empty();
+  private final ItineraryFares fare;
 
   Itinerary(ItineraryBuilder builder) {
     this.legs = List.copyOf(builder.legs);
@@ -108,6 +108,7 @@ public class Itinerary implements ItinerarySortKey {
     this.systemNotices = builder.systemNotices;
     this.accessibilityScore = builder.accessibilityScore;
     this.emissionsPerPerson = builder.emissionsPerPerson;
+    this.fare = builder.fare;
 
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
@@ -598,21 +599,6 @@ public class Itinerary implements ItinerarySortKey {
     }
   }
 
-  /**
-   * The fare products of this itinerary.
-   */
-  public ItineraryFares getFares() {
-    return fare;
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setFare(ItineraryFares fare) {
-    this.fare = fare;
-  }
-
   public List<ScheduledTransitLeg> getScheduledTransitLegs() {
     return getLegs()
       .stream()
@@ -646,6 +632,13 @@ public class Itinerary implements ItinerarySortKey {
    */
   public Duration walkDuration() {
     return walkDuration;
+  }
+
+  /**
+   * The fare products of this itinerary.
+   */
+  public ItineraryFares getFares() {
+    return fare;
   }
 
   /** @see #equals(Object) */
@@ -685,8 +678,8 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("elevationLost", elevationLost_m, "m")
       .addNum("elevationGained", elevationGained_m, "m")
       .addCol("legs", legs)
-      .addObj("fare", fare)
       .addObj("emissionsPerPerson", emissionsPerPerson)
+      .addObj("fare", fare)
       .toString();
   }
 

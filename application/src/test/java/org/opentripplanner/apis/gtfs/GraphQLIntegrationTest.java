@@ -383,9 +383,8 @@ class GraphQLIntegrationTest {
     var singleTicket = fareProduct("single-ticket");
     fares.addFareProduct(railLeg, singleTicket);
     fares.addFareProduct(busLeg, singleTicket);
-    i1.setFare(fares);
 
-    i1.setFare(fares);
+    i1 = i1.copyOf().withFare(fares).build();
     ItineraryFaresDecorator.addFaresToLegs(fares, i1);
 
     i1.setAccessibilityScore(0.5f);
