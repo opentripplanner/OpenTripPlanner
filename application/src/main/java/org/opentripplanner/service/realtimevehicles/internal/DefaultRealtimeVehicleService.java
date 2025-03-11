@@ -23,7 +23,12 @@ import org.opentripplanner.transit.service.TransitService;
 public class DefaultRealtimeVehicleService
   implements RealtimeVehicleService, RealtimeVehicleRepository {
 
-  private ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles = ImmutableListMultimap.of();
+  /**
+   * This multimap is immutable and therefore thread-safe. It is updated using the copy-on-write
+   * pattern so data races are avoided. This is re-enforced with the variable being volatile.
+   */
+  private volatile ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles =
+    ImmutableListMultimap.of();
 
   private final TransitService transitService;
 
@@ -32,12 +37,6 @@ public class DefaultRealtimeVehicleService
     this.transitService = transitService;
   }
 
-  /**
-   * Stores the relationship between a list of realtime vehicles with a pattern. If the pattern is
-   * a realtime-added one, then the original (scheduled) one is used as the key for the map storing
-   * the information.
-   * Before storing the new vehicles, removes the previous updates for the given {@code feedId}.
-   */
   public void setRealtimeVehicles(String feedId, Multimap<TripPattern, RealtimeVehicle> updates) {
     Multimap<TripPattern, RealtimeVehicle> temp = ArrayListMultimap.create();
     temp.putAll(vehicles);

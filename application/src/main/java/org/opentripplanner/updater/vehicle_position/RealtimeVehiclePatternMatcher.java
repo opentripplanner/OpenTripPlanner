@@ -99,10 +99,8 @@ class RealtimeVehiclePatternMatcher {
       .map(vehiclePosition -> toRealtimeVehicle(feedId, vehiclePosition))
       .toList();
 
-    // we take the list of vehicles and out of them create a Map<TripPattern, List<RealtimeVehicle>>
-    // that map makes it very easy to update the vehicles in the service
-    // it also enables the bookkeeping about which pattern previously had vehicles but no longer do
-    // these need to be removed from the service as we assume that the vehicle has stopped
+    // we take the list of vehicles and out of them create a MultiMap<TripPattern, RealtimeVehicle>
+    // that makes it very easy to update the vehicles in the service
     var vehicles = matchResults
       .stream()
       .filter(Result::isSuccess)
@@ -115,6 +113,7 @@ class RealtimeVehiclePatternMatcher {
         )
       );
 
+    // passing the feed id leads to the previous updates being removed
     repository.setRealtimeVehicles(feedId, vehicles);
 
     if (!vehiclePositions.isEmpty() && vehicles.keySet().isEmpty()) {

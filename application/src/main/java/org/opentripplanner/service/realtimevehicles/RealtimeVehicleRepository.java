@@ -7,12 +7,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 public interface RealtimeVehicleRepository {
   /**
-   * For the given pattern set all realtime vehicles.
+   * Stores the relationship between of realtime vehicles with a pattern for a given feed id.
+   * If the pattern is a realtime-added one, then the original (scheduled) one is used as the key
+   * for the map storing the information.
    * <p>
-   * The list is expected to be exhaustive: all existing vehicles will be overridden.
-   * <p>
-   * This means that if there are two updaters providing vehicles for the same pattern they
-   * overwrite each other.
+   * Before storing the new vehicles, it removes the previous updates for the given {@code feedId}.
    */
   void setRealtimeVehicles(String feedId, Multimap<TripPattern, RealtimeVehicle> updates);
 
