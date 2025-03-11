@@ -46,14 +46,16 @@ public record DecorateWithEmission(EmissionsService emissionsService)
 
     Optional<Grams> co2ForCar = calculateCo2EmissionsForCar(carLegs);
 
+    var builder = itinerary.copyOf();
+
     if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
-      itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
+      builder.withEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
     } else if (co2ForTransit.isPresent()) {
-      itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get()));
+      builder.withEmissionsPerPerson(new Emissions(co2ForTransit.get()));
     } else if (co2ForCar.isPresent()) {
-      itinerary.setEmissionsPerPerson(new Emissions(co2ForCar.get()));
+      builder.withEmissionsPerPerson(new Emissions(co2ForCar.get()));
     }
-    return itinerary;
+    return builder.build();
   }
 
   private Optional<Grams> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {

@@ -72,7 +72,7 @@ public class Itinerary implements ItinerarySortKey {
   private final boolean tooSloped;
 
   /* LEGS */
-  private List<Leg> legs;
+  private final List<Leg> legs;
 
   /* ITINERARY LIFECYCLE - MUTABLE FIELDS */
 
@@ -84,8 +84,8 @@ public class Itinerary implements ItinerarySortKey {
 
   /* SANDBOX EXPERIMENTAL PROPERTIES */
 
-  private Float accessibilityScore;
-  private Emissions emissionsPerPerson;
+  private final Float accessibilityScore;
+  private final Emissions emissionsPerPerson;
   private final ItineraryFares fare;
 
   Itinerary(ItineraryBuilder builder) {
@@ -389,16 +389,6 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * @deprecated Replace setters with ItineraryBuilder. This is particular problematic because
-   *             there is no way to verify that the totals calculated in the constructor is still
-   *             valid.
-   */
-  @Deprecated
-  public void setLegs(List<Leg> legs) {
-    this.legs = List.copyOf(legs);
-  }
-
-  /**
    * A sandbox feature for calculating a numeric score between 0 and 1 which indicates how
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
@@ -417,14 +407,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public Float getAccessibilityScore() {
     return accessibilityScore;
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setAccessibilityScore(Float accessibilityScore) {
-    this.accessibilityScore = accessibilityScore;
   }
 
   /**
@@ -595,14 +577,6 @@ public class Itinerary implements ItinerarySortKey {
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
       .toList();
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
-    this.emissionsPerPerson = emissionsPerPerson;
   }
 
   @Nullable

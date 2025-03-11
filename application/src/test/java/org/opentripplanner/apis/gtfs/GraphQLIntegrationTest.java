@@ -359,6 +359,9 @@ class GraphQLIntegrationTest {
       )
       .build();
 
+    // TODO - Use itineraryBuilder() here not build() and compleate building the itinerary using
+    //        the ItineraryBuilder and not going back and forth between the Itinerary and the
+    //        builder.
     var i1 = newItinerary(A, T11_00)
       .walk(20, B, List.of(step1, step2, step3))
       .bus(busRoute, 122, T11_01, T11_15, C)
@@ -373,7 +376,7 @@ class GraphQLIntegrationTest {
     railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
     ArrayList<Leg> legs = new ArrayList<>(i1.getLegs());
     legs.set(2, railLeg);
-    i1.setLegs(legs);
+    i1 = i1.copyOf().withLegs(ignore -> legs).build();
 
     var fares = new ItineraryFares();
 
@@ -386,10 +389,10 @@ class GraphQLIntegrationTest {
 
     i1 = ItineraryFaresDecorator.decorateItineraryWithFare(i1, fares);
 
-    i1.setAccessibilityScore(0.5f);
+    i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
     var emissions = new Emissions(new Grams(123.0));
-    i1.setEmissionsPerPerson(emissions);
+    i1 = i1.copyOf().withEmissionsPerPerson(emissions).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
