@@ -148,6 +148,11 @@ public class ItineraryBuilder {
     return this;
   }
 
+  public ItineraryBuilder withLegs(Function<List<Leg>, List<Leg>> body) {
+    this.legs = body.apply(legs);
+    return this;
+  }
+
   public Leg firstLeg() {
     return legs.getFirst();
   }

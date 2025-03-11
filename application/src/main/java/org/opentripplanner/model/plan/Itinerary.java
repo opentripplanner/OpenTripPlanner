@@ -470,8 +470,8 @@ public class Itinerary implements ItinerarySortKey {
     //        legs changes. If street-legs are replaced then only the calculation of the that
     //        is done in the total calculation is correct. We keep the 'elevationGained_edges_m'
     //        around, since it is "probably" better to include it when the legs are changed instead
-    //        of dropping it. There is not likely to be an error here, but the code is figile and
-    //        it is easy to do a mistake.
+    //        of dropping it. There is an error here, for example the DecorateConsolidatedStopNames
+    //        does not work with this.
     return DoubleUtils.roundTo2Decimals(elevationGained_edges_m + elevationGained_total_m);
   }
 
