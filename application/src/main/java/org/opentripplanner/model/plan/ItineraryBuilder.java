@@ -23,8 +23,8 @@ public class ItineraryBuilder {
   boolean arrivedAtDestinationWithRentedVehicle = false;
 
   /* ELEVATION */
-  Double elevationGained = 0.0;
-  Double elevationLost = 0.0;
+  Double elevationGained_m = 0.0;
+  Double elevationLost_m = 0.0;
   Double maxSlope = null;
   boolean tooSloped = false;
 
@@ -59,8 +59,8 @@ public class ItineraryBuilder {
     this.waitTimeOptimizedCost = itinerary.getWaitTimeOptimizedCost();
 
     // Elevation
-    this.elevationLost = itinerary.getElevationLost();
-    this.elevationGained = itinerary.getElevationGained();
+    this.elevationLost_m = itinerary.getElevationLost();
+    this.elevationGained_m = itinerary.getElevationGained();
     this.tooSloped = itinerary.isTooSloped();
     this.maxSlope = itinerary.getMaxSlope();
 
@@ -116,14 +116,20 @@ public class ItineraryBuilder {
     return this;
   }
 
-  public ItineraryBuilder withElevationLost(Double elevationLost) {
-    this.elevationLost = elevationLost;
-    return this;
-  }
-
-  public ItineraryBuilder withElevationGained(Double elevationGained) {
-    this.elevationGained = elevationGained;
-    return this;
+  /**
+   * Add the elevation change in meters to the the itinerary summary. The builder will add the
+   * change to the {@code elevationGained} or the {@code elevationLost} depending on the sign of
+   * the given change value. Negative change is added to the {@code elevationLost} and positive
+   * values are added to the {@code elevationGained}.
+   *
+   * Note! This is in addition to the elevation added for each leg elevation profile. TODO Why?
+   */
+  public void addElevationChange(double change_m) {
+    if (change_m > 0.0) {
+      this.elevationGained_m += change_m;
+    } else {
+      this.elevationLost_m -= change_m;
+    }
   }
 
   public ItineraryBuilder withTooSloped(boolean tooSloped) {

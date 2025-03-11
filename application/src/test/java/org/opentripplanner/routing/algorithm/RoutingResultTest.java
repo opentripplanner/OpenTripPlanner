@@ -15,10 +15,21 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 class RoutingResultTest implements PlanTestConstants {
 
-  private static final Itinerary I1 = TestItineraryBuilder.newItinerary(A,0).walk(120, B).bus(12, 240, 360, C).build();
-  private static final Itinerary I2 = TestItineraryBuilder.newItinerary(A, 0).bus(5, 40, 460, C).build();
-  private static final RoutingError E1 = new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME);
-  private static final RoutingError E2 = new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, InputField.FROM_PLACE);
+  private static final Itinerary I1 = TestItineraryBuilder.newItinerary(A, 0)
+    .walk(120, B)
+    .bus(12, 240, 360, C)
+    .build();
+  private static final Itinerary I2 = TestItineraryBuilder.newItinerary(A, 0)
+    .bus(5, 40, 460, C)
+    .build();
+  private static final RoutingError E1 = new RoutingError(
+    RoutingErrorCode.OUTSIDE_SERVICE_PERIOD,
+    InputField.DATE_TIME
+  );
+  private static final RoutingError E2 = new RoutingError(
+    RoutingErrorCode.NO_TRANSIT_CONNECTION,
+    InputField.FROM_PLACE
+  );
 
   @Test
   void empty() {
@@ -83,7 +94,11 @@ class RoutingResultTest implements PlanTestConstants {
     assertContains(subject, List.of(), Set.of(E1, E2));
   }
 
-  private void assertContains(RoutingResult subject, List<Itinerary> expItineraries, Set<RoutingError> expErrors) {
+  private void assertContains(
+    RoutingResult subject,
+    List<Itinerary> expItineraries,
+    Set<RoutingError> expErrors
+  ) {
     assertEquals(expItineraries, subject.itineraries());
     assertEquals(expErrors, subject.errors());
   }

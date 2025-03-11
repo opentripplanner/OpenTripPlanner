@@ -18,8 +18,8 @@ class ItinerariesCalculateLegTotals {
   Duration waitingDuration = Duration.ZERO;
   boolean walkOnly = true;
   boolean streetOnly = true;
-  double totalElevationGained = 0.0;
-  double totalElevationLost = 0.0;
+  double totalElevationGained_m = 0.0;
+  double totalElevationLost_m = 0.0;
 
   public ItinerariesCalculateLegTotals(List<Leg> legs) {
     if (legs.isEmpty()) {
@@ -65,8 +65,8 @@ class ItinerariesCalculateLegTotals {
 
       if (leg.getElevationProfile() != null) {
         var p = leg.getElevationProfile();
-        this.totalElevationGained += p.elevationGained();
-        this.totalElevationLost += p.elevationLost();
+        this.totalElevationGained_m += p.elevationGained();
+        this.totalElevationLost_m += p.elevationLost();
       }
     }
     this.waitingDuration = totalDuration.minus(transitDuration).minus(nonTransitDuration);

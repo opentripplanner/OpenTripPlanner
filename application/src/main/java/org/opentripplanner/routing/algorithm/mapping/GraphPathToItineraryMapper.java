@@ -22,6 +22,7 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -139,11 +140,9 @@ public class GraphPathToItineraryMapper {
 
     builder.withArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
 
-    // TODO - Set this on the builder, not the itinerary
-    var itinerary = builder.build();
-    calculateElevations(itinerary, path.edges);
+    calculateElevations(builder, path.edges);
 
-    return itinerary;
+    return builder.build();
   }
 
   /**
@@ -208,7 +207,7 @@ public class GraphPathToItineraryMapper {
    * @param itinerary The itinerary to calculate the elevation changes for
    * @param edges     The edges that go with the itinerary
    */
-  private static void calculateElevations(Itinerary itinerary, List<Edge> edges) {
+  private static void calculateElevations(ItineraryBuilder builder, List<Edge> edges) {
     for (Edge edge : edges) {
       if (!(edge instanceof StreetEdge edgeWithElevation)) {
         continue;
@@ -221,12 +220,7 @@ public class GraphPathToItineraryMapper {
 
       for (int i = 0; i < coordinates.size() - 1; i++) {
         double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
-
-        if (change > 0) {
-          itinerary.setElevationGained(itinerary.getElevationGained() + change);
-        } else if (change < 0) {
-          itinerary.setElevationLost(itinerary.getElevationLost() - change);
-        }
+        builder.addElevationChange(change);
       }
     }
   }

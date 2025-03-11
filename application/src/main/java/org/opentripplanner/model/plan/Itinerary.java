@@ -64,8 +64,8 @@ public class Itinerary implements ItinerarySortKey {
   private final Duration waitingDuration;
 
   /* ELEVATION */
-  private Double elevationGained;
-  private Double elevationLost;
+  private final double elevationGained_m;
+  private final double elevationLost_m;
   private Double maxSlope;
   private boolean tooSloped;
 
@@ -102,8 +102,6 @@ public class Itinerary implements ItinerarySortKey {
     this.waitTimeOptimizedCost = builder.waitTimeOptimizedCost;
     this.accessPenalty = Objects.requireNonNull(builder.accessPenalty);
     this.egressPenalty = Objects.requireNonNull(builder.egressPenalty);
-    this.elevationLost = builder.elevationLost;
-    this.elevationGained = builder.elevationGained;
     this.tooSloped = builder.tooSloped;
     this.maxSlope = builder.maxSlope;
     this.arrivedAtDestinationWithRentedVehicle = builder.arrivedAtDestinationWithRentedVehicle;
@@ -124,8 +122,15 @@ public class Itinerary implements ItinerarySortKey {
     this.walkDistanceMeters = totals.walkDistanceMeters;
     this.walkOnly = totals.walkOnly;
     this.waitingDuration = totals.waitingDuration;
-    this.setElevationGained(totals.totalElevationGained);
-    this.setElevationLost(totals.totalElevationLost);
+
+    // TODO - Why is the elevation computed in two places and added together - this at least needs
+    //        to be documented.
+    this.elevationGained_m = DoubleUtils.roundTo2Decimals(
+      builder.elevationGained_m + totals.totalElevationGained_m
+    );
+    this.elevationLost_m = DoubleUtils.roundTo2Decimals(
+      builder.elevationLost_m + totals.totalElevationLost_m
+    );
   }
 
   /**
@@ -461,15 +466,7 @@ public class Itinerary implements ItinerarySortKey {
    * back down again would have an elevationLost of Everest + K2.
    */
   public Double getElevationLost() {
-    return elevationLost;
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setElevationLost(Double elevationLost) {
-    this.elevationLost = DoubleUtils.roundTo2Decimals(elevationLost);
+    return elevationLost_m;
   }
 
   /**
@@ -477,15 +474,7 @@ public class Itinerary implements ItinerarySortKey {
    * elevationLost.
    */
   public Double getElevationGained() {
-    return elevationGained;
-  }
-
-  /**
-   * @deprecated Replace setters with ItineraryBuilder
-   */
-  @Deprecated
-  public void setElevationGained(Double elevationGained) {
-    this.elevationGained = DoubleUtils.roundTo2Decimals(elevationGained);
+    return elevationGained_m;
   }
 
   /**
@@ -707,8 +696,8 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
-      .addNum("elevationLost", elevationLost, 0.0)
-      .addNum("elevationGained", elevationGained, 0.0)
+      .addNum("elevationLost", elevationLost_m, "m")
+      .addNum("elevationGained", elevationGained_m, "m")
       .addCol("legs", legs)
       .addObj("fare", fare)
       .addObj("emissionsPerPerson", emissionsPerPerson)
