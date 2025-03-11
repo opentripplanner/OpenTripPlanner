@@ -50,33 +50,32 @@ public class ItineraryBuilder {
     this.systemNotices = new ArrayList<>();
   }
 
-  ItineraryBuilder(Itinerary itinerary) {
-    this.legs = itinerary.getLegs();
-    this.searchWindowAware = itinerary.isSearchWindowAware();
-    this.accessPenalty = itinerary.getAccessPenalty();
-    this.egressPenalty = itinerary.getEgressPenalty();
-    this.generalizedCost = Cost.costOfSeconds(itinerary.getGeneralizedCostIncludingPenalty());
-    this.generalizedCost2 = itinerary.getGeneralizedCost2().orElse(null);
-    this.transferPriorityCost = itinerary.getTransferPriorityCost();
-    this.waitTimeOptimizedCost = itinerary.getWaitTimeOptimizedCost();
+  ItineraryBuilder(Itinerary original) {
+    this.legs = original.getLegs();
+    this.searchWindowAware = original.isSearchWindowAware();
+    this.accessPenalty = original.getAccessPenalty();
+    this.egressPenalty = original.getEgressPenalty();
+    this.generalizedCost = Cost.costOfSeconds(original.getGeneralizedCostIncludingPenalty());
+    this.generalizedCost2 = original.getGeneralizedCost2().orElse(null);
+    this.transferPriorityCost = original.getTransferPriorityCost();
+    this.waitTimeOptimizedCost = original.getWaitTimeOptimizedCost();
 
     // Elevation
-    this.elevationLost_m = itinerary.getElevationLost();
-    this.elevationGained_m = itinerary.getElevationGained();
-    this.tooSloped = itinerary.isTooSloped();
-    this.maxSlope = itinerary.getMaxSlope();
+    this.elevationGained_m = original.privateElevationGainedForBuilder();
+    this.elevationLost_m = original.privateElevationLostForBuilder();
+    this.tooSloped = original.isTooSloped();
+    this.maxSlope = original.getMaxSlope();
 
     // Flags
-    this.arrivedAtDestinationWithRentedVehicle =
-      itinerary.isArrivedAtDestinationWithRentedVehicle();
+    this.arrivedAtDestinationWithRentedVehicle = original.isArrivedAtDestinationWithRentedVehicle();
 
     // Itinerary Lifecycle - mutable in itinerary, not mutable here
-    this.systemNotices = itinerary.privateSystemNoticesForBuilder();
+    this.systemNotices = original.privateSystemNoticesForBuilder();
 
     // Sandbox experimental properties
-    this.accessibilityScore = itinerary.getAccessibilityScore();
-    this.emissionsPerPerson = itinerary.getEmissionsPerPerson();
-    this.fare = itinerary.getFares();
+    this.accessibilityScore = original.getAccessibilityScore();
+    this.emissionsPerPerson = original.getEmissionsPerPerson();
+    this.fare = original.getFares();
   }
 
   /**

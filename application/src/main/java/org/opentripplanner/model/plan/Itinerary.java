@@ -64,8 +64,11 @@ public class Itinerary implements ItinerarySortKey {
   private final Duration waitingDuration;
 
   /* ELEVATION */
-  private final double elevationGained_m;
-  private final double elevationLost_m;
+  // TODO See #getElevationGained()
+  private final double elevationGained_edges_m;
+  private final double elevationGained_total_m;
+  private final double elevationLost_edges_m;
+  private final double elevationLost_total_m;
   private final Double maxSlope;
   private final boolean tooSloped;
 
@@ -104,6 +107,8 @@ public class Itinerary implements ItinerarySortKey {
     this.egressPenalty = Objects.requireNonNull(builder.egressPenalty);
     this.tooSloped = builder.tooSloped;
     this.maxSlope = builder.maxSlope;
+    this.elevationGained_edges_m = builder.elevationGained_m;
+    this.elevationLost_edges_m = builder.elevationLost_m;
     this.arrivedAtDestinationWithRentedVehicle = builder.arrivedAtDestinationWithRentedVehicle;
     this.systemNotices = builder.systemNotices;
     this.accessibilityScore = builder.accessibilityScore;
@@ -123,15 +128,8 @@ public class Itinerary implements ItinerarySortKey {
     this.walkDistanceMeters = totals.walkDistanceMeters;
     this.walkOnly = totals.walkOnly;
     this.waitingDuration = totals.waitingDuration;
-
-    // TODO - Why is the elevation computed in two places and added together - this at least needs
-    //        to be documented.
-    this.elevationGained_m = DoubleUtils.roundTo2Decimals(
-      builder.elevationGained_m + totals.totalElevationGained_m
-    );
-    this.elevationLost_m = DoubleUtils.roundTo2Decimals(
-      builder.elevationLost_m + totals.totalElevationLost_m
-    );
+    this.elevationGained_total_m = totals.totalElevationGained_m;
+    this.elevationLost_total_m = totals.totalElevationLost_m;
   }
 
   /**
@@ -462,20 +460,37 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
+   * How much elevation is gained, in total, over the course of the trip, in meters. For more info,
+   * see {@link #getElevationLost()}.
+   */
+  public Double getElevationGained() {
+    // TODO - Why is the elevation computed in two places and added together - this at least needs
+    //        to be documented. This is also a source for error, since 'elevationGained_edges_m'
+    //        is computed onece, while the 'elevationGained_total_m' is computed every time the
+    //        legs changes. If street-legs are replaced then only the calculation of the that
+    //        is done in the total calculation is correct. We keep the 'elevationGained_edges_m'
+    //        around, since it is "probably" better to include it when the legs are changed instead
+    //        of dropping it. There is not likely to be an error here, but the code is figile and
+    //        it is easy to do a mistake.
+    return DoubleUtils.roundTo2Decimals(elevationGained_edges_m + elevationGained_total_m);
+  }
+
+  double privateElevationGainedForBuilder() {
+    return elevationGained_edges_m;
+  }
+
+  /**
    * How much elevation is lost, in total, over the course of the trip, in meters. As an example, a
    * trip that went from the top of Mount Everest straight down to sea level, then back up K2, then
    * back down again would have an elevationLost of Everest + K2.
    */
   public Double getElevationLost() {
-    return elevationLost_m;
+    // TODO - See #getElevationGained().
+    return DoubleUtils.roundTo2Decimals(elevationLost_edges_m + elevationLost_total_m);
   }
 
-  /**
-   * How much elevation is gained, in total, over the course of the trip, in meters. See
-   * elevationLost.
-   */
-  public Double getElevationGained() {
-    return elevationGained_m;
+  double privateElevationLostForBuilder() {
+    return elevationLost_edges_m;
   }
 
   /**
@@ -675,8 +690,8 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
-      .addNum("elevationLost", elevationLost_m, "m")
-      .addNum("elevationGained", elevationGained_m, "m")
+      .addNum("elevationGained", getElevationGained(), "m")
+      .addNum("elevationLost", getElevationLost(), "m")
       .addCol("legs", legs)
       .addObj("emissionsPerPerson", emissionsPerPerson)
       .addObj("fare", fare)
