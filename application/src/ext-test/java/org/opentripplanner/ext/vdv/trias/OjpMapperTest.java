@@ -84,10 +84,7 @@ class OjpMapperTest {
       RESOLVE_FEED_LANG
     );
 
-    var ojp = mapper.mapStopTimesInPattern(
-      List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)),
-      timestamp
-    );
+    var ojp = mapper.mapCalls(List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)), timestamp);
 
     var context = JAXBContext.newInstance(OJP.class);
     var marshaller = context.createMarshaller();
@@ -111,10 +108,7 @@ class OjpMapperTest {
       new UseFeedIdResolver(),
       RESOLVE_FEED_LANG
     );
-    var ojp = mapper.mapStopTimesInPattern(
-      List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)),
-      timestamp
-    );
+    var ojp = mapper.mapCalls(List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)), timestamp);
     OjpToTriasTransformer.transform(ojp, new PrintWriter(System.out));
   }
 }

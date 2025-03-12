@@ -36,30 +36,27 @@ public class VdvService {
     return Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang);
   }
 
-  public List<CallAtStop> findTripTimesOnDate(FeedScopedId stopId, StopEventRequestParams params)
+  public List<CallAtStop> findCallsAtStop(FeedScopedId stopId, StopEventRequestParams params)
     throws EntityNotFoundException {
     var stop = transitService.getRegularStop(stopId);
     if (stop == null) {
       throw new EntityNotFoundException("StopPlace", stopId);
     }
-    return findTripTimesOnDate(stop, params);
+    return findCallsAtStop(stop, params);
   }
 
-  public List<CallAtStop> findTripTimesOnDate(StopLocation stop, StopEventRequestParams params) {
+  public List<CallAtStop> findCallsAtStop(StopLocation stop, StopEventRequestParams params) {
     List<StopLocation> stopLocations = List.of(stop);
     var calls = findCallsAtStop(stopLocations, params);
     return sort(params.numDepartures, calls);
   }
 
-  public List<CallAtStop> findTripTimesOnDate(
-    WgsCoordinate coordinate,
-    StopEventRequestParams params
-  ) {
+  public List<CallAtStop> findCallsAtStop(WgsCoordinate coordinate, StopEventRequestParams params) {
     var calls = finder
       .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
       .stream()
       .flatMap(nearbyStop ->
-        this.findTripTimesOnDate(nearbyStop.stop, params)
+        this.findCallsAtStop(nearbyStop.stop, params)
           .stream()
           .map(tt -> tt.withWalkTime(nearbyStop.duration()))
       )
