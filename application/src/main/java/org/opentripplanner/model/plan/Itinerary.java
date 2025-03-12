@@ -30,7 +30,7 @@ public class Itinerary implements ItinerarySortKey {
   public static final int UNKNOWN = -1;
 
   /* GENERAL */
-  private final Duration duration;
+  private final Duration totalDuration;
   private final boolean searchWindowAware;
 
   /* COST AND PENALTY */
@@ -46,28 +46,28 @@ public class Itinerary implements ItinerarySortKey {
 
   /* TRANSIT */
   private final int numberOfTransfers;
-  private final Duration transitDuration;
+  private final Duration totalTransitDuration;
 
   /* STREET AND WALK */
-  private final double nonTransitDistanceMeters;
-  private final Duration nonTransitDuration;
+  private final double totalStreetDistanceMeters;
+  private final Duration totalStreetDuration;
   private final boolean streetOnly;
-  private final double walkDistanceMeters;
-  private final Duration walkDuration;
+  private final double totalWalkDistanceMeters;
+  private final Duration totalWalkDuration;
   private final boolean walkOnly;
 
   /* RENATL */
   private final boolean arrivedAtDestinationWithRentedVehicle;
 
   /* WAIT */
-  private final Duration waitingDuration;
+  private final Duration totalWaitingDuration;
 
   /* ELEVATION */
   // TODO See #getElevationGained()
   private final double elevationGained_edges_m;
-  private final double elevationGained_total_m;
+  private final double totalElevationGained_m;
   private final double elevationLost_edges_m;
-  private final double elevationLost_total_m;
+  private final double totalElevationLost_m;
   private final Double maxSlope;
   private final boolean tooSloped;
 
@@ -112,18 +112,18 @@ public class Itinerary implements ItinerarySortKey {
     // Set aggregated data
     ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
 
-    this.duration = totals.totalDuration;
+    this.totalDuration = totals.totalDuration;
     this.streetOnly = totals.streetOnly;
     this.numberOfTransfers = totals.transfers();
-    this.transitDuration = totals.transitDuration;
-    this.nonTransitDuration = totals.nonTransitDuration;
-    this.nonTransitDistanceMeters = DoubleUtils.roundTo2Decimals(totals.nonTransitDistanceMeters);
-    this.walkDuration = totals.walkDuration;
-    this.walkDistanceMeters = totals.walkDistanceMeters;
+    this.totalTransitDuration = totals.transitDuration;
+    this.totalStreetDuration = totals.onStreetDuration;
+    this.totalStreetDistanceMeters = DoubleUtils.roundTo2Decimals(totals.onStreetDistanceMeters);
+    this.totalWalkDuration = totals.walkDuration;
+    this.totalWalkDistanceMeters = totals.walkDistanceMeters;
     this.walkOnly = totals.walkOnly;
-    this.waitingDuration = totals.waitingDuration;
-    this.elevationGained_total_m = totals.totalElevationGained_m;
-    this.elevationLost_total_m = totals.totalElevationLost_m;
+    this.totalWaitingDuration = totals.waitingDuration;
+    this.totalElevationGained_m = totals.elevationGained_m;
+    this.totalElevationLost_m = totals.elevationLost_m;
   }
 
   /**
@@ -191,14 +191,14 @@ public class Itinerary implements ItinerarySortKey {
    * This is the amount of time used to travel. {@code waitingTime} is NOT included.
    */
   public Duration effectiveDuration() {
-    return getTransitDuration().plus(getNonTransitDuration());
+    return totalTransitDuration().plus(totalStreetDuration());
   }
 
   /**
    * Total distance in meters.
    */
   public double distanceMeters() {
-    return getLegs()
+    return legs()
       .stream()
       // An unknown distance is -1
       .filter(l -> l.getDistanceMeters() > 0)
@@ -217,6 +217,7 @@ public class Itinerary implements ItinerarySortKey {
 
   /** TRUE if at least one leg is a transit leg. */
   public boolean hasTransit() {
+    // TODO This does not look correct, replace with !streetLeg
     return legs
       .stream()
       .anyMatch(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg);
@@ -228,14 +229,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public boolean isSearchWindowAware() {
     return searchWindowAware;
-  }
-
-  public Leg firstLeg() {
-    return getLegs().get(0);
-  }
-
-  public Leg lastLeg() {
-    return getLegs().get(getLegs().size() - 1);
   }
 
   /**
@@ -272,7 +265,7 @@ public class Itinerary implements ItinerarySortKey {
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
     Duration duration = Duration.between(firstLeg().getStartTime(), afterTime);
-    List<Leg> timeShiftedLegs = getLegs()
+    List<Leg> timeShiftedLegs = legs()
       .stream()
       .map(leg -> leg.withTimeShift(duration))
       .collect(Collectors.toList());
@@ -284,36 +277,36 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /** Total duration of the itinerary in seconds */
-  public Duration getDuration() {
-    return duration;
+  public Duration totalDuration() {
+    return totalDuration;
   }
 
   /**
    * How much time is spent on transit, in seconds.
    */
-  public Duration getTransitDuration() {
-    return transitDuration;
+  public Duration totalTransitDuration() {
+    return totalTransitDuration;
   }
 
   /**
    * The number of transfers this trip has.
    */
-  public int getNumberOfTransfers() {
+  public int numberOfTransfers() {
     return numberOfTransfers;
   }
 
   /**
    * How much time is spent waiting for transit to arrive, in seconds.
    */
-  public Duration getWaitingDuration() {
-    return waitingDuration;
+  public Duration totalWaitingDuration() {
+    return totalWaitingDuration;
   }
 
   /**
    * How far the user has to walk, bike and/or drive, in meters.
    */
-  public double getNonTransitDistanceMeters() {
-    return nonTransitDistanceMeters;
+  public double totalStreetDistanceMeters() {
+    return totalStreetDistanceMeters;
   }
 
   /** TRUE if mode is WALK from start ot end (all legs are walking). */
@@ -334,7 +327,7 @@ public class Itinerary implements ItinerarySortKey {
    * itinerary. This is very handy, when tuning the system or debugging - looking for missing
    * expected trips.
    */
-  public List<SystemNotice> getSystemNotices() {
+  public List<SystemNotice> systemNotices() {
     return List.copyOf(systemNotices);
   }
 
@@ -347,11 +340,19 @@ public class Itinerary implements ItinerarySortKey {
    * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6,
    * then walks to their destination, has four legs.
    */
-  public List<Leg> getLegs() {
+  public List<Leg> legs() {
     return legs;
   }
 
-  public Stream<StreetLeg> getStreetLegs() {
+  public Leg firstLeg() {
+    return legs().get(0);
+  }
+
+  public Leg lastLeg() {
+    return legs().get(legs().size() - 1);
+  }
+
+  public Stream<StreetLeg> streetLegs() {
     return legs.stream().filter(StreetLeg.class::isInstance).map(StreetLeg.class::cast);
   }
 
@@ -361,7 +362,7 @@ public class Itinerary implements ItinerarySortKey {
    *
    * @throws ClassCastException if the leg is not a TransitLeg
    */
-  public TransitLeg getTransitLeg(int index) {
+  public TransitLeg transitLeg(int index) {
     return (TransitLeg) legs.get(index);
   }
 
@@ -371,7 +372,7 @@ public class Itinerary implements ItinerarySortKey {
    *
    * @throws ClassCastException if the leg is not a StreetLeg
    */
-  public StreetLeg getStreetLeg(int index) {
+  public StreetLeg streetLeg(int index) {
     return (StreetLeg) legs.get(index);
   }
 
@@ -392,22 +393,22 @@ public class Itinerary implements ItinerarySortKey {
    * calculating them on the backend makes life a little easier and changes are automatically
    * applied to all frontends.
    */
-  public Float getAccessibilityScore() {
+  public Float accessibilityScore() {
     return accessibilityScore;
   }
 
   /**
    * How much time is spent walking/biking/driving, in seconds.
    */
-  public Duration getNonTransitDuration() {
-    return nonTransitDuration;
+  public Duration totalStreetDuration() {
+    return totalStreetDuration;
   }
 
   /**
    * How much elevation is gained, in total, over the course of the trip, in meters. For more info,
-   * see {@link #getElevationLost()}.
+   * see {@link #totalElevationLost()}.
    */
-  public Double getElevationGained() {
+  public Double totalElevationGained() {
     // TODO - Why is the elevation computed in two places and added together - this at least needs
     //        to be documented. This is also a source for error, since 'elevationGained_edges_m'
     //        is computed onece, while the 'elevationGained_total_m' is computed every time the
@@ -416,7 +417,7 @@ public class Itinerary implements ItinerarySortKey {
     //        around, since it is "probably" better to include it when the legs are changed instead
     //        of dropping it. There is an error here, for example the DecorateConsolidatedStopNames
     //        does not work with this.
-    return DoubleUtils.roundTo2Decimals(elevationGained_edges_m + elevationGained_total_m);
+    return DoubleUtils.roundTo2Decimals(elevationGained_edges_m + totalElevationGained_m);
   }
 
   double privateElevationGainedForBuilder() {
@@ -428,9 +429,9 @@ public class Itinerary implements ItinerarySortKey {
    * trip that went from the top of Mount Everest straight down to sea level, then back up K2, then
    * back down again would have an elevationLost of Everest + K2.
    */
-  public Double getElevationLost() {
+  public Double totalElevationLost() {
     // TODO - See #getElevationGained().
-    return DoubleUtils.roundTo2Decimals(elevationLost_edges_m + elevationLost_total_m);
+    return DoubleUtils.roundTo2Decimals(elevationLost_edges_m + totalElevationLost_m);
   }
 
   double privateElevationLostForBuilder() {
@@ -444,7 +445,7 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
-  public int getGeneralizedCost() {
+  public int generalizedCost() {
     return generalizedCost.toSeconds();
   }
 
@@ -457,7 +458,7 @@ public class Itinerary implements ItinerarySortKey {
    * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
    */
   @Override
-  public Cost getGeneralizedCostIncludingPenalty() {
+  public Cost generalizedCostIncludingPenalty() {
     return generalizedCost.plus(accessPenalty.cost().plus(egressPenalty.cost()));
   }
 
@@ -471,17 +472,17 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * {@link RaptorConstants#NOT_SET} indicate that the cost is not set/computed.
    */
-  public Optional<Integer> getGeneralizedCost2() {
+  public Optional<Integer> generalizedCost2() {
     return Optional.ofNullable(generalizedCost2);
   }
 
   @Nullable
-  public TimeAndCost getAccessPenalty() {
+  public TimeAndCost accessPenalty() {
     return accessPenalty;
   }
 
   @Nullable
-  public TimeAndCost getEgressPenalty() {
+  public TimeAndCost egressPenalty() {
     return egressPenalty;
   }
 
@@ -493,7 +494,7 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
-  public int getWaitTimeOptimizedCost() {
+  public int waitTimeOptimizedCost() {
     return waitTimeOptimizedCost;
   }
 
@@ -506,7 +507,7 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
-  public int getTransferPriorityCost() {
+  public int transferPriorityCost() {
     return transferPriorityCost;
   }
 
@@ -519,8 +520,9 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * The maximum slope for any part of the itinerary.
+   * TODO Document unit
    */
-  public Double getMaxSlope() {
+  public Double maxSlope() {
     return maxSlope;
   }
 
@@ -538,7 +540,7 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * Return {@link #UNKNOWN} if not found.
    */
-  public int getLegIndex(Leg leg) {
+  public int findLegIndex(Leg leg) {
     var index = legs.indexOf(leg);
     // the filter pipeline can also modify the identity of Leg instances. that's why we not only
     // check that but also the start and end point as a replacement for the identity.
@@ -558,8 +560,8 @@ public class Itinerary implements ItinerarySortKey {
     }
   }
 
-  public List<ScheduledTransitLeg> getScheduledTransitLegs() {
-    return getLegs()
+  public List<ScheduledTransitLeg> findScheduledTransitLegs() {
+    return legs()
       .stream()
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
@@ -567,28 +569,28 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   @Nullable
-  public Emissions getEmissionsPerPerson() {
+  public Emissions emissionsPerPerson() {
     return this.emissionsPerPerson;
   }
 
   /**
    * How much walking this itinerary contains, in meters.
    */
-  public double walkDistanceMeters() {
-    return walkDistanceMeters;
+  public double totalWalkDistanceMeters() {
+    return totalWalkDistanceMeters;
   }
 
   /**
    * How long the walking is contained in this itinerary.
    */
-  public Duration walkDuration() {
-    return walkDuration;
+  public Duration totalWalkDuration() {
+    return totalWalkDuration;
   }
 
   /**
    * The fare products of this itinerary.
    */
-  public ItineraryFares getFares() {
+  public ItineraryFares fare() {
     return fare;
   }
 
@@ -616,18 +618,18 @@ public class Itinerary implements ItinerarySortKey {
       .addTime("start", firstLeg().getStartTime())
       .addTime("end", lastLeg().getEndTime())
       .addNum("nTransfers", numberOfTransfers)
-      .addDuration("duration", duration)
-      .addDuration("nonTransitTime", nonTransitDuration)
-      .addDuration("transitTime", transitDuration)
-      .addDuration("waitingTime", waitingDuration)
+      .addDuration("duration", totalDuration)
+      .addDuration("nonTransitTime", totalStreetDuration)
+      .addDuration("transitTime", totalTransitDuration)
+      .addDuration("waitingTime", totalWaitingDuration)
       .addObj("generalizedCost", generalizedCost)
       .addNum("generalizedCost2", generalizedCost2)
       .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
-      .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
+      .addNum("nonTransitDistance", totalStreetDistanceMeters, "m")
       .addBool("tooSloped", tooSloped)
-      .addNum("elevationGained", getElevationGained(), "m")
-      .addNum("elevationLost", getElevationLost(), "m")
+      .addNum("elevationGained", totalElevationGained(), "m")
+      .addNum("elevationLost", totalElevationLost(), "m")
       .addCol("legs", legs)
       .addObj("emissionsPerPerson", emissionsPerPerson)
       .addObj("fare", fare)
@@ -684,7 +686,7 @@ public class Itinerary implements ItinerarySortKey {
     // use-case.
     buf.summary(
       generalizedCost.toCentiSeconds(),
-      getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
+      generalizedCost2().orElse(RaptorConstants.NOT_SET)
     );
 
     return buf.toString();

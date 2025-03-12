@@ -37,7 +37,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     OptionalInt minStreetCost = itineraries
       .stream()
       .filter(Itinerary::isStreetOnly)
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::generalizedCost)
       .min();
 
     if (minStreetCost.isEmpty()) {
@@ -54,7 +54,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       // we use the cost without the access/egress penalty since we don't want to give
       // searches that are only on the street network an unfair advantage (they don't have
       // access/egress so cannot have these penalties)
-      .filter(it -> !it.isStreetOnly() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isStreetOnly() && it.generalizedCost() >= limit)
       .toList();
   }
 

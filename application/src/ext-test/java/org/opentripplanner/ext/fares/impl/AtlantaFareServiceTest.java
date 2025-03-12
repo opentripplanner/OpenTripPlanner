@@ -253,7 +253,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
   private static Leg createLeg(String agencyId, String shortName, long startTimeMins) {
     final var itin = createItinerary(agencyId, shortName, startTimeMins);
-    return itin.getLegs().get(0);
+    return itin.legs().get(0);
   }
 
   private static Itinerary createItinerary(String agencyId, String shortName, long startTimeMins) {

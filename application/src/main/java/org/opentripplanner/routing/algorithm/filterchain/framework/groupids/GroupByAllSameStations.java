@@ -21,7 +21,7 @@ public class GroupByAllSameStations implements GroupId<GroupByAllSameStations> {
 
   public GroupByAllSameStations(Itinerary itinerary) {
     keySet = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isTransitLeg)
       .map(leg ->

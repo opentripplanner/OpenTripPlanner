@@ -69,7 +69,7 @@ class RealtimeResolverTest {
     assertEquals(1, itineraries.size());
     itinerary = itineraries.getFirst();
 
-    var legs = itinerary.getLegs();
+    var legs = itinerary.legs();
     var leg1ArrivalDelay = legs
       .get(0)
       .asScheduledTransitLeg()
@@ -100,7 +100,7 @@ class RealtimeResolverTest {
 
     assertEquals(1, itineraries.size());
 
-    var legs = itinerary.getLegs();
+    var legs = itinerary.legs();
     assertEquals(2, legs.size());
     assertTrue(legs.get(0).isWalkingLeg());
     assertTrue(legs.get(1).isTransitLeg());
@@ -122,7 +122,7 @@ class RealtimeResolverTest {
 
     assertEquals(1, itineraries.size());
 
-    var constrained = itineraries.get(0).getLegs().get(1).getTransferFromPrevLeg();
+    var constrained = itineraries.get(0).legs().get(1).getTransferFromPrevLeg();
     assertNotNull(constrained);
     assertTrue(constrained.getTransferConstraint().isStaySeated());
   }
@@ -150,7 +150,7 @@ class RealtimeResolverTest {
 
   private static List<TripPattern> itineraryPatterns(Itinerary itinerary) {
     return itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)

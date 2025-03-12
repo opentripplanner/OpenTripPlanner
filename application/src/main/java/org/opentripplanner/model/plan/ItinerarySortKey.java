@@ -17,8 +17,8 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
 public interface ItinerarySortKey {
   Instant startTimeAsInstant();
   Instant endTimeAsInstant();
-  Cost getGeneralizedCostIncludingPenalty();
-  int getNumberOfTransfers();
+  Cost generalizedCostIncludingPenalty();
+  int numberOfTransfers();
   boolean isStreetOnly();
 
   default String keyAsString() {
@@ -28,9 +28,9 @@ public interface ItinerarySortKey {
       .addText(", ")
       .addTime(endTimeAsInstant())
       .addText(", ")
-      .addObj(getGeneralizedCostIncludingPenalty())
+      .addObj(generalizedCostIncludingPenalty())
       .addText(", Tx")
-      .addNum(getNumberOfTransfers())
+      .addNum(numberOfTransfers())
       .addText(", ")
       .addBool(isStreetOnly(), "onStreet", "transit")
       .addText("]")

@@ -144,7 +144,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     // Map egress leg
     EgressPathLeg<T> egressPathLeg = pathLeg.asEgressLeg();
     Itinerary mapped = mapEgressLeg(egressPathLeg);
-    legs.addAll(mapped == null ? List.of() : mapped.getLegs());
+    legs.addAll(mapped == null ? List.of() : mapped.legs());
 
     var generalizedCost = Cost.costOfCentiSeconds(path.c1());
     var accessPenalty = mapAccessEgressPenalty(accessPathLeg.access());
@@ -194,13 +194,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var subItinerary = mapAccessEgressPathLeg(accessPathLeg.access());
 
-    if (subItinerary.getLegs().isEmpty()) {
+    if (subItinerary.legs().isEmpty()) {
       return List.of();
     }
 
     int fromTime = accessPathLeg.fromTime();
 
-    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(fromTime)).getLegs();
+    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(fromTime)).legs();
   }
 
   private Leg mapTransitLeg(Leg prevTransitLeg, TransitPathLeg<T> pathLeg) {
@@ -334,7 +334,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var subItinerary = mapAccessEgressPathLeg(egressPathLeg.egress());
 
-    if (subItinerary.getLegs().isEmpty()) {
+    if (subItinerary.legs().isEmpty()) {
       return null;
     }
 
@@ -411,7 +411,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     State[] states = transferStates.toArray(State[]::new);
     var graphPath = new GraphPath<>(states[states.length - 1]);
     var subItinerary = graphPathToItineraryMapper.generateItinerary(graphPath);
-    return subItinerary.getLegs();
+    return subItinerary.legs();
   }
 
   private Itinerary mapUnknownRaptorPath(RaptorPath<T> path) {

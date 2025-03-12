@@ -159,9 +159,9 @@ class McMaxLimitFilterTest {
       .stream()
       .map(i ->
         "[ %d %d %s ]".formatted(
-            i.getGeneralizedCost(),
-            i.getNumberOfTransfers(),
-            groupsToString(i.getGeneralizedCost2().orElse(-1))
+            i.generalizedCost(),
+            i.numberOfTransfers(),
+            groupsToString(i.generalizedCost2().orElse(-1))
           )
       )
       .collect(Collectors.joining(", "));

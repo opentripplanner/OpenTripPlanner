@@ -45,13 +45,13 @@ class SingleCriteriaComparatorTest {
 
   @BeforeAll
   static void setUp() {
-    assertEquals(0, zeroTransferLowCost.getNumberOfTransfers());
-    assertEquals(0, zeroTransferHighCost.getNumberOfTransfers());
-    assertEquals(1, oneTransferLowCost.getNumberOfTransfers());
+    assertEquals(0, zeroTransferLowCost.numberOfTransfers());
+    assertEquals(0, zeroTransferHighCost.numberOfTransfers());
+    assertEquals(1, oneTransferLowCost.numberOfTransfers());
 
-    int expectedCost = zeroTransferLowCost.getGeneralizedCost();
-    assertTrue(expectedCost < zeroTransferHighCost.getGeneralizedCost());
-    assertEquals(expectedCost, oneTransferLowCost.getGeneralizedCost());
+    int expectedCost = zeroTransferLowCost.generalizedCost();
+    assertTrue(expectedCost < zeroTransferHighCost.generalizedCost());
+    assertEquals(expectedCost, oneTransferLowCost.generalizedCost());
   }
 
   @Test

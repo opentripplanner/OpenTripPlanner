@@ -18,7 +18,7 @@ public class UnplannedChangesTest extends GtfsTest {
   public void test3b1() {
     Itinerary itinerary = plan(+1388530860L, "3b1", "3b2", null, false, false, null, "", "", 1);
 
-    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
+    Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
     validateLeg(leg, 1388531460000L, 1388531520000L, "3b2", "3b1", null);
 
@@ -29,7 +29,7 @@ public class UnplannedChangesTest extends GtfsTest {
   public void test3b2() {
     Itinerary itinerary = plan(+1388531460L, "3b1", "3b2", null, false, false, null, "", "", 1);
 
-    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
+    Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
     validateLeg(leg, 1388531460000L, 1388531520000L, "3b2", "3b1", null);
 

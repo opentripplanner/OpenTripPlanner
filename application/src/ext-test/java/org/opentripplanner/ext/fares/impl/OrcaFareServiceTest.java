@@ -549,7 +549,7 @@ public class OrcaFareServiceTest {
     assertFalse(fares.getItineraryProducts().isEmpty());
     assertFalse(fares.getLegProducts().isEmpty());
 
-    var firstLeg = itinerary.getLegs().get(0);
+    var firstLeg = itinerary.legs().get(0);
     var uses = fares.getLegProducts().get(firstLeg);
     assertEquals(7, uses.size());
 
@@ -656,7 +656,7 @@ public class OrcaFareServiceTest {
       lastStopName
     );
 
-    return itin.getLegs().get(0);
+    return itin.legs().get(0);
   }
 
   private static Itinerary createItinerary(

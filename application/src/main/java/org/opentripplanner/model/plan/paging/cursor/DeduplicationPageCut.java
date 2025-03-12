@@ -30,12 +30,12 @@ record DeduplicationPageCut(
   }
 
   @Override
-  public Cost getGeneralizedCostIncludingPenalty() {
+  public Cost generalizedCostIncludingPenalty() {
     return generalizedCost;
   }
 
   @Override
-  public int getNumberOfTransfers() {
+  public int numberOfTransfers() {
     return numOfTransfers;
   }
 

@@ -98,7 +98,7 @@ public class GraphPathToItineraryMapper {
     List<Itinerary> itineraries = new LinkedList<>();
     for (GraphPath<State, Edge, Vertex> path : paths) {
       Itinerary itinerary = generateItinerary(path);
-      if (itinerary.getLegs().isEmpty()) {
+      if (itinerary.legs().isEmpty()) {
         continue;
       }
       itineraries.add(itinerary);

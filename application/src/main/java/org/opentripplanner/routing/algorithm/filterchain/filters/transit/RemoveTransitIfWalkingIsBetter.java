@@ -27,7 +27,7 @@ public class RemoveTransitIfWalkingIsBetter implements RemoveItineraryFlagger {
     OptionalInt minWalkCost = itineraries
       .stream()
       .filter(itinerary -> itinerary.isWalkOnly())
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::generalizedCost)
       .min();
 
     if (minWalkCost.isEmpty()) {
@@ -40,7 +40,7 @@ public class RemoveTransitIfWalkingIsBetter implements RemoveItineraryFlagger {
       .stream()
       // we use the cost without the access/egress penalty since we don't want to give
       // searches that are only on the street network an unfair advantage
-      .filter(it -> !it.isStreetOnly() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isStreetOnly() && it.generalizedCost() >= limit)
       .collect(Collectors.toList());
   }
 

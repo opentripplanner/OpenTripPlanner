@@ -43,7 +43,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     // Get all transit trips for an itinerary
     Function<Itinerary, Set<Trip>> getTripsForItinerary = itinerary ->
       itinerary
-        .getLegs()
+        .legs()
         .stream()
         .filter(Leg::isTransitLeg)
         .map(Leg::getTrip)
@@ -64,7 +64,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
       .stream()
       .mapToInt(itinerary ->
         itinerary
-          .getLegs()
+          .legs()
           .stream()
           .filter(Leg::isTransitLeg)
           .filter(leg -> commonTrips.contains(leg.getTrip()))
@@ -80,7 +80,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     // Find the lowest cost for any itinerary
     int minimumCost = itineraries
       .stream()
-      .mapToInt(it -> it.getGeneralizedCostIncludingPenalty().toSeconds())
+      .mapToInt(it -> it.generalizedCostIncludingPenalty().toSeconds())
       .min()
       .orElseThrow();
 
@@ -91,7 +91,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
 
     return itineraries
       .stream()
-      .filter(it -> it.getGeneralizedCostIncludingPenalty().greaterThan(maxLimit))
+      .filter(it -> it.generalizedCostIncludingPenalty().greaterThan(maxLimit))
       .toList();
   }
 }

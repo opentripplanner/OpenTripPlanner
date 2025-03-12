@@ -35,11 +35,11 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
   ).reversed();
 
   static final Comparator<ItinerarySortKey> GENERALIZED_COST_COMP = comparing(
-    ItinerarySortKey::getGeneralizedCostIncludingPenalty
+    ItinerarySortKey::generalizedCostIncludingPenalty
   );
 
   static final Comparator<ItinerarySortKey> NUM_OF_TRANSFERS_COMP = comparingInt(
-    ItinerarySortKey::getNumberOfTransfers
+    ItinerarySortKey::numberOfTransfers
   );
 
   private static final SortOrderComparator STREET_AND_ARRIVAL_TIME = new SortOrderComparator(

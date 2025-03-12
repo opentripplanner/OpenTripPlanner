@@ -38,16 +38,16 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    var first = (ScheduledTransitLeg) itinerary.getLegs().getFirst();
+    var first = (ScheduledTransitLeg) itinerary.legs().getFirst();
     var withFp = first.copy().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
-    var legs = new ArrayList<>(itinerary.getLegs());
+    var legs = new ArrayList<>(itinerary.legs());
     legs.set(0, withFp);
 
     itinerary = itinerary.copyOf().withLegs(ignore -> legs).build();
 
     itinerary = filter.decorate(itinerary);
 
-    var updatedLeg = itinerary.getLegs().getFirst();
+    var updatedLeg = itinerary.legs().getFirst();
     assertEquals(STOP_C.getName(), updatedLeg.getFrom().name);
     assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
 
@@ -67,7 +67,7 @@ class DecorateConsolidatedStopNamesTest {
 
     itinerary = filter.decorate(itinerary);
 
-    var legs = itinerary.getLegs().stream().map(Leg::getClass).toList();
+    var legs = itinerary.legs().stream().map(Leg::getClass).toList();
     assertEquals(List.of(ConsolidatedStopLeg.class, ScheduledTransitLeg.class), legs);
   }
 
@@ -83,7 +83,7 @@ class DecorateConsolidatedStopNamesTest {
 
     itinerary = filter.decorate(itinerary);
 
-    var legs = itinerary.getLegs().stream().map(Leg::getClass).toList();
+    var legs = itinerary.legs().stream().map(Leg::getClass).toList();
     assertEquals(
       List.of(ConsolidatedStopLeg.class, StreetLeg.class, ScheduledTransitLeg.class),
       legs

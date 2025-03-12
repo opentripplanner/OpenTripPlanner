@@ -371,10 +371,10 @@ class GraphQLIntegrationTest {
 
     i1 = add10MinuteDelay(i1);
 
-    var busLeg = i1.getTransitLeg(1);
-    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
+    var busLeg = i1.transitLeg(1);
+    var railLeg = (ScheduledTransitLeg) i1.transitLeg(2);
     railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
-    ArrayList<Leg> legs = new ArrayList<>(i1.getLegs());
+    ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
     i1 = i1.copyOf().withLegs(ignore -> legs).build();
 

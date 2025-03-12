@@ -71,44 +71,42 @@ class EmissionsTest {
   void testGetEmissionsForItinerary() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(2223.902), i.getEmissionsPerPerson().getCo2());
+    assertEquals(new Grams(2223.902), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
     var i = createItinerary(STREET_LEG);
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(28.0864), i.getEmissionsPerPerson().getCo2());
+    assertEquals(new Grams(28.0864), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
     var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED));
     i = decorateWithEmission.decorate(i);
-    assertNull(i.getEmissionsPerPerson());
+    assertNull(i.emissionsPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(0.0), i.getEmissionsPerPerson().getCo2());
+    assertEquals(new Grams(0.0), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(2251.9884), i.getEmissionsPerPerson().getCo2());
+    assertEquals(new Grams(2251.9884), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG);
     i = decorateWithEmission.decorate(i);
-    var emissionsResult = i.getEmissionsPerPerson() != null
-      ? i.getEmissionsPerPerson().getCo2()
-      : null;
+    var emissionsResult = i.emissionsPerPerson() != null ? i.emissionsPerPerson().getCo2() : null;
     assertNull(emissionsResult);
   }
 

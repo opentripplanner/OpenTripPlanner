@@ -24,7 +24,7 @@ public record DecorateWithEmission(EmissionsService emissionsService)
   @Override
   public Itinerary decorate(Itinerary itinerary) {
     List<TransitLeg> transitLegs = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .map(TransitLeg.class::cast)
@@ -37,7 +37,7 @@ public record DecorateWithEmission(EmissionsService emissionsService)
     }
 
     List<StreetLeg> carLegs = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(l -> l instanceof StreetLeg)
       .map(StreetLeg.class::cast)

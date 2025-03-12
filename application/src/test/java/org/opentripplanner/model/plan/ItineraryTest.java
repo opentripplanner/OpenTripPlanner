@@ -28,19 +28,19 @@ public class ItineraryTest implements PlanTestConstants {
     Itinerary result = newItinerary(A, T11_00).walk(D5m, B).build();
 
     // Expected fields on itinerary set
-    assertEquals(ofMinutes(5), result.getDuration());
-    assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(600, result.getGeneralizedCost());
-    assertEquals(ZERO, result.getTransitDuration());
-    assertEquals(ofMinutes(5), result.getNonTransitDuration());
-    assertEquals(ZERO, result.getWaitingDuration());
+    assertEquals(ofMinutes(5), result.totalDuration());
+    assertEquals(0, result.numberOfTransfers());
+    assertEquals(600, result.generalizedCost());
+    assertEquals(ZERO, result.totalTransitDuration());
+    assertEquals(ofMinutes(5), result.totalStreetDuration());
+    assertEquals(ZERO, result.totalWaitingDuration());
     assertTrue(result.isWalkOnly());
 
     // Expected fields on walking leg set
     assertSameLocation(A, result.firstLeg().getFrom());
     assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_05), result.firstLeg().getEndTime());
-    assertEquals(TraverseMode.WALK, result.getStreetLeg(0).getMode());
+    assertEquals(TraverseMode.WALK, result.streetLeg(0).getMode());
     assertEquals(420.0d, result.firstLeg().getDistanceMeters(), 1E-3);
     assertSameLocation(B, result.lastLeg().getTo());
 
@@ -51,12 +51,12 @@ public class ItineraryTest implements PlanTestConstants {
   void testDerivedFieldsWithBusAllTheWay() {
     Itinerary result = newItinerary(A).bus(55, T11_00, T11_10, B).build();
 
-    assertEquals(ofMinutes(10), result.getDuration());
-    assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(COST.toSeconds(), result.getGeneralizedCost());
-    assertEquals(ofMinutes(10), result.getTransitDuration());
-    assertEquals(ZERO, result.getNonTransitDuration());
-    assertEquals(ZERO, result.getWaitingDuration());
+    assertEquals(ofMinutes(10), result.totalDuration());
+    assertEquals(0, result.numberOfTransfers());
+    assertEquals(COST.toSeconds(), result.generalizedCost());
+    assertEquals(ofMinutes(10), result.totalTransitDuration());
+    assertEquals(ZERO, result.totalStreetDuration());
+    assertEquals(ZERO, result.totalWaitingDuration());
     assertFalse(result.isWalkOnly());
 
     // Expected fields on bus leg set
@@ -64,7 +64,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertSameLocation(B, result.firstLeg().getTo());
     assertEquals(newTime(T11_00), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_10), result.firstLeg().getEndTime());
-    assertEquals(TransitMode.BUS, result.getTransitLeg(0).getMode());
+    assertEquals(TransitMode.BUS, result.transitLeg(0).getMode());
     assertEquals(TimetableRepositoryForTest.id("55"), result.firstLeg().getTrip().getId());
     assertEquals(7500, result.firstLeg().getDistanceMeters(), 1E-3);
 
@@ -75,12 +75,12 @@ public class ItineraryTest implements PlanTestConstants {
   void testDerivedFieldsWithTrainAllTheWay() {
     Itinerary result = newItinerary(A).rail(20, T11_05, T11_15, B).build();
 
-    assertEquals(ofMinutes(10), result.getDuration());
-    assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(COST.toSeconds(), result.getGeneralizedCost());
-    assertEquals(ofMinutes(10), result.getTransitDuration());
-    assertEquals(ZERO, result.getNonTransitDuration());
-    assertEquals(ZERO, result.getWaitingDuration());
+    assertEquals(ofMinutes(10), result.totalDuration());
+    assertEquals(0, result.numberOfTransfers());
+    assertEquals(COST.toSeconds(), result.generalizedCost());
+    assertEquals(ofMinutes(10), result.totalTransitDuration());
+    assertEquals(ZERO, result.totalStreetDuration());
+    assertEquals(ZERO, result.totalWaitingDuration());
     assertFalse(result.isWalkOnly());
 
     // Expected fields on bus leg set
@@ -88,7 +88,7 @@ public class ItineraryTest implements PlanTestConstants {
     assertSameLocation(B, result.firstLeg().getTo());
     assertEquals(newTime(T11_05), result.firstLeg().getStartTime());
     assertEquals(newTime(T11_15), result.firstLeg().getEndTime());
-    assertEquals(TransitMode.RAIL, result.getTransitLeg(0).getMode());
+    assertEquals(TransitMode.RAIL, result.transitLeg(0).getMode());
     assertEquals(TimetableRepositoryForTest.id("20"), result.firstLeg().getTrip().getId());
     assertEquals(15_000, result.firstLeg().getDistanceMeters(), 1E-3);
 
@@ -103,15 +103,15 @@ public class ItineraryTest implements PlanTestConstants {
       .rail(110, T11_15, T11_30, D)
       .build();
 
-    assertEquals(1, itinerary.getNumberOfTransfers());
-    assertEquals(ofMinutes(28), itinerary.getDuration());
-    assertEquals(ofMinutes(20), itinerary.getTransitDuration());
-    assertEquals(ofMinutes(1), itinerary.getNonTransitDuration());
-    assertEquals(ofMinutes((2 + 5)), itinerary.getWaitingDuration());
+    assertEquals(1, itinerary.numberOfTransfers());
+    assertEquals(ofMinutes(28), itinerary.totalDuration());
+    assertEquals(ofMinutes(20), itinerary.totalTransitDuration());
+    assertEquals(ofMinutes(1), itinerary.totalStreetDuration());
+    assertEquals(ofMinutes((2 + 5)), itinerary.totalWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 60 + .8 * 420 + 2 * 120 + 1200
-    assertEquals(1896, itinerary.getGeneralizedCost());
+    assertEquals(1896, itinerary.generalizedCost());
 
-    assertEquals(60 * 1.4, itinerary.getNonTransitDistanceMeters(), 0.01);
+    assertEquals(60 * 1.4, itinerary.totalStreetDistanceMeters(), 0.01);
     assertFalse(itinerary.isWalkOnly());
   }
 
@@ -124,13 +124,13 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D3m, D)
       .build();
 
-    assertEquals(ofMinutes(18), result.getDuration());
-    assertEquals(0, result.getNumberOfTransfers());
-    assertEquals(ofMinutes(10), result.getTransitDuration());
-    assertEquals(ofMinutes(5), result.getNonTransitDuration());
-    assertEquals(ofMinutes(3), result.getWaitingDuration());
+    assertEquals(ofMinutes(18), result.totalDuration());
+    assertEquals(0, result.numberOfTransfers());
+    assertEquals(ofMinutes(10), result.totalTransitDuration());
+    assertEquals(ofMinutes(5), result.totalStreetDuration());
+    assertEquals(ofMinutes(3), result.totalWaitingDuration());
     // Cost: walk + wait + board + transit = 2 * 300 + .8 * 180 + 120 + 600
-    assertEquals(1464, result.getGeneralizedCost());
+    assertEquals(1464, result.generalizedCost());
     assertFalse(result.isWalkOnly());
 
     assertEquals("A ~ Walk 2m ~ B ~ BUS 1 11:10 11:20 ~ C ~ Walk 3m ~ D [C₁1_464]", result.toStr());
@@ -147,11 +147,11 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D1m, G)
       .build();
 
-    assertEquals(ofMinutes(51), result.getDuration());
-    assertEquals(2, result.getNumberOfTransfers());
-    assertEquals(ofMinutes(34), result.getTransitDuration());
-    assertEquals(ofMinutes(6), result.getNonTransitDuration());
-    assertEquals(ofMinutes(11), result.getWaitingDuration());
+    assertEquals(ofMinutes(51), result.totalDuration());
+    assertEquals(2, result.numberOfTransfers());
+    assertEquals(ofMinutes(34), result.totalTransitDuration());
+    assertEquals(ofMinutes(6), result.totalStreetDuration());
+    assertEquals(ofMinutes(11), result.totalWaitingDuration());
     assertFalse(result.isWalkOnly());
     assertSameLocation(A, result.firstLeg().getFrom());
     assertSameLocation(G, result.lastLeg().getTo());
@@ -167,22 +167,22 @@ public class ItineraryTest implements PlanTestConstants {
   void walkSeparateFromBike() {
     var itin = newItinerary(A, T11_00).walk(D2m, B).bicycle(T11_05, T11_15, D).walk(D3m, E).build();
 
-    assertEquals(ofMinutes(15), itin.getNonTransitDuration());
-    assertEquals(ofMinutes(5), itin.walkDuration());
+    assertEquals(ofMinutes(15), itin.totalStreetDuration());
+    assertEquals(ofMinutes(5), itin.totalWalkDuration());
 
-    assertEquals(420, itin.walkDistanceMeters());
-    assertEquals(3420, itin.getNonTransitDistanceMeters());
+    assertEquals(420, itin.totalWalkDistanceMeters());
+    assertEquals(3420, itin.totalStreetDistanceMeters());
   }
 
   @Test
   void walkSeparateFromCar() {
     var itin = newItinerary(A, T11_00).walk(D2m, B).carHail(D10m, D).walk(D3m, E).build();
 
-    assertEquals(ofMinutes(15), itin.getNonTransitDuration());
-    assertEquals(ofMinutes(5), itin.walkDuration());
+    assertEquals(ofMinutes(15), itin.totalStreetDuration());
+    assertEquals(ofMinutes(5), itin.totalWalkDuration());
 
-    assertEquals(420, itin.walkDistanceMeters());
-    assertEquals(15420.0, itin.getNonTransitDistanceMeters());
+    assertEquals(420, itin.totalWalkDistanceMeters());
+    assertEquals(15420.0, itin.totalStreetDistanceMeters());
   }
 
   @Test
@@ -196,13 +196,13 @@ public class ItineraryTest implements PlanTestConstants {
       .walk(D1m, G)
       .build();
 
-    var leg = itinerary.getLegs().get(0);
+    var leg = itinerary.legs().get(0);
     var oneHourLater = leg.withTimeShift(Duration.ofHours(1));
 
     assertNotSame(leg, oneHourLater);
 
-    assertEquals(0, itinerary.getLegIndex(leg));
-    assertEquals(0, itinerary.getLegIndex(oneHourLater));
+    assertEquals(0, itinerary.findLegIndex(leg));
+    assertEquals(0, itinerary.findLegIndex(oneHourLater));
   }
 
   @Test
@@ -223,22 +223,22 @@ public class ItineraryTest implements PlanTestConstants {
     @Test
     void noPenalty() {
       var subject = itineraryBuilder().withGeneralizedCost(COST).build();
-      assertEquals(COST.toSeconds(), subject.getGeneralizedCost());
-      assertEquals(COST, subject.getGeneralizedCostIncludingPenalty());
+      assertEquals(COST.toSeconds(), subject.generalizedCost());
+      assertEquals(COST, subject.generalizedCostIncludingPenalty());
     }
 
     @Test
     void accessPenalty() {
       var subject = itineraryBuilder().withGeneralizedCost(COST).withAccessPenalty(PENALTY).build();
-      assertEquals(COST.minus(PENALTY.cost()).toSeconds(), subject.getGeneralizedCost());
-      assertEquals(COST, subject.getGeneralizedCostIncludingPenalty());
+      assertEquals(COST.minus(PENALTY.cost()).toSeconds(), subject.generalizedCost());
+      assertEquals(COST, subject.generalizedCostIncludingPenalty());
     }
 
     @Test
     void egressPenalty() {
       var subject = itineraryBuilder().withGeneralizedCost(COST).withEgressPenalty(PENALTY).build();
-      assertEquals(COST.minus(PENALTY.cost()).toSeconds(), subject.getGeneralizedCost());
-      assertEquals(COST, subject.getGeneralizedCostIncludingPenalty());
+      assertEquals(COST.minus(PENALTY.cost()).toSeconds(), subject.generalizedCost());
+      assertEquals(COST, subject.generalizedCostIncludingPenalty());
     }
 
     @Test
@@ -248,11 +248,8 @@ public class ItineraryTest implements PlanTestConstants {
         .withAccessPenalty(PENALTY)
         .withEgressPenalty(PENALTY)
         .build();
-      assertEquals(
-        COST.minus(PENALTY.cost().multiply(2)).toSeconds(),
-        subject.getGeneralizedCost()
-      );
-      assertEquals(COST, subject.getGeneralizedCostIncludingPenalty());
+      assertEquals(COST.minus(PENALTY.cost().multiply(2)).toSeconds(), subject.generalizedCost());
+      assertEquals(COST, subject.generalizedCostIncludingPenalty());
     }
 
     @Test

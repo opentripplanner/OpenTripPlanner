@@ -56,8 +56,8 @@ final class PageCursorSerializer {
         .withBoolean(CUT_ON_STREET_FIELD, cut.isStreetOnly())
         .withTimeInstant(CUT_DEPARTURE_TIME_FIELD, cut.startTimeAsInstant())
         .withTimeInstant(CUT_ARRIVAL_TIME_FIELD, cut.endTimeAsInstant())
-        .withInt(CUT_N_TRANSFERS_FIELD, cut.getNumberOfTransfers())
-        .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty().toSeconds());
+        .withInt(CUT_N_TRANSFERS_FIELD, cut.numberOfTransfers())
+        .withInt(CUT_COST_FIELD, cut.generalizedCostIncludingPenalty().toSeconds());
     }
 
     return tokenBuilder.build();

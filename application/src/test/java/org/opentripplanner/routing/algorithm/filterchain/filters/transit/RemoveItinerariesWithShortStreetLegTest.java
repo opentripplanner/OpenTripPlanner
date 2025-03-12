@@ -24,7 +24,7 @@ class RemoveItinerariesWithShortStreetLegTest implements PlanTestConstants {
   @Test
   void justBikeDoesNothing() {
     var itin = newItinerary(A).bicycle(T11_05, T11_06, B).build();
-    assertEquals(300, itin.getLegs().get(0).getDistanceMeters());
+    assertEquals(300, itin.legs().get(0).getDistanceMeters());
 
     assertFalse(subject.shouldBeFlaggedForRemoval().test(itin), itin.toStr());
   }
@@ -33,7 +33,7 @@ class RemoveItinerariesWithShortStreetLegTest implements PlanTestConstants {
   void zeroMinDoesNothing() {
     var filter = new RemoveItinerariesWithShortStreetLeg(0, BICYCLE);
     var itin = newItinerary(A).bicycle(T11_05, T11_06, B).rail(30, T11_16, T11_20, C).build();
-    assertEquals(300, itin.getLegs().get(0).getDistanceMeters());
+    assertEquals(300, itin.legs().get(0).getDistanceMeters());
 
     assertFalse(filter.shouldBeFlaggedForRemoval().test(itin), itin.toStr());
   }
@@ -41,7 +41,7 @@ class RemoveItinerariesWithShortStreetLegTest implements PlanTestConstants {
   @Test
   void shortBike() {
     var itin = newItinerary(A).bicycle(T11_05, T11_06, B).rail(30, T11_16, T11_20, C).build();
-    assertEquals(300, itin.getLegs().get(0).getDistanceMeters());
+    assertEquals(300, itin.legs().get(0).getDistanceMeters());
 
     assertTrue(subject.shouldBeFlaggedForRemoval().test(itin), itin.toStr());
   }
@@ -49,7 +49,7 @@ class RemoveItinerariesWithShortStreetLegTest implements PlanTestConstants {
   @Test
   void longBike() {
     var itin = newItinerary(A).bicycle(T11_05, T11_30, B).rail(30, T11_33, T11_50, C).build();
-    assertEquals(7500, itin.getLegs().get(0).getDistanceMeters());
+    assertEquals(7500, itin.legs().get(0).getDistanceMeters());
 
     assertFalse(subject.shouldBeFlaggedForRemoval().test(itin), itin.toStr());
   }

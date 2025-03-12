@@ -83,7 +83,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLowerGeneralizedCost() {
-    Itinerary middleHighCost = createMiddle(middle.getGeneralizedCost() + 1);
+    Itinerary middleHighCost = createMiddle(middle.generalizedCost() + 1);
 
     List<Itinerary> itineraries = List.of(middleHighCost, middle, late);
 
@@ -101,7 +101,7 @@ public class PagingFilterTest implements PlanTestConstants {
       .bus(21, t0, t0 + D1m, B)
       .bus(22, t0 + D2m, t0 + D3m, C)
       .bus(23, t0 + D4m, MIDDLE_END, D)
-      .build(middle.getGeneralizedCost());
+      .build(middle.generalizedCost());
 
     List<Itinerary> itineraries = List.of(middleHighNumberOfTransfers, middle, late);
 
@@ -117,7 +117,7 @@ public class PagingFilterTest implements PlanTestConstants {
     Itinerary middleEarlierDepartureTime = newItinerary(A)
       .bus(2, t0 - D1m, t0 + D3m, B)
       .bus(21, t0 + D4m, MIDDLE_END, C)
-      .build(middle.getGeneralizedCost());
+      .build(middle.generalizedCost());
 
     List<Itinerary> itineraries = List.of(middleEarlierDepartureTime, middle, late);
 

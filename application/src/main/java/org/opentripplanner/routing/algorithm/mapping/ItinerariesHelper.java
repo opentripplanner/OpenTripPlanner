@@ -40,7 +40,7 @@ public class ItinerariesHelper {
 
   private static OptionalDouble getMaxSlope(Itinerary it) {
     return it
-      .getLegs()
+      .legs()
       .stream()
       .filter(StreetLeg.class::isInstance)
       .map(StreetLeg.class::cast)
