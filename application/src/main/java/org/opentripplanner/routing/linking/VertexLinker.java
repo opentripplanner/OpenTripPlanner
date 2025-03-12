@@ -612,9 +612,9 @@ public class VertexLinker {
       // The more complex the area polygon is, the less visibility connections should be tried
       var areaComplexity = polygon.getNumPoints();
       var totalCount = visibilityVertices.size();
-      // take min. 10 closest visibility points
+      // take min. 6 closest visibility points
       var appliedCount = (long) Math.max(
-        10,
+        6,
         Math.floor((2 * maxAreaNodes * maxAreaNodes) / areaComplexity)
       );
       if (appliedCount < totalCount) {
