@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -56,7 +57,7 @@ final class PageCursorSerializer {
         .withTimeInstant(CUT_DEPARTURE_TIME_FIELD, cut.startTimeAsInstant())
         .withTimeInstant(CUT_ARRIVAL_TIME_FIELD, cut.endTimeAsInstant())
         .withInt(CUT_N_TRANSFERS_FIELD, cut.getNumberOfTransfers())
-        .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
+        .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty().toSeconds());
     }
 
     return tokenBuilder.build();
@@ -87,7 +88,7 @@ final class PageCursorSerializer {
         itineraryPageCut = new DeduplicationPageCut(
           cutDepartureTime,
           token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD),
-          token.getInt(CUT_COST_FIELD),
+          Cost.costOfSeconds(token.getInt(CUT_COST_FIELD)),
           token.getInt(CUT_N_TRANSFERS_FIELD),
           token.getBoolean(CUT_ON_STREET_FIELD)
         );

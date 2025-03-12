@@ -8,6 +8,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -27,7 +28,13 @@ class PageCursorSerializerTest {
     "MXxQUkVWSU9VU19QQUdFfDIwMjMtMTItMzFUMjM6NTk6NTlafHw1aHxTVFJFRVRfQU5EX0RFUEFSVFVSRV9USU1FfH" +
     "x8fHx8";
 
-  private static final ItinerarySortKey CUT = new DeduplicationPageCut(DT, AT, 1200, 3, true);
+  private static final ItinerarySortKey CUT = new DeduplicationPageCut(
+    DT,
+    AT,
+    Cost.costOfSeconds(1200),
+    3,
+    true
+  );
 
   private static final PageCursor PAGE_CURSOR_V1 = new PageCursor(
     PREVIOUS_PAGE,

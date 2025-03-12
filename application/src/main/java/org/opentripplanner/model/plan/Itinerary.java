@@ -470,8 +470,8 @@ public class Itinerary implements ItinerarySortKey {
    * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
    */
   @Override
-  public int getGeneralizedCostIncludingPenalty() {
-    return generalizedCost.plus(accessPenalty.cost().plus(egressPenalty.cost())).toSeconds();
+  public Cost getGeneralizedCostIncludingPenalty() {
+    return generalizedCost.plus(accessPenalty.cost().plus(egressPenalty.cost()));
   }
 
   /**

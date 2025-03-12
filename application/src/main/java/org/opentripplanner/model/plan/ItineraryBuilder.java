@@ -56,7 +56,7 @@ public class ItineraryBuilder {
     this.searchWindowAware = original.isSearchWindowAware();
     this.accessPenalty = original.getAccessPenalty();
     this.egressPenalty = original.getEgressPenalty();
-    this.generalizedCost = Cost.costOfSeconds(original.getGeneralizedCostIncludingPenalty());
+    this.generalizedCost = original.getGeneralizedCostIncludingPenalty();
     this.generalizedCost2 = original.getGeneralizedCost2().orElse(null);
     this.transferPriorityCost = original.getTransferPriorityCost();
     this.waitTimeOptimizedCost = original.getWaitTimeOptimizedCost();

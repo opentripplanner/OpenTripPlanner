@@ -173,7 +173,7 @@ public class TripPatternType {
           .name("generalizedCost")
           .description("Generalized cost or weight of the itinerary. Used for debugging.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> itinerary(env).getGeneralizedCostIncludingPenalty())
+          .dataFetcher(env -> itinerary(env).getGeneralizedCostIncludingPenalty().toSeconds())
           .build()
       )
       .field(

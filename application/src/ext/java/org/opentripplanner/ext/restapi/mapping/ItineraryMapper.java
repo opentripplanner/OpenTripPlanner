@@ -40,7 +40,7 @@ public class ItineraryMapper {
     // We list only the generalizedCostIncludingPenalty, this is the least confusing. We intend to
     // delete this endpoint soon, so we will not make the proper change and add the
     // generalizedCostIncludingPenalty to the response and update the debug client to show it.
-    api.generalizedCost = domain.getGeneralizedCostIncludingPenalty();
+    api.generalizedCost = domain.getGeneralizedCostIncludingPenalty().toSeconds();
     api.elevationLost = domain.getElevationLost();
     api.elevationGained = domain.getElevationGained();
     api.transfers = domain.getNumberOfTransfers();
