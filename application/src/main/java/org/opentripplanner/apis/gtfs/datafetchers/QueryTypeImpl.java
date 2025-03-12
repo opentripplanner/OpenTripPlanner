@@ -937,13 +937,12 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       var args = new GraphQLTypes.GraphQLQueryTypeVehicleRentalsByBboxArgs(
         environment.getArguments()
       );
-
-      return vehicleRentalService.getVehicleRentalPlacesForEnvelope(
-        args.getGraphQLMinimumLongitude(),
-        args.getGraphQLMinimumLatitude(),
-        args.getGraphQLMaximumLongitude(),
-        args.getGraphQLMaximumLatitude()
+      Envelope envelope = new Envelope(
+        new Coordinate(args.getGraphQLMinimumLongitude(), args.getGraphQLMinimumLatitude()),
+        new Coordinate(args.getGraphQLMaximumLongitude(), args.getGraphQLMaximumLatitude())
       );
+
+      return vehicleRentalService.getVehicleRentalPlacesForEnvelope(envelope);
     };
   }
 
