@@ -39,7 +39,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
     var instant = instant("12:00");
     {
-      var result = transitService.findTripTimeOnDate(
+      var result = transitService.findTripTimesOnDate(
         TripTimeOnDateRequest.of(List.of(STOP_A1)).withTime(instant).build()
       );
 
@@ -48,7 +48,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       assertEquals(instant("12:01"), tt.departure());
     }
     {
-      var result = transitService.findTripTimeOnDate(
+      var result = transitService.findTripTimesOnDate(
         TripTimeOnDateRequest.of(List.of(STOP_B1)).withTime(instant).build()
       );
       assertThat(result).hasSize(1);
@@ -67,7 +67,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
     var helper = new StopTimesHelper(transitService);
 
     var instant = instant("18:00");
-    var result = transitService.findTripTimeOnDate(
+    var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A1)).withTime(instant).build()
     );
     assertThat(result).isEmpty();
@@ -81,7 +81,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .getTransitService();
 
     var instant = instant("11:00");
-    var result = transitService.findTripTimeOnDate(
+    var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A1))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(59))
@@ -98,7 +98,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .getTransitService();
 
     var instant = instant("11:00");
-    var result = transitService.findTripTimeOnDate(
+    var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_A1))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(60))
@@ -115,7 +115,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       .getTransitService();
 
     var instant = instant("12:10");
-    var result = transitService.findTripTimeOnDate(
+    var result = transitService.findTripTimesOnDate(
       TripTimeOnDateRequest.of(List.of(STOP_F))
         .withTime(instant)
         .withTimeWindow(Duration.ofMinutes(60))
