@@ -74,7 +74,7 @@
         <micrometer.version>1.14.4</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
-        <protobuf.version>4.29.3</protobuf.version>
+        <protobuf.version>4.30.0</protobuf.version>
         <siri-java-model.version>2.0.0</siri-java-model.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- Other properties -->
@@ -387,7 +387,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.54.0</version>
+                <version>26.56.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

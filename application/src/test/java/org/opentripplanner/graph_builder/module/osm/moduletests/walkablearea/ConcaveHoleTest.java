@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
  * <p>
  * Further reading: https://github.com/opentripplanner/OpenTripPlanner/pull/6486
  */
-public class ConcaveHoleTest {
+class ConcaveHoleTest {
 
   @Test
   void visibilityNodes() {

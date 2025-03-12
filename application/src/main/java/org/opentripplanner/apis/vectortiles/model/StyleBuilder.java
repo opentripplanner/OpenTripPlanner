@@ -293,6 +293,11 @@ public class StyleBuilder {
     return filterClasses(classToFilter);
   }
 
+  @SafeVarargs
+  public final StyleBuilder classFilter(Class<?>... classToFilter) {
+    return filterClasses(classToFilter);
+  }
+
   public StyleBuilder filterValueInProperty(String propertyName, String... values) {
     var newFilter = new ArrayList<>();
     newFilter.add("any");
