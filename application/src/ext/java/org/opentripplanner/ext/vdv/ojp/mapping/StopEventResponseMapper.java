@@ -69,8 +69,8 @@ public class StopEventResponseMapper {
     this.resolveFeedLanguage = resolveFeedLanguage;
   }
 
-  public OJP mapStopTimesInPattern(List<CallAtStop> tripTimesOnDate, ZonedDateTime timestamp) {
-    List<JAXBElement<StopEventResultStructure>> stopEvents = tripTimesOnDate
+  public OJP mapCalls(List<CallAtStop> calls, ZonedDateTime timestamp) {
+    List<JAXBElement<StopEventResultStructure>> stopEvents = calls
       .stream()
       .map(call -> this.stopEventResult(call))
       .map(StopEventResponseMapper::jaxbElement)
@@ -155,7 +155,8 @@ public class StopEventResponseMapper {
       .withOrder(BigInteger.valueOf(tripTimeOnDate.getGtfsSequence()))
       .withNoBoardingAtStop(isNone(tripTimeOnDate.getPickupType()))
       .withNoAlightingAtStop(isNone(tripTimeOnDate.getDropoffType()))
-      .withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)));
+      .withPlannedQuay(internationalText(stop.getPlatformCode(), lang(tripTimeOnDate)))
+      .withNotServicedStop(tripTimeOnDate.isCancelledStop());
   }
 
   private CallAtNearStopStructure callAtNearStop(TripTimeOnDate tripTimeOnDate) {

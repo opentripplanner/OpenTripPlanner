@@ -60,9 +60,9 @@ public class OjpService {
 
     List<CallAtStop> callsAtStop = List.of();
     if (stopId.isPresent()) {
-      callsAtStop = vdvService.findTripTimesOnDate(stopId.get(), params);
+      callsAtStop = vdvService.findCallsAtStop(stopId.get(), params);
     } else if (coordinate.isPresent()) {
-      callsAtStop = vdvService.findTripTimesOnDate(coordinate.get(), params);
+      callsAtStop = vdvService.findCallsAtStop(coordinate.get(), params);
     }
     var optional = mapOptionalFeatures(ser.getParams());
     var mapper = new StopEventResponseMapper(
@@ -71,7 +71,7 @@ public class OjpService {
       idResolver,
       vdvService::resolveLanguage
     );
-    return mapper.mapStopTimesInPattern(callsAtStop, ZonedDateTime.now());
+    return mapper.mapCalls(callsAtStop, ZonedDateTime.now());
   }
 
   protected VdvService.StopEventRequestParams extractStopEventParams(
