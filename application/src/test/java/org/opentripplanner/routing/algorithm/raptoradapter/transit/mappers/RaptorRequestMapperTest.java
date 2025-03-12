@@ -47,7 +47,7 @@ class RaptorRequestMapperTest {
     "Via A",
     null,
     List.of(STOP_A.getId()),
-    List.of()
+    null
   );
   private static final int VIA_FROM_STOP_INDEX = 47;
   private static final int VIA_TO_STOP_INDEX = 123;
@@ -100,7 +100,7 @@ class RaptorRequestMapperTest {
     var minWaitTime = Duration.ofMinutes(13);
 
     req.setViaLocations(
-      List.of(new VisitViaLocation("Via A", minWaitTime, List.of(STOP_A.getId()), List.of()))
+      List.of(new VisitViaLocation("Via A", minWaitTime, List.of(STOP_A.getId()), null))
     );
 
     var result = map(req);
@@ -133,9 +133,7 @@ class RaptorRequestMapperTest {
     Duration minimumWaitTime = Duration.ofMinutes(10);
 
     req.setViaLocations(
-      List.of(
-        new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), List.of(VIA_COORDINATE))
-      )
+      List.of(new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), VIA_COORDINATE))
     );
 
     var result = map(req);

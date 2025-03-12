@@ -245,11 +245,11 @@ public class RaptorRequestMapper<T extends RaptorTripSchedule> {
         builder.addViaStop(stopIndex);
         viaStops.add(stopIndex);
       }
-      for (var coordinate : input.coordinates()) {
+      if (input.coordinate().isPresent()) {
         var viaTransfers = viaTransferResolver.createViaTransfers(
           request,
           input.label(),
-          coordinate
+          input.coordinate().get()
         );
         for (var it : viaTransfers) {
           // If via-stop and via-transfers are used together then walking from a stop

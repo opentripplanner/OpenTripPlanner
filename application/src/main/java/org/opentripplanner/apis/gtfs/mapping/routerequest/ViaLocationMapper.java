@@ -42,7 +42,7 @@ class ViaLocationMapper {
         (String) visit.get(FIELD_LABEL),
         (Duration) visit.get(FIELD_MINIMUM_WAIT_TIME),
         mapStopLocationIds((List<String>) visit.get(FIELD_STOP_LOCATION_IDS)),
-        List.of()
+        null
       );
     } else {
       throw new IllegalArgumentException("ViaLocation must define either pass-through or visit.");

@@ -45,7 +45,7 @@ class ViaLocationMapperTest {
     assertEquals(EXPECTED_IDS_AS_STRING, via.stopLocationIds().toString());
     assertFalse(via.isPassThroughLocation());
     assertEquals(
-      "[VisitViaLocation{label: TestLabel, minimumWaitTime: 5m, stopLocationIds: [F:ID1, F:ID2], coordinates: []}]",
+      "[VisitViaLocation{label: TestLabel, minimumWaitTime: 5m, stopLocationIds: [F:ID1, F:ID2]}]",
       result.toString()
     );
   }

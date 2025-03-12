@@ -156,7 +156,7 @@ class RouteRequestTest {
     assertTrue(request.allowTransferOptimization());
 
     request.setViaLocations(
-      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), List.of()))
+      List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), null))
     );
     assertFalse(request.allowTransferOptimization());
   }
