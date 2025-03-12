@@ -458,8 +458,8 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(env -> {
-            var ids = mapIDsToDomainNullSafe(env.getArgument("ids"));
-            if (!ids.isEmpty()) {
+            if (env.getArgument("ids") != null) {
+              var ids = mapIDsToDomainNullSafe(env.getArgument("ids"));
               return ids
                 .stream()
                 .map(id -> StopPlaceType.fetchStopPlaceById(id, env))

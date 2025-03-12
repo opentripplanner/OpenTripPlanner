@@ -9,8 +9,8 @@ the [release pages on GitHub](https://github.com/opentripplanner/OpenTripPlanner
 or [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp-shaded/),
 navigate to the highest version number, and download the jar file `otp-shaded-VERSION.jar`.
 
-Note that version numbers like `v2.1.0-rc1` or `v2.6.0-SNAPSHOT` refer to development builds _
-before_ the release version `v2.6.0`. The existence of a build `vX.Y.Z-SNAPSHOT` does not mean
+Note that version numbers like `v2.1.0-rc1` or `v2.7.0-SNAPSHOT` refer to development builds _
+before_ the release version `v2.7.0`. The existence of a build `vX.Y.Z-SNAPSHOT` does not mean
 that `vX.Y.Z` has been released yet.
 
 We use the [Github Actions CI system](https://github.com/opentripplanner/OpenTripPlanner/actions) to
@@ -87,7 +87,7 @@ For example, you could do the following:
 
 ```bash
 cd OpenTripPlanner
-git checkout v2.6.0
+git checkout v2.7.0
 git clean -df
 mvn clean package -DskipTests
 ```
@@ -117,6 +117,6 @@ project's `pom.xml`:
 <dependency>
   <groupId>org.opentripplanner</groupId>
   <artifactId>otp</artifactId>
-  <version>2.6.0</version>
+  <version>2.7.0</version>
 </dependency>
 ```

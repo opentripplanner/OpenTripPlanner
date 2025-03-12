@@ -444,7 +444,7 @@ public class TimetableRepository implements Serializable {
   /**
    * Return the stop that is associated with the NeTEx concept of a scheduled stop point.
    * <p>
-   * The scheduled stop point which is a "location-independent" stop that schedule systems provide
+   * The scheduled stop point is a "location-independent" stop that schedule systems provide
    * which in turn can be later be resolved to an actual stop.
    * <p>
    * This way two schedule systems can use their own IDs for scheduled stop points but the stop (the
