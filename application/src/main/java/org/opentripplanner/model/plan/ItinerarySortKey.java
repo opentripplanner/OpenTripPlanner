@@ -19,7 +19,7 @@ public interface ItinerarySortKey {
   Instant endTimeAsInstant();
   Cost getGeneralizedCostIncludingPenalty();
   int getNumberOfTransfers();
-  boolean isOnStreetAllTheWay();
+  boolean isStreetOnly();
 
   default String keyAsString() {
     return ValueObjectToStringBuilder.of()
@@ -32,7 +32,7 @@ public interface ItinerarySortKey {
       .addText(", Tx")
       .addNum(getNumberOfTransfers())
       .addText(", ")
-      .addBool(isOnStreetAllTheWay(), "onStreet", "transit")
+      .addBool(isStreetOnly(), "onStreet", "transit")
       .addText("]")
       .toString();
   }

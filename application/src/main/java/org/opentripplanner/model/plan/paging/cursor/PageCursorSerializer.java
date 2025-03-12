@@ -53,7 +53,7 @@ final class PageCursorSerializer {
     var cut = cursor.itineraryPageCut();
     if (cut != null) {
       tokenBuilder
-        .withBoolean(CUT_ON_STREET_FIELD, cut.isOnStreetAllTheWay())
+        .withBoolean(CUT_ON_STREET_FIELD, cut.isStreetOnly())
         .withTimeInstant(CUT_DEPARTURE_TIME_FIELD, cut.startTimeAsInstant())
         .withTimeInstant(CUT_ARRIVAL_TIME_FIELD, cut.endTimeAsInstant())
         .withInt(CUT_N_TRANSFERS_FIELD, cut.getNumberOfTransfers())

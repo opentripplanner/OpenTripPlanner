@@ -207,20 +207,6 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * Return {@code true} if all legs are WALKING.
-   */
-  public boolean isWalkingAllTheWay() {
-    return isWalkOnly();
-  }
-
-  /**
-   * Return {@code true} if all legs are WALKING.
-   */
-  public boolean isOnStreetAllTheWay() {
-    return isStreetOnly();
-  }
-
-  /**
    * Returns true if this itinerary has only flex and walking legs.
    */
   public boolean isDirectFlex() {
@@ -336,6 +322,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /** TRUE if mode is a non transit move from start ot end (all legs are non-transit). */
+  @Override
   public boolean isStreetOnly() {
     return streetOnly;
   }

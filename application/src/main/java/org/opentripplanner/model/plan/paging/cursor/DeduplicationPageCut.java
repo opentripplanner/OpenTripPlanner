@@ -40,7 +40,7 @@ record DeduplicationPageCut(
   }
 
   @Override
-  public boolean isOnStreetAllTheWay() {
+  public boolean isStreetOnly() {
     return onStreet;
   }
 

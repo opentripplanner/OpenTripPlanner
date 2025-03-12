@@ -33,7 +33,7 @@ public class RoutingErrorsAttacher {
     List<Itinerary> filteredItineraries
   ) {
     final List<RoutingError> routingErrors = new ArrayList<>();
-    Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isOnStreetAllTheWay;
+    Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isStreetOnly;
 
     boolean hasTransitItineraries = originalItineraries
       .stream()
