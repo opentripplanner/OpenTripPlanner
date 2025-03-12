@@ -87,6 +87,7 @@
         <plugin.prettier.version>0.22</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
         <plugin.prettier.skip>false</plugin.prettier.skip>
+        <skip-source-and-javadoc>true</skip-source-and-javadoc>
     </properties>
 
     <distributionManagement>
@@ -156,7 +157,7 @@
                         <configuration>
                             <classesDirectory>${basedir}/doc/javadoc</classesDirectory>
                             <classifier>javadoc</classifier>
-                            <skipIfEmpty>true</skipIfEmpty>
+                            <skipIfEmpty>${skip-source-and-javadoc}</skipIfEmpty>
                         </configuration>
                     </execution>
                 </executions>
@@ -549,6 +550,9 @@
         </profile>
         <profile>
             <id>release</id>
+            <properties>
+                <skip-source-and-javadoc>false</skip-source-and-javadoc>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
