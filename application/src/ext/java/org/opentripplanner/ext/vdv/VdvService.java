@@ -101,7 +101,7 @@ public class VdvService {
       .withIncludedModes(FilterValues.ofEmptyIsEverything("selectedModes", params.includedModes))
       .withExcludedModes(FilterValues.ofEmptyIsEverything("excludedModes", params.excludedModes))
       .build();
-    return transitService.findTripTimeOnDate(request).stream().map(CallAtStop::noWalking).toList();
+    return transitService.findTripTimesOnDate(request).stream().map(CallAtStop::noWalking).toList();
   }
 
   public record StopEventRequestParams(

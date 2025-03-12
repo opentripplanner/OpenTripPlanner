@@ -442,7 +442,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public List<TripTimeOnDate> findTripTimeOnDate(
+  public List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -464,7 +464,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public List<TripTimeOnDate> findTripTimeOnDate(TripTimeOnDateRequest request) {
+  public List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request) {
     return stopTimesHelper.findTripTimeOnDate(request);
   }
 
