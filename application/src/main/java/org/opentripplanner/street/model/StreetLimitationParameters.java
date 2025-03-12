@@ -32,7 +32,7 @@ public class StreetLimitationParameters implements Serializable {
   }
 
   /**
-   * Initiliaze limit for area linking
+   * Initialize limit for area linking
    */
   public void initMaxAreaNodes(int maxAreaNodes) {
     this.maxAreaNodes = maxAreaNodes;
