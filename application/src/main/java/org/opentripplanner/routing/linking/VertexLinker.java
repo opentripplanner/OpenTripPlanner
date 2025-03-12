@@ -136,7 +136,7 @@ public class VertexLinker {
     removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
-  public void setAreaVisibility(Boolean areaVisibility) {
+  public void setAreaVisibility(boolean areaVisibility) {
     this.areaVisibility = areaVisibility;
   }
 
@@ -585,10 +585,12 @@ public class VertexLinker {
   /**
    * Inaccurate but fast distance estimate for sorting
    */
-  private Double distSquared(IntersectionVertex a, IntersectionVertex b) {
+  private double distSquared(IntersectionVertex a, IntersectionVertex b) {
     var aco = a.getCoordinate();
     var bco = b.getCoordinate();
-    return new Double(aco.x * aco.x + aco.y * aco.y);
+    aco.x -= bco.x;
+    aco.y -= bco.y;
+    return aco.x * aco.x + aco.y * aco.y;
   }
 
   /**
@@ -620,7 +622,8 @@ public class VertexLinker {
       if (appliedCount < totalCount) {
         visibilityVertices = visibilityVertices
           .stream()
-          .sorted((v1, v2) -> distSquared(v2, newVertex).compareTo(distSquared(v1, newVertex)))
+          .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+          )
           .limit(appliedCount)
           .collect(Collectors.toSet());
       }
@@ -637,7 +640,8 @@ public class VertexLinker {
         var nearest = areaGroup
           .visibilityVertices()
           .stream()
-          .sorted((v1, v2) -> distSquared(v2, newVertex).compareTo(distSquared(v1, newVertex)))
+          .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
+          )
           .findFirst()
           .get();
         return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges, true);
@@ -720,8 +724,10 @@ public class VertexLinker {
         }
       }
     }
-    // we alread know that the edge is inside the areaGroup and hit != null, but test anyway
-    if (hit != null) {
+    // we already know that the edge is inside the areaGroup and hit != null, but test anyway
+    if (hit == null) {
+      LOG.warn("No intersecting area found. This indicates a bug.");
+    } else {
       double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
       // apply consistent NoThru restrictions
       // if all joining edges are nothru, then the new edge should be as well

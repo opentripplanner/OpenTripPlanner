@@ -52,7 +52,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private final VehicleParkingRepository parkingRepository;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
-  private final Boolean areaVisibility;
+  private final boolean areaVisibility;
   private final int maxAreaNodes;
 
   public StreetLinkerModule(
