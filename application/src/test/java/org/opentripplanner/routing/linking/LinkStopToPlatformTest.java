@@ -30,6 +30,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.test.support.GeoJsonIo;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -67,7 +68,7 @@ public class LinkStopToPlatformTest {
       areaGroup.addVisibilityVertices(Set.of(vertices.get(i)));
     }
 
-    // AreaGroup must include a valid Area which defines area atttributes
+    // AreaGroup must include a valid Area which defines area attributes
     Area area = new Area();
     area.setName(new LocalizedString("test platform"));
     area.setPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
@@ -117,6 +118,8 @@ public class LinkStopToPlatformTest {
 
   /**
    * Link stop outside platform area to platform.
+   * Stop gets linked to the closest edge pair and optimal paths from
+   * the splitting points to visibility points are added
    */
   @Test
   void testLinkStopOutsideArea() {
@@ -250,6 +253,52 @@ public class LinkStopToPlatformTest {
     assertNotNull(v1);
     assertNotNull(v2);
     assertTrue(v1.isConnected(v2));
+  }
+
+  /**
+   * Link stop inside a concave platform. Stop gets connected to the graph,
+   * but visibility edges which would cross the area boundary are not added
+   */
+  @Test
+  void testLinkStopToConcaveArea() {
+    /* test platform has a L shape with 12 edges:
+
+      0                    1
+       ____________________
+      |                    |
+      |____________ 4      |
+                   |       |
+      5            |       |
+                   |  *    |
+                  3 _______ 2
+    */
+
+    Coordinate[] platform = {
+      new Coordinate(10, 60.004),
+      new Coordinate(10.010, 60.004),
+      new Coordinate(10.010, 60),
+      new Coordinate(10.006, 60),
+      new Coordinate(10.006, 60.003),
+      new Coordinate(10, 60.003),
+    };
+    // add entrances to corners 0 and 5
+    int[] visibilityPoints = { 0, 5 };
+
+    // place the stop marked above by * inside the platform, near the edge 2-3
+    Coordinate[] stops = { new Coordinate(10.007, 60.001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph);
+
+    // stop links to the edge pair 2-3, which adds 4 new edges
+    // edge pair splitting adds 2 edges, and transit vertex linking 2 more
+    // new splitting vertices cannot connect with the visibility points
+    // because they are hidden behind the corner
+    assertEquals(
+      20,
+      graph.getEdges().size(),
+      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
+    );
   }
 
   private void linkStops(Graph graph) {
