@@ -2,7 +2,9 @@ package org.opentripplanner.updater.trip.gtfs;
 
 import com.google.transit.realtime.GtfsRealtime;
 import de.mfdz.MfdzRealtimeExtensions;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import javax.annotation.Nullable;
 import org.opentripplanner.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.model.PickDrop;
@@ -13,49 +15,129 @@ import org.opentripplanner.model.PickDrop;
  */
 final class AddedStopTime {
 
-  @Nullable
-  private final PickDrop pickup;
+  private final GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate;
 
-  @Nullable
-  private final PickDrop dropOff;
-
-  public static final PickDrop DEFAULT_PICK_DROP = PickDrop.SCHEDULED;
-
-  AddedStopTime(@Nullable PickDrop pickup, @Nullable PickDrop dropOff) {
-    this.pickup = pickup;
-    this.dropOff = dropOff;
+  AddedStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
+    this.stopTimeUpdate = stopTimeUpdate;
   }
 
   PickDrop pickup() {
-    return Objects.requireNonNullElse(pickup, DEFAULT_PICK_DROP);
+    return getPickDrop(
+      getStopTimeProperties()
+        .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
+        .orElse(null),
+      getStopTimePropertiesExtension()
+        .map(properties -> properties.hasPickupType() ? properties.getPickupType() : null)
+        .orElse(null)
+    );
   }
 
   PickDrop dropOff() {
-    return Objects.requireNonNullElse(dropOff, DEFAULT_PICK_DROP);
+    return getPickDrop(
+      getStopTimeProperties()
+        .map(properties -> properties.hasDropOffType() ? properties.getDropOffType() : null)
+        .orElse(null),
+      getStopTimePropertiesExtension()
+        .map(properties -> properties.hasDropoffType() ? properties.getDropoffType() : null)
+        .orElse(null)
+    );
   }
 
-  static AddedStopTime ofStopTime(GtfsRealtime.TripUpdate.StopTimeUpdate props) {
-    if (props.getStopTimeProperties().hasExtension(MfdzRealtimeExtensions.stopTimeProperties)) {
-      var ext = props
-        .getStopTimeProperties()
-        .getExtension(MfdzRealtimeExtensions.stopTimeProperties);
-      var pickup = ext.getPickupType();
-      var dropOff = ext.getDropoffType();
-      var dropOffType = PickDropMapper.map(dropOff.getNumber());
-      var pickupType = PickDropMapper.map(pickup.getNumber());
-      return new AddedStopTime(pickupType, dropOffType);
-    } else {
-      var pickDrop = toPickDrop(props.getScheduleRelationship());
-      return new AddedStopTime(pickDrop, pickDrop);
-    }
-  }
-
-  private static PickDrop toPickDrop(
-    GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship scheduleRelationship
+  private PickDrop getPickDrop(
+    @Nullable GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties.DropOffPickupType dropOffPickupType,
+    @Nullable MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType extensionDropOffPickup
   ) {
-    return switch (scheduleRelationship) {
-      case SCHEDULED, NO_DATA, UNSCHEDULED -> PickDrop.SCHEDULED;
-      case SKIPPED -> PickDrop.CANCELLED;
-    };
+    if (isSkipped()) {
+      return PickDrop.CANCELLED;
+    }
+
+    if (dropOffPickupType != null) {
+      return PickDropMapper.map(dropOffPickupType.getNumber());
+    }
+
+    if (extensionDropOffPickup != null) {
+      return PickDropMapper.map(extensionDropOffPickup.getNumber());
+    }
+
+    return PickDrop.SCHEDULED;
+  }
+
+  private Optional<
+    GtfsRealtime.TripUpdate.StopTimeUpdate.StopTimeProperties
+  > getStopTimeProperties() {
+    return stopTimeUpdate.hasStopTimeProperties()
+      ? Optional.of(stopTimeUpdate.getStopTimeProperties())
+      : Optional.empty();
+  }
+
+  private Optional<
+    MfdzRealtimeExtensions.StopTimePropertiesExtension
+  > getStopTimePropertiesExtension() {
+    return getStopTimeProperties()
+      .map(stopTimeProperties ->
+        stopTimeProperties.hasExtension(MfdzRealtimeExtensions.stopTimeProperties)
+          ? stopTimeProperties.getExtension(MfdzRealtimeExtensions.stopTimeProperties)
+          : null
+      );
+  }
+
+  OptionalLong arrivalTime() {
+    return stopTimeUpdate.hasArrival()
+      ? getTime(stopTimeUpdate.getArrival())
+      : OptionalLong.empty();
+  }
+
+  OptionalLong departureTime() {
+    return stopTimeUpdate.hasDeparture()
+      ? getTime(stopTimeUpdate.getDeparture())
+      : OptionalLong.empty();
+  }
+
+  private OptionalLong getTime(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+    return stopTimeEvent.hasTime()
+      ? OptionalLong.of(stopTimeEvent.getTime())
+      : OptionalLong.empty();
+  }
+
+  int arrivalDelay() {
+    return stopTimeUpdate.hasArrival() ? getDelay(stopTimeUpdate.getArrival()) : 0;
+  }
+
+  int departureDelay() {
+    return stopTimeUpdate.hasDeparture() ? getDelay(stopTimeUpdate.getDeparture()) : 0;
+  }
+
+  private int getDelay(GtfsRealtime.TripUpdate.StopTimeEvent stopTimeEvent) {
+    return stopTimeEvent.hasDelay()
+      ? stopTimeEvent.getDelay()
+      : stopTimeEvent.hasScheduledTime()
+        ? (int) (stopTimeEvent.getTime() - stopTimeEvent.getScheduledTime())
+        : 0;
+  }
+
+  boolean isSkipped() {
+    return (
+      stopTimeUpdate.getScheduleRelationship() ==
+      GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED
+    );
+  }
+
+  OptionalInt stopSequence() {
+    return stopTimeUpdate.hasStopSequence()
+      ? OptionalInt.of(stopTimeUpdate.getStopSequence())
+      : OptionalInt.empty();
+  }
+
+  Optional<String> stopId() {
+    return stopTimeUpdate.hasStopId() ? Optional.of(stopTimeUpdate.getStopId()) : Optional.empty();
+  }
+
+  Optional<String> stopHeadsign() {
+    return (
+        stopTimeUpdate.hasStopTimeProperties() &&
+        stopTimeUpdate.getStopTimeProperties().hasStopHeadsign()
+      )
+      ? Optional.of(stopTimeUpdate.getStopTimeProperties().getStopHeadsign())
+      : Optional.empty();
   }
 }
