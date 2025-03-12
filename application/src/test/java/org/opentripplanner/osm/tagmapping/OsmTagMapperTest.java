@@ -17,6 +17,8 @@ import org.opentripplanner.osm.wayproperty.specifier.WayTestData;
 
 class OsmTagMapperTest {
 
+  private static final Locale FI = Locale.of("FI");
+
   @Test
   void isMotorThroughTrafficExplicitlyDisallowed() {
     OsmEntity o = new OsmEntity();
@@ -199,7 +201,16 @@ class OsmTagMapperTest {
     var way = way("highway", "corridor");
     assertEquals("corridor", wps.getCreativeNameForWay(way).toString());
     assertEquals("Korridor", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
-    assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(Locale.of("FI")));
+    assertEquals("käytävä", wps.getCreativeNameForWay(way).toString(FI));
+  }
+
+  @Test
+  void indoorAreaName() {
+    var wps = wayProperySet();
+    var way = way("indoor", "area");
+    assertEquals("indoor area", wps.getCreativeNameForWay(way).toString());
+    assertEquals("Innenbereich", wps.getCreativeNameForWay(way).toString(Locale.GERMANY));
+    assertEquals("sisätila", wps.getCreativeNameForWay(way).toString(FI));
   }
 
   public OsmEntity way(String key, String value) {
