@@ -265,6 +265,11 @@
       <RouteDescription>
         <xsl:apply-templates select="ojp:RouteDescription"/>
       </RouteDescription>
+      <xsl:if test="ojp:Cancelled">
+        <Cancelled>
+          <xsl:apply-templates select="ojp:Cancelled"/>
+        </Cancelled>
+      </xsl:if>
     </Service>
   </xsl:template>
 </xsl:stylesheet>

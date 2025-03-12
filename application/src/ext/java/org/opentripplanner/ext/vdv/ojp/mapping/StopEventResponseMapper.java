@@ -141,7 +141,8 @@ public class StopEventResponseMapper {
       .withOriginText(internationalText(firstStop.getName(), lang(tripTimeOnDate)))
       .withDestinationStopPointRef(stopPointRef(lastStop))
       .withDestinationText(internationalText(tripTimeOnDate.getHeadsign(), lang(tripTimeOnDate)))
-      .withRouteDescription(internationalText(route.getDescription(), lang(tripTimeOnDate)));
+      .withRouteDescription(internationalText(route.getDescription(), lang(tripTimeOnDate)))
+      .withCancelled(tripTimeOnDate.getTripTimes().isCanceled());
   }
 
   private CallAtStopStructure callAtStop(TripTimeOnDate tripTimeOnDate) {
@@ -219,7 +220,7 @@ public class StopEventResponseMapper {
     }
   }
 
-  public static <T> JAXBElement<T> jaxbElement(T value) {
+  private static <T> JAXBElement<T> jaxbElement(T value) {
     var xmlType = value.getClass().getAnnotation(XmlType.class);
     return new JAXBElement<>(
       new QName(OJP_NAMESPACE, getName(xmlType)),
