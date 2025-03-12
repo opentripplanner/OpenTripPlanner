@@ -41,7 +41,7 @@ public class StreetLimitationParameters implements Serializable {
   /**
    * Get the limit for area linking
    */
-  public float maxAreaNodes() {
+  public int maxAreaNodes() {
     return maxAreaNodes;
   }
 }
