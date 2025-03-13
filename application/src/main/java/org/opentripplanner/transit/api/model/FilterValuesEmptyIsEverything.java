@@ -16,4 +16,9 @@ public class FilterValuesEmptyIsEverything<E> extends FilterValues<E> {
   public boolean includeEverything() {
     return values == null || values.isEmpty();
   }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof FilterValuesEmptyIsEverything<?> && super.equals(obj);
+  }
 }
