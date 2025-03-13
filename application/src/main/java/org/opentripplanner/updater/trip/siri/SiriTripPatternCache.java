@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.trip.siri;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,10 +28,13 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 class SiriTripPatternCache {
 
-  // TODO RT_AB: Improve documentation. This seems to be the primary collection of added
-  //   TripPatterns, with other collections serving as indexes. Similar to TripPatternCache.cache
-  //   in the GTFS version of this class, but with service date as part of the key.
-  private final Map<StopPatternServiceDateKey, TripPattern> cache = new HashMap<>();
+  /**
+   * We cache the trip pattern based on the stop pattern only in order to de-duplicate them.
+   * <p>
+   * Note that we don't really have a definition which properties are really part of the trip
+   * pattern and several pattern keys are used in different parts of OTP.
+   */
+  private final Map<StopPattern, TripPattern> cache = new HashMap<>();
 
   // TODO RT_AB: generalize this so we can generate IDs for SIRI or GTFS-RT sources.
   private final SiriTripPatternIdGenerator tripPatternIdGenerator;
@@ -71,8 +73,7 @@ class SiriTripPatternCache {
    */
   public synchronized TripPattern getOrCreateTripPattern(
     final StopPattern stopPattern,
-    final Trip trip,
-    LocalDate serviceDate
+    final Trip trip
   ) {
     TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 
@@ -84,8 +85,7 @@ class SiriTripPatternCache {
     }
 
     // Check cache for trip pattern
-    StopPatternServiceDateKey key = new StopPatternServiceDateKey(stopPattern, serviceDate);
-    TripPattern tripPattern = cache.get(key);
+    TripPattern tripPattern = cache.get(stopPattern);
 
     // Create TripPattern if it doesn't exist yet
     if (tripPattern == null) {
@@ -101,44 +101,9 @@ class SiriTripPatternCache {
       // TODO: Add pattern to timetableRepository index?
 
       // Add pattern to cache
-      cache.put(key, tripPattern);
+      cache.put(stopPattern, tripPattern);
     }
 
     return tripPattern;
-  }
-}
-
-// TODO RT_AB: move the below classes inside the above class as private static inner classes.
-//   Defining these additional classes in the same top-level class file is unconventional.
-
-/**
- * Serves as the key for the collection of TripPatterns added by realtime messages.
- * Must define hashcode and equals to confer semantic identity.
- * TODO RT_AB: clarify why each date has a different TripPattern instead of a different Timetable.
- *   It seems like there's a separate TripPattern instance for each StopPattern and service date,
- *   rather a single TripPattern instance associated with a separate timetable for each date.
- */
-class StopPatternServiceDateKey {
-
-  StopPattern stopPattern;
-  LocalDate serviceDate;
-
-  public StopPatternServiceDateKey(StopPattern stopPattern, LocalDate serviceDate) {
-    this.stopPattern = stopPattern;
-    this.serviceDate = serviceDate;
-  }
-
-  @Override
-  public int hashCode() {
-    return stopPattern.hashCode() + serviceDate.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object thatObject) {
-    if (!(thatObject instanceof StopPatternServiceDateKey)) {
-      return false;
-    }
-    StopPatternServiceDateKey that = (StopPatternServiceDateKey) thatObject;
-    return (this.stopPattern.equals(that.stopPattern) && this.serviceDate.equals(that.serviceDate));
   }
 }
