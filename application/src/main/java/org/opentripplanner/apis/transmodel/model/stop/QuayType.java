@@ -305,7 +305,7 @@ public class QuayType {
               transitModes,
               environment
             )
-              .sorted(TripTimeOnDate.compareByDeparture())
+              .sorted(TripTimeOnDate.compareByRealtimeDeparture())
               .distinct()
               .limit(numberOfDepartures)
               .toList();

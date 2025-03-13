@@ -7,12 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 
@@ -24,6 +26,8 @@ class StopTimesHelperTest {
   private static FeedScopedId stopId;
   private static TripPattern pattern;
   private static StopTimesHelper stopTimesHelper;
+  private static Comparator<TripTimeOnDate> SORT_ORDER =
+    TripTimeOnDate.compareByRealtimeDeparture();
 
   @BeforeAll
   public static void setUp() throws Exception {
@@ -60,7 +64,8 @@ class StopTimesHelperTest {
       Duration.ofHours(24),
       0,
       ArrivalDeparture.BOTH,
-      true
+      true,
+      SORT_ORDER
     );
 
     assertTrue(result.isEmpty());
@@ -77,7 +82,8 @@ class StopTimesHelperTest {
       Duration.ofHours(24),
       1,
       ArrivalDeparture.BOTH,
-      true
+      true,
+      SORT_ORDER
     );
 
     assertEquals(3, result.stream().mapToLong(s -> s.times.size()).sum());
@@ -111,7 +117,8 @@ class StopTimesHelperTest {
       Duration.ofHours(24),
       10,
       ArrivalDeparture.BOTH,
-      true
+      true,
+      SORT_ORDER
     );
 
     assertEquals(5, result.stream().mapToLong(s -> s.times.size()).sum());
@@ -126,7 +133,8 @@ class StopTimesHelperTest {
       Duration.ofHours(24),
       10,
       ArrivalDeparture.BOTH,
-      false
+      false,
+      SORT_ORDER
     );
 
     assertEquals(4, result.stream().mapToLong(s -> s.times.size()).sum());
@@ -144,7 +152,8 @@ class StopTimesHelperTest {
       Duration.ofHours(6),
       2,
       ArrivalDeparture.BOTH,
-      true
+      true,
+      SORT_ORDER
     );
 
     assertEquals(0, result.stream().mapToLong(s -> s.times.size()).sum());
@@ -161,7 +170,8 @@ class StopTimesHelperTest {
       Duration.ofHours(36),
       10,
       ArrivalDeparture.BOTH,
-      true
+      true,
+      SORT_ORDER
     );
 
     assertEquals(9, result.stream().mapToLong(s -> s.times.size()).sum());

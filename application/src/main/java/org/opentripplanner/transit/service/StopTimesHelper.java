@@ -57,7 +57,8 @@ class StopTimesHelper {
     Duration timeRange,
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
-    boolean includeCancelledTrips
+    boolean includeCancelledTrips,
+    Comparator<TripTimeOnDate> sortOrder
   ) {
     if (numberOfDepartures <= 0) {
       return List.of();
@@ -77,7 +78,8 @@ class StopTimesHelper {
         numberOfDepartures,
         arrivalDeparture,
         includeCancelledTrips,
-        false
+        false,
+        sortOrder
       );
 
       result.addAll(getStopTimesInPattern(pattern, pq));
@@ -98,13 +100,14 @@ class StopTimesHelper {
           request.timeWindow(),
           request.numberOfDepartures(),
           request.arrivalDeparture(),
-          true
+          true,
+          request.sortOrder()
         )
           .stream()
           .flatMap(st -> st.times.stream())
           .filter(matcher::match)
       )
-      .sorted(TripTimeOnDate.compareByDeparture())
+      .sorted(request.sortOrder())
       .toList();
   }
 
@@ -192,7 +195,8 @@ class StopTimesHelper {
       numberOfDepartures,
       arrivalDeparture,
       includeCancellations,
-      true
+      true,
+      TripTimeOnDate.compareByRealtimeDeparture()
     );
 
     return new ArrayList<>(pq);
@@ -221,7 +225,8 @@ class StopTimesHelper {
     int numberOfDepartures,
     ArrivalDeparture arrivalDeparture,
     boolean includeCancellations,
-    boolean includeReplaced
+    boolean includeReplaced,
+    Comparator<TripTimeOnDate> sortOrder
   ) {
     ZoneId zoneId = transitService.getTimeZone();
     LocalDate startDate = startTime.atZone(zoneId).toLocalDate().minusDays(1);
@@ -239,11 +244,7 @@ class StopTimesHelper {
     // transit hub could result in a DOS attack, but there are probably other more effective
     // ways to do it.
     //
-    MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue.orderedBy(
-      Comparator.comparing(
-        (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
-      )
-    )
+    MinMaxPriorityQueue<TripTimeOnDate> pq = MinMaxPriorityQueue.orderedBy(sortOrder)
       .maximumSize(numberOfDepartures)
       .create();
 
