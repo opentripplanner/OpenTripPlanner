@@ -406,10 +406,6 @@ public class TripTimeOnDate {
     return optionalZonedDateTime(getRealtimeDeparture(), zoneId);
   }
 
-  public Instant departure() {
-    return Instant.ofEpochSecond(midnight + getRealtimeDeparture());
-  }
-
   private TripTimeOnDate atStopIndex(int stopIndex) {
     return new TripTimeOnDate(
       tripTimes,

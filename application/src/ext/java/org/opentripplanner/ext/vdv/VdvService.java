@@ -2,6 +2,7 @@ package org.opentripplanner.ext.vdv;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -37,18 +38,20 @@ public class VdvService {
     return Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang);
   }
 
-  public List<CallAtStop> findCallsAtStop(FeedScopedId stopId, StopEventRequestParams params)
+  public List<CallAtStop> findCallsAtStop(FeedScopedId id, StopEventRequestParams params)
     throws EntityNotFoundException {
-    var stop = transitService.getRegularStop(stopId);
-    if (stop == null) {
-      throw new EntityNotFoundException("StopPlace", stopId);
+    Collection<StopLocation> stops;
+    var stop = transitService.getStopLocation(id);
+    if (stop != null) {
+      stops = List.of(stop);
+    } else {
+      var station = transitService.getStopLocationsGroup(id);
+      if (station == null) {
+        throw new EntityNotFoundException("Stop entity", id);
+      }
+      stops = station.getChildStops();
     }
-    return findCallsAtStop(stop, params);
-  }
-
-  public List<CallAtStop> findCallsAtStop(StopLocation stop, StopEventRequestParams params) {
-    List<StopLocation> stopLocations = List.of(stop);
-    var calls = findCallsAtStop(stopLocations, params);
+    var calls = findCallsAtStop(stops, params);
     return sort(params.numDepartures, calls);
   }
 
@@ -56,11 +59,13 @@ public class VdvService {
     var calls = finder
       .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
       .stream()
-      .flatMap(nearbyStop ->
-        this.findCallsAtStop(nearbyStop.stop, params)
+      .flatMap(nearbyStop -> {
+        List<StopLocation> stopLocations = List.of(nearbyStop.stop);
+        var calls1 = findCallsAtStop(stopLocations, params);
+        return sort(params.numDepartures, calls1)
           .stream()
-          .map(tt -> tt.withWalkTime(nearbyStop.duration()))
-      )
+          .map(tt -> tt.withWalkTime(nearbyStop.duration()));
+      })
       .toList();
 
     return sort(params.numDepartures(), calls);
@@ -69,13 +74,13 @@ public class VdvService {
   private static List<CallAtStop> sort(int numResults, List<CallAtStop> stopTimesInPatterns) {
     return stopTimesInPatterns
       .stream()
-      .sorted(Comparator.comparing(tt -> tt.tripTimeOnDate().departure()))
+      .sorted(CallAtStop.compareByScheduledDeparture())
       .limit(numResults)
       .toList();
   }
 
   private List<CallAtStop> findCallsAtStop(
-    List<StopLocation> stopLocations,
+    Collection<StopLocation> stopLocations,
     StopEventRequestParams params
   ) {
     if (params.numDepartures > MAX_DEPARTURES) {
