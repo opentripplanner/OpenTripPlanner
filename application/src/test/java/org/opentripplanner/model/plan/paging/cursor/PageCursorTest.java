@@ -53,7 +53,7 @@ class PageCursorTest implements PlanTestConstants {
     .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
     .bus(23, 0, 50, B)
     .build();
-  private static final Cost GENERALIZED_COST_MAX_LIMEIT = Cost.costOfSeconds(200);
+  private static final Cost GENERALIZED_COST_MAX_LIMIT = Cost.costOfSeconds(200);
 
   private TimeZone originalTimeZone;
   private PageCursor subjectDepartAfter;
@@ -80,7 +80,7 @@ class PageCursorTest implements PlanTestConstants {
       LAT,
       SEARCH_WINDOW,
       PAGE_CUT,
-      GENERALIZED_COST_MAX_LIMEIT
+      GENERALIZED_COST_MAX_LIMIT
     );
   }
 
