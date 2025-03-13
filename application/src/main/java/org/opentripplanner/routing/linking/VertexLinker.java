@@ -66,9 +66,20 @@ public class VertexLinker {
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
    */
-  private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
-  private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
-  private static final int MAX_SEARCH_RADIUS_METERS = 1000;
+  private static final double DUPLICATE_WAY_EPSILON_DEGREES =
+    SphericalDistanceLibrary.metersToDegrees(0.001);
+
+  /**
+   * Minimal distance for considering two nodes the same
+   */
+  private static final double DUPLICATE_NODE_EPSILON_DEGREES_SQUARED =
+    SphericalDistanceLibrary.metersToDegrees(1) * SphericalDistanceLibrary.metersToDegrees(1);
+
+  private static final double INITIAL_SEARCH_RADIUS_DEGREES =
+    SphericalDistanceLibrary.metersToDegrees(100);
+  private static final double MAX_SEARCH_RADIUS_DEGREES = SphericalDistanceLibrary.metersToDegrees(
+    1000
+  );
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   /**
    * Spatial index of StreetEdges in the graph.
@@ -202,7 +213,7 @@ public class VertexLinker {
         traverseModes,
         direction,
         scope,
-        INITIAL_SEARCH_RADIUS_METERS,
+        INITIAL_SEARCH_RADIUS_DEGREES,
         tempEdges
       );
       if (streetVertices.isEmpty()) {
@@ -211,7 +222,7 @@ public class VertexLinker {
           traverseModes,
           direction,
           scope,
-          MAX_SEARCH_RADIUS_METERS,
+          MAX_SEARCH_RADIUS_DEGREES,
           tempEdges
         );
       }
@@ -262,11 +273,9 @@ public class VertexLinker {
     TraverseModeSet traverseModes,
     LinkingDirection direction,
     Scope scope,
-    int radiusMeters,
+    double radiusDeg,
     @Nullable DisposableEdgeCollection tempEdges
   ) {
-    final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
-
     Envelope env = new Envelope(vertex.getCoordinate());
 
     // Perform a simple local equirectangular projection, so distances are expressed in degrees latitude.
@@ -336,14 +345,10 @@ public class VertexLinker {
     TraverseModeSet traverseModeSet,
     List<DistanceTo<StreetEdge>> candidateEdges
   ) {
-    final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(
-      DUPLICATE_WAY_EPSILON_METERS
-    );
-
     // The following logic has gone through several different versions using different approaches.
     // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
     // catch things like superimposed edges going in opposite directions.
-    // First, all edges within DUPLICATE_WAY_EPSILON_METERS of of the best distance were selected.
+    // First, all edges within INITIAL_SEARCH_RADIUS_DEGREES of of the best distance were selected.
     // More recently, the edges were sorted in order of increasing distance, and all edges in the list were selected
     // up to the point where a distance increase of DUPLICATE_WAY_EPSILON_DEGREES from one edge to the next.
     // This was in response to concerns about arbitrary cutoff distances: at any distance, it's always possible
