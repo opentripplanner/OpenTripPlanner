@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
@@ -97,6 +98,7 @@ public class VdvService {
       .withExcludedRoutes(FilterValues.ofEmptyIsEverything("excludedRoutes", params.excludedRoutes))
       .withIncludedModes(FilterValues.ofEmptyIsEverything("selectedModes", params.includedModes))
       .withExcludedModes(FilterValues.ofEmptyIsEverything("excludedModes", params.excludedModes))
+      .withSortOrder(TripTimeOnDate.compareByScheduledDeparture())
       .build();
     return transitService.findTripTimesOnDate(request).stream().map(CallAtStop::noWalking).toList();
   }

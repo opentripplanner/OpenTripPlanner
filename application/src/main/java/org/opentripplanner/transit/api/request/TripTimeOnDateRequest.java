@@ -3,9 +3,11 @@ package org.opentripplanner.transit.api.request;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -25,6 +27,7 @@ public class TripTimeOnDateRequest {
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
   private final int numberOfDepartures;
+  private final Comparator<TripTimeOnDate> sortOrder;
 
   TripTimeOnDateRequest(
     Collection<StopLocation> stopLocations,
@@ -32,6 +35,7 @@ public class TripTimeOnDateRequest {
     Duration timeWindow,
     ArrivalDeparture arrivalDeparture,
     int numberOfDepartures,
+    Comparator<TripTimeOnDate> sortOrder,
     FilterValues<FeedScopedId> selectedAgencies,
     FilterValues<FeedScopedId> selectedRoutes,
     FilterValues<FeedScopedId> excludedAgencies,
@@ -44,6 +48,7 @@ public class TripTimeOnDateRequest {
     this.timeWindow = timeWindow;
     this.arrivalDeparture = arrivalDeparture;
     this.numberOfDepartures = numberOfDepartures;
+    this.sortOrder = Objects.requireNonNull(sortOrder);
     this.selectedAgencies = selectedAgencies;
     this.selectedRoutes = selectedRoutes;
     this.excludedAgencies = excludedAgencies;
@@ -98,5 +103,9 @@ public class TripTimeOnDateRequest {
 
   public int numberOfDepartures() {
     return numberOfDepartures;
+  }
+
+  public Comparator<TripTimeOnDate> sortOrder() {
+    return sortOrder;
   }
 }

@@ -2,7 +2,9 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -40,6 +42,7 @@ public class TripTimeOnDateRequestBuilder {
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
   private Instant time;
+  private Comparator<TripTimeOnDate> sortOrder = TripTimeOnDate.compareByRealtimeDeparture();
 
   TripTimeOnDateRequestBuilder(List<StopLocation> timesAtStops) {
     this.stopLocations = timesAtStops;
@@ -95,6 +98,11 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
+  public TripTimeOnDateRequestBuilder withSortOrder(Comparator<TripTimeOnDate> sortOrder) {
+    this.sortOrder = sortOrder;
+    return this;
+  }
+
   public TripTimeOnDateRequest build() {
     return new TripTimeOnDateRequest(
       stopLocations,
@@ -102,6 +110,7 @@ public class TripTimeOnDateRequestBuilder {
       timeWindow,
       arrivalDeparture,
       numberOfDepartures,
+      sortOrder,
       includedAgencies,
       includedRoutes,
       excludedAgencies,
