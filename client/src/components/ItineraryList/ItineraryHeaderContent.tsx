@@ -3,7 +3,7 @@ import { ItineraryHeaderLegContent } from './ItineraryHeaderLegContent.tsx';
 import { useContext, useMemo } from 'react';
 import { formatTime } from '../../util/formatTime.ts';
 import { TimeZoneContext } from '../../hooks/TimeZoneContext.ts';
-import { TripPattern } from '../../types.ts';
+import { TripPattern } from '../../static/query/tripQueryTypes';
 
 export function ItineraryHeaderContent({
   tripPattern,

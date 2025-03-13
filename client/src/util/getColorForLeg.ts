@@ -1,5 +1,5 @@
 import { Mode } from '../gql/graphql.ts';
-import { Leg } from '../types.ts';
+import { Leg } from '../static/query/tripQueryTypes';
 
 const getColorForMode = function (mode: Mode) {
   if (mode === Mode.Foot) return '#191616';

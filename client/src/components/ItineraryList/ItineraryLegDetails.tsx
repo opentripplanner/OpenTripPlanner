@@ -6,7 +6,7 @@ import { InterchangeInfo } from './InterchangeInfo.tsx';
 import { ItineraryGraphiQLLineLink } from './ItineraryGraphiQLLineLink.tsx';
 import { ItineraryGraphiQLQuayLink } from './ItineraryGraphiQLQuayLink.tsx';
 import { ItineraryGraphiQLAuthorityLink } from './ItineraryGraphiQLAuthorityLink.tsx';
-import { Leg } from '../../types.ts';
+import { Leg } from '../../static/query/tripQueryTypes';
 
 /**
  * Some GTFS trips don't have a short name (public code) so we use the long name in this case.

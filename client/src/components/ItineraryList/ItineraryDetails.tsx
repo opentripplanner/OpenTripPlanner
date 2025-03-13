@@ -1,5 +1,5 @@
 import { ItineraryLegDetails } from './ItineraryLegDetails.tsx';
-import { TripPattern } from '../../types.ts';
+import { TripPattern } from '../../static/query/tripQueryTypes';
 
 export function ItineraryDetails({ tripPattern }: { tripPattern: TripPattern }) {
   return (

@@ -1,5 +1,5 @@
 import logo from '../../static/img/stay-seated.svg';
-import { Leg } from '../../types.ts';
+import { Leg } from '../../static/query/tripQueryTypes';
 
 /**
  * Displays an icon if a leg has a stay-seated transfer from the previous one.

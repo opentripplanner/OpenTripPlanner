@@ -1,5 +1,5 @@
 import { useHeaderLegContentStyleCalculations } from './useHeaderLegContentStyleCalculations.ts';
-import { Leg } from '../../types.ts';
+import { Leg } from '../../static/query/tripQueryTypes';
 const modeIcons = import.meta.glob('../../static/img/mode/*.png', { query: '?url', import: 'default', eager: true });
 
 function getModeIconUrl(leg: Leg) {
