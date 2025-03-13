@@ -341,16 +341,15 @@ class WalkableAreaBuilder {
         }
       }
     }
-
     pruneAreaEdges(startingVertices, edges, ringEdges);
 
     visibilityVertexCandidates.forEach((areaGroup, vertices) -> {
       if (vertices.size() > maxAreaNodes) {
+        // keep nodes which have most connections
         areaGroup.addVisibilityVertices(
           vertices
             .stream()
-            .sorted((v1, v2) -> (new Long(v2.getDegreeOut())).compareTo(new Long(v1.getDegreeOut()))
-            )
+            .sorted((v1, v2) -> Long.compare((v2.getDegreeOut()), v1.getDegreeOut()))
             .limit(maxAreaNodes)
             .collect(Collectors.toSet())
         );
