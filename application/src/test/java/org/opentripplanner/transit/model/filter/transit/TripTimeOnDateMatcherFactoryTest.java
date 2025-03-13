@@ -49,9 +49,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeRoute() {
-    var request = request()
-      .withIncludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(ROUTE_1.getId())))
-      .build();
+    var request = request().withIncludedRoutes(List.of(ROUTE_1.getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -61,9 +59,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeRoute() {
-    var request = request()
-      .withExcludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(ROUTE_1.getId())))
-      .build();
+    var request = request().withExcludedRoutes(List.of(ROUTE_1.getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -73,11 +69,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeAgency() {
-    var request = request()
-      .withIncludedAgencies(
-        FilterValues.ofEmptyIsEverything("agencies", List.of(ROUTE_1.getAgency().getId()))
-      )
-      .build();
+    var request = request().withIncludedAgencies(List.of(ROUTE_1.getAgency().getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -87,11 +79,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeAgency() {
-    var request = request()
-      .withExcludedAgencies(
-        FilterValues.ofEmptyIsEverything("agencies", List.of(ROUTE_1.getAgency().getId()))
-      )
-      .build();
+    var request = request().withExcludedAgencies(List.of(ROUTE_1.getAgency().getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -101,9 +89,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeMode() {
-    var request = request()
-      .withIncludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
-      .build();
+    var request = request().withIncludedModes(List.of(ROUTE_1.getMode())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -113,9 +99,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeMode() {
-    var request = request()
-      .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
-      .build();
+    var request = request().withExcludedModes(List.of(ROUTE_1.getMode())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -126,8 +110,8 @@ class TripTimeOnDateMatcherFactoryTest {
   @Test
   void excludeModeAndRoute() {
     var request = request()
-      .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
-      .withExcludedRoutes(FilterValues.ofEmptyIsEverything("routes", List.of(ROUTE_2.getId())))
+      .withExcludedModes(List.of(ROUTE_1.getMode()))
+      .withExcludedRoutes(List.of(ROUTE_2.getId()))
       .build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
@@ -139,10 +123,8 @@ class TripTimeOnDateMatcherFactoryTest {
   @Test
   void excludeAgencyAndRoute() {
     var request = request()
-      .withExcludedModes(FilterValues.ofEmptyIsEverything("mode", List.of(ROUTE_1.getMode())))
-      .withExcludedAgencies(
-        FilterValues.ofEmptyIsEverything("agencies", List.of(ROUTE_2.getAgency().getId()))
-      )
+      .withExcludedModes(List.of(ROUTE_1.getMode()))
+      .withExcludedAgencies(List.of(ROUTE_2.getAgency().getId()))
       .build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
