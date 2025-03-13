@@ -141,7 +141,7 @@
     {
       "groupName": "highly trusted dependencies (patch)",
       "matchUpdateTypes": ["patch"],
-      "schedule": ["on the 27th day of the month"],
+      "schedule": ["on the 13th and 27th day of the month"],
       "matchPackageNames": [
         "org.onebusaway:onebusaway-gtfs",
         "org.glassfish.jersey.{/,}**",
