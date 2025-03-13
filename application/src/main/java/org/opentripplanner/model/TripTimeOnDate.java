@@ -141,8 +141,12 @@ public class TripTimeOnDate {
     );
   }
 
-  public static Comparator<TripTimeOnDate> compareByDeparture() {
+  public static Comparator<TripTimeOnDate> compareByRealtimeDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
+  }
+
+  public static Comparator<TripTimeOnDate> compareByScheduledDeparture() {
+    return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getScheduledDeparture());
   }
 
   public StopLocation getStop() {
