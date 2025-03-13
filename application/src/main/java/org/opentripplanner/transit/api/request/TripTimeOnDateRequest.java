@@ -57,7 +57,7 @@ public class TripTimeOnDateRequest {
     this.excludedModes = excludedModes;
   }
 
-  public static TripTimeOnDateRequestBuilder of(List<StopLocation> stopLocations) {
+  public static TripTimeOnDateRequestBuilder of(Collection<StopLocation> stopLocations) {
     return new TripTimeOnDateRequestBuilder(stopLocations);
   }
 

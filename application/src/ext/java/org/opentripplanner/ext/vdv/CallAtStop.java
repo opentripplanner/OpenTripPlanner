@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.vdv;
 
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -12,5 +13,12 @@ public record CallAtStop(TripTimeOnDate tripTimeOnDate, @Nullable Duration walkT
 
   public CallAtStop withWalkTime(Duration duration) {
     return new CallAtStop(tripTimeOnDate, duration);
+  }
+
+  public static Comparator<CallAtStop> compareByScheduledDeparture() {
+    return Comparator.comparing(
+      tt ->
+        tt.tripTimeOnDate().getServiceDayMidnight() + tt.tripTimeOnDate().getScheduledDeparture()
+    );
   }
 }
