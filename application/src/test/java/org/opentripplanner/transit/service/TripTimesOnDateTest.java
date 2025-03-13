@@ -45,7 +45,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
 
       assertThat(result).hasSize(1);
       var tt = result.getFirst();
-      assertEquals(instant("12:01"), tt.departure());
+      assertEquals(instant("12:01"), tt.scheduledDepartureAt(TIME_ZONE).toInstant());
     }
     {
       var result = transitService.findTripTimesOnDate(
@@ -53,7 +53,7 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
       );
       assertThat(result).hasSize(1);
       var tt = result.getFirst();
-      assertEquals(instant("12:11"), tt.departure());
+      assertEquals(instant("12:11"), tt.scheduledDepartureAt(TIME_ZONE).toInstant());
     }
   }
 

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -13,7 +14,7 @@ import org.opentripplanner.transit.service.ArrivalDeparture;
 
 public class TripTimeOnDateRequestBuilder {
 
-  private final List<StopLocation> stopLocations;
+  private final Collection<StopLocation> stopLocations;
   private FilterValues<FeedScopedId> includedAgencies = FilterValues.ofEmptyIsEverything(
     "agencies",
     List.of()
@@ -44,7 +45,7 @@ public class TripTimeOnDateRequestBuilder {
   private Instant time;
   private Comparator<TripTimeOnDate> sortOrder = TripTimeOnDate.compareByRealtimeDeparture();
 
-  TripTimeOnDateRequestBuilder(List<StopLocation> timesAtStops) {
+  TripTimeOnDateRequestBuilder(Collection<StopLocation> timesAtStops) {
     this.stopLocations = timesAtStops;
   }
 
