@@ -1,7 +1,5 @@
 import logo from '../../static/img/stay-seated.svg';
-import { TripQuery } from '../../gql/graphql.ts';
-
-type Leg = TripQuery['trip']['tripPatterns'][0]['legs'][0];
+import {Leg} from "../../types.ts";
 
 /**
  * Displays an icon if a leg has a stay-seated transfer from the previous one.
