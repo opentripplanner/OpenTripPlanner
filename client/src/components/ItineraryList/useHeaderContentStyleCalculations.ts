@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { TripPattern } from '../../gql/graphql.ts';
+import { TripPattern } from '../../types.ts';
 
 const CONTAINER_WIDTH_PADDING = 70;
 const START_PX_PADDING = 20;

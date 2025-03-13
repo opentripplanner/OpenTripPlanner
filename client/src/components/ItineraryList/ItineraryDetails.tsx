@@ -1,5 +1,5 @@
-import { TripPattern } from '../../gql/graphql.ts';
 import { ItineraryLegDetails } from './ItineraryLegDetails.tsx';
+import { TripPattern } from '../../types.ts';
 
 export function ItineraryDetails({ tripPattern }: { tripPattern: TripPattern }) {
   return (
