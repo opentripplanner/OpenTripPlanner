@@ -13,7 +13,7 @@ public interface RealtimeVehicleRepository {
    * <p>
    * Before storing the new vehicles, it removes the previous updates for the given {@code feedId}.
    */
-  void setRealtimeVehicles(String feedId, Multimap<TripPattern, RealtimeVehicle> updates);
+  void setRealtimeVehiclesForFeed(String feedId, Multimap<TripPattern, RealtimeVehicle> updates);
 
   /**
    * Get the vehicles for a certain trip.

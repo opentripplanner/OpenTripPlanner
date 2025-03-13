@@ -415,7 +415,7 @@ class GraphQLIntegrationTest {
       .withStop(pattern.getStop(0))
       .withStopStatus(IN_TRANSIT_TO)
       .build();
-    realtimeVehicleService.setRealtimeVehicles(
+    realtimeVehicleService.setRealtimeVehiclesForFeed(
       pattern.getId().getFeedId(),
       new ImmutableListMultimap.Builder()
         .putAll(pattern, List.of(occypancyVehicle, positionVehicle))

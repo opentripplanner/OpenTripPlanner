@@ -114,7 +114,7 @@ class RealtimeVehiclePatternMatcher {
       );
 
     // passing the feed id leads to the previous updates being removed
-    repository.setRealtimeVehicles(feedId, vehicles);
+    repository.setRealtimeVehiclesForFeed(feedId, vehicles);
 
     if (!vehiclePositions.isEmpty() && vehicles.keySet().isEmpty()) {
       LOG.error(

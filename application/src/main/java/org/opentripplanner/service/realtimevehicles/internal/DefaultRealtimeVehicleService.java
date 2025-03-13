@@ -37,7 +37,10 @@ public class DefaultRealtimeVehicleService
     this.transitService = transitService;
   }
 
-  public void setRealtimeVehicles(String feedId, Multimap<TripPattern, RealtimeVehicle> updates) {
+  public void setRealtimeVehiclesForFeed(
+    String feedId,
+    Multimap<TripPattern, RealtimeVehicle> updates
+  ) {
     Multimap<TripPattern, RealtimeVehicle> temp = ArrayListMultimap.create();
     temp.putAll(vehicles);
     // remove all previous updates for this specific feed id
@@ -58,7 +61,7 @@ public class DefaultRealtimeVehicleService
    * then the original (scheduled) one is used for the lookup instead, so you receive the correct
    * result no matter if you use the realtime or static information.
    *
-   * @see DefaultRealtimeVehicleService#setRealtimeVehicles(String, Multimap)
+   * @see DefaultRealtimeVehicleService#setRealtimeVehiclesForFeed(String, Multimap)
    */
   @Override
   public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
