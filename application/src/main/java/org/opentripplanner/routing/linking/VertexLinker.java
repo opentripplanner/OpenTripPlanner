@@ -740,48 +740,48 @@ public class VertexLinker {
         }
       }
     }
-    // we already know that the edge is inside the areaGroup and hit != null, but test anyway
+    // hit may be null when force linking a point from outside
     if (hit == null) {
-      LOG.warn("No intersecting area found. This indicates a bug.");
-    } else {
-      double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
-      // apply consistent NoThru restrictions
-      // if all joining edges are nothru, then the new edge should be as well
-      var incomingNoThruModes = getNoThruModes(to.getIncoming());
-      var outgoingNoThruModes = getNoThruModes(to.getIncoming());
-      AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
-        .withFromVertex(from)
-        .withToVertex(to)
-        .withGeometry(line)
-        .withName(hit.getName())
-        .withMeterLength(length)
-        .withPermission(hit.getPermission())
-        .withBack(false)
-        .withArea(ag);
-      for (TraverseMode tm : outgoingNoThruModes) {
-        areaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
-      }
-      AreaEdge areaEdge = areaEdgeBuilder.buildAndConnect();
-      if (scope != Scope.PERMANENT) {
-        tempEdges.addEdge(areaEdge);
-      }
+      LOG.warn("No intersecting area found. This may indicate a bug.");
+      hit = areas.getFirst();
+    }
+    double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
+    // apply consistent NoThru restrictions
+    // if all joining edges are nothru, then the new edge should be as well
+    var incomingNoThruModes = getNoThruModes(to.getIncoming());
+    var outgoingNoThruModes = getNoThruModes(to.getIncoming());
+    AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(line)
+      .withName(hit.getName())
+      .withMeterLength(length)
+      .withPermission(hit.getPermission())
+      .withBack(false)
+      .withArea(ag);
+    for (TraverseMode tm : outgoingNoThruModes) {
+      areaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
+    }
+    AreaEdge areaEdge = areaEdgeBuilder.buildAndConnect();
+    if (scope != Scope.PERMANENT) {
+      tempEdges.addEdge(areaEdge);
+    }
 
-      AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder()
-        .withFromVertex(to)
-        .withToVertex(from)
-        .withGeometry(line.reverse())
-        .withName(hit.getName())
-        .withMeterLength(length)
-        .withPermission(hit.getPermission())
-        .withBack(true)
-        .withArea(ag);
-      for (TraverseMode tm : incomingNoThruModes) {
-        reverseAreaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
-      }
-      AreaEdge reverseAreaEdge = reverseAreaEdgeBuilder.buildAndConnect();
-      if (scope != Scope.PERMANENT) {
-        tempEdges.addEdge(reverseAreaEdge);
-      }
+    AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder()
+      .withFromVertex(to)
+      .withToVertex(from)
+      .withGeometry(line.reverse())
+      .withName(hit.getName())
+      .withMeterLength(length)
+      .withPermission(hit.getPermission())
+      .withBack(true)
+      .withArea(ag);
+    for (TraverseMode tm : incomingNoThruModes) {
+      reverseAreaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
+    }
+    AreaEdge reverseAreaEdge = reverseAreaEdgeBuilder.buildAndConnect();
+    if (scope != Scope.PERMANENT) {
+      tempEdges.addEdge(reverseAreaEdge);
     }
   }
 }
