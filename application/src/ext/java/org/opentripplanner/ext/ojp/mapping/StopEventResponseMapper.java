@@ -17,6 +17,7 @@ import de.vdv.ojp20.ServiceDepartureStructure;
 import de.vdv.ojp20.StopEventResultStructure;
 import de.vdv.ojp20.StopEventStructure;
 import de.vdv.ojp20.siri.DefaultedTextStructure;
+import de.vdv.ojp20.siri.DirectionRefStructure;
 import de.vdv.ojp20.siri.LineRefStructure;
 import de.vdv.ojp20.siri.OperatorRefStructure;
 import de.vdv.ojp20.siri.StopPointRefStructure;
@@ -42,6 +43,9 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.rutebanken.time.XmlDateTime;
 
+/**
+ * Maps the OTP-internal data types into OJP responses.
+ */
 public class StopEventResponseMapper {
 
   private final Function<String, Optional<String>> resolveFeedLanguage;
@@ -142,7 +146,10 @@ public class StopEventResponseMapper {
       .withDestinationStopPointRef(stopPointRef(lastStop))
       .withDestinationText(internationalText(tripTimeOnDate.getHeadsign(), lang(tripTimeOnDate)))
       .withRouteDescription(internationalText(route.getDescription(), lang(tripTimeOnDate)))
-      .withCancelled(tripTimeOnDate.getTripTimes().isCanceled());
+      .withCancelled(tripTimeOnDate.getTripTimes().isCanceled())
+      .withDirectionRef(
+        new DirectionRefStructure().withValue(tripTimeOnDate.pattern().getDirection().toString())
+      );
   }
 
   private CallAtStopStructure callAtStop(TripTimeOnDate tripTimeOnDate) {
