@@ -17,7 +17,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * ItineraryFares is a set of fares for different legs, rider categories or fare media.
  */
 @Sandbox
-public class ItineraryFares {
+public class ItineraryFare {
 
   /**
    * The fare products that are valid for all legs of an itinerary, like a day pass.
@@ -33,8 +33,8 @@ public class ItineraryFares {
    */
   private final Multimap<Leg, FareProductUse> legProducts = LinkedHashMultimap.create();
 
-  public static ItineraryFares empty() {
-    return new ItineraryFares();
+  public static ItineraryFare empty() {
+    return new ItineraryFare();
   }
 
   /**
@@ -67,7 +67,7 @@ public class ItineraryFares {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ItineraryFares fare1 = (ItineraryFares) o;
+    ItineraryFare fare1 = (ItineraryFare) o;
     return (
       Objects.equals(itineraryProducts, fare1.itineraryProducts) &&
       Objects.equals(legProducts, fare1.legProducts)
@@ -106,7 +106,7 @@ public class ItineraryFares {
   /**
    * Add the contents of another instance to this one.
    */
-  public void add(ItineraryFares fare) {
+  public void add(ItineraryFare fare) {
     itineraryProducts.addAll(fare.itineraryProducts);
     legProducts.putAll(fare.legProducts);
   }

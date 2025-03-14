@@ -14,7 +14,7 @@ import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -86,7 +86,7 @@ public class Itinerary implements ItinerarySortKey {
 
   private final Float accessibilityScore;
   private final Emissions emissionsPerPerson;
-  private final ItineraryFares fare;
+  private final ItineraryFare fare;
 
   Itinerary(ItineraryBuilder builder) {
     this.legs = List.copyOf(builder.legs);
@@ -591,7 +591,7 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * The fare products of this itinerary.
    */
-  public ItineraryFares fare() {
+  public ItineraryFare fare() {
     return fare;
   }
 
