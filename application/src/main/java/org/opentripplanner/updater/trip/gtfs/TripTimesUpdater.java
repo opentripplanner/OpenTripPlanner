@@ -14,6 +14,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimesPatch;
@@ -104,7 +105,9 @@ class TripTimesUpdater {
     GtfsRealtime.TripUpdate.StopTimeUpdate update = updates.next();
 
     int numStops = newTimes.getNumStops();
+    @Nullable
     Integer delay = null;
+    @Nullable
     Integer firstUpdatedIndex = null;
 
     final long today = ServiceDateUtils.asStartOfService(
@@ -151,11 +154,22 @@ class TripTimesUpdater {
           newTimes.setNoData(i);
         } else {
           // Else the status is SCHEDULED, update times as needed.
-          if (update.hasArrival()) {
+          GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.hasArrival()
+            ? update.getArrival()
+            : null;
+          GtfsRealtime.TripUpdate.StopTimeEvent departure = update.hasDeparture()
+            ? update.getDeparture()
+            : null;
+
+          // This extra variable is necessary if the departure is specified but the arrival isn't.
+          // We want to propagate the arrival delay from the previous stop, even if the departure
+          // delay at this stop is different.
+          var previousDelay = delay;
+
+          if (arrival != null) {
             if (firstUpdatedIndex == null) {
               firstUpdatedIndex = i;
             }
-            GtfsRealtime.TripUpdate.StopTimeEvent arrival = update.getArrival();
             if (arrival.hasDelay()) {
               delay = arrival.getDelay();
               if (arrival.hasTime()) {
@@ -174,15 +188,12 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
-          } else if (delay != null) {
-            newTimes.updateArrivalDelay(i, delay);
           }
 
-          if (update.hasDeparture()) {
+          if (departure != null) {
             if (firstUpdatedIndex == null) {
               firstUpdatedIndex = i;
             }
-            GtfsRealtime.TripUpdate.StopTimeEvent departure = update.getDeparture();
             if (departure.hasDelay()) {
               delay = departure.getDelay();
               if (departure.hasTime()) {
@@ -201,8 +212,38 @@ class TripTimesUpdater {
               );
               return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
-          } else if (delay != null) {
-            newTimes.updateDepartureDelay(i, delay);
+          }
+
+          // propagate arrival and departure times, taking care not to cause negative dwells / hops
+          if (arrival == null) {
+            // propagate the delay from the previous stop
+            if (previousDelay != null) {
+              newTimes.updateArrivalDelay(i, previousDelay);
+            }
+            // if the arrival time is later than the departure time, set it to the departure time
+            if (departure != null && newTimes.getArrivalTime(i) > newTimes.getDepartureTime(i)) {
+              newTimes.updateArrivalTime(i, newTimes.getDepartureTime(i));
+            }
+          }
+
+          previousDelay = newTimes.getArrivalDelay(i);
+          if (departure == null) {
+            if (previousDelay < 0) {
+              // if the bus is early, only propagate if it is not a timepoint, otherwise assume that
+              // the bus will wait until the scheduled time
+              if (newTimes.isTimepoint(i)) {
+                newTimes.updateDepartureDelay(i, 0);
+              } else {
+                newTimes.updateDepartureDelay(i, previousDelay);
+              }
+            } else {
+              // the bus is late, depart as soon as it can after the scheduled time
+              newTimes.updateDepartureTime(
+                i,
+                Math.max(newTimes.getArrivalTime(i), newTimes.getScheduledDepartureTime(i))
+              );
+            }
+            delay = newTimes.getDepartureDelay(i);
           }
         }
 
