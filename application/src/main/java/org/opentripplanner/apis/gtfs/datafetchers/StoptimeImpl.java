@@ -85,7 +85,10 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<Long> serviceDay() {
-    return environment -> getSource(environment).getServiceDayMidnight();
+    return environment -> {
+      Long midnight = getSource(environment).getServiceDayMidnight();
+      return midnight != TripTimeOnDate.UNDEFINED ? midnight : null;
+    };
   }
 
   @Override

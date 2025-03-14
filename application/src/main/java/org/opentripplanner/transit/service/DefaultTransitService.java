@@ -121,18 +121,28 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
+  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(
+    Trip trip,
+    LocalDate serviceDate,
+    boolean fallbackToPlannedTimetableOnNoServiceDate
+  ) {
     TripPattern pattern = findPattern(trip, serviceDate);
 
     Timetable timetable = findTimetable(pattern, serviceDate);
 
     // This check is made here to avoid changing TripTimeOnDate.fromTripTimes
     TripTimes times = timetable.getTripTimes(trip);
-    if (
-      times == null ||
-      !this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())
-    ) {
+    if (times == null) {
       return Optional.empty();
+    } else if (!this.getServiceCodesRunningForDate(serviceDate).contains(times.getServiceCode())) {
+      if (fallbackToPlannedTimetableOnNoServiceDate) {
+        // Technically not returning empty here is incorrect, you should use getScheduledTripTimes
+        // above instead if you want this, but it has been the behavior for a very long time, and
+        // at least one longstanding front end will fail without this.
+        return Optional.ofNullable(TripTimeOnDate.fromTripTimes(timetable, trip));
+      } else {
+        return Optional.empty();
+      }
     } else {
       Instant midnight = ServiceDateUtils.asStartOfService(
         serviceDate,
@@ -140,6 +150,11 @@ public class DefaultTransitService implements TransitEditorService {
       ).toInstant();
       return Optional.of(TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight));
     }
+  }
+
+  @Override
+  public Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate) {
+    return getTripTimeOnDates(trip, serviceDate, false);
   }
 
   @Override

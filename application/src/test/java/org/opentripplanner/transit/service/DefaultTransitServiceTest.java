@@ -242,6 +242,19 @@ class DefaultTransitServiceTest {
   }
 
   @Test
+  void getTripTimeOnDateWithNoServiceAndFallbackToPlannedTimetable() {
+    assertEquals(
+      Optional.of(
+        List.of(
+          new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 0, RAIL_PATTERN),
+          new TripTimeOnDate(SCHEDULED_TRIP_TIMES, 1, RAIL_PATTERN)
+        )
+      ),
+      service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE, true)
+    );
+  }
+
+  @Test
   void getTripTimesOnNoServiceDay() {
     assertEquals(Optional.empty(), service.getTripTimeOnDates(TRIP, NO_SERVICE_DATE));
   }

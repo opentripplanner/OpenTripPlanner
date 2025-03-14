@@ -73,6 +73,17 @@ public interface TransitService {
   Optional<List<TripTimeOnDate>> getScheduledTripTimes(Trip trip);
 
   /**
+   * @return if the trip doesn't run on the specified service date, return scheduled trip times,
+   * unmodified by any realtime data, if fallbackToPlannedTimetableOnNoServiceDate is true, empty
+   * otherwise. Logically this is confusing, but existing API users depend on this.
+   */
+  Optional<List<TripTimeOnDate>> getTripTimeOnDates(
+    Trip trip,
+    LocalDate serviceDate,
+    boolean fallbackToPlannedTimetableOnNoServiceDate
+  );
+
+  /**
    * @return empty if the trip doesn't run on the date specified
    */
   Optional<List<TripTimeOnDate>> getTripTimeOnDates(Trip trip, LocalDate serviceDate);
