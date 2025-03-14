@@ -29,16 +29,17 @@ class OjpToTriasTransformer {
     "trias_to_ojp2.0_request.xslt"
   );
 
-  static String transform(OJP ojp) {
+  private static final JAXBContext CONTEXT = jaxbContext();
+
+  static String ojpToTrias(OJP ojp) {
     var writer = new StringWriter();
-    transform(ojp, writer);
+    ojpToTrias(ojp, writer);
     return writer.toString();
   }
 
-  static void transform(OJP ojp, Writer writer) {
+  static void ojpToTrias(OJP ojp, Writer writer) {
     try {
-      var context = JAXBContext.newInstance(OJP.class);
-      var marshaller = context.createMarshaller();
+      var marshaller = CONTEXT.createMarshaller();
 
       // Convert Java object to XML string
       var outputStream = new ByteArrayOutputStream();
@@ -46,15 +47,13 @@ class OjpToTriasTransformer {
 
       var xmlSource = new StreamSource(new ByteArrayInputStream(outputStream.toByteArray()));
 
-      transform(writer, xmlSource);
+      ojpToTrias(writer, xmlSource);
     } catch (IOException | JAXBException | TransformerException e) {
       throw new RuntimeException(e);
     }
   }
 
   static OJP triasToOjp(String trias) throws JAXBException, TransformerException {
-    var context = JAXBContext.newInstance(OJP.class);
-
     var xmlSource = new StreamSource(
       new ByteArrayInputStream(trias.getBytes(StandardCharsets.UTF_8))
     );
@@ -64,13 +63,13 @@ class OjpToTriasTransformer {
     transformer.transform(xmlSource, new StreamResult(writer));
     var transformedXml = writer.toString(StandardCharsets.UTF_8);
 
-    var unmarshaller = context.createUnmarshaller();
+    var unmarshaller = CONTEXT.createUnmarshaller();
     return (OJP) unmarshaller.unmarshal(
       new ByteArrayInputStream(transformedXml.getBytes(StandardCharsets.UTF_8))
     );
   }
 
-  static void transform(Writer writer, StreamSource xmlSource)
+  static void ojpToTrias(Writer writer, StreamSource xmlSource)
     throws IOException, TransformerException {
     var transformer = OJP_TO_TRIAS_TEMPLATE.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -84,6 +83,14 @@ class OjpToTriasTransformer {
       TransformerFactory factory = TransformerFactory.newInstance();
       return factory.newTemplates(xsltSource);
     } catch (TransformerConfigurationException | IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static JAXBContext jaxbContext() {
+    try {
+      return JAXBContext.newInstance(OJP.class);
+    } catch (JAXBException e) {
       throw new RuntimeException(e);
     }
   }

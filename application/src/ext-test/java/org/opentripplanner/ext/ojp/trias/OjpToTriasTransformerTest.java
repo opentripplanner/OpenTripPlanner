@@ -38,7 +38,7 @@ class OjpToTriasTransformerTest {
   @Test
   void error() {
     var ojp = ErrorMapper.error("An error occurred", ZDT);
-    var actual = OjpToTriasTransformer.transform(ojp);
+    var actual = OjpToTriasTransformer.ojpToTrias(ojp);
     var file = LOADER.extTestResourceFile("error.xml");
     var original = readFile(file);
     writeFile(file, actual);
