@@ -466,6 +466,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request) {
+    OTPRequestTimeoutException.checkForTimeout();
     return stopTimesHelper.findTripTimeOnDate(request);
   }
 

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.trias;
+package org.opentripplanner.ext.ojp.trias;
 
 import static jakarta.xml.bind.Marshaller.*;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -18,9 +18,9 @@ import java.util.Set;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.vdv.CallAtStop;
-import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
-import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
+import org.opentripplanner.ext.ojp.id.UseFeedIdResolver;
+import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;
+import org.opentripplanner.ext.ojp.service.CallAtStop;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;

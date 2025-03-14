@@ -1,9 +1,8 @@
-package org.opentripplanner.ext.vdv;
+package org.opentripplanner.ext.ojp.service;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -11,7 +10,6 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
@@ -20,7 +18,10 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 
-public class VdvService {
+/**
+ * Implements OJP specific business logic but delegates the bulk of the work to TransitService.
+ */
+public class OjpService {
 
   private final TransitService transitService;
   private final GraphFinder finder;
@@ -29,15 +30,14 @@ public class VdvService {
    */
   private final int MAX_DEPARTURES = 100;
 
-  public VdvService(TransitService transitService, GraphFinder finder) {
+  public OjpService(TransitService transitService, GraphFinder finder) {
     this.transitService = transitService;
     this.finder = finder;
   }
 
-  public Optional<String> resolveLanguage(String feedId) {
-    return Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang);
-  }
-
+  /**
+   * Find calls at stop at a specific time. These are useful for departure/arrival boards.
+   */
   public List<CallAtStop> findCallsAtStop(FeedScopedId id, StopEventRequestParams params)
     throws EntityNotFoundException {
     Collection<StopLocation> stops;
@@ -55,6 +55,11 @@ public class VdvService {
     return sort(params.numDepartures, calls);
   }
 
+  /**
+   * Find calls at stop near a given coordinate at a specific time.
+   * <p>
+   * These are useful for departure/arrival boards.
+   */
   public List<CallAtStop> findCallsAtStop(WgsCoordinate coordinate, StopEventRequestParams params) {
     var calls = finder
       .findClosestStops(coordinate.asJtsCoordinate(), params.maximumWalkDistance)
@@ -69,6 +74,13 @@ public class VdvService {
       .toList();
 
     return sort(params.numDepartures(), calls);
+  }
+
+  /**
+   * Extract the feed language from its ID.
+   */
+  Optional<String> resolveLanguage(String feedId) {
+    return Optional.ofNullable(transitService.getFeedInfo(feedId)).map(FeedInfo::getLang);
   }
 
   private static List<CallAtStop> sort(int numResults, List<CallAtStop> stopTimesInPatterns) {

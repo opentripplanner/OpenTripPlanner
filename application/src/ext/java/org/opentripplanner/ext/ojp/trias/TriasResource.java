@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.trias;
+package org.opentripplanner.ext.ojp.trias;
 
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPStopEventRequestStructure;
@@ -22,13 +22,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.TransformerException;
-import org.opentripplanner.ext.vdv.VdvService;
-import org.opentripplanner.ext.vdv.id.HideFeedIdResolver;
-import org.opentripplanner.ext.vdv.id.IdResolver;
-import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
-import org.opentripplanner.ext.vdv.ojp.OjpService;
-import org.opentripplanner.ext.vdv.ojp.mapping.ErrorMapper;
-import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
+import org.opentripplanner.ext.ojp.id.HideFeedIdResolver;
+import org.opentripplanner.ext.ojp.id.IdResolver;
+import org.opentripplanner.ext.ojp.id.UseFeedIdResolver;
+import org.opentripplanner.ext.ojp.mapping.ErrorMapper;
+import org.opentripplanner.ext.ojp.service.OjpService;
+import org.opentripplanner.ext.ojp.service.OjpServiceMapper;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
@@ -45,15 +44,15 @@ public class TriasResource {
     "stop-event-stop-point.xml"
   );
 
-  private final OjpService ojpService;
+  private final OjpServiceMapper ojpService;
 
   public TriasResource(@Context OtpServerRequestContext context) {
     var transitService = context.transitService();
     var zoneId = transitService.getTimeZone();
-    var vdvService = new VdvService(context.transitService(), context.graphFinder());
+    var vdvService = new OjpService(context.transitService(), context.graphFinder());
 
     IdResolver idResolver = idResolver(context.triasApiConfig());
-    this.ojpService = new OjpService(vdvService, idResolver, zoneId);
+    this.ojpService = new OjpServiceMapper(vdvService, idResolver, zoneId);
   }
 
   private IdResolver idResolver(TriasApiConfig triasApiConfig) {
