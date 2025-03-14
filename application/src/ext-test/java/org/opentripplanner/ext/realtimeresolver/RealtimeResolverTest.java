@@ -64,7 +64,10 @@ class RealtimeResolverTest {
       .build();
     transitService.getTransitAlertService().setAlerts(List.of(alert));
 
-    var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(List.of(itinerary), transitService);
+    var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
+      List.of(itinerary),
+      transitService
+    );
 
     assertFalse(itinerariesWithRealtime.isEmpty());
 

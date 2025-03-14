@@ -443,9 +443,10 @@ public class Itinerary implements ItinerarySortKey {
    * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
    * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
-   * -1 indicate that the cost is not set/computed.
+   * Zero(0) cost indicate that the cost is not set/computed.
    */
   public int generalizedCost() {
+    // TODO Return Cost type, not int
     return generalizedCost.toSeconds();
   }
 
@@ -560,7 +561,7 @@ public class Itinerary implements ItinerarySortKey {
     }
   }
 
-  public List<ScheduledTransitLeg> findScheduledTransitLegs() {
+  public List<ScheduledTransitLeg> listScheduledTransitLegs() {
     return legs()
       .stream()
       .filter(ScheduledTransitLeg.class::isInstance)
