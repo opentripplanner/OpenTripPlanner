@@ -359,17 +359,17 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.55.2</version>
+            <version>1.55.3</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.8</version>
+            <version>7.17.9</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.15.3</version>
+            <version>1.15.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
