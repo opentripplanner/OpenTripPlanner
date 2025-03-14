@@ -7,7 +7,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 
 public interface RealtimeVehicleRepository {
   /**
-   * Stores the relationship between of realtime vehicles with a pattern for a given feed id.
+   * Stores all realtime vehicles for a given {@code feedId} and associates each with a pattern.
    * If the pattern is a realtime-added one, then the original (scheduled) one is used as the key
    * for the map storing the information.
    * <p>
