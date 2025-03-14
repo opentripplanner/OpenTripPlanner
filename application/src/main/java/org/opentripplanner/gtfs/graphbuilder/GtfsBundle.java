@@ -7,7 +7,7 @@ import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.slf4j.Logger;
@@ -43,15 +43,15 @@ public class GtfsBundle {
 
   private GtfsBundle(CompositeDataSource compositeDataSource) {
     this(
-      new ConfiguredDataSource<>(
+      new ConfiguredCompositeDataSource<>(
         compositeDataSource,
         new GtfsFeedParametersBuilder().withSource(compositeDataSource.uri()).build()
       )
     );
   }
 
-  public GtfsBundle(ConfiguredDataSource<GtfsFeedParameters> configuredDataSource) {
-    this.dataSource = (CompositeDataSource) configuredDataSource.dataSource();
+  public GtfsBundle(ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource) {
+    this.dataSource = configuredDataSource.dataSource();
     if (configuredDataSource.config().feedId() != null) {
       this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
     }

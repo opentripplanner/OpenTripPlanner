@@ -14,8 +14,8 @@ import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
@@ -104,7 +104,10 @@ public class ConstantsForTests {
     var netexZipFile = new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME);
 
     var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
-    var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
+    var configuredDataSource = new ConfiguredCompositeDataSource<>(
+      dataSource,
+      buildConfig.netexDefaults
+    );
     var transitService = new OtpTransitServiceBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
@@ -119,7 +122,10 @@ public class ConstantsForTests {
     var netexZipFile = new File(NETEX_EPIP_DATA_DIR);
 
     var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
-    var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
+    var configuredDataSource = new ConfiguredCompositeDataSource<>(
+      dataSource,
+      buildConfig.netexDefaults
+    );
     var transitService = new OtpTransitServiceBuilder(
       new SiteRepository(),
       DataImportIssueStore.NOOP
@@ -268,7 +274,9 @@ public class ConstantsForTests {
           .copyOf()
           .withSource(NETEX_MINIMAL_DATA_SOURCE.uri())
           .build();
-        var sources = List.of(new ConfiguredDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig));
+        var sources = List.of(
+          new ConfiguredCompositeDataSource<>(NETEX_MINIMAL_DATA_SOURCE, netexConfig)
+        );
 
         new NetexConfigure(buildConfig)
           .createNetexModule(

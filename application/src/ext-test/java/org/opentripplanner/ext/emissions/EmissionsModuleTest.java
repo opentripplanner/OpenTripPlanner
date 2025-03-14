@@ -11,10 +11,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.datastore.file.DirectoryDataSource;
+import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -35,9 +36,9 @@ public class EmissionsModuleTest {
 
   @Test
   void testMultipleGtfsDataReading() {
-    inputData.put(GTFS, new FileDataSource(CO2_GTFS_ZIP, GTFS));
-    inputData.put(GTFS, new FileDataSource(CO2_GTFS, GTFS));
-    Iterable<ConfiguredDataSource<GtfsFeedParameters>> configuredDataSource =
+    inputData.put(GTFS, new ZipFileDataSource(CO2_GTFS_ZIP, GTFS));
+    inputData.put(GTFS, new DirectoryDataSource(CO2_GTFS, GTFS));
+    Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> configuredDataSource =
       getGtfsConfiguredDatasource();
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
     EmissionsModule emissionsModule = new EmissionsModule(
@@ -57,11 +58,13 @@ public class EmissionsModuleTest {
     );
   }
 
-  private Iterable<ConfiguredDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
+  private Iterable<
+    ConfiguredCompositeDataSource<GtfsFeedParameters>
+  > getGtfsConfiguredDatasource() {
     return inputData
       .get(GTFS)
       .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getGtfsFeedConfig(it)))
+      .map(it -> new ConfiguredCompositeDataSource<>(it, getGtfsFeedConfig(it)))
       .toList();
   }
 

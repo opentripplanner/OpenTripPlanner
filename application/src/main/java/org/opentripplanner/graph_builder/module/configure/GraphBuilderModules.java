@@ -17,12 +17,12 @@ import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -36,7 +36,6 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
@@ -107,9 +106,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (ConfiguredDataSource<
-      GtfsFeedParameters
-    > gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+    for (var gtfsData : dataSources.getGtfsConfiguredDatasource()) {
       GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
 
       gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();

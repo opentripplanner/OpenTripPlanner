@@ -20,6 +20,8 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
+import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
@@ -148,11 +150,11 @@ public class GraphBuilderDataSources {
       );
   }
 
-  public Iterable<ConfiguredDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
+  public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
     return inputData
       .get(GTFS)
       .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getGtfsFeedConfig(it)))
+      .map(it -> new ConfiguredCompositeDataSource<>(it, getGtfsFeedConfig(it)))
       .toList();
   }
 
@@ -165,11 +167,13 @@ public class GraphBuilderDataSources {
       .orElse(buildConfig.gtfsDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
-  public Iterable<ConfiguredDataSource<NetexFeedParameters>> getNetexConfiguredDatasource() {
+  public Iterable<
+    ConfiguredCompositeDataSource<NetexFeedParameters>
+  > getNetexConfiguredDatasource() {
     return inputData
       .get(NETEX)
       .stream()
-      .map(it -> new ConfiguredDataSource<>(it, getNetexConfig(it)))
+      .map(it -> new ConfiguredCompositeDataSource<>(it, getNetexConfig(it)))
       .toList();
   }
 
