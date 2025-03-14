@@ -175,7 +175,7 @@ public class SplitEdgeTurnRestrictionsTest {
     // make sure that we only get CAR legs
     itineraries.forEach(i ->
       i
-        .getLegs()
+        .legs()
         .forEach(l -> {
           if (l instanceof StreetLeg stLeg) {
             assertEquals(TraverseMode.CAR, stLeg.getMode());
@@ -184,7 +184,7 @@ public class SplitEdgeTurnRestrictionsTest {
           }
         })
     );
-    Geometry geometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
+    Geometry geometry = itineraries.get(0).legs().get(0).getLegGeometry();
     return EncodedPolyline.encode(geometry).points();
   }
 }

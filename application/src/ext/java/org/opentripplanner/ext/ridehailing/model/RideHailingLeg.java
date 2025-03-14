@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.ridehailing.model;
 
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.StreetLegBuilder;
 
 /**
  * This is a special leg for ride hailing that adds information about the ride estimate like
@@ -13,7 +12,7 @@ public class RideHailingLeg extends StreetLeg {
   private final RideHailingProvider provider;
 
   public RideHailingLeg(StreetLeg streetLeg, RideHailingProvider provider, RideEstimate estimate) {
-    super(StreetLegBuilder.of(streetLeg));
+    super(streetLeg.copyOf());
     this.provider = provider;
     this.estimate = estimate;
   }

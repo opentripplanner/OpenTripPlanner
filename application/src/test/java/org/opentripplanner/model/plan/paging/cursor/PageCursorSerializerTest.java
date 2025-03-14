@@ -39,7 +39,13 @@ class PageCursorSerializerTest {
   private static final String PREV_TOKEN_W_NULLS = TOKEN_V1 + TOKEN_W_NULLS_BODY + "";
   private static final String CURR_TOKEN_W_NULLS = TOKEN_V2 + TOKEN_W_NULLS_BODY + "fA==";
 
-  private static final ItinerarySortKey CUT = new DeduplicationPageCut(DT, AT, 1200, 3, true);
+  private static final ItinerarySortKey CUT = new DeduplicationPageCut(
+    DT,
+    AT,
+    Cost.costOfSeconds(1200),
+    3,
+    true
+  );
 
   private static final PageCursor PAGE_CURSOR = new PageCursor(
     PREVIOUS_PAGE,

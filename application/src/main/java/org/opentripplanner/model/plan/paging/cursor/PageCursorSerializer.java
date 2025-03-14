@@ -58,11 +58,11 @@ final class PageCursorSerializer {
     if (cursor.containsItineraryPageCut()) {
       var cut = cursor.itineraryPageCut();
       tokenBuilder
-        .withBoolean(CUT_ON_STREET_FIELD, cut.isOnStreetAllTheWay())
+        .withBoolean(CUT_ON_STREET_FIELD, cut.isStreetOnly())
         .withTimeInstant(CUT_DEPARTURE_TIME_FIELD, cut.startTimeAsInstant())
         .withTimeInstant(CUT_ARRIVAL_TIME_FIELD, cut.endTimeAsInstant())
-        .withInt(CUT_N_TRANSFERS_FIELD, cut.getNumberOfTransfers())
-        .withInt(CUT_COST_FIELD, cut.getGeneralizedCostIncludingPenalty());
+        .withInt(CUT_N_TRANSFERS_FIELD, cut.numberOfTransfers())
+        .withInt(CUT_COST_FIELD, cut.generalizedCostIncludingPenalty().toSeconds());
     }
     if (cursor.containsGeneralizedCostMaxLimit()) {
       tokenBuilder.withInt(
@@ -98,7 +98,7 @@ final class PageCursorSerializer {
         itineraryPageCut = new DeduplicationPageCut(
           cutDepartureTime.get(),
           token.getTimeInstant(CUT_ARRIVAL_TIME_FIELD).orElseThrow(),
-          token.getInt(CUT_COST_FIELD).orElseThrow(),
+          Cost.costOfSeconds(token.getInt(CUT_COST_FIELD).orElseThrow()),
           token.getInt(CUT_N_TRANSFERS_FIELD).orElseThrow(),
           token.getBoolean(CUT_ON_STREET_FIELD).orElseThrow()
         );

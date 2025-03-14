@@ -117,12 +117,12 @@ class ScheduledDeviatedTripIntegrationTest {
     var itineraries = router
       .createFlexOnlyItineraries(false)
       .stream()
-      .peek(filter::decorate)
+      .map(filter::decorate)
       .toList();
 
     var itinerary = itineraries.getFirst();
 
-    assertFalse(itinerary.getFares().getLegProducts().isEmpty());
+    assertFalse(itinerary.fare().getLegProducts().isEmpty());
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
@@ -152,7 +152,7 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals(2, itineraries.size());
 
     var itin = itineraries.get(0);
-    var leg = itin.getLegs().get(0);
+    var leg = itin.legs().get(0);
 
     assertEquals("cujv", leg.getFrom().stop.getId().getId());
     assertEquals("yz85", leg.getTo().stop.getId().getId());
