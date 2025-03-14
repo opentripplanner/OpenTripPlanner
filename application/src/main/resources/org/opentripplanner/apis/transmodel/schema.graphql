@@ -159,7 +159,7 @@ type Contact {
 "A planned journey on a specific day"
 type DatedServiceJourney {
   "Returns scheduled passingTimes for this dated service journey, updated with real-time-updates (if available). "
-  estimatedCalls: [EstimatedCall] @timingData
+  estimatedCalls: [EstimatedCall!]! @timingData
   id: ID!
   "JourneyPattern for the dated service journey."
   journeyPattern: JourneyPattern
@@ -1145,7 +1145,7 @@ type ServiceJourney {
   estimatedCalls(
     "Date to get estimated calls for. Defaults to today."
     date: Date
-  ): [EstimatedCall] @timingData
+  ): [EstimatedCall!]! @timingData
   id: ID!
   "JourneyPattern for the service journey, according to scheduled data. If the ServiceJourney is not included in the scheduled data, null is returned."
   journeyPattern: JourneyPattern
