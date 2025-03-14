@@ -1,6 +1,6 @@
-package org.opentripplanner.ext.vdv.ojp.mapping;
+package org.opentripplanner.ext.ojp.mapping;
 
-import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
 
 import de.vdv.ojp20.CallAtNearStopStructure;
 import de.vdv.ojp20.CallAtStopStructure;
@@ -33,8 +33,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import org.opentripplanner.ext.vdv.CallAtStop;
-import org.opentripplanner.ext.vdv.id.IdResolver;
+import org.opentripplanner.ext.ojp.id.IdResolver;
+import org.opentripplanner.ext.ojp.service.CallAtStop;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;

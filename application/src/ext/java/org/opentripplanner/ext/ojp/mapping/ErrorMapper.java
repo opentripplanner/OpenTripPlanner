@@ -1,10 +1,8 @@
-package org.opentripplanner.ext.vdv.ojp.mapping;
+package org.opentripplanner.ext.ojp.mapping;
 
 import de.vdv.ojp20.OJP;
 import de.vdv.ojp20.OJPResponseStructure;
-import de.vdv.ojp20.siri.CapabilityNotSupportedErrorStructure;
 import de.vdv.ojp20.siri.ErrorDescriptionStructure;
-import de.vdv.ojp20.siri.ServiceDelivery;
 import de.vdv.ojp20.siri.ServiceDeliveryStructure;
 import java.time.ZonedDateTime;
 

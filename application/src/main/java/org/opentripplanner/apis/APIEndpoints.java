@@ -27,13 +27,13 @@ import org.opentripplanner.apis.vectortiles.GraphInspectorVectorTileResource;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
+import org.opentripplanner.ext.ojp.trias.TriasResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.restapi.resources.BikeRental;
 import org.opentripplanner.ext.restapi.resources.IndexAPI;
 import org.opentripplanner.ext.restapi.resources.PlannerResource;
 import org.opentripplanner.ext.restapi.resources.Routers;
-import org.opentripplanner.ext.vdv.trias.TriasResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 

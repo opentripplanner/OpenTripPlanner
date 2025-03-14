@@ -1,8 +1,7 @@
-package org.opentripplanner.ext.vdv;
+package org.opentripplanner.ext.ojp.service;
 
 import java.time.Duration;
 import java.util.Comparator;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
 

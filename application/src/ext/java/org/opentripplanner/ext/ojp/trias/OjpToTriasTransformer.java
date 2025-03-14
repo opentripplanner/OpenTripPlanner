@@ -1,13 +1,11 @@
-package org.opentripplanner.ext.vdv.trias;
+package org.opentripplanner.ext.ojp.trias;
 
 import de.vdv.ojp20.OJP;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +17,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-public class OjpToTriasTransformer {
+/**
+ * Converts from OJP XML to TRIAS XML by using an XSLT stylesheet.
+ */
+class OjpToTriasTransformer {
 
   private static final Templates OJP_TO_TRIAS_TEMPLATE = loadTemplate(
     "trias_to_ojp2.0_response.xslt"
@@ -28,13 +29,13 @@ public class OjpToTriasTransformer {
     "trias_to_ojp2.0_request.xslt"
   );
 
-  public static String transform(OJP ojp) {
+  static String transform(OJP ojp) {
     var writer = new StringWriter();
     transform(ojp, writer);
     return writer.toString();
   }
 
-  public static void transform(OJP ojp, Writer writer) {
+  static void transform(OJP ojp, Writer writer) {
     try {
       var context = JAXBContext.newInstance(OJP.class);
       var marshaller = context.createMarshaller();
@@ -51,7 +52,7 @@ public class OjpToTriasTransformer {
     }
   }
 
-  public static OJP triasToOjp(String trias) throws JAXBException, TransformerException {
+  static OJP triasToOjp(String trias) throws JAXBException, TransformerException {
     var context = JAXBContext.newInstance(OJP.class);
 
     var xmlSource = new StreamSource(
@@ -69,14 +70,14 @@ public class OjpToTriasTransformer {
     );
   }
 
-  private static void transform(Writer writer, StreamSource xmlSource)
+  static void transform(Writer writer, StreamSource xmlSource)
     throws IOException, TransformerException {
     var transformer = OJP_TO_TRIAS_TEMPLATE.newTransformer();
     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
     transformer.transform(xmlSource, new StreamResult(writer));
   }
 
-  private static Templates loadTemplate(String name) {
+  static Templates loadTemplate(String name) {
     try {
       var xslt = OjpToTriasTransformer.class.getResource(name).openStream();
       var xsltSource = new StreamSource(xslt);
