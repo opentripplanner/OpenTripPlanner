@@ -102,7 +102,7 @@ public class DefaultFareService implements FareService {
   @Override
   public ItineraryFares calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .map(Leg.class::cast)

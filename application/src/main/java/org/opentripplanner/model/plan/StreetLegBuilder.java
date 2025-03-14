@@ -29,23 +29,22 @@ public class StreetLegBuilder {
 
   protected StreetLegBuilder() {}
 
-  public static StreetLegBuilder of(StreetLeg leg) {
-    return new StreetLegBuilder()
-      .withMode(leg.getMode())
-      .withStartTime(leg.getStartTime())
-      .withEndTime(leg.getEndTime())
-      .withFrom(leg.getFrom())
-      .withTo(leg.getTo())
-      .withDistanceMeters(leg.getDistanceMeters())
-      .withGeneralizedCost(leg.getGeneralizedCost())
-      .withGeometry(leg.getLegGeometry())
-      .withElevationProfile(leg.getElevationProfile())
-      .withWalkSteps(leg.getWalkSteps())
-      .withWalkingBike(leg.getWalkingBike())
-      .withRentedVehicle(leg.getRentedVehicle())
-      .withVehicleRentalNetwork(leg.getVehicleRentalNetwork())
-      .withAccessibilityScore(leg.accessibilityScore())
-      .withStreetNotes(leg.getStreetNotes());
+  protected StreetLegBuilder(StreetLeg leg) {
+    this.mode = leg.getMode();
+    this.startTime = leg.getStartTime();
+    this.endTime = leg.getEndTime();
+    this.from = leg.getFrom();
+    this.to = leg.getTo();
+    this.distanceMeters = leg.getDistanceMeters();
+    this.generalizedCost = leg.getGeneralizedCost();
+    this.geometry = leg.getLegGeometry();
+    this.elevationProfile = leg.getElevationProfile();
+    this.walkSteps = Objects.requireNonNull(leg.getWalkSteps());
+    this.walkingBike = leg.getWalkingBike();
+    this.rentedVehicle = leg.getRentedVehicle();
+    this.vehicleRentalNetwork = leg.getVehicleRentalNetwork();
+    this.accessibilityScore = leg.accessibilityScore();
+    streetNotes = Set.copyOf(leg.getStreetNotes());
   }
 
   public StreetLeg build() {

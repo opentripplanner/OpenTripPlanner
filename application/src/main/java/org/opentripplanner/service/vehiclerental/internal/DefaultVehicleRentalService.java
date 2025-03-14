@@ -121,17 +121,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   }
 
   @Override
-  public List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(
-    double minLon,
-    double minLat,
-    double maxLon,
-    double maxLat
-  ) {
-    Envelope envelope = new Envelope(
-      new Coordinate(minLon, minLat),
-      new Coordinate(maxLon, maxLat)
-    );
-
+  public List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(Envelope envelope) {
     Stream<VehicleRentalPlace> vehicleRentalPlaceStream = getVehicleRentalPlaces()
       .stream()
       .filter(vr -> envelope.contains(new Coordinate(vr.getLongitude(), vr.getLatitude())));

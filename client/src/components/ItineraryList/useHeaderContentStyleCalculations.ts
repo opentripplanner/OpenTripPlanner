@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { TripPattern } from '../../gql/graphql.ts';
+import { TripPattern } from '../../static/query/tripQueryTypes';
 
 const CONTAINER_WIDTH_PADDING = 70;
 const START_PX_PADDING = 20;

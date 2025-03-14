@@ -32,8 +32,8 @@ class ItineraryFaresTest {
       .rail(439, T11_30, T11_50, D)
       .build();
 
-    var busLeg = i1.getTransitLeg(1);
-    var railLeg = i1.getTransitLeg(2);
+    var busLeg = i1.transitLeg(1);
+    var railLeg = i1.transitLeg(2);
 
     var fares = new ItineraryFares();
 

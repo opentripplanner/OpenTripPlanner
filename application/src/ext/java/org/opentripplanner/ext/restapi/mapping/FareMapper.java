@@ -30,7 +30,7 @@ public class FareMapper {
   }
 
   public ApiItineraryFares mapFare(Itinerary itinerary) {
-    var fares = itinerary.getFares();
+    var fares = itinerary.fare();
 
     return new ApiItineraryFares(
       Map.of(),
@@ -51,7 +51,7 @@ public class FareMapper {
         .keySet()
         .stream()
         .map(leg -> {
-          var index = itinerary.getLegIndex(leg);
+          var index = itinerary.findLegIndex(leg);
           // eventually we want to implement products that span multiple legs (but not the entire itinerary)
           return new ApiLegProducts(
             List.of(index),

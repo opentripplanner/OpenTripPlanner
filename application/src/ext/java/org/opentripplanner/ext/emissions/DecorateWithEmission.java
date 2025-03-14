@@ -22,9 +22,9 @@ import org.opentripplanner.utils.lang.Sandbox;
 public record DecorateWithEmission(EmissionsService emissionsService)
   implements ItineraryDecorator {
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     List<TransitLeg> transitLegs = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .map(TransitLeg.class::cast)
@@ -33,11 +33,11 @@ public record DecorateWithEmission(EmissionsService emissionsService)
     Optional<Grams> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
 
     if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
-      return;
+      return itinerary;
     }
 
     List<StreetLeg> carLegs = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(l -> l instanceof StreetLeg)
       .map(StreetLeg.class::cast)
@@ -46,13 +46,16 @@ public record DecorateWithEmission(EmissionsService emissionsService)
 
     Optional<Grams> co2ForCar = calculateCo2EmissionsForCar(carLegs);
 
+    var builder = itinerary.copyOf();
+
     if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
-      itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
+      builder.withEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
     } else if (co2ForTransit.isPresent()) {
-      itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get()));
+      builder.withEmissionsPerPerson(new Emissions(co2ForTransit.get()));
     } else if (co2ForCar.isPresent()) {
-      itinerary.setEmissionsPerPerson(new Emissions(co2ForCar.get()));
+      builder.withEmissionsPerPerson(new Emissions(co2ForCar.get()));
     }
+    return builder.build();
   }
 
   private Optional<Grams> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {

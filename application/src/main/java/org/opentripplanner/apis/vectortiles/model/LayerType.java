@@ -7,4 +7,5 @@ public enum LayerType {
   GeofencingZones,
   Edge,
   Vertex,
+  Rental,
 }

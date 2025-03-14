@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { isTransitMode } from '../../util/isTransitMode.ts';
 import { getColorForLeg } from '../../util/getColorForLeg.ts';
 import { generateTextColor } from '../../util/generateTextColor.ts';
-import { Leg } from '../../gql/graphql.ts';
+import { Leg } from '../../static/query/tripQueryTypes';
 
 export function useHeaderLegContentStyleCalculations(
   leg: Leg,

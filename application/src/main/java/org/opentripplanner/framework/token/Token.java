@@ -5,11 +5,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
- * Given a schema definition and a token version this class holds the values for
- * all fields in a token.
+ * Given a schema definition and a token version this class holds the values for all fields in a
+ * token. The field accessors return an optional value and there is no accessors to get "required"
+ * fields. The responsibility of enforcing required fields is left to the concrete domain
+ * specific representation, like the {@code PageCursor}.
  */
 public class Token {
 
@@ -25,24 +29,22 @@ public class Token {
     return definition.version();
   }
 
-  public boolean getBoolean(String fieldName) {
-    return (boolean) get(fieldName, TokenType.BOOLEAN);
+  public Optional<Boolean> getBoolean(String fieldName) {
+    var value = (Boolean) get(fieldName, TokenType.BOOLEAN);
+    return Optional.ofNullable(value);
   }
 
-  public byte getByte(String fieldName) {
-    return (byte) get(fieldName, TokenType.BYTE);
+  public Optional<Duration> getDuration(String fieldName) {
+    return Optional.ofNullable((Duration) get(fieldName, TokenType.DURATION));
   }
 
-  public Duration getDuration(String fieldName) {
-    return (Duration) get(fieldName, TokenType.DURATION);
+  public OptionalInt getInt(String fieldName) {
+    Integer v = (Integer) get(fieldName, TokenType.INT);
+    return v == null ? OptionalInt.empty() : OptionalInt.of(v);
   }
 
-  public int getInt(String fieldName) {
-    return (int) get(fieldName, TokenType.INT);
-  }
-
-  public String getString(String fieldName) {
-    return (String) get(fieldName, TokenType.STRING);
+  public Optional<String> getString(String fieldName) {
+    return Optional.ofNullable((String) get(fieldName, TokenType.STRING));
   }
 
   /**
@@ -59,18 +61,18 @@ public class Token {
    */
   public <T extends Enum<T>> Optional<T> getEnum(String fieldName, Class<T> enumClass) {
     try {
-      return Optional.of(Enum.valueOf(enumClass, (String) get(fieldName, TokenType.ENUM)));
+      String value = (String) get(fieldName, TokenType.ENUM);
+      if (value == null) {
+        return Optional.empty();
+      }
+      return Optional.of(Enum.valueOf(enumClass, value));
     } catch (IllegalArgumentException ignore) {
       return Optional.empty();
     }
   }
 
-  public Instant getTimeInstant(String fieldName) {
-    return (Instant) get(fieldName, TokenType.TIME_INSTANT);
-  }
-
-  private Object get(String fieldName, TokenType type) {
-    return fieldValues.get(definition.getIndex(fieldName, type));
+  public Optional<Instant> getTimeInstant(String fieldName) {
+    return Optional.ofNullable((Instant) get(fieldName, TokenType.TIME_INSTANT));
   }
 
   @Override
@@ -82,5 +84,10 @@ public class Token {
       fieldValues.stream().map(Objects::toString).collect(Collectors.joining(", ")) +
       ')'
     );
+  }
+
+  @Nullable
+  private Object get(String fieldName, TokenType type) {
+    return fieldValues.get(definition.getIndex(fieldName, type));
   }
 }

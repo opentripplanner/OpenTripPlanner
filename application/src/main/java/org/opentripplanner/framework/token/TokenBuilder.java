@@ -21,10 +21,6 @@ public class TokenBuilder {
     return with(fieldName, TokenType.BOOLEAN, v);
   }
 
-  public TokenBuilder withByte(String fieldName, byte v) {
-    return with(fieldName, TokenType.BYTE, v);
-  }
-
   public TokenBuilder withEnum(String fieldName, Enum<?> v) {
     return with(fieldName, TokenType.ENUM, v);
   }
@@ -51,8 +47,7 @@ public class TokenBuilder {
 
   private TokenBuilder with(String fieldName, TokenType type, Object value) {
     int index = definition.getIndex(fieldName, type);
-    ObjectUtils.requireNotInitialized(fieldName, values[index], value);
-    values[index] = value;
+    values[index] = ObjectUtils.requireNotInitialized(fieldName, values[index], value);
     return this;
   }
 }

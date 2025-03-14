@@ -10,7 +10,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.impl.FareModelForTest;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
@@ -39,16 +38,16 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    var first = (ScheduledTransitLeg) itinerary.getLegs().getFirst();
+    var first = (ScheduledTransitLeg) itinerary.legs().getFirst();
     var withFp = first.copy().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
-    var legs = new ArrayList<>(itinerary.getLegs());
+    var legs = new ArrayList<>(itinerary.legs());
     legs.set(0, withFp);
 
-    itinerary.setLegs(legs);
+    itinerary = itinerary.copyOf().withLegs(ignore -> legs).build();
 
-    filter.decorate(itinerary);
+    itinerary = filter.decorate(itinerary);
 
-    var updatedLeg = itinerary.getLegs().getFirst();
+    var updatedLeg = itinerary.legs().getFirst();
     assertEquals(STOP_C.getName(), updatedLeg.getFrom().name);
     assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
 
@@ -66,9 +65,9 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    filter.decorate(itinerary);
+    itinerary = filter.decorate(itinerary);
 
-    var legs = itinerary.getLegs().stream().map(Leg::getClass).toList();
+    var legs = itinerary.legs().stream().map(Leg::getClass).toList();
     assertEquals(List.of(ConsolidatedStopLeg.class, ScheduledTransitLeg.class), legs);
   }
 
@@ -82,9 +81,9 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    filter.decorate(itinerary);
+    itinerary = filter.decorate(itinerary);
 
-    var legs = itinerary.getLegs().stream().map(Leg::getClass).toList();
+    var legs = itinerary.legs().stream().map(Leg::getClass).toList();
     assertEquals(
       List.of(ConsolidatedStopLeg.class, StreetLeg.class, ScheduledTransitLeg.class),
       legs

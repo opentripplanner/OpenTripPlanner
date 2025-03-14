@@ -52,6 +52,104 @@
       }
     },
     {
+      "id" : "rental-vehicle",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "rental",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          15,
+          0.2,
+          23,
+          3.0
+        ],
+        "circle-radius" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          13,
+          1.4,
+          23,
+          10.0
+        ],
+        "circle-color" : "#277eb5"
+      },
+      "filter" : [
+        "in",
+        "class",
+        "VehicleRentalVehicle"
+      ],
+      "layout" : {
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Rental"
+      }
+    },
+    {
+      "id" : "rental-station",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "rental",
+      "minzoom" : 13,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          0.5,
+          23,
+          5.0
+        ],
+        "circle-radius" : [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          0.5,
+          23,
+          10.0
+        ],
+        "circle-color" : "#1cafad"
+      },
+      "filter" : [
+        "in",
+        "class",
+        "VehicleRentalStation"
+      ],
+      "layout" : {
+        "visibility" : "none"
+      },
+      "metadata" : {
+        "group" : "Rental"
+      }
+    },
+    {
       "id" : "wheelchair-accessible",
       "source" : "vectorSource",
       "source-layer" : "edges",

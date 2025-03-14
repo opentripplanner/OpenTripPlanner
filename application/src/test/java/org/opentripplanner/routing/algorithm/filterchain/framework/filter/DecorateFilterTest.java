@@ -1,16 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.framework.filter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -23,7 +20,7 @@ class DecorateFilterTest implements ItineraryDecorator, PlanTestConstants {
   private Iterator<Itinerary> expectedQueue;
 
   @Override
-  public void decorate(Itinerary itinerary) {
+  public Itinerary decorate(Itinerary itinerary) {
     if (expectedQueue == null) {
       fail("The expected queue is null, this method should not be called.");
     }
@@ -34,6 +31,8 @@ class DecorateFilterTest implements ItineraryDecorator, PlanTestConstants {
 
     var current = expectedQueue.next();
     assertEquals(current, itinerary);
+
+    return itinerary;
   }
 
   @Test

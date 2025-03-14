@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
@@ -158,9 +159,9 @@ class McMaxLimitFilterTest {
       .stream()
       .map(i ->
         "[ %d %d %s ]".formatted(
-            i.getGeneralizedCost(),
-            i.getNumberOfTransfers(),
-            groupsToString(i.getGeneralizedCost2().orElse(-1))
+            i.generalizedCost(),
+            i.numberOfTransfers(),
+            groupsToString(i.generalizedCost2().orElse(-1))
           )
       )
       .collect(Collectors.joining(", "));
@@ -178,9 +179,12 @@ class McMaxLimitFilterTest {
         for (int i = 0; i < nTransfers; i++) {
           builder.bus(1, ++start, ++start, PLACES[i + 2]);
         }
-        builder.withGeneralizedCost2(transitGroupIds);
       }
-      return builder.build(c1);
+      return builder
+        .itineraryBuilder()
+        .withGeneralizedCost(Cost.costOfSeconds(c1))
+        .withGeneralizedCost2(transitGroupIds)
+        .build();
     }
 
     @Override

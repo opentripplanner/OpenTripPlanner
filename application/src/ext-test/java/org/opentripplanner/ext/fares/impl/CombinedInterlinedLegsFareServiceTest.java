@@ -67,11 +67,11 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itinerary);
     assertNotNull(fare);
 
-    var firstLeg = itinerary.getTransitLeg(0);
+    var firstLeg = itinerary.transitLeg(0);
     var uses = fare.getLegProducts().get(firstLeg);
     assertEquals(1, uses.size());
 
-    var secondLeg = itinerary.getTransitLeg(1);
+    var secondLeg = itinerary.transitLeg(1);
     uses = fare.getLegProducts().get(secondLeg);
     assertEquals(1, uses.size());
 
@@ -96,14 +96,14 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
 
     var fare = service.calculateFares(itinerary);
 
-    var firstLeg = itinerary.getTransitLeg(0);
+    var firstLeg = itinerary.transitLeg(0);
     var uses = List.copyOf(fare.getLegProducts().get(firstLeg));
     assertEquals(1, uses.size());
 
     var firstLegUse = uses.getFirst();
     assertEquals(tenDollars, firstLegUse.product().price());
 
-    var secondLeg = itinerary.getTransitLeg(1);
+    var secondLeg = itinerary.transitLeg(1);
     uses = List.copyOf(fare.getLegProducts().get(secondLeg));
     assertEquals(1, uses.size());
 

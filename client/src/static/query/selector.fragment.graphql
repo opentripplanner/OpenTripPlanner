@@ -8,6 +8,7 @@
         expectedStartTime
         duration
         distance
+        generalizedCost
         legs {
             id
             mode
@@ -18,6 +19,7 @@
             realtime
             distance
             duration
+            generalizedCost
             fromPlace {
                 name
                 quay {

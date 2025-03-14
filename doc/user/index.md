@@ -26,7 +26,8 @@ the selector in the upper left of the published documentation.
 
 **Releases**
  
-- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.6 (the git master branch)
+- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.7 (the git master branch)
+- [v2.6.0](http://docs.opentripplanner.org/en/v2.6.0) - Version 2.6
 - [v2.5.0](http://docs.opentripplanner.org/en/v2.5.0) - Version 2.5
 - [v2.4.0](http://docs.opentripplanner.org/en/v2.4.0) - Version 2.4
 - [v2.3.0](http://docs.opentripplanner.org/en/v2.3.0) - Version 2.3

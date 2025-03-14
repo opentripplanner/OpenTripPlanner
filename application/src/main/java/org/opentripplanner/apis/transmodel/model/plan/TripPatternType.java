@@ -93,7 +93,7 @@ public class TripPatternType {
           .name("duration")
           .description("Duration of the trip, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getDuration().toSeconds())
+          .dataFetcher(env -> itinerary(env).totalDuration().toSeconds())
           .build()
       )
       .field(
@@ -101,7 +101,7 @@ public class TripPatternType {
           .name("directDuration")
           .description("NOT IMPLEMENTED.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getDuration().toSeconds())
+          .dataFetcher(env -> itinerary(env).totalDuration().toSeconds())
           .build()
       )
       .field(
@@ -109,7 +109,7 @@ public class TripPatternType {
           .name("waitingTime")
           .description("How much time is spent waiting for transit to arrive, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).getWaitingDuration().toSeconds())
+          .dataFetcher(env -> itinerary(env).totalWaitingDuration().toSeconds())
           .build()
       )
       .field(
@@ -125,7 +125,7 @@ public class TripPatternType {
           .name("walkTime")
           .description("How much time is spent walking, in seconds.")
           .type(ExtendedScalars.GraphQLLong)
-          .dataFetcher(env -> itinerary(env).walkDuration().toSeconds())
+          .dataFetcher(env -> itinerary(env).totalWalkDuration().toSeconds())
           .build()
       )
       .field(
@@ -136,7 +136,7 @@ public class TripPatternType {
             "all street(none transit) modes."
           )
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> itinerary(env).getNonTransitDistanceMeters())
+          .dataFetcher(env -> itinerary(env).totalStreetDistanceMeters())
           .build()
       )
       .field(
@@ -144,7 +144,7 @@ public class TripPatternType {
           .name("walkDistance")
           .deprecate("Replaced by `streetDistance`.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> itinerary(env).walkDistanceMeters())
+          .dataFetcher(env -> itinerary(env).totalWalkDistanceMeters())
           .build()
       )
       .field(
@@ -157,7 +157,7 @@ public class TripPatternType {
             "then walks to their destination, has four legs."
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(legType))))
-          .dataFetcher(env -> itinerary(env).getLegs())
+          .dataFetcher(env -> itinerary(env).legs())
           .build()
       )
       .field(
@@ -165,7 +165,7 @@ public class TripPatternType {
           .name("systemNotices")
           .description("Get all system notices.")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(systemNoticeType))))
-          .dataFetcher(env -> itinerary(env).getSystemNotices())
+          .dataFetcher(env -> itinerary(env).systemNotices())
           .build()
       )
       .field(
@@ -173,7 +173,7 @@ public class TripPatternType {
           .name("generalizedCost")
           .description("Generalized cost or weight of the itinerary. Used for debugging.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> itinerary(env).getGeneralizedCostIncludingPenalty())
+          .dataFetcher(env -> itinerary(env).generalizedCostIncludingPenalty().toSeconds())
           .build()
       )
       .field(
@@ -184,7 +184,7 @@ public class TripPatternType {
             "and transit-priority-groups use a second cost during routing. This is used for debugging."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> itinerary(env).getGeneralizedCost2().orElse(null))
+          .dataFetcher(env -> itinerary(env).generalizedCost2().orElse(null))
           .build()
       )
       .field(
@@ -195,7 +195,7 @@ public class TripPatternType {
             "short transfers. This field is meant for debugging only."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> itinerary(env).getWaitTimeOptimizedCost())
+          .dataFetcher(env -> itinerary(env).waitTimeOptimizedCost())
           .build()
       )
       .field(
@@ -206,7 +206,7 @@ public class TripPatternType {
             "field is meant for debugging only."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> itinerary(env).getTransferPriorityCost())
+          .dataFetcher(env -> itinerary(env).transferPriorityCost())
           .build()
       )
       .field(

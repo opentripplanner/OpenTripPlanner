@@ -75,13 +75,13 @@ public class BarrierRoutingTest {
           .stream()
           .flatMap(i ->
             Stream.of(
-              () -> assertEquals(1, i.getLegs().size()),
-              () -> assertEquals(TraverseMode.BICYCLE, i.getStreetLeg(0).getMode()),
+              () -> assertEquals(1, i.legs().size()),
+              () -> assertEquals(TraverseMode.BICYCLE, i.streetLeg(0).getMode()),
               () ->
                 assertEquals(
                   List.of(false, true, false, true, false),
                   i
-                    .getLegs()
+                    .legs()
                     .get(0)
                     .getWalkSteps()
                     .stream()
@@ -142,7 +142,7 @@ public class BarrierRoutingTest {
       itineraries ->
         itineraries
           .stream()
-          .flatMap(i -> i.getLegs().stream())
+          .flatMap(i -> i.legs().stream())
           .map(
             l ->
               () ->
@@ -194,7 +194,7 @@ public class BarrierRoutingTest {
 
     assertAll(assertions.apply(itineraries));
 
-    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).getLegGeometry();
     temporaryVertices.close();
 
     return EncodedPolyline.encode(legGeometry).points();

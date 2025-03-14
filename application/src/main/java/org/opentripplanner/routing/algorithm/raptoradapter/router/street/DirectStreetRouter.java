@@ -65,7 +65,7 @@ public class DirectStreetRouter {
         serverContext.graph().ellipsoidToGeoidDifference
       );
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
-      ItinerariesHelper.decorateItinerariesWithRequestData(
+      response = ItinerariesHelper.decorateItinerariesWithRequestData(
         response,
         directRequest.wheelchair(),
         directRequest.preferences().wheelchair()

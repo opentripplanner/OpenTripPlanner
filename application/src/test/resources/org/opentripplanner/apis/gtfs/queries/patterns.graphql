@@ -36,6 +36,7 @@
       speed
       heading
       lastUpdated
+      lastUpdate
       trip {
         gtfsId
       }
