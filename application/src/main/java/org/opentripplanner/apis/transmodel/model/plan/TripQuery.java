@@ -536,30 +536,6 @@ public class TripQuery {
       )
       .argument(
         GraphQLArgument.newArgument()
-          .name("relaxTransitSearchGeneralizedCostAtDestination")
-          .deprecate("This is replaced by 'relaxTransitGroupPriority'.")
-          .description(
-            """
-            Whether non-optimal transit paths at the destination should be returned. Let c be the
-            existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
-            accepted if the following is true:
-
-            `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`
-
-            The parameter is optional. If not set, a normal comparison is performed.
-
-            Values less than 1.0 is not allowed, and values greater than 2.0 are not
-            supported, due to performance reasons.
-            """
-          )
-          .type(Scalars.GraphQLFloat)
-          .defaultValueProgrammatic(
-            preferences.transit().raptor().relaxGeneralizedCostAtDestination().orElse(null)
-          )
-          .build()
-      )
-      .argument(
-        GraphQLArgument.newArgument()
           .name("itineraryFilters")
           .description(
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +
