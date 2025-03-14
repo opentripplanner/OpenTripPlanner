@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emissions;
 import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -30,7 +30,7 @@ public record DecorateWithEmission(EmissionsService emissionsService)
       .map(TransitLeg.class::cast)
       .toList();
 
-    Optional<Grams> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
+    Optional<Gram> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
 
     if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
       return itinerary;
@@ -44,7 +44,7 @@ public record DecorateWithEmission(EmissionsService emissionsService)
       .filter(leg -> leg.getMode() == TraverseMode.CAR)
       .toList();
 
-    Optional<Grams> co2ForCar = calculateCo2EmissionsForCar(carLegs);
+    Optional<Gram> co2ForCar = calculateCo2EmissionsForCar(carLegs);
 
     var builder = itinerary.copyOf();
 
@@ -58,11 +58,11 @@ public record DecorateWithEmission(EmissionsService emissionsService)
     return builder.build();
   }
 
-  private Optional<Grams> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {
+  private Optional<Gram> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {
     if (transitLegs.isEmpty()) {
       return Optional.empty();
     }
-    Grams co2Emissions = new Grams(0.0);
+    Gram co2Emissions = new Gram(0.0);
     for (TransitLeg leg : transitLegs) {
       FeedScopedId feedScopedRouteId = new FeedScopedId(
         leg.getAgency().getId().getFeedId(),
@@ -83,14 +83,14 @@ public record DecorateWithEmission(EmissionsService emissionsService)
     return Optional.ofNullable(co2Emissions);
   }
 
-  private Optional<Grams> calculateCo2EmissionsForCar(List<StreetLeg> carLegs) {
+  private Optional<Gram> calculateCo2EmissionsForCar(List<StreetLeg> carLegs) {
     if (carLegs.isEmpty()) {
       return Optional.empty();
     }
     return emissionsService
       .getEmissionsPerMeterForCar()
       .map(emissions ->
-        new Grams(
+        new Gram(
           carLegs
             .stream()
             .mapToDouble(leg -> emissions.getCo2().multiply(leg.getDistanceMeters()).asDouble())

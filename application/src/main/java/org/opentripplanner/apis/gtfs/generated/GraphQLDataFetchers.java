@@ -32,6 +32,7 @@ import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -390,7 +391,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLEmissions {
-    public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
+    public DataFetcher<Gram> co2();
   }
 
   /** Station entrance or exit, originating from OSM or GTFS data. */
