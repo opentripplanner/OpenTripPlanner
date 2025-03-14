@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsGraphBuilder;
+import org.opentripplanner.ext.emissions.configure.EmissionsGraphBuilderModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -39,7 +40,13 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Singleton
-@Component(modules = { GraphBuilderModules.class, OsmInfoGraphBuildServiceModule.class })
+@Component(
+  modules = {
+    GraphBuilderModules.class,
+    OsmInfoGraphBuildServiceModule.class,
+    EmissionsGraphBuilderModule.class,
+  }
+)
 public interface GraphBuilderFactory {
   //DataImportIssueStore issueStore();
   GraphBuilder graphBuilder();
