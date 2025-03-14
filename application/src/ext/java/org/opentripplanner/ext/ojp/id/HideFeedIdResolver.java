@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.id;
+package org.opentripplanner.ext.ojp.id;
 
 import java.util.Objects;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

@@ -1,9 +1,9 @@
-package org.opentripplanner.ext.vdv.ojp;
+package org.opentripplanner.ext.ojp.service;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
-import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
-import static org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.ONWARD_CALLS;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.PREVIOUS_CALLS;
+import static org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper.OptionalFeature.REALTIME_DATA;
 
 import de.vdv.ojp20.LineDirectionFilterStructure;
 import de.vdv.ojp20.ModeFilterStructure;
@@ -27,26 +27,27 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.vdv.CallAtStop;
-import org.opentripplanner.ext.vdv.VdvService;
-import org.opentripplanner.ext.vdv.id.IdResolver;
-import org.opentripplanner.ext.vdv.ojp.mapping.PtModeMapper;
-import org.opentripplanner.ext.vdv.ojp.mapping.StopEventResponseMapper;
+import org.opentripplanner.ext.ojp.id.IdResolver;
+import org.opentripplanner.ext.ojp.mapping.PtModeMapper;
+import org.opentripplanner.ext.ojp.mapping.StopEventResponseMapper;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 
-public class OjpService {
+/**
+ * Takes raw OJP types, extracts information and forwards it to the underlying services.
+ */
+public class OjpServiceMapper {
 
   public static final int DEFAULT_RADIUS_METERS = 1000;
   public static final int DEFAULT_NUM_DEPARTURES = 1;
   private static final Duration DEFAULT_TIME_WINDOW = Duration.ofHours(2);
-  private final VdvService vdvService;
+  private final OjpService vdvService;
   private final IdResolver idResolver;
   private final ZoneId zoneId;
 
-  public OjpService(VdvService vdvService, IdResolver idResolver, ZoneId zoneId) {
+  public OjpServiceMapper(OjpService vdvService, IdResolver idResolver, ZoneId zoneId) {
     this.vdvService = vdvService;
     this.idResolver = idResolver;
     this.zoneId = zoneId;
@@ -74,7 +75,7 @@ public class OjpService {
     return mapper.mapCalls(callsAtStop, ZonedDateTime.now());
   }
 
-  protected VdvService.StopEventRequestParams extractStopEventParams(
+  protected OjpService.StopEventRequestParams extractStopEventParams(
     OJPStopEventRequestStructure ser
   ) {
     var time = Optional.ofNullable(ser.getLocation().getDepArrTime().atZone(zoneId)).orElse(
@@ -107,7 +108,7 @@ public class OjpService {
       .map(BigInteger::intValue)
       .orElse(DEFAULT_RADIUS_METERS);
 
-    return new VdvService.StopEventRequestParams(
+    return new OjpService.StopEventRequestParams(
       time.toInstant(),
       arrivalDeparture,
       timeWindow,
@@ -208,7 +209,7 @@ public class OjpService {
   private static ArrivalDeparture arrivalDeparture(OJPStopEventRequestStructure ser) {
     return params(ser)
       .map(StopEventParamStructure::getStopEventType)
-      .map(OjpService::mapType)
+      .map(OjpServiceMapper::mapType)
       .orElse(ArrivalDeparture.BOTH);
   }
 

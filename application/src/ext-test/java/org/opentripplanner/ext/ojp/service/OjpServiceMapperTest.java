@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.vdv.ojp;
+package org.opentripplanner.ext.ojp.service;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,15 +22,20 @@ import java.time.ZonedDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.vdv.id.UseFeedIdResolver;
+import org.opentripplanner.ext.ojp.id.UseFeedIdResolver;
+import org.opentripplanner.ext.ojp.service.OjpServiceMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.rutebanken.time.XmlDateTime;
 
-class OjpServiceTest {
+class OjpServiceMapperTest {
 
   private static final ZonedDateTime ZDT = ZonedDateTime.parse("2025-02-17T14:24:02+01:00");
   private static final UseFeedIdResolver ID_RESOLVER = new UseFeedIdResolver();
-  private static final OjpService SERVICE = new OjpService(null, ID_RESOLVER, ZoneIds.BERLIN);
+  private static final OjpServiceMapper SERVICE = new OjpServiceMapper(
+    null,
+    ID_RESOLVER,
+    ZoneIds.BERLIN
+  );
 
   private static final FeedScopedId LINE_ID = id("line1");
 
@@ -43,8 +48,8 @@ class OjpServiceTest {
     assertThat(params.excludedAgencies()).isEmpty();
     assertThat(params.includedModes()).isEmpty();
     assertThat(params.excludedModes()).isEmpty();
-    assertEquals(OjpService.DEFAULT_RADIUS_METERS, params.maximumWalkDistance());
-    assertEquals(OjpService.DEFAULT_NUM_DEPARTURES, params.numDepartures());
+    assertEquals(OjpServiceMapper.DEFAULT_RADIUS_METERS, params.maximumWalkDistance());
+    assertEquals(OjpServiceMapper.DEFAULT_NUM_DEPARTURES, params.numDepartures());
   }
 
   @Test
