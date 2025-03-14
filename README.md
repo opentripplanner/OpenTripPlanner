@@ -16,10 +16,7 @@ GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate 
 clients, finding itineraries that account for disruptions and service changes.
 
 Note that this branch contains **OpenTripPlanner 2**, the second major version of OTP, which has
-been under development since 2018. The latest version of OTP is v2.5.0, released in March 2024.
-
-If you do not want to use this version, please switch to the final 1.x release
-tag `v1.5.0` or the `dev-1.x` branch.
+been under development since 2018 and is now the dominant one and the only one being supported.
 
 ## Performance Test
 
