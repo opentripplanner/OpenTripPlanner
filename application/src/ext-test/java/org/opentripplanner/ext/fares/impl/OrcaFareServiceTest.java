@@ -13,7 +13,6 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_A
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WHATCOM_AGENCY_ID;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
-import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.core.FareType.regular;
 import static org.opentripplanner.transit.model.basic.Money.USD;
@@ -29,7 +28,6 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -194,7 +192,6 @@ public class OrcaFareServiceTest {
    * the new two hour window and will be free.
    */
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateFareThatExceedsTwoHourFreeTransferWindow() {
     List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
@@ -220,7 +217,6 @@ public class OrcaFareServiceTest {
    * trip!
    */
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateFareThatIncludesNoFreeTransfers() {
     List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
@@ -256,7 +252,6 @@ public class OrcaFareServiceTest {
    * Total trip time is 4h 30m. This is equivalent to three transfer windows and therefore three Orca fare charges.
    */
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateFareThatExceedsTwoHourFreeTransferWindowTwice() {
     List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
@@ -284,7 +279,6 @@ public class OrcaFareServiceTest {
    * all subsequent transfers will come under one transfer window and only one Orca discount charge will apply.
    */
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateFareThatStartsWithACashFare() {
     List<Leg> rides = List.of(
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 0),
@@ -352,7 +346,6 @@ public class OrcaFareServiceTest {
    * Single trip with Link Light Rail to ensure distance fare is calculated correctly.
    */
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateFareForSTRail() {
     List<Leg> rides = List.of(
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown"),
@@ -398,7 +391,6 @@ public class OrcaFareServiceTest {
    * Make sure that we get ST's bus fare and not the contracted agency's fare.
    */
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateSoundTransitBusFares() {
     List<Leg> rides = List.of(
       getLeg(COMM_TRANS_AGENCY_ID, "512", 0),
@@ -428,7 +420,6 @@ public class OrcaFareServiceTest {
   }
 
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateCashFreeTransferKCMetroAndKitsap() {
     List<Leg> rides = List.of(
       getLeg(KC_METRO_AGENCY_ID, 0),
@@ -449,7 +440,6 @@ public class OrcaFareServiceTest {
   }
 
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void calculateTransferExtension() {
     List<Leg> rides = List.of(
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "Kitsap Fast Ferry", "east"), // 2.00
@@ -706,10 +696,10 @@ public class OrcaFareServiceTest {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
-    var itin = newItinerary(Place.forStop(firstStop), start)
-      .transit(route, tripId, start, T11_12, 5, 7, Place.forStop(lastStop), null, null, null)
+    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
+    return newItinerary(Place.forStop(firstStop), start)
+      .transit(route, tripId, start, end, 5, 7, Place.forStop(lastStop), null, null, null)
       .build();
-    return itin;
   }
 
   private static class TestOrcaFareService extends OrcaFareService {

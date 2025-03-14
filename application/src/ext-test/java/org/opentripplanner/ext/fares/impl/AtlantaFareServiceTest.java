@@ -16,7 +16,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -161,7 +160,6 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   @Test
-  @Disabled("This test creates a invalid itinerary with a negative cost")
   void expiredTransfer() {
     List<Leg> rides = List.of(
       getLeg(MARTA_AGENCY_ID, 0),
@@ -284,8 +282,9 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
+    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
     return newItinerary(Place.forStop(firstStop), start)
-      .bus(route, 1, start, T11_12, Place.forStop(lastStop))
+      .bus(route, 1, start, end, Place.forStop(lastStop))
       .build();
   }
 
