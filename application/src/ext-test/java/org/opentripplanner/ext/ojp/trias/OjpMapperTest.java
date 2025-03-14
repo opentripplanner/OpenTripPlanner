@@ -109,6 +109,6 @@ class OjpMapperTest {
       RESOLVE_FEED_LANG
     );
     var ojp = mapper.mapCalls(List.of(new CallAtStop(TRIP_TIMES_ON_DATE, WALK_TIME)), timestamp);
-    OjpToTriasTransformer.transform(ojp, new PrintWriter(System.out));
+    OjpToTriasTransformer.ojpToTrias(ojp, new PrintWriter(System.out));
   }
 }

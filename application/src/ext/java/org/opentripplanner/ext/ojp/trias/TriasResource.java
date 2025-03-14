@@ -107,12 +107,11 @@ public class TriasResource {
   }
 
   private static StreamingOutput ojpToTrias(OJP ojpOutput) {
-    StreamingOutput stream = os -> {
-      Writer writer = new BufferedWriter(new OutputStreamWriter(os));
-      OjpToTriasTransformer.transform(ojpOutput, writer);
+    return os -> {
+      Writer writer = new OutputStreamWriter(os);
+      OjpToTriasTransformer.ojpToTrias(ojpOutput, writer);
       writer.flush();
     };
-    return stream;
   }
 
   @GET
