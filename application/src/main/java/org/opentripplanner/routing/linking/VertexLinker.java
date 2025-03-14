@@ -410,15 +410,20 @@ public class VertexLinker {
       if (start == null) {
         if (ag.getGeometry().contains(GEOMETRY_FACTORY.createPoint(vertex.getCoordinate()))) {
           // vertex is inside an area
-          if (vertex instanceof IntersectionVertex iv) {
-            start = iv;
+          if (distSquared(vertex, split) <= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED) {
+            // vertex is so close to the edge that we can use the split point directly
+            start = split;
           } else {
-            start = createSplitVertex(aEdge, scope, vertex.getLon(), vertex.getLat());
+            if (vertex instanceof IntersectionVertex iv) {
+              start = iv;
+            } else {
+              start = createSplitVertex(aEdge, scope, vertex.getLon(), vertex.getLat());
+            }
+            linkedAreas.put(ag, start);
           }
-          linkedAreas.put(ag, start);
         }
       }
-      if (start != null) {
+      if (start != null && start != split) {
         // vertex is inside the area. try connecting the vertex to the edge's split point, because
         // connections to visibility vertices may fail or do not always provide an optimal route
         // note that by definition, connection to closest edge cannot be blocked and edge can be forced
@@ -590,7 +595,7 @@ public class VertexLinker {
   /**
    * Inaccurate but fast distance estimate for sorting
    */
-  private double distSquared(IntersectionVertex a, IntersectionVertex b) {
+  private double distSquared(Vertex a, Vertex b) {
     var aco = a.getCoordinate();
     var bco = b.getCoordinate();
     aco.x -= bco.x;
