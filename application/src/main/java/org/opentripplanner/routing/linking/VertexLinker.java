@@ -647,9 +647,11 @@ public class VertexLinker {
     // this happens when the added vertex is outside the area or all visibility edges are blocked
     if (added == 0) {
       if (force) {
+        // link with nearest visibility vertex which does not overlap
         var nearest = areaGroup
           .visibilityVertices()
           .stream()
+          .filter(v -> distSquared(v, newVertex) >= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED)
           .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .findFirst()
@@ -658,7 +660,7 @@ public class VertexLinker {
       }
       return false;
     } else if (scope == Scope.PERMANENT) {
-      // marking the new vertex as visibilityVertex enables  direct connections to it
+      // marking the new vertex as visibilityVertex enables direct connections to it
       areaGroup.addVisibilityVertices(Set.of(newVertex));
     }
     return true;
@@ -696,6 +698,10 @@ public class VertexLinker {
     // Check that vertices are not yet linked
     if (from.isConnected(to)) {
       return true;
+    }
+    // Check that vertices are not overlapping
+    if (!force && distSquared(from, to) < DUPLICATE_NODE_EPSILON_DEGREES_SQUARED) {
+      return false;
     }
     LineString line = GEOMETRY_FACTORY.createLineString(
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
