@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 
 /**
  * Given a schema definition and a token version this class holds the values for all fields in a
- * token. The field accessors return an optional value and there is no accessors to get "requiered"
- * fields. The resbonsibility of enforcing requiered fields is left to the concreate domain
+ * token. The field accessors return an optional value and there is no accessors to get "required"
+ * fields. The responsibility of enforcing required fields is left to the concrete domain
  * specific representation, like the {@code PageCursor}.
  */
 public class Token {
