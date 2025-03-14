@@ -213,6 +213,33 @@ public class LinkStopToPlatformTest {
   }
 
   /**
+   * Link a stop which is inside an area and very close to its edge.
+   * Linking snaps directly to the edge without short connecting edges
+   */
+  @Test
+  void testLinkStopNearPlatformEdge() {
+    Coordinate[] platform = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add entrance to every corner of the platform
+    int[] visibilityPoints = { 0, 1, 2, 3 };
+
+    // place one stop inside the platform, very near of the bottom edge
+    Coordinate[] stops = { new Coordinate(10.002, 60.00000001) };
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+    linkStops(graph, 100, true);
+
+    // Bottom edge pair splits in the middle (+2)
+    // Stop links to split vertices (+4)
+    // Split vertices link with visibily vertices at top corners (+8)
+    assertEquals(22, graph.getEdges().size());
+  }
+
+  /**
    * Link two stops inside platform area to platform.
    * Stops will get linked directly.
    */
