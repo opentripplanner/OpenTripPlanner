@@ -21,9 +21,9 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class EmissionsModuleTest {
+public class EmissionsGraphBuilderTest {
 
-  private final ResourceLoader RES = ResourceLoader.of(EmissionsModuleTest.class);
+  private final ResourceLoader RES = ResourceLoader.of(EmissionsGraphBuilderTest.class);
   private final File CO2_GTFS_ZIP = RES.file("emissions-test-gtfs.zip");
   private final File CO2_GTFS = RES.file("emissions-test-gtfs/");
   private final String CONFIG_PATH = "standalone/config/" + OtpFileNames.BUILD_CONFIG_FILENAME;
@@ -41,13 +41,13 @@ public class EmissionsModuleTest {
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> configuredDataSource =
       getGtfsConfiguredDatasource();
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
-    EmissionsModule emissionsModule = new EmissionsModule(
+    EmissionsGraphBuilder emissionsGraphBuilder = new EmissionsGraphBuilder(
       configuredDataSource,
       buildConfig,
       emissionsDataModel,
       DataImportIssueStore.NOOP
     );
-    emissionsModule.buildGraph();
+    emissionsGraphBuilder.buildGraph();
     assertEquals(
       Optional.of(0.006),
       emissionsDataModel.getCO2EmissionsById(new FeedScopedId("emissionstest", "1001"))

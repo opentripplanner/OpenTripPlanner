@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.emissions;
 
-import dagger.Module;
-import jakarta.inject.Inject;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,17 +15,15 @@ import org.slf4j.LoggerFactory;
 /**
  * This class allows updating the graph with emissions data from external emissions data files.
  */
-@Module
-public class EmissionsModule implements GraphBuilderModule {
+public class EmissionsGraphBuilder implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EmissionsModule.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmissionsGraphBuilder.class);
   private final BuildConfig config;
   private final EmissionsDataModel emissionsDataModel;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources;
   private final DataImportIssueStore issueStore;
 
-  @Inject
-  public EmissionsModule(
+  public EmissionsGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources,
     BuildConfig config,
     EmissionsDataModel emissionsDataModel,
