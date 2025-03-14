@@ -1,7 +1,9 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.internal;
 
 import jakarta.inject.Inject;
 import java.util.Optional;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

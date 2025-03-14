@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;
