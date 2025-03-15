@@ -2,10 +2,11 @@ package org.opentripplanner.ext.emissions.configure;
 
 import dagger.Module;
 import dagger.Provides;
-import jakarta.inject.Singleton;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
+import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionsDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
 /**
  * The service is used during application serve phase, not loading, so we need to provide
@@ -15,8 +16,8 @@ import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
 public class EmissionsServiceModule {
 
   @Provides
-  @Singleton
-  public EmissionsService provideEmissionsService(EmissionsDataModel emissionsDataModel) {
-    return new DefaultEmissionsService(emissionsDataModel);
+  @EmissionsDecorator
+  public ItineraryDecorator provideEmissionsService(EmissionsDataModel emissionsDataModel) {
+    return new DecorateWithEmission(new DefaultEmissionsService(emissionsDataModel));
   }
 }
