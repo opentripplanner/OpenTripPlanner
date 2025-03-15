@@ -175,7 +175,8 @@ public class GraphBuilderModules {
       parkingRepository,
       timetableRepository,
       issueStore,
-      config.areaVisibility
+      config.areaVisibility,
+      config.maxAreaNodes
     );
   }
 
@@ -197,7 +198,8 @@ public class GraphBuilderModules {
         parkingRepository,
         timetableRepository,
         issueStore,
-        config.areaVisibility
+        config.areaVisibility,
+        config.maxAreaNodes
       )
     );
     pruneIslands.setPruningThresholdIslandWithoutStops(

@@ -17,6 +17,8 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generates "direct" street routes, i.e. those that do not use transit and are on the street
@@ -26,11 +28,15 @@ import org.opentripplanner.street.search.state.State;
  */
 public class DirectStreetRouter {
 
+  private static final Logger LOG = LoggerFactory.getLogger(DirectStreetRouter.class);
+
   public static List<Itinerary> route(OtpServerRequestContext serverContext, RouteRequest request) {
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
     OTPRequestTimeoutException.checkForTimeout();
+
+    long searchBeginTime = System.currentTimeMillis();
 
     RouteRequest directRequest = request.clone();
     try (
@@ -70,6 +76,8 @@ public class DirectStreetRouter {
         directRequest.wheelchair(),
         directRequest.preferences().wheelchair()
       );
+      LOG.debug("Direct routing time {} msec", System.currentTimeMillis() - searchBeginTime);
+
       return response;
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
