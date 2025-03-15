@@ -6,7 +6,7 @@ import java.util.function.Function;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 
 public class ItineraryBuilder {
 
@@ -39,7 +39,7 @@ public class ItineraryBuilder {
   /* SANDBOX EXPERIMENTAL PROPERTIES */
   Float accessibilityScore;
   Emissions emissionsPerPerson;
-  ItineraryFares fare = ItineraryFares.empty();
+  ItineraryFare fare = ItineraryFare.empty();
 
   ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
     this.legs = legs;
@@ -148,6 +148,11 @@ public class ItineraryBuilder {
     return this;
   }
 
+  /**
+   * Decorate the existing legs with new information. This method takes a lambda to make sure
+   * the caller uses the right set of legs as abase for the decoration, and not just set a
+   * new set of legs - witch may lead to information loss.
+   */
   public ItineraryBuilder withLegs(Function<List<Leg>, List<Leg>> body) {
     this.legs = body.apply(legs);
     return this;
@@ -185,11 +190,11 @@ public class ItineraryBuilder {
     return this;
   }
 
-  public ItineraryFares fare() {
+  public ItineraryFare fare() {
     return fare;
   }
 
-  public ItineraryBuilder withFare(ItineraryFares fare) {
+  public ItineraryBuilder withFare(ItineraryFare fare) {
     this.fare = fare;
     return this;
   }

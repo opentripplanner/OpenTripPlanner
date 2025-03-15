@@ -14,7 +14,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -42,7 +42,7 @@ public class FaresIntegrationTest {
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
-    ItineraryFares fare = getFare(from, to, start, serverContext);
+    ItineraryFare fare = getFare(from, to, start, serverContext);
     var product = fare.getLegProducts().values().iterator().next().product();
     assertEquals(Money.usDollars(4.25f), product.price());
     assertEquals("OW_2", product.id().getId().toString());
@@ -73,7 +73,7 @@ public class FaresIntegrationTest {
       .atZone(ZoneId.of("America/Los_Angeles"))
       .toInstant();
 
-    ItineraryFares fare = getFare(from, to, startTime, serverContext);
+    ItineraryFare fare = getFare(from, to, startTime, serverContext);
     var fpu = List.copyOf(fare.getLegProducts().values());
     assertEquals(1, fpu.size());
 
@@ -108,7 +108,7 @@ public class FaresIntegrationTest {
     // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
   }
 
-  private static ItineraryFares getFare(
+  private static ItineraryFare getFare(
     GenericLocation from,
     GenericLocation to,
     Instant time,

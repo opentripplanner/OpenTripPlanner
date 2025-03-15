@@ -19,7 +19,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
@@ -437,13 +437,13 @@ public class OrcaFareService extends DefaultFareService {
    * one.
    */
   @Override
-  public ItineraryFares calculateFaresForType(
+  public ItineraryFare calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    var fare = ItineraryFares.empty();
+    var fare = ItineraryFare.empty();
     Money cost = Money.ZERO_USD;
     var orcaFareDiscount = new TransferData();
     HashMap<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
@@ -513,14 +513,14 @@ public class OrcaFareService extends DefaultFareService {
    * Adds a leg fare product to the given itinerary fares object
    *
    * @param leg              The leg to create a fareproduct for
-   * @param itineraryFares   The itinerary fares to store the fare product in
+   * @param itineraryFare   The itinerary fares to store the fare product in
    * @param fareType         Fare type (split into container and rider category)
    * @param totalFare        Total fare paid after transfer
    * @param transferDiscount Transfer discount applied
    */
   private static void addLegFareProduct(
     Leg leg,
-    ItineraryFares itineraryFares,
+    ItineraryFare itineraryFare,
     FareType fareType,
     Money totalFare,
     Money transferDiscount
@@ -536,7 +536,7 @@ public class OrcaFareService extends DefaultFareService {
     }
     var duration = Duration.ZERO;
     var fareProduct = new FareProduct(id, "rideCost", totalFare, duration, riderCategory, medium);
-    itineraryFares.addFareProduct(leg, fareProduct);
+    itineraryFare.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount.isPositive()) {
       var transferFareProduct = new FareProduct(
@@ -547,7 +547,7 @@ public class OrcaFareService extends DefaultFareService {
         riderCategory,
         medium
       );
-      itineraryFares.addFareProduct(leg, transferFareProduct);
+      itineraryFare.addFareProduct(leg, transferFareProduct);
     }
   }
 

@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -30,9 +30,9 @@ public class FaresFilterTest implements PlanTestConstants {
       .bus(ID, 52, 100, C)
       .build();
 
-    assertEquals(ItineraryFares.empty(), i1.fare());
+    assertEquals(ItineraryFare.empty(), i1.fare());
 
-    var fares = new ItineraryFares();
+    var fares = new ItineraryFare();
 
     var leg = i1.legs().get(1);
     var fp = new FareProduct(id("fp"), "fare product", Money.euros(10.00f), null, null, null);
