@@ -30,6 +30,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
+import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -76,6 +77,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final TraverseVisitor traverseVisitor;
 
+  private final TriasApiConfig triasApiConfig;
+
   /* Lazy initialized fields */
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
@@ -97,6 +100,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
+    TriasApiConfig triasApiConfig,
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
@@ -120,6 +124,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.triasApiConfig = triasApiConfig;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
@@ -251,6 +256,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public ViaCoordinateTransferFactory viaTransferResolver() {
     return viaTransferResolver;
+  }
+
+  @Override
+  public TriasApiConfig triasApiConfig() {
+    return triasApiConfig;
   }
 
   @Nullable

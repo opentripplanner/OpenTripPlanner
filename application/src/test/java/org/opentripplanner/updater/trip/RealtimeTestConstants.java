@@ -35,12 +35,16 @@ public interface RealtimeTestConstants {
   RegularStop STOP_B2 = TEST_MODEL.stop("B2").withParentStation(STATION_B).build();
   RegularStop STOP_C1 = TEST_MODEL.stop(STOP_C1_ID).withParentStation(STATION_C).build();
   RegularStop STOP_D1 = TEST_MODEL.stop("D1").withParentStation(STATION_D).build();
+  RegularStop STOP_E = TEST_MODEL.stop("E").withParentStation(STATION_D).build();
+  RegularStop STOP_F = TEST_MODEL.stop("F").withParentStation(STATION_D).build();
   SiteRepository SITE_REPOSITORY = TEST_MODEL.siteRepositoryBuilder()
     .withRegularStop(STOP_A1)
     .withRegularStop(STOP_B1)
     .withRegularStop(STOP_B2)
     .withRegularStop(STOP_C1)
     .withRegularStop(STOP_D1)
+    .withRegularStop(STOP_E)
+    .withRegularStop(STOP_F)
     .build();
 
   Route ROUTE_1 = TimetableRepositoryForTest.route(ROUTE_1_ID).build();

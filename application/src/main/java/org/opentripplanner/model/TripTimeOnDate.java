@@ -2,10 +2,14 @@ package org.opentripplanner.model;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -137,8 +141,12 @@ public class TripTimeOnDate {
     );
   }
 
-  public static Comparator<TripTimeOnDate> compareByDeparture() {
+  public static Comparator<TripTimeOnDate> compareByRealtimeDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
+  }
+
+  public static Comparator<TripTimeOnDate> compareByScheduledDeparture() {
+    return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getScheduledDeparture());
   }
 
   public StopLocation getStop() {
@@ -161,6 +169,10 @@ public class TripTimeOnDate {
     return tripTimes.getScheduledArrivalTime(stopIndex);
   }
 
+  public ZonedDateTime scheduledArrivalAt(ZoneId zoneId) {
+    return toZonedDateTime(getScheduledArrival(), zoneId);
+  }
+
   /**
    * @return The GTFS stop sequence of the stop time.
    */
@@ -170,6 +182,10 @@ public class TripTimeOnDate {
 
   public int getScheduledDeparture() {
     return tripTimes.getScheduledDepartureTime(stopIndex);
+  }
+
+  public ZonedDateTime scheduledDepartureAt(ZoneId zoneId) {
+    return toZonedDateTime(getScheduledDeparture(), zoneId);
   }
 
   public int getRealtimeArrival() {
@@ -343,5 +359,76 @@ public class TripTimeOnDate {
   @Override
   public int hashCode() {
     return Objects.hash(tripTimes, stopIndex, tripPattern, serviceDate, midnight);
+  }
+
+  public TripPattern pattern() {
+    return tripPattern;
+  }
+
+  /**
+   * Returns the previous stop time in the trip. If it's the first stop in the trip, it returns an
+   * empty list.
+   */
+  public List<TripTimeOnDate> previousTimes() {
+    if (stopIndex == 0) {
+      return List.of();
+    } else {
+      // IntStream.range is (inclusive, exclusive)
+      return IntStream.range(0, stopIndex).mapToObj(this::atStopIndex).toList();
+    }
+  }
+
+  /**
+   * Returns the next stop time in the trip, if it isn't the last one.
+   */
+  public List<TripTimeOnDate> nextTimes() {
+    if (stopIndex == tripTimes.getNumStops() - 1) {
+      return List.of();
+    } else {
+      // IntStream.range is (inclusive, exclusive)
+      return IntStream.range(stopIndex + 1, tripTimes.getNumStops())
+        .mapToObj(this::atStopIndex)
+        .toList();
+    }
+  }
+
+  /**
+   * Returns the real time arrival, if available, at the given zone.
+   */
+  public Optional<ZonedDateTime> realtimeArrivalAt(ZoneId zoneId) {
+    return optionalZonedDateTime(getRealtimeArrival(), zoneId);
+  }
+
+  /**
+   * Returns the real time departure, if available, at the given zone.
+   */
+  public Optional<ZonedDateTime> realtimeDepartureAt(ZoneId zoneId) {
+    return optionalZonedDateTime(getRealtimeDeparture(), zoneId);
+  }
+
+  private TripTimeOnDate atStopIndex(int stopIndex) {
+    return new TripTimeOnDate(
+      tripTimes,
+      stopIndex,
+      tripPattern,
+      serviceDate,
+      Instant.ofEpochSecond(midnight)
+    );
+  }
+
+  /**
+   * If real time data is available for this stop (call) then it is returned or an empty Optional
+   * otherwise.
+   */
+  private Optional<ZonedDateTime> optionalZonedDateTime(int secondsSinceMidnight, ZoneId zoneId) {
+    if (isCancelledStop() || isRealtime()) {
+      return Optional.of(toZonedDateTime(secondsSinceMidnight, zoneId));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private ZonedDateTime toZonedDateTime(int secondsSinceMidnight, ZoneId zoneId) {
+    return Instant.ofEpochSecond(midnight).atZone(zoneId).plusSeconds(secondsSinceMidnight);
   }
 }
