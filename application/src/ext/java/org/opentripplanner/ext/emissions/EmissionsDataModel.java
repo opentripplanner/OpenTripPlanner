@@ -17,6 +17,7 @@ public class EmissionsDataModel implements Serializable {
   @Inject
   public EmissionsDataModel() {}
 
+  /** Used for testing only. */
   public EmissionsDataModel(Map<FeedScopedId, Double> co2Emissions, double carAvgCo2PerMeter) {
     this.co2Emissions = co2Emissions;
     this.carAvgCo2PerMeter = carAvgCo2PerMeter;

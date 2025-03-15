@@ -1,7 +1,8 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.itinerary;
 
 import java.util.List;
 import java.util.Optional;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emissions;

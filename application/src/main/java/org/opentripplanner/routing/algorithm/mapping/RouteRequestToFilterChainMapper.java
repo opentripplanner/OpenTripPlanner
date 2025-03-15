@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.emissions.DecorateWithEmission;
+import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
 import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
