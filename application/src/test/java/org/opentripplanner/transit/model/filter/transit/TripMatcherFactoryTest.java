@@ -1,14 +1,11 @@
 package org.opentripplanner.transit.model.filter.transit;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -75,16 +72,14 @@ public class TripMatcherFactoryTest {
   @Test
   void testMatchRouteId() {
     TripRequest request = TripRequest.of()
-      .withRoutes(
-        FilterValues.ofEmptyIsEverything("routes", List.of(new FeedScopedId("F", "RUT:route:1")))
-      )
+      .withIncludeRoutes(List.of(new FeedScopedId("F", "RUT:route:1")))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    assertTrue(matcher.match(tripRut));
-    assertFalse(matcher.match(tripRut2));
-    assertFalse(matcher.match(tripAkt));
+    Assertions.assertTrue(matcher.match(tripRut));
+    Assertions.assertFalse(matcher.match(tripRut2));
+    Assertions.assertFalse(matcher.match(tripAkt));
   }
 
   @Test
@@ -93,42 +88,57 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    assertTrue(matcher.match(tripRut));
-    assertTrue(matcher.match(tripRut2));
-    assertTrue(matcher.match(tripAkt));
+    Assertions.assertTrue(matcher.match(tripRut));
+    Assertions.assertTrue(matcher.match(tripRut2));
+    Assertions.assertTrue(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testNullListMatchesAll() {
+    TripRequest request = TripRequest.of().withIncludeAgencies(null).build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    Assertions.assertTrue(matcher.match(tripRut));
+    Assertions.assertTrue(matcher.match(tripRut2));
+    Assertions.assertTrue(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testEmptyListMatchesNone() {
+    TripRequest request = TripRequest.of().withIncludeAgencies(List.of()).build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    Assertions.assertFalse(matcher.match(tripRut));
+    Assertions.assertFalse(matcher.match(tripRut2));
+    Assertions.assertFalse(matcher.match(tripAkt));
   }
 
   @Test
   void testMatchAgencyId() {
     TripRequest request = TripRequest.of()
-      .withAgencies(
-        FilterValues.ofEmptyIsEverything("agencies", List.of(new FeedScopedId("F", "RUT:1")))
-      )
+      .withIncludeAgencies(List.of(new FeedScopedId("F", "RUT:1")))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    assertTrue(matcher.match(tripRut));
-    assertFalse(matcher.match(tripRut2));
-    assertFalse(matcher.match(tripAkt));
+    Assertions.assertTrue(matcher.match(tripRut));
+    Assertions.assertFalse(matcher.match(tripRut2));
+    Assertions.assertFalse(matcher.match(tripAkt));
   }
 
   @Test
   void testMatchServiceDates() {
     TripRequest request = TripRequest.of()
-      .withServiceDates(
-        FilterValues.ofEmptyIsEverything(
-          "operatingDays",
-          List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23))
-        )
-      )
+      .withIncludeServiceDates(List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23)))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, this::dummyServiceDateProvider);
 
-    assertTrue(matcher.match(tripRut));
-    assertTrue(matcher.match(tripRut2));
-    assertFalse(matcher.match(tripAkt));
+    Assertions.assertTrue(matcher.match(tripRut));
+    Assertions.assertTrue(matcher.match(tripRut2));
+    Assertions.assertFalse(matcher.match(tripAkt));
   }
 
   private Set<LocalDate> dummyServiceDateProvider(FeedScopedId feedScopedId) {

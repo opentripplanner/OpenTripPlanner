@@ -4,12 +4,12 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.apis.transmodel.mapping.SeverityMapper.getTransmodelSeverity;
 import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDToDomain;
+import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomain;
 import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.FILTER_PLACE_TYPE_ENUM;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.apis.transmodel.model.scalars.DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar;
-import static org.opentripplanner.apis.transmodel.support.GqlUtil.toListNullSafe;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -30,7 +30,6 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.SchemaTransformer;
-import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1216,28 +1215,11 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
-            var authorities = FilterValues.ofEmptyIsEverything(
-              "authorities",
-              mapIDsToDomainNullSafe(environment.getArgument("authorities"))
-            );
-            var lineIds = FilterValues.ofEmptyIsEverything(
-              "lines",
-              mapIDsToDomainNullSafe(environment.getArgument("lines"))
-            );
-            var privateCodes = FilterValues.ofEmptyIsEverything(
-              "privateCodes",
-              toListNullSafe(environment.<List<String>>getArgument("privateCodes"))
-            );
-            var activeServiceDates = FilterValues.ofEmptyIsEverything(
-              "activeDates",
-              toListNullSafe(environment.<List<LocalDate>>getArgument("activeDates"))
-            );
-
-            TripRequest tripRequest = TripRequest.of()
-              .withAgencies(authorities)
-              .withRoutes(lineIds)
-              .withNetexInternalPlanningCodes(privateCodes)
-              .withServiceDates(activeServiceDates)
+            var tripRequest = TripRequest.of()
+              .withIncludeAgencies(mapIDsToDomain(environment.getArgument("authorities")))
+              .withIncludeRoutes(mapIDsToDomain(environment.getArgument("lines")))
+              .withIncludeNetexInternalPlanningCodes(environment.getArgument("privateCodes"))
+              .withIncludeServiceDates(environment.getArgument("activeDates"))
               .build();
 
             return GqlUtil.getTransitService(environment).getTrips(tripRequest);
