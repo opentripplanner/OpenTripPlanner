@@ -7,8 +7,8 @@ import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsGraphBuilder;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.ext.emissions.configure.EmissionsGraphBuilderModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
@@ -115,6 +115,6 @@ public interface GraphBuilderFactory {
     GraphBuilderFactory build();
 
     @BindsInstance
-    Builder emissionsDataModel(@Nullable EmissionsDataModel emissionsDataModel);
+    Builder emissionsDataModel(@Nullable EmissionsRepository emissionsRepository);
   }
 }

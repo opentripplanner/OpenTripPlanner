@@ -19,19 +19,19 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmissionsGraphBuilder.class);
   private final BuildConfig config;
-  private final EmissionsDataModel emissionsDataModel;
+  private final EmissionsRepository emissionsRepository;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources;
   private final DataImportIssueStore issueStore;
 
   public EmissionsGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources,
     BuildConfig config,
-    EmissionsDataModel emissionsDataModel,
+    EmissionsRepository emissionsRepository,
     DataImportIssueStore issueStore
   ) {
     this.dataSources = dataSources;
     this.config = config;
-    this.emissionsDataModel = emissionsDataModel;
+    this.emissionsRepository = emissionsRepository;
     this.issueStore = issueStore;
   }
 
@@ -53,8 +53,8 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
         }
         emissionsData.putAll(co2Emissions);
       }
-      this.emissionsDataModel.setCo2Emissions(emissionsData);
-      this.emissionsDataModel.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
+      this.emissionsRepository.setCo2Emissions(emissionsData);
+      this.emissionsRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
       LOG.info(
         "Emissions building finished. Number of CO2 emission records saved: " + emissionsData.size()
       );

@@ -9,16 +9,16 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 /**
  * Container for emissions data.
  */
-public class EmissionsDataModel implements Serializable {
+public class EmissionsRepository implements Serializable {
 
   private Map<FeedScopedId, Double> co2Emissions;
   private Double carAvgCo2PerMeter;
 
   @Inject
-  public EmissionsDataModel() {}
+  public EmissionsRepository() {}
 
   /** Used for testing only. */
-  public EmissionsDataModel(Map<FeedScopedId, Double> co2Emissions, double carAvgCo2PerMeter) {
+  public EmissionsRepository(Map<FeedScopedId, Double> co2Emissions, double carAvgCo2PerMeter) {
     this.co2Emissions = co2Emissions;
     this.carAvgCo2PerMeter = carAvgCo2PerMeter;
   }

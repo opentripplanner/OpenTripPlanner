@@ -20,7 +20,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -69,7 +69,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var weRepo = new DefaultWorldEnvelopeRepository();
-    var emissionsDataModel = new EmissionsDataModel();
+    var emissionsDataModel = new EmissionsRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -89,7 +89,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    var emissionsDataModel = new EmissionsDataModel();
+    var emissionsDataModel = new EmissionsRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -198,7 +198,7 @@ public class GraphSerializationTest {
     TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
-    EmissionsDataModel emissionsDataModel
+    EmissionsRepository emissionsRepository
   ) throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
@@ -213,7 +213,7 @@ public class GraphSerializationTest {
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),
-      emissionsDataModel,
+      emissionsRepository,
       null,
       streetLimitationParameters
     );

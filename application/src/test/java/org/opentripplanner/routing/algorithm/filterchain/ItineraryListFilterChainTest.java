@@ -20,7 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
@@ -395,7 +395,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       car = newItinerary(A).drive(T11_30, T11_50, B).build();
       Map<FeedScopedId, Double> emissions = new HashMap<>();
       emissions.put(new FeedScopedId("F", "1"), 1.0);
-      eService = new DefaultEmissionsService(new EmissionsDataModel(emissions, 1.0));
+      eService = new DefaultEmissionsService(new EmissionsRepository(emissions, 1.0));
     }
 
     @Test

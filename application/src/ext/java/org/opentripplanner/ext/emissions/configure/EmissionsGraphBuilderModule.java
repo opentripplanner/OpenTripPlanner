@@ -4,8 +4,8 @@ import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsGraphBuilder;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -18,13 +18,13 @@ public class EmissionsGraphBuilderModule {
   static EmissionsGraphBuilder provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
-    @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable EmissionsRepository emissionsRepository,
     DataImportIssueStore issueStore
   ) {
     return new EmissionsGraphBuilder(
       dataSources.getGtfsConfiguredDatasource(),
       config,
-      emissionsDataModel,
+      emissionsRepository,
       issueStore
     );
   }

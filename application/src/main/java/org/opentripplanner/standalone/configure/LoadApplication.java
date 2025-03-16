@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -61,7 +61,7 @@ public class LoadApplication {
       obj.worldEnvelopeRepository,
       obj.parkingRepository,
       obj.issueSummary,
-      obj.emissionsDataModel,
+      obj.emissionsRepository,
       obj.stopConsolidationRepository,
       obj.streetLimitationParameters
     );
@@ -100,7 +100,7 @@ public class LoadApplication {
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository parkingRepository,
     DataImportIssueSummary issueSummary,
-    @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable EmissionsRepository emissionsRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters
   ) {
@@ -113,7 +113,7 @@ public class LoadApplication {
       config(),
       graphBuilderDataSources(),
       issueSummary,
-      emissionsDataModel,
+      emissionsRepository,
       parkingRepository,
       stopConsolidationRepository,
       streetLimitationParameters

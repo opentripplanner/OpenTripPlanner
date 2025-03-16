@@ -40,21 +40,21 @@ public class EmissionsGraphBuilderTest {
     inputData.put(GTFS, new DirectoryDataSource(CO2_GTFS, GTFS));
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> configuredDataSource =
       getGtfsConfiguredDatasource();
-    EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
+    EmissionsRepository emissionsRepository = new EmissionsRepository();
     EmissionsGraphBuilder emissionsGraphBuilder = new EmissionsGraphBuilder(
       configuredDataSource,
       buildConfig,
-      emissionsDataModel,
+      emissionsRepository,
       DataImportIssueStore.NOOP
     );
     emissionsGraphBuilder.buildGraph();
     assertEquals(
       Optional.of(0.006),
-      emissionsDataModel.getCO2EmissionsById(new FeedScopedId("emissionstest", "1001"))
+      emissionsRepository.getCO2EmissionsById(new FeedScopedId("emissionstest", "1001"))
     );
     assertEquals(
       Optional.of(0.041),
-      emissionsDataModel.getCO2EmissionsById(new FeedScopedId("emissionstest1", "1002"))
+      emissionsRepository.getCO2EmissionsById(new FeedScopedId("emissionstest1", "1002"))
     );
   }
 
