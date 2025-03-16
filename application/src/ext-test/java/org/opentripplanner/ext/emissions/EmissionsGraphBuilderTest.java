@@ -13,6 +13,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
@@ -40,7 +41,7 @@ public class EmissionsGraphBuilderTest {
     inputData.put(GTFS, new DirectoryDataSource(CO2_GTFS, GTFS));
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> configuredDataSource =
       getGtfsConfiguredDatasource();
-    EmissionsRepository emissionsRepository = new EmissionsRepository();
+    EmissionsRepository emissionsRepository = new DefaultEmissionsRepository();
     EmissionsGraphBuilder emissionsGraphBuilder = new EmissionsGraphBuilder(
       configuredDataSource,
       buildConfig,

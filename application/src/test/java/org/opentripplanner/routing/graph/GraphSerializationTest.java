@@ -21,6 +21,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emissions.EmissionsRepository;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -69,7 +70,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var weRepo = new DefaultWorldEnvelopeRepository();
-    var emissionsDataModel = new EmissionsRepository();
+    var emissionsRepository = new DefaultEmissionsRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -77,7 +78,7 @@ public class GraphSerializationTest {
       model.timetableRepository(),
       weRepo,
       parkingRepository,
-      emissionsDataModel
+      emissionsRepository
     );
   }
 
@@ -89,7 +90,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    var emissionsDataModel = new EmissionsRepository();
+    var emissionsRepository = new DefaultEmissionsRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -97,7 +98,7 @@ public class GraphSerializationTest {
       model.timetableRepository(),
       worldEnvelopeRepository,
       parkingRepository,
-      emissionsDataModel
+      emissionsRepository
     );
   }
 

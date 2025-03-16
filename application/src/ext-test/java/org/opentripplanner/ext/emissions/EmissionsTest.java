@@ -13,6 +13,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
 import org.opentripplanner.framework.model.Cost;
@@ -64,7 +65,9 @@ class EmissionsTest {
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
     emissions.put(new FeedScopedId("F", "2"), 0.0);
-    EmissionsRepository emissionsRepository = new EmissionsRepository(emissions, 0.131);
+    EmissionsRepository emissionsRepository = new DefaultEmissionsRepository();
+    emissionsRepository.setCo2Emissions(emissions);
+    emissionsRepository.setCarAvgCo2PerMeter(0.131);
     eService = new DefaultEmissionsService(emissionsRepository);
     decorateWithEmission = new DecorateWithEmission(eService);
   }
