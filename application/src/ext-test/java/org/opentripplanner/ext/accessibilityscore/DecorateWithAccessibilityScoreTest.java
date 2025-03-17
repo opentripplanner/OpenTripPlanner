@@ -77,4 +77,12 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
     assertNull(itinerary.accessibilityScore());
     itinerary.legs().forEach(l -> assertNull(l.accessibilityScore()));
   }
+
+  @MethodSource("nonWalkingCases")
+  @ParameterizedTest
+  void itineraryLevelScore(Function<TestItineraryBuilder, TestItineraryBuilder> modifier) {
+    var itinerary = modifier.apply(newItinerary(A, 0)).walk(10, C).build();
+    itinerary = DECORATOR.decorate(itinerary);
+    assertNull(itinerary.accessibilityScore());
+  }
 }
