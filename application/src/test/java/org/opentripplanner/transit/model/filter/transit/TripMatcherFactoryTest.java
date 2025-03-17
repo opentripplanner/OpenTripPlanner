@@ -1,9 +1,12 @@
 package org.opentripplanner.transit.model.filter.transit;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.api.request.TripRequest;
@@ -77,9 +80,9 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    Assertions.assertTrue(matcher.match(tripRut));
-    Assertions.assertFalse(matcher.match(tripRut2));
-    Assertions.assertFalse(matcher.match(tripAkt));
+    assertTrue(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
   }
 
   @Test
@@ -88,9 +91,9 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    Assertions.assertTrue(matcher.match(tripRut));
-    Assertions.assertTrue(matcher.match(tripRut2));
-    Assertions.assertTrue(matcher.match(tripAkt));
+    assertTrue(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
+    assertTrue(matcher.match(tripAkt));
   }
 
   @Test
@@ -99,9 +102,9 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    Assertions.assertTrue(matcher.match(tripRut));
-    Assertions.assertTrue(matcher.match(tripRut2));
-    Assertions.assertTrue(matcher.match(tripAkt));
+    assertTrue(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
+    assertTrue(matcher.match(tripAkt));
   }
 
   @Test
@@ -110,9 +113,9 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    Assertions.assertFalse(matcher.match(tripRut));
-    Assertions.assertFalse(matcher.match(tripRut2));
-    Assertions.assertFalse(matcher.match(tripAkt));
+    assertFalse(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
   }
 
   @Test
@@ -123,9 +126,9 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
-    Assertions.assertTrue(matcher.match(tripRut));
-    Assertions.assertFalse(matcher.match(tripRut2));
-    Assertions.assertFalse(matcher.match(tripAkt));
+    assertTrue(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
   }
 
   @Test
@@ -136,9 +139,9 @@ public class TripMatcherFactoryTest {
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, this::dummyServiceDateProvider);
 
-    Assertions.assertTrue(matcher.match(tripRut));
-    Assertions.assertTrue(matcher.match(tripRut2));
-    Assertions.assertFalse(matcher.match(tripAkt));
+    assertTrue(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
   }
 
   private Set<LocalDate> dummyServiceDateProvider(FeedScopedId feedScopedId) {
