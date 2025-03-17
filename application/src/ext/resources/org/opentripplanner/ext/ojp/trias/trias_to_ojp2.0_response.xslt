@@ -28,7 +28,7 @@
       <siri:ProducerRef>
         <xsl:value-of select="//siri:ProducerRef[1]"/>
       </siri:ProducerRef>
-      <Language>en</Language> <!-- TODO hack -->
+      <trias:Language>en</trias:Language> <!-- TODO hack -->
       <xsl:apply-templates select="ojp:OJPStopEventDelivery"/>
       <xsl:apply-templates select="siri:ErrorCondition"/>
 
