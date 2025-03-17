@@ -58,13 +58,29 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   }
 
   @Test
+  void nextDay() {
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT1).addTrip(TRIP_INPUT2).build();
+    var transitService = env.getTransitService();
+
+    var instant = instant("12:00").plus(Duration.ofDays(1));
+    var result = transitService.findTripTimesOnDate(
+      TripTimeOnDateRequest.of(List.of(STOP_A1)).withTime(instant).build()
+    );
+
+    assertThat(result).hasSize(1);
+    var tt = result.getFirst();
+    assertEquals(
+      instant("12:01").plus(Duration.ofDays(1)),
+      tt.scheduledDepartureAt(TIME_ZONE).toInstant()
+    );
+  }
+
+  @Test
   void tooLate() {
     var transitService = RealtimeTestEnvironment.of()
       .addTrip(TRIP_INPUT1)
       .build()
       .getTransitService();
-
-    var helper = new StopTimesHelper(transitService);
 
     var instant = instant("18:00");
     var result = transitService.findTripTimesOnDate(
@@ -110,7 +126,8 @@ public class TripTimesOnDateTest implements RealtimeTestConstants {
   @Test
   void several() {
     var transitService = RealtimeTestEnvironment.of()
-      .addTrip(TRIP_INPUT2, TRIP_INPUT3)
+      .addTrip(TRIP_INPUT2)
+      .addTrip(TRIP_INPUT3)
       .build()
       .getTransitService();
 
