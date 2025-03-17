@@ -8,7 +8,6 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

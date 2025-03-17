@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedId;
 
 class GtfsImport {
 

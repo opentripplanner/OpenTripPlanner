@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.gtfs.graphbuilder;
 
 import com.csvreader.CsvReader;
 import java.io.IOException;
