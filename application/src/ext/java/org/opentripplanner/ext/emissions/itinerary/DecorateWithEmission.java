@@ -20,8 +20,14 @@ import org.opentripplanner.utils.lang.Sandbox;
  * @param emissionsService
  */
 @Sandbox
-public record DecorateWithEmission(EmissionsService emissionsService)
-  implements ItineraryDecorator {
+public class DecorateWithEmission implements ItineraryDecorator {
+
+  private final EmissionsService emissionsService;
+
+  public DecorateWithEmission(EmissionsService emissionsService) {
+    this.emissionsService = emissionsService;
+  }
+
   @Override
   public Itinerary decorate(Itinerary itinerary) {
     List<TransitLeg> transitLegs = itinerary
