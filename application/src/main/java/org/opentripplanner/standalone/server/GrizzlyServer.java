@@ -90,7 +90,7 @@ public class GrizzlyServer {
     CompressionConfig cc = httpListener.getCompressionConfig();
     cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
     cc.setCompressionMinSize(50000); // the min number of bytes to compress
-    cc.setCompressableMimeTypes("application/json", "text/json", MediaType.APPLICATION_XML); // the mime types to compress
+    cc.setCompressibleMimeTypes("application/json", "text/json", MediaType.APPLICATION_XML); // the mime types to compress
     httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
     httpListener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
     httpServer.addListener(httpListener);

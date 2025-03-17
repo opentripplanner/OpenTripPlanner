@@ -1,10 +1,18 @@
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:siri="http://www.siri.org.uk/siri" xmlns:ojp="http://www.vdv.de/ojp" xmlns="http://www.vdv.de/trias" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:trias="http://www.vdv.de/trias"
+                xmlns:siri="http://www.siri.org.uk/siri"
+                xmlns:ojp="http://www.vdv.de/ojp"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
   <xsl:template match="ojp:OJP">
-    <Trias version="1.2" xmlns="http://www.vdv.de/trias" xmlns:siri="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.vdv.de/trias https://raw.githubusercontent.com/VDVde/TRIAS/refs/tags/v1.2/Trias.xsd">
+    <trias:Trias version="1.2"
+           xmlns:trias="http://www.vdv.de/trias"
+           xmlns:siri="http://www.siri.org.uk/siri"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.vdv.de/trias https://raw.githubusercontent.com/VDVde/TRIAS/refs/tags/v1.2/Trias.xsd">
       <xsl:apply-templates select="ojp:OJPResponse"/>
-    </Trias>
+    </trias:Trias>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:OJPResponse">
@@ -13,7 +21,7 @@
   <!--*********************************************-->
 
   <xsl:template match="siri:ServiceDelivery">
-    <ServiceDelivery>
+    <trias:ServiceDelivery>
       <siri:ResponseTimestamp>
         <xsl:value-of select="//siri:ResponseTimestamp[1]"/>
       </siri:ResponseTimestamp>
@@ -24,17 +32,17 @@
       <xsl:apply-templates select="ojp:OJPStopEventDelivery"/>
       <xsl:apply-templates select="siri:ErrorCondition"/>
 
-    </ServiceDelivery>
+    </trias:ServiceDelivery>
   </xsl:template>
   <!--*********************************************-->
 
   <xsl:template match="ojp:OJPStopEventDelivery">
-    <DeliveryPayload>
-      <StopEventResponse>
+    <trias:DeliveryPayload>
+      <trias:StopEventResponse>
         <xsl:apply-templates select="ojp:StopEventResponseContext"/>
         <xsl:apply-templates select="ojp:StopEventResult"/>
-      </StopEventResponse>
-    </DeliveryPayload>
+      </trias:StopEventResponse>
+    </trias:DeliveryPayload>
   </xsl:template>
 
   <!--*********************************************-->
@@ -48,228 +56,228 @@
 
   <!--*********************************************-->
   <xsl:template match="ojp:StopEventResponseContext">
-    <StopEventResponseContext>
+    <trias:StopEventResponseContext>
       <xsl:apply-templates select="ojp:Places"/>
-    </StopEventResponseContext>
+    </trias:StopEventResponseContext>
   </xsl:template>
   <xsl:template match="ojp:Places">
-    <Locations>
+    <trias:Locations>
       <xsl:apply-templates select="ojp:Place"/>
-    </Locations>
+    </trias:Locations>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:StopEventResult">
-    <StopEventResult>
-      <ResultId>
+    <trias:StopEventResult>
+      <trias:ResultId>
         <xsl:value-of select="ojp:Id"/>
-      </ResultId>
+      </trias:ResultId>
       <xsl:apply-templates select="ojp:StopEvent"/>
-    </StopEventResult>
+    </trias:StopEventResult>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:Place">
-    <Location>
+    <trias:Location>
       <xsl:apply-templates select="ojp:StopPlace"/>
       <xsl:apply-templates select="ojp:StopPoint"/>
-      <LocationName>
-        <Text><xsl:value-of select="ojp:Name/ojp:Text"/></Text>
-      </LocationName>
+      <trias:LocationName>
+        <trias:Text><xsl:value-of select="ojp:Name/ojp:Text"/></trias:Text>
+      </trias:LocationName>
       <xsl:apply-templates select="ojp:GeoPosition"/>
-    </Location>
+    </trias:Location>
     <!--*********************************************-->
   </xsl:template>
   <xsl:template match="ojp:GeoPosition">
-    <GeoPosition>
-      <Longitude>
+    <trias:GeoPosition>
+      <trias:Longitude>
         <xsl:value-of select="siri:Longitude"/>
-      </Longitude>
-      <Latitude>
+      </trias:Longitude>
+      <trias:Latitude>
         <xsl:value-of select="siri:Latitude"/>
-      </Latitude>
-    </GeoPosition>
+      </trias:Latitude>
+    </trias:GeoPosition>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:StopPlace">
-    <StopPlace>
-      <StopPlaceRef>
+    <trias:StopPlace>
+      <trias:StopPlaceRef>
         <xsl:value-of select="ojp:StopPlaceRef"/>
-      </StopPlaceRef>
-      <StopPlaceName>
-        <Text><xsl:value-of select="normalize-space(ojp:StopPlaceName)"/></Text>
-      </StopPlaceName>
+      </trias:StopPlaceRef>
+      <trias:StopPlaceName>
+        <trias:Text><xsl:value-of select="normalize-space(ojp:StopPlaceName)"/></trias:Text>
+      </trias:StopPlaceName>
 
-      <PrivateCode>
-        <System><xsl:value-of select="ojp:PrivateCode/ojp:System"/></System>
-        <Value><xsl:value-of select="ojp:PrivateCode/ojp:Value"/></Value>
-      </PrivateCode>
+      <trias:PrivateCode>
+        <trias:System><xsl:value-of select="ojp:PrivateCode/ojp:System"/></trias:System>
+        <trias:Value><xsl:value-of select="ojp:PrivateCode/ojp:Value"/></trias:Value>
+      </trias:PrivateCode>
       <!--<xsl:if test="ojp:TopographicPlaceRef">
       <TopographicPlaceRef><xsl:value-of select="ojp:TopographicPlaceRef"/></TopographicPlaceRef></xsl:if>-->
-    </StopPlace>
+    </trias:StopPlace>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:StopPoint">
-    <StopPoint>
-      <StopPointRef>
+    <trias:StopPoint>
+      <trias:StopPointRef>
         <xsl:value-of select="siri:StopPointRef"/>
-      </StopPointRef>
-      <StopPointName>
+      </trias:StopPointRef>
+      <trias:StopPointName>
         <xsl:apply-templates select="ojp:StopPointName"/>
-      </StopPointName>
-      <PrivateCode>
-        <System><xsl:value-of select="ojp:PrivateCode/ojp:System"/>
-        </System>
+      </trias:StopPointName>
+      <trias:PrivateCode>
+        <trias:System><xsl:value-of select="ojp:PrivateCode/ojp:System"/>
+        </trias:System>
         <Value><xsl:value-of select="ojp:PrivateCode/ojp:Value"/></Value>
-      </PrivateCode>
+      </trias:PrivateCode>
       <!-- <xsl:if test="ojp:TopographicPlaceRef">
       <TopographicPlaceRef><xsl:value-of select="ojp:TopographicPlaceRef"/></TopographicPlaceRef></xsl:if> -->
-    </StopPoint>
+    </trias:StopPoint>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:CallAtStop">
-    <CallAtStop>
-      <StopPointRef>
+    <trias:CallAtStop>
+      <trias:StopPointRef>
         <xsl:value-of select="siri:StopPointRef"/>
-      </StopPointRef>
-      <StopPointName>
+      </trias:StopPointRef>
+      <trias:StopPointName>
         <xsl:apply-templates select="ojp:StopPointName"/>
-      </StopPointName>
-      <PlannedBay>
+      </trias:StopPointName>
+      <trias:PlannedBay>
         <xsl:apply-templates select="ojp:PlannedQuay"/>
-      </PlannedBay>
+      </trias:PlannedBay>
       <xsl:if test="ojp:EstimatedQuay">
-        <EstimatedBay>
+        <trias:EstimatedBay>
           <Text><xsl:value-of select="ojp:EstimatedQuay/ojp:Text"/></Text>
-        </EstimatedBay>
+        </trias:EstimatedBay>
       </xsl:if>
       <xsl:apply-templates select="ojp:ServiceArrival"/>
       <xsl:apply-templates select="ojp:ServiceDeparture"/>
       <xsl:if test="ojp:Order">
-        <StopSeqNumber><xsl:value-of select="ojp:Order"/></StopSeqNumber>
+        <trias:StopSeqNumber><xsl:value-of select="ojp:Order"/></trias:StopSeqNumber>
       </xsl:if>
       <xsl:if test="ojp:RequestStop">
-        <DemandStop><xsl:value-of select="ojp:RequestStop"/></DemandStop>
+        <trias:DemandStop><xsl:value-of select="ojp:RequestStop"/></trias:DemandStop>
       </xsl:if>
       <xsl:if test="ojp:UnplannedStop">
-        <UnplannedStop><xsl:value-of select="ojp:UnplannedStop"/></UnplannedStop>
+        <trias:UnplannedStop><xsl:value-of select="ojp:UnplannedStop"/></trias:UnplannedStop>
       </xsl:if>
       <xsl:if test="ojp:NotServicedStop">
-        <NotServicedStop><xsl:value-of select="ojp:NotServicedStop"/></NotServicedStop>
+        <trias:NotServicedStop><xsl:value-of select="ojp:NotServicedStop"/></trias:NotServicedStop>
       </xsl:if>
       <xsl:if test="ojp:NoBoardingAtStop">
-        <NoBoardingAtStop><xsl:value-of select="ojp:NoBoardingAtStop"/></NoBoardingAtStop>
+        <trias:NoBoardingAtStop><xsl:value-of select="ojp:NoBoardingAtStop"/></trias:NoBoardingAtStop>
       </xsl:if>
       <xsl:if test="ojp:NoAlightingAtStop">
-        <NoAlightingAtStop><xsl:value-of select="ojp:NoAlightingAtStop"/></NoAlightingAtStop>
+        <trias:NoAlightingAtStop><xsl:value-of select="ojp:NoAlightingAtStop"/></trias:NoAlightingAtStop>
       </xsl:if>
-    </CallAtStop>
+    </trias:CallAtStop>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:ServiceArrival">
-    <ServiceArrival>
+    <trias:ServiceArrival>
       <xsl:if test="ojp:TimetabledTime">
-        <TimetabledTime><xsl:value-of select="ojp:TimetabledTime"/></TimetabledTime>
+        <trias:TimetabledTime><xsl:value-of select="ojp:TimetabledTime"/></trias:TimetabledTime>
       </xsl:if>
       <xsl:if test="ojp:EstimatedTime">
-        <EstimatedTime><xsl:value-of select="ojp:EstimatedTime"/></EstimatedTime>
+        <trias:EstimatedTime><xsl:value-of select="ojp:EstimatedTime"/></trias:EstimatedTime>
       </xsl:if>
-    </ServiceArrival>
+    </trias:ServiceArrival>
 
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:ServiceDeparture">
-    <ServiceDeparture>
+    <trias:ServiceDeparture>
       <xsl:if test="ojp:TimetabledTime">
-        <TimetabledTime><xsl:value-of select="ojp:TimetabledTime"/></TimetabledTime>
+        <trias:TimetabledTime><xsl:value-of select="ojp:TimetabledTime"/></trias:TimetabledTime>
       </xsl:if>
       <xsl:if test="ojp:EstimatedTime">
-        <EstimatedTime><xsl:value-of select="ojp:EstimatedTime"/></EstimatedTime>
+        <trias:EstimatedTime><xsl:value-of select="ojp:EstimatedTime"/></trias:EstimatedTime>
       </xsl:if>
-    </ServiceDeparture>
+    </trias:ServiceDeparture>
 
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:StopEvent">
-    <StopEvent>
+    <trias:StopEvent>
       <xsl:apply-templates select="ojp:PreviousCall"/>
       <xsl:apply-templates select="ojp:ThisCall"/>
       <xsl:apply-templates select="ojp:OnwardCall"/>
       <xsl:apply-templates select="ojp:Service"/>
-      <Extension>
+      <trias:Extension>
         <xsl:if test="ojp:Service/ojp:TrainNumber">
-          <TrainNumber><xsl:value-of select="ojp:Service/ojp:TrainNumber"/></TrainNumber>
+          <trias:TrainNumber><xsl:value-of select="ojp:Service/ojp:TrainNumber"/></trias:TrainNumber>
         </xsl:if>
         <xsl:if test="ojp:Service/ojp:ProductCategory">
-          <ProductCategory><xsl:value-of select="ojp:Service/ojp:ProductCategory/ojp:ShortName/ojp:Text"/></ProductCategory>
+          <trias:ProductCategory><xsl:value-of select="ojp:Service/ojp:ProductCategory/ojp:ShortName/ojp:Text"/></trias:ProductCategory>
         </xsl:if>
-      </Extension>
-    </StopEvent>
+      </trias:Extension>
+    </trias:StopEvent>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:ThisCall">
-    <ThisCall>
+    <trias:ThisCall>
       <xsl:apply-templates select="ojp:CallAtStop"/>
       <xsl:if test="ojp:WalkDuration">
-        <WalkDuration><xsl:value-of select="ojp:WalkDuration"/></WalkDuration>
+        <trias:WalkDuration><xsl:value-of select="ojp:WalkDuration"/></trias:WalkDuration>
       </xsl:if>
       <xsl:if test="ojp:WalkDistance">
-        <WalkDistance><xsl:value-of select="ojp:WalkDistance"/></WalkDistance>
+        <trias:WalkDistance><xsl:value-of select="ojp:WalkDistance"/></trias:WalkDistance>
       </xsl:if>
-    </ThisCall>
+    </trias:ThisCall>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:PreviousCall">
-    <PreviousCall>
+    <trias:PreviousCall>
       <xsl:apply-templates select="ojp:CallAtStop"/>
-    </PreviousCall>
+    </trias:PreviousCall>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:OnwardCall">
-    <OnwardCall>
+    <trias:OnwardCall>
       <xsl:apply-templates select="ojp:CallAtStop"/>
-    </OnwardCall>
+    </trias:OnwardCall>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:Text">
-    <Text><xsl:value-of select="text()"/></Text>
-    <Language><xsl:value-of select="@xml:lang"/></Language>
+    <trias:Text><xsl:value-of select="text()"/></trias:Text>
+    <trias:Language><xsl:value-of select="@xml:lang"/></trias:Language>
   </xsl:template>
   <!--*********************************************-->
   <xsl:template match="ojp:Service">
-    <Service>
-      <OperatingDayRef><xsl:value-of select="ojp:OperatingDayRef"/></OperatingDayRef>
-      <JourneyRef><xsl:value-of select="ojp:JourneyRef"/></JourneyRef>
-      <ServiceSection>
-        <LineRef><xsl:value-of select="siri:LineRef"/></LineRef>
-        <DirectionRef><xsl:value-of select="siri:DirectionRef"/></DirectionRef>
-        <Mode>
-          <PtMode><xsl:value-of select="ojp:Mode/ojp:PtMode"/></PtMode>
+    <trias:Service>
+      <trias:OperatingDayRef><xsl:value-of select="ojp:OperatingDayRef"/></trias:OperatingDayRef>
+      <trias:JourneyRef><xsl:value-of select="ojp:JourneyRef"/></trias:JourneyRef>
+      <trias:ServiceSection>
+        <trias:LineRef><xsl:value-of select="siri:LineRef"/></trias:LineRef>
+        <trias:DirectionRef><xsl:value-of select="siri:DirectionRef"/></trias:DirectionRef>
+        <trias:Mode>
+          <trias:PtMode><xsl:value-of select="ojp:Mode/ojp:PtMode"/></trias:PtMode>
           <!-- Handling of SubMode -->
-        </Mode>
-        <PublishedLineName>
-          <Text><xsl:value-of select="normalize-space(ojp:PublishedServiceName)"/></Text>
-        </PublishedLineName>
-        <OperatorRef><xsl:value-of select="siri:OperatorRef"/></OperatorRef>
-      </ServiceSection>
-      <OriginStopPointRef>
+        </trias:Mode>
+        <trias:PublishedLineName>
+          <trias:Text><xsl:value-of select="normalize-space(ojp:PublishedServiceName)"/></trias:Text>
+        </trias:PublishedLineName>
+        <trias:OperatorRef><xsl:value-of select="siri:OperatorRef"/></trias:OperatorRef>
+      </trias:ServiceSection>
+      <trias:OriginStopPointRef>
         <xsl:value-of select="ojp:OriginStopPointRef"/>
-      </OriginStopPointRef>
-      <OriginText>
+      </trias:OriginStopPointRef>
+      <trias:OriginText>
         <xsl:apply-templates select="ojp:OriginText"/>
-      </OriginText>
-      <DestinationStopPointRef>
+      </trias:OriginText>
+      <trias:DestinationStopPointRef>
         <xsl:value-of select="ojp:DestinationStopPointRef"/>
-      </DestinationStopPointRef>
-      <DestinationText>
+      </trias:DestinationStopPointRef>
+      <trias:DestinationText>
         <xsl:apply-templates select="ojp:DestinationText"/>
-      </DestinationText>
-      <RouteDescription>
+      </trias:DestinationText>
+      <trias:RouteDescription>
         <xsl:apply-templates select="ojp:RouteDescription"/>
-      </RouteDescription>
+      </trias:RouteDescription>
       <xsl:if test="ojp:Cancelled">
-        <Cancelled>
+        <trias:Cancelled>
           <xsl:apply-templates select="ojp:Cancelled"/>
-        </Cancelled>
+        </trias:Cancelled>
       </xsl:if>
-    </Service>
+    </trias:Service>
   </xsl:template>
 </xsl:stylesheet>
