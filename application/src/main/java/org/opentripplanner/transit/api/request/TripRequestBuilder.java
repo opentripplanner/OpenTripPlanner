@@ -2,50 +2,65 @@ package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 
-  private FilterValues<FeedScopedId> agencies = FilterValues.ofEmptyIsEverything(
-    "agencies",
-    List.of()
+  private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
+    "includeAgencies",
+    null
   );
-  private FilterValues<FeedScopedId> routes = FilterValues.ofEmptyIsEverything("routes", List.of());
-  private FilterValues<String> netexInternalPlanningCodes = FilterValues.ofEmptyIsEverything(
-    "netexInternalPlanningCodes",
-    List.of()
+  private FilterValues<FeedScopedId> includeRoutes = FilterValues.ofNullIsEverything(
+    "includeRoutes",
+    null
   );
-  private FilterValues<LocalDate> serviceDates = FilterValues.ofEmptyIsEverything(
-    "serviceDates",
-    List.of()
+  private FilterValues<String> includeNetexInternalPlanningCodes = FilterValues.ofNullIsEverything(
+    "includeNetexInternalPlanningCodes",
+    null
+  );
+  private FilterValues<LocalDate> includeServiceDates = FilterValues.ofNullIsEverything(
+    "includeServiceDates",
+    null
   );
 
   TripRequestBuilder() {}
 
-  public TripRequestBuilder withAgencies(FilterValues<FeedScopedId> agencies) {
-    this.agencies = agencies;
+  public TripRequestBuilder withIncludeAgencies(@Nullable List<FeedScopedId> includeAgencies) {
+    this.includeAgencies = FilterValues.ofNullIsEverything("includeAgencies", includeAgencies);
     return this;
   }
 
-  public TripRequestBuilder withRoutes(FilterValues<FeedScopedId> routes) {
-    this.routes = routes;
+  public TripRequestBuilder withIncludeRoutes(@Nullable List<FeedScopedId> includeRoutes) {
+    this.includeRoutes = FilterValues.ofNullIsEverything("includeRoutes", includeRoutes);
     return this;
   }
 
-  public TripRequestBuilder withNetexInternalPlanningCodes(
-    FilterValues<String> netexInternalPlanningCodes
+  public TripRequestBuilder withIncludeNetexInternalPlanningCodes(
+    @Nullable List<String> includeNetexInternalPlanningCodes
   ) {
-    this.netexInternalPlanningCodes = netexInternalPlanningCodes;
+    this.includeNetexInternalPlanningCodes = FilterValues.ofNullIsEverything(
+      "includeNetexInternalPlanningCodes",
+      includeNetexInternalPlanningCodes
+    );
     return this;
   }
 
-  public TripRequestBuilder withServiceDates(FilterValues<LocalDate> serviceDates) {
-    this.serviceDates = serviceDates;
+  public TripRequestBuilder withIncludeServiceDates(@Nullable List<LocalDate> includeServiceDates) {
+    this.includeServiceDates = FilterValues.ofNullIsEverything(
+      "includeServiceDates",
+      includeServiceDates
+    );
     return this;
   }
 
   public TripRequest build() {
-    return new TripRequest(agencies, routes, netexInternalPlanningCodes, serviceDates);
+    return new TripRequest(
+      includeAgencies,
+      includeRoutes,
+      includeNetexInternalPlanningCodes,
+      includeServiceDates
+    );
   }
 }
