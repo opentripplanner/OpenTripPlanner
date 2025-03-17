@@ -47,7 +47,7 @@ public class OjpService {
     } else {
       var station = transitService.getStopLocationsGroup(id);
       if (station == null) {
-        throw new EntityNotFoundException("Stop entity", id);
+        throw new EntityNotFoundException("StopPointRef", id);
       }
       stops = station.getChildStops();
     }

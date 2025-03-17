@@ -45,6 +45,10 @@ public interface RealtimeTestConstants {
     .withRegularStop(STOP_D1)
     .withRegularStop(STOP_E)
     .withRegularStop(STOP_F)
+    .withStation(STATION_A)
+    .withStation(STATION_B)
+    .withStation(STATION_C)
+    .withStation(STATION_D)
     .build();
 
   Route ROUTE_1 = TimetableRepositoryForTest.route(ROUTE_1_ID).build();
