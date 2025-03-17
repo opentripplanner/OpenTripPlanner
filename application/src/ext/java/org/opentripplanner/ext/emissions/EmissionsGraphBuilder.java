@@ -3,6 +3,7 @@ package org.opentripplanner.ext.emissions;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.ext.emissions.config.EmissionsConfig;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -18,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class EmissionsGraphBuilder implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmissionsGraphBuilder.class);
-  private final BuildConfig config;
+  private final EmissionsConfig config;
   private final EmissionsRepository emissionsRepository;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources;
   private final DataImportIssueStore issueStore;
@@ -30,17 +31,17 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
     DataImportIssueStore issueStore
   ) {
     this.dataSources = dataSources;
-    this.config = config;
+    this.config = config.emissions;
     this.emissionsRepository = emissionsRepository;
     this.issueStore = issueStore;
   }
 
   public void buildGraph() {
-    if (config.emissions != null) {
+    if (config != null) {
       LOG.info("Start emissions building");
       Co2EmissionsDataReader co2EmissionsDataReader = new Co2EmissionsDataReader(issueStore);
-      double carAvgCo2PerKm = config.emissions.getCarAvgCo2PerKm();
-      double carAvgOccupancy = config.emissions.getCarAvgOccupancy();
+      double carAvgCo2PerKm = config.getCarAvgCo2PerKm();
+      double carAvgOccupancy = config.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
       Map<FeedScopedId, Double> emissionsData = new HashMap<>();
 
