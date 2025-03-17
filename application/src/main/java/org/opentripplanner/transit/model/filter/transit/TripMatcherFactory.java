@@ -63,14 +63,14 @@ public class TripMatcherFactory {
 
   static Matcher<Trip> excludeAgencyId(FeedScopedId id) {
     return new NegationMatcher<>(
-      "excludedAgency",
+      "excludeAgency",
       new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId())
     );
   }
 
   static Matcher<Trip> excludeRouteId(FeedScopedId id) {
     return new NegationMatcher<>(
-      "excludedRoute",
+      "excludeRoute",
       new EqualityMatcher<>("route", id, t -> t.getRoute().getId())
     );
   }
