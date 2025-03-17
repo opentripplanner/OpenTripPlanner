@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.application.ApplicationShutdownSuppo
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.net.BindException;
 import java.time.Duration;
@@ -89,7 +90,7 @@ public class GrizzlyServer {
     CompressionConfig cc = httpListener.getCompressionConfig();
     cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
     cc.setCompressionMinSize(50000); // the min number of bytes to compress
-    cc.setCompressableMimeTypes("application/json", "text/json"); // the mime types to compress
+    cc.setCompressableMimeTypes("application/json", "text/json", MediaType.APPLICATION_XML); // the mime types to compress
     httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
     httpListener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
     httpServer.addListener(httpListener);
