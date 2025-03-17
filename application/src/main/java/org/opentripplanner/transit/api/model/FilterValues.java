@@ -60,18 +60,6 @@ public abstract class FilterValues<E> {
   }
 
   /**
-   * Returns a {@link FilterValues} that matches nothing if there are no filter values.
-   *
-   * @param name   - The name of the filter.
-   * @param <E>    - The type of the filter values. Typically, String or {@link FeedScopedId}.
-   * @param values - The {@link Collection} of filter values.
-   * @return FilterValues
-   */
-  public static <E> FilterValues<E> ofEmptyIsNothing(String name, @Nullable Collection<E> values) {
-    return new FilterValuesEmptyIsNothing<>(name, values);
-  }
-
-  /**
    * Returns a {@link RequiredFilterValues} that throws an exception at creation time if the filter
    * values is null or empty.
    * </p>
