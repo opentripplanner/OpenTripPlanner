@@ -23,9 +23,8 @@ jobs:
             sleep: 15
           - name: houston
             sleep: 30
-          # disabled on 2025-03-14 because the Denver GTFS download didn't work
-          #- name: denver
-          #  sleep: 15
+          - name: denver
+            sleep: 15
           - name: septa
             sleep: 15
           - name: portland
