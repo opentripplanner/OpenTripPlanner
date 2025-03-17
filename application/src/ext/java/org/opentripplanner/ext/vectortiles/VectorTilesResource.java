@@ -86,8 +86,8 @@ public class VectorTilesResource {
 
     List<String> rLayers = Arrays.asList(requestedLayers.split(","));
 
-    var url = serverContext
-      .vectorTileConfig()
+    var config = serverContext.vectorTileConfig();
+    var url = config
       .basePath()
       .map(overrideBasePath ->
         TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, rLayers)
@@ -96,14 +96,14 @@ public class VectorTilesResource {
         TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
-    return serverContext
-      .vectorTileConfig()
+    return  config
       .attribution()
-      .map(attr -> new TileJson(url, envelope, attr))
+      .map(attr -> new TileJson(url, envelope, attr, config.minZoom(), config.maxZoom()))
       .orElseGet(() -> {
         var feedInfos = getFeedInfos();
-        return new TileJson(url, envelope, feedInfos);
+        return new TileJson(url, envelope, feedInfos, config.minZoom(), config.maxZoom());
       });
+
   }
 
   private List<FeedInfo> getFeedInfos() {

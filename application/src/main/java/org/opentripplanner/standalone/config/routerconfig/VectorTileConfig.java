@@ -161,6 +161,14 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
     );
   }
 
+  public int minZoom() {
+    return layers.stream().mapToInt(LayerParameters::minZoom).min().orElse(MIN_ZOOM);
+  }
+
+  public int maxZoom() {
+    return layers.stream().mapToInt(LayerParameters::maxZoom).min().orElse(MAX_ZOOM);
+  }
+
   record Layer(
     String name,
     VectorTilesResource.LayerType type,
