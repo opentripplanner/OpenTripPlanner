@@ -43,15 +43,15 @@ following to `router-config.json`.
 
 | Config Parameter                                       |    Type   | Summary                                                      |  Req./Opt. | Default Value | Since |
 |--------------------------------------------------------|:---------:|--------------------------------------------------------------|:----------:|---------------|:-----:|
-| [hardcodedInputFeedId](#triasApi_hardcodedInputFeedId) |  `string` | The hardcoded feedId to add to all input ids.                | *Optional* |               |  2.7  |
-| [hideFeedId](#triasApi_hideFeedId)                     | `boolean` | Hide the feed id in all API output, and add it to input ids. | *Optional* | `false`       |  2.7  |
+| [hardcodedInputFeedId](#triasApi_hardcodedInputFeedId) |  `string` | The hardcoded feedId to add to all input ids.                | *Optional* |               |  2.8  |
+| [hideFeedId](#triasApi_hideFeedId)                     | `boolean` | Hide the feed id in all API output, and add it to input ids. | *Optional* | `false`       |  2.8  |
 
 
 ### Details
 
 <h4 id="triasApi_hardcodedInputFeedId">hardcodedInputFeedId</h4>
 
-**Since version:** `2.7` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.8` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
 **Path:** /triasApi 
 
 The hardcoded feedId to add to all input ids.
@@ -60,7 +60,7 @@ Only turn this feature on if you have unique ids across all feeds, without the f
 
 <h4 id="triasApi_hideFeedId">hideFeedId</h4>
 
-**Since version:** `2.7` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Since version:** `2.8` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /triasApi 
 
 Hide the feed id in all API output, and add it to input ids.
