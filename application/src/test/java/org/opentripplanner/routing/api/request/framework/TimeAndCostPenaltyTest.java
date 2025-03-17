@@ -30,7 +30,7 @@ class TimeAndCostPenaltyTest {
     var inputTime = Duration.ofSeconds(inputSeconds);
     var expectedTimeAndCost = new TimeAndCost(
       DurationUtils.duration("27m35s"),
-      Cost.costOfSeconds(4138)
+      Cost.costOfCentiSeconds(413750)
     );
 
     assertEquals(expectedTimeAndCost, subject.calculate(inputTime));

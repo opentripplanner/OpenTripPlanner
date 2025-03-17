@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.stoptimes;
+package org.opentripplanner.transit.service;
 
 public enum ArrivalDeparture {
   DEPARTURES,

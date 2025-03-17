@@ -45,6 +45,21 @@ public abstract class FilterValues<E> {
   }
 
   /**
+   * Returns a {@link FilterValues} that matches everything if the filter values are null.
+   * </p>
+   * @param name   - The name of the filter.
+   * @param <E>    - The type of the filter values. Typically, String or {@link FeedScopedId}.
+   * @param values - The {@link Collection} of filter values.
+   * @return FilterValues
+   */
+  public static <E> FilterValues<E> ofNullIsEverything(
+    String name,
+    @Nullable Collection<E> values
+  ) {
+    return new FilterValuesNullIsEverything<>(name, values);
+  }
+
+  /**
    * Returns a {@link FilterValues} that matches nothing if there are no filter values.
    *
    * @param name   - The name of the filter.

@@ -162,7 +162,7 @@ class DeleteResultHandlerTest {
     }
 
     private String tag(Itinerary it) {
-      return it.getSystemNotices().stream().map(SystemNotice::tag).findFirst().orElse("na");
+      return it.systemNotices().stream().map(SystemNotice::tag).findFirst().orElse("na");
     }
   }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.service.vehiclerental;
 
 import java.util.Collection;
 import java.util.List;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
@@ -42,10 +43,5 @@ public interface VehicleRentalService {
   /**
    * Gets all vehicle rental places inside an envelope.
    */
-  List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(
-    double minLon,
-    double minLat,
-    double maxLon,
-    double maxLat
-  );
+  List<VehicleRentalPlace> getVehicleRentalPlacesForEnvelope(Envelope envelope);
 }

@@ -17,7 +17,6 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugPr
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -28,6 +27,7 @@ import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.booking.BookingMethod;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 
 public class EnumTypes {
 

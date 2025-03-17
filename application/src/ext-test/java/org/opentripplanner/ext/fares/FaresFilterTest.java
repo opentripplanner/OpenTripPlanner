@@ -30,21 +30,21 @@ public class FaresFilterTest implements PlanTestConstants {
       .bus(ID, 52, 100, C)
       .build();
 
-    assertEquals(ItineraryFares.empty(), i1.getFares());
+    assertEquals(ItineraryFares.empty(), i1.fare());
 
     var fares = new ItineraryFares();
 
-    var leg = i1.getLegs().get(1);
+    var leg = i1.legs().get(1);
     var fp = new FareProduct(id("fp"), "fare product", Money.euros(10.00f), null, null, null);
     fares.addFareProduct(leg, fp);
 
     var filter = new DecorateWithFare((FareService) itinerary -> fares);
 
-    filter.decorate(i1);
+    i1 = filter.decorate(i1);
 
-    assertEquals(fares, i1.getFares());
+    assertEquals(fares, i1.fare());
 
-    var busLeg = i1.getTransitLeg(1);
+    var busLeg = i1.transitLeg(1);
 
     assertEquals(
       List.of(new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),

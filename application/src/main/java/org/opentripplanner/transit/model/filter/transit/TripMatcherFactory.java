@@ -37,16 +37,16 @@ public class TripMatcherFactory {
   ) {
     ExpressionBuilder<Trip> expr = ExpressionBuilder.of();
 
-    expr.atLeastOneMatch(request.includedAgencies(), TripMatcherFactory::includeAgencyId);
-    expr.atLeastOneMatch(request.includedRoutes(), TripMatcherFactory::includeRouteId);
+    expr.atLeastOneMatch(request.includeAgencies(), TripMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.includeRoutes(), TripMatcherFactory::routeId);
     expr.matchesAll(request.excludedAgencies(), TripMatcherFactory::excludeAgencyId);
     expr.matchesAll(request.excludedRoutes(), TripMatcherFactory::excludeRouteId);
     expr.atLeastOneMatch(
-      request.netexInternalPlanningCodes(),
+      request.includeNetexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
     );
     expr.atLeastOneMatch(
-      request.serviceDates(),
+      request.includeServiceDates(),
       TripMatcherFactory.serviceDate(serviceDateProvider)
     );
 

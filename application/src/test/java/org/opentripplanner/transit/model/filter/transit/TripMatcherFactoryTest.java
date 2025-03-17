@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.filter.transit;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.LocalDate;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -63,8 +62,10 @@ public class TripMatcherFactoryTest {
   }
 
   @Test
-  void testMatchIncludeRouteId() {
-    TripRequest request = TripRequest.of().withIncludedRoutes(List.of(RUTER_ROUTE1_ID)).build();
+  void testMatchRouteId() {
+    TripRequest request = TripRequest.of()
+      .withIncludeRoutes(List.of(new FeedScopedId("F", "RUT:route:1")))
+      .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
 
@@ -93,6 +94,28 @@ public class TripMatcherFactoryTest {
     assertTrue(matcher.match(tripRut));
     assertTrue(matcher.match(tripRut2));
     assertTrue(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testNullListMatchesAll() {
+    TripRequest request = TripRequest.of().withIncludeAgencies(null).build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertTrue(matcher.match(tripRut));
+    assertTrue(matcher.match(tripRut2));
+    assertTrue(matcher.match(tripAkt));
+  }
+
+  @Test
+  void testEmptyListMatchesNone() {
+    TripRequest request = TripRequest.of().withIncludeAgencies(List.of()).build();
+
+    Matcher<Trip> matcher = TripMatcherFactory.of(request, feedScopedId -> Set.of());
+
+    assertFalse(matcher.match(tripRut));
+    assertFalse(matcher.match(tripRut2));
+    assertFalse(matcher.match(tripAkt));
   }
 
   @Test
@@ -170,12 +193,7 @@ public class TripMatcherFactoryTest {
   @Test
   void testMatchServiceDates() {
     TripRequest request = TripRequest.of()
-      .withServiceDates(
-        FilterValues.ofEmptyIsEverything(
-          "operatingDays",
-          List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23))
-        )
-      )
+      .withIncludeServiceDates(List.of(LocalDate.of(2024, 2, 22), LocalDate.of(2024, 2, 23)))
       .build();
 
     Matcher<Trip> matcher = TripMatcherFactory.of(request, this::dummyServiceDateProvider);

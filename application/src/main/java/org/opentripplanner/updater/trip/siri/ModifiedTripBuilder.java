@@ -1,8 +1,10 @@
 package org.opentripplanner.updater.trip.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.model.PickDrop.NONE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.STOP_MISMATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_MANY_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -102,14 +104,40 @@ class ModifiedTripBuilder {
   public Result<TripUpdate, UpdateError> build() {
     RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
 
-    var stopPattern = createStopPattern(pattern, calls, entityResolver);
+    if (cancellation) {
+      return cancelTrip(newTimes);
+    }
 
-    if (cancellation || stopPattern.isAllStopsNonRoutable()) {
-      LOG.debug("Trip is cancelled");
-      newTimes.cancelTrip();
-      return Result.success(
-        new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
+    if (calls.size() < existingTripTimes.getNumStops()) {
+      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS, dataSource);
+    }
+
+    if (calls.size() > existingTripTimes.getNumStops()) {
+      return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_MANY_STOPS, dataSource);
+    }
+
+    var result = createStopPattern(pattern, calls, entityResolver);
+    if (result.isFailure()) {
+      int invalidStopIndex = result.failureValue().stopIndex();
+      LOG.info(
+        "Invalid SIRI-ET data for trip {} - {} at stop index {}",
+        existingTripTimes.getTrip().getId(),
+        result.failureValue().errorType(),
+        invalidStopIndex
       );
+      return Result.failure(
+        new UpdateError(
+          existingTripTimes.getTrip().getId(),
+          result.failureValue().errorType(),
+          invalidStopIndex,
+          dataSource
+        )
+      );
+    }
+
+    StopPattern stopPattern = result.successValue();
+    if (stopPattern.isAllStopsNonRoutable()) {
+      return cancelTrip(newTimes);
     }
 
     applyUpdates(newTimes);
@@ -151,14 +179,24 @@ class ModifiedTripBuilder {
   }
 
   /**
+   * Full cancellation of a trip.
+   */
+  private Result<TripUpdate, UpdateError> cancelTrip(RealTimeTripTimes newTimes) {
+    newTimes.cancelTrip();
+    return Result.success(
+      new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate, dataSource)
+    );
+  }
+
+  /**
    * Applies real-time updates from the calls into newTimes.
+   * Precondition: the number of calls is equal to the number of stops in the pattern (this is
+   * verified before calling this method).
    */
   private void applyUpdates(RealTimeTripTimes newTimes) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
-    int departureFromPreviousStop = 0;
-    int lastDepartureDelay = 0;
     List<StopLocation> stopsInPattern = pattern.getStops();
     for (int stopIndex = 0; stopIndex < stopsInPattern.size(); stopIndex++) {
       StopLocation stopInPattern = stopsInPattern.get(stopIndex);
@@ -176,51 +214,26 @@ class ModifiedTripBuilder {
         }
       }
 
-      if (matchingCall != null) {
-        TimetableHelper.applyUpdates(
-          startOfService,
-          newTimes,
-          stopIndex,
-          stopIndex == (stopsInPattern.size() - 1),
-          predictionInaccurate,
-          matchingCall,
-          occupancy
+      if (matchingCall == null) {
+        throw new IllegalStateException(
+          "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug.".formatted(
+              stopIndex,
+              newTimes.getTrip().getId()
+            )
         );
-
-        alreadyVisited.add(matchingCall);
-
-        lastDepartureDelay = newTimes.getDepartureDelay(stopIndex);
-      } else {
-        // No update found in calls
-        if (pattern.isBoardAndAlightAt(stopIndex, NONE)) {
-          // When newTimes contains stops without pickup/dropoff - set both arrival/departure to previous stop's departure
-          // This necessary to accommodate the case when delay is reduced/eliminated between to stops with pickup/dropoff, and
-          // multiple non-pickup/dropoff stops are in between.
-          newTimes.updateArrivalTime(stopIndex, departureFromPreviousStop);
-          newTimes.updateDepartureTime(stopIndex, departureFromPreviousStop);
-
-          LOG.info(
-            "Siri non-pickup/dropoff stop time interpolation for tripId: {}",
-            newTimes.getTrip().getId()
-          );
-        } else {
-          int arrivalDelay = lastDepartureDelay;
-          int departureDelay = lastDepartureDelay;
-
-          if (lastDepartureDelay == 0) {
-            //No match has been found yet (i.e. still in RecordedCalls) - keep existing delays
-            arrivalDelay = existingTripTimes.getArrivalDelay(stopIndex);
-            departureDelay = existingTripTimes.getDepartureDelay(stopIndex);
-          }
-
-          newTimes.updateArrivalDelay(stopIndex, arrivalDelay);
-          newTimes.updateDepartureDelay(stopIndex, departureDelay);
-
-          LOG.info("Siri stop time interpolation for tripId: {}", newTimes.getTrip().getId());
-        }
       }
 
-      departureFromPreviousStop = newTimes.getDepartureTime(stopIndex);
+      TimetableHelper.applyUpdates(
+        startOfService,
+        newTimes,
+        stopIndex,
+        stopIndex == (stopsInPattern.size() - 1),
+        predictionInaccurate,
+        matchingCall,
+        occupancy
+      );
+
+      alreadyVisited.add(matchingCall);
     }
   }
 
@@ -228,8 +241,10 @@ class ModifiedTripBuilder {
    * Creates a new StopPattern, based on an existing pattern, and list of calls. The stops can be
    * replaced with stops belonging to the same Station/StopPlace. The PickDrop values are updated
    * as well.
+   * Precondition: the number of calls is equal to the number of stops in the pattern (this is
+   * verified before calling this method).
    */
-  static StopPattern createStopPattern(
+  static Result<StopPattern, UpdateError> createStopPattern(
     TripPattern pattern,
     List<CallWrapper> calls,
     EntityResolver entityResolver
@@ -242,6 +257,7 @@ class ModifiedTripBuilder {
     for (int i = 0; i < numberOfStops; i++) {
       StopLocation stop = builder.stops.original(i);
 
+      boolean matchFound = false;
       for (CallWrapper call : calls) {
         if (alreadyVisited.contains(call)) {
           continue;
@@ -249,9 +265,14 @@ class ModifiedTripBuilder {
 
         //Current stop is being updated
         var callStop = entityResolver.resolveQuay(call.getStopPointRef());
+        if (callStop == null) {
+          return Result.failure(new UpdateError(null, UNKNOWN_STOP, i));
+        }
+
         if (!stop.equals(callStop) && !stop.isPartOfSameStationAs(callStop)) {
           continue;
         }
+        matchFound = true;
 
         // Used in lambda
         final int stopIndex = i;
@@ -268,10 +289,13 @@ class ModifiedTripBuilder {
         alreadyVisited.add(call);
         break;
       }
+      if (!matchFound) {
+        return Result.failure(new UpdateError(null, STOP_MISMATCH, i));
+      }
     }
     var newStopPattern = builder.build();
     return (pattern.isModified() && pattern.getStopPattern().equals(newStopPattern))
-      ? pattern.getStopPattern()
-      : newStopPattern;
+      ? Result.success(pattern.getStopPattern())
+      : Result.success(newStopPattern);
   }
 }

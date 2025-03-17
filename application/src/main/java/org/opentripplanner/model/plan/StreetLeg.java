@@ -55,8 +55,12 @@ public class StreetLeg implements Leg {
     this.accessibilityScore = builder.getAccessibilityScore();
   }
 
-  public static StreetLegBuilder create() {
+  public static StreetLegBuilder of() {
     return new StreetLegBuilder();
+  }
+
+  public StreetLegBuilder copyOf() {
+    return new StreetLegBuilder(this);
   }
 
   @Override
@@ -174,7 +178,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return StreetLegBuilder.of(this)
+    return copyOf()
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
@@ -186,7 +190,7 @@ public class StreetLeg implements Leg {
   }
 
   public StreetLeg withAccessibilityScore(float accessibilityScore) {
-    return StreetLegBuilder.of(this).withAccessibilityScore(accessibilityScore).build();
+    return copyOf().withAccessibilityScore(accessibilityScore).build();
   }
 
   /**
