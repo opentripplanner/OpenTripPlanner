@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -37,8 +36,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     // Find the best street-all-the-way option
     OptionalInt minStreetCost = itineraries
       .stream()
-      .filter(Itinerary::isOnStreetAllTheWay)
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .filter(Itinerary::isStreetOnly)
+      .mapToInt(Itinerary::generalizedCost)
       .min();
 
     if (minStreetCost.isEmpty()) {
@@ -55,7 +54,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       // we use the cost without the access/egress penalty since we don't want to give
       // searches that are only on the street network an unfair advantage (they don't have
       // access/egress so cannot have these penalties)
-      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isStreetOnly() && it.generalizedCost() >= limit)
       .toList();
   }
 

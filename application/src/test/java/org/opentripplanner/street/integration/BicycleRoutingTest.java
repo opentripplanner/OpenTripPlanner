@@ -102,7 +102,7 @@ public class BicycleRoutingTest {
     // make sure that we only get BICYCLE legs
     itineraries.forEach(i ->
       i
-        .getLegs()
+        .legs()
         .forEach(l -> {
           if (l instanceof StreetLeg stLeg) {
             assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
@@ -111,7 +111,7 @@ public class BicycleRoutingTest {
           }
         })
     );
-    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).getLegGeometry();
     return EncodedPolyline.encode(legGeometry).points();
   }
 }

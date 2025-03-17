@@ -21,7 +21,7 @@ public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndSt
 
   public GroupBySameRoutesAndStops(Itinerary itinerary) {
     keySet = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isTransitLeg)
       .flatMap(leg ->

@@ -246,7 +246,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * This will NOT delete itineraries, but tag them as deleted using the {@link
-   * Itinerary#getSystemNotices()}.
+   * Itinerary#systemNotices()}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;

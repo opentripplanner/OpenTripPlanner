@@ -12,7 +12,10 @@ import org.opentripplanner.apis.vectortiles.model.TileSource.RasterSource;
 import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber;
 import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.standalone.config.debuguiconfig.BackgroundTileLayer;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -59,11 +62,22 @@ public class DebugStyleSpec {
   private static final String MAGENTA = "#f21d52";
   private static final String BRIGHT_GREEN = "#22DD9E";
   private static final String DARK_GREEN = "#136b04";
+  private static final String TEAL = "#277eb5";
+  private static final String TURQUOISE = "#1cafad";
   private static final String RED = "#fc0f2a";
   private static final String PURPLE = "#BC55F2";
   private static final String BLACK = "#140d0e";
 
   private static final int MAX_ZOOM = 23;
+  private static final ZoomDependentNumber LARGE_CIRCLE_LINE_WIDTH = new ZoomDependentNumber(
+    List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5))
+  );
+  private static final ZoomDependentNumber LARGE_CIRCLE_RADIUS = new ZoomDependentNumber(
+    List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10))
+  );
+  private static final ZoomDependentNumber MEDIUM_CIRCLE_RADIUS = new ZoomDependentNumber(
+    List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10))
+  );
   private static final int LINE_DETAIL_ZOOM = 13;
   private static final ZoomDependentNumber LINE_OFFSET = new ZoomDependentNumber(
     List.of(new ZoomStop(LINE_DETAIL_ZOOM, 0.4f), new ZoomStop(MAX_ZOOM, 7))
@@ -92,6 +106,7 @@ public class DebugStyleSpec {
   private static final String BICYCLE_SAFETY_GROUP = "Bicycle safety";
   private static final String STOPS_GROUP = "Stops";
   private static final String VERTICES_GROUP = "Vertices";
+  private static final String RENTAL_GROUP = "Rental";
   private static final String PERMISSIONS_GROUP = "Permissions";
   private static final String NO_THRU_TRAFFIC_GROUP = "No-thru traffic";
 
@@ -108,9 +123,10 @@ public class DebugStyleSpec {
     VectorSourceLayer groupStops,
     VectorSourceLayer edges,
     VectorSourceLayer vertices,
+    VectorSourceLayer rental,
     List<BackgroundTileLayer> extraLayers
   ) {
-    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices)
+    List<TileSource> vectorSources = Stream.of(regularStops, edges, vertices, rental)
       .map(VectorSourceLayer::vectorSource)
       .map(TileSource.class::cast)
       .toList();
@@ -133,6 +149,7 @@ public class DebugStyleSpec {
       allSources,
       ListUtils.combine(
         backgroundLayers(extraRasterSources),
+        rental(rental),
         wheelchair(edges),
         noThruTraffic(edges),
         bicycleSafety(edges),
@@ -191,13 +208,8 @@ public class DebugStyleSpec {
         .group(STOPS_GROUP)
         .typeCircle()
         .vectorSourceLayer(regularStops)
-        .circleStroke(
-          BLACK,
-          new ZoomDependentNumber(List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 5)))
-        )
-        .circleRadius(
-          new ZoomDependentNumber(List.of(new ZoomStop(11, 0.5f), new ZoomStop(MAX_ZOOM, 10)))
-        )
+        .circleStroke(BLACK, LARGE_CIRCLE_LINE_WIDTH)
+        .circleRadius(LARGE_CIRCLE_RADIUS)
         .circleColor("#fcf9fa")
         .minZoom(10)
         .maxZoom(MAX_ZOOM)
@@ -224,10 +236,35 @@ public class DebugStyleSpec {
         .vectorSourceLayer(vertices)
         .vertexFilter(VehicleParkingEntranceVertex.class)
         .circleStroke(BLACK, CIRCLE_STROKE)
-        .circleRadius(
-          new ZoomDependentNumber(List.of(new ZoomStop(13, 1.4f), new ZoomStop(MAX_ZOOM, 10)))
-        )
+        .circleRadius(MEDIUM_CIRCLE_RADIUS)
         .circleColor(DARK_GREEN)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden()
+    );
+  }
+
+  private static List<StyleBuilder> rental(VectorSourceLayer layer) {
+    return List.of(
+      StyleBuilder.ofId("rental-vehicle")
+        .group(RENTAL_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(layer)
+        .classFilter(VehicleRentalVehicle.class)
+        .circleStroke(BLACK, CIRCLE_STROKE)
+        .circleRadius(MEDIUM_CIRCLE_RADIUS)
+        .circleColor(TEAL)
+        .minZoom(13)
+        .maxZoom(MAX_ZOOM)
+        .intiallyHidden(),
+      StyleBuilder.ofId("rental-station")
+        .group(RENTAL_GROUP)
+        .typeCircle()
+        .vectorSourceLayer(layer)
+        .classFilter(VehicleRentalStation.class)
+        .circleStroke(BLACK, LARGE_CIRCLE_LINE_WIDTH)
+        .circleRadius(LARGE_CIRCLE_RADIUS)
+        .circleColor(TURQUOISE)
         .minZoom(13)
         .maxZoom(MAX_ZOOM)
         .intiallyHidden()

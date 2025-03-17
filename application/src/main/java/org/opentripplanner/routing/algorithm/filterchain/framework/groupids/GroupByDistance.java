@@ -47,9 +47,9 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
    */
   public GroupByDistance(Itinerary itinerary, double p) {
     assertPIsValid(p);
-    double limit = p * calculateTotalDistance(itinerary.getLegs());
+    double limit = p * calculateTotalDistance(itinerary.legs());
     this.streetOnly = itinerary.isStreetOnly();
-    this.keySet = createKeySetOfLegsByLimit(itinerary.getLegs(), limit);
+    this.keySet = createKeySetOfLegsByLimit(itinerary.legs(), limit);
   }
 
   @Override

@@ -132,7 +132,7 @@ public class DatedServiceJourneyType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("estimatedCalls")
-          .type(new GraphQLList(estimatedCallType))
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passingTimes for this dated service journey, " +
@@ -142,7 +142,7 @@ public class DatedServiceJourneyType {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);
             return GqlUtil.getTransitService(environment)
               .getTripTimeOnDates(tripOnServiceDate.getTrip(), tripOnServiceDate.getServiceDate())
-              .orElse(null);
+              .orElse(List.of());
           })
           .build()
       )

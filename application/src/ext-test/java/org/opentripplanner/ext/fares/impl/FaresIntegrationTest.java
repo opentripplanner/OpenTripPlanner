@@ -115,7 +115,7 @@ public class FaresIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     Itinerary itinerary = getItineraries(from, to, time, serverContext).get(0);
-    return itinerary.getFares();
+    return itinerary.fare();
   }
 
   private static List<Itinerary> getItineraries(
@@ -138,7 +138,7 @@ public class FaresIntegrationTest {
     return result
       .getTripPlan()
       .itineraries.stream()
-      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCost))
+      .sorted(Comparator.comparingInt(Itinerary::generalizedCost))
       .toList();
   }
 }

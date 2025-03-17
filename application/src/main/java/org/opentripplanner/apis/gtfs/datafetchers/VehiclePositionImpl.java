@@ -2,6 +2,8 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.OffsetDateTime;
+import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
@@ -17,6 +19,14 @@ public class VehiclePositionImpl implements GraphQLDataFetchers.GraphQLVehiclePo
   @Override
   public DataFetcher<String> label() {
     return env -> getSource(env).label().orElse(null);
+  }
+
+  @Override
+  public DataFetcher<OffsetDateTime> lastUpdate() {
+    return env -> {
+      var zoneId = env.<GraphQLRequestContext>getContext().transitService().getTimeZone();
+      return getSource(env).time().map(time -> OffsetDateTime.ofInstant(time, zoneId)).orElse(null);
+    };
   }
 
   @Override

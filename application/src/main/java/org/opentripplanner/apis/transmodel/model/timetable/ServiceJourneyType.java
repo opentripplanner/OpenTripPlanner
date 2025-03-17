@@ -221,7 +221,7 @@ public class ServiceJourneyType {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("estimatedCalls")
-          .type(new GraphQLList(estimatedCallType))
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(estimatedCallType))))
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .description(
             "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available). " +
@@ -241,7 +241,7 @@ public class ServiceJourneyType {
               .orElse(LocalDate.now(GqlUtil.getTransitService(environment).getTimeZone()));
             return GqlUtil.getTransitService(environment)
               .getTripTimeOnDates(trip(environment), serviceDate)
-              .orElse(null);
+              .orElse(List.of());
           })
           .build()
       )

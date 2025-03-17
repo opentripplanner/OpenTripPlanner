@@ -80,19 +80,19 @@ public class FlexIntegrationTest {
   void shouldReturnARouteTransferringFromBusToFlex() {
     var itin = getItinerary(OUTSIDE_FLEX_ZONE, INSIDE_FLEX_ZONE, 4);
 
-    assertEquals(4, itin.getLegs().size());
+    assertEquals(4, itin.legs().size());
 
-    var walkToBus = itin.getStreetLeg(0);
+    var walkToBus = itin.streetLeg(0);
     assertEquals(WALK, walkToBus.getMode());
 
-    var bus = itin.getTransitLeg(1);
+    var bus = itin.transitLeg(1);
     assertEquals(BUS, bus.getMode());
     assertEquals("30", bus.getRoute().getShortName());
 
-    var transfer = itin.getStreetLeg(2);
+    var transfer = itin.streetLeg(2);
     assertEquals(WALK, transfer.getMode());
 
-    var flex = itin.getTransitLeg(3);
+    var flex = itin.transitLeg(3);
     assertEquals(BUS, flex.getMode());
     assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());
@@ -112,23 +112,23 @@ public class FlexIntegrationTest {
 
     var itin = getItinerary(from, to, 3);
 
-    assertEquals(5, itin.getLegs().size());
+    assertEquals(5, itin.legs().size());
 
-    var firstBus = itin.getTransitLeg(0);
+    var firstBus = itin.transitLeg(0);
     assertEquals(BUS, firstBus.getMode());
     assertEquals("856", firstBus.getRoute().getShortName());
 
-    var transferToSecondBus = itin.getStreetLeg(1);
+    var transferToSecondBus = itin.streetLeg(1);
     assertEquals(WALK, transferToSecondBus.getMode());
 
-    var secondBus = itin.getTransitLeg(2);
+    var secondBus = itin.transitLeg(2);
     assertEquals(BUS, secondBus.getMode());
     assertEquals("30", secondBus.getRoute().getShortName());
 
-    var transferToFlex = itin.getStreetLeg(3);
+    var transferToFlex = itin.streetLeg(3);
     assertEquals(WALK, transferToFlex.getMode());
 
-    var finalFlex = itin.getTransitLeg(4);
+    var finalFlex = itin.transitLeg(4);
     assertEquals(BUS, finalFlex.getMode());
     assertEquals("Zone 2", finalFlex.getRoute().getShortName());
     assertTrue(finalFlex.isFlexibleTrip());
@@ -153,14 +153,14 @@ public class FlexIntegrationTest {
     var itin = itineraries.get(0);
 
     // walk, flex
-    assertEquals(2, itin.getLegs().size());
+    assertEquals(2, itin.legs().size());
     assertEquals("2021-12-02T12:52:54-05:00[America/New_York]", itin.startTime().toString());
-    assertEquals(3203, itin.getGeneralizedCost());
+    assertEquals(3203, itin.generalizedCost());
 
-    var walkToFlex = itin.getStreetLeg(0);
+    var walkToFlex = itin.streetLeg(0);
     assertEquals(WALK, walkToFlex.getMode());
 
-    var flex = itin.getTransitLeg(1);
+    var flex = itin.transitLeg(1);
     assertEquals(BUS, flex.getMode());
     assertEquals("Zone 2", flex.getRoute().getShortName());
     assertTrue(flex.isFlexibleTrip());

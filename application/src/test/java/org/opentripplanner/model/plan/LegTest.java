@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.SERVICE_DAY;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class LegTest implements PlanTestConstants {
     .build();
 
   private final Leg WALK_LEG = ITINERARY.firstLeg();
-  private final Leg BUS_LEG = ITINERARY.getLegs().get(1);
+  private final Leg BUS_LEG = ITINERARY.legs().get(1);
   private final Leg BICYCLE_LEG = ITINERARY.lastLeg();
 
   @Test
@@ -180,7 +179,9 @@ public class LegTest implements PlanTestConstants {
     int toStopIndex,
     LocalDate serviceDate
   ) {
-    return leg(b -> b.bus(tripId, 99, 99, fromStopIndex, toStopIndex, B, serviceDate));
+    return leg(b ->
+      b.bus(tripId, START_TIME, START_TIME + 99, fromStopIndex, toStopIndex, B, serviceDate)
+    );
   }
 
   private static Leg leg(Consumer<TestItineraryBuilder> buildOp) {

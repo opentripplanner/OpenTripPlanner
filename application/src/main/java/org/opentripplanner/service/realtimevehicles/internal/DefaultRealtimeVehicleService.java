@@ -2,13 +2,14 @@ package org.opentripplanner.service.realtimevehicles.internal;
 
 import static org.opentripplanner.transit.model.timetable.OccupancyStatus.NO_DATA_AVAILABLE;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
@@ -22,7 +23,12 @@ import org.opentripplanner.transit.service.TransitService;
 public class DefaultRealtimeVehicleService
   implements RealtimeVehicleService, RealtimeVehicleRepository {
 
-  private final Map<TripPattern, List<RealtimeVehicle>> vehicles = new ConcurrentHashMap<>();
+  /**
+   * This multimap is immutable and therefore thread-safe. It is updated using the copy-on-write
+   * pattern so data races are avoided. This is re-enforced with the variable being volatile.
+   */
+  private volatile ImmutableListMultimap<TripPattern, RealtimeVehicle> vehicles =
+    ImmutableListMultimap.of();
 
   private final TransitService transitService;
 
@@ -31,22 +37,23 @@ public class DefaultRealtimeVehicleService
     this.transitService = transitService;
   }
 
-  /**
-   * Stores the relationship between a list of realtime vehicles with a pattern. If the pattern is
-   * a realtime-added one, then the original (scheduled) one is used as the key for the map storing
-   * the information.
-   */
-  @Override
-  public void setRealtimeVehicles(TripPattern pattern, List<RealtimeVehicle> updates) {
-    if (pattern.getOriginalTripPattern() != null) {
-      pattern = pattern.getOriginalTripPattern();
-    }
-    vehicles.put(pattern, List.copyOf(updates));
-  }
+  public void setRealtimeVehiclesForFeed(
+    String feedId,
+    Multimap<TripPattern, RealtimeVehicle> updates
+  ) {
+    Multimap<TripPattern, RealtimeVehicle> temp = ArrayListMultimap.create();
+    temp.putAll(vehicles);
+    // remove all previous updates for this specific feed id
+    vehicles.keys().stream().filter(p -> p.getFeedId().equals(feedId)).forEach(temp::removeAll);
+    // transform keys and put all fresh updates into map
+    updates.forEach((pattern, vehicles) -> {
+      if (pattern.getOriginalTripPattern() != null) {
+        pattern = pattern.getOriginalTripPattern();
+      }
+      temp.put(pattern, vehicles);
+    });
 
-  @Override
-  public void clearRealtimeVehicles(TripPattern pattern) {
-    vehicles.remove(pattern);
+    vehicles = ImmutableListMultimap.copyOf(temp);
   }
 
   /**
@@ -54,7 +61,7 @@ public class DefaultRealtimeVehicleService
    * then the original (scheduled) one is used for the lookup instead, so you receive the correct
    * result no matter if you use the realtime or static information.
    *
-   * @see DefaultRealtimeVehicleService#setRealtimeVehicles(TripPattern, List)
+   * @see DefaultRealtimeVehicleService#setRealtimeVehiclesForFeed(String, Multimap)
    */
   @Override
   public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
@@ -62,7 +69,7 @@ public class DefaultRealtimeVehicleService
       pattern = pattern.getOriginalTripPattern();
     }
     // the list is made immutable during insertion, so we can safely return them
-    return vehicles.getOrDefault(pattern, List.of());
+    return vehicles.get(pattern);
   }
 
   @Override
@@ -78,7 +85,7 @@ public class DefaultRealtimeVehicleService
    */
   public OccupancyStatus getOccupancyStatus(FeedScopedId tripId, TripPattern pattern) {
     return vehicles
-      .getOrDefault(pattern, List.of())
+      .get(pattern)
       .stream()
       .filter(vehicle -> tripId.equals(vehicle.trip().getId()))
       .max(Comparator.comparing(vehicle -> vehicle.time().orElse(Instant.MIN)))

@@ -43,7 +43,7 @@ public class RemoveNonTransitItinerariesBasedOnGeneralizedCost implements Remove
     // ALL itineraries are considered here. Both transit and non-transit
     OptionalInt minGeneralizedCost = itineraries
       .stream()
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::generalizedCost)
       .min();
 
     if (minGeneralizedCost.isEmpty()) {
@@ -58,7 +58,7 @@ public class RemoveNonTransitItinerariesBasedOnGeneralizedCost implements Remove
 
     return itineraries
       .stream()
-      .filter(it -> !it.hasTransit() && it.getGeneralizedCost() > maxLimit)
+      .filter(it -> !it.hasTransit() && it.generalizedCost() > maxLimit)
       .collect(Collectors.toList());
   }
 }

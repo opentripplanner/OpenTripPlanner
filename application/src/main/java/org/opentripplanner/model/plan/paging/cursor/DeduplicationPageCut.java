@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Instant;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 
 /**
@@ -13,7 +14,7 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
 record DeduplicationPageCut(
   Instant departureTime,
   Instant arrivalTime,
-  int generalizedCost,
+  Cost generalizedCost,
   int numOfTransfers,
   boolean onStreet
 )
@@ -29,17 +30,17 @@ record DeduplicationPageCut(
   }
 
   @Override
-  public int getGeneralizedCostIncludingPenalty() {
+  public Cost generalizedCostIncludingPenalty() {
     return generalizedCost;
   }
 
   @Override
-  public int getNumberOfTransfers() {
+  public int numberOfTransfers() {
     return numOfTransfers;
   }
 
   @Override
-  public boolean isOnStreetAllTheWay() {
+  public boolean isStreetOnly() {
     return onStreet;
   }
 

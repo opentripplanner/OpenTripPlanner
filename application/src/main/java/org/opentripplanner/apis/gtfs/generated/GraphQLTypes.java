@@ -2249,16 +2249,24 @@ public class GraphQLTypes {
 
   public static class GraphQLPlanVisitViaLocationInput {
 
+    private GraphQLPlanCoordinateInput coordinate;
     private String label;
     private java.time.Duration minimumWaitTime;
     private List<String> stopLocationIds;
 
     public GraphQLPlanVisitViaLocationInput(Map<String, Object> args) {
       if (args != null) {
+        this.coordinate = new GraphQLPlanCoordinateInput(
+          (Map<String, Object>) args.get("coordinate")
+        );
         this.label = (String) args.get("label");
         this.minimumWaitTime = (java.time.Duration) args.get("minimumWaitTime");
         this.stopLocationIds = (List<String>) args.get("stopLocationIds");
       }
+    }
+
+    public GraphQLPlanCoordinateInput getGraphQLCoordinate() {
+      return this.coordinate;
     }
 
     public String getGraphQLLabel() {
@@ -2271,6 +2279,10 @@ public class GraphQLTypes {
 
     public List<String> getGraphQLStopLocationIds() {
       return this.stopLocationIds;
+    }
+
+    public void setGraphQLCoordinate(GraphQLPlanCoordinateInput coordinate) {
+      this.coordinate = coordinate;
     }
 
     public void setGraphQLLabel(String label) {
