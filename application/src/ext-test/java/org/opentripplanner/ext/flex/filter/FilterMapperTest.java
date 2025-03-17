@@ -30,8 +30,8 @@ class FilterMapperTest {
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
     var actual = FilterMapper.map(List.of(transitFilter));
     var expected = TripRequest.of()
-      .withIncludedRoutes(Set.of(ROUTE_ID1))
-      .withExcludedRoutes(Set.of(ROUTE_ID1))
+      .withIncludeRoutes(List.of(ROUTE_ID1))
+      .withExcludeRoutes(List.of(ROUTE_ID1))
       .build();
 
     assertEquals(expected, actual);
@@ -43,8 +43,8 @@ class FilterMapperTest {
     var transitFilter = TransitFilterRequest.of().addSelect(select).addNot(select).build();
     var actual = FilterMapper.map(List.of(transitFilter));
     var expected = TripRequest.of()
-      .withIncludedAgencies(Set.of(AGENCY_ID1))
-      .withExcludedAgencies(Set.of(AGENCY_ID1))
+      .withIncludeAgencies(List.of(AGENCY_ID1))
+      .withExcludeAgencies(List.of(AGENCY_ID1))
       .build();
 
     assertEquals(expected, actual);
@@ -65,10 +65,10 @@ class FilterMapperTest {
 
     var actual = FilterMapper.map(List.of(routeFilter, agencyFilter));
     var expected = TripRequest.of()
-      .withIncludedAgencies(Set.of(AGENCY_ID1))
-      .withExcludedAgencies(Set.of(AGENCY_ID1))
-      .withIncludedRoutes(Set.of(ROUTE_ID1))
-      .withExcludedRoutes(Set.of(ROUTE_ID1))
+      .withIncludeAgencies(List.of(AGENCY_ID1))
+      .withExcludeAgencies(List.of(AGENCY_ID1))
+      .withIncludeRoutes(List.of(ROUTE_ID1))
+      .withExcludeRoutes(List.of(ROUTE_ID1))
       .build();
 
     assertEquals(expected, actual);

@@ -43,11 +43,11 @@ public class TripRequest {
     return new TripRequestBuilder();
   }
 
-  public FilterValues<FeedScopedId> includedAgencies() {
+  public FilterValues<FeedScopedId> includeAgencies() {
     return includedAgencies;
   }
 
-  public FilterValues<FeedScopedId> includedRoutes() {
+  public FilterValues<FeedScopedId> includeRoutes() {
     return includedRoutes;
   }
 
@@ -59,11 +59,11 @@ public class TripRequest {
     return excludedRoutes;
   }
 
-  public FilterValues<String> netexInternalPlanningCodes() {
+  public FilterValues<String> includeNetexInternalPlanningCodes() {
     return netexInternalPlanningCodes;
   }
 
-  public FilterValues<LocalDate> serviceDates() {
+  public FilterValues<LocalDate> includeServiceDates() {
     return serviceDates;
   }
 

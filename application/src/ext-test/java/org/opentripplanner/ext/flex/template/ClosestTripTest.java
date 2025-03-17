@@ -17,7 +17,6 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -83,7 +82,7 @@ class ClosestTripTest {
   @Test
   void filter() {
     var request = TripRequest.of()
-      .withExcludedAgencies(List.of(FLEX_TRIP.getTrip().getRoute().getAgency().getId()))
+      .withExcludeAgencies(List.of(FLEX_TRIP.getTrip().getRoute().getAgency().getId()))
       .build();
 
     var matcher = TripMatcherFactory.of(request, id -> Set.of(DATE));

@@ -1,13 +1,11 @@
 package org.opentripplanner.ext.flex.filter;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -16,10 +14,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class FilterMapper {
 
-  private final Set<FeedScopedId> excludedAgencies = new HashSet<>();
-  private final Set<FeedScopedId> excludedRoutes = new HashSet<>();
-  private final Set<FeedScopedId> selectedAgencies = new HashSet<>();
-  private final Set<FeedScopedId> selectedRoutes = new HashSet<>();
+  private final List<FeedScopedId> excludedAgencies = new ArrayList<>();
+  private final List<FeedScopedId> excludedRoutes = new ArrayList<>();
+  private final List<FeedScopedId> selectedAgencies = new ArrayList<>();
+  private final List<FeedScopedId> selectedRoutes = new ArrayList<>();
 
   private FilterMapper() {}
 
@@ -41,16 +39,16 @@ public class FilterMapper {
       }
     }
     if (!selectedAgencies.isEmpty()) {
-      builder.withIncludedAgencies(selectedAgencies);
+      builder.withIncludeAgencies(selectedAgencies);
     }
     if (!selectedRoutes.isEmpty()) {
-      builder.withIncludedRoutes(selectedRoutes);
+      builder.withIncludeRoutes(selectedRoutes);
     }
     if (!excludedAgencies.isEmpty()) {
-      builder.withExcludedAgencies(excludedAgencies);
+      builder.withExcludeAgencies(excludedAgencies);
     }
     if (!excludedRoutes.isEmpty()) {
-      builder.withExcludedRoutes(excludedRoutes);
+      builder.withExcludeRoutes(excludedRoutes);
     }
     return builder.build();
   }

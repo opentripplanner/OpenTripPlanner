@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.api.request;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.api.model.FilterValues;
@@ -9,34 +8,25 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestBuilder {
 
-  private FilterValues<FeedScopedId> includedAgencies = FilterValues.ofEmptyIsEverything(
-    "includedAgencies",
-    List.of()
-  );
-  private FilterValues<FeedScopedId> includedRoutes = FilterValues.ofEmptyIsEverything(
-    "includedRoutes",
-    List.of()
   private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
     "includeAgencies",
     null
   );
 
-  private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofNullIsEverything(
     "excludedAgencies",
-    List.of()
+    null
   );
-  private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofNullIsEverything(
     "excludedRoutes",
-    List.of()
+    null
   );
 
-  private FilterValues<String> netexInternalPlanningCodes = FilterValues.ofEmptyIsEverything(
-    "netexInternalPlanningCodes",
-    List.of()
   private FilterValues<FeedScopedId> includeRoutes = FilterValues.ofNullIsEverything(
     "includeRoutes",
     null
   );
+
   private FilterValues<String> includeNetexInternalPlanningCodes = FilterValues.ofNullIsEverything(
     "includeNetexInternalPlanningCodes",
     null
@@ -50,24 +40,20 @@ public class TripRequestBuilder {
 
   public TripRequestBuilder withIncludeAgencies(@Nullable List<FeedScopedId> includeAgencies) {
     this.includeAgencies = FilterValues.ofNullIsEverything("includeAgencies", includeAgencies);
-  public TripRequestBuilder withIncludedAgencies(Collection<FeedScopedId> agencies) {
-    this.includedAgencies = FilterValues.ofEmptyIsNothing("includedAgencies", agencies);
     return this;
   }
 
   public TripRequestBuilder withIncludeRoutes(@Nullable List<FeedScopedId> includeRoutes) {
     this.includeRoutes = FilterValues.ofNullIsEverything("includeRoutes", includeRoutes);
-  public TripRequestBuilder withIncludedRoutes(Collection<FeedScopedId> routes) {
-    this.includedRoutes = FilterValues.ofEmptyIsNothing("includedRoutes", routes);
     return this;
   }
 
-  public TripRequestBuilder withExcludedAgencies(Collection<FeedScopedId> agencies) {
+  public TripRequestBuilder withExcludeAgencies(@Nullable List<FeedScopedId> agencies) {
     this.excludedAgencies = FilterValues.ofEmptyIsEverything("excludedAgencies", agencies);
     return this;
   }
 
-  public TripRequestBuilder withExcludedRoutes(Collection<FeedScopedId> routes) {
+  public TripRequestBuilder withExcludeRoutes(@Nullable List<FeedScopedId> routes) {
     this.excludedRoutes = FilterValues.ofEmptyIsEverything("excludedRoutes", routes);
     return this;
   }
@@ -92,11 +78,11 @@ public class TripRequestBuilder {
 
   public TripRequest build() {
     return new TripRequest(
-      includedAgencies,
-      includedRoutes,
+      includeAgencies,
+      includeRoutes,
       excludedAgencies,
       excludedRoutes,
-      netexInternalPlanningCodes,
+      includeNetexInternalPlanningCodes,
       includeServiceDates
     );
   }
