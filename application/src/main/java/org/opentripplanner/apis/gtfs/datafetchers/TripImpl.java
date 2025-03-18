@@ -62,7 +62,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         types.forEach(type -> {
           switch (type) {
             case TRIP:
-              alerts.addAll(alertService.getTripAlerts(getSource(environment).getId(), null));
+              alerts.addAll(alertService.getTripAlerts(getSource(environment).getId()));
               break;
             case AGENCY:
               alerts.addAll(alertService.getAgencyAlerts(getAgency(environment).getId()));
@@ -118,7 +118,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         });
         return alerts.stream().distinct().collect(Collectors.toList());
       } else {
-        return alertService.getTripAlerts(getSource(environment).getId(), null);
+        return alertService.getTripAlerts(getSource(environment).getId());
       }
     };
   }
