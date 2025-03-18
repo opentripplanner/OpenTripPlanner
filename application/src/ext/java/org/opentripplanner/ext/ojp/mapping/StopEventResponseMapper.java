@@ -187,22 +187,22 @@ public class StopEventResponseMapper {
 
   private ServiceDepartureStructure serviceDeparture(TripTimeOnDate tripTimeOnDate) {
     var departure = new ServiceDepartureStructure()
-      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledDepartureAt(zoneId)));
+      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledDeparture().atZone(zoneId)));
     tripTimeOnDate
-      .realtimeDepartureAt(zoneId)
+      .realtimeDeparture()
       .filter(d -> optionalFeatures.contains(REALTIME_DATA))
-      .ifPresent(time -> departure.withEstimatedTime(new XmlDateTime(time)));
+      .ifPresent(time -> departure.withEstimatedTime(new XmlDateTime(time.atZone(zoneId))));
     return departure;
   }
 
   private ServiceArrivalStructure serviceArrival(TripTimeOnDate tripTimeOnDate) {
     var arrival = new ServiceArrivalStructure()
-      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledArrivalAt(zoneId)));
+      .withTimetabledTime(new XmlDateTime(tripTimeOnDate.scheduledArrival().atZone(zoneId)));
 
     tripTimeOnDate
-      .realtimeArrivalAt(zoneId)
+      .realtimeArrival()
       .filter(d -> optionalFeatures.contains(REALTIME_DATA))
-      .ifPresent(time -> arrival.withEstimatedTime(new XmlDateTime(time)));
+      .ifPresent(time -> arrival.withEstimatedTime(new XmlDateTime(time.atZone(zoneId))));
     return arrival;
   }
 

@@ -41,6 +41,15 @@ public class TriasApiConfig {
       .of("timeZone")
       .since(V2_8)
       .summary("If you don't want to use the feed's timezone, configure it here.")
+      .description(
+        """
+        By default the input feed's timezone is used. However, there may be cases when you want the
+        API to use a different timezone.
+
+        **Think hard about changing the timezone! We recommend that you keep the feed's time zone and
+        convert the time in the client which will make debugging OTP much easier.**
+        """
+      )
       .asZoneId(null);
 
     if (hideFeedId && hardcodedInputFeedId == null) {
