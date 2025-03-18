@@ -41,10 +41,11 @@ following to `router-config.json`.
 ```
 ### Overview
 
-| Config Parameter                                       |    Type   | Summary                                                      |  Req./Opt. | Default Value | Since |
-|--------------------------------------------------------|:---------:|--------------------------------------------------------------|:----------:|---------------|:-----:|
-| [hardcodedInputFeedId](#triasApi_hardcodedInputFeedId) |  `string` | The hardcoded feedId to add to all input ids.                | *Optional* |               |  2.8  |
-| [hideFeedId](#triasApi_hideFeedId)                     | `boolean` | Hide the feed id in all API output, and add it to input ids. | *Optional* | `false`       |  2.8  |
+| Config Parameter                                       |     Type    | Summary                                                          |  Req./Opt. | Default Value | Since |
+|--------------------------------------------------------|:-----------:|------------------------------------------------------------------|:----------:|---------------|:-----:|
+| [hardcodedInputFeedId](#triasApi_hardcodedInputFeedId) |   `string`  | The hardcoded feedId to add to all input ids.                    | *Optional* |               |  2.8  |
+| [hideFeedId](#triasApi_hideFeedId)                     |  `boolean`  | Hide the feed id in all API output, and add it to input ids.     | *Optional* | `false`       |  2.8  |
+| timeZone                                               | `time-zone` | If you don't want to use the feed's timezone, configure it here. | *Optional* |               |  2.8  |
 
 
 ### Details

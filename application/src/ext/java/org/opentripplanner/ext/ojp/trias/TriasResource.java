@@ -48,7 +48,7 @@ public class TriasResource {
 
   public TriasResource(@Context OtpServerRequestContext context) {
     var transitService = context.transitService();
-    var zoneId = transitService.getTimeZone();
+    var zoneId = context.triasApiConfig().timeZone().orElse(transitService.getTimeZone());
     var vdvService = new OjpService(context.transitService(), context.graphFinder());
 
     IdResolver idResolver = idResolver(context.triasApiConfig());
