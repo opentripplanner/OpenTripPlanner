@@ -429,6 +429,6 @@ public class TripTimeOnDate {
   }
 
   private ZonedDateTime toZonedDateTime(int secondsSinceMidnight, ZoneId zoneId) {
-    return Instant.ofEpochSecond(midnight).atZone(zoneId).plusSeconds(secondsSinceMidnight);
+    return Instant.ofEpochSecond(midnight).plusSeconds(secondsSinceMidnight).atZone(zoneId);
   }
 }
