@@ -45,7 +45,7 @@ following to `router-config.json`.
 |--------------------------------------------------------|:-----------:|------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [hardcodedInputFeedId](#triasApi_hardcodedInputFeedId) |   `string`  | The hardcoded feedId to add to all input ids.                    | *Optional* |               |  2.8  |
 | [hideFeedId](#triasApi_hideFeedId)                     |  `boolean`  | Hide the feed id in all API output, and add it to input ids.     | *Optional* | `false`       |  2.8  |
-| timeZone                                               | `time-zone` | If you don't want to use the feed's timezone, configure it here. | *Optional* |               |  2.8  |
+| [timeZone](#triasApi_timeZone)                         | `time-zone` | If you don't want to use the feed's timezone, configure it here. | *Optional* |               |  2.8  |
 
 
 ### Details
@@ -67,6 +67,20 @@ Only turn this feature on if you have unique ids across all feeds, without the f
 Hide the feed id in all API output, and add it to input ids.
 
 Only turn this feature on if you have unique ids across all feeds, without the feedId prefix.
+
+<h4 id="triasApi_timeZone">timeZone</h4>
+
+**Since version:** `2.8` ∙ **Type:** `time-zone` ∙ **Cardinality:** `Optional`   
+**Path:** /triasApi 
+
+If you don't want to use the feed's timezone, configure it here.
+
+By default the input feed's timezone is used. However, there may be cases when you want the
+API to use a different timezone.
+
+**Think hard about changing the timezone! We recommend that you keep the feed's time zone and
+convert the time in the client which will make debugging OTP much easier.**
+
 
 
 

@@ -2,8 +2,6 @@ package org.opentripplanner.model;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -169,8 +167,11 @@ public class TripTimeOnDate {
     return tripTimes.getScheduledArrivalTime(stopIndex);
   }
 
-  public ZonedDateTime scheduledArrivalAt(ZoneId zoneId) {
-    return toZonedDateTime(getScheduledArrival(), zoneId);
+  /**
+   * Returns the scheduled arrival as an Instant.
+   */
+  public Instant scheduledArrival() {
+    return toInstant(getScheduledArrival());
   }
 
   /**
@@ -184,8 +185,11 @@ public class TripTimeOnDate {
     return tripTimes.getScheduledDepartureTime(stopIndex);
   }
 
-  public ZonedDateTime scheduledDepartureAt(ZoneId zoneId) {
-    return toZonedDateTime(getScheduledDeparture(), zoneId);
+  /**
+   * Returns the scheduled departure as an Instant.
+   */
+  public Instant scheduledDeparture() {
+    return toInstant(getScheduledDeparture());
   }
 
   public int getRealtimeArrival() {
@@ -393,17 +397,17 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the real time arrival, if available, at the given zone.
+   * Returns the real time arrival, if available.
    */
-  public Optional<ZonedDateTime> realtimeArrivalAt(ZoneId zoneId) {
-    return optionalZonedDateTime(getRealtimeArrival(), zoneId);
+  public Optional<Instant> realtimeArrival() {
+    return optionalInstant(getRealtimeArrival());
   }
 
   /**
-   * Returns the real time departure, if available, at the given zone.
+   * Returns the real time departure, if available.
    */
-  public Optional<ZonedDateTime> realtimeDepartureAt(ZoneId zoneId) {
-    return optionalZonedDateTime(getRealtimeDeparture(), zoneId);
+  public Optional<Instant> realtimeDeparture() {
+    return optionalInstant(getRealtimeDeparture());
   }
 
   private TripTimeOnDate atStopIndex(int stopIndex) {
@@ -420,15 +424,15 @@ public class TripTimeOnDate {
    * If real time data is available for this stop (call) then it is returned or an empty Optional
    * otherwise.
    */
-  private Optional<ZonedDateTime> optionalZonedDateTime(int secondsSinceMidnight, ZoneId zoneId) {
+  private Optional<Instant> optionalInstant(int secondsSinceMidnight) {
     if (isCancelledStop() || isRealtime()) {
-      return Optional.of(toZonedDateTime(secondsSinceMidnight, zoneId));
+      return Optional.of(toInstant(secondsSinceMidnight));
     } else {
       return Optional.empty();
     }
   }
 
-  private ZonedDateTime toZonedDateTime(int secondsSinceMidnight, ZoneId zoneId) {
-    return Instant.ofEpochSecond(midnight).plusSeconds(secondsSinceMidnight).atZone(zoneId);
+  private Instant toInstant(int secondsSinceMidnight) {
+    return Instant.ofEpochSecond(midnight).plusSeconds(secondsSinceMidnight);
   }
 }

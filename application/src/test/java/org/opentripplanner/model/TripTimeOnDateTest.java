@@ -5,19 +5,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.utils.time.ServiceDateUtils;
 
-class TripTimeOnDateTest implements PlanTestConstants {
+class TripTimeOnDateTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+
+  private static final LocalDate DATE = LocalDate.of(2025, 3, 18);
+  private static final Instant MIDNIGHT = ServiceDateUtils.asStartOfService(
+    DATE,
+    ZoneIds.BERLIN
+  ).toInstant();
 
   @Test
   void gtfsSequence() {
@@ -78,6 +87,16 @@ class TripTimeOnDateTest implements PlanTestConstants {
     assertThat(secondLast.nextTimes().getFirst().nextTimes()).isEmpty();
   }
 
+  @Test
+  void atZone() {
+    var subject = tripTimeOnDate();
+    var departure = subject.scheduledDeparture();
+    assertEquals(
+      "2025-03-18T11:10+01:00",
+      departure.atZone(ZoneIds.BERLIN).toOffsetDateTime().toString()
+    );
+  }
+
   private static TripTimeOnDate tripTimeOnDate() {
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00");
@@ -86,6 +105,6 @@ class TripTimeOnDateTest implements PlanTestConstants {
       .withStopPattern(TimetableRepositoryForTest.stopPattern(stops))
       .build();
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    return new TripTimeOnDate(tripTimes, 2, pattern);
+    return new TripTimeOnDate(tripTimes, 2, pattern, DATE, MIDNIGHT);
   }
 }
