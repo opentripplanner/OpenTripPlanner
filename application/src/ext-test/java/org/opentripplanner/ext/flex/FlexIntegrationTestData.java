@@ -44,7 +44,7 @@ public final class FlexIntegrationTestData {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
-    GtfsBundle gtfsBundle = new GtfsBundle(file);
+    GtfsBundle gtfsBundle = new GtfsBundle(file, null);
     GtfsModule module = new GtfsModule(
       List.of(gtfsBundle),
       timetableRepository,

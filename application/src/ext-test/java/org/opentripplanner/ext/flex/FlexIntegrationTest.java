@@ -182,7 +182,7 @@ public class FlexIntegrationTest {
     List<File> gtfsFiles
   ) {
     // GTFS
-    var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::new).toList();
+    var gtfsBundles = gtfsFiles.stream().map(it -> new GtfsBundle(it, null)).toList();
     GtfsModule gtfsModule = new GtfsModule(
       gtfsBundles,
       timetableRepository,

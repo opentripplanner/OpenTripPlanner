@@ -37,7 +37,7 @@ class GtfsFeedIdTest {
   }
 
   private static String feedId(String input) {
-    var id = new GtfsFeedId.Builder().id(input).build().getId();
+    var id = GtfsFeedId.normalizeId(input);
     assertNotNull(id);
     return id;
   }

@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.graphbuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
@@ -17,7 +18,10 @@ public class GtfsBundle {
 
   private final CompositeDataSource dataSource;
 
-  private GtfsFeedId feedId;
+  // The feadId is resolved lazy to make any exceptions in the caller when parsing the
+  // gfts files, and not in the instrumentation of the bundle.
+  @Nullable
+  private String feedId;
 
   private CsvInputSource csvInputSource;
 
@@ -26,22 +30,20 @@ public class GtfsBundle {
   public GtfsBundle(ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource) {
     this.dataSource = configuredDataSource.dataSource();
     this.parameters = configuredDataSource.config();
-
-    if (configuredDataSource.config().feedId() != null) {
-      this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
-    }
+    // Override feed id, if set in config
+    this.feedId = configuredDataSource.config().feedId();
   }
 
   /** Used by unit tests */
-  public GtfsBundle(File gtfsFile) {
-    this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
+  public GtfsBundle(File gtfsFile, @Nullable String feedId) {
+    this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS), feedId);
   }
 
-  private GtfsBundle(CompositeDataSource compositeDataSource) {
+  private GtfsBundle(CompositeDataSource compositeDataSource, @Nullable String feedId) {
     this(
       new ConfiguredCompositeDataSource<>(
         compositeDataSource,
-        GtfsFeedParameters.of().withSource(compositeDataSource.uri()).build()
+        GtfsFeedParameters.of().withSource(compositeDataSource.uri()).withFeedId(feedId).build()
       )
     );
   }
@@ -79,26 +81,18 @@ public class GtfsBundle {
     }
   }
 
-  public String toString() {
-    String src = dataSource.path();
-    if (feedId != null) {
-      src += " (" + feedId.getId() + ")";
-    }
-    return "GTFS bundle at " + src;
+  public String feedInfo() {
+    return "GTFS bundle at " + dataSource.path() + " (" + getFeedId() + ")";
   }
 
   /**
    * So that we can load multiple gtfs feeds into the same database.
    */
-  public GtfsFeedId getFeedId() {
+  public String getFeedId() {
     if (feedId == null) {
-      feedId = new GtfsFeedId.Builder().fromGtfsFeed(getCsvInputSource()).build();
+      feedId = GtfsFeedId.fromGtfsFeed(getCsvInputSource());
     }
     return feedId;
-  }
-
-  public void setFeedId(GtfsFeedId feedId) {
-    this.feedId = feedId;
   }
 
   public void checkInputs() {

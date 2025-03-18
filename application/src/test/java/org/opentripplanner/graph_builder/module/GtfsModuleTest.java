@@ -13,7 +13,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedId;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
@@ -28,7 +27,7 @@ class GtfsModuleTest {
   void addShapesForFrequencyTrips() {
     var model = buildTestModel();
 
-    var bundle = new GtfsBundle(ConstantsForTests.SIMPLE_GTFS);
+    var bundle = new GtfsBundle(ConstantsForTests.SIMPLE_GTFS, null);
     var module = new GtfsModule(
       List.of(bundle),
       model.timetableRepository,
@@ -80,9 +79,10 @@ class GtfsModuleTest {
   record TestModels(Graph graph, TimetableRepository timetableRepository) {}
 
   static GtfsBundle bundle(String feedId) {
-    var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"));
-    b.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
-    return b;
+    return new GtfsBundle(
+      ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"),
+      feedId
+    );
   }
 
   @Nested

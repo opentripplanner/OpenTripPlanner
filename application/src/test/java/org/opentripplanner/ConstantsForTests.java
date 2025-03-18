@@ -22,7 +22,6 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedId;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -325,8 +324,7 @@ public class ConstantsForTests {
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
   ) {
-    var bundle = new GtfsBundle(file);
-    bundle.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
+    var bundle = new GtfsBundle(file, feedId);
 
     var module = new GtfsModule(
       List.of(bundle),
