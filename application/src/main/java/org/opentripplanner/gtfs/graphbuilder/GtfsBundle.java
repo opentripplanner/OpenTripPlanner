@@ -22,9 +22,6 @@ public class GtfsBundle {
 
   private CsvInputSource csvInputSource;
 
-  public int subwayAccessTime;
-
-  private double maxStopToShapeSnapDistance = 150;
   private final boolean removeRepeatedStops;
 
   private final StopTransferPriority stationTransferPreference;
@@ -126,14 +123,6 @@ public class GtfsBundle {
         "GTFS Path " + dataSource.path() + " does not exist or " + "cannot be read."
       );
     }
-  }
-
-  public double getMaxStopToShapeSnapDistance() {
-    return maxStopToShapeSnapDistance;
-  }
-
-  public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
-    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
   }
 
   public boolean removeRepeatedStops() {

@@ -86,13 +86,18 @@ public class GtfsModule implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
+  private final double maxStopToShapeSnapDistance;
+  private final int subwayAccessTime_s;
+
   public GtfsModule(
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
-    FareServiceFactory fareServiceFactory
+    FareServiceFactory fareServiceFactory,
+    double maxStopToShapeSnapDistance,
+    int subwayAccessTime_s
   ) {
     this.gtfsBundles = bundles;
     this.timetableRepository = timetableRepository;
@@ -100,6 +105,8 @@ public class GtfsModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.subwayAccessTime_s = subwayAccessTime_s;
   }
 
   public GtfsModule(
@@ -114,7 +121,9 @@ public class GtfsModule implements GraphBuilderModule {
       graph,
       DataImportIssueStore.NOOP,
       transitPeriodLimit,
-      new DefaultFareServiceFactory()
+      new DefaultFareServiceFactory(),
+      150.0,
+      120
     );
   }
 
@@ -167,7 +176,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
-          gtfsBundle.getMaxStopToShapeSnapDistance(),
+          maxStopToShapeSnapDistance,
           issueStore
         );
 
@@ -300,7 +309,7 @@ public class GtfsModule implements GraphBuilderModule {
   ) {
     AddTransitEntitiesToGraph.addToGraph(
       otpTransitService,
-      gtfsBundle.subwayAccessTime,
+      subwayAccessTime_s,
       graph,
       timetableRepository
     );

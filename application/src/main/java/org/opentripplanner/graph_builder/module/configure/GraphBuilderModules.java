@@ -105,11 +105,7 @@ public class GraphBuilderModules {
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
     for (var gtfsData : dataSources.getGtfsConfiguredDatasource()) {
-      GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
-
-      gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
-      gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
-      gtfsBundles.add(gtfsBundle);
+      gtfsBundles.add(new GtfsBundle(gtfsData));
     }
     return new GtfsModule(
       gtfsBundles,
@@ -117,7 +113,9 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory
+      config.fareServiceFactory,
+      config.maxStopToShapeSnapDistance,
+      config.getSubwayAccessTimeSeconds()
     );
   }
 

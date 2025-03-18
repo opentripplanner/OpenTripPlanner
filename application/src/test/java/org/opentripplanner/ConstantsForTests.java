@@ -50,6 +50,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.utils.time.DurationUtils;
 
 public class ConstantsForTests {
 
@@ -333,7 +334,9 @@ public class ConstantsForTests {
       graph,
       DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded(),
-      fareServiceFactory
+      fareServiceFactory,
+      150.0,
+      DurationUtils.durationInSeconds("2m")
     );
 
     module.buildGraph();
