@@ -78,6 +78,10 @@ class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
     itinerary.legs().forEach(l -> assertNull(l.accessibilityScore()));
   }
 
+  /**
+   * Only itinerary which are walk-only or have a transit leg should have an itinerary-level
+   * score.
+   */
   @MethodSource("nonWalkingCases")
   @ParameterizedTest
   void itineraryLevelScore(Function<TestItineraryBuilder, TestItineraryBuilder> modifier) {
