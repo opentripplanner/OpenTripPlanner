@@ -148,9 +148,9 @@ public class GtfsModule implements GraphBuilderModule {
           new OtpTransitServiceBuilder(timetableRepository.getSiteRepository(), issueStore),
           feedId,
           issueStore,
-          gtfsBundle.discardMinTransferTimes(),
+          gtfsBundle.parameters().discardMinTransferTimes(),
           gtfsDao,
-          gtfsBundle.stationTransferPreference()
+          gtfsBundle.parameters().stationTransferPreference()
         );
         mapper.mapStopTripAndRouteDataIntoBuilder();
 
@@ -168,7 +168,7 @@ public class GtfsModule implements GraphBuilderModule {
         validateAndInterpolateStopTimesForEachTrip(
           builder.getStopTimesSortedByTrip(),
           issueStore,
-          gtfsBundle.removeRepeatedStops()
+          gtfsBundle.parameters().removeRepeatedStops()
         );
 
         // We need to run this after the cleaning of the data, as stop indices might have changed
@@ -197,11 +197,11 @@ public class GtfsModule implements GraphBuilderModule {
 
         addTimetableRepositoryToGraph(graph, timetableRepository, gtfsBundle, otpTransitService);
 
-        if (gtfsBundle.blockBasedInterlining()) {
+        if (gtfsBundle.parameters().blockBasedInterlining()) {
           new InterlineProcessor(
             timetableRepository.getTransferService(),
             builder.getStaySeatedNotAllowed(),
-            gtfsBundle.maxInterlineDistance(),
+            gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
             calendarServiceData
           ).run(otpTransitService.getTripPatterns());

@@ -8,7 +8,6 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
-import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +21,16 @@ public class GtfsBundle {
 
   private CsvInputSource csvInputSource;
 
-  private final boolean removeRepeatedStops;
+  private final GtfsFeedParameters parameters;
 
-  private final StopTransferPriority stationTransferPreference;
+  public GtfsBundle(ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource) {
+    this.dataSource = configuredDataSource.dataSource();
+    this.parameters = configuredDataSource.config();
 
-  private final boolean discardMinTransferTimes;
-
-  private final boolean blockBasedInterlining;
-
-  private final int maxInterlineDistance;
+    if (configuredDataSource.config().feedId() != null) {
+      this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
+    }
+  }
 
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {
@@ -44,18 +44,6 @@ public class GtfsBundle {
         GtfsFeedParameters.of().withSource(compositeDataSource.uri()).build()
       )
     );
-  }
-
-  public GtfsBundle(ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource) {
-    this.dataSource = configuredDataSource.dataSource();
-    if (configuredDataSource.config().feedId() != null) {
-      this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
-    }
-    this.removeRepeatedStops = configuredDataSource.config().removeRepeatedStops();
-    this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
-    this.discardMinTransferTimes = configuredDataSource.config().discardMinTransferTimes();
-    this.blockBasedInterlining = configuredDataSource.config().blockBasedInterlining();
-    this.maxInterlineDistance = configuredDataSource.config().maxInterlineDistance();
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -125,23 +113,7 @@ public class GtfsBundle {
     }
   }
 
-  public boolean removeRepeatedStops() {
-    return removeRepeatedStops;
-  }
-
-  public StopTransferPriority stationTransferPreference() {
-    return stationTransferPreference;
-  }
-
-  public boolean discardMinTransferTimes() {
-    return discardMinTransferTimes;
-  }
-
-  public boolean blockBasedInterlining() {
-    return blockBasedInterlining;
-  }
-
-  public int maxInterlineDistance() {
-    return maxInterlineDistance;
+  public GtfsFeedParameters parameters() {
+    return parameters;
   }
 }
