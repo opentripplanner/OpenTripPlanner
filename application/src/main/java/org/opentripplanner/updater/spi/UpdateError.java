@@ -41,6 +41,7 @@ public record UpdateError(
     TRIP_NOT_FOUND,
     TRIP_NOT_FOUND_IN_PATTERN,
     NO_FUZZY_TRIP_MATCH,
+    MULTIPLE_FUZZY_TRIP_MATCHES,
     EMPTY_STOP_POINT_REF,
     NO_TRIP_FOR_CANCELLATION_FOUND,
     TRIP_ALREADY_EXISTS,
@@ -48,7 +49,13 @@ public record UpdateError(
     NO_UPDATES,
     NO_TRIP_ID,
     TOO_FEW_STOPS,
+    TOO_MANY_STOPS,
     NO_VALID_STOPS,
+    // the stop cannot be found in the site repository
+    UNKNOWN_STOP,
+    // the stop exists in the site repository, but the planned stop cannot be replaced by this stop
+    // since they do not belong to the same station.
+    STOP_MISMATCH,
     NO_SERVICE_ON_DATE,
     INVALID_ARRIVAL_TIME,
     INVALID_DEPARTURE_TIME,

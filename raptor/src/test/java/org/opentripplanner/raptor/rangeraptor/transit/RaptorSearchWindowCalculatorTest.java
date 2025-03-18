@@ -211,9 +211,7 @@ public class RaptorSearchWindowCalculatorTest {
 
   @Test
   void roundUpToNearestMinuteNotDefinedForNegativeNumbers() {
-    var ex = assertThrows(
-      IllegalArgumentException.class,
-      () -> subject.roundDownToNearestMinute(-1)
+    var ex = assertThrows(IllegalArgumentException.class, () -> subject.roundDownToNearestMinute(-1)
     );
     assertEquals("This operation is not defined for negative numbers: -1", ex.getMessage());
   }

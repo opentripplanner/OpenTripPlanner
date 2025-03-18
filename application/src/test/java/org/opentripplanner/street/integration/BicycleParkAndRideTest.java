@@ -82,7 +82,7 @@ public class BicycleParkAndRideTest extends ParkAndRideTest {
       "null - BikePark Entrance (328.07, 66)",
       "null (parked) - BikePark Entrance (448.07, 126)",
       "null (parked) - BikePark Entrance (449.07, 126)",
-      "WALK (parked) - CD street (579.89, 192)"
+      "WALK (parked) - CD street (579.89, 191)"
     );
   }
 
@@ -97,7 +97,7 @@ public class BicycleParkAndRideTest extends ParkAndRideTest {
       "null - All Park Entrance (35.80, 18)",
       "null (parked) - All Park Entrance (155.80, 78)",
       "null (parked) - All Park Entrance (156.80, 78)",
-      "WALK (parked) - AB street (287.63, 144)"
+      "WALK (parked) - AB street (287.63, 143)"
     );
   }
 }

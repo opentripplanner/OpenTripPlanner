@@ -50,8 +50,7 @@ public class NetexDataSourceHierarchy {
       sharedFilePattern,
       sharedGroupFilePattern,
       groupFilePattern
-    )
-      .execute();
+    ).execute();
     return this;
   }
 

@@ -35,8 +35,7 @@ public interface RealtimeTestConstants {
   RegularStop STOP_B2 = TEST_MODEL.stop("B2").withParentStation(STATION_B).build();
   RegularStop STOP_C1 = TEST_MODEL.stop(STOP_C1_ID).withParentStation(STATION_C).build();
   RegularStop STOP_D1 = TEST_MODEL.stop("D1").withParentStation(STATION_D).build();
-  SiteRepository SITE_REPOSITORY = TEST_MODEL
-    .siteRepositoryBuilder()
+  SiteRepository SITE_REPOSITORY = TEST_MODEL.siteRepositoryBuilder()
     .withRegularStop(STOP_A1)
     .withRegularStop(STOP_B1)
     .withRegularStop(STOP_B2)

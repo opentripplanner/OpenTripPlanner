@@ -36,8 +36,7 @@ public class FaresIntegrationTest {
 
     var serverContext = TestServerContext.createServerContext(graph, timetableRepository);
 
-    var start = LocalDateTime
-      .of(2009, Month.AUGUST, 7, 12, 0, 0)
+    var start = LocalDateTime.of(2009, Month.AUGUST, 7, 12, 0, 0)
       .atZone(ZoneIds.LOS_ANGELES)
       .toInstant();
     var from = GenericLocation.fromStopId("Origin", feedId, "Millbrae Caltrain");
@@ -70,8 +69,7 @@ public class FaresIntegrationTest {
       "8371"
     );
 
-    Instant startTime = LocalDateTime
-      .of(2009, 11, 1, 12, 0, 0)
+    Instant startTime = LocalDateTime.of(2009, 11, 1, 12, 0, 0)
       .atZone(ZoneId.of("America/Los_Angeles"))
       .toInstant();
 
@@ -85,8 +83,9 @@ public class FaresIntegrationTest {
 
     // long trip
 
-    startTime =
-      LocalDateTime.of(2009, 11, 2, 14, 0, 0).atZone(ZoneId.of("America/Los_Angeles")).toInstant();
+    startTime = LocalDateTime.of(2009, 11, 2, 14, 0, 0)
+      .atZone(ZoneId.of("America/Los_Angeles"))
+      .toInstant();
 
     from = GenericLocation.fromStopId("Origin", portlandId, "8389");
     to = GenericLocation.fromStopId("Destination", portlandId, "1252");
@@ -116,7 +115,7 @@ public class FaresIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     Itinerary itinerary = getItineraries(from, to, time, serverContext).get(0);
-    return itinerary.getFares();
+    return itinerary.fare();
   }
 
   private static List<Itinerary> getItineraries(
@@ -139,7 +138,7 @@ public class FaresIntegrationTest {
     return result
       .getTripPlan()
       .itineraries.stream()
-      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCost))
+      .sorted(Comparator.comparingInt(Itinerary::generalizedCost))
       .toList();
   }
 }

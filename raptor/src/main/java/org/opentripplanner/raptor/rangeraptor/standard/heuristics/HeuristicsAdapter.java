@@ -48,15 +48,14 @@ public class HeuristicsAdapter implements Heuristics {
     this.bestOverallTimes = bestOverallTimes;
     this.bestNumOfTransfers = bestNTransfers;
     this.originDepartureTime = calculator.minIterationDepartureTime();
-    this.aggregatedResults =
-      AggregatedResults.create(
-        calculator,
-        originDepartureTime,
-        bestOverallTimes,
-        bestTransitTimes,
-        bestNTransfers,
-        this.egressPaths
-      );
+    this.aggregatedResults = AggregatedResults.create(
+      calculator,
+      originDepartureTime,
+      bestOverallTimes,
+      bestTransitTimes,
+      bestNTransfers,
+      this.egressPaths
+    );
   }
 
   @Override
@@ -110,16 +109,15 @@ public class HeuristicsAdapter implements Heuristics {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(Heuristics.class)
+    return ToStringBuilder.of(Heuristics.class)
       .addServiceTime("originDepartureTime(last iteration)", originDepartureTime)
       .addObj("aggregatedResults", aggregatedResults)
       .addCol(
         "egress stops reached",
-        Arrays
-          .stream(egressPaths.keys())
+        Arrays.stream(egressPaths.keys())
           .filter(bestOverallTimes::isReached)
-          .mapToObj(s -> "[" + s + " " + TimeUtils.timeToStrCompact(bestOverallTimes.value(s)) + "]"
+          .mapToObj(
+            s -> "[" + s + " " + TimeUtils.timeToStrCompact(bestOverallTimes.value(s)) + "]"
           )
           .limit(20)
           .toList()

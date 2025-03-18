@@ -30,7 +30,7 @@ public class FareMapper {
   }
 
   public ApiItineraryFares mapFare(Itinerary itinerary) {
-    var fares = itinerary.getFares();
+    var fares = itinerary.fare();
 
     return new ApiItineraryFares(
       Map.of(),
@@ -51,7 +51,7 @@ public class FareMapper {
         .keySet()
         .stream()
         .map(leg -> {
-          var index = itinerary.getLegIndex(leg);
+          var index = itinerary.findLegIndex(leg);
           // eventually we want to implement products that span multiple legs (but not the entire itinerary)
           return new ApiLegProducts(
             List.of(index),
@@ -63,15 +63,13 @@ public class FareMapper {
   }
 
   private static ApiFareQualifier toApiFareQualifier(@Nullable FareMedium nullable) {
-    return Optional
-      .ofNullable(nullable)
+    return Optional.ofNullable(nullable)
       .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
 
   private static ApiFareQualifier toApiFareQualifier(@Nullable RiderCategory nullable) {
-    return Optional
-      .ofNullable(nullable)
+    return Optional.ofNullable(nullable)
       .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
@@ -81,7 +79,8 @@ public class FareMapper {
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {
-    if (product.isEmpty()) return null; else {
+    if (product.isEmpty()) return null;
+    else {
       return product
         .stream()
         .map(p ->

@@ -25,17 +25,19 @@ public final class Agency extends AbstractTransitEntity<Agency, AgencyBuilder> i
   Agency(AgencyBuilder builder) {
     super(builder.getId());
     // Required fields
-    this.name =
-      assertHasValue(builder.getName(), "Missing mandatory name on Agency %s", builder.getId());
+    this.name = assertHasValue(
+      builder.getName(),
+      "Missing mandatory name on Agency %s",
+      builder.getId()
+    );
 
-    this.timezone =
-      ZoneId.of(
-        assertHasValue(
-          builder.getTimezone(),
-          "Missing mandatory time zone on Agency %s",
-          builder.getId()
-        )
-      );
+    this.timezone = ZoneId.of(
+      assertHasValue(
+        builder.getTimezone(),
+        "Missing mandatory time zone on Agency %s",
+        builder.getId()
+      )
+    );
 
     // Optional fields
     this.url = builder.getUrl();

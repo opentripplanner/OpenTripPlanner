@@ -175,7 +175,7 @@ text inserted is valid JSON object (starts with `{` and ends with `}`) or valid 
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.6.0 of OTP:
+Here is an example including variable substitution, assuming version 2.7.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -199,7 +199,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.6.0.obj"
+          "source": "netex-v2.7.0.obj"
         }
       ]
 } 
@@ -243,6 +243,7 @@ Here is a list of all features which can be toggled on/off and their default val
 | `WaitForGraphUpdateInPollingUpdaters` | Make all polling updaters wait for graph updates to complete before finishing. If this is not enabled, the updaters will finish after submitting the task to update the graph.                                                                                                                                                                                                                                  |         ✓️         |         |
 | `Co2Emissions`                        | Enable the emissions sandbox module.                                                                                                                                                                                                                                                                                                                                                                            |                    |    ✓️   |
 | `DataOverlay`                         | Enable usage of data overlay when calculating costs for the street network.                                                                                                                                                                                                                                                                                                                                     |                    |    ✓️   |
+| `DebugRasterTiles`                    | Enable debug raster tile API.                                                                                                                                                                                                                                                                                                                                                                                   |                    |    ✓️   |
 | `FaresV2`                             | Enable import of GTFS-Fares v2 data.                                                                                                                                                                                                                                                                                                                                                                            |                    |    ✓️   |
 | `FlexRouting`                         | Enable FLEX routing.                                                                                                                                                                                                                                                                                                                                                                                            |                    |    ✓️   |
 | `GoogleCloudStorage`                  | Enable Google Cloud Storage integration.                                                                                                                                                                                                                                                                                                                                                                        |                    |    ✓️   |

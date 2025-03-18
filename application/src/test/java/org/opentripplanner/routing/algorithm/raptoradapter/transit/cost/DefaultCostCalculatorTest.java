@@ -20,13 +20,11 @@ public class DefaultCostCalculatorTest {
   private static final int STOP_B = 1;
   private static final String ANY_SCHEDULE = "10:00 11:00";
 
-  private static final TestTripSchedule TRIP_1 = TestTripSchedule
-    .schedule(ANY_SCHEDULE)
+  private static final TestTripSchedule TRIP_1 = TestTripSchedule.schedule(ANY_SCHEDULE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_1)
     .build();
 
-  private static final TestTripSchedule TRIP_2 = TestTripSchedule
-    .schedule(ANY_SCHEDULE)
+  private static final TestTripSchedule TRIP_2 = TestTripSchedule.schedule(ANY_SCHEDULE)
     .transitReluctanceIndex(TRANSIT_RELUCTANCE_2)
     .build();
 
@@ -121,12 +119,9 @@ public class DefaultCostCalculatorTest {
     // Should be generalized cost plus transfer cost
 
     var GENERALIZED_COST = 100;
-    var DESIRED_COST = GENERALIZED_COST + TRANSFER_COST_SEC * 100;
+    var DESIRED_COST = GENERALIZED_COST + RaptorCostConverter.toRaptorCost(TRANSFER_COST_SEC);
 
-    // Should be the same on all stop indexes
-    var t1 = TestAccessEgress.flex(0, 15, 1, GENERALIZED_COST);
-    assertEquals(DESIRED_COST, subject.costEgress(t1));
-    var t2 = TestAccessEgress.flex(1, 15, 1, GENERALIZED_COST);
-    assertEquals(DESIRED_COST, subject.costEgress(t2));
+    var egress = TestAccessEgress.flex(0, 15, 1, GENERALIZED_COST);
+    assertEquals(DESIRED_COST, subject.costEgress(egress));
   }
 }

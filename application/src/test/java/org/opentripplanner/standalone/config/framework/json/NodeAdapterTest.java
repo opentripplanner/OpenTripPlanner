@@ -173,13 +173,13 @@ public class NodeAdapterTest {
     // Given
     NodeAdapter subject = newNodeAdapterForTest(
       """
-      {
-        key : 'NONE_EXISTING_ENUM_VALUE',
-        skim : {
-          albin : 'NONE_EXISTING_ENUM_VALUE'
+        {
+          key : 'NONE_EXISTING_ENUM_VALUE',
+          skim : {
+            albin : 'NONE_EXISTING_ENUM_VALUE'
+          }
         }
-      }
-    """
+      """
     );
 
     NodeAdapter child = subject.of("skim").asObject();
@@ -194,9 +194,9 @@ public class NodeAdapterTest {
     subject.logAllWarnings(m -> log.append(m).append('\n'));
     assertEquals(
       """
-        {error-message} Parameter: skim.albin. Source: Test.
-        {error-message} Parameter: key. Source: Test.
-        """.replace(
+      {error-message} Parameter: skim.albin. Source: Test.
+      {error-message} Parameter: key. Source: Test.
+      """.replace(
           "{error-message}",
           "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. Expected one of [A, B, A_B_C]."
         ),
@@ -270,9 +270,8 @@ public class NodeAdapterTest {
     assertNull(subject.of("missing-key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class));
 
     var subjectMissingB = newNodeAdapterForTest("{ key : { A: true, a_B_c: true } }");
-    assertThrows(
-      OtpAppException.class,
-      () -> subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    assertThrows(OtpAppException.class, () ->
+      subjectMissingB.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
 
     // Any extra keys should be ignored for forward/backward compatibility
@@ -284,9 +283,8 @@ public class NodeAdapterTest {
     // A value for C is missing in map
     NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
 
-    assertThrows(
-      OtpAppException.class,
-      () -> subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
+    assertThrows(OtpAppException.class, () ->
+      subject.of("key").asEnumMapAllKeysRequired(AnEnum.class, Boolean.class)
     );
   }
 
@@ -367,9 +365,8 @@ public class NodeAdapterTest {
     NodeAdapter subject = newNodeAdapterForTest("{ 'foo' : 'bar' }");
 
     // Then
-    assertThrows(
-      OtpAppException.class,
-      () -> subject.of("foo").asDateOrRelativePeriod(null, ZoneId.systemDefault())
+    assertThrows(OtpAppException.class, () ->
+      subject.of("foo").asDateOrRelativePeriod(null, ZoneId.systemDefault())
     );
   }
 

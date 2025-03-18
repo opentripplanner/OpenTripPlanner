@@ -15,14 +15,18 @@ public class SearchContextViaLeg<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> parent;
   private final AccessPaths accessPaths;
+
+  @Nullable
   private final ViaConnections viaConnections;
+
+  @Nullable
   private final EgressPaths egressPaths;
 
   public SearchContextViaLeg(
     SearchContext<T> parent,
     AccessPaths accessPaths,
-    ViaConnections viaConnections,
-    EgressPaths egressPaths
+    @Nullable ViaConnections viaConnections,
+    @Nullable EgressPaths egressPaths
   ) {
     this.parent = parent;
     this.accessPaths = accessPaths;

@@ -41,8 +41,9 @@ public class PageCursorFactory {
     Instant lat,
     Duration searchWindow
   ) {
-    this.currentPageType =
-      pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
+    this.currentPageType = pageType == null
+      ? resolvePageTypeForTheFirstSearch(sortOrder)
+      : pageType;
 
     this.currentEdt = edt;
     this.currentLat = lat;
@@ -84,8 +85,7 @@ public class PageCursorFactory {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(PageCursorFactory.class)
+    return ToStringBuilder.of(PageCursorFactory.class)
       .addEnum("sortOrder", sortOrder)
       .addEnum("currentPageType", currentPageType)
       .addDateTime("currentEdt", currentEdt)
@@ -130,42 +130,40 @@ public class PageCursorFactory {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
-        prevEdt =
-          pageCursorInput
-            .numItinerariesFilterResults()
-            .latestRemovedDeparture()
-            .minus(newSearchWindow)
-            .plusSeconds(60);
+        prevEdt = pageCursorInput
+          .numItinerariesFilterResults()
+          .latestRemovedDeparture()
+          .minus(newSearchWindow)
+          .plusSeconds(60);
         nextEdt = edtAfterUsedSw();
       }
     }
 
     Cost generalizedCostMaxLimit = null;
     if (pageCursorInput.removeTransitIfStreetOnlyIsBetterResults() != null) {
-      generalizedCostMaxLimit =
-        pageCursorInput.removeTransitIfStreetOnlyIsBetterResults().generalizedCostMaxLimit();
+      generalizedCostMaxLimit = pageCursorInput
+        .removeTransitIfStreetOnlyIsBetterResults()
+        .generalizedCostMaxLimit();
     }
 
-    prevCursor =
-      new PageCursor(
-        PREVIOUS_PAGE,
-        sortOrder,
-        prevEdt,
-        currentLat,
-        newSearchWindow,
-        itineraryPageCut,
-        generalizedCostMaxLimit
-      );
-    nextCursor =
-      new PageCursor(
-        NEXT_PAGE,
-        sortOrder,
-        nextEdt,
-        null,
-        newSearchWindow,
-        itineraryPageCut,
-        generalizedCostMaxLimit
-      );
+    prevCursor = new PageCursor(
+      PREVIOUS_PAGE,
+      sortOrder,
+      prevEdt,
+      currentLat,
+      newSearchWindow,
+      itineraryPageCut,
+      generalizedCostMaxLimit
+    );
+    nextCursor = new PageCursor(
+      NEXT_PAGE,
+      sortOrder,
+      nextEdt,
+      null,
+      newSearchWindow,
+      itineraryPageCut,
+      generalizedCostMaxLimit
+    );
   }
 
   private Instant edtBeforeNewSw() {

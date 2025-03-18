@@ -31,13 +31,12 @@ public class PlatformLinkerTest {
 
     DefaultOsmProvider provider = new DefaultOsmProvider(file, false);
 
-    OsmModule osmModule = OsmModule
-      .of(
-        provider,
-        graph,
-        new DefaultOsmInfoGraphBuildRepository(),
-        new DefaultVehicleParkingRepository()
-      )
+    OsmModule osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    )
       .withPlatformEntriesLinking(true)
       .build();
 

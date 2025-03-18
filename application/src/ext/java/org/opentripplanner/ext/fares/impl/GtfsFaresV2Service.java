@@ -50,7 +50,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public ProductResult getProducts(Itinerary itinerary) {
-    var transitLegs = itinerary.getScheduledTransitLegs();
+    var transitLegs = itinerary.findScheduledTransitLegs();
 
     var allLegProducts = new HashSet<LegProducts>();
     for (int i = 0; i < transitLegs.size(); i++) {
@@ -104,21 +104,17 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   private boolean coversItinerary(Itinerary i, LegProducts.ProductWithTransfer pwt) {
-    var transitLegs = i.getScheduledTransitLegs();
+    var transitLegs = i.findScheduledTransitLegs();
     var allLegsInProductFeed = transitLegs
       .stream()
       .allMatch(leg -> leg.getAgency().getId().getFeedId().equals(pwt.legRule().feedId()));
 
     return (
       allLegsInProductFeed &&
-      (
-        transitLegs.size() == 1 ||
-        (
-          pwt.products().stream().anyMatch(p -> p.coversDuration(i.getTransitDuration())) &&
-          appliesToAllLegs(pwt.legRule(), transitLegs)
-        ) ||
-        coversItineraryWithFreeTransfers(i, pwt)
-      )
+      (transitLegs.size() == 1 ||
+        (pwt.products().stream().anyMatch(p -> p.coversDuration(i.totalTransitDuration())) &&
+          appliesToAllLegs(pwt.legRule(), transitLegs)) ||
+        coversItineraryWithFreeTransfers(i, pwt))
     );
   }
 
@@ -131,7 +127,7 @@ public final class GtfsFaresV2Service implements Serializable {
     LegProducts.ProductWithTransfer pwt
   ) {
     var feedIdsInItinerary = i
-      .getScheduledTransitLegs()
+      .findScheduledTransitLegs()
       .stream()
       .map(l -> l.getAgency().getId().getFeedId())
       .collect(Collectors.toSet());
@@ -235,9 +231,8 @@ public final class GtfsFaresV2Service implements Serializable {
       .toList();
 
     return (
-      (
-        isNull(rule.networkId()) && networksWithRules.stream().noneMatch(routesNetworkIds::contains)
-      ) ||
+      (isNull(rule.networkId()) &&
+        networksWithRules.stream().noneMatch(routesNetworkIds::contains)) ||
       routesNetworkIds.contains(rule.networkId())
     );
   }

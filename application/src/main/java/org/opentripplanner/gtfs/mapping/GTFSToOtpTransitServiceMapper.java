@@ -44,7 +44,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
 
-  private final ServiceCalendarDateMapper serviceCalendarDateMapper = new ServiceCalendarDateMapper();
+  private final ServiceCalendarDateMapper serviceCalendarDateMapper =
+    new ServiceCalendarDateMapper();
 
   private final FeedInfoMapper feedInfoMapper;
 
@@ -110,23 +111,29 @@ public class GTFSToOtpTransitServiceMapper {
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
     boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);
     locationMapper = new LocationMapper(builder.siteRepository(), issueStore);
-    locationGroupMapper =
-      new LocationGroupMapper(stopMapper, locationMapper, builder.siteRepository());
-    pathwayMapper =
-      new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
+    locationGroupMapper = new LocationGroupMapper(
+      stopMapper,
+      locationMapper,
+      builder.siteRepository()
+    );
+    pathwayMapper = new PathwayMapper(
+      stopMapper,
+      entranceMapper,
+      pathwayNodeMapper,
+      boardingAreaMapper
+    );
     routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
     directionMapper = new DirectionMapper(issueStore);
     tripMapper = new TripMapper(routeMapper, directionMapper, translationHelper);
     bookingRuleMapper = new BookingRuleMapper();
-    stopTimeMapper =
-      new StopTimeMapper(
-        stopMapper,
-        locationMapper,
-        locationGroupMapper,
-        tripMapper,
-        bookingRuleMapper,
-        translationHelper
-      );
+    stopTimeMapper = new StopTimeMapper(
+      stopMapper,
+      locationMapper,
+      locationGroupMapper,
+      tripMapper,
+      bookingRuleMapper,
+      translationHelper
+    );
     frequencyMapper = new FrequencyMapper(tripMapper);
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
     fareProductMapper = new FareProductMapper();

@@ -77,19 +77,15 @@ public class ExampleConfigTest {
   )
   @ParameterizedTest(name = "Fail when parsing an invalid config from {0}")
   void failInvalidConfig(Path filename) {
-    Assertions.assertThrows(
-      AssertionFailedError.class,
-      () -> testConfig(filename, a -> new BuildConfig(a, true))
+    Assertions.assertThrows(AssertionFailedError.class, () ->
+      testConfig(filename, a -> new BuildConfig(a, true))
     );
   }
 
   private void testConfig(Path path, Consumer<NodeAdapter> buildConfig) {
     try {
       var json = Files.readString(path);
-      var replaced = EnvironmentVariableReplacer.insertVariables(
-        json,
-        json,
-        ignored -> "some-value"
+      var replaced = EnvironmentVariableReplacer.insertVariables(json, json, ignored -> "some-value"
       );
       var node = JsonSupport.jsonNodeFromString(replaced);
       var a = new NodeAdapter(node, path.toString());

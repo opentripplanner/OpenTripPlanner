@@ -33,7 +33,8 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCaseFactor
 public class B03_AccessEgressTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
-  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
+  private final RaptorRequestBuilder<TestTripSchedule> requestBuilder =
+    new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
   );
@@ -41,8 +42,9 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
   @BeforeEach
   public void setup() {
     data.withRoute(
-      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H)
-        .withTimetable(schedule("0:10, 0:14, 0:18, 0:22, 0:28, 0:32, 0:36, 0:40"))
+      route("R1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E, STOP_F, STOP_G, STOP_H).withTimetable(
+        schedule("0:10, 0:14, 0:18, 0:22, 0:28, 0:32, 0:36, 0:40")
+      )
     );
 
     requestBuilder
@@ -70,8 +72,7 @@ public class B03_AccessEgressTest implements RaptorTestConstants {
     String expStd = "Walk 7m ~ C ~ BUS R1 0:18 0:32 ~ F ~ Walk 7m [0:11 0:39 28m Tₓ0]";
     String expStdOne = "Walk 1s ~ A ~ BUS R1 0:10 0:32 ~ F ~ Walk 7m [0:09:59 0:39 29m1s Tₓ0]";
     String expStdRevOne = "Walk 7m ~ C ~ BUS R1 0:18 0:40 ~ H ~ Walk 1s [0:11 0:40:01 29m1s Tₓ0]";
-    return RaptorModuleTestCase
-      .of()
+    return RaptorModuleTestCase.of()
       .withRequest(r -> r.searchParams().timetable(true))
       .addMinDuration("28m", TX_0, T00_00, T01_00)
       .add(standard().manyIterations(), expStd)

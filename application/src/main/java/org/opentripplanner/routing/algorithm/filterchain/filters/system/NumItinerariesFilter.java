@@ -32,10 +32,9 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
   ) {
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
-    this.numItinerariesFilterResultsSubscriber =
-      numItinerariesFilterResultsSubscriber == null
-        ? IGNORE_SUBSCRIBER
-        : numItinerariesFilterResultsSubscriber;
+    this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber == null
+      ? IGNORE_SUBSCRIBER
+      : numItinerariesFilterResultsSubscriber;
   }
 
   @Override

@@ -35,7 +35,9 @@ public class RouteRequestToFilterChainMapper {
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
     Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber,
-    Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber
+    Consumer<
+      RemoveTransitIfStreetOnlyIsBetterResults
+    > removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -140,9 +142,9 @@ public class RouteRequestToFilterChainMapper {
 
   private static double minBikeParkingDistance(RouteRequest request) {
     var modes = request.journey().modes();
-    boolean hasBikePark = List
-      .of(modes.accessMode, modes.egressMode)
-      .contains(StreetMode.BIKE_TO_PARK);
+    boolean hasBikePark = List.of(modes.accessMode, modes.egressMode).contains(
+      StreetMode.BIKE_TO_PARK
+    );
 
     double minBikeParkingDistance = 0;
     if (hasBikePark) {

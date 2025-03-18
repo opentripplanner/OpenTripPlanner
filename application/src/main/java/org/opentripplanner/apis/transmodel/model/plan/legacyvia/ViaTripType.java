@@ -16,8 +16,7 @@ public class ViaTripType {
     GraphQLObjectType tripPatternType,
     GraphQLObjectType routingErrorType
   ) {
-    var viaTripPatternSegment = GraphQLObjectType
-      .newObject()
+    var viaTripPatternSegment = GraphQLObjectType.newObject()
       .name("ViaTripPatternSegment")
       .description(
         "A segment of the via search. The first segment is from the start location to the first " +
@@ -25,8 +24,7 @@ public class ViaTripType {
         "to the end location."
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPatterns")
           .description("A list of trip patterns for this segment of the search")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(tripPatternType))))
@@ -35,15 +33,13 @@ public class ViaTripType {
       )
       .build();
 
-    var viaTripPatternCombinations = GraphQLObjectType
-      .newObject()
+    var viaTripPatternCombinations = GraphQLObjectType.newObject()
       .name("ViaConnection")
       .description(
         "An acceptable combination of trip patterns between two segments of the via search"
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("from")
           .description("The index of the trip pattern in the segment before the via point")
           .type(Scalars.GraphQLInt)
@@ -53,8 +49,7 @@ public class ViaTripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("to")
           .description("The index of the trip pattern in the segment after the via point")
           .type(Scalars.GraphQLInt)
@@ -65,16 +60,14 @@ public class ViaTripType {
       )
       .build();
 
-    return GraphQLObjectType
-      .newObject()
+    return GraphQLObjectType.newObject()
       .name("ViaTrip")
       .description(
         "Description of a trip via one or more intermediate locations. " +
         "For example from A, via B, then C to D."
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPatternsPerSegment")
           .description(
             "A list of segments of the via search. The first segment is from the start location " +
@@ -86,8 +79,7 @@ public class ViaTripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("tripPatternCombinations")
           .description(
             "A list of the acceptable combinations of the trip patterns in this segment and the " +
@@ -104,8 +96,7 @@ public class ViaTripType {
           .build()
       )
       .field(
-        GraphQLFieldDefinition
-          .newFieldDefinition()
+        GraphQLFieldDefinition.newFieldDefinition()
           .name("routingErrors")
           .description("A list of routing errors, and fields which caused them")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(routingErrorType))))

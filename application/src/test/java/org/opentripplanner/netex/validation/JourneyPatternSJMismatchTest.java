@@ -95,7 +95,8 @@ class JourneyPatternSJMismatchTest {
   static class ServiceJourneyPatternBuilder {
 
     private final ServiceJourneyPattern pattern = new ServiceJourneyPattern();
-    private final PointsInJourneyPattern_RelStructure points = new PointsInJourneyPattern_RelStructure();
+    private final PointsInJourneyPattern_RelStructure points =
+      new PointsInJourneyPattern_RelStructure();
 
     ServiceJourneyPatternBuilder(String id) {
       pattern.setId(id);

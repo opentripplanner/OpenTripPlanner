@@ -24,8 +24,7 @@ class SystemPreferencesTest {
     .add(ParameterName.LEAD, ParameterType.PENALTY, 17.3)
     .build();
 
-  private final SystemPreferences subject = SystemPreferences
-    .of()
+  private final SystemPreferences subject = SystemPreferences.of()
     .withGeoidElevation(true)
     .withMaxJourneyDuration(MAX_JOURNEY_DURATION)
     .addTags(List.of(TAG_RENTAL))

@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
-public record InvalidVehicleParkingCapacity(OsmWithTags entity, String capacityValue)
+public record InvalidVehicleParkingCapacity(OsmEntity entity, String capacityValue)
   implements DataImportIssue {
   private static final String FMT =
     "Capacity for osm node %d is not a number: '%s'; it's replaced with '-1' (unknown).";

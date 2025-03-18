@@ -3,6 +3,7 @@ package org.opentripplanner.raptorlegacy._data.api;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripTimes;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -12,9 +13,10 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptorlegacy._data.RaptorTestConstants;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
-import org.opentripplanner.raptorlegacy._data.transit.TestTransfer;
+import org.opentripplanner.raptorlegacy._data.transit.TestTransfers;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripPattern;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 
 /**
  * Utility to help build paths for testing. The path builder is "reusable", every time the {@code
@@ -76,21 +78,17 @@ public class TestPathBuilder implements RaptorTestConstants {
    * Create access with the given {@code startTime}, but allow the access to be time-shifted
    * according to the opening hours of the given {@code transfer}.
    */
-  private TestPathBuilder access(int startTime, TestAccessEgress transfer) {
+  private TestPathBuilder access(int startTime, RaptorAccessEgress transfer) {
     reset(startTime);
     builder.access(transfer);
     return this;
   }
 
   public TestPathBuilder walk(int duration, int toStop) {
-    return walk(TestTransfer.transfer(toStop, duration));
+    return walk(TestTransfers.transfer(toStop, duration));
   }
 
-  public TestPathBuilder walk(int duration, int toStop, int cost) {
-    return walk(TestTransfer.transfer(toStop, duration, cost));
-  }
-
-  public TestPathBuilder walk(TestTransfer transfer) {
+  public TestPathBuilder walk(DefaultRaptorTransfer transfer) {
     builder.transfer(transfer, transfer.stop());
     return this;
   }
@@ -109,8 +107,9 @@ public class TestPathBuilder implements RaptorTestConstants {
     int toTime = fromTime + duration;
     int fromStop = currentStop();
 
-    TestTripSchedule trip = TestTripSchedule
-      .schedule(TestTripPattern.pattern(patternName, fromStop, toStop))
+    TestTripSchedule trip = TestTripSchedule.schedule(
+      TestTripPattern.pattern(patternName, fromStop, toStop)
+    )
       .arrDepOffset(BOARD_ALIGHT_OFFSET)
       .departures(fromTime, toTime + BOARD_ALIGHT_OFFSET)
       .build();
@@ -126,12 +125,7 @@ public class TestPathBuilder implements RaptorTestConstants {
     );
   }
 
-  public PathBuilder<TestTripSchedule> access(TestAccessEgress access) {
-    builder.access(access);
-    return builder;
-  }
-
-  public RaptorPath<TestTripSchedule> egress(TestAccessEgress egress) {
+  public RaptorPath<TestTripSchedule> egress(RaptorAccessEgress egress) {
     builder.egress(egress);
     builder.c2(c2);
     return builder.build();
@@ -145,13 +139,12 @@ public class TestPathBuilder implements RaptorTestConstants {
 
   private void reset(int startTime) {
     this.startTime = startTime;
-    this.builder =
-      PathBuilder.tailPathBuilder(
-        slackProvider,
-        startTime,
-        costCalculator,
-        RaptorStopNameResolver.nullSafe(null),
-        null
-      );
+    this.builder = PathBuilder.tailPathBuilder(
+      slackProvider,
+      startTime,
+      costCalculator,
+      RaptorStopNameResolver.nullSafe(null),
+      null
+    );
   }
 }

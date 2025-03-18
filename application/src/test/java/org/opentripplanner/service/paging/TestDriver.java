@@ -167,11 +167,8 @@ final class TestDriver {
 
     // Filter nResults
     var filterResultBox = new Box<PageCursorInput>();
-    var maxNumFilter = new NumItinerariesFilter(
-      nResults,
-      cropItineraries,
-      it ->
-        filterResultBox.set(DefaultPageCursorInput.of().withNumItinerariesFilterResults(it).build())
+    var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries, it ->
+      filterResultBox.set(DefaultPageCursorInput.of().withNumItinerariesFilterResults(it).build())
     );
     kept = maxNumFilter.removeMatchesForTest(kept);
 

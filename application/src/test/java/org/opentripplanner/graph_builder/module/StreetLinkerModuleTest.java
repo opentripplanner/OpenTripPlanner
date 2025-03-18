@@ -150,8 +150,7 @@ class StreetLinkerModuleTest {
   @Test
   void linkCarsAllowedStop() {
     var model = new TestModel();
-    var carsAllowedTrip = TimetableRepositoryForTest
-      .of()
+    var carsAllowedTrip = TimetableRepositoryForTest.of()
       .trip("carsAllowedTrip")
       .withCarsAllowed(CarAccess.ALLOWED)
       .build();
@@ -203,11 +202,10 @@ class StreetLinkerModuleTest {
       var walkableEdge = StreetModelForTest.streetEdge(from, to, PEDESTRIAN);
       var drivableEdge = StreetModelForTest.streetEdge(from, to, CAR);
       var builder = SiteRepository.of();
-      stop =
-        builder
-          .regularStop(id("platform-1"))
-          .withCoordinate(new WgsCoordinate(KONGSBERG_PLATFORM_1))
-          .build();
+      stop = builder
+        .regularStop(id("platform-1"))
+        .withCoordinate(new WgsCoordinate(KONGSBERG_PLATFORM_1))
+        .build();
       builder.withRegularStop(stop);
 
       timetableRepository = new TimetableRepository(builder.build(), new Deduplicator());
@@ -216,14 +214,14 @@ class StreetLinkerModuleTest {
       graph.addVertex(stopVertex);
       graph.hasStreets = true;
 
-      module =
-        new StreetLinkerModule(
-          graph,
-          new DefaultVehicleParkingRepository(),
-          timetableRepository,
-          DataImportIssueStore.NOOP,
-          false
-        );
+      module = new StreetLinkerModule(
+        graph,
+        new DefaultVehicleParkingRepository(),
+        timetableRepository,
+        DataImportIssueStore.NOOP,
+        false,
+        0
+      );
 
       assertFalse(stopVertex.isConnectedToGraph());
       assertTrue(stopVertex.getIncoming().isEmpty());
@@ -252,8 +250,7 @@ class StreetLinkerModuleTest {
 
     public void withCarsAllowedTrip(Trip trip, StopLocation... stops) {
       Route route = TimetableRepositoryForTest.route("carsAllowedRoute").build();
-      var stopTimes = Arrays
-        .stream(stops)
+      var stopTimes = Arrays.stream(stops)
         .map(s -> {
           var stopTime = new StopTime();
           stopTime.setStop(s);
@@ -269,8 +266,10 @@ class StreetLinkerModuleTest {
         stopTimes,
         timetableRepository.getDeduplicator()
       );
-      TripPattern tripPattern = TimetableRepositoryForTest
-        .tripPattern("carsAllowedTripPattern", route)
+      TripPattern tripPattern = TimetableRepositoryForTest.tripPattern(
+        "carsAllowedTripPattern",
+        route
+      )
         .withStopPattern(stopPattern)
         .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
         .build();

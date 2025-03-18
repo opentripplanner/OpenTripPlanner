@@ -40,13 +40,12 @@ public class TileJson implements Serializable {
     this.attribution = attribution;
     tiles = new String[] { tileUrl };
 
-    bounds =
-      new double[] {
-        envelope.lowerLeft().longitude(),
-        envelope.lowerLeft().latitude(),
-        envelope.upperRight().longitude(),
-        envelope.upperRight().latitude(),
-      };
+    bounds = new double[] {
+      envelope.lowerLeft().longitude(),
+      envelope.lowerLeft().latitude(),
+      envelope.upperRight().longitude(),
+      envelope.upperRight().latitude(),
+    };
 
     var c = envelope.center();
     center = new double[] { c.longitude(), c.latitude(), 9 };

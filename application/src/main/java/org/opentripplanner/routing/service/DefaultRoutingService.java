@@ -49,10 +49,8 @@ public class DefaultRoutingService implements RoutingService {
   public ViaRoutingResponse route(RouteViaRequest request) {
     LOG.debug("Request: {}", request);
     OTPRequestTimeoutException.checkForTimeout();
-    var viaRoutingWorker = new ViaRoutingWorker(
-      request,
-      req ->
-        new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
+    var viaRoutingWorker = new ViaRoutingWorker(request, req ->
+      new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
     );
     // TODO: Add output logging here, see route(..) method
     return viaRoutingWorker.route();
@@ -67,8 +65,7 @@ public class DefaultRoutingService implements RoutingService {
 
     if (LOG.isDebugEnabled()) {
       var m = response.getMetadata();
-      var text = MultiLineToStringBuilder
-        .of("Response")
+      var text = MultiLineToStringBuilder.of("Response")
         .addDuration("SearchWindowUsed", m == null ? null : m.searchWindowUsed)
         .add("NextPage", response.getNextPageCursor())
         .add("PreviousPage", response.getPreviousPageCursor())

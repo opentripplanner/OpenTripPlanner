@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Responsible for downloading GTFS-rt vehicle positions from a URL and loading into memory.
  */
-public class GtfsRealtimeHttpVehiclePositionSource {
+class GtfsRealtimeHttpVehiclePositionSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(
     GtfsRealtimeHttpVehiclePositionSource.class
@@ -51,13 +51,12 @@ public class GtfsRealtimeHttpVehiclePositionSource {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(GtfsRealtimeHttpVehiclePositionSource.class)
+    return ToStringBuilder.of(GtfsRealtimeHttpVehiclePositionSource.class)
       .addObj("url", url)
       .toString();
   }
 
-  public List<VehiclePosition> getPositions(InputStream is) throws IOException {
+  private List<VehiclePosition> getPositions(InputStream is) throws IOException {
     List<VehiclePosition> positions = null;
     List<GtfsRealtime.FeedEntity> feedEntityList;
     GtfsRealtime.FeedMessage feedMessage;

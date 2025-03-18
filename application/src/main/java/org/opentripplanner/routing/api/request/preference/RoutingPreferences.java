@@ -253,8 +253,10 @@ public final class RoutingPreferences implements Serializable {
     }
 
     public Builder withWheelchair(Consumer<WheelchairPreferences.Builder> body) {
-      this.wheelchair =
-        ifNotNull(this.wheelchair, original.wheelchair).copyOf().apply(body).build();
+      this.wheelchair = ifNotNull(this.wheelchair, original.wheelchair)
+        .copyOf()
+        .apply(body)
+        .build();
       return this;
     }
 
@@ -299,8 +301,10 @@ public final class RoutingPreferences implements Serializable {
     }
 
     public Builder withItineraryFilter(Consumer<ItineraryFilterPreferences.Builder> body) {
-      this.itineraryFilter =
-        ifNotNull(this.itineraryFilter, original.itineraryFilter).copyOf().apply(body).build();
+      this.itineraryFilter = ifNotNull(this.itineraryFilter, original.itineraryFilter)
+        .copyOf()
+        .apply(body)
+        .build();
       return this;
     }
 

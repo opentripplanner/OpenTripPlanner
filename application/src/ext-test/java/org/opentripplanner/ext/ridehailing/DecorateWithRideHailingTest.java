@@ -32,8 +32,7 @@ class DecorateWithRideHailingTest implements PlanTestConstants {
   );
   RideHailingService failingService = new FailingRideHailingService();
 
-  Itinerary i = TestItineraryBuilder
-    .newItinerary(A)
+  Itinerary i = TestItineraryBuilder.newItinerary(A)
     .drive(T11_30, PlanTestConstants.T11_50, B)
     .build();
 
@@ -52,7 +51,7 @@ class DecorateWithRideHailingTest implements PlanTestConstants {
 
     var filtered = filter.filter(List.of(i));
 
-    var leg = filtered.get(0).getLegs().get(0);
+    var leg = filtered.get(0).legs().get(0);
 
     assertInstanceOf(RideHailingLeg.class, leg);
 

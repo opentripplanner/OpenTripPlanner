@@ -49,8 +49,7 @@ public class GqlUtil {
   }
 
   public static GraphQLFieldDefinition newTransitIdField() {
-    return GraphQLFieldDefinition
-      .newFieldDefinition()
+    return GraphQLFieldDefinition.newFieldDefinition()
       .name("id")
       .type(new GraphQLNonNull(Scalars.GraphQLID))
       .dataFetcher(env -> TransitIdMapper.mapEntityIDToApi(env.getSource()))
@@ -58,8 +57,7 @@ public class GqlUtil {
   }
 
   public static GraphQLInputObjectField newIdListInputField(String name, String description) {
-    return GraphQLInputObjectField
-      .newInputObjectField()
+    return GraphQLInputObjectField.newInputObjectField()
       .name(name)
       .description(description)
       .type(new GraphQLList(Scalars.GraphQLID))
@@ -101,12 +99,12 @@ public class GqlUtil {
   }
 
   /**
-   * Null-safe handling of a collection of type T. Returns an empty list if the collection is null.
+   * Null-safe handling of a collection of type T. Returns null if the incoming collection is null.
    * Null elements are filtered out.
    */
-  public static <T> List<T> toListNullSafe(@Nullable Collection<T> args) {
+  public static <T> List<T> toList(@Nullable Collection<T> args) {
     if (args == null) {
-      return List.of();
+      return null;
     }
     return args.stream().filter(Objects::nonNull).toList();
   }

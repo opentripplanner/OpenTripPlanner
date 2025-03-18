@@ -23,8 +23,8 @@ public class TestStreetLinkerModule {
       parkingRepository,
       timetableRepository,
       DataImportIssueStore.NOOP,
-      false
-    )
-      .buildGraph();
+      false,
+      0
+    ).buildGraph();
   }
 }

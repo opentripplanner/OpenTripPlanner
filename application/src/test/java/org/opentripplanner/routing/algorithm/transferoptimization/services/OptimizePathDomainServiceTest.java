@@ -38,18 +38,11 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR = new DefaultCostCalculator<>(
-    BOARD_COST_SEC,
-    TRANSFER_COST_SEC,
-    WAIT_RELUCTANCE,
-    null,
-    null
-  );
+  public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
+    new DefaultCostCalculator<>(BOARD_COST_SEC, TRANSFER_COST_SEC, WAIT_RELUCTANCE, null, null);
 
-  private static final TransferWaitTimeCostCalculator TRANS_WAIT_TIME_CALC = new TransferWaitTimeCostCalculator(
-    1.0,
-    2.0
-  );
+  private static final TransferWaitTimeCostCalculator TRANS_WAIT_TIME_CALC =
+    new TransferWaitTimeCostCalculator(1.0, 2.0);
 
   static {
     TRANS_WAIT_TIME_CALC.setMinSafeTransferTime(D5m);
@@ -61,8 +54,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   @Test
   public void testTripWithoutTransfers() {
     // Given a trip A-B-C-D
-    var trip1 = TestTripSchedule
-      .schedule()
+    var trip1 = TestTripSchedule.schedule()
       .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D)
       .times("10:02 10:10 10:20 10:30")
       .build();
@@ -97,15 +89,13 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   @Test
   public void testTripWithOneTransfer() {
     // Given
-    var trip1 = TestTripSchedule
-      .schedule()
+    var trip1 = TestTripSchedule.schedule()
       .arrDepOffset(D0s)
       .pattern("T1", STOP_A, STOP_B, STOP_C, STOP_D)
       .times("10:02 10:10 10:20 10:30")
       .build();
 
-    var trip2 = TestTripSchedule
-      .schedule()
+    var trip2 = TestTripSchedule.schedule()
       .arrDepOffset(D0s)
       .pattern("T2", STOP_E, STOP_F, STOP_G)
       .times("10:12 10:22 10:50")
@@ -148,20 +138,17 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   @Test
   public void testPathWithThreeTripsAndMultiplePlacesToTransfer() {
     // Given
-    var trip1 = TestTripSchedule
-      .schedule()
+    var trip1 = TestTripSchedule.schedule()
       .pattern("T1", STOP_A, STOP_B, STOP_D)
       .times("10:02 10:10 10:20")
       .build();
 
-    var trip2 = TestTripSchedule
-      .schedule()
+    var trip2 = TestTripSchedule.schedule()
       .pattern("T2", STOP_B, STOP_C, STOP_D, STOP_F)
       .times("10:12 10:15 10:22 10:35")
       .build();
 
-    var trip3 = TestTripSchedule
-      .schedule()
+    var trip3 = TestTripSchedule.schedule()
       .pattern("T3", STOP_E, STOP_F, STOP_G)
       .times("10:24 10:37 10:49")
       .build();
@@ -229,14 +216,12 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   @Test
   public void testConstrainedTransferIsPreferred() {
     // Given
-    var trip1 = TestTripSchedule
-      .schedule()
+    var trip1 = TestTripSchedule.schedule()
       .pattern("T1", STOP_A, STOP_B, STOP_C)
       .times("10:02 10:10 10:15")
       .build();
 
-    var trip2 = TestTripSchedule
-      .schedule()
+    var trip2 = TestTripSchedule.schedule()
       .pattern("T2", STOP_B, STOP_C, STOP_D)
       .times("10:13 10:17 10:30")
       .build();
@@ -289,14 +274,12 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
   @Test
   public void testSameStopTimesInPattern() {
     // Given
-    var trip1 = TestTripSchedule
-      .schedule()
+    var trip1 = TestTripSchedule.schedule()
       .pattern("T1", STOP_A, STOP_B, STOP_C)
       .times("10:10 10:10 10:15")
       .build();
 
-    var trip2 = TestTripSchedule
-      .schedule()
+    var trip2 = TestTripSchedule.schedule()
       .pattern("T2", STOP_B, STOP_C, STOP_D)
       .times("10:13 10:13 10:30")
       .build();
@@ -345,8 +328,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var filter = new MinCostPathTailFilterFactory<TestTripSchedule>(
       true,
       waitTimeCalculator != null
-    )
-      .createFilter();
+    ).createFilter();
     return new OptimizePathDomainService<>(
       generator,
       COST_CALCULATOR,

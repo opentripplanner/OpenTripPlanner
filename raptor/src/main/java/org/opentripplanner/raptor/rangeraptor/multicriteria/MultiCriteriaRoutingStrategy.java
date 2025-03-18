@@ -74,9 +74,8 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
         // the stop is a pass-through point and the path has visited the pass-through points in the
         // correct order.
         //noinspection unchecked
-        passThroughPointsService.updateC2Value(
-          ride.c2(),
-          newC2 -> patternRides.add((R) ride.updateC2(newC2))
+        passThroughPointsService.updateC2Value(ride.c2(), newC2 ->
+          patternRides.add((R) ride.updateC2(newC2))
         );
       }
     }

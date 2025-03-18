@@ -27,7 +27,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector.StopAndRoute;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -35,6 +34,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -64,17 +64,14 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
                 alert
                   .entities()
                   .stream()
-                  .anyMatch(entity ->
-                    (
-                      types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_ROUTES) &&
-                      entity instanceof StopAndRoute stopAndRoute &&
-                      stopAndRoute.stopId().equals(id)
-                    ) ||
-                    (
-                      types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_TRIPS) &&
-                      entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
-                      stopAndTrip.stopId().equals(id)
-                    )
+                  .anyMatch(
+                    entity ->
+                      (types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_ROUTES) &&
+                        entity instanceof StopAndRoute stopAndRoute &&
+                        stopAndRoute.stopId().equals(id)) ||
+                      (types.contains(GraphQLTypes.GraphQLStopAlertType.STOP_ON_TRIPS) &&
+                        entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                        stopAndTrip.stopId().equals(id))
                   )
               )
               .toList()
@@ -84,36 +81,34 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)
         ) {
-          getPatterns(environment)
-            .forEach(pattern -> {
-              if (types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS)) {
-                alerts.addAll(
-                  alertService.getDirectionAndRouteAlerts(
-                    pattern.getDirection(),
-                    pattern.getRoute().getId()
-                  )
-                );
-              }
-              if (types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)) {
-                pattern
-                  .scheduledTripsAsStream()
-                  .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
-              }
-            });
+          getPatterns(environment).forEach(pattern -> {
+            if (types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS)) {
+              alerts.addAll(
+                alertService.getDirectionAndRouteAlerts(
+                  pattern.getDirection(),
+                  pattern.getRoute().getId()
+                )
+              );
+            }
+            if (types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)) {
+              pattern
+                .scheduledTripsAsStream()
+                .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+            }
+          });
         }
         if (
           types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)
         ) {
-          getRoutes(environment)
-            .forEach(route -> {
-              if (types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES)) {
-                alerts.addAll(alertService.getRouteAlerts(route.getId()));
-              }
-              if (types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
-                alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
-              }
-            });
+          getRoutes(environment).forEach(route -> {
+            if (types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES)) {
+              alerts.addAll(alertService.getRouteAlerts(route.getId()));
+            }
+            if (types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
+              alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
+            }
+          });
         }
         return alerts.stream().distinct().collect(Collectors.toList());
       } else {
@@ -267,9 +262,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         environment,
         stop -> {
           TransitService transitService = getTransitService(environment);
-          GraphQLTypes.GraphQLStopStopTimesForPatternArgs args = new GraphQLTypes.GraphQLStopStopTimesForPatternArgs(
-            environment.getArguments()
-          );
+          GraphQLTypes.GraphQLStopStopTimesForPatternArgs args =
+            new GraphQLTypes.GraphQLStopStopTimesForPatternArgs(environment.getArguments());
           TripPattern pattern = transitService.getTripPattern(
             FeedScopedId.parse(args.getGraphQLId())
           );
@@ -327,16 +321,13 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           !args.getGraphQLOmitCanceled()
         );
 
-      return getValue(
-        environment,
-        stopTFunction,
-        station ->
-          station
-            .getChildStops()
-            .stream()
-            .map(stopTFunction)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList())
+      return getValue(environment, stopTFunction, station ->
+        station
+          .getChildStops()
+          .stream()
+          .map(stopTFunction)
+          .flatMap(Collection::stream)
+          .collect(Collectors.toList())
       );
     };
   }
@@ -363,16 +354,13 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           !args.getGraphQLOmitCanceled()
         );
 
-      return getValue(
-        environment,
-        stopTFunction,
-        station ->
-          station
-            .getChildStops()
-            .stream()
-            .map(stopTFunction)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList())
+      return getValue(environment, stopTFunction, station ->
+        station
+          .getChildStops()
+          .stream()
+          .map(stopTFunction)
+          .flatMap(Collection::stream)
+          .collect(Collectors.toList())
       );
     };
   }
@@ -395,10 +383,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           )
           .stream();
 
-      Stream<StopTimesInPattern> stream = getValue(
-        environment,
-        stopTFunction,
-        station -> station.getChildStops().stream().flatMap(stopTFunction)
+      Stream<StopTimesInPattern> stream = getValue(environment, stopTFunction, station ->
+        station.getChildStops().stream().flatMap(stopTFunction)
       );
 
       return stream
@@ -427,8 +413,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
         stop -> {
           Integer maxDistance = new GraphQLTypes.GraphQLStopTransfersArgs(
             environment.getArguments()
-          )
-            .getGraphQLMaxDistance();
+          ).getGraphQLMaxDistance();
 
           return getTransitService(environment)
             .findPathTransfers(stop)
@@ -477,10 +462,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   @Override
   public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairBoarding() {
     return environment -> {
-      var boarding = getValue(
-        environment,
-        StopLocation::getWheelchairAccessibility,
-        station -> null
+      var boarding = getValue(environment, StopLocation::getWheelchairAccessibility, station -> null
       );
       return GraphQLUtils.toGraphQL(boarding);
     };
@@ -513,7 +495,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   /**
-   * TODO this functionality should be supported by {@link org.opentripplanner.routing.stoptimes.StopTimesHelper#stopTimesForPatternAtStop}
+   * TODO this functionality should be supported by {@link StopTimesHelper#stopTimesForPatternAtStop}
    */
   private List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
     TripPattern originalPattern,
@@ -524,11 +506,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     Instant startTime = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
     LocalDate date = startTime.atZone(transitService.getTimeZone()).toLocalDate();
 
-    return Stream
-      .concat(
-        getRealtimeAddedPatternsAsStream(originalPattern, transitService, date),
-        Stream.of(originalPattern)
-      )
+    return Stream.concat(
+      getRealtimeAddedPatternsAsStream(originalPattern, transitService, date),
+      Stream.of(originalPattern)
+    )
       .flatMap(tripPattern ->
         transitService
           .findTripTimeOnDate(
@@ -543,8 +524,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           .stream()
       )
       .sorted(
-        Comparator.comparing((TripTimeOnDate tts) ->
-          tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
+        Comparator.comparing(
+          (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
         )
       )
       .limit(args.getGraphQLNumberOfDepartures())
@@ -563,8 +544,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return originalPattern
       .scheduledTripsAsStream()
       .map(trip -> transitService.findNewTripPatternForModifiedTrip(trip.getId(), date))
-      .filter(tripPattern ->
-        tripPattern != null && tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
+      .filter(
+        tripPattern ->
+          tripPattern != null &&
+          tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );
   }
 

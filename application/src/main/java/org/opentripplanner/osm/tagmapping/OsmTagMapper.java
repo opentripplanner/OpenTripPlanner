@@ -10,7 +10,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.wayproperty.WayProperties;
 import org.opentripplanner.osm.wayproperty.WayPropertySet;
 import org.opentripplanner.osm.wayproperty.specifier.BestMatchSpecifier;
@@ -668,6 +668,8 @@ public class OsmTagMapper {
     props.createNames("highway=bridleway", "name.bridleway");
     props.createNames("highway=footway;bicycle=no", "name.pedestrian_path");
     props.createNames("highway=corridor", "name.corridor");
+    props.createNames("indoor=corridor", "name.corridor");
+    props.createNames("indoor=area", "name.indoor_area");
 
     // Platforms
     props.createNames("otp:route_ref=*", "name.otp_route_ref");
@@ -678,6 +680,7 @@ public class OsmTagMapper {
     props.createNames("railway=platform;highway=pedestrian", "name.platform");
     props.createNames("railway=platform;highway=path", "name.platform");
     props.createNames("railway=platform;highway=footway", "name.platform");
+    props.createNames("public_transport=platform", "name.platform");
     props.createNames("highway=platform", "name.platform");
     props.createNames("railway=platform", "name.platform");
     props.createNames("railway=platform;highway=footway;bicycle=no", "name.platform");
@@ -735,7 +738,7 @@ public class OsmTagMapper {
     );
   }
 
-  public float getCarSpeedForWay(OsmWithTags way, boolean backward) {
+  public float getCarSpeedForWay(OsmEntity way, boolean backward) {
     return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, backward);
   }
 
@@ -743,12 +746,12 @@ public class OsmTagMapper {
     return wayPropertySet.maxUsedCarSpeed;
   }
 
-  public boolean isGeneralNoThroughTraffic(OsmWithTags way) {
+  public boolean isGeneralNoThroughTraffic(OsmEntity way) {
     String access = way.getTag("access");
     return doesTagValueDisallowThroughTraffic(access);
   }
 
-  public boolean isVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String vehicle = way.getTag("vehicle");
     if (vehicle != null) {
       return doesTagValueDisallowThroughTraffic(vehicle);
@@ -760,7 +763,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for motor vehicles is not allowed.
    */
-  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String motorVehicle = way.getTag("motor_vehicle");
     if (motorVehicle != null) {
       return doesTagValueDisallowThroughTraffic(motorVehicle);
@@ -772,7 +775,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for bicycle is not allowed.
    */
-  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isBicycleThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String bicycle = way.getTag("bicycle");
     if (bicycle != null) {
       return doesTagValueDisallowThroughTraffic(bicycle);
@@ -784,7 +787,7 @@ public class OsmTagMapper {
   /**
    * Returns true if through traffic for walk is not allowed.
    */
-  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmWithTags way) {
+  public boolean isWalkThroughTrafficExplicitlyDisallowed(OsmEntity way) {
     String foot = way.getTag("foot");
     if (foot != null) {
       return doesTagValueDisallowThroughTraffic(foot);

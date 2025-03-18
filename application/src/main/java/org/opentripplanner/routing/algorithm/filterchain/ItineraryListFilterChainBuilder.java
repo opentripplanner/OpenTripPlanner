@@ -82,7 +82,9 @@ public class ItineraryListFilterChainBuilder {
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
-  private Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+  private Consumer<
+    RemoveTransitIfStreetOnlyIsBetterResults
+  > removeTransitIfStreetOnlyIsBetterResultsSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -251,7 +253,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * This will NOT delete itineraries, but tag them as deleted using the {@link
-   * Itinerary#getSystemNotices()}.
+   * Itinerary#systemNotices()}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;
@@ -294,7 +296,9 @@ public class ItineraryListFilterChainBuilder {
    * This stores the best street only cost in the cursor.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
-    Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber
+    Consumer<
+      RemoveTransitIfStreetOnlyIsBetterResults
+    > removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
     this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
       removeTransitIfStreetOnlyIsBetterResultsSubscriber;

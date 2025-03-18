@@ -8,12 +8,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
-import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -67,8 +67,9 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
               );
               break;
             case TRIPS:
-              getTrips(environment)
-                .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+              getTrips(environment).forEach(trip ->
+                alerts.addAll(alertService.getTripAlerts(trip.getId(), null))
+              );
               break;
             case STOPS_ON_ROUTE:
               alerts.addAll(
@@ -79,17 +80,17 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
                     alert
                       .entities()
                       .stream()
-                      .anyMatch(entity ->
-                        entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
-                        stopAndRoute.routeId().equals(getSource(environment).getId())
+                      .anyMatch(
+                        entity ->
+                          entity instanceof EntitySelector.StopAndRoute stopAndRoute &&
+                          stopAndRoute.routeId().equals(getSource(environment).getId())
                       )
                   )
                   .toList()
               );
-              getStops(environment)
-                .forEach(stop ->
-                  alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()))
-                );
+              getStops(environment).forEach(stop ->
+                alerts.addAll(alertService.getStopAlerts(((StopLocation) stop).getId()))
+              );
               break;
             case STOPS_ON_TRIPS:
               Iterable<Trip> trips = getTrips(environment);
@@ -102,9 +103,10 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
                       alert
                         .entities()
                         .stream()
-                        .anyMatch(entity ->
-                          entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
-                          stopAndTrip.tripId().equals(trip.getId())
+                        .anyMatch(
+                          entity ->
+                            entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
+                            stopAndTrip.tripId().equals(trip.getId())
                         )
                     )
                     .toList()
@@ -171,7 +173,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<GraphQLTransitMode> mode() {
-    return environment -> GraphQLUtils.toGraphQL(getSource(environment).getMode());
+    return environment -> TransitModeMapper.map(getSource(environment).getMode());
   }
 
   @Override

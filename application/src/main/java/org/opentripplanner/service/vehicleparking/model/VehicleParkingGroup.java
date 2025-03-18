@@ -75,8 +75,7 @@ public class VehicleParkingGroup {
   }
 
   public String toString() {
-    return ToStringBuilder
-      .of(VehicleParkingGroup.class)
+    return ToStringBuilder.of(VehicleParkingGroup.class)
       .addStr("name", name.toString())
       .addObj("coordinate", coordinate)
       .toString();

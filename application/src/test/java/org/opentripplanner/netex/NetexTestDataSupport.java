@@ -116,11 +116,10 @@ public final class NetexTestDataSupport {
     String opPeriodId,
     Boolean isAvailable
   ) {
-    return createDayTypeAssignment(dayTypeId, isAvailable)
-      .withOperatingPeriodRef(
-        new ObjectFactory()
-          .createOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId))
-      );
+    return createDayTypeAssignment(dayTypeId, isAvailable).withOperatingPeriodRef(
+      new ObjectFactory()
+        .createOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId))
+    );
   }
 
   public static DayTypeAssignment createDayTypeAssignmentWithOpDay(
@@ -128,8 +127,9 @@ public final class NetexTestDataSupport {
     String opDayId,
     Boolean isAvailable
   ) {
-    return createDayTypeAssignment(dayTypeId, isAvailable)
-      .withOperatingDayRef(new OperatingDayRefStructure().withRef(opDayId));
+    return createDayTypeAssignment(dayTypeId, isAvailable).withOperatingDayRef(
+      new OperatingDayRefStructure().withRef(opDayId)
+    );
   }
 
   public static OperatingPeriod createOperatingPeriod(
@@ -217,8 +217,7 @@ public final class NetexTestDataSupport {
 
     if (quay != null) {
       Collection<JAXBElement<?>> jaxbQuays = List.of(OBJECT_FACTORY.createQuay(quay));
-      Quays_RelStructure quays = OBJECT_FACTORY
-        .createQuays_RelStructure()
+      Quays_RelStructure quays = OBJECT_FACTORY.createQuays_RelStructure()
         .withQuayRefOrQuay(jaxbQuays);
       stopPlace.withQuays(quays);
     }

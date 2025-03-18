@@ -15,8 +15,7 @@ import org.opentripplanner.test.support.HttpForTest;
 class TileJsonTest {
 
   private static final List<String> LAYERS = List.of("stops", "rentalVehicles");
-  private static final WorldEnvelope ENVELOPE = WorldEnvelope
-    .of()
+  private static final WorldEnvelope ENVELOPE = WorldEnvelope.of()
     .expandToIncludeStreetEntities(1, 1)
     .expandToIncludeStreetEntities(2, 2)
     .build();

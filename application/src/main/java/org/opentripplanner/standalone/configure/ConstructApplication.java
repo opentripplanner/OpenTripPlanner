@@ -96,20 +96,19 @@ public class ConstructApplication {
     // use Dagger DI to do it - passing in a parameter to enable it or not.
     var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
-    this.factory =
-      DaggerConstructApplicationFactory
-        .builder()
-        .configModel(config)
-        .graph(graph)
-        .timetableRepository(timetableRepository)
-        .graphVisualizer(graphVisualizer)
-        .worldEnvelopeRepository(worldEnvelopeRepository)
-        .vehicleParkingRepository(vehicleParkingRepository)
-        .emissionsDataModel(emissionsDataModel)
-        .dataImportIssueSummary(issueSummary)
-        .stopConsolidationRepository(stopConsolidationRepository)
-        .streetLimitationParameters(streetLimitationParameters)
-        .build();
+    this.factory = DaggerConstructApplicationFactory.builder()
+      .configModel(config)
+      .graph(graph)
+      .timetableRepository(timetableRepository)
+      .graphVisualizer(graphVisualizer)
+      .worldEnvelopeRepository(worldEnvelopeRepository)
+      .vehicleParkingRepository(vehicleParkingRepository)
+      .emissionsDataModel(emissionsDataModel)
+      .dataImportIssueSummary(issueSummary)
+      .stopConsolidationRepository(stopConsolidationRepository)
+      .streetLimitationParameters(streetLimitationParameters)
+      .schema(config.routerConfig().routingRequestDefaults())
+      .build();
   }
 
   public ConstructApplicationFactory getFactory() {

@@ -26,7 +26,7 @@ public class TransitFeedConfig {
         of scanning for transit data files in the [base directory](Configuration.md#Base-Directory).
         You can specify data located outside the local filesystem (including cloud storage services)
         or at various different locations around the local filesystem.
-        
+
         When a feed of a particular type (`netex` or `gtfs`) is specified in the transitFeeds
         section, auto-scanning in the base directory for this feed type will be disabled.
         """

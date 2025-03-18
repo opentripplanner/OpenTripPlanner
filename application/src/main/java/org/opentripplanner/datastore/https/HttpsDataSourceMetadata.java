@@ -84,8 +84,7 @@ class HttpsDataSourceMetadata {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
+    return ToStringBuilder.of(this.getClass())
       .addObj("contentType", contentType)
       .addObj("contentLength", contentLength)
       .addObj("lastModified", lastModified)

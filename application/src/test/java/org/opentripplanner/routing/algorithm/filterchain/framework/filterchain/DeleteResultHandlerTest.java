@@ -82,8 +82,9 @@ class DeleteResultHandlerTest {
   @ParameterizedTest
   @MethodSource("filterLimitToSearchWindowTestCases")
   void filterLimitToSearchWindow(TestCase tc) {
-    var result = new DeleteResultHandler(LIMIT_TO_SEARCH_WINDOW, tc.numItineraries)
-      .filter(tc.input());
+    var result = new DeleteResultHandler(LIMIT_TO_SEARCH_WINDOW, tc.numItineraries).filter(
+      tc.input()
+    );
     assertEquals(Itinerary.toStr(tc.expected), Itinerary.toStr(result));
   }
 
@@ -104,8 +105,9 @@ class DeleteResultHandlerTest {
   @ParameterizedTest
   @MethodSource("filterLimitToNumOfItinerariesTestCases")
   void filterLimitToNumOfItineraries(TestCase tc) {
-    var result = new DeleteResultHandler(LIMIT_TO_NUM_OF_ITINERARIES, tc.numItineraries)
-      .filter(tc.input());
+    var result = new DeleteResultHandler(LIMIT_TO_NUM_OF_ITINERARIES, tc.numItineraries).filter(
+      tc.input()
+    );
     assertEquals(Itinerary.toStr(tc.expected), Itinerary.toStr(result));
   }
 
@@ -160,7 +162,7 @@ class DeleteResultHandlerTest {
     }
 
     private String tag(Itinerary it) {
-      return it.getSystemNotices().stream().map(SystemNotice::tag).findFirst().orElse("na");
+      return it.systemNotices().stream().map(SystemNotice::tag).findFirst().orElse("na");
     }
   }
 }

@@ -111,8 +111,7 @@ public final class RoutingBookingInfo {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(RoutingBookingInfo.class)
+    return ToStringBuilder.of(RoutingBookingInfo.class)
       .addServiceTime("latestBookingTime", latestBookingTime, NOT_SET)
       .addDurationSec("minimumBookingNotice", minimumBookingNotice, NOT_SET)
       .toString();
@@ -156,14 +155,16 @@ public final class RoutingBookingInfo {
     }
 
     public Builder withLatestBookingTime(@Nullable BookingTime latestBookingTime) {
-      this.latestBookingTime =
-        latestBookingTime == null ? NOT_SET : latestBookingTime.relativeTimeSeconds();
+      this.latestBookingTime = latestBookingTime == null
+        ? NOT_SET
+        : latestBookingTime.relativeTimeSeconds();
       return this;
     }
 
     public Builder withMinimumBookingNotice(@Nullable Duration minimumBookingNotice) {
-      this.minimumBookingNotice =
-        minimumBookingNotice == null ? NOT_SET : (int) minimumBookingNotice.toSeconds();
+      this.minimumBookingNotice = minimumBookingNotice == null
+        ? NOT_SET
+        : (int) minimumBookingNotice.toSeconds();
       return this;
     }
 

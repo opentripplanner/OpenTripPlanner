@@ -53,8 +53,7 @@ public class DefaultPageCursorInput implements PageCursorInput {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(DefaultPageCursorInput.class)
+    return ToStringBuilder.of(DefaultPageCursorInput.class)
       .addObj("numItinerariesFilterResults", numItinerariesFilterResults)
       .addObj("removeTransitIfStreetOnlyIsBetterResults", removeTransitIfStreetOnlyIsBetterResults)
       .toString();

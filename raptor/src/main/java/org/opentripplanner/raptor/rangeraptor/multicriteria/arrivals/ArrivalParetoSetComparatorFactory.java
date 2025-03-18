@@ -37,9 +37,9 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
       : createFactoryRelaxC2(relaxC1, c2DominanceFunction);
   }
 
-  private static <
-    T extends McStopArrival<?>
-  > ArrivalParetoSetComparatorFactory<T> createFactoryC1() {
+  private static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
+    T
+  > createFactoryC1() {
     return new ArrivalParetoSetComparatorFactory<T>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
@@ -54,11 +54,9 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
     };
   }
 
-  private static <
-    T extends McStopArrival<?>
-  > ArrivalParetoSetComparatorFactory<T> createFactoryC1AndC2(
-    DominanceFunction c2DominanceFunction
-  ) {
+  private static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
+    T
+  > createFactoryC1AndC2(DominanceFunction c2DominanceFunction) {
     return new ArrivalParetoSetComparatorFactory<T>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
@@ -78,9 +76,9 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
     };
   }
 
-  private static <
-    T extends McStopArrival<?>
-  > ArrivalParetoSetComparatorFactory<T> createFactoryRelaxC1(RelaxFunction rc1) {
+  private static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
+    T
+  > createFactoryRelaxC1(RelaxFunction rc1) {
     return new ArrivalParetoSetComparatorFactory<>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
@@ -95,12 +93,9 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
     };
   }
 
-  private static <
-    T extends McStopArrival<?>
-  > ArrivalParetoSetComparatorFactory<T> createFactoryRelaxC2(
-    RelaxFunction relaxC1,
-    DominanceFunction c2DominanceFunction
-  ) {
+  private static <T extends McStopArrival<?>> ArrivalParetoSetComparatorFactory<
+    T
+  > createFactoryRelaxC2(RelaxFunction relaxC1, DominanceFunction c2DominanceFunction) {
     return new ArrivalParetoSetComparatorFactory<>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
@@ -114,11 +109,9 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
         return (l, r) ->
-          (
-            c2DominanceFunction.leftDominateRight(l.c2(), r.c2())
+          (c2DominanceFunction.leftDominateRight(l.c2(), r.c2())
               ? McStopArrival.relaxedCompareBase(relaxC1, l, r)
-              : McStopArrival.compareBase(l, r)
-          ) ||
+              : McStopArrival.compareBase(l, r)) ||
           McStopArrival.compareArrivedOnBoard(l, r);
       }
     };

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.alternativelegs;
 
-import static org.opentripplanner.routing.stoptimes.StopTimesHelper.skipByTripCancellation;
+import static org.opentripplanner.transit.service.TripTimesHelper.skipByTripCancellation;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -137,8 +137,8 @@ public class AlternativeLegs {
     // TODO: What should we have here
     ZoneId timeZone = transitService.getTimeZone();
 
-    Comparator<TripTimeOnDate> comparator = Comparator.comparing((TripTimeOnDate tts) ->
-      tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
+    Comparator<TripTimeOnDate> comparator = Comparator.comparing(
+      (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
     );
 
     if (direction == NavigationDirection.PREVIOUS) {
@@ -258,20 +258,17 @@ public class AlternativeLegs {
     List<StopLocation> stops = tripPattern.getStops();
 
     // Find out all alighting positions
-    var alightingPositions = IntStream
-      .iterate(stops.size() - 1, i -> i - 1)
+    var alightingPositions = IntStream.iterate(stops.size() - 1, i -> i - 1)
       .limit(stops.size())
       .filter(i -> destinations.contains(stops.get(i)) && tripPattern.canAlight(i))
       .toArray();
 
     // Find out all boarding positions
-    return IntStream
-      .range(0, stops.size())
+    return IntStream.range(0, stops.size())
       .filter(i -> origins.contains(stops.get(i)) && tripPattern.canBoard(i))
       .boxed()
       .flatMap(boardingPosition ->
-        Arrays
-          .stream(alightingPositions)
+        Arrays.stream(alightingPositions)
           // Filter out the impossible combinations
           .filter(alightingPosition -> boardingPosition < alightingPosition)
           .min()

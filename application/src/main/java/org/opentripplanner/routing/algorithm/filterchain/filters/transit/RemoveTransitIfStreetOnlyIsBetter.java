@@ -15,11 +15,14 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  */
 public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
-  private static final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> IGNORE_SUBSCRIBER = i -> {};
+  private static final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> IGNORE_SUBSCRIBER =
+    i -> {};
 
   private final CostLinearFunction costLimitFunction;
   private final Cost generalizedCostMaxLimit;
-  private final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+  private final Consumer<
+    RemoveTransitIfStreetOnlyIsBetterResults
+  > removeTransitIfStreetOnlyIsBetterResultsSubscriber;
 
   /**
    * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
@@ -30,7 +33,9 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
     Cost generalizedCostMaxLimit,
-    Consumer<RemoveTransitIfStreetOnlyIsBetterResults> removeTransitIfStreetOnlyIsBetterResultsSubscriber
+    Consumer<
+      RemoveTransitIfStreetOnlyIsBetterResults
+    > removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
     this.costLimitFunction = costLimitFunction;
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
@@ -56,8 +61,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     // Find the best street-all-the-way option
     OptionalInt minStreetCostOption = itineraries
       .stream()
-      .filter(Itinerary::isOnStreetAllTheWay)
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .filter(Itinerary::isStreetOnly)
+      .mapToInt(Itinerary::generalizedCost)
       .min();
     Cost minStreetCost = null;
 
@@ -91,7 +96,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       // we use the cost without the access/egress penalty since we don't want to give
       // searches that are only on the street network an unfair advantage (they don't have
       // access/egress so cannot have these penalties)
-      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isStreetOnly() && it.generalizedCost() >= limit)
       .toList();
   }
 
