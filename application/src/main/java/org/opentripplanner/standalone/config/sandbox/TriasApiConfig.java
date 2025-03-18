@@ -2,12 +2,15 @@ package org.opentripplanner.standalone.config.sandbox;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
+import java.time.ZoneId;
+import java.util.Optional;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TriasApiConfig {
 
   private final boolean hideFeedId;
   private final String hardcodedInputFeedId;
+  private final ZoneId timeZone;
 
   public TriasApiConfig(String parameterName, NodeAdapter root) {
     var c = root
@@ -34,6 +37,11 @@ public class TriasApiConfig {
         "feedId prefix _and_ `hideFeedId` is set to `true`.`"
       )
       .asString(null);
+    timeZone = c
+      .of("timeZone")
+      .since(V2_8)
+      .summary("If you don't want to use the feed's timezone, configure it here.")
+      .asZoneId(null);
 
     if (hideFeedId && hardcodedInputFeedId == null) {
       throw new IllegalArgumentException(
@@ -48,5 +56,9 @@ public class TriasApiConfig {
 
   public String hardcodedInputFeedId() {
     return hardcodedInputFeedId;
+  }
+
+  public Optional<ZoneId> timeZone() {
+    return Optional.ofNullable(timeZone);
   }
 }
