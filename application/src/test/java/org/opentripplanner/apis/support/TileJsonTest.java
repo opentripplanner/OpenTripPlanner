@@ -61,13 +61,25 @@ class TileJsonTest {
 
   @Test
   void attributionFromFeedInfo() {
-    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO), MIN_ZOOM, MAX_ZOOM);
+    var tileJson = new TileJson(
+      "http://example.com",
+      ENVELOPE,
+      List.of(FEED_INFO),
+      MIN_ZOOM,
+      MAX_ZOOM
+    );
     assertEquals("<a href='https://trimet.org'>Trimet</a>", tileJson.attribution);
   }
 
   @Test
   void duplicateAttribution() {
-    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO, FEED_INFO), MIN_ZOOM, MAX_ZOOM);
+    var tileJson = new TileJson(
+      "http://example.com",
+      ENVELOPE,
+      List.of(FEED_INFO, FEED_INFO),
+      MIN_ZOOM,
+      MAX_ZOOM
+    );
     assertEquals("<a href='https://trimet.org'>Trimet</a>", tileJson.attribution);
   }
 
@@ -76,5 +88,12 @@ class TileJsonTest {
     var override = "OVERRIDE";
     var tileJson = new TileJson("http://example.com", ENVELOPE, override, MIN_ZOOM, MAX_ZOOM);
     assertEquals(override, tileJson.attribution);
+  }
+
+  @Test
+  void zoom() {
+    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO), 0, 5);
+    assertEquals(0, tileJson.minzoom);
+    assertEquals(5, tileJson.maxzoom);
   }
 }

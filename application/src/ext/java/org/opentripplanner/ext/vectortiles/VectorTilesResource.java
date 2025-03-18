@@ -96,14 +96,13 @@ public class VectorTilesResource {
         TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
-    return  config
+    return config
       .attribution()
       .map(attr -> new TileJson(url, envelope, attr, config.minZoom(), config.maxZoom()))
       .orElseGet(() -> {
         var feedInfos = getFeedInfos();
         return new TileJson(url, envelope, feedInfos, config.minZoom(), config.maxZoom());
       });
-
   }
 
   private List<FeedInfo> getFeedInfos() {

@@ -36,7 +36,13 @@ public class TileJson implements Serializable {
   public final double[] bounds;
   public final double[] center;
 
-  public TileJson(String tileUrl, WorldEnvelope envelope, String attribution, int minZoom, int maxZoom) {
+  public TileJson(
+    String tileUrl,
+    WorldEnvelope envelope,
+    String attribution,
+    int minZoom,
+    int maxZoom
+  ) {
     this.attribution = attribution;
     tiles = new String[] { tileUrl };
 
@@ -54,7 +60,13 @@ public class TileJson implements Serializable {
     maxzoom = maxZoom;
   }
 
-  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos, int minZoom, int maxZoom) {
+  public TileJson(
+    String tileUrl,
+    WorldEnvelope envelope,
+    Collection<FeedInfo> feedInfos,
+    int minZoom,
+    int maxZoom
+  ) {
     this(tileUrl, envelope, attributionFromFeedInfo(feedInfos), minZoom, maxZoom);
   }
 

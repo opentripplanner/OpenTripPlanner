@@ -27,22 +27,8 @@ class VectorTilesResourceTest {
       "https://localhost:8080/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{y}.pbf",
       tileJson.tiles[0]
     );
-  }
 
-  @Test
-  void minZoom() {
-    // the Grizzly request is awful to instantiate, using Mockito
-    var grizzlyRequest = Mockito.mock(Request.class);
-    var resource = new VectorTilesResource(
-      TestServerContext.createServerContext(new Graph(), new TimetableRepository()),
-      grizzlyRequest,
-      "default"
-    );
-    var req = HttpForTest.containerRequest();
-    var tileJson = resource.getTileJson(req.getUriInfo(), req, "layer1,layer2");
-    assertEquals(
-      "https://localhost:8080/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{y}.pbf",
-      tileJson.tiles[0]
-    );
+    assertEquals(9, tileJson.minzoom);
+    assertEquals(20, tileJson.maxzoom);
   }
 }
