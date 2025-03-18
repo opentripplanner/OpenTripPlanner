@@ -44,7 +44,7 @@ public class GtfsBundle {
     this(
       new ConfiguredCompositeDataSource<>(
         compositeDataSource,
-        new GtfsFeedParametersBuilder().withSource(compositeDataSource.uri()).build()
+        GtfsFeedParameters.of().withSource(compositeDataSource.uri()).build()
       )
     );
   }

@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.graphbuilder;
 
 import java.net.URI;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 
 /**
@@ -9,20 +10,15 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 public class GtfsFeedParametersBuilder {
 
   private URI source;
+
+  @Nullable
   private String feedId;
+
   private boolean removeRepeatedStops;
   private StopTransferPriority stationTransferPreference;
   private boolean discardMinTransferTimes;
   private boolean blockBasedInterlining;
   private int maxInterlineDistance;
-
-  public GtfsFeedParametersBuilder() {
-    this.removeRepeatedStops = GtfsFeedParameters.DEFAULT_REMOVE_REPEATED_STOPS;
-    this.stationTransferPreference = StopTransferPriority.defaultValue();
-    this.discardMinTransferTimes = GtfsFeedParameters.DEFAULT_DISCARD_MIN_TRANSFER_TIMES;
-    this.blockBasedInterlining = GtfsFeedParameters.DEFAULT_BLOCK_BASED_INTERLINING;
-    this.maxInterlineDistance = GtfsFeedParameters.DEFAULT_MAX_INTERLINE_DISTANCE;
-  }
 
   public GtfsFeedParametersBuilder(GtfsFeedParameters original) {
     this.removeRepeatedStops = original.removeRepeatedStops();
@@ -32,11 +28,12 @@ public class GtfsFeedParametersBuilder {
     this.maxInterlineDistance = original.maxInterlineDistance();
   }
 
-  public GtfsFeedParametersBuilder withFeedId(String feedId) {
+  public GtfsFeedParametersBuilder withFeedId(@Nullable String feedId) {
     this.feedId = feedId;
     return this;
   }
 
+  @Nullable
   String feedId() {
     return feedId;
   }
