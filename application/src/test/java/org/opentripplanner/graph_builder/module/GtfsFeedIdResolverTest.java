@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedId;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedIdResolver;
 
-class GtfsFeedIdTest {
+class GtfsFeedIdResolverTest {
 
   private static final String NUMBERS_ONLY_REGEX = "^\\d+$";
 
@@ -37,7 +37,7 @@ class GtfsFeedIdTest {
   }
 
   private static String feedId(String input) {
-    var id = GtfsFeedId.normalizeId(input);
+    var id = GtfsFeedIdResolver.normalizeId(input);
     assertNotNull(id);
     return id;
   }

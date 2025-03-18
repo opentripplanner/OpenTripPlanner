@@ -12,7 +12,7 @@ import org.opentripplanner.utils.lang.StringUtils;
 /**
  * Represent a feed id in a GTFS feed.
  */
-public class GtfsFeedId {
+public class GtfsFeedIdResolver {
 
   /**
    * A counter that will increase for each created feed id.
@@ -52,7 +52,7 @@ public class GtfsFeedId {
   /**
    * Package local to be unit-testable.
    */
-  public static String normalizeId(String id) {
+  static String normalizeId(String id) {
     var cleanId = cleanId(id);
     return cleanId == null ? generateId() : cleanId;
   }

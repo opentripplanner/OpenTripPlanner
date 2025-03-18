@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedId;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedIdResolver;
 
 class GtfsImport {
 
@@ -42,6 +42,8 @@ class GtfsImport {
   }
 
   private static String resolveFeedId(String defaultFeedId, GtfsReader reader) {
-    return defaultFeedId == null ? GtfsFeedId.fromGtfsFeed(reader.getInputSource()) : defaultFeedId;
+    return defaultFeedId == null
+      ? GtfsFeedIdResolver.fromGtfsFeed(reader.getInputSource())
+      : defaultFeedId;
   }
 }

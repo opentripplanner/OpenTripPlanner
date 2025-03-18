@@ -90,7 +90,7 @@ public class GtfsBundle {
    */
   public String getFeedId() {
     if (feedId == null) {
-      feedId = GtfsFeedId.fromGtfsFeed(getCsvInputSource());
+      feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource());
     }
     return feedId;
   }
