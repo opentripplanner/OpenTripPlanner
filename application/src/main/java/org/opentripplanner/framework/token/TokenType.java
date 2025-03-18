@@ -36,7 +36,7 @@ public enum TokenType {
       case BYTE -> Byte.toString((byte) value);
       case DURATION -> DurationUtils.durationToStr((Duration) value);
       case ENUM -> ((Enum<?>) value).name();
-      case INT -> Integer.toString((Integer) value);
+      case INT -> Integer.toString((int) value);
       case STRING -> (String) value;
       case TIME_INSTANT -> value.toString();
     };

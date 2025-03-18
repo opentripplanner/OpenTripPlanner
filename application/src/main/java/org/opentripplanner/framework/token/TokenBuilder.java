@@ -29,7 +29,7 @@ public class TokenBuilder {
     return with(fieldName, TokenType.DURATION, v);
   }
 
-  public TokenBuilder withInt(String fieldName, Integer v) {
+  public TokenBuilder withInt(String fieldName, int v) {
     return with(fieldName, TokenType.INT, v);
   }
 
