@@ -4,11 +4,15 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 
 public class GraphQLUtils {
 
-  public static String getTranslation(I18NString input, DataFetchingEnvironment environment) {
+  public static String getTranslation(
+    @Nullable I18NString input,
+    DataFetchingEnvironment environment
+  ) {
     if (input == null) {
       return null;
     }
@@ -24,7 +28,10 @@ public class GraphQLUtils {
     return getLocaleFromEnvironment(environment);
   }
 
-  public static Locale getLocale(DataFetchingEnvironment environment, String localeString) {
+  public static Locale getLocale(
+    DataFetchingEnvironment environment,
+    @Nullable String localeString
+  ) {
     if (localeString != null) {
       return Locale.forLanguageTag(localeString);
     }
@@ -32,7 +39,7 @@ public class GraphQLUtils {
     return getLocaleFromEnvironment(environment);
   }
 
-  public static Locale getLocale(DataFetchingEnvironment environment, Locale locale) {
+  public static Locale getLocale(DataFetchingEnvironment environment, @Nullable Locale locale) {
     if (locale != null) {
       return locale;
     }
@@ -42,18 +49,10 @@ public class GraphQLUtils {
 
   public static Locale getLocaleFromEnvironment(DataFetchingEnvironment environment) {
     // This can come from the accept-language header
-    var userLocale = environment.getLocale();
-    var defaultLocale = getDefaultLocale(environment);
-
-    if (userLocale == null) {
-      return defaultLocale.orElse(Locale.forLanguageTag("*"));
-    }
-
-    if (defaultLocale.isPresent() && acceptAnyLocale(userLocale)) {
-      return defaultLocale.get();
-    }
-
-    return userLocale;
+    var envLocale = environment.getLocale();
+    // This can come from a locale param
+    var localContextLocale = getDefaultLocale(environment);
+    return localContextLocale.orElse(envLocale);
   }
 
   private static Optional<Locale> getDefaultLocale(DataFetchingEnvironment environment) {
@@ -62,9 +61,5 @@ public class GraphQLUtils {
       return Optional.empty();
     }
     return Optional.ofNullable((Locale) localContext.get("locale"));
-  }
-
-  private static boolean acceptAnyLocale(Locale locale) {
-    return locale.getLanguage().equals("*");
   }
 }
