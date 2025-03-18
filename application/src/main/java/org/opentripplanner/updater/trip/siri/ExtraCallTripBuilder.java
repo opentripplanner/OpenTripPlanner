@@ -3,7 +3,7 @@ package org.opentripplanner.updater.trip.siri;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -103,7 +103,7 @@ class ExtraCallTripBuilder {
 
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
-        return UpdateError.result(trip.getId(), NO_VALID_STOPS, dataSource);
+        return UpdateError.result(trip.getId(), UNKNOWN_STOP, dataSource);
       }
 
       aimedStopTimes.add(stopTime);
