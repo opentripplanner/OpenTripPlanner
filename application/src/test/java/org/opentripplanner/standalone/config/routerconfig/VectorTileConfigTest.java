@@ -21,22 +21,24 @@ class VectorTileConfigTest {
     final int maxZoom = 24;
     final int minZoom = 2;
     var config = new VectorTileConfig(
-      List.of(
-        new VectorTileConfig.Layer(
-          "aaa",
-          VectorTilesResource.LayerType.Stop,
-          "a-mapper",
-          maxZoom,
-          minZoom,
-          60,
-          0.25,
-          LayerFilters.FilterType.NONE
-        )
-      ),
+      List.of(layerConfig(maxZoom, minZoom), layerConfig(maxZoom - 1, minZoom + 1)),
       null,
       null
     );
     assertEquals(minZoom, config.minZoom());
     assertEquals(maxZoom, config.maxZoom());
+  }
+
+  private static VectorTileConfig.Layer layerConfig(int maxZoom, int minZoom) {
+    return new VectorTileConfig.Layer(
+      "aaa",
+      VectorTilesResource.LayerType.Stop,
+      "a-mapper",
+      maxZoom,
+      minZoom,
+      60,
+      0.25,
+      LayerFilters.FilterType.NONE
+    );
   }
 }

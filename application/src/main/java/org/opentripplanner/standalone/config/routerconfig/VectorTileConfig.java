@@ -172,7 +172,7 @@ public class VectorTileConfig implements VectorTilesResource.LayersParameters<La
    * The highest configured maxZoom value of any layer or the fallback of {@link LayerParameters#MAX_ZOOM}
    */
   public int maxZoom() {
-    return layers.stream().mapToInt(LayerParameters::maxZoom).min().orElse(MAX_ZOOM);
+    return layers.stream().mapToInt(LayerParameters::maxZoom).max().orElse(MAX_ZOOM);
   }
 
   record Layer(
