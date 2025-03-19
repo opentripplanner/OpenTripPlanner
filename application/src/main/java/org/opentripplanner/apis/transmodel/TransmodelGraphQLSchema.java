@@ -1217,12 +1217,7 @@ public class TransmodelGraphQLSchema {
           )
           .dataFetcher(environment -> {
             if (
-              Stream.of(
-                "lines",
-                "privateCodes",
-                "authorities",
-                "activeDates"
-              ).noneMatch(
+              Stream.of("lines", "privateCodes", "authorities", "activeDates").noneMatch(
                 key -> environment.getArgument(key) != null
               )
             ) {
@@ -1231,7 +1226,9 @@ public class TransmodelGraphQLSchema {
             var tripRequest = TripRequest.of()
               .withIncludeAgencies(mapIDsToDomain(environment.getArgument("authorities")))
               .withIncludeRoutes(mapIDsToDomain(environment.getArgument("lines")))
-              .withIncludeNetexInternalPlanningCodes(GqlUtil.toList(environment.getArgument("privateCodes")))
+              .withIncludeNetexInternalPlanningCodes(
+                GqlUtil.toStringList(environment.getArgument("privateCodes"))
+              )
               .withIncludeServiceDates(GqlUtil.toList(environment.getArgument("activeDates")))
               .build();
 
