@@ -2,21 +2,15 @@ package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
-import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.datastore.file.DirectoryDataSource;
-import org.opentripplanner.datastore.file.ZipFileDataSource;
+import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
-import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
+import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -25,26 +19,23 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class EmissionsGraphBuilderTest {
 
   private final ResourceLoader RES = ResourceLoader.of(EmissionsGraphBuilderTest.class);
-  private final File CO2_GTFS_ZIP = RES.file("emissions-test-gtfs.zip");
-  private final File CO2_GTFS = RES.file("emissions-test-gtfs/");
-  private final String CONFIG_PATH = "standalone/config/" + OtpFileNames.BUILD_CONFIG_FILENAME;
-  private final BuildConfig buildConfig = new BuildConfig(
-    jsonNodeFromResource(CONFIG_PATH),
-    CONFIG_PATH,
-    true
+  private final CompositeDataSource CO2_GTFS_ZIP = RES.catalogDataSource(
+    "emissions-test-gtfs.zip",
+    GTFS
   );
-  private final Multimap<FileType, DataSource> inputData = ArrayListMultimap.create();
+  private final CompositeDataSource CO2_GTFS = RES.catalogDataSource("emissions-test-gtfs/", GTFS);
 
   @Test
   void testMultipleGtfsDataReading() {
-    inputData.put(GTFS, new ZipFileDataSource(CO2_GTFS_ZIP, GTFS));
-    inputData.put(GTFS, new DirectoryDataSource(CO2_GTFS, GTFS));
-    Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> configuredDataSource =
-      getGtfsConfiguredDatasource();
-    EmissionsRepository emissionsRepository = new DefaultEmissionsRepository();
-    EmissionsGraphBuilder emissionsGraphBuilder = new EmissionsGraphBuilder(
-      configuredDataSource,
-      buildConfig,
+    var configuredDataSources = List.of(
+      configuredDataSource(CO2_GTFS_ZIP),
+      configuredDataSource(CO2_GTFS)
+    );
+
+    var emissionsRepository = new DefaultEmissionsRepository();
+    var emissionsGraphBuilder = new EmissionsGraphBuilder(
+      configuredDataSources,
+      BuildConfig.DEFAULT.emissions,
       emissionsRepository,
       DataImportIssueStore.NOOP
     );
@@ -59,21 +50,12 @@ public class EmissionsGraphBuilderTest {
     );
   }
 
-  private Iterable<
-    ConfiguredCompositeDataSource<GtfsFeedParameters>
-  > getGtfsConfiguredDatasource() {
-    return inputData
-      .get(GTFS)
-      .stream()
-      .map(it -> new ConfiguredCompositeDataSource<>(it, getGtfsFeedConfig(it)))
-      .toList();
-  }
-
-  private GtfsFeedParameters getGtfsFeedConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds
-      .gtfsFeeds()
-      .stream()
-      .findFirst()
-      .orElse(buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build());
+  private static ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource(
+    CompositeDataSource dataSource
+  ) {
+    return new ConfiguredCompositeDataSource<>(
+      dataSource,
+      GtfsDefaultParameters.DEFAULT.withFeedInfo().withSource(dataSource.uri()).build()
+    );
   }
 }

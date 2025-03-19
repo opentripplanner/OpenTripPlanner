@@ -23,7 +23,7 @@ public class EmissionsGraphBuilderModule {
   ) {
     return new EmissionsGraphBuilder(
       dataSources.getGtfsConfiguredDatasource(),
-      config,
+      config.emissions,
       emissionsRepository,
       issueStore
     );
