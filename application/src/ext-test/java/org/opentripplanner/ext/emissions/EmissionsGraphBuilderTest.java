@@ -17,7 +17,7 @@ import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -74,6 +74,6 @@ public class EmissionsGraphBuilderTest {
       .gtfsFeeds()
       .stream()
       .findFirst()
-      .orElse(buildConfig.gtfsDefaults.copyOf().withSource(dataSource.uri()).build());
+      .orElse(buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build());
   }
 }

@@ -30,7 +30,7 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -157,7 +157,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Duration maxTransferDuration;
   public final Map<StreetMode, TransferParameters> transferParametersForMode;
   public final NetexFeedParameters netexDefaults;
-  public final GtfsFeedParameters gtfsDefaults;
+  public final GtfsDefaultParameters gtfsDefaults;
 
   public final DemExtractParameters demDefaults;
   public final OsmExtractParameters osmDefaults;

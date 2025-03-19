@@ -26,7 +26,7 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersBuilder;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -164,7 +164,7 @@ public class GraphBuilderDataSources {
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
-      .orElse(buildConfig.gtfsDefaults.copyOf().withSource(dataSource.uri()).build());
+      .orElse(buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build());
   }
 
   public Iterable<

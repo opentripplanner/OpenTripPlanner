@@ -1,18 +1,8 @@
-package org.opentripplanner.gtfs.graphbuilder;
+package org.opentripplanner.gtfs.config;
 
-import java.net.URI;
-import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 
-/**
- * Configure a GTFS feed.
- */
-public class GtfsFeedParametersBuilder {
-
-  private URI source;
-
-  @Nullable
-  private String feedId;
+public class GtfsDefaultParametersBuilder {
 
   private boolean removeRepeatedStops;
   private StopTransferPriority stationTransferPreference;
@@ -20,7 +10,7 @@ public class GtfsFeedParametersBuilder {
   private boolean blockBasedInterlining;
   private int maxInterlineDistance;
 
-  public GtfsFeedParametersBuilder(GtfsFeedParameters original) {
+  public GtfsDefaultParametersBuilder(GtfsDefaultParameters original) {
     this.removeRepeatedStops = original.removeRepeatedStops();
     this.stationTransferPreference = original.stationTransferPreference();
     this.discardMinTransferTimes = original.discardMinTransferTimes();
@@ -28,17 +18,7 @@ public class GtfsFeedParametersBuilder {
     this.maxInterlineDistance = original.maxInterlineDistance();
   }
 
-  public GtfsFeedParametersBuilder withFeedId(@Nullable String feedId) {
-    this.feedId = feedId;
-    return this;
-  }
-
-  @Nullable
-  String feedId() {
-    return feedId;
-  }
-
-  public GtfsFeedParametersBuilder withStationTransferPreference(
+  public GtfsDefaultParametersBuilder withStationTransferPreference(
     StopTransferPriority stationTransferPreference
   ) {
     this.stationTransferPreference = stationTransferPreference;
@@ -49,16 +29,7 @@ public class GtfsFeedParametersBuilder {
     return stationTransferPreference;
   }
 
-  public GtfsFeedParametersBuilder withSource(URI source) {
-    this.source = source;
-    return this;
-  }
-
-  URI source() {
-    return source;
-  }
-
-  public GtfsFeedParametersBuilder withRemoveRepeatedStops(boolean value) {
+  public GtfsDefaultParametersBuilder withRemoveRepeatedStops(boolean value) {
     this.removeRepeatedStops = value;
     return this;
   }
@@ -67,7 +38,7 @@ public class GtfsFeedParametersBuilder {
     return removeRepeatedStops;
   }
 
-  public GtfsFeedParametersBuilder withDiscardMinTransferTimes(boolean value) {
+  public GtfsDefaultParametersBuilder withDiscardMinTransferTimes(boolean value) {
     this.discardMinTransferTimes = value;
     return this;
   }
@@ -76,7 +47,7 @@ public class GtfsFeedParametersBuilder {
     return discardMinTransferTimes;
   }
 
-  public GtfsFeedParametersBuilder withBlockBasedInterlining(boolean value) {
+  public GtfsDefaultParametersBuilder withBlockBasedInterlining(boolean value) {
     this.blockBasedInterlining = value;
     return this;
   }
@@ -85,7 +56,7 @@ public class GtfsFeedParametersBuilder {
     return blockBasedInterlining;
   }
 
-  public GtfsFeedParametersBuilder withMaxInterlineDistance(int value) {
+  public GtfsDefaultParametersBuilder withMaxInterlineDistance(int value) {
     this.maxInterlineDistance = value;
     return this;
   }
@@ -94,7 +65,7 @@ public class GtfsFeedParametersBuilder {
     return maxInterlineDistance;
   }
 
-  public GtfsFeedParameters build() {
-    return new GtfsFeedParameters(this);
+  public GtfsDefaultParameters build() {
+    return new GtfsDefaultParameters(this);
   }
 }

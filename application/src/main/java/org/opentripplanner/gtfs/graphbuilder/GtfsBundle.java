@@ -9,6 +9,8 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
+import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +45,10 @@ public class GtfsBundle {
     this(
       new ConfiguredCompositeDataSource<>(
         compositeDataSource,
-        GtfsFeedParameters.of().withSource(compositeDataSource.uri()).withFeedId(feedId).build()
+        GtfsDefaultParameters.DEFAULT.withFeedInfo()
+          .withSource(compositeDataSource.uri())
+          .withFeedId(feedId)
+          .build()
       )
     );
   }
