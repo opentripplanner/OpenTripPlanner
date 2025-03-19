@@ -27,8 +27,8 @@ class GtfsModuleTest {
   void addShapesForFrequencyTrips() {
     var model = buildTestModel();
 
-    var bundle = new GtfsBundle(ConstantsForTests.SIMPLE_GTFS, null);
-    var module = new GtfsModule(
+    var bundle = GtfsBundle.forTest(ConstantsForTests.SIMPLE_GTFS);
+    var module = GtfsModule.forTest(
       List.of(bundle),
       model.timetableRepository,
       model.graph,
@@ -59,7 +59,7 @@ class GtfsModuleTest {
     var bundles = List.of(bundle("A"), bundle("A"));
     var model = buildTestModel();
 
-    var module = new GtfsModule(
+    var module = GtfsModule.forTest(
       bundles,
       model.timetableRepository,
       model.graph,
@@ -79,7 +79,7 @@ class GtfsModuleTest {
   record TestModels(Graph graph, TimetableRepository timetableRepository) {}
 
   static GtfsBundle bundle(String feedId) {
-    return new GtfsBundle(
+    return GtfsBundle.forTest(
       ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"),
       feedId
     );
@@ -108,7 +108,7 @@ class GtfsModuleTest {
       var feedIds = bundles.stream().map(GtfsBundle::getFeedId).collect(Collectors.toSet());
       assertEquals(bundles.size(), feedIds.size());
 
-      var module = new GtfsModule(
+      var module = GtfsModule.forTest(
         bundles,
         model.timetableRepository,
         model.graph,

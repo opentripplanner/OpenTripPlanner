@@ -324,7 +324,7 @@ public class ConstantsForTests {
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
   ) {
-    var bundle = new GtfsBundle(file, feedId);
+    var bundle = GtfsBundle.forTest(file, feedId);
 
     var module = new GtfsModule(
       List.of(bundle),

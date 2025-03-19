@@ -109,13 +109,16 @@ public class GtfsModule implements GraphBuilderModule {
     this.subwayAccessTime_s = subwayAccessTime_s;
   }
 
-  public GtfsModule(
+  /**
+   * Create a new instance for unit-testing.
+   */
+  public static GtfsModule forTest(
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
     ServiceDateInterval transitPeriodLimit
   ) {
-    this(
+    return new GtfsModule(
       bundles,
       timetableRepository,
       graph,

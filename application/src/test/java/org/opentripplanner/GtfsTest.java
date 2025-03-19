@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
@@ -193,8 +192,9 @@ public abstract class GtfsTest {
   protected void setUp() throws Exception {
     File gtfs = new File("src/test/resources/" + getFeedName());
     File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
-    GtfsBundle gtfsBundle = new GtfsBundle(gtfs, FEED_ID);
-    List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
+
+    GtfsBundle gtfsBundle = GtfsBundle.forTest(gtfs, FEED_ID);
+    List<GtfsBundle> gtfsBundleList = List.of(gtfsBundle);
 
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
@@ -207,7 +207,7 @@ public abstract class GtfsTest {
       )
     );
 
-    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+    GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
       timetableRepository,
       graph,

@@ -8,7 +8,6 @@ import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.slf4j.Logger;
@@ -29,28 +28,26 @@ public class GtfsBundle {
 
   private final GtfsFeedParameters parameters;
 
-  public GtfsBundle(ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource) {
-    this.dataSource = configuredDataSource.dataSource();
-    this.parameters = configuredDataSource.config();
+  public GtfsBundle(CompositeDataSource dataSource, GtfsFeedParameters parameters) {
+    this.dataSource = dataSource;
+    this.parameters = parameters;
     // Override feed id, if set in config
-    this.feedId = configuredDataSource.config().feedId();
+    this.feedId = parameters.feedId();
   }
 
   /** Used by unit tests */
-  public GtfsBundle(File gtfsFile, @Nullable String feedId) {
-    this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS), feedId);
+  public static GtfsBundle forTest(File gtfsFile, @Nullable String feedId) {
+    var dataSource = DataStoreModule.compositeSource(gtfsFile, FileType.GTFS);
+    var parameters = GtfsDefaultParameters.DEFAULT.withFeedInfo()
+      .withSource(dataSource.uri())
+      .withFeedId(feedId)
+      .build();
+    return new GtfsBundle(dataSource, parameters);
   }
 
-  private GtfsBundle(CompositeDataSource compositeDataSource, @Nullable String feedId) {
-    this(
-      new ConfiguredCompositeDataSource<>(
-        compositeDataSource,
-        GtfsDefaultParameters.DEFAULT.withFeedInfo()
-          .withSource(compositeDataSource.uri())
-          .withFeedId(feedId)
-          .build()
-      )
-    );
+  /** Used by unit tests */
+  public static GtfsBundle forTest(File gtfsFile) {
+    return forTest(gtfsFile, null);
   }
 
   public CsvInputSource getCsvInputSource() {

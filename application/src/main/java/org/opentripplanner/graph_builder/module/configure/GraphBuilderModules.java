@@ -105,7 +105,7 @@ public class GraphBuilderModules {
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
     for (var gtfsData : dataSources.getGtfsConfiguredDatasource()) {
-      gtfsBundles.add(new GtfsBundle(gtfsData));
+      gtfsBundles.add(new GtfsBundle(gtfsData.dataSource(), gtfsData.config()));
     }
     return new GtfsModule(
       gtfsBundles,
