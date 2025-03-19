@@ -3,6 +3,7 @@ package org.opentripplanner.apis.transmodel;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.apis.transmodel.mapping.SeverityMapper.getTransmodelSeverity;
+import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDToApi;
 import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDToDomain;
 import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomain;
 import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
