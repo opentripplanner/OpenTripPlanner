@@ -30,6 +30,7 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLScalarType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.SchemaTransformer;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1215,11 +1216,23 @@ public class TransmodelGraphQLSchema {
               .build()
           )
           .dataFetcher(environment -> {
+            if (
+              Stream.of(
+                "lines",
+                "privateCodes",
+                "authorities",
+                "activeDates"
+              ).noneMatch(
+                key -> environment.getArgument(key) != null
+              )
+            ) {
+              throw new IllegalArgumentException("At least one argument must be non-null");
+            }
             var tripRequest = TripRequest.of()
               .withIncludeAgencies(mapIDsToDomain(environment.getArgument("authorities")))
               .withIncludeRoutes(mapIDsToDomain(environment.getArgument("lines")))
-              .withIncludeNetexInternalPlanningCodes(environment.getArgument("privateCodes"))
-              .withIncludeServiceDates(environment.getArgument("activeDates"))
+              .withIncludeNetexInternalPlanningCodes(GqlUtil.toList(environment.getArgument("privateCodes")))
+              .withIncludeServiceDates(GqlUtil.toList(environment.getArgument("activeDates")))
               .build();
 
             return GqlUtil.getTransitService(environment).getTrips(tripRequest);
