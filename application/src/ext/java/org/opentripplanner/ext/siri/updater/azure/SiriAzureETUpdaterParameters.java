@@ -40,7 +40,7 @@ public class SiriAzureETUpdaterParameters
         return new ConnectionStringProperties(getServiceBusUrl()).getEndpoint().toString();
       } catch (IllegalArgumentException ignore) {}
     }
-    return "unkown";
+    return "unknown";
   }
 
   @Override
