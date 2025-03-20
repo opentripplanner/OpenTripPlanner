@@ -209,9 +209,9 @@ enable it by changing the config.
 
 ## How To Make The First Release
 
-The release script looks for the _last release_ to resolve the next version. It uses the the version
-in the Maven _pom.xml_, stip of `-SNAPSHOT` and append `<organization name>` and a sequence number
-(`N`). The release fails if there are no tags matching `vX.Y.Z-<organization name>-N`. There is two
+The release script looks for the _last release_ to resolve the next version. It uses the version
+in the Maven _pom.xml_, strips of `-SNAPSHOT` and appends `<organization name>` and a sequence number
+(`N`). The release fails if there are no tags matching `vX.Y.Z-<organization name>-N`. There are two
 ways to resolve this:
 
 - The simplest way to fix this, is to tag the _last release_ with an extra tag. Let say the new OTP 
