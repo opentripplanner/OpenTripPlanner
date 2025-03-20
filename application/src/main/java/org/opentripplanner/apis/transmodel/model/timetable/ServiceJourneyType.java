@@ -284,7 +284,7 @@ public class ServiceJourneyType {
           .dataFetcher(environment ->
             GqlUtil.getTransitService(environment)
               .getTransitAlertService()
-              .getTripAlerts(trip(environment).getId(), null)
+              .getTripAlerts(trip(environment).getId())
           )
           .build()
       )

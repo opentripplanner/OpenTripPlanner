@@ -10,6 +10,7 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 
 /**
@@ -29,7 +30,7 @@ public class OsmModuleBuilder {
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
   private boolean includeOsmSubwayEntrances = false;
-  private int maxAreaNodes;
+  private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
   private StreetLimitationParameters streetLimitationParameters = new StreetLimitationParameters();
 
   OsmModuleBuilder(

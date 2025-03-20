@@ -167,6 +167,8 @@ class WalkableAreaBuilder {
     // Edges which are part of the rings
     Set<Edge> ringEdges = new HashSet<>();
 
+    HashMap<AreaGroup, HashSet<IntersectionVertex>> visibilityVertexCandidates = new HashMap<>();
+
     // OSM ways that this area group consists of
     Set<Long> osmWayIds = group.areas
       .stream()
@@ -189,7 +191,6 @@ class WalkableAreaBuilder {
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
       OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
@@ -293,13 +294,11 @@ class WalkableAreaBuilder {
         }
         continue;
       }
-
-      areaGroup.addVisibilityVertices(visibilityVertices);
-      createAreas(areaGroup, ring, group.areas);
-
       if (visibilityVertices.size() > maxAreaNodes) {
         issueStore.add(new AreaTooComplicated(group, visibilityVertices.size(), maxAreaNodes));
       }
+      visibilityVertexCandidates.put(areaGroup, visibilityVertices);
+      createAreas(areaGroup, ring, group.areas);
 
       // if area is too complex, consider only part of visibility nodes
       // so that at least some edges passing through the area are added
@@ -343,6 +342,21 @@ class WalkableAreaBuilder {
       }
     }
     pruneAreaEdges(startingVertices, edges, ringEdges);
+
+    visibilityVertexCandidates.forEach((areaGroup, vertices) -> {
+      if (vertices.size() > maxAreaNodes) {
+        // keep nodes which have most connections
+        areaGroup.addVisibilityVertices(
+          vertices
+            .stream()
+            .sorted((v1, v2) -> Long.compare((v2.getDegreeOut()), v1.getDegreeOut()))
+            .limit(maxAreaNodes)
+            .collect(Collectors.toSet())
+        );
+      } else {
+        areaGroup.addVisibilityVertices(vertices);
+      }
+    });
   }
 
   /**

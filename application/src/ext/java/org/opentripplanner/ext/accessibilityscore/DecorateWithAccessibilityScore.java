@@ -4,7 +4,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -37,10 +36,11 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
 
   @Override
   public Itinerary decorate(Itinerary itinerary) {
-    return addAccessibilityScore(itinerary.copyOf()).build();
+    return addAccessibilityScore(itinerary);
   }
 
-  private ItineraryBuilder addAccessibilityScore(ItineraryBuilder builder) {
+  private Itinerary addAccessibilityScore(Itinerary i) {
+    var builder = i.copyOf();
     var legs = builder
       .legs()
       .stream()
@@ -54,7 +54,11 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
         }
       })
       .toList();
-    return builder.withLegs(ignore -> legs).withAccessibilityScore(compute(legs));
+    builder.withLegs(ignore -> legs);
+    if (i.isWalkOnly() || i.hasTransit()) {
+      builder.withAccessibilityScore(compute(legs));
+    }
+    return builder.build();
   }
 
   private static float compute(ScheduledTransitLeg leg) {

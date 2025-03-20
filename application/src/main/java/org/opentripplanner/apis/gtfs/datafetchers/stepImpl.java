@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import static org.opentripplanner.framework.graphql.GraphQLUtils.getLocale;
+
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -81,7 +83,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
   @Override
   public DataFetcher<String> streetName() {
     return environment ->
-      getSource(environment).getDirectionText().toString(environment.getLocale());
+      getSource(environment).getDirectionText().toString(getLocale(environment));
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static org.opentripplanner.apis.gtfs.GraphQLUtils.toGraphQL;
+import static org.opentripplanner.framework.graphql.GraphQLUtils.getLocale;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -19,7 +20,7 @@ public class RoutingErrorImpl implements GraphQLDataFetchers.GraphQLRoutingError
   @Override
   public DataFetcher<String> description() {
     return environment ->
-      PlannerErrorMapper.mapMessage(getSource(environment)).message.get(environment.getLocale());
+      PlannerErrorMapper.mapMessage(getSource(environment)).message.get(getLocale(environment));
   }
 
   @Override
