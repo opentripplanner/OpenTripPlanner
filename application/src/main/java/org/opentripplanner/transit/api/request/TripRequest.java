@@ -14,29 +14,29 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class TripRequest {
 
-  private final FilterValues<FeedScopedId> includedAgencies;
-  private final FilterValues<FeedScopedId> includedRoutes;
+  private final FilterValues<FeedScopedId> includeAgencies;
+  private final FilterValues<FeedScopedId> includeRoutes;
 
-  private final FilterValues<FeedScopedId> excludedAgencies;
-  private final FilterValues<FeedScopedId> excludedRoutes;
+  private final FilterValues<FeedScopedId> excludeAgencies;
+  private final FilterValues<FeedScopedId> excludeRoutes;
 
-  private final FilterValues<String> netexInternalPlanningCodes;
-  private final FilterValues<LocalDate> serviceDates;
+  private final FilterValues<String> includeNetexInternalPlanningCodes;
+  private final FilterValues<LocalDate> includeServiceDates;
 
   TripRequest(
-    FilterValues<FeedScopedId> includedAgencies,
-    FilterValues<FeedScopedId> includedRoutes,
-    FilterValues<FeedScopedId> excludedAgencies,
-    FilterValues<FeedScopedId> excludedRoutes,
-    FilterValues<String> netexInternalPlanningCodes,
-    FilterValues<LocalDate> serviceDates
+    FilterValues<FeedScopedId> includeAgencies,
+    FilterValues<FeedScopedId> includeRoutes,
+    FilterValues<FeedScopedId> excludeAgencies,
+    FilterValues<FeedScopedId> excludeRoutes,
+    FilterValues<String> includeNetexInternalPlanningCodes,
+    FilterValues<LocalDate> includeServiceDates
   ) {
-    this.includedAgencies = includedAgencies;
-    this.includedRoutes = includedRoutes;
-    this.excludedAgencies = excludedAgencies;
-    this.excludedRoutes = excludedRoutes;
-    this.netexInternalPlanningCodes = netexInternalPlanningCodes;
-    this.serviceDates = serviceDates;
+    this.includeAgencies = includeAgencies;
+    this.includeRoutes = includeRoutes;
+    this.excludeAgencies = excludeAgencies;
+    this.excludeRoutes = excludeRoutes;
+    this.includeNetexInternalPlanningCodes = includeNetexInternalPlanningCodes;
+    this.includeServiceDates = includeServiceDates;
   }
 
   public static TripRequestBuilder of() {
@@ -44,27 +44,27 @@ public class TripRequest {
   }
 
   public FilterValues<FeedScopedId> includeAgencies() {
-    return includedAgencies;
+    return includeAgencies;
   }
 
   public FilterValues<FeedScopedId> includeRoutes() {
-    return includedRoutes;
+    return includeRoutes;
   }
 
-  public FilterValues<FeedScopedId> excludedAgencies() {
-    return excludedAgencies;
+  public FilterValues<FeedScopedId> excludeAgencies() {
+    return excludeAgencies;
   }
 
-  public FilterValues<FeedScopedId> excludedRoutes() {
-    return excludedRoutes;
+  public FilterValues<FeedScopedId> excludeRoutes() {
+    return excludeRoutes;
   }
 
   public FilterValues<String> includeNetexInternalPlanningCodes() {
-    return netexInternalPlanningCodes;
+    return includeNetexInternalPlanningCodes;
   }
 
   public FilterValues<LocalDate> includeServiceDates() {
-    return serviceDates;
+    return includeServiceDates;
   }
 
   @Override
@@ -72,36 +72,36 @@ public class TripRequest {
     if (this == o) return true;
     if (!(o instanceof TripRequest that)) return false;
     return (
-      Objects.equals(includedAgencies, that.includedAgencies) &&
-      Objects.equals(includedRoutes, that.includedRoutes) &&
-      Objects.equals(excludedAgencies, that.excludedAgencies) &&
-      Objects.equals(excludedRoutes, that.excludedRoutes) &&
-      Objects.equals(netexInternalPlanningCodes, that.netexInternalPlanningCodes) &&
-      Objects.equals(serviceDates, that.serviceDates)
+      Objects.equals(includeAgencies, that.includeAgencies) &&
+      Objects.equals(includeRoutes, that.includeRoutes) &&
+      Objects.equals(excludeAgencies, that.excludeAgencies) &&
+      Objects.equals(excludeRoutes, that.excludeRoutes) &&
+      Objects.equals(includeNetexInternalPlanningCodes, that.includeNetexInternalPlanningCodes) &&
+      Objects.equals(includeServiceDates, that.includeServiceDates)
     );
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(
-      includedAgencies,
-      includedRoutes,
-      excludedAgencies,
-      excludedRoutes,
-      netexInternalPlanningCodes,
-      serviceDates
+      includeAgencies,
+      includeRoutes,
+      excludeAgencies,
+      excludeRoutes,
+      includeNetexInternalPlanningCodes,
+      includeServiceDates
     );
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(TripRequest.class)
-      .addObj("includedAgencies", includedAgencies)
-      .addObj("includedRoutes", includedRoutes)
-      .addObj("excludedAgencies", excludedAgencies)
-      .addObj("excludedRoutes", excludedRoutes)
-      .addObj("netexInternalPlanningCodes", netexInternalPlanningCodes)
-      .addObj("serviceDates", serviceDates)
+      .addObj("includeAgencies", includeAgencies)
+      .addObj("includeRoutes", includeRoutes)
+      .addObj("excludeAgencies", excludeAgencies)
+      .addObj("excludeRoutes", excludeRoutes)
+      .addObj("includeNetexInternalPlanningCodes", includeNetexInternalPlanningCodes)
+      .addObj("includeServiceDates", includeServiceDates)
       .toString();
   }
 }

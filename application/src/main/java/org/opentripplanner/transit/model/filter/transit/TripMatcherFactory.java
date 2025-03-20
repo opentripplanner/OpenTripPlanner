@@ -39,8 +39,8 @@ public class TripMatcherFactory {
 
     expr.atLeastOneMatch(request.includeAgencies(), TripMatcherFactory::includeAgencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripMatcherFactory::includeRouteId);
-    expr.matchesAll(request.excludedAgencies(), TripMatcherFactory::excludeAgencyId);
-    expr.matchesAll(request.excludedRoutes(), TripMatcherFactory::excludeRouteId);
+    expr.matchesAll(request.excludeAgencies(), TripMatcherFactory::excludeAgencyId);
+    expr.matchesAll(request.excludeRoutes(), TripMatcherFactory::excludeRouteId);
     expr.atLeastOneMatch(
       request.includeNetexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
@@ -54,11 +54,11 @@ public class TripMatcherFactory {
   }
 
   static Matcher<Trip> includeAgencyId(FeedScopedId id) {
-    return new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId());
+    return new EqualityMatcher<>("includeAgency", id, t -> t.getRoute().getAgency().getId());
   }
 
   static Matcher<Trip> includeRouteId(FeedScopedId id) {
-    return new EqualityMatcher<>("route", id, t -> t.getRoute().getId());
+    return new EqualityMatcher<>("includeRoute", id, t -> t.getRoute().getId());
   }
 
   static Matcher<Trip> excludeAgencyId(FeedScopedId id) {
@@ -77,7 +77,7 @@ public class TripMatcherFactory {
 
   static Matcher<Trip> netexInternalPlanningCode(String code) {
     return new EqualityMatcher<>(
-      "netexInternalPlanningCode",
+      "includeNetexInternalPlanningCode",
       code,
       Trip::getNetexInternalPlanningCode
     );
@@ -88,7 +88,7 @@ public class TripMatcherFactory {
   ) {
     return date ->
       new ContainsMatcher<>(
-        "serviceDates",
+        "includeServiceDate",
         t -> serviceDateProvider.apply(t.getServiceId()),
         new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
       );
