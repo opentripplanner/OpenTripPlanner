@@ -149,6 +149,7 @@ public final class TransferPreferences implements Serializable {
    * old functionality the same way, but we will try to map this parameter
    * so it does work similar as before.
    */
+  @Deprecated
   public int nonpreferredCost() {
     return nonpreferredCost.toSeconds();
   }
