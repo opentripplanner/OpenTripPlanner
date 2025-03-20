@@ -53,7 +53,10 @@ public class SimpleAreaTest {
 
     assertFalse(graph.getVertices().isEmpty());
 
-    System.out.println(GeoJsonIo.toUrl(graph));
-    assertEquals(10, graph.getEdgesOfType(AreaEdge.class).size());
+    assertEquals(
+      10,
+      graph.getEdgesOfType(AreaEdge.class).size(),
+      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
+    );
   }
 }
