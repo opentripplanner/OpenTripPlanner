@@ -13,13 +13,13 @@ public class TripRequestBuilder {
     null
   );
 
-  private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofNullIsEverything(
-    "excludedAgencies",
-    null
+  private FilterValues<FeedScopedId> excludedAgencies = FilterValues.ofEmptyIsEverything(
+    "excludeAgencies",
+    List.of()
   );
-  private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofNullIsEverything(
-    "excludedRoutes",
-    null
+  private FilterValues<FeedScopedId> excludedRoutes = FilterValues.ofEmptyIsEverything(
+    "excludeRoutes",
+    List.of()
   );
 
   private FilterValues<FeedScopedId> includeRoutes = FilterValues.ofNullIsEverything(
