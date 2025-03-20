@@ -53,16 +53,16 @@ public class TripMatcherFactory {
   }
 
   static Matcher<Trip> agencyId(FeedScopedId id) {
-    return new EqualityMatcher<>("includeAgency", id, t -> t.getRoute().getAgency().getId());
+    return new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId());
   }
 
   static Matcher<Trip> routeId(FeedScopedId id) {
-    return new EqualityMatcher<>("includeRoute", id, t -> t.getRoute().getId());
+    return new EqualityMatcher<>("route", id, t -> t.getRoute().getId());
   }
 
   static Matcher<Trip> netexInternalPlanningCode(String code) {
     return new EqualityMatcher<>(
-      "includeNetexInternalPlanningCode",
+      "netexInternalPlanningCode",
       code,
       Trip::getNetexInternalPlanningCode
     );
@@ -73,7 +73,7 @@ public class TripMatcherFactory {
   ) {
     return date ->
       new ContainsMatcher<>(
-        "includeServiceDate",
+        "serviceDate",
         t -> serviceDateProvider.apply(t.getServiceId()),
         new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
       );
