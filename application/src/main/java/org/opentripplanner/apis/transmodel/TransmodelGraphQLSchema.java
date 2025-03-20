@@ -1184,7 +1184,9 @@ public class TransmodelGraphQLSchema {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourneys")
-          .description("Get all _service journeys_")
+          .description(
+            "Get all _service journeys_. At least one of the filter arguments must be non-null."
+          )
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
           .argument(
@@ -1221,7 +1223,9 @@ public class TransmodelGraphQLSchema {
                 key -> environment.getArgument(key) != null
               )
             ) {
-              throw new IllegalArgumentException("At least one argument must be non-null");
+              throw new IllegalArgumentException(
+                "At least one of these filter arguments must be non-null: lines, privateCodes, authorities, activeDates"
+              );
             }
             var tripRequest = TripRequest.of()
               .withIncludeAgencies(mapIDsToDomain(environment.getArgument("authorities")))
