@@ -8,7 +8,6 @@ import org.opentripplanner.transit.model.filter.expr.ContainsMatcher;
 import org.opentripplanner.transit.model.filter.expr.EqualityMatcher;
 import org.opentripplanner.transit.model.filter.expr.ExpressionBuilder;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
-import org.opentripplanner.transit.model.filter.expr.NegationMatcher;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -37,10 +36,10 @@ public class TripMatcherFactory {
   ) {
     ExpressionBuilder<Trip> expr = ExpressionBuilder.of();
 
-    expr.atLeastOneMatch(request.includeAgencies(), TripMatcherFactory::includeAgencyId);
-    expr.atLeastOneMatch(request.includeRoutes(), TripMatcherFactory::includeRouteId);
-    expr.matchesAll(request.excludeAgencies(), TripMatcherFactory::excludeAgencyId);
-    expr.matchesAll(request.excludeRoutes(), TripMatcherFactory::excludeRouteId);
+    expr.atLeastOneMatch(request.includeAgencies(), TripMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.includeRoutes(), TripMatcherFactory::routeId);
+    expr.matchesNone(request.excludeAgencies(), TripMatcherFactory::agencyId);
+    expr.matchesNone(request.excludeRoutes(), TripMatcherFactory::routeId);
     expr.atLeastOneMatch(
       request.includeNetexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
@@ -53,26 +52,12 @@ public class TripMatcherFactory {
     return expr.build();
   }
 
-  static Matcher<Trip> includeAgencyId(FeedScopedId id) {
+  static Matcher<Trip> agencyId(FeedScopedId id) {
     return new EqualityMatcher<>("includeAgency", id, t -> t.getRoute().getAgency().getId());
   }
 
-  static Matcher<Trip> includeRouteId(FeedScopedId id) {
+  static Matcher<Trip> routeId(FeedScopedId id) {
     return new EqualityMatcher<>("includeRoute", id, t -> t.getRoute().getId());
-  }
-
-  static Matcher<Trip> excludeAgencyId(FeedScopedId id) {
-    return new NegationMatcher<>(
-      "excludeAgency",
-      new EqualityMatcher<>("agency", id, t -> t.getRoute().getAgency().getId())
-    );
-  }
-
-  static Matcher<Trip> excludeRouteId(FeedScopedId id) {
-    return new NegationMatcher<>(
-      "excludeRoute",
-      new EqualityMatcher<>("route", id, t -> t.getRoute().getId())
-    );
   }
 
   static Matcher<Trip> netexInternalPlanningCode(String code) {

@@ -39,15 +39,19 @@ public class ExpressionBuilder<T> {
     return this;
   }
 
-  public <V> ExpressionBuilder<T> matchesAll(
+  public <V> ExpressionBuilder<T> matchesNone(
     FilterValues<V> filterValues,
     Function<V, Matcher<T>> matcherProvider
   ) {
     if (filterValues.includeEverything()) {
       return this;
     }
-
-    matchers.add(AndMatcher.of(filterValues.get().stream().map(matcherProvider).toList()));
+    matchers.add(
+      new NegationMatcher<>(
+        "matchesNone",
+        OrMatcher.of(filterValues.get().stream().map(matcherProvider).toList())
+      )
+    );
     return this;
   }
 
