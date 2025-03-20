@@ -462,7 +462,7 @@ public class IndexAPI {
   public Collection<ApiAlert> getAlertsForTrip(@PathParam("tripId") String tripId) {
     var alertMapper = new AlertMapper(null); // TODO: Add locale
     var id = createId("tripId", tripId);
-    return alertMapper.mapToApi(transitService().getTransitAlertService().getTripAlerts(id, null));
+    return alertMapper.mapToApi(transitService().getTransitAlertService().getTripAlerts(id));
   }
 
   @GET

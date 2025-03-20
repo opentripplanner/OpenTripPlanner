@@ -11,4 +11,5 @@ public class StreetConstants {
    * data. Unit is m/s and value equals to 144 km/h.
    */
   public static final float DEFAULT_MAX_CAR_SPEED = 40f;
+  public static final int DEFAULT_MAX_AREA_NODES = 200;
 }

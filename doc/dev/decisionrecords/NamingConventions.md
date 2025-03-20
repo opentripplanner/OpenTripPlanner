@@ -1,9 +1,11 @@
 # Naming Conventions
 
 In general, we use American English. We use the GTFS terminology inside OTP as the transit
-domain-specific language. In cases where GTFS does not provide an alternative, we use NeTEx. The
-naming should follow the Java standard naming conventions. For example, a "real-time updater" class
-is named `RealTimeUpdater`. If in doubt, check the Oxford Dictionary (American).
+domain-specific language. In cases where GTFS does not provide an alternative, we use NeTEx.
+We follow the [Google Java Style Guide - Naming](https://google.github.io/styleguide/javaguide.html#s5-naming) conventions.
+The code formatting part of that style guide is not relevant, as OTP code is auto-formatted using Prettier.
+If in doubt, check the Oxford Dictionary (American).
+
 
 ## Packages
 
@@ -61,6 +63,12 @@ them.
 | `withStops(Collection<Stop> stops) : this`) | Replace all Stops in builder with new set. Consider using `addStops(...)` instead.                     |
 | `setStop(Stop stop)`                        | Set a mutable Stop reference. Avoid if not part of natural lifecycle. Use `initStop(...)` if possible. |
 | `getStop() : Stop`                          | Old style accessor. Use the shorter form `stop() : Stop`.                                              |
+
+
+## Variables
+
+We follow the [standard of using camelCase](https://google.github.io/styleguide/javaguide.html#s5.2.5-non-constant-field-names) with a lower-case first letter for variable, parameter, and field names. However, variables of numeric types _may_ include units as an underscore-separated suffix. For example, `length_mm` or `duration_msec`. The reason is that case is significant in metric prefixes (e.g. `M` for mega- versus `m` for milli-). The underscore also reinforces that these are units rather than part of the base variable name. In constants, use the full word: `SLACK_IN_SECONDS`, not ~~`SLACK_S`~~.
+
 
 ## Service, Model and Repository
 

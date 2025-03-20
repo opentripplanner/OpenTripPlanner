@@ -2,6 +2,7 @@ package org.opentripplanner.routing.alertpatch;
 
 import java.time.LocalDate;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 
@@ -56,7 +57,7 @@ public sealed interface EntitySelector {
     }
   }
 
-  record Trip(FeedScopedId tripId, LocalDate serviceDate) implements EntitySelector {
+  record Trip(FeedScopedId tripId, @Nullable LocalDate serviceDate) implements EntitySelector {
     public Trip(FeedScopedId tripId) {
       this(tripId, null);
     }

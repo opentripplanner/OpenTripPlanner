@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.gtfs.datafetchers;
 
+import static org.opentripplanner.framework.graphql.GraphQLUtils.getLocale;
+
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
@@ -66,7 +68,7 @@ public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRen
 
   @Override
   public DataFetcher<String> name() {
-    return environment -> getSource(environment).getName().toString(environment.getLocale());
+    return environment -> getSource(environment).getName().toString(getLocale(environment));
   }
 
   @Override
