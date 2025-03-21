@@ -58,7 +58,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
         LegCallTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime)),
         LegCallTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime)),
         i,
-        tripTimes.gtfsSequenceOfStopIndex(i)
+        tripTimes.gtfsSequenceOfStopIndex(i),
+        tripTimes.isCanceled() || tripTimes.isCancelledStop(i)
       );
       visits.add(visit);
     }

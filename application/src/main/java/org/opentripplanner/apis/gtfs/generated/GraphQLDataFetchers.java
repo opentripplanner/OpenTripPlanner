@@ -689,6 +689,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
+    public DataFetcher<Boolean> canceled();
+
     public DataFetcher<VehicleParking> carPark();
 
     public DataFetcher<LegCallTime> departure();
