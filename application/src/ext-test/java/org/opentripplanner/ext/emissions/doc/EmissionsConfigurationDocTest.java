@@ -1,4 +1,4 @@
-package org.opentripplanner.generate.doc;
+package org.opentripplanner.ext.emissions.doc;
 
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
