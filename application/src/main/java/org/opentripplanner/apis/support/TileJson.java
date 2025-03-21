@@ -24,10 +24,8 @@ public class TileJson implements Serializable {
   @SuppressWarnings("unused")
   public final String scheme = "xyz";
 
-  @SuppressWarnings("unused")
   public final int minzoom;
 
-  @SuppressWarnings("unused")
   public final int maxzoom;
 
   public final String name = "OpenTripPlanner";
