@@ -98,7 +98,7 @@ public final class TripPattern
    * The original TripPattern this replaces at least for one modified trip.
    *
    * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
-   * SiriTripPatternCache.
+   * TripPatternCache.
    *
    * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    */

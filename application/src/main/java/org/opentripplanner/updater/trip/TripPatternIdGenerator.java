@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.trip.siri;
+package org.opentripplanner.updater.trip;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * usage pattern is not enforced due to differing needs in tests.
  * The ID generation is threadsafe, even if that is probably not needed.
  */
-class SiriTripPatternIdGenerator {
+public class TripPatternIdGenerator {
 
   private final AtomicInteger counter = new AtomicInteger(0);
 
@@ -23,7 +23,7 @@ class SiriTripPatternIdGenerator {
    * roughly follows the format of {@link GenerateTripPatternsOperation}. The generator suffixes the
    * ID with 'RT' to indicate that this trip pattern is generated in response to a realtime message.
    */
-  FeedScopedId generateUniqueTripPatternId(Trip trip) {
+  public FeedScopedId generateUniqueTripPatternId(Trip trip) {
     Route route = trip.getRoute();
     FeedScopedId routeId = route.getId();
     Direction direction = trip.getDirection();
