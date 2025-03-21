@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.apis.support.TileJson;
@@ -96,12 +97,14 @@ public class VectorTilesResource {
         TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
+    int minZoom = config.minZoom(Set.copyOf(rLayers));
+    int maxZoom = config.maxZoom(Set.copyOf(rLayers));
     return config
       .attribution()
-      .map(attr -> new TileJson(url, envelope, attr, config.minZoom(), config.maxZoom()))
+      .map(attr -> new TileJson(url, envelope, attr, minZoom, maxZoom))
       .orElseGet(() -> {
         var feedInfos = getFeedInfos();
-        return new TileJson(url, envelope, feedInfos, config.minZoom(), config.maxZoom());
+        return new TileJson(url, envelope, feedInfos, minZoom, maxZoom);
       });
   }
 
