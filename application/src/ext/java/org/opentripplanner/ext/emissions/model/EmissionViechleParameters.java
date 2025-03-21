@@ -11,40 +11,11 @@ public record EmissionViechleParameters(int avgCo2PerKm, double avgOccupancy) {
     CAR_AVG_OCCUPANCY
   );
 
-  public Builder copyOf() {
-    return new Builder(this);
-  }
-
   @Override
   public String toString() {
     return ToStringBuilder.of(EmissionViechleParameters.class)
       .addNum("carAvgCo2PerKm", avgCo2PerKm)
       .addNum("carAvgOccupancy", avgOccupancy)
       .toString();
-  }
-
-  public static class Builder {
-
-    private int carAvgCo2PerKm;
-    private double carAvgOccupancy;
-
-    public Builder(EmissionViechleParameters origin) {
-      this.carAvgCo2PerKm = origin.avgCo2PerKm;
-      this.carAvgOccupancy = origin.avgOccupancy;
-    }
-
-    public Builder withCarAvgCo2PerKm(int carAvgCo2PerKm) {
-      this.carAvgCo2PerKm = carAvgCo2PerKm;
-      return this;
-    }
-
-    public Builder withCarAvgOccupancy(double carAvgOccupancy) {
-      this.carAvgOccupancy = carAvgOccupancy;
-      return this;
-    }
-
-    public EmissionViechleParameters build() {
-      return new EmissionViechleParameters(carAvgCo2PerKm, carAvgOccupancy);
-    }
   }
 }
