@@ -9,7 +9,6 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.utils.collection.ListSection;
 
 public class NumItinerariesFilterTest {
@@ -18,7 +17,7 @@ public class NumItinerariesFilterTest {
   private static final Itinerary i2 = newItinerary(A).bicycle(6, 8, B).build();
   private static final Itinerary i3 = newItinerary(A).bus(21, 7, 9, B).build();
 
-  private PageCursorInput subscribeResult = null;
+  private NumItinerariesFilterResults subscribeResult = null;
 
   @Test
   public void name() {
