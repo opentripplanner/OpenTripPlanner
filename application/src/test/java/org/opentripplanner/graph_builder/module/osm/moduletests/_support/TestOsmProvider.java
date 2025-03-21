@@ -115,12 +115,15 @@ public class TestOsmProvider implements OsmProvider {
     }
 
     public Builder addWayFromNodes(OsmNode... nodes) {
-      var wayNodes = Arrays.stream(nodes).toList();
-      this.nodes.addAll(wayNodes);
-      var nodeIds = wayNodes.stream().map(OsmEntity::getId).toList();
+      return addWayFromNodes(counter.incrementAndGet(), Arrays.stream(nodes).toList());
+    }
+
+    public Builder addWayFromNodes(long id, List<OsmNode> nodes) {
+      this.nodes.addAll(nodes);
+      var nodeIds = nodes.stream().map(OsmEntity::getId).toList();
 
       var way = new OsmWay();
-      way.setId(counter.incrementAndGet());
+      way.setId(id);
       way.addTag("highway", "pedestrian");
       way.getNodeRefs().addAll(nodeIds);
 
