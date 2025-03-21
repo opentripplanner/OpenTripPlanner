@@ -1301,10 +1301,6 @@ the centroid.
     }
   ],
   "stopConsolidationFile" : "consolidated-stops.csv",
-  "emissions" : {
-    "carAvgCo2PerKm" : 170,
-    "carAvgOccupancy" : 1.3
-  },
   "transferParametersForMode" : {
     "CAR" : {
       "disableDefaultTransfers" : true,
