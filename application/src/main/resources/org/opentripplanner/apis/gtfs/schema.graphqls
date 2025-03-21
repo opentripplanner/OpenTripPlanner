@@ -960,6 +960,8 @@ type Pattern implements Node {
   semanticHash: String
   "List of stops served by this pattern"
   stops: [Stop!]
+  "List of stops with pickup / dropoff type served by this pattern"
+  stopsInPattern: [StopInPattern!]!
   "Trips which run on this pattern"
   trips: [Trip!]
   "Trips which run on this pattern on the specified date"
@@ -2278,6 +2280,15 @@ type StopGeometries {
   Proper stops are represented as single point "lines".
   """
   googleEncoded: [Geometry]
+}
+
+type StopInPattern {
+  "NULL means that the stop is cancelled from the pattern."
+  dropOffType: PickupDropoffType
+  indexInPattern: Int!
+  "NULL means that the stop is cancelled from the pattern."
+  pickupType: PickupDropoffType
+  stop: Stop!
 }
 
 "Stop that should (but not guaranteed) to exist on a route."
