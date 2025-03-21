@@ -85,8 +85,6 @@ public class ApiWalkStep {
    */
   public Boolean walkingBike;
 
-  public List<ApiAlert> alerts;
-
   public String toString() {
     String direction = absoluteDirection.toString();
     if (relativeDirection != null) {

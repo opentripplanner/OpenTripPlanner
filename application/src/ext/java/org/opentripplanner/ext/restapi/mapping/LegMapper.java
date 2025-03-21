@@ -7,12 +7,9 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.apis.support.mapping.StreetNoteMapper;
-import org.opentripplanner.ext.restapi.model.ApiAlert;
 import org.opentripplanner.ext.restapi.model.ApiLeg;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
-import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -20,8 +17,6 @@ import org.opentripplanner.model.plan.TransitLeg;
 public class LegMapper {
 
   private final WalkStepMapper walkStepMapper;
-  private final StreetNoteMapper streetNoteMaperMapper;
-  private final AlertMapper alertMapper;
   private final PlaceMapper placeMapper;
   private final boolean addIntermediateStops;
 
@@ -29,8 +24,6 @@ public class LegMapper {
 
   public LegMapper(Locale locale, boolean addIntermediateStops) {
     this.walkStepMapper = new WalkStepMapper(locale);
-    this.streetNoteMaperMapper = new StreetNoteMapper(locale);
-    this.alertMapper = new AlertMapper(locale);
     this.placeMapper = new PlaceMapper(locale);
     this.addIntermediateStops = addIntermediateStops;
     this.i18NStringMapper = new I18NStringMapper(locale);
@@ -131,23 +124,9 @@ public class LegMapper {
     api.legGeometry = EncodedPolyline.encode(domain.getLegGeometry());
     api.legElevation = mapElevation(domain.getElevationProfile());
     api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
-    api.alerts = concatenateAlerts(
-      streetNoteMaperMapper.mapToApi(domain.getStreetNotes()),
-      alertMapper.mapToApi(domain.getTransitAlerts())
-    );
-    api.boardRule = getBoardAlightMessage(domain.getBoardRule());
-    api.alightRule = getBoardAlightMessage(domain.getAlightRule());
-
-    api.pickupBookingInfo = BookingInfoMapper.mapBookingInfoForPickup(
-      domain.getPickupBookingInfo()
-    );
-    api.dropOffBookingInfo = BookingInfoMapper.mapBookingInfoForDropOff(
-      domain.getDropOffBookingInfo()
-    );
 
     api.rentedBike = domain.getRentedVehicle();
     api.walkingBike = domain.getWalkingBike();
-    api.accessibilityScore = domain.accessibilityScore();
 
     return api;
   }
@@ -156,31 +135,4 @@ public class LegMapper {
     return Math.round(value * 1000d) / 1000d;
   }
 
-  private static String getBoardAlightMessage(PickDrop boardAlightType) {
-    if (boardAlightType == null) {
-      return null;
-    }
-    switch (boardAlightType) {
-      case NONE:
-        return "impossible";
-      case CALL_AGENCY:
-        return "mustPhone";
-      case COORDINATE_WITH_DRIVER:
-        return "coordinateWithDriver";
-      default:
-        return null;
-    }
-  }
-
-  private static List<ApiAlert> concatenateAlerts(List<ApiAlert> a, List<ApiAlert> b) {
-    if (a == null) {
-      return b;
-    } else if (b == null) {
-      return a;
-    } else {
-      List<ApiAlert> ret = new ArrayList<>(a);
-      ret.addAll(b);
-      return ret;
-    }
-  }
 }

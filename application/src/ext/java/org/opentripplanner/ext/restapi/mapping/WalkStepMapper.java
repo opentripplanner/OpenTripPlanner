@@ -7,18 +7,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.opentripplanner.apis.support.mapping.StreetNoteMapper;
 import org.opentripplanner.ext.restapi.model.ApiWalkStep;
 import org.opentripplanner.model.plan.WalkStep;
 
 public class WalkStepMapper {
 
-  private final StreetNoteMapper alertsMapper;
   private final Locale locale;
 
   public WalkStepMapper(Locale locale) {
     this.locale = locale;
-    this.alertsMapper = new StreetNoteMapper(locale);
   }
 
   public List<ApiWalkStep> mapWalkSteps(Collection<WalkStep> domain) {
@@ -51,7 +48,6 @@ public class WalkStepMapper {
     }
     api.elevation = mapElevation(domain.getElevationProfile());
     api.walkingBike = domain.isWalkingBike();
-    api.alerts = alertsMapper.mapToApi(domain.getStreetNotes());
 
     return api;
   }

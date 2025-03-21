@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -86,17 +85,6 @@ public class ApiItinerary {
    * then walks to their destination, has four legs.
    */
   public List<ApiLeg> legs = new ArrayList<>();
-
-  /**
-   * A itinerary can be tagged with a system notice. System notices should only be added to a
-   * response if explicit asked for in the request.
-   * <p>
-   * For example when tuning or manually testing the itinerary-filter-chain it you can enable the
-   * {@link ItineraryFilterPreferences#debug} and instead of removing itineraries from the result the
-   * itineraries would be tagged by the filters instead. This enable investigating, why an expected
-   * itinerary is missing from the result set.
-   */
-  public List<ApiSystemNotice> systemNotices = null;
 
   /**
    * This itinerary has a greater slope than the user requested (but there are no possible
