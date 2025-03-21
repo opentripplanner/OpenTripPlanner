@@ -12,6 +12,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Optimize routing time vertex linking with areas [#6495](https://github.com/opentripplanner/OpenTripPlanner/pull/6495)
 - Add explanation of underscore-separated units in variable names [ci skip] [#6470](https://github.com/opentripplanner/OpenTripPlanner/pull/6470)
 - Use locale param from plan queries for all translations in the GTFS API if accept-language header is not set [#6546](https://github.com/opentripplanner/OpenTripPlanner/pull/6546)
+- do not discard turn restrictions where the turn description and angle do not match, just add an issue [#6553](https://github.com/opentripplanner/OpenTripPlanner/pull/6553)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
