@@ -7,6 +7,7 @@ import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupT
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import javax.annotation.Nullable;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TripUpdateBuilder {
@@ -37,32 +38,134 @@ public class TripUpdateBuilder {
     this.midnight = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, int minutes) {
-    return addStopTime(
-      stopId,
-      minutes,
-      NO_VALUE,
-      NO_DELAY,
-      NO_DELAY,
-      DEFAULT_SCHEDULE_RELATIONSHIP,
-      null
+  public TripUpdateBuilder(
+    String tripId,
+    LocalDate serviceDate,
+    GtfsRealtime.TripDescriptor.ScheduleRelationship scheduleRelationship,
+    ZoneId zoneId,
+    String tripHeadsign
+  ) {
+    this(tripId, serviceDate, scheduleRelationship, zoneId);
+    tripUpdateBuilder.setTripProperties(
+      GtfsRealtime.TripUpdate.TripProperties.newBuilder().setTripHeadsign(tripHeadsign).build()
     );
   }
 
-  public TripUpdateBuilder addStopTime(String stopId, int minutes, DropOffPickupType pickDrop) {
+  public TripUpdateBuilder addStopTime(String stopId, int secondsFromMidnight) {
     return addStopTime(
       stopId,
-      minutes,
+      secondsFromMidnight,
       NO_VALUE,
       NO_DELAY,
       NO_DELAY,
       DEFAULT_SCHEDULE_RELATIONSHIP,
-      pickDrop
+      null,
+      null,
+      null,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addStopTime(String stopId, int secondsFromMidnight, String headsign) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null,
+      headsign,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addStopTimeWithDelay(String stopId, int secondsFromMidnight, int delay) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      delay,
+      delay,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null,
+      null,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addStopTimeWithScheduled(
+    String stopId,
+    int secondsFromMidnight,
+    int scheduledSeconds
+  ) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null,
+      null,
+      scheduledSeconds
+    );
+  }
+
+  public TripUpdateBuilder addStopTime(
+    String stopId,
+    int secondsFromMidnight,
+    DropOffPickupType pickDrop
+  ) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      pickDrop,
+      null,
+      null,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addStopTime(
+    String stopId,
+    int secondsFromMidnight,
+    StopTimeUpdate.StopTimeProperties.DropOffPickupType pickDrop
+  ) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      pickDrop,
+      null,
+      NO_VALUE
     );
   }
 
   public TripUpdateBuilder addDelayedStopTime(int stopSequence, int delay) {
-    return addStopTime(null, -1, stopSequence, delay, delay, DEFAULT_SCHEDULE_RELATIONSHIP, null);
+    return addStopTime(
+      null,
+      -1,
+      stopSequence,
+      delay,
+      delay,
+      DEFAULT_SCHEDULE_RELATIONSHIP,
+      null,
+      null,
+      null,
+      NO_VALUE
+    );
   }
 
   public TripUpdateBuilder addDelayedStopTime(
@@ -77,7 +180,10 @@ public class TripUpdateBuilder {
       arrivalDelay,
       departureDelay,
       DEFAULT_SCHEDULE_RELATIONSHIP,
-      null
+      null,
+      null,
+      null,
+      NO_VALUE
     );
   }
 
@@ -92,7 +198,10 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.NO_DATA,
-      null
+      null,
+      null,
+      null,
+      NO_VALUE
     );
   }
 
@@ -107,7 +216,44 @@ public class TripUpdateBuilder {
       NO_DELAY,
       NO_DELAY,
       StopTimeUpdate.ScheduleRelationship.SKIPPED,
-      null
+      null,
+      null,
+      null,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addSkippedStop(String stopId, int secondsFromMidnight) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null,
+      null,
+      null,
+      NO_VALUE
+    );
+  }
+
+  public TripUpdateBuilder addSkippedStop(
+    String stopId,
+    int secondsFromMidnight,
+    DropOffPickupType pickDrop
+  ) {
+    return addStopTime(
+      stopId,
+      secondsFromMidnight,
+      NO_VALUE,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      pickDrop,
+      null,
+      null,
+      NO_VALUE
     );
   }
 
@@ -121,13 +267,16 @@ public class TripUpdateBuilder {
   }
 
   private TripUpdateBuilder addStopTime(
-    String stopId,
-    int minutes,
+    @Nullable String stopId,
+    int secondsFromMidnight,
     int stopSequence,
     int arrivalDelay,
     int departureDelay,
     StopTimeUpdate.ScheduleRelationship scheduleRelationShip,
-    DropOffPickupType pickDrop
+    @Nullable DropOffPickupType pickDrop,
+    @Nullable StopTimeUpdate.StopTimeProperties.DropOffPickupType gtfsPickDrop,
+    @Nullable String headsign,
+    int scheduledSeconds
   ) {
     final StopTimeUpdate.Builder stopTimeUpdateBuilder =
       tripUpdateBuilder.addStopTimeUpdateBuilder();
@@ -141,14 +290,24 @@ public class TripUpdateBuilder {
       stopTimeUpdateBuilder.setStopSequence(stopSequence);
     }
 
-    if (pickDrop != null) {
+    if (pickDrop != null || gtfsPickDrop != null || headsign != null) {
       var stopTimePropsBuilder = stopTimeUpdateBuilder.getStopTimePropertiesBuilder();
-      var b = MfdzRealtimeExtensions.StopTimePropertiesExtension.newBuilder();
-      b.setDropoffType(pickDrop);
-      b.setPickupType(pickDrop);
 
-      var ext = b.build();
-      stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
+      if (headsign != null) {
+        stopTimePropsBuilder.setStopHeadsign(headsign);
+      }
+
+      if (gtfsPickDrop != null) {
+        stopTimePropsBuilder.setDropOffType(gtfsPickDrop);
+        stopTimePropsBuilder.setPickupType(gtfsPickDrop);
+      }
+      if (pickDrop != null) {
+        var b = MfdzRealtimeExtensions.StopTimePropertiesExtension.newBuilder();
+        b.setDropoffType(pickDrop);
+        b.setPickupType(pickDrop);
+        var ext = b.build();
+        stopTimePropsBuilder.setExtension(MfdzRealtimeExtensions.stopTimeProperties, ext);
+      }
     }
 
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder arrivalBuilder =
@@ -156,10 +315,16 @@ public class TripUpdateBuilder {
     final GtfsRealtime.TripUpdate.StopTimeEvent.Builder departureBuilder =
       stopTimeUpdateBuilder.getDepartureBuilder();
 
-    if (minutes > NO_VALUE) {
-      var epochSeconds = midnight.plusHours(8).plusMinutes(minutes).toEpochSecond();
+    if (secondsFromMidnight > NO_VALUE) {
+      var epochSeconds = midnight.plusSeconds(secondsFromMidnight).toEpochSecond();
       arrivalBuilder.setTime(epochSeconds);
       departureBuilder.setTime(epochSeconds);
+    }
+
+    if (scheduledSeconds > NO_VALUE) {
+      var epochSeconds = midnight.plusSeconds(scheduledSeconds).toEpochSecond();
+      arrivalBuilder.setScheduledTime(epochSeconds);
+      departureBuilder.setScheduledTime(epochSeconds);
     }
 
     if (arrivalDelay != NO_DELAY) {

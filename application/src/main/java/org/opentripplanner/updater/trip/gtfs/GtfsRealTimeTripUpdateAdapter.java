@@ -230,7 +230,12 @@ public class GtfsRealTimeTripUpdateAdapter {
             serviceDate,
             backwardsDelayPropagationType
           );
-          case ADDED -> validateAndHandleAddedTrip(tripUpdate, tripDescriptor, tripId, serviceDate);
+          case NEW, ADDED -> validateAndHandleAddedTrip(
+            tripUpdate,
+            tripDescriptor,
+            tripId,
+            serviceDate
+          );
           case CANCELED -> handleCanceledTrip(
             tripId,
             serviceDate,
@@ -279,7 +284,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   /**
    * Remove previous realtime updates for this trip. This is necessary to avoid previous stop
    * pattern modifications from persisting. If a trip was previously added with the
-   * ScheduleRelationship ADDED and is now cancelled or deleted, we still want to keep the realtime
+   * ScheduleRelationship NEW and is now cancelled or deleted, we still want to keep the realtime
    * added trip pattern.
    */
   private void purgePatternModifications(
@@ -298,7 +303,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     ) {
       // Remove previous realtime updates for this trip. This is necessary to avoid previous
       // stop pattern modifications from persisting. If a trip was previously added with the ScheduleRelationship
-      // ADDED and is now cancelled or deleted, we still want to keep the realtime added trip pattern.
+      // NEW and is now cancelled or deleted, we still want to keep the realtime added trip pattern.
       this.snapshotManager.revertTripToScheduledTripPattern(tripId, serviceDate);
     }
   }
@@ -425,7 +430,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Validate and handle GTFS-RT TripUpdate message containing an ADDED trip.
+   * Validate and handle GTFS-RT TripUpdate message containing an NEW trip.
    *
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @param tripDescriptor GTFS-RT TripDescriptor
@@ -449,20 +454,14 @@ public class GtfsRealTimeTripUpdateAdapter {
     final Trip trip = transitEditorService.getScheduledTrip(tripId);
 
     if (trip != null) {
-      // TODO: should we support this and add a new instantiation of this trip (making it
-      // frequency based)?
-      debug(tripId, serviceDate, "Graph already contains trip id of ADDED trip, skipping.");
+      debug(tripId, serviceDate, "Graph already contains trip id of NEW trip, skipping.");
       return UpdateError.result(tripId, TRIP_ALREADY_EXISTS);
     }
 
     // Check whether a start date exists
     if (!tripDescriptor.hasStartDate()) {
       // TODO: should we support this and apply update to all days?
-      debug(
-        tripId,
-        serviceDate,
-        "ADDED trip doesn't have a start date in TripDescriptor, skipping."
-      );
+      debug(tripId, serviceDate, "NEW trip doesn't have a start date in TripDescriptor, skipping.");
       return UpdateError.result(tripId, NO_START_DATE);
     }
 
@@ -480,7 +479,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
     // check if after filtering the stops we still have at least 2
     if (stopTimeUpdates.size() < 2) {
-      debug(tripId, serviceDate, "ADDED trip has fewer than two known stops, skipping.");
+      debug(tripId, serviceDate, "NEW trip has fewer than two known stops, skipping.");
       return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
@@ -522,7 +521,7 @@ public class GtfsRealTimeTripUpdateAdapter {
           debug(
             tripId,
             serviceDate,
-            "Stop '{}' not found in graph. Removing from ADDED trip.",
+            "Stop '{}' not found in graph. Removing from NEW trip.",
             st.getStopId()
           );
         }
@@ -532,7 +531,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Check stop time updates of trip update that results in a new trip (ADDED or MODIFIED) and find
+   * Check stop time updates of trip update that results in a new trip (NEW or REPLACEMENT) and find
    * all stops of that trip.
    *
    * @return stops when stop time updates are correct; null if there are errors
@@ -547,11 +546,12 @@ public class GtfsRealTimeTripUpdateAdapter {
     final List<StopLocation> stops = new ArrayList<>(stopTimeUpdates.size());
 
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
-      final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
+      final var addedStopTime = new AddedStopTime(stopTimeUpdates.get(index));
 
       // Check stop sequence
-      if (stopTimeUpdate.hasStopSequence()) {
-        final Integer stopSequence = stopTimeUpdate.getStopSequence();
+      final var optionalStopSequence = addedStopTime.stopSequence();
+      if (optionalStopSequence.isPresent()) {
+        final var stopSequence = optionalStopSequence.getAsInt();
 
         // Check non-negative
         if (stopSequence < 0) {
@@ -566,14 +566,16 @@ public class GtfsRealTimeTripUpdateAdapter {
         }
         previousStopSequence = stopSequence;
       } else {
-        // Allow missing stop sequences for ADDED and MODIFIED trips
+        // Allow missing stop sequences for NEW and REPLACEMENT trips
       }
 
       // Find stops
-      if (stopTimeUpdate.hasStopId()) {
+      final var optionalStopId = addedStopTime.stopId();
+      if (optionalStopId.isPresent()) {
+        final var stopId = optionalStopId.get();
         // Find stop
         final var stop = transitEditorService.getRegularStop(
-          new FeedScopedId(tripId.getFeedId(), stopTimeUpdate.getStopId())
+          new FeedScopedId(tripId.getFeedId(), stopId)
         );
         if (stop != null) {
           // Remember stop
@@ -583,7 +585,7 @@ public class GtfsRealTimeTripUpdateAdapter {
             tripId,
             serviceDate,
             "Graph doesn't contain stop id '{}' of trip update, skipping.",
-            stopTimeUpdate.getStopId()
+            stopId
           );
           return null;
         }
@@ -598,9 +600,10 @@ public class GtfsRealTimeTripUpdateAdapter {
       }
 
       // Check arrival time
-      if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
+      final var arrival = addedStopTime.arrivalTime();
+      if (arrival.isPresent()) {
+        final var time = arrival.getAsLong();
         // Check for increasing time
-        final Long time = stopTimeUpdate.getArrival().getTime();
         if (previousTime != null && previousTime > time) {
           debug(tripId, serviceDate, "Trip update contains decreasing times, skipping.");
           return null;
@@ -612,9 +615,10 @@ public class GtfsRealTimeTripUpdateAdapter {
       }
 
       // Check departure time
-      if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
+      final var departure = addedStopTime.departureTime();
+      if (departure.isPresent()) {
+        final var time = departure.getAsLong();
         // Check for increasing time
-        final Long time = stopTimeUpdate.getDeparture().getTime();
         if (previousTime != null && previousTime > time) {
           debug(tripId, serviceDate, "Trip update contains decreasing times, skipping.");
           return null;
@@ -629,7 +633,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Handle GTFS-RT TripUpdate message containing an ADDED trip.
+   * Handle GTFS-RT TripUpdate message containing an NEW trip.
    *
    * @param stopTimeUpdates GTFS-RT stop time updates
    * @param tripDescriptor  GTFS-RT TripDescriptor
@@ -677,7 +681,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       debug(
         tripId,
         serviceDate,
-        "ADDED trip has service date {} for which no service id is available, skipping.",
+        "NEW trip has service date {} for which no service id is available, skipping.",
         serviceDate.toString()
       );
       return UpdateError.result(tripId, NO_SERVICE_ON_DATE);
@@ -685,6 +689,12 @@ public class GtfsRealTimeTripUpdateAdapter {
       // Just use first service id of set
       tripBuilder.withServiceId(serviceIds.iterator().next());
     }
+
+    var tripHeadsign = getTripHeadsign(tripUpdate);
+    if (tripHeadsign != null) {
+      tripBuilder.withHeadsign(new NonLocalizedString(tripHeadsign));
+    }
+
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
       tripUpdate.getVehicle(),
@@ -692,8 +702,20 @@ public class GtfsRealTimeTripUpdateAdapter {
       stops,
       serviceDate,
       RealTimeState.ADDED,
-      !routeExists
+      !routeExists,
+      tripHeadsign
     );
+  }
+
+  @Nullable
+  private static String getTripHeadsign(TripUpdate tripUpdate) {
+    if (tripUpdate.hasTripProperties()) {
+      var tripProperties = tripUpdate.getTripProperties();
+      if (tripProperties.hasTripHeadsign()) {
+        return tripProperties.getTripHeadsign();
+      }
+    }
+    return null;
   }
 
   private Route createRoute(TripDescriptor tripDescriptor, FeedScopedId tripId) {
@@ -776,7 +798,8 @@ public class GtfsRealTimeTripUpdateAdapter {
     final List<StopLocation> stops,
     final LocalDate serviceDate,
     final RealTimeState realTimeState,
-    final boolean isAddedRoute
+    final boolean isAddedRoute,
+    @Nullable final String tripHeadsign
   ) {
     // Preconditions
     Objects.requireNonNull(stops);
@@ -794,7 +817,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     // Create StopTimes
     final List<StopTime> stopTimes = new ArrayList<>(stopTimeUpdates.size());
     for (int index = 0; index < stopTimeUpdates.size(); ++index) {
-      final StopTimeUpdate stopTimeUpdate = stopTimeUpdates.get(index);
+      final var added = new AddedStopTime(stopTimeUpdates.get(index));
       final var stop = stops.get(index);
 
       // Create stop time
@@ -802,13 +825,15 @@ public class GtfsRealTimeTripUpdateAdapter {
       stopTime.setTrip(trip);
       stopTime.setStop(stop);
       // Set arrival time
-      if (stopTimeUpdate.hasArrival() && stopTimeUpdate.getArrival().hasTime()) {
-        final long arrivalTime = stopTimeUpdate.getArrival().getTime() - midnightSecondsSinceEpoch;
+      final var arrival = added.arrivalTime();
+      if (arrival.isPresent()) {
+        final var delay = added.arrivalDelay();
+        final var arrivalTime = arrival.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (arrivalTime < 0 || arrivalTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
             serviceDate,
-            "ADDED trip has invalid arrival time (compared to start date in " +
+            "NEW trip has invalid arrival time (compared to start date in " +
             "TripDescriptor), skipping."
           );
           return UpdateError.result(trip.getId(), INVALID_ARRIVAL_TIME);
@@ -816,14 +841,15 @@ public class GtfsRealTimeTripUpdateAdapter {
         stopTime.setArrivalTime((int) arrivalTime);
       }
       // Set departure time
-      if (stopTimeUpdate.hasDeparture() && stopTimeUpdate.getDeparture().hasTime()) {
-        final long departureTime =
-          stopTimeUpdate.getDeparture().getTime() - midnightSecondsSinceEpoch;
+      final var departure = added.departureTime();
+      if (departure.isPresent()) {
+        final var delay = added.departureDelay();
+        final long departureTime = departure.getAsLong() - midnightSecondsSinceEpoch - delay;
         if (departureTime < 0 || departureTime > MAX_ARRIVAL_DEPARTURE_TIME) {
           debug(
             trip.getId(),
             serviceDate,
-            "ADDED trip has invalid departure time (compared to start date in " +
+            "NEW trip has invalid departure time (compared to start date in " +
             "TripDescriptor), skipping."
           );
           return UpdateError.result(trip.getId(), INVALID_DEPARTURE_TIME);
@@ -831,12 +857,19 @@ public class GtfsRealTimeTripUpdateAdapter {
         stopTime.setDepartureTime((int) departureTime);
       }
       stopTime.setTimepoint(1); // Exact time
-      if (stopTimeUpdate.hasStopSequence()) {
-        stopTime.setStopSequence(stopTimeUpdate.getStopSequence());
-      }
-      var added = AddedStopTime.ofStopTime(stopTimeUpdate);
+      added.stopSequence().ifPresent(stopTime::setStopSequence);
       stopTime.setPickupType(added.pickup());
       stopTime.setDropOffType(added.dropOff());
+      added
+        .stopHeadsign()
+        .ifPresentOrElse(
+          headsign -> stopTime.setStopHeadsign(new NonLocalizedString(headsign)),
+          () -> {
+            if (tripHeadsign != null) {
+              stopTime.setStopHeadsign(new NonLocalizedString(tripHeadsign));
+            }
+          }
+        );
       // Add stop time to list
       stopTimes.add(stopTime);
     }
@@ -862,12 +895,23 @@ public class GtfsRealTimeTripUpdateAdapter {
     );
 
     // Update all times to mark trip times as realtime
-    // TODO: should we incorporate the delay field if present?
+    // TODO: This is based on the proposal at https://github.com/google/transit/issues/490
     for (int stopIndex = 0; stopIndex < newTripTimes.getNumStops(); stopIndex++) {
-      newTripTimes.updateArrivalTime(stopIndex, newTripTimes.getScheduledArrivalTime(stopIndex));
+      final var addedStopTime = new AddedStopTime(stopTimeUpdates.get(stopIndex));
+
+      if (addedStopTime.isSkipped()) {
+        newTripTimes.setCancelled(stopIndex);
+      }
+
+      final int arrivalDelay = addedStopTime.arrivalDelay();
+      final int departureDelay = addedStopTime.departureDelay();
+      newTripTimes.updateArrivalTime(
+        stopIndex,
+        newTripTimes.getScheduledArrivalTime(stopIndex) + arrivalDelay
+      );
       newTripTimes.updateDepartureTime(
         stopIndex,
-        newTripTimes.getScheduledDepartureTime(stopIndex)
+        newTripTimes.getScheduledDepartureTime(stopIndex) + departureDelay
       );
     }
 
@@ -996,7 +1040,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   }
 
   /**
-   * Validate and handle GTFS-RT TripUpdate message containing a MODIFIED trip.
+   * Validate and handle GTFS-RT TripUpdate message containing a REPLACEMENT trip.
    *
    * @param tripUpdate     GTFS-RT TripUpdate message
    * @param tripDescriptor GTFS-RT TripDescriptor
@@ -1020,8 +1064,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     Trip trip = transitEditorService.getTrip(tripId);
 
     if (trip == null) {
-      // TODO: should we support this and consider it an ADDED trip?
-      debug(tripId, serviceDate, "Feed does not contain trip id of MODIFIED trip, skipping.");
+      debug(tripId, serviceDate, "Feed does not contain trip id of REPLACEMENT trip, skipping.");
       return UpdateError.result(tripId, TRIP_NOT_FOUND);
     }
 
@@ -1107,7 +1150,8 @@ public class GtfsRealTimeTripUpdateAdapter {
       stops,
       serviceDate,
       RealTimeState.MODIFIED,
-      false
+      false,
+      getTripHeadsign(tripUpdate)
     );
   }
 
