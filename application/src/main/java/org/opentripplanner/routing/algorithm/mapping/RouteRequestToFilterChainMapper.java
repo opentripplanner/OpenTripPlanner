@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.emissions.DecorateWithEmission;
 import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
@@ -110,8 +109,8 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
-      builder.withEmissions(new DecorateWithEmission(context.emissionsService()));
+    if (OTPFeature.Co2Emissions.isOn()) {
+      builder.withEmissions(context.emissionsItineraryDecorator());
     }
 
     if (

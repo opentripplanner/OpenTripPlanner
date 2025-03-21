@@ -97,6 +97,7 @@ public class ItineraryListFilterChainBuilder {
    */
 
   @Sandbox
+  @Nullable
   private ItineraryDecorator emissionDecorator;
 
   @Sandbox
@@ -339,7 +340,9 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(ItineraryDecorator emissionDecorator) {
+  public ItineraryListFilterChainBuilder withEmissions(
+    @Nullable ItineraryDecorator emissionDecorator
+  ) {
     this.emissionDecorator = emissionDecorator;
     return this;
   }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -14,6 +13,7 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
@@ -59,7 +59,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   /* Optional fields */
 
   @Nullable
-  private final EmissionsService emissionsService;
+  private final ItineraryDecorator emissionsItineraryDecorator;
 
   @Nullable
   private final LuceneIndex luceneIndex;
@@ -102,7 +102,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
-    @Nullable EmissionsService emissionsService,
+    @Nullable ItineraryDecorator emissionsItineraryDecorator,
     @Nullable LuceneIndex luceneIndex,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
@@ -127,7 +127,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
 
     // Optional fields
-    this.emissionsService = emissionsService;
+    this.emissionsItineraryDecorator = emissionsItineraryDecorator;
     this.luceneIndex = luceneIndex;
     this.schema = schema;
     this.sorlandsbanenService = sorlandsbanenService;
@@ -260,8 +260,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public EmissionsService emissionsService() {
-    return emissionsService;
+  public ItineraryDecorator emissionsItineraryDecorator() {
+    return emissionsItineraryDecorator;
   }
 
   @Nullable

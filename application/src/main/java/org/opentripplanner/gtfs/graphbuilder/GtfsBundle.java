@@ -3,13 +3,13 @@ package org.opentripplanner.gtfs.graphbuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.configure.DataStoreModule;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,47 +19,35 @@ public class GtfsBundle {
 
   private final CompositeDataSource dataSource;
 
-  private GtfsFeedId feedId;
+  // The feadId is resolved lazy to make any exceptions in the caller when parsing the
+  // gfts files, and not in the instrumentation of the bundle.
+  @Nullable
+  private String feedId;
 
   private CsvInputSource csvInputSource;
 
-  public int subwayAccessTime;
+  private final GtfsFeedParameters parameters;
 
-  private double maxStopToShapeSnapDistance = 150;
-  private final boolean removeRepeatedStops;
-
-  private final StopTransferPriority stationTransferPreference;
-
-  private final boolean discardMinTransferTimes;
-
-  private final boolean blockBasedInterlining;
-
-  private final int maxInterlineDistance;
+  public GtfsBundle(CompositeDataSource dataSource, GtfsFeedParameters parameters) {
+    this.dataSource = dataSource;
+    this.parameters = parameters;
+    // Override feed id, if set in config
+    this.feedId = parameters.feedId();
+  }
 
   /** Used by unit tests */
-  public GtfsBundle(File gtfsFile) {
-    this(DataStoreModule.compositeSource(gtfsFile, FileType.GTFS));
+  public static GtfsBundle forTest(File gtfsFile, @Nullable String feedId) {
+    var dataSource = DataStoreModule.compositeSource(gtfsFile, FileType.GTFS);
+    var parameters = GtfsDefaultParameters.DEFAULT.withFeedInfo()
+      .withSource(dataSource.uri())
+      .withFeedId(feedId)
+      .build();
+    return new GtfsBundle(dataSource, parameters);
   }
 
-  private GtfsBundle(CompositeDataSource compositeDataSource) {
-    this(
-      new ConfiguredDataSource<>(
-        compositeDataSource,
-        new GtfsFeedParametersBuilder().withSource(compositeDataSource.uri()).build()
-      )
-    );
-  }
-
-  public GtfsBundle(ConfiguredDataSource<GtfsFeedParameters> configuredDataSource) {
-    this.dataSource = (CompositeDataSource) configuredDataSource.dataSource();
-    if (configuredDataSource.config().feedId() != null) {
-      this.feedId = new GtfsFeedId.Builder().id(configuredDataSource.config().feedId()).build();
-    }
-    this.removeRepeatedStops = configuredDataSource.config().removeRepeatedStops();
-    this.stationTransferPreference = configuredDataSource.config().stationTransferPreference();
-    this.discardMinTransferTimes = configuredDataSource.config().discardMinTransferTimes();
-    this.blockBasedInterlining = configuredDataSource.config().blockBasedInterlining();
-    this.maxInterlineDistance = configuredDataSource.config().maxInterlineDistance();
+  /** Used by unit tests */
+  public static GtfsBundle forTest(File gtfsFile) {
+    return forTest(gtfsFile, null);
   }
 
   public CsvInputSource getCsvInputSource() {
@@ -95,26 +83,18 @@ public class GtfsBundle {
     }
   }
 
-  public String toString() {
-    String src = dataSource.path();
-    if (feedId != null) {
-      src += " (" + feedId.getId() + ")";
-    }
-    return "GTFS bundle at " + src;
+  public String feedInfo() {
+    return "GTFS bundle at " + dataSource.path() + " (" + getFeedId() + ")";
   }
 
   /**
    * So that we can load multiple gtfs feeds into the same database.
    */
-  public GtfsFeedId getFeedId() {
+  public String getFeedId() {
     if (feedId == null) {
-      feedId = new GtfsFeedId.Builder().fromGtfsFeed(getCsvInputSource()).build();
+      feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource());
     }
     return feedId;
-  }
-
-  public void setFeedId(GtfsFeedId feedId) {
-    this.feedId = feedId;
   }
 
   public void checkInputs() {
@@ -129,31 +109,7 @@ public class GtfsBundle {
     }
   }
 
-  public double getMaxStopToShapeSnapDistance() {
-    return maxStopToShapeSnapDistance;
-  }
-
-  public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
-    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
-  }
-
-  public boolean removeRepeatedStops() {
-    return removeRepeatedStops;
-  }
-
-  public StopTransferPriority stationTransferPreference() {
-    return stationTransferPreference;
-  }
-
-  public boolean discardMinTransferTimes() {
-    return discardMinTransferTimes;
-  }
-
-  public boolean blockBasedInterlining() {
-    return blockBasedInterlining;
-  }
-
-  public int maxInterlineDistance() {
-    return maxInterlineDistance;
+  public GtfsFeedParameters parameters() {
+    return parameters;
   }
 }
