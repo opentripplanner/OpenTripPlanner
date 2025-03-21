@@ -134,5 +134,4 @@ public class LegMapper {
   private Double round3Decimals(double value) {
     return Math.round(value * 1000d) / 1000d;
   }
-
 }
