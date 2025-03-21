@@ -8,11 +8,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emissions.model.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -35,7 +35,7 @@ public class EmissionsGraphBuilderTest {
     var emissionsRepository = new DefaultEmissionsRepository();
     var emissionsGraphBuilder = new EmissionsGraphBuilder(
       configuredDataSources,
-      BuildConfig.DEFAULT.emissions,
+      EmissionParameters.DEFAULT,
       emissionsRepository,
       DataImportIssueStore.NOOP
     );

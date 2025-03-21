@@ -31,8 +31,8 @@ public class EmissionsConfigurationDocTest {
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test
-  public void updateEmissionsDoc() {
-    NodeAdapter node = readEmissionsConfig();
+  public void updateMapEmissionsConfigDoc() {
+    NodeAdapter node = readMapEmissionsConfigConfig();
 
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
@@ -43,7 +43,7 @@ public class EmissionsConfigurationDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readEmissionsConfig() {
+  private NodeAdapter readMapEmissionsConfigConfig() {
     var json = jsonNodeFromResource(CONFIG_PATH);
     var conf = new BuildConfig(json, CONFIG_PATH, false);
     return conf.asNodeAdapter().child("emissions");
