@@ -39,6 +39,7 @@ import org.opentripplanner.transit.api.request.FindRoutesRequest;
 import org.opentripplanner.transit.api.request.FindStopLocationsRequest;
 import org.opentripplanner.transit.api.request.TripOnServiceDateRequest;
 import org.opentripplanner.transit.api.request.TripRequest;
+import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.filter.expr.Matcher;
@@ -161,16 +162,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public FeedInfo getFeedInfo(String feedId) {
     return this.timetableRepository.getFeedInfo(feedId);
-  }
-
-  @Override
-  public void addAgency(Agency agency) {
-    this.timetableRepository.addAgency(agency);
-  }
-
-  @Override
-  public void addFeedInfo(FeedInfo info) {
-    this.timetableRepository.addFeedInfo(info);
   }
 
   @Override
@@ -430,7 +421,8 @@ public class DefaultTransitService implements TransitEditorService {
       timeRange,
       numberOfDepartures,
       arrivalDeparture,
-      includeCancelledTrips
+      includeCancelledTrips,
+      TripTimeOnDate.compareByRealtimeDeparture()
     );
   }
 
@@ -451,7 +443,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public List<TripTimeOnDate> findTripTimeOnDate(
+  public List<TripTimeOnDate> findTripTimesOnDate(
     StopLocation stop,
     TripPattern pattern,
     Instant startTime,
@@ -470,6 +462,12 @@ public class DefaultTransitService implements TransitEditorService {
       arrivalDeparture,
       includeCancellations
     );
+  }
+
+  @Override
+  public List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request) {
+    OTPRequestTimeoutException.checkForTimeout();
+    return stopTimesHelper.findTripTimeOnDate(request);
   }
 
   /**
@@ -622,11 +620,6 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate) {
     return timetableRepository.getOrCreateServiceIdForDate(serviceDate);
-  }
-
-  @Override
-  public void addTransitMode(TransitMode mode) {
-    this.timetableRepository.addTransitMode(mode);
   }
 
   @Override

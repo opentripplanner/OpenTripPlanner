@@ -84,8 +84,6 @@ public class StreetGraphFinder implements GraphFinder {
     TraverseVisitor<State, Edge> visitor,
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy
   ) {
-    // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-    // TODO make a function that builds normal routing requests from profile requests
     RouteRequest rr = new RouteRequest();
     rr.setFrom(new GenericLocation(null, null, lat, lon));
     rr.withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)));

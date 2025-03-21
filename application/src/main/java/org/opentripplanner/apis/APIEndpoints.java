@@ -13,6 +13,7 @@ import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeo
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIParkAndRideApi;
 import static org.opentripplanner.framework.application.OTPFeature.TransmodelGraphQlApi;
+import static org.opentripplanner.framework.application.OTPFeature.TriasApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import org.opentripplanner.apis.vectortiles.GraphInspectorVectorTileResource;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
+import org.opentripplanner.ext.ojp.trias.TriasResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.restapi.resources.BikeRental;
@@ -62,6 +64,7 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
+    addIfEnabled(TriasApi, TriasResource.class);
 
     // scheduled to be removed
     addIfEnabled(APIBikeRental, BikeRental.class);
