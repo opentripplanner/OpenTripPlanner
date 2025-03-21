@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping.restapi.model;
 
 /**
  * Represent type of vertex, used in Place aka from, to in API for easier client side localization

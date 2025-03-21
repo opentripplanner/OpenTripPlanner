@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.TransitMode;

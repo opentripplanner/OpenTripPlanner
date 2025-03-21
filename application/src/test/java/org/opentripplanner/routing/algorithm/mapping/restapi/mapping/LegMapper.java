@@ -1,18 +1,19 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
-import static org.opentripplanner.ext.restapi.mapping.ElevationMapper.mapElevation;
+import static org.opentripplanner.routing.algorithm.mapping.restapi.mapping.ElevationMapper.mapElevation;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.ext.restapi.model.ApiLeg;
+import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiLeg;
 
 public class LegMapper {
 

@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
-import org.opentripplanner.ext.restapi.model.ApiRelativeDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiRelativeDirection;
 
 public class RelativeDirectionMapper {
 

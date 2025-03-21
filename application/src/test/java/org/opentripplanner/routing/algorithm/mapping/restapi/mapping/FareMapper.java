@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
 import com.google.common.collect.Multimap;
 import java.util.Collection;
@@ -7,18 +7,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.restapi.model.ApiCurrency;
-import org.opentripplanner.ext.restapi.model.ApiFareProduct;
-import org.opentripplanner.ext.restapi.model.ApiFareQualifier;
-import org.opentripplanner.ext.restapi.model.ApiItineraryFares;
-import org.opentripplanner.ext.restapi.model.ApiLegProducts;
-import org.opentripplanner.ext.restapi.model.ApiMoney;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiCurrency;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiFareProduct;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiFareQualifier;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiItineraryFares;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiLegProducts;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiMoney;
 import org.opentripplanner.transit.model.basic.Money;
 
 public class FareMapper {

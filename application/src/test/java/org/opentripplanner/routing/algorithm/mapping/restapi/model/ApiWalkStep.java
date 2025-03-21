@@ -1,6 +1,4 @@
-package org.opentripplanner.ext.restapi.model;
-
-import java.util.List;
+package org.opentripplanner.routing.algorithm.mapping.restapi.model;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:

@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
-import org.opentripplanner.ext.restapi.model.ApiAbsoluteDirection;
 import org.opentripplanner.model.plan.AbsoluteDirection;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiAbsoluteDirection;
 
 public class AbsoluteDirectionMapper {
 

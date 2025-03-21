@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping.restapi.model;
 
 /**
  * Qualifiers for Fares V2 fare products. Qualifiers can be rider categories (youth, senior, veteran) or

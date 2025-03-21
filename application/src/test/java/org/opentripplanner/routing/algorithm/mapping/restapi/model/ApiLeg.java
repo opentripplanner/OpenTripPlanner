@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping.restapi.model;
 
 import java.util.Calendar;
 import java.util.List;

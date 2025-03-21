@@ -1,14 +1,14 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
-import static org.opentripplanner.ext.restapi.mapping.ElevationMapper.mapElevation;
-import static org.opentripplanner.ext.restapi.mapping.RelativeDirectionMapper.mapRelativeDirection;
+import static org.opentripplanner.routing.algorithm.mapping.restapi.mapping.ElevationMapper.mapElevation;
+import static org.opentripplanner.routing.algorithm.mapping.restapi.mapping.RelativeDirectionMapper.mapRelativeDirection;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.restapi.model.ApiWalkStep;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiWalkStep;
 
 public class WalkStepMapper {
 

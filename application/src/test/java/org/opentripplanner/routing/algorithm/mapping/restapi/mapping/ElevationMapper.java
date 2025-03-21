@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
 import org.opentripplanner.model.plan.ElevationProfile;
 

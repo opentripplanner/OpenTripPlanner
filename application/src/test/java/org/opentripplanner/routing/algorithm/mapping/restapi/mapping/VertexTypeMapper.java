@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
-import org.opentripplanner.ext.restapi.model.ApiVertexType;
 import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiVertexType;
 
 public class VertexTypeMapper {
 

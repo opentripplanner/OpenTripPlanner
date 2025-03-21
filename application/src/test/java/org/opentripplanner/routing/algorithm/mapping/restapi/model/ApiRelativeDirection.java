@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping.restapi.model;
 
 /**
  * Represents a turn direction, relative to the current heading.

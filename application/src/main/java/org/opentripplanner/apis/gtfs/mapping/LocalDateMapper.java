@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.apis.gtfs.mapping;
 
 import java.time.LocalDate;
 import org.opentripplanner.utils.time.ServiceDateUtils;

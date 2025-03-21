@@ -1,12 +1,12 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
 
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.restapi.model.ApiItinerary;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiItinerary;
 
 public class ItineraryMapper {
 

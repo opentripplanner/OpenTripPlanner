@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping.restapi.model;
 
 /**
  * A Fares V2 product. This is a type of ticket or monthly pass that customers can buy.
