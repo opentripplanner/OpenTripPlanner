@@ -2495,10 +2495,10 @@ type Trip implements Node {
   "List of times when this trip arrives to or departs from a stop"
   stoptimes: [Stoptime]
   """
-  List of times when this trip arrives to or departs from a stop on a given date, or
-  today if the date is not given. If the trip does not run on the given date, will
-  return the times of the next scheduled running date. This is a confusing call and
-  will be deprecated when a better API is implemented.
+  List of times when this trip arrives to or departs from each stop on a given date, or
+  today if the date is not given. If the trip does not run on the given date, it will
+  return scheduled times from another date. This field is slightly confusing and
+  will be deprecated when a better replacement is implemented.
   """
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
