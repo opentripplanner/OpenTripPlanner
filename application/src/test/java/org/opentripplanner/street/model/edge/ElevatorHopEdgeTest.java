@@ -1,21 +1,34 @@
 package org.opentripplanner.street.model.edge;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.graph_builder.module.osm.moduletests._support.NodeBuilder.node;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
+import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.moduletests._support.TestOsmProvider;
+import org.opentripplanner.osm.model.OsmWay;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
+import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 
 class ElevatorHopEdgeTest {
 
@@ -86,5 +99,28 @@ class ElevatorHopEdgeTest {
     var state = new State(from, req);
 
     return edge.traverse(state);
+  }
+
+  @Test
+  void testDuration() {
+    var way = new OsmWay();
+    way.addTag("duration", "00:01:02");
+    way.addTag("highway", "elevator");
+    var provider = TestOsmProvider.of().addWay(way).build();
+    var graph = new Graph(new Deduplicator());
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    ).build();
+    osmModule.buildGraph();
+    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    assertThat(edges).hasSize(2);
+    var edge = (ElevatorHopEdge) edges.getFirst();
+    var from = edge.getFromVertex();
+    var req = StreetSearchRequest.of().withMode(StreetMode.WALK);
+    var res = edge.traverse(new State(from, req.build()))[0];
+    assertEquals(62_000, res.getTimeDeltaMilliseconds());
   }
 }
