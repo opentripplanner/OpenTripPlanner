@@ -36,11 +36,10 @@ class StatesToWalkStepsMapperTest {
 
   @Test
   void stationEntrance() {
-    // need to add zag distance and name
     var walkSteps = buildWalkSteps(
       TestStateBuilder.ofWalking()
         .streetEdge("name", 1)
-        .entrance() // name
+        .entrance()
         .streetEdge()
         .areaEdge("name", 10)
     );
