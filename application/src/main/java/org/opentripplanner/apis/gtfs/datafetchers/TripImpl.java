@@ -138,6 +138,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         Timetable timetable = tripPattern.getScheduledTimetable();
 
         TripTimes tripTimes = timetable.getTripTimes(getSource(environment));
+        if (tripTimes == null) {
+          return null;
+        }
         LocalDate serviceDate = null;
         Instant midnight = null;
 
@@ -186,6 +189,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
         Timetable timetable = tripPattern.getScheduledTimetable();
 
         TripTimes tripTimes = timetable.getTripTimes(getSource(environment));
+        if (tripTimes == null) {
+          return null;
+        }
         LocalDate serviceDate = null;
         Instant midnight = null;
 
@@ -322,7 +328,13 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           transitService.getTimeZone()
         ).toInstant();
         Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
-        return TripTimeOnDate.fromTripTimes(timetable, trip, serviceDate, midnight);
+        return TripTimeOnDate.fromTripTimesWithScheduleFallback(
+          timetable,
+          trip,
+          serviceDate,
+          midnight,
+          transitService
+        );
       } catch (ParseException e) {
         // invalid date format
         return null;

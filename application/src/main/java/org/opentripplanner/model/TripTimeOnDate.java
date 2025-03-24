@@ -16,6 +16,7 @@ import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +77,34 @@ public class TripTimeOnDate {
     List<TripTimeOnDate> out = new ArrayList<>();
     for (int i = 0; i < times.getNumStops(); ++i) {
       out.add(new TripTimeOnDate(times, i, table.getPattern()));
+    }
+    return out;
+  }
+
+  /**
+   * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
+   * StopPatterns.
+   * <br>
+   * If the timetable does not contain the trip, scheduledTimetable is used instead.
+   *
+   * @param table the timetable for the service day
+   * @param serviceDate service day to set
+   */
+  public static List<TripTimeOnDate> fromTripTimesWithScheduleFallback(
+    Timetable table,
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight,
+    TransitService transitService
+  ) {
+    TripTimes times = table.getTripTimes(trip);
+    if (times == null) {
+      Timetable scheduledTimetable = transitService.findPattern(trip).getScheduledTimetable();
+      return fromTripTimes(scheduledTimetable, trip);
+    }
+    List<TripTimeOnDate> out = new ArrayList<>();
+    for (int i = 0; i < times.getNumStops(); ++i) {
+      out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
     }
     return out;
   }
