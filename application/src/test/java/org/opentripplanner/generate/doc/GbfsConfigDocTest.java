@@ -12,7 +12,6 @@ import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.generate.doc.framework.DocBuilder;
 import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
@@ -23,35 +22,17 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @GeneratesDocumentation
-public class UpdaterConfigDocTest {
+public class GbfsConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_PATH, "UpdaterConfig.md");
-  private static final File OUT_FILE = new File(USER_DOC_PATH, "UpdaterConfig.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "GBFS-Config.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "GBFS-Config.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final Set<String> SKIP_UPDATERS = Set.of(
-    "siri-azure-sx-updater",
-    "siri-azure-et-updater",
-    "vehicle-parking",
-    "siri-et-updater",
-    "siri-et-google-pubsub-updater",
-    "siri-sx-updater",
-    "siri-et-lite",
-    "siri-sx-lite"
-  );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();
 
-  /**
-   * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest
-   * version of the code. The following is auto generated:
-   * <ul>
-   *   <li>The configuration type table</li>
-   *   <li>The list of OTP features</li>
-   * </ul>
-   */
   @Test
-  public void updateRouterConfigurationDoc() {
+  public void updateDoc() {
     NodeAdapter node = readBuildConfig();
 
     // Read and close input file (same as output file)
@@ -62,7 +43,7 @@ public class UpdaterConfigDocTest {
       var child = node.child(childName);
       var type = child.typeQualifier();
 
-      if (!SKIP_UPDATERS.contains(type)) {
+      if (type.equals("vehicle-rental")) {
         template = replaceSection(template, type, updaterDoc(child));
       }
     }
