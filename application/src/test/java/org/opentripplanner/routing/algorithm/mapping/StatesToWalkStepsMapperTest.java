@@ -50,7 +50,7 @@ class StatesToWalkStepsMapperTest {
     assertEquals(3, walkSteps.size());
     assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
     assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(1).getRelativeDirection());
-    assertEquals(RelativeDirection.HARD_RIGHT, walkSteps.get(2).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
   }
 
   @Test

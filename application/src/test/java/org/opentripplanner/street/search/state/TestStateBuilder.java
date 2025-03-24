@@ -136,12 +136,6 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
-    var toTurn = StreetModelForTest.intersectionVertex(count, count + 1);
-    var fromTurn = StreetModelForTest.intersectionVertex(count - 1, count);
-    StreetModelForTest.streetEdge(from, fromTurn);
-    StreetModelForTest.streetEdge(to, toTurn);
-    StreetModelForTest.streetEdge(fromTurn, from);
-    StreetModelForTest.streetEdge(toTurn, to);
     var edge = StreetModelForTest.streetEdge(
       from,
       to,
@@ -158,6 +152,7 @@ public class TestStateBuilder {
   }
 
   public TestStateBuilder areaEdge(String name, int distance) {
+    count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
     var area = StreetModelForTest.areaEdge(from, to, "name", StreetTraversalPermission.PEDESTRIAN);
@@ -247,12 +242,6 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = new StationEntranceVertex(count, count, 12345, "A", Accessibility.POSSIBLE);
-    var toTurn = StreetModelForTest.intersectionVertex(count, count + 1);
-    var fromTurn = StreetModelForTest.intersectionVertex(count - 1, count);
-    StreetModelForTest.streetEdge(from, fromTurn);
-    StreetModelForTest.streetEdge(to, toTurn);
-    StreetModelForTest.streetEdge(fromTurn, from);
-    StreetModelForTest.streetEdge(toTurn, to);
 
     var edge = StreetModelForTest.streetEdge(
       from,
