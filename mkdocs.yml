@@ -84,8 +84,8 @@ nav:
     - "Realtime Updaters":
         - Introduction: 'Realtime-Updaters.md'
         - "GTFS-RT": 'GTFS-RT-Config.md'
-        - "SIRI": 'SIRI-Config.md'
-        - "GBFS": 'GBFS-Config.md'
+        - SIRI: 'SIRI-Config.md'
+        - GBFS: 'GBFS-Config.md'
     - "Debug UI": 'DebugUiConfiguration.md'
     - "Migrating between versions/builds": 'Migrating-Configuration.md'
 - Features explained:

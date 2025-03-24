@@ -21,7 +21,6 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 <!-- INSERT: real-time-alerts -->
 
-
 ## TripUpdates via HTTP(S)
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 

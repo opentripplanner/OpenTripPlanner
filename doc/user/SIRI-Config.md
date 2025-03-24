@@ -1,4 +1,4 @@
-These updater support consuming SIRI ET and SX messages via HTTPS. They aim to support the [Nordic
+These updaters support consuming SIRI-ET and SX messages via HTTPS. They aim to support the [Nordic
 and EPIP SIRI profiles](./features-explained/Netex-Siri-Compatibility.md) which 
 are subsets of the SIRI specification.
 
@@ -157,13 +157,16 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ## SIRI-ET Lite
 
 SIRI Lite is 
-[not very well](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
-[specified](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri),
+not very well specified
+[[1]](https://nextcloud.leonard.io/s/2tdYdmYBGtLQMfi/download?path=&files=Proposition-Profil-SIRI-Lite-initial-v1-3%20en.pdf)
+[[2]](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri)
 but this updater supports the following definition: 
 
 > Fetching XML-formatted SIRI messages as single GET request rather than the more common request/response 
-> flow. This means that the XML feed must contain all updates for all trips, just like it is the case 
-> for GTFS-RT TripUpdates.
+> flow. 
+ 
+This means that the XML feed must contain all updates for all trips, just like it is the case 
+ for GTFS-RT TripUpdates.
 
 <!-- siri-et-lite BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->

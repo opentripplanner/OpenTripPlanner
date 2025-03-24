@@ -65,7 +65,6 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- real-time-alerts END -->
 
-
 ## TripUpdates via HTTP(S)
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
