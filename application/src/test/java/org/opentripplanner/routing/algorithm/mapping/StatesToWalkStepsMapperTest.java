@@ -44,8 +44,8 @@ class StatesToWalkStepsMapperTest {
       TestStateBuilder.ofWalking()
         .streetEdge("name", 1)
         .entrance() // name
-        .streetEdge("other", 31)
-        .areaEdge("area", 10)
+        .streetEdge()
+        .areaEdge("name", 10)
     );
     assertEquals(3, walkSteps.size());
     assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());

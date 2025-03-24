@@ -155,7 +155,7 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
-    var area = StreetModelForTest.areaEdge(from, to, "name", StreetTraversalPermission.PEDESTRIAN);
+    var area = StreetModelForTest.areaEdge(from, to, name, StreetTraversalPermission.PEDESTRIAN);
     var states = area.traverse(currentState);
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
