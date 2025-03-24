@@ -232,6 +232,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       pathLeg.toStop()
     );
 
+    var distanceMeters = LegConstructionSupport.computeDistanceMeters(
+      tripSchedule.getOriginalTripPattern(),
+      boardStopIndexInPattern,
+      alightStopIndexInPattern
+    );
+
     if (tripSchedule.isFrequencyBasedTrip()) {
       int frequencyHeadwayInSeconds = tripSchedule.frequencyHeadwayInSeconds();
       return new FrequencyTransitLegBuilder()
@@ -241,6 +247,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         .withAlightStopIndexInPattern(alightStopIndexInPattern)
         .withStartTime(createZonedDateTime(pathLeg.fromTime() + frequencyHeadwayInSeconds))
         .withEndTime(createZonedDateTime(pathLeg.toTime()))
+        .withDistanceMeters(distanceMeters)
         .withServiceDate(tripSchedule.getServiceDate())
         .withZoneId(transitSearchTimeZero.getZone().normalized())
         .withTransferFromPreviousLeg(
@@ -254,11 +261,6 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     TripOnServiceDate tripOnServiceDate = getTripOnServiceDate(tripSchedule);
 
-    var distanceMeters = LegConstructionSupport.computeDistanceMeters(
-      tripSchedule.getOriginalTripPattern(),
-      boardStopIndexInPattern,
-      alightStopIndexInPattern
-    );
     return new ScheduledTransitLegBuilder<>()
       .withTripTimes(tripSchedule.getOriginalTripTimes())
       .withTripPattern(tripSchedule.getOriginalTripPattern())
