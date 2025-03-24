@@ -9,9 +9,12 @@ import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.ext.restapi.mapping.WalkStepMapper;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.WalkStepBuilder;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -32,6 +35,22 @@ class StatesToWalkStepsMapperTest {
     var elevatorStep = walkSteps.get(3);
     assertEquals(RelativeDirection.ELEVATOR, elevatorStep.getRelativeDirection());
     assertTrue(elevatorStep.getAbsoluteDirection().isEmpty());
+  }
+
+  @Test
+  void stationEntrance() {
+    // need to add zag distance and name
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking()
+        .streetEdge("name", 1)
+        .entrance() // name
+        .streetEdge("other", 31)
+        .areaEdge("area", 10)
+    );
+    assertEquals(3, walkSteps.size());
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.HARD_RIGHT, walkSteps.get(2).getRelativeDirection());
   }
 
   @Test

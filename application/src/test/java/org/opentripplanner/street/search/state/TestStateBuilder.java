@@ -31,6 +31,7 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
+import org.opentripplanner.street.model.vertex.StationEntranceVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -131,6 +132,43 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder streetEdge(String name, int distance) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var toTurn = StreetModelForTest.intersectionVertex(count, count + 1);
+    var fromTurn = StreetModelForTest.intersectionVertex(count - 1, count);
+    StreetModelForTest.streetEdge(from, fromTurn);
+    StreetModelForTest.streetEdge(to, toTurn);
+    StreetModelForTest.streetEdge(fromTurn, from);
+    StreetModelForTest.streetEdge(toTurn, to);
+    var edge = StreetModelForTest.streetEdge(
+      from,
+      to,
+      name,
+      distance,
+      StreetTraversalPermission.PEDESTRIAN
+    );
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder areaEdge(String name, int distance) {
+    var from = (StreetVertex) currentState.vertex;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var area = StreetModelForTest.areaEdge(from, to, "name", StreetTraversalPermission.PEDESTRIAN);
+    var states = area.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
+    return this;
+  }
+
   /**
    * Traverse a street edge and switch to Car mode
    */
@@ -202,6 +240,28 @@ public class TestStateBuilder {
       currentState,
       List.of(link, boardEdge, hopEdge, alightEdge)
     ).orElseThrow();
+    return this;
+  }
+
+  public TestStateBuilder entrance() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = new StationEntranceVertex(count, count, 12345, "A", Accessibility.POSSIBLE);
+    var toTurn = StreetModelForTest.intersectionVertex(count, count + 1);
+    var fromTurn = StreetModelForTest.intersectionVertex(count - 1, count);
+    StreetModelForTest.streetEdge(from, fromTurn);
+    StreetModelForTest.streetEdge(to, toTurn);
+    StreetModelForTest.streetEdge(fromTurn, from);
+    StreetModelForTest.streetEdge(toTurn, to);
+
+    var edge = StreetModelForTest.streetEdge(
+      from,
+      to,
+      "name",
+      30,
+      StreetTraversalPermission.PEDESTRIAN
+    );
+    currentState = edge.traverse(currentState)[0];
     return this;
   }
 
