@@ -2,9 +2,11 @@ package org.opentripplanner.ext.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.opentripplanner.ext.emissions.model.EmissionFeedParameters;
 import org.opentripplanner.ext.emissions.model.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
+import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -21,16 +23,19 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
 
   private final EmissionParameters parameters;
   private final EmissionsRepository emissionsRepository;
-  private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources;
+  private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources;
+  private final Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionsDataSources;
   private final DataImportIssueStore issueStore;
 
   public EmissionsGraphBuilder(
-    Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> dataSources,
+    Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources,
+    Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionsDataSources,
     EmissionParameters parameters,
     EmissionsRepository emissionsRepository,
     DataImportIssueStore issueStore
   ) {
-    this.dataSources = dataSources;
+    this.gtfsDataSources = gtfsDataSources;
+    this.emissionsDataSources = emissionsDataSources;
     this.parameters = parameters;
     this.emissionsRepository = emissionsRepository;
     this.issueStore = issueStore;
@@ -45,9 +50,14 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
       Map<FeedScopedId, Double> emissionsData = new HashMap<>();
 
-      for (var gtfsData : dataSources) {
-        var resolvedFeedId = new GtfsBundle(gtfsData.dataSource(), gtfsData.config()).getFeedId();
-        emissionsData.putAll(co2EmissionsDataReader.read(gtfsData.dataSource(), resolvedFeedId));
+      for (var data : emissionsDataSources) {
+        emissionsData.putAll(
+          co2EmissionsDataReader.read(data.dataSource(), data.config().feedId())
+        );
+      }
+      for (var data : gtfsDataSources) {
+        var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
+        emissionsData.putAll(co2EmissionsDataReader.read(data.dataSource(), resolvedFeedId));
       }
       this.emissionsRepository.setCo2Emissions(emissionsData);
       this.emissionsRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);

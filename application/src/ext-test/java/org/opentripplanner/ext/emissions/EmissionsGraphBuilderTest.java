@@ -35,6 +35,7 @@ public class EmissionsGraphBuilderTest {
     var emissionsRepository = new DefaultEmissionsRepository();
     var emissionsGraphBuilder = new EmissionsGraphBuilder(
       configuredDataSources,
+      List.of(),
       EmissionParameters.DEFAULT,
       emissionsRepository,
       DataImportIssueStore.NOOP

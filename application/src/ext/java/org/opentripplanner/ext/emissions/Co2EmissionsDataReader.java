@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.Sandbox;
@@ -31,19 +32,19 @@ public class Co2EmissionsDataReader {
     this.issueStore = issueStore;
   }
 
-  public Map<FeedScopedId, Double> read(CompositeDataSource catalog, String resolvedFeedId) {
-    try {
-      var emissionsDataSource = catalog.entry(EMISSIONS_FILE_NAME);
+  Map<FeedScopedId, Double> read(CompositeDataSource catalog, String resolvedFeedId) {
+    return read(catalog.entry(EMISSIONS_FILE_NAME), resolvedFeedId);
+  }
 
+  Map<FeedScopedId, Double> read(DataSource emissionsDataSource, String resolvedFeedId) {
+    try {
       if (emissionsDataSource.exists()) {
         return readEmissions(emissionsDataSource.asInputStream(), resolvedFeedId);
-      } else {
-        return Map.of();
       }
     } catch (IOException e) {
-      LOG.error("Failed to read emission data. Details: " + e.getMessage(), e);
-      return Map.of();
+      LOG.error("Failed to read emision data. Details: " + e.getMessage(), e);
     }
+    return Map.of();
   }
 
   private Map<FeedScopedId, Double> readEmissions(InputStream stream, String feedId)
