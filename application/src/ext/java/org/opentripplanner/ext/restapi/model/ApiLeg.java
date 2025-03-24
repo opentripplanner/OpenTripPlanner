@@ -212,6 +212,7 @@ public class ApiLeg {
    *
    * @deprecated This is always null or false, the information is now stored per walk step
    */
+  @Deprecated
   public Boolean walkingBike;
 
   /**

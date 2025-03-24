@@ -2,7 +2,7 @@ package org.opentripplanner.ext.fares;
 
 import java.util.List;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.FareProductAware;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -13,20 +13,20 @@ import org.opentripplanner.utils.collection.ListUtils;
  */
 public final class ItineraryFaresDecorator {
 
-  private final ItineraryFares fare;
+  private final ItineraryFare fare;
   private final List<FareProductUse> itineraryFareUses;
 
-  public ItineraryFaresDecorator(ItineraryFares fare, List<FareProductUse> itineraryFareUses) {
+  public ItineraryFaresDecorator(ItineraryFare fare, List<FareProductUse> itineraryFareUses) {
     this.fare = fare;
     this.itineraryFareUses = itineraryFareUses;
   }
 
-  public static Itinerary decorateItineraryWithFare(Itinerary i, ItineraryFares fare) {
+  public static Itinerary decorateItineraryWithFare(Itinerary i, ItineraryFare fare) {
     var legDecorator = new ItineraryFaresDecorator(fare, createItineraryFareUses(i, fare));
     return i.copyOf().withFare(fare).transformTransitLegs(legDecorator::decorateTransitLeg).build();
   }
 
-  private static List<FareProductUse> createItineraryFareUses(Itinerary i, ItineraryFares fare) {
+  private static List<FareProductUse> createItineraryFareUses(Itinerary i, ItineraryFare fare) {
     return fare
       .getItineraryProducts()
       .stream()

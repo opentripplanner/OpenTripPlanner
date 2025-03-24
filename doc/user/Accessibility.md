@@ -44,7 +44,7 @@ If you want to allow trips and stops of unknown wheelchair-accessibility then ad
       },
       "inaccessibleStreetReluctance": 25,
       "maxSlope": 0.08333,
-      "slopeExceededReluctance": 50,
+      "slopeExceededReluctance": 1,
       "stairsReluctance": 25
     }
   },
