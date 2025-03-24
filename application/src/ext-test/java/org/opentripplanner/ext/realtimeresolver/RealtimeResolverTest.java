@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.realtimeresolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -63,13 +64,14 @@ class RealtimeResolverTest {
       .build();
     transitService.getTransitAlertService().setAlerts(List.of(alert));
 
-    var itineraries = List.of(itinerary);
-    itineraries = RealtimeResolver.populateLegsWithRealtime(itineraries, transitService);
+    var itinerariesWithRealtime = RealtimeResolver.populateLegsWithRealtime(
+      List.of(itinerary),
+      transitService
+    );
 
-    assertEquals(1, itineraries.size());
-    itinerary = itineraries.getFirst();
+    assertFalse(itinerariesWithRealtime.isEmpty());
 
-    var legs = itinerary.legs();
+    var legs = itinerariesWithRealtime.getFirst().legs();
     var leg1ArrivalDelay = legs
       .get(0)
       .asScheduledTransitLeg()
@@ -81,6 +83,7 @@ class RealtimeResolverTest {
     assertEquals(123, leg1ArrivalDelay);
     assertEquals(0, legs.get(0).getTransitAlerts().size());
     assertEquals(1, legs.get(1).getTransitAlerts().size());
+    assertEquals(1, itinerariesWithRealtime.size());
   }
 
   @Test

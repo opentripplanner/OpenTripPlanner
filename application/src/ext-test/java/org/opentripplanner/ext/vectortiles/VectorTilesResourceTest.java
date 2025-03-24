@@ -27,5 +27,8 @@ class VectorTilesResourceTest {
       "https://localhost:8080/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{y}.pbf",
       tileJson.tiles[0]
     );
+
+    assertEquals(9, tileJson.minzoom);
+    assertEquals(20, tileJson.maxzoom);
   }
 }

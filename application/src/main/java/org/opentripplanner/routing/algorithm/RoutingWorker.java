@@ -222,7 +222,7 @@ public class RoutingWorker {
     //       would be nice to also support via as a feature in the direct-street
     //       search.
     if (request.isViaSearch()) {
-      return null;
+      return RoutingResult.empty();
     }
 
     debugTimingAggregator.startedDirectStreetRouter();

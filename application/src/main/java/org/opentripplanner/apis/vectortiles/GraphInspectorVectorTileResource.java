@@ -8,6 +8,8 @@ import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Rental;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
+import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
+import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -126,7 +128,7 @@ public class GraphInspectorVectorTileResource {
       ignoreRouterId,
       "inspector/vectortile"
     );
-    return new TileJson(url, envelope, feedInfos);
+    return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
 
   @GET

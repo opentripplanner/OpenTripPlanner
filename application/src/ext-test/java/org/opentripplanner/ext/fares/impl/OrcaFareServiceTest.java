@@ -38,7 +38,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -93,12 +93,7 @@ public class OrcaFareServiceTest {
     );
   }
 
-  private static void assertLegFareEquals(
-    int fare,
-    Leg leg,
-    ItineraryFares fares,
-    boolean hasXfer
-  ) {
+  private static void assertLegFareEquals(int fare, Leg leg, ItineraryFare fares, boolean hasXfer) {
     var legFareProducts = fares.getLegProducts().get(leg);
 
     var rideCost = legFareProducts

@@ -18,11 +18,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.model.basic.Money;
 
-class ItineraryFaresTest {
+class ItineraryFareTest {
 
   @Test
   void legProduct() {
@@ -35,7 +35,7 @@ class ItineraryFaresTest {
     var busLeg = i1.transitLeg(1);
     var railLeg = i1.transitLeg(2);
 
-    var fares = new ItineraryFares();
+    var fares = new ItineraryFare();
 
     var busTicket = fareProduct("bus");
     var railTicketA = fareProduct("rail-a");
@@ -61,7 +61,7 @@ class ItineraryFaresTest {
 
   @Test
   void empty() {
-    assertTrue(ItineraryFares.empty().isEmpty());
+    assertTrue(ItineraryFare.empty().isEmpty());
   }
 
   private static FareProduct fareProduct(String id) {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
@@ -48,7 +48,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
    * additional free transfers from there.
    */
   @Override
-  protected ItineraryFares calculateFaresForType(
+  protected ItineraryFare calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -94,7 +94,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       null,
       null
     );
-    var fare = ItineraryFares.empty();
+    var fare = ItineraryFare.empty();
     if (cost.greaterThan(zero)) {
       fare.addItineraryProducts(List.of(fp));
     }

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.response.RoutingError;
 
@@ -21,32 +20,34 @@ class RoutingResult {
   private final Set<RoutingError> errors = new HashSet<>();
 
   RoutingResult(Collection<Itinerary> itineraries, Collection<RoutingError> errors) {
-    addAll(itineraries, errors);
+    addItineraries(itineraries);
+    addErrors(errors);
   }
 
   static RoutingResult empty() {
-    return new RoutingResult(null, null);
+    return new RoutingResult(List.of(), List.of());
   }
 
   static RoutingResult ok(List<Itinerary> itineraries) {
-    return new RoutingResult(itineraries, null);
+    return new RoutingResult(itineraries, List.of());
   }
 
   static RoutingResult failed(Collection<RoutingError> errors) {
-    return new RoutingResult(null, errors);
+    return new RoutingResult(List.of(), errors);
   }
 
   List<Itinerary> itineraries() {
-    return itineraries;
+    return List.copyOf(itineraries);
   }
 
   Set<RoutingError> errors() {
-    return errors;
+    return Set.copyOf(errors);
   }
 
   void merge(RoutingResult... others) {
     for (RoutingResult it : others) {
-      addAll(it.itineraries, it.errors);
+      addItineraries(it.itineraries);
+      addErrors(it.errors);
     }
   }
 
@@ -70,19 +71,12 @@ class RoutingResult {
   }
 
   void addErrors(Collection<RoutingError> errors) {
-    addToIfNotNull(this.errors, errors);
+    this.errors.addAll(errors);
   }
 
   /* private methods */
 
-  private void addAll(Collection<Itinerary> itineraries, Collection<RoutingError> errors) {
-    addToIfNotNull(this.itineraries, itineraries);
-    addToIfNotNull(this.errors, errors);
-  }
-
-  private static <T> void addToIfNotNull(Collection<T> target, @Nullable Collection<T> values) {
-    if (values != null) {
-      target.addAll(values);
-    }
+  private void addItineraries(Collection<Itinerary> itineraries) {
+    this.itineraries.addAll(itineraries);
   }
 }
