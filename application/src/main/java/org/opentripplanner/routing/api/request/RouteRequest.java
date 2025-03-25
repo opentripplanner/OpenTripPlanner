@@ -189,8 +189,8 @@ public class RouteRequest implements Cloneable, Serializable {
    * <p>
    * The direct mode is also unset when there is a page cursor because for anything other than the
    * initial page we don't want to see direct results. If the direct mode was given in the first request,
-   * the results of the direct mode search from the initial request are stored in the page cursor for use with
-   * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
+   * the generalized cost of the direct mode itinerary from the initial request is stored in the page cursor 
+   * for use with {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
    * to filter away unwanted transit results.
    */
   public void applyPageCursor() {
