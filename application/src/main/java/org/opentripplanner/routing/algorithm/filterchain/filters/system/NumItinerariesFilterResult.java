@@ -24,13 +24,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * returned as part of the result. The sort vector will be included in the page-cursor and
  * used in the next/previous page to filter away duplicates.
  */
-public class NumItinerariesFilterResults {
+public class NumItinerariesFilterResult {
 
   private final Instant earliestRemovedDeparture;
   private final Instant latestRemovedDeparture;
   private final ItinerarySortKey pageCut;
 
-  public NumItinerariesFilterResults(
+  public NumItinerariesFilterResult(
     Instant earliestRemovedDeparture,
     Instant latestRemovedDeparture,
     ItinerarySortKey pageCut
@@ -40,7 +40,7 @@ public class NumItinerariesFilterResults {
     this.pageCut = pageCut;
   }
 
-  public NumItinerariesFilterResults(
+  public NumItinerariesFilterResult(
     List<Itinerary> keptItineraries,
     List<Itinerary> removedItineraries,
     ListSection cropSection
@@ -73,7 +73,7 @@ public class NumItinerariesFilterResults {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(NumItinerariesFilterResults.class)
+    return ToStringBuilder.of(NumItinerariesFilterResult.class)
       .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
       .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
       .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)

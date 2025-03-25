@@ -65,9 +65,9 @@ public class PageCursorFactory {
   public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
     this.pageCursorInput = pageCursorInput;
     // If the whole search window was not used (i.e. if there were removed itineraries)
-    if (pageCursorInput.numItinerariesFilterResults() != null) {
+    if (pageCursorInput.numItinerariesFilterResult() != null) {
       this.wholeSwUsed = false;
-      this.itineraryPageCut = pageCursorInput.numItinerariesFilterResults().pageCut();
+      this.itineraryPageCut = pageCursorInput.numItinerariesFilterResult().pageCut();
     }
     return this;
   }
@@ -126,13 +126,13 @@ public class PageCursorFactory {
     else {
       if (currentPageType == NEXT_PAGE) {
         prevEdt = edtBeforeNewSw();
-        nextEdt = pageCursorInput.numItinerariesFilterResults().earliestRemovedDeparture();
+        nextEdt = pageCursorInput.numItinerariesFilterResult().earliestRemovedDeparture();
       } else {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
         prevEdt = pageCursorInput
-          .numItinerariesFilterResults()
+          .numItinerariesFilterResult()
           .latestRemovedDeparture()
           .minus(newSearchWindow)
           .plusSeconds(60);

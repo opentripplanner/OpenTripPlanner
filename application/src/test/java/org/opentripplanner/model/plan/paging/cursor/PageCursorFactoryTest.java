@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -213,13 +213,13 @@ class PageCursorFactoryTest implements PlanTestConstants {
   }
 
   private record TestPageCursorInput(
-    NumItinerariesFilterResults numItinerariesFilterResults,
+    NumItinerariesFilterResult numItinerariesFilterResult,
     RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults
   )
     implements PageCursorInput {
     public TestPageCursorInput(Itinerary removedItinerary, Cost generalizedCostMaxLimit) {
       this(
-        new NumItinerariesFilterResults(
+        new NumItinerariesFilterResult(
           removedItinerary.startTimeAsInstant(),
           removedItinerary.startTimeAsInstant(),
           removedItinerary

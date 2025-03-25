@@ -267,7 +267,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     var sortOrder = arriveBy ? STREET_AND_DEPARTURE_TIME : STREET_AND_ARRIVAL_TIME;
     return new ItineraryListFilterChainBuilder(sortOrder)
       .withMaxNumberOfItineraries(numOfItineraries)
-      .withNumItinerariesFilterResultsSubscriber(i -> {})
+      .withNumItinerariesFilterResultSubscriber(i -> {})
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
         CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )

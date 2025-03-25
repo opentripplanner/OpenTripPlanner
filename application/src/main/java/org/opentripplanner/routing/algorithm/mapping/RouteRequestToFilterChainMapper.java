@@ -13,7 +13,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -34,7 +34,7 @@ public class RouteRequestToFilterChainMapper {
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
-    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber,
+    Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber,
     Consumer<
       RemoveTransitIfStreetOnlyIsBetterResults
     > removeTransitIfStreetOnlyIsBetterResultsSubscriber
@@ -101,7 +101,7 @@ public class RouteRequestToFilterChainMapper {
         context.transitService()::findMultiModalStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
-      .withNumItinerariesFilterResultsSubscriber(numItinerariesFilterResultsSubscriber)
+      .withNumItinerariesFilterResultSubscriber(numItinerariesFilterResultSubscriber)
       .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
         removeTransitIfStreetOnlyIsBetterResultsSubscriber
       )

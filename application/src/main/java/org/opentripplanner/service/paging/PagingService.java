@@ -97,10 +97,10 @@ public class PagingService {
     }
 
     // SearchWindow cropped -> decrease search-window
-    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null) {
+    if (pageCursorInput != null && pageCursorInput.numItinerariesFilterResult() != null) {
       boolean cropSWHead = doCropSearchWindowAtTail();
       Instant rmItineraryStartTime = pageCursorInput
-        .numItinerariesFilterResults()
+        .numItinerariesFilterResult()
         .pageCut()
         .startTimeAsInstant();
 
@@ -127,14 +127,14 @@ public class PagingService {
   }
 
   private Instant lastKeptDepartureTime() {
-    return pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null
-      ? pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant()
+    return pageCursorInput != null && pageCursorInput.numItinerariesFilterResult() != null
+      ? pageCursorInput.numItinerariesFilterResult().pageCut().startTimeAsInstant()
       : null;
   }
 
   private Instant firstKeptDepartureTime() {
-    return pageCursorInput != null && pageCursorInput.numItinerariesFilterResults() != null
-      ? pageCursorInput.numItinerariesFilterResults().pageCut().startTimeAsInstant()
+    return pageCursorInput != null && pageCursorInput.numItinerariesFilterResult() != null
+      ? pageCursorInput.numItinerariesFilterResult().pageCut().startTimeAsInstant()
       : null;
   }
 

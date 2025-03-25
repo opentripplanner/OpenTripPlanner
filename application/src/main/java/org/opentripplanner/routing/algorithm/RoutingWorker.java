@@ -16,7 +16,7 @@ import org.opentripplanner.model.plan.paging.cursor.DefaultPageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
@@ -65,7 +65,7 @@ public class RoutingWorker {
   private final AdditionalSearchDays additionalSearchDays;
   private final TransitGroupPriorityService transitGroupPriorityService;
   private SearchParams raptorSearchParamsUsed = null;
-  private NumItinerariesFilterResults numItinerariesFilterResults = null;
+  private NumItinerariesFilterResult numItinerariesFilterResult = null;
   private RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
@@ -142,7 +142,7 @@ public class RoutingWorker {
         searchWindowUsed(),
         emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
-        it -> numItinerariesFilterResults = it,
+        it -> numItinerariesFilterResult = it,
         it -> removeTransitIfStreetOnlyIsBetterResults = it
       );
 
@@ -288,7 +288,7 @@ public class RoutingWorker {
       request,
       raptorSearchParamsUsed,
       DefaultPageCursorInput.of()
-        .withNumItinerariesFilterResults(numItinerariesFilterResults)
+        .withNumItinerariesFilterResult(numItinerariesFilterResult)
         .withRemoveTransitIfStreetOnlyIsBetterResults(removeTransitIfStreetOnlyIsBetterResults)
         .build(),
       itineraries

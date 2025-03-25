@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
 
 /**
@@ -13,7 +13,7 @@ public interface PageCursorInput {
   /**
    * This contains the results from {@link org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter}.
    */
-  NumItinerariesFilterResults numItinerariesFilterResults();
+  NumItinerariesFilterResult numItinerariesFilterResult();
   /**
    * RemoveTransitIfStreetOnlyIsBetterResults contains the best street only cost that comes from taking the cost of the best street only itinerary from the first search.
    * This is used as a comparison in {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}

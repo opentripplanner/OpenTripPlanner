@@ -26,7 +26,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemovePa
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.FlexSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
@@ -81,7 +81,7 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
+  private Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber;
   private Consumer<
     RemoveTransitIfStreetOnlyIsBetterResults
   > removeTransitIfStreetOnlyIsBetterResultsSubscriber;
@@ -284,10 +284,10 @@ public class ItineraryListFilterChainBuilder {
    * the last thing* happening in the filter-chain after the final sort. So, if another filter
    * removes an itinerary, the itinerary is not considered with respect to this limit.
    */
-  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultsSubscriber(
-    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber
+  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultSubscriber(
+    Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber
   ) {
-    this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber;
+    this.numItinerariesFilterResultSubscriber = numItinerariesFilterResultSubscriber;
     return this;
   }
 
@@ -532,7 +532,7 @@ public class ItineraryListFilterChainBuilder {
           new NumItinerariesFilter(
             maxNumberOfItineraries,
             maxNumberOfItinerariesCropSection,
-            numItinerariesFilterResultsSubscriber
+            numItinerariesFilterResultSubscriber
           )
         );
       }

@@ -19,20 +19,20 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   private final int maxLimit;
   private final ListSection cropSection;
-  private final Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
+  private final Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber;
 
   public NumItinerariesFilter(
     int maxLimit,
     ListSection cropSection,
-    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber
+    Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber
   ) {
     Objects.requireNonNull(
-      numItinerariesFilterResultsSubscriber,
-      "'numItinerariesFilterResultsSubscriber' should not be null"
+      numItinerariesFilterResultSubscriber,
+      "'numItinerariesFilterResultSubscriber' should not be null"
     );
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
-    this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber;
+    this.numItinerariesFilterResultSubscriber = numItinerariesFilterResultSubscriber;
   }
 
   @Override
@@ -59,8 +59,8 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
       itinerariesToKeep = itineraries.subList(0, maxLimit);
     }
 
-    numItinerariesFilterResultsSubscriber.accept(
-      new NumItinerariesFilterResults(itinerariesToKeep, itinerariesToRemove, cropSection)
+    numItinerariesFilterResultSubscriber.accept(
+      new NumItinerariesFilterResult(itinerariesToKeep, itinerariesToRemove, cropSection)
     );
 
     return itinerariesToRemove;

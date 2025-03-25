@@ -17,7 +17,7 @@ public class NumItinerariesFilterTest {
   private static final Itinerary i2 = newItinerary(A).bicycle(6, 8, B).build();
   private static final Itinerary i3 = newItinerary(A).bus(21, 7, 9, B).build();
 
-  private NumItinerariesFilterResults subscribeResult = null;
+  private NumItinerariesFilterResult subscribeResult = null;
 
   @Test
   public void name() {
