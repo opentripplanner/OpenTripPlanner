@@ -12,8 +12,6 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
 public interface PageCursorInput {
   /**
    * This contains the results from {@link org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter}.
-   * The Instant fields in NumItinerariesFilterResults come from the sets of itineraries that were removed and the ones that were
-   * kept as a result of using the numItineraries parameter.
    */
   NumItinerariesFilterResults numItinerariesFilterResults();
   /**
