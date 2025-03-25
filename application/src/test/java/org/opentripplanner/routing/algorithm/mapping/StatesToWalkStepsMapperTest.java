@@ -39,7 +39,7 @@ class StatesToWalkStepsMapperTest {
     var walkSteps = buildWalkSteps(
       TestStateBuilder.ofWalking()
         .streetEdge("name", 1)
-        .entrance()
+        .entrance("name")
         .streetEdge()
         .areaEdge("name", 10)
     );

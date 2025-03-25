@@ -89,30 +89,6 @@ public class StreetModelForTest {
     return streetEdgeBuilder(vA, vB, length, perm).buildAndConnect();
   }
 
-  public static StreetEdge streetEdge(
-    StreetVertex vA,
-    StreetVertex vB,
-    String name,
-    double length,
-    StreetTraversalPermission perm
-  ) {
-    Coordinate[] coords = new Coordinate[2];
-    coords[0] = vA.getCoordinate();
-    coords[1] = vB.getCoordinate();
-    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
-
-    var builder = new StreetEdgeBuilder<>()
-      .withFromVertex(vA)
-      .withToVertex(vB)
-      .withGeometry(geom)
-      .withName(name)
-      .withMeterLength(length)
-      .withPermission(perm)
-      .withBack(false);
-
-    return builder.buildAndConnect();
-  }
-
   public static StreetEdge areaEdge(
     StreetVertex vA,
     StreetVertex vB,

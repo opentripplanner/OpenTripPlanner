@@ -136,13 +136,15 @@ public class TestStateBuilder {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = StreetModelForTest.intersectionVertex(count, count);
-    var edge = StreetModelForTest.streetEdge(
+    var edge = StreetModelForTest.streetEdgeBuilder(
       from,
       to,
-      name,
       distance,
       StreetTraversalPermission.PEDESTRIAN
-    );
+    )
+      .withName(name)
+      .buildAndConnect();
+
     var states = edge.traverse(currentState);
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
@@ -238,18 +240,19 @@ public class TestStateBuilder {
     return this;
   }
 
-  public TestStateBuilder entrance() {
+  public TestStateBuilder entrance(String name) {
     count++;
     var from = (StreetVertex) currentState.vertex;
     var to = new StationEntranceVertex(count, count, 12345, "A", Accessibility.POSSIBLE);
 
-    var edge = StreetModelForTest.streetEdge(
+    var edge = StreetModelForTest.streetEdgeBuilder(
       from,
       to,
-      "name",
       30,
       StreetTraversalPermission.PEDESTRIAN
-    );
+    )
+      .withName(name)
+      .buildAndConnect();
     currentState = edge.traverse(currentState)[0];
     return this;
   }
