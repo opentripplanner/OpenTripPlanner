@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.RealTimeTripUpdate;
+import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -272,5 +273,22 @@ class DefaultTransitServiceTest {
   @Test
   void getRealtimeTripTimesForAddedTripOnNoServiceDay() {
     assertEquals(Optional.empty(), service.getTripTimeOnDates(ADDED_TRIP, NO_SERVICE_DATE));
+  }
+
+  @Test
+  void testFromTripTimesWithScheduleFallback() {
+    TripPattern tripPattern = service.findPattern(TRIP);
+    Timetable timetable = service.findTimetable(tripPattern, SERVICE_DATE);
+    Instant midnight = ServiceDateUtils.asStartOfService(
+      SERVICE_DATE,
+      service.getTimeZone()
+    ).toInstant();
+    var tripTimeOnDate = TripTimeOnDate.fromTripTimesWithScheduleFallback(
+      timetable,
+      TRIP,
+      SERVICE_DATE,
+      midnight,
+      service
+    );
   }
 }
