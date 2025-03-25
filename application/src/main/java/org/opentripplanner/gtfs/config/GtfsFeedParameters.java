@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.config;
 
 import java.net.URI;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
@@ -35,7 +36,7 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
       maxInterlineDistance
     );
     this.feedId = feedId;
-    this.source = source;
+    this.source = Objects.requireNonNull(source);
   }
 
   /**
@@ -72,7 +73,7 @@ public final class GtfsFeedParameters extends GtfsDefaultParameters implements D
   public String toString() {
     var builder = ToStringBuilder.of(GtfsFeedParameters.class)
       .addStr("feedId", feedId)
-      .addObj("source", source, "ALLWAYS SHOW");
+      .addObj("source", source);
     return super.toStringAppend(builder).toString();
   }
 }
