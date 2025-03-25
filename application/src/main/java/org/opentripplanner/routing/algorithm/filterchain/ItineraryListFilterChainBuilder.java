@@ -35,7 +35,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.Decorat
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
@@ -83,8 +83,8 @@ public class ItineraryListFilterChainBuilder {
   private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber;
   private Consumer<
-    RemoveTransitIfStreetOnlyIsBetterResults
-  > removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+    RemoveTransitIfStreetOnlyIsBetterResult
+  > removeTransitIfStreetOnlyIsBetterResultSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -296,13 +296,13 @@ public class ItineraryListFilterChainBuilder {
    * This subscriber enables storing the best street only cost from the {@link RemoveTransitIfStreetOnlyIsBetter} filter
    * for use with paging.
    */
-  public ItineraryListFilterChainBuilder withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
+  public ItineraryListFilterChainBuilder withRemoveTransitIfStreetOnlyIsBetterResultSubscriber(
     Consumer<
-      RemoveTransitIfStreetOnlyIsBetterResults
-    > removeTransitIfStreetOnlyIsBetterResultsSubscriber
+      RemoveTransitIfStreetOnlyIsBetterResult
+    > removeTransitIfStreetOnlyIsBetterResultSubscriber
   ) {
-    this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
-      removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+    this.removeTransitIfStreetOnlyIsBetterResultSubscriber =
+      removeTransitIfStreetOnlyIsBetterResultSubscriber;
     return this;
   }
 
@@ -471,7 +471,7 @@ public class ItineraryListFilterChainBuilder {
           new RemoveTransitIfStreetOnlyIsBetter(
             removeTransitWithHigherCostThanBestOnStreetOnly,
             generalizedCostMaxLimit,
-            removeTransitIfStreetOnlyIsBetterResultsSubscriber
+            removeTransitIfStreetOnlyIsBetterResultSubscriber
           )
         );
       }

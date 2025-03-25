@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 
 /**
  * This class holds information needed to create the next/previous page cursors either when there were
@@ -15,9 +15,9 @@ public interface PageCursorInput {
    */
   NumItinerariesFilterResult numItinerariesFilterResult();
   /**
-   * RemoveTransitIfStreetOnlyIsBetterResults contains the best street only cost that comes from taking the cost of the best street only itinerary from the first search.
+   * RemoveTransitIfStreetOnlyIsBetterResult contains the best street only cost that comes from taking the cost of the best street only itinerary from the first search.
    * This is used as a comparison in {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
    * when paging is used.
    */
-  RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults();
+  RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult();
 }

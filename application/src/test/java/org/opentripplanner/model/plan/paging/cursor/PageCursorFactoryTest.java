@@ -14,7 +14,7 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.utils.time.TimeUtils;
 
 @SuppressWarnings("ConstantConditions")
@@ -214,7 +214,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
 
   private record TestPageCursorInput(
     NumItinerariesFilterResult numItinerariesFilterResult,
-    RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults
+    RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult
   )
     implements PageCursorInput {
     public TestPageCursorInput(Itinerary removedItinerary, Cost generalizedCostMaxLimit) {
@@ -224,7 +224,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
           removedItinerary.startTimeAsInstant(),
           removedItinerary
         ),
-        new RemoveTransitIfStreetOnlyIsBetterResults(generalizedCostMaxLimit)
+        new RemoveTransitIfStreetOnlyIsBetterResult(generalizedCostMaxLimit)
       );
     }
   }

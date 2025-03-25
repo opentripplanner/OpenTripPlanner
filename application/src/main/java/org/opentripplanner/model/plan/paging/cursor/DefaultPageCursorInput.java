@@ -1,7 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -20,17 +20,17 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class DefaultPageCursorInput implements PageCursorInput {
 
   private final NumItinerariesFilterResult numItinerariesFilterResult;
-  private final RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults;
+  private final RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult;
 
   private DefaultPageCursorInput() {
     this.numItinerariesFilterResult = null;
-    this.removeTransitIfStreetOnlyIsBetterResults = null;
+    this.removeTransitIfStreetOnlyIsBetterResult = null;
   }
 
   private DefaultPageCursorInput(Builder builder) {
     this.numItinerariesFilterResult = builder.numItinerariesFilterResult();
-    this.removeTransitIfStreetOnlyIsBetterResults =
-      builder.removeTransitIfStreetOnlyIsBetterResults();
+    this.removeTransitIfStreetOnlyIsBetterResult =
+      builder.removeTransitIfStreetOnlyIsBetterResult();
   }
 
   public static DefaultPageCursorInput.Builder of() {
@@ -47,27 +47,27 @@ public class DefaultPageCursorInput implements PageCursorInput {
   }
 
   @Override
-  public RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults() {
-    return removeTransitIfStreetOnlyIsBetterResults;
+  public RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult() {
+    return removeTransitIfStreetOnlyIsBetterResult;
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(DefaultPageCursorInput.class)
       .addObj("numItinerariesFilterResult", numItinerariesFilterResult)
-      .addObj("removeTransitIfStreetOnlyIsBetterResults", removeTransitIfStreetOnlyIsBetterResults)
+      .addObj("removeTransitIfStreetOnlyIsBetterResult", removeTransitIfStreetOnlyIsBetterResult)
       .toString();
   }
 
   public static class Builder {
 
     private NumItinerariesFilterResult numItinerariesFilterResult;
-    private RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults;
+    private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult;
 
     public Builder(DefaultPageCursorInput original) {
       this.numItinerariesFilterResult = original.numItinerariesFilterResult;
-      this.removeTransitIfStreetOnlyIsBetterResults =
-        original.removeTransitIfStreetOnlyIsBetterResults;
+      this.removeTransitIfStreetOnlyIsBetterResult =
+        original.removeTransitIfStreetOnlyIsBetterResult;
     }
 
     public NumItinerariesFilterResult numItinerariesFilterResult() {
@@ -81,14 +81,14 @@ public class DefaultPageCursorInput implements PageCursorInput {
       return this;
     }
 
-    public RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults() {
-      return removeTransitIfStreetOnlyIsBetterResults;
+    public RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult() {
+      return removeTransitIfStreetOnlyIsBetterResult;
     }
 
-    public Builder withRemoveTransitIfStreetOnlyIsBetterResults(
-      RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults
+    public Builder withRemoveTransitIfStreetOnlyIsBetterResult(
+      RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult
     ) {
-      this.removeTransitIfStreetOnlyIsBetterResults = removeTransitIfStreetOnlyIsBetterResults;
+      this.removeTransitIfStreetOnlyIsBetterResult = removeTransitIfStreetOnlyIsBetterResult;
       return this;
     }
 

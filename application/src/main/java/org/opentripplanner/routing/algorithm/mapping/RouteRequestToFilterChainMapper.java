@@ -14,7 +14,7 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChai
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -36,8 +36,8 @@ public class RouteRequestToFilterChainMapper {
     boolean removeWalkAllTheWayResults,
     Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber,
     Consumer<
-      RemoveTransitIfStreetOnlyIsBetterResults
-    > removeTransitIfStreetOnlyIsBetterResultsSubscriber
+      RemoveTransitIfStreetOnlyIsBetterResult
+    > removeTransitIfStreetOnlyIsBetterResultSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -102,8 +102,8 @@ public class RouteRequestToFilterChainMapper {
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withNumItinerariesFilterResultSubscriber(numItinerariesFilterResultSubscriber)
-      .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
-        removeTransitIfStreetOnlyIsBetterResultsSubscriber
+      .withRemoveTransitIfStreetOnlyIsBetterResultSubscriber(
+        removeTransitIfStreetOnlyIsBetterResultSubscriber
       )
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)

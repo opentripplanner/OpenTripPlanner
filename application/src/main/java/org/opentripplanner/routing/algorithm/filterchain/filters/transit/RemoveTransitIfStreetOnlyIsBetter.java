@@ -19,30 +19,30 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   private final CostLinearFunction costLimitFunction;
   private final Cost generalizedCostMaxLimit;
   private final Consumer<
-    RemoveTransitIfStreetOnlyIsBetterResults
-  > removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+    RemoveTransitIfStreetOnlyIsBetterResult
+  > removeTransitIfStreetOnlyIsBetterResultSubscriber;
 
   /**
    * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
    * @param costLimitFunction the cost limit function to use with the filter
    * @param generalizedCostMaxLimit this limit is not null when paging is used
-   * @param removeTransitIfStreetOnlyIsBetterResultsSubscriber this subscriber stores the generalizedCostMaxLimit for use with paging
+   * @param removeTransitIfStreetOnlyIsBetterResultSubscriber this subscriber stores the generalizedCostMaxLimit for use with paging
    */
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
     Cost generalizedCostMaxLimit,
     Consumer<
-      RemoveTransitIfStreetOnlyIsBetterResults
-    > removeTransitIfStreetOnlyIsBetterResultsSubscriber
+      RemoveTransitIfStreetOnlyIsBetterResult
+    > removeTransitIfStreetOnlyIsBetterResultSubscriber
   ) {
     Objects.requireNonNull(
-      removeTransitIfStreetOnlyIsBetterResultsSubscriber,
-      "'removeTransitIfStreetOnlyIsBetterResultsSubscriber' should not be null"
+      removeTransitIfStreetOnlyIsBetterResultSubscriber,
+      "'removeTransitIfStreetOnlyIsBetterResultSubscriber' should not be null"
     );
     this.costLimitFunction = costLimitFunction;
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
-    this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
-      removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+    this.removeTransitIfStreetOnlyIsBetterResultSubscriber =
+      removeTransitIfStreetOnlyIsBetterResultSubscriber;
   }
 
   /**
@@ -84,8 +84,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     }
 
     // The best street only cost is saved in the cursor.
-    removeTransitIfStreetOnlyIsBetterResultsSubscriber.accept(
-      new RemoveTransitIfStreetOnlyIsBetterResults(minStreetCost)
+    removeTransitIfStreetOnlyIsBetterResultSubscriber.accept(
+      new RemoveTransitIfStreetOnlyIsBetterResult(minStreetCost)
     );
 
     var limit = costLimitFunction.calculate(minStreetCost).toSeconds();

@@ -141,9 +141,9 @@ public class PageCursorFactory {
     }
 
     Cost generalizedCostMaxLimit = null;
-    if (pageCursorInput.removeTransitIfStreetOnlyIsBetterResults() != null) {
+    if (pageCursorInput.removeTransitIfStreetOnlyIsBetterResult() != null) {
       generalizedCostMaxLimit = pageCursorInput
-        .removeTransitIfStreetOnlyIsBetterResults()
+        .removeTransitIfStreetOnlyIsBetterResult()
         .generalizedCostMaxLimit();
     }
 

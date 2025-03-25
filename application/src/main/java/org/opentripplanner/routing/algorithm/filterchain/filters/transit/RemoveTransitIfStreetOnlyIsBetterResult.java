@@ -8,10 +8,10 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * a generalizedCostMaxLimit. Transit itineraries that have a higher generalized cost than the limit
  * will be filtered away. This results class is used as input for the PageCursor.
  */
-public record RemoveTransitIfStreetOnlyIsBetterResults(Cost generalizedCostMaxLimit) {
+public record RemoveTransitIfStreetOnlyIsBetterResult(Cost generalizedCostMaxLimit) {
   @Override
   public String toString() {
-    return ToStringBuilder.of(RemoveTransitIfStreetOnlyIsBetterResults.class)
+    return ToStringBuilder.of(RemoveTransitIfStreetOnlyIsBetterResult.class)
       .addObj("generalizedCostMaxLimit", generalizedCostMaxLimit)
       .toString();
   }

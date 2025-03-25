@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -66,7 +66,7 @@ public class RoutingWorker {
   private final TransitGroupPriorityService transitGroupPriorityService;
   private SearchParams raptorSearchParamsUsed = null;
   private NumItinerariesFilterResult numItinerariesFilterResult = null;
-  private RemoveTransitIfStreetOnlyIsBetterResults removeTransitIfStreetOnlyIsBetterResults = null;
+  private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     // Applying the page cursor modifies the request by removing the direct mode, for example.
@@ -143,7 +143,7 @@ public class RoutingWorker {
         emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
         it -> numItinerariesFilterResult = it,
-        it -> removeTransitIfStreetOnlyIsBetterResults = it
+        it -> removeTransitIfStreetOnlyIsBetterResult = it
       );
 
       result.transform(filterChain::filter);
@@ -289,7 +289,7 @@ public class RoutingWorker {
       raptorSearchParamsUsed,
       DefaultPageCursorInput.of()
         .withNumItinerariesFilterResult(numItinerariesFilterResult)
-        .withRemoveTransitIfStreetOnlyIsBetterResults(removeTransitIfStreetOnlyIsBetterResults)
+        .withRemoveTransitIfStreetOnlyIsBetterResult(removeTransitIfStreetOnlyIsBetterResult)
         .build(),
       itineraries
     );
