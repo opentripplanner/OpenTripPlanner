@@ -22,6 +22,7 @@ import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitWhenDirectModeIsEmpty;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
@@ -69,6 +70,7 @@ public class RoutingWorker {
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     // Applying the page cursor modifies the request by removing the direct mode, for example.
+    // If the page cursor doesn't exist, this function does nothing.
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
@@ -91,6 +93,15 @@ public class RoutingWorker {
 
   public RoutingResponse route() {
     OTPRequestTimeoutException.checkForTimeout();
+
+    // If no direct mode is set, then we set one.
+    // See {@link FilterTransitWhenDirectModeIsEmpty}
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
+      request.journey().direct().mode(),
+      request.pageCursor() != null
+    );
+
+    request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -129,6 +140,7 @@ public class RoutingWorker {
         serverContext,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
+        emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
         it -> numItinerariesFilterResults = it,
         it -> removeTransitIfStreetOnlyIsBetterResults = it
@@ -147,6 +159,9 @@ public class RoutingWorker {
     }
 
     this.debugTimingAggregator.finishedFiltering();
+
+    // Restore original directMode.
+    request.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
