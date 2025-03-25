@@ -292,8 +292,9 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * After the first search the paging does not keep the best street only cost without storing it in the cursor.
-   * This stores the best street only cost in the cursor.
+   * Paging stores information from the original search for use with related requests.
+   * This subscriber enables storing the best street only cost from the {@link RemoveTransitIfStreetOnlyIsBetter} filter
+   * for use with paging.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(
     Consumer<
