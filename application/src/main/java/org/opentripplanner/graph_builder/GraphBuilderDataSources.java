@@ -151,39 +151,33 @@ public class GraphBuilderDataSources {
   }
 
   public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
-    return inputData
-      .get(GTFS)
-      .stream()
-      .map(it -> new ConfiguredCompositeDataSource<>(it, getGtfsFeedConfig(it)))
-      .toList();
+    return inputData.get(GTFS).stream().map(this::mapGtfsFeed).toList();
   }
 
-  private GtfsFeedParameters getGtfsFeedConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds
+  private ConfiguredCompositeDataSource<GtfsFeedParameters> mapGtfsFeed(DataSource dataSource) {
+    var p = buildConfig.transitFeeds
       .gtfsFeeds()
       .stream()
       .filter(gtfsFeedConfig -> uriMatch(gtfsFeedConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(buildConfig.gtfsDefaults.withFeedInfo().withSource(dataSource.uri()).build());
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
 
   public Iterable<
     ConfiguredCompositeDataSource<NetexFeedParameters>
   > getNetexConfiguredDatasource() {
-    return inputData
-      .get(NETEX)
-      .stream()
-      .map(it -> new ConfiguredCompositeDataSource<>(it, getNetexConfig(it)))
-      .toList();
+    return inputData.get(NETEX).stream().map(this::mapNetexFeed).toList();
   }
 
-  public NetexFeedParameters getNetexConfig(DataSource dataSource) {
-    return buildConfig.transitFeeds
+  public ConfiguredCompositeDataSource<NetexFeedParameters> mapNetexFeed(DataSource dataSource) {
+    var p = buildConfig.transitFeeds
       .netexFeeds()
       .stream()
       .filter(netexFeedConfig -> uriMatch(netexFeedConfig.source(), dataSource.uri()))
       .findFirst()
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
+    return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
   }
 
   /**
