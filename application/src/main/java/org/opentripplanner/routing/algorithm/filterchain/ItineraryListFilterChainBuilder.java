@@ -308,8 +308,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * If the search is done with a page cursor that contains an encoded best street only cost, then
-   * this function adds the information to the
-   * {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter} filter.
+   * this function adds the information to the {@link RemoveTransitIfStreetOnlyIsBetter} filter.
    *
    * @param generalizedCostMaxLimit the best street only cost used in filtering.
    */
