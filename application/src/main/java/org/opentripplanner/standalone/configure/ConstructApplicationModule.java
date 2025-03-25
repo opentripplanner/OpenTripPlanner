@@ -78,7 +78,7 @@ public class ConstructApplicationModule {
       vehicleRentalService,
       viaTransferResolver,
       worldEnvelopeService,
-      // Optional Sadbox services
+      // Optional Sandbox services
       emissionsItineraryDecorator,
       luceneIndex,
       schema,

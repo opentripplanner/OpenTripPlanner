@@ -10,7 +10,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Configure a GTFS feed.
  * Example: {@code [ {type="gtfs", source: "file:///path/to/otp/norway-gtfs.zip"} ] }
  * <p>
- * To create use the {@link GtfsDefaultParameters#withFeedInfo()} method witch return a builder.
+ * For object creation, use the {@link GtfsDefaultParameters#withFeedInfo()} method which returns a builder.
  * For example: {@code GtfsDefaultParameters.DEFAULT.copyOfFeed()}.
  */
 public final class GtfsFeedParameters extends GtfsDefaultParameters implements DataSourceConfig {

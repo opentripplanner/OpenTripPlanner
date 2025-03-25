@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.emissions;
 
 import com.csvreader.CsvReader;
-import com.esotericsoftware.minlog.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +41,7 @@ public class Co2EmissionsDataReader {
         return Map.of();
       }
     } catch (IOException e) {
-      Log.error("Failed to read emmisions data. Details: " + e.getMessage(), e);
+      LOG.error("Failed to read emisions data. Details: " + e.getMessage(), e);
       return Map.of();
     }
   }

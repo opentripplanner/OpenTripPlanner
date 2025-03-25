@@ -25,7 +25,7 @@ public class GtfsFeedIdResolver {
    * This will try to fetch the experimental feed_id field from the feed_info.txt file.
    * </p>
    * <p>
-   * If the feed does not contain a feed_info.txt or a feed_id field a default GtfsFeedId will be
+   * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will be
    * created.
    * </p>
    *

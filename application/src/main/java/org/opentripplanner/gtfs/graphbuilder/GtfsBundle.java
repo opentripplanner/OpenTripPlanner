@@ -19,7 +19,7 @@ public class GtfsBundle {
 
   private final CompositeDataSource dataSource;
 
-  // The feadId is resolved lazy to make any exceptions in the caller when parsing the
+  // The feedId is resolved lazy to make any exceptions in the caller when parsing the
   // gfts files, and not in the instrumentation of the bundle.
   @Nullable
   private String feedId;

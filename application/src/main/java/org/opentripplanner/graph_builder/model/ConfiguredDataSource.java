@@ -4,7 +4,6 @@ import java.util.Objects;
 import org.opentripplanner.datastore.api.DataSource;
 
 /**
- *
  * A pair linking together a data source and its custom configuration.
  */
 public class ConfiguredDataSource<T extends DataSourceConfig> {
