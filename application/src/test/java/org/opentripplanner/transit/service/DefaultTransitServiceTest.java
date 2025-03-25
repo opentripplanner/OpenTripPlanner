@@ -278,9 +278,12 @@ class DefaultTransitServiceTest {
 
   @Test
   void testFromTripTimesWithScheduleFallback() {
-    TripPattern tripPattern = service.findPattern(BAD_TRIP);
+    TripPattern tripPattern = service.findPattern(TRIP);
     // Construct a timetable which definitely does not contain this trip, because it is empty.
-    Timetable timetable = Timetable.of().withTripPattern(tripPattern).withServiceDate(SERVICE_DATE).build();
+    Timetable timetable = Timetable.of()
+      .withTripPattern(tripPattern)
+      .withServiceDate(SERVICE_DATE)
+      .build();
     Instant midnight = ServiceDateUtils.asStartOfService(
       SERVICE_DATE,
       service.getTimeZone()
