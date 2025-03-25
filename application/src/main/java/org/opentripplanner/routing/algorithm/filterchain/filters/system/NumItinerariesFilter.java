@@ -1,14 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.utils.collection.ListSection;
-import org.opentripplanner.utils.collection.ListUtils;
 
 /**
  * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list
@@ -62,29 +59,8 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
       itinerariesToKeep = itineraries.subList(0, maxLimit);
     }
 
-    List<Instant> removedDepartures = itinerariesToRemove
-      .stream()
-      .map(it -> it.startTime().toInstant())
-      .toList();
-
-    Instant earliestRemovedDeparture = removedDepartures
-      .stream()
-      .min(Instant::compareTo)
-      .orElse(null);
-    Instant latestRemovedDeparture = removedDepartures
-      .stream()
-      .max(Instant::compareTo)
-      .orElse(null);
-    ItinerarySortKey pageCut = null;
-
-    if (cropSection == ListSection.HEAD) {
-      pageCut = ListUtils.first(itinerariesToKeep);
-    } else {
-      pageCut = ListUtils.last(itinerariesToKeep);
-    }
-
     numItinerariesFilterResultsSubscriber.accept(
-      new NumItinerariesFilterResults(earliestRemovedDeparture, latestRemovedDeparture, pageCut)
+      new NumItinerariesFilterResults(itinerariesToKeep, itinerariesToRemove, cropSection)
     );
 
     return itinerariesToRemove;
