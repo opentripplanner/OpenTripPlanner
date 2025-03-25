@@ -31,10 +31,15 @@ new features, consider what is best; To follow the existing style or follow the 
 Our APIs need to be backwards compatible as they are used by hundreds of clients
 (web-pages/apps/services). Correcting mistakes may not be possible or may take a long time.
 
-We allow API breaking changes in these cases:
+We allow breaking API changes in these cases:
 
 - During incremental development of a new feature (multiple PRs). The new part of the API should be
   documented as _"WorkInProgress - Why/When is it ready"_. A new API should not stay "open" for a
   long time.
 - Deprecated features can be removed after 2 years (4 minor releases) unless a user wants to keep 
-  it. We will revert a removal if the request to keep it comes after the feature is removed.
+  it. We will revert a removal if the request to keep it comes after the feature is removed. 
+  Example:
+
+> Use featurer xyz instead. 
+> Note! This feature is subject for removal from september 2027! If you want this to stay, pleace
+>       notify the OTP community.
