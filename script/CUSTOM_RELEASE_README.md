@@ -207,6 +207,22 @@ to turn _on_ new features in over test environment. When the new feature is test
 enable it by changing the config.
 
 
+## How To Make The First Release
+
+The release script looks for the _last release_ to resolve the next version. It uses the version
+in the Maven _pom.xml_, strips of `-SNAPSHOT` and appends `<organization name>` and a sequence number
+(`N`). The release fails if there are no tags matching `vX.Y.Z-<organization name>-N`. There are two
+ways to resolve this:
+
+- The simplest way to fix this, is to tag the _last release_ with an extra tag. Let say the new OTP 
+  version is `X.Y.Z-SNAPSHOT`. Then tag the last released version (or any commit in the release 
+  branch) with `vX.Y.Z-<organization name>-0`, for example `v2.8.0-entur-0`. The script will now 
+  use this as the _last version_ and set the new version number to `v2.8.0-entur-1`. You can delete
+  the tag `v2.8.0-entur-0` after the release is done.
+- Another way to do it, is to make the first release manually. Make sure to tag the release with 
+  `vX.Y.Z-<organization name>-1`. 
+
+
 ## How To Make A Release
 
 Find the base branch/commit to use, for example `otp/dev-2.x`. If you use a specific branch/commit, 
