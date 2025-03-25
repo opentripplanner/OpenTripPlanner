@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
@@ -28,11 +29,10 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
     ListSection cropSection,
     Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber
   ) {
-    if (numItinerariesFilterResultsSubscriber == null) {
-      throw new IllegalArgumentException(
-        "'numItinerariesFilterResultsSubscriber' should not be null"
-      );
-    }
+    Objects.requireNonNull(
+      numItinerariesFilterResultsSubscriber,
+      "'numItinerariesFilterResultsSubscriber' should not be null"
+    );
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
     this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber;

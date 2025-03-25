@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
@@ -34,11 +35,10 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       RemoveTransitIfStreetOnlyIsBetterResults
     > removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
-    if (removeTransitIfStreetOnlyIsBetterResultsSubscriber == null) {
-      throw new IllegalArgumentException(
-        "'removeTransitIfStreetOnlyIsBetterResultsSubscriber' should not be null"
-      );
-    }
+    Objects.requireNonNull(
+      removeTransitIfStreetOnlyIsBetterResultsSubscriber,
+      "'removeTransitIfStreetOnlyIsBetterResultsSubscriber' should not be null"
+    );
     this.costLimitFunction = costLimitFunction;
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
     this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
