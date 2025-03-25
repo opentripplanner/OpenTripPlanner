@@ -19,8 +19,6 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   public static final String TAG = "number-of-itineraries-filter";
 
-  private static final Consumer<NumItinerariesFilterResults> IGNORE_SUBSCRIBER = i -> {};
-
   private final int maxLimit;
   private final ListSection cropSection;
   private final Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber;
@@ -30,11 +28,14 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
     ListSection cropSection,
     Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsSubscriber
   ) {
+    if (numItinerariesFilterResultsSubscriber == null) {
+      throw new IllegalArgumentException(
+        "'numItinerariesFilterResultsSubscriber' should not be null"
+      );
+    }
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
-    this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber == null
-      ? IGNORE_SUBSCRIBER
-      : numItinerariesFilterResultsSubscriber;
+    this.numItinerariesFilterResultsSubscriber = numItinerariesFilterResultsSubscriber;
   }
 
   @Override

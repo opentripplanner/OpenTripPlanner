@@ -15,9 +15,6 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  */
 public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
-  private static final Consumer<RemoveTransitIfStreetOnlyIsBetterResults> IGNORE_SUBSCRIBER =
-    i -> {};
-
   private final CostLinearFunction costLimitFunction;
   private final Cost generalizedCostMaxLimit;
   private final Consumer<
@@ -37,12 +34,15 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       RemoveTransitIfStreetOnlyIsBetterResults
     > removeTransitIfStreetOnlyIsBetterResultsSubscriber
   ) {
+    if (removeTransitIfStreetOnlyIsBetterResultsSubscriber == null) {
+      throw new IllegalArgumentException(
+        "'removeTransitIfStreetOnlyIsBetterResultsSubscriber' should not be null"
+      );
+    }
     this.costLimitFunction = costLimitFunction;
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
     this.removeTransitIfStreetOnlyIsBetterResultsSubscriber =
-      removeTransitIfStreetOnlyIsBetterResultsSubscriber == null
-        ? IGNORE_SUBSCRIBER
-        : removeTransitIfStreetOnlyIsBetterResultsSubscriber;
+      removeTransitIfStreetOnlyIsBetterResultsSubscriber;
   }
 
   /**

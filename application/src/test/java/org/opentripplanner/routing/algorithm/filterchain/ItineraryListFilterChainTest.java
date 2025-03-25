@@ -184,6 +184,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
         CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )
+      .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(i -> {})
       .build();
 
     Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
@@ -266,9 +267,11 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     var sortOrder = arriveBy ? STREET_AND_DEPARTURE_TIME : STREET_AND_ARRIVAL_TIME;
     return new ItineraryListFilterChainBuilder(sortOrder)
       .withMaxNumberOfItineraries(numOfItineraries)
+      .withNumItinerariesFilterResultsSubscriber(i -> {})
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
         CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )
+      .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(i -> {})
       .withDebugEnabled(ofDebugEnabled(debug));
   }
 
@@ -358,6 +361,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       // Allow non-optimal bus itinerary pass through
       ItineraryListFilterChain chain = builder
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(null)
+        .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(i -> {})
         .withRemoveTransitIfWalkingIsBetter(false)
         .build();
       assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
@@ -370,6 +374,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
           CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
         )
+        .withRemoveTransitIfStreetOnlyIsBetterResultsSubscriber(i -> {})
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
     }

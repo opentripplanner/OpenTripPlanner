@@ -21,13 +21,13 @@ public class NumItinerariesFilterTest {
 
   @Test
   public void name() {
-    NumItinerariesFilter subject = new NumItinerariesFilter(3, ListSection.TAIL, null);
+    NumItinerariesFilter subject = new NumItinerariesFilter(3, ListSection.TAIL, i -> {});
     assertEquals("number-of-itineraries-filter", subject.name());
   }
 
   @Test
   public void testCropHead() {
-    NumItinerariesFilter subject = new NumItinerariesFilter(1, ListSection.HEAD, null);
+    NumItinerariesFilter subject = new NumItinerariesFilter(1, ListSection.HEAD, i -> {});
     List<Itinerary> itineraries = List.of(i1, i2, i3);
     var result = subject.removeMatchesForTest(itineraries);
     assertEquals(toStr(List.of(i3)), toStr(result));
