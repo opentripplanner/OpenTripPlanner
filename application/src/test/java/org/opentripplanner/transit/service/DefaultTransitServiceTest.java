@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
@@ -277,18 +278,23 @@ class DefaultTransitServiceTest {
 
   @Test
   void testFromTripTimesWithScheduleFallback() {
-    TripPattern tripPattern = service.findPattern(TRIP);
-    Timetable timetable = service.findTimetable(tripPattern, SERVICE_DATE);
+    TripPattern tripPattern = service.findPattern(BAD_TRIP);
+    // Construct a timetable which definitely does not contain this trip, because it is empty.
+    Timetable timetable = Timetable.of().withTripPattern(tripPattern).withServiceDate(SERVICE_DATE).build();
     Instant midnight = ServiceDateUtils.asStartOfService(
       SERVICE_DATE,
       service.getTimeZone()
     ).toInstant();
-    var tripTimeOnDate = TripTimeOnDate.fromTripTimesWithScheduleFallback(
+    var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
       timetable,
       TRIP,
       SERVICE_DATE,
       midnight,
       service
     );
+    for (var tripTimeOnDate : tripTimeOnDates) {
+      assertThat(tripTimeOnDate.getServiceDay()).isNull();
+      assertThat(tripTimeOnDate.getServiceDayMidnight()).isEqualTo(TripTimeOnDate.UNDEFINED);
+    }
   }
 }
