@@ -64,6 +64,7 @@ public class PageCursorFactory {
    */
   public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
     this.pageCursorInput = pageCursorInput;
+    // If the whole search window was not used (i.e. if there were removed itineraries)
     if (pageCursorInput.numItinerariesFilterResults() != null) {
       this.wholeSwUsed = false;
       this.itineraryPageCut = pageCursorInput.numItinerariesFilterResults().pageCut();
