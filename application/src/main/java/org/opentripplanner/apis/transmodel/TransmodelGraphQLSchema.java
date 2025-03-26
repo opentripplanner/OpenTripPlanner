@@ -1185,7 +1185,7 @@ public class TransmodelGraphQLSchema {
         GraphQLFieldDefinition.newFieldDefinition()
           .name("serviceJourneys")
           .description(
-            "Get all _service journeys_. At least one of the filter arguments must be non-null."
+            "Get _service journeys_. At least one of the filter arguments must be non-null."
           )
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
