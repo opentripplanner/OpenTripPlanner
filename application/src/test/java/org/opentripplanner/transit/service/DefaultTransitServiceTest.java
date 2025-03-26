@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.service;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
@@ -19,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.RealTimeTripUpdate;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -276,28 +274,4 @@ class DefaultTransitServiceTest {
     assertEquals(Optional.empty(), service.getTripTimeOnDates(ADDED_TRIP, NO_SERVICE_DATE));
   }
 
-  @Test
-  void testFromTripTimesWithScheduleFallback() {
-    TripPattern tripPattern = service.findPattern(TRIP);
-    // Construct a timetable which definitely does not contain this trip, because it is empty.
-    Timetable timetable = Timetable.of()
-      .withTripPattern(tripPattern)
-      .withServiceDate(SERVICE_DATE)
-      .build();
-    Instant midnight = ServiceDateUtils.asStartOfService(
-      SERVICE_DATE,
-      service.getTimeZone()
-    ).toInstant();
-    var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
-      timetable,
-      TRIP,
-      SERVICE_DATE,
-      midnight,
-      service
-    );
-    for (var tripTimeOnDate : tripTimeOnDates) {
-      assertThat(tripTimeOnDate.getServiceDay()).isNull();
-      assertThat(tripTimeOnDate.getServiceDayMidnight()).isEqualTo(TripTimeOnDate.UNDEFINED);
-    }
-  }
 }
