@@ -763,7 +763,7 @@ type QueryType {
   ): [PtSituationElement!]! @timingData
   "Get a single stopPlace based on its id)"
   stopPlace(id: String!): StopPlace @timingData
-  "Get all stopPlaces"
+  "Get stopPlaces by ids. The ids argument must be set to a non-null value."
   stopPlaces(ids: [String]): [StopPlace]! @timingData
   "Get all stop places within the specified bounding box"
   stopPlacesByBbox(

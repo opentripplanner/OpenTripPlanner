@@ -447,7 +447,7 @@ public class TransmodelGraphQLSchema {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("stopPlaces")
-          .description("Get all stopPlaces")
+          .description("Get stopPlaces by ids. The ids argument must be set to a non-null value.")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(stopPlaceType)))
           .argument(
