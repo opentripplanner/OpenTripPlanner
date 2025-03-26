@@ -120,32 +120,27 @@ public class TestOsmProvider implements OsmProvider {
     }
 
     public Builder addWayFromNodes(long id, List<OsmNode> nodes) {
-      this.nodes.addAll(nodes);
-      var nodeIds = nodes.stream().map(OsmEntity::getId).toList();
-
-      var way = new OsmWay();
-      way.setId(id);
-      way.addTag("highway", "pedestrian");
-      way.getNodeRefs().addAll(nodeIds);
-
-      this.ways.add(way);
-      return this;
+      return addWayFromNodes(way -> {}, id, nodes);
     }
 
     public Builder addWayFromNodes(Consumer<OsmWay> wayConsumer, OsmNode... nodes) {
-      this.nodes.addAll(Arrays.stream(nodes).toList());
-      var nodeIds = Arrays.stream(nodes).map(OsmEntity::getId).toList();
-      var way = new OsmWay();
-      way.setId(counter.incrementAndGet());
-      way.addTag("highway", "pedestrian");
-      wayConsumer.accept(way);
-      way.getNodeRefs().addAll(nodeIds);
-      this.ways.add(way);
-      return this;
+      return addWayFromNodes(wayConsumer, counter.incrementAndGet(), List.of(nodes));
     }
 
     public Builder addRelation(OsmRelation relation) {
       this.relations.add(relation);
+      return this;
+    }
+
+    private Builder addWayFromNodes(Consumer<OsmWay> wayConsumer, long id, List<OsmNode> nodes) {
+      this.nodes.addAll(nodes);
+      var nodeIds = nodes.stream().map(OsmEntity::getId).toList();
+      var way = new OsmWay();
+      way.setId(id);
+      way.addTag("highway", "pedestrian");
+      wayConsumer.accept(way);
+      way.getNodeRefs().addAll(nodeIds);
+      this.ways.add(way);
       return this;
     }
   }
