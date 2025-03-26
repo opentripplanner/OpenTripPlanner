@@ -703,7 +703,7 @@ type QueryType {
   operators: [Operator]! @timingData
   "Get a single quay based on its id)"
   quay(id: String!): Quay @timingData
-  "Get all quays"
+  "Get quays. Either ids or name must be set."
   quays(ids: [String], name: String): [Quay]! @timingData
   "Get all quays within the specified bounding box"
   quaysByBbox(

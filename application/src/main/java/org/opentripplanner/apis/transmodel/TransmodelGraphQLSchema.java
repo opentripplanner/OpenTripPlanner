@@ -571,7 +571,7 @@ public class TransmodelGraphQLSchema {
       .field(
         GraphQLFieldDefinition.newFieldDefinition()
           .name("quays")
-          .description("Get all quays")
+          .description("Get quays. Either ids or name must be set.")
           .withDirective(TransmodelDirectives.TIMING_DATA)
           .type(new GraphQLNonNull(new GraphQLList(quayType)))
           .argument(
