@@ -2,7 +2,7 @@ package org.opentripplanner.updater.support.siri;
 
 import jakarta.xml.bind.JAXBException;
 import java.util.Optional;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.Siri;
 
 /**
  * The Siri loader is used to fetch updates from a source like http(s) or directory.
