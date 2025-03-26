@@ -4,37 +4,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.datastore.api.CompositeDataSource;
-import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class Co2EmissionsDataReaderTest {
+public class Co2EmissionsDataReaderTest implements EmissionTestData {
 
-  private static final ResourceLoader RES = ResourceLoader.of(Co2EmissionsDataReaderTest.class);
-  private static final CompositeDataSource CO2_GTFS = RES.catalogDataSource(
-    "emissions-test-gtfs",
-    FileType.GTFS
+  // We explicit set the feed-id in this test, we do NOT use the feed-id in the teed-info.txt.
+  // This way, we test that the feed-id can be overridden.
+  private static final String FEED_ID = "F";
+  private static final FeedScopedId ROUTE_D_1001 = new FeedScopedId(
+    FEED_ID,
+    ROUTE_ID_GD_1001.getId()
   );
-  private static final CompositeDataSource INVALID_CO2_GTFS = RES.catalogDataSource(
-    "emissions-invalid-test-gtfs",
-    FileType.GTFS
-  );
-  public static final String FEED_ID = "em";
+  private static final FeedScopedId ROUTE_F_R1 = new FeedScopedId(FEED_ID, ROUTE_ID_EM_R1.getId());
 
   private Co2EmissionsDataReader co2EmissionsDataReader = new Co2EmissionsDataReader(
     DataImportIssueStore.NOOP
   );
 
   @Test
-  void testCo2EmissionsDataReading() throws FileNotFoundException {
-    var emissions = co2EmissionsDataReader.read(CO2_GTFS, FEED_ID);
+  void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
+    var emissions = co2EmissionsDataReader.read(gtfsWithEmissionDir(), FEED_ID);
+    assertEquals(0.006, emissions.get(ROUTE_D_1001), 0.0001);
     assertEquals(6, emissions.size());
   }
 
   @Test
-  void testInvalidCo2EmissionsDataReading() throws FileNotFoundException {
-    var emissions = co2EmissionsDataReader.read(INVALID_CO2_GTFS, FEED_ID);
-    assertEquals(0, emissions.size());
+  void testCo2EmissionsFromFeedDataSource() throws FileNotFoundException {
+    var emissions = co2EmissionsDataReader.read(emissionFeed(), FEED_ID);
+    assertEquals(0.006, emissions.get(ROUTE_F_R1), 0.0001);
+    assertEquals(2, emissions.size());
   }
 }
