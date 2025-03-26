@@ -273,5 +273,4 @@ class DefaultTransitServiceTest {
   void getRealtimeTripTimesForAddedTripOnNoServiceDay() {
     assertEquals(Optional.empty(), service.getTripTimeOnDates(ADDED_TRIP, NO_SERVICE_DATE));
   }
-
 }

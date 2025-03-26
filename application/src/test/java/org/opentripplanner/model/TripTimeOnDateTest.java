@@ -67,9 +67,10 @@ class TripTimeOnDateTest implements PlanTestConstants {
     var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
     var tripTimes = ScheduledTripTimes.of()
       .withTrip(trip)
-      .withDepartureTimes(new int [] { 0, 1 })
+      .withDepartureTimes(new int[] { 0, 1 })
       .build();
-    var tripPattern = testModel.pattern(TransitMode.BUS)
+    var tripPattern = testModel
+      .pattern(TransitMode.BUS)
       .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
       .build();
     timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
@@ -83,10 +84,7 @@ class TripTimeOnDateTest implements PlanTestConstants {
       .withTripPattern(tripPattern)
       .withServiceDate(serviceDate)
       .build();
-    Instant midnight = ServiceDateUtils.asStartOfService(
-      serviceDate,
-      ZoneIds.HELSINKI
-    ).toInstant();
+    Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, ZoneIds.HELSINKI).toInstant();
     var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
       timetable,
       trip,
