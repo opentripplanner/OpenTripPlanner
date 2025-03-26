@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.osm.moduletests._support.NodeBuilder.node;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
-import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -117,10 +116,50 @@ class ElevatorHopEdgeTest {
     osmModule.buildGraph();
     var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
     assertThat(edges).hasSize(2);
-    var edge = (ElevatorHopEdge) edges.getFirst();
-    var from = edge.getFromVertex();
+    for (var edge : edges) {
+      assertThat(edge.getTravelTime()).isEqualTo(62);
+    }
+  }
+
+  @Test
+  void testMultilevelNodeDuration() {
+    var node0 = node(0, new WgsCoordinate(0, 0));
+    var node1 = node(1, new WgsCoordinate(2, 0));
+    var node = node(2, new WgsCoordinate(1, 0));
+    node.addTag("duration", "00:01:02");
+    node.addTag("highway", "elevator");
+    node.addTag("level", "1;2");
+    var provider = TestOsmProvider.of()
+      .addWayFromNodes(way -> way.addTag("level", "1"), node0, node)
+      .addWayFromNodes(way -> way.addTag("level", "2"), node1, node)
+      .build();
+    var graph = new Graph(new Deduplicator());
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      new DefaultOsmInfoGraphBuildRepository(),
+      new DefaultVehicleParkingRepository()
+    ).build();
+    osmModule.buildGraph();
+    var edges = graph.getEdgesOfType(ElevatorHopEdge.class);
+    assertThat(edges).hasSize(2);
+    for (var edge : edges) {
+      assertThat(edge.getTravelTime()).isEqualTo(62);
+    }
+  }
+
+  @Test
+  void testTraversal() {
+    var edge = ElevatorHopEdge.createElevatorHopEdge(
+      from,
+      to,
+      StreetTraversalPermission.ALL,
+      null,
+      2,
+      62
+    );
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK);
     var res = edge.traverse(new State(from, req.build()))[0];
-    assertEquals(62_000, res.getTimeDeltaMilliseconds());
+    assertThat(res.getTimeDeltaMilliseconds()).isEqualTo(62_000);
   }
 }

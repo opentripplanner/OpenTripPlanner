@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.OsmProvider;
@@ -127,6 +128,18 @@ public class TestOsmProvider implements OsmProvider {
       way.addTag("highway", "pedestrian");
       way.getNodeRefs().addAll(nodeIds);
 
+      this.ways.add(way);
+      return this;
+    }
+
+    public Builder addWayFromNodes(Consumer<OsmWay> wayConsumer, OsmNode... nodes) {
+      this.nodes.addAll(Arrays.stream(nodes).toList());
+      var nodeIds = Arrays.stream(nodes).map(OsmEntity::getId).toList();
+      var way = new OsmWay();
+      way.setId(counter.incrementAndGet());
+      way.addTag("highway", "pedestrian");
+      wayConsumer.accept(way);
+      way.getNodeRefs().addAll(nodeIds);
       this.ways.add(way);
       return this;
     }
