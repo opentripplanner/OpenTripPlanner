@@ -21,6 +21,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
@@ -241,15 +242,15 @@ public final class GtfsFaresV2Service implements Serializable {
     // If no valid distance type is given, do not consider distances in fare computation
 
     FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops ruleDistance) {
+    if (distance instanceof FareDistance.Stops(int min, int max)) {
       var numStops = leg.getIntermediateStops().size();
-      return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
-    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance ruleDistance) {
-      var ruleMax = ruleDistance.max();
-      var ruleMin = ruleDistance.min();
+      return numStops >= min && max >= numStops;
+    } else if (
+      rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
+    ) {
       var legDistance = leg.getDirectDistanceMeters();
 
-      return legDistance > ruleMin.toMeters() && legDistance < ruleMax.toMeters();
+      return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
   }
 
