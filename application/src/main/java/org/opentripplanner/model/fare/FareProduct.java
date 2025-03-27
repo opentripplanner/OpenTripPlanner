@@ -1,5 +1,6 @@
 package org.opentripplanner.model.fare;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -17,7 +18,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * It may be valid for the entirety of an itinerary or just for some of its legs.
  */
 @Sandbox
-public final class FareProduct {
+public final class FareProduct implements Serializable {
 
   private final FeedScopedId id;
   private final String name;
