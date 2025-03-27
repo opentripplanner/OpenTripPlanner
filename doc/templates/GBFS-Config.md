@@ -7,11 +7,11 @@
 
 OTP can also fetch real-time data about vehicle rental networks
 including the number of vehicles and free parking spaces at each station. We support vehicle rental
-systems that use the GBFS standard.
+systems that use the [GBFS](https://github.com/NABSA/gbfs) standard, which can describe a variety of 
+shared mobility services.
 
-[GBFS](https://github.com/NABSA/gbfs) can be used for a variety of shared mobility services, with
-partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)). OTP supports the following
-GBFS form factors:
+OTP has partial support for both GBFS v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)). 
+Furthermore, support is limited to the following form factors:
 
 - bicycle
 - scooter
