@@ -68,37 +68,6 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
   }
 
   @Test
-  void filterAwayLongTravelTimeWithoutWaitTimeWithCursorInfoAndDirectItinerary() {
-    // Given: a bicycle itinerary with low cost - transit with clearly higher cost are removed
-    Itinerary bicycle = newItinerary(A).bicycle(6, 8, E).build(200);
-
-    // transit with almost equal cost should not be dropped
-    Itinerary i1 = newItinerary(A).bus(21, 6, 8, E).build(220);
-
-    // transit with considerably higher cost will be dropped
-    Itinerary i2 = newItinerary(A).bus(31, 6, 8, E).build(360);
-
-    // When:
-    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
-      CostLinearFunction.of(Duration.ofSeconds(60), 1.2),
-      // This generalized cost that usually comes from the cursor should be used because it is lower
-      // than the lowest generalized cost of the direct itineraries.
-      Cost.costOfSeconds(199),
-      it -> subscribeResult = it.generalizedCostMaxLimit()
-    );
-
-    // Then:
-    UnsupportedOperationException exception = assertThrows(
-      UnsupportedOperationException.class,
-      () -> flagger.removeMatchesForTest(List.of(i2, bicycle, i1))
-    );
-    assertEquals(
-      "Both the minStreetCostOption and generalizedCostMaxLimit are present, this should never happen.",
-      exception.getMessage()
-    );
-  }
-
-  @Test
   void filterAwayLongTravelTimeWithoutWaitTimeWithCursorInfoAndWithoutDirectItinerary() {
     // transit with almost equal cost should not be dropped
     Itinerary i1 = newItinerary(A).bus(21, 6, 8, E).build(220);

@@ -58,29 +58,27 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    // Find the best street-all-the-way option
-    OptionalInt minStreetCostOption = itineraries
-      .stream()
-      .filter(Itinerary::isStreetOnly)
-      .mapToInt(Itinerary::generalizedCost)
-      .min();
     Cost minStreetCost = null;
 
-    if (minStreetCostOption.isEmpty() && generalizedCostMaxLimit == null) {
-      // If no cost is found an empty list is returned.
-      return List.of();
-    } else if (minStreetCostOption.isPresent() && generalizedCostMaxLimit != null) {
-      // This case should not be possible.
-      throw new UnsupportedOperationException(
-        "Both the minStreetCostOption and generalizedCostMaxLimit are present, this should never happen."
-      );
-    } else if (generalizedCostMaxLimit != null) {
-      // If the best street only cost can't be found in the itineraries but
-      // it is present in the cursor, then the information from the cursor is used.
+    if (generalizedCostMaxLimit != null) {
+      // The best street only cost is used from the cursor, if it can be found.
       minStreetCost = generalizedCostMaxLimit;
     } else {
-      // The minStreetCostOption is present.
-      minStreetCost = Cost.costOfSeconds(minStreetCostOption.getAsInt());
+      // Find the best street-all-the-way option.
+      OptionalInt minStreetCostOption = itineraries
+        .stream()
+        .filter(Itinerary::isStreetOnly)
+        .mapToInt(Itinerary::generalizedCost)
+        .min();
+
+      if (minStreetCostOption.isPresent()) {
+        minStreetCost = Cost.costOfSeconds(minStreetCostOption.getAsInt());
+      }
+    }
+
+    // If no cost is found an empty list is returned.
+    if (minStreetCost == null) {
+      return List.of();
     }
 
     // The best street only cost is saved in the cursor.
