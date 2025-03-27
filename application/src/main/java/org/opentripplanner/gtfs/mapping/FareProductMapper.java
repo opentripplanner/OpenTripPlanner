@@ -25,14 +25,15 @@ public class FareProductMapper {
     if (rhs.getDurationUnit() != NOT_SET) {
       duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
     }
-    var fp = new FareProduct(
+    var fp = FareProduct.of(
       AgencyAndIdMapper.mapAgencyAndId(rhs.getFareProductId()),
       rhs.getName(),
-      price,
-      duration,
-      toInternalModel(rhs.getRiderCategory()),
-      toInternalModel(rhs.getFareMedium())
-    );
+      price
+    )
+      .withValidity(duration)
+      .withCategory(toInternalModel(rhs.getRiderCategory()))
+      .withMedium(toInternalModel(rhs.getFareMedium()))
+      .build();
     mappedFareProducts.add(fp);
     return fp;
   }
