@@ -1,6 +1,6 @@
 # Updater configuration
 
-After the graph build has completed it is possible to dynamically add frequently changing real time 
+After the graph build has completed it is possible to dynamically add frequently changing real-time 
 data to OTP.
 
 To do this, configure an updater in the `updaters` section of `router-config.json`.
