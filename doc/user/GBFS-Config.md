@@ -5,7 +5,7 @@
    - Generated directory is: /doc/user 
 -->
 
-Besides GTFS-RT or SIRI transit data, OTP can also fetch real-time data about vehicle rental networks
+OTP can also fetch real-time data about vehicle rental networks
 including the number of vehicles and free parking spaces at each station. We support vehicle rental
 systems that use the GBFS standard.
 

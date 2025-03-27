@@ -9,7 +9,7 @@ To enable one of the SIRI updaters you need to add it to the `updaters` section 
 
 ## SIRI-ET Request/Response via HTTPS
 
-This requires there to be a SIRI server that can handle SIRI POST requests, stores requestor refs 
+This requires there to be a SIRI server that handles SIRI POST requests, stores requestor refs 
 and responds only with the newest data.
 
 <!-- siri-et-updater BEGIN -->
@@ -162,7 +162,7 @@ not very well specified
 [[2]](https://normes.transport.data.gouv.fr/normes/siri/profil-france/#protocoles-d%C3%A9change-des-donn%C3%A9es-siri)
 but this updater supports the following definition: 
 
-> Fetching XML-formatted SIRI messages as single GET request rather than the more common request/response 
+> Fetching XML-formatted SIRI messages as a single GET request rather than the more common request/response 
 > flow. 
  
 This means that the XML feed must contain all updates for all trips, just like it is the case 

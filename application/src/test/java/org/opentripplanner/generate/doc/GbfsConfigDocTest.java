@@ -33,7 +33,7 @@ public class GbfsConfigDocTest {
 
   @Test
   public void updateDoc() {
-    NodeAdapter node = readBuildConfig();
+    NodeAdapter node = readConfig();
 
     // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
@@ -52,7 +52,7 @@ public class GbfsConfigDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readConfig() {
     var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
     var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");
