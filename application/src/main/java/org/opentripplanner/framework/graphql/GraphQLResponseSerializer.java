@@ -8,8 +8,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for serializing a GraphQL {@link ExecutionResult} into a String, which
- * can be returned as the body of the HTTP response. This differs from the mapper provided by
- * the removed REST API, by serializing all fields in the objects, including null fields.
+ * can be returned as the body of the HTTP response.
  */
 public class GraphQLResponseSerializer {
 

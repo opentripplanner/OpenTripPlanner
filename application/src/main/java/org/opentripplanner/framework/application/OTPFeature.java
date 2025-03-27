@@ -127,11 +127,6 @@ public enum OTPFeature {
     "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data"
   ),
   ReportApi(false, true, "Enable the report API."),
-  RestAPIPassInDefaultConfigAsJson(
-    false,
-    false,
-    "Enable a default RouteRequest to be passed in as JSON on the REST API - FOR DEBUGGING ONLY!"
-  ),
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
