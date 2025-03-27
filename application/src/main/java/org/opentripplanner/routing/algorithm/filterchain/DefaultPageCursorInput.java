@@ -1,5 +1,6 @@
-package org.opentripplanner.model.plan.paging.cursor;
+package org.opentripplanner.routing.algorithm.filterchain;
 
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
