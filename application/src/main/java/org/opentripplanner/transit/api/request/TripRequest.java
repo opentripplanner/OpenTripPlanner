@@ -12,40 +12,40 @@ import org.opentripplanner.transit.model.timetable.Trip;
  */
 public class TripRequest {
 
-  private final FilterValues<FeedScopedId> agencies;
-  private final FilterValues<FeedScopedId> routes;
-  private final FilterValues<String> netexInternalPlanningCodes;
-  private final FilterValues<LocalDate> serviceDates;
+  private final FilterValues<FeedScopedId> includeAgencies;
+  private final FilterValues<FeedScopedId> includeRoutes;
+  private final FilterValues<String> includeNetexInternalPlanningCodes;
+  private final FilterValues<LocalDate> includeServiceDates;
 
   TripRequest(
-    FilterValues<FeedScopedId> agencies,
-    FilterValues<FeedScopedId> routes,
-    FilterValues<String> netexInternalPlanningCodes,
-    FilterValues<LocalDate> serviceDates
+    FilterValues<FeedScopedId> includeAgencies,
+    FilterValues<FeedScopedId> includeRoutes,
+    FilterValues<String> includeNetexInternalPlanningCodes,
+    FilterValues<LocalDate> includeServiceDates
   ) {
-    this.agencies = agencies;
-    this.routes = routes;
-    this.netexInternalPlanningCodes = netexInternalPlanningCodes;
-    this.serviceDates = serviceDates;
+    this.includeAgencies = includeAgencies;
+    this.includeRoutes = includeRoutes;
+    this.includeNetexInternalPlanningCodes = includeNetexInternalPlanningCodes;
+    this.includeServiceDates = includeServiceDates;
   }
 
   public static TripRequestBuilder of() {
     return new TripRequestBuilder();
   }
 
-  public FilterValues<FeedScopedId> agencies() {
-    return agencies;
+  public FilterValues<FeedScopedId> includeAgencies() {
+    return includeAgencies;
   }
 
-  public FilterValues<FeedScopedId> routes() {
-    return routes;
+  public FilterValues<FeedScopedId> includeRoutes() {
+    return includeRoutes;
   }
 
-  public FilterValues<String> netexInternalPlanningCodes() {
-    return netexInternalPlanningCodes;
+  public FilterValues<String> includeNetexInternalPlanningCodes() {
+    return includeNetexInternalPlanningCodes;
   }
 
-  public FilterValues<LocalDate> serviceDates() {
-    return serviceDates;
+  public FilterValues<LocalDate> includeServiceDates() {
+    return includeServiceDates;
   }
 }

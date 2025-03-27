@@ -49,6 +49,7 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
+import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.ObjectUtils;
 import org.slf4j.Logger;
@@ -480,7 +481,7 @@ public class BuildConfig implements OtpDataStoreConfig {
       .summary(
         "Visibility calculations for an area will not be done if there are more nodes than this limit."
       )
-      .asInt(150);
+      .asInt(StreetConstants.DEFAULT_MAX_AREA_NODES);
     maxElevationPropagationMeters = root
       .of("maxElevationPropagationMeters")
       .since(V1_5)

@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.GtfsTest;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -58,10 +59,10 @@ class AlternativeLegsTest extends GtfsTest {
     var legs = toString(alternativeLegs);
 
     var expected =
-      "B ~ BUS 2 0:20 0:30 ~ C [C₁-1], " +
-      "B ~ BUS 1 0:10 0:20 ~ C [C₁-1], " +
+      "B ~ BUS 2 0:20 0:30 ~ C [], " +
+      "B ~ BUS 1 0:10 0:20 ~ C [], " +
       // Previous day
-      "B ~ BUS 1 8:20 8:30 ~ C [C₁-1]";
+      "B ~ BUS 1 8:20 8:30 ~ C []";
 
     assertEquals(expected, legs);
   }
@@ -91,10 +92,10 @@ class AlternativeLegsTest extends GtfsTest {
     var legs = toString(alternativeLegs);
 
     var expected =
-      "B ~ BUS 3 1:00 1:10 ~ C [C₁-1], " +
-      "B ~ BUS 1 8:20 8:30 ~ C [C₁-1], " +
+      "B ~ BUS 3 1:00 1:10 ~ C [], " +
+      "B ~ BUS 1 8:20 8:30 ~ C [], " +
       // Next day
-      "B ~ BUS 1 0:10 0:20 ~ C [C₁-1]";
+      "B ~ BUS 1 0:10 0:20 ~ C []";
 
     assertEquals(expected, legs);
   }
@@ -123,7 +124,7 @@ class AlternativeLegsTest extends GtfsTest {
 
     var legs = toString(alternativeLegs);
 
-    assertEquals("X ~ BUS 19 10:30 10:40 ~ Y [C₁-1], X ~ BUS 19 10:00 10:10 ~ Y [C₁-1]", legs);
+    assertEquals("X ~ BUS 19 10:30 10:40 ~ Y [], X ~ BUS 19 10:00 10:10 ~ Y []", legs);
   }
 
   @Test
@@ -149,7 +150,7 @@ class AlternativeLegsTest extends GtfsTest {
     );
     var legs = toString(alternativeLegs);
 
-    var expected = String.join(", ", List.of("X ~ BUS 19 10:30 11:00 ~ B [C₁-1]"));
+    var expected = String.join(", ", List.of("X ~ BUS 19 10:30 11:00 ~ B []"));
     assertEquals(expected, legs);
   }
 
@@ -159,7 +160,7 @@ class AlternativeLegsTest extends GtfsTest {
         .stream()
         .map(Leg.class::cast)
         .map(List::of)
-        .map(Itinerary::createScheduledTransitItinerary)
+        .map(it -> Itinerary.ofScheduledTransit(it).withGeneralizedCost(Cost.ZERO).build())
         .toList()
     );
   }

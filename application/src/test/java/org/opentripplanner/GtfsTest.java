@@ -159,7 +159,7 @@ public abstract class GtfsTest {
     // Stored in instance field for use in individual tests
     Itinerary itinerary = itineraries.get(0);
 
-    assertEquals(legCount, itinerary.getLegs().size());
+    assertEquals(legCount, itinerary.legs().size());
 
     return itinerary;
   }

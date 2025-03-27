@@ -9,7 +9,8 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_N
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimaps;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
@@ -21,13 +22,11 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -55,7 +54,7 @@ import org.slf4j.LoggerFactory;
  * Responsible for converting vehicle positions in memory to exportable ones, and associating each
  * position with a pattern.
  */
-public class RealtimeVehiclePatternMatcher {
+class RealtimeVehiclePatternMatcher {
 
   private static final Logger LOG = LoggerFactory.getLogger(RealtimeVehiclePatternMatcher.class);
 
@@ -68,8 +67,6 @@ public class RealtimeVehiclePatternMatcher {
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
   private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
-
-  private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
   public RealtimeVehiclePatternMatcher(
     String feedId,
@@ -102,33 +99,24 @@ public class RealtimeVehiclePatternMatcher {
       .map(vehiclePosition -> toRealtimeVehicle(feedId, vehiclePosition))
       .toList();
 
-    // we take the list of vehicles and out of them create a Map<TripPattern, List<RealtimeVehicle>>
-    // that map makes it very easy to update the vehicles in the service
-    // it also enables the bookkeeping about which pattern previously had vehicles but no longer do
-    // these need to be removed from the service as we assume that the vehicle has stopped
+    // we take the list of vehicles and out of them create a MultiMap<TripPattern, RealtimeVehicle>
+    // that makes it very easy to update the vehicles in the service
     var vehicles = matchResults
       .stream()
       .filter(Result::isSuccess)
       .map(Result::successValue)
-      .collect(Collectors.groupingBy(PatternAndRealtimeVehicle::pattern))
-      .entrySet()
-      .stream()
       .collect(
-        Collectors.toMap(Entry::getKey, e ->
-          e.getValue().stream().map(PatternAndRealtimeVehicle::vehicle).collect(Collectors.toList())
+        Multimaps.toMultimap(
+          PatternAndRealtimeVehicle::pattern,
+          PatternAndRealtimeVehicle::vehicle,
+          ArrayListMultimap::create
         )
       );
 
-    vehicles.forEach(repository::setRealtimeVehicles);
-    Set<TripPattern> patternsInCurrentUpdate = vehicles.keySet();
+    // passing the feed id leads to the previous updates being removed
+    repository.setRealtimeVehiclesForFeed(feedId, vehicles);
 
-    // if there was a vehicle in the previous update but not in the current one, we assume
-    // that the pattern has no more vehicles.
-    var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
-    toDelete.forEach(repository::clearRealtimeVehicles);
-    patternsInPreviousUpdate = patternsInCurrentUpdate;
-
-    if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {
+    if (!vehiclePositions.isEmpty() && vehicles.keySet().isEmpty()) {
       LOG.error(
         "Could not match any vehicle positions for feedId '{}'. Are you sure that the updater is using the correct feedId?",
         feedId
@@ -380,5 +368,5 @@ public class RealtimeVehiclePatternMatcher {
     return Result.success(new PatternAndRealtimeVehicle(pattern, newVehicle));
   }
 
-  record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
+  private record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
 }

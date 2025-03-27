@@ -33,7 +33,7 @@ public class RoutingErrorsAttacher {
     List<Itinerary> filteredItineraries
   ) {
     final List<RoutingError> routingErrors = new ArrayList<>();
-    Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isOnStreetAllTheWay;
+    Predicate<Itinerary> isOnStreetAllTheWay = Itinerary::isStreetOnly;
 
     boolean hasTransitItineraries = originalItineraries
       .stream()
@@ -48,12 +48,12 @@ public class RoutingErrorsAttacher {
     if (hasTransitItineraries && allTransitItinerariesDeleted) {
       Predicate<Itinerary> isWorseThanStreet = it ->
         it
-          .getSystemNotices()
+          .systemNotices()
           .stream()
           .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetter.TAG));
       Predicate<Itinerary> isWorseThanWalking = it ->
         it
-          .getSystemNotices()
+          .systemNotices()
           .stream()
           .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
       if (
@@ -63,7 +63,7 @@ public class RoutingErrorsAttacher {
       ) {
         var nonTransitIsWalking = filteredItineraries
           .stream()
-          .flatMap(Itinerary::getStreetLegs)
+          .flatMap(Itinerary::streetLegs)
           .allMatch(StreetLeg::isWalkingLeg);
         if (nonTransitIsWalking) {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));

@@ -17,6 +17,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.utils.collection.ListSection;
@@ -42,7 +43,7 @@ public class PagingFilterTest implements PlanTestConstants {
   private static final Itinerary early = newItinerary(A).bus(1, EARLY_START, EARLY_END, D).build();
 
   /**  [11:03, 11:10, $636, Tx1, transit] */
-  private static final Itinerary middle = createMiddle();
+  private static final Itinerary middle = createMiddle(636);
 
   /** [11:00, 11:12, $840, Tx0, transit] */
   private static final Itinerary late = newItinerary(A).bus(3, LATE_START, LATE_END, D).build();
@@ -82,8 +83,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLowerGeneralizedCost() {
-    Itinerary middleHighCost = createMiddle();
-    middleHighCost.setGeneralizedCost(middle.getGeneralizedCost() + 1);
+    Itinerary middleHighCost = createMiddle(middle.generalizedCost() + 1);
 
     List<Itinerary> itineraries = List.of(middleHighCost, middle, late);
 
@@ -101,9 +101,7 @@ public class PagingFilterTest implements PlanTestConstants {
       .bus(21, t0, t0 + D1m, B)
       .bus(22, t0 + D2m, t0 + D3m, C)
       .bus(23, t0 + D4m, MIDDLE_END, D)
-      .build();
-
-    middleHighNumberOfTransfers.setGeneralizedCost(middle.getGeneralizedCost());
+      .build(middle.generalizedCost());
 
     List<Itinerary> itineraries = List.of(middleHighNumberOfTransfers, middle, late);
 
@@ -119,9 +117,7 @@ public class PagingFilterTest implements PlanTestConstants {
     Itinerary middleEarlierDepartureTime = newItinerary(A)
       .bus(2, t0 - D1m, t0 + D3m, B)
       .bus(21, t0 + D4m, MIDDLE_END, C)
-      .build();
-
-    middleEarlierDepartureTime.setGeneralizedCost(middle.getGeneralizedCost());
+      .build(middle.generalizedCost());
 
     List<Itinerary> itineraries = List.of(middleEarlierDepartureTime, middle, late);
 
@@ -260,16 +256,18 @@ public class PagingFilterTest implements PlanTestConstants {
     } else {
       builder.drive(departureTime, arrivalTime, B);
     }
-    var it = builder.build();
-    it.setGeneralizedCost(cost);
+    var it = builder.build(cost);
     return it;
   }
 
-  private static Itinerary createMiddle() {
+  private static Itinerary createMiddle(int generalizedCost) {
+    return createMiddleBuilder().build(generalizedCost);
+  }
+
+  private static TestItineraryBuilder createMiddleBuilder() {
     return newItinerary(A)
       .bus(2, MIDDLE_START, MIDDLE_START + D2m, B)
-      .bus(21, MIDDLE_END - D3m, MIDDLE_END, D)
-      .build();
+      .bus(21, MIDDLE_END - D3m, MIDDLE_END, D);
   }
 
   private static void assertItineraryEq(Itinerary expected, Itinerary actual) {

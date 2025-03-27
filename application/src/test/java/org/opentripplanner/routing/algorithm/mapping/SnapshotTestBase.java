@@ -135,16 +135,16 @@ public abstract class SnapshotTestBase {
       System.out.printf(
         "Itinerary %2d - duration: %s [%5s] (effective: %s [%5s]) - wait time: %s, transit time: %s \n",
         i,
-        TimeUtils.durationToStrCompact(itinerary.getDuration()),
-        itinerary.getDuration(),
+        TimeUtils.durationToStrCompact(itinerary.totalDuration()),
+        itinerary.totalDuration(),
         TimeUtils.durationToStrCompact(itinerary.effectiveDuration()),
         itinerary.effectiveDuration(),
-        itinerary.getWaitingDuration(),
-        itinerary.getTransitDuration()
+        itinerary.totalWaitingDuration(),
+        itinerary.totalTransitDuration()
       );
 
-      for (int j = 0; j < itinerary.getLegs().size(); j++) {
-        Leg leg = itinerary.getLegs().get(j);
+      for (int j = 0; j < itinerary.legs().size(); j++) {
+        Leg leg = itinerary.legs().get(j);
         String mode = (leg instanceof StreetLeg stLeg)
           ? stLeg.getMode().name().substring(0, 1)
           : "T";

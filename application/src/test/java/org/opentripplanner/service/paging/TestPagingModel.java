@@ -224,8 +224,6 @@ class TestPagingModel {
     } else {
       builder.drive(departureTime, arrivalTime, B);
     }
-    var it = builder.build();
-    it.setGeneralizedCost(cost);
-    return it;
+    return builder.build(cost);
   }
 }
