@@ -20,7 +20,7 @@ public class PageCursorFactory {
   private Instant currentEdt = null;
   private Instant currentLat = null;
   private Duration currentSearchWindow = null;
-  private boolean wholeSwUsed = true;
+  private boolean wholeSearchWindowUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = DefaultPageCursorInput.of().build();
 
@@ -67,7 +67,7 @@ public class PageCursorFactory {
     this.pageCursorInput = pageCursorInput;
     // If the whole search window was not used (i.e. if there were removed itineraries)
     if (pageCursorInput.numItinerariesFilterResult() != null) {
-      this.wholeSwUsed = false;
+      this.wholeSearchWindowUsed = false;
       this.itineraryPageCut = pageCursorInput.numItinerariesFilterResult().pageCut();
     }
     return this;
@@ -94,7 +94,7 @@ public class PageCursorFactory {
       .addDateTime("currentLat", currentLat)
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
-      .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
+      .addBoolIfTrue("searchWindowCropped", !wholeSearchWindowUsed)
       .addObj("pageCursorFactoryParams", pageCursorInput)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
@@ -119,7 +119,7 @@ public class PageCursorFactory {
     Instant prevEdt;
     Instant nextEdt;
 
-    if (wholeSwUsed) {
+    if (wholeSearchWindowUsed) {
       prevEdt = edtBeforeNewSw();
       nextEdt = edtAfterUsedSw();
     }
