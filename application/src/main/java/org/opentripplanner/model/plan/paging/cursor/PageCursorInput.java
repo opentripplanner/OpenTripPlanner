@@ -11,11 +11,13 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
  */
 public interface PageCursorInput {
   /**
+   * The itinerary filter chain may crop the search window as a result of reducing the list down to a specified maximum number of itineraries.
    * This contains the results from {@link org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter}.
    */
   NumItinerariesFilterResult numItinerariesFilterResult();
   /**
-   * RemoveTransitIfStreetOnlyIsBetterResult contains the best street only cost that comes from taking the cost of the best street only itinerary from the first search.
+   * {@link RemoveTransitIfStreetOnlyIsBetterResult} contains a maximum cost for itineraries.
+   * It is calculated by taking the cost of the best street only itinerary from the first search.
    * This is used as a comparison in {@link org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter}
    * when paging is used.
    */
