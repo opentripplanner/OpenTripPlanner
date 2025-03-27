@@ -16,7 +16,6 @@ import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
-import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,12 +93,11 @@ public class TripTimeOnDate {
     Timetable table,
     Trip trip,
     LocalDate serviceDate,
-    Instant midnight,
-    TransitService transitService
+    Instant midnight
   ) {
     TripTimes times = table.getTripTimes(trip);
     if (times == null) {
-      Timetable scheduledTimetable = transitService.findPattern(trip).getScheduledTimetable();
+      Timetable scheduledTimetable = table.getPattern().getScheduledTimetable();
       return fromTripTimes(scheduledTimetable, trip);
     }
     List<TripTimeOnDate> out = new ArrayList<>();

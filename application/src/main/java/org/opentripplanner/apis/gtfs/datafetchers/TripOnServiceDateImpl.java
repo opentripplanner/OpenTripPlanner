@@ -66,8 +66,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
         arguments.timetable(),
         arguments.trip(),
         arguments.serviceDate(),
-        arguments.midnight(),
-        getTransitService(environment)
+        arguments.midnight()
       );
     };
   }

@@ -332,8 +332,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           timetable,
           trip,
           serviceDate,
-          midnight,
-          transitService
+          midnight
         );
       } catch (ParseException e) {
         // invalid date format

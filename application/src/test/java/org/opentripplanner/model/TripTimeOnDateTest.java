@@ -89,8 +89,7 @@ class TripTimeOnDateTest implements PlanTestConstants {
       timetable,
       trip,
       serviceDate,
-      midnight,
-      transitService
+      midnight
     );
     for (var tripTimeOnDate : tripTimeOnDates) {
       assertNull(tripTimeOnDate.getServiceDay());
