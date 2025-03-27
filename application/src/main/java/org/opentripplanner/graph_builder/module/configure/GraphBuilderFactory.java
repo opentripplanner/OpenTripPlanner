@@ -48,35 +48,34 @@ import org.opentripplanner.transit.service.TimetableRepository;
   }
 )
 public interface GraphBuilderFactory {
-  //DataImportIssueStore issueStore();
-  GraphBuilder graphBuilder();
-  OsmModule osmModule();
-  GtfsModule gtfsModule();
-  EmissionsGraphBuilder emissionsModule();
-  NetexModule netexModule();
-  TimeZoneAdjusterModule timeZoneAdjusterModule();
-  TripPatternNamer tripPatternNamer();
-  OsmBoardingLocationsModule osmBoardingLocationsModule();
-  StreetLinkerModule streetLinkerModule();
-  PruneIslands pruneIslands();
-  List<ElevationModule> elevationModules();
   AreaStopsToVerticesMapper areaStopsToVerticesMapper();
+  CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
+  DataImportIssueReporter dataImportIssueReporter();
   DirectTransferGenerator directTransferGenerator();
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
+  GraphBuilder graphBuilder();
+  GtfsModule gtfsModule();
+  List<ElevationModule> elevationModules();
+  NetexModule netexModule();
+  OsmBoardingLocationsModule osmBoardingLocationsModule();
+  OsmModule osmModule();
+  PruneIslands pruneIslands();
+  StreetLinkerModule streetLinkerModule();
+  TimeZoneAdjusterModule timeZoneAdjusterModule();
+  TripPatternNamer tripPatternNamer();
+
+  @Nullable
   EdgeUpdaterModule dataOverlayFactory();
-  DataImportIssueReporter dataImportIssueReporter();
-  CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
-  StreetLimitationParameters streetLimitationParameters();
+
+  @Nullable
+  EmissionsGraphBuilder emissionsModule();
 
   @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();
 
   @Nullable
   StopConsolidationModule stopConsolidationModule();
-
-  @Nullable
-  StopConsolidationRepository stopConsolidationRepository();
 
   @Component.Builder
   interface Builder {

@@ -15,12 +15,17 @@ public class EmissionsGraphBuilderModule {
 
   @Provides
   @Singleton
+  @Nullable
   static EmissionsGraphBuilder provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmissionsRepository emissionsRepository,
     DataImportIssueStore issueStore
   ) {
+    if (emissionsRepository == null) {
+      return null;
+    }
+
     return new EmissionsGraphBuilder(
       dataSources.getGtfsConfiguredDatasource(),
       dataSources.getEmissionConfiguredDatasource(),
