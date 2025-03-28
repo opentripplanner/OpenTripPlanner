@@ -41,7 +41,7 @@ public class Co2EmissionsDataReader {
         return Map.of();
       }
     } catch (IOException e) {
-      LOG.error("Failed to read emisions data. Details: " + e.getMessage(), e);
+      LOG.error("Failed to read emission data. Details: " + e.getMessage(), e);
       return Map.of();
     }
   }
