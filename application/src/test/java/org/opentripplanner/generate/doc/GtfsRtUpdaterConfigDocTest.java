@@ -23,26 +23,32 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @GeneratesDocumentation
-public class SiriAzureConfigDocTest {
+public class GtfsRtUpdaterConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_PATH, "sandbox/siri/SiriAzureUpdater.md");
-  private static final File OUT_FILE = new File(USER_DOC_PATH, "sandbox/siri/SiriAzureUpdater.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "GTFS-RT-Config.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "GTFS-RT-Config.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final Set<String> INCLUDE_UPDATERS = Set.of(
-    "siri-azure-et-updater",
-    "siri-azure-sx-updater"
+  private static final Set<String> TYPES = Set.of(
+    "real-time-alerts",
+    "stop-time-updater",
+    "mqtt-gtfs-rt-updater",
+    "vehicle-positions"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the latest
-   * version of the code.
+   * NOTE! This test updates the {@code doc/user/Configuration.md} document based on the latest
+   * version of the code. The following is auto generated:
+   * <ul>
+   *   <li>The configuration type table</li>
+   *   <li>The list of OTP features</li>
+   * </ul>
    */
   @Test
-  public void updateSiriDoc() {
-    NodeAdapter node = readUpdaterConfig();
+  public void updateRouterConfigurationDoc() {
+    NodeAdapter node = readBuildConfig();
 
     // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
@@ -52,7 +58,7 @@ public class SiriAzureConfigDocTest {
       var child = node.child(childName);
       var type = child.typeQualifier();
 
-      if (INCLUDE_UPDATERS.contains(type)) {
+      if (TYPES.contains(type)) {
         template = replaceSection(template, type, updaterDoc(child));
       }
     }
@@ -61,7 +67,7 @@ public class SiriAzureConfigDocTest {
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readUpdaterConfig() {
+  private NodeAdapter readBuildConfig() {
     var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
     var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("updaters");

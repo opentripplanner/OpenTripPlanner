@@ -81,7 +81,11 @@ nav:
         - UK: 'osm/UK.md'
     - Router: 'RouterConfiguration.md'
     - "Route Request": 'RouteRequest.md'
-    - "Realtime Updaters": 'UpdaterConfig.md'
+    - "Realtime Updaters":
+        - Introduction: 'Realtime-Updaters.md'
+        - "GTFS-RT": 'GTFS-RT-Config.md'
+        - SIRI: 'SIRI-Config.md'
+        - GBFS: 'GBFS-Config.md'
     - "Debug UI": 'DebugUiConfiguration.md'
     - "Migrating between versions/builds": 'Migrating-Configuration.md'
 - Features explained:
@@ -91,7 +95,7 @@ nav:
     - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'
     - Accessibility: 'Accessibility.md'
-    - NeTEx and SIRI compatibility: 'features-explained/Netex-Siri-Compatibility.md'
+    - "NeTEx and SIRI compatibility": 'features-explained/Netex-Siri-Compatibility.md'
     - "Travel Time Analysis": 'Analysis.md'
     - "Logging": "Logging.md"
 - Development:
@@ -105,7 +109,6 @@ nav:
     - Debug Raster Tiles: 'sandbox/DebugRasterTiles.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - SIRI Updaters: 'sandbox/siri/SiriUpdater.md'
     - SIRI Updaters (Google Cloud): 'sandbox/siri/SiriGooglePubSubUpdater.md'
     - SIRI Updater (Azure): 'sandbox/siri/SiriAzureUpdater.md'
     - Vehicle Rental Service Directory API support: 'sandbox/VehicleRentalServiceDirectory.md'

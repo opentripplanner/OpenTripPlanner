@@ -16,7 +16,7 @@ import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepo
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class BoardingLocationTest {
+class BoardingLocationTest {
 
   /**
    * There is a one-way road which is also marked as a platform in Sky Campus which crashed OSM.
