@@ -131,6 +131,16 @@ public class GraphBuilderDataSources {
     return store.stopConsolidation();
   }
 
+  public CompositeDataSource getBuildReportDir() {
+    return store.getBuildReportDir();
+  }
+
+  public File getCacheDirectory() {
+    return cacheDirectory;
+  }
+
+  /* private methods */
+
   private ConfiguredDataSource<OsmExtractParameters> mapOsmData(DataSource dataSource) {
     var p = buildConfig.osm.parameters
       .stream()
@@ -143,16 +153,6 @@ public class GraphBuilderDataSources {
       );
     return new ConfiguredDataSource<>(dataSource, p);
   }
-
-  public CompositeDataSource getBuildReportDir() {
-    return store.getBuildReportDir();
-  }
-
-  public File getCacheDirectory() {
-    return cacheDirectory;
-  }
-
-  /* private methods */
 
   private ConfiguredDataSource<DemExtractParameters> mapDemData(DataSource dataSource) {
     var p = buildConfig.dem
