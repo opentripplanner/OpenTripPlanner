@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.paging;
 
 import java.util.function.Consumer;
-
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.DefaultPageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
@@ -10,27 +9,88 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
 /**
  * This class aggregates results from NumItinerariesFilter and RemoveTransitIfStreetOnlyIsBetter for PageCursorInput.
  */
-public class PageCursorInputAggregator  {
+public class PageCursorInputAggregator {
+
   private final NumItinerariesFilter numItinerariesFilter;
   private final RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter;
   private final Consumer<PageCursorInput> pageCursorInputSubscriber;
 
-  private PageCursorInputAggregator(
-    NumItinerariesFilter numItinerariesFilter,
-    RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter,
-    Consumer<PageCursorInput> pageCursorInputSubscriber
-  ) {
-    this.numItinerariesFilter = numItinerariesFilter;
-    this.removeTransitIfStreetOnlyIsBetter = removeTransitIfStreetOnlyIsBetter;
-    this.pageCursorInputSubscriber = pageCursorInputSubscriber;
+  public static PageCursorInputAggregator.Builder of() {
+    return new Builder(new PageCursorInputAggregator());
+  }
+
+  private PageCursorInputAggregator() {
+    this.numItinerariesFilter = null;
+    this.removeTransitIfStreetOnlyIsBetter = null;
+    this.pageCursorInputSubscriber = null;
+  }
+
+  private PageCursorInputAggregator(Builder builder) {
+    this.numItinerariesFilter = builder.numItinerariesFilter();
+    this.removeTransitIfStreetOnlyIsBetter = builder.removeTransitIfStreetOnlyIsBetter();
+    this.pageCursorInputSubscriber = builder.pageCursorInputSubscriber();
   }
 
   public void createPageCursorInput() {
     pageCursorInputSubscriber.accept(
       DefaultPageCursorInput.of()
-      .withNumItinerariesFilterResult(numItinerariesFilter.getNumItinerariesFilterResult())
-      .withRemoveTransitIfStreetOnlyIsBetterResult(removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult())
-      .build()
+        .withNumItinerariesFilterResult(
+          numItinerariesFilter != null ? numItinerariesFilter.getNumItinerariesFilterResult() : null
+        )
+        .withRemoveTransitIfStreetOnlyIsBetterResult(
+          removeTransitIfStreetOnlyIsBetter != null
+            ? removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult()
+            : null
+        )
+        .build()
     );
+  }
+
+  public static class Builder {
+
+    private NumItinerariesFilter numItinerariesFilter;
+    private RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter;
+    private Consumer<PageCursorInput> pageCursorInputSubscriber;
+
+    public Builder(PageCursorInputAggregator original) {
+      this.numItinerariesFilter = original.numItinerariesFilter;
+      this.removeTransitIfStreetOnlyIsBetter = original.removeTransitIfStreetOnlyIsBetter;
+      this.pageCursorInputSubscriber = original.pageCursorInputSubscriber;
+    }
+
+    public NumItinerariesFilter numItinerariesFilter() {
+      return numItinerariesFilter;
+    }
+
+    public Builder withNumItinerariesFilter(NumItinerariesFilter numItinerariesFilter) {
+      this.numItinerariesFilter = numItinerariesFilter;
+      return this;
+    }
+
+    public RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter() {
+      return removeTransitIfStreetOnlyIsBetter;
+    }
+
+    public Builder withRemoveTransitIfStreetOnlyIsBetter(
+      RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter
+    ) {
+      this.removeTransitIfStreetOnlyIsBetter = removeTransitIfStreetOnlyIsBetter;
+      return this;
+    }
+
+    public Consumer<PageCursorInput> pageCursorInputSubscriber() {
+      return pageCursorInputSubscriber;
+    }
+
+    public Builder withPageCursorInputSubscriber(
+      Consumer<PageCursorInput> pageCursorInputSubscriber
+    ) {
+      this.pageCursorInputSubscriber = pageCursorInputSubscriber;
+      return this;
+    }
+
+    public PageCursorInputAggregator build() {
+      return new PageCursorInputAggregator(this);
+    }
   }
 }

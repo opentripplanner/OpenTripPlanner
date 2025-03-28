@@ -10,6 +10,7 @@ import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
 import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
@@ -34,10 +35,7 @@ public class RouteRequestToFilterChainMapper {
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
-    Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber,
-    Consumer<
-      RemoveTransitIfStreetOnlyIsBetterResult
-    > removeTransitIfStreetOnlyIsBetterResultSubscriber
+    Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -101,10 +99,7 @@ public class RouteRequestToFilterChainMapper {
         context.transitService()::findMultiModalStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
-      .withNumItinerariesFilterResultSubscriber(numItinerariesFilterResultSubscriber)
-      .withRemoveTransitIfStreetOnlyIsBetterResultSubscriber(
-        removeTransitIfStreetOnlyIsBetterResultSubscriber
-      )
+      .withPageCursorInputSubscriber(pageCursorInputSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
       .withFilterDirectFlexBySearchWindow(params.filterDirectFlexBySearchWindow())

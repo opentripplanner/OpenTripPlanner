@@ -1,9 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.OptionalInt;
-import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -19,31 +17,18 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   private final CostLinearFunction costLimitFunction;
   private final Cost generalizedCostMaxLimit;
   private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
-  private final Consumer<
-    RemoveTransitIfStreetOnlyIsBetterResult
-  > removeTransitIfStreetOnlyIsBetterResultSubscriber;
 
   /**
    * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
    * @param costLimitFunction the cost limit function to use with the filter
    * @param generalizedCostMaxLimit this limit is not null when paging is used
-   * @param removeTransitIfStreetOnlyIsBetterResultSubscriber this subscriber stores the generalizedCostMaxLimit for use with paging
    */
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
-    Cost generalizedCostMaxLimit,
-    Consumer<
-      RemoveTransitIfStreetOnlyIsBetterResult
-    > removeTransitIfStreetOnlyIsBetterResultSubscriber
+    Cost generalizedCostMaxLimit
   ) {
-    Objects.requireNonNull(
-      removeTransitIfStreetOnlyIsBetterResultSubscriber,
-      "'removeTransitIfStreetOnlyIsBetterResultSubscriber' should not be null"
-    );
     this.costLimitFunction = costLimitFunction;
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
-    this.removeTransitIfStreetOnlyIsBetterResultSubscriber =
-      removeTransitIfStreetOnlyIsBetterResultSubscriber;
   }
 
   /**
@@ -83,7 +68,9 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     }
 
     // This result is used for paging. It is collected by an aggregator.
-    removeTransitIfStreetOnlyIsBetterResult = new RemoveTransitIfStreetOnlyIsBetterResult(minStreetCost);
+    removeTransitIfStreetOnlyIsBetterResult = new RemoveTransitIfStreetOnlyIsBetterResult(
+      minStreetCost
+    );
 
     var limit = costLimitFunction.calculate(minStreetCost).toSeconds();
 

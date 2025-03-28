@@ -18,6 +18,7 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveBikeRentalWithMostlyWalking;
@@ -53,6 +54,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrde
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.paging.PageCursorInputAggregator;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -81,10 +83,7 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber;
-  private Consumer<
-    RemoveTransitIfStreetOnlyIsBetterResult
-  > removeTransitIfStreetOnlyIsBetterResultSubscriber;
+  private Consumer<PageCursorInput> pageCursorInputSubscriber = i -> {};
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -279,30 +278,13 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
-   * The paging service needs this information to adjust the paging cursor. The 'maxLimit' check is
-   * the last thing* happening in the filter-chain after the final sort. So, if another filter
-   * removes an itinerary, the itinerary is not considered with respect to this limit.
-   */
-  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultSubscriber(
-    Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber
-  ) {
-    this.numItinerariesFilterResultSubscriber = numItinerariesFilterResultSubscriber;
-    return this;
-  }
-
-  /**
    * Paging stores information from the original search for use with related requests.
-   * This subscriber enables storing the best street only cost from the {@link RemoveTransitIfStreetOnlyIsBetter} filter
-   * for use with paging.
+   * This subscriber stores the input needed for creating the page cursor.
    */
-  public ItineraryListFilterChainBuilder withRemoveTransitIfStreetOnlyIsBetterResultSubscriber(
-    Consumer<
-      RemoveTransitIfStreetOnlyIsBetterResult
-    > removeTransitIfStreetOnlyIsBetterResultSubscriber
+  public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
+    Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
-    this.removeTransitIfStreetOnlyIsBetterResultSubscriber =
-      removeTransitIfStreetOnlyIsBetterResultSubscriber;
+    this.pageCursorInputSubscriber = pageCursorInputSubscriber;
     return this;
   }
 
@@ -416,6 +398,8 @@ public class ItineraryListFilterChainBuilder {
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
+    NumItinerariesFilter numItinerariesFilter = null;
+    RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter = null;
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
@@ -466,14 +450,11 @@ public class ItineraryListFilterChainBuilder {
     {
       // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-        addRemoveFilter(
-          filters,
-          new RemoveTransitIfStreetOnlyIsBetter(
-            removeTransitWithHigherCostThanBestOnStreetOnly,
-            generalizedCostMaxLimit,
-            removeTransitIfStreetOnlyIsBetterResultSubscriber
-          )
+        removeTransitIfStreetOnlyIsBetter = new RemoveTransitIfStreetOnlyIsBetter(
+          removeTransitWithHigherCostThanBestOnStreetOnly,
+          generalizedCostMaxLimit
         );
+        addRemoveFilter(filters, removeTransitIfStreetOnlyIsBetter);
       }
 
       if (removeTransitIfWalkingIsBetter) {
@@ -527,14 +508,11 @@ public class ItineraryListFilterChainBuilder {
       // Remove itineraries if max limit is set
       if (maxNumberOfItineraries > 0) {
         addSort(filters, SortOrderComparator.comparator(sortOrder));
-        addRemoveFilter(
-          filters,
-          new NumItinerariesFilter(
-            maxNumberOfItineraries,
-            maxNumberOfItinerariesCropSection,
-            numItinerariesFilterResultSubscriber
-          )
+        numItinerariesFilter = new NumItinerariesFilter(
+          maxNumberOfItineraries,
+          maxNumberOfItinerariesCropSection
         );
+        addRemoveFilter(filters, numItinerariesFilter);
       }
     }
 
@@ -575,8 +553,13 @@ public class ItineraryListFilterChainBuilder {
     }
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
+    PageCursorInputAggregator pageCursorInputAggregator = PageCursorInputAggregator.of()
+      .withNumItinerariesFilter(numItinerariesFilter)
+      .withRemoveTransitIfStreetOnlyIsBetter(removeTransitIfStreetOnlyIsBetter)
+      .withPageCursorInputSubscriber(pageCursorInputSubscriber)
+      .build();
 
-    return new ItineraryListFilterChain(filters, debugHandler);
+    return new ItineraryListFilterChain(filters, debugHandler, pageCursorInputAggregator);
   }
 
   public ItineraryListFilterChainBuilder withFilterDirectFlexBySearchWindow(boolean b) {
