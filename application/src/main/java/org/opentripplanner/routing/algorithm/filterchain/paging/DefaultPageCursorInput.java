@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.routing.algorithm.filterchain.paging;
 
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;

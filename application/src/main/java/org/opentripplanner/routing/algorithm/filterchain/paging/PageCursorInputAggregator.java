@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.filterchain.paging;
 
 import java.util.function.Consumer;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
-import org.opentripplanner.routing.algorithm.filterchain.DefaultPageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
 

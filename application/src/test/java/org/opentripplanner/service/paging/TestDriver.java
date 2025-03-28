@@ -10,10 +10,10 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
-import org.opentripplanner.routing.algorithm.filterchain.DefaultPageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 import org.opentripplanner.utils.collection.ListSection;
 import org.opentripplanner.utils.lang.Box;
 

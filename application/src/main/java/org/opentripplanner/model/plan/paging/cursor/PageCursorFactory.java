@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.DefaultPageCursorInput;
+import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class PageCursorFactory {
