@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiRelativeDirection;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiRelativeDirection;
 
-public class RelativeDirectionMapper {
+@Deprecated
+class RelativeDirectionMapper {
 
   public static ApiRelativeDirection mapRelativeDirection(RelativeDirection domain) {
     if (domain == null) {

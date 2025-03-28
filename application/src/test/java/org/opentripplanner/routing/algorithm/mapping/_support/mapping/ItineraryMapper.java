@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiItinerary;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiItinerary;
 
+@Deprecated
 public class ItineraryMapper {
 
   private final LegMapper legMapper;

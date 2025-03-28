@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 import java.util.Calendar;
 import java.util.List;
@@ -9,6 +9,7 @@ import org.opentripplanner.framework.geometry.EncodedPolyline;
  * particular vehicle (or on foot).
  */
 
+@Deprecated
 public class ApiLeg {
 
   /**

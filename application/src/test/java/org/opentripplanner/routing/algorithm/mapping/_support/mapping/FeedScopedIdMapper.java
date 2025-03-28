@@ -1,8 +1,9 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class FeedScopedIdMapper {
+@Deprecated
+class FeedScopedIdMapper {
 
   private static final String SEPARATOR = ":";
 

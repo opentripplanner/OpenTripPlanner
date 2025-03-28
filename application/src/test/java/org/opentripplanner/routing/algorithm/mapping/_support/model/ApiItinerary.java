@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,6 +9,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
+@Deprecated
 public class ApiItinerary {
 
   /**

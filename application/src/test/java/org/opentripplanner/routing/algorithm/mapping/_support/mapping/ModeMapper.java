@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public class ModeMapper {
+@Deprecated
+class ModeMapper {
 
   public static String mapToApi(TraverseMode domain) {
     if (domain == null) {

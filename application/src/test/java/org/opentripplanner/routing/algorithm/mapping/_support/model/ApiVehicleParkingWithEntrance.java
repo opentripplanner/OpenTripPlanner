@@ -1,10 +1,11 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 import java.util.List;
 
 /**
  * The details of a parking place along with the entrance used.
  */
+@Deprecated
 public class ApiVehicleParkingWithEntrance {
 
   /**

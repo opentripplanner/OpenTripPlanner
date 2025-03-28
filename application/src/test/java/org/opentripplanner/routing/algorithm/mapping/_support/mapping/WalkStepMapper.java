@@ -1,16 +1,17 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
-import static org.opentripplanner.routing.algorithm.mapping.restapi.mapping.ElevationMapper.mapElevation;
-import static org.opentripplanner.routing.algorithm.mapping.restapi.mapping.RelativeDirectionMapper.mapRelativeDirection;
+import static org.opentripplanner.routing.algorithm.mapping._support.mapping.ElevationMapper.mapElevation;
+import static org.opentripplanner.routing.algorithm.mapping._support.mapping.RelativeDirectionMapper.mapRelativeDirection;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiWalkStep;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiWalkStep;
 
-public class WalkStepMapper {
+@Deprecated
+class WalkStepMapper {
 
   private final Locale locale;
 

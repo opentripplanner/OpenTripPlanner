@@ -1,10 +1,11 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 /**
  * Represents a turn direction, relative to the current heading.
  * <p>
  * CIRCLE_CLOCKWISE and CIRCLE_CLOCKWISE are used to represent traffic circles.
  */
+@Deprecated
 public enum ApiRelativeDirection {
   DEPART,
   HARD_LEFT,

@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.model.plan.VertexType;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiVertexType;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiVertexType;
 
-public class VertexTypeMapper {
+@Deprecated
+class VertexTypeMapper {
 
   public static ApiVertexType mapVertexType(VertexType domain) {
     if (domain == null) {

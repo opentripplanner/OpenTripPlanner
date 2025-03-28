@@ -1,5 +1,6 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
+@Deprecated
 public record ApiCurrency(
   String currency,
   int defaultFractionDigits,

@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.model.plan.AbsoluteDirection;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiAbsoluteDirection;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiAbsoluteDirection;
 
-public class AbsoluteDirectionMapper {
+@Deprecated
+class AbsoluteDirectionMapper {
 
   public static ApiAbsoluteDirection mapAbsoluteDirection(AbsoluteDirection domain) {
     if (domain == null) {

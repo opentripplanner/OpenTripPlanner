@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import com.google.common.collect.Multimap;
 import java.util.Collection;
@@ -13,15 +13,16 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiCurrency;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiFareProduct;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiFareQualifier;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiItineraryFares;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiLegProducts;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiMoney;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiCurrency;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiFareProduct;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiFareQualifier;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiItineraryFares;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLegProducts;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiMoney;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class FareMapper {
+@Deprecated
+class FareMapper {
 
   private final Locale locale;
 

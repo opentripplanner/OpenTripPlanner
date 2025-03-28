@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -12,13 +12,14 @@ import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiPlace;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiVehicleParkingSpaces;
-import org.opentripplanner.routing.algorithm.mapping.restapi.model.ApiVehicleParkingWithEntrance;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiPlace;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiVehicleParkingSpaces;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiVehicleParkingWithEntrance;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-public class PlaceMapper {
+@Deprecated
+class PlaceMapper {
 
   private final Locale locale;
   private final I18NStringMapper i18NStringMapper;

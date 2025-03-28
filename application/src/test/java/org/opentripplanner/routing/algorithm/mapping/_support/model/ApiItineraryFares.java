@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 import java.util.List;
 import java.util.Map;
@@ -10,9 +10,10 @@ import java.util.Map;
  * @param legProducts       The Fares V2 products that cover only parts of the legs of the
  *                          itinerary, ie. the customer has to buy more than one ticket.
  */
+@Deprecated
 public record ApiItineraryFares(
   Map<String, ApiMoney> fare,
-  Map<String, List<ApiFareComponent>> details,
+  Map<String, List<Object>> details,
   List<ApiFareProduct> coveringItinerary,
   List<ApiLegProducts> legProducts
 ) {}

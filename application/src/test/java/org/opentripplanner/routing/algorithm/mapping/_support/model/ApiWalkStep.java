@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -17,6 +17,7 @@ package org.opentripplanner.routing.algorithm.mapping.restapi.model;
  * true <br> everything else false <br>
  * </p>
  */
+@Deprecated
 public class ApiWalkStep {
 
   /**

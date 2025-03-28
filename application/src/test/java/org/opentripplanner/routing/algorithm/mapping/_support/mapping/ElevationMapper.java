@@ -1,8 +1,9 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.mapping;
+package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
 import org.opentripplanner.model.plan.ElevationProfile;
 
-public class ElevationMapper {
+@Deprecated
+class ElevationMapper {
 
   public static String mapElevation(ElevationProfile p) {
     if (p == null) {

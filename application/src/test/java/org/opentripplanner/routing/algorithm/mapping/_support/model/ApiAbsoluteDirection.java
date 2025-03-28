@@ -1,8 +1,9 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 /**
  * An absolute cardinal or intermediate direction.
  */
+@Deprecated
 public enum ApiAbsoluteDirection {
   NORTH,
   NORTHEAST,

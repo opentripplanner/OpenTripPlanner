@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.mapping.restapi.model;
+package org.opentripplanner.routing.algorithm.mapping._support.model;
 
 import java.util.Calendar;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * A Place is where a journey starts or ends, or a transit stop along the way.
  */
+@Deprecated
 public class ApiPlace {
 
   /**
