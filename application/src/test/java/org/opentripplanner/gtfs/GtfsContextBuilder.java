@@ -13,7 +13,6 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -68,24 +67,8 @@ public class GtfsContextBuilder {
     return transitBuilder;
   }
 
-  public GtfsContextBuilder withIssueStoreAndDeduplicator(Graph graph) {
-    return withIssueStoreAndDeduplicator(graph, DataImportIssueStore.NOOP);
-  }
-
-  public GtfsContextBuilder withIssueStoreAndDeduplicator(
-    Graph graph,
-    DataImportIssueStore issueStore
-  ) {
-    return withDataImportIssueStore(issueStore).withDeduplicator(graph.deduplicator);
-  }
-
   public GtfsContextBuilder withDataImportIssueStore(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
-    return this;
-  }
-
-  private GtfsContextBuilder withDeduplicator(Deduplicator deduplicator) {
-    this.deduplicator = deduplicator;
     return this;
   }
 

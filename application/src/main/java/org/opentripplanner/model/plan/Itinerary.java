@@ -14,7 +14,7 @@ import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -86,7 +86,7 @@ public class Itinerary implements ItinerarySortKey {
 
   private final Float accessibilityScore;
   private final Emissions emissionsPerPerson;
-  private final ItineraryFares fare;
+  private final ItineraryFare fare;
 
   Itinerary(ItineraryBuilder builder) {
     this.legs = List.copyOf(builder.legs);
@@ -443,9 +443,10 @@ public class Itinerary implements ItinerarySortKey {
    * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
    * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
-   * -1 indicate that the cost is not set/computed.
+   * Zero(0) cost indicate that the cost is not set/computed.
    */
   public int generalizedCost() {
+    // TODO Return Cost type, not int
     return generalizedCost.toSeconds();
   }
 
@@ -560,7 +561,7 @@ public class Itinerary implements ItinerarySortKey {
     }
   }
 
-  public List<ScheduledTransitLeg> findScheduledTransitLegs() {
+  public List<ScheduledTransitLeg> listScheduledTransitLegs() {
     return legs()
       .stream()
       .filter(ScheduledTransitLeg.class::isInstance)
@@ -590,7 +591,7 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * The fare products of this itinerary.
    */
-  public ItineraryFares fare() {
+  public ItineraryFare fare() {
     return fare;
   }
 

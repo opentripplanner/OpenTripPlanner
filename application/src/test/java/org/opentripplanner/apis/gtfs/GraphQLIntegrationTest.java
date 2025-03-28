@@ -54,7 +54,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
@@ -379,7 +379,7 @@ class GraphQLIntegrationTest {
     legs.set(2, railLeg);
     i1 = i1.copyOf().withLegs(ignore -> legs).build();
 
-    var fares = new ItineraryFares();
+    var fares = new ItineraryFare();
 
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));

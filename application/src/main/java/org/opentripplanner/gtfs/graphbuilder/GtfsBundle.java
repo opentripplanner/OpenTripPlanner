@@ -50,6 +50,32 @@ public class GtfsBundle {
     return forTest(gtfsFile, null);
   }
 
+  /**
+   * So that we can load multiple gtfs feeds into the same database.
+   */
+  public String getFeedId() {
+    if (feedId == null) {
+      feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource());
+    }
+    return feedId;
+  }
+
+  public GtfsFeedParameters parameters() {
+    return parameters;
+  }
+
+  public void checkInputs() {
+    if (csvInputSource != null) {
+      LOG.warn("unknown CSV source type; cannot check inputs");
+      return;
+    }
+    if (!dataSource.exists()) {
+      throw new RuntimeException(
+        "GTFS Path " + dataSource.path() + " does not exist or " + "cannot be read."
+      );
+    }
+  }
+
   public CsvInputSource getCsvInputSource() {
     if (csvInputSource == null) {
       csvInputSource = new CsvInputSource() {
@@ -83,33 +109,7 @@ public class GtfsBundle {
     }
   }
 
-  public String feedInfo() {
+    public String feedInfo() {
     return "GTFS bundle at " + dataSource.path() + " (" + getFeedId() + ")";
-  }
-
-  /**
-   * So that we can load multiple gtfs feeds into the same database.
-   */
-  public String getFeedId() {
-    if (feedId == null) {
-      feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource());
-    }
-    return feedId;
-  }
-
-  public void checkInputs() {
-    if (csvInputSource != null) {
-      LOG.warn("unknown CSV source type; cannot check inputs");
-      return;
-    }
-    if (!dataSource.exists()) {
-      throw new RuntimeException(
-        "GTFS Path " + dataSource.path() + " does not exist or " + "cannot be read."
-      );
-    }
-  }
-
-  public GtfsFeedParameters parameters() {
-    return parameters;
   }
 }

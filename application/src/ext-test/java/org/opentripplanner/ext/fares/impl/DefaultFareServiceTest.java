@@ -20,7 +20,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
@@ -47,7 +47,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     service.addFareRules(FareType.regular, List.of());
     var itin = newItinerary(A, T11_00).bus(1, T11_05, T11_12, B).build();
     var fare = service.calculateFares(itin);
-    assertEquals(ItineraryFares.empty(), fare);
+    assertEquals(ItineraryFare.empty(), fare);
   }
 
   @Test
