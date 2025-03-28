@@ -25,8 +25,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 @GeneratesDocumentation
 public class SiriConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_PATH, "sandbox/siri/SiriUpdater.md");
-  private static final File OUT_FILE = new File(USER_DOC_PATH, "sandbox/siri/SiriUpdater.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "SIRI-Config.md");
+  private static final File OUT_FILE = new File(USER_DOC_PATH, "SIRI-Config.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
   private static final Set<String> INCLUDE_UPDATERS = Set.of(
@@ -39,7 +39,7 @@ public class SiriConfigDocTest {
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code doc/user/sandbox/SiriUpdater.md} document based on the latest
+   * NOTE! This test updates the {@code doc/user/sandbox/SIRI-Config.md} document based on the latest
    * version of the code.
    */
   @Test

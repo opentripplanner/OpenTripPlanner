@@ -98,6 +98,10 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     return permission;
   }
 
+  public int getTravelTime() {
+    return travelTime;
+  }
+
   @Override
   public State[] traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();

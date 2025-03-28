@@ -81,7 +81,7 @@ Enables `allowKeepingVehicleAtDestination` for the given network.
 Configures if a vehicle rented from a station must be returned to another one or can
 be kept at the end of the trip.
 
-See the regular [GBFS documentation](../UpdaterConfig.md#gbfs-vehicle-rental-systems) for more information.
+See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 
 
 <h4 id="vehicleRentalServiceDirectory_networks_0_geofencingZones">geofencingZones</h4>
@@ -91,7 +91,7 @@ See the regular [GBFS documentation](../UpdaterConfig.md#gbfs-vehicle-rental-sys
 
 Enables geofencingZones for the given network
 
-See the regular [GBFS documentation](../UpdaterConfig.md#gbfs-vehicle-rental-systems) for more information.
+See the regular [GBFS documentation](../GBFS-Config.md) for more information.
 
 
 <!-- PARAMETERS-DETAILS END -->
