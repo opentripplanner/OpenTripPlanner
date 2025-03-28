@@ -18,6 +18,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
 
   private final CostLinearFunction costLimitFunction;
   private final Cost generalizedCostMaxLimit;
+  private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
   private final Consumer<
     RemoveTransitIfStreetOnlyIsBetterResult
   > removeTransitIfStreetOnlyIsBetterResultSubscriber;
@@ -81,10 +82,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       return List.of();
     }
 
-    // The best street only cost is saved in the cursor.
-    removeTransitIfStreetOnlyIsBetterResultSubscriber.accept(
-      new RemoveTransitIfStreetOnlyIsBetterResult(minStreetCost)
-    );
+    // This result is used for paging. It is collected by an aggregator.
+    removeTransitIfStreetOnlyIsBetterResult = new RemoveTransitIfStreetOnlyIsBetterResult(minStreetCost);
 
     var limit = costLimitFunction.calculate(minStreetCost).toSeconds();
 
@@ -101,5 +100,9 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
   @Override
   public boolean skipAlreadyFlaggedItineraries() {
     return false;
+  }
+
+  public RemoveTransitIfStreetOnlyIsBetterResult getRemoveTransitIfStreetOnlyIsBetterResult() {
+    return removeTransitIfStreetOnlyIsBetterResult;
   }
 }
