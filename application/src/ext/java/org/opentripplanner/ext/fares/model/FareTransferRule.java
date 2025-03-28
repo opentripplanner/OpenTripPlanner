@@ -16,11 +16,18 @@ public record FareTransferRule(
   @Nullable Duration timeLimit,
   Collection<FareProduct> fareProducts
 ) {
-  public FareTransferRule{
+  public FareTransferRule {
     Objects.requireNonNull(id);
     fareProducts = List.copyOf(fareProducts);
   }
   public String feedId() {
     return id.getFeedId();
+  }
+
+  /**
+   * Returns true if this rule contains a free transfer product or an empty list of fare products.
+   */
+  public boolean isFree() {
+    return fareProducts.isEmpty() || fareProducts.stream().anyMatch(p -> p.price().isZero());
   }
 }

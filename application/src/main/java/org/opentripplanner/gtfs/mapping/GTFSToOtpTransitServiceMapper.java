@@ -138,7 +138,7 @@ public class GTFSToOtpTransitServiceMapper {
     fareRuleMapper = new FareRuleMapper(routeMapper, fareAttributeMapper);
     fareProductMapper = new FareProductMapper();
     fareLegRuleMapper = new FareLegRuleMapper(fareProductMapper, issueStore);
-    fareTransferRuleMapper = new FareTransferRuleMapper(fareProductMapper, issueStore);
+    fareTransferRuleMapper = new FareTransferRuleMapper(feedId, fareProductMapper, issueStore);
   }
 
   public OtpTransitServiceBuilder getBuilder() {

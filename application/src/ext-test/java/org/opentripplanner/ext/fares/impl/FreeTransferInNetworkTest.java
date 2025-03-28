@@ -23,34 +23,22 @@ import org.opentripplanner.transit.model.network.Route;
 class FreeTransferInNetworkTest implements PlanTestConstants {
 
   private static final GroupOfRoutes NETWORK = groupOfRoutes("n1").build();
-  private static final Route ROUTE = TimetableRepositoryForTest.route("r1").withGroupOfRoutes(List.of(NETWORK)).build();
-  private static final FeedScopedId LEG_GROUP1 = id("leg-group1");
+  private static final Route ROUTE = TimetableRepositoryForTest.route("r1")
+    .withGroupOfRoutes(List.of(NETWORK))
+    .build();
+  private static final FeedScopedId LEG_GROUP = id("leg-group1");
 
-  FareProduct freeTransfer = FareProduct.of(
-    id("free-transfer"),
-    "Free transfer",
-    Money.ZERO_USD
-  ).build();
-
-  FareProduct regular = FareProduct.of(
-    id( "regular"),
-    "regular",
-    Money.euros(5)
-  ).build();
+  FareProduct regular = FareProduct.of(id("regular"), "regular", Money.euros(5)).build();
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
       FareLegRule.of(id("6"), regular)
-        .withLegGroupId(LEG_GROUP1)
+        .withLegGroupId(LEG_GROUP)
         .withNetworkId(NETWORK.getId())
         .build()
     ),
-    List.of(
-      new FareTransferRule(id("transfer"), LEG_GROUP1, LEG_GROUP1, -1, null, List.of(freeTransfer))
-    ),
-    Multimaps.forMap(
-      Map.of()
-    )
+    List.of(new FareTransferRule(id("transfer"), LEG_GROUP, LEG_GROUP, -1, null, List.of())),
+    Multimaps.forMap(Map.of())
   );
 
   @Test

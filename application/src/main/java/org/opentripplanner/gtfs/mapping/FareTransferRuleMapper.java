@@ -10,25 +10,22 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareTransferRuleMapper {
 
-  public static final FareProduct FREE_TRANSFER = FareProduct.of(
-    new FeedScopedId("unknown", "free-transfer"),
-    "Free transfer",
-    Money.ZERO_USD
-  ).build();
   public final int MISSING_VALUE = -999;
 
   private final DataImportIssueStore issueStore;
+  private final String feedId;
   private final FareProductMapper fareProductMapper;
 
   public FareTransferRuleMapper(
+    String feedId,
     FareProductMapper fareProductMapper,
     DataImportIssueStore issueStore
   ) {
+    this.feedId = feedId;
     this.fareProductMapper = fareProductMapper;
     this.issueStore = issueStore;
   }
@@ -41,7 +38,7 @@ public class FareTransferRuleMapper {
 
   private FareTransferRule doMap(org.onebusaway.gtfs.model.FareTransferRule rhs) {
     var fareProductId = mapAgencyAndId(rhs.getFareProductId());
-    final var products = getFareProducts(fareProductId, rhs.getId());
+    final var products = resolveFareProducts(fareProductId, rhs.getId());
     if (products == null) {
       return null;
     }
@@ -51,7 +48,7 @@ public class FareTransferRuleMapper {
       duration = Duration.ofSeconds(rhs.getDurationLimit());
     }
     return new FareTransferRule(
-      new FeedScopedId(fareProductId.getFeedId(), rhs.getId()),
+      new FeedScopedId(feedId, rhs.getId()),
       AgencyAndIdMapper.mapAgencyAndId(rhs.getFromLegGroupId()),
       AgencyAndIdMapper.mapAgencyAndId(rhs.getToLegGroupId()),
       rhs.getTransferCount(),
@@ -61,9 +58,12 @@ public class FareTransferRuleMapper {
   }
 
   @Nullable
-  private Collection<FareProduct> getFareProducts(@Nullable FeedScopedId fareProductId, String id) {
+  private Collection<FareProduct> resolveFareProducts(
+    @Nullable FeedScopedId fareProductId,
+    String id
+  ) {
     if (fareProductId == null) {
-      return List.of(FREE_TRANSFER);
+      return List.of();
     }
     var products = fareProductMapper.getByFareProductId(fareProductId);
     if (products.isEmpty()) {

@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -15,6 +16,7 @@ import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueSto
 
 class FareTransferRuleMapperTest {
 
+  private static final String FEED_ID = "A";
   final String feedId = "A";
   final String productId = "123";
   final AgencyAndId id = new AgencyAndId(feedId, productId);
@@ -25,7 +27,7 @@ class FareTransferRuleMapperTest {
   void addIssueForUnknownProduct() {
     var fareProductMapper = new FareProductMapper();
     var issueStore = new DefaultDataImportIssueStore();
-    var subject = new FareTransferRuleMapper(fareProductMapper, issueStore);
+    var subject = new FareTransferRuleMapper(FEED_ID, fareProductMapper, issueStore);
 
     var rule = new FareTransferRule();
     rule.setFareProductId(id);
@@ -33,7 +35,7 @@ class FareTransferRuleMapperTest {
     var mapped = subject.map(List.of(rule));
 
     assertTrue(mapped.isEmpty());
-    assertEquals("UnknownFareProductId", issueStore.listIssues().get(0).getType());
+    assertEquals("UnknownFareProductId", issueStore.listIssues().getFirst().getType());
   }
 
   @Test
@@ -64,6 +66,19 @@ class FareTransferRuleMapperTest {
     assertEquals(groupId2.getId(), transferRule.toLegGroup().getId());
   }
 
+  @Test
+  void ruleWithoutProductIsFree() {
+    var rule = new FareTransferRule();
+    rule.setFromLegGroupId(groupId1);
+    rule.setToLegGroupId(groupId2);
+
+    var fareProductMapper = new FareProductMapper();
+    var subject = new FareTransferRuleMapper(FEED_ID, fareProductMapper, DataImportIssueStore.NOOP);
+    var transferRule = subject.map(List.of(rule)).stream().toList().getFirst();
+    assertTrue(transferRule.isFree());
+    assertThat(transferRule.fareProducts()).isEmpty();
+  }
+
   private FareProduct fareProduct() {
     var fareProduct = new FareProduct();
     fareProduct.setId(id);
@@ -81,12 +96,12 @@ class FareTransferRuleMapperTest {
     var fareProductMapper = new FareProductMapper();
     fareProductMapper.map(fareProduct);
 
-    var subject = new FareTransferRuleMapper(fareProductMapper, DataImportIssueStore.NOOP);
+    var subject = new FareTransferRuleMapper(FEED_ID, fareProductMapper, DataImportIssueStore.NOOP);
 
     var mapped = subject.map(List.of(rule)).stream().toList();
 
     assertFalse(mapped.isEmpty());
 
-    return mapped.get(0);
+    return mapped.getFirst();
   }
 }

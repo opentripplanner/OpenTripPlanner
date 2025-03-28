@@ -39,7 +39,7 @@ public final class FareLegRuleMapper {
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule.of(ruleId, productsForRule)
             .withLegGroupId(mapAgencyAndId(r.getLegGroupId()))
-            .withNetworkId(new FeedScopedId(fareProductId.getFeedId(), r.getNetworkId()))
+            .withNetworkId(FeedScopedId.ofNullable(fareProductId.getFeedId(), r.getNetworkId()))
             .withFromAreaId(areaId(r.getFromArea()))
             .withToAreaId(areaId(r.getToArea()))
             .withFareDistance(fareDistance)
