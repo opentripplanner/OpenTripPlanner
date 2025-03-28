@@ -11,5 +11,4 @@ class AgencyAndIdMapper {
   public static FeedScopedId mapAgencyAndId(@Nullable AgencyAndId id) {
     return id == null ? null : new FeedScopedId(id.getAgencyId(), id.getId());
   }
-
 }

@@ -15,7 +15,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareTransferRuleMapper {
 
-  public static final FareProduct FREE_TRANSFER = FareProduct.of(new FeedScopedId("unknown", "free-transfer"), "Free transfer", Money.ZERO_USD).build();
+  public static final FareProduct FREE_TRANSFER = FareProduct.of(
+    new FeedScopedId("unknown", "free-transfer"),
+    "Free transfer",
+    Money.ZERO_USD
+  ).build();
   public final int MISSING_VALUE = -999;
 
   private final DataImportIssueStore issueStore;
@@ -58,7 +62,7 @@ public class FareTransferRuleMapper {
 
   @Nullable
   private Collection<FareProduct> getFareProducts(@Nullable FeedScopedId fareProductId, String id) {
-    if(fareProductId == null) {
+    if (fareProductId == null) {
       return List.of(FREE_TRANSFER);
     }
     var products = fareProductMapper.getByFareProductId(fareProductId);
@@ -66,8 +70,8 @@ public class FareTransferRuleMapper {
       issueStore.add(
         "UnknownFareProductId",
         "Fare product with id %s referenced by fare transfer rule with id %s not found.".formatted(
-          fareProductId,
-          id
+            fareProductId,
+            id
           )
       );
       return null;
