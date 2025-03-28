@@ -3,9 +3,13 @@
     "addedTrip": {
       "gtfsId": "F:ADDED_TRIP",
       "timetabledOrigin": null,
-      "datedOrigin": null,
+      "datedOrigin": {
+        "realtimeDeparture": 0
+      },
       "timetabledDestination": null,
-      "datedDestination": null,
+      "datedDestination": {
+        "realtimeArrival": 900
+      },
       "stoptimes": null,
       "stoptimesForDate": [
         {
@@ -44,13 +48,13 @@
         "scheduledDeparture": 41400
       },
       "datedOrigin": {
-        "realtimeDeparture": 41400
+        "realtimeDeparture": 0
       },
       "timetabledDestination": {
         "scheduledArrival": 42000
       },
       "datedDestination": {
-        "realtimeArrival": 42000
+        "realtimeArrival": 900
       },
       "stoptimes": [
         {

@@ -91,9 +91,13 @@ class TripTimeOnDateTest implements PlanTestConstants {
       serviceDate,
       midnight
     );
+    int i = 0;
     for (var tripTimeOnDate : tripTimeOnDates) {
       assertNull(tripTimeOnDate.getServiceDay());
       assertEquals(tripTimeOnDate.getServiceDayMidnight(), TripTimeOnDate.UNDEFINED);
+      assertEquals(tripTimeOnDate.getTripTimes(), tripTimes);
+      assertEquals(tripTimeOnDate.getStopIndex(), i);
+      i++;
     }
   }
 }

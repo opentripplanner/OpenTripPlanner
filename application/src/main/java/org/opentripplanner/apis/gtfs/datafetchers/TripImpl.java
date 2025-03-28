@@ -131,26 +131,25 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment -> {
       try {
         TransitService transitService = getTransitService(environment);
-        TripPattern tripPattern = getTripPattern(environment);
+        Trip trip = getSource(environment);
+        var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
+
+        ZoneId timeZone = transitService.getTimeZone();
+        LocalDate serviceDate = args.getGraphQLServiceDate() != null
+          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+          : LocalDate.now();
+
+        TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
         if (tripPattern == null) {
           return null;
         }
-        Timetable timetable = tripPattern.getScheduledTimetable();
 
-        TripTimes tripTimes = timetable.getTripTimes(getSource(environment));
+        Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant();
+        Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
+
+        TripTimes tripTimes = timetable.getTripTimes(trip);
         if (tripTimes == null) {
           return null;
-        }
-        LocalDate serviceDate = null;
-        Instant midnight = null;
-
-        var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
-        if (args.getGraphQLServiceDate() != null) {
-          serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
-          midnight = ServiceDateUtils.asStartOfService(
-            serviceDate,
-            transitService.getTimeZone()
-          ).toInstant();
         }
 
         return new TripTimeOnDate(
@@ -182,26 +181,25 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment -> {
       try {
         TransitService transitService = getTransitService(environment);
-        TripPattern tripPattern = getTripPattern(environment);
+        Trip trip = getSource(environment);
+        var args = new GraphQLTypes.GraphQLTripDepartureStoptimeArgs(environment.getArguments());
+
+        ZoneId timeZone = transitService.getTimeZone();
+        LocalDate serviceDate = args.getGraphQLServiceDate() != null
+          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
+          : LocalDate.now();
+
+        TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
         if (tripPattern == null) {
           return null;
         }
-        Timetable timetable = tripPattern.getScheduledTimetable();
 
-        TripTimes tripTimes = timetable.getTripTimes(getSource(environment));
+        Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant();
+        Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
+
+        TripTimes tripTimes = timetable.getTripTimes(trip);
         if (tripTimes == null) {
           return null;
-        }
-        LocalDate serviceDate = null;
-        Instant midnight = null;
-
-        var args = new GraphQLTypes.GraphQLTripDepartureStoptimeArgs(environment.getArguments());
-        if (args.getGraphQLServiceDate() != null) {
-          serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
-          midnight = ServiceDateUtils.asStartOfService(
-            serviceDate,
-            transitService.getTimeZone()
-          ).toInstant();
         }
 
         return new TripTimeOnDate(tripTimes, 0, tripPattern, serviceDate, midnight);
@@ -323,10 +321,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           return List.of();
         }
 
-        Instant midnight = ServiceDateUtils.asStartOfService(
-          serviceDate,
-          transitService.getTimeZone()
-        ).toInstant();
+        Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, timeZone).toInstant();
         Timetable timetable = transitService.findTimetable(tripPattern, serviceDate);
         return TripTimeOnDate.fromTripTimesWithScheduleFallback(
           timetable,
