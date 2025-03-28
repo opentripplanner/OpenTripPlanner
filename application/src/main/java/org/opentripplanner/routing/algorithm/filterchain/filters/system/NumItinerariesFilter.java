@@ -19,6 +19,7 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   private final int maxLimit;
   private final ListSection cropSection;
+  private NumItinerariesFilterResult numItinerariesFilterResult = null;
   private final Consumer<NumItinerariesFilterResult> numItinerariesFilterResultSubscriber;
 
   public NumItinerariesFilter(
@@ -59,10 +60,13 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
       itinerariesToKeep = itineraries.subList(0, maxLimit);
     }
 
-    numItinerariesFilterResultSubscriber.accept(
-      new NumItinerariesFilterResult(itinerariesToKeep, itinerariesToRemove, cropSection)
-    );
+    // This result is used for paging. It is collected by an aggregator.
+    numItinerariesFilterResult = new NumItinerariesFilterResult(itinerariesToKeep, itinerariesToRemove, cropSection);
 
     return itinerariesToRemove;
+  }
+
+  public NumItinerariesFilterResult getNumItinerariesFilterResult() {
+    return numItinerariesFilterResult;
   }
 }
