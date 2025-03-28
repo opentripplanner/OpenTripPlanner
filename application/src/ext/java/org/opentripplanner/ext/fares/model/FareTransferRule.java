@@ -2,6 +2,8 @@ package org.opentripplanner.ext.fares.model;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -14,6 +16,10 @@ public record FareTransferRule(
   @Nullable Duration timeLimit,
   Collection<FareProduct> fareProducts
 ) {
+  public FareTransferRule{
+    Objects.requireNonNull(id);
+    fareProducts = List.copyOf(fareProducts);
+  }
   public String feedId() {
     return id.getFeedId();
   }

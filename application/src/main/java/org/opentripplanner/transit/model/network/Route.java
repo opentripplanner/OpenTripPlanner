@@ -118,8 +118,8 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
   }
 
   /**
-   *
-   * @return
+   * Returns the NeTEx group of routes or the GTFS networks which are both ways of grouping several
+   * routes together but the GTFS networks are primarily used for fare calculation.
    */
   public List<GroupOfRoutes> getGroupsOfRoutes() {
     return groupsOfRoutes;
