@@ -117,6 +117,10 @@ public final class Route extends AbstractTransitEntity<Route, RouteBuilder> impl
     return branding;
   }
 
+  /**
+   *
+   * @return
+   */
   public List<GroupOfRoutes> getGroupsOfRoutes() {
     return groupsOfRoutes;
   }

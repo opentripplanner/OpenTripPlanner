@@ -33,7 +33,7 @@ public final class GtfsFaresV2Service implements Serializable {
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
   private final Multimap<FeedScopedId, String> stopAreas;
-  private final Set<String> networksWithRules;
+  private final Set<FeedScopedId> networksWithRules;
   private final Set<String> fromAreasWithRules;
   private final Set<String> toAreasWithRules;
 
@@ -79,7 +79,7 @@ public final class GtfsFaresV2Service implements Serializable {
     return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
   }
 
-  private static Set<String> findNetworksWithRules(Collection<FareLegRule> legRules) {
+  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
     return legRules
       .stream()
       .map(FareLegRule::networkId)
@@ -227,7 +227,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .getRoute()
       .getGroupsOfRoutes()
       .stream()
-      .map(group -> group.getId().getId())
+      .map(group -> group.getId())
       .filter(Objects::nonNull)
       .toList();
 

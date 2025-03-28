@@ -4,6 +4,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import java.util.Collection;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -38,7 +39,7 @@ public final class FareLegRuleMapper {
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule.of(ruleId, productsForRule)
             .withLegGroupId(mapAgencyAndId(r.getLegGroupId()))
-            .withNetworkId(r.getNetworkId())
+            .withNetworkId(new FeedScopedId(fareProductId.getFeedId(), r.getNetworkId()))
             .withFromAreaId(areaId(r.getFromArea()))
             .withToAreaId(areaId(r.getToArea()))
             .withFareDistance(fareDistance)
@@ -57,7 +58,7 @@ public final class FareLegRuleMapper {
       .toList();
   }
 
-  private static String areaId(org.onebusaway.gtfs.model.Area area) {
+  private static String areaId(@Nullable org.onebusaway.gtfs.model.Area area) {
     if (area == null) {
       return null;
     } else {

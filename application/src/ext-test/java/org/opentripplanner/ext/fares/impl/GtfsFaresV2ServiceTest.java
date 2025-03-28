@@ -36,8 +36,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FeedScopedId LEG_GROUP4 = id("leg-group4");
   FeedScopedId LEG_GROUP5 = id("leg-group5");
   int ID = 100;
-  String expressNetwork = "express";
-  String localNetwork = "local";
+  FeedScopedId expressNetwork = id("express");
+  FeedScopedId localNetwork = id("local");
 
   FareProduct single = FareProduct.of(
     new FeedScopedId(FEED_ID, "single"),

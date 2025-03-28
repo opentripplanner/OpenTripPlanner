@@ -12,7 +12,7 @@ public class FareLegRuleBuilder {
   private final FeedScopedId id;
   private final Collection<FareProduct> fareProducts;
   private FeedScopedId legGroupId;
-  private String networkId;
+  private FeedScopedId networkId;
   private String fromAreaId;
   private FareDistance fareDistance = null;
   private String toAreaId;
@@ -27,7 +27,7 @@ public class FareLegRuleBuilder {
     return this;
   }
 
-  public FareLegRuleBuilder withNetworkId(String networkId) {
+  public FareLegRuleBuilder withNetworkId(FeedScopedId networkId) {
     this.networkId = networkId;
     return this;
   }

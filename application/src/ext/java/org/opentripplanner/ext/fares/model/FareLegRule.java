@@ -6,11 +6,12 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.collection.CollectionUtils;
 
 public record FareLegRule(
   FeedScopedId id,
   @Nullable FeedScopedId legGroupId,
-  @Nullable String networkId,
+  @Nullable FeedScopedId networkId,
   @Nullable String fromAreaId,
   @Nullable String toAreaId,
   @Nullable FareDistance fareDistance,

@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.groupOfRoutes;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.collect.Multimaps;
@@ -17,10 +18,12 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
-class FreeTransferTest implements PlanTestConstants {
+class FreeTransferInNetworkTest implements PlanTestConstants {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
+  private static final GroupOfRoutes NETWORK = groupOfRoutes("n1").build();
 
   FeedScopedId LEG_GROUP1 = id("leg-group1");
   int ID = 100;
@@ -52,6 +55,7 @@ class FreeTransferTest implements PlanTestConstants {
         .withLegGroupId(LEG_GROUP1)
         .withFromAreaId(INNER_ZONE)
         .withToAreaId(INNER_ZONE)
+        .withNetworkId(NETWORK.getId())
         .build()
     ),
     List.of(
@@ -64,6 +68,7 @@ class FreeTransferTest implements PlanTestConstants {
 
   @Test
   void freeTransfer() {
+    TimetableRepositoryForTest.route("r1").withGroupOfRoutes(List.of(NETWORK)).build();
     var i1 = newItinerary(INNER_ZONE_STOP, 0).bus(ID, 0, 50, INNER_ZONE_STOP).build();
     var result = service.getProducts(i1);
     assertEquals(Set.of(regular), result.itineraryProducts());
