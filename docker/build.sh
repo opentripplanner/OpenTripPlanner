@@ -1,1 +1,0 @@
-docker buildx build . -f docker/Dockerfile -t opentripplanner:2.7.0-heleman
