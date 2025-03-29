@@ -863,19 +863,6 @@ type QueryType {
     """
     relaxTransitGroupPriority: RelaxCostInput = null,
     """
-    Whether non-optimal transit paths at the destination should be returned. Let c be the
-    existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
-    accepted if the following is true:
-    
-    `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`
-    
-    The parameter is optional. If not set, a normal comparison is performed.
-    
-    Values less than 1.0 is not allowed, and values greater than 2.0 are not
-    supported, due to performance reasons.
-    """
-    relaxTransitSearchGeneralizedCostAtDestination: Float = null @deprecated(reason : "This is replaced by 'relaxTransitGroupPriority'."),
-    """
     The length of the search-window in minutes. This parameter is optional.
     
     The search-window is defined as the duration between the earliest-departure-time(EDT) and

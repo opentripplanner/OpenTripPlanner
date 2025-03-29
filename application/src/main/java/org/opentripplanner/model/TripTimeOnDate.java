@@ -84,6 +84,33 @@ public class TripTimeOnDate {
    * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
    * StopPatterns.
    * <br>
+   * If the timetable does not contain the trip, scheduledTimetable is used instead.
+   *
+   * @param table the timetable for the service day
+   * @param serviceDate service day to set
+   */
+  public static List<TripTimeOnDate> fromTripTimesWithScheduleFallback(
+    Timetable table,
+    Trip trip,
+    LocalDate serviceDate,
+    Instant midnight
+  ) {
+    TripTimes times = table.getTripTimes(trip);
+    if (times == null) {
+      Timetable scheduledTimetable = table.getPattern().getScheduledTimetable();
+      return fromTripTimes(scheduledTimetable, trip);
+    }
+    List<TripTimeOnDate> out = new ArrayList<>();
+    for (int i = 0; i < times.getNumStops(); ++i) {
+      out.add(new TripTimeOnDate(times, i, table.getPattern(), serviceDate, midnight));
+    }
+    return out;
+  }
+
+  /**
+   * Must pass in both Timetable and Trip, because TripTimes do not have a reference to
+   * StopPatterns.
+   * <br>
    * The timetable given must correspond to the service day so that it must contain the trip.
    *
    * @param table the timetable for the service day

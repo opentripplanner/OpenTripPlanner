@@ -5,30 +5,16 @@
    - Generated directory is: /doc/user 
 -->
 
-
-# Updater configuration
-
-This section covers options that can be set in the updaters section of `router-config.json`. 
-See the parameter summary and examples in the router configuration documentation
-
-Real-time data are those that are not added to OTP during the graph build phase but during runtime.
-
-Real-time data sources are configured in the `updaters` section is an array of JSON objects, each
-of which has a `type` field and other configuration fields specific to that type. 
-
-## GTFS-Realtime
-
 GTFS feeds contain *schedule* data that is published by an agency or operator in advance. The
 feed does not account for unexpected service changes or traffic disruptions that occur from day to
-day. Thus, this kind of data is also referred to as 'static' data or 'theoretical' arrival and
+day. Thus, this kind of data is also referred to as 'static' data or 'scheduled' arrival and
 departure times.
 
-[GTFS-Realtime](https://gtfs.org/realtime/) complements GTFS with three
+[GTFS-Realtime](https://gtfs.org/realtime/) complements GTFS with 
 additional kinds of feeds. In contrast to the base GTFS schedule feed, they provide *real-time*
 updates (*'dynamic'* data) and are updated from minute to minute.
 
-
-### Alerts
+## Alerts
 
 Alerts are text messages attached to GTFS objects, informing riders of disruptions and changes. 
 The information is downloaded in a single HTTP request and polled regularly.
@@ -79,8 +65,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- real-time-alerts END -->
 
-
-### TripUpdates via HTTP(S)
+## TripUpdates via HTTP(S)
 
 TripUpdates report on the status of scheduled trips as they happen, providing observed and 
 predicted arrival and departure times for the remainder of the trip.
@@ -164,7 +149,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- stop-time-updater END -->
 
-### Streaming TripUpdates via MQTT
+## Streaming TripUpdates via MQTT
 
 This updater connects to an MQTT broker and processes TripUpdates in a streaming fashion. This means
 that they will be applied individually in near-realtime rather than in batches at a certain interval.
@@ -231,7 +216,7 @@ How backwards propagation should be handled.
 
 <!-- mqtt-gtfs-rt-updater END -->
 
-### Vehicle Positions
+## Vehicle Positions
 
 VehiclePositions give the location of some or all vehicles currently in service, in terms of 
 geographic coordinates or position relative to their scheduled stops.
@@ -295,140 +280,4 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- vehicle-positions END -->
 
-
-## GBFS vehicle rental systems
-
-Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks
-including the number of vehicles and free parking spaces at each station. We support vehicle rental
-systems that use the GBFS standard.
-
-[GBFS](https://github.com/NABSA/gbfs) can be used for a variety of shared mobility services, with
-partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)). OTP supports the following
-GBFS form factors:
-
-- bicycle
-- scooter
-- car
-
-<!-- vehicle-rental BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-| Config Parameter                                                                      |       Type      | Summary                                                                                                                                                        |  Req./Opt. | Default Value | Since |
-|---------------------------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                                                                                                       | *Required* |               |  1.5  |
-| [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                                | *Optional* | `false`       |  2.1  |
-| frequency                                                                             |    `duration`   | How often the data should be updated.                                                                                                                          | *Optional* | `"PT1M"`      |  1.5  |
-| [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                                                                                                | *Optional* | `false`       |  2.3  |
-| language                                                                              |     `string`    | TODO                                                                                                                                                           | *Optional* |               |  2.1  |
-| [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.                                                                                      | *Optional* |               |  1.5  |
-| overloadingAllowed                                                                    |    `boolean`    | Allow leaving vehicles at a station even though there are no free slots.                                                                                       | *Optional* | `false`       |  2.2  |
-| [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                                                                                                  | *Required* |               |  1.5  |
-| url                                                                                   |     `string`    | The URL to download the data from.                                                                                                                             | *Required* |               |  1.5  |
-| [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                                                                                     | *Optional* |               |  1.5  |
-| [rentalPickupTypes](#u_1_rentalPickupTypes)                                           |    `enum set`   | This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source. | *Optional* |               |  2.7  |
-
-
-##### Parameter details
-
-<h4 id="u_1_allowKeepingRentedVehicleAtDestination">allowKeepingRentedVehicleAtDestination</h4>
-
-**Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /updaters/[1] 
-
-If a vehicle should be allowed to be kept at the end of a station-based rental.
-
-In some cases it may be useful to not drop off the rented vehicle before arriving at the destination.
-This is useful if vehicles may only be rented for round trips, or the destination is an intermediate place.
-
-For this to be possible three things need to be configured:
-
- - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
- - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
- - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
-
-
-<h4 id="u_1_geofencingZones">geofencingZones</h4>
-
-**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
-**Path:** /updaters/[1] 
-
-Compute rental restrictions based on GBFS 2.2 geofencing zones.
-
-This feature is somewhat experimental and therefore turned off by default for the following reasons:
-
-- It delays start up of OTP. How long is dependent on the complexity of the zones. For example in Oslo it takes 6 seconds to compute while Portland takes 25 seconds.
-- It's easy for a malformed or unintended geofencing zone to make routing impossible. If you encounter such a case, please file a bug report.
-
-
-<h4 id="u_1_network">network</h4>
-
-**Since version:** `1.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[1] 
-
-The name of the network to override the one derived from the source data.
-
-GBFS feeds must include a system_id which will be used as the default `network`. These ids are sometimes not helpful so setting this property will override it.
-
-<h4 id="u_1_sourceType">sourceType</h4>
-
-**Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
-**Path:** /updaters/[1]   
-**Enum values:** `gbfs` | `smoove`
-
-What source of vehicle rental updater to use.
-
-<h4 id="u_1_headers">headers</h4>
-
-**Since version:** `1.5` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[1] 
-
-HTTP headers to add to the request. Any header key, value can be inserted.
-
-<h4 id="u_1_rentalPickupTypes">rentalPickupTypes</h4>
-
-**Since version:** `2.7` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
-**Path:** /updaters/[1]   
-**Enum values:** `station` | `free-floating`
-
-This is temporary and will be removed in a future version of OTP. Use this to specify the type of rental data that is allowed to be read from the data source.
-
- - `station` Stations are imported.
- - `free-floating` Free-floating vehicles are imported.
-
-
-
-
-##### Example configuration
-
-```JSON
-// router-config.json
-{
-  "updaters" : [
-    {
-      "type" : "vehicle-rental",
-      "network" : "socialbicycles_coast",
-      "sourceType" : "gbfs",
-      "language" : "en",
-      "frequency" : "1m",
-      "allowKeepingRentedVehicleAtDestination" : false,
-      "geofencingZones" : false,
-      "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
-      "headers" : {
-        "Auth" : "<any-token>",
-        "<key>" : "<value>"
-      }
-    }
-  ]
-}
-```
-
-<!-- vehicle-rental END -->
-
-## Other updaters in sandboxes
-
-- [Vehicle parking](sandbox/VehicleParking.md)
-- [SIRI over HTTP](sandbox/siri/SiriUpdater.md)
-- [SIRI over Google Cloud PubSub](sandbox/siri/SiriGooglePubSubUpdater.md)
-- [SIRI over Azure Message Bus](sandbox/siri/SiriAzureUpdater.md)
-- [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)
 
