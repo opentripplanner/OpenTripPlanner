@@ -43,7 +43,7 @@ final class FareLegRuleMapper {
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule.of(ruleId, productsForRule)
             .withLegGroupId(idFactory.toId(r.getLegGroupId()))
-            .withNetworkId(FeedScopedId.ofNullable(fareProductId.getFeedId(), r.getNetworkId()))
+            .withNetworkId(idFactory.id(r.getNetworkId()))
             .withFromAreaId(areaId(r.getFromArea()))
             .withToAreaId(areaId(r.getToArea()))
             .withFareDistance(fareDistance)
@@ -62,11 +62,11 @@ final class FareLegRuleMapper {
       .toList();
   }
 
-  private static String areaId(@Nullable org.onebusaway.gtfs.model.Area area) {
+  private FeedScopedId areaId(@Nullable org.onebusaway.gtfs.model.Area area) {
     if (area == null) {
       return null;
     } else {
-      return area.getAreaId();
+      return idFactory.id(area.getAreaId());
     }
   }
 

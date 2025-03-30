@@ -13,9 +13,9 @@ public class FareLegRuleBuilder {
   private final Collection<FareProduct> fareProducts;
   private FeedScopedId legGroupId;
   private FeedScopedId networkId;
-  private String fromAreaId;
+  private FeedScopedId fromAreaId;
+  private FeedScopedId toAreaId;
   private FareDistance fareDistance = null;
-  private String toAreaId;
 
   public FareLegRuleBuilder(FeedScopedId id, Collection<FareProduct> products) {
     this.id = id;
@@ -32,7 +32,7 @@ public class FareLegRuleBuilder {
     return this;
   }
 
-  public FareLegRuleBuilder withFromAreaId(String fromAreaId) {
+  public FareLegRuleBuilder withFromAreaId(FeedScopedId fromAreaId) {
     this.fromAreaId = fromAreaId;
     return this;
   }
@@ -42,7 +42,7 @@ public class FareLegRuleBuilder {
     return this;
   }
 
-  public FareLegRuleBuilder withToAreaId(String toAreaId) {
+  public FareLegRuleBuilder withToAreaId(FeedScopedId toAreaId) {
     this.toAreaId = toAreaId;
     return this;
   }

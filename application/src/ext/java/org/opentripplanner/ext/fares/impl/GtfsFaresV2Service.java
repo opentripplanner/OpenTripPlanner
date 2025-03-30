@@ -32,15 +32,15 @@ public final class GtfsFaresV2Service implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(GtfsFaresV2Service.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final Multimap<FeedScopedId, String> stopAreas;
+  private final Multimap<FeedScopedId, FeedScopedId> stopAreas;
   private final Set<FeedScopedId> networksWithRules;
-  private final Set<String> fromAreasWithRules;
-  private final Set<String> toAreasWithRules;
+  private final Set<FeedScopedId> fromAreasWithRules;
+  private final Set<FeedScopedId> toAreasWithRules;
 
   public GtfsFaresV2Service(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
-    Multimap<FeedScopedId, String> stopAreas
+    Multimap<FeedScopedId, FeedScopedId> stopAreas
   ) {
     this.legRules = legRules;
     this.transferRules = fareTransferRules;
@@ -72,9 +72,9 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary, allLegProducts);
   }
 
-  private static Set<String> findAreasWithRules(
+  private static Set<FeedScopedId> findAreasWithRules(
     List<FareLegRule> legRules,
-    Function<FareLegRule, String> getArea
+    Function<FareLegRule, FeedScopedId> getArea
   ) {
     return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
   }
@@ -207,7 +207,11 @@ public final class GtfsFaresV2Service implements Serializable {
     return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 
-  private boolean matchesArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
+  private boolean matchesArea(
+    StopLocation stop,
+    FeedScopedId areaId,
+    Set<FeedScopedId> areasWithRules
+  ) {
     var stopAreas = this.stopAreas.get(stop.getId());
     return (
       (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||

@@ -99,8 +99,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   Place OUTER_ZONE_STOP = Place.forStop(
     testModel.stop("outer city stop").withCoordinate(2, 2).build()
   );
-  String INNER_ZONE = "inner-zone";
-  String OUTER_ZONE = "outer-zone";
+  FeedScopedId INNER_ZONE = id("inner-zone");
+  FeedScopedId OUTER_ZONE = id("outer-zone");
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(

@@ -12,8 +12,8 @@ public record FareLegRule(
   FeedScopedId id,
   @Nullable FeedScopedId legGroupId,
   @Nullable FeedScopedId networkId,
-  @Nullable String fromAreaId,
-  @Nullable String toAreaId,
+  @Nullable FeedScopedId fromAreaId,
+  @Nullable FeedScopedId toAreaId,
   @Nullable FareDistance fareDistance,
   Collection<FareProduct> fareProducts
 ) {
