@@ -48,9 +48,10 @@ public class RouteMapperTest {
   private static final Integer SORT_ORDER = 1;
 
   private static final Route ROUTE = new Route();
+  private static final IdFactory ID_FACTORY = new IdFactory("A");
   private final RouteMapper subject = new RouteMapper(
-    new IdFactory("A"),
-    new AgencyMapper(TimetableRepositoryForTest.FEED_ID),
+    ID_FACTORY,
+    new AgencyMapper(ID_FACTORY),
     DataImportIssueStore.NOOP,
     new TranslationHelper()
   );

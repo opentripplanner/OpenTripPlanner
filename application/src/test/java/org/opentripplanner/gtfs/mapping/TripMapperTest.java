@@ -45,7 +45,12 @@ public class TripMapperTest {
   private static TripMapper defaultTripMapper() {
     return new TripMapper(
       ID_FACTORY,
-      new RouteMapper(ID_FACTORY, new AgencyMapper(FEED_ID), ISSUE_STORE, new TranslationHelper()),
+      new RouteMapper(
+        ID_FACTORY,
+        new AgencyMapper(ID_FACTORY),
+        ISSUE_STORE,
+        new TranslationHelper()
+      ),
       new DirectionMapper(ISSUE_STORE),
       new TranslationHelper()
     );

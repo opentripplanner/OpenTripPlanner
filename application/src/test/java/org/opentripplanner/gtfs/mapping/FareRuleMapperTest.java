@@ -37,7 +37,7 @@ public class FareRuleMapperTest {
   private final FareRuleMapper subject = new FareRuleMapper(
     new RouteMapper(
       ID_FACTORY,
-      new AgencyMapper(FEED_ID),
+      new AgencyMapper(ID_FACTORY),
       DataImportIssueStore.NOOP,
       new TranslationHelper()
     ),

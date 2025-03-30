@@ -108,7 +108,7 @@ public class GTFSToOtpTransitServiceMapper {
     shapePointMapper = new ShapePointMapper(idFactory);
     translationHelper = new TranslationHelper();
     feedInfoMapper = new FeedInfoMapper(feedId);
-    agencyMapper = new AgencyMapper(feedId);
+    agencyMapper = new AgencyMapper(idFactory);
     stationMapper = new StationMapper(idFactory, translationHelper, stationTransferPreference);
     stopMapper = new StopMapper(
       idFactory,

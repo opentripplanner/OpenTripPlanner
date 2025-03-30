@@ -9,12 +9,16 @@ class IdFactory {
 
   private final String feedId;
 
-  public IdFactory(String feedId) {
+  IdFactory(String feedId) {
     this.feedId = feedId;
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  public FeedScopedId toId(@Nullable AgencyAndId id) {
+  FeedScopedId toId(@Nullable AgencyAndId id) {
     return id == null ? null : new FeedScopedId(feedId, id.getId());
+  }
+
+  FeedScopedId id(@Nullable String id) {
+    return id == null ? null : new FeedScopedId(feedId, id);
   }
 }

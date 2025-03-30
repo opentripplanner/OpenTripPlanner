@@ -47,7 +47,7 @@ class FareTransferRuleMapper {
       duration = Duration.ofSeconds(rhs.getDurationLimit());
     }
     return new FareTransferRule(
-      new FeedScopedId(feedId, rhs.getId()),
+      idFactory.id(rhs.getId()),
       idFactory.toId(rhs.getFromLegGroupId()),
       idFactory.toId(rhs.getToLegGroupId()),
       rhs.getTransferCount(),

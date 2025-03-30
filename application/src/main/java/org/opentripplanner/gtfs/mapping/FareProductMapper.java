@@ -30,11 +30,7 @@ class FareProductMapper {
     if (rhs.getDurationUnit() != NOT_SET) {
       duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
     }
-    var fp = FareProduct.of(
-      idFactory.toId(rhs.getFareProductId()),
-      rhs.getName(),
-      price
-    )
+    var fp = FareProduct.of(idFactory.toId(rhs.getFareProductId()), rhs.getName(), price)
       .withValidity(duration)
       .withCategory(toInternalModel(rhs.getRiderCategory()))
       .withMedium(toInternalModel(rhs.getFareMedium()))

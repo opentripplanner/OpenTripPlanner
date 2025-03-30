@@ -72,8 +72,12 @@ class FareTransferRuleMapperTest {
     rule.setFromLegGroupId(groupId1);
     rule.setToLegGroupId(groupId2);
 
-    var fareProductMapper = new FareProductMapper();
-    var subject = new FareTransferRuleMapper(FEED_ID, fareProductMapper, DataImportIssueStore.NOOP);
+    var fareProductMapper = new FareProductMapper(ID_FACTORY);
+    var subject = new FareTransferRuleMapper(
+      ID_FACTORY,
+      fareProductMapper,
+      DataImportIssueStore.NOOP
+    );
     var transferRule = subject.map(List.of(rule)).stream().toList().getFirst();
     assertTrue(transferRule.isFree());
     assertThat(transferRule.fareProducts()).isEmpty();
