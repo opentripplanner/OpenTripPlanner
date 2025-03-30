@@ -11,11 +11,16 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class FareProductMapper {
+class FareProductMapper {
 
   public static int NOT_SET = -999;
 
+  private final IdFactory idFactory;
   private final Set<FareProduct> mappedFareProducts = new HashSet<>();
+
+  public FareProductMapper(IdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
   public FareProduct map(org.onebusaway.gtfs.model.FareProduct rhs) {
     var currency = Currency.getInstance(rhs.getCurrency());
@@ -26,7 +31,7 @@ public class FareProductMapper {
       duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
     }
     var fp = FareProduct.of(
-      AgencyAndIdMapper.mapAgencyAndId(rhs.getFareProductId()),
+      idFactory.toId(rhs.getFareProductId()),
       rhs.getName(),
       price
     )
@@ -48,14 +53,12 @@ public class FareProductMapper {
     return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
-  private static RiderCategory toInternalModel(
-    org.onebusaway.gtfs.model.RiderCategory riderCategory
-  ) {
+  private RiderCategory toInternalModel(org.onebusaway.gtfs.model.RiderCategory riderCategory) {
     if (riderCategory == null) {
       return null;
     } else {
       return new RiderCategory(
-        AgencyAndIdMapper.mapAgencyAndId(riderCategory.getId()),
+        idFactory.toId(riderCategory.getId()),
         riderCategory.getName(),
         riderCategory.getEligibilityUrl()
       );
@@ -77,11 +80,11 @@ public class FareProductMapper {
     };
   }
 
-  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareMedium c) {
+  private FareMedium toInternalModel(org.onebusaway.gtfs.model.FareMedium c) {
     if (c == null) {
       return null;
     } else {
-      return new FareMedium(AgencyAndIdMapper.mapAgencyAndId(c.getId()), c.getName());
+      return new FareMedium(idFactory.toId(c.getId()), c.getName());
     }
   }
 }

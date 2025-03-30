@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -12,20 +10,21 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class FareTransferRuleMapper {
+class FareTransferRuleMapper {
 
   public final int MISSING_VALUE = -999;
 
+  private final IdFactory idFactory;
   private final DataImportIssueStore issueStore;
   private final String feedId;
   private final FareProductMapper fareProductMapper;
 
-  public FareTransferRuleMapper(
-    String feedId,
+  FareTransferRuleMapper(
+    IdFactory idFactory,
     FareProductMapper fareProductMapper,
     DataImportIssueStore issueStore
   ) {
-    this.feedId = feedId;
+    this.idFactory = idFactory;
     this.fareProductMapper = fareProductMapper;
     this.issueStore = issueStore;
   }
@@ -37,7 +36,7 @@ public class FareTransferRuleMapper {
   }
 
   private FareTransferRule doMap(org.onebusaway.gtfs.model.FareTransferRule rhs) {
-    var fareProductId = mapAgencyAndId(rhs.getFareProductId());
+    var fareProductId = idFactory.toId(rhs.getFareProductId());
     final var products = resolveFareProducts(fareProductId, rhs.getId());
     if (products == null) {
       return null;
@@ -49,8 +48,8 @@ public class FareTransferRuleMapper {
     }
     return new FareTransferRule(
       new FeedScopedId(feedId, rhs.getId()),
-      AgencyAndIdMapper.mapAgencyAndId(rhs.getFromLegGroupId()),
-      AgencyAndIdMapper.mapAgencyAndId(rhs.getToLegGroupId()),
+      idFactory.toId(rhs.getFromLegGroupId()),
+      idFactory.toId(rhs.getToLegGroupId()),
       rhs.getTransferCount(),
       duration,
       products

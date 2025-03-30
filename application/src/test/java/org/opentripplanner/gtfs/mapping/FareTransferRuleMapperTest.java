@@ -17,17 +17,17 @@ import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueSto
 class FareTransferRuleMapperTest {
 
   private static final String FEED_ID = "A";
-  final String feedId = "A";
+  private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
   final String productId = "123";
-  final AgencyAndId id = new AgencyAndId(feedId, productId);
-  final AgencyAndId groupId1 = new AgencyAndId(feedId, "group1");
-  final AgencyAndId groupId2 = new AgencyAndId(feedId, "group2");
+  final AgencyAndId id = new AgencyAndId(FEED_ID, productId);
+  final AgencyAndId groupId1 = new AgencyAndId(FEED_ID, "group1");
+  final AgencyAndId groupId2 = new AgencyAndId(FEED_ID, "group2");
 
   @Test
   void addIssueForUnknownProduct() {
-    var fareProductMapper = new FareProductMapper();
+    var fareProductMapper = new FareProductMapper(ID_FACTORY);
     var issueStore = new DefaultDataImportIssueStore();
-    var subject = new FareTransferRuleMapper(FEED_ID, fareProductMapper, issueStore);
+    var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper, issueStore);
 
     var rule = new FareTransferRule();
     rule.setFareProductId(id);
@@ -46,7 +46,7 @@ class FareTransferRuleMapperTest {
     rule.setFareProductId(id);
 
     var transferRule = map(fareProduct, rule);
-    assertEquals(feedId, transferRule.feedId());
+    assertEquals(FEED_ID, transferRule.feedId());
     assertNull(transferRule.fromLegGroup());
     assertNull(transferRule.toLegGroup());
   }
@@ -93,10 +93,14 @@ class FareTransferRuleMapperTest {
     FareProduct fareProduct,
     FareTransferRule rule
   ) {
-    var fareProductMapper = new FareProductMapper();
+    var fareProductMapper = new FareProductMapper(ID_FACTORY);
     fareProductMapper.map(fareProduct);
 
-    var subject = new FareTransferRuleMapper(FEED_ID, fareProductMapper, DataImportIssueStore.NOOP);
+    var subject = new FareTransferRuleMapper(
+      ID_FACTORY,
+      fareProductMapper,
+      DataImportIssueStore.NOOP
+    );
 
     var mapped = subject.map(List.of(rule)).stream().toList();
 

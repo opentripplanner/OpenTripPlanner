@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.util.Collection;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -13,14 +11,20 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class FareLegRuleMapper {
+final class FareLegRuleMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FareLegRuleMapper.class);
 
+  private final IdFactory idFactory;
   private final FareProductMapper fareProductMapper;
   private final DataImportIssueStore issueStore;
 
-  public FareLegRuleMapper(FareProductMapper fareProductMapper, DataImportIssueStore issueStore) {
+  public FareLegRuleMapper(
+    IdFactory idFactory,
+    FareProductMapper fareProductMapper,
+    DataImportIssueStore issueStore
+  ) {
+    this.idFactory = idFactory;
     this.fareProductMapper = fareProductMapper;
     this.issueStore = issueStore;
   }
@@ -31,14 +35,14 @@ public final class FareLegRuleMapper {
     return allFareLegRules
       .stream()
       .map(r -> {
-        var fareProductId = mapAgencyAndId(r.getFareProductId());
+        var fareProductId = idFactory.toId(r.getFareProductId());
         var productsForRule = fareProductMapper.getByFareProductId(fareProductId);
 
         if (!productsForRule.isEmpty()) {
           FareDistance fareDistance = createFareDistance(r);
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule.of(ruleId, productsForRule)
-            .withLegGroupId(mapAgencyAndId(r.getLegGroupId()))
+            .withLegGroupId(idFactory.toId(r.getLegGroupId()))
             .withNetworkId(FeedScopedId.ofNullable(fareProductId.getFeedId(), r.getNetworkId()))
             .withFromAreaId(areaId(r.getFromArea()))
             .withToAreaId(areaId(r.getToArea()))

@@ -49,6 +49,7 @@ public class RouteMapperTest {
 
   private static final Route ROUTE = new Route();
   private final RouteMapper subject = new RouteMapper(
+    new IdFactory("A"),
     new AgencyMapper(TimetableRepositoryForTest.FEED_ID),
     DataImportIssueStore.NOOP,
     new TranslationHelper()
