@@ -152,8 +152,7 @@
         "io.micrometer:micrometer-registry-influx",
         "com.fasterxml.jackson.core:{/,}**",
         "com.fasterxml.jackson.datatype:{/,}**",
-        "com.azure:{/,}**",
-        "org.apache.httpcomponents.client5:httpclient5"
+        "com.azure:{/,}**"
       ],
       "automerge": true
     },

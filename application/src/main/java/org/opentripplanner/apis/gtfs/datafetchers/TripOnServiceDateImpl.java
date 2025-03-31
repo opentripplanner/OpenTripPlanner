@@ -62,7 +62,7 @@ public class TripOnServiceDateImpl implements GraphQLDataFetchers.GraphQLTripOnS
       if (arguments.timetable() == null) {
         return List.of();
       }
-      return TripTimeOnDate.fromTripTimes(
+      return TripTimeOnDate.fromTripTimesWithScheduleFallback(
         arguments.timetable(),
         arguments.trip(),
         arguments.serviceDate(),
