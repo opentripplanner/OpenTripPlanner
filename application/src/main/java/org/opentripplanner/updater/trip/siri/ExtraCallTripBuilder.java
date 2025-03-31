@@ -3,6 +3,7 @@ package org.opentripplanner.updater.trip.siri;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.STOP_MISMATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -73,8 +75,11 @@ class ExtraCallTripBuilder {
   }
 
   Result<TripUpdate, UpdateError> build() {
-    if (calls.size() <= transitService.findPattern(trip).numberOfStops()) {
-      // An extra call trip update is expected to have at least one more stop than the scheduled trip
+    TripPattern originalPattern = transitService.findPattern(trip);
+    long numExtraCalls = calls.stream().filter(CallWrapper::isExtraCall).count();
+    if (calls.size() - numExtraCalls != originalPattern.numberOfStops()) {
+      // A trip update with extra calls is expected to have the same number of non-extra calls as
+      // the number of stops in the original scheduled trip
       return UpdateError.result(trip.getId(), INVALID_STOP_SEQUENCE, dataSource);
     }
 
@@ -90,13 +95,17 @@ class ExtraCallTripBuilder {
     ZonedDateTime departureDate = serviceDate.atStartOfDay(timeZone);
 
     // Create the "scheduled version" of the trip
+    // We do not reuse the trip times of the original scheduled trip
+    // since adding extra stops change the timings of later stops in the trip pattern.
     var aimedStopTimes = new ArrayList<StopTime>();
+    int extraCallCounter = 0;
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
+      CallWrapper call = calls.get(stopSequence);
       StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
         departureDate,
         stopSequence,
-        calls.get(stopSequence),
+        call,
         stopSequence == 0,
         stopSequence == (calls.size() - 1)
       );
@@ -104,6 +113,23 @@ class ExtraCallTripBuilder {
       // Drop this update if the call refers to an unknown stop (not present in the site repository).
       if (stopTime == null) {
         return UpdateError.result(trip.getId(), UNKNOWN_STOP, dataSource);
+      }
+
+      // Drop this update if it replaces scheduled stops from the original pattern.
+      // Only changes within the same parent station are allowed.
+      if (call.isExtraCall()) {
+        extraCallCounter++;
+      } else {
+        StopLocation stopInOriginalPattern = originalPattern.getStop(
+          stopSequence - extraCallCounter
+        );
+        StopLocation stopInNewPattern = stopTime.getStop();
+        if (
+          !stopInNewPattern.equals(stopInOriginalPattern) &&
+          !stopInNewPattern.isPartOfSameStationAs(stopInOriginalPattern)
+        ) {
+          return UpdateError.result(trip.getId(), STOP_MISMATCH, dataSource);
+        }
       }
 
       aimedStopTimes.add(stopTime);

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -75,7 +74,6 @@ class ExtraCallTest implements RealtimeTestConstants {
   }
 
   @Test
-  @Disabled("Not supported yet")
   void testExtraUnknownStop() {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
 
@@ -96,7 +94,54 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     var result = env.applyEstimatedTimetable(updates);
 
+    assertFailure(UpdateError.UpdateErrorType.TOO_MANY_STOPS, result);
+  }
+
+  @Test
+  void testExtraCallSameNumberOfStops() {
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+
+    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A1)
+          .departAimedExpected("00:00:11", "00:00:15")
+          // Unexpected ExtraCall flag on a scheduled stop
+          .call(STOP_B1)
+          .withIsExtraCall(true)
+          .arriveAimedExpected("00:00:30", "00:00:33")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = env.applyEstimatedTimetable(updates);
+
     assertFailure(UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE, result);
+  }
+
+  @Test
+  void testExtraCallAndIllegalChangeOfOtherStops() {
+    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+
+    var updates = new SiriEtBuilder(env.getDateTimeHelper())
+      .withDatedVehicleJourneyRef(TRIP_1_ID)
+      .withEstimatedCalls(builder ->
+        builder
+          .call(STOP_A1)
+          .departAimedExpected("00:00:11", "00:00:15")
+          .call(STOP_D1)
+          .withIsExtraCall(true)
+          .arriveAimedExpected("00:00:19", "00:00:20")
+          .departAimedExpected("00:00:24", "00:00:25")
+          // this scheduled stop should not be changed
+          .call(STOP_C1)
+          .arriveAimedExpected("00:00:30", "00:00:33")
+      )
+      .buildEstimatedTimetableDeliveries();
+
+    var result = env.applyEstimatedTimetable(updates);
+
+    assertFailure(UpdateError.UpdateErrorType.STOP_MISMATCH, result);
   }
 
   private static List<EstimatedTimetableDeliveryStructure> updateWithExtraCall(
