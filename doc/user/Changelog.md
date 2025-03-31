@@ -14,6 +14,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use locale param from plan queries for all translations in the GTFS API if accept-language header is not set [#6546](https://github.com/opentripplanner/OpenTripPlanner/pull/6546)
 - do not discard turn restrictions where the turn description and angle do not match, just add an issue [#6553](https://github.com/opentripplanner/OpenTripPlanner/pull/6553)
 - Use locale param if one is defined over accept-language header in GTFS APIs [#6552](https://github.com/opentripplanner/OpenTripPlanner/pull/6552)
+- Fix entrances being removed from walk steps [#6530](https://github.com/opentripplanner/OpenTripPlanner/pull/6530)
+- Handle duration tags for elevators in the same way as for escalators [#6568](https://github.com/opentripplanner/OpenTripPlanner/pull/6568)
+- Revert arrivalStoptime, departureStoptime and stoptimesForDate behavior changes from #6245 [#6554](https://github.com/opentripplanner/OpenTripPlanner/pull/6554)
+- Filter flex trips by agency and route [#6421](https://github.com/opentripplanner/OpenTripPlanner/pull/6421)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

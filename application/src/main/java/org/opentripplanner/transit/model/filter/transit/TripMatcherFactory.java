@@ -38,6 +38,8 @@ public class TripMatcherFactory {
 
     expr.atLeastOneMatch(request.includeAgencies(), TripMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripMatcherFactory::routeId);
+    expr.matchesNone(request.excludeAgencies(), TripMatcherFactory::agencyId);
+    expr.matchesNone(request.excludeRoutes(), TripMatcherFactory::routeId);
     expr.atLeastOneMatch(
       request.includeNetexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
@@ -71,7 +73,7 @@ public class TripMatcherFactory {
   ) {
     return date ->
       new ContainsMatcher<>(
-        "serviceDates",
+        "serviceDate",
         t -> serviceDateProvider.apply(t.getServiceId()),
         new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
       );

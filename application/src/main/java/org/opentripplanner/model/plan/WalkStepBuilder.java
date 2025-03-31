@@ -138,6 +138,10 @@ public class WalkStepBuilder {
     return str;
   }
 
+  public boolean hasEntrance() {
+    return entrance != null;
+  }
+
   public WalkStepBuilder addStreetNotes(Set<StreetNote> notes) {
     this.streetNotes.addAll(notes);
     return this;

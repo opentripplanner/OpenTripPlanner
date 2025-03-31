@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
@@ -15,7 +16,10 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 class TripTimeOnDateTest {
@@ -106,5 +110,47 @@ class TripTimeOnDateTest {
       .build();
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     return new TripTimeOnDate(tripTimes, 2, pattern, DATE, MIDNIGHT);
+  }
+
+  @Test
+  void testFromTripTimesWithScheduleFallback() {
+    var testModel = TimetableRepositoryForTest.of();
+    var trip = TimetableRepositoryForTest.trip("123").build();
+    var siteRepository = testModel.siteRepositoryBuilder().build();
+    var timetableRepository = new TimetableRepository(siteRepository, new Deduplicator());
+    var tripTimes = ScheduledTripTimes.of()
+      .withTrip(trip)
+      .withDepartureTimes(new int[] { 0, 1 })
+      .build();
+    var tripPattern = testModel
+      .pattern(TransitMode.BUS)
+      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+      .build();
+    timetableRepository.addTripPattern(tripPattern.getId(), tripPattern);
+    timetableRepository.index();
+    var timetableSnapshot = new TimetableSnapshot();
+    timetableSnapshot.commit();
+    var transitService = new DefaultTransitService(timetableRepository, timetableSnapshot);
+    var serviceDate = LocalDate.of(2025, 1, 1);
+    // Construct a timetable which definitely does not contain this trip, because it is empty.
+    Timetable timetable = Timetable.of()
+      .withTripPattern(tripPattern)
+      .withServiceDate(serviceDate)
+      .build();
+    Instant midnight = ServiceDateUtils.asStartOfService(serviceDate, ZoneIds.HELSINKI).toInstant();
+    var tripTimeOnDates = TripTimeOnDate.fromTripTimesWithScheduleFallback(
+      timetable,
+      trip,
+      serviceDate,
+      midnight
+    );
+    int i = 0;
+    for (var tripTimeOnDate : tripTimeOnDates) {
+      assertNull(tripTimeOnDate.getServiceDay());
+      assertEquals(tripTimeOnDate.getServiceDayMidnight(), TripTimeOnDate.UNDEFINED);
+      assertEquals(tripTimeOnDate.getTripTimes(), tripTimes);
+      assertEquals(tripTimeOnDate.getStopIndex(), i);
+      i++;
+    }
   }
 }
