@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.transit.api.model.FilterValues;
-import org.opentripplanner.transit.model.filter.transit.TripMatcherFactory;
 
 /**
  * A builder for creating complex matchers composed of other matchers.
@@ -37,18 +36,6 @@ public class ExpressionBuilder<T> {
     }
 
     matchers.add(OrMatcher.of(filterValues.get().stream().map(matcherProvider).toList()));
-    return this;
-  }
-
-  public <V> ExpressionBuilder<T> noMatches(
-    FilterValues<V> filterValues,
-    Function<V, Matcher<T>> matcherProvider
-  ) {
-    if (filterValues.includeEverything()) {
-      return this;
-    }
-
-    matchers.add(AndMatcher.of(filterValues.get().stream().map(matcherProvider).toList()));
     return this;
   }
 

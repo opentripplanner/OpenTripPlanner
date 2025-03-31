@@ -105,12 +105,12 @@ public class OjpService {
       .withArrivalDeparture(params.arrivalDeparture)
       .withTimeWindow(params.timeWindow)
       .withNumberOfDepartures(params.numDepartures)
-      .withIncludedAgencies(params.includedAgencies)
-      .withIncludedRoutes(params.includedRoutes)
-      .withExcludedAgencies(params.excludedAgencies)
-      .withExcludedRoutes(params.excludedRoutes)
-      .withIncludedModes(params.includedModes)
-      .withExcludedModes(params.excludedModes)
+      .withIncludeAgencies(params.includedAgencies)
+      .withIncludeRoutes(params.includedRoutes)
+      .withExcludeAgencies(params.excludedAgencies)
+      .withExcludeRoutes(params.excludedRoutes)
+      .withIncludeModes(params.includedModes)
+      .withExcludeModes(params.excludedModes)
       .withSortOrder(TripTimeOnDate.compareByScheduledDeparture())
       .build();
     return transitService.findTripTimesOnDate(request).stream().map(CallAtStop::noWalking).toList();

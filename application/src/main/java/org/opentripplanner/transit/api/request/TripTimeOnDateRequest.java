@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -18,12 +17,12 @@ public class TripTimeOnDateRequest {
 
   private final Set<StopLocation> stopLocations;
   private final Instant time;
-  private final FilterValues<FeedScopedId> selectedAgencies;
-  private final FilterValues<FeedScopedId> selectedRoutes;
-  private final FilterValues<FeedScopedId> excludedAgencies;
-  private final FilterValues<FeedScopedId> excludedRoutes;
+  private final FilterValues<FeedScopedId> selectAgencies;
+  private final FilterValues<FeedScopedId> selectRoutes;
+  private final FilterValues<FeedScopedId> excludeAgencies;
+  private final FilterValues<FeedScopedId> excludeRoutes;
   private final FilterValues<TransitMode> includedModes;
-  private final FilterValues<TransitMode> excludedModes;
+  private final FilterValues<TransitMode> excludeModes;
   private final Duration timeWindow;
   private final ArrivalDeparture arrivalDeparture;
   private final int numberOfDepartures;
@@ -36,12 +35,12 @@ public class TripTimeOnDateRequest {
     ArrivalDeparture arrivalDeparture,
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
-    FilterValues<FeedScopedId> selectedAgencies,
-    FilterValues<FeedScopedId> selectedRoutes,
-    FilterValues<FeedScopedId> excludedAgencies,
-    FilterValues<FeedScopedId> excludedRoutes,
+    FilterValues<FeedScopedId> selectAgencies,
+    FilterValues<FeedScopedId> selectRoutes,
+    FilterValues<FeedScopedId> excludeAgencies,
+    FilterValues<FeedScopedId> excludeRoutes,
     FilterValues<TransitMode> includedModes,
-    FilterValues<TransitMode> excludedModes
+    FilterValues<TransitMode> excludeModes
   ) {
     this.stopLocations = Set.copyOf(stopLocations);
     this.time = Objects.requireNonNull(time);
@@ -49,12 +48,12 @@ public class TripTimeOnDateRequest {
     this.arrivalDeparture = arrivalDeparture;
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
-    this.selectedAgencies = selectedAgencies;
-    this.selectedRoutes = selectedRoutes;
-    this.excludedAgencies = excludedAgencies;
-    this.excludedRoutes = excludedRoutes;
+    this.selectAgencies = selectAgencies;
+    this.selectRoutes = selectRoutes;
+    this.excludeAgencies = excludeAgencies;
+    this.excludeRoutes = excludeRoutes;
     this.includedModes = includedModes;
-    this.excludedModes = excludedModes;
+    this.excludeModes = excludeModes;
   }
 
   public static TripTimeOnDateRequestBuilder of(Collection<StopLocation> stopLocations) {
@@ -69,28 +68,28 @@ public class TripTimeOnDateRequest {
     return time;
   }
 
-  public FilterValues<FeedScopedId> selectedAgencies() {
-    return selectedAgencies;
+  public FilterValues<FeedScopedId> selectAgencies() {
+    return selectAgencies;
   }
 
-  public FilterValues<FeedScopedId> selectedRoutes() {
-    return selectedRoutes;
+  public FilterValues<FeedScopedId> selectRoutes() {
+    return selectRoutes;
   }
 
-  public FilterValues<FeedScopedId> excludedAgencies() {
-    return excludedAgencies;
+  public FilterValues<FeedScopedId> excludeAgencies() {
+    return excludeAgencies;
   }
 
-  public FilterValues<FeedScopedId> excludedRoutes() {
-    return excludedRoutes;
+  public FilterValues<FeedScopedId> excludeRoutes() {
+    return excludeRoutes;
   }
 
   public FilterValues<TransitMode> includedModes() {
     return includedModes;
   }
 
-  public FilterValues<TransitMode> excludedModes() {
-    return excludedModes;
+  public FilterValues<TransitMode> excludeModes() {
+    return excludeModes;
   }
 
   public Duration timeWindow() {

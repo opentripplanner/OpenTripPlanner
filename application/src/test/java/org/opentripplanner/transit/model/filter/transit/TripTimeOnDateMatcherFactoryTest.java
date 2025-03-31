@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequest;
 import org.opentripplanner.transit.api.request.TripTimeOnDateRequestBuilder;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -49,7 +48,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeRoute() {
-    var request = request().withIncludedRoutes(List.of(ROUTE_1.getId())).build();
+    var request = request().withIncludeRoutes(List.of(ROUTE_1.getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -59,7 +58,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeRoute() {
-    var request = request().withExcludedRoutes(List.of(ROUTE_1.getId())).build();
+    var request = request().withExcludeRoutes(List.of(ROUTE_1.getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -69,7 +68,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeAgency() {
-    var request = request().withIncludedAgencies(List.of(ROUTE_1.getAgency().getId())).build();
+    var request = request().withIncludeAgencies(List.of(ROUTE_1.getAgency().getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -79,7 +78,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeAgency() {
-    var request = request().withExcludedAgencies(List.of(ROUTE_1.getAgency().getId())).build();
+    var request = request().withExcludeAgencies(List.of(ROUTE_1.getAgency().getId())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -89,7 +88,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void includeMode() {
-    var request = request().withIncludedModes(List.of(ROUTE_1.getMode())).build();
+    var request = request().withIncludeModes(List.of(ROUTE_1.getMode())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -99,7 +98,7 @@ class TripTimeOnDateMatcherFactoryTest {
 
   @Test
   void excludeMode() {
-    var request = request().withExcludedModes(List.of(ROUTE_1.getMode())).build();
+    var request = request().withExcludeModes(List.of(ROUTE_1.getMode())).build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
 
@@ -110,8 +109,8 @@ class TripTimeOnDateMatcherFactoryTest {
   @Test
   void excludeModeAndRoute() {
     var request = request()
-      .withExcludedModes(List.of(ROUTE_1.getMode()))
-      .withExcludedRoutes(List.of(ROUTE_2.getId()))
+      .withExcludeModes(List.of(ROUTE_1.getMode()))
+      .withExcludeRoutes(List.of(ROUTE_2.getId()))
       .build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
@@ -123,8 +122,8 @@ class TripTimeOnDateMatcherFactoryTest {
   @Test
   void excludeAgencyAndRoute() {
     var request = request()
-      .withExcludedModes(List.of(ROUTE_1.getMode()))
-      .withExcludedAgencies(List.of(ROUTE_2.getAgency().getId()))
+      .withExcludeModes(List.of(ROUTE_1.getMode()))
+      .withExcludeAgencies(List.of(ROUTE_2.getAgency().getId()))
       .build();
 
     var matcher = TripTimeOnDateMatcherFactory.of(request);
