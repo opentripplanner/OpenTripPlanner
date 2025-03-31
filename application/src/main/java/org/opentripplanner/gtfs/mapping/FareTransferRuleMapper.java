@@ -16,7 +16,6 @@ class FareTransferRuleMapper {
 
   private final IdFactory idFactory;
   private final DataImportIssueStore issueStore;
-  private final String feedId;
   private final FareProductMapper fareProductMapper;
 
   FareTransferRuleMapper(
