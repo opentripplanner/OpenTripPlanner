@@ -40,6 +40,6 @@ We allow breaking API changes in these cases:
   it. We will revert a removal if the request to keep it comes after the feature is removed. 
   Example:
 
-> Use featurer xyz instead. 
-> Note! This feature is subject for removal from september 2027! If you want this to stay, pleace
+> Use feature xyz instead. 
+> Note! This feature is subject for removal in September 2027! If you want this to stay, please
 >       notify the OTP community.
