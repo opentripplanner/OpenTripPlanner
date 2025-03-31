@@ -127,6 +127,8 @@ public class ShortestPathTree<
    */
   public boolean add(State newState) {
     Vertex vertex = newState.getVertex();
+    // Change stateSets from Map<Vertex, List<State>> to Map<Vertex, RequestVertex>
+    // where RequestVertex contains List<State>.
     List<State> states = stateSets.get(vertex);
 
     // if the vertex has no states, add one and return
@@ -144,6 +146,7 @@ public class ShortestPathTree<
       State oldState = it.next();
       // order is important, because in the case of a tie
       // we want to reject the new state
+      // pass RequestVertex to dominance function (same for both states)
       if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
         return false;
       }

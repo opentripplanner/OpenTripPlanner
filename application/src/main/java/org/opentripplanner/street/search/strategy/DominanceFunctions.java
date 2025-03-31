@@ -89,6 +89,14 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
      * including the loops should still result in a route. Often this will be preferable to
      * taking a detour due to turn restrictions anyway.
      */
+    // get rid of isCloseToStartOrEnd and track turn restrictions properly
+    //  - if we earlier arrived from a direction which caused one of the outgoing edges
+    //    to be skipped, have a boolean in the state to mark it (wasTurnRestricted)
+    //  - if there was a restriction, have a list of skipped edges (turnRestrictedEdges)
+    //  - check if we can go to a restricted egde from this arrival direction
+    //  - if we got this far, return false
+    // StreetEdge.turnRestriction
+    // StreetEdge.canTurnOnto()
     if (
       a.backEdge != b.getBackEdge() &&
       (a.backEdge instanceof StreetEdge) &&

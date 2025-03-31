@@ -521,6 +521,12 @@ public class StreetEdge
           turnRestriction.modes.contains(mode) &&
           turnRestriction.active(state.getTimeSeconds())
         ) {
+          // we could stuff the wasTurnRestricted/turnRestrictedEdges fields here,
+          // but don't have the other edges in hand. How far up do we have to go
+          // before we do?
+          //  call from doTraverse:1182 (same problem)
+          //  traverse:377
+          //  Astar.iterate:144 (here we have the edges)
           return false;
         }
       }
