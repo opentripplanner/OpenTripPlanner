@@ -1,0 +1,39 @@
+{
+    "dataImportReport": true,
+    "areaVisibility": true,
+    "staticParkAndRide": false,
+    "subwayAccessTime": 200,
+    "maxAreaNodes": 50,
+    "maxTransferDuration": "26m",
+    "multiThreadElevationCalculations": true,
+    "transitServiceStart": "-P2W",
+    "transitServiceEnd": "P12W",
+    "transitModelTimeZone": "Europe/Helsinki",
+    "fares": "hsl",
+    "transferRequests": [
+      { "modes": "WALK" },
+      {
+        "modes": "WALK",
+        "wheelchairAccessibility": {
+          "enabled": true,
+          "maxSlope": 0.125
+        }
+      }
+    ],
+    "gtfsDefaults" : {
+      "stationTransferPreference" : "recommended"
+    },
+    "osmDefaults": {
+      "timeZone": "Europe/Helsinki",
+      "osmTagMapping": "finland",
+      "includeOsmSubwayEntrances": true
+      },
+    "demDefaults": {
+      "elevationUnitMultiplier": 0.1
+    },
+    "emissions": {
+      "carAvgCo2PerKm": 170,
+      "carAvgOccupancy": 1.3
+    }
+  }
+  

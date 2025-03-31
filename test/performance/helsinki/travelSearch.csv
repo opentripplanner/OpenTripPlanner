@@ -1,0 +1,534 @@
+testCaseId,description,departure,fromLat,fromLon,toLat,toLon,origin,destination,modes,category
+1,Kamppi to Töölöntori (transit),06:00,60.169665, 24.934652,60.179022, 24.924151,Kamppi,Töölöntori,TRANSIT|WALK,transit
+2,Kamppi to Töölöntori (transit),13:00,60.169665, 24.934652,60.179022, 24.924151,Kamppi,Töölöntori,TRANSIT|WALK,transit
+3,Kamppi to Töölöntori (transit),22:00,60.169665, 24.934652,60.179022, 24.924151,Kamppi,Töölöntori,TRANSIT|WALK,transit
+4,Kamppi to Pitäjänmäki (transit),06:00,60.169665, 24.934652,60.22070, 24.86094,Kamppi,Pitäjänmäki,TRANSIT|WALK,transit
+5,Kamppi to Pitäjänmäki (transit),13:00,60.169665, 24.934652,60.22070, 24.86094,Kamppi,Pitäjänmäki,TRANSIT|WALK,transit
+6,Kamppi to Pitäjänmäki (transit),22:00,60.169665, 24.934652,60.22070, 24.86094,Kamppi,Pitäjänmäki,TRANSIT|WALK,transit
+7,Kamppi to Itäkeskus (transit),06:00,60.169665, 24.934652,60.20863, 25.07946,Kamppi,Itäkeskus,TRANSIT|WALK,transit
+8,Kamppi to Itäkeskus (transit),13:00,60.169665, 24.934652,60.20863, 25.07946,Kamppi,Itäkeskus,TRANSIT|WALK,transit
+9,Kamppi to Itäkeskus (transit),22:00,60.169665, 24.934652,60.20863, 25.07946,Kamppi,Itäkeskus,TRANSIT|WALK,transit
+10,Kamppi to Suomenlinna (transit),06:00,60.169665, 24.934652,60.148237,24.985142,Kamppi,Suomenlinna,TRANSIT|WALK,transit
+11,Kamppi to Suomenlinna (transit),13:00,60.169665, 24.934652,60.148237,24.985142,Kamppi,Suomenlinna,TRANSIT|WALK,transit
+12,Kamppi to Suomenlinna (transit),22:00,60.169665, 24.934652,60.148237,24.985142,Kamppi,Suomenlinna,TRANSIT|WALK,transit
+13,Kamppi to Otaniemi (transit),06:00,60.169665, 24.934652,60.18234, 24.82531,Kamppi,Otaniemi,TRANSIT|WALK,transit
+14,Kamppi to Otaniemi (transit),13:00,60.169665, 24.934652,60.18234, 24.82531,Kamppi,Otaniemi,TRANSIT|WALK,transit
+15,Kamppi to Otaniemi (transit),22:00,60.169665, 24.934652,60.18234, 24.82531,Kamppi,Otaniemi,TRANSIT|WALK,transit
+16,Kamppi to Espoon Keskusta (transit),06:00,60.169665, 24.934652,60.205940, 24.656711,Kamppi,Espoon Keskusta,TRANSIT|WALK,transit
+17,Kamppi to Espoon Keskusta (transit),13:00,60.169665, 24.934652,60.205940, 24.656711,Kamppi,Espoon Keskusta,TRANSIT|WALK,transit
+18,Kamppi to Espoon Keskusta (transit),22:00,60.169665, 24.934652,60.205940, 24.656711,Kamppi,Espoon Keskusta,TRANSIT|WALK,transit
+19,Kamppi to Matinkylä (transit),06:00,60.169665, 24.934652,60.15509, 24.74546,Kamppi,Matinkylä,TRANSIT|WALK,transit
+20,Kamppi to Matinkylä (transit),13:00,60.169665, 24.934652,60.15509, 24.74546,Kamppi,Matinkylä,TRANSIT|WALK,transit
+21,Kamppi to Matinkylä (transit),22:00,60.169665, 24.934652,60.15509, 24.74546,Kamppi,Matinkylä,TRANSIT|WALK,transit
+22,Kamppi to Kauklahti (transit),06:00,60.169665, 24.934652,60.19586, 24.58912,Kamppi,Kauklahti,TRANSIT|WALK,transit
+23,Kamppi to Kauklahti (transit),13:00,60.169665, 24.934652,60.19586, 24.58912,Kamppi,Kauklahti,TRANSIT|WALK,transit
+24,Kamppi to Kauklahti (transit),22:00,60.169665, 24.934652,60.19586, 24.58912,Kamppi,Kauklahti,TRANSIT|WALK,transit
+25,Kamppi to Nuuksio (transit),06:00,60.169665, 24.934652,60.29030, 24.56324,Kamppi,Nuuksio,TRANSIT|WALK,transit
+26,Kamppi to Nuuksio (transit),13:00,60.169665, 24.934652,60.29030, 24.56324,Kamppi,Nuuksio,TRANSIT|WALK,transit
+28,Kamppi to Latokaski (transit),06:00,60.169665, 24.934652,60.17892, 24.65813,Kamppi,Latokaski,TRANSIT|WALK,transit
+29,Kamppi to Latokaski (transit),13:00,60.169665, 24.934652,60.17892, 24.65813,Kamppi,Latokaski,TRANSIT|WALK,transit
+30,Kamppi to Latokaski (transit),22:00,60.169665, 24.934652,60.17892, 24.65813,Kamppi,Latokaski,TRANSIT|WALK,transit
+31,Kamppi to Tikkurila (transit),06:00,60.169665, 24.934652,60.29246, 25.03861,Kamppi,Tikkurila,TRANSIT|WALK,transit
+32,Kamppi to Tikkurila (transit),13:00,60.169665, 24.934652,60.29246, 25.03861,Kamppi,Tikkurila,TRANSIT|WALK,transit
+33,Kamppi to Tikkurila (transit),22:00,60.169665, 24.934652,60.29246, 25.03861,Kamppi,Tikkurila,TRANSIT|WALK,transit
+34,Kamppi to Airport (transit),06:00,60.169665, 24.934652,60.317508, 24.969089,Kamppi,Airport,TRANSIT|WALK,transit
+35,Kamppi to Airport (transit),13:00,60.169665, 24.934652,60.317508, 24.969089,Kamppi,Airport,TRANSIT|WALK,transit
+36,Kamppi to Airport (transit),22:00,60.169665, 24.934652,60.317508, 24.969089,Kamppi,Airport,TRANSIT|WALK,transit
+37,Kamppi to Kirkkonummi (transit),06:00,60.169665, 24.934652,60.12640, 24.43613,Kamppi,Kirkkonummi,TRANSIT|WALK,transit
+38,Kamppi to Kirkkonummi (transit),13:00,60.169665, 24.934652,60.12640, 24.43613,Kamppi,Kirkkonummi,TRANSIT|WALK,transit
+39,Kamppi to Kirkkonummi (transit),22:00,60.169665, 24.934652,60.12640, 24.43613,Kamppi,Kirkkonummi,TRANSIT|WALK,transit
+40,Töölöntori to Kamppi (transit),06:00,60.179022, 24.924151,60.169665, 24.934652,Töölöntori,Kamppi,TRANSIT|WALK,transit
+41,Töölöntori to Kamppi (transit),13:00,60.179022, 24.924151,60.169665, 24.934652,Töölöntori,Kamppi,TRANSIT|WALK,transit
+42,Töölöntori to Kamppi (transit),22:00,60.179022, 24.924151,60.169665, 24.934652,Töölöntori,Kamppi,TRANSIT|WALK,transit
+43,Töölöntori to Pitäjänmäki (transit),06:00,60.179022, 24.924151,60.22070, 24.86094,Töölöntori,Pitäjänmäki,TRANSIT|WALK,transit
+44,Töölöntori to Pitäjänmäki (transit),13:00,60.179022, 24.924151,60.22070, 24.86094,Töölöntori,Pitäjänmäki,TRANSIT|WALK,transit
+45,Töölöntori to Pitäjänmäki (transit),22:00,60.179022, 24.924151,60.22070, 24.86094,Töölöntori,Pitäjänmäki,TRANSIT|WALK,transit
+46,Töölöntori to Itäkeskus (transit),06:00,60.179022, 24.924151,60.20863, 25.07946,Töölöntori,Itäkeskus,TRANSIT|WALK,transit
+47,Töölöntori to Itäkeskus (transit),13:00,60.179022, 24.924151,60.20863, 25.07946,Töölöntori,Itäkeskus,TRANSIT|WALK,transit
+48,Töölöntori to Itäkeskus (transit),22:00,60.179022, 24.924151,60.20863, 25.07946,Töölöntori,Itäkeskus,TRANSIT|WALK,transit
+49,Töölöntori to Suomenlinna (transit),06:00,60.179022, 24.924151,60.148237,24.985142,Töölöntori,Suomenlinna,TRANSIT|WALK,transit
+50,Töölöntori to Suomenlinna (transit),13:00,60.179022, 24.924151,60.148237,24.985142,Töölöntori,Suomenlinna,TRANSIT|WALK,transit
+51,Töölöntori to Suomenlinna (transit),22:00,60.179022, 24.924151,60.148237,24.985142,Töölöntori,Suomenlinna,TRANSIT|WALK,transit
+52,Töölöntori to Otaniemi (transit),06:00,60.179022, 24.924151,60.18234, 24.82531,Töölöntori,Otaniemi,TRANSIT|WALK,transit
+53,Töölöntori to Otaniemi (transit),13:00,60.179022, 24.924151,60.18234, 24.82531,Töölöntori,Otaniemi,TRANSIT|WALK,transit
+54,Töölöntori to Otaniemi (transit),22:00,60.179022, 24.924151,60.18234, 24.82531,Töölöntori,Otaniemi,TRANSIT|WALK,transit
+55,Töölöntori to Espoon Keskusta (transit),06:00,60.179022, 24.924151,60.205940, 24.656711,Töölöntori,Espoon Keskusta,TRANSIT|WALK,transit
+56,Töölöntori to Espoon Keskusta (transit),13:00,60.179022, 24.924151,60.205940, 24.656711,Töölöntori,Espoon Keskusta,TRANSIT|WALK,transit
+57,Töölöntori to Espoon Keskusta (transit),22:00,60.179022, 24.924151,60.205940, 24.656711,Töölöntori,Espoon Keskusta,TRANSIT|WALK,transit
+58,Töölöntori to Matinkylä (transit),06:00,60.179022, 24.924151,60.15509, 24.74546,Töölöntori,Matinkylä,TRANSIT|WALK,transit
+59,Töölöntori to Matinkylä (transit),13:00,60.179022, 24.924151,60.15509, 24.74546,Töölöntori,Matinkylä,TRANSIT|WALK,transit
+60,Töölöntori to Matinkylä (transit),22:00,60.179022, 24.924151,60.15509, 24.74546,Töölöntori,Matinkylä,TRANSIT|WALK,transit
+61,Töölöntori to Kauklahti (transit),06:00,60.179022, 24.924151,60.19586, 24.58912,Töölöntori,Kauklahti,TRANSIT|WALK,transit
+62,Töölöntori to Kauklahti (transit),13:00,60.179022, 24.924151,60.19586, 24.58912,Töölöntori,Kauklahti,TRANSIT|WALK,transit
+63,Töölöntori to Kauklahti (transit),22:00,60.179022, 24.924151,60.19586, 24.58912,Töölöntori,Kauklahti,TRANSIT|WALK,transit
+64,Töölöntori to Nuuksio (transit),06:00,60.179022, 24.924151,60.29030, 24.56324,Töölöntori,Nuuksio,TRANSIT|WALK,transit
+65,Töölöntori to Nuuksio (transit),13:00,60.179022, 24.924151,60.29030, 24.56324,Töölöntori,Nuuksio,TRANSIT|WALK,transit
+67,Töölöntori to Latokaski (transit),06:00,60.179022, 24.924151,60.17892, 24.65813,Töölöntori,Latokaski,TRANSIT|WALK,transit
+68,Töölöntori to Latokaski (transit),13:00,60.179022, 24.924151,60.17892, 24.65813,Töölöntori,Latokaski,TRANSIT|WALK,transit
+69,Töölöntori to Latokaski (transit),22:00,60.179022, 24.924151,60.17892, 24.65813,Töölöntori,Latokaski,TRANSIT|WALK,transit
+70,Töölöntori to Tikkurila (transit),06:00,60.179022, 24.924151,60.29246, 25.03861,Töölöntori,Tikkurila,TRANSIT|WALK,transit
+71,Töölöntori to Tikkurila (transit),13:00,60.179022, 24.924151,60.29246, 25.03861,Töölöntori,Tikkurila,TRANSIT|WALK,transit
+72,Töölöntori to Tikkurila (transit),22:00,60.179022, 24.924151,60.29246, 25.03861,Töölöntori,Tikkurila,TRANSIT|WALK,transit
+73,Töölöntori to Airport (transit),06:00,60.179022, 24.924151,60.317508, 24.969089,Töölöntori,Airport,TRANSIT|WALK,transit
+74,Töölöntori to Airport (transit),13:00,60.179022, 24.924151,60.317508, 24.969089,Töölöntori,Airport,TRANSIT|WALK,transit
+75,Töölöntori to Airport (transit),22:00,60.179022, 24.924151,60.317508, 24.969089,Töölöntori,Airport,TRANSIT|WALK,transit
+76,Töölöntori to Kirkkonummi (transit),06:00,60.179022, 24.924151,60.12640, 24.43613,Töölöntori,Kirkkonummi,TRANSIT|WALK,transit
+77,Töölöntori to Kirkkonummi (transit),13:00,60.179022, 24.924151,60.12640, 24.43613,Töölöntori,Kirkkonummi,TRANSIT|WALK,transit
+78,Töölöntori to Kirkkonummi (transit),22:00,60.179022, 24.924151,60.12640, 24.43613,Töölöntori,Kirkkonummi,TRANSIT|WALK,transit
+79,Pitäjänmäki to Kamppi (transit),06:00,60.22070, 24.86094,60.169665, 24.934652,Pitäjänmäki,Kamppi,TRANSIT|WALK,transit
+80,Pitäjänmäki to Kamppi (transit),13:00,60.22070, 24.86094,60.169665, 24.934652,Pitäjänmäki,Kamppi,TRANSIT|WALK,transit
+81,Pitäjänmäki to Kamppi (transit),22:00,60.22070, 24.86094,60.169665, 24.934652,Pitäjänmäki,Kamppi,TRANSIT|WALK,transit
+82,Pitäjänmäki to Töölöntori (transit),06:00,60.22070, 24.86094,60.179022, 24.924151,Pitäjänmäki,Töölöntori,TRANSIT|WALK,transit
+83,Pitäjänmäki to Töölöntori (transit),13:00,60.22070, 24.86094,60.179022, 24.924151,Pitäjänmäki,Töölöntori,TRANSIT|WALK,transit
+84,Pitäjänmäki to Töölöntori (transit),22:00,60.22070, 24.86094,60.179022, 24.924151,Pitäjänmäki,Töölöntori,TRANSIT|WALK,transit
+85,Pitäjänmäki to Itäkeskus (transit),06:00,60.22070, 24.86094,60.20863, 25.07946,Pitäjänmäki,Itäkeskus,TRANSIT|WALK,transit
+86,Pitäjänmäki to Itäkeskus (transit),13:00,60.22070, 24.86094,60.20863, 25.07946,Pitäjänmäki,Itäkeskus,TRANSIT|WALK,transit
+87,Pitäjänmäki to Itäkeskus (transit),22:00,60.22070, 24.86094,60.20863, 25.07946,Pitäjänmäki,Itäkeskus,TRANSIT|WALK,transit
+88,Pitäjänmäki to Suomenlinna (transit),06:00,60.22070, 24.86094,60.148237,24.985142,Pitäjänmäki,Suomenlinna,TRANSIT|WALK,transit
+89,Pitäjänmäki to Suomenlinna (transit),13:00,60.22070, 24.86094,60.148237,24.985142,Pitäjänmäki,Suomenlinna,TRANSIT|WALK,transit
+90,Pitäjänmäki to Suomenlinna (transit),22:00,60.22070, 24.86094,60.148237,24.985142,Pitäjänmäki,Suomenlinna,TRANSIT|WALK,transit
+91,Pitäjänmäki to Otaniemi (transit),06:00,60.22070, 24.86094,60.18234, 24.82531,Pitäjänmäki,Otaniemi,TRANSIT|WALK,transit
+92,Pitäjänmäki to Otaniemi (transit),13:00,60.22070, 24.86094,60.18234, 24.82531,Pitäjänmäki,Otaniemi,TRANSIT|WALK,transit
+93,Pitäjänmäki to Otaniemi (transit),22:00,60.22070, 24.86094,60.18234, 24.82531,Pitäjänmäki,Otaniemi,TRANSIT|WALK,transit
+94,Pitäjänmäki to Espoon Keskusta (transit),06:00,60.22070, 24.86094,60.205940, 24.656711,Pitäjänmäki,Espoon Keskusta,TRANSIT|WALK,transit
+95,Pitäjänmäki to Espoon Keskusta (transit),13:00,60.22070, 24.86094,60.205940, 24.656711,Pitäjänmäki,Espoon Keskusta,TRANSIT|WALK,transit
+96,Pitäjänmäki to Espoon Keskusta (transit),22:00,60.22070, 24.86094,60.205940, 24.656711,Pitäjänmäki,Espoon Keskusta,TRANSIT|WALK,transit
+97,Pitäjänmäki to Matinkylä (transit),06:00,60.22070, 24.86094,60.15509, 24.74546,Pitäjänmäki,Matinkylä,TRANSIT|WALK,transit
+98,Pitäjänmäki to Matinkylä (transit),13:00,60.22070, 24.86094,60.15509, 24.74546,Pitäjänmäki,Matinkylä,TRANSIT|WALK,transit
+99,Pitäjänmäki to Matinkylä (transit),22:00,60.22070, 24.86094,60.15509, 24.74546,Pitäjänmäki,Matinkylä,TRANSIT|WALK,transit
+100,Pitäjänmäki to Kauklahti (transit),06:00,60.22070, 24.86094,60.19586, 24.58912,Pitäjänmäki,Kauklahti,TRANSIT|WALK,transit
+101,Pitäjänmäki to Kauklahti (transit),13:00,60.22070, 24.86094,60.19586, 24.58912,Pitäjänmäki,Kauklahti,TRANSIT|WALK,transit
+102,Pitäjänmäki to Kauklahti (transit),22:00,60.22070, 24.86094,60.19586, 24.58912,Pitäjänmäki,Kauklahti,TRANSIT|WALK,transit
+103,Pitäjänmäki to Nuuksio (transit),06:00,60.22070, 24.86094,60.29030, 24.56324,Pitäjänmäki,Nuuksio,TRANSIT|WALK,transit
+104,Pitäjänmäki to Nuuksio (transit),13:00,60.22070, 24.86094,60.29030, 24.56324,Pitäjänmäki,Nuuksio,TRANSIT|WALK,transit
+106,Pitäjänmäki to Latokaski (transit),06:00,60.22070, 24.86094,60.17892, 24.65813,Pitäjänmäki,Latokaski,TRANSIT|WALK,transit
+107,Pitäjänmäki to Latokaski (transit),13:00,60.22070, 24.86094,60.17892, 24.65813,Pitäjänmäki,Latokaski,TRANSIT|WALK,transit
+108,Pitäjänmäki to Latokaski (transit),22:00,60.22070, 24.86094,60.17892, 24.65813,Pitäjänmäki,Latokaski,TRANSIT|WALK,transit
+109,Pitäjänmäki to Tikkurila (transit),06:00,60.22070, 24.86094,60.29246, 25.03861,Pitäjänmäki,Tikkurila,TRANSIT|WALK,transit
+110,Pitäjänmäki to Tikkurila (transit),13:00,60.22070, 24.86094,60.29246, 25.03861,Pitäjänmäki,Tikkurila,TRANSIT|WALK,transit
+111,Pitäjänmäki to Tikkurila (transit),22:00,60.22070, 24.86094,60.29246, 25.03861,Pitäjänmäki,Tikkurila,TRANSIT|WALK,transit
+112,Pitäjänmäki to Airport (transit),06:00,60.22070, 24.86094,60.317508, 24.969089,Pitäjänmäki,Airport,TRANSIT|WALK,transit
+113,Pitäjänmäki to Airport (transit),13:00,60.22070, 24.86094,60.317508, 24.969089,Pitäjänmäki,Airport,TRANSIT|WALK,transit
+114,Pitäjänmäki to Airport (transit),22:00,60.22070, 24.86094,60.317508, 24.969089,Pitäjänmäki,Airport,TRANSIT|WALK,transit
+115,Pitäjänmäki to Kirkkonummi (transit),06:00,60.22070, 24.86094,60.12640, 24.43613,Pitäjänmäki,Kirkkonummi,TRANSIT|WALK,transit
+116,Pitäjänmäki to Kirkkonummi (transit),13:00,60.22070, 24.86094,60.12640, 24.43613,Pitäjänmäki,Kirkkonummi,TRANSIT|WALK,transit
+117,Pitäjänmäki to Kirkkonummi (transit),22:00,60.22070, 24.86094,60.12640, 24.43613,Pitäjänmäki,Kirkkonummi,TRANSIT|WALK,transit
+118,Itäkeskus to Kamppi (transit),06:00,60.20863, 25.07946,60.169665, 24.934652,Itäkeskus,Kamppi,TRANSIT|WALK,transit
+119,Itäkeskus to Kamppi (transit),13:00,60.20863, 25.07946,60.169665, 24.934652,Itäkeskus,Kamppi,TRANSIT|WALK,transit
+120,Itäkeskus to Kamppi (transit),22:00,60.20863, 25.07946,60.169665, 24.934652,Itäkeskus,Kamppi,TRANSIT|WALK,transit
+121,Itäkeskus to Töölöntori (transit),06:00,60.20863, 25.07946,60.179022, 24.924151,Itäkeskus,Töölöntori,TRANSIT|WALK,transit
+122,Itäkeskus to Töölöntori (transit),13:00,60.20863, 25.07946,60.179022, 24.924151,Itäkeskus,Töölöntori,TRANSIT|WALK,transit
+123,Itäkeskus to Töölöntori (transit),22:00,60.20863, 25.07946,60.179022, 24.924151,Itäkeskus,Töölöntori,TRANSIT|WALK,transit
+124,Itäkeskus to Pitäjänmäki (transit),06:00,60.20863, 25.07946,60.22070, 24.86094,Itäkeskus,Pitäjänmäki,TRANSIT|WALK,transit
+125,Itäkeskus to Pitäjänmäki (transit),13:00,60.20863, 25.07946,60.22070, 24.86094,Itäkeskus,Pitäjänmäki,TRANSIT|WALK,transit
+126,Itäkeskus to Pitäjänmäki (transit),22:00,60.20863, 25.07946,60.22070, 24.86094,Itäkeskus,Pitäjänmäki,TRANSIT|WALK,transit
+127,Itäkeskus to Suomenlinna (transit),06:00,60.20863, 25.07946,60.148237,24.985142,Itäkeskus,Suomenlinna,TRANSIT|WALK,transit
+128,Itäkeskus to Suomenlinna (transit),13:00,60.20863, 25.07946,60.148237,24.985142,Itäkeskus,Suomenlinna,TRANSIT|WALK,transit
+129,Itäkeskus to Suomenlinna (transit),22:00,60.20863, 25.07946,60.148237,24.985142,Itäkeskus,Suomenlinna,TRANSIT|WALK,transit
+130,Itäkeskus to Otaniemi (transit),06:00,60.20863, 25.07946,60.18234, 24.82531,Itäkeskus,Otaniemi,TRANSIT|WALK,transit
+131,Itäkeskus to Otaniemi (transit),13:00,60.20863, 25.07946,60.18234, 24.82531,Itäkeskus,Otaniemi,TRANSIT|WALK,transit
+132,Itäkeskus to Otaniemi (transit),22:00,60.20863, 25.07946,60.18234, 24.82531,Itäkeskus,Otaniemi,TRANSIT|WALK,transit
+133,Itäkeskus to Espoon Keskusta (transit),06:00,60.20863, 25.07946,60.205940, 24.656711,Itäkeskus,Espoon Keskusta,TRANSIT|WALK,transit
+134,Itäkeskus to Espoon Keskusta (transit),13:00,60.20863, 25.07946,60.205940, 24.656711,Itäkeskus,Espoon Keskusta,TRANSIT|WALK,transit
+135,Itäkeskus to Espoon Keskusta (transit),22:00,60.20863, 25.07946,60.205940, 24.656711,Itäkeskus,Espoon Keskusta,TRANSIT|WALK,transit
+136,Itäkeskus to Matinkylä (transit),06:00,60.20863, 25.07946,60.15509, 24.74546,Itäkeskus,Matinkylä,TRANSIT|WALK,transit
+137,Itäkeskus to Matinkylä (transit),13:00,60.20863, 25.07946,60.15509, 24.74546,Itäkeskus,Matinkylä,TRANSIT|WALK,transit
+138,Itäkeskus to Matinkylä (transit),22:00,60.20863, 25.07946,60.15509, 24.74546,Itäkeskus,Matinkylä,TRANSIT|WALK,transit
+139,Itäkeskus to Kauklahti (transit),06:00,60.20863, 25.07946,60.19586, 24.58912,Itäkeskus,Kauklahti,TRANSIT|WALK,transit
+140,Itäkeskus to Kauklahti (transit),13:00,60.20863, 25.07946,60.19586, 24.58912,Itäkeskus,Kauklahti,TRANSIT|WALK,transit
+141,Itäkeskus to Kauklahti (transit),22:00,60.20863, 25.07946,60.19586, 24.58912,Itäkeskus,Kauklahti,TRANSIT|WALK,transit
+142,Itäkeskus to Nuuksio (transit),06:00,60.20863, 25.07946,60.29030, 24.56324,Itäkeskus,Nuuksio,TRANSIT|WALK,transit
+143,Itäkeskus to Nuuksio (transit),13:00,60.20863, 25.07946,60.29030, 24.56324,Itäkeskus,Nuuksio,TRANSIT|WALK,transit
+145,Itäkeskus to Latokaski (transit),06:00,60.20863, 25.07946,60.17892, 24.65813,Itäkeskus,Latokaski,TRANSIT|WALK,transit
+146,Itäkeskus to Latokaski (transit),13:00,60.20863, 25.07946,60.17892, 24.65813,Itäkeskus,Latokaski,TRANSIT|WALK,transit
+147,Itäkeskus to Latokaski (transit),22:00,60.20863, 25.07946,60.17892, 24.65813,Itäkeskus,Latokaski,TRANSIT|WALK,transit
+148,Itäkeskus to Tikkurila (transit),06:00,60.20863, 25.07946,60.29246, 25.03861,Itäkeskus,Tikkurila,TRANSIT|WALK,transit
+149,Itäkeskus to Tikkurila (transit),13:00,60.20863, 25.07946,60.29246, 25.03861,Itäkeskus,Tikkurila,TRANSIT|WALK,transit
+150,Itäkeskus to Tikkurila (transit),22:00,60.20863, 25.07946,60.29246, 25.03861,Itäkeskus,Tikkurila,TRANSIT|WALK,transit
+151,Itäkeskus to Airport (transit),06:00,60.20863, 25.07946,60.317508, 24.969089,Itäkeskus,Airport,TRANSIT|WALK,transit
+152,Itäkeskus to Airport (transit),13:00,60.20863, 25.07946,60.317508, 24.969089,Itäkeskus,Airport,TRANSIT|WALK,transit
+153,Itäkeskus to Airport (transit),22:00,60.20863, 25.07946,60.317508, 24.969089,Itäkeskus,Airport,TRANSIT|WALK,transit
+154,Itäkeskus to Kirkkonummi (transit),06:00,60.20863, 25.07946,60.12640, 24.43613,Itäkeskus,Kirkkonummi,TRANSIT|WALK,transit
+155,Itäkeskus to Kirkkonummi (transit),13:00,60.20863, 25.07946,60.12640, 24.43613,Itäkeskus,Kirkkonummi,TRANSIT|WALK,transit
+156,Itäkeskus to Kirkkonummi (transit),22:00,60.20863, 25.07946,60.12640, 24.43613,Itäkeskus,Kirkkonummi,TRANSIT|WALK,transit
+157,Suomenlinna to Kamppi (transit),06:00,60.148237,24.985142,60.169665, 24.934652,Suomenlinna,Kamppi,TRANSIT|WALK,transit
+158,Suomenlinna to Kamppi (transit),13:00,60.148237,24.985142,60.169665, 24.934652,Suomenlinna,Kamppi,TRANSIT|WALK,transit
+160,Suomenlinna to Töölöntori (transit),06:00,60.148237,24.985142,60.179022, 24.924151,Suomenlinna,Töölöntori,TRANSIT|WALK,transit
+161,Suomenlinna to Töölöntori (transit),13:00,60.148237,24.985142,60.179022, 24.924151,Suomenlinna,Töölöntori,TRANSIT|WALK,transit
+162,Suomenlinna to Töölöntori (transit),22:00,60.148237,24.985142,60.179022, 24.924151,Suomenlinna,Töölöntori,TRANSIT|WALK,transit
+163,Suomenlinna to Pitäjänmäki (transit),06:00,60.148237,24.985142,60.22070, 24.86094,Suomenlinna,Pitäjänmäki,TRANSIT|WALK,transit
+164,Suomenlinna to Pitäjänmäki (transit),13:00,60.148237,24.985142,60.22070, 24.86094,Suomenlinna,Pitäjänmäki,TRANSIT|WALK,transit
+165,Suomenlinna to Pitäjänmäki (transit),22:00,60.148237,24.985142,60.22070, 24.86094,Suomenlinna,Pitäjänmäki,TRANSIT|WALK,transit
+166,Suomenlinna to Itäkeskus (transit),06:00,60.148237,24.985142,60.20863, 25.07946,Suomenlinna,Itäkeskus,TRANSIT|WALK,transit
+167,Suomenlinna to Itäkeskus (transit),13:00,60.148237,24.985142,60.20863, 25.07946,Suomenlinna,Itäkeskus,TRANSIT|WALK,transit
+168,Suomenlinna to Itäkeskus (transit),22:00,60.148237,24.985142,60.20863, 25.07946,Suomenlinna,Itäkeskus,TRANSIT|WALK,transit
+169,Suomenlinna to Otaniemi (transit),06:00,60.148237,24.985142,60.18234, 24.82531,Suomenlinna,Otaniemi,TRANSIT|WALK,transit
+170,Suomenlinna to Otaniemi (transit),13:00,60.148237,24.985142,60.18234, 24.82531,Suomenlinna,Otaniemi,TRANSIT|WALK,transit
+171,Suomenlinna to Otaniemi (transit),22:00,60.148237,24.985142,60.18234, 24.82531,Suomenlinna,Otaniemi,TRANSIT|WALK,transit
+172,Suomenlinna to Espoon Keskusta (transit),06:00,60.148237,24.985142,60.205940, 24.656711,Suomenlinna,Espoon Keskusta,TRANSIT|WALK,transit
+173,Suomenlinna to Espoon Keskusta (transit),13:00,60.148237,24.985142,60.205940, 24.656711,Suomenlinna,Espoon Keskusta,TRANSIT|WALK,transit
+174,Suomenlinna to Espoon Keskusta (transit),22:00,60.148237,24.985142,60.205940, 24.656711,Suomenlinna,Espoon Keskusta,TRANSIT|WALK,transit
+175,Suomenlinna to Matinkylä (transit),06:00,60.148237,24.985142,60.15509, 24.74546,Suomenlinna,Matinkylä,TRANSIT|WALK,transit
+176,Suomenlinna to Matinkylä (transit),13:00,60.148237,24.985142,60.15509, 24.74546,Suomenlinna,Matinkylä,TRANSIT|WALK,transit
+177,Suomenlinna to Matinkylä (transit),22:00,60.148237,24.985142,60.15509, 24.74546,Suomenlinna,Matinkylä,TRANSIT|WALK,transit
+178,Suomenlinna to Kauklahti (transit),06:00,60.148237,24.985142,60.19586, 24.58912,Suomenlinna,Kauklahti,TRANSIT|WALK,transit
+179,Suomenlinna to Kauklahti (transit),13:00,60.148237,24.985142,60.19586, 24.58912,Suomenlinna,Kauklahti,TRANSIT|WALK,transit
+180,Suomenlinna to Kauklahti (transit),22:00,60.148237,24.985142,60.19586, 24.58912,Suomenlinna,Kauklahti,TRANSIT|WALK,transit
+181,Suomenlinna to Nuuksio (transit),06:00,60.148237,24.985142,60.29030, 24.56324,Suomenlinna,Nuuksio,TRANSIT|WALK,transit
+182,Suomenlinna to Nuuksio (transit),13:00,60.148237,24.985142,60.29030, 24.56324,Suomenlinna,Nuuksio,TRANSIT|WALK,transit
+184,Suomenlinna to Latokaski (transit),06:00,60.148237,24.985142,60.17892, 24.65813,Suomenlinna,Latokaski,TRANSIT|WALK,transit
+185,Suomenlinna to Latokaski (transit),13:00,60.148237,24.985142,60.17892, 24.65813,Suomenlinna,Latokaski,TRANSIT|WALK,transit
+186,Suomenlinna to Latokaski (transit),22:00,60.148237,24.985142,60.17892, 24.65813,Suomenlinna,Latokaski,TRANSIT|WALK,transit
+187,Suomenlinna to Tikkurila (transit),06:00,60.148237,24.985142,60.29246, 25.03861,Suomenlinna,Tikkurila,TRANSIT|WALK,transit
+188,Suomenlinna to Tikkurila (transit),13:00,60.148237,24.985142,60.29246, 25.03861,Suomenlinna,Tikkurila,TRANSIT|WALK,transit
+189,Suomenlinna to Tikkurila (transit),22:00,60.148237,24.985142,60.29246, 25.03861,Suomenlinna,Tikkurila,TRANSIT|WALK,transit
+190,Suomenlinna to Airport (transit),06:00,60.148237,24.985142,60.317508, 24.969089,Suomenlinna,Airport,TRANSIT|WALK,transit
+191,Suomenlinna to Airport (transit),13:00,60.148237,24.985142,60.317508, 24.969089,Suomenlinna,Airport,TRANSIT|WALK,transit
+192,Suomenlinna to Airport (transit),22:00,60.148237,24.985142,60.317508, 24.969089,Suomenlinna,Airport,TRANSIT|WALK,transit
+193,Suomenlinna to Kirkkonummi (transit),06:00,60.148237,24.985142,60.12640, 24.43613,Suomenlinna,Kirkkonummi,TRANSIT|WALK,transit
+194,Suomenlinna to Kirkkonummi (transit),13:00,60.148237,24.985142,60.12640, 24.43613,Suomenlinna,Kirkkonummi,TRANSIT|WALK,transit
+195,Suomenlinna to Kirkkonummi (transit),22:00,60.148237,24.985142,60.12640, 24.43613,Suomenlinna,Kirkkonummi,TRANSIT|WALK,transit
+196,Otaniemi to Kamppi (transit),06:00,60.18234, 24.82531,60.169665, 24.934652,Otaniemi,Kamppi,TRANSIT|WALK,transit
+197,Otaniemi to Kamppi (transit),13:00,60.18234, 24.82531,60.169665, 24.934652,Otaniemi,Kamppi,TRANSIT|WALK,transit
+198,Otaniemi to Kamppi (transit),22:00,60.18234, 24.82531,60.169665, 24.934652,Otaniemi,Kamppi,TRANSIT|WALK,transit
+199,Otaniemi to Töölöntori (transit),06:00,60.18234, 24.82531,60.179022, 24.924151,Otaniemi,Töölöntori,TRANSIT|WALK,transit
+200,Otaniemi to Töölöntori (transit),13:00,60.18234, 24.82531,60.179022, 24.924151,Otaniemi,Töölöntori,TRANSIT|WALK,transit
+201,Otaniemi to Töölöntori (transit),22:00,60.18234, 24.82531,60.179022, 24.924151,Otaniemi,Töölöntori,TRANSIT|WALK,transit
+202,Otaniemi to Pitäjänmäki (transit),06:00,60.18234, 24.82531,60.22070, 24.86094,Otaniemi,Pitäjänmäki,TRANSIT|WALK,transit
+203,Otaniemi to Pitäjänmäki (transit),13:00,60.18234, 24.82531,60.22070, 24.86094,Otaniemi,Pitäjänmäki,TRANSIT|WALK,transit
+204,Otaniemi to Pitäjänmäki (transit),22:00,60.18234, 24.82531,60.22070, 24.86094,Otaniemi,Pitäjänmäki,TRANSIT|WALK,transit
+205,Otaniemi to Itäkeskus (transit),06:00,60.18234, 24.82531,60.20863, 25.07946,Otaniemi,Itäkeskus,TRANSIT|WALK,transit
+206,Otaniemi to Itäkeskus (transit),13:00,60.18234, 24.82531,60.20863, 25.07946,Otaniemi,Itäkeskus,TRANSIT|WALK,transit
+207,Otaniemi to Itäkeskus (transit),22:00,60.18234, 24.82531,60.20863, 25.07946,Otaniemi,Itäkeskus,TRANSIT|WALK,transit
+208,Otaniemi to Suomenlinna (transit),06:00,60.18234, 24.82531,60.148237,24.985142,Otaniemi,Suomenlinna,TRANSIT|WALK,transit
+209,Otaniemi to Suomenlinna (transit),13:00,60.18234, 24.82531,60.148237,24.985142,Otaniemi,Suomenlinna,TRANSIT|WALK,transit
+210,Otaniemi to Suomenlinna (transit),22:00,60.18234, 24.82531,60.148237,24.985142,Otaniemi,Suomenlinna,TRANSIT|WALK,transit
+211,Otaniemi to Espoon Keskusta (transit),06:00,60.18234, 24.82531,60.205940, 24.656711,Otaniemi,Espoon Keskusta,TRANSIT|WALK,transit
+212,Otaniemi to Espoon Keskusta (transit),13:00,60.18234, 24.82531,60.205940, 24.656711,Otaniemi,Espoon Keskusta,TRANSIT|WALK,transit
+213,Otaniemi to Espoon Keskusta (transit),22:00,60.18234, 24.82531,60.205940, 24.656711,Otaniemi,Espoon Keskusta,TRANSIT|WALK,transit
+214,Otaniemi to Matinkylä (transit),06:00,60.18234, 24.82531,60.15509, 24.74546,Otaniemi,Matinkylä,TRANSIT|WALK,transit
+215,Otaniemi to Matinkylä (transit),13:00,60.18234, 24.82531,60.15509, 24.74546,Otaniemi,Matinkylä,TRANSIT|WALK,transit
+216,Otaniemi to Matinkylä (transit),22:00,60.18234, 24.82531,60.15509, 24.74546,Otaniemi,Matinkylä,TRANSIT|WALK,transit
+217,Otaniemi to Kauklahti (transit),06:00,60.18234, 24.82531,60.19586, 24.58912,Otaniemi,Kauklahti,TRANSIT|WALK,transit
+218,Otaniemi to Kauklahti (transit),13:00,60.18234, 24.82531,60.19586, 24.58912,Otaniemi,Kauklahti,TRANSIT|WALK,transit
+219,Otaniemi to Kauklahti (transit),22:00,60.18234, 24.82531,60.19586, 24.58912,Otaniemi,Kauklahti,TRANSIT|WALK,transit
+220,Otaniemi to Nuuksio (transit),06:00,60.18234, 24.82531,60.29030, 24.56324,Otaniemi,Nuuksio,TRANSIT|WALK,transit
+221,Otaniemi to Nuuksio (transit),13:00,60.18234, 24.82531,60.29030, 24.56324,Otaniemi,Nuuksio,TRANSIT|WALK,transit
+223,Otaniemi to Latokaski (transit),06:00,60.18234, 24.82531,60.17892, 24.65813,Otaniemi,Latokaski,TRANSIT|WALK,transit
+224,Otaniemi to Latokaski (transit),13:00,60.18234, 24.82531,60.17892, 24.65813,Otaniemi,Latokaski,TRANSIT|WALK,transit
+225,Otaniemi to Latokaski (transit),22:00,60.18234, 24.82531,60.17892, 24.65813,Otaniemi,Latokaski,TRANSIT|WALK,transit
+226,Otaniemi to Tikkurila (transit),06:00,60.18234, 24.82531,60.29246, 25.03861,Otaniemi,Tikkurila,TRANSIT|WALK,transit
+227,Otaniemi to Tikkurila (transit),13:00,60.18234, 24.82531,60.29246, 25.03861,Otaniemi,Tikkurila,TRANSIT|WALK,transit
+228,Otaniemi to Tikkurila (transit),22:00,60.18234, 24.82531,60.29246, 25.03861,Otaniemi,Tikkurila,TRANSIT|WALK,transit
+229,Otaniemi to Airport (transit),06:00,60.18234, 24.82531,60.317508, 24.969089,Otaniemi,Airport,TRANSIT|WALK,transit
+230,Otaniemi to Airport (transit),13:00,60.18234, 24.82531,60.317508, 24.969089,Otaniemi,Airport,TRANSIT|WALK,transit
+231,Otaniemi to Airport (transit),22:00,60.18234, 24.82531,60.317508, 24.969089,Otaniemi,Airport,TRANSIT|WALK,transit
+232,Otaniemi to Kirkkonummi (transit),06:00,60.18234, 24.82531,60.12640, 24.43613,Otaniemi,Kirkkonummi,TRANSIT|WALK,transit
+233,Otaniemi to Kirkkonummi (transit),13:00,60.18234, 24.82531,60.12640, 24.43613,Otaniemi,Kirkkonummi,TRANSIT|WALK,transit
+234,Otaniemi to Kirkkonummi (transit),22:00,60.18234, 24.82531,60.12640, 24.43613,Otaniemi,Kirkkonummi,TRANSIT|WALK,transit
+235,Espoon Keskusta to Kamppi (transit),06:00,60.205940, 24.656711,60.169665, 24.934652,Espoon Keskusta,Kamppi,TRANSIT|WALK,transit
+236,Espoon Keskusta to Kamppi (transit),13:00,60.205940, 24.656711,60.169665, 24.934652,Espoon Keskusta,Kamppi,TRANSIT|WALK,transit
+237,Espoon Keskusta to Kamppi (transit),22:00,60.205940, 24.656711,60.169665, 24.934652,Espoon Keskusta,Kamppi,TRANSIT|WALK,transit
+238,Espoon Keskusta to Töölöntori (transit),06:00,60.205940, 24.656711,60.179022, 24.924151,Espoon Keskusta,Töölöntori,TRANSIT|WALK,transit
+239,Espoon Keskusta to Töölöntori (transit),13:00,60.205940, 24.656711,60.179022, 24.924151,Espoon Keskusta,Töölöntori,TRANSIT|WALK,transit
+240,Espoon Keskusta to Töölöntori (transit),22:00,60.205940, 24.656711,60.179022, 24.924151,Espoon Keskusta,Töölöntori,TRANSIT|WALK,transit
+241,Espoon Keskusta to Pitäjänmäki (transit),06:00,60.205940, 24.656711,60.22070, 24.86094,Espoon Keskusta,Pitäjänmäki,TRANSIT|WALK,transit
+242,Espoon Keskusta to Pitäjänmäki (transit),13:00,60.205940, 24.656711,60.22070, 24.86094,Espoon Keskusta,Pitäjänmäki,TRANSIT|WALK,transit
+243,Espoon Keskusta to Pitäjänmäki (transit),22:00,60.205940, 24.656711,60.22070, 24.86094,Espoon Keskusta,Pitäjänmäki,TRANSIT|WALK,transit
+244,Espoon Keskusta to Itäkeskus (transit),06:00,60.205940, 24.656711,60.20863, 25.07946,Espoon Keskusta,Itäkeskus,TRANSIT|WALK,transit
+245,Espoon Keskusta to Itäkeskus (transit),13:00,60.205940, 24.656711,60.20863, 25.07946,Espoon Keskusta,Itäkeskus,TRANSIT|WALK,transit
+246,Espoon Keskusta to Itäkeskus (transit),22:00,60.205940, 24.656711,60.20863, 25.07946,Espoon Keskusta,Itäkeskus,TRANSIT|WALK,transit
+247,Espoon Keskusta to Suomenlinna (transit),06:00,60.205940, 24.656711,60.148237,24.985142,Espoon Keskusta,Suomenlinna,TRANSIT|WALK,transit
+248,Espoon Keskusta to Suomenlinna (transit),13:00,60.205940, 24.656711,60.148237,24.985142,Espoon Keskusta,Suomenlinna,TRANSIT|WALK,transit
+249,Espoon Keskusta to Suomenlinna (transit),22:00,60.205940, 24.656711,60.148237,24.985142,Espoon Keskusta,Suomenlinna,TRANSIT|WALK,transit
+250,Espoon Keskusta to Otaniemi (transit),06:00,60.205940, 24.656711,60.18234, 24.82531,Espoon Keskusta,Otaniemi,TRANSIT|WALK,transit
+251,Espoon Keskusta to Otaniemi (transit),13:00,60.205940, 24.656711,60.18234, 24.82531,Espoon Keskusta,Otaniemi,TRANSIT|WALK,transit
+252,Espoon Keskusta to Otaniemi (transit),22:00,60.205940, 24.656711,60.18234, 24.82531,Espoon Keskusta,Otaniemi,TRANSIT|WALK,transit
+253,Espoon Keskusta to Matinkylä (transit),06:00,60.205940, 24.656711,60.15509, 24.74546,Espoon Keskusta,Matinkylä,TRANSIT|WALK,transit
+254,Espoon Keskusta to Matinkylä (transit),13:00,60.205940, 24.656711,60.15509, 24.74546,Espoon Keskusta,Matinkylä,TRANSIT|WALK,transit
+255,Espoon Keskusta to Matinkylä (transit),22:00,60.205940, 24.656711,60.15509, 24.74546,Espoon Keskusta,Matinkylä,TRANSIT|WALK,transit
+256,Espoon Keskusta to Kauklahti (transit),06:00,60.205940, 24.656711,60.19586, 24.58912,Espoon Keskusta,Kauklahti,TRANSIT|WALK,transit
+257,Espoon Keskusta to Kauklahti (transit),13:00,60.205940, 24.656711,60.19586, 24.58912,Espoon Keskusta,Kauklahti,TRANSIT|WALK,transit
+258,Espoon Keskusta to Kauklahti (transit),22:00,60.205940, 24.656711,60.19586, 24.58912,Espoon Keskusta,Kauklahti,TRANSIT|WALK,transit
+259,Espoon Keskusta to Nuuksio (transit),06:00,60.205940, 24.656711,60.29030, 24.56324,Espoon Keskusta,Nuuksio,TRANSIT|WALK,transit
+260,Espoon Keskusta to Nuuksio (transit),13:00,60.205940, 24.656711,60.29030, 24.56324,Espoon Keskusta,Nuuksio,TRANSIT|WALK,transit
+261,Espoon Keskusta to Nuuksio (transit),22:00,60.205940, 24.656711,60.29030, 24.56324,Espoon Keskusta,Nuuksio,TRANSIT|WALK,transit
+262,Espoon Keskusta to Latokaski (transit),06:00,60.205940, 24.656711,60.17892, 24.65813,Espoon Keskusta,Latokaski,TRANSIT|WALK,transit
+263,Espoon Keskusta to Latokaski (transit),13:00,60.205940, 24.656711,60.17892, 24.65813,Espoon Keskusta,Latokaski,TRANSIT|WALK,transit
+264,Espoon Keskusta to Latokaski (transit),22:00,60.205940, 24.656711,60.17892, 24.65813,Espoon Keskusta,Latokaski,TRANSIT|WALK,transit
+265,Espoon Keskusta to Tikkurila (transit),06:00,60.205940, 24.656711,60.29246, 25.03861,Espoon Keskusta,Tikkurila,TRANSIT|WALK,transit
+266,Espoon Keskusta to Tikkurila (transit),13:00,60.205940, 24.656711,60.29246, 25.03861,Espoon Keskusta,Tikkurila,TRANSIT|WALK,transit
+267,Espoon Keskusta to Tikkurila (transit),22:00,60.205940, 24.656711,60.29246, 25.03861,Espoon Keskusta,Tikkurila,TRANSIT|WALK,transit
+268,Espoon Keskusta to Airport (transit),06:00,60.205940, 24.656711,60.317508, 24.969089,Espoon Keskusta,Airport,TRANSIT|WALK,transit
+269,Espoon Keskusta to Airport (transit),13:00,60.205940, 24.656711,60.317508, 24.969089,Espoon Keskusta,Airport,TRANSIT|WALK,transit
+270,Espoon Keskusta to Airport (transit),22:00,60.205940, 24.656711,60.317508, 24.969089,Espoon Keskusta,Airport,TRANSIT|WALK,transit
+271,Espoon Keskusta to Kirkkonummi (transit),06:00,60.205940, 24.656711,60.12640, 24.43613,Espoon Keskusta,Kirkkonummi,TRANSIT|WALK,transit
+272,Espoon Keskusta to Kirkkonummi (transit),13:00,60.205940, 24.656711,60.12640, 24.43613,Espoon Keskusta,Kirkkonummi,TRANSIT|WALK,transit
+273,Espoon Keskusta to Kirkkonummi (transit),22:00,60.205940, 24.656711,60.12640, 24.43613,Espoon Keskusta,Kirkkonummi,TRANSIT|WALK,transit
+274,Matinkylä to Kamppi (transit),06:00,60.15509, 24.74546,60.169665, 24.934652,Matinkylä,Kamppi,TRANSIT|WALK,transit
+275,Matinkylä to Kamppi (transit),13:00,60.15509, 24.74546,60.169665, 24.934652,Matinkylä,Kamppi,TRANSIT|WALK,transit
+276,Matinkylä to Kamppi (transit),22:00,60.15509, 24.74546,60.169665, 24.934652,Matinkylä,Kamppi,TRANSIT|WALK,transit
+277,Matinkylä to Töölöntori (transit),06:00,60.15509, 24.74546,60.179022, 24.924151,Matinkylä,Töölöntori,TRANSIT|WALK,transit
+278,Matinkylä to Töölöntori (transit),13:00,60.15509, 24.74546,60.179022, 24.924151,Matinkylä,Töölöntori,TRANSIT|WALK,transit
+279,Matinkylä to Töölöntori (transit),22:00,60.15509, 24.74546,60.179022, 24.924151,Matinkylä,Töölöntori,TRANSIT|WALK,transit
+280,Matinkylä to Pitäjänmäki (transit),06:00,60.15509, 24.74546,60.22070, 24.86094,Matinkylä,Pitäjänmäki,TRANSIT|WALK,transit
+281,Matinkylä to Pitäjänmäki (transit),13:00,60.15509, 24.74546,60.22070, 24.86094,Matinkylä,Pitäjänmäki,TRANSIT|WALK,transit
+282,Matinkylä to Pitäjänmäki (transit),22:00,60.15509, 24.74546,60.22070, 24.86094,Matinkylä,Pitäjänmäki,TRANSIT|WALK,transit
+283,Matinkylä to Itäkeskus (transit),06:00,60.15509, 24.74546,60.20863, 25.07946,Matinkylä,Itäkeskus,TRANSIT|WALK,transit
+284,Matinkylä to Itäkeskus (transit),13:00,60.15509, 24.74546,60.20863, 25.07946,Matinkylä,Itäkeskus,TRANSIT|WALK,transit
+285,Matinkylä to Itäkeskus (transit),22:00,60.15509, 24.74546,60.20863, 25.07946,Matinkylä,Itäkeskus,TRANSIT|WALK,transit
+286,Matinkylä to Suomenlinna (transit),06:00,60.15509, 24.74546,60.148237,24.985142,Matinkylä,Suomenlinna,TRANSIT|WALK,transit
+287,Matinkylä to Suomenlinna (transit),13:00,60.15509, 24.74546,60.148237,24.985142,Matinkylä,Suomenlinna,TRANSIT|WALK,transit
+288,Matinkylä to Suomenlinna (transit),22:00,60.15509, 24.74546,60.148237,24.985142,Matinkylä,Suomenlinna,TRANSIT|WALK,transit
+289,Matinkylä to Otaniemi (transit),06:00,60.15509, 24.74546,60.18234, 24.82531,Matinkylä,Otaniemi,TRANSIT|WALK,transit
+290,Matinkylä to Otaniemi (transit),13:00,60.15509, 24.74546,60.18234, 24.82531,Matinkylä,Otaniemi,TRANSIT|WALK,transit
+291,Matinkylä to Otaniemi (transit),22:00,60.15509, 24.74546,60.18234, 24.82531,Matinkylä,Otaniemi,TRANSIT|WALK,transit
+292,Matinkylä to Espoon Keskusta (transit),06:00,60.15509, 24.74546,60.205940, 24.656711,Matinkylä,Espoon Keskusta,TRANSIT|WALK,transit
+293,Matinkylä to Espoon Keskusta (transit),13:00,60.15509, 24.74546,60.205940, 24.656711,Matinkylä,Espoon Keskusta,TRANSIT|WALK,transit
+294,Matinkylä to Espoon Keskusta (transit),22:00,60.15509, 24.74546,60.205940, 24.656711,Matinkylä,Espoon Keskusta,TRANSIT|WALK,transit
+295,Matinkylä to Kauklahti (transit),06:00,60.15509, 24.74546,60.19586, 24.58912,Matinkylä,Kauklahti,TRANSIT|WALK,transit
+296,Matinkylä to Kauklahti (transit),13:00,60.15509, 24.74546,60.19586, 24.58912,Matinkylä,Kauklahti,TRANSIT|WALK,transit
+297,Matinkylä to Kauklahti (transit),22:00,60.15509, 24.74546,60.19586, 24.58912,Matinkylä,Kauklahti,TRANSIT|WALK,transit
+298,Matinkylä to Nuuksio (transit),06:00,60.15509, 24.74546,60.29030, 24.56324,Matinkylä,Nuuksio,TRANSIT|WALK,transit
+299,Matinkylä to Nuuksio (transit),13:00,60.15509, 24.74546,60.29030, 24.56324,Matinkylä,Nuuksio,TRANSIT|WALK,transit
+301,Matinkylä to Latokaski (transit),06:00,60.15509, 24.74546,60.17892, 24.65813,Matinkylä,Latokaski,TRANSIT|WALK,transit
+302,Matinkylä to Latokaski (transit),13:00,60.15509, 24.74546,60.17892, 24.65813,Matinkylä,Latokaski,TRANSIT|WALK,transit
+303,Matinkylä to Latokaski (transit),22:00,60.15509, 24.74546,60.17892, 24.65813,Matinkylä,Latokaski,TRANSIT|WALK,transit
+304,Matinkylä to Tikkurila (transit),06:00,60.15509, 24.74546,60.29246, 25.03861,Matinkylä,Tikkurila,TRANSIT|WALK,transit
+305,Matinkylä to Tikkurila (transit),13:00,60.15509, 24.74546,60.29246, 25.03861,Matinkylä,Tikkurila,TRANSIT|WALK,transit
+306,Matinkylä to Tikkurila (transit),22:00,60.15509, 24.74546,60.29246, 25.03861,Matinkylä,Tikkurila,TRANSIT|WALK,transit
+307,Matinkylä to Airport (transit),06:00,60.15509, 24.74546,60.317508, 24.969089,Matinkylä,Airport,TRANSIT|WALK,transit
+308,Matinkylä to Airport (transit),13:00,60.15509, 24.74546,60.317508, 24.969089,Matinkylä,Airport,TRANSIT|WALK,transit
+309,Matinkylä to Airport (transit),22:00,60.15509, 24.74546,60.317508, 24.969089,Matinkylä,Airport,TRANSIT|WALK,transit
+310,Matinkylä to Kirkkonummi (transit),06:00,60.15509, 24.74546,60.12640, 24.43613,Matinkylä,Kirkkonummi,TRANSIT|WALK,transit
+311,Matinkylä to Kirkkonummi (transit),13:00,60.15509, 24.74546,60.12640, 24.43613,Matinkylä,Kirkkonummi,TRANSIT|WALK,transit
+312,Matinkylä to Kirkkonummi (transit),22:00,60.15509, 24.74546,60.12640, 24.43613,Matinkylä,Kirkkonummi,TRANSIT|WALK,transit
+313,Kauklahti to Kamppi (transit),06:00,60.19586, 24.58912,60.169665, 24.934652,Kauklahti,Kamppi,TRANSIT|WALK,transit
+314,Kauklahti to Kamppi (transit),13:00,60.19586, 24.58912,60.169665, 24.934652,Kauklahti,Kamppi,TRANSIT|WALK,transit
+315,Kauklahti to Kamppi (transit),22:00,60.19586, 24.58912,60.169665, 24.934652,Kauklahti,Kamppi,TRANSIT|WALK,transit
+316,Kauklahti to Töölöntori (transit),06:00,60.19586, 24.58912,60.179022, 24.924151,Kauklahti,Töölöntori,TRANSIT|WALK,transit
+317,Kauklahti to Töölöntori (transit),13:00,60.19586, 24.58912,60.179022, 24.924151,Kauklahti,Töölöntori,TRANSIT|WALK,transit
+318,Kauklahti to Töölöntori (transit),22:00,60.19586, 24.58912,60.179022, 24.924151,Kauklahti,Töölöntori,TRANSIT|WALK,transit
+319,Kauklahti to Pitäjänmäki (transit),06:00,60.19586, 24.58912,60.22070, 24.86094,Kauklahti,Pitäjänmäki,TRANSIT|WALK,transit
+320,Kauklahti to Pitäjänmäki (transit),13:00,60.19586, 24.58912,60.22070, 24.86094,Kauklahti,Pitäjänmäki,TRANSIT|WALK,transit
+321,Kauklahti to Pitäjänmäki (transit),22:00,60.19586, 24.58912,60.22070, 24.86094,Kauklahti,Pitäjänmäki,TRANSIT|WALK,transit
+322,Kauklahti to Itäkeskus (transit),06:00,60.19586, 24.58912,60.20863, 25.07946,Kauklahti,Itäkeskus,TRANSIT|WALK,transit
+323,Kauklahti to Itäkeskus (transit),13:00,60.19586, 24.58912,60.20863, 25.07946,Kauklahti,Itäkeskus,TRANSIT|WALK,transit
+324,Kauklahti to Itäkeskus (transit),22:00,60.19586, 24.58912,60.20863, 25.07946,Kauklahti,Itäkeskus,TRANSIT|WALK,transit
+325,Kauklahti to Suomenlinna (transit),06:00,60.19586, 24.58912,60.148237,24.985142,Kauklahti,Suomenlinna,TRANSIT|WALK,transit
+326,Kauklahti to Suomenlinna (transit),13:00,60.19586, 24.58912,60.148237,24.985142,Kauklahti,Suomenlinna,TRANSIT|WALK,transit
+327,Kauklahti to Suomenlinna (transit),22:00,60.19586, 24.58912,60.148237,24.985142,Kauklahti,Suomenlinna,TRANSIT|WALK,transit
+328,Kauklahti to Otaniemi (transit),06:00,60.19586, 24.58912,60.18234, 24.82531,Kauklahti,Otaniemi,TRANSIT|WALK,transit
+329,Kauklahti to Otaniemi (transit),13:00,60.19586, 24.58912,60.18234, 24.82531,Kauklahti,Otaniemi,TRANSIT|WALK,transit
+330,Kauklahti to Otaniemi (transit),22:00,60.19586, 24.58912,60.18234, 24.82531,Kauklahti,Otaniemi,TRANSIT|WALK,transit
+331,Kauklahti to Espoon Keskusta (transit),06:00,60.19586, 24.58912,60.205940, 24.656711,Kauklahti,Espoon Keskusta,TRANSIT|WALK,transit
+332,Kauklahti to Espoon Keskusta (transit),13:00,60.19586, 24.58912,60.205940, 24.656711,Kauklahti,Espoon Keskusta,TRANSIT|WALK,transit
+333,Kauklahti to Espoon Keskusta (transit),22:00,60.19586, 24.58912,60.205940, 24.656711,Kauklahti,Espoon Keskusta,TRANSIT|WALK,transit
+334,Kauklahti to Matinkylä (transit),06:00,60.19586, 24.58912,60.15509, 24.74546,Kauklahti,Matinkylä,TRANSIT|WALK,transit
+335,Kauklahti to Matinkylä (transit),13:00,60.19586, 24.58912,60.15509, 24.74546,Kauklahti,Matinkylä,TRANSIT|WALK,transit
+336,Kauklahti to Matinkylä (transit),22:00,60.19586, 24.58912,60.15509, 24.74546,Kauklahti,Matinkylä,TRANSIT|WALK,transit
+337,Kauklahti to Nuuksio (transit),06:00,60.19586, 24.58912,60.29030, 24.56324,Kauklahti,Nuuksio,TRANSIT|WALK,transit
+338,Kauklahti to Nuuksio (transit),13:00,60.19586, 24.58912,60.29030, 24.56324,Kauklahti,Nuuksio,TRANSIT|WALK,transit
+340,Kauklahti to Latokaski (transit),06:00,60.19586, 24.58912,60.17892, 24.65813,Kauklahti,Latokaski,TRANSIT|WALK,transit
+341,Kauklahti to Latokaski (transit),13:00,60.19586, 24.58912,60.17892, 24.65813,Kauklahti,Latokaski,TRANSIT|WALK,transit
+342,Kauklahti to Latokaski (transit),22:00,60.19586, 24.58912,60.17892, 24.65813,Kauklahti,Latokaski,TRANSIT|WALK,transit
+343,Kauklahti to Tikkurila (transit),06:00,60.19586, 24.58912,60.29246, 25.03861,Kauklahti,Tikkurila,TRANSIT|WALK,transit
+344,Kauklahti to Tikkurila (transit),13:00,60.19586, 24.58912,60.29246, 25.03861,Kauklahti,Tikkurila,TRANSIT|WALK,transit
+345,Kauklahti to Tikkurila (transit),22:00,60.19586, 24.58912,60.29246, 25.03861,Kauklahti,Tikkurila,TRANSIT|WALK,transit
+346,Kauklahti to Airport (transit),06:00,60.19586, 24.58912,60.317508, 24.969089,Kauklahti,Airport,TRANSIT|WALK,transit
+347,Kauklahti to Airport (transit),13:00,60.19586, 24.58912,60.317508, 24.969089,Kauklahti,Airport,TRANSIT|WALK,transit
+348,Kauklahti to Airport (transit),22:00,60.19586, 24.58912,60.317508, 24.969089,Kauklahti,Airport,TRANSIT|WALK,transit
+349,Kauklahti to Kirkkonummi (transit),06:00,60.19586, 24.58912,60.12640, 24.43613,Kauklahti,Kirkkonummi,TRANSIT|WALK,transit
+350,Kauklahti to Kirkkonummi (transit),13:00,60.19586, 24.58912,60.12640, 24.43613,Kauklahti,Kirkkonummi,TRANSIT|WALK,transit
+351,Kauklahti to Kirkkonummi (transit),22:00,60.19586, 24.58912,60.12640, 24.43613,Kauklahti,Kirkkonummi,TRANSIT|WALK,transit
+352,Nuuksio to Kamppi (transit),06:00,60.29030, 24.56324,60.169665, 24.934652,Nuuksio,Kamppi,TRANSIT|WALK,transit
+353,Nuuksio to Kamppi (transit),13:00,60.29030, 24.56324,60.169665, 24.934652,Nuuksio,Kamppi,TRANSIT|WALK,transit
+354,Nuuksio to Kamppi (transit),22:00,60.29030, 24.56324,60.169665, 24.934652,Nuuksio,Kamppi,TRANSIT|WALK,transit
+355,Nuuksio to Töölöntori (transit),06:00,60.29030, 24.56324,60.179022, 24.924151,Nuuksio,Töölöntori,TRANSIT|WALK,transit
+356,Nuuksio to Töölöntori (transit),13:00,60.29030, 24.56324,60.179022, 24.924151,Nuuksio,Töölöntori,TRANSIT|WALK,transit
+357,Nuuksio to Töölöntori (transit),22:00,60.29030, 24.56324,60.179022, 24.924151,Nuuksio,Töölöntori,TRANSIT|WALK,transit
+358,Nuuksio to Pitäjänmäki (transit),06:00,60.29030, 24.56324,60.22070, 24.86094,Nuuksio,Pitäjänmäki,TRANSIT|WALK,transit
+359,Nuuksio to Pitäjänmäki (transit),13:00,60.29030, 24.56324,60.22070, 24.86094,Nuuksio,Pitäjänmäki,TRANSIT|WALK,transit
+360,Nuuksio to Pitäjänmäki (transit),22:00,60.29030, 24.56324,60.22070, 24.86094,Nuuksio,Pitäjänmäki,TRANSIT|WALK,transit
+361,Nuuksio to Itäkeskus (transit),06:00,60.29030, 24.56324,60.20863, 25.07946,Nuuksio,Itäkeskus,TRANSIT|WALK,transit
+362,Nuuksio to Itäkeskus (transit),13:00,60.29030, 24.56324,60.20863, 25.07946,Nuuksio,Itäkeskus,TRANSIT|WALK,transit
+363,Nuuksio to Itäkeskus (transit),22:00,60.29030, 24.56324,60.20863, 25.07946,Nuuksio,Itäkeskus,TRANSIT|WALK,transit
+364,Nuuksio to Suomenlinna (transit),06:00,60.29030, 24.56324,60.148237,24.985142,Nuuksio,Suomenlinna,TRANSIT|WALK,transit
+365,Nuuksio to Suomenlinna (transit),13:00,60.29030, 24.56324,60.148237,24.985142,Nuuksio,Suomenlinna,TRANSIT|WALK,transit
+366,Nuuksio to Suomenlinna (transit),22:00,60.29030, 24.56324,60.148237,24.985142,Nuuksio,Suomenlinna,TRANSIT|WALK,transit
+367,Nuuksio to Otaniemi (transit),06:00,60.29030, 24.56324,60.18234, 24.82531,Nuuksio,Otaniemi,TRANSIT|WALK,transit
+368,Nuuksio to Otaniemi (transit),13:00,60.29030, 24.56324,60.18234, 24.82531,Nuuksio,Otaniemi,TRANSIT|WALK,transit
+369,Nuuksio to Otaniemi (transit),22:00,60.29030, 24.56324,60.18234, 24.82531,Nuuksio,Otaniemi,TRANSIT|WALK,transit
+370,Nuuksio to Espoon Keskusta (transit),06:00,60.29030, 24.56324,60.205940, 24.656711,Nuuksio,Espoon Keskusta,TRANSIT|WALK,transit
+371,Nuuksio to Espoon Keskusta (transit),13:00,60.29030, 24.56324,60.205940, 24.656711,Nuuksio,Espoon Keskusta,TRANSIT|WALK,transit
+372,Nuuksio to Espoon Keskusta (transit),22:00,60.29030, 24.56324,60.205940, 24.656711,Nuuksio,Espoon Keskusta,TRANSIT|WALK,transit
+373,Nuuksio to Matinkylä (transit),06:00,60.29030, 24.56324,60.15509, 24.74546,Nuuksio,Matinkylä,TRANSIT|WALK,transit
+374,Nuuksio to Matinkylä (transit),13:00,60.29030, 24.56324,60.15509, 24.74546,Nuuksio,Matinkylä,TRANSIT|WALK,transit
+375,Nuuksio to Matinkylä (transit),22:00,60.29030, 24.56324,60.15509, 24.74546,Nuuksio,Matinkylä,TRANSIT|WALK,transit
+376,Nuuksio to Kauklahti (transit),06:00,60.29030, 24.56324,60.19586, 24.58912,Nuuksio,Kauklahti,TRANSIT|WALK,transit
+377,Nuuksio to Kauklahti (transit),13:00,60.29030, 24.56324,60.19586, 24.58912,Nuuksio,Kauklahti,TRANSIT|WALK,transit
+378,Nuuksio to Kauklahti (transit),22:00,60.29030, 24.56324,60.19586, 24.58912,Nuuksio,Kauklahti,TRANSIT|WALK,transit
+379,Nuuksio to Latokaski (transit),06:00,60.29030, 24.56324,60.17892, 24.65813,Nuuksio,Latokaski,TRANSIT|WALK,transit
+380,Nuuksio to Latokaski (transit),13:00,60.29030, 24.56324,60.17892, 24.65813,Nuuksio,Latokaski,TRANSIT|WALK,transit
+381,Nuuksio to Latokaski (transit),22:00,60.29030, 24.56324,60.17892, 24.65813,Nuuksio,Latokaski,TRANSIT|WALK,transit
+382,Nuuksio to Tikkurila (transit),06:00,60.29030, 24.56324,60.29246, 25.03861,Nuuksio,Tikkurila,TRANSIT|WALK,transit
+383,Nuuksio to Tikkurila (transit),13:00,60.29030, 24.56324,60.29246, 25.03861,Nuuksio,Tikkurila,TRANSIT|WALK,transit
+384,Nuuksio to Tikkurila (transit),22:00,60.29030, 24.56324,60.29246, 25.03861,Nuuksio,Tikkurila,TRANSIT|WALK,transit
+385,Nuuksio to Airport (transit),06:00,60.29030, 24.56324,60.317508, 24.969089,Nuuksio,Airport,TRANSIT|WALK,transit
+386,Nuuksio to Airport (transit),13:00,60.29030, 24.56324,60.317508, 24.969089,Nuuksio,Airport,TRANSIT|WALK,transit
+387,Nuuksio to Airport (transit),22:00,60.29030, 24.56324,60.317508, 24.969089,Nuuksio,Airport,TRANSIT|WALK,transit
+388,Nuuksio to Kirkkonummi (transit),06:00,60.29030, 24.56324,60.12640, 24.43613,Nuuksio,Kirkkonummi,TRANSIT|WALK,transit
+389,Nuuksio to Kirkkonummi (transit),13:00,60.29030, 24.56324,60.12640, 24.43613,Nuuksio,Kirkkonummi,TRANSIT|WALK,transit
+390,Nuuksio to Kirkkonummi (transit),22:00,60.29030, 24.56324,60.12640, 24.43613,Nuuksio,Kirkkonummi,TRANSIT|WALK,transit
+391,Latokaski to Kamppi (transit),06:00,60.17892, 24.65813,60.169665, 24.934652,Latokaski,Kamppi,TRANSIT|WALK,transit
+392,Latokaski to Kamppi (transit),13:00,60.17892, 24.65813,60.169665, 24.934652,Latokaski,Kamppi,TRANSIT|WALK,transit
+393,Latokaski to Kamppi (transit),22:00,60.17892, 24.65813,60.169665, 24.934652,Latokaski,Kamppi,TRANSIT|WALK,transit
+394,Latokaski to Töölöntori (transit),06:00,60.17892, 24.65813,60.179022, 24.924151,Latokaski,Töölöntori,TRANSIT|WALK,transit
+395,Latokaski to Töölöntori (transit),13:00,60.17892, 24.65813,60.179022, 24.924151,Latokaski,Töölöntori,TRANSIT|WALK,transit
+396,Latokaski to Töölöntori (transit),22:00,60.17892, 24.65813,60.179022, 24.924151,Latokaski,Töölöntori,TRANSIT|WALK,transit
+397,Latokaski to Pitäjänmäki (transit),06:00,60.17892, 24.65813,60.22070, 24.86094,Latokaski,Pitäjänmäki,TRANSIT|WALK,transit
+398,Latokaski to Pitäjänmäki (transit),13:00,60.17892, 24.65813,60.22070, 24.86094,Latokaski,Pitäjänmäki,TRANSIT|WALK,transit
+399,Latokaski to Pitäjänmäki (transit),22:00,60.17892, 24.65813,60.22070, 24.86094,Latokaski,Pitäjänmäki,TRANSIT|WALK,transit
+400,Latokaski to Itäkeskus (transit),06:00,60.17892, 24.65813,60.20863, 25.07946,Latokaski,Itäkeskus,TRANSIT|WALK,transit
+401,Latokaski to Itäkeskus (transit),13:00,60.17892, 24.65813,60.20863, 25.07946,Latokaski,Itäkeskus,TRANSIT|WALK,transit
+402,Latokaski to Itäkeskus (transit),22:00,60.17892, 24.65813,60.20863, 25.07946,Latokaski,Itäkeskus,TRANSIT|WALK,transit
+403,Latokaski to Suomenlinna (transit),06:00,60.17892, 24.65813,60.148237,24.985142,Latokaski,Suomenlinna,TRANSIT|WALK,transit
+404,Latokaski to Suomenlinna (transit),13:00,60.17892, 24.65813,60.148237,24.985142,Latokaski,Suomenlinna,TRANSIT|WALK,transit
+405,Latokaski to Suomenlinna (transit),22:00,60.17892, 24.65813,60.148237,24.985142,Latokaski,Suomenlinna,TRANSIT|WALK,transit
+406,Latokaski to Otaniemi (transit),06:00,60.17892, 24.65813,60.18234, 24.82531,Latokaski,Otaniemi,TRANSIT|WALK,transit
+407,Latokaski to Otaniemi (transit),13:00,60.17892, 24.65813,60.18234, 24.82531,Latokaski,Otaniemi,TRANSIT|WALK,transit
+408,Latokaski to Otaniemi (transit),22:00,60.17892, 24.65813,60.18234, 24.82531,Latokaski,Otaniemi,TRANSIT|WALK,transit
+409,Latokaski to Espoon Keskusta (transit),06:00,60.17892, 24.65813,60.205940, 24.656711,Latokaski,Espoon Keskusta,TRANSIT|WALK,transit
+410,Latokaski to Espoon Keskusta (transit),13:00,60.17892, 24.65813,60.205940, 24.656711,Latokaski,Espoon Keskusta,TRANSIT|WALK,transit
+411,Latokaski to Espoon Keskusta (transit),22:00,60.17892, 24.65813,60.205940, 24.656711,Latokaski,Espoon Keskusta,TRANSIT|WALK,transit
+412,Latokaski to Matinkylä (transit),06:00,60.17892, 24.65813,60.15509, 24.74546,Latokaski,Matinkylä,TRANSIT|WALK,transit
+413,Latokaski to Matinkylä (transit),13:00,60.17892, 24.65813,60.15509, 24.74546,Latokaski,Matinkylä,TRANSIT|WALK,transit
+414,Latokaski to Matinkylä (transit),22:00,60.17892, 24.65813,60.15509, 24.74546,Latokaski,Matinkylä,TRANSIT|WALK,transit
+415,Latokaski to Kauklahti (transit),06:00,60.17892, 24.65813,60.19586, 24.58912,Latokaski,Kauklahti,TRANSIT|WALK,transit
+416,Latokaski to Kauklahti (transit),13:00,60.17892, 24.65813,60.19586, 24.58912,Latokaski,Kauklahti,TRANSIT|WALK,transit
+417,Latokaski to Kauklahti (transit),22:00,60.17892, 24.65813,60.19586, 24.58912,Latokaski,Kauklahti,TRANSIT|WALK,transit
+418,Latokaski to Nuuksio (transit),06:00,60.17892, 24.65813,60.29030, 24.56324,Latokaski,Nuuksio,TRANSIT|WALK,transit
+419,Latokaski to Nuuksio (transit),13:00,60.17892, 24.65813,60.29030, 24.56324,Latokaski,Nuuksio,TRANSIT|WALK,transit
+421,Latokaski to Tikkurila (transit),06:00,60.17892, 24.65813,60.29246, 25.03861,Latokaski,Tikkurila,TRANSIT|WALK,transit
+422,Latokaski to Tikkurila (transit),13:00,60.17892, 24.65813,60.29246, 25.03861,Latokaski,Tikkurila,TRANSIT|WALK,transit
+423,Latokaski to Tikkurila (transit),22:00,60.17892, 24.65813,60.29246, 25.03861,Latokaski,Tikkurila,TRANSIT|WALK,transit
+424,Latokaski to Airport (transit),06:00,60.17892, 24.65813,60.317508, 24.969089,Latokaski,Airport,TRANSIT|WALK,transit
+425,Latokaski to Airport (transit),13:00,60.17892, 24.65813,60.317508, 24.969089,Latokaski,Airport,TRANSIT|WALK,transit
+426,Latokaski to Airport (transit),22:00,60.17892, 24.65813,60.317508, 24.969089,Latokaski,Airport,TRANSIT|WALK,transit
+427,Latokaski to Kirkkonummi (transit),06:00,60.17892, 24.65813,60.12640, 24.43613,Latokaski,Kirkkonummi,TRANSIT|WALK,transit
+428,Latokaski to Kirkkonummi (transit),13:00,60.17892, 24.65813,60.12640, 24.43613,Latokaski,Kirkkonummi,TRANSIT|WALK,transit
+429,Latokaski to Kirkkonummi (transit),22:00,60.17892, 24.65813,60.12640, 24.43613,Latokaski,Kirkkonummi,TRANSIT|WALK,transit
+430,Tikkurila to Kamppi (transit),06:00,60.29246, 25.03861,60.169665, 24.934652,Tikkurila,Kamppi,TRANSIT|WALK,transit
+431,Tikkurila to Kamppi (transit),13:00,60.29246, 25.03861,60.169665, 24.934652,Tikkurila,Kamppi,TRANSIT|WALK,transit
+432,Tikkurila to Kamppi (transit),22:00,60.29246, 25.03861,60.169665, 24.934652,Tikkurila,Kamppi,TRANSIT|WALK,transit
+433,Tikkurila to Töölöntori (transit),06:00,60.29246, 25.03861,60.179022, 24.924151,Tikkurila,Töölöntori,TRANSIT|WALK,transit
+434,Tikkurila to Töölöntori (transit),13:00,60.29246, 25.03861,60.179022, 24.924151,Tikkurila,Töölöntori,TRANSIT|WALK,transit
+435,Tikkurila to Töölöntori (transit),22:00,60.29246, 25.03861,60.179022, 24.924151,Tikkurila,Töölöntori,TRANSIT|WALK,transit
+436,Tikkurila to Pitäjänmäki (transit),06:00,60.29246, 25.03861,60.22070, 24.86094,Tikkurila,Pitäjänmäki,TRANSIT|WALK,transit
+437,Tikkurila to Pitäjänmäki (transit),13:00,60.29246, 25.03861,60.22070, 24.86094,Tikkurila,Pitäjänmäki,TRANSIT|WALK,transit
+438,Tikkurila to Pitäjänmäki (transit),22:00,60.29246, 25.03861,60.22070, 24.86094,Tikkurila,Pitäjänmäki,TRANSIT|WALK,transit
+439,Tikkurila to Itäkeskus (transit),06:00,60.29246, 25.03861,60.20863, 25.07946,Tikkurila,Itäkeskus,TRANSIT|WALK,transit
+440,Tikkurila to Itäkeskus (transit),13:00,60.29246, 25.03861,60.20863, 25.07946,Tikkurila,Itäkeskus,TRANSIT|WALK,transit
+441,Tikkurila to Itäkeskus (transit),22:00,60.29246, 25.03861,60.20863, 25.07946,Tikkurila,Itäkeskus,TRANSIT|WALK,transit
+442,Tikkurila to Suomenlinna (transit),06:00,60.29246, 25.03861,60.148237,24.985142,Tikkurila,Suomenlinna,TRANSIT|WALK,transit
+443,Tikkurila to Suomenlinna (transit),13:00,60.29246, 25.03861,60.148237,24.985142,Tikkurila,Suomenlinna,TRANSIT|WALK,transit
+444,Tikkurila to Suomenlinna (transit),22:00,60.29246, 25.03861,60.148237,24.985142,Tikkurila,Suomenlinna,TRANSIT|WALK,transit
+445,Tikkurila to Otaniemi (transit),06:00,60.29246, 25.03861,60.18234, 24.82531,Tikkurila,Otaniemi,TRANSIT|WALK,transit
+446,Tikkurila to Otaniemi (transit),13:00,60.29246, 25.03861,60.18234, 24.82531,Tikkurila,Otaniemi,TRANSIT|WALK,transit
+447,Tikkurila to Otaniemi (transit),22:00,60.29246, 25.03861,60.18234, 24.82531,Tikkurila,Otaniemi,TRANSIT|WALK,transit
+448,Tikkurila to Espoon Keskusta (transit),06:00,60.29246, 25.03861,60.205940, 24.656711,Tikkurila,Espoon Keskusta,TRANSIT|WALK,transit
+449,Tikkurila to Espoon Keskusta (transit),13:00,60.29246, 25.03861,60.205940, 24.656711,Tikkurila,Espoon Keskusta,TRANSIT|WALK,transit
+450,Tikkurila to Espoon Keskusta (transit),22:00,60.29246, 25.03861,60.205940, 24.656711,Tikkurila,Espoon Keskusta,TRANSIT|WALK,transit
+451,Tikkurila to Matinkylä (transit),06:00,60.29246, 25.03861,60.15509, 24.74546,Tikkurila,Matinkylä,TRANSIT|WALK,transit
+452,Tikkurila to Matinkylä (transit),13:00,60.29246, 25.03861,60.15509, 24.74546,Tikkurila,Matinkylä,TRANSIT|WALK,transit
+453,Tikkurila to Matinkylä (transit),22:00,60.29246, 25.03861,60.15509, 24.74546,Tikkurila,Matinkylä,TRANSIT|WALK,transit
+454,Tikkurila to Kauklahti (transit),06:00,60.29246, 25.03861,60.19586, 24.58912,Tikkurila,Kauklahti,TRANSIT|WALK,transit
+455,Tikkurila to Kauklahti (transit),13:00,60.29246, 25.03861,60.19586, 24.58912,Tikkurila,Kauklahti,TRANSIT|WALK,transit
+456,Tikkurila to Kauklahti (transit),22:00,60.29246, 25.03861,60.19586, 24.58912,Tikkurila,Kauklahti,TRANSIT|WALK,transit
+457,Tikkurila to Nuuksio (transit),06:00,60.29246, 25.03861,60.29030, 24.56324,Tikkurila,Nuuksio,TRANSIT|WALK,transit
+458,Tikkurila to Nuuksio (transit),13:00,60.29246, 25.03861,60.29030, 24.56324,Tikkurila,Nuuksio,TRANSIT|WALK,transit
+460,Tikkurila to Latokaski (transit),06:00,60.29246, 25.03861,60.17892, 24.65813,Tikkurila,Latokaski,TRANSIT|WALK,transit
+461,Tikkurila to Latokaski (transit),13:00,60.29246, 25.03861,60.17892, 24.65813,Tikkurila,Latokaski,TRANSIT|WALK,transit
+462,Tikkurila to Latokaski (transit),22:00,60.29246, 25.03861,60.17892, 24.65813,Tikkurila,Latokaski,TRANSIT|WALK,transit
+463,Tikkurila to Airport (transit),06:00,60.29246, 25.03861,60.317508, 24.969089,Tikkurila,Airport,TRANSIT|WALK,transit
+464,Tikkurila to Airport (transit),13:00,60.29246, 25.03861,60.317508, 24.969089,Tikkurila,Airport,TRANSIT|WALK,transit
+465,Tikkurila to Airport (transit),22:00,60.29246, 25.03861,60.317508, 24.969089,Tikkurila,Airport,TRANSIT|WALK,transit
+466,Tikkurila to Kirkkonummi (transit),06:00,60.29246, 25.03861,60.12640, 24.43613,Tikkurila,Kirkkonummi,TRANSIT|WALK,transit
+467,Tikkurila to Kirkkonummi (transit),13:00,60.29246, 25.03861,60.12640, 24.43613,Tikkurila,Kirkkonummi,TRANSIT|WALK,transit
+468,Tikkurila to Kirkkonummi (transit),22:00,60.29246, 25.03861,60.12640, 24.43613,Tikkurila,Kirkkonummi,TRANSIT|WALK,transit
+469,Airport to Kamppi (transit),06:00,60.317508, 24.969089,60.169665, 24.934652,Airport,Kamppi,TRANSIT|WALK,transit
+470,Airport to Kamppi (transit),13:00,60.317508, 24.969089,60.169665, 24.934652,Airport,Kamppi,TRANSIT|WALK,transit
+471,Airport to Kamppi (transit),22:00,60.317508, 24.969089,60.169665, 24.934652,Airport,Kamppi,TRANSIT|WALK,transit
+472,Airport to Töölöntori (transit),06:00,60.317508, 24.969089,60.179022, 24.924151,Airport,Töölöntori,TRANSIT|WALK,transit
+473,Airport to Töölöntori (transit),13:00,60.317508, 24.969089,60.179022, 24.924151,Airport,Töölöntori,TRANSIT|WALK,transit
+474,Airport to Töölöntori (transit),22:00,60.317508, 24.969089,60.179022, 24.924151,Airport,Töölöntori,TRANSIT|WALK,transit
+475,Airport to Pitäjänmäki (transit),06:00,60.317508, 24.969089,60.22070, 24.86094,Airport,Pitäjänmäki,TRANSIT|WALK,transit
+476,Airport to Pitäjänmäki (transit),13:00,60.317508, 24.969089,60.22070, 24.86094,Airport,Pitäjänmäki,TRANSIT|WALK,transit
+477,Airport to Pitäjänmäki (transit),22:00,60.317508, 24.969089,60.22070, 24.86094,Airport,Pitäjänmäki,TRANSIT|WALK,transit
+478,Airport to Itäkeskus (transit),06:00,60.317508, 24.969089,60.20863, 25.07946,Airport,Itäkeskus,TRANSIT|WALK,transit
+479,Airport to Itäkeskus (transit),13:00,60.317508, 24.969089,60.20863, 25.07946,Airport,Itäkeskus,TRANSIT|WALK,transit
+480,Airport to Itäkeskus (transit),22:00,60.317508, 24.969089,60.20863, 25.07946,Airport,Itäkeskus,TRANSIT|WALK,transit
+481,Airport to Suomenlinna (transit),06:00,60.317508, 24.969089,60.148237,24.985142,Airport,Suomenlinna,TRANSIT|WALK,transit
+482,Airport to Suomenlinna (transit),13:00,60.317508, 24.969089,60.148237,24.985142,Airport,Suomenlinna,TRANSIT|WALK,transit
+483,Airport to Suomenlinna (transit),22:00,60.317508, 24.969089,60.148237,24.985142,Airport,Suomenlinna,TRANSIT|WALK,transit
+484,Airport to Otaniemi (transit),06:00,60.317508, 24.969089,60.18234, 24.82531,Airport,Otaniemi,TRANSIT|WALK,transit
+485,Airport to Otaniemi (transit),13:00,60.317508, 24.969089,60.18234, 24.82531,Airport,Otaniemi,TRANSIT|WALK,transit
+486,Airport to Otaniemi (transit),22:00,60.317508, 24.969089,60.18234, 24.82531,Airport,Otaniemi,TRANSIT|WALK,transit
+487,Airport to Espoon Keskusta (transit),06:00,60.317508, 24.969089,60.205940, 24.656711,Airport,Espoon Keskusta,TRANSIT|WALK,transit
+488,Airport to Espoon Keskusta (transit),13:00,60.317508, 24.969089,60.205940, 24.656711,Airport,Espoon Keskusta,TRANSIT|WALK,transit
+489,Airport to Espoon Keskusta (transit),22:00,60.317508, 24.969089,60.205940, 24.656711,Airport,Espoon Keskusta,TRANSIT|WALK,transit
+490,Airport to Matinkylä (transit),06:00,60.317508, 24.969089,60.15509, 24.74546,Airport,Matinkylä,TRANSIT|WALK,transit
+491,Airport to Matinkylä (transit),13:00,60.317508, 24.969089,60.15509, 24.74546,Airport,Matinkylä,TRANSIT|WALK,transit
+492,Airport to Matinkylä (transit),22:00,60.317508, 24.969089,60.15509, 24.74546,Airport,Matinkylä,TRANSIT|WALK,transit
+493,Airport to Kauklahti (transit),06:00,60.317508, 24.969089,60.19586, 24.58912,Airport,Kauklahti,TRANSIT|WALK,transit
+494,Airport to Kauklahti (transit),13:00,60.317508, 24.969089,60.19586, 24.58912,Airport,Kauklahti,TRANSIT|WALK,transit
+495,Airport to Kauklahti (transit),22:00,60.317508, 24.969089,60.19586, 24.58912,Airport,Kauklahti,TRANSIT|WALK,transit
+496,Airport to Nuuksio (transit),06:00,60.317508, 24.969089,60.29030, 24.56324,Airport,Nuuksio,TRANSIT|WALK,transit
+497,Airport to Nuuksio (transit),13:00,60.317508, 24.969089,60.29030, 24.56324,Airport,Nuuksio,TRANSIT|WALK,transit
+499,Airport to Latokaski (transit),06:00,60.317508, 24.969089,60.17892, 24.65813,Airport,Latokaski,TRANSIT|WALK,transit
+500,Airport to Latokaski (transit),13:00,60.317508, 24.969089,60.17892, 24.65813,Airport,Latokaski,TRANSIT|WALK,transit
+501,Airport to Latokaski (transit),22:00,60.317508, 24.969089,60.17892, 24.65813,Airport,Latokaski,TRANSIT|WALK,transit
+502,Airport to Tikkurila (transit),06:00,60.317508, 24.969089,60.29246, 25.03861,Airport,Tikkurila,TRANSIT|WALK,transit
+503,Airport to Tikkurila (transit),13:00,60.317508, 24.969089,60.29246, 25.03861,Airport,Tikkurila,TRANSIT|WALK,transit
+504,Airport to Tikkurila (transit),22:00,60.317508, 24.969089,60.29246, 25.03861,Airport,Tikkurila,TRANSIT|WALK,transit
+505,Airport to Kirkkonummi (transit),06:00,60.317508, 24.969089,60.12640, 24.43613,Airport,Kirkkonummi,TRANSIT|WALK,transit
+506,Airport to Kirkkonummi (transit),13:00,60.317508, 24.969089,60.12640, 24.43613,Airport,Kirkkonummi,TRANSIT|WALK,transit
+507,Airport to Kirkkonummi (transit),22:00,60.317508, 24.969089,60.12640, 24.43613,Airport,Kirkkonummi,TRANSIT|WALK,transit
+508,Kirkkonummi to Kamppi (transit),06:00,60.12640, 24.43613,60.169665, 24.934652,Kirkkonummi,Kamppi,TRANSIT|WALK,transit
+509,Kirkkonummi to Kamppi (transit),13:00,60.12640, 24.43613,60.169665, 24.934652,Kirkkonummi,Kamppi,TRANSIT|WALK,transit
+510,Kirkkonummi to Kamppi (transit),22:00,60.12640, 24.43613,60.169665, 24.934652,Kirkkonummi,Kamppi,TRANSIT|WALK,transit
+511,Kirkkonummi to Töölöntori (transit),06:00,60.12640, 24.43613,60.179022, 24.924151,Kirkkonummi,Töölöntori,TRANSIT|WALK,transit
+512,Kirkkonummi to Töölöntori (transit),13:00,60.12640, 24.43613,60.179022, 24.924151,Kirkkonummi,Töölöntori,TRANSIT|WALK,transit
+513,Kirkkonummi to Töölöntori (transit),22:00,60.12640, 24.43613,60.179022, 24.924151,Kirkkonummi,Töölöntori,TRANSIT|WALK,transit
+514,Kirkkonummi to Pitäjänmäki (transit),06:00,60.12640, 24.43613,60.22070, 24.86094,Kirkkonummi,Pitäjänmäki,TRANSIT|WALK,transit
+515,Kirkkonummi to Pitäjänmäki (transit),13:00,60.12640, 24.43613,60.22070, 24.86094,Kirkkonummi,Pitäjänmäki,TRANSIT|WALK,transit
+516,Kirkkonummi to Pitäjänmäki (transit),22:00,60.12640, 24.43613,60.22070, 24.86094,Kirkkonummi,Pitäjänmäki,TRANSIT|WALK,transit
+517,Kirkkonummi to Itäkeskus (transit),06:00,60.12640, 24.43613,60.20863, 25.07946,Kirkkonummi,Itäkeskus,TRANSIT|WALK,transit
+518,Kirkkonummi to Itäkeskus (transit),13:00,60.12640, 24.43613,60.20863, 25.07946,Kirkkonummi,Itäkeskus,TRANSIT|WALK,transit
+519,Kirkkonummi to Itäkeskus (transit),22:00,60.12640, 24.43613,60.20863, 25.07946,Kirkkonummi,Itäkeskus,TRANSIT|WALK,transit
+520,Kirkkonummi to Suomenlinna (transit),06:00,60.12640, 24.43613,60.148237,24.985142,Kirkkonummi,Suomenlinna,TRANSIT|WALK,transit
+521,Kirkkonummi to Suomenlinna (transit),13:00,60.12640, 24.43613,60.148237,24.985142,Kirkkonummi,Suomenlinna,TRANSIT|WALK,transit
+522,Kirkkonummi to Suomenlinna (transit),22:00,60.12640, 24.43613,60.148237,24.985142,Kirkkonummi,Suomenlinna,TRANSIT|WALK,transit
+523,Kirkkonummi to Otaniemi (transit),06:00,60.12640, 24.43613,60.18234, 24.82531,Kirkkonummi,Otaniemi,TRANSIT|WALK,transit
+524,Kirkkonummi to Otaniemi (transit),13:00,60.12640, 24.43613,60.18234, 24.82531,Kirkkonummi,Otaniemi,TRANSIT|WALK,transit
+525,Kirkkonummi to Otaniemi (transit),22:00,60.12640, 24.43613,60.18234, 24.82531,Kirkkonummi,Otaniemi,TRANSIT|WALK,transit
+526,Kirkkonummi to Espoon Keskusta (transit),06:00,60.12640, 24.43613,60.205940, 24.656711,Kirkkonummi,Espoon Keskusta,TRANSIT|WALK,transit
+527,Kirkkonummi to Espoon Keskusta (transit),13:00,60.12640, 24.43613,60.205940, 24.656711,Kirkkonummi,Espoon Keskusta,TRANSIT|WALK,transit
+528,Kirkkonummi to Espoon Keskusta (transit),22:00,60.12640, 24.43613,60.205940, 24.656711,Kirkkonummi,Espoon Keskusta,TRANSIT|WALK,transit
+529,Kirkkonummi to Matinkylä (transit),06:00,60.12640, 24.43613,60.15509, 24.74546,Kirkkonummi,Matinkylä,TRANSIT|WALK,transit
+530,Kirkkonummi to Matinkylä (transit),13:00,60.12640, 24.43613,60.15509, 24.74546,Kirkkonummi,Matinkylä,TRANSIT|WALK,transit
+531,Kirkkonummi to Matinkylä (transit),22:00,60.12640, 24.43613,60.15509, 24.74546,Kirkkonummi,Matinkylä,TRANSIT|WALK,transit
+532,Kirkkonummi to Kauklahti (transit),06:00,60.12640, 24.43613,60.19586, 24.58912,Kirkkonummi,Kauklahti,TRANSIT|WALK,transit
+533,Kirkkonummi to Kauklahti (transit),13:00,60.12640, 24.43613,60.19586, 24.58912,Kirkkonummi,Kauklahti,TRANSIT|WALK,transit
+534,Kirkkonummi to Kauklahti (transit),22:00,60.12640, 24.43613,60.19586, 24.58912,Kirkkonummi,Kauklahti,TRANSIT|WALK,transit
+535,Kirkkonummi to Nuuksio (transit),06:00,60.12640, 24.43613,60.29030, 24.56324,Kirkkonummi,Nuuksio,TRANSIT|WALK,transit
+536,Kirkkonummi to Nuuksio (transit),13:00,60.12640, 24.43613,60.29030, 24.56324,Kirkkonummi,Nuuksio,TRANSIT|WALK,transit
+538,Kirkkonummi to Latokaski (transit),06:00,60.12640, 24.43613,60.17892, 24.65813,Kirkkonummi,Latokaski,TRANSIT|WALK,transit
+539,Kirkkonummi to Latokaski (transit),13:00,60.12640, 24.43613,60.17892, 24.65813,Kirkkonummi,Latokaski,TRANSIT|WALK,transit
+540,Kirkkonummi to Latokaski (transit),22:00,60.12640, 24.43613,60.17892, 24.65813,Kirkkonummi,Latokaski,TRANSIT|WALK,transit
+541,Kirkkonummi to Tikkurila (transit),06:00,60.12640, 24.43613,60.29246, 25.03861,Kirkkonummi,Tikkurila,TRANSIT|WALK,transit
+542,Kirkkonummi to Tikkurila (transit),13:00,60.12640, 24.43613,60.29246, 25.03861,Kirkkonummi,Tikkurila,TRANSIT|WALK,transit
+543,Kirkkonummi to Tikkurila (transit),22:00,60.12640, 24.43613,60.29246, 25.03861,Kirkkonummi,Tikkurila,TRANSIT|WALK,transit
+544,Kirkkonummi to Airport (transit),06:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK,transit
+545,Kirkkonummi to Airport (transit),13:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK,transit
+546,Kirkkonummi to Airport (transit),22:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK,transit
