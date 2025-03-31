@@ -109,7 +109,7 @@ public class GtfsBundle {
     }
   }
 
-    public String feedInfo() {
+  public String feedInfo() {
     return "GTFS bundle at " + dataSource.path() + " (" + getFeedId() + ")";
   }
 }
