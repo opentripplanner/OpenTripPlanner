@@ -127,8 +127,6 @@ public class ShortestPathTree<
    */
   public boolean add(State newState) {
     Vertex vertex = newState.getVertex();
-    // Change stateSets from Map<Vertex, List<State>> to Map<Vertex, RequestVertex>
-    // where RequestVertex contains List<State>.
     List<State> states = stateSets.get(vertex);
 
     // if the vertex has no states, add one and return
