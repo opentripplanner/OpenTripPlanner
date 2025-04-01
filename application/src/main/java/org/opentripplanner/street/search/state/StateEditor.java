@@ -116,7 +116,11 @@ public class StateEditor {
     // supporting non-pointlike turn restrictions
     // the isReverseOf check in StreetEdge.doTraverse _always_ prohibits u-turns, so
     // there is an implicit u-turn restriction always in place!
-    if (child.getBackMode() != null && child.getBackMode().isInCar() && child.backEdge instanceof StreetEdge streetEdge) {
+    if (
+      child.getBackMode() != null &&
+      child.getBackMode().isInCar() &&
+      child.backEdge instanceof StreetEdge streetEdge
+    ) {
       child.pendingTurnRestrictions = new HashSet<>();
       child.unusedOutgoingEdges = new HashSet<>();
       for (TurnRestriction turnRestriction : streetEdge.getTurnRestrictions()) {
