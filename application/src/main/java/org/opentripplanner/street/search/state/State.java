@@ -5,6 +5,7 @@ import static org.opentripplanner.utils.lang.ObjectUtils.requireNotInitialized;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -15,6 +16,7 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -42,6 +44,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   protected State backState;
 
   public Edge backEdge;
+
+  public Set<TurnRestriction> pendingTurnRestrictions;
+  public Set<Edge> unusedOutgoingEdges;
 
   /* StateData contains data which is unlikely to change as often */
   public StateData stateData;
@@ -78,6 +83,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
     this.walkDistance = 0;
     this.time_ms = startTime.toEpochMilli();
+    this.pendingTurnRestrictions = new HashSet<>();
   }
 
   /**

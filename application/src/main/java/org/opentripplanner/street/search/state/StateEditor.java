@@ -1,9 +1,12 @@
 package org.opentripplanner.street.search.state;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -107,6 +110,23 @@ public class StateEditor {
     if (defectiveTraversal) {
       LOG.error("Defective traversal flagged on edge " + child.backEdge);
       return null;
+    }
+
+    // record pending turn restrictions, which gets more complicated when we start
+    // supporting non-pointlike turn restrictions
+    // the isReverseOf check in StreetEdge.doTraverse _always_ prohibits u-turns, so
+    // there is an implicit u-turn restriction always in place!
+    if (child.getBackMode() != null && child.getBackMode().isInCar() && child.backEdge instanceof StreetEdge streetEdge) {
+      child.pendingTurnRestrictions = new HashSet<>();
+      child.unusedOutgoingEdges = new HashSet<>();
+      for (TurnRestriction turnRestriction : streetEdge.getTurnRestrictions()) {
+        if (turnRestriction.from == streetEdge) {
+          child.pendingTurnRestrictions.add(turnRestriction);
+          child.unusedOutgoingEdges.add(turnRestriction.to);
+        }
+      }
+      child.unusedOutgoingEdges.add(streetEdge);
+      child.pendingTurnRestrictions.addAll(streetEdge.getTurnRestrictions());
     }
 
     if (child.backState != null) {

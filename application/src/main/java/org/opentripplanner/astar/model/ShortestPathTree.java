@@ -146,7 +146,14 @@ public class ShortestPathTree<
       State oldState = it.next();
       // order is important, because in the case of a tie
       // we want to reject the new state
-      // pass RequestVertex to dominance function (same for both states)
+      // [ pass RequestVertex to dominance function (same for both states) ]
+      // The RequestVertex thing doesn't really work for turn restrictions which are
+      // not pointlike, which we want to support in the near future. Instead we should
+      // keep track of the pending (have passed the start of, have yet to pass the end of)
+      // turn restrictions, and compare the two sets of turn restrictions in the dominance
+      // functions, and never report dominance unless they are equal. This even keeps the
+      // change out of AStar, ShortestPathTree, and Edge, limiting it to State, StreetEdge,
+      // and DominanceFunctions
       if (dominanceFunction.betterOrEqualAndComparable(oldState, newState)) {
         return false;
       }

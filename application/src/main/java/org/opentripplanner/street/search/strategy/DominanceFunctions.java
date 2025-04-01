@@ -1,8 +1,10 @@
 package org.opentripplanner.street.search.strategy;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Objects;
 import org.opentripplanner.astar.spi.DominanceFunction;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
 
@@ -89,14 +91,13 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
      * including the loops should still result in a route. Often this will be preferable to
      * taking a detour due to turn restrictions anyway.
      */
-    // get rid of isCloseToStartOrEnd and track turn restrictions properly
+    // [ get rid of isCloseToStartOrEnd and track turn restrictions properly
     //  - if we earlier arrived from a direction which caused one of the outgoing edges
     //    to be skipped, have a boolean in the state to mark it (wasTurnRestricted)
     //  - if there was a restriction, have a list of skipped edges (turnRestrictedEdges)
     //  - check if we can go to a restricted egde from this arrival direction
-    //  - if we got this far, return false
-    // StreetEdge.turnRestriction
-    // StreetEdge.canTurnOnto()
+    //  - if we got this far, return false ]
+    /*
     if (
       a.backEdge != b.getBackEdge() &&
       (a.backEdge instanceof StreetEdge) &&
@@ -105,6 +106,39 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       a.getRequest().isCloseToStartOrEnd(a.getVertex())
     ) {
       return false;
+    }
+     */
+
+    // The backEdge difference test only applies when all turn restrictions are pointlike.
+    // This really should work without it, but it does yield a small performance benefit.
+    // When we start supporting non-pointlike turn restrictions, we'll have to return to
+    // this implementation and actually look at State.pendingTurnRestrictions as well.
+    if (
+      a.backEdge != b.getBackEdge() &&
+      (a.backEdge instanceof StreetEdge) &&
+      a.getBackMode() != null &&
+      a.getBackMode().isInCar()
+    ) {
+      // Fortunately the number of edges from a vertex is usually very low. We can reimplement
+      // this as a bunch of integer bit operations.
+      boolean setsDifferent = false;
+      HashSet<Edge> unusedOutgoingEdges = new HashSet<>();
+      for (Edge edge : a.unusedOutgoingEdges) {
+        if (b.unusedOutgoingEdges.contains(edge)) {
+          unusedOutgoingEdges.add(edge);
+        } else {
+          setsDifferent = true;
+        }
+      }
+      for (Edge edge : b.unusedOutgoingEdges) {
+        if (!a.unusedOutgoingEdges.contains(edge)) {
+          setsDifferent = true;
+          break;
+        }
+      }
+      a.unusedOutgoingEdges = unusedOutgoingEdges;
+      b.unusedOutgoingEdges = unusedOutgoingEdges;
+      return !setsDifferent;
     }
 
     // These two states are comparable (they are on the same "plane" or "copy" of the graph).
