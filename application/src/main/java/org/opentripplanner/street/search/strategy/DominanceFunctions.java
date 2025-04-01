@@ -120,7 +120,9 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       }
       a.unusedOutgoingEdges = unusedOutgoingEdges;
       b.unusedOutgoingEdges = unusedOutgoingEdges;
-      return !setsDifferent;
+      if (setsDifferent) {
+        return false;
+      }
     }
 
     // These two states are comparable (they are on the same "plane" or "copy" of the graph).
