@@ -141,11 +141,6 @@ public class AStar<
 
       // Iterate over traversal results. When an edge leads nowhere (as indicated by
       // returning an empty array), the iteration is over.
-      // need to pass RequestVertex to Edge.traverse to mark turn restricted edges?
-      // nah, store RequestVertex in State
-      // nah, change explosion. just track the missed edges here / in spt.add which
-      // gets called for all actual new states (have to have some kind of
-      // spt.registerEdgeCandidates so there is something to compare to)
       var states = edge.traverse(u);
       for (var v : states) {
         // Could be: for (State v : traverseEdge...)
