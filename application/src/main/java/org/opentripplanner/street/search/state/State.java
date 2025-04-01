@@ -83,7 +83,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     }
     this.walkDistance = 0;
     this.time_ms = startTime.toEpochMilli();
-    this.pendingTurnRestrictions = new HashSet<>();
   }
 
   /**
