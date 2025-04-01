@@ -113,7 +113,7 @@ public class GqlUtil {
    * Null-safe handling of a collection of strings. Returns null if the incoming collection is null.
    * Null and empty elements are filtered out.
    */
-  public static List<String> toStringList(@Nullable Collection<String> args) {
+  public static @Nullable List<String> toStringList(@Nullable Collection<String> args) {
     if (args == null) {
       return null;
     }
