@@ -30,7 +30,7 @@ public class PageCursorInputAggregator {
     this.pageCursorInputSubscriber = builder.pageCursorInputSubscriber();
   }
 
-  public void createPageCursorInput() {
+  public void providePageCursorInput() {
     pageCursorInputSubscriber.accept(
       DefaultPageCursorInput.of()
         .withNumItinerariesFilterResult(

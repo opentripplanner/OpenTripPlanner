@@ -33,7 +33,7 @@ public class ItineraryListFilterChain {
       result = filter.filter(result);
     }
 
-    pageCursorInputAggregator.createPageCursorInput();
+    pageCursorInputAggregator.providePageCursorInput();
 
     routingErrors.addAll(RoutingErrorsAttacher.computeErrors(itineraries, result));
 
