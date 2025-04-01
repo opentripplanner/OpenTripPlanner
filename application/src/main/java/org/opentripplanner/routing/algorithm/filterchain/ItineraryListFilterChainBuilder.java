@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.OptionalInt;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -27,7 +26,6 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemovePa
 import org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.FlexSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.SingleCriteriaComparator;
@@ -36,7 +34,6 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.Decorat
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.KeepItinerariesWithFewestTransfers;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
