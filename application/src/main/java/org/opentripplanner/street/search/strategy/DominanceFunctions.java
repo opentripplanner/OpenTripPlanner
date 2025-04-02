@@ -3,6 +3,7 @@ package org.opentripplanner.street.search.strategy;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -24,6 +25,43 @@ import org.opentripplanner.street.search.state.State;
  * different JVMs, for instance in OTPA Cluster.
  */
 public abstract class DominanceFunctions implements Serializable, DominanceFunction<State> {
+
+  // Separate this part as its own method to make the various early exits feasible without gotos
+  // or other convoluted flow control. Avoid allocating new memory in the form of a new HashSet
+  // if at all possible. Returns true if the states were non-commensurable, i.e. the sets of
+  // unused outgoing edges were different. Afterwards the outgoing edge sets will be the same,
+  // not only same for equals() but also for object identity. smaller.unusedOutgoingEdges will
+  // be reused if it is correct (always for the empty set, if it is a subset of the larger set
+  // otherwise).
+  private boolean unifyUnusedOutgoingStates(State larger, State smaller, boolean sizesDifferent) {
+    if (smaller.unusedOutgoingEdges.isEmpty()) {
+      if (!sizesDifferent) {
+        return false;
+      }
+      larger.unusedOutgoingEdges = smaller.unusedOutgoingEdges;
+      return true;
+    }
+    boolean setsDifferent = false;
+    for (Edge edge : smaller.unusedOutgoingEdges) {
+      if (!larger.unusedOutgoingEdges.contains(edge)) {
+        setsDifferent = true;
+        break;
+      }
+    }
+    if (!setsDifferent) {
+      larger.unusedOutgoingEdges = smaller.unusedOutgoingEdges;
+      return sizesDifferent;
+    }
+    HashSet<Edge> unusedOutgoingEdges = new HashSet<>();
+    for (Edge edge : larger.unusedOutgoingEdges) {
+      if (smaller.unusedOutgoingEdges.contains(edge)) {
+        unusedOutgoingEdges.add(edge);
+      }
+    }
+    larger.unusedOutgoingEdges = unusedOutgoingEdges;
+    smaller.unusedOutgoingEdges = unusedOutgoingEdges;
+    return true;
+  }
 
   /**
    * For bike rental, parking, and approaching turn-restricted intersections states are
@@ -114,25 +152,22 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       //      -> (State, Edge, int, TraverseMode, boolean)
       //  5. State.edit(Edge) -> (Edge, int)
       //  6. new StateEditor(State, Edge) -> (State, Edge, int)
-      boolean setsDifferent = false;
-      HashSet<Edge> unusedOutgoingEdges = new HashSet<>();
-      for (Edge edge : a.unusedOutgoingEdges) {
-        if (b.unusedOutgoingEdges.contains(edge)) {
-          unusedOutgoingEdges.add(edge);
+      // The unification might have made the unusedOutgoingEdges sets of two different States
+      // the same, test for that immediately, because that's a cheap early exit.
+      if (a.unusedOutgoingEdges != b.unusedOutgoingEdges) {
+        int aSize = a.unusedOutgoingEdges.size();
+        int bSize = b.unusedOutgoingEdges.size();
+        boolean nonCommensurable;
+        if (aSize > bSize) {
+          nonCommensurable = unifyUnusedOutgoingStates(a, b, true);
+        } else if (aSize < bSize) {
+          nonCommensurable = unifyUnusedOutgoingStates(b, a, true);
         } else {
-          setsDifferent = true;
+          nonCommensurable = unifyUnusedOutgoingStates(a, b, false);
         }
-      }
-      for (Edge edge : b.unusedOutgoingEdges) {
-        if (!a.unusedOutgoingEdges.contains(edge)) {
-          setsDifferent = true;
-          break;
+        if (nonCommensurable) {
+          return false;
         }
-      }
-      a.unusedOutgoingEdges = unusedOutgoingEdges;
-      b.unusedOutgoingEdges = unusedOutgoingEdges;
-      if (setsDifferent) {
-        return false;
       }
     }
 

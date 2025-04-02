@@ -207,6 +207,14 @@ public class CarRoutingTest {
     // The costs of the edges are set up so that the search first goes A->B->D before trying
     // A->B->C->D. The test tests that the previous visit of D does not block the proper
     // path A->B->C->D->F.
+    //      E
+    //      |
+    //  F - D -\
+    //      |   C
+    //      B -/
+    //      |
+    //      A
+    // B-D-F is forbidden by a turn restriction
     var graph = new Graph();
     var A = vertex(graph, "A", 0.0, 0.0);
     var B = vertex(graph, "B", 1.0, 0.0);
