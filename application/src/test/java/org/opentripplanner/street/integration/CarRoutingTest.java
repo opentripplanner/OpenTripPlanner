@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,16 +13,32 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.TurnRestriction;
+import org.opentripplanner.street.model.TurnRestrictionType;
+import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.edge.Edge;
+import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class CarRoutingTest {
@@ -164,5 +181,68 @@ public class CarRoutingTest {
     );
     Geometry legGeometry = itineraries.get(0).legs().get(0).getLegGeometry();
     return EncodedPolyline.encode(legGeometry).points();
+  }
+
+  private StreetVertex vertex(Graph graph, String label, double lat, double lon) {
+    var v = StreetModelForTest.intersectionVertex(label, lat, lon);
+    graph.addVertex(v);
+    return v;
+  }
+
+  private StreetEdge streetEdge(StreetVertex a, StreetVertex b, double length) {
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(a)
+      .withToVertex(b)
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .buildAndConnect();
+  }
+
+  private StreetEdge[] edges(StreetVertex a, StreetVertex b, double length) {
+    return new StreetEdge[] {streetEdge(a, b, length), streetEdge(b, a, length)};
+  }
+
+  @Test
+  public void turnRestrictedVisitDoesNotBlockSearch() {
+    // The costs of the edges are set up so that the search first goes A->B->D before trying
+    // A->B->C->D. The test tests that the previous visit of D does not block the proper
+    // path A->B->C->D->F.
+    var graph = new Graph();
+    var A = vertex(graph, "A", 0.0, 0.0);
+    var B = vertex(graph, "B", 1.0, 0.0);
+    var C = vertex(graph, "C", 1.5, 1.0);
+    var D = vertex(graph, "D", 2.0, 0.0);
+    var E = vertex(graph, "E", 3.0, 0.0);
+    var F = vertex(graph, "F", 2.0, -1.0);
+    edges(A, B, 1.0);
+    edges(B, C, 1.0);
+    var BD = edges(B, D, 1.0);
+    edges(C, D, 1.0);
+    edges(D, E, 1.0);
+    var DF = edges(D, F, 1.0);
+    BD[0].addTurnRestriction(
+      new TurnRestriction(BD[0], DF[0], TurnRestrictionType.NO_TURN, new TraverseModeSet(TraverseMode.CAR), null));
+
+    var request = new RouteRequest();
+    request.setDateTime(dateTime);
+    request.journey().direct().setMode(StreetMode.CAR);
+
+    var streetRequest = new StreetRequest(StreetMode.CAR);
+
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+      .setHeuristic(new EuclideanRemainingWeightHeuristic())
+      .setRequest(request)
+      .setStreetRequest(streetRequest)
+      .setFrom(A)
+      .setTo(F)
+      .getShortestPathTree();
+    GraphPath<State, Edge, Vertex> path = spt.getPath(F);
+    List<State> states = path.states;
+    assertEquals(5, states.size());
+    assertEquals(states.get(0).getVertex(), A);
+    assertEquals(states.get(1).getVertex(), B);
+    assertEquals(states.get(2).getVertex(), C);
+    assertEquals(states.get(3).getVertex(), D);
+    assertEquals(states.get(4).getVertex(), F);
   }
 }
