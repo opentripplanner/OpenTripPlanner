@@ -532,3 +532,163 @@ testCaseId,description,departure,fromLat,fromLon,toLat,toLon,origin,destination,
 544,Kirkkonummi to Airport (transit),06:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK,transit
 545,Kirkkonummi to Airport (transit),13:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK,transit
 546,Kirkkonummi to Airport (transit),22:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK,transit
+547,Kamppi to Töölöntori (scooter-transit),06:00,60.169665, 24.934652,60.179022, 24.924151,Kamppi,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+548,Kamppi to Pitäjänmäki (scooter-transit),06:00,60.169665, 24.934652,60.22070, 24.86094,Kamppi,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+549,Kamppi to Itäkeskus (scooter-transit),06:00,60.169665, 24.934652,60.20863, 25.07946,Kamppi,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+550,Kamppi to Suomenlinna (scooter-transit),06:00,60.169665, 24.934652,60.148237,24.985142,Kamppi,Suomenlinna,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+551,Kamppi to Otaniemi (scooter-transit),06:00,60.169665, 24.934652,60.18234, 24.82531,Kamppi,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+552,Kamppi to Espoon Keskusta (scooter-transit),06:00,60.169665, 24.934652,60.205940, 24.656711,Kamppi,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+553,Kamppi to Matinkylä (scooter-transit),06:00,60.169665, 24.934652,60.15509, 24.74546,Kamppi,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+554,Kamppi to Kauklahti (scooter-transit),06:00,60.169665, 24.934652,60.19586, 24.58912,Kamppi,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+555,Kamppi to Nuuksio (scooter-transit),06:00,60.169665, 24.934652,60.29030, 24.56324,Kamppi,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+556,Kamppi to Latokaski (scooter-transit),06:00,60.169665, 24.934652,60.17892, 24.65813,Kamppi,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+557,Kamppi to Tikkurila (scooter-transit),06:00,60.169665, 24.934652,60.29246, 25.03861,Kamppi,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+558,Kamppi to Airport (scooter-transit),06:00,60.169665, 24.934652,60.317508, 24.969089,Kamppi,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+559,Kamppi to Kirkkonummi (scooter-transit),06:00,60.169665, 24.934652,60.12640, 24.43613,Kamppi,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+560,Töölöntori to Kamppi (scooter-transit),06:00,60.179022, 24.924151,60.169665, 24.934652,Töölöntori,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+561,Töölöntori to Pitäjänmäki (scooter-transit),06:00,60.179022, 24.924151,60.22070, 24.86094,Töölöntori,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+562,Töölöntori to Itäkeskus (scooter-transit),06:00,60.179022, 24.924151,60.20863, 25.07946,Töölöntori,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+563,Töölöntori to Suomenlinna (scooter-transit),06:00,60.179022, 24.924151,60.148237,24.985142,Töölöntori,Suomenlinna,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+564,Töölöntori to Otaniemi (scooter-transit),06:00,60.179022, 24.924151,60.18234, 24.82531,Töölöntori,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+565,Töölöntori to Espoon Keskusta (scooter-transit),06:00,60.179022, 24.924151,60.205940, 24.656711,Töölöntori,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+566,Töölöntori to Matinkylä (scooter-transit),06:00,60.179022, 24.924151,60.15509, 24.74546,Töölöntori,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+567,Töölöntori to Kauklahti (scooter-transit),06:00,60.179022, 24.924151,60.19586, 24.58912,Töölöntori,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+568,Töölöntori to Nuuksio (scooter-transit),06:00,60.179022, 24.924151,60.29030, 24.56324,Töölöntori,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+569,Töölöntori to Latokaski (scooter-transit),06:00,60.179022, 24.924151,60.17892, 24.65813,Töölöntori,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+570,Töölöntori to Tikkurila (scooter-transit),06:00,60.179022, 24.924151,60.29246, 25.03861,Töölöntori,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+571,Töölöntori to Airport (scooter-transit),06:00,60.179022, 24.924151,60.317508, 24.969089,Töölöntori,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+572,Töölöntori to Kirkkonummi (scooter-transit),06:00,60.179022, 24.924151,60.12640, 24.43613,Töölöntori,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+573,Pitäjänmäki to Kamppi (scooter-transit),06:00,60.22070, 24.86094,60.169665, 24.934652,Pitäjänmäki,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+574,Pitäjänmäki to Töölöntori (scooter-transit),06:00,60.22070, 24.86094,60.179022, 24.924151,Pitäjänmäki,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+575,Pitäjänmäki to Itäkeskus (scooter-transit),06:00,60.22070, 24.86094,60.20863, 25.07946,Pitäjänmäki,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+577,Pitäjänmäki to Otaniemi (scooter-transit),06:00,60.22070, 24.86094,60.18234, 24.82531,Pitäjänmäki,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+578,Pitäjänmäki to Espoon Keskusta (scooter-transit),06:00,60.22070, 24.86094,60.205940, 24.656711,Pitäjänmäki,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+579,Pitäjänmäki to Matinkylä (scooter-transit),06:00,60.22070, 24.86094,60.15509, 24.74546,Pitäjänmäki,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+580,Pitäjänmäki to Kauklahti (scooter-transit),06:00,60.22070, 24.86094,60.19586, 24.58912,Pitäjänmäki,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+581,Pitäjänmäki to Nuuksio (scooter-transit),06:00,60.22070, 24.86094,60.29030, 24.56324,Pitäjänmäki,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+582,Pitäjänmäki to Latokaski (scooter-transit),06:00,60.22070, 24.86094,60.17892, 24.65813,Pitäjänmäki,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+583,Pitäjänmäki to Tikkurila (scooter-transit),06:00,60.22070, 24.86094,60.29246, 25.03861,Pitäjänmäki,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+584,Pitäjänmäki to Airport (scooter-transit),06:00,60.22070, 24.86094,60.317508, 24.969089,Pitäjänmäki,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+585,Pitäjänmäki to Kirkkonummi (scooter-transit),06:00,60.22070, 24.86094,60.12640, 24.43613,Pitäjänmäki,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+586,Itäkeskus to Kamppi (scooter-transit),06:00,60.20863, 25.07946,60.169665, 24.934652,Itäkeskus,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+587,Itäkeskus to Töölöntori (scooter-transit),06:00,60.20863, 25.07946,60.179022, 24.924151,Itäkeskus,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+588,Itäkeskus to Pitäjänmäki (scooter-transit),06:00,60.20863, 25.07946,60.22070, 24.86094,Itäkeskus,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+590,Itäkeskus to Otaniemi (scooter-transit),06:00,60.20863, 25.07946,60.18234, 24.82531,Itäkeskus,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+591,Itäkeskus to Espoon Keskusta (scooter-transit),06:00,60.20863, 25.07946,60.205940, 24.656711,Itäkeskus,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+592,Itäkeskus to Matinkylä (scooter-transit),06:00,60.20863, 25.07946,60.15509, 24.74546,Itäkeskus,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+593,Itäkeskus to Kauklahti (scooter-transit),06:00,60.20863, 25.07946,60.19586, 24.58912,Itäkeskus,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+594,Itäkeskus to Nuuksio (scooter-transit),06:00,60.20863, 25.07946,60.29030, 24.56324,Itäkeskus,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+595,Itäkeskus to Latokaski (scooter-transit),06:00,60.20863, 25.07946,60.17892, 24.65813,Itäkeskus,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+596,Itäkeskus to Tikkurila (scooter-transit),06:00,60.20863, 25.07946,60.29246, 25.03861,Itäkeskus,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+597,Itäkeskus to Airport (scooter-transit),06:00,60.20863, 25.07946,60.317508, 24.969089,Itäkeskus,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+598,Itäkeskus to Kirkkonummi (scooter-transit),06:00,60.20863, 25.07946,60.12640, 24.43613,Itäkeskus,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+599,Suomenlinna to Kamppi (scooter-transit),06:00,60.148237,24.985142,60.169665, 24.934652,Suomenlinna,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+600,Suomenlinna to Töölöntori (scooter-transit),06:00,60.148237,24.985142,60.179022, 24.924151,Suomenlinna,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+612,Otaniemi to Kamppi (scooter-transit),06:00,60.18234, 24.82531,60.169665, 24.934652,Otaniemi,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+613,Otaniemi to Töölöntori (scooter-transit),06:00,60.18234, 24.82531,60.179022, 24.924151,Otaniemi,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+614,Otaniemi to Pitäjänmäki (scooter-transit),06:00,60.18234, 24.82531,60.22070, 24.86094,Otaniemi,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+615,Otaniemi to Itäkeskus (scooter-transit),06:00,60.18234, 24.82531,60.20863, 25.07946,Otaniemi,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+617,Otaniemi to Espoon Keskusta (scooter-transit),06:00,60.18234, 24.82531,60.205940, 24.656711,Otaniemi,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+618,Otaniemi to Matinkylä (scooter-transit),06:00,60.18234, 24.82531,60.15509, 24.74546,Otaniemi,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+619,Otaniemi to Kauklahti (scooter-transit),06:00,60.18234, 24.82531,60.19586, 24.58912,Otaniemi,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+620,Otaniemi to Nuuksio (scooter-transit),06:00,60.18234, 24.82531,60.29030, 24.56324,Otaniemi,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+621,Otaniemi to Latokaski (scooter-transit),06:00,60.18234, 24.82531,60.17892, 24.65813,Otaniemi,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+622,Otaniemi to Tikkurila (scooter-transit),06:00,60.18234, 24.82531,60.29246, 25.03861,Otaniemi,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+623,Otaniemi to Airport (scooter-transit),06:00,60.18234, 24.82531,60.317508, 24.969089,Otaniemi,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+624,Otaniemi to Kirkkonummi (scooter-transit),06:00,60.18234, 24.82531,60.12640, 24.43613,Otaniemi,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+625,Espoon Keskusta to Kamppi (scooter-transit),06:00,60.205940, 24.656711,60.169665, 24.934652,Espoon Keskusta,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+626,Espoon Keskusta to Töölöntori (scooter-transit),06:00,60.205940, 24.656711,60.179022, 24.924151,Espoon Keskusta,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+627,Espoon Keskusta to Pitäjänmäki (scooter-transit),06:00,60.205940, 24.656711,60.22070, 24.86094,Espoon Keskusta,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+628,Espoon Keskusta to Itäkeskus (scooter-transit),06:00,60.205940, 24.656711,60.20863, 25.07946,Espoon Keskusta,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+630,Espoon Keskusta to Otaniemi (scooter-transit),06:00,60.205940, 24.656711,60.18234, 24.82531,Espoon Keskusta,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+631,Espoon Keskusta to Matinkylä (scooter-transit),06:00,60.205940, 24.656711,60.15509, 24.74546,Espoon Keskusta,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+632,Espoon Keskusta to Kauklahti (scooter-transit),06:00,60.205940, 24.656711,60.19586, 24.58912,Espoon Keskusta,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+633,Espoon Keskusta to Nuuksio (scooter-transit),06:00,60.205940, 24.656711,60.29030, 24.56324,Espoon Keskusta,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+634,Espoon Keskusta to Latokaski (scooter-transit),06:00,60.205940, 24.656711,60.17892, 24.65813,Espoon Keskusta,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+635,Espoon Keskusta to Tikkurila (scooter-transit),06:00,60.205940, 24.656711,60.29246, 25.03861,Espoon Keskusta,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+636,Espoon Keskusta to Airport (scooter-transit),06:00,60.205940, 24.656711,60.317508, 24.969089,Espoon Keskusta,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+637,Espoon Keskusta to Kirkkonummi (scooter-transit),06:00,60.205940, 24.656711,60.12640, 24.43613,Espoon Keskusta,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+638,Matinkylä to Kamppi (scooter-transit),06:00,60.15509, 24.74546,60.169665, 24.934652,Matinkylä,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+639,Matinkylä to Töölöntori (scooter-transit),06:00,60.15509, 24.74546,60.179022, 24.924151,Matinkylä,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+640,Matinkylä to Pitäjänmäki (scooter-transit),06:00,60.15509, 24.74546,60.22070, 24.86094,Matinkylä,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+641,Matinkylä to Itäkeskus (scooter-transit),06:00,60.15509, 24.74546,60.20863, 25.07946,Matinkylä,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+643,Matinkylä to Otaniemi (scooter-transit),06:00,60.15509, 24.74546,60.18234, 24.82531,Matinkylä,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+644,Matinkylä to Espoon Keskusta (scooter-transit),06:00,60.15509, 24.74546,60.205940, 24.656711,Matinkylä,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+645,Matinkylä to Kauklahti (scooter-transit),06:00,60.15509, 24.74546,60.19586, 24.58912,Matinkylä,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+646,Matinkylä to Nuuksio (scooter-transit),06:00,60.15509, 24.74546,60.29030, 24.56324,Matinkylä,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+647,Matinkylä to Latokaski (scooter-transit),06:00,60.15509, 24.74546,60.17892, 24.65813,Matinkylä,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+648,Matinkylä to Tikkurila (scooter-transit),06:00,60.15509, 24.74546,60.29246, 25.03861,Matinkylä,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+649,Matinkylä to Airport (scooter-transit),06:00,60.15509, 24.74546,60.317508, 24.969089,Matinkylä,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+650,Matinkylä to Kirkkonummi (scooter-transit),06:00,60.15509, 24.74546,60.12640, 24.43613,Matinkylä,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+651,Kauklahti to Kamppi (scooter-transit),06:00,60.19586, 24.58912,60.169665, 24.934652,Kauklahti,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+652,Kauklahti to Töölöntori (scooter-transit),06:00,60.19586, 24.58912,60.179022, 24.924151,Kauklahti,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+653,Kauklahti to Pitäjänmäki (scooter-transit),06:00,60.19586, 24.58912,60.22070, 24.86094,Kauklahti,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+654,Kauklahti to Itäkeskus (scooter-transit),06:00,60.19586, 24.58912,60.20863, 25.07946,Kauklahti,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+656,Kauklahti to Otaniemi (scooter-transit),06:00,60.19586, 24.58912,60.18234, 24.82531,Kauklahti,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+657,Kauklahti to Espoon Keskusta (scooter-transit),06:00,60.19586, 24.58912,60.205940, 24.656711,Kauklahti,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+658,Kauklahti to Matinkylä (scooter-transit),06:00,60.19586, 24.58912,60.15509, 24.74546,Kauklahti,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+659,Kauklahti to Nuuksio (scooter-transit),06:00,60.19586, 24.58912,60.29030, 24.56324,Kauklahti,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+660,Kauklahti to Latokaski (scooter-transit),06:00,60.19586, 24.58912,60.17892, 24.65813,Kauklahti,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+661,Kauklahti to Tikkurila (scooter-transit),06:00,60.19586, 24.58912,60.29246, 25.03861,Kauklahti,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+662,Kauklahti to Airport (scooter-transit),06:00,60.19586, 24.58912,60.317508, 24.969089,Kauklahti,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+663,Kauklahti to Kirkkonummi (scooter-transit),06:00,60.19586, 24.58912,60.12640, 24.43613,Kauklahti,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+664,Nuuksio to Kamppi (scooter-transit),06:00,60.29030, 24.56324,60.169665, 24.934652,Nuuksio,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+665,Nuuksio to Töölöntori (scooter-transit),06:00,60.29030, 24.56324,60.179022, 24.924151,Nuuksio,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+666,Nuuksio to Pitäjänmäki (scooter-transit),06:00,60.29030, 24.56324,60.22070, 24.86094,Nuuksio,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+667,Nuuksio to Itäkeskus (scooter-transit),06:00,60.29030, 24.56324,60.20863, 25.07946,Nuuksio,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+669,Nuuksio to Otaniemi (scooter-transit),06:00,60.29030, 24.56324,60.18234, 24.82531,Nuuksio,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+670,Nuuksio to Espoon Keskusta (scooter-transit),06:00,60.29030, 24.56324,60.205940, 24.656711,Nuuksio,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+671,Nuuksio to Matinkylä (scooter-transit),06:00,60.29030, 24.56324,60.15509, 24.74546,Nuuksio,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+672,Nuuksio to Kauklahti (scooter-transit),06:00,60.29030, 24.56324,60.19586, 24.58912,Nuuksio,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+673,Nuuksio to Latokaski (scooter-transit),06:00,60.29030, 24.56324,60.17892, 24.65813,Nuuksio,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+674,Nuuksio to Tikkurila (scooter-transit),06:00,60.29030, 24.56324,60.29246, 25.03861,Nuuksio,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+675,Nuuksio to Airport (scooter-transit),06:00,60.29030, 24.56324,60.317508, 24.969089,Nuuksio,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+676,Nuuksio to Kirkkonummi (scooter-transit),06:00,60.29030, 24.56324,60.12640, 24.43613,Nuuksio,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+677,Latokaski to Kamppi (scooter-transit),06:00,60.17892, 24.65813,60.169665, 24.934652,Latokaski,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+678,Latokaski to Töölöntori (scooter-transit),06:00,60.17892, 24.65813,60.179022, 24.924151,Latokaski,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+679,Latokaski to Pitäjänmäki (scooter-transit),06:00,60.17892, 24.65813,60.22070, 24.86094,Latokaski,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+680,Latokaski to Itäkeskus (scooter-transit),06:00,60.17892, 24.65813,60.20863, 25.07946,Latokaski,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+682,Latokaski to Otaniemi (scooter-transit),06:00,60.17892, 24.65813,60.18234, 24.82531,Latokaski,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+683,Latokaski to Espoon Keskusta (scooter-transit),06:00,60.17892, 24.65813,60.205940, 24.656711,Latokaski,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+684,Latokaski to Matinkylä (scooter-transit),06:00,60.17892, 24.65813,60.15509, 24.74546,Latokaski,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+685,Latokaski to Kauklahti (scooter-transit),06:00,60.17892, 24.65813,60.19586, 24.58912,Latokaski,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+686,Latokaski to Nuuksio (scooter-transit),06:00,60.17892, 24.65813,60.29030, 24.56324,Latokaski,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+687,Latokaski to Tikkurila (scooter-transit),06:00,60.17892, 24.65813,60.29246, 25.03861,Latokaski,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+688,Latokaski to Airport (scooter-transit),06:00,60.17892, 24.65813,60.317508, 24.969089,Latokaski,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+689,Latokaski to Kirkkonummi (scooter-transit),06:00,60.17892, 24.65813,60.12640, 24.43613,Latokaski,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+690,Tikkurila to Kamppi (scooter-transit),06:00,60.29246, 25.03861,60.169665, 24.934652,Tikkurila,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+691,Tikkurila to Töölöntori (scooter-transit),06:00,60.29246, 25.03861,60.179022, 24.924151,Tikkurila,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+692,Tikkurila to Pitäjänmäki (scooter-transit),06:00,60.29246, 25.03861,60.22070, 24.86094,Tikkurila,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+693,Tikkurila to Itäkeskus (scooter-transit),06:00,60.29246, 25.03861,60.20863, 25.07946,Tikkurila,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+695,Tikkurila to Otaniemi (scooter-transit),06:00,60.29246, 25.03861,60.18234, 24.82531,Tikkurila,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+696,Tikkurila to Espoon Keskusta (scooter-transit),06:00,60.29246, 25.03861,60.205940, 24.656711,Tikkurila,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+697,Tikkurila to Matinkylä (scooter-transit),06:00,60.29246, 25.03861,60.15509, 24.74546,Tikkurila,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+698,Tikkurila to Kauklahti (scooter-transit),06:00,60.29246, 25.03861,60.19586, 24.58912,Tikkurila,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+699,Tikkurila to Nuuksio (scooter-transit),06:00,60.29246, 25.03861,60.29030, 24.56324,Tikkurila,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+700,Tikkurila to Latokaski (scooter-transit),06:00,60.29246, 25.03861,60.17892, 24.65813,Tikkurila,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+701,Tikkurila to Airport (scooter-transit),06:00,60.29246, 25.03861,60.317508, 24.969089,Tikkurila,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+702,Tikkurila to Kirkkonummi (scooter-transit),06:00,60.29246, 25.03861,60.12640, 24.43613,Tikkurila,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+703,Airport to Kamppi (scooter-transit),06:00,60.317508, 24.969089,60.169665, 24.934652,Airport,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+704,Airport to Töölöntori (scooter-transit),06:00,60.317508, 24.969089,60.179022, 24.924151,Airport,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+705,Airport to Pitäjänmäki (scooter-transit),06:00,60.317508, 24.969089,60.22070, 24.86094,Airport,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+706,Airport to Itäkeskus (scooter-transit),06:00,60.317508, 24.969089,60.20863, 25.07946,Airport,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+708,Airport to Otaniemi (scooter-transit),06:00,60.317508, 24.969089,60.18234, 24.82531,Airport,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+709,Airport to Espoon Keskusta (scooter-transit),06:00,60.317508, 24.969089,60.205940, 24.656711,Airport,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+710,Airport to Matinkylä (scooter-transit),06:00,60.317508, 24.969089,60.15509, 24.74546,Airport,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+711,Airport to Kauklahti (scooter-transit),06:00,60.317508, 24.969089,60.19586, 24.58912,Airport,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+712,Airport to Nuuksio (scooter-transit),06:00,60.317508, 24.969089,60.29030, 24.56324,Airport,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+713,Airport to Latokaski (scooter-transit),06:00,60.317508, 24.969089,60.17892, 24.65813,Airport,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+714,Airport to Tikkurila (scooter-transit),06:00,60.317508, 24.969089,60.29246, 25.03861,Airport,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+715,Airport to Kirkkonummi (scooter-transit),06:00,60.317508, 24.969089,60.12640, 24.43613,Airport,Kirkkonummi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+716,Kirkkonummi to Kamppi (scooter-transit),06:00,60.12640, 24.43613,60.169665, 24.934652,Kirkkonummi,Kamppi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+717,Kirkkonummi to Töölöntori (scooter-transit),06:00,60.12640, 24.43613,60.179022, 24.924151,Kirkkonummi,Töölöntori,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+718,Kirkkonummi to Pitäjänmäki (scooter-transit),06:00,60.12640, 24.43613,60.22070, 24.86094,Kirkkonummi,Pitäjänmäki,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+719,Kirkkonummi to Itäkeskus (scooter-transit),06:00,60.12640, 24.43613,60.20863, 25.07946,Kirkkonummi,Itäkeskus,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+721,Kirkkonummi to Otaniemi (scooter-transit),06:00,60.12640, 24.43613,60.18234, 24.82531,Kirkkonummi,Otaniemi,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+722,Kirkkonummi to Espoon Keskusta (scooter-transit),06:00,60.12640, 24.43613,60.205940, 24.656711,Kirkkonummi,Espoon Keskusta,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+723,Kirkkonummi to Matinkylä (scooter-transit),06:00,60.12640, 24.43613,60.15509, 24.74546,Kirkkonummi,Matinkylä,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+724,Kirkkonummi to Kauklahti (scooter-transit),06:00,60.12640, 24.43613,60.19586, 24.58912,Kirkkonummi,Kauklahti,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+725,Kirkkonummi to Nuuksio (scooter-transit),06:00,60.12640, 24.43613,60.29030, 24.56324,Kirkkonummi,Nuuksio,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+726,Kirkkonummi to Latokaski (scooter-transit),06:00,60.12640, 24.43613,60.17892, 24.65813,Kirkkonummi,Latokaski,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+727,Kirkkonummi to Tikkurila (scooter-transit),06:00,60.12640, 24.43613,60.29246, 25.03861,Kirkkonummi,Tikkurila,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
+728,Kirkkonummi to Airport (scooter-transit),06:00,60.12640, 24.43613,60.317508, 24.969089,Kirkkonummi,Airport,TRANSIT|WALK|SCOOTER_RENT,scooter-transit
