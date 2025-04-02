@@ -152,6 +152,17 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       //      -> (State, Edge, int, TraverseMode, boolean)
       //  5. State.edit(Edge) -> (Edge, int)
       //  6. new StateEditor(State, Edge) -> (State, Edge, int)
+
+      // This entire thing, including the helper method unifyUnusedOutgoingStates, will reduce,
+      // using integers, to:
+      //   boolean nonCommensurable = a.unusedOutgoingEdgesInt ^ b.unusedOutgoingEdgesInt != 0;
+      //   int unusedOutgoingEdgesInt = a.unusedOutgoingEdgesInt & b.unusedOutgoingEdgesInt;
+      //   a.unusedOutgoingEdgesInt = unusedOutgoingEdgesInt;
+      //   b.unusedOutgoingEdgesInt = unusedOutgoingEdgesInt;
+      //   if (nonCommensurable) {
+      //     return false;
+      //   }
+
       // The unification might have made the unusedOutgoingEdges sets of two different States
       // the same, test for that immediately, because that's a cheap early exit.
       if (a.unusedOutgoingEdges != b.unusedOutgoingEdges) {
