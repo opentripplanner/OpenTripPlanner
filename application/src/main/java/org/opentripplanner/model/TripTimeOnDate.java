@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -397,7 +398,7 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the previous stop time in the trip. If it's the first stop in the trip, it returns an
+   * Returns the previous stop times in the trip. If it's the first stop in the trip, it returns an
    * empty list.
    */
   public List<TripTimeOnDate> previousTimes() {
@@ -410,7 +411,7 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the next stop time in the trip, if it isn't the last one.
+   * Returns the next stop times in the trip. If it's the stop in the trip it returns an empty list.
    */
   public List<TripTimeOnDate> nextTimes() {
     if (stopIndex == tripTimes.getNumStops() - 1) {
@@ -438,6 +439,7 @@ public class TripTimeOnDate {
   }
 
   private TripTimeOnDate atStopIndex(int stopIndex) {
+    IntUtils.requireInRange(stopIndex, 0, tripTimes.getNumStops() - 1, "stopIndex");
     return new TripTimeOnDate(
       tripTimes,
       stopIndex,
