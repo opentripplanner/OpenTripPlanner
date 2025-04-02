@@ -102,7 +102,18 @@ public abstract class DominanceFunctions implements Serializable, DominanceFunct
       a.getBackMode().isInCar()
     ) {
       // Fortunately the number of edges from a vertex is usually very low. We can reimplement
-      // this as a bunch of integer bit operations.
+      // this as a bunch of integer bit operations. This will require passing through the number
+      // of the edge in the current context through a bunch of method calls:
+      //  1. AStar.iterate
+      //  2. Edge.traverse(State) -> (int, State)
+      //  2a. StreetEdge.traverse(State) -> (int, State)
+      //  2b. other edge types can probably ignore this change
+      //  3. StreetEdge.doTraverse(State, TraverseMode, boolean)
+      //      -> (int, State, TraverseMode, boolean)
+      //  4. BikeWalkableEdge.createEditor(State, Edge, TraverseMode, boolean)
+      //      -> (State, Edge, int, TraverseMode, boolean)
+      //  5. State.edit(Edge) -> (Edge, int)
+      //  6. new StateEditor(State, Edge) -> (State, Edge, int)
       boolean setsDifferent = false;
       HashSet<Edge> unusedOutgoingEdges = new HashSet<>();
       for (Edge edge : a.unusedOutgoingEdges) {
