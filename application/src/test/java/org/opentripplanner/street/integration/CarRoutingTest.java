@@ -199,7 +199,7 @@ public class CarRoutingTest {
   }
 
   private StreetEdge[] edges(StreetVertex a, StreetVertex b, double length) {
-    return new StreetEdge[] {streetEdge(a, b, length), streetEdge(b, a, length)};
+    return new StreetEdge[] { streetEdge(a, b, length), streetEdge(b, a, length) };
   }
 
   @Test
@@ -221,7 +221,14 @@ public class CarRoutingTest {
     edges(D, E, 1.0);
     var DF = edges(D, F, 1.0);
     BD[0].addTurnRestriction(
-      new TurnRestriction(BD[0], DF[0], TurnRestrictionType.NO_TURN, new TraverseModeSet(TraverseMode.CAR), null));
+        new TurnRestriction(
+          BD[0],
+          DF[0],
+          TurnRestrictionType.NO_TURN,
+          new TraverseModeSet(TraverseMode.CAR),
+          null
+        )
+      );
 
     var request = new RouteRequest();
     request.setDateTime(dateTime);
