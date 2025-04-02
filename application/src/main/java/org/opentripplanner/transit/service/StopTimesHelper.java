@@ -88,7 +88,7 @@ class StopTimesHelper {
     return result;
   }
 
-  List<TripTimeOnDate> findTripTimeOnDate(TripTimeOnDateRequest request) {
+  List<TripTimeOnDate> findTripTimesOnDate(TripTimeOnDateRequest request) {
     Matcher<TripTimeOnDate> matcher = TripTimeOnDateMatcherFactory.of(request);
     return request
       .stopLocations()
