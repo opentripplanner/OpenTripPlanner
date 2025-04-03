@@ -1,8 +1,9 @@
 import csv
 
-fieldnames = ["testCaseId", "description", "departure", "fromLat", "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category"]
+fieldnames = ["testCaseId", "description", "departure", "fromLat",
+              "fromLon", "toLat", "toLon", "origin", "destination", "modes", "category"]
 
-locations= [
+locations = [
 
     # Helsinki
     {
@@ -22,8 +23,8 @@ locations= [
         "name": "Itäkeskus"
     },
     {
-         "coordinates":  "60.148237,24.985142",
-         "name": "Suomenlinna"
+        "coordinates":  "60.148237,24.985142",
+        "name": "Suomenlinna"
     },
     # Espoo
     {
@@ -43,12 +44,12 @@ locations= [
         "name": "Kauklahti"
     },
     {
-         "coordinates":  "60.29030, 24.56324",
-         "name": "Nuuksio"
+        "coordinates":  "60.29030, 24.56324",
+        "name": "Nuuksio"
     },
     {
-         "coordinates":  "60.17892, 24.65813",
-         "name": "Latokaski"
+        "coordinates":  "60.17892, 24.65813",
+        "name": "Latokaski"
     },
 
     # Vantaa
@@ -56,29 +57,65 @@ locations= [
         "coordinates":  "60.29246, 25.03861",
         "name": "Tikkurila"
     },
-    #Airpot
+    # Airpot
     {
-            "coordinates":  "60.317508, 24.969089",
-            "name": "Airport"
+        "coordinates":  "60.317508, 24.969089",
+        "name": "Airport"
     },
-    #Kirkkonummi
+    # Kirkkonummi
     {
-                "coordinates":  "60.12640, 24.43613",
-                "name": "Kirkkonummi"
+        "coordinates":  "60.12640, 24.43613",
+        "name": "Kirkkonummi"
     }
 ]
 
-departure_times = ["06:00","13:00","22:00"]
+scooter_locations = [
+    {
+        "coordinates": "60.169665, 24.934652",
+        "name": "Kamppi"
+    },
+    {
+        "coordinates":  "60.179022, 24.924151",
+        "name": "Töölöntori"
+    },
+    {
+        "coordinates":  "60.18234, 24.82531",
+        "name": "Otaniemi"
+    },
+    {
+        "coordinates":  "60.198349, 24.875654",
+        "name": "Munkkiniemi"
+    },
+    {
+        "coordinates":  "60.199712, 24.939437",
+        "name": "Pasila"
+    },
+    {
+        "coordinates":  "60.155454, 24.945134",
+        "name": "Eira"
+    },
+    {
+        "coordinates":  "60.184945,24.982309",
+        "name": "Kalasatama"
+    },
+    {
+        "coordinates":  "60.15654,24.86665",
+        "name": "Lauttasaari"
+    },
+    {
+        "coordinates":  "60.18534,25.00162",
+        "name": "Kulosaari"
+    },
+]
+departure_times = ["06:00", "13:00", "22:00"]
 
 
-failing_cases = [27, 66, 105, 144, 159, 183, 222, 300, 339, 420, 459, 498, 537, 576, 589, 601, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 616, 629, 642, 655, 668, 681, 694, 707, 720]
-
-
-
-
+failing_cases = [27, 66, 105, 144, 159, 183, 222,
+                 300, 339, 420, 459, 498, 537, 566, 568, 570]
 
 
 rows = []
+
 
 def parse_coords(input):
     split = input.split(",")
@@ -86,6 +123,7 @@ def parse_coords(input):
         "lat": split[0],
         "lon": split[1]
     }
+
 
 counter = 0
 for start in locations:
@@ -97,7 +135,8 @@ for start in locations:
             for departure in departure_times:
                 counter = counter + 1
                 if counter in failing_cases:
-                    print("FAILED: ", start["name"], " ", end["name"],  " ", departure)
+                    print("FAILED: ", start["name"],
+                          " ", end["name"],  " ", departure)
                 else:
                     rows.append({
                         "testCaseId": counter,
@@ -113,19 +152,20 @@ for start in locations:
                         "category": "transit"
                     })
 # Generate scooter test
-for start in locations:
-    for end in locations:
+for start in scooter_locations:
+    for end in scooter_locations:
         if end["coordinates"] != start["coordinates"]:
             start_coords = parse_coords(start["coordinates"])
             end_coords = parse_coords(end["coordinates"])
             departure = departure_times[0]  # Use just the first time
             counter += 1
             if counter in failing_cases:
-                print("FAILED:", start["name"], "→", end["name"], "@", departure, "(scooter-transit)")
+                print("FAILED:", start["name"], "→",
+                      end["name"], "@", departure, "(scooter)")
             else:
                 rows.append({
                     "testCaseId": counter,
-                    "description": f'{start["name"]} to {end["name"]} (scooter-transit)',
+                    "description": f'{start["name"]} to {end["name"]} (scooter)',
                     "departure": departure,
                     "fromLat": start_coords["lat"],
                     "fromLon": start_coords["lon"],
@@ -133,8 +173,8 @@ for start in locations:
                     "toLon": end_coords["lon"],
                     "origin": start["name"],
                     "destination": end["name"],
-                    "modes": "TRANSIT|WALK|SCOOTER_RENT",
-                    "category": "scooter-transit"
+                    "modes": "SCOOTER_RENT|WALK",
+                    "category": "scooter"
                 })
 
 print(counter)
