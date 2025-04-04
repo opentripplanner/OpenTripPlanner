@@ -1,13 +1,11 @@
 package org.opentripplanner.apis;
 
-import static org.opentripplanner.framework.application.OTPFeature.APIBikeRental;
 import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
 import static org.opentripplanner.framework.application.OTPFeature.DebugRasterTiles;
 import static org.opentripplanner.framework.application.OTPFeature.DebugUi;
 import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
-import static org.opentripplanner.framework.application.OTPFeature.LegacyRestApi;
 import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeocoder;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
@@ -30,10 +28,6 @@ import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.ojp.trias.TriasResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
-import org.opentripplanner.ext.restapi.resources.BikeRental;
-import org.opentripplanner.ext.restapi.resources.IndexAPI;
-import org.opentripplanner.ext.restapi.resources.PlannerResource;
-import org.opentripplanner.ext.restapi.resources.Routers;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 
@@ -65,12 +59,6 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
     addIfEnabled(TriasApi, TriasResource.class);
-
-    // scheduled to be removed
-    addIfEnabled(APIBikeRental, BikeRental.class);
-    addIfEnabled(LegacyRestApi, Routers.class);
-    addIfEnabled(LegacyRestApi, PlannerResource.class);
-    addIfEnabled(LegacyRestApi, IndexAPI.class);
   }
 
   /**

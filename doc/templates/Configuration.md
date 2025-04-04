@@ -102,9 +102,9 @@ The project information variables available are:
 
 All three configuration files have an optional `configVersion` property. The property can be used to
 version the configuration in a deployment pipeline. The `configVersion` is not used by OTP in any
-way, but is logged at startup and is available as part of the _server-info_ data in the REST API.
+way, but is logged at startup and is available as part of the _server-info_ data in the API.
 The intended usage is to be able to check which version of the configuration the graph was build
-with and which version the router uses. In an deployment with many OTP instances it can be useful to
+with and which version the router uses. In a deployment with many OTP instances it can be useful to
 ask an instance about the version, instead of tracking the deployment pipeline backwards to find the
 version used. How you inject a version into the configuration file is up to you, but you can do it
 in your build-pipeline, at deployment time or use system environment variable substitution.
