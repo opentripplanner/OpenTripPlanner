@@ -8,6 +8,7 @@ import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAILING;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
+import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 import static org.opentripplanner.transit.model.basic.TransitMode.AIRPLANE;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
@@ -227,5 +228,16 @@ class QualifiedModeSetTest {
     assertEquals(WALK, modeSet.getRequestModes().directMode);
     assertEquals(CAR_HAILING, modeSet.getRequestModes().accessMode);
     assertEquals(CAR_HAILING, modeSet.getRequestModes().egressMode);
+  }
+
+  @Test
+  void scooterTransfer() {
+    var modeSet = new QualifiedModeSet("SCOOTER_RENT,BUS,RAIL,SUBWAY");
+    assertEquals(Set.of(BUS, RAIL, SUBWAY), Set.copyOf(modeSet.getTransitModes()));
+
+    var requestModes = modeSet.getRequestModes();
+    assertEquals(SCOOTER_RENTAL, requestModes.directMode);
+    assertEquals(WALK, requestModes.transferMode);
+    assertEquals(SCOOTER_RENTAL, requestModes.egressMode);
   }
 }
