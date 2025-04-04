@@ -20,9 +20,4 @@ OTP instance and reading live application metrics.
 
 The [Geocoder API](../sandbox/GeocoderAPI.md) allows you to geocode stop names and codes.
 
-## Removed legacy APIs
-
-The OTP REST API used to power many apps and frontends. For years it was the only way to access
-OTP programmatically.
-
-Over time it has been replaced by the GraphQL APIs and was removed in 2025.
+The OTP REST API was removed in 2025.
