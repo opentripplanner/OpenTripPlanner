@@ -654,9 +654,13 @@ public class VertexLinker {
           .filter(v -> distSquared(v, newVertex) >= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED)
           .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
-          .findFirst()
-          .get();
-        return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges, true);
+          .findFirst();
+        if (!nearest.isPresent()) {
+          nearest = areaGroup.visibilityVertices().stream().findFirst();
+        }
+        if (nearest.isPresent()) {
+          return addVisibilityEdges(newVertex, nearest.get(), areaGroup, scope, tempEdges, true);
+        }
       }
       return false;
     } else if (scope == Scope.PERMANENT) {
