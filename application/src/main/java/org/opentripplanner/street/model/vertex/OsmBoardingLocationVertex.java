@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -36,7 +37,10 @@ public class OsmBoardingLocationVertex extends LabelledIntersectionVertex {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(getClass()).addCol("references", references).toString();
+    return ToStringBuilder.of(getClass())
+      .addObj("coordinate", new WgsCoordinate(getCoordinate()))
+      .addCol("references", references)
+      .toString();
   }
 
   public boolean isConnectedToStreetNetwork() {

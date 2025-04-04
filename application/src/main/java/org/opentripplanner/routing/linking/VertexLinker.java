@@ -655,7 +655,11 @@ public class VertexLinker {
           .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
           .findFirst()
-          .get();
+          .orElseThrow(() ->
+            new IllegalStateException(
+              "No nearest visibility vertex found for %s in %s".formatted(newVertex, areaGroup)
+            )
+          );
         return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges, true);
       }
       return false;
