@@ -16,6 +16,7 @@ import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
+import static org.opentripplanner.street.search.TraverseMode.SCOOTER;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.street.search.state.TestStateBuilder.ofCarRental;
 import static org.opentripplanner.street.search.state.TestStateBuilder.ofDriving;
@@ -51,12 +52,11 @@ class StateTest {
   static Stream<Arguments> testCases() {
     return Stream.of(
       of(SCOOTER_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-      //FIXME: it's strange that the arriveBy rental searches all start on a bicycle
-      of(SCOOTER_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(SCOOTER_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, SCOOTER)),
       of(BIKE_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
       of(BIKE_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
       of(CAR_RENTAL, false, Set.of(BEFORE_RENTING), Set.of(WALK)),
-      of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, BICYCLE)),
+      of(CAR_RENTAL, true, Set.of(HAVE_RENTED, RENTING_FLOATING), Set.of(WALK, CAR)),
       of(StreetMode.CAR, false, NULL_RENTAL_STATES, Set.of(CAR)),
       of(BIKE, false, NULL_RENTAL_STATES, Set.of(BICYCLE)),
       of(StreetMode.WALK, false, NULL_RENTAL_STATES, Set.of(TraverseMode.WALK)),
