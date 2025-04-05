@@ -258,8 +258,7 @@ public class NetexMapper {
       .forEach(gol -> {
         GroupOfRoutes model = mapper.mapGroupOfRoutes(gol);
 
-        Optional
-          .ofNullable(gol.getMembers())
+        Optional.ofNullable(gol.getMembers())
           .stream()
           .map(LineRefs_RelStructure::getLineRef)
           .filter(Objects::nonNull)
@@ -535,9 +534,20 @@ public class NetexMapper {
       .localKeys()
       .forEach(id -> {
         var sspid = idFactory.createId(id);
-        var stopId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
-        var stop = Objects.requireNonNull(transitBuilder.getStops().get(stopId));
-        transitBuilder.addStopByScheduledStopPoint(sspid, stop);
+        var quayId = idFactory.createId(currentNetexIndex.getQuayIdByStopPointRef().lookup(id));
+        if (transitBuilder.getStops().containsKey(quayId)) {
+          var stop = transitBuilder.getStops().get(quayId);
+          transitBuilder.addStopByScheduledStopPoint(sspid, stop);
+        } else {
+          // it's debatable if this is actually a problem with the data set. there are legitimate
+          // cases where SSPs are not mapped, for example pass-through stops.
+          issueStore.add(
+            "ScheduledStopPointAssignedToUnknownQuay",
+            "Scheduled stop point %s been mapped to unknow quay %s.",
+            sspid,
+            quayId
+          );
+        }
       });
   }
 

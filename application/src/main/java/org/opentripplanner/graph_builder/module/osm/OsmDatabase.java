@@ -36,6 +36,7 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.osm.model.OsmLevel;
 import org.opentripplanner.osm.model.OsmLevel.Source;
 import org.opentripplanner.osm.model.OsmNode;
@@ -43,7 +44,6 @@ import org.opentripplanner.osm.model.OsmRelation;
 import org.opentripplanner.osm.model.OsmRelationMember;
 import org.opentripplanner.osm.model.OsmTag;
 import org.opentripplanner.osm.model.OsmWay;
-import org.opentripplanner.osm.model.OsmWithTags;
 import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -78,13 +78,13 @@ public class OsmDatabase {
   private final TLongObjectMap<OsmRelation> relationsById = new TLongObjectHashMap<>();
 
   /* All walkable areas */
-  private final List<Area> walkableAreas = new ArrayList<>();
+  private final List<OsmArea> walkableAreas = new ArrayList<>();
 
   /* All P+R areas */
-  private final List<Area> parkAndRideAreas = new ArrayList<>();
+  private final List<OsmArea> parkAndRideAreas = new ArrayList<>();
 
   /* All bike parking areas */
-  private final List<Area> bikeParkingAreas = new ArrayList<>();
+  private final List<OsmArea> bikeParkingAreas = new ArrayList<>();
 
   /* Map of all area OSMWay for a given node */
   private final TLongObjectMap<Set<OsmWay>> areasForNode = new TLongObjectHashMap<>();
@@ -92,7 +92,7 @@ public class OsmDatabase {
   /* Map of all area OSMWay for a given node */
   private final List<OsmWay> singleWayAreas = new ArrayList<>();
 
-  private final Set<OsmWithTags> processedAreas = new HashSet<>();
+  private final Set<OsmEntity> processedAreas = new HashSet<>();
 
   /* Set of area way IDs */
   private final TLongSet areaWayIds = new TLongHashSet();
@@ -104,19 +104,21 @@ public class OsmDatabase {
   private final TLongSet areaNodeIds = new TLongHashSet();
 
   /* Track which vertical level each OSM way belongs to, for building elevators etc. */
-  private final Map<OsmWithTags, OsmLevel> wayLevels = new HashMap<>();
+  private final Map<OsmEntity, OsmLevel> wayLevels = new HashMap<>();
 
   /* Set of turn restrictions for each turn "from" way ID */
-  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay = ArrayListMultimap.create();
+  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByFromWay =
+    ArrayListMultimap.create();
 
   /* Set of turn restrictions for each turn "to" way ID */
-  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay = ArrayListMultimap.create();
+  private final Multimap<Long, TurnRestrictionTag> turnRestrictionsByToWay =
+    ArrayListMultimap.create();
 
   /*
    * Map of all transit stop nodes that lie within an area and which are connected to the area by
    * a relation. Keyed by the area's OSM way.
    */
-  private final Multimap<OsmWithTags, OsmNode> stopsInAreas = HashMultimap.create();
+  private final Multimap<OsmEntity, OsmNode> stopsInAreas = HashMultimap.create();
 
   /*
    * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -166,15 +168,15 @@ public class OsmDatabase {
     return Collections.unmodifiableCollection(carParkingNodes.valueCollection());
   }
 
-  public Collection<Area> getWalkableAreas() {
+  public Collection<OsmArea> getWalkableAreas() {
     return Collections.unmodifiableCollection(walkableAreas);
   }
 
-  public Collection<Area> getParkAndRideAreas() {
+  public Collection<OsmArea> getParkAndRideAreas() {
     return Collections.unmodifiableCollection(parkAndRideAreas);
   }
 
-  public Collection<Area> getBikeParkingAreas() {
+  public Collection<OsmArea> getBikeParkingAreas() {
     return Collections.unmodifiableCollection(bikeParkingAreas);
   }
 
@@ -190,11 +192,11 @@ public class OsmDatabase {
     return turnRestrictionsByToWay.get(toWayId);
   }
 
-  public Collection<OsmNode> getStopsInArea(OsmWithTags areaParent) {
+  public Collection<OsmNode> getStopsInArea(OsmEntity areaParent) {
     return stopsInAreas.get(areaParent);
   }
 
-  public OsmLevel getLevelForWay(OsmWithTags way) {
+  public OsmLevel getLevelForWay(OsmEntity way) {
     return Objects.requireNonNullElse(wayLevels.get(way), OsmLevel.DEFAULT);
   }
 
@@ -218,11 +220,9 @@ public class OsmDatabase {
       carParkingNodes.put(node.getId(), node);
     }
     if (
-      !(
-        waysNodeIds.contains(node.getId()) ||
+      !(waysNodeIds.contains(node.getId()) ||
         areaNodeIds.contains(node.getId()) ||
-        node.isBoardingLocation()
-      )
+        node.isBoardingLocation())
     ) {
       return;
     }
@@ -279,8 +279,7 @@ public class OsmDatabase {
     }
 
     if (
-      relation.isMultiPolygon() &&
-      (relation.isRoutable() || relation.isParkAndRide()) ||
+      (relation.isMultiPolygon() && (relation.isRoutable() || relation.isParkAndRide())) ||
       relation.isBikeParking()
     ) {
       // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
@@ -373,7 +372,7 @@ public class OsmDatabase {
      */
     Set<KeyPair> commonSegments = new HashSet<>();
     HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
-    for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
+    for (OsmArea area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
       for (Ring ring : area.outermostRings) {
         processAreaRingForUnconnectedAreas(commonSegments, spndx, area, ring);
       }
@@ -590,7 +589,7 @@ public class OsmDatabase {
   private void processAreaRingForUnconnectedAreas(
     Set<KeyPair> commonSegments,
     HashGridSpatialIndex<RingSegment> spndx,
-    Area area,
+    OsmArea area,
     Ring ring
   ) {
     for (int j = 0; j < ring.nodes.size(); j++) {
@@ -636,7 +635,7 @@ public class OsmDatabase {
     return node;
   }
 
-  private void applyLevelsForWay(OsmWithTags way) {
+  private void applyLevelsForWay(OsmEntity way) {
     /* Determine OSM level for each way, if it was not already set */
     if (!wayLevels.containsKey(way)) {
       // if this way is not a key in the wayLevels map, a level map was not
@@ -647,12 +646,22 @@ public class OsmDatabase {
       OsmLevel level = OsmLevel.DEFAULT;
       if (way.hasTag("level")) { // TODO: floating-point levels &c.
         levelName = way.getTag("level");
-        level =
-          OsmLevel.fromString(levelName, OsmLevel.Source.LEVEL_TAG, noZeroLevels, issueStore, way);
+        level = OsmLevel.fromString(
+          levelName,
+          OsmLevel.Source.LEVEL_TAG,
+          noZeroLevels,
+          issueStore,
+          way
+        );
       } else if (way.hasTag("layer")) {
         levelName = way.getTag("layer");
-        level =
-          OsmLevel.fromString(levelName, OsmLevel.Source.LAYER_TAG, noZeroLevels, issueStore, way);
+        level = OsmLevel.fromString(
+          levelName,
+          OsmLevel.Source.LAYER_TAG,
+          noZeroLevels,
+          issueStore,
+          way
+        );
       }
       if (level == null || (!level.reliable)) {
         issueStore.add(new LevelAmbiguous(levelName, way));
@@ -676,7 +685,7 @@ public class OsmDatabase {
    * Create areas from single ways.
    */
   private void processSingleWayAreas() {
-    AREA:for (OsmWay way : singleWayAreas) {
+    AREA: for (OsmWay way : singleWayAreas) {
       if (processedAreas.contains(way)) {
         continue;
       }
@@ -688,8 +697,8 @@ public class OsmDatabase {
         }
       }
       try {
-        addArea(new Area(way, List.of(way), Collections.emptyList(), nodesById));
-      } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
+        addArea(new OsmArea(way, List.of(way), Collections.emptyList(), nodesById));
+      } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         // this area cannot be constructed, but we already have all the
         // necessary nodes to construct it. So, something must be wrong with
         // the area; we'll mark it as processed so that we don't retry.
@@ -709,15 +718,13 @@ public class OsmDatabase {
    * the used ways.
    */
   private void processMultipolygonRelations() {
-    RELATION:for (OsmRelation relation : relationsById.valueCollection()) {
+    RELATION: for (OsmRelation relation : relationsById.valueCollection()) {
       if (processedAreas.contains(relation)) {
         continue;
       }
       if (
-        !(
-          relation.isMultiPolygon() &&
-          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking())
-        )
+        !(relation.isMultiPolygon() &&
+          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking()))
       ) {
         continue;
       }
@@ -751,8 +758,8 @@ public class OsmDatabase {
       }
       processedAreas.add(relation);
       try {
-        addArea(new Area(relation, outerWays, innerWays, nodesById));
-      } catch (Area.AreaConstructionException | Ring.RingConstructionException e) {
+        addArea(new OsmArea(relation, outerWays, innerWays, nodesById));
+      } catch (OsmArea.AreaConstructionException | Ring.RingConstructionException e) {
         issueStore.add(new InvalidOsmGeometry(relation));
         continue;
       }
@@ -763,7 +770,7 @@ public class OsmDatabase {
           continue;
         }
 
-        OsmWithTags way = waysById.get(member.getRef());
+        OsmEntity way = waysById.get(member.getRef());
         if (way == null) {
           continue;
         }
@@ -784,9 +791,9 @@ public class OsmDatabase {
   }
 
   /**
-   * Handler for a new Area (single way area or multipolygon relations)
+   * Handler for a new OsmArea (single way area or multipolygon relations)
    */
-  private void addArea(Area area) {
+  private void addArea(OsmArea area) {
     StreetTraversalPermission permissions = area.parent
       .getOsmProvider()
       .getWayPropertySet()
@@ -887,48 +894,56 @@ public class OsmDatabase {
 
     TurnRestrictionTag tag;
     if (relation.isTag("restriction", "no_right_turn")) {
-      tag =
-        new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.RIGHT, relation.getId());
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.RIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "no_left_turn")) {
-      tag =
-        new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.LEFT, relation.getId());
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.LEFT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "no_straight_on")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.NO_TURN,
-          Direction.STRAIGHT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.NO_TURN,
+        Direction.STRAIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "no_u_turn")) {
       tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U, relation.getId());
     } else if (relation.isTag("restriction", "only_straight_on")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.ONLY_TURN,
-          Direction.STRAIGHT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.STRAIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_right_turn")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.ONLY_TURN,
-          Direction.RIGHT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.RIGHT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_left_turn")) {
-      tag =
-        new TurnRestrictionTag(
-          via,
-          TurnRestrictionType.ONLY_TURN,
-          Direction.LEFT,
-          relation.getId()
-        );
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.LEFT,
+        relation.getId()
+      );
     } else if (relation.isTag("restriction", "only_u_turn")) {
-      tag =
-        new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U, relation.getId());
+      tag = new TurnRestrictionTag(
+        via,
+        TurnRestrictionType.ONLY_TURN,
+        Direction.U,
+        relation.getId()
+      );
     } else {
       issueStore.add(new TurnRestrictionUnknown(relation, relation.getTag("restriction")));
       return;
@@ -943,14 +958,13 @@ public class OsmDatabase {
       relation.hasTag("hour_off")
     ) {
       try {
-        tag.time =
-          RepeatingTimePeriod.parseFromOsmTurnRestriction(
-            relation.getTag("day_on"),
-            relation.getTag("day_off"),
-            relation.getTag("hour_on"),
-            relation.getTag("hour_off"),
-            relation.getOsmProvider()::getZoneId
-          );
+        tag.time = RepeatingTimePeriod.parseFromOsmTurnRestriction(
+          relation.getTag("day_on"),
+          relation.getTag("day_off"),
+          relation.getTag("hour_on"),
+          relation.getTag("hour_off"),
+          relation.getOsmProvider()::getZoneId
+        );
       } catch (NumberFormatException e) {
         LOG.info("Unparseable turn restriction: {}", relation.getId());
       }
@@ -1011,7 +1025,7 @@ public class OsmDatabase {
         continue;
       }
 
-      OsmWithTags way = waysById.get(member.getRef());
+      OsmEntity way = waysById.get(member.getRef());
       if (way == null) {
         continue;
       }
@@ -1052,7 +1066,7 @@ public class OsmDatabase {
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
    */
   private void processPublicTransportStopArea(OsmRelation relation) {
-    Set<OsmWithTags> platformAreas = new HashSet<>();
+    Set<OsmEntity> platformAreas = new HashSet<>();
     Set<OsmNode> platformNodes = new HashSet<>();
     for (OsmRelationMember member : relation.getMembers()) {
       switch (member.getType()) {
@@ -1075,7 +1089,7 @@ public class OsmDatabase {
       }
     }
 
-    for (OsmWithTags area : platformAreas) {
+    for (OsmEntity area : platformAreas) {
       if (area == null) {
         throw new RuntimeException(
           "Could not process public transport relation '%s' (%s)".formatted(
@@ -1108,7 +1122,7 @@ public class OsmDatabase {
   // Simple holder for the spatial index
   static class RingSegment {
 
-    Area area;
+    OsmArea area;
 
     Ring ring;
 

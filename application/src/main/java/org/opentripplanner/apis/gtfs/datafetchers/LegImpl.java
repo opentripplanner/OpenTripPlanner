@@ -9,10 +9,10 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
-import org.opentripplanner.ext.restapi.mapping.LocalDateMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -298,34 +298,29 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
-          !(
-            originModesWithParentStation
+          !(originModesWithParentStation
               .stream()
               .map(GraphQLTypes.GraphQLTransitMode::toString)
               .toList()
-              .contains(originalLeg.getMode().name())
-          );
+              .contains(originalLeg.getMode().name()));
 
         boolean limitToExactDestinationStop =
           destinationModesWithParentStation == null ||
-          !(
-            destinationModesWithParentStation
+          !(destinationModesWithParentStation
               .stream()
               .map(GraphQLTypes.GraphQLTransitMode::toString)
               .toList()
-              .contains(originalLeg.getMode().name())
-          );
+              .contains(originalLeg.getMode().name()));
 
-        var res = AlternativeLegs
-          .getAlternativeLegs(
-            environment.getSource(),
-            numberOfLegs,
-            environment.<GraphQLRequestContext>getContext().transitService(),
-            direction,
-            AlternativeLegsFilter.NO_FILTER,
-            limitToExactOriginStop,
-            limitToExactDestinationStop
-          )
+        var res = AlternativeLegs.getAlternativeLegs(
+          environment.getSource(),
+          numberOfLegs,
+          environment.<GraphQLRequestContext>getContext().transitService(),
+          direction,
+          AlternativeLegsFilter.NO_FILTER,
+          limitToExactOriginStop,
+          limitToExactDestinationStop
+        )
           .stream()
           .map(Leg.class::cast)
           .toList();

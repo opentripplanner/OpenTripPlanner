@@ -179,8 +179,7 @@ public class GtfsModule implements GraphBuilderModule {
             gtfsBundle.maxInterlineDistance(),
             issueStore,
             calendarServiceData
-          )
-            .run(otpTransitService.getTripPatterns());
+          ).run(otpTransitService.getTripPatterns());
         }
 
         fareServiceFactory.processGtfs(fareRulesData, otpTransitService);
@@ -246,8 +245,7 @@ public class GtfsModule implements GraphBuilderModule {
       true,
       removeRepeatedStops,
       issueStore
-    )
-      .run();
+    ).run();
   }
 
   /**
@@ -294,7 +292,7 @@ public class GtfsModule implements GraphBuilderModule {
   private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
     StoreImpl store = new StoreImpl(new GtfsRelationalDaoImpl());
     store.open();
-    LOG.info("reading {}", gtfsBundle.toString());
+    LOG.info("reading {}", gtfsBundle);
 
     GtfsFeedId gtfsFeedId = gtfsBundle.getFeedId();
 
@@ -372,9 +370,15 @@ public class GtfsModule implements GraphBuilderModule {
       fareProduct.getId().setAgencyId(reader.getDefaultAgencyId());
     }
     for (var transferRule : store.getAllEntitiesForType(FareTransferRule.class)) {
-      transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
-      transferRule.getFromLegGroupId().setAgencyId(reader.getDefaultAgencyId());
-      transferRule.getToLegGroupId().setAgencyId(reader.getDefaultAgencyId());
+      if (transferRule.getFareProductId() != null) {
+        transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
+      }
+      if (transferRule.getFromLegGroupId() != null) {
+        transferRule.getFromLegGroupId().setAgencyId(reader.getDefaultAgencyId());
+      }
+      if (transferRule.getToLegGroupId() != null) {
+        transferRule.getToLegGroupId().setAgencyId(reader.getDefaultAgencyId());
+      }
     }
     for (var transferRule : store.getAllEntitiesForType(FareLegRule.class)) {
       transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());

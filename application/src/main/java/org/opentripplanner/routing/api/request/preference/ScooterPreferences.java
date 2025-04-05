@@ -103,8 +103,7 @@ public final class ScooterPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ScooterPreferences.class)
+    return ToStringBuilder.of(ScooterPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addObj("rental", rental, DEFAULT.rental)

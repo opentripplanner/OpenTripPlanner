@@ -33,8 +33,7 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
   /** Any stop not part of trip. */
   private static final int ANY_STOP = STOP_I;
 
-  private final TestTripSchedule trip1 = TestTripSchedule
-    .schedule()
+  private final TestTripSchedule trip1 = TestTripSchedule.schedule()
     .pattern("Line 1", STOP_A, STOP_B, STOP_C, STOP_D, STOP_E)
     .times("10:05 10:10 10:15 10:20 10:25")
     .build();

@@ -5,8 +5,11 @@ import static org.opentripplanner.apis.vectortiles.model.LayerType.Edge;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GroupStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Rental;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
+import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
+import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -35,6 +38,7 @@ import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.edge.EdgeLayerBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
+import org.opentripplanner.inspector.vector.rental.RentalLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.GroupStopLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
 import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
@@ -57,13 +61,15 @@ public class GraphInspectorVectorTileResource {
   );
   private static final LayerParams EDGES = new LayerParams("edges", Edge);
   private static final LayerParams VERTICES = new LayerParams("vertices", Vertex);
+  private static final LayerParams RENTAL = new LayerParams("rental", Rental);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
     GROUP_STOPS,
     GEOFENCING_ZONES,
     EDGES,
-    VERTICES
+    VERTICES,
+    RENTAL
   );
 
   private final OtpServerRequestContext serverContext;
@@ -122,7 +128,7 @@ public class GraphInspectorVectorTileResource {
       ignoreRouterId,
       "inspector/vectortile"
     );
-    return new TileJson(url, envelope, feedInfos);
+    return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
 
   @GET
@@ -141,6 +147,7 @@ public class GraphInspectorVectorTileResource {
       "street",
       tileJsonUrl(base, List.of(EDGES, GEOFENCING_ZONES, VERTICES))
     );
+    var rentalSource = new VectorSource("rental", tileJsonUrl(base, List.of(RENTAL)));
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
@@ -148,6 +155,7 @@ public class GraphInspectorVectorTileResource {
       GROUP_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource),
+      RENTAL.toVectorSourceLayer(rentalSource),
       serverContext.debugUiConfig().additionalBackgroundLayers()
     );
   }
@@ -180,15 +188,11 @@ public class GraphInspectorVectorTileResource {
     OtpServerRequestContext context
   ) {
     return switch (layerParameters.type()) {
-      case RegularStop -> new StopLayerBuilder<>(
-        layerParameters,
-        locale,
-        e -> context.transitService().findRegularStopsByBoundingBox(e)
+      case RegularStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
+        context.transitService().findRegularStopsByBoundingBox(e)
       );
-      case AreaStop -> new StopLayerBuilder<>(
-        layerParameters,
-        locale,
-        e -> context.transitService().findAreaStops(e)
+      case AreaStop -> new StopLayerBuilder<>(layerParameters, locale, e ->
+        context.transitService().findAreaStops(e)
       );
       case GroupStop -> new GroupStopLayerBuilder(
         layerParameters,
@@ -199,6 +203,7 @@ public class GraphInspectorVectorTileResource {
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
       case Edge -> new EdgeLayerBuilder(context.graph(), layerParameters);
       case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
+      case Rental -> new RentalLayerBuilder(context.vehicleRentalService(), layerParameters);
     };
   }
 }

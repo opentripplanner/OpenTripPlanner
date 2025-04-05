@@ -1,7 +1,7 @@
 package org.opentripplanner.osm.wayproperty.specifier;
 
 import java.util.Arrays;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 
 /**
  * An interface for assigning match scores for OSM entities (mostly ways). The higher the score the
@@ -11,8 +11,7 @@ import org.opentripplanner.osm.model.OsmWithTags;
  */
 public interface OsmSpecifier {
   static Condition[] parseConditions(String spec, String separator) {
-    return Arrays
-      .stream(spec.split(separator))
+    return Arrays.stream(spec.split(separator))
       .filter(p -> !p.isEmpty())
       .map(pair -> {
         var kv = pair.split("=");
@@ -33,14 +32,14 @@ public interface OsmSpecifier {
    *
    * @param way an OSM tagged object to compare to this specifier
    */
-  Scores matchScores(OsmWithTags way);
+  Scores matchScores(OsmEntity way);
 
   /**
    * Calculates a score expressing how well an OSM entity's tags match this specifier. This does
-   * exactly the same thing as {@link OsmSpecifier#matchScores(OsmWithTags)} but without regard for
+   * exactly the same thing as {@link OsmSpecifier#matchScores(OsmEntity)} but without regard for
    * :left, :right, :forward, :backward and :both.
    */
-  int matchScore(OsmWithTags way);
+  int matchScore(OsmEntity way);
 
   /**
    * Convert this specifier to a human-readable identifier that represents this in (generated)

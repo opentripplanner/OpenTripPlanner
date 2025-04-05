@@ -108,7 +108,7 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals(2, itineraries.size());
 
     var itin = itineraries.get(0);
-    var leg = itin.getLegs().get(0);
+    var leg = itin.legs().get(0);
 
     assertEquals("cujv", leg.getFrom().stop.getId().getId());
     assertEquals("yz85", leg.getTo().stop.getId().getId());
@@ -139,7 +139,7 @@ class ScheduledDeviatedTripIntegrationTest {
 
     assertEquals(3, pattern.numberOfStops());
 
-    var tripTimes = pattern.getScheduledTimetable().getTripTimes(0);
+    var tripTimes = pattern.getScheduledTimetable().getTripTimes().getFirst();
     var arrivalTime = tripTimes.getArrivalTime(1);
 
     assertEquals(StopTime.MISSING_VALUE, arrivalTime);

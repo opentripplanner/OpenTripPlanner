@@ -12,19 +12,23 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * A factory for creating matchers for {@link Trip} objects.
- * <p/>
+ * A factory for creating matchers for Trip objects.
+ * <p>
  * This factory is used to create matchers for {@link Trip} objects based on a request. The
- * resulting matcher can be used to filter a list of {@link Trip} objects.
+ * resulting matcher can be used to filter a list of Trips.
  */
 public class TripMatcherFactory {
 
   /**
-   * Creates a matcher for {@link Trip} objects based on the given request.
+   * Creates a matcher that filters Trips.
+   * <p>
+   * The {@code serviceDateProvider} is a function that provides the service dates for a given Trip.
+   * It is injected because the service dates are determined by the transit service which has access
+   * to service dates for a Trip.
    *
-   * @param request - a {@link TripRequest} object that contains the criteria for the matcher.
-   * @param serviceDateProvider a function that provides the service dates for a given {@link FeedScopedId} of a {@link Trip}.
-   * @return a {@link Matcher<Trip>} to be used for filtering {@link Trip} objects.
+   * @param request the criteria for filtering Trips.
+   * @param serviceDateProvider a function that provides the service dates for a given Trip.
+   * @return a matcher for filtering Trips.
    */
   public static Matcher<Trip> of(
     TripRequest request,
@@ -32,14 +36,16 @@ public class TripMatcherFactory {
   ) {
     ExpressionBuilder<Trip> expr = ExpressionBuilder.of();
 
-    expr.atLeastOneMatch(request.agencies(), TripMatcherFactory::agencyId);
-    expr.atLeastOneMatch(request.routes(), TripMatcherFactory::routeId);
+    expr.atLeastOneMatch(request.includeAgencies(), TripMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.includeRoutes(), TripMatcherFactory::routeId);
+    expr.matchesNone(request.excludeAgencies(), TripMatcherFactory::agencyId);
+    expr.matchesNone(request.excludeRoutes(), TripMatcherFactory::routeId);
     expr.atLeastOneMatch(
-      request.netexInternalPlanningCodes(),
+      request.includeNetexInternalPlanningCodes(),
       TripMatcherFactory::netexInternalPlanningCode
     );
     expr.atLeastOneMatch(
-      request.serviceDates(),
+      request.includeServiceDates(),
       TripMatcherFactory.serviceDate(serviceDateProvider)
     );
 
@@ -67,7 +73,7 @@ public class TripMatcherFactory {
   ) {
     return date ->
       new ContainsMatcher<>(
-        "serviceDates",
+        "serviceDate",
         t -> serviceDateProvider.apply(t.getServiceId()),
         new EqualityMatcher<>("serviceDate", date, (dateToMatch -> dateToMatch))
       );

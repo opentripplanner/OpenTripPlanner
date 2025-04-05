@@ -1,6 +1,8 @@
 package org.opentripplanner.apis.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
+import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,8 +17,7 @@ import org.opentripplanner.test.support.HttpForTest;
 class TileJsonTest {
 
   private static final List<String> LAYERS = List.of("stops", "rentalVehicles");
-  private static final WorldEnvelope ENVELOPE = WorldEnvelope
-    .of()
+  private static final WorldEnvelope ENVELOPE = WorldEnvelope.of()
     .expandToIncludeStreetEntities(1, 1)
     .expandToIncludeStreetEntities(2, 2)
     .build();
@@ -60,20 +61,39 @@ class TileJsonTest {
 
   @Test
   void attributionFromFeedInfo() {
-    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO));
+    var tileJson = new TileJson(
+      "http://example.com",
+      ENVELOPE,
+      List.of(FEED_INFO),
+      MIN_ZOOM,
+      MAX_ZOOM
+    );
     assertEquals("<a href='https://trimet.org'>Trimet</a>", tileJson.attribution);
   }
 
   @Test
   void duplicateAttribution() {
-    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO, FEED_INFO));
+    var tileJson = new TileJson(
+      "http://example.com",
+      ENVELOPE,
+      List.of(FEED_INFO, FEED_INFO),
+      MIN_ZOOM,
+      MAX_ZOOM
+    );
     assertEquals("<a href='https://trimet.org'>Trimet</a>", tileJson.attribution);
   }
 
   @Test
   void attributionFromOverride() {
     var override = "OVERRIDE";
-    var tileJson = new TileJson("http://example.com", ENVELOPE, override);
+    var tileJson = new TileJson("http://example.com", ENVELOPE, override, MIN_ZOOM, MAX_ZOOM);
     assertEquals(override, tileJson.attribution);
+  }
+
+  @Test
+  void zoom() {
+    var tileJson = new TileJson("http://example.com", ENVELOPE, List.of(FEED_INFO), 0, 5);
+    assertEquals(0, tileJson.minzoom);
+    assertEquals(5, tileJson.maxzoom);
   }
 }

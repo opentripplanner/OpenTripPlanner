@@ -1720,8 +1720,8 @@ type QueryType {
     preferences: PlanPreferencesInput,
     """
     Duration of the search window. This either starts at the defined earliest departure
-    time or ends at the latest arrival time. If this is not provided, a reasonable
-    search window is automatically generated. When searching for earlier or later itineraries
+    time or ends at the latest arrival time. If this is not provided or the value is set as null,
+    a reasonable search window is automatically generated. When searching for earlier or later itineraries
     with paging, this search window is no longer used and the new window will be based
     on how many suggestions were returned in the previous search. The new search window can be
     shorter or longer than the original search window. Note, itineraries are returned faster
@@ -2444,7 +2444,11 @@ type Trip implements Node {
     """
     types: [TripAlertType]
   ): [Alert]
-  "Arrival time to the final stop"
+  """
+  Arrival time to the final stop. If the trip does not run on the given date,
+  it will return scheduled times from another date. This field is slightly
+  confusing and will be deprecated when a better replacement is implemented.
+  """
   arrivalStoptime(
     """
     Date for which the arrival time is returned. Format: YYYYMMDD. If this
@@ -2455,7 +2459,11 @@ type Trip implements Node {
   "Whether bikes are allowed on board the vehicle running this trip"
   bikesAllowed: BikesAllowed
   blockId: String
-  "Departure time from the first stop"
+  """
+  Departure time from the first stop. If the trip does not run on the given date,
+  it will return scheduled times from another date. This field is slightly
+  confusing and will be deprecated when a better replacement is implemented.
+  """
   departureStoptime(
     """
     Date for which the departure time is returned. Format: YYYYMMDD. If this
@@ -2494,6 +2502,12 @@ type Trip implements Node {
   stops: [Stop!]!
   "List of times when this trip arrives to or departs from a stop"
   stoptimes: [Stoptime]
+  """
+  List of times when this trip arrives to or departs from each stop on a given date, or
+  today if the date is not given. If the trip does not run on the given date, it will
+  return scheduled times from another date. This field is slightly confusing and
+  will be deprecated when a better replacement is implemented.
+  """
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
     serviceDate: String
@@ -2659,8 +2673,10 @@ type VehiclePosition {
   heading: Float
   "Human-readable label of the vehicle, eg. a publicly visible number or a license plate"
   label: String
+  "When the position of the vehicle was recorded."
+  lastUpdate: OffsetDateTime
   "When the position of the vehicle was recorded in seconds since the UNIX epoch."
-  lastUpdated: Long
+  lastUpdated: Long @deprecated(reason : "Use `lastUpdate` instead.")
   "Latitude of the vehicle"
   lat: Float
   "Longitude of the vehicle"
@@ -3913,7 +3929,10 @@ input BicyclePreferencesInput {
 
 "Preferences related to bicycle rental (station based or floating bicycle rental)."
 input BicycleRentalPreferencesInput {
-  "Rental networks which can be potentially used as part of an itinerary."
+  """
+  Rental networks which can be potentially used as part of an itinerary. If this field has no default value,
+  it means that all networks are allowed unless some are banned with `bannedNetworks`.
+  """
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
@@ -4006,7 +4025,10 @@ input CarPreferencesInput {
 
 "Preferences related to car rental (station based or floating car rental)."
 input CarRentalPreferencesInput {
-  "Rental networks which can be potentially used as part of an itinerary."
+  """
+  Rental networks which can be potentially used as part of an itinerary. If this field has no default value,
+  it means that all networks are allowed unless some are banned with `bannedNetworks`.
+  """
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
@@ -4321,7 +4343,6 @@ input PlanModesInput {
   If more than one mode is selected, at least one of them must be used but not necessarily all.
   There are modes that automatically also use walking such as the rental modes. To force rental
   to be used, this should only include the rental mode and not `WALK` in addition.
-  The default access mode is `WALK`.
   """
   direct: [PlanDirectMode!]
   "Should only the direct search without any transit be done."
@@ -4329,8 +4350,7 @@ input PlanModesInput {
   """
   Modes for different phases of an itinerary when transit is included. Also
   includes street mode selections related to connecting to the transit network
-  and transfers. By default, all transit modes are usable and `WALK` is used for
-  access, egress and transfers.
+  and transfers. By default, all transit modes are usable.
   """
   transit: PlanTransitModesInput
   """
@@ -4423,7 +4443,6 @@ input PlanTransitModesInput {
   If more than one mode is selected, at least one of them must be used but not necessarily all.
   There are modes that automatically also use walking such as the rental modes. To force rental
   to be used, this should only include the rental mode and not `WALK` in addition.
-  The default access mode is `WALK`.
   """
   access: [PlanAccessMode!]
   """
@@ -4431,13 +4450,9 @@ input PlanTransitModesInput {
   If more than one mode is selected, at least one of them must be used but not necessarily all.
   There are modes that automatically also use walking such as the rental modes. To force rental
   to be used, this should only include the rental mode and not `WALK` in addition.
-  The default access mode is `WALK`.
   """
   egress: [PlanEgressMode!]
-  """
-  Street mode that is used when searching for transfers. Selection of only one allowed for now.
-  The default transfer mode is `WALK`.
-  """
+  "Street mode that is used when searching for transfers. Selection of only one allowed for now."
   transfer: [PlanTransferMode!]
   """
   Transit modes and reluctances associated with them. Each defined mode can be used in
@@ -4463,10 +4478,14 @@ A visit-via-location is a physical visit to one of the stop locations or coordin
 on-board visit does not count, the traveler must alight or board at the given stop for it to to
 be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
 in the street network from a stop and back to another stop to join the transit network.
-
-NOTE! Coordinates are NOT supported yet.
 """
 input PlanVisitViaLocationInput {
+  """
+  A coordinate to route through. To visit a coordinate, the traveler must walk(bike or drive)
+  to the closest point in the street network from a stop and back to another stop to join the transit
+  network.
+  """
+  coordinate: PlanCoordinateInput
   "The label/name of the location. This is pass-through information and is not used in routing."
   label: String
   """
@@ -4510,7 +4529,10 @@ input ScooterPreferencesInput {
 
 "Preferences related to scooter rental (station based or floating scooter rental)."
 input ScooterRentalPreferencesInput {
-  "Rental networks which can be potentially used as part of an itinerary."
+  """
+  Rental networks which can be potentially used as part of an itinerary. If this field has no default value,
+  it means that all networks are allowed unless some are banned with `bannedNetworks`.
+  """
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
@@ -4559,11 +4581,11 @@ input TransferPreferencesInput {
   "How many transfers there can be at maximum in an itinerary."
   maximumTransfers: Int
   """
-  A global minimum transfer time (in seconds) that specifies the minimum amount of time
-  that must pass between exiting one transit vehicle and boarding another. This time is
-  in addition to time it might take to walk between transit stops. Setting this value
-  as `PT0S`, for example, can lead to passenger missing a connection when the vehicle leaves
-  ahead of time or the passenger arrives to the stop later than expected.
+  A global minimum transfer time that specifies the minimum amount of time that must pass
+  between exiting one transit vehicle and boarding another. This time is in addition to
+  time it might take to walk between transit stops. Setting this value as `PT0S`, for
+  example, can lead to passenger missing a connection when the vehicle leaves ahead of time
+  or the passenger arrives to the stop later than expected.
   """
   slack: Duration
 }

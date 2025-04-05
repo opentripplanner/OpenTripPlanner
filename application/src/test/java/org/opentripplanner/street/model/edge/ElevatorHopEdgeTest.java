@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -35,8 +37,7 @@ class ElevatorHopEdgeTest {
       .withWheelchair(true)
       .withPreferences(preferences ->
         preferences.withWheelchair(
-          WheelchairPreferences
-            .of()
+          WheelchairPreferences.of()
             .withTrip(feature)
             .withStop(feature)
             .withElevator(feature)
@@ -75,6 +76,21 @@ class ElevatorHopEdgeTest {
     var wheelchairResult = traverse(wheelchair, req)[0];
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);
+  }
+
+  @Test
+  void testTraversal() {
+    var edge = ElevatorHopEdge.createElevatorHopEdge(
+      from,
+      to,
+      StreetTraversalPermission.ALL,
+      null,
+      2,
+      62
+    );
+    var req = StreetSearchRequest.of().withMode(StreetMode.WALK);
+    var res = edge.traverse(new State(from, req.build()))[0];
+    assertEquals(62_000, res.getTimeDeltaMilliseconds());
   }
 
   private State[] traverse(Accessibility wheelchair, StreetSearchRequest req) {

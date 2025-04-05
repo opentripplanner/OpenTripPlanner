@@ -31,6 +31,10 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     return Collections.unmodifiableList(Arrays.asList(select));
   }
 
+  public List<SelectRequest> not() {
+    return Collections.unmodifiableList(Arrays.asList(not));
+  }
+
   public static Builder of() {
     return new Builder();
   }
@@ -107,8 +111,7 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TransitFilterRequest.class)
+    return ToStringBuilder.of(TransitFilterRequest.class)
       .addCol("select", Arrays.asList(select))
       .addCol("not", Arrays.asList(not))
       .toString();

@@ -66,24 +66,23 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
   }
 
   private Double findElevationForVertex(Vertex v) {
-    return Stream
-      .concat(
-        v
-          .getIncomingStreetEdges()
-          .stream()
-          .filter(StreetEdge::hasElevationExtension)
-          .map(streetEdge ->
-            streetEdge
-              .getElevationProfile()
-              .getCoordinate(streetEdge.getElevationProfile().size() - 1)
-              .y
-          ),
-        v
-          .getOutgoingStreetEdges()
-          .stream()
-          .filter(StreetEdge::hasElevationExtension)
-          .map(streetEdge -> streetEdge.getElevationProfile().getCoordinate(0).y)
-      )
+    return Stream.concat(
+      v
+        .getIncomingStreetEdges()
+        .stream()
+        .filter(StreetEdge::hasElevationExtension)
+        .map(streetEdge ->
+          streetEdge
+            .getElevationProfile()
+            .getCoordinate(streetEdge.getElevationProfile().size() - 1)
+            .y
+        ),
+      v
+        .getOutgoingStreetEdges()
+        .stream()
+        .filter(StreetEdge::hasElevationExtension)
+        .map(streetEdge -> streetEdge.getElevationProfile().getCoordinate(0).y)
+    )
       .findAny()
       .orElse(null);
   }

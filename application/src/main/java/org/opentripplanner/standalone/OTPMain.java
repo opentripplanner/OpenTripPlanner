@@ -168,8 +168,7 @@ public class OTPMain {
         // to move the builder into the OtpTransitServiceBuilder and create the service with the
         // rest of the transit data.
         app.buildConfig().fareServiceFactory.makeFareService()
-      )
-        .save(app.graphOutputDataSource());
+      ).save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
     }
@@ -200,6 +199,7 @@ public class OTPMain {
     app.timetableRepository().index();
     app.graph().index(app.timetableRepository().getSiteRepository());
 
+    app.graph().getLinker().setMaxAreaNodes(app.streetLimitationParameters().maxAreaNodes());
     // publishing the config version info make it available to the APIs
     setOtpConfigVersionsOnServerInfo(app);
 
@@ -245,17 +245,14 @@ public class OTPMain {
     TimetableRepository timetableRepository,
     RaptorConfig<?> raptorConfig
   ) {
-    ApplicationShutdownSupport.addShutdownHook(
-      "server-shutdown",
-      () -> {
-        LOG.info("OTP shutdown started...");
-        UpdaterConfigurator.shutdownGraph(timetableRepository);
-        raptorConfig.shutdown();
-        WeakCollectionCleaner.DEFAULT.exit();
-        DeferredAuthorityFactory.exit();
-        LOG.info("OTP shutdown: resources released...");
-      }
-    );
+    ApplicationShutdownSupport.addShutdownHook("server-shutdown", () -> {
+      LOG.info("OTP shutdown started...");
+      UpdaterConfigurator.shutdownGraph(timetableRepository);
+      raptorConfig.shutdown();
+      WeakCollectionCleaner.DEFAULT.exit();
+      DeferredAuthorityFactory.exit();
+      LOG.info("OTP shutdown: resources released...");
+    });
   }
 
   private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {

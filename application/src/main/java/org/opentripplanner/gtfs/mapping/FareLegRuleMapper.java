@@ -36,8 +36,7 @@ public final class FareLegRuleMapper {
         if (!productsForRule.isEmpty()) {
           FareDistance fareDistance = createFareDistance(r);
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
-          return FareLegRule
-            .of(ruleId, productsForRule)
+          return FareLegRule.of(ruleId, productsForRule)
             .withLegGroupId(mapAgencyAndId(r.getLegGroupId()))
             .withNetworkId(r.getNetworkId())
             .withFromAreaId(areaId(r.getFromArea()))
@@ -79,28 +78,20 @@ public final class FareLegRuleMapper {
         fareLegRule.getMaxDistance().intValue()
       );
       case 1 -> new FareDistance.LinearDistance(
-        Distance
-          .ofMetersBoxed(
+        Distance.ofMetersBoxed(fareLegRule.getMinDistance(), error ->
+          LOG.warn(
+            "Fare leg rule min distance not valid: {} - {}",
             fareLegRule.getMinDistance(),
-            error ->
-              LOG.warn(
-                "Fare leg rule min distance not valid: {} - {}",
-                fareLegRule.getMinDistance(),
-                error
-              )
+            error
           )
-          .orElse(null),
-        Distance
-          .ofMetersBoxed(
+        ).orElse(null),
+        Distance.ofMetersBoxed(fareLegRule.getMaxDistance(), error ->
+          LOG.warn(
+            "Fare leg rule max distance not valid: {} - {}",
             fareLegRule.getMaxDistance(),
-            error ->
-              LOG.warn(
-                "Fare leg rule max distance not valid: {} - {}",
-                fareLegRule.getMaxDistance(),
-                error
-              )
+            error
           )
-          .orElse(null)
+        ).orElse(null)
       );
       default -> null;
     };

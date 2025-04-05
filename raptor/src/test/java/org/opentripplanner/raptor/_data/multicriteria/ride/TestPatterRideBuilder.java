@@ -62,11 +62,10 @@ public class TestPatterRideBuilder {
     }
     if (prevArrival == null) {
       int departureTime = boardTime - 180;
-      prevArrival =
-        stopArrivalFactory.createAccessStopArrival(
-          departureTime,
-          TestAccessEgress.walk(boardStopIndex, 30)
-        );
+      prevArrival = stopArrivalFactory.createAccessStopArrival(
+        departureTime,
+        TestAccessEgress.walk(boardStopIndex, 30)
+      );
     }
     if (boardC1 == NOT_SET) {
       boardC1 = prevArrival.c1() + 150;

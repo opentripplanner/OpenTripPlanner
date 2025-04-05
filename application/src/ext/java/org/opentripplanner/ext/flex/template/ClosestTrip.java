@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 import org.opentripplanner.utils.lang.IntUtils;
 
@@ -51,10 +54,16 @@ record ClosestTrip(
   static Collection<ClosestTrip> of(
     FlexAccessEgressCallbackAdapter callbackService,
     Collection<NearbyStop> nearbyStops,
+    Matcher<Trip> matcher,
     List<FlexServiceDate> dates,
     boolean pickup
   ) {
-    var closestTrips = findAllTripsReachableFromNearbyStop(callbackService, nearbyStops, pickup);
+    var closestTrips = findAllTripsReachableFromNearbyStop(
+      callbackService,
+      nearbyStops,
+      matcher,
+      pickup
+    );
     return findActiveDatesForTripAndDecorateResult(callbackService, dates, closestTrips, true);
   }
 
@@ -70,6 +79,7 @@ record ClosestTrip(
   private static Map<FlexTrip<?, ?>, ClosestTrip> findAllTripsReachableFromNearbyStop(
     FlexAccessEgressCallbackAdapter callbackService,
     Collection<NearbyStop> nearbyStops,
+    Matcher<Trip> matcher,
     boolean pickup
   ) {
     var map = new HashMap<FlexTrip<?, ?>, ClosestTrip>();
@@ -77,7 +87,7 @@ record ClosestTrip(
       var stop = nearbyStop.stop;
       for (var trip : callbackService.getFlexTripsByStop(stop)) {
         int stopPos = pickup ? trip.findBoardIndex(stop) : trip.findAlightIndex(stop);
-        if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND) {
+        if (stopPos != FlexTrip.STOP_INDEX_NOT_FOUND && matcher.match(trip.getTrip())) {
           var existing = map.get(trip);
           if (existing == null || nearbyStop.isBetter(existing.nearbyStop())) {
             map.put(trip, new ClosestTrip(nearbyStop, trip, stopPos));
@@ -127,8 +137,9 @@ record ClosestTrip(
     FlexServiceDate date,
     int stopPos
   ) {
-    return RoutingBookingInfo
-      .of(date.requestedBookingTime(), trip.getPickupBookingInfo(stopPos))
-      .exceedsLatestBookingTime();
+    return RoutingBookingInfo.of(
+      date.requestedBookingTime(),
+      trip.getPickupBookingInfo(stopPos)
+    ).exceedsLatestBookingTime();
   }
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_FLEX_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KC_METRO_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KITSAP_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
@@ -12,7 +13,6 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_A
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WHATCOM_AGENCY_ID;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
-import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.core.FareType.regular;
 import static org.opentripplanner.transit.model.basic.Money.USD;
@@ -36,8 +36,9 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -78,7 +79,7 @@ public class OrcaFareServiceTest {
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
-    var itinerary = Itinerary.createScheduledTransitItinerary(legs);
+    var itinerary = Itinerary.ofScheduledTransit(legs).withGeneralizedCost(Cost.ZERO).build();
     var itineraryFares = orcaFareService.calculateFares(itinerary);
     assertEquals(
       expectedPrice,
@@ -92,21 +93,17 @@ public class OrcaFareServiceTest {
     );
   }
 
-  private static void assertLegFareEquals(
-    int fare,
-    Leg leg,
-    ItineraryFares fares,
-    boolean hasXfer
-  ) {
+  private static void assertLegFareEquals(int fare, Leg leg, ItineraryFare fares, boolean hasXfer) {
     var legFareProducts = fares.getLegProducts().get(leg);
 
     var rideCost = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(fp ->
-        fp.medium().name().equals("electronic") &&
-        fp.category().name().equals("regular") &&
-        fp.name().equals("rideCost")
+      .filter(
+        fp ->
+          fp.medium().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("rideCost")
       )
       .findFirst();
     if (rideCost.isEmpty()) {
@@ -117,10 +114,11 @@ public class OrcaFareServiceTest {
     var transfer = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(fp ->
-        fp.medium().name().equals("electronic") &&
-        fp.category().name().equals("regular") &&
-        fp.name().equals("transfer")
+      .filter(
+        fp ->
+          fp.medium().name().equals("electronic") &&
+          fp.category().name().equals("regular") &&
+          fp.name().equals("transfer")
       )
       .findFirst();
     Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
@@ -133,11 +131,11 @@ public class OrcaFareServiceTest {
   void calculateFareForSingleAgency() {
     List<Leg> rides = List.of(getLeg(COMM_TRANS_AGENCY_ID, "400", 0));
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, TWO_DOLLARS);
+    calculateFare(rides, FareType.senior, usDollars(1.25f));
     calculateFare(rides, FareType.youth, ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(1.25f));
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
+    calculateFare(rides, FareType.electronicSenior, usDollars(1.25f));
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
   }
 
@@ -170,11 +168,16 @@ public class OrcaFareServiceTest {
    */
   @Test
   void calculateFareByLeg() {
-    List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0), getLeg(COMM_TRANS_AGENCY_ID, 2));
+    List<Leg> rides = List.of(
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0),
+      getLeg(COMM_TRANS_AGENCY_ID, 2),
+      getLeg(COMM_TRANS_FLEX_AGENCY_ID, 3)
+    );
     var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
 
     assertLegFareEquals(349, rides.get(0), fares, false);
     assertLegFareEquals(0, rides.get(1), fares, true);
+    assertLegFareEquals(0, rides.get(2), fares, true);
   }
 
   /**
@@ -398,11 +401,10 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
 
     // Also make sure that PT's 500 and 501 get regular Pierce fare and not ST's fare
-    rides =
-      List.of(
-        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
-        getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
-      );
+    rides = List.of(
+      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "500", 0),
+      getLeg(PIERCE_COUNTY_TRANSIT_AGENCY_ID, "501", 60)
+    );
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.senior, TWO_DOLLARS);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
@@ -532,7 +534,7 @@ public class OrcaFareServiceTest {
     assertFalse(fares.getItineraryProducts().isEmpty());
     assertFalse(fares.getLegProducts().isEmpty());
 
-    var firstLeg = itinerary.getLegs().get(0);
+    var firstLeg = itinerary.legs().get(0);
     var uses = fares.getLegProducts().get(firstLeg);
     assertEquals(7, uses.size());
 
@@ -639,7 +641,7 @@ public class OrcaFareServiceTest {
       lastStopName
     );
 
-    return itin.getLegs().get(0);
+    return itin.legs().get(0);
   }
 
   private static Itinerary createItinerary(
@@ -655,8 +657,7 @@ public class OrcaFareServiceTest {
   ) {
     // Use the agency ID as feed ID to make sure that we have a new feed ID for each different agency
     // This tests to make sure we are calculating transfers across feeds correctly.
-    Agency agency = Agency
-      .of(new FeedScopedId(agencyId, agencyId))
+    Agency agency = Agency.of(new FeedScopedId(agencyId, agencyId))
       .withName(agencyId)
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
@@ -680,8 +681,7 @@ public class OrcaFareServiceTest {
     if (routeLongName != null) {
       longName = new NonLocalizedString(routeLongName);
     }
-    Route route = Route
-      .of(routeFeedScopeId)
+    Route route = Route.of(routeFeedScopeId)
       .withAgency(agency)
       .withShortName(shortName)
       .withLongName(longName)
@@ -691,10 +691,10 @@ public class OrcaFareServiceTest {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
-    var itin = newItinerary(Place.forStop(firstStop), start)
-      .transit(route, tripId, start, T11_12, 5, 7, Place.forStop(lastStop), null, null, null)
+    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
+    return newItinerary(Place.forStop(firstStop), start)
+      .transit(route, tripId, start, end, 5, 7, Place.forStop(lastStop), null, null, null)
       .build();
-    return itin;
   }
 
   private static class TestOrcaFareService extends OrcaFareService {

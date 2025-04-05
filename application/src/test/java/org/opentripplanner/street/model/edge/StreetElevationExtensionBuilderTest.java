@@ -19,22 +19,17 @@ class StreetElevationExtensionBuilderTest {
   private static final Coordinate[] COORDINATES_ONE_POINT = new Coordinate[] {
     new Coordinate(0, 0),
   };
-  private static final PackedCoordinateSequence ELEVATION_PROFILE_ONE_POINT = new PackedCoordinateSequence.Double(
-    COORDINATES_ONE_POINT,
-    2
-  );
+  private static final PackedCoordinateSequence ELEVATION_PROFILE_ONE_POINT =
+    new PackedCoordinateSequence.Double(COORDINATES_ONE_POINT, 2);
 
   private static final Coordinate[] COORDINATES_TWO_POINTS = new Coordinate[] {
     new Coordinate(0, 0),
     new Coordinate(1, 1),
   };
-  private static final PackedCoordinateSequence ELEVATION_PROFILE_TWO_POINTS = new PackedCoordinateSequence.Double(
-    COORDINATES_TWO_POINTS,
-    2
-  );
+  private static final PackedCoordinateSequence ELEVATION_PROFILE_TWO_POINTS =
+    new PackedCoordinateSequence.Double(COORDINATES_TWO_POINTS, 2);
 
-  private static final LineString GEOMETRY = GeometryUtils
-    .getGeometryFactory()
+  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory()
     .createLineString(
       new Coordinate[] {
         StreetModelForTest.V1.getCoordinate(),
@@ -45,12 +40,11 @@ class StreetElevationExtensionBuilderTest {
 
   @BeforeEach
   void setup() {
-    streetEdgeBuilder =
-      new StreetEdgeBuilder<>()
-        .withPermission(StreetTraversalPermission.ALL)
-        .withFromVertex(StreetModelForTest.V1)
-        .withToVertex(StreetModelForTest.V2)
-        .withGeometry(GEOMETRY);
+    streetEdgeBuilder = new StreetEdgeBuilder<>()
+      .withPermission(StreetTraversalPermission.ALL)
+      .withFromVertex(StreetModelForTest.V1)
+      .withToVertex(StreetModelForTest.V2)
+      .withGeometry(GEOMETRY);
   }
 
   @Test
@@ -75,27 +69,31 @@ class StreetElevationExtensionBuilderTest {
   @Test
   void testBuildFromStreetEdge() {
     StreetEdge se = streetEdgeBuilder.buildAndConnect();
-    StreetElevationExtensionBuilder seeb = StreetElevationExtensionBuilder
-      .of(se)
-      .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS);
+    StreetElevationExtensionBuilder seeb = StreetElevationExtensionBuilder.of(
+      se
+    ).withElevationProfile(ELEVATION_PROFILE_TWO_POINTS);
     Optional<StreetElevationExtension> streetElevationExtension = seeb.build();
     assertFalse(streetElevationExtension.isEmpty());
   }
 
   @Test
   void testBuildFromStreetEdgeBuilder() {
-    StreetElevationExtensionBuilder seebFromStreetEdgeBuilder = StreetElevationExtensionBuilder
-      .of(streetEdgeBuilder)
+    StreetElevationExtensionBuilder seebFromStreetEdgeBuilder = StreetElevationExtensionBuilder.of(
+      streetEdgeBuilder
+    )
       .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS)
       .withDistanceInMeters(1);
-    Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdgeBuilder = seebFromStreetEdgeBuilder.build();
+    Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdgeBuilder =
+      seebFromStreetEdgeBuilder.build();
     assertFalse(streetElevationExtensionFromStreetEdgeBuilder.isEmpty());
 
-    StreetElevationExtensionBuilder seebFromStreetEdge = StreetElevationExtensionBuilder
-      .of(streetEdgeBuilder.buildAndConnect())
+    StreetElevationExtensionBuilder seebFromStreetEdge = StreetElevationExtensionBuilder.of(
+      streetEdgeBuilder.buildAndConnect()
+    )
       .withElevationProfile(ELEVATION_PROFILE_TWO_POINTS)
       .withDistanceInMeters(1);
-    Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdge = seebFromStreetEdge.build();
+    Optional<StreetElevationExtension> streetElevationExtensionFromStreetEdge =
+      seebFromStreetEdge.build();
 
     assertEquals(
       streetElevationExtensionFromStreetEdge.orElseThrow().toString(),

@@ -43,8 +43,7 @@ public class TransmodelGraphQLPlanner {
     }
 
     Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
-    return DataFetcherResult
-      .<PlanResponse>newResult()
+    return DataFetcherResult.<PlanResponse>newResult()
       .data(response)
       .localContext(Map.of("locale", locale))
       .build();
@@ -63,8 +62,7 @@ public class TransmodelGraphQLPlanner {
 
     Locale defaultLocale = ctx.getServerContext().defaultLocale();
     Locale locale = request == null ? defaultLocale : request.locale();
-    return DataFetcherResult
-      .<ViaRoutingResponse>newResult()
+    return DataFetcherResult.<ViaRoutingResponse>newResult()
       .data(response)
       .localContext(Map.of("locale", locale))
       .build();

@@ -20,13 +20,7 @@
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core",
-        // Skanetrafiken doesn't want automatic updates for these Azure libraries
-        "com.microsoft.azure:azure-servicebus",
-        "com.azure.resourcemanager:azure-resourcemanager-servicebus",
-        "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus",
-        "com.azure:azure-identity"
+        "org.processing:core"
       ],
       "enabled": false
     },
@@ -147,7 +141,7 @@
     {
       "groupName": "highly trusted dependencies (patch)",
       "matchUpdateTypes": ["patch"],
-      "schedule": ["on the 27th day of the month"],
+      "schedule": ["on the 13th and 27th day of the month"],
       "matchPackageNames": [
         "org.onebusaway:onebusaway-gtfs",
         "org.glassfish.jersey.{/,}**",
@@ -156,8 +150,9 @@
         "com.google.protobuf:protobuf-java",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
-        "com.fasterxml.jackson:{/,}**",
-        "com.fasterxml.jackson.datatype::{/,}**"
+        "com.fasterxml.jackson.core:{/,}**",
+        "com.fasterxml.jackson.datatype:{/,}**",
+        "com.azure:{/,}**"
       ],
       "automerge": true
     },
@@ -180,6 +175,15 @@
       ],
       "minimumReleaseAge": "1 week",
       "labels": ["skip changelog", "bump serialization id"]
+    },
+    {
+      "groupName": "Azure dependencies",
+      "matchPackageNames": [
+        "com.azure:{/,}**"
+      ],
+      "matchUpdateTypes": ["major", "minor"],
+      "schedule": "on the 14th day of the month",
+      "reviewers": ["habrahamsson-skanetrafiken"]
     }
   ],
   "timezone": "Europe/Berlin"

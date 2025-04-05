@@ -26,4 +26,9 @@ public class AllowAllTransitFilter implements Serializable, TransitFilter {
   public boolean matchTripTimes(TripTimes trip) {
     return true;
   }
+
+  @Override
+  public String toString() {
+    return "ALLOW_ALL";
+  }
 }

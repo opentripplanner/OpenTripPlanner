@@ -44,19 +44,17 @@ public class QualifiedModeSet implements Serializable {
 
     //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
     //  It was unclear what exactly each combination of QualifiedModes should mean.
-    //  TODO OTP2 This should either be updated with missing modes or the REST API should be
-    //   redesigned to better reflect the mode structure used in RequestModes.
-    //   Also, some StreetModes are implied by combination of QualifiedModes and are not covered
-    //   in this mapping.
+    //  TODO OTP2 Once all GraphQL queries have stopped using this logic, this class can be removed.
     QualifiedMode requestMode = null;
 
     List<QualifiedMode> filteredModes = qModes
       .stream()
-      .filter(m ->
-        m.mode == ApiRequestMode.WALK ||
-        m.mode == ApiRequestMode.BICYCLE ||
-        m.mode == ApiRequestMode.SCOOTER ||
-        m.mode == ApiRequestMode.CAR
+      .filter(
+        m ->
+          m.mode == ApiRequestMode.WALK ||
+          m.mode == ApiRequestMode.BICYCLE ||
+          m.mode == ApiRequestMode.SCOOTER ||
+          m.mode == ApiRequestMode.CAR
       )
       .toList();
 

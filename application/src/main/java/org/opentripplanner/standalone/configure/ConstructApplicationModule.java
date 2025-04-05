@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import dagger.Module;
 import dagger.Provides;
+import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -16,6 +17,7 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
@@ -43,10 +45,12 @@ public class ConstructApplicationModule {
     VehicleRentalService vehicleRentalService,
     VehicleParkingService vehicleParkingService,
     List<RideHailingService> rideHailingServices,
+    ViaCoordinateTransferFactory viaTransferResolver,
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService,
+    @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex,
@@ -74,9 +78,11 @@ public class ConstructApplicationModule {
       vectorTileConfig,
       vehicleParkingService,
       vehicleRentalService,
+      viaTransferResolver,
       worldEnvelopeService,
       emissionsService,
       luceneIndex,
+      schema,
       sorlandsbanenService,
       stopConsolidationService,
       traverseVisitor

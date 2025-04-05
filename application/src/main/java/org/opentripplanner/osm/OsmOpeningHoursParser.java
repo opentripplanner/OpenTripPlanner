@@ -416,9 +416,8 @@ public class OsmOpeningHoursParser {
     return previousOpeningHoursBuilders
       .stream()
       .flatMap(openingHoursBuilder -> {
-        var openingHoursBuilderAndNewBuilders = openingHoursBuilder.createBuildersForRelativeComplement(
-          closedOpeningHoursBuilder
-        );
+        var openingHoursBuilderAndNewBuilders =
+          openingHoursBuilder.createBuildersForRelativeComplement(closedOpeningHoursBuilder);
         return openingHoursBuilderAndNewBuilders.newBuilders().stream();
       })
       .filter(Objects::nonNull)
@@ -488,18 +487,14 @@ public class OsmOpeningHoursParser {
   private boolean is247Rule(Rule rule) {
     return (
       (isOpenRule(rule) || isClosedRule(rule)) &&
-      (
-        rule.isTwentyfourseven() ||
-        (
-          rule.getHolidays() == null &&
+      (rule.isTwentyfourseven() ||
+        (rule.getHolidays() == null &&
           rule.getYears() == null &&
           rule.getDays() == null &&
           rule.getTimes() == null &&
           rule.getDates() == null &&
           rule.getWeeks() == null &&
-          rule.getComment() == null
-        )
-      )
+          rule.getComment() == null))
     );
   }
 

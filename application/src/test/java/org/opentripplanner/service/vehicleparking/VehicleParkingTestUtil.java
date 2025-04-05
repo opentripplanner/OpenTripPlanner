@@ -28,8 +28,7 @@ public class VehicleParkingTestUtil {
         .coordinate(new WgsCoordinate(y, x))
         .walkAccessible(true);
 
-    return StreetModelForTest
-      .vehicleParking()
+    return StreetModelForTest.vehicleParking()
       .id(new FeedScopedId(TEST_FEED_ID, id))
       .bicyclePlaces(true)
       .capacity(vehiclePlaces)

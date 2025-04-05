@@ -29,7 +29,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.module.osm.StreetEdgePair;
 import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
-import org.opentripplanner.osm.model.OsmWithTags;
+import org.opentripplanner.osm.model.OsmEntity;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.utils.lang.DoubleUtils;
 import org.opentripplanner.utils.logging.ProgressTracker;
@@ -65,12 +65,12 @@ public class SidewalkNamer implements EdgeNamer {
   private PreciseBuffer preciseBuffer;
 
   @Override
-  public I18NString name(OsmWithTags way) {
+  public I18NString name(OsmEntity way) {
     return way.getAssumedName();
   }
 
   @Override
-  public void recordEdges(OsmWithTags way, StreetEdgePair pair) {
+  public void recordEdges(OsmEntity way, StreetEdgePair pair) {
     // This way is a sidewalk and hasn't been named yet (and is not explicitly unnamed)
     if (way.isSidewalk() && way.hasNoName() && !way.isExplicitlyUnnamed()) {
       pair
@@ -115,7 +115,7 @@ public class SidewalkNamer implements EdgeNamer {
       "Assigned names to {} of {} of sidewalks ({}%)",
       namesApplied.get(),
       unnamedSidewalks.size(),
-      DoubleUtils.roundTo2Decimals((double) namesApplied.get() / unnamedSidewalks.size() * 100)
+      DoubleUtils.roundTo2Decimals(((double) namesApplied.get() / unnamedSidewalks.size()) * 100)
     );
 
     LOG.info(progress.completeMessage());
@@ -228,8 +228,7 @@ public class SidewalkNamer implements EdgeNamer {
     private double length(Geometry intersection) {
       return switch (intersection) {
         case LineString ls -> SphericalDistanceLibrary.length(ls);
-        case MultiLineString mls -> GeometryUtils
-          .getLineStrings(mls)
+        case MultiLineString mls -> GeometryUtils.getLineStrings(mls)
           .stream()
           .mapToDouble(this::intersectionLength)
           .sum();

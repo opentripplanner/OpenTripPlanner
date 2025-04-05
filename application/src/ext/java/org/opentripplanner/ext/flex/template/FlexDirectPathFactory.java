@@ -14,7 +14,9 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.booking.RoutingBookingInfo;
 
 public class FlexDirectPathFactory {
@@ -23,17 +25,20 @@ public class FlexDirectPathFactory {
   private final FlexPathCalculator accessPathCalculator;
   private final FlexPathCalculator egressPathCalculator;
   private final Duration maxTransferDuration;
+  private final Matcher<Trip> matcher;
 
   public FlexDirectPathFactory(
     FlexAccessEgressCallbackAdapter callbackService,
     FlexPathCalculator accessPathCalculator,
     FlexPathCalculator egressPathCalculator,
-    Duration maxTransferDuration
+    Duration maxTransferDuration,
+    Matcher<Trip> matcher
   ) {
     this.callbackService = callbackService;
     this.accessPathCalculator = accessPathCalculator;
     this.egressPathCalculator = egressPathCalculator;
     this.maxTransferDuration = maxTransferDuration;
+    this.matcher = matcher;
   }
 
   public Collection<DirectFlexPath> calculateDirectFlexPaths(
@@ -48,16 +53,16 @@ public class FlexDirectPathFactory {
     var flexAccessTemplates = new FlexAccessFactory(
       callbackService,
       accessPathCalculator,
-      maxTransferDuration
-    )
-      .calculateFlexAccessTemplates(streetAccesses, dates);
+      maxTransferDuration,
+      matcher
+    ).calculateFlexAccessTemplates(streetAccesses, dates);
 
     var flexEgressTemplates = new FlexEgressFactory(
       callbackService,
       egressPathCalculator,
-      maxTransferDuration
-    )
-      .calculateFlexEgressTemplates(streetEgresses, dates);
+      maxTransferDuration,
+      matcher
+    ).calculateFlexEgressTemplates(streetEgresses, dates);
 
     Multimap<StopLocation, NearbyStop> streetEgressByStop = HashMultimap.create();
     streetEgresses.forEach(it -> streetEgressByStop.put(it.stop, it));
@@ -78,8 +83,9 @@ public class FlexDirectPathFactory {
         flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))
       ) {
         for (NearbyStop egress : streetEgressByStop.get(transferStop)) {
-          createDirectGraphPath(template, egress, arriveBy, requestTime)
-            .ifPresent(directFlexPaths::add);
+          createDirectGraphPath(template, egress, arriveBy, requestTime).ifPresent(
+            directFlexPaths::add
+          );
         }
       }
     }
@@ -154,10 +160,10 @@ public class FlexDirectPathFactory {
 
       // Time-shift departure so the minimum-booking-notice restriction is honored.
       var bookingInfo = trip.getPickupBookingInfo(accessBoardStopPosition);
-      firstStopDepartureTime =
-        RoutingBookingInfo
-          .of(requestedBookingTime, bookingInfo)
-          .earliestDepartureTime(firstStopDepartureTime);
+      firstStopDepartureTime = RoutingBookingInfo.of(
+        requestedBookingTime,
+        bookingInfo
+      ).earliestDepartureTime(firstStopDepartureTime);
 
       int earliestDepartureTime = trip.earliestDepartureTime(
         firstStopDepartureTime,

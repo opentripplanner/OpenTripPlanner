@@ -6,6 +6,7 @@ import static org.opentripplanner.transit.model.timetable.TimetableValidationErr
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
@@ -384,8 +385,10 @@ public final class RealTimeTripTimes implements TripTimes {
   }
 
   public void setServiceCode(int serviceCode) {
-    this.scheduledTripTimes =
-      scheduledTripTimes.copyOfNoDuplication().withServiceCode(serviceCode).build();
+    this.scheduledTripTimes = scheduledTripTimes
+      .copyOfNoDuplication()
+      .withServiceCode(serviceCode)
+      .build();
   }
 
   @Override
@@ -561,6 +564,37 @@ public final class RealTimeTripTimes implements TripTimes {
 
     prepareForRealTimeUpdates();
     headsigns[index] = headsign;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    RealTimeTripTimes that = (RealTimeTripTimes) o;
+    return (
+      Objects.equals(scheduledTripTimes, that.scheduledTripTimes) &&
+      Objects.deepEquals(arrivalTimes, that.arrivalTimes) &&
+      Objects.deepEquals(departureTimes, that.departureTimes) &&
+      realTimeState == that.realTimeState &&
+      Objects.deepEquals(stopRealTimeStates, that.stopRealTimeStates) &&
+      Objects.deepEquals(headsigns, that.headsigns) &&
+      Objects.deepEquals(occupancyStatus, that.occupancyStatus) &&
+      wheelchairAccessibility == that.wheelchairAccessibility
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      scheduledTripTimes,
+      Arrays.hashCode(arrivalTimes),
+      Arrays.hashCode(departureTimes),
+      realTimeState,
+      Arrays.hashCode(stopRealTimeStates),
+      Arrays.hashCode(headsigns),
+      Arrays.hashCode(occupancyStatus),
+      wheelchairAccessibility
+    );
   }
 
   private static int getOrElse(int index, int[] array, IntUnaryOperator defaultValue) {

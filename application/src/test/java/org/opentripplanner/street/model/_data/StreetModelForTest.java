@@ -13,6 +13,8 @@ import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVeh
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
+import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -42,8 +44,7 @@ public class StreetModelForTest {
   }
 
   public static TransitEntranceVertex transitEntranceVertex(String id, double lat, double lon) {
-    var entrance = Entrance
-      .of(id(id))
+    var entrance = Entrance.of(id(id))
       .withCoordinate(new WgsCoordinate(lat, lon))
       .withName(I18NString.of(id))
       .build();
@@ -88,6 +89,29 @@ public class StreetModelForTest {
     return streetEdgeBuilder(vA, vB, length, perm).buildAndConnect();
   }
 
+  public static StreetEdge areaEdge(
+    StreetVertex vA,
+    StreetVertex vB,
+    String name,
+    StreetTraversalPermission perm
+  ) {
+    Coordinate[] coords = new Coordinate[2];
+    coords[0] = vA.getCoordinate();
+    coords[1] = vB.getCoordinate();
+    LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+
+    AreaGroup AREA = new AreaGroup(null);
+
+    return new AreaEdgeBuilder()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withPermission(perm)
+      .withName(name)
+      .withArea(AREA)
+      .buildAndConnect();
+  }
+
   public static StreetEdge streetEdge(
     StreetVertex from,
     StreetVertex to,
@@ -97,8 +121,7 @@ public class StreetModelForTest {
   }
 
   public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {
-    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder
-      .of()
+    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder.of()
       .withLatitude(-122.575133)
       .withLongitude(45.456773);
     if (formFactor == RentalFormFactor.SCOOTER) {

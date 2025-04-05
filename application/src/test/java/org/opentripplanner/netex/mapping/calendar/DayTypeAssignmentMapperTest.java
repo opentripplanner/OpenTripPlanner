@@ -50,8 +50,10 @@ class DayTypeAssignmentMapperTest {
   private static final Boolean AVAILABLE = TRUE;
   private static final Boolean NOT_AVAILABLE = FALSE;
 
-  private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
-  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS =
+    new HierarchicalMapById<>();
+  private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS =
+    new HierarchicalMapById<>();
   public static final String OPERATING_DAY_1 = "OD-1";
   public static final String OPERATING_DAY_2 = "OD-2";
 
@@ -180,6 +182,33 @@ class DayTypeAssignmentMapperTest {
   }
 
   @Test
+  void mapDayTypesToLocalDatesWithOneDayPeriod() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+
+    {
+      // From 2020-11-01 to 2020-11-01 inclusive
+      dayTypes.add(createDayType(DAY_TYPE_1, EVERYDAY));
+      periods.add(createOperatingPeriod(OP_1, D2020_11_01, D2020_11_01));
+      assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+    }
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      EMPTY_OPERATING_DAYS,
+      periods,
+      null
+    );
+
+    // THEN - verify
+    assertEquals("[2020-11-01]", toStr(result, DAY_TYPE_1));
+  }
+
+  @Test
   void mapDayTypesToLocalDatesWithOperatingDays() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
@@ -205,6 +234,35 @@ class DayTypeAssignmentMapperTest {
 
     // THEN - verify
     assertEquals("[2020-11-01, 2020-11-02, 2020-11-03]", toStr(result, DAY_TYPE_1));
+  }
+
+  @Test
+  void mapDayTypesToLocalDatesWithOneDayOperatingPeriodWithOperatingDays() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+    var operatingDays = new HierarchicalMapById<OperatingDay>();
+
+    // From 2020-11-01 to 2020-11-01 inclusive
+    operatingDays.add(createOperatingDay(OPERATING_DAY_1, D2020_11_01));
+    operatingDays.add(createOperatingDay(OPERATING_DAY_2, D2020_11_01));
+    periods.add(createOperatingPeriodWithOperatingDays(OP_1, OPERATING_DAY_1, OPERATING_DAY_2));
+    dayTypes.add(createDayType(DAY_TYPE_1, EVERYDAY));
+
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      operatingDays,
+      periods,
+      null
+    );
+
+    // THEN - verify
+    assertEquals("[2020-11-01]", toStr(result, DAY_TYPE_1));
   }
 
   @Test

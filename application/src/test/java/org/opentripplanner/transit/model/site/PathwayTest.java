@@ -16,15 +16,13 @@ class PathwayTest {
   private static final String ID = "1:pathway";
   private static final String NAME = "name";
   private static final PathwayMode MODE = PathwayMode.ESCALATOR;
-  private static final PathwayNode FROM = PathwayNode
-    .of(TimetableRepositoryForTest.id("1:node"))
+  private static final PathwayNode FROM = PathwayNode.of(TimetableRepositoryForTest.id("1:node"))
     .withCoordinate(new WgsCoordinate(20, 30))
     .build();
   private static final RegularStop TO = TimetableRepositoryForTest.of().stop("1:stop").build();
   public static final int TRAVERSAL_TIME = 120;
 
-  private final Pathway subject = Pathway
-    .of(TimetableRepositoryForTest.id(ID))
+  private final Pathway subject = Pathway.of(TimetableRepositoryForTest.id(ID))
     .withPathwayMode(MODE)
     .withSignpostedAs(NAME)
     .withFromStop(FROM)

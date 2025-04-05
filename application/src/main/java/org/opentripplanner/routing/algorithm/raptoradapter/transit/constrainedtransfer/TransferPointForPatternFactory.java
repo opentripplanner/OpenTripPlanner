@@ -45,10 +45,9 @@ final class TransferPointForPatternFactory {
     private final TIntSet childStops;
 
     private StationSP(Station station) {
-      this.childStops =
-        new TIntHashSet(
-          station.getChildStops().stream().mapToInt(StopLocation::getIndex).toArray()
-        );
+      this.childStops = new TIntHashSet(
+        station.getChildStops().stream().mapToInt(StopLocation::getIndex).toArray()
+      );
     }
 
     @Override

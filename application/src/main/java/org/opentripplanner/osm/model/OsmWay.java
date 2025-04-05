@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
-public class OsmWay extends OsmWithTags {
+public class OsmWay extends OsmEntity {
 
   private static final Set<String> ESCALATOR_CONVEYING_TAGS = Set.of(
     "yes",
@@ -133,10 +133,6 @@ public class OsmWay extends OsmWithTags {
     return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
 
-  public Optional<Duration> getDuration(Consumer<String> errorHandler) {
-    return getTagValueAsDuration("duration", errorHandler);
-  }
-
   public boolean isForwardEscalator() {
     return isEscalator() && "forward".equals(this.getTag("conveying"));
   }
@@ -153,13 +149,11 @@ public class OsmWay extends OsmWithTags {
   public boolean isRoutableArea() {
     return (
       !isTag("area", "no") &&
-      (
-        isTag("area", "yes") ||
+      (isTag("area", "yes") ||
         isParking() ||
         isBikeParking() ||
         isBoardingArea() ||
-        isIndoorRoutable()
-      ) &&
+        isIndoorRoutable()) &&
       getNodeRefs().size() > 2
     );
   }

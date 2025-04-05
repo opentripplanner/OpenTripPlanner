@@ -47,8 +47,10 @@ public final class TransferPreferences implements Serializable {
     this.slack = DurationUtils.requireNonNegative(builder.slack);
     this.waitReluctance = Units.reluctance(builder.waitReluctance);
     this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
-    this.maxAdditionalTransfers =
-      Units.count(builder.maxAdditionalTransfers, MAX_NUMBER_OF_TRANSFERS);
+    this.maxAdditionalTransfers = Units.count(
+      builder.maxAdditionalTransfers,
+      MAX_NUMBER_OF_TRANSFERS
+    );
     this.optimization = requireNonNull(builder.optimization);
     this.nonpreferredCost = builder.nonpreferredCost;
   }
@@ -147,6 +149,7 @@ public final class TransferPreferences implements Serializable {
    * old functionality the same way, but we will try to map this parameter
    * so it does work similar as before.
    */
+  @Deprecated
   public int nonpreferredCost() {
     return nonpreferredCost.toSeconds();
   }
@@ -182,8 +185,7 @@ public final class TransferPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TransferPreferences.class)
+    return ToStringBuilder.of(TransferPreferences.class)
       .addObj("cost", cost, DEFAULT.cost)
       .addDuration("slack", slack, DEFAULT.slack)
       .addNum("waitReluctance", waitReluctance, DEFAULT.waitReluctance)

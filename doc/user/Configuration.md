@@ -129,9 +129,9 @@ The project information variables available are:
 
 All three configuration files have an optional `configVersion` property. The property can be used to
 version the configuration in a deployment pipeline. The `configVersion` is not used by OTP in any
-way, but is logged at startup and is available as part of the _server-info_ data in the REST API.
+way, but is logged at startup and is available as part of the _server-info_ data in the API.
 The intended usage is to be able to check which version of the configuration the graph was build
-with and which version the router uses. In an deployment with many OTP instances it can be useful to
+with and which version the router uses. In a deployment with many OTP instances it can be useful to
 ask an instance about the version, instead of tracking the deployment pipeline backwards to find the
 version used. How you inject a version into the configuration file is up to you, but you can do it
 in your build-pipeline, at deployment time or use system environment variable substitution.
@@ -175,7 +175,7 @@ text inserted is valid JSON object (starts with `{` and ends with `}`) or valid 
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.6.0 of OTP:
+Here is an example including variable substitution, assuming version 2.7.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -199,7 +199,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.6.0.obj"
+          "source": "netex-v2.7.0.obj"
         }
       ]
 } 
@@ -243,14 +243,13 @@ Here is a list of all features which can be toggled on/off and their default val
 | `WaitForGraphUpdateInPollingUpdaters` | Make all polling updaters wait for graph updates to complete before finishing. If this is not enabled, the updaters will finish after submitting the task to update the graph.                                                                                                                                                                                                                                  |         ✓️         |         |
 | `Co2Emissions`                        | Enable the emissions sandbox module.                                                                                                                                                                                                                                                                                                                                                                            |                    |    ✓️   |
 | `DataOverlay`                         | Enable usage of data overlay when calculating costs for the street network.                                                                                                                                                                                                                                                                                                                                     |                    |    ✓️   |
+| `DebugRasterTiles`                    | Enable debug raster tile API.                                                                                                                                                                                                                                                                                                                                                                                   |                    |    ✓️   |
 | `FaresV2`                             | Enable import of GTFS-Fares v2 data.                                                                                                                                                                                                                                                                                                                                                                            |                    |    ✓️   |
 | `FlexRouting`                         | Enable FLEX routing.                                                                                                                                                                                                                                                                                                                                                                                            |                    |    ✓️   |
 | `GoogleCloudStorage`                  | Enable Google Cloud Storage integration.                                                                                                                                                                                                                                                                                                                                                                        |                    |    ✓️   |
-| `LegacyRestApi`                       | Enable legacy REST API. This API will be removed in the future.                                                                                                                                                                                                                                                                                                                                                 |                    |    ✓️   |
 | `MultiCriteriaGroupMaxFilter`         | Keep the best itinerary with respect to each criteria used in the transit-routing search. For example the itinerary with the lowest cost, fewest transfers, and each unique transit-group (transit-group-priority) is kept, even if the max-limit is exceeded. This is turned off by default for now, until this feature is well tested.                                                                        |                    |         |
 | `RealtimeResolver`                    | When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data                                                                                                                                                                                                                                                                                                     |                    |    ✓️   |
 | `ReportApi`                           | Enable the report API.                                                                                                                                                                                                                                                                                                                                                                                          |                    |    ✓️   |
-| `RestAPIPassInDefaultConfigAsJson`    | Enable a default RouteRequest to be passed in as JSON on the REST API - FOR DEBUGGING ONLY!                                                                                                                                                                                                                                                                                                                     |                    |         |
 | `SandboxAPIGeocoder`                  | Enable the Geocoder API.                                                                                                                                                                                                                                                                                                                                                                                        |                    |    ✓️   |
 | `SandboxAPIMapboxVectorTilesApi`      | Enable Mapbox vector tiles API.                                                                                                                                                                                                                                                                                                                                                                                 |                    |    ✓️   |
 | `SandboxAPIParkAndRideApi`            | Enable park-and-ride endpoint.                                                                                                                                                                                                                                                                                                                                                                                  |                    |    ✓️   |

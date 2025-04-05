@@ -76,13 +76,8 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId stopId,
     Set<StopCondition> stopConditions
   ) {
-    Set<TransitAlert> result = new HashSet<>();
     EntitySelector.Stop entitySelector = new EntitySelector.Stop(stopId, stopConditions);
-    for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
-        result.add(alert);
-      }
-    }
+    var result = findMatchingAlerts(entitySelector);
     if (result.isEmpty()) {
       // Search for alerts on parent-stop
       if (timetableRepository != null) {
@@ -111,15 +106,13 @@ public class TransitAlertServiceImpl implements TransitAlertService {
   }
 
   @Override
+  public Collection<TransitAlert> getTripAlerts(FeedScopedId trip) {
+    return findMatchingAlerts(new EntitySelector.Trip(trip));
+  }
+
+  @Override
   public Collection<TransitAlert> getTripAlerts(FeedScopedId trip, LocalDate serviceDate) {
-    Set<TransitAlert> result = new HashSet<>();
-    EntitySelector.Trip entitySelector = new EntitySelector.Trip(trip, serviceDate);
-    for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
-        result.add(alert);
-      }
-    }
-    return result;
+    return findMatchingAlerts(new EntitySelector.Trip(trip, serviceDate));
   }
 
   @Override
@@ -133,18 +126,12 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId route,
     Set<StopCondition> stopConditions
   ) {
-    Set<TransitAlert> result = new HashSet<>();
     EntitySelector.StopAndRoute entitySelector = new EntitySelector.StopAndRoute(
       stop,
       route,
       stopConditions
     );
-    for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
-        result.add(alert);
-      }
-    }
-    return result;
+    return findMatchingAlerts(entitySelector);
   }
 
   @Override
@@ -154,19 +141,13 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     LocalDate serviceDate,
     Set<StopCondition> stopConditions
   ) {
-    Set<TransitAlert> result = new HashSet<>();
     EntitySelector.StopAndTrip entitySelector = new EntitySelector.StopAndTrip(
       stop,
       trip,
       serviceDate,
       stopConditions
     );
-    for (TransitAlert alert : alerts.get(entitySelector.key())) {
-      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
-        result.add(alert);
-      }
-    }
-    return result;
+    return findMatchingAlerts(entitySelector);
   }
 
   @Override
@@ -185,5 +166,15 @@ public class TransitAlertServiceImpl implements TransitAlertService {
     FeedScopedId route
   ) {
     return alerts.get(new EntityKey.DirectionAndRoute(route, direction));
+  }
+
+  private Collection<TransitAlert> findMatchingAlerts(EntitySelector entitySelector) {
+    Set<TransitAlert> result = new HashSet<>();
+    for (TransitAlert alert : alerts.get(entitySelector.key())) {
+      if (alert.entities().stream().anyMatch(selector -> selector.matches(entitySelector))) {
+        result.add(alert);
+      }
+    }
+    return result;
   }
 }

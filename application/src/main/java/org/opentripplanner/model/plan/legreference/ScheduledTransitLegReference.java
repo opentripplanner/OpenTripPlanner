@@ -69,18 +69,16 @@ public record ScheduledTransitLegReference(
   public ScheduledTransitLeg getLeg(TransitService transitService) {
     Trip trip;
     TripOnServiceDate tripOnServiceDate = null;
+
     if (tripOnServiceDateId != null) {
       tripOnServiceDate = transitService.getTripOnServiceDate(tripOnServiceDateId);
       if (tripOnServiceDate == null) {
-        LOG.info(
-          "Invalid transit leg reference: trip on service date '{}' not found",
-          tripOnServiceDateId
-        );
+        logInvalidLegRef("trip on service date '{}' not found", tripOnServiceDateId);
         return null;
       }
       if (!tripOnServiceDate.getServiceDate().equals(serviceDate)) {
-        LOG.info(
-          "Invalid transit leg reference: trip on service date '{}' does not run on service date {}",
+        logInvalidLegRef(
+          "trip on service date '{}' does not run on service date {}",
           tripOnServiceDateId,
           serviceDate
         );
@@ -89,17 +87,17 @@ public record ScheduledTransitLegReference(
       trip = tripOnServiceDate.getTrip();
     } else {
       trip = transitService.getTrip(tripId);
-      if (trip == null) {
-        LOG.info("Invalid transit leg reference: trip '{}' not found", tripId);
-        return null;
-      }
+    }
+    if (trip == null) {
+      logInvalidLegRef("trip '{}' not found", tripId);
+      return null;
     }
 
     TripPattern tripPattern = transitService.findPattern(trip, serviceDate);
     if (tripPattern == null) {
-      LOG.info(
-        "Invalid transit leg reference: trip pattern not found for trip '{}' and service date {} ",
-        tripId,
+      logInvalidLegRef(
+        "trip pattern not found for trip '{}' and service date {}",
+        trip.getId(),
         serviceDate
       );
       return null;
@@ -107,12 +105,12 @@ public record ScheduledTransitLegReference(
 
     int numStops = tripPattern.numberOfStops();
     if (fromStopPositionInPattern >= numStops || toStopPositionInPattern >= numStops) {
-      LOG.info(
+      logInvalidLegRef(
         "Invalid transit leg reference: boarding stop {} or alighting stop {} is out of range" +
         " in trip '{}' and service date {} ({} stops in trip pattern) ",
         fromStopPositionInPattern,
         toStopPositionInPattern,
-        tripId,
+        trip.getId(),
         serviceDate,
         numStops
       );
@@ -135,9 +133,9 @@ public record ScheduledTransitLegReference(
     TripTimes tripTimes = timetable.getTripTimes(trip);
 
     if (tripTimes == null) {
-      LOG.info(
-        "Invalid transit leg reference: trip times not found for trip '{}' and service date {}",
-        tripId,
+      logInvalidLegRef(
+        "trip times not found for trip '{}' and service date {}",
+        trip.getId(),
         serviceDate
       );
       return null;
@@ -148,11 +146,7 @@ public record ScheduledTransitLegReference(
         .getServiceCodesRunningForDate(serviceDate)
         .contains(tripTimes.getServiceCode())
     ) {
-      LOG.info(
-        "Invalid transit leg reference: the trip '{}' does not run on service date {}",
-        tripId,
-        serviceDate
-      );
+      logInvalidLegRef("the trip '{}' does not run on service date {}", trip.getId(), serviceDate);
       return null;
     }
 
@@ -186,8 +180,7 @@ public record ScheduledTransitLegReference(
     return (ScheduledTransitLeg) new AlertToLegMapper(
       transitService.getTransitAlertService(),
       transitService::findMultiModalStation
-    )
-      .decorateWithAlerts(leg, false);
+    ).decorateWithAlerts(leg, false);
   }
 
   /**
@@ -244,5 +237,11 @@ public record ScheduledTransitLegReference(
       serviceDate
     );
     return true;
+  }
+
+  private void logInvalidLegRef(String message, Object... args) {
+    if (LOG.isInfoEnabled()) {
+      LOG.info("Invalid transit leg reference: " + message + " for " + this, args);
+    }
   }
 }

@@ -11,8 +11,25 @@ import org.opentripplanner.transit.model.filter.expr.Matcher;
 import org.opentripplanner.transit.model.filter.expr.NullSafeWrapperMatcher;
 import org.opentripplanner.transit.model.network.Route;
 
+/**
+ * A factory for creating matchers for Routes.
+ * <p>
+ * This factory is used to create matchers for {@link Route} objects based on a request. The
+ * resulting matcher can be used to filter a list of Route objects.
+ */
 public class RouteMatcherFactory {
 
+  /**
+   * Creates a matcher that filters Route objects.
+   * <p>
+   * The {@code isFlexRoutePredicate} is an injected function, because the check is done by the
+   * transit service which has access to all routes and we don't want to pass all the routes into
+   * this factory.
+   *
+   * @param request the criteria for filtering Routes.
+   * @param isFlexRoutePredicate a function that determines if a Route is a flexible route.
+   * @return a matcher for filtering Routes.
+   */
   public static Matcher<Route> of(
     FindRoutesRequest request,
     Predicate<Route> isFlexRoutePredicate
@@ -71,10 +88,7 @@ public class RouteMatcherFactory {
     return new NullSafeWrapperMatcher<>(
       "longName",
       Route::getLongName,
-      new CaseInsensitiveStringPrefixMatcher<>(
-        "name",
-        name,
-        route -> route.getLongName().toString()
+      new CaseInsensitiveStringPrefixMatcher<>("name", name, route -> route.getLongName().toString()
       )
     );
   }

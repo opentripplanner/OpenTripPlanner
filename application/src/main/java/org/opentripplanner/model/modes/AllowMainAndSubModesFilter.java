@@ -58,14 +58,12 @@ class AllowMainAndSubModesFilter implements AllowTransitModeFilter {
   public String toString() {
     // Sort the list of sub-modes to make sure the order is the same every time, this
     // allows using the toString in tests
-    List<SubMode> subModes = SubMode
-      .getByIndex(this.subModes)
+    List<SubMode> subModes = SubMode.getByIndex(this.subModes)
       .stream()
       .sorted(Comparator.comparing(SubMode::name))
       .toList();
 
-    return ToStringBuilder
-      .of(AllowMainAndSubModesFilter.class)
+    return ToStringBuilder.of(AllowMainAndSubModesFilter.class)
       .addEnum("mainMode", mainMode)
       .addCol("subModes", subModes)
       .toString();

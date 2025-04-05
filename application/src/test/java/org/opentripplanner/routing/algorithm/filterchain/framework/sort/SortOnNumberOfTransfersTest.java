@@ -29,11 +29,9 @@ public class SortOnNumberOfTransfersTest implements PlanTestConstants {
       .build();
 
     // When: sorting
-    result =
-      Stream
-        .of(twoTransfers, oneTransfer, zeroTransfers)
-        .sorted(numberOfTransfersComparator())
-        .collect(Collectors.toList());
+    result = Stream.of(twoTransfers, oneTransfer, zeroTransfers)
+      .sorted(numberOfTransfersComparator())
+      .collect(Collectors.toList());
 
     // Then: expect the results to be in order according to number of transfers
     assertEquals(toStr(List.of(zeroTransfers, oneTransfer, twoTransfers)), toStr(result));

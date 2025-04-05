@@ -11,15 +11,15 @@ class ItinerariesCalculateLegTotals {
   Duration totalDuration = Duration.ZERO;
   Duration transitDuration = Duration.ZERO;
   int nTransitLegs = 0;
-  Duration nonTransitDuration = Duration.ZERO;
-  double nonTransitDistanceMeters = 0.0;
+  Duration onStreetDuration = Duration.ZERO;
+  double onStreetDistanceMeters = 0.0;
   Duration walkDuration = Duration.ZERO;
   double walkDistanceMeters = 0.0;
   Duration waitingDuration = Duration.ZERO;
   boolean walkOnly = true;
   boolean streetOnly = true;
-  double totalElevationGained = 0.0;
-  double totalElevationLost = 0.0;
+  double elevationGained_m = 0.0;
+  double elevationLost_m = 0.0;
 
   public ItinerariesCalculateLegTotals(List<Leg> legs) {
     if (legs.isEmpty()) {
@@ -44,8 +44,8 @@ class ItinerariesCalculateLegTotals {
           ++nTransitLegs;
         }
       } else if (leg.isStreetLeg()) {
-        nonTransitDuration = nonTransitDuration.plus(dt);
-        nonTransitDistanceMeters += leg.getDistanceMeters();
+        onStreetDuration = onStreetDuration.plus(dt);
+        onStreetDistanceMeters += leg.getDistanceMeters();
 
         if (leg.isWalkingLeg()) {
           walkDuration = walkDuration.plus(leg.getDuration());
@@ -65,10 +65,10 @@ class ItinerariesCalculateLegTotals {
 
       if (leg.getElevationProfile() != null) {
         var p = leg.getElevationProfile();
-        this.totalElevationGained += p.elevationGained();
-        this.totalElevationLost += p.elevationLost();
+        this.elevationGained_m += p.elevationGained();
+        this.elevationLost_m += p.elevationLost();
       }
     }
-    this.waitingDuration = totalDuration.minus(transitDuration).minus(nonTransitDuration);
+    this.waitingDuration = totalDuration.minus(transitDuration).minus(onStreetDuration);
   }
 }

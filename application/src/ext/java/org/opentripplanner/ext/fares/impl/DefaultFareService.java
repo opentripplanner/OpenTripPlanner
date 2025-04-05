@@ -21,7 +21,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -100,9 +100,9 @@ public class DefaultFareService implements FareService {
   }
 
   @Override
-  public ItineraryFares calculateFares(Itinerary itinerary) {
+  public ItineraryFare calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
       .map(Leg.class::cast)
@@ -116,7 +116,7 @@ public class DefaultFareService implements FareService {
     }
     var fareLegsByFeed = fareLegsByFeed(fareLegs);
 
-    ItineraryFares fare = ItineraryFares.empty();
+    ItineraryFare fare = ItineraryFare.empty();
     for (FareType fareType : fareRulesPerType.keySet()) {
       for (String feedId : fareLegsByFeed.keySet()) {
         var fareRules = fareRulesForFeed(fareType, feedId);
@@ -124,7 +124,7 @@ public class DefaultFareService implements FareService {
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
         if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
-          ItineraryFares computedFaresForType = calculateFaresForType(
+          ItineraryFare computedFaresForType = calculateFaresForType(
             currency,
             fareType,
             fareLegsByFeed.get(feedId),
@@ -147,13 +147,11 @@ public class DefaultFareService implements FareService {
       .entrySet()
       .stream()
       .collect(
-        Collectors.toMap(
-          Map.Entry::getKey,
-          rules ->
-            rules
-              .getValue()
-              .stream()
-              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        Collectors.toMap(Map.Entry::getKey, rules ->
+          rules
+            .getValue()
+            .stream()
+            .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
         )
       );
     return fareRulesByTypeAndFeed.get(fareType).get(feedId);
@@ -175,7 +173,7 @@ public class DefaultFareService implements FareService {
    * If our only rule were A-B with a fare of 10, we would have no lowest fare, but we will still
    * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
-  protected ItineraryFares calculateFaresForType(
+  protected ItineraryFare calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -199,9 +197,11 @@ public class DefaultFareService implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
-      var product = FareProduct
-        .of(fareId, fareType.name(), Money.ofFractionalAmount(currency, cost))
-        .build();
+      var product = FareProduct.of(
+        fareId,
+        fareType.name(),
+        Money.ofFractionalAmount(currency, cost)
+      ).build();
 
       List<Leg> applicableLegs = new ArrayList<>();
       for (int i = start; i <= via; ++i) {
@@ -231,7 +231,7 @@ public class DefaultFareService implements FareService {
       start = via + 1;
     }
 
-    var fare = ItineraryFares.empty();
+    var fare = ItineraryFare.empty();
     fare.addFareProductUses(fareProductUses);
     return fare;
   }
@@ -313,9 +313,9 @@ public class DefaultFareService implements FareService {
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
     Money finalBestFare = bestFare;
-    return Optional
-      .ofNullable(bestAttribute)
-      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
+    return Optional.ofNullable(bestAttribute).map(attribute ->
+      new FareAndId(finalBestFare, attribute.getId())
+    );
   }
 
   /**

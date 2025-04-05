@@ -383,8 +383,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
     );
     request.setArriveBy(arriveBy);
 
-    var tree = StreetSearchBuilder
-      .of()
+    var tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setRequest(request)
       .setStreetRequest(new StreetRequest(streetMode))

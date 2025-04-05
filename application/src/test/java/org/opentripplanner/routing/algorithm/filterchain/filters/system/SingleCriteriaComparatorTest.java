@@ -15,7 +15,8 @@ import org.opentripplanner.transit.model.network.grouppriority.DefaultTransitGro
 class SingleCriteriaComparatorTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
-  private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR = new DefaultTransitGroupPriorityCalculator();
+  private static final DefaultTransitGroupPriorityCalculator GROUP_PRIORITY_CALCULATOR =
+    new DefaultTransitGroupPriorityCalculator();
 
   private static final Place A = TEST_MODEL.place("A", 10, 11);
   private static final Place B = TEST_MODEL.place("B", 10, 13);
@@ -44,13 +45,13 @@ class SingleCriteriaComparatorTest {
 
   @BeforeAll
   static void setUp() {
-    assertEquals(0, zeroTransferLowCost.getNumberOfTransfers());
-    assertEquals(0, zeroTransferHighCost.getNumberOfTransfers());
-    assertEquals(1, oneTransferLowCost.getNumberOfTransfers());
+    assertEquals(0, zeroTransferLowCost.numberOfTransfers());
+    assertEquals(0, zeroTransferHighCost.numberOfTransfers());
+    assertEquals(1, oneTransferLowCost.numberOfTransfers());
 
-    int expectedCost = zeroTransferLowCost.getGeneralizedCost();
-    assertTrue(expectedCost < zeroTransferHighCost.getGeneralizedCost());
-    assertEquals(expectedCost, oneTransferLowCost.getGeneralizedCost());
+    int expectedCost = zeroTransferLowCost.generalizedCost();
+    assertTrue(expectedCost < zeroTransferHighCost.generalizedCost());
+    assertEquals(expectedCost, oneTransferLowCost.generalizedCost());
   }
 
   @Test
@@ -88,10 +89,19 @@ class SingleCriteriaComparatorTest {
 
   @Test
   void compareTransitPriorityGroups() {
-    var group1 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(1).build();
-    var group2 = newItinerary(A).bus(1, START, END_LOW, C).withGeneralizedCost2(2).build();
+    var group1 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .itineraryBuilder()
+      .withGeneralizedCost2(1)
+      .build();
+    var group2 = newItinerary(A)
+      .bus(1, START, END_LOW, C)
+      .itineraryBuilder()
+      .withGeneralizedCost2(2)
+      .build();
     var group1And2 = newItinerary(A)
       .bus(1, START, END_LOW, C)
+      .itineraryBuilder()
       .withGeneralizedCost2(GROUP_PRIORITY_CALCULATOR.mergeInGroupId(1, 2))
       .build();
 

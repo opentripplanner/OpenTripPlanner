@@ -206,8 +206,7 @@ public final class TransitPreferences implements Serializable {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(TransitPreferences.class)
+    return ToStringBuilder.of(TransitPreferences.class)
       .addObj("boardSlack", boardSlack, DEFAULT.boardSlack)
       .addObj("alightSlack", alightSlack, DEFAULT.alightSlack)
       .addObj("reluctanceForMode", reluctanceForMode, DEFAULT.reluctanceForMode)

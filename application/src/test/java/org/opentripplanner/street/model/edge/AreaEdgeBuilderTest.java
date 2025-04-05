@@ -19,11 +19,10 @@ class AreaEdgeBuilderTest {
     StreetTraversalPermission.ALL;
 
   private static final I18NString NAME = I18NString.of("area-edge-name");
-  private static final LineString GEOMETRY = GeometryUtils
-    .getGeometryFactory()
+  private static final LineString GEOMETRY = GeometryUtils.getGeometryFactory()
     .createLineString(new Coordinate[] { FROM_VERTEX.getCoordinate(), TO_VERTEX.getCoordinate() });
 
-  private static final AreaEdgeList AREA = new AreaEdgeList(null, null);
+  private static final AreaGroup AREA = new AreaGroup(null);
 
   @Test
   void buildAndConnect() {

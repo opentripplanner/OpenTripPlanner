@@ -16,8 +16,7 @@ class ContactInfoTest {
   private static final String EMAIL = "email@aaa.com";
   private static final String INFO_URL = "http://info.aaa.com";
 
-  private static final ContactInfo subject = ContactInfo
-    .of()
+  private static final ContactInfo subject = ContactInfo.of()
     .withContactPerson(CONTACT_PERSON)
     .withPhoneNumber(PHONE)
     .withEMail(EMAIL)

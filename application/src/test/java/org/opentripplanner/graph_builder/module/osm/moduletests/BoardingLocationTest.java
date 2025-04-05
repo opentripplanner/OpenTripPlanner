@@ -16,7 +16,7 @@ import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepo
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class BoardingLocationTest {
+class BoardingLocationTest {
 
   /**
    * There is a one-way road which is also marked as a platform in Sky Campus which crashed OSM.
@@ -31,8 +31,12 @@ public class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule
-      .of(provider, graph, osmInfoRepository, new DefaultVehicleParkingRepository())
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      osmInfoRepository,
+      new DefaultVehicleParkingRepository()
+    )
       .withBoardingAreaRefTags(Set.of("ref"))
       .build();
 
@@ -54,8 +58,12 @@ public class BoardingLocationTest {
 
     var graph = new Graph(new Deduplicator());
     var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
-    var osmModule = OsmModule
-      .of(provider, graph, osmInfoRepository, new DefaultVehicleParkingRepository())
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      osmInfoRepository,
+      new DefaultVehicleParkingRepository()
+    )
       .withBoardingAreaRefTags(Set.of("ref"))
       .build();
 
@@ -65,5 +73,33 @@ public class BoardingLocationTest {
 
     var platform = osmInfoRepository.findPlatform(edges.getFirst());
     assertTrue(platform.isEmpty());
+  }
+
+  @Test
+  void testHighwayPlatform() {
+    var way = new OsmWay();
+    way.addTag("highway", "platform");
+    way.addTag("ref", "1");
+    var provider = TestOsmProvider.of().addWay(way).build();
+
+    var graph = new Graph(new Deduplicator());
+    var osmInfoRepository = new DefaultOsmInfoGraphBuildRepository();
+    var osmModule = OsmModule.of(
+      provider,
+      graph,
+      osmInfoRepository,
+      new DefaultVehicleParkingRepository()
+    )
+      .withBoardingAreaRefTags(Set.of("ref"))
+      .build();
+
+    osmModule.buildGraph();
+    var edges = List.copyOf(graph.getEdges());
+    assertThat(edges).hasSize(2);
+
+    var platform = osmInfoRepository.findPlatform(edges.getFirst());
+
+    assertTrue(platform.isPresent());
+    assertEquals(Set.of("1"), platform.get().references());
   }
 }

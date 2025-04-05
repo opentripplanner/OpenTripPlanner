@@ -47,9 +47,9 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
    */
   public GroupByDistance(Itinerary itinerary, double p) {
     assertPIsValid(p);
-    double limit = p * calculateTotalDistance(itinerary.getLegs());
+    double limit = p * calculateTotalDistance(itinerary.legs());
     this.streetOnly = itinerary.isStreetOnly();
-    this.keySet = createKeySetOfLegsByLimit(itinerary.getLegs(), limit);
+    this.keySet = createKeySetOfLegsByLimit(itinerary.legs(), limit);
   }
 
   @Override
@@ -76,8 +76,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(GroupByDistance.class)
+    return ToStringBuilder.of(GroupByDistance.class)
       .addBoolIfTrue("streetOnly", streetOnly)
       .addCol("keySet", keySet, GroupByDistance::keySetToString)
       .toString();
@@ -96,8 +95,10 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   /** package local to be unit-testable */
   static List<Leg> createKeySetOfLegsByLimit(List<Leg> legs, double distanceLimitMeters) {
     // Sort legs descending on distance
-    legs =
-      legs.stream().sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed()).toList();
+    legs = legs
+      .stream()
+      .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
+      .toList();
 
     double sum = 0.0;
     int i = 0;
@@ -140,8 +141,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
   }
 
   private static String keySetToString(Leg leg) {
-    var builder = ToStringBuilder
-      .of(leg.getClass())
+    var builder = ToStringBuilder.of(leg.getClass())
       .addTime("start", leg.getStartTime())
       .addTime("end", leg.getStartTime());
 

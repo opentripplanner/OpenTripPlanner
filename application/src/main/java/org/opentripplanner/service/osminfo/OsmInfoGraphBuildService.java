@@ -2,6 +2,7 @@ package org.opentripplanner.service.osminfo;
 
 import java.util.Optional;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
@@ -18,8 +19,12 @@ public interface OsmInfoGraphBuildService {
   /**
    * Find the platform the given edge is part of.
    * <p>
-   * TODO: This service currently only stores linear platforms, but area platforms and
-   * node platforms should be supported as well.
+   * TODO: node platforms should be supported as well.
    */
   Optional<Platform> findPlatform(Edge edge);
+
+  /**
+   * Find the platform which relates to an area
+   */
+  Optional<Platform> findPlatform(Area area);
 }

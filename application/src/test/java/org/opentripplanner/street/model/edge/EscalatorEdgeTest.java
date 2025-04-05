@@ -29,8 +29,7 @@ class EscalatorEdgeTest {
   @MethodSource("args")
   void testWalking(double escalatorReluctance, double expectedWeight) {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, null);
-    var req = StreetSearchRequest
-      .of()
+    var req = StreetSearchRequest.of()
       .withPreferences(p ->
         p.withWalk(w -> w.withEscalator(escalator -> escalator.withReluctance(escalatorReluctance)))
       )
@@ -38,7 +37,7 @@ class EscalatorEdgeTest {
 
     var res = edge.traverse(new State(from, req.build()))[0];
     assertEquals(expectedWeight, res.weight);
-    assertEquals(100, res.getTimeDeltaSeconds());
+    assertEquals(100_000, res.getTimeDeltaMilliseconds());
   }
 
   @Test
@@ -47,7 +46,7 @@ class EscalatorEdgeTest {
     var edge = EscalatorEdge.createEscalatorEdge(from, to, 45, Duration.ofSeconds(60));
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK);
     var res = edge.traverse(new State(from, req.build()))[0];
-    assertEquals(60, res.getTimeDeltaSeconds());
+    assertEquals(60_000, res.getTimeDeltaMilliseconds());
   }
 
   @Test

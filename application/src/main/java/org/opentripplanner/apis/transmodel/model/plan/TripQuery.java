@@ -46,8 +46,7 @@ public class TripQuery {
   ) {
     RoutingPreferences preferences = routing.request.preferences();
 
-    return GraphQLFieldDefinition
-      .newFieldDefinition()
+    return GraphQLFieldDefinition.newFieldDefinition()
       .name("trip")
       .description(
         "Input type for executing a travel search for a trip between two locations. Returns " +
@@ -56,8 +55,7 @@ public class TripQuery {
       .type(new GraphQLNonNull(tripType))
       .withDirective(TransmodelDirectives.TIMING_DATA)
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("dateTime")
           .description(
             "The date and time for the earliest time the user is willing to start the journey " +
@@ -68,8 +66,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("bookingTime")
           .description(
             """
@@ -85,20 +82,19 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("searchWindow")
           .description(
             """
             The length of the search-window in minutes. This parameter is optional.
-            
+
             The search-window is defined as the duration between the earliest-departure-time(EDT) and
             the latest-departure-time(LDT). OTP will search for all itineraries in this departure
             window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP
             will dynamically calculate the EDT. Using a short search-window is faster than using a
             longer one, but the search duration is not linear. Using a \"too\" short search-window will
             waste resources server side, while using a search-window that is too long will be slow.
-            
+
             OTP will dynamically calculate a reasonable value for the search-window, if not provided. The
             calculation comes with a significant overhead (10-20%% extra). Whether you should use the
             dynamic calculated value or pass in a value depends on your use-case. For a travel planner
@@ -107,19 +103,19 @@ public class TripQuery {
             so that the number of itineraries on average is around the wanted `numTripPatterns`. Make
             sure you set the `numTripPatterns` to a high number while testing. For a country wide area like
             Norway, using the dynamic search-window is the best.
-            
+
             When paginating, the search-window is calculated using the `numTripPatterns` in the original
             search together with statistics from the search for the last page. This behaviour is
             configured server side, and can not be overridden from the client. The paging may even
             exceed the maximum value.
-            
+
             The search-window used is returned to the response metadata as `searchWindowUsed`.
             This can be used by the client to calculate the when the next page start/end.
-                   
+
             Note! In some cases you may have to page many times to get all the results you want.
             This is intended. Increasing the search-window beyond the max value is NOT going to be
             much faster. Instead the client can inform the user about the progress.
-                        
+
             Maximum value: %d minutes (%dh)
             """.formatted(
                 transitTuningParameters.maxSearchWindow().toMinutes(),
@@ -130,23 +126,21 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("pageCursor")
           .description(
             """
             Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last
             response and keep the original request as is. This will enable you to search for
             itineraries in the next or previous search-window. The paging will automatically scale
-            up/down the search-window to fit the `numTripPatterns`. 
+            up/down the search-window to fit the `numTripPatterns`.
             """
           )
           .type(Scalars.GraphQLString)
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("timetableView")
           .description(
             "Search for the best trip options within a time window. If `true` two " +
@@ -178,24 +172,21 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("from")
           .description("The start location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("to")
           .description("The destination location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("passThroughPoints")
           .deprecate("Use via instead")
           .description("The list of points the journey is required to pass through.")
@@ -203,16 +194,14 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name(TRIP_VIA_PARAMETER)
           .description(DOC_VIA)
           .type(new GraphQLList(new GraphQLNonNull(ViaLocationInputType.VIA_LOCATION_INPUT)))
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("arriveBy")
           .description(
             "Whether the trip should depart at dateTime (false, the default), or arrive at " +
@@ -223,8 +212,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("wheelchairAccessible")
           .description(
             "Whether the trip must be wheelchair accessible. Supported for the street part to " +
@@ -235,8 +223,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("ignoreRealtimeUpdates")
           .description("When true, real-time updates are ignored during this search.")
           .type(Scalars.GraphQLBoolean)
@@ -244,8 +231,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("includePlannedCancellations")
           .description(
             "When true, service journeys cancelled in scheduled route data will be included during this search."
@@ -255,8 +241,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("includeRealtimeCancellations")
           .description(
             "When true, service journeys cancelled by real-time updates will be included during this search."
@@ -266,8 +251,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("locale")
           .description(
             "The preferable language to use for text targeted the end user. Note! The data " +
@@ -279,8 +263,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("modes")
           .description(
             "The set of access/egress/direct/transit modes to be used for this search. " +
@@ -291,8 +274,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("banned")
           .description("Banned")
           .description(
@@ -302,8 +284,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("whiteListed")
           .description(
             "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
@@ -312,8 +293,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("filters")
           .description(
             "A list of filters for which trips should be included. " +
@@ -325,8 +305,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("relaxTransitGroupPriority")
           .description(
             """
@@ -334,15 +313,15 @@ public class TripQuery {
             transit-group-priorities. The groups are set server side for service-journey and
             can not be configured in the API. This mainly helps to return competition neutral
             services. Long distance authorities are put in different transit-groups.
-            
+
             This relaxes the comparison inside the routing engine for each stop-arrival. If two
             paths have a different set of transit-group-priorities, then the generalized-cost
             comparison is relaxed. The final set of paths are filtered through the normal
             itinerary-filters.
-            
+
             - The `ratio` must be greater or equal to 1.0 and less then 1.2.
             - The `constant` must be greater or equal to '0s' and less then '1h'.
-            
+
             THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
             """.stripIndent()
           )
@@ -355,8 +334,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("walkSpeed")
           .description("The maximum walk speed along streets, in meters per second.")
           .type(Scalars.GraphQLFloat)
@@ -364,8 +342,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("walkReluctance")
           .description(
             "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
@@ -375,8 +352,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("waitReluctance")
           .description(
             "Wait cost is multiplied by this value. Setting this to a value lower than 1 " +
@@ -389,8 +365,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("bikeSpeed")
           .description("The maximum bike speed along streets, in meters per second")
           .type(Scalars.GraphQLFloat)
@@ -398,8 +373,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("bicycleOptimisationMethod")
           .description(
             "The set of characteristics that the user wants to optimise for during bicycle " +
@@ -414,8 +388,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("triangleFactors")
           .description(
             "When setting the " +
@@ -431,8 +404,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("useBikeRentalAvailabilityInformation")
           .description(
             "Whether or not bike rental availability information will be used to plan bike " +
@@ -443,8 +415,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("transferPenalty")
           .description(
             "An extra penalty added on transfers (i.e. all boardings except the first one). " +
@@ -464,8 +435,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("transferSlack")
           .description(
             "An expected transfer time (in seconds) that specifies the amount of time that " +
@@ -477,8 +447,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("boardSlackDefault")
           .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
           .type(Scalars.GraphQLInt)
@@ -486,8 +455,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("boardSlackList")
           .description(
             TransportModeSlack.slackByGroupDescription(
@@ -499,8 +467,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("alightSlackDefault")
           .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
           .type(Scalars.GraphQLInt)
@@ -508,8 +475,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("alightSlackList")
           .description(
             TransportModeSlack.slackByGroupDescription(
@@ -521,8 +487,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("numTripPatterns")
           .description(
             "The maximum number of trip patterns to return. Note! This reduce the number of " +
@@ -535,8 +500,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("maximumTransfers")
           .description(
             "Maximum number of transfers. Note! The best way to reduce the number of " +
@@ -547,8 +511,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("maximumAdditionalTransfers")
           .description(
             "Maximum number of additional transfers compared to the best number of transfers " +
@@ -560,8 +523,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("debugItineraryFilter")
           .description(
             "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries " +
@@ -573,33 +535,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
-          .name("relaxTransitSearchGeneralizedCostAtDestination")
-          .deprecate("This is replaced by 'relaxTransitGroupPriority'.")
-          .description(
-            """
-              Whether non-optimal transit paths at the destination should be returned. Let c be the
-              existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
-              accepted if the following is true:
-              
-              `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`
-                          
-              The parameter is optional. If not set, a normal comparison is performed.
-              
-              Values less than 1.0 is not allowed, and values greater than 2.0 are not
-              supported, due to performance reasons.
-              """
-          )
-          .type(Scalars.GraphQLFloat)
-          .defaultValueProgrammatic(
-            preferences.transit().raptor().relaxGeneralizedCostAtDestination().orElse(null)
-          )
-          .build()
-      )
-      .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name("itineraryFilters")
           .description(
             "Configure the itinerary-filter-chain. NOTE! THESE PARAMETERS ARE USED " +
@@ -609,8 +545,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name(ACCESS_EGRESS_PENALTY)
           .description("Time and cost penalty on access/egress modes.")
           .type(new GraphQLList(new GraphQLNonNull(penaltyForStreetMode)))
@@ -622,8 +557,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name(MAX_ACCESS_EGRESS_DURATION_FOR_MODE)
           .description(
             "Maximum duration for access/egress for street searches per respective mode. " +
@@ -636,8 +570,7 @@ public class TripQuery {
           .build()
       )
       .argument(
-        GraphQLArgument
-          .newArgument()
+        GraphQLArgument.newArgument()
           .name(MAX_DIRECT_DURATION_FOR_MODE)
           .description(
             "Maximum duration for direct street searchers per respective mode. " +

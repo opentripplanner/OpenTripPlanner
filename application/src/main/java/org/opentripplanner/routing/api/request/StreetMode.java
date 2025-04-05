@@ -131,9 +131,9 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
 
   private static String GBFS_PREREQ =
     """
-    
+
     _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
-    See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
+    See [Configuring GBFS](GBFS-Config.md) on how to add one.
     """;
 
   @Override
@@ -142,47 +142,47 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
       case NOT_SET -> "";
       case WALK -> "Walking some or all of the way of the route.";
       case BIKE -> """
-        Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
+      Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
 
-        Taking a bicycle onto transit is only possible if information about the permission to do so is supplied in the source data. In GTFS this field
-        is called `bikesAllowed`.
-        """;
+      Taking a bicycle onto transit is only possible if information about the permission to do so is supplied in the source data. In GTFS this field
+      is called `bikesAllowed`.
+      """;
       case BIKE_TO_PARK -> """
-        Leaving the bicycle at the departure station and walking from the arrival station to the destination.
-        This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.
-        
-        _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
-        """;
+      Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+      This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.
+
+      _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
+      """;
       case BIKE_RENTAL -> """
-        Taking a rented, shared-mobility bike for part or the entirety of the route.
-        """ +
+      Taking a rented, shared-mobility bike for part or the entirety of the route.
+      """ +
       GBFS_PREREQ;
       case SCOOTER_RENTAL -> """
-        Walking to a scooter rental point, riding a scooter to a scooter rental drop-off point, and walking the rest of the way.
-        This can include scooter rental at fixed locations or free-floating services.
-        """ +
+      Walking to a scooter rental point, riding a scooter to a scooter rental drop-off point, and walking the rest of the way.
+      This can include scooter rental at fixed locations or free-floating services.
+      """ +
       GBFS_PREREQ;
       case CAR_RENTAL -> """
-        Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
-        This can include car rental at fixed locations or free-floating services.
-        """ +
+      Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
+      This can include car rental at fixed locations or free-floating services.
+      """ +
       GBFS_PREREQ;
       case CAR -> """
-        Driving your own car the entirety of the route.
-        This can be combined with transit, where will return routes with a [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component.
-        This means that the car is not parked in a permanent parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off location.
-        """;
+      Driving your own car the entirety of the route.
+      This can be combined with transit, where will return routes with a [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component.
+      This means that the car is not parked in a permanent parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off location.
+      """;
       case CAR_TO_PARK -> """
-        Driving a car to the park-and-ride facilities near a station and taking publictransport.
-        This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
-        _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
-        """;
+      Driving a car to the park-and-ride facilities near a station and taking publictransport.
+      This mode needs to be combined with at least one transit mode otherwise, it behaves like an ordinary car journey.
+      _Prerequisite:_ Park-and-ride areas near the stations need to be present in the OSM input file.
+      """;
       case CAR_PICKUP -> "Walking to a pickup point along the road, driving to a drop-off point along the road, and walking the rest of the way. <br/> This can include various taxi-services or kiss & ride.";
       case CAR_HAILING -> """
-        Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
-        
-        See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
-        """;
+      Using a car hailing app like Uber or Lyft to get to a train station or all the way to the destination.
+
+      See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
+      """;
       case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
     };
   }

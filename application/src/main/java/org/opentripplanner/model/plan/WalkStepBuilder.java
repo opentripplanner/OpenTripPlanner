@@ -93,7 +93,7 @@ public class WalkStepBuilder {
   }
 
   public WalkStepBuilder withAbsoluteDirection(double thisAngle) {
-    int octant = (8 + IntUtils.round(thisAngle * 8 / (Math.PI * 2))) % 8;
+    int octant = (8 + IntUtils.round((thisAngle * 8) / (Math.PI * 2))) % 8;
     absoluteDirection = AbsoluteDirection.values()[octant];
     return this;
   }
@@ -136,6 +136,10 @@ public class WalkStepBuilder {
       return str.substring(0, idx - 1);
     }
     return str;
+  }
+
+  public boolean hasEntrance() {
+    return entrance != null;
   }
 
   public WalkStepBuilder addStreetNotes(Set<StreetNote> notes) {

@@ -38,16 +38,13 @@ class IndexedLineSegment {
 
   // in radians
   static double bearing(Coordinate c1, Coordinate c2) {
-    double deltaLon = (c2.x - c1.x) * Math.PI / 180;
-    double lat1Radians = c1.y * Math.PI / 180;
-    double lat2Radians = c2.y * Math.PI / 180;
+    double deltaLon = ((c2.x - c1.x) * Math.PI) / 180;
+    double lat1Radians = (c1.y * Math.PI) / 180;
+    double lat2Radians = (c2.y * Math.PI) / 180;
     double y = Math.sin(deltaLon) * Math.cos(lat2Radians);
     double x =
-      Math.cos(lat1Radians) *
-      Math.sin(lat2Radians) -
-      Math.sin(lat1Radians) *
-      Math.cos(lat2Radians) *
-      Math.cos(deltaLon);
+      Math.cos(lat1Radians) * Math.sin(lat2Radians) -
+      Math.sin(lat1Radians) * Math.cos(lat2Radians) * Math.cos(deltaLon);
     return Math.atan2(y, x);
   }
 

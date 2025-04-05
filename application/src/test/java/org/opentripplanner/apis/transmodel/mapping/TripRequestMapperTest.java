@@ -79,8 +79,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
     var patterns = itineraryPatterns(itinerary);
-    var siteRepository = TEST_MODEL
-      .siteRepositoryBuilder()
+    var siteRepository = TEST_MODEL.siteRepositoryBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)
@@ -92,7 +91,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
     LocalDate serviceDate = itinerary.startTime().toLocalDate();
     patterns.forEach(pattern -> {
       timetableRepository.addTripPattern(pattern.getId(), pattern);
-      final int serviceCode = pattern.getScheduledTimetable().getTripTimes(0).getServiceCode();
+      final int serviceCode = pattern
+        .getScheduledTimetable()
+        .getTripTimes()
+        .getFirst()
+        .getServiceCode();
       timetableRepository.getServiceCodes().put(pattern.getId(), serviceCode);
       calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
     });
@@ -128,12 +131,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
       defaultRequest
     );
 
-    context =
-      new TransmodelRequestContext(
-        otpServerRequestContext,
-        otpServerRequestContext.routingService(),
-        otpServerRequestContext.transitService()
-      );
+    context = new TransmodelRequestContext(
+      otpServerRequestContext,
+      otpServerRequestContext.routingService(),
+      otpServerRequestContext.transitService()
+    );
   }
 
   private static final List<Map<String, Object>> DURATIONS = List.of(
@@ -193,8 +195,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   @Test
   public void testMaxAccessEgressDurationValidation() {
-    var defaultValue = StreetPreferences.DEFAULT
-      .accessEgress()
+    var defaultValue = StreetPreferences.DEFAULT.accessEgress()
       .maxDuration()
       .valueOf(StreetMode.WALK);
     var duration = List.of(
@@ -203,9 +204,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     Map<String, Object> arguments = Map.of("maxAccessEgressDurationForMode", duration);
 
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    assertThrows(IllegalArgumentException.class, () ->
+      TripRequestMapper.createRequest(executionContext(arguments))
     );
   }
 
@@ -215,9 +215,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "maxAccessEgressDurationForMode",
       List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    assertThrows(IllegalArgumentException.class, () ->
+      TripRequestMapper.createRequest(executionContext(arguments))
     );
   }
 
@@ -230,9 +229,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
     Map<String, Object> arguments = Map.of("maxDirectDurationForMode", duration);
 
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    assertThrows(IllegalArgumentException.class, () ->
+      TripRequestMapper.createRequest(executionContext(arguments))
     );
   }
 
@@ -242,9 +240,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       "maxDirectDurationForMode",
       List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
     );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    assertThrows(IllegalArgumentException.class, () ->
+      TripRequestMapper.createRequest(executionContext(arguments))
     );
   }
 
@@ -304,9 +301,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
       List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
     );
 
-    final List<ViaLocation> viaLocations = TripRequestMapper
-      .createRequest(executionContext(arguments))
-      .getViaLocations();
+    final List<ViaLocation> viaLocations = TripRequestMapper.createRequest(
+      executionContext(arguments)
+    ).getViaLocations();
     assertEquals(
       "PassThroughViaLocation{label: PTP1, stopLocationIds: [F:ST:stop1, F:ST:stop2, F:ST:stop3]}",
       viaLocations.get(0).toString()
@@ -401,8 +398,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
+    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query("")
       .operationName("trip")
       .context(context)
@@ -414,8 +410,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .executionId(ExecutionId.from(this.getClass().getName()))
       .build();
 
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .context(context)
       .arguments(arguments)
       .build();
@@ -425,7 +420,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   private static List<TripPattern> itineraryPatterns(final Itinerary itinerary) {
     return itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)

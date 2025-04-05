@@ -3,6 +3,7 @@ package org.opentripplanner;
 import static org.opentripplanner.standalone.configure.ConstructApplication.createRaptorTransitData;
 
 import io.micrometer.core.instrument.Metrics;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Nullable;
@@ -15,6 +16,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
+import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.VehicleParkingService;
@@ -67,8 +70,11 @@ public class TestServerContext {
       request = routerConfig.routingRequestDefaults();
     }
     if (snapshotManager == null) {
-      snapshotManager =
-        new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now);
+      snapshotManager = new TimetableSnapshotManager(
+        null,
+        TimetableSnapshotParameters.DEFAULT,
+        LocalDate::now
+      );
     }
 
     timetableRepository.index();
@@ -102,8 +108,10 @@ public class TestServerContext {
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),
+      createViaTransferResolver(graph, transitService),
       createWorldEnvelopeService(),
       createEmissionsService(),
+      null,
       null,
       null,
       null,
@@ -114,8 +122,7 @@ public class TestServerContext {
   /** Static factory method to create a service for test purposes. */
   public static WorldEnvelopeService createWorldEnvelopeService() {
     var repository = new DefaultWorldEnvelopeRepository();
-    var envelope = WorldEnvelope
-      .of()
+    var envelope = WorldEnvelope.of()
       .expandToIncludeStreetEntities(0, 0)
       .expandToIncludeStreetEntities(1, 1)
       .build();
@@ -141,5 +148,12 @@ public class TestServerContext {
 
   public static StreetLimitationParametersService createStreetLimitationParametersService() {
     return new DefaultStreetLimitationParametersService(new StreetLimitationParameters());
+  }
+
+  public static ViaCoordinateTransferFactory createViaTransferResolver(
+    Graph graph,
+    TransitService transitService
+  ) {
+    return new DefaultViaCoordinateTransferFactory(graph, transitService, Duration.ofMinutes(30));
   }
 }

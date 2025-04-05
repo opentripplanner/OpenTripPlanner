@@ -19,23 +19,20 @@ class GraphQLUtilsTest {
   static final ExecutionContext executionContext;
 
   static {
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
+    ExecutionInput executionInput = ExecutionInput.newExecutionInput()
       .query("")
       .locale(Locale.ENGLISH)
       .build();
 
-    executionContext =
-      newExecutionContextBuilder()
-        .executionInput(executionInput)
-        .executionId(ExecutionId.from("GraphQLUtilsTest"))
-        .build();
+    executionContext = newExecutionContextBuilder()
+      .executionInput(executionInput)
+      .executionId(ExecutionId.from("GraphQLUtilsTest"))
+      .build();
   }
 
   @Test
   void testGetTranslationWithNullString() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .locale(Locale.ENGLISH)
       .build();
 
@@ -46,8 +43,7 @@ class GraphQLUtilsTest {
 
   @Test
   void testGetTranslationWithTranslations() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .locale(Locale.FRENCH)
       .build();
 
@@ -65,8 +61,7 @@ class GraphQLUtilsTest {
 
   @Test
   void testGetLocaleWithDefinedLocaleArg() {
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .localContext(Map.of("locale", Locale.GERMAN))
       .locale(Locale.ENGLISH)
       .build();
@@ -83,10 +78,8 @@ class GraphQLUtilsTest {
   @Test
   void testGetLocaleWithEnvLocale() {
     var frenchLocale = Locale.FRENCH;
-    var env = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
-      .localContext(Map.of("locale", Locale.GERMAN))
-      .locale(frenchLocale)
+    var env = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+      .locale(Locale.FRENCH)
       .build();
 
     var locale = GraphQLUtils.getLocale(env);
@@ -96,11 +89,11 @@ class GraphQLUtilsTest {
 
   @Test
   void testGetLocaleWithLocalContextLocale() {
-    // Should use locale from local context if env locale is not defined
+    // Should use locale from local context even if env locale is defined
 
     var frenchLocale = Locale.FRENCH;
-    var envWithNoLocale = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var envWithNoLocale = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
+      .locale(Locale.GERMAN)
       .localContext(Map.of("locale", Locale.FRENCH))
       .build();
 
@@ -112,8 +105,9 @@ class GraphQLUtilsTest {
 
     var wildcardLocale = new Locale("*");
 
-    var envWithWildcardLocale = DataFetchingEnvironmentImpl
-      .newDataFetchingEnvironment(executionContext)
+    var envWithWildcardLocale = DataFetchingEnvironmentImpl.newDataFetchingEnvironment(
+      executionContext
+    )
       .locale(wildcardLocale)
       .localContext(Map.of("locale", Locale.FRENCH))
       .build();

@@ -109,12 +109,15 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void testToString() {
-    assertEquals(BASIC_PATH_AS_STRING, subject.toString(this::stopIndexToName));
+    assertEquals(BASIC_PATH_AS_STRING, subject.toString(RaptorTestConstants::stopIndexToName));
   }
 
   @Test
   public void testToStringDetailed() {
-    assertEquals(BASIC_PATH_AS_DETAILED_STRING, subject.toStringDetailed(this::stopIndexToName));
+    assertEquals(
+      BASIC_PATH_AS_DETAILED_STRING,
+      subject.toStringDetailed(RaptorTestConstants::stopIndexToName)
+    );
   }
 
   @Test
@@ -156,8 +159,7 @@ public class PathTest implements RaptorTestConstants {
       egress.c1()
     );
 
-    var trip3 = TestTripSchedule
-      .schedule(pattern("L1", STOP_B, STOP_C))
+    var trip3 = TestTripSchedule.schedule(pattern("L1", STOP_B, STOP_C))
       .times(time("09:20"), egressStart)
       .build();
     TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(
@@ -171,8 +173,7 @@ public class PathTest implements RaptorTestConstants {
       leg4
     );
 
-    var trip2 = TestTripSchedule
-      .schedule(pattern("L1", STOP_A, STOP_B))
+    var trip2 = TestTripSchedule.schedule(pattern("L1", STOP_A, STOP_B))
       .times(time("09:10"), time("09:20"))
       .build();
 
@@ -214,8 +215,7 @@ public class PathTest implements RaptorTestConstants {
       egress.c1()
     );
 
-    var trip3 = TestTripSchedule
-      .schedule(pattern("L1", STOP_B, STOP_C))
+    var trip3 = TestTripSchedule.schedule(pattern("L1", STOP_B, STOP_C))
       .times(time("09:20"), egressStart)
       .build();
     TransitPathLeg<TestTripSchedule> leg3 = new TransitPathLeg<>(
@@ -229,8 +229,7 @@ public class PathTest implements RaptorTestConstants {
       leg4
     );
 
-    var trip2 = TestTripSchedule
-      .schedule(pattern("L1", STOP_A, STOP_B))
+    var trip2 = TestTripSchedule.schedule(pattern("L1", STOP_A, STOP_B))
       .times(time("09:10"), time("09:20"))
       .build();
 

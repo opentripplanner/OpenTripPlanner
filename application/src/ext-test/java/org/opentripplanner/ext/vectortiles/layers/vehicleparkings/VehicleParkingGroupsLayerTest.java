@@ -39,54 +39,50 @@ public class VehicleParkingGroupsLayerTest {
 
   @BeforeEach
   public void setUp() {
-    vehicleParkingGroup =
-      VehicleParkingGroup
-        .of(ID)
-        .withName(
-          TranslatedString.getI18NString(
-            new HashMap<>() {
-              {
-                put(null, "groupName");
-                put("de", "groupDE");
-              }
-            },
-            false,
-            false
-          )
+    vehicleParkingGroup = VehicleParkingGroup.of(ID)
+      .withName(
+        TranslatedString.getI18NString(
+          new HashMap<>() {
+            {
+              put(null, "groupName");
+              put("de", "groupDE");
+            }
+          },
+          false,
+          false
         )
-        .withCoordinate(new WgsCoordinate(1.9, 1.1))
-        .build();
-    vehicleParking =
-      VehicleParking
-        .builder()
-        .id(ID)
-        .name(
-          TranslatedString.getI18NString(
-            new HashMap<>() {
-              {
-                put(null, "name");
-                put("de", "DE");
-              }
-            },
-            false,
-            false
-          )
+      )
+      .withCoordinate(new WgsCoordinate(1.9, 1.1))
+      .build();
+    vehicleParking = VehicleParking.builder()
+      .id(ID)
+      .name(
+        TranslatedString.getI18NString(
+          new HashMap<>() {
+            {
+              put(null, "name");
+              put("de", "DE");
+            }
+          },
+          false,
+          false
         )
-        .coordinate(new WgsCoordinate(2, 1))
-        .bicyclePlaces(false)
-        .carPlaces(true)
-        .wheelchairAccessibleCarPlaces(false)
-        .imageUrl("image")
-        .detailsUrl("details")
-        .note(new NonLocalizedString("note"))
-        .tags(List.of("tag1", "tag2"))
-        .state(VehicleParkingState.OPERATIONAL)
-        .capacity(VehicleParkingSpaces.builder().bicycleSpaces(5).carSpaces(6).build())
-        .availability(
-          VehicleParkingSpaces.builder().wheelchairAccessibleCarSpaces(1).bicycleSpaces(1).build()
-        )
-        .vehicleParkingGroup(vehicleParkingGroup)
-        .build();
+      )
+      .coordinate(new WgsCoordinate(2, 1))
+      .bicyclePlaces(false)
+      .carPlaces(true)
+      .wheelchairAccessibleCarPlaces(false)
+      .imageUrl("image")
+      .detailsUrl("details")
+      .note(new NonLocalizedString("note"))
+      .tags(List.of("tag1", "tag2"))
+      .state(VehicleParkingState.OPERATIONAL)
+      .capacity(VehicleParkingSpaces.builder().bicycleSpaces(5).carSpaces(6).build())
+      .availability(
+        VehicleParkingSpaces.builder().wheelchairAccessibleCarSpaces(1).bicycleSpaces(1).build()
+      )
+      .vehicleParkingGroup(vehicleParkingGroup)
+      .build();
   }
 
   @Test
@@ -132,9 +128,8 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void digitransitVehicleParkingGroupPropertyMapperTest() {
-    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
-      Locale.US
-    );
+    VehicleParkingGroupPropertyMapperWithPublicMap mapper =
+      new VehicleParkingGroupPropertyMapperWithPublicMap(Locale.US);
     Map<String, Object> map = new HashMap<>();
     mapper
       .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))
@@ -151,9 +146,8 @@ public class VehicleParkingGroupsLayerTest {
 
   @Test
   public void digitransitVehicleParkingGroupPropertyMapperTranslationTest() {
-    VehicleParkingGroupPropertyMapperWithPublicMap mapper = new VehicleParkingGroupPropertyMapperWithPublicMap(
-      new Locale("de")
-    );
+    VehicleParkingGroupPropertyMapperWithPublicMap mapper =
+      new VehicleParkingGroupPropertyMapperWithPublicMap(new Locale("de"));
     Map<String, Object> map = new HashMap<>();
     mapper
       .map(new VehicleParkingAndGroup(vehicleParkingGroup, Set.of(vehicleParking)))

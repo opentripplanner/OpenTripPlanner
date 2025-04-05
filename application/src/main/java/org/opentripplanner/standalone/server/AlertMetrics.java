@@ -41,11 +41,9 @@ public class AlertMetrics implements MeterBinder {
 
   @Override
   public void bindTo(MeterRegistry meterRegistry) {
-    this.statuses =
-      MultiGauge
-        .builder("alerts")
-        .description("Total number of alerts (sourced from GTFS-Alerts and SIRI-SX) in the system.")
-        .register(meterRegistry);
+    this.statuses = MultiGauge.builder("alerts")
+      .description("Total number of alerts (sourced from GTFS-Alerts and SIRI-SX) in the system.")
+      .register(meterRegistry);
     ApplicationShutdownSupport.addShutdownHook("alert-metrics-shutdown", scheduler::shutdownNow);
   }
 
@@ -73,10 +71,11 @@ public class AlertMetrics implements MeterBinder {
     ImmutableMultimap<AlertTags, TransitAlert> taggedAlerts = alerts
       .stream()
       .collect(
-        ImmutableListMultimap.<TransitAlert, AlertTags, TransitAlert>flatteningToImmutableListMultimap(
-          AlertTags::of,
-          Stream::of
-        )
+        ImmutableListMultimap.<
+            TransitAlert,
+            AlertTags,
+            TransitAlert
+          >flatteningToImmutableListMultimap(AlertTags::of, Stream::of)
       );
     return taggedAlerts
       .keySet()

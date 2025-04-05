@@ -5,6 +5,7 @@ import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import com.google.common.collect.Lists;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Currency;
@@ -18,7 +19,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
@@ -31,6 +32,7 @@ public class OrcaFareService extends DefaultFareService {
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
 
   public static final String COMM_TRANS_AGENCY_ID = "29";
+  public static final String COMM_TRANS_FLEX_AGENCY_ID = "4969";
   public static final String KC_METRO_AGENCY_ID = "1";
   public static final String SOUND_TRANSIT_AGENCY_ID = "40";
   public static final String T_LINK_AGENCY_ID = "F1";
@@ -52,6 +54,9 @@ public class OrcaFareService extends DefaultFareService {
     "cash"
   );
 
+  // TODO: Remove after mar 1
+  private static final LocalDate CT_FARE_CHANGE_DATE = LocalDate.of(2025, 3, 1);
+
   protected enum TransferType {
     ORCA_INTERAGENCY_TRANSFER,
     SAME_AGENCY_TRANSFER,
@@ -60,7 +65,6 @@ public class OrcaFareService extends DefaultFareService {
 
   protected enum RideType {
     COMM_TRANS_LOCAL_SWIFT,
-    COMM_TRANS_COMMUTER_EXPRESS,
     EVERETT_TRANSIT,
     KC_WATER_TAXI_VASHON_ISLAND,
     KC_WATER_TAXI_WEST_SEATTLE,
@@ -157,14 +161,11 @@ public class OrcaFareService extends DefaultFareService {
     var route = leg.getRoute();
     var tripId = leg.getTrip().getId().getId();
     return switch (agencyId) {
-      case COMM_TRANS_AGENCY_ID -> {
+      case COMM_TRANS_AGENCY_ID, COMM_TRANS_FLEX_AGENCY_ID -> {
         try {
           int routeId = Integer.parseInt(route.getShortName());
           if (routeId >= 500 && routeId < 600) {
             yield RideType.SOUND_TRANSIT_BUS; // CommTrans operates some ST routes.
-          }
-          if (routeId >= 400 && routeId <= 899) {
-            yield RideType.COMM_TRANS_COMMUTER_EXPRESS;
           }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
@@ -226,15 +227,6 @@ public class OrcaFareService extends DefaultFareService {
     };
   }
 
-  private static String routeLongNameFallBack(Route route) {
-    var longName = route.getLongName();
-    if (longName == null) {
-      return "";
-    } else {
-      return longName.toString();
-    }
-  }
-
   public OrcaFareService(Collection<FareRuleSet> regularFareRules) {
     addFareRules(FareType.regular, regularFareRules);
     addFareRules(FareType.senior, regularFareRules);
@@ -264,7 +256,7 @@ public class OrcaFareService extends DefaultFareService {
     }
     return switch (fareType) {
       case youth, electronicYouth -> Optional.of(getYouthFare());
-      case electronicSpecial -> getLiftFare(rideType, defaultFare, leg.getRoute());
+      case electronicSpecial -> getLiftFare(rideType, defaultFare, leg);
       case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
       default -> Optional.of(defaultFare);
@@ -273,6 +265,16 @@ public class OrcaFareService extends DefaultFareService {
 
   private static Optional<Money> optionalUSD(float amount) {
     return Optional.of(usDollars(amount));
+  }
+
+  private static Optional<Money> getCTLocalReducedFare(Leg leg) {
+    if (
+      leg.getStartTime().isBefore(CT_FARE_CHANGE_DATE.atStartOfDay(leg.getStartTime().getZone()))
+    ) {
+      return optionalUSD(1.25f);
+    } else {
+      return optionalUSD(1.00f);
+    }
   }
 
   /**
@@ -285,6 +287,9 @@ public class OrcaFareService extends DefaultFareService {
     Leg leg
   ) {
     Route route = leg.getRoute();
+    if (route == null) {
+      return Optional.of(defaultFare);
+    }
     return switch (rideType) {
       case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType)
         ? optionalUSD(5.75f)
@@ -309,10 +314,13 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Apply Orca lift discount fares based on the ride type.
    */
-  private Optional<Money> getLiftFare(RideType rideType, Money defaultFare, Route route) {
+  private Optional<Money> getLiftFare(RideType rideType, Money defaultFare, Leg leg) {
+    var route = leg.getRoute();
+    if (route == null) {
+      return Optional.of(defaultFare);
+    }
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(4.5f);
       case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(3.75f);
       case KC_METRO,
@@ -348,11 +356,12 @@ public class OrcaFareService extends DefaultFareService {
     Leg leg
   ) {
     var route = leg.getRoute();
-    var regularFare = getRegularFare(fareType, rideType, defaultFare, leg);
+    if (route == null) {
+      return Optional.of(defaultFare);
+    }
     // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case COMM_TRANS_LOCAL_SWIFT -> getCTLocalReducedFare(leg);
       case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case EVERETT_TRANSIT -> optionalUSD(0.5f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
@@ -428,13 +437,13 @@ public class OrcaFareService extends DefaultFareService {
    * one.
    */
   @Override
-  public ItineraryFares calculateFaresForType(
+  public ItineraryFare calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    var fare = ItineraryFares.empty();
+    var fare = ItineraryFare.empty();
     Money cost = Money.ZERO_USD;
     var orcaFareDiscount = new TransferData();
     HashMap<String, TransferData> perAgencyTransferDiscount = new HashMap<>();
@@ -490,9 +499,11 @@ public class OrcaFareService extends DefaultFareService {
       }
     }
     if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
-      var fp = FareProduct
-        .of(new FeedScopedId(FEED_ID, fareType.name()), fareType.name(), cost)
-        .build();
+      var fp = FareProduct.of(
+        new FeedScopedId(FEED_ID, fareType.name()),
+        fareType.name(),
+        cost
+      ).build();
       fare.addItineraryProducts(List.of(fp));
     }
     return fare;
@@ -502,14 +513,14 @@ public class OrcaFareService extends DefaultFareService {
    * Adds a leg fare product to the given itinerary fares object
    *
    * @param leg              The leg to create a fareproduct for
-   * @param itineraryFares   The itinerary fares to store the fare product in
+   * @param itineraryFare   The itinerary fares to store the fare product in
    * @param fareType         Fare type (split into container and rider category)
    * @param totalFare        Total fare paid after transfer
    * @param transferDiscount Transfer discount applied
    */
   private static void addLegFareProduct(
     Leg leg,
-    ItineraryFares itineraryFares,
+    ItineraryFare itineraryFare,
     FareType fareType,
     Money totalFare,
     Money transferDiscount
@@ -525,7 +536,7 @@ public class OrcaFareService extends DefaultFareService {
     }
     var duration = Duration.ZERO;
     var fareProduct = new FareProduct(id, "rideCost", totalFare, duration, riderCategory, medium);
-    itineraryFares.addFareProduct(leg, fareProduct);
+    itineraryFare.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount.isPositive()) {
       var transferFareProduct = new FareProduct(
@@ -536,7 +547,7 @@ public class OrcaFareService extends DefaultFareService {
         riderCategory,
         medium
       );
-      itineraryFares.addFareProduct(leg, transferFareProduct);
+      itineraryFare.addFareProduct(leg, transferFareProduct);
     }
   }
 
