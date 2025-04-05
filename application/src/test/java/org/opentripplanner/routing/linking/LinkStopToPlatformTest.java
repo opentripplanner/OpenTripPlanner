@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.GeoJsonIo;
@@ -46,14 +47,15 @@ public class LinkStopToPlatformTest {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
     Graph graph = new Graph(deduplicator);
+    var vertexFactory = new VertexFactory(graph);
+
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      var vertex = new LabelledIntersectionVertex(String.valueOf(i), c.x, c.y, false, false);
-      graph.addVertex(vertex);
+      var vertex = vertexFactory.intersection(String.valueOf(i), c.x, c.y);
       vertices.add(vertex);
       closedGeom[i] = c;
     }
@@ -109,8 +111,7 @@ public class LinkStopToPlatformTest {
     graph.index(timetableRepository.getSiteRepository());
 
     for (RegularStop s : transitStops) {
-      var v = TransitStopVertex.of().withStop(s).build();
-      graph.addVertex(v);
+      vertexFactory.transitStop(TransitStopVertex.of().withStop(s));
     }
 
     return graph;
