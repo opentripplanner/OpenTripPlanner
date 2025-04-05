@@ -214,6 +214,43 @@ public class LinkStopToPlatformTest {
   }
 
   /**
+   * Link an interior vertex which is very close to a visibility vertex by
+   * calling directly addPermanentAreaVertex used in boarding location linking
+   * A connecting edge pair is created despite of the small distance
+   */
+  @Test
+  void testAddPermanentAreaVertex() {
+    Coordinate[] platform = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add one entrance to bottom left corner
+    int[] visibilityPoints = { 3 };
+
+    // No stops
+    Coordinate[] stops = {};
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+
+    // dig up the AreaGroup
+    AreaGroup ag = null;
+    var edge = graph.getEdges().stream().findFirst().get();
+    if (edge instanceof AreaEdge ae) {
+      ag = ae.getArea();
+    }
+    assertNotNull(ag);
+
+    var vertexFactory = new VertexFactory(graph);
+    var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
+    graph.getLinker().addPermanentAreaVertex(v, ag);
+
+    // vertex links to the single visibility point with 2 edges
+    assertEquals(10, graph.getEdges().size());
+  }
+
+  /**
    * Link a stop which is inside an area and very close to its edge.
    * Linking snaps directly to the edge without short connecting edges
    */
