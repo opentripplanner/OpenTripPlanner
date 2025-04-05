@@ -656,6 +656,9 @@ public class VertexLinker {
           )
           .findFirst();
         if (!nearest.isPresent()) {
+          /* This can happen when all (probably the single one) visibility points are very close
+	       to the linked vertex. Such situatin can arise in boarding location linking which skips
+	       the snapping logic of normal linking and calls addPermanentAreaVertex directly */
           nearest = areaGroup.visibilityVertices().stream().findFirst();
         }
         if (nearest.isPresent()) {
