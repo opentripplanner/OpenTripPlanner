@@ -16,11 +16,12 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 class VectorTileResponseFactoryTest {
 
-  public static final OtpServerRequestContext SERVER_CONTEXT = TestServerContext.createServerContext(
-    new Graph(),
-    new TimetableRepository(),
-    new DefaultFareService()
-  );
+  public static final OtpServerRequestContext SERVER_CONTEXT =
+    TestServerContext.createServerContext(
+      new Graph(),
+      new TimetableRepository(),
+      new DefaultFareService()
+    );
 
   enum LayerType {
     RED,

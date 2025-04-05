@@ -71,14 +71,11 @@ public class FlexIntegrationTest {
       ),
       new DefaultFareServiceFactory()
     );
-    service =
-      TestServerContext
-        .createServerContext(
-          graph,
-          timetableRepository,
-          model.fareServiceFactory().makeFareService()
-        )
-        .routingService();
+    service = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      model.fareServiceFactory().makeFareService()
+    ).routingService();
   }
 
   @Test

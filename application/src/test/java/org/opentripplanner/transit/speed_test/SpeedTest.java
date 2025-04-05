@@ -114,7 +114,7 @@ public class SpeedTest {
 
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
-        new DefaultFareService(),
+      new DefaultFareService(),
       config.flexConfig,
       graph,
       timer.getRegistry(),

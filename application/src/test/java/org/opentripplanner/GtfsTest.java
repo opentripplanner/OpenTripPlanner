@@ -261,13 +261,12 @@ public abstract class GtfsTest {
       );
       alertsUpdateHandler.update(feedMessage, null);
     } catch (FileNotFoundException exception) {}
-    serverContext =
-      TestServerContext.createServerContext(
-        graph,
-        timetableRepository,
-        new DefaultFareService(),
-        snapshotManager,
-        null
-      );
+    serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      new DefaultFareService(),
+      snapshotManager,
+      null
+    );
   }
 }

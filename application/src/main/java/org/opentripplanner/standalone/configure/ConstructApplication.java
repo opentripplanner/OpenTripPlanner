@@ -110,7 +110,7 @@ public class ConstructApplication {
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .schema(config.routerConfig().routingRequestDefaults())
-        .fareService(fareService)
+      .fareService(fareService)
       .build();
   }
 
