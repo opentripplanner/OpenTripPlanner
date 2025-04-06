@@ -20,7 +20,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
@@ -120,7 +120,7 @@ public interface ConstructApplicationFactory {
   @Nullable
   LuceneIndex luceneIndex();
 
-  FareService fareService();
+  FareServiceFactory fareServiceFactory();
 
   @Component.Builder
   interface Builder {
@@ -160,7 +160,7 @@ public interface ConstructApplicationFactory {
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);
 
     @BindsInstance
-    Builder fareService(FareService fareService);
+    Builder fareServiceFactory(FareServiceFactory fareService);
 
     ConstructApplicationFactory build();
   }

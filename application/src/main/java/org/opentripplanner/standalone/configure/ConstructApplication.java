@@ -17,6 +17,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -88,7 +89,7 @@ public class ConstructApplication {
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
-    FareService fareService
+    FareServiceFactory fareServiceFactory
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -110,7 +111,7 @@ public class ConstructApplication {
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .schema(config.routerConfig().routingRequestDefaults())
-      .fareService(fareService)
+      .fareServiceFactory(fareServiceFactory)
       .build();
   }
 
@@ -140,6 +141,7 @@ public class ConstructApplication {
       graphBuilderDataSources,
       graph(),
       osmInfoGraphBuildRepository,
+      fareServiceFactory(),
       factory.timetableRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
@@ -161,6 +163,8 @@ public class ConstructApplication {
   public DataSource graphOutputDataSource() {
     return graphBuilderDataSources.getOutputGraph();
   }
+
+
 
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
@@ -350,5 +354,9 @@ public class ConstructApplication {
 
   public StreetLimitationParameters streetLimitationParameters() {
     return factory.streetLimitationParameters();
+  }
+
+  public FareServiceFactory fareServiceFactory() {
+    return factory.fareServiceFactory();
   }
 }

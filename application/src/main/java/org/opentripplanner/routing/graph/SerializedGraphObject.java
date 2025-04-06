@@ -24,7 +24,7 @@ import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.model.projectinfo.GraphFileHeader;
 import org.opentripplanner.model.projectinfo.OtpProjectInfo;
-import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.kryosupport.KryoBuilder;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -85,7 +85,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
   public final EmissionsDataModel emissionsDataModel;
-  public final FareService fareService;
+  public final FareServiceFactory fareServiceFactory;
   public final StreetLimitationParameters streetLimitationParameters;
   public final VehicleParkingRepository parkingRepository;
 
@@ -101,7 +101,7 @@ public class SerializedGraphObject implements Serializable {
     EmissionsDataModel emissionsDataModel,
     StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
-    FareService fareService
+    FareServiceFactory fareServiceFactory
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
@@ -117,7 +117,7 @@ public class SerializedGraphObject implements Serializable {
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
     this.stopConsolidationRepository = stopConsolidationRepository;
     this.streetLimitationParameters = streetLimitationParameters;
-    this.fareService = fareService;
+    this.fareServiceFactory = fareServiceFactory;
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {

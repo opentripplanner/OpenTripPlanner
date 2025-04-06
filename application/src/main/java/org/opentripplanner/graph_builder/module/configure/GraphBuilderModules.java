@@ -43,6 +43,7 @@ import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -104,7 +105,8 @@ public class GraphBuilderModules {
     BuildConfig config,
     Graph graph,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    FareServiceFactory fareServiceFactory
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
     for (ConfiguredDataSource<
@@ -122,8 +124,14 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory
+      fareServiceFactory
     );
+  }
+
+  @Provides
+  @Singleton
+  static FareServiceFactory provideFareServiceFactory(BuildConfig config) {
+    return config.fareServiceFactory;
   }
 
   @Provides
