@@ -14,11 +14,16 @@ import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
 public class FaresConfiguration {
 
-  public static NodeAdapter fromConfig(NodeAdapter root, String parameterName) {
+  public static JsonNode fromConfig(NodeAdapter root, String parameterName) {
     // Fares uses the raw node, not the types-safe adapter, but defining the fares root here
     // will cause fares to be added to the build-config configuration document with a link to the
     // Fares.md.
-    return root.of(parameterName).summary("Fare configuration.").since(OtpVersion.V2_0).asObject();
+    return root
+      .of(parameterName)
+      .summary("Fare configuration.")
+      .since(OtpVersion.V2_0)
+      .asObject()
+      .rawNode();
   }
 
   /**

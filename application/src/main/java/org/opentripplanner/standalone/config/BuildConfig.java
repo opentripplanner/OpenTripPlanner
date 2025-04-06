@@ -126,7 +126,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * A specific fares service to use.
    */
-  public final NodeAdapter fareConfig;
+  public final JsonNode fareConfig;
 
   private final Pattern netexLocalFilePattern;
 

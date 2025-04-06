@@ -13,6 +13,6 @@ public class FareModule {
   @Provides
   @Singleton
   public FareServiceFactory factory(BuildConfig config) {
-    return FaresConfiguration.fromConfig(config.fareConfig.rawNode());
+    return FaresConfiguration.fromConfig(config.fareConfig);
   }
 }
