@@ -220,7 +220,7 @@ public class GraphSerializationTest {
       emissionsDataModel,
       null,
       streetLimitationParameters,
-      fareServiceFactory.makeFareService()
+      fareServiceFactory
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);

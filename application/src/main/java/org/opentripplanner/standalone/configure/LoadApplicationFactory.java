@@ -38,7 +38,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
     WorldEnvelopeRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
-    FareModule.class
+    FareModule.class,
   }
 )
 public interface LoadApplicationFactory {

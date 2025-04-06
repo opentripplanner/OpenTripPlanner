@@ -4,6 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
+import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
@@ -55,7 +56,7 @@ public class ConstructApplicationModule {
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
     @Nullable LuceneIndex luceneIndex,
-    FareServiceFactory fareService
+    FareService fareService
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
@@ -65,7 +66,7 @@ public class ConstructApplicationModule {
 
     return new DefaultServerRequestContext(
       debugUiConfig,
-      fareService.makeFareService(),
+      fareService,
       flexParameters,
       graph,
       Metrics.globalRegistry,
@@ -88,6 +89,12 @@ public class ConstructApplicationModule {
       stopConsolidationService,
       traverseVisitor
     );
+  }
+
+  @Singleton
+  @Provides
+  public FareService fareService(FareServiceFactory fareServiceFactory) {
+    return fareServiceFactory.makeFareService();
   }
 
   @Provides

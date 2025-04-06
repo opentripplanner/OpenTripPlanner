@@ -72,6 +72,8 @@ public interface GraphBuilderFactory {
   @Nullable
   StopConsolidationRepository stopConsolidationRepository();
 
+  FareServiceFactory fareServiceFactory();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -96,6 +98,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder vehicleParkingRepository(VehicleParkingRepository parkingRepository);
+
+    @BindsInstance
+    Builder fareServiceFactory(FareServiceFactory fareServiceFactory);
 
     @BindsInstance
     Builder streetLimitationParameters(StreetLimitationParameters streetLimitationParameters);

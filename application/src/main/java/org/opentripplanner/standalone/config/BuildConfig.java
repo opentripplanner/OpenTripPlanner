@@ -35,8 +35,6 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.buildconfig.DemConfig;
 import org.opentripplanner.standalone.config.buildconfig.GtfsConfig;
 import org.opentripplanner.standalone.config.buildconfig.IslandPruningConfig;
@@ -128,7 +126,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * A specific fares service to use.
    */
-  public final FareServiceFactory fareServiceFactory;
+  public final NodeAdapter fareConfig;
 
   private final Pattern netexLocalFilePattern;
 
@@ -620,7 +618,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     );
 
     // List of complex parameters
-    fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");
+    fareConfig = FaresConfiguration.fromConfig(root, "fares");
     edgeNamer = EdgeNamer.EdgeNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 

@@ -130,12 +130,6 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static FareServiceFactory provideFareServiceFactory(BuildConfig config) {
-    return config.fareServiceFactory;
-  }
-
-  @Provides
-  @Singleton
   static EmissionsModule provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
