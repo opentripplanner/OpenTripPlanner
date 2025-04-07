@@ -278,9 +278,9 @@ public class Graph implements Serializable {
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
    *           - something that should go into the index; Hence, inconsistent data.
    */
-  public void index(SiteRepository siteRepository) {
+  public void index() {
     LOG.info("Index street model...");
-    streetIndex = new StreetIndex(this, siteRepository);
+    streetIndex = new StreetIndex(this);
     LOG.info("Index street model complete.");
   }
 
@@ -359,7 +359,7 @@ public class Graph implements Serializable {
 
   private void indexIfNotIndexed(SiteRepository siteRepository) {
     if (streetIndex == null) {
-      index(siteRepository);
+      index();
     }
   }
 

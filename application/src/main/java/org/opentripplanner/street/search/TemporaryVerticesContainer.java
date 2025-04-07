@@ -127,7 +127,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
   @Nullable
-  public Set<Vertex> getStreetVerticesForLocation(
+  private Set<Vertex> getStreetVerticesForLocation(
     GenericLocation location,
     StreetMode streetMode,
     boolean endVertex,

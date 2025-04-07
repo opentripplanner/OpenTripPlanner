@@ -1,7 +1,6 @@
 package org.opentripplanner.routing;
 
 import static com.google.common.collect.Iterables.filter;
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -15,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
@@ -27,8 +25,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -56,7 +52,6 @@ import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TestHalfEdges {
 
-  public static final GenericLocation ANY_LOCATION = new GenericLocation(-74.005000001, 40.01);
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
@@ -169,7 +164,7 @@ public class TestHalfEdges {
     graph.hasStreets = true;
 
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
   }
 
   @Test
@@ -570,58 +565,6 @@ public class TestHalfEdges {
   }
 
   @Test
-  public void testStreetLocationFinder() {
-    GraphFinder graphFinder = new DirectGraphFinder(
-      timetableRepository.getSiteRepository()::findRegularStops
-    );
-    Set<DisposableEdgeCollection> tempEdges = new HashSet<>();
-    // test that the local stop finder finds stops
-    assertTrue(graphFinder.findClosestStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
-
-    var container = new TemporaryVerticesContainer(
-      graph,
-      ANY_LOCATION,
-      ANY_LOCATION,
-      StreetMode.WALK,
-      StreetMode.WALK
-    );
-    // test that the closest vertex finder returns the closest vertex
-    TemporaryStreetLocation some = getStreetVerticesForLocation(
-      container,
-      tempEdges,
-      new GenericLocation(-74.00, 40.00)
-    );
-    assertNotNull(some);
-
-    // test that the closest vertex finder correctly splits streets
-    TemporaryStreetLocation start = getStreetVerticesForLocation(
-      container,
-      tempEdges,
-      new GenericLocation(-74.01, 40.004)
-    );
-    assertNotNull(start);
-    assertTrue(
-      start.isWheelchairAccessible(),
-      "wheelchair accessibility is correctly set (splitting)"
-    );
-
-    Collection<Edge> edges = start.getOutgoing();
-    assertEquals(2, edges.size());
-
-    TemporaryStreetLocation end = getStreetVerticesForLocation(
-      container,
-      tempEdges,
-      new GenericLocation(-74.0, 40.008)
-    );
-    assertNotNull(end);
-
-    edges = end.getIncoming();
-    assertEquals(2, edges.size());
-
-    tempEdges.forEach(DisposableEdgeCollection::disposeEdges);
-  }
-
-  @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
     RouteRequest walking = new RouteRequest();
@@ -671,17 +614,5 @@ public class TestHalfEdges {
 
     Vertex station2point = edge.getToVertex();
     assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);
-  }
-
-  private static TemporaryStreetLocation getStreetVerticesForLocation(
-    TemporaryVerticesContainer container,
-    Set<DisposableEdgeCollection> tempEdges,
-    GenericLocation location
-  ) {
-    var result = container.getStreetVerticesForLocation(location, StreetMode.WALK, true, tempEdges);
-
-    assertThat(result).hasSize(1);
-
-    return result.stream().map(v -> (TemporaryStreetLocation) v).findFirst().orElseThrow();
   }
 }

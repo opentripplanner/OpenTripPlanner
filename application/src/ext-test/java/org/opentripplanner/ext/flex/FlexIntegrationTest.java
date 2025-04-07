@@ -213,7 +213,7 @@ public class FlexIntegrationTest {
     ).buildGraph();
 
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
   }
 
   private Itinerary getItinerary(GenericLocation from, GenericLocation to, int index) {

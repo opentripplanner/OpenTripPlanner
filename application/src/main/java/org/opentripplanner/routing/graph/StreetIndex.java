@@ -23,7 +23,6 @@ import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +55,10 @@ class StreetIndex {
   /**
    * Should only be called by the graph.
    */
-  public StreetIndex(Graph graph, SiteRepository siteRepository) {
+  public StreetIndex(Graph graph) {
     this.edgeIndex = new EdgeSpatialIndex();
     this.vertexIndex = new HashGridSpatialIndex<>();
-    this.vertexLinker = new VertexLinker(graph, siteRepository);
+    this.vertexLinker = new VertexLinker(graph);
     var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
     this.stopVerticesById = indexStopIds(stopVertices);
     this.stopVerticesByParentId = indexStationIds(stopVertices);

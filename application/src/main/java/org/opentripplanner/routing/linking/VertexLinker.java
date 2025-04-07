@@ -36,7 +36,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,7 +81,6 @@ public class VertexLinker {
 
   private final Graph graph;
 
-  private final SiteRepository siteRepository;
   private final VertexFactory vertexFactory;
 
   private boolean areaVisibility = true;
@@ -92,10 +90,9 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(Graph graph, SiteRepository siteRepository) {
+  public VertexLinker(Graph graph) {
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
-    this.siteRepository = siteRepository;
   }
 
   public void linkVertexPermanently(
@@ -430,9 +427,13 @@ public class VertexLinker {
       start = split;
     }
 
-    // TODO Consider moving this code
     if (OTPFeature.FlexRouting.isOn()) {
-      FlexLocationAdder.addFlexLocations(edge, start, siteRepository);
+      var areaStops = start
+        .getIncomingStreetEdges()
+        .stream()
+        .flatMap(e -> e.getFromVertex().areaStops().stream())
+        .toList();
+      start.addAreaStops(areaStops);
     }
 
     return start;

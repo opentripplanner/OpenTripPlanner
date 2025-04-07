@@ -116,7 +116,7 @@ class OsmBoardingLocationsModuleTest {
     );
 
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
 
     assertEquals(0, busVertex.getIncoming().size());
     assertEquals(0, busVertex.getOutgoing().size());
@@ -216,7 +216,7 @@ class OsmBoardingLocationsModuleTest {
       .withBoardingAreaRefTags(Set.of("naptan:AtcoCode"))
       .build();
     osmModule.buildGraph();
-    graph.index(new SiteRepository());
+    graph.index();
 
     var factory = new VertexFactory(graph);
 
