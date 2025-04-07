@@ -30,7 +30,7 @@ public class GeofencingZonesLayerBuilder extends LayerBuilder<Vertex> {
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     return graph
-      .getVerticesForEnvelope(query)
+      .findVertices(query)
       .stream()
       .filter(se -> !(se.rentalRestrictions() instanceof NoRestriction))
       .map(vertex -> {

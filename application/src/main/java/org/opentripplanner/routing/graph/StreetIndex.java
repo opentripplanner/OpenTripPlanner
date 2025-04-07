@@ -17,7 +17,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.linking.Scope;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -39,8 +38,6 @@ class StreetIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
-  private final VertexLinker vertexLinker;
-
   private final Map<FeedScopedId, TransitStopVertex> stopVerticesById;
   private final ImmutableSetMultimap<FeedScopedId, TransitStopVertex> stopVerticesByParentId;
 
@@ -58,17 +55,12 @@ class StreetIndex {
   public StreetIndex(Graph graph) {
     this.edgeIndex = new EdgeSpatialIndex();
     this.vertexIndex = new HashGridSpatialIndex<>();
-    this.vertexLinker = new VertexLinker(graph);
     var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
     this.stopVerticesById = indexStopIds(stopVertices);
     this.stopVerticesByParentId = indexStationIds(stopVertices);
 
     this.stationCentroidVertices = createStationCentroidVertexMap(graph);
     postSetup(graph.getVertices());
-  }
-
-  public VertexLinker getVertexLinker() {
-    return vertexLinker;
   }
 
   @Nullable
@@ -132,7 +124,7 @@ class StreetIndex {
    * If the id corresponds to a station we will either return the coordinates of the child stops or
    * the station centroid if the station is configured to route to centroid.
    */
-  public Set<Vertex> getStreetVerticesById(FeedScopedId id) {
+  Set<Vertex> getStreetVerticesById(FeedScopedId id) {
     var stationVertex = stationCentroidVertices.get(id);
     if (stationVertex != null) {
       return Set.of(stationVertex);
@@ -140,15 +132,15 @@ class StreetIndex {
     return Collections.unmodifiableSet(getStopOrChildStopsVertices(id));
   }
 
-  public Collection<Edge> getEdgesForEnvelope(Envelope env, Scope scope) {
+  Collection<Edge> getEdgesForEnvelope(Envelope env, Scope scope) {
     return edgeIndex.query(env, scope).toList();
   }
 
-  public void insert(Edge edge, Scope scope) {
+  void insert(Edge edge, Scope scope) {
     edgeIndex.insert(edge, scope);
   }
 
-  public void remove(Edge e, Scope scope) {
+  void remove(Edge e, Scope scope) {
     edgeIndex.remove(e, scope);
   }
 

@@ -22,9 +22,9 @@ public class VertexLayerBuilder extends LayerBuilder<Vertex> {
   }
 
   @Override
-  protected List<Geometry> getGeometries(Envelope query) {
+  protected List<Geometry> getGeometries(Envelope env) {
     return graph
-      .getVerticesForEnvelope(query)
+      .findVertices(env)
       .stream()
       .map(vertex -> {
         Geometry geometry = GeometryUtils.getGeometryFactory().createPoint(vertex.getCoordinate());

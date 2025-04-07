@@ -61,13 +61,13 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
 
     Collection<Vertex> vertices = context.graph
-      .getVerticesForEnvelope(bboxWithMargins)
+      .findVertices(bboxWithMargins)
       .stream()
       .sorted(evRenderer::vertexSorter)
       .toList();
 
     Collection<Edge> edges = context.graph
-      .getEdgesForEnvelope(bboxWithMargins)
+      .findEdges(bboxWithMargins)
       .stream()
       .distinct()
       .sorted(evRenderer::edgeSorter)

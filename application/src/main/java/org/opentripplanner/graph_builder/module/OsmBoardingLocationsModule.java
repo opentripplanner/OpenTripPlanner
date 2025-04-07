@@ -84,7 +84,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
-    this.linker = graph.getLinker();
+    this.linker = graph.getLinkerSafe();
     int successes = 0;
 
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
@@ -136,7 +136,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private boolean connectVertexToArea(TransitStopVertex ts, Graph graph) {
     RegularStop stop = ts.getStop();
     var nearbyAreaGroups = graph
-      .getEdgesForEnvelope(getEnvelope(ts))
+      .findEdges(getEnvelope(ts))
       .stream()
       .filter(AreaEdge.class::isInstance)
       .map(AreaEdge.class::cast)
@@ -178,7 +178,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     var stop = ts.getStop();
     var nearbyEdges = new HashMap<Platform, List<Edge>>();
 
-    for (var edge : graph.getEdgesForEnvelope(getEnvelope(ts))) {
+    for (var edge : graph.findEdges(getEnvelope(ts))) {
       osmInfoGraphBuildService
         .findPlatform(edge)
         .ifPresent(platform -> {
@@ -225,7 +225,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
    */
   private boolean connectVertexToNode(TransitStopVertex ts, Graph graph) {
     var nearbyBoardingLocations = graph
-      .getVerticesForEnvelope(getEnvelope(ts))
+      .findVertices(getEnvelope(ts))
       .stream()
       .filter(OsmBoardingLocationVertex.class::isInstance)
       .map(OsmBoardingLocationVertex.class::cast)

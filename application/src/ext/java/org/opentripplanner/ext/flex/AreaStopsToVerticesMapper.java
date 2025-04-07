@@ -75,7 +75,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 
   private static Stream<MatchResult> matchingVerticesForStop(Graph graph, AreaStop areaStop) {
     return graph
-      .getVerticesForEnvelope(areaStop.getGeometry().getEnvelopeInternal())
+      .findVertices(areaStop.getGeometry().getEnvelopeInternal())
       .stream()
       .filter(StreetVertex.class::isInstance)
       .map(StreetVertex.class::cast)

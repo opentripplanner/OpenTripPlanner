@@ -105,7 +105,7 @@ class Subgraph {
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
     return index
-      .getVerticesForEnvelope(envelope)
+      .findVertices(envelope)
       .stream()
       .filter(vx -> !contains(vx))
       .map(vx -> vertexDistanceFromSubgraph(vx, searchRadius))

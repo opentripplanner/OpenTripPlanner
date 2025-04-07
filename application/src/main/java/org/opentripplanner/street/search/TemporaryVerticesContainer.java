@@ -103,7 +103,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (from.stopId == null) {
       return Set.of();
     }
-    return graph.getStopOrChildStopsVertices(from.stopId);
+    return graph.findStopOrChildStopsVertices(from.stopId);
   }
 
   /**
@@ -115,7 +115,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (to.stopId == null) {
       return Set.of();
     }
-    return graph.getStopOrChildStopsVertices(to.stopId);
+    return graph.findStopOrChildStopsVertices(to.stopId);
   }
 
   /* PRIVATE METHODS */

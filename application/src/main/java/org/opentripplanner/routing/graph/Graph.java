@@ -30,7 +30,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -289,39 +288,42 @@ public class Graph implements Serializable {
     return this.openingHoursCalendarService;
   }
 
-  public Collection<Vertex> getVerticesForEnvelope(Envelope env) {
+  public Collection<Vertex> findVertices(Envelope env) {
     requireIndex();
     return streetIndex.getVerticesForEnvelope(env);
   }
 
-  public Collection<Edge> getEdgesForEnvelope(Envelope env) {
+  public Collection<Edge> findEdges(Envelope env) {
     requireIndex();
     return streetIndex.getEdgesForEnvelope(env);
   }
 
-  public Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId stopId) {
+  public Set<TransitStopVertex> findStopOrChildStopsVertices(FeedScopedId stopId) {
+    requireIndex();
     return streetIndex.getStopOrChildStopsVertices(stopId);
   }
 
-  public void insert(StreetEdge head, Scope scope) {
-    streetIndex.insert(head, scope);
+  public void insert(StreetEdge edge, Scope scope) {
+    requireIndex();
+    streetIndex.insert(edge, scope);
   }
 
   /**
    * Get VertexLinker, safe to use while routing, but do not use during graph build.
-   * @see #getLinkerSafe(SiteRepository)
+   * @see #getLinkerSafe()
    */
   public VertexLinker getLinker() {
-    return streetIndex.getVertexLinker();
+    requireIndex();
+    return new VertexLinker(this);
   }
 
   /**
    * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
    * before calling this.
    */
-  public VertexLinker getLinkerSafe(SiteRepository siteRepository) {
-    indexIfNotIndexed(siteRepository);
-    return streetIndex.getVertexLinker();
+  public VertexLinker getLinkerSafe() {
+    indexIfNotIndexed();
+    return new VertexLinker(this);
   }
 
   /**
@@ -357,7 +359,7 @@ public class Graph implements Serializable {
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
   }
 
-  private void indexIfNotIndexed(SiteRepository siteRepository) {
+  private void indexIfNotIndexed() {
     if (streetIndex == null) {
       index();
     }

@@ -23,7 +23,7 @@ public class EdgeLayerBuilder extends LayerBuilder<Edge> {
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
     return graph
-      .getEdgesForEnvelope(query)
+      .findEdges(query)
       .stream()
       .filter(e -> e.getGeometry() != null)
       .map(edge -> {
