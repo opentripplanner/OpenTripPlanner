@@ -208,7 +208,7 @@ public class Graph implements Serializable {
 
   @Nullable
   public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
-    return streetIndex.findTransitStopVertices(id);
+    return streetIndex.findTransitStopVertex(id);
   }
 
   /**

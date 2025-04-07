@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
@@ -29,8 +28,6 @@ import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +42,6 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(TemporaryVerticesContainer.class);
 
   private final Graph graph;
-  private final Function<FeedScopedId, RegularStop> getStop;
   private final Set<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
@@ -55,13 +51,11 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
   public TemporaryVerticesContainer(
     Graph graph,
-    Function<FeedScopedId, RegularStop> getStop,
     GenericLocation from,
     GenericLocation to,
     StreetMode accessMode,
     StreetMode egressMode
   ) {
-    this.getStop = getStop;
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
@@ -145,13 +139,14 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     if (mode.isInCar()) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
-        var stop = getStop.apply(location.stopId);
-        if (stop != null) {
+        var stopVertex = graph.getStopVertexForStopId(location.stopId);
+        if (stopVertex != null) {
+          var c = stopVertex.getStop().getCoordinate();
           location = new GenericLocation(
             location.label,
             location.stopId,
-            stop.getCoordinate().latitude(),
-            stop.getCoordinate().longitude()
+            c.latitude(),
+            c.longitude()
           );
         }
       }

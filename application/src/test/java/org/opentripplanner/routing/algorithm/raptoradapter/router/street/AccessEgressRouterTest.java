@@ -19,8 +19,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 class AccessEgressRouterTest extends GraphRoutingTest {
 
@@ -260,7 +258,6 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     try (
       var verticesContainer = new TemporaryVerticesContainer(
         graph,
-        id -> null,
         from,
         to,
         StreetMode.WALK,

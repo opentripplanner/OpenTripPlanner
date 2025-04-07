@@ -52,7 +52,6 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TestHalfEdges {
@@ -581,8 +580,8 @@ public class TestHalfEdges {
 
     var container = new TemporaryVerticesContainer(
       graph,
-      id -> null,
-      ANY_LOCATION, ANY_LOCATION,
+      ANY_LOCATION,
+      ANY_LOCATION,
       StreetMode.WALK,
       StreetMode.WALK
     );
@@ -631,7 +630,6 @@ public class TestHalfEdges {
     try (
       var container = new TemporaryVerticesContainer(
         graph,
-        id -> null,
         walking.from(),
         walking.to(),
         StreetMode.WALK,

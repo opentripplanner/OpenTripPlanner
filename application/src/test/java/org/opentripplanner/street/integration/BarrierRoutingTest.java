@@ -32,8 +32,6 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 public class BarrierRoutingTest {
 
@@ -182,14 +180,7 @@ public class BarrierRoutingTest {
 
     options.accept(request);
 
-    var temporaryVertices = new TemporaryVerticesContainer(
-      graph,
-      id -> null,
-      from,
-      to,
-      streetMode,
-      streetMode
-    );
+    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode, streetMode);
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
 

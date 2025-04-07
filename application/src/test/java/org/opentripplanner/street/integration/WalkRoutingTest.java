@@ -22,8 +22,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 class WalkRoutingTest {
 
@@ -90,7 +88,6 @@ class WalkRoutingTest {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        id -> null,
         request.from(),
         request.to(),
         request.journey().direct().mode(),

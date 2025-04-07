@@ -23,8 +23,6 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 public class CarRoutingTest {
 
@@ -135,7 +133,6 @@ public class CarRoutingTest {
     request.journey().direct().setMode(StreetMode.CAR);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
-      id -> null,
       from,
       to,
       StreetMode.CAR,

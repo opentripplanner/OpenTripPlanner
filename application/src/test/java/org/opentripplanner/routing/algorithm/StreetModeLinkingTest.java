@@ -16,8 +16,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
  * This tests linking of GenericLocations to streets for each StreetMode. The test has 5 parallel
@@ -208,7 +206,6 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          id -> TimetableRepositoryForTest.of().stop(id.getId()).build(),
           routingRequest.from(),
           routingRequest.to(),
           streetMode,
@@ -234,7 +231,6 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          id -> null,
           routingRequest.from(),
           routingRequest.to(),
           streetMode,

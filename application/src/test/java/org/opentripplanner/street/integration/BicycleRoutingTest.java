@@ -22,8 +22,6 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
-import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.TimetableRepository;
 
 public class BicycleRoutingTest {
 
@@ -84,7 +82,6 @@ public class BicycleRoutingTest {
     request.journey().direct().setMode(StreetMode.BIKE);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
-      id ->null,
       request.from(),
       request.to(),
       request.journey().direct().mode(),
