@@ -254,8 +254,10 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
     return switch (mode) {
       // 1000 km/h
       case AIRPLANE -> 280;
-      // 250 km/h
-      case RAIL -> 70;
+      // 160 km/h
+      case SUBWAY -> 45;
+      // 360 km/h
+      case RAIL -> 100;
       // max in the world is 9 m/s for gondolas, 6 m/s for funiculars
       case GONDOLA, FUNICULAR -> 10;
       // 108km/h
