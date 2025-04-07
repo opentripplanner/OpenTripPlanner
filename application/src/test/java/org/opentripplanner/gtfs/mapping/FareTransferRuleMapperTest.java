@@ -4,6 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -24,7 +25,7 @@ class FareTransferRuleMapperTest {
   final AgencyAndId groupId2 = new AgencyAndId(FEED_ID, "group2");
 
   @Test
-  void addIssueForUnknownProduct() {
+  void throwOnUnknownFareProduct() {
     var fareProductMapper = new FareProductMapper(ID_FACTORY);
     var issueStore = new DefaultDataImportIssueStore();
     var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper, issueStore);
@@ -32,10 +33,7 @@ class FareTransferRuleMapperTest {
     var rule = new FareTransferRule();
     rule.setFareProductId(id);
 
-    var mapped = subject.map(List.of(rule));
-
-    assertTrue(mapped.isEmpty());
-    assertEquals("UnknownFareProductId", issueStore.listIssues().getFirst().getType());
+    assertThrows(IllegalArgumentException.class, () -> subject.map(List.of(rule)));
   }
 
   @Test
