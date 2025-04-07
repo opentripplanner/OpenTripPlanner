@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -428,10 +429,16 @@ public class VertexLinker {
     }
 
     if (OTPFeature.FlexRouting.isOn()) {
-      var areaStops = start
-        .getIncomingStreetEdges()
-        .stream()
-        .flatMap(e -> e.getFromVertex().areaStops().stream())
+      var areaStops = Stream.concat(
+        start.getIncomingStreetEdges().stream(),
+        start.getOutgoing().stream()
+      )
+        .flatMap(e ->
+          Stream.concat(
+            e.getFromVertex().areaStops().stream(),
+            e.getToVertex().areaStops().stream()
+          )
+        )
         .toList();
       start.addAreaStops(areaStops);
     }
