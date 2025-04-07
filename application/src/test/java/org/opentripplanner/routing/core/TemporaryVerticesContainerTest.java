@@ -64,7 +64,7 @@ public class TemporaryVerticesContainerTest {
     // When - the container is created
     subject = new TemporaryVerticesContainer(
       g,
-      new DefaultTransitService(new TimetableRepository()),
+      id -> null,
       from,
       to,
       StreetMode.WALK,

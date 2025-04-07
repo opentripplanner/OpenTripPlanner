@@ -581,7 +581,7 @@ public class TestHalfEdges {
 
     var container = new TemporaryVerticesContainer(
       graph,
-      new DefaultTransitService(new TimetableRepository()),
+      id -> null,
       ANY_LOCATION, ANY_LOCATION,
       StreetMode.WALK,
       StreetMode.WALK
@@ -631,7 +631,7 @@ public class TestHalfEdges {
     try (
       var container = new TemporaryVerticesContainer(
         graph,
-        new DefaultTransitService(new TimetableRepository()),
+        id -> null,
         walking.from(),
         walking.to(),
         StreetMode.WALK,

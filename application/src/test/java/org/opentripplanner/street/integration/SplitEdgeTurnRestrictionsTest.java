@@ -157,7 +157,7 @@ public class SplitEdgeTurnRestrictionsTest {
     request.journey().direct().setMode(StreetMode.CAR);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
-      new DefaultTransitService(new TimetableRepository()),
+      id -> null,
       from,
       to,
       StreetMode.CAR,

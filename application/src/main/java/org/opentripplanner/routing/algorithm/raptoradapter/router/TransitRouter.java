@@ -383,7 +383,7 @@ public class TransitRouter {
   ) {
     return new TemporaryVerticesContainer(
       serverContext.graph(),
-      serverContext.transitService(),
+      serverContext.transitService()::getRegularStop,
       request.from(),
       request.to(),
       request.journey().access().mode(),

@@ -260,7 +260,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     try (
       var verticesContainer = new TemporaryVerticesContainer(
         graph,
-        new DefaultTransitService(new TimetableRepository()),
+        id -> null,
         from,
         to,
         StreetMode.WALK,

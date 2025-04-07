@@ -97,7 +97,7 @@ public class StreetGraphFinder implements GraphFinder {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        transitService,
+        transitService::getRegularStop,
         rr.from(),
         rr.to(),
         StreetMode.WALK,

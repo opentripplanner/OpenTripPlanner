@@ -516,7 +516,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        new DefaultTransitService(new TimetableRepository()),
+        id -> null,
         options.from(),
         options.to(),
         options.journey().direct().mode(),

@@ -208,7 +208,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          new DefaultTransitService(new TimetableRepository()),
+          id -> TimetableRepositoryForTest.of().stop(id.getId()).build(),
           routingRequest.from(),
           routingRequest.to(),
           streetMode,
@@ -234,7 +234,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          new DefaultTransitService(new TimetableRepository()),
+          id -> null,
           routingRequest.from(),
           routingRequest.to(),
           streetMode,

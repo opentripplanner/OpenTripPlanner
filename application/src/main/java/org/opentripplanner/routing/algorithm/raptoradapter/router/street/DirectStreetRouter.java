@@ -36,7 +36,7 @@ public class DirectStreetRouter {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),
-        serverContext.transitService(),
+        serverContext.transitService()::getRegularStop,
         directRequest.from(),
         directRequest.to(),
         request.journey().direct().mode(),
