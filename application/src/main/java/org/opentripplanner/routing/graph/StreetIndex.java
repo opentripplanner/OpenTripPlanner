@@ -52,26 +52,26 @@ class StreetIndex {
   /**
    * Should only be called by the graph.
    */
-  public StreetIndex(Graph graph) {
+  StreetIndex(Graph graph) {
     this.edgeIndex = new EdgeSpatialIndex();
     this.vertexIndex = new HashGridSpatialIndex<>();
     var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
     this.stopVerticesById = indexStopIds(stopVertices);
     this.stopVerticesByParentId = indexStationIds(stopVertices);
 
-    this.stationCentroidVertices = createStationCentroidVertexMap(graph);
+    this.stationCentroidVertices = indexStationCentroids(graph);
     postSetup(graph.getVertices());
   }
 
   @Nullable
-  public TransitStopVertex findTransitStopVertex(FeedScopedId stopId) {
+  TransitStopVertex findTransitStopVertex(FeedScopedId stopId) {
     return stopVerticesById.get(stopId);
   }
 
   /**
    * Returns the vertices intersecting with the specified envelope.
    */
-  public List<Vertex> getVerticesForEnvelope(Envelope envelope) {
+  List<Vertex> getVerticesForEnvelope(Envelope envelope) {
     List<Vertex> vertices = vertexIndex.query(envelope);
     // Here we assume vertices list modifiable
     vertices.removeIf(v -> !envelope.contains(new Coordinate(v.getLon(), v.getLat())));
@@ -82,7 +82,7 @@ class StreetIndex {
    * Return the edges whose geometry intersect with the specified envelope. Warning: edges disconnected from the graph
    * will not be indexed.
    */
-  public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
+  Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
     return edgeIndex
       .query(envelope, Scope.PERMANENT)
       .filter(
@@ -108,11 +108,11 @@ class StreetIndex {
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
-  public Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId id) {
+  Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId id) {
     if (stopVerticesById.containsKey(id)) {
       return Set.of(stopVerticesById.get(id));
     } else if (stopVerticesByParentId.containsKey(id)) {
-      return Set.copyOf(stopVerticesByParentId.get(id));
+      return stopVerticesByParentId.get(id);
     } else {
       return Set.of();
     }
@@ -201,9 +201,7 @@ class StreetIndex {
     return ImmutableSetMultimap.copyOf(map);
   }
 
-  private static Map<FeedScopedId, StationCentroidVertex> createStationCentroidVertexMap(
-    Graph graph
-  ) {
+  private static Map<FeedScopedId, StationCentroidVertex> indexStationCentroids(Graph graph) {
     return graph
       .getVerticesOfType(StationCentroidVertex.class)
       .stream()

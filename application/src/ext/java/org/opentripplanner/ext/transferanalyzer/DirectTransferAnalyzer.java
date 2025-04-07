@@ -18,7 +18,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,9 +70,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(
       timetableRepository.getSiteRepository()::findRegularStops
     );
-    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(
-      graph
-    );
+    StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 
     int stopsAnalyzed = 0;
 

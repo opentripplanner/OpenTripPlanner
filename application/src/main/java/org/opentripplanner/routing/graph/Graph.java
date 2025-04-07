@@ -3,7 +3,6 @@ package org.opentripplanner.routing.graph;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -71,10 +70,10 @@ public class Graph implements Serializable {
   /** Conserve memory by reusing immutable instances of Strings, integer arrays, etc. */
   public final transient Deduplicator deduplicator;
 
-  public final Instant buildTime = Instant.now();
-
   @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
+
+  private final transient VertexLinker linker;
 
   private transient StreetIndex streetIndex;
 
@@ -129,6 +128,7 @@ public class Graph implements Serializable {
   ) {
     this.deduplicator = deduplicator;
     this.openingHoursCalendarService = openingHoursCalendarService;
+    this.linker = new VertexLinker(this);
   }
 
   public Graph(Deduplicator deduplicator) {
@@ -314,7 +314,7 @@ public class Graph implements Serializable {
    */
   public VertexLinker getLinker() {
     requireIndex();
-    return new VertexLinker(this);
+    return linker;
   }
 
   /**
@@ -323,7 +323,7 @@ public class Graph implements Serializable {
    */
   public VertexLinker getLinkerSafe() {
     indexIfNotIndexed();
-    return new VertexLinker(this);
+    return linker;
   }
 
   /**
