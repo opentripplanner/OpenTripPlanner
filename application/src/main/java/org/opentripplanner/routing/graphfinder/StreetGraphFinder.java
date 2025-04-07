@@ -27,11 +27,9 @@ import org.opentripplanner.transit.service.TransitService;
 public class StreetGraphFinder implements GraphFinder {
 
   private final Graph graph;
-  private final TransitService transitService;
 
-  public StreetGraphFinder(Graph graph, TransitService transitService) {
+  public StreetGraphFinder(Graph graph) {
     this.graph = graph;
-    this.transitService = transitService;
   }
 
   @Override

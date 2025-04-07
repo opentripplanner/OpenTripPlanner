@@ -72,8 +72,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
       timetableRepository.getSiteRepository()::findRegularStops
     );
     StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(
-      graph,
-      new DefaultTransitService(timetableRepository)
+      graph
     );
 
     int stopsAnalyzed = 0;

@@ -110,7 +110,7 @@ class StreetGraphFinderTest extends GraphRoutingTest {
     );
 
     transitService = new DefaultTransitService(otpModel.timetableRepository());
-    graphFinder = new StreetGraphFinder(otpModel.graph(), transitService);
+    graphFinder = new StreetGraphFinder(otpModel.graph());
   }
 
   @Test

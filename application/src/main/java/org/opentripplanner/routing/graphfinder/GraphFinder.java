@@ -18,7 +18,7 @@ public interface GraphFinder {
    */
   static GraphFinder getInstance(Graph graph, TransitService transitService) {
     return graph.hasStreets
-      ? new StreetGraphFinder(graph, transitService)
+      ? new StreetGraphFinder(graph)
       : new DirectGraphFinder(transitService::findRegularStopsByBoundingBox);
   }
 

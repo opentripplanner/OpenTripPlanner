@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.service;
 
-import com.esotericsoftware.kryo.util.Null;
 import gnu.trove.set.TIntSet;
 import java.time.Duration;
 import java.time.Instant;
