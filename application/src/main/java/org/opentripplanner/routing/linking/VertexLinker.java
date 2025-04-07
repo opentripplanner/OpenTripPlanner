@@ -276,7 +276,7 @@ public class VertexLinker {
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
     List<DistanceTo<StreetEdge>> candidateEdges = graph
-      .queryEdges(env, scope)
+      .findEdges(env, scope)
       .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)

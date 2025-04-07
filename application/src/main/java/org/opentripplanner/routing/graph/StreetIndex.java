@@ -118,13 +118,11 @@ class StreetIndex {
     }
   }
 
+
   /**
-   * Get the street vertices for an id. If the id corresponds to a regular stop we will return the
-   * coordinate for the stop.
-   * If the id corresponds to a station we will either return the coordinates of the child stops or
-   * the station centroid if the station is configured to route to centroid.
+   * @see Graph#findStopVertices(FeedScopedId)
    */
-  Set<Vertex> getStreetVerticesById(FeedScopedId id) {
+  Set<Vertex> findStopVertices(FeedScopedId id) {
     var stationVertex = stationCentroidVertices.get(id);
     if (stationVertex != null) {
       return Set.of(stationVertex);

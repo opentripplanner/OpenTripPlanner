@@ -205,9 +205,22 @@ public class Graph implements Serializable {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Return the vertex corresponding to the stop id, or null.
+   */
   @Nullable
   public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
     return streetIndex.findTransitStopVertex(id);
+  }
+
+  /**
+   * If the {@code id} is a stop id return a set with a single element.
+   * If it is a station id return a set containing all child stop vertices, or an empty
+   * set otherwise.
+   */
+  public Set<TransitStopVertex> findStopOrChildStopsVertices(FeedScopedId stopId) {
+    requireIndex();
+    return streetIndex.getStopOrChildStopsVertices(stopId);
   }
 
   /**
@@ -288,21 +301,42 @@ public class Graph implements Serializable {
     return this.openingHoursCalendarService;
   }
 
+  /**
+   * Find all vertices inside the bounding box defined by {@code env}.
+   */
   public Collection<Vertex> findVertices(Envelope env) {
     requireIndex();
     return streetIndex.getVerticesForEnvelope(env);
   }
 
+  /**
+   * Get the street vertices for an id. If the id corresponds to a regular stop we will return the
+   * coordinate for the stop.
+   * If the id corresponds to a station we will either return the coordinates of the child stops or
+   * the station centroid if the station is configured to route to centroid.
+   */
+  public Set<Vertex> findStopVertices(FeedScopedId stopId) {
+    return streetIndex.findStopVertices(stopId);
+  }
+
+  /**
+   * Find all permanent edges inside the bounding box defined by {@code env}.
+   */
   public Collection<Edge> findEdges(Envelope env) {
     requireIndex();
     return streetIndex.getEdgesForEnvelope(env);
   }
 
-  public Set<TransitStopVertex> findStopOrChildStopsVertices(FeedScopedId stopId) {
-    requireIndex();
-    return streetIndex.getStopOrChildStopsVertices(stopId);
+  /**
+   * Find all edges with the given scope inside the bounding box defined by {@code env}.
+   */
+  public Collection<Edge> findEdges(Envelope env, Scope scope) {
+    return streetIndex.getEdgesForEnvelope(env, scope);
   }
 
+  /**
+   * Insert edge into the index with the give scope.
+   */
   public void insert(StreetEdge edge, Scope scope) {
     requireIndex();
     streetIndex.insert(edge, scope);
