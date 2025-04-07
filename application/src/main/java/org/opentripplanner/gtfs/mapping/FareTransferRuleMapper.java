@@ -37,9 +37,6 @@ class FareTransferRuleMapper {
   private FareTransferRule doMap(org.onebusaway.gtfs.model.FareTransferRule rhs) {
     var fareProductId = idFactory.createId(rhs.getFareProductId());
     final var products = findFareProducts(fareProductId, rhs.getId());
-    if (products == null) {
-      return null;
-    }
 
     Duration duration = null;
     if (rhs.getDurationLimit() != MISSING_VALUE) {
@@ -55,24 +52,18 @@ class FareTransferRuleMapper {
     );
   }
 
-  @Nullable
   private Collection<FareProduct> findFareProducts(
     @Nullable FeedScopedId fareProductId,
-    String id
+    String ruleId
   ) {
     if (fareProductId == null) {
       return List.of();
     }
     var products = fareProductMapper.getByFareProductId(fareProductId);
     if (products.isEmpty()) {
-      issueStore.add(
-        "UnknownFareProductId",
-        "Fare product with id %s referenced by fare transfer rule with id %s not found.".formatted(
-            fareProductId,
-            id
-          )
+      throw new IllegalArgumentException(
+        "Cannot find fare product '%s' for transfer rule '%s'".formatted(fareProductId, ruleId)
       );
-      return null;
     }
     return products;
   }
