@@ -16,7 +16,6 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -47,11 +46,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
-    StreetIndex index = this.graph.getStreetIndex();
     this.from = from;
     this.to = to;
-    fromVertices = index.getStreetVerticesForLocation(from, accessMode, false, tempEdges);
-    toVertices = index.getStreetVerticesForLocation(to, egressMode, true, tempEdges);
+    fromVertices = graph.getStreetVerticesForLocation(from, accessMode, false, tempEdges);
+    toVertices = graph.getStreetVerticesForLocation(to, egressMode, true, tempEdges);
 
     checkIfVerticesFound();
 
@@ -88,11 +86,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    * return the child stops of that station.
    */
   public Set<TransitStopVertex> getFromStopVertices() {
-    StreetIndex index = this.graph.getStreetIndex();
     if (from.stopId == null) {
       return Set.of();
     }
-    return index.getStopOrChildStopsVertices(from.stopId);
+    return graph.getStopOrChildStopsVertices(from.stopId);
   }
 
   /**
@@ -101,11 +98,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    * return the child stops of that station.
    */
   public Set<TransitStopVertex> getToStopVertices() {
-    StreetIndex index = this.graph.getStreetIndex();
     if (to.stopId == null) {
       return Set.of();
     }
-    return index.getStopOrChildStopsVertices(to.stopId);
+    return graph.getStopOrChildStopsVertices(to.stopId);
   }
 
   /* PRIVATE METHODS */

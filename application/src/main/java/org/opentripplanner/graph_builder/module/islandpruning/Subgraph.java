@@ -13,7 +13,7 @@ import org.locationtech.jts.geom.MultiPoint;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.graph.index.StreetIndex;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -88,7 +88,7 @@ class Subgraph {
   // For speed reasons, graph geometry only within given search radius is considered.
   // Distance is estimated using minimal vertex to vertex search instead of computing
   // distances between graph edges. This is good enough for our heuristics.
-  double distanceFromOtherGraph(StreetIndex index, double searchRadius) {
+  double distanceFromOtherGraph(Graph index, double searchRadius) {
     Vertex v = getRepresentativeVertex();
     double xscale = Math.cos((v.getCoordinate().y * Math.PI) / 180);
     double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(searchRadius);

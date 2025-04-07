@@ -18,7 +18,6 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -56,7 +55,6 @@ public class PruneIslands implements GraphBuilderModule {
   private int adaptivePruningDistance;
   private double adaptivePruningFactor;
   private VertexLinker vertexLinker;
-  private StreetIndex streetIndex;
 
   public PruneIslands(
     Graph graph,
@@ -82,7 +80,6 @@ public class PruneIslands implements GraphBuilderModule {
     );
 
     this.vertexLinker = graph.getLinkerSafe(timetableRepository.getSiteRepository());
-    this.streetIndex = graph.getStreetIndexSafe(timetableRepository.getSiteRepository());
 
     pruneIslands(TraverseMode.BICYCLE);
     pruneIslands(TraverseMode.WALK);
@@ -254,7 +251,7 @@ public class PruneIslands implements GraphBuilderModule {
         // do not remove real islands which have only ferry stops
         if (!onlyFerry && island.streetSize() < pruningThresholdWithStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
-            ? island.distanceFromOtherGraph(streetIndex, adaptivePruningDistance) /
+            ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
             adaptivePruningDistance
             : 1.0;
 
@@ -269,7 +266,7 @@ public class PruneIslands implements GraphBuilderModule {
         //for islands without stops
         if (island.streetSize() < pruningThresholdWithoutStops * adaptivePruningFactor) {
           double sizeCoeff = (adaptivePruningFactor > 1.0)
-            ? island.distanceFromOtherGraph(streetIndex, adaptivePruningDistance) /
+            ? island.distanceFromOtherGraph(graph, adaptivePruningDistance) /
             adaptivePruningDistance
             : 1.0;
           if (island.streetSize() * sizeCoeff < pruningThresholdWithoutStops) {

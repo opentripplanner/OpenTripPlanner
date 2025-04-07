@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -40,8 +39,6 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       return;
     }
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(timetableRepository.getSiteRepository());
-
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
@@ -54,7 +51,7 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {
-        var matchedVertices = matchingVerticesForStop(streetIndex, areaStop);
+        var matchedVertices = matchingVerticesForStop(graph, areaStop);
         // Keep lambda! A method-ref would cause incorrect class and line number to be logged
         progress.step(m -> LOG.info(m));
         return matchedVertices;
@@ -76,11 +73,8 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  private static Stream<MatchResult> matchingVerticesForStop(
-    StreetIndex streetIndex,
-    AreaStop areaStop
-  ) {
-    return streetIndex
+  private static Stream<MatchResult> matchingVerticesForStop(Graph graph, AreaStop areaStop) {
+    return graph
       .getVerticesForEnvelope(areaStop.getGeometry().getEnvelopeInternal())
       .stream()
       .filter(StreetVertex.class::isInstance)

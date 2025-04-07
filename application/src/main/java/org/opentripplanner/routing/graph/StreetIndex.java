@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.index;
+package org.opentripplanner.routing.graph;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,14 +13,11 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -28,10 +25,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
-import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -50,9 +44,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Creates a TemporaryStreetLocation representing a location on a street that's not at an
  * intersection, based on input latitude and longitude. Instantiating this class is expensive,
- * because it creates a spatial index of all of the intersections in the graph.
+ * because it creates a spatial index of all the intersections in the graph.
  */
-public class StreetIndex {
+class StreetIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
@@ -77,64 +71,10 @@ public class StreetIndex {
     this.siteRepository = siteRepository;
     this.edgeSpatialIndex = new EdgeSpatialIndex();
     this.verticesTree = new HashGridSpatialIndex<>();
-    this.vertexLinker = new VertexLinker(graph, siteRepository, edgeSpatialIndex);
+    this.vertexLinker = new VertexLinker(graph, siteRepository);
     this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
     this.stationCentroidVertices = createStationCentroidVertexMap(graph);
     postSetup(graph.getVertices());
-  }
-
-  /**
-   * Creates a TemporaryStreetLocation on the given street (set of PlainStreetEdges). How far along
-   * is controlled by the location parameter, which represents a distance along the edge between 0
-   * (the from vertex) and 1 (the to vertex).
-   *
-   * @param edges A collection of nearby edges, which represent one street.
-   * @return the new TemporaryStreetLocation
-   */
-  public static TemporaryStreetLocation createTemporaryStreetLocationForTest(
-    String label,
-    I18NString name,
-    Iterable<StreetEdge> edges,
-    Coordinate nearestPoint,
-    boolean endVertex,
-    DisposableEdgeCollection tempEdges
-  ) {
-    boolean wheelchairAccessible = false;
-
-    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name);
-
-    for (StreetEdge street : edges) {
-      Vertex fromv = street.getFromVertex();
-      Vertex tov = street.getToVertex();
-      wheelchairAccessible |= street.isWheelchairAccessible();
-
-      /* forward edges and vertices */
-      Vertex edgeLocation;
-      if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-        edgeLocation = fromv;
-
-        if (endVertex) {
-          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
-        } else {
-          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
-        }
-      } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
-        // no need to link to area edges caught on-end
-        edgeLocation = tov;
-
-        if (endVertex) {
-          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
-        } else {
-          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
-        }
-      } else {
-        // creates links from street head -> location -> street tail.
-        createHalfLocationForTest(location, name, nearestPoint, street, endVertex, tempEdges);
-      }
-    }
-    location.setWheelchairAccessible(wheelchairAccessible);
-    return location;
   }
 
   public VertexLinker getVertexLinker() {
@@ -238,20 +178,6 @@ public class StreetIndex {
   }
 
   /**
-   * Create the appropriate vertex for this coordinate.
-   *
-   * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
-   */
-  public Vertex createVertexForCoordinateForTest(
-    Coordinate location,
-    StreetMode streetMode,
-    boolean endVertex,
-    Set<DisposableEdgeCollection> tempEdges
-  ) {
-    return createVertexFromCoordinate(location, null, streetMode, endVertex, tempEdges);
-  }
-
-  /**
    * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
@@ -279,60 +205,16 @@ public class StreetIndex {
     return Collections.unmodifiableSet(getStopOrChildStopsVertices(id));
   }
 
-  private static void createHalfLocationForTest(
-    TemporaryStreetLocation base,
-    I18NString name,
-    Coordinate nearestPoint,
-    StreetEdge street,
-    boolean endVertex,
-    DisposableEdgeCollection tempEdges
-  ) {
-    StreetVertex tov = (StreetVertex) street.getToVertex();
-    StreetVertex fromv = (StreetVertex) street.getFromVertex();
-    LineString geometry = street.getGeometry();
-
-    SplitLineString geometries = getGeometry(street, nearestPoint);
-
-    double totalGeomLength = geometry.getLength();
-    double lengthRatioIn = geometries.beginning().getLength() / totalGeomLength;
-
-    double lengthIn = street.getDistanceMeters() * lengthRatioIn;
-    double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
-
-    if (endVertex) {
-      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(street)
-        .withFromVertex(fromv)
-        .withToVertex(base)
-        .withGeometry(geometries.beginning())
-        .withName(name)
-        .withMeterLength(lengthIn)
-        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
-        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
-        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
-        .withLink(street.isLink())
-        .buildAndConnect();
-      tempEdges.addEdge(tpse);
-    } else {
-      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
-        .withParentEdge(street)
-        .withFromVertex(base)
-        .withToVertex(tov)
-        .withGeometry(geometries.ending())
-        .withName(name)
-        .withMeterLength(lengthOut)
-        .withLink(street.isLink())
-        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
-        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
-        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
-        .buildAndConnect();
-      tempEdges.addEdge(tpse);
-    }
+  public Collection<Edge> getEdgesForEnvelope(Envelope env, Scope scope) {
+    return edgeSpatialIndex.query(env, scope).toList();
   }
 
-  private static SplitLineString getGeometry(StreetEdge e, Coordinate nearestPoint) {
-    LineString geometry = e.getGeometry();
-    return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
+  public void insert(Edge edge, Scope scope) {
+    edgeSpatialIndex.insert(edge, scope);
+  }
+
+  public void remove(Edge e, Scope scope) {
+    edgeSpatialIndex.remove(e, scope);
   }
 
   private static LineString edgeGeometryOrStraightLine(Edge e) {
@@ -347,7 +229,7 @@ public class StreetIndex {
     return geometry;
   }
 
-  private Vertex createVertexFromCoordinate(
+  Vertex createVertexFromCoordinate(
     Coordinate coordinate,
     @Nullable String label,
     StreetMode streetMode,

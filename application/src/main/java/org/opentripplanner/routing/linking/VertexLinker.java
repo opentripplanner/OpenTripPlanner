@@ -16,12 +16,10 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -81,10 +79,6 @@ public class VertexLinker {
     1000
   );
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
-  /**
-   * Spatial index of StreetEdges in the graph.
-   */
-  private final EdgeSpatialIndex edgeSpatialIndex;
 
   private final Graph graph;
 
@@ -98,12 +92,7 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(
-    Graph graph,
-    SiteRepository siteRepository,
-    EdgeSpatialIndex edgeSpatialIndex
-  ) {
-    this.edgeSpatialIndex = edgeSpatialIndex;
+  public VertexLinker(Graph graph, SiteRepository siteRepository) {
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
     this.siteRepository = siteRepository;
@@ -139,7 +128,7 @@ public class VertexLinker {
   public void removeEdgeFromIndex(Edge edge, Scope scope) {
     // Edges without geometry will not have been added to the index in the first place
     if (edge.getGeometry() != null) {
-      edgeSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
+      graph.removeEdge(edge);
     }
   }
 
@@ -288,8 +277,9 @@ public class VertexLinker {
     // street edges traversable by at least one of the given modes and are still present in the
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
-    List<DistanceTo<StreetEdge>> candidateEdges = edgeSpatialIndex
-      .query(env, scope)
+    List<DistanceTo<StreetEdge>> candidateEdges = graph
+      .queryEdges(env, scope)
+      .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
@@ -487,7 +477,6 @@ public class VertexLinker {
    * Split the street edge at the given fraction
    *
    * @param originalEdge to be split
-   * @param ll           fraction at which to split the edge
    * @param scope        the scope of the split
    * @param direction    what direction to link the edges
    * @param tempEdges    collection of temporary edges
@@ -511,10 +500,10 @@ public class VertexLinker {
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
       if (newEdges.head() != null) {
-        edgeSpatialIndex.insert(newEdges.head().getGeometry(), newEdges.head(), scope);
+        graph.insert(newEdges.head(), scope);
       }
       if (newEdges.tail() != null) {
-        edgeSpatialIndex.insert(newEdges.tail().getGeometry(), newEdges.tail(), scope);
+        graph.insert(newEdges.tail(), scope);
       }
 
       if (scope == Scope.PERMANENT) {
