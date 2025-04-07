@@ -118,7 +118,6 @@ class StreetIndex {
     }
   }
 
-
   /**
    * @see Graph#findStopVertices(FeedScopedId)
    */

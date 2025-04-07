@@ -258,6 +258,9 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     rentalRestrictions = rentalRestrictions.remove(ext);
   }
 
+  /**
+   * Returns the (flex) area stops that this vertex is inside.
+   */
   public Set<AreaStop> areaStops() {
     return Set.of();
   }
