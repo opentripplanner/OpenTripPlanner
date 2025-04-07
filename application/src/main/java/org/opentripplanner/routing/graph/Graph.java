@@ -12,17 +12,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.fares.FareService;
-import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -303,39 +299,12 @@ public class Graph implements Serializable {
     return streetIndex.getEdgesForEnvelope(env);
   }
 
-  public Set<Vertex> getStreetVerticesForLocation(
-    GenericLocation to,
-    StreetMode egressMode,
-    boolean b,
-    Set<DisposableEdgeCollection> tempEdges
-  ) {
-    return streetIndex.getStreetVerticesForLocation(to, egressMode, b, tempEdges);
-  }
-
   public Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId stopId) {
     return streetIndex.getStopOrChildStopsVertices(stopId);
   }
 
   public void insert(StreetEdge head, Scope scope) {
     streetIndex.insert(head, scope);
-  }
-
-  /**
-   * Create the appropriate vertex for this coordinate.
-   */
-  public Vertex createVertexForCoordinateForTest(
-    Coordinate coordinate,
-    StreetMode streetMode,
-    boolean endVertex,
-    Set<DisposableEdgeCollection> tempEdges
-  ) {
-    return streetIndex.createVertexFromCoordinate(
-      coordinate,
-      null,
-      streetMode,
-      endVertex,
-      tempEdges
-    );
   }
 
   /**

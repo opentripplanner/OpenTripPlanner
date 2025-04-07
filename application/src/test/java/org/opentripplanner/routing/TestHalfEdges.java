@@ -1,6 +1,7 @@
 package org.opentripplanner.routing;
 
 import static com.google.common.collect.Iterables.filter;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -51,10 +52,12 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TestHalfEdges {
 
+  public static final GenericLocation ANY_LOCATION = new GenericLocation(-74.005000001, 40.01);
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
 
   private Graph graph;
@@ -576,23 +579,27 @@ public class TestHalfEdges {
     // test that the local stop finder finds stops
     assertTrue(graphFinder.findClosestStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
 
-    // test that the closest vertex finder returns the closest vertex
-    TemporaryStreetLocation some = (TemporaryStreetLocation) graph.createVertexForCoordinateForTest(
-      new Coordinate(-74.00, 40.00),
+    var container = new TemporaryVerticesContainer(
+      graph,
+      new DefaultTransitService(new TimetableRepository()),
+      ANY_LOCATION, ANY_LOCATION,
       StreetMode.WALK,
-      true,
-      tempEdges
+      StreetMode.WALK
+    );
+    // test that the closest vertex finder returns the closest vertex
+    TemporaryStreetLocation some = getStreetVerticesForLocation(
+      container,
+      tempEdges,
+      new GenericLocation(-74.00, 40.00)
     );
     assertNotNull(some);
 
     // test that the closest vertex finder correctly splits streets
-    TemporaryStreetLocation start =
-      (TemporaryStreetLocation) graph.createVertexForCoordinateForTest(
-        new Coordinate(-74.01, 40.004),
-        StreetMode.WALK,
-        false,
-        tempEdges
-      );
+    TemporaryStreetLocation start = getStreetVerticesForLocation(
+      container,
+      tempEdges,
+      new GenericLocation(-74.01, 40.004)
+    );
     assertNotNull(start);
     assertTrue(
       start.isWheelchairAccessible(),
@@ -602,11 +609,10 @@ public class TestHalfEdges {
     Collection<Edge> edges = start.getOutgoing();
     assertEquals(2, edges.size());
 
-    TemporaryStreetLocation end = (TemporaryStreetLocation) graph.createVertexForCoordinateForTest(
-      new Coordinate(-74.0, 40.008),
-      StreetMode.BIKE,
-      true,
-      tempEdges
+    TemporaryStreetLocation end = getStreetVerticesForLocation(
+      container,
+      tempEdges,
+      new GenericLocation(-74.0, 40.008)
     );
     assertNotNull(end);
 
@@ -625,6 +631,7 @@ public class TestHalfEdges {
     try (
       var container = new TemporaryVerticesContainer(
         graph,
+        new DefaultTransitService(new TimetableRepository()),
         walking.from(),
         walking.to(),
         StreetMode.WALK,
@@ -666,5 +673,17 @@ public class TestHalfEdges {
 
     Vertex station2point = edge.getToVertex();
     assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);
+  }
+
+  private static TemporaryStreetLocation getStreetVerticesForLocation(
+    TemporaryVerticesContainer container,
+    Set<DisposableEdgeCollection> tempEdges,
+    GenericLocation location
+  ) {
+    var result = container.getStreetVerticesForLocation(location, StreetMode.WALK, true, tempEdges);
+
+    assertThat(result).hasSize(1);
+
+    return result.stream().map(v -> (TemporaryStreetLocation) v).findFirst().orElseThrow();
   }
 }

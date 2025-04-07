@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import com.esotericsoftware.kryo.util.Null;
 import gnu.trove.set.TIntSet;
 import java.time.Duration;
 import java.time.Instant;
@@ -142,6 +143,7 @@ public interface TransitService {
 
   Operator getOperator(FeedScopedId id);
 
+  @Nullable
   RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();

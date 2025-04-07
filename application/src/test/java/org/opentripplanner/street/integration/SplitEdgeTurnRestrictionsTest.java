@@ -22,6 +22,8 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 /*
  * When bus stops are added to graph they split an existing edge in two parts so that an artificial
@@ -155,6 +157,7 @@ public class SplitEdgeTurnRestrictionsTest {
     request.journey().direct().setMode(StreetMode.CAR);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
+      new DefaultTransitService(new TimetableRepository()),
       from,
       to,
       StreetMode.CAR,

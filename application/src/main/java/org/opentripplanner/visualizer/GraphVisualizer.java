@@ -75,6 +75,8 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
+import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -514,6 +516,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        new DefaultTransitService(new TimetableRepository()),
         options.from(),
         options.to(),
         options.journey().direct().mode(),

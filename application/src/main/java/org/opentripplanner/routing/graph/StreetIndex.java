@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.graph;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,26 +16,13 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.LinkingDirection;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.vertex.StationCentroidVertex;
-import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -50,29 +40,30 @@ class StreetIndex {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetIndex.class);
 
-  private final SiteRepository siteRepository;
-
   private final VertexLinker vertexLinker;
 
-  private final Map<FeedScopedId, TransitStopVertex> transitStopVertices;
+  private final Map<FeedScopedId, TransitStopVertex> stopVerticesById;
+  private final ImmutableSetMultimap<FeedScopedId, TransitStopVertex> stopVerticesByParentId;
 
   /**
    * This list contains transitStationVertices for the stations that are configured to route to centroid
    */
   private final Map<FeedScopedId, StationCentroidVertex> stationCentroidVertices;
 
-  private final EdgeSpatialIndex edgeSpatialIndex;
-  private final HashGridSpatialIndex<Vertex> verticesTree;
+  private final EdgeSpatialIndex edgeIndex;
+  private final HashGridSpatialIndex<Vertex> vertexIndex;
 
   /**
    * Should only be called by the graph.
    */
   public StreetIndex(Graph graph, SiteRepository siteRepository) {
-    this.siteRepository = siteRepository;
-    this.edgeSpatialIndex = new EdgeSpatialIndex();
-    this.verticesTree = new HashGridSpatialIndex<>();
+    this.edgeIndex = new EdgeSpatialIndex();
+    this.vertexIndex = new HashGridSpatialIndex<>();
     this.vertexLinker = new VertexLinker(graph, siteRepository);
-    this.transitStopVertices = toImmutableMap(graph.getVerticesOfType(TransitStopVertex.class));
+    var stopVertices = graph.getVerticesOfType(TransitStopVertex.class);
+    this.stopVerticesById = indexStopIds(stopVertices);
+    this.stopVerticesByParentId = indexStationIds(stopVertices);
+
     this.stationCentroidVertices = createStationCentroidVertexMap(graph);
     postSetup(graph.getVertices());
   }
@@ -83,14 +74,14 @@ class StreetIndex {
 
   @Nullable
   public TransitStopVertex findTransitStopVertices(FeedScopedId stopId) {
-    return transitStopVertices.get(stopId);
+    return stopVerticesById.get(stopId);
   }
 
   /**
    * Returns the vertices intersecting with the specified envelope.
    */
   public List<Vertex> getVerticesForEnvelope(Envelope envelope) {
-    List<Vertex> vertices = verticesTree.query(envelope);
+    List<Vertex> vertices = vertexIndex.query(envelope);
     // Here we assume vertices list modifiable
     vertices.removeIf(v -> !envelope.contains(new Coordinate(v.getLon(), v.getLat())));
     return vertices;
@@ -101,7 +92,7 @@ class StreetIndex {
    * will not be indexed.
    */
   public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
-    return edgeSpatialIndex
+    return edgeIndex
       .query(envelope, Scope.PERMANENT)
       .filter(
         e ->
@@ -111,69 +102,14 @@ class StreetIndex {
       .toList();
   }
 
-  /**
-   * Gets a set of vertices corresponding to the location provided. It first tries to match one of
-   * the stop or station types by id, and if not successful it uses the coordinates if provided.
-   *
-   * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
-   */
-  @Nullable
-  public Set<Vertex> getStreetVerticesForLocation(
-    GenericLocation location,
-    StreetMode streetMode,
-    boolean endVertex,
-    Set<DisposableEdgeCollection> tempEdges
-  ) {
-    // Differentiate between driving and non-driving, as driving is not available from transit stops
-    TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
-
-    if (nonTransitMode.isInCar()) {
-      // Fetch coordinate from stop, if not given in request
-      if (location.stopId != null && location.getCoordinate() == null) {
-        var coordinate = siteRepository.getCoordinateById(location.stopId);
-        if (coordinate != null) {
-          location = new GenericLocation(
-            location.label,
-            location.stopId,
-            coordinate.latitude(),
-            coordinate.longitude()
-          );
-        }
-      }
-    } else {
-      // Check if Stop/StopCollection is found by FeedScopeId
-      if (location.stopId != null) {
-        var streetVertices = getStreetVerticesById(location.stopId);
-        if (!streetVertices.isEmpty()) {
-          return streetVertices;
-        }
-      }
-    }
-
-    // Check if coordinate is provided and connect it to graph
-    if (location.getCoordinate() != null) {
-      return Set.of(
-        createVertexFromCoordinate(
-          location.getCoordinate(),
-          location.label,
-          streetMode,
-          endVertex,
-          tempEdges
-        )
-      );
-    }
-
-    return null;
-  }
-
   @Override
   public String toString() {
     return (
       getClass().getName() +
       " -- edgeTree: " +
-      edgeSpatialIndex.toString() +
+      edgeIndex.toString() +
       " -- verticesTree: " +
-      verticesTree.toString()
+      vertexIndex.toString()
     );
   }
 
@@ -182,13 +118,13 @@ class StreetIndex {
    * @return The associated TransitStopVertex or all underlying TransitStopVertices
    */
   public Set<TransitStopVertex> getStopOrChildStopsVertices(FeedScopedId id) {
-    return siteRepository
-      .findStopOrChildStops(id)
-      .stream()
-      .filter(RegularStop.class::isInstance)
-      .map(RegularStop.class::cast)
-      .map(it -> transitStopVertices.get(it.getId()))
-      .collect(Collectors.toSet());
+    if (stopVerticesById.containsKey(id)) {
+      return Set.of(stopVerticesById.get(id));
+    } else if (stopVerticesByParentId.containsKey(id)) {
+      return Set.copyOf(stopVerticesByParentId.get(id));
+    } else {
+      return Set.of();
+    }
   }
 
   /**
@@ -206,15 +142,15 @@ class StreetIndex {
   }
 
   public Collection<Edge> getEdgesForEnvelope(Envelope env, Scope scope) {
-    return edgeSpatialIndex.query(env, scope).toList();
+    return edgeIndex.query(env, scope).toList();
   }
 
   public void insert(Edge edge, Scope scope) {
-    edgeSpatialIndex.insert(edge, scope);
+    edgeIndex.insert(edge, scope);
   }
 
   public void remove(Edge e, Scope scope) {
-    edgeSpatialIndex.remove(e, scope);
+    edgeIndex.remove(e, scope);
   }
 
   private static LineString edgeGeometryOrStraightLine(Edge e) {
@@ -229,80 +165,6 @@ class StreetIndex {
     return geometry;
   }
 
-  Vertex createVertexFromCoordinate(
-    Coordinate coordinate,
-    @Nullable String label,
-    StreetMode streetMode,
-    boolean endVertex,
-    Set<DisposableEdgeCollection> tempEdges
-  ) {
-    if (endVertex) {
-      LOG.debug("Creating end vertex for {}", coordinate);
-    } else {
-      LOG.debug("Creating start vertex for {}", coordinate);
-    }
-
-    I18NString name;
-    if (label == null || label.isEmpty()) {
-      if (endVertex) {
-        name = new LocalizedString("destination");
-      } else {
-        name = new LocalizedString("origin");
-      }
-    } else {
-      name = new NonLocalizedString(label);
-    }
-
-    var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
-
-    TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
-
-    tempEdges.add(
-      vertexLinker.linkVertexForRequest(
-        temporaryStreetLocation,
-        new TraverseModeSet(nonTransitMode),
-        endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
-        endVertex
-          ? (vertex, streetVertex) ->
-            List.of(
-              TemporaryFreeEdge.createTemporaryFreeEdge(
-                streetVertex,
-                (TemporaryStreetLocation) vertex
-              )
-            )
-          : (vertex, streetVertex) ->
-            List.of(
-              TemporaryFreeEdge.createTemporaryFreeEdge(
-                (TemporaryStreetLocation) vertex,
-                streetVertex
-              )
-            )
-      )
-    );
-
-    if (
-      temporaryStreetLocation.getIncoming().isEmpty() &&
-      temporaryStreetLocation.getOutgoing().isEmpty()
-    ) {
-      LOG.warn("Couldn't link {}", coordinate);
-    }
-
-    temporaryStreetLocation.setWheelchairAccessible(true);
-
-    return temporaryStreetLocation;
-  }
-
-  private TraverseMode getTraverseModeForLinker(StreetMode streetMode, boolean endVertex) {
-    TraverseMode nonTransitMode = TraverseMode.WALK;
-    // for park and ride we will start in car mode and walk to the end vertex
-    boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && !endVertex;
-    boolean onlyCarAvailable = streetMode == StreetMode.CAR;
-    if (onlyCarAvailable || parkAndRideDepart) {
-      nonTransitMode = TraverseMode.CAR;
-    }
-    return nonTransitMode;
-  }
-
   private void postSetup(Collection<Vertex> vertices) {
     var progress = ProgressTracker.track("Index street vertex", 1000, vertices.size());
     LOG.info(progress.startMessage());
@@ -310,22 +172,22 @@ class StreetIndex {
     for (Vertex gv : vertices) {
       for (Edge e : gv.getOutgoing()) {
         LineString geometry = edgeGeometryOrStraightLine(e);
-        edgeSpatialIndex.insert(geometry, e, Scope.PERMANENT);
+        edgeIndex.insert(geometry, e, Scope.PERMANENT);
       }
       Envelope env = new Envelope(gv.getCoordinate());
-      verticesTree.insert(env, gv);
+      vertexIndex.insert(env, gv);
 
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
 
     // Trim the sizes of the indices
-    edgeSpatialIndex.compact();
-    verticesTree.compact();
+    edgeIndex.compact();
+    vertexIndex.compact();
     LOG.info(progress.completeMessage());
   }
 
-  private static Map<FeedScopedId, TransitStopVertex> toImmutableMap(
+  private static Map<FeedScopedId, TransitStopVertex> indexStopIds(
     Collection<TransitStopVertex> vertices
   ) {
     var map = new HashMap<FeedScopedId, TransitStopVertex>();
@@ -333,6 +195,19 @@ class StreetIndex {
       map.put(it.getStop().getId(), it);
     }
     return Map.copyOf(map);
+  }
+
+  private static ImmutableSetMultimap<FeedScopedId, TransitStopVertex> indexStationIds(
+    Collection<TransitStopVertex> vertices
+  ) {
+    Multimap<FeedScopedId, TransitStopVertex> map = ArrayListMultimap.create();
+    vertices
+      .stream()
+      .filter(v -> v.getStop().isPartOfStation())
+      .forEach(v -> {
+        map.put(v.getStop().getParentStation().getId(), v);
+      });
+    return ImmutableSetMultimap.copyOf(map);
   }
 
   private static Map<FeedScopedId, StationCentroidVertex> createStationCentroidVertexMap(

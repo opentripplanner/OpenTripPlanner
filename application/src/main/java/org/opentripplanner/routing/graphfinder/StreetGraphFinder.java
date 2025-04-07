@@ -27,9 +27,11 @@ import org.opentripplanner.transit.service.TransitService;
 public class StreetGraphFinder implements GraphFinder {
 
   private final Graph graph;
+  private final TransitService transitService;
 
-  public StreetGraphFinder(Graph graph) {
+  public StreetGraphFinder(Graph graph, TransitService transitService) {
     this.graph = graph;
+    this.transitService = transitService;
   }
 
   @Override
@@ -95,6 +97,7 @@ public class StreetGraphFinder implements GraphFinder {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
+        transitService,
         rr.from(),
         rr.to(),
         StreetMode.WALK,

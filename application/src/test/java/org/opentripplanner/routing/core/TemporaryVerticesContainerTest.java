@@ -28,7 +28,9 @@ import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class TemporaryVerticesContainerTest {
 
@@ -60,7 +62,14 @@ public class TemporaryVerticesContainerTest {
   @Test
   public void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, from, to, StreetMode.WALK, StreetMode.WALK);
+    subject = new TemporaryVerticesContainer(
+      g,
+      new DefaultTransitService(new TimetableRepository()),
+      from,
+      to,
+      StreetMode.WALK,
+      StreetMode.WALK
+    );
 
     // Then:
     originAndDestinationInsertedCorrect();
