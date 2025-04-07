@@ -123,15 +123,11 @@ public class VertexLinker {
     return link(vertex, traverseModes, direction, Scope.REQUEST, edgeFunction);
   }
 
-  public void removeEdgeFromIndex(Edge edge, Scope scope) {
+  private void removeEdgeFromIndex(Edge edge, Scope scope) {
     // Edges without geometry will not have been added to the index in the first place
     if (edge.getGeometry() != null) {
-      graph.removeEdge(edge);
+      graph.removeEdge(edge, scope);
     }
-  }
-
-  public void removePermanentEdgeFromIndex(Edge edge) {
-    removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
   public void setAreaVisibility(boolean areaVisibility) {

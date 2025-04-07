@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -445,8 +446,6 @@ public class PruneIslands implements GraphBuilderModule {
               }
               if (changed) {
                 if (permission == StreetTraversalPermission.NONE) {
-                  // currently we must update spatial index manually, graph.removeEdge does not do that
-                  vertexLinker.removePermanentEdgeFromIndex(pse);
                   graph.removeEdge(pse);
                   stats.put("removed", stats.get("removed") + 1);
                   removed++;

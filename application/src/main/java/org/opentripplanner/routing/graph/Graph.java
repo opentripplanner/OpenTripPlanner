@@ -156,16 +156,20 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Removes an edge from the graph. This method is not thread-safe.
+   * Removes a permanent edge from the graph. This method is not thread-safe.
    *
    * @param e The edge to be removed
    */
   public void removeEdge(Edge e) {
+    removeEdge(e, Scope.PERMANENT);
+  }
+
+  public void removeEdge(Edge e, Scope scope) {
     streetNotesService.removeStaticNotes(e);
-    if (streetIndex != null) {
-      streetIndex.remove(e, Scope.PERMANENT);
-    }
     e.remove();
+    if (streetIndex != null) {
+      streetIndex.remove(e, scope);
+    }
   }
 
   /**
