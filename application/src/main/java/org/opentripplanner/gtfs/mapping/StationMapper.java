@@ -51,7 +51,7 @@ class StationMapper {
           )
       );
     }
-    StationBuilder builder = Station.of(idFactory.toId(rhs.getId()))
+    StationBuilder builder = Station.of(idFactory.createId(rhs.getId()))
       .withCoordinate(WgsCoordinateMapper.mapToDomain(rhs))
       .withCode(rhs.getCode());
 

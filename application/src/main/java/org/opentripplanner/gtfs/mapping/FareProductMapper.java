@@ -30,7 +30,7 @@ class FareProductMapper {
     if (rhs.getDurationUnit() != NOT_SET) {
       duration = toDuration(rhs.getDurationUnit(), rhs.getDurationAmount());
     }
-    var fp = FareProduct.of(idFactory.toId(rhs.getFareProductId()), rhs.getName(), price)
+    var fp = FareProduct.of(idFactory.createId(rhs.getFareProductId()), rhs.getName(), price)
       .withValidity(duration)
       .withCategory(toInternalModel(rhs.getRiderCategory()))
       .withMedium(toInternalModel(rhs.getFareMedium()))
@@ -54,7 +54,7 @@ class FareProductMapper {
       return null;
     } else {
       return new RiderCategory(
-        idFactory.toId(riderCategory.getId()),
+        idFactory.createId(riderCategory.getId()),
         riderCategory.getName(),
         riderCategory.getEligibilityUrl()
       );
@@ -80,7 +80,7 @@ class FareProductMapper {
     if (c == null) {
       return null;
     } else {
-      return new FareMedium(idFactory.toId(c.getId()), c.getName());
+      return new FareMedium(idFactory.createId(c.getId()), c.getName());
     }
   }
 }

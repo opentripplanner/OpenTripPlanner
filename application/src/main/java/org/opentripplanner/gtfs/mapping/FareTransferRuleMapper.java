@@ -35,8 +35,8 @@ class FareTransferRuleMapper {
   }
 
   private FareTransferRule doMap(org.onebusaway.gtfs.model.FareTransferRule rhs) {
-    var fareProductId = idFactory.toId(rhs.getFareProductId());
-    final var products = resolveFareProducts(fareProductId, rhs.getId());
+    var fareProductId = idFactory.createId(rhs.getFareProductId());
+    final var products = findFareProducts(fareProductId, rhs.getId());
     if (products == null) {
       return null;
     }
@@ -46,9 +46,9 @@ class FareTransferRuleMapper {
       duration = Duration.ofSeconds(rhs.getDurationLimit());
     }
     return new FareTransferRule(
-      idFactory.id(rhs.getId()),
-      idFactory.toId(rhs.getFromLegGroupId()),
-      idFactory.toId(rhs.getToLegGroupId()),
+      idFactory.createId(rhs.getId()),
+      idFactory.createId(rhs.getFromLegGroupId()),
+      idFactory.createId(rhs.getToLegGroupId()),
       rhs.getTransferCount(),
       duration,
       products
@@ -56,7 +56,7 @@ class FareTransferRuleMapper {
   }
 
   @Nullable
-  private Collection<FareProduct> resolveFareProducts(
+  private Collection<FareProduct> findFareProducts(
     @Nullable FeedScopedId fareProductId,
     String id
   ) {

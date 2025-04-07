@@ -4,7 +4,9 @@ import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-/** Responsible for mapping GTFS AgencyAndId into the OTP model. */
+/**
+ * Responsible for creating feed-scoped from OBA's {@code AgencyAndId} or strings.
+ **/
 class IdFactory {
 
   private final String feedId;
@@ -14,11 +16,11 @@ class IdFactory {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  FeedScopedId toId(@Nullable AgencyAndId id) {
+  FeedScopedId createId(@Nullable AgencyAndId id) {
     return id == null ? null : new FeedScopedId(feedId, id.getId());
   }
 
-  FeedScopedId id(@Nullable String id) {
+  FeedScopedId createId(@Nullable String id) {
     return id == null ? null : new FeedScopedId(feedId, id);
   }
 }

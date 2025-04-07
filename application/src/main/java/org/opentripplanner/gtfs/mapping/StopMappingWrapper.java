@@ -21,7 +21,7 @@ class StopMappingWrapper {
   }
 
   public FeedScopedId getId() {
-    return idFactory.toId(stop.getId());
+    return idFactory.createId(stop.getId());
   }
 
   public String getName() {

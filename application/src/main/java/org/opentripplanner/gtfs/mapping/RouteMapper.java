@@ -45,7 +45,7 @@ class RouteMapper {
   }
 
   private Route doMap(org.onebusaway.gtfs.model.Route rhs) {
-    var lhs = Route.of(idFactory.toId(rhs.getId()));
+    var lhs = Route.of(idFactory.createId(rhs.getId()));
     I18NString longName = null;
     if (rhs.getLongName() != null) {
       longName = translationHelper.getTranslation(

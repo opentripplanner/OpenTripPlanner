@@ -45,7 +45,7 @@ class LocationGroupMapper {
 
   private GroupStop doMap(LocationGroup element) {
     GroupStopBuilder groupStopBuilder = siteRepositoryBuilder
-      .groupStop(idFactory.toId(element.getId()))
+      .groupStop(idFactory.createId(element.getId()))
       .withName(new NonLocalizedString(element.getName()));
 
     for (var location : element.getLocations()) {
