@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.SiteRepository;
-import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri21.OccupancyEnumeration;
 
 public class TimetableHelperTest {
 

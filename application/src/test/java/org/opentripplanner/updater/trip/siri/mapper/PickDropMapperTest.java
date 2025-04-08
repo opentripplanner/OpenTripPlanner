@@ -3,16 +3,16 @@ package org.opentripplanner.updater.trip.siri.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.org.siri.siri20.ArrivalBoardingActivityEnumeration.ALIGHTING;
-import static uk.org.siri.siri20.ArrivalBoardingActivityEnumeration.NO_ALIGHTING;
-import static uk.org.siri.siri20.DepartureBoardingActivityEnumeration.BOARDING;
-import static uk.org.siri.siri20.DepartureBoardingActivityEnumeration.NO_BOARDING;
+import static uk.org.siri.siri21.ArrivalBoardingActivityEnumeration.ALIGHTING;
+import static uk.org.siri.siri21.ArrivalBoardingActivityEnumeration.NO_ALIGHTING;
+import static uk.org.siri.siri21.DepartureBoardingActivityEnumeration.BOARDING;
+import static uk.org.siri.siri21.DepartureBoardingActivityEnumeration.NO_BOARDING;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.updater.trip.siri.TestCall;
 import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
-import uk.org.siri.siri20.CallStatusEnumeration;
+import uk.org.siri.siri21.CallStatusEnumeration;
 
 class PickDropMapperTest {
 
