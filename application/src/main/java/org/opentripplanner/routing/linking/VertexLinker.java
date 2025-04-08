@@ -425,10 +425,7 @@ public class VertexLinker {
     }
 
     if (OTPFeature.FlexRouting.isOn()) {
-      var areaStops = Stream.concat(
-        start.getIncomingStreetEdges().stream(),
-        start.getOutgoing().stream()
-      )
+      var areaStops = Stream.concat(start.getIncoming().stream(), start.getOutgoing().stream())
         .flatMap(e ->
           Stream.concat(
             e.getFromVertex().areaStops().stream(),
