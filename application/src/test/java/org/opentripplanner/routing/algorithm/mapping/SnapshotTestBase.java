@@ -39,12 +39,12 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
-import org.opentripplanner.ext.restapi.mapping.ItineraryMapper;
-import org.opentripplanner.ext.restapi.model.ApiLeg;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.routing.algorithm.mapping._support.mapping.ItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
@@ -273,8 +273,7 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    // TODO: 2022-12-20 filters: this is for REST so there should not be more than one filter
-    //  but technically this is not right
+    // TODO: 2022-12-20 filters: there should not be more than one filter but technically this is not right
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
     if (filter instanceof TransitFilterRequest filterRequest) {

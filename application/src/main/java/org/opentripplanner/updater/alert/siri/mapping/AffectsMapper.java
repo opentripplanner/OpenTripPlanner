@@ -14,22 +14,22 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.siri.EntityResolver;
 import org.opentripplanner.updater.trip.siri.SiriFuzzyTripMatcher;
-import uk.org.ifopt.siri20.StopPlaceRef;
-import uk.org.siri.siri20.AffectedLineStructure;
-import uk.org.siri.siri20.AffectedOperatorStructure;
-import uk.org.siri.siri20.AffectedRouteStructure;
-import uk.org.siri.siri20.AffectedStopPlaceStructure;
-import uk.org.siri.siri20.AffectedStopPointStructure;
-import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
-import uk.org.siri.siri20.AffectsScopeStructure;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.NetworkRefStructure;
-import uk.org.siri.siri20.OperatorRefStructure;
-import uk.org.siri.siri20.RoutePointTypeEnumeration;
-import uk.org.siri.siri20.StopPointRef;
-import uk.org.siri.siri20.VehicleJourneyRef;
+import uk.org.ifopt.siri21.StopPlaceRef;
+import uk.org.siri.siri21.AffectedLineStructure;
+import uk.org.siri.siri21.AffectedOperatorStructure;
+import uk.org.siri.siri21.AffectedRouteStructure;
+import uk.org.siri.siri21.AffectedStopPlaceStructure;
+import uk.org.siri.siri21.AffectedStopPointStructure;
+import uk.org.siri.siri21.AffectedVehicleJourneyStructure;
+import uk.org.siri.siri21.AffectsScopeStructure;
+import uk.org.siri.siri21.DatedVehicleJourneyRef;
+import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri21.LineRef;
+import uk.org.siri.siri21.NetworkRefStructure;
+import uk.org.siri.siri21.OperatorRefStructure;
+import uk.org.siri.siri21.RoutePointTypeEnumeration;
+import uk.org.siri.siri21.StopPointRefStructure;
+import uk.org.siri.siri21.VehicleJourneyRef;
 
 /**
  * Maps a {@link AffectsScopeStructure} to a list of {@link EntitySelector}s
@@ -300,7 +300,7 @@ public class AffectsMapper {
     List<EntitySelector> selectors = new ArrayList<>();
 
     for (AffectedStopPointStructure stopPoint : stopPoints.getAffectedStopPoints()) {
-      StopPointRef stopPointRef = stopPoint.getStopPointRef();
+      StopPointRefStructure stopPointRef = stopPoint.getStopPointRef();
       if (stopPointRef == null || stopPointRef.getValue() == null) {
         continue;
       }

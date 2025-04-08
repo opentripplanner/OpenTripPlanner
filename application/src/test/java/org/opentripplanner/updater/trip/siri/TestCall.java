@@ -2,11 +2,11 @@ package org.opentripplanner.updater.trip.siri;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
-import uk.org.siri.siri20.CallStatusEnumeration;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
-import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri21.ArrivalBoardingActivityEnumeration;
+import uk.org.siri.siri21.CallStatusEnumeration;
+import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
+import uk.org.siri.siri21.NaturalLanguageStringStructure;
+import uk.org.siri.siri21.OccupancyEnumeration;
 
 public class TestCall implements CallWrapper {
 

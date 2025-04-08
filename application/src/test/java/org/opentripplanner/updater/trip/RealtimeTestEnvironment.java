@@ -25,7 +25,7 @@ import org.opentripplanner.updater.trip.gtfs.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.updater.EstimatedTimetableHandler;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 /**
  * This class exists so that you can share the data building logic for GTFS and Siri tests.
