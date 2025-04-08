@@ -88,7 +88,7 @@ class Subgraph {
   // For speed reasons, graph geometry only within given search radius is considered.
   // Distance is estimated using minimal vertex to vertex search instead of computing
   // distances between graph edges. This is good enough for our heuristics.
-  double distanceFromOtherGraph(Graph index, double searchRadius) {
+  double distanceFromOtherGraph(Graph graph, double searchRadius) {
     Vertex v = getRepresentativeVertex();
     double xscale = Math.cos((v.getCoordinate().y * Math.PI) / 180);
     double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(searchRadius);
@@ -104,7 +104,7 @@ class Subgraph {
     }
     envelope.expandBy(searchRadiusDegrees / xscale, searchRadiusDegrees);
 
-    return index
+    return graph
       .findVertices(envelope)
       .stream()
       .filter(vx -> !contains(vx))

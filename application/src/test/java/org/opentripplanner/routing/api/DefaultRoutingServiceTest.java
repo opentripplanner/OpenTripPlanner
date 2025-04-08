@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.routing.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -25,8 +25,6 @@ import org.opentripplanner.transit.service.TransitService;
 /**
  * Check that the graph index is created, that GTFS elements can be found in the index, and that the
  * indexes are coherent with one another.
- * <p>
- * TODO: The old transit index doesn't exist anymore, and the new one needs more tests.
  */
 public class DefaultRoutingServiceTest extends GtfsTest {
 
@@ -120,15 +118,5 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     assertTrue(stops.contains(stopL));
     assertTrue(stops.contains(stopM));
     assertTrue(stops.size() >= 3); // Query can overselect
-  }
-
-  @Test
-  public void testParentStations() {
-    // graph.index.stopsForParentStation;
-  }
-
-  @Test
-  public void testLucene() {
-    // graph.index.luceneIndex
   }
 }

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
@@ -22,22 +21,22 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 
-public class GraphTest {
+class GraphTest {
 
   @Test
-  public void testBasic() {
+  void testBasic() {
     Graph g = new Graph();
     assertNotNull(g);
   }
 
   @Test
-  public void testAddVertex() {
+  void testAddVertex() {
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     assertEquals(a.getLabel(), VertexLabel.string("A"));
   }
 
   @Test
-  public void testGetVertex() {
+  void testGetVertex() {
     var g = new Graph();
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     g.addVertex(a);
@@ -46,7 +45,7 @@ public class GraphTest {
   }
 
   @Test
-  public void testAddEdge() {
+  void testAddEdge() {
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     Vertex b = StreetModelForTest.intersectionVertex("B", 6, 6);
     FreeEdge ee = FreeEdge.createFreeEdge(a, b);
@@ -54,7 +53,7 @@ public class GraphTest {
   }
 
   @Test
-  public void testGetEdgesOneEdge() {
+  void testGetEdgesOneEdge() {
     Graph g = new Graph();
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     Vertex b = StreetModelForTest.intersectionVertex("B", 6, 6);
@@ -70,7 +69,7 @@ public class GraphTest {
   }
 
   @Test
-  public void testGetEdgesMultiple() {
+  void testGetEdgesMultiple() {
     Graph g = new Graph();
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     Vertex b = StreetModelForTest.intersectionVertex("B", 6, 6);
@@ -92,7 +91,7 @@ public class GraphTest {
   }
 
   @Test
-  public void testGetStreetEdgesNone() {
+  void testGetStreetEdgesNone() {
     Graph g = new Graph();
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     Vertex b = StreetModelForTest.intersectionVertex("B", 6, 6);
@@ -109,7 +108,7 @@ public class GraphTest {
   }
 
   @Test
-  public void testGetStreetEdgesSeveral() {
+  void testGetStreetEdgesSeveral() {
     Graph g = new Graph();
     StreetVertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     StreetVertex b = StreetModelForTest.intersectionVertex("B", 6, 6);
@@ -131,7 +130,7 @@ public class GraphTest {
   }
 
   @Test
-  public void testGetEdgesAndVerticesById() {
+  void testGetEdgesAndVerticesById() {
     StreetVertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
     StreetVertex b = StreetModelForTest.intersectionVertex("B", 6, 6);
     StreetVertex c = StreetModelForTest.intersectionVertex("C", 3, 2);
