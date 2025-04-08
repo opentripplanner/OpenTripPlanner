@@ -21,6 +21,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix crash on itineraries with frequencies where distanceMeters was not computed [#6580](https://github.com/opentripplanner/OpenTripPlanner/pull/6580)
 - Remove REST API [#6578](https://github.com/opentripplanner/OpenTripPlanner/pull/6578)
 - Don't use bicycle as street routing mode when car or scooter rental is requested [#6599](https://github.com/opentripplanner/OpenTripPlanner/pull/6599)
+- Updating SIRI objects used to SIRI 2.1 [#6573](https://github.com/opentripplanner/OpenTripPlanner/pull/6573)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
