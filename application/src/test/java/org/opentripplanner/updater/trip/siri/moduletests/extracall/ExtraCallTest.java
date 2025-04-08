@@ -10,7 +10,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 class ExtraCallTest implements RealtimeTestConstants {
 

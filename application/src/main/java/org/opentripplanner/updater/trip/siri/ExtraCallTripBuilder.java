@@ -29,8 +29,8 @@ import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.OccupancyEnumeration;
 
 class ExtraCallTripBuilder {
 

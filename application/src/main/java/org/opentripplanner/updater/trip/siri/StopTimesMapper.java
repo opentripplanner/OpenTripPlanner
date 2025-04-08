@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri21.NaturalLanguageStringStructure;
 
 class StopTimesMapper {
 
