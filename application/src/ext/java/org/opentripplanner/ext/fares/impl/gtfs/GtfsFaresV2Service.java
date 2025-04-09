@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -32,17 +31,13 @@ public final class GtfsFaresV2Service implements Serializable {
   public ProductResult calculateFareProducts(Itinerary itinerary) {
     var transitLegs = itinerary.listScheduledTransitLegs();
 
-    var allLegProducts = new HashSet<LegProducts>();
+    var allLegProducts = new HashSet<FareProductMatch>();
     for (int i = 0; i < transitLegs.size(); i++) {
       var leg = transitLegs.get(i);
-      var nextIndex = i + 1;
+      var previousIndex = legAtIndex(i - 1, transitLegs);
+      var nextLeg = legAtIndex(i + 1, transitLegs);
 
-      Optional<ScheduledTransitLeg> nextLeg = Optional.empty();
-      if (nextIndex < transitLegs.size()) {
-        nextLeg = Optional.of(transitLegs.get(nextIndex));
-      }
-
-      var lp = getLegProduct(leg, nextLeg);
+      var lp = getLegProduct(leg, previousIndex, nextLeg);
       allLegProducts.add(lp);
     }
 
@@ -51,24 +46,35 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary, allLegProducts);
   }
 
+  private static Optional<ScheduledTransitLeg> legAtIndex(
+    int index,
+    List<ScheduledTransitLeg> transitLegs
+  ) {
+    if (index >= 0 && index < transitLegs.size()) {
+      return Optional.of(transitLegs.get(index));
+    } else {
+      return Optional.empty();
+    }
+  }
+
   private Set<FareProduct> productsCoveringItinerary(
     Itinerary itinerary,
-    Collection<LegProducts> legProducts
+    Collection<FareProductMatch> legProducts
   ) {
     var distinctProductWithTransferSets = legProducts
       .stream()
-      .map(LegProducts::products)
+      .map(FareProductMatch::products)
       .collect(Collectors.toSet());
 
     return distinctProductWithTransferSets
       .stream()
       .flatMap(p -> p.stream().filter(ps -> coversItinerary(itinerary, ps)))
-      .map(LegProducts.ProductWithTransfer::legRule)
+      .map(FareProductMatch.ProductWithTransfer::legRule)
       .flatMap(r -> r.fareProducts().stream())
       .collect(Collectors.toSet());
   }
 
-  private boolean coversItinerary(Itinerary i, LegProducts.ProductWithTransfer pwt) {
+  private boolean coversItinerary(Itinerary i, FareProductMatch.ProductWithTransfer pwt) {
     var transitLegs = i.listScheduledTransitLegs();
     var allLegsInProductFeed = transitLegs
       .stream()
@@ -89,7 +95,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
   private boolean coversItineraryWithFreeTransfers(
     Itinerary i,
-    LegProducts.ProductWithTransfer pwt
+    FareProductMatch.ProductWithTransfer pwt
   ) {
     var feedIdsInItinerary = i
       .listScheduledTransitLegs()
@@ -103,31 +109,30 @@ public final class GtfsFaresV2Service implements Serializable {
     );
   }
 
-  private LegProducts getLegProduct(
+  private FareProductMatch getLegProduct(
     ScheduledTransitLeg leg,
+    Optional<ScheduledTransitLeg> previousLeg,
     Optional<ScheduledTransitLeg> nextLeg
   ) {
-    var legRules = lookup.legRules(leg);
+    var products = lookup.productsWithTransfer(leg, nextLeg);
 
-    final var products = lookup.getProductWithTransfers(leg, nextLeg, legRules);
+    var transferFromPrevious = previousLeg
+      .map(previous -> lookup.transfersFromPreviousLeg(previous, leg))
+      .orElse(Set.of());
 
-    return new LegProducts(leg, nextLeg, products);
+    return new FareProductMatch(leg, products, transferFromPrevious);
   }
 
   /**
    * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
    * @param legProducts       The fare products that cover only individual legs.
    */
-  record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
-    public Set<FareProduct> getProducts(Leg leg) {
+  record ProductResult(Set<FareProduct> itineraryProducts, Set<FareProductMatch> legProducts) {
+    public Optional<FareProductMatch> match(Leg leg) {
       return legProducts
         .stream()
         .filter(lp -> lp.leg().equals(leg))
-        .findFirst()
-        .map(l ->
-          l.products().stream().flatMap(lp -> lp.products().stream()).collect(Collectors.toSet())
-        )
-        .orElse(Set.of());
+        .findFirst();
     }
   }
 }

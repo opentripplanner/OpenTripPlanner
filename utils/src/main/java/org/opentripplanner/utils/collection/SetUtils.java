@@ -12,6 +12,6 @@ public class SetUtils {
    */
   @SafeVarargs
   public static <T> Set<T> combine(Collection<T>... colls) {
-    return Arrays.stream(colls).flatMap(Collection::stream).collect(Collectors.toSet());
+    return Arrays.stream(colls).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet());
   }
 }

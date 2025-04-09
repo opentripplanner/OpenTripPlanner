@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.groupOfRoutes;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.impl.gtfs.FareProductMatch.Transfer;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareProduct;
@@ -56,10 +58,12 @@ class TransferTest implements PlanTestConstants {
     var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B).bus(ROUTE_2, 2, 21, 40, C).build();
     var result = SERVICE.calculateFareProducts(i1);
 
-    var leg1Products = result.getProducts(i1.firstLeg());
-    var leg2Products = result.getProducts(i1.lastLeg());
+    var leg1Products = result.match(i1.firstLeg()).get().fareProducts();
     assertEquals(Set.of(REGULAR), leg1Products);
-    assertEquals(Set.of(TRANSFER), leg2Products);
+
+    var leg2match= result.match(i1.lastLeg()).get();
+    assertThat(leg2match.transfersFromPreviousLeg()).containsExactly(new Transfer(TRANSFER));
+    assertThat(leg2match.fareProducts()).containsExactly(REGULAR);
   }
 
   private static Route route(String id) {

@@ -30,4 +30,8 @@ public record FareTransferRule(
   public boolean isFree() {
     return fareProducts.isEmpty() || fareProducts.stream().anyMatch(p -> p.price().isZero());
   }
+
+  public boolean containsWildCard() {
+    return fromLegGroup == null || toLegGroup == null;
+  }
 }

@@ -174,11 +174,11 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     assertEquals(0, result.itineraryProducts().size());
 
     var localLeg = i1.legs().get(1);
-    var localLegProducts = result.getProducts(localLeg);
+    var localLegProducts = result.match(localLeg).get().fareProducts();
     assertEquals(Set.of(localPass), localLegProducts);
 
     var expressLeg = i1.legs().get(2);
-    var expressProducts = result.getProducts(expressLeg);
+    var expressProducts = result.match(expressLeg).get().fareProducts();
     assertEquals(Set.of(expressPass), expressProducts);
   }
 
@@ -382,7 +382,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
           Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
         )
       );
-      assertEquals(faresV2Service.calculateFareProducts(i1).itineraryProducts(), Set.of(twelveStopProduct));
+      assertEquals(
+        faresV2Service.calculateFareProducts(i1).itineraryProducts(),
+        Set.of(twelveStopProduct)
+      );
     }
 
     @Test
@@ -400,7 +403,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
           Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
         )
       );
-      assertEquals(faresV2Service.calculateFareProducts(i1).itineraryProducts(), Set.of(threeKmProduct));
+      assertEquals(
+        faresV2Service.calculateFareProducts(i1).itineraryProducts(),
+        Set.of(threeKmProduct)
+      );
     }
   }
 }

@@ -2,7 +2,6 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import java.util.Collection;
 import java.util.Objects;
-import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.fares.FareService;
@@ -22,12 +21,12 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
   /**
    * Add a complex set of fare products for a specific leg;
    */
-  private static void addLegProducts(Collection<LegProducts> legProducts, ItineraryFare fares) {
+  private static void addLegProducts(Collection<FareProductMatch> legProducts, ItineraryFare fares) {
     legProducts.forEach(lp -> {
       lp
         .products()
         .stream()
-        .map(LegProducts.ProductWithTransfer::products)
+        .map(FareProductMatch.ProductWithTransfer::products)
         .forEach(fp -> {
           fares.addFareProduct(lp.leg(), fp);
         });

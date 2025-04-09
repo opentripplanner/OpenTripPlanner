@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -33,7 +32,7 @@ class FareLookupService implements Serializable {
   private final Set<FeedScopedId> fromAreasWithRules;
   private final Set<FeedScopedId> toAreasWithRules;
 
-  public FareLookupService(
+  FareLookupService(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
     Multimap<FeedScopedId, FeedScopedId> stopAreas
@@ -46,7 +45,22 @@ class FareLookupService implements Serializable {
     this.stopAreas = stopAreas;
   }
 
-  public Set<FareLegRule> legRules(ScheduledTransitLeg leg) {
+  Set<FareProductMatch.Transfer> transfersFromPreviousLeg(
+    ScheduledTransitLeg previous,
+    ScheduledTransitLeg current
+  ) {
+    var previousLegRules = legRuleIds(previous);
+    var currentLegRules = legRuleIds(current);
+    return transferRules
+      .stream()
+      .filter(FareLookupService::checkForWildcards)
+      .filter(f -> previousLegRules.contains(f.fromLegGroup()))
+      .filter(f -> currentLegRules.contains(f.toLegGroup()))
+      .flatMap(r -> r.fareProducts().stream().map(FareProductMatch.Transfer::new))
+      .collect(Collectors.toUnmodifiableSet());
+  }
+
+  Set<FareLegRule> legRules(ScheduledTransitLeg leg) {
     return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
   }
 
@@ -64,44 +78,54 @@ class FareLookupService implements Serializable {
     );
   }
 
-  Set<LegProducts.ProductWithTransfer> getProductWithTransfers(
+  Set<FareProductMatch.ProductWithTransfer> productsWithTransfer(
     ScheduledTransitLeg leg,
-    Optional<ScheduledTransitLeg> nextLeg,
-    Set<FareLegRule> legRules
+    Optional<ScheduledTransitLeg> nextLeg
   ) {
-    var transferRulesForLeg = transferRules
-      .stream()
-      .filter(t -> t.feedId().equals(leg.getAgency().getId().getFeedId()))
-      .toList();
+    var legRules = legRules(leg);
 
     return legRules
       .stream()
       .map(rule -> {
-        var transferRulesToNextLeg = transferRulesForLeg
-          .stream()
-          .filter(FareLookupService::checkForWildcards)
-          .filter(t -> t.fromLegGroup().equals(rule.legGroupId()))
-          .filter(t -> transferRuleMatchesNextLeg(nextLeg, t))
-          .toList();
-        return new LegProducts.ProductWithTransfer(rule, transferRulesToNextLeg);
+        var transferRulesToNextLeg = transferRulesToNextLeg(nextLeg, rule);
+        return new FareProductMatch.ProductWithTransfer(rule, transferRulesToNextLeg);
       })
       .collect(Collectors.toSet());
   }
 
+  private List<FareTransferRule> transferRulesToNextLeg(
+    Optional<ScheduledTransitLeg> nextLeg,
+    FareLegRule rule
+  ) {
+    return transferRules
+      .stream()
+      .filter(FareLookupService::checkForWildcards)
+      .filter(t -> t.fromLegGroup().equals(rule.legGroupId()))
+      .filter(t -> transferRuleMatchesNextLeg(nextLeg, t))
+      .toList();
+  }
+
+  private Set<FeedScopedId> legRuleIds(ScheduledTransitLeg current) {
+    return legRules(current)
+      .stream()
+      .map(FareLegRule::legGroupId)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toUnmodifiableSet());
+  }
+
   private static boolean checkForWildcards(FareTransferRule t) {
-    if (Objects.isNull(t.fromLegGroup()) || Objects.isNull(t.toLegGroup())) {
-      LOG.error(
+    if (t.containsWildCard()) {
+      LOG.warn(
         "Transfer rule {} contains a wildcard leg group reference. These are not supported yet.",
         t
       );
       return false;
-    } else return true;
+    } else {
+      return true;
+    }
   }
 
-  public boolean transferRuleMatchesNextLeg(
-    Optional<ScheduledTransitLeg> nextLeg,
-    FareTransferRule t
-  ) {
+  boolean transferRuleMatchesNextLeg(Optional<ScheduledTransitLeg> nextLeg, FareTransferRule t) {
     return nextLeg
       .map(nLeg -> {
         var maybeFareRule = getFareLegRuleByGroupId(t.toLegGroup());
