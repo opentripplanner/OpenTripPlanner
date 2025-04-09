@@ -91,4 +91,15 @@ public class ListUtils {
     }
     return list;
   }
+
+  public static <T> List<List<T>> splitIntoOverlappingPairs(List<T> input) {
+    var output = new ArrayList<List<T>>(input.size());
+    for (int i = 0; i < input.size() - 1; i++) {
+      T first = input.get(i);
+      T second = input.get(i + 1);
+      output.add(List.of(first, second));
+    }
+
+    return output;
+  }
 }

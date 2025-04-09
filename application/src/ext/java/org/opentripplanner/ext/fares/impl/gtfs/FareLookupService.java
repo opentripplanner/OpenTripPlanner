@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

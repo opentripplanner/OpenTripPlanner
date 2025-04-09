@@ -11,7 +11,7 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
   @Override
   public ItineraryFare calculateFares(Itinerary itinerary) {
     var fare = ItineraryFare.empty();
-    if(faresV2.isEmpty()){
+    if (faresV2.isEmpty()) {
       fare = Objects.requireNonNullElse(faresV1.calculateFares(itinerary), ItineraryFare.empty());
     } else {
       var products = faresV2.calculateFareProducts(itinerary);

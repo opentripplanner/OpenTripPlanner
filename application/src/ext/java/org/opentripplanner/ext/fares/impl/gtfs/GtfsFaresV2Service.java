@@ -15,6 +15,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public final class GtfsFaresV2Service implements Serializable {
 
@@ -104,16 +105,16 @@ public final class GtfsFaresV2Service implements Serializable {
     Itinerary i,
     FareProductMatch.ProductWithTransfer pwt
   ) {
-    var feedIdsInItinerary = i
-      .listScheduledTransitLegs()
+    return ListUtils.splitIntoOverlappingPairs(i.listScheduledTransitLegs())
       .stream()
-      .map(l -> l.getAgency().getId().getFeedId())
-      .collect(Collectors.toSet());
-
-    return (
-      feedIdsInItinerary.size() == 1 &&
-      pwt.transferRules().stream().anyMatch(FareTransferRule::isFree)
-    );
+      .allMatch(legs -> {
+        var transfers = lookup.transfersFromPreviousLeg(legs.getFirst(), legs.getLast());
+        return transfers
+          .stream()
+          .flatMap(t -> t.requirements().stream())
+          .collect(Collectors.toSet())
+          .containsAll(pwt.products());
+      });
   }
 
   private FareProductMatch getLegProduct(
