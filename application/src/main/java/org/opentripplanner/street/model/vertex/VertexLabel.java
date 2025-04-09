@@ -47,6 +47,15 @@ public sealed interface VertexLabel {
     }
   }
 
+  record SubsidiaryOsmNodeLabel(long nodeId, int counter) implements VertexLabel {
+    private static final String TEMPLATE = "osm:node:%s:%s";
+
+    @Override
+    public String toString() {
+      return TEMPLATE.formatted(nodeId, counter);
+    }
+  }
+
   /**
    * A vertex label for an OSM node that also has a level, for example the upper and lower
    * vertices of an elevator edge.

@@ -185,6 +185,8 @@ public class GraphBuilder implements Runnable {
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
+    graphBuilder.addModule(factory.turnRestrictionModule());
+
     return graphBuilder;
   }
 
