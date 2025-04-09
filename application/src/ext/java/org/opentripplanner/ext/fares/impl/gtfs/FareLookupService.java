@@ -45,6 +45,10 @@ class FareLookupService implements Serializable {
     this.stopAreas = stopAreas;
   }
 
+  boolean isEmpty() {
+    return legRules.isEmpty() && transferRules.isEmpty();
+  }
+
   Set<FareProductMatch.Transfer> transfersFromPreviousLeg(
     ScheduledTransitLeg previous,
     ScheduledTransitLeg current

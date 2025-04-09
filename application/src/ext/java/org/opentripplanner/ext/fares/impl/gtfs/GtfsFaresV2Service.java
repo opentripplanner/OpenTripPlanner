@@ -46,6 +46,13 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary, allLegProducts);
   }
 
+  /**
+   * Returns false if this services contains any Fares V2 data, true otherwise.
+   */
+  boolean isEmpty() {
+    return lookup.isEmpty();
+  }
+
   private static Optional<ScheduledTransitLeg> legAtIndex(
     int index,
     List<ScheduledTransitLeg> transitLegs
