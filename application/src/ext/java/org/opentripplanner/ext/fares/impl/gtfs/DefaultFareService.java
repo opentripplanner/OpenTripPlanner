@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.fares.impl.HSLFareService;
+import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareService;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
@@ -59,9 +61,6 @@ class FareSearch {
     Arrays.fill(endOfComponent, -1);
   }
 }
-
-/** Holds fare and corresponding fareId */
-record FareAndId(Money fare, FeedScopedId fareId) {}
 
 /**
  * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute

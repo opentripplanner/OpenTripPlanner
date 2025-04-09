@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl._support;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.OTHER_FEED_AGENCY;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -29,56 +29,56 @@ public class FareModelForTest {
 
   private static final SiteRepositoryBuilder SITE_REPOSITORY_BUILDER = SiteRepository.of();
 
-  static final RegularStop AIRPORT_STOP = SITE_REPOSITORY_BUILDER.regularStop(id("airport"))
+  public static final RegularStop AIRPORT_STOP = SITE_REPOSITORY_BUILDER.regularStop(id("airport"))
     .withCoordinate(new WgsCoordinate(1, 1))
     .addFareZones(AIRPORT_ZONE)
     .withName(I18NString.of("Airport"))
     .build();
 
-  static final RegularStop CITY_CENTER_A_STOP = SITE_REPOSITORY_BUILDER.regularStop(
+  public static final RegularStop CITY_CENTER_A_STOP = SITE_REPOSITORY_BUILDER.regularStop(
     id("city-center-a")
   )
     .withCoordinate(new WgsCoordinate(1, 2))
     .addFareZones(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop A"))
     .build();
-  static final RegularStop CITY_CENTER_B_STOP = SITE_REPOSITORY_BUILDER.regularStop(
+  public static final RegularStop CITY_CENTER_B_STOP = SITE_REPOSITORY_BUILDER.regularStop(
     id("city-center-b")
   )
     .withCoordinate(new WgsCoordinate(1, 3))
     .addFareZones(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop B"))
     .build();
-  static final RegularStop CITY_CENTER_C_STOP = SITE_REPOSITORY_BUILDER.regularStop(
+  public static final RegularStop CITY_CENTER_C_STOP = SITE_REPOSITORY_BUILDER.regularStop(
     id("city-center-c")
   )
     .withCoordinate(new WgsCoordinate(1, 4))
     .addFareZones(CITY_CENTER_ZONE)
     .withName(I18NString.of("City center: stop C"))
     .build();
-  static final RegularStop SUBURB_STOP = SITE_REPOSITORY_BUILDER.regularStop(id("suburb"))
+  public static final RegularStop SUBURB_STOP = SITE_REPOSITORY_BUILDER.regularStop(id("suburb"))
     .withCoordinate(new WgsCoordinate(1, 4))
     .withName(I18NString.of("Suburb"))
     .build();
 
-  static final RegularStop OTHER_FEED_STOP = SITE_REPOSITORY_BUILDER.regularStop(
+  public static final RegularStop OTHER_FEED_STOP = SITE_REPOSITORY_BUILDER.regularStop(
     FeedScopedId.ofNullable("F2", "other-feed-stop")
   )
     .withCoordinate(new WgsCoordinate(1, 5))
     .withName(I18NString.of("Other feed stop"))
     .addFareZones(OTHER_FEED_ZONE)
     .build();
-  static final FareAttribute TEN_DOLLARS = FareAttribute.of(id("airport-to-city-center"))
+  public static final FareAttribute TEN_DOLLARS = FareAttribute.of(id("airport-to-city-center"))
     .setPrice(Money.usDollars(10))
     .setTransfers(0)
     .build();
 
-  static final FareAttribute FREE_TRANSFERS = FareAttribute.of(id("free-transfers"))
+  public static final FareAttribute FREE_TRANSFERS = FareAttribute.of(id("free-transfers"))
     .setPrice(Money.usDollars(20))
     .setTransfers(10)
     .build();
 
-  static final FareAttribute OTHER_FEED_ATTRIBUTE = FareAttribute.of(
+  public static final FareAttribute OTHER_FEED_ATTRIBUTE = FareAttribute.of(
     FeedScopedId.ofNullable("F2", "other-feed-attribute")
   )
     .setPrice(Money.usDollars(10))
@@ -96,11 +96,11 @@ public class FareModelForTest {
   );
 
   // Fare rule sets
-  static FareRuleSet AIRPORT_TO_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);
-  static FareRuleSet INSIDE_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);
-  static FareRuleSet FREE_TRANSFERS_IN_CITY_SET = new FareRuleSet(FREE_TRANSFERS);
+  public static FareRuleSet AIRPORT_TO_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);
+  public static FareRuleSet INSIDE_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);
+  public static FareRuleSet FREE_TRANSFERS_IN_CITY_SET = new FareRuleSet(FREE_TRANSFERS);
 
-  static FareRuleSet OTHER_FEED_SET = new FareRuleSet(OTHER_FEED_ATTRIBUTE);
+  public static FareRuleSet OTHER_FEED_SET = new FareRuleSet(OTHER_FEED_ATTRIBUTE);
 
   static {
     AIRPORT_TO_CITY_CENTER_SET.addOriginDestination(
@@ -121,7 +121,7 @@ public class FareModelForTest {
     );
   }
 
-  static Route OTHER_FEED_ROUTE = Route.of(new FeedScopedId("F2", "other-feed-route"))
+  public static Route OTHER_FEED_ROUTE = Route.of(new FeedScopedId("F2", "other-feed-route"))
     .withAgency(OTHER_FEED_AGENCY)
     .withLongName(I18NString.of("other-feed-route"))
     .withMode(TransitMode.BUS)

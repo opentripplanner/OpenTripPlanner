@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;

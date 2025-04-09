@@ -1,14 +1,14 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode.ALWAYS;
-import static org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_B_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.AIRPORT_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_A_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_B_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl.gtfs.CombinedInterlinedLegsFareService.CombinationMode.ALWAYS;
+import static org.opentripplanner.ext.fares.impl.gtfs.CombinedInterlinedLegsFareService.CombinationMode.SAME_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
+import org.opentripplanner.ext.fares.impl.gtfs.CombinedInterlinedLegsFareService.CombinationMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;

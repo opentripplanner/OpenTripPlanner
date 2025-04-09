@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.FARE_PRODUCT_USE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.FARE_PRODUCT_USE;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_C;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;

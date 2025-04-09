@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import java.util.Collection;
 import java.util.Objects;

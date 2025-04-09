@@ -1,19 +1,19 @@
-package org.opentripplanner.ext.fares.impl;
+package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_B_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_C_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.FREE_TRANSFERS_IN_CITY_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CENTER_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ATTRIBUTE;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ROUTE;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_SET;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_STOP;
-import static org.opentripplanner.ext.fares.impl.FareModelForTest.SUBURB_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.AIRPORT_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_A_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_B_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.CITY_CENTER_C_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.FREE_TRANSFERS_IN_CITY_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_ATTRIBUTE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_ROUTE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_SET;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.OTHER_FEED_STOP;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.SUBURB_STOP;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;

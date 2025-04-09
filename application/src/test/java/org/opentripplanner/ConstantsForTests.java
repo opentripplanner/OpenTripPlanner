@@ -12,7 +12,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;

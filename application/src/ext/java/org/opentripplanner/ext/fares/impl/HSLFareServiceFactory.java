@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.impl;
 
 import java.util.Collection;
 import java.util.Map;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareServiceFactory;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRule;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
