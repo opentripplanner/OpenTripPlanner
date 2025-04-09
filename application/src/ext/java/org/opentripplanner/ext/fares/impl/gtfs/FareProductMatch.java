@@ -15,10 +15,10 @@ record FareProductMatch(
   Set<Transfer> transfersFromPreviousLeg
 ) {
   public Set<FareProduct> fareProducts() {
-      return products
-        .stream()
-        .flatMap(lp -> lp.products().stream())
-        .collect(Collectors.toUnmodifiableSet());
+    return products
+      .stream()
+      .flatMap(lp -> lp.products().stream())
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   public record ProductWithTransfer(FareLegRule legRule, List<FareTransferRule> transferRules) {

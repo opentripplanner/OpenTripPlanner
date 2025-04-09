@@ -104,7 +104,6 @@ public class DefaultFareService implements FareService {
       .legs()
       .stream()
       .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
-      .map(Leg.class::cast)
       .toList();
 
     fareLegs = combineInterlinedLegs(fareLegs);

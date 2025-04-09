@@ -61,7 +61,7 @@ class TransferTest implements PlanTestConstants {
     var leg1Products = result.match(i1.firstLeg()).get().fareProducts();
     assertEquals(Set.of(REGULAR), leg1Products);
 
-    var leg2match= result.match(i1.lastLeg()).get();
+    var leg2match = result.match(i1.lastLeg()).get();
     assertThat(leg2match.transfersFromPreviousLeg()).containsExactly(new Transfer(TRANSFER));
     assertThat(leg2match.fareProducts()).containsExactly(REGULAR);
   }

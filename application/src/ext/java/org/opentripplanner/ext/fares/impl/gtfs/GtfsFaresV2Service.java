@@ -129,10 +129,7 @@ public final class GtfsFaresV2Service implements Serializable {
    */
   record ProductResult(Set<FareProduct> itineraryProducts, Set<FareProductMatch> legProducts) {
     public Optional<FareProductMatch> match(Leg leg) {
-      return legProducts
-        .stream()
-        .filter(lp -> lp.leg().equals(leg))
-        .findFirst();
+      return legProducts.stream().filter(lp -> lp.leg().equals(leg)).findFirst();
     }
   }
 }
