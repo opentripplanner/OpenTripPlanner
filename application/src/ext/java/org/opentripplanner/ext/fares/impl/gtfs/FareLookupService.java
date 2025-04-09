@@ -38,7 +38,7 @@ class FareLookupService implements Serializable {
     Multimap<FeedScopedId, FeedScopedId> stopAreas
   ) {
     this.legRules = legRules;
-    this.transferRules = fareTransferRules;
+    this.transferRules = stripWildcards(fareTransferRules);
     this.networksWithRules = findNetworksWithRules(legRules);
     this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
     this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
@@ -53,10 +53,18 @@ class FareLookupService implements Serializable {
     var currentLegRules = legRuleIds(current);
     return transferRules
       .stream()
-      .filter(FareLookupService::checkForWildcards)
       .filter(f -> previousLegRules.contains(f.fromLegGroup()))
       .filter(f -> currentLegRules.contains(f.toLegGroup()))
-      .flatMap(r -> r.fareProducts().stream().map(FareProductMatch.Transfer::new))
+      .flatMap(f -> {
+        var requiredProducts = findFareLegRule(f.fromLegGroup())
+          .stream()
+          .flatMap(fr -> fr.fareProducts().stream())
+          .toList();
+        return f
+          .fareProducts()
+          .stream()
+          .map(transferProduct -> new FareProductMatch.Transfer(transferProduct, requiredProducts));
+      })
       .collect(Collectors.toUnmodifiableSet());
   }
 
@@ -99,10 +107,17 @@ class FareLookupService implements Serializable {
   ) {
     return transferRules
       .stream()
-      .filter(FareLookupService::checkForWildcards)
       .filter(t -> t.fromLegGroup().equals(rule.legGroupId()))
       .filter(t -> transferRuleMatchesNextLeg(nextLeg, t))
       .toList();
+  }
+
+  private Optional<FareLegRule> findFareLegRule(FeedScopedId id) {
+    return legRules.stream().filter(r -> r.legGroupId().equals(id)).findFirst();
+  }
+
+  private static List<FareTransferRule> stripWildcards(Collection<FareTransferRule> rules) {
+    return rules.stream().filter(FareLookupService::checkForWildcards).toList();
   }
 
   private Set<FeedScopedId> legRuleIds(ScheduledTransitLeg current) {

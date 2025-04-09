@@ -27,5 +27,5 @@ record FareProductMatch(
     }
   }
 
-  public record Transfer(FareProduct product) {}
+  public record Transfer(FareProduct product, Collection<FareProduct> requirements) {}
 }
