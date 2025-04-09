@@ -139,7 +139,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   void singleLeg() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
-    var result = service.getProducts(i1);
+    var result = service.calculateFareProducts(i1);
     assertEquals(Set.of(dayPass, single), result.itineraryProducts());
   }
 
@@ -147,7 +147,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   void twoLegs() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
-    var result = service.getProducts(i1);
+    var result = service.calculateFareProducts(i1);
     assertEquals(Set.of(dayPass), result.itineraryProducts());
   }
 
@@ -155,7 +155,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   void networkId() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
-    var result = service.getProducts(i1);
+    var result = service.calculateFareProducts(i1);
     assertEquals(Set.of(expressPass), result.itineraryProducts());
   }
 
@@ -170,7 +170,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .faresV2Rail(ID, 60, 100, C, expressNetwork)
       .build();
 
-    var result = service.getProducts(i1);
+    var result = service.calculateFareProducts(i1);
     assertEquals(0, result.itineraryProducts().size());
 
     var localLeg = i1.legs().get(1);
@@ -192,7 +192,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
         .build();
 
-      var result = service.getProducts(i1);
+      var result = service.calculateFareProducts(i1);
       assertEquals(Set.of(innerToOuterZoneSingle), result.itineraryProducts());
     }
 
@@ -203,7 +203,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
         .build();
 
-      var result = service.getProducts(i1);
+      var result = service.calculateFareProducts(i1);
       assertEquals(Set.of(singleToOuter), result.itineraryProducts());
     }
 
@@ -214,7 +214,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, B, null)
         .build();
 
-      var result = service.getProducts(i1);
+      var result = service.calculateFareProducts(i1);
       assertEquals(Set.of(singleFromOuter), result.itineraryProducts());
     }
   }
@@ -268,7 +268,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     @Test
     void freeTransferInSameGroup() {
       var i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
-      var result = service.getProducts(i1);
+      var result = service.calculateFareProducts(i1);
       assertEquals(Set.of(freeTransferSingle), result.itineraryProducts());
     }
 
@@ -280,7 +280,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .walk(53, OUTER_ZONE_STOP)
         .bus(ID, 55, 70, OUTER_ZONE_STOP)
         .build();
-      var result = service.getProducts(i1);
+      var result = service.calculateFareProducts(i1);
       assertEquals(Set.of(freeTransferFromInnerToOuter), result.itineraryProducts());
     }
   }
@@ -382,7 +382,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
           Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
         )
       );
-      assertEquals(faresV2Service.getProducts(i1).itineraryProducts(), Set.of(twelveStopProduct));
+      assertEquals(faresV2Service.calculateFareProducts(i1).itineraryProducts(), Set.of(twelveStopProduct));
     }
 
     @Test
@@ -400,7 +400,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
           Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
         )
       );
-      assertEquals(faresV2Service.getProducts(i1).itineraryProducts(), Set.of(threeKmProduct));
+      assertEquals(faresV2Service.calculateFareProducts(i1).itineraryProducts(), Set.of(threeKmProduct));
     }
   }
 }

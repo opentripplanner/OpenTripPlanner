@@ -54,7 +54,7 @@ class TransferTest implements PlanTestConstants {
   @Test
   void transfer() {
     var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B).bus(ROUTE_2, 2, 21, 40, C).build();
-    var result = SERVICE.getProducts(i1);
+    var result = SERVICE.calculateFareProducts(i1);
 
     var leg1Products = result.getProducts(i1.firstLeg());
     var leg2Products = result.getProducts(i1.lastLeg());

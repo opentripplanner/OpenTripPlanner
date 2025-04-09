@@ -16,8 +16,6 @@ import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.ext.fares.model.LegProducts;
-import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -25,7 +23,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class FareLookupService implements Serializable {
+class FareLookupService implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
@@ -52,22 +50,7 @@ public final class FareLookupService implements Serializable {
     return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
   }
 
-  private static Set<FeedScopedId> findAreasWithRules(
-    List<FareLegRule> legRules,
-    Function<FareLegRule, FeedScopedId> getArea
-  ) {
-    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
-  }
-
-  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
-    return legRules
-      .stream()
-      .map(FareLegRule::networkId)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toSet());
-  }
-
-  public boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
+  boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
       leg.getAgency().getId().getFeedId().equals(rule.feedId()) &&
@@ -81,7 +64,7 @@ public final class FareLookupService implements Serializable {
     );
   }
 
-  public Set<LegProducts.ProductWithTransfer> getProductWithTransfers(
+  Set<LegProducts.ProductWithTransfer> getProductWithTransfers(
     ScheduledTransitLeg leg,
     Optional<ScheduledTransitLeg> nextLeg,
     Set<FareLegRule> legRules
@@ -163,6 +146,21 @@ public final class FareLookupService implements Serializable {
     );
   }
 
+  private static Set<FeedScopedId> findAreasWithRules(
+    List<FareLegRule> legRules,
+    Function<FareLegRule, FeedScopedId> getArea
+  ) {
+    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
+  }
+
+  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
+    return legRules
+      .stream()
+      .map(FareLegRule::networkId)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toSet());
+  }
+
   private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
 
@@ -177,22 +175,5 @@ public final class FareLookupService implements Serializable {
 
       return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
-  }
-
-  /**
-   * @param itineraryProducts The fare products that cover the entire itinerary, like a daily pass.
-   * @param legProducts       The fare products that cover only individual legs.
-   */
-  record ProductResult(Set<FareProduct> itineraryProducts, Set<LegProducts> legProducts) {
-    public Set<FareProduct> getProducts(Leg leg) {
-      return legProducts
-        .stream()
-        .filter(lp -> lp.leg().equals(leg))
-        .findFirst()
-        .map(l ->
-          l.products().stream().flatMap(lp -> lp.products().stream()).collect(Collectors.toSet())
-        )
-        .orElse(Set.of());
-    }
   }
 }

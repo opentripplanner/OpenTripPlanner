@@ -29,7 +29,7 @@ public final class GtfsFaresV2Service implements Serializable {
     this.lookup = new FareLookupService(legRules, fareTransferRules, stopAreas);
   }
 
-  public ProductResult getProducts(Itinerary itinerary) {
+  public ProductResult calculateFareProducts(Itinerary itinerary) {
     var transitLegs = itinerary.listScheduledTransitLegs();
 
     var allLegProducts = new HashSet<LegProducts>();
