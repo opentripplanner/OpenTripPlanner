@@ -38,6 +38,11 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     }
   }
 
+  boolean isCorrespondingVertex(Vertex a, Vertex b) {
+    if (a == b) return true;
+    return getMainVertex(a) == getMainVertex(b);
+  }
+
   boolean isCorrespondingEdge(StreetEdge a, StreetEdge b) {
     if (a == b) return true;
     Vertex aTo = getMainVertex(a.getToVertex());
@@ -47,12 +52,10 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     return aTo == bTo || aFrom == bFrom;
   }
 
-  StreetEdge getCorrespondingEdge(StreetEdge edge, Collection<Edge> edges) {
-    for (Edge e : edges) {
-      if (e instanceof StreetEdge streetEdge) {
-        if (isCorrespondingEdge(streetEdge, edge)) {
-          return streetEdge;
-        }
+  StreetEdge getFromCorrespondingEdge(StreetEdge edge, Collection<StreetEdge> edges) {
+    for (var e : edges) {
+      if (isCorrespondingVertex(e.getFromVertex(), edge.getFromVertex())) {
+        return e;
       }
     }
     throw new IllegalStateException(
@@ -66,10 +69,13 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     graph.addVertex(splitVertex);
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
-    var fromEdge = getCorrespondingEdge(turnRestriction.from, vertex.getIncoming());
-    var toEdge = getCorrespondingEdge(turnRestriction.to, vertex.getOutgoing());
+    var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex.getIncomingStreetEdges());
     fromEdge.toBuilder().withToVertex(splitVertex).buildAndConnect();
-    toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+    for (var toEdge : vertex.getOutgoingStreetEdges()) {
+      if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+        toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+      }
+    }
   }
 
   void processRestriction(TurnRestriction turnRestriction) {
