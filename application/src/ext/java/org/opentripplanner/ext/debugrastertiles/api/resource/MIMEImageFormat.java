@@ -1,10 +1,10 @@
-package org.opentripplanner.api.parameter;
+package org.opentripplanner.ext.debugrastertiles.api.resource;
 
 import jakarta.ws.rs.BadRequestException;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class MIMEImageFormat {
+class MIMEImageFormat {
 
   public static final Collection<String> acceptedTypes = Arrays.asList(
     "png",
