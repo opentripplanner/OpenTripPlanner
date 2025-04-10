@@ -150,6 +150,8 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(it);
     }
 
+    graphBuilder.addModule(factory.turnRestrictionModule());
+
     if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       if (OTPFeature.FlexRouting.isOn()) {
@@ -184,8 +186,6 @@ public class GraphBuilder implements Runnable {
     }
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
-
-    graphBuilder.addModule(factory.turnRestrictionModule());
 
     return graphBuilder;
   }
