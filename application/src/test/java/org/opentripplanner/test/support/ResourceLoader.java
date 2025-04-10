@@ -11,6 +11,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
+import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.FileDataSourceRepository;
 
 /**
  * Loads files from the resources folder relative to the package name of the class/instances
@@ -39,6 +42,14 @@ public class ResourceLoader {
    */
   public static ResourceLoader of(Object object) {
     return new ResourceLoader(object.getClass());
+  }
+
+  /**
+   * Return a composite datasource (directory or zip) in the resource catalog. The given
+   * {@code relativePath} should be a directory in the "package" catalog.
+   */
+  public CompositeDataSource catalogDataSource(String relativePath, FileType fileType) {
+    return FileDataSourceRepository.compositeSource(file(relativePath), fileType);
   }
 
   /**

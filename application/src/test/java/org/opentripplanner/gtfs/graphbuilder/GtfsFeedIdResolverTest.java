@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.gtfs.graphbuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,7 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class GtfsFeedIdTest {
+class GtfsFeedIdResolverTest {
 
   private static final String NUMBERS_ONLY_REGEX = "^\\d+$";
 
@@ -36,7 +36,7 @@ class GtfsFeedIdTest {
   }
 
   private static String feedId(String input) {
-    var id = new GtfsFeedId.Builder().id(input).build().getId();
+    var id = GtfsFeedIdResolver.normalizeId(input);
     assertNotNull(id);
     return id;
   }

@@ -1,26 +1,16 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.internal;
 
-import jakarta.inject.Inject;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-/**
- * Container for emissions data.
- */
-public class EmissionsDataModel implements Serializable {
+public class DefaultEmissionsRepository implements EmissionsRepository {
 
   private Map<FeedScopedId, Double> co2Emissions;
   private Double carAvgCo2PerMeter;
 
-  @Inject
-  public EmissionsDataModel() {}
-
-  public EmissionsDataModel(Map<FeedScopedId, Double> co2Emissions, double carAvgCo2PerMeter) {
-    this.co2Emissions = co2Emissions;
-    this.carAvgCo2PerMeter = carAvgCo2PerMeter;
-  }
+  public DefaultEmissionsRepository() {}
 
   public void setCo2Emissions(Map<FeedScopedId, Double> co2Emissions) {
     this.co2Emissions = co2Emissions;

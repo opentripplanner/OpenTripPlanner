@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.config;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
