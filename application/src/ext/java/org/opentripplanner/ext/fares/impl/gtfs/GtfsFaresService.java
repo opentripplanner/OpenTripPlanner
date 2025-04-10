@@ -14,7 +14,7 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
     if (faresV2.isEmpty()) {
       fare = Objects.requireNonNullElse(faresV1.calculateFares(itinerary), ItineraryFare.empty());
     } else {
-      var products = faresV2.calculateFareProducts(itinerary);
+      var products = faresV2.calculateFares(itinerary);
       fare.addItineraryProducts(products.itineraryProducts());
       if (products.itineraryProducts().isEmpty()) {
         addLegProducts(products.legProducts(), fare);
@@ -31,16 +31,10 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
   ) {
     legProducts.forEach(lp -> {
       lp
-        .products()
-        .stream()
-        .map(FareProductMatch.ProductWithTransfer::products)
+        .fareProducts()
         .forEach(fp -> {
           fares.addFareProduct(lp.leg(), fp);
         });
-
-      lp
-        .transfersFromPreviousLeg()
-        .forEach(transfer -> fares.addFareProduct(lp.leg(), transfer.product()));
     });
   }
 }

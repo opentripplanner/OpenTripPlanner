@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -92,14 +93,20 @@ public class ListUtils {
     return list;
   }
 
-  public static <T> List<List<T>> splitIntoOverlappingPairs(List<T> input) {
-    var output = new ArrayList<List<T>>(input.size());
+  public static <T> List<Pair<T>> splitIntoOverlappingPairs(List<T> input) {
+    var output = new ArrayList<Pair<T>>(input.size());
     for (int i = 0; i < input.size() - 1; i++) {
       T first = input.get(i);
       T second = input.get(i + 1);
-      output.add(List.of(first, second));
+      output.add(new Pair(first, second));
     }
-
     return output;
+  }
+
+  public record Pair<T>(T first, T second) {
+    public Pair {
+      Objects.requireNonNull(first);
+      Objects.requireNonNull(second);
+    }
   }
 }

@@ -15,11 +15,12 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,31 +51,42 @@ class FareLookupService implements Serializable {
     return legRules.isEmpty() && transferRules.isEmpty();
   }
 
-  Set<FareProductMatch.Transfer> transfersFromPreviousLeg(
-    ScheduledTransitLeg previous,
-    ScheduledTransitLeg current
-  ) {
-    var previousLegRules = legRuleIds(previous);
-    var currentLegRules = legRuleIds(current);
-    return transferRules
-      .stream()
-      .filter(f -> previousLegRules.contains(f.fromLegGroup()))
-      .filter(f -> currentLegRules.contains(f.toLegGroup()))
-      .flatMap(f -> {
-        var requiredProducts = findFareLegRule(f.fromLegGroup())
-          .stream()
-          .flatMap(fr -> fr.fareProducts().stream())
-          .toList();
-        return f
-          .fareProducts()
-          .stream()
-          .map(transferProduct -> new FareProductMatch.Transfer(transferProduct, requiredProducts));
-      })
-      .collect(Collectors.toUnmodifiableSet());
-  }
-
   Set<FareLegRule> legRules(ScheduledTransitLeg leg) {
     return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
+  }
+
+  Set<TransferMatch> transferRulesMatchingAllLegs(List<ScheduledTransitLeg> legs) {
+    return this.transferRules.stream()
+      .map(r -> findTransferMatch(r, legs))
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      .collect(Collectors.toSet());
+  }
+
+  private Optional<TransferMatch> findTransferMatch(
+    FareTransferRule transferRule,
+    List<ScheduledTransitLeg> transitLegs
+  ) {
+    var pairs = ListUtils.splitIntoOverlappingPairs(transitLegs);
+    var fromRule = findFareLegRule(transferRule.fromLegGroup());
+    var toRule = findFareLegRule(transferRule.toLegGroup());
+
+    if (fromRule.isEmpty() || toRule.isEmpty()) {
+      return Optional.empty();
+    } else {
+      var matches = pairs
+        .stream()
+        .allMatch(
+          pair ->
+            legMatchesRule(pair.first(), fromRule.get()) &&
+            legMatchesRule(pair.second(), toRule.get())
+        );
+      if (matches) {
+        return Optional.of(new TransferMatch(transferRule, fromRule.get(), toRule.get()));
+      } else {
+        return Optional.empty();
+      }
+    }
   }
 
   boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
@@ -91,46 +103,12 @@ class FareLookupService implements Serializable {
     );
   }
 
-  Set<FareProductMatch.ProductWithTransfer> productsWithTransfer(
-    ScheduledTransitLeg leg,
-    Optional<ScheduledTransitLeg> nextLeg
-  ) {
-    var legRules = legRules(leg);
-
-    return legRules
-      .stream()
-      .map(rule -> {
-        var transferRulesToNextLeg = transferRulesToNextLeg(nextLeg, rule);
-        return new FareProductMatch.ProductWithTransfer(rule, transferRulesToNextLeg);
-      })
-      .collect(Collectors.toSet());
-  }
-
-  private List<FareTransferRule> transferRulesToNextLeg(
-    Optional<ScheduledTransitLeg> nextLeg,
-    FareLegRule rule
-  ) {
-    return transferRules
-      .stream()
-      .filter(t -> t.fromLegGroup().equals(rule.legGroupId()))
-      .filter(t -> transferRuleMatchesNextLeg(nextLeg, t))
-      .toList();
-  }
-
   private Optional<FareLegRule> findFareLegRule(FeedScopedId id) {
     return legRules.stream().filter(r -> r.legGroupId().equals(id)).findFirst();
   }
 
   private static List<FareTransferRule> stripWildcards(Collection<FareTransferRule> rules) {
     return rules.stream().filter(FareLookupService::checkForWildcards).toList();
-  }
-
-  private Set<FeedScopedId> legRuleIds(ScheduledTransitLeg current) {
-    return legRules(current)
-      .stream()
-      .map(FareLegRule::legGroupId)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toUnmodifiableSet());
   }
 
   private static boolean checkForWildcards(FareTransferRule t) {
@@ -143,19 +121,6 @@ class FareLookupService implements Serializable {
     } else {
       return true;
     }
-  }
-
-  boolean transferRuleMatchesNextLeg(Optional<ScheduledTransitLeg> nextLeg, FareTransferRule t) {
-    return nextLeg
-      .map(nLeg -> {
-        var maybeFareRule = getFareLegRuleByGroupId(t.toLegGroup());
-        return maybeFareRule.map(rule -> legMatchesRule(nLeg, rule)).orElse(false);
-      })
-      .orElse(false);
-  }
-
-  private Optional<FareLegRule> getFareLegRuleByGroupId(FeedScopedId groupId) {
-    return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 
   private boolean matchesArea(
@@ -179,7 +144,7 @@ class FareLookupService implements Serializable {
       .getRoute()
       .getGroupsOfRoutes()
       .stream()
-      .map(group -> group.getId())
+      .map(AbstractTransitEntity::getId)
       .filter(Objects::nonNull)
       .toList();
 
@@ -207,7 +172,6 @@ class FareLookupService implements Serializable {
 
   private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
-
     FareDistance distance = rule.fareDistance();
     if (distance instanceof FareDistance.Stops(int min, int max)) {
       var numStops = leg.getIntermediateStops().size();

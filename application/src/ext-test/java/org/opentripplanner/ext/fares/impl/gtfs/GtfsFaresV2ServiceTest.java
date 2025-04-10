@@ -12,17 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.model.FareDistance;
-import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -139,24 +135,24 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   void singleLeg() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
-    var result = service.calculateFareProducts(i1);
-    assertEquals(Set.of(dayPass, single), result.itineraryProducts());
+    var result = service.calculateFares(i1);
+    assertEquals(Set.of(dayPass, single), result.match(i1.legs().get(1)).get().fareProducts());
   }
 
   @Test
   void twoLegs() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
-    var result = service.calculateFareProducts(i1);
-    assertEquals(Set.of(dayPass), result.itineraryProducts());
+    var result = service.calculateFares(i1);
+    assertEquals(Set.of(dayPass), result.match(i1.legs().get(1)).get().fareProducts());
   }
 
   @Test
   void networkId() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
-    var result = service.calculateFareProducts(i1);
-    assertEquals(Set.of(expressPass), result.itineraryProducts());
+    var result = service.calculateFares(i1);
+    assertEquals(Set.of(expressPass), result.match(i1.legs().get(1)).get().fareProducts());
   }
 
   /**
@@ -170,7 +166,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .faresV2Rail(ID, 60, 100, C, expressNetwork)
       .build();
 
-    var result = service.calculateFareProducts(i1);
+    var result = service.calculateFares(i1);
     assertEquals(0, result.itineraryProducts().size());
 
     var localLeg = i1.legs().get(1);
@@ -192,8 +188,11 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
         .build();
 
-      var result = service.calculateFareProducts(i1);
-      assertEquals(Set.of(innerToOuterZoneSingle), result.itineraryProducts());
+      var result = service.calculateFares(i1);
+      assertEquals(
+        Set.of(innerToOuterZoneSingle),
+        result.match(i1.legs().get(1)).get().fareProducts()
+      );
     }
 
     @Test
@@ -203,8 +202,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
         .build();
 
-      var result = service.calculateFareProducts(i1);
-      assertEquals(Set.of(singleToOuter), result.itineraryProducts());
+      var result = service.calculateFares(i1);
+      assertEquals(Set.of(singleToOuter), result.match(i1.legs().get(1)).get().fareProducts());
     }
 
     @Test
@@ -214,8 +213,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, B, null)
         .build();
 
-      var result = service.calculateFareProducts(i1);
-      assertEquals(Set.of(singleFromOuter), result.itineraryProducts());
+      var result = service.calculateFares(i1);
+      assertEquals(Set.of(singleFromOuter), result.match(i1.legs().get(1)).get().fareProducts());
     }
   }
 
@@ -268,7 +267,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     @Test
     void freeTransferInSameGroup() {
       var i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
-      var result = service.calculateFareProducts(i1);
+      var result = service.calculateFares(i1);
       assertEquals(Set.of(freeTransferSingle), result.itineraryProducts());
     }
 
@@ -280,133 +279,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .walk(53, OUTER_ZONE_STOP)
         .bus(ID, 55, 70, OUTER_ZONE_STOP)
         .build();
-      var result = service.calculateFareProducts(i1);
-      assertEquals(Set.of(freeTransferFromInnerToOuter), result.itineraryProducts());
-    }
-  }
-
-  @Nested
-  class DistanceFares {
-
-    FeedScopedId DISTANCE_ID = id("distance");
-    FareProduct threeStopProduct = FareProduct.of(
-      new FeedScopedId(FEED_ID, "three-stop-product"),
-      "three-stop-product",
-      Money.euros(1)
-    )
-      .withValidity(Duration.ofHours(1))
-      .build();
-    FareProduct fiveStopProduct = FareProduct.of(
-      new FeedScopedId(FEED_ID, "five-stop-product"),
-      "five-stop-product",
-      Money.euros(1)
-    )
-      .withValidity(Duration.ofHours(1))
-      .build();
-    FareProduct twelveStopProduct = FareProduct.of(
-      new FeedScopedId(FEED_ID, "twelve-stop-product"),
-      "twelve-stop-product",
-      Money.euros(1)
-    )
-      .withValidity(Duration.ofHours(1))
-      .build();
-
-    FareProduct tenKmProduct = FareProduct.of(
-      new FeedScopedId(FEED_ID, "ten-km-product"),
-      "ten-km-product",
-      Money.euros(1)
-    )
-      .withValidity(Duration.ofHours(1))
-      .build();
-    FareProduct threeKmProduct = FareProduct.of(
-      new FeedScopedId(FEED_ID, "three-km-product"),
-      "three-km-product",
-      Money.euros(1)
-    )
-      .withValidity(Duration.ofHours(1))
-      .build();
-    FareProduct twoKmProduct = FareProduct.of(
-      new FeedScopedId(FEED_ID, "two-km-product"),
-      "two-km-product",
-      Money.euros(1)
-    )
-      .withValidity(Duration.ofHours(1))
-      .build();
-
-    List<FareLegRule> stopRules = List.of(
-      FareLegRule.of(DISTANCE_ID, threeStopProduct)
-        .withFareDistance(new FareDistance.Stops(0, 3))
-        .build(),
-      FareLegRule.of(DISTANCE_ID, fiveStopProduct)
-        .withFareDistance(new FareDistance.Stops(5, 10))
-        .build(),
-      FareLegRule.of(DISTANCE_ID, twelveStopProduct)
-        .withFareDistance(new FareDistance.Stops(12, 20))
-        .build()
-    );
-
-    List<FareLegRule> distanceRules = List.of(
-      FareLegRule.of(DISTANCE_ID, tenKmProduct)
-        .withFareDistance(
-          new LinearDistance(
-            Distance.ofKilometersBoxed(7d, ignore -> {}).orElse(null),
-            Distance.ofKilometersBoxed(10d, ignore -> {}).orElse(null)
-          )
-        )
-        .build(),
-      FareLegRule.of(DISTANCE_ID, threeKmProduct)
-        .withFareDistance(
-          new LinearDistance(
-            Distance.ofKilometersBoxed(3d, ignore -> {}).orElse(null),
-            Distance.ofKilometersBoxed(6d, ignore -> {}).orElse(null)
-          )
-        )
-        .build(),
-      FareLegRule.of(DISTANCE_ID, twoKmProduct)
-        .withFareDistance(
-          new LinearDistance(
-            Distance.ofMetersBoxed(0d, ignore -> {}).orElse(null),
-            Distance.ofMetersBoxed(2000d, ignore -> {}).orElse(null)
-          )
-        )
-        .build()
-    );
-
-    @Test
-    void stops() {
-      var i1 = newItinerary(A, 0).bus(ID, 0, 50, 1, 20, C).build();
-      var faresV2Service = new GtfsFaresV2Service(
-        stopRules,
-        List.of(),
-        Multimaps.forMap(
-          Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
-        )
-      );
-      assertEquals(
-        faresV2Service.calculateFareProducts(i1).itineraryProducts(),
-        Set.of(twelveStopProduct)
-      );
-    }
-
-    @Test
-    void directDistance() {
-      Place dest = testModel.place(
-        "Destination",
-        A.coordinate.latitude(),
-        A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)
-      );
-      var i1 = newItinerary(A, 0).bus(ID, 0, 50, dest).build();
-      var faresV2Service = new GtfsFaresV2Service(
-        distanceRules,
-        List.of(),
-        Multimaps.forMap(
-          Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
-        )
-      );
-      assertEquals(
-        faresV2Service.calculateFareProducts(i1).itineraryProducts(),
-        Set.of(threeKmProduct)
-      );
+      var result = service.calculateFares(i1);
+      assertEquals(Set.of(freeTransferFromInnerToOuter, single), result.itineraryProducts());
     }
   }
 }
