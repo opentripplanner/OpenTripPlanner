@@ -35,29 +35,30 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.RealTimeUpdateContext;
-import uk.org.ifopt.siri20.StopPlaceRef;
-import uk.org.siri.siri20.AffectedLineStructure;
-import uk.org.siri.siri20.AffectedRouteStructure;
-import uk.org.siri.siri20.AffectedStopPlaceStructure;
-import uk.org.siri.siri20.AffectedStopPointStructure;
-import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
-import uk.org.siri.siri20.AffectsScopeStructure;
-import uk.org.siri.siri20.DataFrameRefStructure;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
-import uk.org.siri.siri20.DefaultedTextStructure;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
-import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
-import uk.org.siri.siri20.InfoLinkStructure;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.PtSituationElement;
-import uk.org.siri.siri20.RoutePointTypeEnumeration;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.SeverityEnumeration;
-import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
-import uk.org.siri.siri20.SituationNumber;
-import uk.org.siri.siri20.StopPointRef;
-import uk.org.siri.siri20.VehicleJourneyRef;
-import uk.org.siri.siri20.WorkflowStatusEnumeration;
+import uk.org.ifopt.siri21.StopPlaceRef;
+import uk.org.siri.siri21.AffectedLineStructure;
+import uk.org.siri.siri21.AffectedRouteStructure;
+import uk.org.siri.siri21.AffectedStopPlaceStructure;
+import uk.org.siri.siri21.AffectedStopPointStructure;
+import uk.org.siri.siri21.AffectedVehicleJourneyStructure;
+import uk.org.siri.siri21.AffectsScopeStructure;
+import uk.org.siri.siri21.DataFrameRefStructure;
+import uk.org.siri.siri21.DatedVehicleJourneyRef;
+import uk.org.siri.siri21.DefaultedTextStructure;
+import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri21.HalfOpenTimestampOutputRangeStructure;
+import uk.org.siri.siri21.InfoLinkStructure;
+import uk.org.siri.siri21.LineRef;
+import uk.org.siri.siri21.PtSituationElement;
+import uk.org.siri.siri21.ReportTypeEnumeration;
+import uk.org.siri.siri21.RoutePointTypeEnumeration;
+import uk.org.siri.siri21.ServiceDelivery;
+import uk.org.siri.siri21.SeverityEnumeration;
+import uk.org.siri.siri21.SituationExchangeDeliveryStructure;
+import uk.org.siri.siri21.SituationNumber;
+import uk.org.siri.siri21.StopPointRefStructure;
+import uk.org.siri.siri21.VehicleJourneyRef;
+import uk.org.siri.siri21.WorkflowStatusEnumeration;
 
 public class SiriAlertsUpdateHandlerTest extends GtfsTest {
 
@@ -132,7 +133,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     ptSituation.setInfoLinks(new PtSituationElement.InfoLinks());
     ptSituation.getInfoLinks().getInfoLinks().add(infoLink);
 
-    final String reportType = "incident";
+    final ReportTypeEnumeration reportType = ReportTypeEnumeration.INCIDENT;
     ptSituation.setReportType(reportType);
     ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
@@ -148,7 +149,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     final TransitAlert transitAlert = stopPatches.iterator().next();
 
     assertEquals(situationNumber, transitAlert.getId().getId());
-    assertEquals(reportType, transitAlert.type());
+    assertEquals(reportType.value(), transitAlert.type());
     assertEquals(AlertSeverity.SEVERE, transitAlert.severity());
     assertEquals(priorityValue, transitAlert.priority());
 
@@ -242,7 +243,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     period_2.setEndTime(endTimePeriod_2);
     ptSituation.getValidityPeriods().add(period_2);
 
-    final String reportType = "incident";
+    final ReportTypeEnumeration reportType = ReportTypeEnumeration.INCIDENT;
     ptSituation.setReportType(reportType);
     ptSituation.setSeverity(SeverityEnumeration.SEVERE);
 
@@ -280,7 +281,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       createAffectsStop(List.of(), stopId0.getId(), stopId1.getId())
     );
 
-    final String reportType = "incident";
+    final ReportTypeEnumeration reportType = ReportTypeEnumeration.INCIDENT;
     ptSituation.setReportType(reportType);
 
     final SeverityEnumeration severity = SeverityEnumeration.SEVERE;
@@ -912,7 +913,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AffectsScopeStructure.StopPoints stopPoints = new AffectsScopeStructure.StopPoints();
 
     for (String stopId : stopIds) {
-      StopPointRef stopPointRef = new StopPointRef();
+      StopPointRefStructure stopPointRef = new StopPointRefStructure();
       stopPointRef.setValue(stopId);
       AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
       affectedStopPoint.setStopPointRef(stopPointRef);
@@ -1057,7 +1058,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
     AffectedRouteStructure.StopPoints stopPoints = new AffectedRouteStructure.StopPoints();
     for (String stopId : stopIds) {
       AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
-      StopPointRef stopPointRef = new StopPointRef();
+      StopPointRefStructure stopPointRef = new StopPointRefStructure();
       stopPointRef.setValue(stopId);
       affectedStopPoint.setStopPointRef(stopPointRef);
       stopPoints.getAffectedStopPointsAndLinkProjectionToNextStopPoints().add(affectedStopPoint);
@@ -1237,7 +1238,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
       AffectsScopeStructure.StopPoints stopPoints = new AffectsScopeStructure.StopPoints();
       for (String stopId : stopIds) {
         AffectedStopPointStructure affectedStopPoint = new AffectedStopPointStructure();
-        StopPointRef stopPointRef = new StopPointRef();
+        StopPointRefStructure stopPointRef = new StopPointRefStructure();
         stopPointRef.setValue(stopId);
         affectedStopPoint.setStopPointRef(stopPointRef);
         stopPoints.getAffectedStopPoints().add(affectedStopPoint);

@@ -8,7 +8,7 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.Siri;
 
 /**
  * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP using the request/response

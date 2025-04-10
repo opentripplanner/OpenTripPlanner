@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
@@ -9,15 +9,15 @@ import org.opentripplanner.utils.lang.Sandbox;
 @Sandbox
 public class Emissions {
 
-  private Grams co2;
+  private Gram co2;
 
-  public Emissions(Grams co2) {
+  public Emissions(Gram co2) {
     if (co2 != null) {
       this.co2 = co2;
     }
   }
 
-  public Grams getCo2() {
+  public Gram getCo2() {
     return co2;
   }
 }

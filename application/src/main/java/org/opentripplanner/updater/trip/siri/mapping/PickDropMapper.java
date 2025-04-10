@@ -8,7 +8,7 @@ import static org.opentripplanner.model.PickDrop.SCHEDULED;
 import java.util.Optional;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.updater.trip.siri.CallWrapper;
-import uk.org.siri.siri20.CallStatusEnumeration;
+import uk.org.siri.siri21.CallStatusEnumeration;
 
 public class PickDropMapper {
 

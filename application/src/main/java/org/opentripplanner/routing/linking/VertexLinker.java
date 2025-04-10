@@ -654,9 +654,16 @@ public class VertexLinker {
           .filter(v -> distSquared(v, newVertex) >= DUPLICATE_NODE_EPSILON_DEGREES_SQUARED)
           .sorted((v1, v2) -> Double.compare(distSquared(v1, newVertex), distSquared(v2, newVertex))
           )
-          .findFirst()
-          .get();
-        return addVisibilityEdges(newVertex, nearest, areaGroup, scope, tempEdges, true);
+          .findFirst();
+        if (!nearest.isPresent()) {
+          // This can happen when all (probably the single one) visibility points are very close
+          // to the linked vertex. Such situation can arise in boarding location linking which skips
+          // the snapping logic of normal linking and calls addPermanentAreaVertex directly
+          nearest = areaGroup.visibilityVertices().stream().findFirst();
+        }
+        if (nearest.isPresent()) {
+          return addVisibilityEdges(newVertex, nearest.get(), areaGroup, scope, tempEdges, true);
+        }
       }
       return false;
     } else if (scope == Scope.PERMANENT) {

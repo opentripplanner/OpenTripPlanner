@@ -6,8 +6,8 @@ import graphql.schema.GraphQLSchema;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.SchemaModule;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsServiceModule;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
+import org.opentripplanner.ext.emissions.configure.EmissionsServiceModule;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
@@ -93,7 +93,7 @@ public interface ConstructApplicationFactory {
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
-  EmissionsDataModel emissionsDataModel();
+  EmissionsRepository emissionsDataModel();
 
   @Nullable
   GraphVisualizer graphVisualizer();
@@ -148,7 +148,7 @@ public interface ConstructApplicationFactory {
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
 
     @BindsInstance
-    Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
+    Builder emissionsDataModel(EmissionsRepository emissionsRepository);
 
     @BindsInstance
     Builder schema(RouteRequest defaultRouteRequest);

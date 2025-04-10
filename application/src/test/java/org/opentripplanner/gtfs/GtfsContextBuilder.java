@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -25,14 +24,14 @@ import org.opentripplanner.transit.service.SiteRepository;
  */
 public class GtfsContextBuilder {
 
-  private final GtfsFeedId feedId;
+  private final String feedId;
 
   private final OtpTransitServiceBuilder transitBuilder;
   private CalendarService calendarService = null;
   private DataImportIssueStore issueStore = null;
   private Deduplicator deduplicator;
 
-  public GtfsContextBuilder(GtfsFeedId feedId, OtpTransitServiceBuilder transitBuilder) {
+  public GtfsContextBuilder(String feedId, OtpTransitServiceBuilder transitBuilder) {
     this.feedId = feedId;
     this.transitBuilder = transitBuilder;
   }
@@ -48,10 +47,10 @@ public class GtfsContextBuilder {
       DataImportIssueStore.NOOP
     );
     GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
-    GtfsFeedId feedId = gtfsImport.getFeedId();
+    String feedId = gtfsImport.getFeedId();
     var mapper = new GTFSToOtpTransitServiceMapper(
       transitBuilder,
-      feedId.getId(),
+      feedId,
       DataImportIssueStore.NOOP,
       false,
       gtfsImport.getDao(),
@@ -151,18 +150,18 @@ public class GtfsContextBuilder {
 
   private static class GtfsContextImpl implements GtfsContext {
 
-    private final GtfsFeedId feedId;
+    private final String feedId;
     private final OtpTransitService transitService;
     private final CalendarServiceData calendarServiceData;
 
-    private GtfsContextImpl(GtfsFeedId feedId, OtpTransitServiceBuilder builder) {
+    private GtfsContextImpl(String feedId, OtpTransitServiceBuilder builder) {
       this.feedId = feedId;
       this.calendarServiceData = builder.buildCalendarServiceData();
       this.transitService = builder.build();
     }
 
     @Override
-    public GtfsFeedId getFeedId() {
+    public String getFeedId() {
       return feedId;
     }
 

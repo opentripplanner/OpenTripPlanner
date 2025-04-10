@@ -7,8 +7,9 @@ import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsModule;
+import org.opentripplanner.ext.emissions.EmissionsGraphBuilder;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
+import org.opentripplanner.ext.emissions.configure.EmissionsGraphBuilderModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -39,13 +40,19 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 @Singleton
-@Component(modules = { GraphBuilderModules.class, OsmInfoGraphBuildServiceModule.class })
+@Component(
+  modules = {
+    GraphBuilderModules.class,
+    OsmInfoGraphBuildServiceModule.class,
+    EmissionsGraphBuilderModule.class,
+  }
+)
 public interface GraphBuilderFactory {
   //DataImportIssueStore issueStore();
   GraphBuilder graphBuilder();
   OsmModule osmModule();
   GtfsModule gtfsModule();
-  EmissionsModule emissionsModule();
+  EmissionsGraphBuilder emissionsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
@@ -108,6 +115,6 @@ public interface GraphBuilderFactory {
     GraphBuilderFactory build();
 
     @BindsInstance
-    Builder emissionsDataModel(@Nullable EmissionsDataModel emissionsDataModel);
+    Builder emissionsDataModel(@Nullable EmissionsRepository emissionsRepository);
   }
 }
