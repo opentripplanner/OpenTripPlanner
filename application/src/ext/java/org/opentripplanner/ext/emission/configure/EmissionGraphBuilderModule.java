@@ -11,7 +11,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
 
 @Module
-public class EmissionsGraphBuilderModule {
+public class EmissionGraphBuilderModule {
 
   @Provides
   @Singleton

@@ -8,7 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.emission.EmissionsRepository;
-import org.opentripplanner.ext.emission.configure.EmissionsGraphBuilderModule;
+import org.opentripplanner.ext.emission.configure.EmissionGraphBuilderModule;
 import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuilder;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
@@ -44,7 +44,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
   modules = {
     GraphBuilderModules.class,
     OsmInfoGraphBuildServiceModule.class,
-    EmissionsGraphBuilderModule.class,
+    EmissionGraphBuilderModule.class,
   }
 )
 public interface GraphBuilderFactory {
