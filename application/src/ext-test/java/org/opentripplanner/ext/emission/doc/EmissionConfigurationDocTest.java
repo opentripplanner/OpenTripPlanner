@@ -22,7 +22,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.test.support.ResourceLoader;
 
 @GeneratesDocumentation
-public class EmissionsConfigurationDocTest implements DocsTestConstants {
+public class EmissionConfigurationDocTest implements DocsTestConstants {
 
   private static final File TEMPLATE = new File(TEMPLATE_PATH, "Emission.md");
   private static final File OUT_FILE = new File(SANDBOX_USER_DOC_PATH, "Emission.md");
@@ -42,9 +42,9 @@ public class EmissionsConfigurationDocTest implements DocsTestConstants {
   }
 
   private NodeAdapter readMapEmissionsConfigConfig() {
-    var buildConfigFile = ResourceLoader.of(
-      EmissionsConfigurationDocTest.class
-    ).extTestResourceFile(BUILD_CONFIG_FILENAME);
+    var buildConfigFile = ResourceLoader.of(EmissionConfigurationDocTest.class).extTestResourceFile(
+      BUILD_CONFIG_FILENAME
+    );
 
     var json = JsonSupport.jsonNodeFromPath(buildConfigFile.toPath());
     var conf = new BuildConfig(json, buildConfigFile.toString(), false);
