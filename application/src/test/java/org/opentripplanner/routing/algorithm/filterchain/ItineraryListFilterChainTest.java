@@ -382,7 +382,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Nested
-  class AddEmissionsToItineraryTest {
+  class AddEmissionToItineraryTest {
 
     Itinerary bus;
     Itinerary car;
