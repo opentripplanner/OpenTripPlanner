@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emission.EmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -69,7 +69,7 @@ public class GraphBuilder implements Runnable {
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
-    @Nullable EmissionsRepository emissionsRepository,
+    @Nullable EmissionRepository emissionRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
     boolean loadStreetGraph,
@@ -91,7 +91,7 @@ public class GraphBuilder implements Runnable {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
-      .emissionsDataModel(emissionsRepository)
+      .emissionsDataModel(emissionRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .dataSources(dataSources)
       .timeZoneId(timetableRepository.getTimeZone());

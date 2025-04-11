@@ -2,7 +2,7 @@ package org.opentripplanner.ext.emission.internal.graphbuilder;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.ext.emission.EmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
@@ -24,7 +24,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(EmissionGraphBuilder.class);
 
   private final EmissionParameters parameters;
-  private final EmissionsRepository emissionsRepository;
+  private final EmissionRepository emissionRepository;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources;
   private final Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionsDataSources;
   private final DataImportIssueStore issueStore;
@@ -33,13 +33,13 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources,
     Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionsDataSources,
     EmissionParameters parameters,
-    EmissionsRepository emissionsRepository,
+    EmissionRepository emissionRepository,
     DataImportIssueStore issueStore
   ) {
     this.gtfsDataSources = gtfsDataSources;
     this.emissionsDataSources = emissionsDataSources;
     this.parameters = parameters;
-    this.emissionsRepository = emissionsRepository;
+    this.emissionRepository = emissionRepository;
     this.issueStore = issueStore;
   }
 
@@ -59,8 +59,8 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
         var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
         emissionsData.putAll(dataReader.read(data.dataSource(), resolvedFeedId));
       }
-      this.emissionsRepository.setCo2Emissions(emissionsData);
-      this.emissionsRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
+      this.emissionRepository.setCo2Emissions(emissionsData);
+      this.emissionRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
       LOG.info(
         "Emissions building finished. Number of CO2 emission records saved: " + emissionsData.size()
       );

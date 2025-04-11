@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionTestData;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -26,7 +26,7 @@ public class EmissionGraphBuilderTest implements EmissionTestData {
       configuredDataSource(gtfsWithEmissionDir())
     );
     var feedDataSources = List.of(configuredDataSource(emissionFeed()));
-    var emissionsRepository = new DefaultEmissionsRepository();
+    var emissionsRepository = new DefaultEmissionRepository();
 
     var subject = new EmissionGraphBuilder(
       gtfsDataSources,

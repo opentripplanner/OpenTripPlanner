@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
-import org.opentripplanner.ext.emission.EmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.configure.EmissionsRepositoryModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationRepositoryModule;
@@ -61,7 +61,7 @@ public interface LoadApplicationFactory {
   GraphBuilderDataSources graphBuilderDataSources();
 
   @Singleton
-  EmissionsRepository emptyEmissionsDataModel();
+  EmissionRepository emptyEmissionsDataModel();
 
   @Singleton
   StopConsolidationRepository emptyStopConsolidationRepository();

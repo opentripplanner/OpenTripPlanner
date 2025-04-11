@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 /**
  * Repository for emissions data.
  */
-public interface EmissionsRepository extends Serializable {
+public interface EmissionRepository extends Serializable {
   void setCo2Emissions(Map<FeedScopedId, Double> co2Emissions);
 
   void setCarAvgCo2PerMeter(double carAvgCo2PerMeter);

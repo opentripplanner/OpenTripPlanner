@@ -2,15 +2,15 @@ package org.opentripplanner.ext.emission.internal;
 
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.ext.emission.EmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class DefaultEmissionsRepository implements EmissionsRepository {
+public class DefaultEmissionRepository implements EmissionRepository {
 
   private Map<FeedScopedId, Double> co2Emissions;
   private Double carAvgCo2PerMeter;
 
-  public DefaultEmissionsRepository() {}
+  public DefaultEmissionRepository() {}
 
   public void setCo2Emissions(Map<FeedScopedId, Double> co2Emissions) {
     this.co2Emissions = co2Emissions;

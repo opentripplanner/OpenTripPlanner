@@ -20,8 +20,8 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
-import org.opentripplanner.ext.emission.EmissionsRepository;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -70,7 +70,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var weRepo = new DefaultWorldEnvelopeRepository();
-    var emissionsRepository = new DefaultEmissionsRepository();
+    var emissionsRepository = new DefaultEmissionRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -90,7 +90,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    var emissionsRepository = new DefaultEmissionsRepository();
+    var emissionsRepository = new DefaultEmissionRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -199,7 +199,7 @@ public class GraphSerializationTest {
     TimetableRepository originalTimetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingRepository,
-    EmissionsRepository emissionsRepository
+    EmissionRepository emissionRepository
   ) throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
@@ -214,7 +214,7 @@ public class GraphSerializationTest {
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
       DataImportIssueSummary.empty(),
-      emissionsRepository,
+      emissionRepository,
       null,
       streetLimitationParameters
     );

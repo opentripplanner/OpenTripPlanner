@@ -7,7 +7,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionsService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -140,7 +140,7 @@ public class TestServerContext {
 
   public static ItineraryDecorator createEmissionsItineraryDecorator() {
     return new EmissionItineraryDecorator(
-      new DefaultEmissionsService(new DefaultEmissionsRepository())
+      new DefaultEmissionsService(new DefaultEmissionRepository())
     );
   }
 
