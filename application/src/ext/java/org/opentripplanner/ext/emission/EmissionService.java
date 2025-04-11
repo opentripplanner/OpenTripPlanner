@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.emission;
 
 import org.opentripplanner.model.plan.Emission;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
@@ -19,7 +19,17 @@ public interface EmissionService {
   Emission calculateCarPassengerEmission(double distanceMeters);
 
   /**
-   * Calculate passenger emissions per meter for a specific route.
+   * Calculate the passenger emissions for a specific [route and distance] or [trip, from stop/time,
+   * to stop ]. The service implementation will deside witch of the two caclulation methods
+   * is used.
+   *
+   * @return The emissions per passanger for the whole. {@link Emission#ZERO} is retuned if no
+   * emission exist.
    */
-  Emission calculateEmissionPerMeterForRoute(FeedScopedId feedScopedRouteId, double distance_m);
+  Emission calculateTransitPassengerEmissionForTripLeg(
+    Trip trip,
+    int boardStopPosInPattern,
+    int alightStopPosInPattern,
+    double distance_m
+  );
 }

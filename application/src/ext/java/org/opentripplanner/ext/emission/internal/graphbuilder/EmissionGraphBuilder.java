@@ -1,7 +1,11 @@
 package org.opentripplanner.ext.emission.internal.graphbuilder;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
+import org.opentripplanner.ext.emission.internal.csvdata.trip.TripLegMapper;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -10,6 +14,10 @@ import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +33,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
   private final EmissionRepository emissionRepository;
   private final Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources;
   private final Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionDataSources;
+  private final TimetableRepository timetableRepository;
 
   private final DataImportIssueStore issueStore;
 
@@ -33,12 +42,14 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionDataSources,
     EmissionParameters parameters,
     EmissionRepository emissionRepository,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     this.gtfsDataSources = gtfsDataSources;
     this.emissionDataSources = emissionDataSources;
     this.parameters = parameters;
     this.emissionRepository = emissionRepository;
+    this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
   }
 
@@ -47,7 +58,12 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       return;
     }
     var progress = ProgressTracker.track("Read emission data", 100, -1);
-    var co2EmissionsDataReader = new EmissionDataReader(emissionRepository, issueStore);
+    var tripLegMapper = new TripLegMapper(createStopsByTripIdMap(), issueStore);
+    var co2EmissionsDataReader = new EmissionDataReader(
+      emissionRepository,
+      tripLegMapper,
+      issueStore
+    );
 
     // Init car passenger emission data
     {
@@ -68,5 +84,13 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
+  }
+
+  private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {
+    var map = new HashMap<FeedScopedId, List<StopLocation>>();
+    for (TripPattern pattern : timetableRepository.getAllTripPatterns()) {
+      pattern.scheduledTripsAsStream().forEach(it -> map.put(it.getId(), pattern.getStops()));
+    }
+    return map;
   }
 }

@@ -57,4 +57,10 @@ class RouteDataReaderTest implements EmissionTestData {
     var emissions = subject.read(emissionMissingFile(), FEED_ID);
     assertTrue(emissions.isEmpty());
   }
+
+  @Test
+  void ignoreDataSourceIfHeadersDoesNotMatch() {
+    var emissions = subject.read(emissionOnTripLegs(), FEED_ID);
+    assertTrue(emissions.isEmpty());
+  }
 }

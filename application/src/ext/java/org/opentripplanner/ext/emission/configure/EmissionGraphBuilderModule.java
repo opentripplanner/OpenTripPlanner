@@ -9,6 +9,7 @@ import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuild
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 @Module
 public class EmissionGraphBuilderModule {
@@ -20,6 +21,7 @@ public class EmissionGraphBuilderModule {
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     @Nullable EmissionRepository emissionRepository,
+    TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     if (emissionRepository == null) {
@@ -31,6 +33,7 @@ public class EmissionGraphBuilderModule {
       dataSources.getEmissionConfiguredDatasource(),
       config.emission,
       emissionRepository,
+      timetableRepository,
       issueStore
     );
   }
