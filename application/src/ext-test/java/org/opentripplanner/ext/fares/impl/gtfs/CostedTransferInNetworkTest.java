@@ -25,6 +25,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
   private static final GroupOfRoutes NETWORK = groupOfRoutes("n1").build();
   private static final Route ROUTE_1 = route("r1");
   private static final Route ROUTE_2 = route("r2");
+  private static final Route ROUTE_3 = TimetableRepositoryForTest.route("r3").build();
   private static final FeedScopedId LEG_GROUP = id("leg-group1");
 
   private static final GtfsFaresV2Service SERVICE = new GtfsFaresV2Service(
@@ -72,6 +73,22 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.firstLeg()));
     assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().get(1)));
     assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.lastLeg()));
+  }
+
+  @Test
+  void threeLegsDifferentRoute() {
+    var i1 = newItinerary(A, 0)
+      .bus(ROUTE_1, 1, 0, 20, B)
+      .bus(ROUTE_2, 2, 21, 40, C)
+      .bus(ROUTE_3, 3, 41, 45, D)
+      .build();
+
+    var result = SERVICE.calculateFares(i1);
+
+    assertEquals(Set.of(), result.itineraryProducts());
+    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.firstLeg()));
+    assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().get(1)));
+    assertEquals(Set.of(), result.productsForLeg(i1.lastLeg()));
   }
 
   private static Route route(String id) {
