@@ -25,6 +25,7 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.GeoJsonIo;
 
 public class TurnRestrictionModuleTest {
+
   private StreetVertex vertex(Graph graph, long nodeId, double lat, double lon) {
     var v = new OsmVertex(lat, lon, nodeId);
     graph.addVertex(v);
@@ -45,14 +46,13 @@ public class TurnRestrictionModuleTest {
   }
 
   private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to) {
-    TurnRestriction restriction =
-      new TurnRestriction(
-        from,
-        to,
-        TurnRestrictionType.NO_TURN,
-        TraverseModeSet.allModes(),
-        null
-      );
+    TurnRestriction restriction = new TurnRestriction(
+      from,
+      to,
+      TurnRestrictionType.NO_TURN,
+      TraverseModeSet.allModes(),
+      null
+    );
     from.addTurnRestriction(restriction);
     return restriction;
   }
@@ -70,25 +70,32 @@ public class TurnRestrictionModuleTest {
     edges(B, D, 1.0);
     var BE = edges(B, E, 1.0);
     AB[0].addTurnRestriction(
-      new TurnRestriction(
-        AB[0],
-        BE[0],
-        TurnRestrictionType.NO_TURN,
-        TraverseModeSet.allModes(),
-        null
-      )
-    );
+        new TurnRestriction(
+          AB[0],
+          BE[0],
+          TurnRestrictionType.NO_TURN,
+          TraverseModeSet.allModes(),
+          null
+        )
+      );
     var module = new TurnRestrictionModule(graph);
     module.buildGraph();
 
-    assertEquals(2, A.getOutgoing().size());
-    var newOutgoing = A.getOutgoing().stream().filter(e -> e != AB[0]).findFirst().get();
-    var newB = newOutgoing.getToVertex();
-    assertEquals(3, newB.getOutgoing().size());
+    var newB = graph
+      .getVertices()
+      .stream()
+      .filter(v -> v.sameLocation(B) && v != B)
+      .findFirst()
+      .get();
+    assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, newB);
+    var newBout = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(newBout).containsExactly(A, C, D);
+    var Bout = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(Bout).containsExactly(A, C, D, E);
   }
 
   @ParameterizedTest
-  @ValueSource(ints = {0, 1})
+  @ValueSource(ints = { 0, 1 })
   public void doubleTurnRestriction(int order) {
     //   F D
     // G E B C
@@ -131,9 +138,18 @@ public class TurnRestrictionModuleTest {
       module.processRestriction(turnRestriction);
     }
 
-
-    var newB = graph.getVertices().stream().filter(v -> v.sameLocation(B) && v != B).findFirst().get();
-    var newE = graph.getVertices().stream().filter(v -> v.sameLocation(E) && v != E).findFirst().get();
+    var newB = graph
+      .getVertices()
+      .stream()
+      .filter(v -> v.sameLocation(B) && v != B)
+      .findFirst()
+      .get();
+    var newE = graph
+      .getVertices()
+      .stream()
+      .filter(v -> v.sameLocation(E) && v != E)
+      .findFirst()
+      .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, F, G, H, newB, newE);
     var newBout = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
     assertThat(newBout).containsExactly(A, C, D);

@@ -91,7 +91,11 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     var oldPermission = fromPermission.remove(restrictionPermission);
     var newPermission = fromPermission.intersection(restrictionPermission);
     if (newPermission.allowsAnything()) {
-      fromEdge.toBuilder().withToVertex(splitVertex).withPermission(newPermission).buildAndConnect();
+      fromEdge
+        .toBuilder()
+        .withToVertex(splitVertex)
+        .withPermission(newPermission)
+        .buildAndConnect();
     }
     if (oldPermission.allowsNothing()) {
       fromEdge.remove();
