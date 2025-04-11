@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public record FareTransferRule(
@@ -34,19 +33,5 @@ public record FareTransferRule(
 
   public boolean containsWildCard() {
     return fromLegGroup == null || toLegGroup == null;
-  }
-
-  public Collection<FareProduct> fareProducts() {
-    if (isFree()) {
-      return List.of(
-        FareProduct.of(
-          new FeedScopedId(id.getFeedId(), "free"),
-          "free transfer",
-          Money.ZERO_USD
-        ).build()
-      );
-    } else {
-      return fareProducts;
-    }
   }
 }

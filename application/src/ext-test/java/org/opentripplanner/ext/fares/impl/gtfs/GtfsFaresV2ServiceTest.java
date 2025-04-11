@@ -24,81 +24,81 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
-  private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
+  private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
 
-  FeedScopedId LEG_GROUP1 = id("leg-group1");
-  FeedScopedId LEG_GROUP2 = id("leg-group2");
-  FeedScopedId LEG_GROUP3 = id("leg-group3");
-  FeedScopedId LEG_GROUP4 = id("leg-group4");
-  FeedScopedId LEG_GROUP5 = id("leg-group5");
-  int ID = 100;
-  FeedScopedId expressNetwork = id("express");
-  FeedScopedId localNetwork = id("local");
+  private static final FeedScopedId LEG_GROUP1 = id("leg-group1");
+  private static final FeedScopedId LEG_GROUP2 = id("leg-group2");
+  private static final FeedScopedId LEG_GROUP3 = id("leg-group3");
+  private static final FeedScopedId LEG_GROUP4 = id("leg-group4");
+  private static final FeedScopedId LEG_GROUP5 = id("leg-group5");
+  private static final int ID = 100;
+  private static final FeedScopedId expressNetwork = id("express");
+  private static final FeedScopedId localNetwork = id("local");
 
-  FareProduct single = FareProduct.of(
+  private static final  FareProduct single = FareProduct.of(
     new FeedScopedId(FEED_ID, "single"),
     "Single one-way ticket",
     Money.euros(1)
   ).build();
-  FareProduct singleToOuter = FareProduct.of(
+  private static final FareProduct singleToOuter = FareProduct.of(
     new FeedScopedId(FEED_ID, "single_to_outer"),
     "Single one-way ticket to outer zone",
     Money.euros(1)
   ).build();
-  FareProduct singleFromOuter = FareProduct.of(
+  private static final FareProduct singleFromOuter = FareProduct.of(
     new FeedScopedId(FEED_ID, "single_from_outer"),
     "Single one-way ticket from outer zone to anywhere",
     Money.euros(1)
   ).build();
-  FareProduct dayPass = FareProduct.of(
+  private static final FareProduct dayPass = FareProduct.of(
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
     Money.euros(5)
   )
     .withValidity(Duration.ofDays(1))
     .build();
-  FareProduct innerToOuterZoneSingle = FareProduct.of(
+  private static final FareProduct innerToOuterZoneSingle = FareProduct.of(
     new FeedScopedId(FEED_ID, "zone_ab_single"),
     "Day Pass",
     Money.euros(5)
   ).build();
-  FareProduct monthlyPass = FareProduct.of(
+  private static final FareProduct monthlyPass = FareProduct.of(
     new FeedScopedId("another", "monthly_pass"),
     "Monthly Pass",
     Money.euros(30)
   )
     .withValidity(Duration.ofDays(30))
     .build();
-  FareProduct expressPass = FareProduct.of(
+  private static final FareProduct expressPass = FareProduct.of(
     new FeedScopedId(FEED_ID, "express_pass"),
     "Express Pass",
     Money.euros(50)
   )
     .withValidity(Duration.ofDays(1))
     .build();
-  FareProduct localPass = FareProduct.of(
+  private static final FareProduct localPass = FareProduct.of(
     new FeedScopedId(FEED_ID, "local_pass"),
     "Local Pass",
     Money.euros(20)
   )
     .withValidity(Duration.ofDays(1))
     .build();
-  FareProduct freeTransfer = FareProduct.of(
+  private static final FareProduct freeTransfer = FareProduct.of(
     new FeedScopedId(FEED_ID, "free_transfer"),
     "Free transfer",
     Money.euros(0)
   ).build();
 
-  Place INNER_ZONE_STOP = Place.forStop(
-    testModel.stop("inner city stop").withCoordinate(1, 1).build()
+  private static final Place INNER_ZONE_STOP = Place.forStop(
+    MODEL.stop("inner city stop").withCoordinate(1, 1).build()
   );
-  Place OUTER_ZONE_STOP = Place.forStop(
-    testModel.stop("outer city stop").withCoordinate(2, 2).build()
+  private static final Place OUTER_ZONE_STOP = Place.forStop(
+    MODEL.stop("outer city stop").withCoordinate(2, 2).build()
   );
-  FeedScopedId INNER_ZONE = id("inner-zone");
-  FeedScopedId OUTER_ZONE = id("outer-zone");
+  private static final FeedScopedId INNER_ZONE = id("inner-zone");
+  private static final FeedScopedId OUTER_ZONE = id("outer-zone");
 
-  GtfsFaresV2Service service = new GtfsFaresV2Service(
+  private static final GtfsFaresV2Service SERVICE = new GtfsFaresV2Service(
     List.of(
       FareLegRule.of(id("1"), single).withLegGroupId(LEG_GROUP1).build(),
       FareLegRule.of(id("2"), singleToOuter)
@@ -135,24 +135,24 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   void singleLeg() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
-    var result = service.calculateFares(i1);
-    assertEquals(Set.of(dayPass, single), result.match(i1.legs().get(1)).get().fareProducts());
+    var result = SERVICE.calculateFares(i1);
+    assertEquals(Set.of(dayPass, single), result.productsForLeg(i1.legs().get(1)));
   }
 
   @Test
   void twoLegs() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
-    var result = service.calculateFares(i1);
-    assertEquals(Set.of(dayPass), result.match(i1.legs().get(1)).get().fareProducts());
+    var result = SERVICE.calculateFares(i1);
+    assertEquals(Set.of(dayPass, single), result.productsForLeg(i1.legs().get(1)));
   }
 
   @Test
   void networkId() {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
-    var result = service.calculateFares(i1);
-    assertEquals(Set.of(expressPass), result.match(i1.legs().get(1)).get().fareProducts());
+    var result = SERVICE.calculateFares(i1);
+    assertEquals(Set.of(expressPass), result.productsForLeg(i1.legs().get(1)));
   }
 
   /**
@@ -166,15 +166,15 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
       .faresV2Rail(ID, 60, 100, C, expressNetwork)
       .build();
 
-    var result = service.calculateFares(i1);
+    var result = SERVICE.calculateFares(i1);
     assertEquals(0, result.itineraryProducts().size());
 
     var localLeg = i1.legs().get(1);
-    var localLegProducts = result.match(localLeg).get().fareProducts();
+    var localLegProducts = result.productsForLeg(localLeg);
     assertEquals(Set.of(localPass), localLegProducts);
 
     var expressLeg = i1.legs().get(2);
-    var expressProducts = result.match(expressLeg).get().fareProducts();
+    var expressProducts = result.productsForLeg(expressLeg);
     assertEquals(Set.of(expressPass), expressProducts);
   }
 
@@ -188,11 +188,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
         .build();
 
-      var result = service.calculateFares(i1);
-      assertEquals(
-        Set.of(innerToOuterZoneSingle),
-        result.match(i1.legs().get(1)).get().fareProducts()
-      );
+      var result = SERVICE.calculateFares(i1);
+      assertEquals(Set.of(innerToOuterZoneSingle), result.productsForLeg(i1.legs().get(1)));
     }
 
     @Test
@@ -202,8 +199,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, OUTER_ZONE_STOP, null)
         .build();
 
-      var result = service.calculateFares(i1);
-      assertEquals(Set.of(singleToOuter), result.match(i1.legs().get(1)).get().fareProducts());
+      var result = SERVICE.calculateFares(i1);
+      assertEquals(Set.of(singleToOuter), result.productsForLeg(i1.legs().get(1)));
     }
 
     @Test
@@ -213,8 +210,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         .faresV2Rail(ID, 0, 50, B, null)
         .build();
 
-      var result = service.calculateFares(i1);
-      assertEquals(Set.of(singleFromOuter), result.match(i1.legs().get(1)).get().fareProducts());
+      var result = SERVICE.calculateFares(i1);
+      assertEquals(Set.of(singleFromOuter), result.productsForLeg(i1.legs().get(1)));
     }
   }
 

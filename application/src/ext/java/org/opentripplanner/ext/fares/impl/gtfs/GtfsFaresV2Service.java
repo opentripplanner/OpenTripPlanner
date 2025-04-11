@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.fares.model.FareLegRule;
@@ -27,7 +27,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public FareResult calculateFares(Itinerary itinerary) {
-    Multimap<Leg, FareProduct> legProducts = ArrayListMultimap.create();
+    SetMultimap<Leg, FareProduct> legProducts = HashMultimap.create();
     itinerary
       .listScheduledTransitLegs()
       .forEach(leg -> {
@@ -38,13 +38,6 @@ public final class GtfsFaresV2Service implements Serializable {
           .collect(Collectors.toUnmodifiableSet());
         legProducts.putAll(leg, products);
       });
-
-    var legMatches = legProducts
-      .asMap()
-      .entrySet()
-      .stream()
-      .map(e -> new FareProductMatch(e.getKey(), Set.copyOf(e.getValue())))
-      .collect(Collectors.toUnmodifiableSet());
 
     var itinProducts = lookup
       .transferRulesMatchingAllLegs(itinerary.listScheduledTransitLegs())
@@ -57,7 +50,7 @@ public final class GtfsFaresV2Service implements Serializable {
       )
       .collect(Collectors.toUnmodifiableSet());
 
-    return new FareResult(itinProducts, legMatches);
+    return new FareResult(itinProducts, legProducts);
   }
 
   /**

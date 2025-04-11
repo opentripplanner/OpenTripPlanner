@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
@@ -23,7 +22,7 @@ import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-class DistanceFaresTest {
+class DistancesTest {
 
   private static final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   private static final Place INNER_ZONE_STOP = Place.forStop(
@@ -132,7 +131,10 @@ class DistanceFaresTest {
         Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
       )
     );
-    assertEquals(faresV2Service.calculateFares(i1).itineraryProducts(), Set.of(twelveStopProduct));
+    assertEquals(
+      faresV2Service.calculateFares(i1).productsForLeg(i1.firstLeg()),
+      Set.of(twelveStopProduct)
+    );
   }
 
   @Test
@@ -150,6 +152,9 @@ class DistanceFaresTest {
         Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
       )
     );
-    assertEquals(faresV2Service.calculateFares(i1).itineraryProducts(), Set.of(threeKmProduct));
+    assertEquals(
+      faresV2Service.calculateFares(i1).productsForLeg(i1.transitLeg(0)),
+      Set.of(threeKmProduct)
+    );
   }
 }

@@ -71,7 +71,8 @@ class FareLookupService implements Serializable {
     var fromRule = findFareLegRule(transferRule.fromLegGroup());
     var toRule = findFareLegRule(transferRule.toLegGroup());
 
-    if (fromRule.isEmpty() || toRule.isEmpty()) {
+    // no need to compute transfers if there is only a single leg or the rules cannot be found
+    if (pairs.isEmpty() || fromRule.isEmpty() || toRule.isEmpty()) {
       return Optional.empty();
     } else {
       var matches = pairs

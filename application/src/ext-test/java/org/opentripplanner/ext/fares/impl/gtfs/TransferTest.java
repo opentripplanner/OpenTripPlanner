@@ -57,11 +57,11 @@ class TransferTest implements PlanTestConstants {
     var i1 = newItinerary(A, 0).bus(ROUTE_1, 1, 0, 20, B).bus(ROUTE_2, 2, 21, 40, C).build();
     var result = SERVICE.calculateFares(i1);
 
-    var leg1Products = result.match(i1.firstLeg()).get().fareProducts();
+    var leg1Products = result.productsForLeg(i1.firstLeg());
     assertEquals(Set.of(REGULAR), leg1Products);
 
-    var leg2match = result.match(i1.lastLeg()).get();
-    assertThat(leg2match.fareProducts()).containsExactly(REGULAR);
+    var leg2match = result.productsForLeg(i1.lastLeg());
+    assertThat(leg2match).containsExactly(REGULAR);
   }
 
   private static Route route(String id) {
