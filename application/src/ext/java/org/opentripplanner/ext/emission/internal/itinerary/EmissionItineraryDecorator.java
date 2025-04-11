@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionsService;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.model.Gram;
-import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -56,11 +56,11 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     var builder = itinerary.copyOf();
 
     if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
-      builder.withEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
+      builder.withEmissionPerPerson(new Emission(co2ForTransit.get().plus(co2ForCar.get())));
     } else if (co2ForTransit.isPresent()) {
-      builder.withEmissionsPerPerson(new Emissions(co2ForTransit.get()));
+      builder.withEmissionPerPerson(new Emission(co2ForTransit.get()));
     } else if (co2ForCar.isPresent()) {
-      builder.withEmissionsPerPerson(new Emissions(co2ForCar.get()));
+      builder.withEmissionPerPerson(new Emission(co2ForCar.get()));
     }
     return builder.build();
   }
@@ -75,7 +75,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
         leg.getAgency().getId().getFeedId(),
         leg.getRoute().getId().getId()
       );
-      Optional<Emissions> co2EmissionsForRoute = emissionsService.getEmissionsPerMeterForRoute(
+      Optional<Emission> co2EmissionsForRoute = emissionsService.getEmissionPerMeterForRoute(
         feedScopedRouteId
       );
       if (co2EmissionsForRoute.isPresent()) {
@@ -95,7 +95,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
       return Optional.empty();
     }
     return emissionsService
-      .getEmissionsPerMeterForCar()
+      .getEmissionPerMeterForCar()
       .map(emissions ->
         new Gram(
           carLegs

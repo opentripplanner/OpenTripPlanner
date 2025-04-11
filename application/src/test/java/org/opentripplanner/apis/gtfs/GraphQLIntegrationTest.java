@@ -56,7 +56,7 @@ import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
-import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -392,8 +392,8 @@ class GraphQLIntegrationTest {
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emissions = new Emissions(new Gram(123.0));
-    i1 = i1.copyOf().withEmissionsPerPerson(emissions).build();
+    var emission = new Emission(new Gram(123.0));
+    i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);

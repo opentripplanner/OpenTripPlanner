@@ -407,7 +407,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
         .withEmissions(new EmissionItineraryDecorator(eService))
         .build();
       List<Itinerary> itineraries = chain.filter(List.of(bus, car));
-      assertFalse(itineraries.stream().anyMatch(i -> i.emissionsPerPerson().getCo2() == null));
+      assertFalse(itineraries.stream().anyMatch(i -> i.emissionPerPerson().getCo2() == null));
     }
   }
 }

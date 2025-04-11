@@ -7,11 +7,11 @@ import org.opentripplanner.utils.lang.Sandbox;
  * Represents the emissions of a journey. Each type of emissions has its own field and unit.
  */
 @Sandbox
-public class Emissions {
+public class Emission {
 
   private Gram co2;
 
-  public Emissions(Gram co2) {
+  public Emission(Gram co2) {
     if (co2 != null) {
       this.co2 = co2;
     }
