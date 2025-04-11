@@ -9,7 +9,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.internal.itinerary.DecorateWithEmission;
+import org.opentripplanner.ext.emissions.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -139,7 +139,9 @@ public class TestServerContext {
   }
 
   public static ItineraryDecorator createEmissionsItineraryDecorator() {
-    return new DecorateWithEmission(new DefaultEmissionsService(new DefaultEmissionsRepository()));
+    return new EmissionItineraryDecorator(
+      new DefaultEmissionsService(new DefaultEmissionsRepository())
+    );
   }
 
   public static StreetLimitationParametersService createStreetLimitationParametersService() {

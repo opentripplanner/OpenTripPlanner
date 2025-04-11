@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.internal.itinerary.DecorateWithEmission;
+import org.opentripplanner.ext.emissions.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -404,7 +404,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     @Test
     void emissionsTest() {
       ItineraryListFilterChain chain = builder
-        .withEmissions(new DecorateWithEmission(eService))
+        .withEmissions(new EmissionItineraryDecorator(eService))
         .build();
       List<Itinerary> itineraries = chain.filter(List.of(bus, car));
       assertFalse(itineraries.stream().anyMatch(i -> i.emissionsPerPerson().getCo2() == null));
