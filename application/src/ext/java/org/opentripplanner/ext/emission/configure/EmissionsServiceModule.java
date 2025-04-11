@@ -5,7 +5,7 @@ import dagger.Provides;
 import org.opentripplanner.ext.emission.EmissionsRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionsService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
-import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionsDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
 /**
@@ -16,7 +16,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
 public class EmissionsServiceModule {
 
   @Provides
-  @EmissionsDecorator
+  @EmissionDecorator
   public ItineraryDecorator provideEmissionsService(EmissionsRepository emissionsRepository) {
     return new EmissionItineraryDecorator(new DefaultEmissionsService(emissionsRepository));
   }

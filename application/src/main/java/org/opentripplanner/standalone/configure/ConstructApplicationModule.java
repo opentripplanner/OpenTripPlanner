@@ -13,7 +13,7 @@ import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionsDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
@@ -49,7 +49,7 @@ public class ConstructApplicationModule {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
-    @Nullable @EmissionsDecorator ItineraryDecorator emissionsItineraryDecorator,
+    @Nullable @EmissionDecorator ItineraryDecorator emissionsItineraryDecorator,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
