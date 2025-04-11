@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
+import org.opentripplanner.ext.emissions.internal.itinerary.DecorateWithEmission;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;

@@ -6,7 +6,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-interface EmissionTestData {
+public interface EmissionTestData {
   String FEED_FEED_ID = "em";
   String GTFS_DIR_FEED_ID = "gd";
   String GTFS_ZIP_FEED_ID = "gz";

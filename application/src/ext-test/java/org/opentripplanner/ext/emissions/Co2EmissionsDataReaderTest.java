@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.emissions.internal.csvdata.Co2EmissionsDataReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 

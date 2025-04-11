@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.model;
+package org.opentripplanner.ext.emissions.parameters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

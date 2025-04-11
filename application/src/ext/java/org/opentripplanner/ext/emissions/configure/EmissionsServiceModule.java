@@ -4,7 +4,7 @@ import dagger.Module;
 import dagger.Provides;
 import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
+import org.opentripplanner.ext.emissions.internal.itinerary.DecorateWithEmission;
 import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionsDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 

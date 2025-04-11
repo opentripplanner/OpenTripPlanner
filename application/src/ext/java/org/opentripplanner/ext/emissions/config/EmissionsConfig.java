@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.emissions.config;
 
-import static org.opentripplanner.ext.emissions.model.EmissionViechleParameters.CAR_DEFAULTS;
+import static org.opentripplanner.ext.emissions.parameters.EmissionViechleParameters.CAR_DEFAULTS;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
 import java.util.List;
-import org.opentripplanner.ext.emissions.model.EmissionFeedParameters;
-import org.opentripplanner.ext.emissions.model.EmissionParameters;
-import org.opentripplanner.ext.emissions.model.EmissionViechleParameters;
+import org.opentripplanner.ext.emissions.parameters.EmissionFeedParameters;
+import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
+import org.opentripplanner.ext.emissions.parameters.EmissionViechleParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**

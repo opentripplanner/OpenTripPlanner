@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.emissions.config.EmissionsConfig;
-import org.opentripplanner.ext.emissions.model.EmissionParameters;
+import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.TransferParameters;

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.itinerary;
+package org.opentripplanner.ext.emissions.internal.itinerary;
 
 import java.util.List;
 import java.util.Optional;

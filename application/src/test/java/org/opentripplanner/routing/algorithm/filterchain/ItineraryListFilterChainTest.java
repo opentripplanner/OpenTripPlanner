@@ -23,7 +23,7 @@ import org.mockito.Mockito;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
+import org.opentripplanner.ext.emissions.internal.itinerary.DecorateWithEmission;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;

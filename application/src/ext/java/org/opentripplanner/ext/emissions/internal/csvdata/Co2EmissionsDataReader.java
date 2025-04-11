@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.internal.csvdata;
 
 import com.csvreader.CsvReader;
 import java.io.IOException;
@@ -32,11 +32,11 @@ public class Co2EmissionsDataReader {
     this.issueStore = issueStore;
   }
 
-  Map<FeedScopedId, Double> read(CompositeDataSource catalog, String resolvedFeedId) {
+  public Map<FeedScopedId, Double> read(CompositeDataSource catalog, String resolvedFeedId) {
     return read(catalog.entry(EMISSIONS_FILE_NAME), resolvedFeedId);
   }
 
-  Map<FeedScopedId, Double> read(DataSource emissionsDataSource, String resolvedFeedId) {
+  public Map<FeedScopedId, Double> read(DataSource emissionsDataSource, String resolvedFeedId) {
     try {
       if (emissionsDataSource.exists()) {
         return readEmissions(emissionsDataSource.asInputStream(), resolvedFeedId);

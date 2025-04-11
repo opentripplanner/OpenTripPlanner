@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.internal.graphbuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,19 +7,17 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.emissions.EmissionTestData;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
-import org.opentripplanner.ext.emissions.model.EmissionFeedParameters;
-import org.opentripplanner.ext.emissions.model.EmissionParameters;
+import org.opentripplanner.ext.emissions.parameters.EmissionFeedParameters;
+import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
-import org.opentripplanner.test.support.ResourceLoader;
 
 public class EmissionsGraphBuilderTest implements EmissionTestData {
-
-  private final ResourceLoader RES = ResourceLoader.of(EmissionsGraphBuilderTest.class);
 
   @Test
   void testMultipleGtfsDataReading() {
@@ -28,16 +26,17 @@ public class EmissionsGraphBuilderTest implements EmissionTestData {
       configuredDataSource(gtfsWithEmissionDir())
     );
     var feedDataSources = List.of(configuredDataSource(emissionFeed()));
-
     var emissionsRepository = new DefaultEmissionsRepository();
-    var emissionsGraphBuilder = new EmissionsGraphBuilder(
+
+    var subject = new EmissionsGraphBuilder(
       gtfsDataSources,
       feedDataSources,
       EmissionParameters.DEFAULT,
       emissionsRepository,
       DataImportIssueStore.NOOP
     );
-    emissionsGraphBuilder.buildGraph();
+    subject.buildGraph();
+
     assertEquals(Optional.of(0.006), emissionsRepository.getCO2EmissionsById(ROUTE_ID_GD_1001));
     assertEquals(Optional.of(0.041), emissionsRepository.getCO2EmissionsById(ROUTE_ID_GZ_1002));
     assertEquals(Optional.of(0.006), emissionsRepository.getCO2EmissionsById(ROUTE_ID_EM_R1));

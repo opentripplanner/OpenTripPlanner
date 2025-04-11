@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.model;
+package org.opentripplanner.ext.emissions.parameters;
 
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
