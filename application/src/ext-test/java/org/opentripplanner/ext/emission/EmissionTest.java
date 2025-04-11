@@ -17,8 +17,8 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegConstructionSupport;
@@ -76,14 +76,14 @@ class EmissionTest {
   void testGetEmissionsForItinerary() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
     i = emissionDecorator.decorate(i);
-    assertEquals(Gram.of(2223.902), i.emissionPerPerson().getCo2());
+    assertEquals(Emission.co2_g(2223.902), i.emissionPerPerson());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
     var i = createItinerary(STREET_LEG);
     i = emissionDecorator.decorate(i);
-    assertEquals(Gram.of(28.0864), i.emissionPerPerson().getCo2());
+    assertEquals(Emission.co2_g(28.0864), i.emissionPerPerson());
   }
 
   @Test
@@ -97,21 +97,21 @@ class EmissionTest {
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
     i = emissionDecorator.decorate(i);
-    assertEquals(Gram.of(0.0), i.emissionPerPerson().getCo2());
+    assertEquals(Emission.co2_g(0.0), i.emissionPerPerson());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
     i = emissionDecorator.decorate(i);
-    assertEquals(Gram.of(2251.9884), i.emissionPerPerson().getCo2());
+    assertEquals(Emission.co2_g(2251.9884), i.emissionPerPerson());
   }
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG);
     i = emissionDecorator.decorate(i);
-    var emissionsResult = i.emissionPerPerson() != null ? i.emissionPerPerson().getCo2() : null;
+    var emissionsResult = i.emissionPerPerson() != null ? i.emissionPerPerson().co2() : null;
     assertNull(emissionsResult);
   }
 

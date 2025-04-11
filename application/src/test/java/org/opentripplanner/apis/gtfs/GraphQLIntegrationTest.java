@@ -46,7 +46,6 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.RealTimeTripUpdate;
@@ -392,7 +391,7 @@ class GraphQLIntegrationTest {
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emission = new Emission(Gram.of(123.0));
+    var emission = Emission.co2_g(123.0);
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));

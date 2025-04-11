@@ -55,11 +55,11 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     var builder = itinerary.copyOf();
 
     if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
-      builder.withEmissionPerPerson(new Emission(co2ForTransit.get().plus(co2ForCar.get())));
+      builder.withEmissionPerPerson(Emission.of(co2ForTransit.get().plus(co2ForCar.get())));
     } else if (co2ForTransit.isPresent()) {
-      builder.withEmissionPerPerson(new Emission(co2ForTransit.get()));
+      builder.withEmissionPerPerson(Emission.of(co2ForTransit.get()));
     } else if (co2ForCar.isPresent()) {
-      builder.withEmissionPerPerson(new Emission(co2ForCar.get()));
+      builder.withEmissionPerPerson(Emission.of(co2ForCar.get()));
     }
     return builder.build();
   }
@@ -79,7 +79,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
       );
       if (co2EmissionsForRoute.isPresent()) {
         co2Emissions = co2Emissions.plus(
-          co2EmissionsForRoute.get().getCo2().multiply(leg.getDistanceMeters())
+          co2EmissionsForRoute.get().co2().multiply(leg.getDistanceMeters())
         );
       } else {
         // Partial results would not give an accurate representation of the emissions.
@@ -99,7 +99,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
         Gram.of(
           carLegs
             .stream()
-            .mapToDouble(leg -> emission.getCo2().multiply(leg.getDistanceMeters()).asDouble())
+            .mapToDouble(leg -> emission.co2().multiply(leg.getDistanceMeters()).asDouble())
             .sum()
         )
       );
