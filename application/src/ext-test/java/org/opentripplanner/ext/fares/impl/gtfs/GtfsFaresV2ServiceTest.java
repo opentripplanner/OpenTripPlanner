@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.model.FareTransferRule.UNLIMITED_TRANSFERS;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -14,7 +13,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareLegRule;
-import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -28,10 +26,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   private static final TimetableRepositoryForTest MODEL = TimetableRepositoryForTest.of();
 
   private static final FeedScopedId LEG_GROUP1 = id("leg-group1");
-  private static final FeedScopedId LEG_GROUP2 = id("leg-group2");
-  private static final FeedScopedId LEG_GROUP3 = id("leg-group3");
-  private static final FeedScopedId LEG_GROUP4 = id("leg-group4");
-  private static final FeedScopedId LEG_GROUP5 = id("leg-group5");
   private static final int ID = 100;
   private static final FeedScopedId expressNetwork = id("express");
   private static final FeedScopedId localNetwork = id("local");
@@ -84,11 +78,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   )
     .withValidity(Duration.ofDays(1))
     .build();
-  private static final FareProduct FREE_TRANSFER = FareProduct.of(
-    new FeedScopedId(FEED_ID, "free_transfer"),
-    "Free transfer",
-    Money.euros(0)
-  ).build();
 
   private static final Place INNER_ZONE_STOP = Place.forStop(
     MODEL.stop("inner city stop").withCoordinate(1, 1).build()
@@ -213,100 +202,6 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
       var result = SERVICE.calculateFares(i1);
       assertEquals(Set.of(singleFromOuter), result.productsForLeg(i1.legs().get(1)));
-    }
-  }
-
-  @Nested
-  class Transfers {
-
-    FeedScopedId TRANSFER_ID = id("transfer");
-    FareProduct freeTransferFromInnerToOuter = FareProduct.of(
-      new FeedScopedId(FEED_ID, "free-transfer-from-inner-to-outer"),
-      "Single ticket with free transfer from the inner to the outer zone",
-      Money.euros(50)
-    ).build();
-
-    FareProduct freeTransferSingle = FareProduct.of(
-      new FeedScopedId(FEED_ID, "free-transfer-from-anywhere-to-outer"),
-      "Single ticket with free transfer any zone",
-      Money.euros(10)
-    ).build();
-
-    GtfsFaresV2Service service = new GtfsFaresV2Service(
-      List.of(
-        FareLegRule.of(id("6"), freeTransferFromInnerToOuter)
-          .withLegGroupId(LEG_GROUP2)
-          .withFromAreaId(INNER_ZONE)
-          .withToAreaId(INNER_ZONE)
-          .build(),
-        FareLegRule.of(id("7"), single)
-          .withLegGroupId(LEG_GROUP3)
-          .withFromAreaId(OUTER_ZONE)
-          .withToAreaId(OUTER_ZONE)
-          .build(),
-        FareLegRule.of(id("8"), freeTransferSingle).withLegGroupId(LEG_GROUP4).build(),
-        FareLegRule.of(id("9"), singleToOuter)
-          .withLegGroupId(LEG_GROUP5)
-          .withFromAreaId(INNER_ZONE)
-          .withToAreaId(OUTER_ZONE)
-          .build()
-      ),
-      List.of(
-        new FareTransferRule(
-          TRANSFER_ID,
-          LEG_GROUP1,
-          LEG_GROUP1,
-          UNLIMITED_TRANSFERS,
-          null,
-          List.of(FREE_TRANSFER)
-        ),
-        new FareTransferRule(
-          TRANSFER_ID,
-          LEG_GROUP2,
-          LEG_GROUP3,
-          UNLIMITED_TRANSFERS,
-          null,
-          List.of(FREE_TRANSFER)
-        ),
-        new FareTransferRule(
-          TRANSFER_ID,
-          LEG_GROUP4,
-          LEG_GROUP4,
-          UNLIMITED_TRANSFERS,
-          null,
-          List.of(FREE_TRANSFER)
-        ),
-        new FareTransferRule(
-          TRANSFER_ID,
-          null,
-          LEG_GROUP5,
-          UNLIMITED_TRANSFERS,
-          null,
-          List.of(FREE_TRANSFER)
-        )
-      ),
-      Multimaps.forMap(
-        Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
-      )
-    );
-
-    @Test
-    void freeTransferInSameGroup() {
-      var i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
-      var result = service.calculateFares(i1);
-      assertEquals(Set.of(freeTransferSingle), result.itineraryProducts());
-    }
-
-    @Test
-    void freeTransferIntoAnotherGroup() {
-      var i1 = newItinerary(A, 0)
-        .walk(20, INNER_ZONE_STOP)
-        .bus(ID, 0, 50, INNER_ZONE_STOP)
-        .walk(53, OUTER_ZONE_STOP)
-        .bus(ID, 55, 70, OUTER_ZONE_STOP)
-        .build();
-      var result = service.calculateFares(i1);
-      assertEquals(Set.of(freeTransferFromInnerToOuter, single), result.itineraryProducts());
     }
   }
 }

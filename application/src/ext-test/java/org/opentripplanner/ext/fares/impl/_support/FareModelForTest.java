@@ -7,7 +7,6 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -18,7 +17,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 
-public class FareModelForTest {
+public class FareModelForTest implements FareTestConstants {
 
   public static final FareZone AIRPORT_ZONE = FareZone.of(id("airport-zone")).build();
   public static final FareZone CITY_CENTER_ZONE = FareZone.of(id("city-center")).build();
@@ -85,14 +84,9 @@ public class FareModelForTest {
     .setTransfers(1)
     .setAgency(OTHER_FEED_AGENCY.getId())
     .build();
-  public static final FareProduct FARE_PRODUCT = FareProduct.of(
-    id("fp"),
-    "fare product",
-    Money.euros(10.00f)
-  ).build();
   public static final FareProductUse FARE_PRODUCT_USE = new FareProductUse(
     "c1a04702-1fb6-32d4-ba02-483bf68111ed",
-    FARE_PRODUCT
+    FareTestConstants.FARE_PRODUCT
   );
 
   // Fare rule sets

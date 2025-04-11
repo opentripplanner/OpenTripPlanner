@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
@@ -58,9 +59,26 @@ class FareLookupService implements Serializable {
   Set<TransferMatch> transfersMatchingAllLegs(List<ScheduledTransitLeg> legs) {
     return this.transferRules.stream()
       .filter(FareTransferRule::unlimitedTransfers)
+      .filter(FareTransferRule::isFree)
       .map(r -> findTransferMatch(r, legs))
       .filter(Optional::isPresent)
       .map(Optional::get)
+      .collect(Collectors.toSet());
+  }
+
+  Set<TransferMatch> transferForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+    return this.transferRules.stream()
+      .flatMap(r -> {
+        var fromRule = findFareLegRule(r.fromLegGroup());
+        var toRule = findFareLegRule(r.toLegGroup());
+        if (fromRule.isEmpty() || toRule.isEmpty()) {
+          return Stream.of();
+        } else if (legMatchesRule(from, fromRule.get()) && legMatchesRule(to, toRule.get())) {
+          return Stream.of(new TransferMatch(r, fromRule.get(), toRule.get()));
+        } else {
+          return Stream.of();
+        }
+      })
       .collect(Collectors.toSet());
   }
 

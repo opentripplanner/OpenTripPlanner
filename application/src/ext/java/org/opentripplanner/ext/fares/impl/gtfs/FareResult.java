@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 import java.util.Collection;
 import java.util.Set;
@@ -11,6 +12,9 @@ import org.opentripplanner.model.plan.Leg;
  * @param legProducts       The fare products that cover only individual legs.
  */
 record FareResult(Set<FareProduct> itineraryProducts, SetMultimap<Leg, FareProduct> legProducts) {
+  public FareResult {
+    legProducts = ImmutableSetMultimap.copyOf(legProducts);
+  }
   public Collection<FareProduct> productsForLeg(Leg leg) {
     return legProducts.get(leg);
   }

@@ -13,6 +13,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.collection.ListUtils;
 
 public final class GtfsFaresV2Service implements Serializable {
 
@@ -39,14 +40,25 @@ public final class GtfsFaresV2Service implements Serializable {
         legProducts.putAll(leg, products);
       });
 
+    var pairs = ListUtils.partitionIntoOverlappingPairs(itinerary.listScheduledTransitLegs());
+    pairs.forEach(pair ->
+      lookup
+        .transferForPair(pair.first(), pair.second())
+        .forEach(transfer -> {
+          legProducts.putAll(pair.second(), transfer.transferRule().fareProducts());
+          transfer.fromLegRule().fareProducts().forEach(p -> legProducts.remove(pair.second(), p));
+        })
+    );
+
     var itinProducts = lookup
       .transfersMatchingAllLegs(itinerary.listScheduledTransitLegs())
       .stream()
       .flatMap(transferRule ->
-        Stream.concat(
-          transferRule.fromLegRule().fareProducts().stream(),
-          transferRule.toLegRule().fareProducts().stream()
-        )
+        ListUtils.combine(
+          transferRule.fromLegRule().fareProducts(),
+          transferRule.toLegRule().fareProducts(),
+          transferRule.transferRule().fareProducts()
+        ).stream()
       )
       .collect(Collectors.toUnmodifiableSet());
 
