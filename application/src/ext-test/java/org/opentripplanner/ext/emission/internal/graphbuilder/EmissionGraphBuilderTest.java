@@ -3,7 +3,6 @@ package org.opentripplanner.ext.emission.internal.graphbuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
@@ -16,6 +15,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
+import org.opentripplanner.model.plan.Emission;
 
 public class EmissionGraphBuilderTest implements EmissionTestData {
 
@@ -25,7 +25,7 @@ public class EmissionGraphBuilderTest implements EmissionTestData {
       configuredDataSource(gtfsWithEmissionZip()),
       configuredDataSource(gtfsWithEmissionDir())
     );
-    var feedDataSources = List.of(configuredDataSource(emissionFeed()));
+    var feedDataSources = List.of(configuredDataSource(emissionOnRoutes()));
     var emissionRepository = new DefaultEmissionRepository();
 
     var subject = new EmissionGraphBuilder(
@@ -36,10 +36,18 @@ public class EmissionGraphBuilderTest implements EmissionTestData {
       DataImportIssueStore.NOOP
     );
     subject.buildGraph();
-
-    assertEquals(Optional.of(0.006), emissionRepository.getCO2EmissionsById(ROUTE_ID_GD_1001));
-    assertEquals(Optional.of(0.041), emissionRepository.getCO2EmissionsById(ROUTE_ID_GZ_1002));
-    assertEquals(Optional.of(0.006), emissionRepository.getCO2EmissionsById(ROUTE_ID_EM_R1));
+    assertEquals(
+      Emission.co2_g(.006),
+      emissionRepository.routePassengerEmissionsPerMeter(ROUTE_ID_GD_1001)
+    );
+    assertEquals(
+      Emission.co2_g(0.041),
+      emissionRepository.routePassengerEmissionsPerMeter(ROUTE_ID_GZ_1002)
+    );
+    assertEquals(
+      Emission.co2_g(0.006),
+      emissionRepository.routePassengerEmissionsPerMeter(ROUTE_ID_EM_R1)
+    );
   }
 
   private static ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource(

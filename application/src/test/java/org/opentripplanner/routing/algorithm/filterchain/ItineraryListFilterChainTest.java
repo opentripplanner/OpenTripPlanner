@@ -25,6 +25,7 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -394,9 +395,9 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       bus = newItinerary(A).bus(21, T11_06, T11_09, B).build();
       car = newItinerary(A).drive(T11_30, T11_50, B).build();
       var eRepository = new DefaultEmissionRepository();
-      Map<FeedScopedId, Double> emissions = new HashMap<>();
-      emissions.put(new FeedScopedId("F", "1"), 1.0);
-      eRepository.setCo2Emissions(emissions);
+      Map<FeedScopedId, Emission> emissions = new HashMap<>();
+      emissions.put(new FeedScopedId("F", "1"), Emission.co2_g(1.0));
+      eRepository.addRouteEmissions(emissions);
       eRepository.setCarAvgCo2PerMeter(1.0);
       eService = new DefaultEmissionService(eRepository);
     }

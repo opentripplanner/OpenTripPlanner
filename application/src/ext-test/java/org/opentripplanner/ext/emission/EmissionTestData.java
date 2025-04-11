@@ -1,8 +1,11 @@
 package org.opentripplanner.ext.emission;
 
+import java.io.File;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -23,8 +26,24 @@ public interface EmissionTestData {
     return resource().catalogDataSource("gd-gtfs/", FileType.GTFS);
   }
 
-  default DataSource emissionFeed() {
-    return resource().dataSource("em-feed.txt", FileType.EMMISION);
+  default DataSource gtfsWithEmissionFile() {
+    return gtfsWithEmissionDir().entry(EmissionDataReader.EMISSION_FILE_NAME);
+  }
+
+  default DataSource emissionOnRoutes() {
+    return resource().dataSource("em-on-routes.txt", FileType.EMMISION);
+  }
+
+  default DataSource emissionOnTripLegs() {
+    return resource().dataSource("em-on-trip-legs.txt", FileType.EMMISION);
+  }
+
+  /**
+   * The DataSource framwork should prevent this from happening, but we add it here
+   * as a test-case so we can see that the parsers handle it gracefully.
+   */
+  default DataSource emissionMissingFile() {
+    return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMMISION);
   }
 
   private ResourceLoader resource() {

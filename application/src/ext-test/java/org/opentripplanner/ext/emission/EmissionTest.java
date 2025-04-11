@@ -34,6 +34,14 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
+/**
+ * @deprecated The purpose of this test is not clear?
+ * - Is it an integration test, it does notload data from file.
+ * - Or, is it a unit-test on the {@link EmissionItineraryDecorator}? The test package/name does not
+ *   reflect this and there is realy no need to create a
+ *
+ */
+@Deprecated
 class EmissionTest {
 
   private static DefaultEmissionService eService;
@@ -53,7 +61,7 @@ class EmissionTest {
   private static final Route ROUTE_WITH_EMISSIONS = TimetableRepositoryForTest.route(
     id("1")
   ).build();
-  private static final Route ROUTE_WITH_ZERO_EMISSIONS = TimetableRepositoryForTest.route(
+  private static final Route ROUTE_WITH_UNKNOWN_EMISSIONS = TimetableRepositoryForTest.route(
     id("2")
   ).build();
   private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TimetableRepositoryForTest.route(
@@ -62,11 +70,11 @@ class EmissionTest {
 
   @BeforeAll
   static void SetUp() {
-    Map<FeedScopedId, Double> emissions = new HashMap<>();
-    emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
-    emissions.put(new FeedScopedId("F", "2"), 0.0);
+    Map<FeedScopedId, Emission> emission = new HashMap<>();
+    emission.put(id("1"), Emission.co2_g(.12 / 12));
+    emission.put(id("2"), Emission.co2_g(0.0));
     EmissionRepository emissionRepository = new DefaultEmissionRepository();
-    emissionRepository.setCo2Emissions(emissions);
+    emissionRepository.addRouteEmissions(emission);
     emissionRepository.setCarAvgCo2PerMeter(0.131);
     eService = new DefaultEmissionService(emissionRepository);
     emissionDecorator = new EmissionItineraryDecorator(eService);
@@ -74,45 +82,47 @@ class EmissionTest {
 
   @Test
   void testGetEmissionsForItinerary() {
-    var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
-    i = emissionDecorator.decorate(i);
-    assertEquals(Emission.co2_g(2223.902), i.emissionPerPerson());
+    var itinerary = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
+    itinerary = emissionDecorator.decorate(itinerary);
+    assertEquals(Emission.co2_g(2223.902), itinerary.emissionPerPerson());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
-    var i = createItinerary(STREET_LEG);
-    i = emissionDecorator.decorate(i);
-    assertEquals(Emission.co2_g(28.0864), i.emissionPerPerson());
+    var itinerary = createItinerary(STREET_LEG);
+    itinerary = emissionDecorator.decorate(itinerary);
+    assertEquals(Emission.co2_g(28.0864), itinerary.emissionPerPerson());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
-    var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED));
-    i = emissionDecorator.decorate(i);
-    assertNull(i.emissionPerPerson());
+    var itinerary = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED));
+    itinerary = emissionDecorator.decorate(itinerary);
+    assertNull(itinerary.emissionPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
-    var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
-    i = emissionDecorator.decorate(i);
-    assertEquals(Emission.co2_g(0.0), i.emissionPerPerson());
+    var itinerary = createItinerary(createTransitLeg(ROUTE_WITH_UNKNOWN_EMISSIONS));
+    itinerary = emissionDecorator.decorate(itinerary);
+    assertNull(itinerary.emissionPerPerson());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
-    var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
-    i = emissionDecorator.decorate(i);
-    assertEquals(Emission.co2_g(2251.9884), i.emissionPerPerson());
+    var itinerary = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
+    itinerary = emissionDecorator.decorate(itinerary);
+    assertEquals(Emission.co2_g(2251.9884), itinerary.emissionPerPerson());
   }
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
-    var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG);
-    i = emissionDecorator.decorate(i);
-    var emissionsResult = i.emissionPerPerson() != null ? i.emissionPerPerson().co2() : null;
-    assertNull(emissionsResult);
+    var itinerary = createItinerary(
+      createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED),
+      STREET_LEG
+    );
+    itinerary = emissionDecorator.decorate(itinerary);
+    assertNull(itinerary.emissionPerPerson());
   }
 
   private ScheduledTransitLeg createTransitLeg(Route route) {
@@ -127,10 +137,7 @@ class EmissionTest {
     var pattern = TimetableRepositoryForTest.tripPattern("1", route)
       .withStopPattern(stopPattern)
       .build();
-    var trip = Trip.of(FeedScopedId.parse("FOO:BAR"))
-      .withMode(TransitMode.BUS)
-      .withRoute(route)
-      .build();
+    var trip = Trip.of(id("FOO:BAR")).withMode(TransitMode.BUS).withRoute(route).build();
     return new ScheduledTransitLegBuilder<>()
       .withTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
       .withTripPattern(pattern)

@@ -1,20 +1,18 @@
 package org.opentripplanner.ext.emission.internal;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class DefaultEmissionRepository implements EmissionRepository {
 
-  private Map<FeedScopedId, Double> co2Emissions;
   private Double carAvgCo2PerMeter;
+  private Map<FeedScopedId, Emission> routeEmissions = new HashMap<>();
 
   public DefaultEmissionRepository() {}
-
-  public void setCo2Emissions(Map<FeedScopedId, Double> co2Emissions) {
-    this.co2Emissions = co2Emissions;
-  }
 
   public void setCarAvgCo2PerMeter(double carAvgCo2PerMeter) {
     this.carAvgCo2PerMeter = carAvgCo2PerMeter;
@@ -24,7 +22,14 @@ public class DefaultEmissionRepository implements EmissionRepository {
     return Optional.ofNullable(this.carAvgCo2PerMeter);
   }
 
-  public Optional<Double> getCO2EmissionsById(FeedScopedId feedScopedRouteId) {
-    return Optional.ofNullable(this.co2Emissions.get(feedScopedRouteId));
+  @Override
+  public void addRouteEmissions(Map<FeedScopedId, Emission> routeAvgCo2Emissions) {
+    this.routeEmissions.putAll(routeAvgCo2Emissions);
+  }
+
+  @Override
+  public Emission routePassengerEmissionsPerMeter(FeedScopedId routeId) {
+    var value = this.routeEmissions.get(routeId);
+    return value == null ? Emission.ZERO : value;
   }
 }

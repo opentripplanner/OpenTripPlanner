@@ -19,12 +19,13 @@ public class DefaultEmissionService implements EmissionService {
   }
 
   @Override
-  public Optional<Emission> getEmissionPerMeterForRoute(FeedScopedId feedScopedRouteId) {
-    return this.emissionRepository.getCO2EmissionsById(feedScopedRouteId).map(Emission::co2_g);
+  public Optional<Emission> getEmissionPerMeterForCar() {
+    return this.emissionRepository.getCarAvgCo2PerMeter().map(Emission::co2_g);
   }
 
   @Override
-  public Optional<Emission> getEmissionPerMeterForCar() {
-    return this.emissionRepository.getCarAvgCo2PerMeter().map(Emission::co2_g);
+  public Optional<Emission> getEmissionPerMeterForRoute(FeedScopedId feedScopedRouteId) {
+    Emission emission = this.emissionRepository.routePassengerEmissionsPerMeter(feedScopedRouteId);
+    return emission.isZero() ? Optional.empty() : Optional.ofNullable(emission);
   }
 }
