@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emission;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -13,9 +13,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
-import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;

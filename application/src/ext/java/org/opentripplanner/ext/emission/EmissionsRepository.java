@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emission;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.internal.csvdata;
+package org.opentripplanner.ext.emission.internal.csvdata;
 
 import com.csvreader.CsvReader;
 import java.io.IOException;

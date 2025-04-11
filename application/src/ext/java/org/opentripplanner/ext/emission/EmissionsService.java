@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emission;
 
 import java.util.Optional;
 import org.opentripplanner.model.plan.Emissions;

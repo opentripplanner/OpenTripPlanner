@@ -1,11 +1,11 @@
-package org.opentripplanner.ext.emissions.internal.graphbuilder;
+package org.opentripplanner.ext.emission.internal.graphbuilder;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.opentripplanner.ext.emissions.EmissionsRepository;
-import org.opentripplanner.ext.emissions.internal.csvdata.EmissionsDataReader;
-import org.opentripplanner.ext.emissions.parameters.EmissionFeedParameters;
-import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
+import org.opentripplanner.ext.emission.EmissionsRepository;
+import org.opentripplanner.ext.emission.internal.csvdata.EmissionsDataReader;
+import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
+import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;

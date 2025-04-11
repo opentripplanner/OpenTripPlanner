@@ -1,10 +1,10 @@
-package org.opentripplanner.ext.emissions.configure;
+package org.opentripplanner.ext.emission.configure;
 
 import dagger.Module;
 import dagger.Provides;
 import jakarta.inject.Singleton;
-import org.opentripplanner.ext.emissions.EmissionsRepository;
-import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionsRepository;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionsRepository;
 
 @Module
 public class EmissionsRepositoryModule {

@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.parameters;
+package org.opentripplanner.ext.emission.parameters;
 
 import java.net.URI;
 import org.opentripplanner.graph_builder.model.DataSourceConfig;

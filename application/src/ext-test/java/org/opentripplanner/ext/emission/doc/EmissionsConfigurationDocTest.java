@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.doc;
+package org.opentripplanner.ext.emission.doc;
 
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;

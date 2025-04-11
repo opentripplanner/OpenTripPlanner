@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.internal.graphbuilder;
+package org.opentripplanner.ext.emission.internal.graphbuilder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,10 +7,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.emissions.EmissionTestData;
-import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
-import org.opentripplanner.ext.emissions.parameters.EmissionFeedParameters;
-import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
+import org.opentripplanner.ext.emission.EmissionTestData;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
+import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;

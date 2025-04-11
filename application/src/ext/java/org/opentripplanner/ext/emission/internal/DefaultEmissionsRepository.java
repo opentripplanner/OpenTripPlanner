@@ -1,8 +1,8 @@
-package org.opentripplanner.ext.emissions.internal;
+package org.opentripplanner.ext.emission.internal;
 
 import java.util.Map;
 import java.util.Optional;
-import org.opentripplanner.ext.emissions.EmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionsRepository;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class DefaultEmissionsRepository implements EmissionsRepository {

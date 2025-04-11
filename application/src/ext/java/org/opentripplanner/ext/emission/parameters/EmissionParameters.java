@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions.parameters;
+package org.opentripplanner.ext.emission.parameters;
 
 import java.util.ArrayList;
 import java.util.Collection;

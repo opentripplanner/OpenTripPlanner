@@ -1,10 +1,10 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emission;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.emissions.internal.csvdata.EmissionsDataReader;
+import org.opentripplanner.ext.emission.internal.csvdata.EmissionsDataReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
