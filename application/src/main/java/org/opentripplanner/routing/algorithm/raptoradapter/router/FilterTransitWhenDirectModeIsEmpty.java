@@ -29,12 +29,13 @@ import org.opentripplanner.routing.api.request.StreetMode;
  * searches for WALK-ALL-THE_WAY, BIKE-ALL-THE-WAY, and WALK+TRANSIT. In this case, it would be
  * best for if Request 2 above return an empty set, not the silly Itinerary-2.
  * <p>
- * If no directMode is set and if the page cursor does not exist, the responsibility of this class is to
- * always filter away itineraries with a generalized-cost that is higher than the WALK-ALL-THE-WAY result.
- * This is not done with paging because the page cursor supports filtering based on a direct mode used in
- * the search. We achieve the filtering by setting the directMode before searching. This triggers the direct
- * street search, and later the result is passed into the filter chain where none optimal results are removed.
- * Finally the street itinerary is removed and the request street mode is assigned back to the original state.
+ * If no directMode is set and if the page cursor does not exist, the responsibility of this class
+ * is to always filter away itineraries with a generalized-cost that is higher than the
+ * WALK-ALL-THE-WAY result. This is not done with paging because the page cursor supports filtering
+ * based on a direct mode used in the search. We achieve the filtering by setting the directMode
+ * before searching. This triggers the direct street search, and later the result is passed into
+ * the filter chain where none optimal results are removed. Finally the street itinerary is removed
+ * and the request street mode is assigned back to the original state.
  * <p>
  * <b>Why do we use generalized-cost, and not walk distance or a full pareto comparison?</b>
  * <p>
