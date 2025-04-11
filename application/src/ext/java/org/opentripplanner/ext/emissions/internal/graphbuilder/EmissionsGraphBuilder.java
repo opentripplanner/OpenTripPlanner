@@ -3,7 +3,7 @@ package org.opentripplanner.ext.emissions.internal.graphbuilder;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.emissions.EmissionsRepository;
-import org.opentripplanner.ext.emissions.internal.csvdata.Co2EmissionsDataReader;
+import org.opentripplanner.ext.emissions.internal.csvdata.EmissionsDataReader;
 import org.opentripplanner.ext.emissions.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -46,20 +46,18 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
   public void buildGraph() {
     if (parameters != null) {
       LOG.info("Start emissions building");
-      var co2EmissionsDataReader = new Co2EmissionsDataReader(issueStore);
+      var emissionsDataReader = new EmissionsDataReader(issueStore);
       double carAvgCo2PerKm = parameters.car().avgCo2PerKm();
       double carAvgOccupancy = parameters.car().avgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
       Map<FeedScopedId, Double> emissionsData = new HashMap<>();
 
       for (var data : emissionsDataSources) {
-        emissionsData.putAll(
-          co2EmissionsDataReader.read(data.dataSource(), data.config().feedId())
-        );
+        emissionsData.putAll(emissionsDataReader.read(data.dataSource(), data.config().feedId()));
       }
       for (var data : gtfsDataSources) {
         var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
-        emissionsData.putAll(co2EmissionsDataReader.read(data.dataSource(), resolvedFeedId));
+        emissionsData.putAll(emissionsDataReader.read(data.dataSource(), resolvedFeedId));
       }
       this.emissionsRepository.setCo2Emissions(emissionsData);
       this.emissionsRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
