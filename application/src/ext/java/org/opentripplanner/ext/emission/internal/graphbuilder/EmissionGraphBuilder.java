@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class allows updating the graph with emissions data from external emissions data files.
+ * This class allows updating the graph with emission data from external emission data files.
  */
 public class EmissionGraphBuilder implements GraphBuilderModule {
 
@@ -62,7 +62,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       this.emissionRepository.setCo2Emissions(emissionsData);
       this.emissionRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
       LOG.info(
-        "Emissions building finished. Number of CO2 emission records saved: " + emissionsData.size()
+        "Emissions building finished. Number of emission records saved: " + emissionsData.size()
       );
     }
   }

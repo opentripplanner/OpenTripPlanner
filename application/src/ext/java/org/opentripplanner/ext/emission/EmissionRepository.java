@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * Repository for emissions data.
+ * Repository for emission data.
  */
 public interface EmissionRepository extends Serializable {
   void setCo2Emissions(Map<FeedScopedId, Double> co2Emissions);
