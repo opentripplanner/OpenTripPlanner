@@ -201,15 +201,14 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant expLat,
     Duration expSearchWindow,
     PageType expPageType,
-    Boolean hasDeduplicationParams,
+    Boolean hasDedupeParams,
     Boolean hasGeneralizedCostMaxLimit
   ) {
     assertEquals(expEdt, pageCursor.earliestDepartureTime());
     assertEquals(expLat, pageCursor.latestArrivalTime());
     assertEquals(expSearchWindow, pageCursor.searchWindow());
     assertEquals(expPageType, pageCursor.type());
-    // This is related to the DeduplicationPageCut class.
-    assertEquals(hasDeduplicationParams, pageCursor.containsItineraryPageCut());
+    assertEquals(hasDedupeParams, pageCursor.containsItineraryPageCut());
     assertEquals(hasGeneralizedCostMaxLimit, pageCursor.containsGeneralizedCostMaxLimit());
   }
 
