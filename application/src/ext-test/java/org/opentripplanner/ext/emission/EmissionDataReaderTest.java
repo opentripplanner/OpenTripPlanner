@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.FileNotFoundException;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.emission.internal.csvdata.EmissionsDataReader;
+import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class EmissionsDataReaderTest implements EmissionTestData {
+public class EmissionDataReaderTest implements EmissionTestData {
 
   // We explicit set the feed-id in this test, we do NOT use the feed-id in the teed-info.txt.
   // This way, we test that the feed-id can be overridden.
@@ -19,7 +19,7 @@ public class EmissionsDataReaderTest implements EmissionTestData {
   );
   private static final FeedScopedId ROUTE_F_R1 = new FeedScopedId(FEED_ID, ROUTE_ID_EM_R1.getId());
 
-  private EmissionsDataReader subject = new EmissionsDataReader(DataImportIssueStore.NOOP);
+  private EmissionDataReader subject = new EmissionDataReader(DataImportIssueStore.NOOP);
 
   @Test
   void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {

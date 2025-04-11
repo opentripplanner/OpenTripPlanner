@@ -21,14 +21,14 @@ import org.slf4j.LoggerFactory;
  * and saving it in a map.
  */
 @Sandbox
-public class EmissionsDataReader {
+public class EmissionDataReader {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EmissionsDataReader.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmissionDataReader.class);
   private static final String EMISSIONS_FILE_NAME = "emissions.txt";
 
   private final DataImportIssueStore issueStore;
 
-  public EmissionsDataReader(DataImportIssueStore issueStore) {
+  public EmissionDataReader(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
   }
 
