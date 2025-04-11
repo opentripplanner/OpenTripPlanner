@@ -160,7 +160,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
-    graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Co2Emissions);
+    graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
 
     graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
 
