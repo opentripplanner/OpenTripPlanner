@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
-import org.opentripplanner.ext.emissions.config.EmissionsConfig;
+import org.opentripplanner.ext.emissions.config.EmissionConfig;
 import org.opentripplanner.ext.emissions.parameters.EmissionParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
@@ -608,7 +608,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
-    emissions = EmissionsConfig.mapEmissionsConfig("emissions", root);
+    emissions = EmissionConfig.mapEmissionsConfig("emissions", root);
 
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");

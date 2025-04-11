@@ -13,7 +13,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 /**
  * This class is responsible for mapping emissions configuration into emissions parameters.
  */
-public class EmissionsConfig {
+public class EmissionConfig {
 
   public static EmissionParameters mapEmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
@@ -51,7 +51,7 @@ public class EmissionsConfig {
       .of("feeds")
       .since(V2_8)
       .summary("List of emmistion feeds.")
-      .asObjects(List.of(), EmissionsConfig::mapFeed);
+      .asObjects(List.of(), EmissionConfig::mapFeed);
   }
 
   private static EmissionFeedParameters mapFeed(NodeAdapter c) {
