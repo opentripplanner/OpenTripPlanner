@@ -9,7 +9,7 @@ import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-public class EmissionDataReaderTest implements EmissionTestData {
+public class RouteDataReaderTest implements EmissionTestData {
 
   // We explicit set the feed-id in this test, we do NOT use the feed-id in the teed-info.txt.
   // This way, we test that the feed-id can be overridden.
