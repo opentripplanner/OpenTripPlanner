@@ -20,9 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.ext.emission.EmissionsService;
+import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
@@ -387,7 +387,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     Itinerary bus;
     Itinerary car;
     ItineraryListFilterChainBuilder builder = createBuilder(true, false, 2);
-    EmissionsService eService;
+    EmissionService eService;
 
     @BeforeEach
     void setUpItineraries() {
@@ -398,7 +398,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       emissions.put(new FeedScopedId("F", "1"), 1.0);
       eRepository.setCo2Emissions(emissions);
       eRepository.setCarAvgCo2PerMeter(1.0);
-      eService = new DefaultEmissionsService(eRepository);
+      eService = new DefaultEmissionService(eRepository);
     }
 
     @Test

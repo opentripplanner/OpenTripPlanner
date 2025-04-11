@@ -9,7 +9,7 @@ import org.opentripplanner.utils.lang.Sandbox;
  * A service for getting emissions information for routes.
  */
 @Sandbox
-public interface EmissionsService {
+public interface EmissionService {
   /**
    * Get all emissions per meter for a specific route.
    *

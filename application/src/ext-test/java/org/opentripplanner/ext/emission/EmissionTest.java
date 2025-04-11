@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Gram;
@@ -36,7 +36,7 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class EmissionTest {
 
-  private static DefaultEmissionsService eService;
+  private static DefaultEmissionService eService;
   private static EmissionItineraryDecorator emissionDecorator;
 
   static final ZonedDateTime TIME = OffsetDateTime.parse(
@@ -68,7 +68,7 @@ class EmissionTest {
     EmissionRepository emissionRepository = new DefaultEmissionRepository();
     emissionRepository.setCo2Emissions(emissions);
     emissionRepository.setCarAvgCo2PerMeter(0.131);
-    eService = new DefaultEmissionsService(emissionRepository);
+    eService = new DefaultEmissionService(emissionRepository);
     emissionDecorator = new EmissionItineraryDecorator(eService);
   }
 

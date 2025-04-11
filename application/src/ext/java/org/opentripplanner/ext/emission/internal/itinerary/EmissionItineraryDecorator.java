@@ -2,7 +2,7 @@ package org.opentripplanner.ext.emission.internal.itinerary;
 
 import java.util.List;
 import java.util.Optional;
-import org.opentripplanner.ext.emission.EmissionsService;
+import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
@@ -22,10 +22,10 @@ import org.opentripplanner.utils.lang.Sandbox;
 @Sandbox
 public class EmissionItineraryDecorator implements ItineraryDecorator {
 
-  private final EmissionsService emissionsService;
+  private final EmissionService emissionService;
 
-  public EmissionItineraryDecorator(EmissionsService emissionsService) {
-    this.emissionsService = emissionsService;
+  public EmissionItineraryDecorator(EmissionService emissionService) {
+    this.emissionService = emissionService;
   }
 
   @Override
@@ -75,7 +75,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
         leg.getAgency().getId().getFeedId(),
         leg.getRoute().getId().getId()
       );
-      Optional<Emission> co2EmissionsForRoute = emissionsService.getEmissionPerMeterForRoute(
+      Optional<Emission> co2EmissionsForRoute = emissionService.getEmissionPerMeterForRoute(
         feedScopedRouteId
       );
       if (co2EmissionsForRoute.isPresent()) {
@@ -94,7 +94,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     if (carLegs.isEmpty()) {
       return Optional.empty();
     }
-    return emissionsService
+    return emissionService
       .getEmissionPerMeterForCar()
       .map(emissions ->
         new Gram(
