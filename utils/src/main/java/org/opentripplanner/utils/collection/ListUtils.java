@@ -93,12 +93,16 @@ public class ListUtils {
     return list;
   }
 
-  public static <T> List<Pair<T>> splitIntoOverlappingPairs(List<T> input) {
+  /**
+   * Take a list of items and split it into a list of "overlapping" pairs. For example
+   * [A,B,C,D] becomes [[A,B],[B,C],[C,D]].
+   */
+  public static <T> List<Pair<T>> partitionIntoOverlappingPairs(List<T> input) {
     var output = new ArrayList<Pair<T>>(input.size());
     for (int i = 0; i < input.size() - 1; i++) {
       T first = input.get(i);
       T second = input.get(i + 1);
-      output.add(new Pair(first, second));
+      output.add(new Pair<>(first, second));
     }
     return output;
   }

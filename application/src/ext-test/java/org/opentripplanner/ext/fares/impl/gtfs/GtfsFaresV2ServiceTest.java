@@ -35,7 +35,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   private static final FeedScopedId expressNetwork = id("express");
   private static final FeedScopedId localNetwork = id("local");
 
-  private static final  FareProduct single = FareProduct.of(
+  private static final FareProduct single = FareProduct.of(
     new FeedScopedId(FEED_ID, "single"),
     "Single one-way ticket",
     Money.euros(1)

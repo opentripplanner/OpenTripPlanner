@@ -67,7 +67,7 @@ class FareLookupService implements Serializable {
     FareTransferRule transferRule,
     List<ScheduledTransitLeg> transitLegs
   ) {
-    var pairs = ListUtils.splitIntoOverlappingPairs(transitLegs);
+    var pairs = ListUtils.partitionIntoOverlappingPairs(transitLegs);
     var fromRule = findFareLegRule(transferRule.fromLegGroup());
     var toRule = findFareLegRule(transferRule.toLegGroup());
 
