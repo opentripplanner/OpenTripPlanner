@@ -76,14 +76,14 @@ class EmissionTest {
   void testGetEmissionsForItinerary() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
     i = emissionDecorator.decorate(i);
-    assertEquals(new Gram(2223.902), i.emissionPerPerson().getCo2());
+    assertEquals(Gram.of(2223.902), i.emissionPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
     var i = createItinerary(STREET_LEG);
     i = emissionDecorator.decorate(i);
-    assertEquals(new Gram(28.0864), i.emissionPerPerson().getCo2());
+    assertEquals(Gram.of(28.0864), i.emissionPerPerson().getCo2());
   }
 
   @Test
@@ -97,14 +97,14 @@ class EmissionTest {
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
     i = emissionDecorator.decorate(i);
-    assertEquals(new Gram(0.0), i.emissionPerPerson().getCo2());
+    assertEquals(Gram.of(0.0), i.emissionPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
     i = emissionDecorator.decorate(i);
-    assertEquals(new Gram(2251.9884), i.emissionPerPerson().getCo2());
+    assertEquals(Gram.of(2251.9884), i.emissionPerPerson().getCo2());
   }
 
   @Test

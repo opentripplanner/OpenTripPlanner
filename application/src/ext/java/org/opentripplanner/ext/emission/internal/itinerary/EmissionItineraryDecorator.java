@@ -68,7 +68,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     if (transitLegs.isEmpty()) {
       return Optional.empty();
     }
-    Gram co2Emissions = new Gram(0.0);
+    Gram co2Emissions = Gram.of(0.0);
     for (TransitLeg leg : transitLegs) {
       FeedScopedId feedScopedRouteId = new FeedScopedId(
         leg.getAgency().getId().getFeedId(),
@@ -96,7 +96,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     return emissionService
       .getEmissionPerMeterForCar()
       .map(emission ->
-        new Gram(
+        Gram.of(
           carLegs
             .stream()
             .mapToDouble(leg -> emission.getCo2().multiply(leg.getDistanceMeters()).asDouble())

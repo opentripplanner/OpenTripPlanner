@@ -392,7 +392,7 @@ class GraphQLIntegrationTest {
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emission = new Emission(new Gram(123.0));
+    var emission = new Emission(Gram.of(123.0));
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
