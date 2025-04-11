@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.emission.EmissionsRepository;
 import org.opentripplanner.ext.emission.configure.EmissionsGraphBuilderModule;
-import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionsGraphBuilder;
+import org.opentripplanner.ext.emission.internal.graphbuilder.EmissionGraphBuilder;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
@@ -69,7 +69,7 @@ public interface GraphBuilderFactory {
   EdgeUpdaterModule dataOverlayFactory();
 
   @Nullable
-  EmissionsGraphBuilder emissionsModule();
+  EmissionGraphBuilder emissionGraphBuilder();
 
   @Nullable
   RouteToCentroidStationIdsValidator routeToCentroidStationIdValidator();

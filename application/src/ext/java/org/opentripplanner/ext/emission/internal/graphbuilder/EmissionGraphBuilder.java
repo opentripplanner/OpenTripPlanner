@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This class allows updating the graph with emissions data from external emissions data files.
  */
-public class EmissionsGraphBuilder implements GraphBuilderModule {
+public class EmissionGraphBuilder implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EmissionsGraphBuilder.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmissionGraphBuilder.class);
 
   private final EmissionParameters parameters;
   private final EmissionsRepository emissionsRepository;
@@ -29,7 +29,7 @@ public class EmissionsGraphBuilder implements GraphBuilderModule {
   private final Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionsDataSources;
   private final DataImportIssueStore issueStore;
 
-  public EmissionsGraphBuilder(
+  public EmissionGraphBuilder(
     Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> gtfsDataSources,
     Iterable<ConfiguredDataSource<EmissionFeedParameters>> emissionsDataSources,
     EmissionParameters parameters,

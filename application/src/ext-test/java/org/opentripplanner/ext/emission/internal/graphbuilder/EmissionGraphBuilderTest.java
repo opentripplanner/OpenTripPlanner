@@ -17,7 +17,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
 import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 
-public class EmissionsGraphBuilderTest implements EmissionTestData {
+public class EmissionGraphBuilderTest implements EmissionTestData {
 
   @Test
   void testMultipleGtfsDataReading() {
@@ -28,7 +28,7 @@ public class EmissionsGraphBuilderTest implements EmissionTestData {
     var feedDataSources = List.of(configuredDataSource(emissionFeed()));
     var emissionsRepository = new DefaultEmissionsRepository();
 
-    var subject = new EmissionsGraphBuilder(
+    var subject = new EmissionGraphBuilder(
       gtfsDataSources,
       feedDataSources,
       EmissionParameters.DEFAULT,
