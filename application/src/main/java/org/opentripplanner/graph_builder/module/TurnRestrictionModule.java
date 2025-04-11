@@ -7,12 +7,14 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.SubsidiaryOsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.TraverseModeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,20 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     );
   }
 
+  StreetTraversalPermission streetTraversalPermission(TraverseModeSet traverseModeSet) {
+    var permission = StreetTraversalPermission.NONE;
+    if (traverseModeSet.getBicycle()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+    }
+    if (traverseModeSet.getWalk()) {
+      permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+    if (traverseModeSet.getCar()) {
+      permission = permission.add(StreetTraversalPermission.CAR);
+    }
+    return permission;
+  }
+
   void processVertex(OsmVertex vertex, TurnRestriction turnRestriction) {
     var mainVertex = (OsmVertex) turnRestriction.from.getToVertex();
     var splitVertex = new SubsidiaryOsmVertex(mainVertex);
@@ -70,7 +86,18 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
     var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex.getIncomingStreetEdges());
-    fromEdge.toBuilder().withToVertex(splitVertex).buildAndConnect();
+    var fromPermission = fromEdge.getPermission();
+    var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
+    var oldPermission = fromPermission.remove(restrictionPermission);
+    var newPermission = fromPermission.intersection(restrictionPermission);
+    if (newPermission.allowsAnything()) {
+      fromEdge.toBuilder().withToVertex(splitVertex).withPermission(newPermission).buildAndConnect();
+    }
+    if (oldPermission.allowsNothing()) {
+      fromEdge.remove();
+    } else {
+      fromEdge.setPermission(oldPermission);
+    }
     for (var toEdge : vertex.getOutgoingStreetEdges()) {
       if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
         toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
