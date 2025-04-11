@@ -33,7 +33,7 @@ public class BuildConfigurationDocTest {
     .skip("dataOverlay", "sandbox/DataOverlay.md")
     .skip("fares", "sandbox/Fares.md")
     .skip("transferRequests", "RouteRequest.md")
-    .skip("emissions", "sandbox/Emission.md")
+    .skip("emission", "sandbox/Emission.md")
     .build();
 
   /**
