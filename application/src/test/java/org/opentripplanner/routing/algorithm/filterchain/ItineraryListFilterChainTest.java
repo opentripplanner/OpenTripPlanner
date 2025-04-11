@@ -13,31 +13,25 @@ import static org.opentripplanner.routing.api.request.preference.ItineraryFilter
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.ext.emission.EmissionService;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
-import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
-import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.Box;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -273,6 +267,20 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .withDebugEnabled(ofDebugEnabled(debug));
   }
 
+  @Test
+  void makeSureEmissionDecoratorIsAddedToTheFilterChainTest() {
+    final Box<String> state = Box.of("I");
+    ItineraryDecorator emissionDecorator = it -> {
+      state.modify(v -> v + "+C");
+      return it;
+    };
+    createBuilder(false, false, 10)
+      .withEmissions(emissionDecorator)
+      .build()
+      .filter(List.of(i1, i2));
+    assertEquals("I+C+C", state.get());
+  }
+
   @Nested
   class MaxItinerariesBuilderTest {
 
@@ -380,35 +388,5 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     return systemNotices == null
       ? "[]"
       : systemNotices.stream().map(SystemNotice::tag).toList().toString();
-  }
-
-  @Nested
-  class AddEmissionToItineraryTest {
-
-    Itinerary bus;
-    Itinerary car;
-    ItineraryListFilterChainBuilder builder = createBuilder(true, false, 2);
-    EmissionService eService;
-
-    @BeforeEach
-    void setUpItineraries() {
-      bus = newItinerary(A).bus(21, T11_06, T11_09, B).build();
-      car = newItinerary(A).drive(T11_30, T11_50, B).build();
-      var eRepository = new DefaultEmissionRepository();
-      Map<FeedScopedId, Emission> emissions = new HashMap<>();
-      emissions.put(new FeedScopedId("F", "1"), Emission.co2_g(1.0));
-      eRepository.addRouteEmissions(emissions);
-      eRepository.setCarAvgCo2PerMeter(1.0);
-      eService = new DefaultEmissionService(eRepository);
-    }
-
-    @Test
-    void emissionsTest() {
-      ItineraryListFilterChain chain = builder
-        .withEmissions(new EmissionItineraryDecorator(eService))
-        .build();
-      List<Itinerary> itineraries = chain.filter(List.of(bus, car));
-      assertFalse(itineraries.stream().anyMatch(i -> i.emissionPerPerson().co2() == null));
-    }
   }
 }
