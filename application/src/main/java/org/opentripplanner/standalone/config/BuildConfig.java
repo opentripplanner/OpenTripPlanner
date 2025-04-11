@@ -173,7 +173,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Set<String> boardingLocationTags;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
-  public final EmissionParameters emissions;
+  public final EmissionParameters emission;
   public final TransitFeeds transitFeeds;
   public final boolean staticParkAndRide;
   public final boolean staticBikeParkAndRide;
@@ -608,7 +608,7 @@ public class BuildConfig implements OtpDataStoreConfig {
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
-    emissions = EmissionConfig.mapEmissionsConfig("emissions", root);
+    emission = EmissionConfig.mapEmissionsConfig("emission", root);
 
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");

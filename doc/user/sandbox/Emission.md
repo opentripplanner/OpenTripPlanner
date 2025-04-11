@@ -53,7 +53,7 @@ the `carAvgOccupancy` provides the average number of passengers in a car.
 ```JSON
 // build-config.json
 {
-  "emissions" : {
+  "emission" : {
     "carAvgCo2PerKm" : 170,
     "carAvgOccupancy" : 1.3,
     "feeds" : [
@@ -67,21 +67,21 @@ the `carAvgOccupancy` provides the average number of passengers in a car.
 ```
 ### Overview
 
-| Config Parameter          |    Type    | Summary                                                                         |  Req./Opt. | Default Value | Since |
-|---------------------------|:----------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| carAvgCo2PerKm            |  `integer` | The average CO₂ emissions of a car in grams per kilometer.                      | *Optional* | `170`         |  2.5  |
-| carAvgOccupancy           |  `double`  | The average number of passengers in a car.                                      | *Optional* | `1.3`         |  2.5  |
-| [feeds](#emissions_feeds) | `object[]` | List of emmistion feeds.                                                        | *Optional* |               |  2.8  |
-|       feedId              |  `string`  | Specify the feed id to use for matching transit ids in the emission input data. | *Required* |               |  2.8  |
-|       source              |    `uri`   | Specify the feed source url.                                                    | *Required* |               |  2.8  |
+| Config Parameter         |    Type    | Summary                                                                         |  Req./Opt. | Default Value | Since |
+|--------------------------|:----------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| carAvgCo2PerKm           |  `integer` | The average CO₂ emissions of a car in grams per kilometer.                      | *Optional* | `170`         |  2.5  |
+| carAvgOccupancy          |  `double`  | The average number of passengers in a car.                                      | *Optional* | `1.3`         |  2.5  |
+| [feeds](#emission_feeds) | `object[]` | List of emmistion feeds.                                                        | *Optional* |               |  2.8  |
+|       feedId             |  `string`  | Specify the feed id to use for matching transit ids in the emission input data. | *Required* |               |  2.8  |
+|       source             |    `uri`   | Specify the feed source url.                                                    | *Required* |               |  2.8  |
 
 
 ### Details
 
-<h4 id="emissions_feeds">feeds</h4>
+<h4 id="emission_feeds">feeds</h4>
 
 **Since version:** `2.8` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
-**Path:** /emissions 
+**Path:** /emission 
 
 List of emmistion feeds.
 

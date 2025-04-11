@@ -195,7 +195,7 @@ public class GraphBuilderDataSources {
   }
 
   private ConfiguredDataSource<EmissionFeedParameters> mapEmissionFeed(DataSource dataSource) {
-    var p = buildConfig.emissions
+    var p = buildConfig.emission
       .feeds()
       .stream()
       .filter(c -> uriMatch(c.source(), dataSource.uri()))

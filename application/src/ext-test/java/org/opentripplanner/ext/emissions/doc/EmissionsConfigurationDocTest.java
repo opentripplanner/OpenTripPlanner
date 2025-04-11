@@ -24,8 +24,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 @GeneratesDocumentation
 public class EmissionsConfigurationDocTest implements DocsTestConstants {
 
-  private static final File TEMPLATE = new File(TEMPLATE_PATH, "Emissions.md");
-  private static final File OUT_FILE = new File(SANDBOX_USER_DOC_PATH, "Emissions.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "Emission.md");
+  private static final File OUT_FILE = new File(SANDBOX_USER_DOC_PATH, "Emission.md");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test
@@ -48,7 +48,7 @@ public class EmissionsConfigurationDocTest implements DocsTestConstants {
 
     var json = JsonSupport.jsonNodeFromPath(buildConfigFile.toPath());
     var conf = new BuildConfig(json, buildConfigFile.toString(), false);
-    return conf.asNodeAdapter().child("emissions");
+    return conf.asNodeAdapter().child("emission");
   }
 
   private String updaterDoc(NodeAdapter node) {
@@ -72,7 +72,7 @@ public class EmissionsConfigurationDocTest implements DocsTestConstants {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject("emissions").build();
+    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject("emission").build();
     buf.header(3, "Example configuration", null).addExample("build-config.json", root);
   }
 }
