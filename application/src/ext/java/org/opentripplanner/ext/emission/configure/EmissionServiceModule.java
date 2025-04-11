@@ -13,11 +13,11 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * a module for the service without the repository, which is injected from the loading phase.
  */
 @Module
-public class EmissionsServiceModule {
+public class EmissionServiceModule {
 
   @Provides
   @EmissionDecorator
-  public ItineraryDecorator provideEmissionsService(EmissionRepository emissionRepository) {
+  public ItineraryDecorator provideEmissionService(EmissionRepository emissionRepository) {
     return new EmissionItineraryDecorator(new DefaultEmissionsService(emissionRepository));
   }
 }

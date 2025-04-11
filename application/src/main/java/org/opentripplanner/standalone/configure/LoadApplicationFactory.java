@@ -7,7 +7,7 @@ import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
-import org.opentripplanner.ext.emission.configure.EmissionsRepositoryModule;
+import org.opentripplanner.ext.emission.configure.EmissionRepositoryModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationRepositoryModule;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -35,7 +35,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
     GsDataSourceModule.class,
     OsmInfoGraphBuildRepositoryModule.class,
     WorldEnvelopeRepositoryModule.class,
-    EmissionsRepositoryModule.class,
+    EmissionRepositoryModule.class,
     StopConsolidationRepositoryModule.class,
     VehicleParkingRepositoryModule.class,
   }

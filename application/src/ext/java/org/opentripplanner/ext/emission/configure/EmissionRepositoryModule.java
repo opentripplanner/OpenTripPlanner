@@ -7,7 +7,7 @@ import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 
 @Module
-public class EmissionsRepositoryModule {
+public class EmissionRepositoryModule {
 
   @Provides
   @Singleton

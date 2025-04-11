@@ -7,7 +7,7 @@ import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.configure.SchemaModule;
 import org.opentripplanner.ext.emission.EmissionRepository;
-import org.opentripplanner.ext.emission.configure.EmissionsServiceModule;
+import org.opentripplanner.ext.emission.configure.EmissionServiceModule;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.geocoder.configure.GeocoderModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
@@ -58,7 +58,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
   modules = {
     ConfigModule.class,
     ConstructApplicationModule.class,
-    EmissionsServiceModule.class,
+    EmissionServiceModule.class,
     GeocoderModule.class,
     InteractiveLauncherModule.class,
     RealtimeVehicleServiceModule.class,
