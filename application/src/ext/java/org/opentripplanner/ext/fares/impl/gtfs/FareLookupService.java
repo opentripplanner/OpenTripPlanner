@@ -55,8 +55,9 @@ class FareLookupService implements Serializable {
     return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
   }
 
-  Set<TransferMatch> transferRulesMatchingAllLegs(List<ScheduledTransitLeg> legs) {
+  Set<TransferMatch> transfersMatchingAllLegs(List<ScheduledTransitLeg> legs) {
     return this.transferRules.stream()
+      .filter(FareTransferRule::unlimitedTransfers)
       .map(r -> findTransferMatch(r, legs))
       .filter(Optional::isPresent)
       .map(Optional::get)

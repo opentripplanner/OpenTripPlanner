@@ -16,6 +16,7 @@ public record FareTransferRule(
   @Nullable Duration timeLimit,
   Collection<FareProduct> fareProducts
 ) {
+  public static final int UNLIMITED_TRANSFERS = -1;
   public FareTransferRule {
     Objects.requireNonNull(id);
     fareProducts = List.copyOf(fareProducts);
@@ -33,5 +34,12 @@ public record FareTransferRule(
 
   public boolean containsWildCard() {
     return fromLegGroup == null || toLegGroup == null;
+  }
+
+  /**
+   * Returns true if there is no limited on the number of transfers.
+   */
+  public boolean unlimitedTransfers() {
+    return transferCount == UNLIMITED_TRANSFERS;
   }
 }

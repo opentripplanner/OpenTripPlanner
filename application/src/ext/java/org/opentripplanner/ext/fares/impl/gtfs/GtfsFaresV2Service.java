@@ -40,7 +40,7 @@ public final class GtfsFaresV2Service implements Serializable {
       });
 
     var itinProducts = lookup
-      .transferRulesMatchingAllLegs(itinerary.listScheduledTransitLegs())
+      .transfersMatchingAllLegs(itinerary.listScheduledTransitLegs())
       .stream()
       .flatMap(transferRule ->
         Stream.concat(

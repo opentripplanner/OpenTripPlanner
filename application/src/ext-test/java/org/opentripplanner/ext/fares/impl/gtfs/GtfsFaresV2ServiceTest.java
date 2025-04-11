@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.ext.fares.model.FareTransferRule.UNLIMITED_TRANSFERS;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
@@ -83,7 +84,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   )
     .withValidity(Duration.ofDays(1))
     .build();
-  private static final FareProduct freeTransfer = FareProduct.of(
+  private static final FareProduct FREE_TRANSFER = FareProduct.of(
     new FeedScopedId(FEED_ID, "free_transfer"),
     "Free transfer",
     Money.euros(0)
@@ -251,10 +252,38 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
           .build()
       ),
       List.of(
-        new FareTransferRule(TRANSFER_ID, LEG_GROUP1, LEG_GROUP1, 1, null, List.of(freeTransfer)),
-        new FareTransferRule(TRANSFER_ID, LEG_GROUP2, LEG_GROUP3, 1, null, List.of(freeTransfer)),
-        new FareTransferRule(TRANSFER_ID, LEG_GROUP4, LEG_GROUP4, 1, null, List.of(freeTransfer)),
-        new FareTransferRule(TRANSFER_ID, null, LEG_GROUP5, 1, null, List.of(freeTransfer))
+        new FareTransferRule(
+          TRANSFER_ID,
+          LEG_GROUP1,
+          LEG_GROUP1,
+          UNLIMITED_TRANSFERS,
+          null,
+          List.of(FREE_TRANSFER)
+        ),
+        new FareTransferRule(
+          TRANSFER_ID,
+          LEG_GROUP2,
+          LEG_GROUP3,
+          UNLIMITED_TRANSFERS,
+          null,
+          List.of(FREE_TRANSFER)
+        ),
+        new FareTransferRule(
+          TRANSFER_ID,
+          LEG_GROUP4,
+          LEG_GROUP4,
+          UNLIMITED_TRANSFERS,
+          null,
+          List.of(FREE_TRANSFER)
+        ),
+        new FareTransferRule(
+          TRANSFER_ID,
+          null,
+          LEG_GROUP5,
+          UNLIMITED_TRANSFERS,
+          null,
+          List.of(FREE_TRANSFER)
+        )
       ),
       Multimaps.forMap(
         Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
