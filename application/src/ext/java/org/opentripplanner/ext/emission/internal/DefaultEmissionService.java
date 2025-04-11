@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.emission.internal;
 
 import jakarta.inject.Inject;
-import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.model.plan.Emission;
@@ -19,13 +18,20 @@ public class DefaultEmissionService implements EmissionService {
   }
 
   @Override
-  public Optional<Emission> getEmissionPerMeterForCar() {
-    return this.emissionRepository.getCarAvgCo2PerMeter().map(Emission::co2_g);
+  public Emission calculateCarPassengerEmission(double distance_m) {
+    return emissionRepository.carAvgPassengerEmissionPerMeter().multiply(distance_m);
   }
 
   @Override
-  public Optional<Emission> getEmissionPerMeterForRoute(FeedScopedId feedScopedRouteId) {
-    Emission emission = this.emissionRepository.routePassengerEmissionsPerMeter(feedScopedRouteId);
-    return emission.isZero() ? Optional.empty() : Optional.ofNullable(emission);
+  public Emission calculateEmissionPerMeterForRoute(
+    FeedScopedId feedScopedRouteId,
+    double distance_m
+  ) {
+    // Calculate emissions based on average passenger emisions for the route
+    var value = emissionRepository.routePassengerEmissionsPerMeter(feedScopedRouteId);
+    if (!value.isZero()) {
+      return value.multiply(distance_m);
+    }
+    return Emission.ZERO;
   }
 }

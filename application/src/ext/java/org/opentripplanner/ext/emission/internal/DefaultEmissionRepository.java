@@ -2,24 +2,25 @@ package org.opentripplanner.ext.emission.internal;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class DefaultEmissionRepository implements EmissionRepository {
 
-  private Double carAvgCo2PerMeter;
+  private Emission carAvgCo2PerMeter = Emission.ZERO;
   private Map<FeedScopedId, Emission> routeEmissions = new HashMap<>();
 
   public DefaultEmissionRepository() {}
 
+  @Override
   public void setCarAvgCo2PerMeter(double carAvgCo2PerMeter) {
-    this.carAvgCo2PerMeter = carAvgCo2PerMeter;
+    this.carAvgCo2PerMeter = Emission.co2_g(carAvgCo2PerMeter);
   }
 
-  public Optional<Double> getCarAvgCo2PerMeter() {
-    return Optional.ofNullable(this.carAvgCo2PerMeter);
+  @Override
+  public Emission carAvgPassengerEmissionPerMeter() {
+    return this.carAvgCo2PerMeter;
   }
 
   @Override

@@ -1,18 +1,12 @@
 package org.opentripplanner.ext.emission.internal.itinerary;
 
-import java.util.List;
-import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionService;
-import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
@@ -29,79 +23,37 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
 
   @Override
   public Itinerary decorate(Itinerary itinerary) {
-    List<TransitLeg> transitLegs = itinerary
-      .legs()
-      .stream()
-      .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
-      .map(TransitLeg.class::cast)
-      .toList();
+    var sum = Emission.ZERO;
 
-    Optional<Gram> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
-
-    if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
-      return itinerary;
-    }
-
-    List<StreetLeg> carLegs = itinerary
-      .legs()
-      .stream()
-      .filter(l -> l instanceof StreetLeg)
-      .map(StreetLeg.class::cast)
-      .filter(leg -> leg.getMode() == TraverseMode.CAR)
-      .toList();
-
-    Optional<Gram> co2ForCar = calculateCo2EmissionsForCar(carLegs);
-
-    var builder = itinerary.copyOf();
-
-    if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
-      builder.withEmissionPerPerson(Emission.of(co2ForTransit.get().plus(co2ForCar.get())));
-    } else if (co2ForTransit.isPresent()) {
-      builder.withEmissionPerPerson(Emission.of(co2ForTransit.get()));
-    } else if (co2ForCar.isPresent()) {
-      builder.withEmissionPerPerson(Emission.of(co2ForCar.get()));
-    }
-    return builder.build();
-  }
-
-  private Optional<Gram> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {
-    if (transitLegs.isEmpty()) {
-      return Optional.empty();
-    }
-    Gram co2Emissions = Gram.of(0.0);
-    for (TransitLeg leg : transitLegs) {
-      FeedScopedId feedScopedRouteId = new FeedScopedId(
-        leg.getAgency().getId().getFeedId(),
-        leg.getRoute().getId().getId()
-      );
-      Optional<Emission> co2EmissionsForRoute = emissionService.getEmissionPerMeterForRoute(
-        feedScopedRouteId
-      );
-      if (co2EmissionsForRoute.isPresent()) {
-        co2Emissions = co2Emissions.plus(
-          co2EmissionsForRoute.get().co2().multiply(leg.getDistanceMeters())
-        );
+    for (var l : itinerary.legs()) {
+      Emission value;
+      if (l instanceof TransitLeg tl) {
+        value = calculateCo2EmissionsForTransit(tl);
+      } else if (l instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
+        value = calculateCo2EmissionsForCar(sl);
       } else {
-        // Partial results would not give an accurate representation of the emissions.
-        return Optional.empty();
+        continue;
       }
+
+      // Note! Partial results would not give an accurate representation of the emissions, not all
+      // legs have emissions. This should be fixed by setting the emission on each leg and mark
+      // legs witch have UNKNOWN emissions.
+      if (value.isZero()) {
+        return itinerary;
+      }
+      sum = sum.plus(value);
     }
-    return Optional.ofNullable(co2Emissions);
+    return sum.isZero() ? itinerary : itinerary.copyOf().withEmissionPerPerson(sum).build();
   }
 
-  private Optional<Gram> calculateCo2EmissionsForCar(List<StreetLeg> carLegs) {
-    if (carLegs.isEmpty()) {
-      return Optional.empty();
-    }
-    return emissionService
-      .getEmissionPerMeterForCar()
-      .map(emission ->
-        Gram.of(
-          carLegs
-            .stream()
-            .mapToDouble(leg -> emission.co2().multiply(leg.getDistanceMeters()).asDouble())
-            .sum()
-        )
-      );
+  private Emission calculateCo2EmissionsForTransit(TransitLeg leg) {
+    return emissionService.calculateEmissionPerMeterForRoute(
+      leg.getRoute().getId(),
+      leg.getDistanceMeters()
+    );
+  }
+
+  private Emission calculateCo2EmissionsForCar(StreetLeg carLeg) {
+    return emissionService.calculateCarPassengerEmission(carLeg.getDistanceMeters());
   }
 }

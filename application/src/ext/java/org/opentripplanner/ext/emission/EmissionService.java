@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.emission;
 
-import java.util.Optional;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.Sandbox;
@@ -11,12 +10,16 @@ import org.opentripplanner.utils.lang.Sandbox;
 @Sandbox
 public interface EmissionService {
   /**
-   * Get passenger emissions per meter for a specific route.
+   * Calculate the passenger emission for car for a given distance. The calculation is based on the
+   * configured number of people in the car and the average car emissions.
+   *
+   * @return The emissions per passanger for the whole given distance. {@link Emission#ZERO} is
+   * retuned if no emission exist.
    */
-  Optional<Emission> getEmissionPerMeterForRoute(FeedScopedId feedScopedRouteId);
+  Emission calculateCarPassengerEmission(double distanceMeters);
 
   /**
-   * Get emissions per meter per person for a car.
+   * Calculate passenger emissions per meter for a specific route.
    */
-  Optional<Emission> getEmissionPerMeterForCar();
+  Emission calculateEmissionPerMeterForRoute(FeedScopedId feedScopedRouteId, double distance_m);
 }
