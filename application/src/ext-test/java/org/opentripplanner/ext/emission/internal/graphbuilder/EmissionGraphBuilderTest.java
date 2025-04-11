@@ -26,20 +26,20 @@ public class EmissionGraphBuilderTest implements EmissionTestData {
       configuredDataSource(gtfsWithEmissionDir())
     );
     var feedDataSources = List.of(configuredDataSource(emissionFeed()));
-    var emissionsRepository = new DefaultEmissionRepository();
+    var emissionRepository = new DefaultEmissionRepository();
 
     var subject = new EmissionGraphBuilder(
       gtfsDataSources,
       feedDataSources,
       EmissionParameters.DEFAULT,
-      emissionsRepository,
+      emissionRepository,
       DataImportIssueStore.NOOP
     );
     subject.buildGraph();
 
-    assertEquals(Optional.of(0.006), emissionsRepository.getCO2EmissionsById(ROUTE_ID_GD_1001));
-    assertEquals(Optional.of(0.041), emissionsRepository.getCO2EmissionsById(ROUTE_ID_GZ_1002));
-    assertEquals(Optional.of(0.006), emissionsRepository.getCO2EmissionsById(ROUTE_ID_EM_R1));
+    assertEquals(Optional.of(0.006), emissionRepository.getCO2EmissionsById(ROUTE_ID_GD_1001));
+    assertEquals(Optional.of(0.041), emissionRepository.getCO2EmissionsById(ROUTE_ID_GZ_1002));
+    assertEquals(Optional.of(0.006), emissionRepository.getCO2EmissionsById(ROUTE_ID_EM_R1));
   }
 
   private static ConfiguredCompositeDataSource<GtfsFeedParameters> configuredDataSource(

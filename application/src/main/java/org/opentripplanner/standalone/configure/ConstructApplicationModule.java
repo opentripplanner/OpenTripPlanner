@@ -49,7 +49,7 @@ public class ConstructApplicationModule {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
-    @Nullable @EmissionDecorator ItineraryDecorator emissionsItineraryDecorator,
+    @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
@@ -79,7 +79,7 @@ public class ConstructApplicationModule {
       viaTransferResolver,
       worldEnvelopeService,
       // Optional Sandbox services
-      emissionsItineraryDecorator,
+      emissionItineraryDecorator,
       luceneIndex,
       schema,
       sorlandsbanenService,

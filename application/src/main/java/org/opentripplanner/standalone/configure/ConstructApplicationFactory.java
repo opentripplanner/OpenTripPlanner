@@ -93,7 +93,7 @@ public interface ConstructApplicationFactory {
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
-  EmissionRepository emissionsDataModel();
+  EmissionRepository emissionRepository();
 
   @Nullable
   GraphVisualizer graphVisualizer();
@@ -148,7 +148,7 @@ public interface ConstructApplicationFactory {
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
 
     @BindsInstance
-    Builder emissionsDataModel(EmissionRepository emissionRepository);
+    Builder emissionRepository(EmissionRepository emissionRepository);
 
     @BindsInstance
     Builder schema(RouteRequest defaultRouteRequest);

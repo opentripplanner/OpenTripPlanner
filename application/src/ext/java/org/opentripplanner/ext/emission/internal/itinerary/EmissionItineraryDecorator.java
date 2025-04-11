@@ -17,7 +17,6 @@ import org.opentripplanner.utils.lang.Sandbox;
 
 /**
  * Calculates the emissions for the itineraries and adds them.
- * @param emissionsService
  */
 @Sandbox
 public class EmissionItineraryDecorator implements ItineraryDecorator {
@@ -96,11 +95,11 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     }
     return emissionService
       .getEmissionPerMeterForCar()
-      .map(emissions ->
+      .map(emission ->
         new Gram(
           carLegs
             .stream()
-            .mapToDouble(leg -> emissions.getCo2().multiply(leg.getDistanceMeters()).asDouble())
+            .mapToDouble(leg -> emission.getCo2().multiply(leg.getDistanceMeters()).asDouble())
             .sum()
         )
       );

@@ -91,7 +91,7 @@ public class GraphBuilder implements Runnable {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
-      .emissionsDataModel(emissionRepository)
+      .emissionRepository(emissionRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .dataSources(dataSources)
       .timeZoneId(timetableRepository.getTimeZone());

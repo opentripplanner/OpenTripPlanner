@@ -114,6 +114,6 @@ public interface GraphBuilderFactory {
     GraphBuilderFactory build();
 
     @BindsInstance
-    Builder emissionsDataModel(@Nullable EmissionRepository emissionRepository);
+    Builder emissionRepository(@Nullable EmissionRepository emissionRepository);
   }
 }

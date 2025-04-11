@@ -70,7 +70,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var weRepo = new DefaultWorldEnvelopeRepository();
-    var emissionsRepository = new DefaultEmissionRepository();
+    var emissionRepository = new DefaultEmissionRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -78,7 +78,7 @@ public class GraphSerializationTest {
       model.timetableRepository(),
       weRepo,
       parkingRepository,
-      emissionsRepository
+      emissionRepository
     );
   }
 
@@ -90,7 +90,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    var emissionsRepository = new DefaultEmissionRepository();
+    var emissionRepository = new DefaultEmissionRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -98,7 +98,7 @@ public class GraphSerializationTest {
       model.timetableRepository(),
       worldEnvelopeRepository,
       parkingRepository,
-      emissionsRepository
+      emissionRepository
     );
   }
 

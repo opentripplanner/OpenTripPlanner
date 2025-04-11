@@ -23,15 +23,15 @@ public class EmissionDataReaderTest implements EmissionTestData {
 
   @Test
   void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
-    var emissions = subject.read(gtfsWithEmissionDir(), FEED_ID);
-    assertEquals(0.006, emissions.get(ROUTE_D_1001), 0.0001);
-    assertEquals(6, emissions.size());
+    var emission = subject.read(gtfsWithEmissionDir(), FEED_ID);
+    assertEquals(0.006, emission.get(ROUTE_D_1001), 0.0001);
+    assertEquals(6, emission.size());
   }
 
   @Test
   void testCo2EmissionsFromFeedDataSource() throws FileNotFoundException {
-    var emissions = subject.read(emissionFeed(), FEED_ID);
-    assertEquals(0.006, emissions.get(ROUTE_F_R1), 0.0001);
-    assertEquals(2, emissions.size());
+    var emission = subject.read(emissionFeed(), FEED_ID);
+    assertEquals(0.006, emission.get(ROUTE_F_R1), 0.0001);
+    assertEquals(2, emission.size());
   }
 }

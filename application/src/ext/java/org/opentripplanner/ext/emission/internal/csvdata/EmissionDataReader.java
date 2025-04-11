@@ -36,10 +36,10 @@ public class EmissionDataReader {
     return read(catalog.entry(EMISSIONS_FILE_NAME), resolvedFeedId);
   }
 
-  public Map<FeedScopedId, Double> read(DataSource emissionsDataSource, String resolvedFeedId) {
+  public Map<FeedScopedId, Double> read(DataSource emissionDataSource, String resolvedFeedId) {
     try {
-      if (emissionsDataSource.exists()) {
-        return readEmissions(emissionsDataSource.asInputStream(), resolvedFeedId);
+      if (emissionDataSource.exists()) {
+        return readEmissions(emissionDataSource.asInputStream(), resolvedFeedId);
       }
     } catch (IOException e) {
       LOG.error("Failed to read emision data. Details: " + e.getMessage(), e);
@@ -49,7 +49,7 @@ public class EmissionDataReader {
 
   private Map<FeedScopedId, Double> readEmissions(InputStream stream, String feedId)
     throws IOException {
-    Map<FeedScopedId, Double> emissionsData = new HashMap<>();
+    Map<FeedScopedId, Double> emissionData = new HashMap<>();
     CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
     reader.readHeaders();
 
@@ -88,17 +88,17 @@ public class EmissionDataReader {
       ) {
         Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
         Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
-        Optional<Double> emissions = calculateEmissionsPerPassengerPerMeter(
+        Optional<Double> emission = calculateEmissionsPerPassengerPerMeter(
           routeId,
           avgCo2PerVehiclePerMeter,
           avgPassengerCount
         );
-        if (emissions.isPresent()) {
-          emissionsData.put(new FeedScopedId(feedId, routeId), emissions.get());
+        if (emission.isPresent()) {
+          emissionData.put(new FeedScopedId(feedId, routeId), emission.get());
         }
       }
     }
-    return emissionsData;
+    return emissionData;
   }
 
   private String readFeedId(InputStream stream) {

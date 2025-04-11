@@ -45,7 +45,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
 
   public void buildGraph() {
     if (parameters != null) {
-      LOG.info("Start emissions building");
+      LOG.info("Start emission building");
       var dataReader = new EmissionDataReader(issueStore);
       double carAvgCo2PerKm = parameters.car().avgCo2PerKm();
       double carAvgOccupancy = parameters.car().avgOccupancy();

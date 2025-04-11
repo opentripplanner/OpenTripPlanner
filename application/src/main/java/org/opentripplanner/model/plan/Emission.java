@@ -4,7 +4,7 @@ import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
- * Represents the emissions of a journey. Each type of emissions has its own field and unit.
+ * Represents the emission of a journey. Each type of emissions has its own field and unit.
  */
 @Sandbox
 public class Emission {

@@ -104,7 +104,7 @@ public class ConstructApplication {
       .graphVisualizer(graphVisualizer)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
-      .emissionsDataModel(emissionRepository)
+      .emissionRepository(emissionRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
@@ -141,7 +141,7 @@ public class ConstructApplication {
       factory.timetableRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
-      factory.emissionsDataModel(),
+      factory.emissionRepository(),
       factory.stopConsolidationRepository(),
       factory.streetLimitationParameters(),
       cli.doLoadStreetGraph(),
@@ -343,7 +343,7 @@ public class ConstructApplication {
   }
 
   public EmissionRepository emissionRepository() {
-    return factory.emissionsDataModel();
+    return factory.emissionRepository();
   }
 
   public StreetLimitationParameters streetLimitationParameters() {
