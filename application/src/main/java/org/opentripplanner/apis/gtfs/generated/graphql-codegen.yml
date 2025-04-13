@@ -66,7 +66,7 @@ config:
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
-    Emissions: org.opentripplanner.model.plan.Emissions#Emissions
+    Emissions: org.opentripplanner.model.plan.Emission#Emission
     Feed: String
     FeedPublisher: org.opentripplanner.apis.gtfs.model.FeedPublisher#FeedPublisher
     Geometry: org.locationtech.jts.geom.Geometry#Geometry
