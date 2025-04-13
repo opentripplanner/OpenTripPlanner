@@ -190,7 +190,7 @@ public abstract class SnapshotTestBase {
 
     RouteRequest arriveBy = request.clone();
     arriveBy.setArriveBy(true);
-    arriveBy.setDateTime(departByItineraries.get(0).lastLeg().getEndTime().toInstant());
+    arriveBy.setDateTime(departByItineraries.get(0).legs().getLast().getEndTime().toInstant());
 
     List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
 

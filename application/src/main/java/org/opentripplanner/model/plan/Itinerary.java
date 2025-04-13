@@ -149,42 +149,42 @@ public class Itinerary implements ItinerarySortKey {
    * Time that the trip departs.
    */
   public ZonedDateTime startTime() {
-    return firstLeg().getStartTime();
+    return legs().getFirst().getStartTime();
   }
 
   /**
    * Time that the trip departs as a Java Instant type.
    */
   public Instant startTimeAsInstant() {
-    return firstLeg().getStartTime().toInstant();
+    return legs().getFirst().getStartTime().toInstant();
   }
 
   /**
    * Time that the trip arrives.
    */
   public ZonedDateTime endTime() {
-    return lastLeg().getEndTime();
+    return legs().getLast().getEndTime();
   }
 
   /**
    * Time that the trip arrives as a Java Instant type.
    */
   public Instant endTimeAsInstant() {
-    return lastLeg().getEndTime().toInstant();
+    return legs().getLast().getEndTime().toInstant();
   }
 
   /**
    * Reflects the departureDelay on the first Leg Unit: seconds.
    */
   public int departureDelay() {
-    return firstLeg().getDepartureDelay();
+    return legs().getFirst().getDepartureDelay();
   }
 
   /**
    * Reflects the arrivalDelay on the last Leg Unit: seconds.
    */
   public int arrivalDelay() {
-    return lastLeg().getArrivalDelay();
+    return legs().getLast().getArrivalDelay();
   }
 
   /**
@@ -264,7 +264,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
-    Duration duration = Duration.between(firstLeg().getStartTime(), afterTime);
+    Duration duration = Duration.between(legs().getFirst().getStartTime(), afterTime);
     List<Leg> timeShiftedLegs = legs()
       .stream()
       .map(leg -> leg.withTimeShift(duration))
@@ -342,14 +342,6 @@ public class Itinerary implements ItinerarySortKey {
    */
   public List<Leg> legs() {
     return legs;
-  }
-
-  public Leg firstLeg() {
-    return legs().get(0);
-  }
-
-  public Leg lastLeg() {
-    return legs().get(legs().size() - 1);
   }
 
   public Stream<StreetLeg> streetLegs() {
@@ -614,10 +606,10 @@ public class Itinerary implements ItinerarySortKey {
   @Override
   public String toString() {
     return ToStringBuilder.of(Itinerary.class)
-      .addStr("from", firstLeg().getFrom().toStringShort())
-      .addStr("to", lastLeg().getTo().toStringShort())
-      .addTime("start", firstLeg().getStartTime())
-      .addTime("end", lastLeg().getEndTime())
+      .addStr("from", legs().getFirst().getFrom().toStringShort())
+      .addStr("to", legs().getLast().getTo().toStringShort())
+      .addTime("start", legs().getFirst().getStartTime())
+      .addTime("end", legs().getLast().getEndTime())
       .addNum("nTransfers", numberOfTransfers)
       .addDuration("duration", totalDuration)
       .addDuration("nonTransitTime", totalStreetDuration)
@@ -665,7 +657,7 @@ public class Itinerary implements ItinerarySortKey {
   public String toStr() {
     // No translater needed, stop indexes are never passed to the builder
     PathStringBuilder buf = new PathStringBuilder(null);
-    buf.stop(firstLeg().getFrom().name.toString());
+    buf.stop(legs().getFirst().getFrom().name.toString());
 
     for (Leg leg : legs) {
       if (leg.isWalkingLeg()) {

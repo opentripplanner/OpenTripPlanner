@@ -21,9 +21,9 @@ public class LegTest implements PlanTestConstants {
     .bicycle(T11_16, T11_20, E)
     .build();
 
-  private final Leg WALK_LEG = ITINERARY.firstLeg();
+  private final Leg WALK_LEG = ITINERARY.legs().getFirst();
   private final Leg BUS_LEG = ITINERARY.legs().get(1);
-  private final Leg BICYCLE_LEG = ITINERARY.lastLeg();
+  private final Leg BICYCLE_LEG = ITINERARY.legs().getLast();
 
   @Test
   public void isTransitLeg() {
@@ -161,7 +161,9 @@ public class LegTest implements PlanTestConstants {
     var overlappingStartTime = START_TIME + duration - 1;
 
     Leg subject = leg(b -> b.bus(11, START_TIME, endTime, B));
-    Leg overlappingLeg = leg(overlappingStartTime, b -> b.walk(duration, B).build().firstLeg());
+    Leg overlappingLeg = leg(overlappingStartTime, b ->
+      b.walk(duration, B).build().legs().getFirst()
+    );
     Leg legAfter = leg(endTime, b -> b.walk(D12m, B));
 
     // Overlap in time
@@ -191,6 +193,6 @@ public class LegTest implements PlanTestConstants {
   private static Leg leg(int startTime, Consumer<TestItineraryBuilder> buildOp) {
     var builder = newItinerary(A, startTime);
     buildOp.accept(builder);
-    return builder.build().firstLeg();
+    return builder.build().legs().getFirst();
   }
 }
