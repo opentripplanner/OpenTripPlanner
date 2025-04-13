@@ -18,7 +18,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * access, transit , transfers and egress - but where the specific legs are unknown.
  * This leg represent such path.
  */
-public class UnknownTransitPathLeg implements Leg {
+public class UnknownPathLeg implements Leg {
 
   private final Place from;
   private final Place to;
@@ -27,7 +27,7 @@ public class UnknownTransitPathLeg implements Leg {
 
   private final int nTransfers;
 
-  public UnknownTransitPathLeg(
+  public UnknownPathLeg(
     Place from,
     Place to,
     ZonedDateTime startTime,
@@ -117,7 +117,7 @@ public class UnknownTransitPathLeg implements Leg {
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(UnknownTransitPathLeg.class)
+    return ToStringBuilder.of(UnknownPathLeg.class)
       .addObj("from", from)
       .addObj("to", to)
       .addTime("startTime", startTime)

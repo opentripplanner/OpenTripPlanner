@@ -51,8 +51,8 @@ class ItinerariesCalculateLegTotals {
           walkDuration = walkDuration.plus(leg.getDuration());
           walkDistanceMeters = walkDistanceMeters + leg.getDistanceMeters();
         }
-      } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
-        nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
+      } else if (leg instanceof UnknownPathLeg unknownPathLeg) {
+        nTransitLegs += unknownPathLeg.getNumberOfTransfers() + 1;
       }
 
       if (!leg.isWalkingLeg()) {

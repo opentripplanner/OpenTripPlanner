@@ -21,7 +21,7 @@ import org.opentripplanner.model.plan.LegConstructionSupport;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.UnknownTransitPathLeg;
+import org.opentripplanner.model.plan.UnknownPathLeg;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
@@ -418,7 +418,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private Itinerary mapUnknownRaptorPath(RaptorPath<T> path) {
     List<Leg> legs = List.of(
-      new UnknownTransitPathLeg(
+      new UnknownPathLeg(
         mapPlace(request.from()),
         mapPlace(request.to()),
         createZonedDateTime(path.startTime()),

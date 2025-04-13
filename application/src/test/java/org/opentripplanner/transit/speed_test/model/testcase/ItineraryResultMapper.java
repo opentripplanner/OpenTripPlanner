@@ -13,7 +13,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.model.plan.UnknownTransitPathLeg;
+import org.opentripplanner.model.plan.UnknownPathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -94,7 +94,7 @@ class ItineraryResultMapper {
           leg.getStartTime().get(ChronoField.SECOND_OF_DAY),
           leg.getEndTime().get(ChronoField.SECOND_OF_DAY)
         );
-      } else if (leg instanceof UnknownTransitPathLeg d) {
+      } else if (leg instanceof UnknownPathLeg d) {
         buf.text(d.description());
       }
     }
