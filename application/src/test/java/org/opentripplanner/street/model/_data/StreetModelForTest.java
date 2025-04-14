@@ -145,6 +145,7 @@ public class StreetModelForTest {
   }
 
   static class GraphBuilder {
+
     Set<Vertex> knownVertices;
     Set<Vertex> inProgressVertices;
     Graph graph;
