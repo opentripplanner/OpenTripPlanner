@@ -5,12 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.astar.model.GraphPath;
+import org.opentripplanner.astar.model.ShortestPathTree;
+import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
@@ -20,14 +28,18 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.test.support.GeoJsonIo;
 
 public class TurnRestrictionModuleTest {
 
   private StreetVertex vertex(Graph graph, long nodeId, double lat, double lon) {
-    var v = new OsmVertex(lat, lon, nodeId);
+    var v = new OsmVertex(lon, lat, nodeId);
     graph.addVertex(v);
     return v;
   }
@@ -45,16 +57,20 @@ public class TurnRestrictionModuleTest {
     return new StreetEdge[] { streetEdge(a, b, length), streetEdge(b, a, length) };
   }
 
-  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to) {
+  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to, TraverseModeSet traverseModeSet) {
     TurnRestriction restriction = new TurnRestriction(
       from,
       to,
       TurnRestrictionType.NO_TURN,
-      TraverseModeSet.allModes(),
+      traverseModeSet,
       null
     );
     from.addTurnRestriction(restriction);
     return restriction;
+  }
+
+  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to) {
+    return turnRestriction(from, to, TraverseModeSet.allModes());
   }
 
   @Test
@@ -98,7 +114,9 @@ public class TurnRestrictionModuleTest {
   @ValueSource(ints = { 0, 1 })
   public void doubleTurnRestriction(int order) {
     //   F D
-    // G E B C
+    //   | |
+    // G-E-B-C
+    //   | |
     //   H A
     var graph = new Graph();
     StreetVertex A = vertex(graph, 1, -1, 0);
@@ -168,5 +186,59 @@ public class TurnRestrictionModuleTest {
     assertThat(newEin).containsExactly(B);
     var Ein = E.getIncoming().stream().map(Edge::getFromVertex).toList();
     assertThat(Ein).containsExactly(F, G, H);
+  }
+
+  @Test
+  public void turnRestrictedVisitDoesNotBlockSearch() {
+    // The costs of the edges are set up so that the search first goes A->B->D before trying
+    // A->B->C->D. The test tests that the previous visit of D does not block the proper
+    // path A->B->C->D->F.
+    //      E
+    //      |
+    //  F - D -\
+    //      |   C
+    //      B -/
+    //      |
+    //      A
+    // B-D-F is forbidden by a turn restriction
+    var graph = new Graph();
+    var A = vertex(graph, 1, 0.0, 0.0);
+    var B = vertex(graph, 2, 1.0, 0.0);
+    var C = vertex(graph, 3, 1.5, 1.0);
+    var D = vertex(graph, 4, 2.0, 0.0);
+    var E = vertex(graph, 5, 3.0, 0.0);
+    var F = vertex(graph, 6, 2.0, -1.0);
+    edges(A, B, 1.0);
+    edges(B, C, 1.0);
+    var BD = edges(B, D, 1.0);
+    edges(C, D, 1.0);
+    edges(D, E, 1.0);
+    var DF = edges(D, F, 1.0);
+    turnRestriction(BD[0], DF[0], new TraverseModeSet(TraverseMode.CAR));
+
+    var module = new TurnRestrictionModule(graph);
+    module.buildGraph();
+
+    var request = new RouteRequest();
+    var dateTime = Instant.now();
+    request.setDateTime(dateTime);
+    request.journey().direct().setMode(StreetMode.CAR);
+
+    var streetRequest = new StreetRequest(StreetMode.CAR);
+
+    ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
+      .setRequest(request)
+      .setStreetRequest(streetRequest)
+      .setFrom(A)
+      .setTo(F)
+      .getShortestPathTree();
+    GraphPath<State, Edge, Vertex> path = spt.getPath(F);
+    List<State> states = path.states;
+    assertEquals(5, states.size());
+    assertEquals(states.get(0).getVertex(), A);
+    assertEquals(states.get(1).getVertex(), B);
+    assertEquals(states.get(2).getVertex(), C);
+    assertEquals(states.get(3).getVertex(), D);
+    assertEquals(states.get(4).getVertex(), F);
   }
 }
