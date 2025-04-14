@@ -57,7 +57,11 @@ public class TurnRestrictionModuleTest {
     return new StreetEdge[] { streetEdge(a, b, length), streetEdge(b, a, length) };
   }
 
-  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to, TraverseModeSet traverseModeSet) {
+  private TurnRestriction turnRestriction(
+    StreetEdge from,
+    StreetEdge to,
+    TraverseModeSet traverseModeSet
+  ) {
     TurnRestriction restriction = new TurnRestriction(
       from,
       to,

@@ -2,18 +2,17 @@ package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.framework.i18n.I18NString;
 
-public class SubsidiaryOsmVertex extends OsmVertex {
+public class SubsidiaryVertex extends IntersectionVertex {
 
-  private OsmVertex parent;
+  private IntersectionVertex parent;
   private int counter;
 
   private static int counterSource = 0;
 
-  public SubsidiaryOsmVertex(OsmVertex parent) {
+  public SubsidiaryVertex(IntersectionVertex parent) {
     super(
       parent.getX(),
       parent.getY(),
-      parent.nodeId,
       parent.hasDrivingTrafficLight(),
       parent.hasWalkingTrafficLight()
     );
@@ -28,6 +27,6 @@ public class SubsidiaryOsmVertex extends OsmVertex {
 
   @Override
   public VertexLabel getLabel() {
-    return new VertexLabel.SubsidiaryOsmNodeLabel(nodeId, counter);
+    return new VertexLabel.SubsidiaryVertexLabel(parent.getLabel(), counter);
   }
 }

@@ -161,6 +161,14 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return getLabel().toString();
   }
 
+  public String getMainLabelString() {
+    VertexLabel label = getLabel();
+    if (label instanceof VertexLabel.SubsidiaryVertexLabel subsidiaryVertexLabel) {
+      return subsidiaryVertexLabel.parent().toString();
+    }
+    return label.toString();
+  }
+
   /**
    * Return the position of the vertex as a WgsCoordinate.
    */

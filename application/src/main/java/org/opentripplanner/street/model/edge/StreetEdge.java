@@ -1172,6 +1172,7 @@ public class StreetEdge
       TraverseMode backMode = s0.getBackMode();
       final boolean arriveBy = s0.getRequest().arriveBy();
 
+      /*
       // Apply turn restrictions
       if (
         arriveBy
@@ -1180,6 +1181,7 @@ public class StreetEdge
       ) {
         return null;
       }
+      */
 
       double backSpeed = backPSE.calculateSpeed(preferences, backMode, s0.isBackWalkingBike());
       final double turnDuration; // Units are seconds.

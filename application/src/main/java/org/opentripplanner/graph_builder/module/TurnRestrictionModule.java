@@ -9,10 +9,9 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
-import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.OsmVertex;
-import org.opentripplanner.street.model.vertex.SubsidiaryOsmVertex;
+import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.SubsidiaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.slf4j.Logger;
@@ -23,8 +22,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(TurnRestrictionModule.class);
 
   final Graph graph;
-  final Map<Vertex, Set<SubsidiaryOsmVertex>> subsidiaryVertices;
-  final Map<Vertex, OsmVertex> mainVertices;
+  final Map<Vertex, Set<SubsidiaryVertex>> subsidiaryVertices;
+  final Map<Vertex, IntersectionVertex> mainVertices;
 
   public TurnRestrictionModule(Graph graph) {
     this.graph = graph;
@@ -79,9 +78,9 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     return permission;
   }
 
-  void processVertex(OsmVertex vertex, TurnRestriction turnRestriction) {
-    var mainVertex = (OsmVertex) turnRestriction.from.getToVertex();
-    var splitVertex = new SubsidiaryOsmVertex(mainVertex);
+  void processVertex(IntersectionVertex vertex, TurnRestriction turnRestriction) {
+    var mainVertex = (IntersectionVertex) turnRestriction.from.getToVertex();
+    var splitVertex = new SubsidiaryVertex(mainVertex);
     graph.addVertex(splitVertex);
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
@@ -111,16 +110,16 @@ public class TurnRestrictionModule implements GraphBuilderModule {
 
   void processRestriction(TurnRestriction turnRestriction) {
     var vertex = turnRestriction.from.getToVertex();
-    if (vertex instanceof OsmVertex osmVertex) {
+    if (vertex instanceof IntersectionVertex intersectionVertex) {
       if (subsidiaryVertices.containsKey(vertex)) {
         var vertices = subsidiaryVertices.get(vertex);
-        for (var subVertex : vertices.toArray(new SubsidiaryOsmVertex[0])) {
+        for (var subVertex : vertices.toArray(new SubsidiaryVertex[0])) {
           processVertex(subVertex, turnRestriction);
         }
       } else {
         subsidiaryVertices.put(vertex, new HashSet<>());
       }
-      processVertex(osmVertex, turnRestriction);
+      processVertex(intersectionVertex, turnRestriction);
     } else {
       throw new IllegalStateException(String.format("Vertex %s is not an OsmVertex", vertex));
     }

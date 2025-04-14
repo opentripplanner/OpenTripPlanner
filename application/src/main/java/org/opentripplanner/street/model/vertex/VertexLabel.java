@@ -47,12 +47,10 @@ public sealed interface VertexLabel {
     }
   }
 
-  record SubsidiaryOsmNodeLabel(long nodeId, int counter) implements VertexLabel {
-    private static final String TEMPLATE = "osm:node:%s:%s";
-
+  record SubsidiaryVertexLabel(VertexLabel parent, int counter) implements VertexLabel {
     @Override
     public String toString() {
-      return TEMPLATE.formatted(nodeId, counter);
+      return parent.toString() + ":" + counter;
     }
   }
 
