@@ -247,7 +247,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         .withServiceDate(tripSchedule.getServiceDate())
         .withZoneId(transitSearchTimeZero.getZone().normalized())
         .withTransferFromPreviousLeg(
-          (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg())
+          (prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg())
         )
         .withTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg())
         .withGeneralizedCost(toOtpDomainCost(pathLeg.c1() + lastLegCost))
@@ -269,7 +269,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       .withZoneId(transitSearchTimeZero.getZone().normalized())
       .withTripOnServiceDate(tripOnServiceDate)
       .withTransferFromPreviousLeg(
-        (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg())
+        (prevTransitLeg == null ? null : prevTransitLeg.transferToNextLeg())
       )
       .withTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg())
       .withGeneralizedCost(toOtpDomainCost(pathLeg.c1() + lastLegCost))
@@ -387,7 +387,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       );
     }
     // We need to timeshift the toLegs
-    long toDuration = toLegs.stream().mapToLong(l -> l.getDuration().toSeconds()).sum();
+    long toDuration = toLegs.stream().mapToLong(l -> l.duration().toSeconds()).sum();
 
     toLegs = toLegs.stream().map(l -> l.withTimeShift(Duration.ofSeconds(-toDuration))).toList();
 
@@ -448,8 +448,8 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (
       transitLegBeforeTransfer == null ||
-      transitLegBeforeTransfer.getTransferToNextLeg() == null ||
-      !transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
+      transitLegBeforeTransfer.transferToNextLeg() == null ||
+      !transitLegBeforeTransfer.transferToNextLeg().getTransferConstraint().isStaySeated()
     );
   }
 

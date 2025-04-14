@@ -83,7 +83,7 @@ public class BarrierRoutingTest {
                   i
                     .legs()
                     .get(0)
-                    .getWalkSteps()
+                    .listWalkSteps()
                     .stream()
                     .map(WalkStep::isWalkingBike)
                     .collect(Collectors.toList())
@@ -194,7 +194,7 @@ public class BarrierRoutingTest {
 
     assertAll(assertions.apply(itineraries));
 
-    Geometry legGeometry = itineraries.get(0).legs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     temporaryVertices.close();
 
     return EncodedPolyline.encode(legGeometry).points();

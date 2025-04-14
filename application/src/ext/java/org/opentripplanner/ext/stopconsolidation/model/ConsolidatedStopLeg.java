@@ -21,12 +21,12 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
   }
 
   @Override
-  public Place getFrom() {
+  public Place from() {
     return from;
   }
 
   @Override
-  public Place getTo() {
+  public Place to() {
     return to;
   }
 

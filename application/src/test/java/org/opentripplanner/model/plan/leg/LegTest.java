@@ -51,10 +51,10 @@ public class LegTest implements PlanTestConstants {
   }
 
   @Test
-  public void getDuration() {
-    assertEquals(ofMinutes(2), WALK_LEG.getDuration());
-    assertEquals(ofMinutes(10), BUS_LEG.getDuration());
-    assertEquals(ofMinutes(4), BICYCLE_LEG.getDuration());
+  public void duration() {
+    assertEquals(ofMinutes(2), WALK_LEG.duration());
+    assertEquals(ofMinutes(10), BUS_LEG.duration());
+    assertEquals(ofMinutes(4), BICYCLE_LEG.duration());
   }
 
   @Test

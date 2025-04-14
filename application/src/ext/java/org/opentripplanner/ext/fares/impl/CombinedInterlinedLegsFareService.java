@@ -27,7 +27,7 @@ public class CombinedInterlinedLegsFareService extends DefaultFareService {
   ) {
     return switch (mode) {
       case ALWAYS -> true;
-      case SAME_ROUTE -> currentLeg.getRoute().getId().equals(previousLeg.getRoute().getId());
+      case SAME_ROUTE -> currentLeg.route().getId().equals(previousLeg.route().getId());
     };
   }
 

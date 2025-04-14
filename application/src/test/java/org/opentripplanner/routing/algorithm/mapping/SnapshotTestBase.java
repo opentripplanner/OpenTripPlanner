@@ -151,11 +151,11 @@ public abstract class SnapshotTestBase {
         System.out.printf(
           " - leg %2d - %52.52s %9s --%s-> %-9s %-52.52s\n",
           j,
-          leg.getFrom().toStringShort(),
-          ISO_LOCAL_TIME.format(leg.getStartTime().toInstant().atZone(timeZone)),
+          leg.from().toStringShort(),
+          ISO_LOCAL_TIME.format(leg.startTime().toInstant().atZone(timeZone)),
           mode,
-          ISO_LOCAL_TIME.format(leg.getEndTime().toInstant().atZone(timeZone)),
-          leg.getTo().toStringShort()
+          ISO_LOCAL_TIME.format(leg.endTime().toInstant().atZone(timeZone)),
+          leg.to().toStringShort()
         );
       }
 
@@ -190,7 +190,7 @@ public abstract class SnapshotTestBase {
 
     RouteRequest arriveBy = request.clone();
     arriveBy.setArriveBy(true);
-    arriveBy.setDateTime(departByItineraries.get(0).legs().getLast().getEndTime().toInstant());
+    arriveBy.setDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant());
 
     List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);
 

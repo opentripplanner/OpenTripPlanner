@@ -38,7 +38,7 @@ public class RealtimeResolver {
   }
 
   private Leg mapLeg(Leg leg) {
-    var ref = leg.getLegReference();
+    var ref = leg.legReference();
     if (ref == null) {
       return leg;
     }
@@ -62,9 +62,9 @@ public class RealtimeResolver {
     ScheduledTransitLeg original
   ) {
     return new ScheduledTransitLegBuilder<>(reference)
-      .withTransferFromPreviousLeg(original.getTransferFromPrevLeg())
-      .withTransferToNextLeg(original.getTransferToNextLeg())
-      .withGeneralizedCost(original.getGeneralizedCost())
+      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
+      .withTransferToNextLeg(original.transferToNextLeg())
+      .withGeneralizedCost(original.generalizedCost())
       .withAccessibilityScore(original.accessibilityScore())
       .build();
   }

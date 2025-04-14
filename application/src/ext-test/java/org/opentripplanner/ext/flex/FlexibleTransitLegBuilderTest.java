@@ -48,7 +48,7 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
       .withFlexTripEdge(EDGE)
       .build();
     assertNotNull(leg.fareProducts());
-    assertNotNull(leg.getTransitAlerts());
+    assertNotNull(leg.listTransitAlerts());
   }
 
   @Test
@@ -76,9 +76,9 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
     var copy = leg.copy().build();
 
     assertEquals(copy.flexTripEdge(), EDGE);
-    assertEquals(copy.getStartTime(), START_TIME);
-    assertEquals(copy.getEndTime(), END_TIME);
-    assertEquals(copy.getTransitAlerts(), Set.of(ALERT));
+    assertEquals(copy.startTime(), START_TIME);
+    assertEquals(copy.endTime(), END_TIME);
+    assertEquals(copy.listTransitAlerts(), Set.of(ALERT));
     assertEquals(copy.fareProducts(), List.of(FARE_PRODUCT_USE));
   }
 
@@ -94,9 +94,9 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
 
     var shifted = leg.withTimeShift(TIME_SHIFT);
 
-    assertEquals(START_TIME.plus(TIME_SHIFT), shifted.getStartTime());
-    assertEquals(END_TIME.plus(TIME_SHIFT), shifted.getEndTime());
+    assertEquals(START_TIME.plus(TIME_SHIFT), shifted.startTime());
+    assertEquals(END_TIME.plus(TIME_SHIFT), shifted.endTime());
     assertEquals(List.of(FARE_PRODUCT_USE), shifted.fareProducts());
-    assertEquals(Set.of(ALERT), shifted.getTransitAlerts());
+    assertEquals(Set.of(ALERT), shifted.listTransitAlerts());
   }
 }

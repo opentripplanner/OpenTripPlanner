@@ -22,12 +22,12 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
   }
 
   @Override
-  public Boolean getNonExactFrequency() {
+  public Boolean isNonExactFrequency() {
     return frequencyHeadwayInSeconds != 0;
   }
 
   @Override
-  public Integer getHeadway() {
+  public Integer headway() {
     return frequencyHeadwayInSeconds;
   }
 
@@ -37,8 +37,8 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
     // frequency-based trips have all the same trip id, so we have to check that the start times
     // are not equal
     if (other instanceof FrequencyTransitLeg frequencyTransitLeg) {
-      var start = getTripTimes().getDepartureTime(0);
-      var otherStart = frequencyTransitLeg.getTripTimes().getDepartureTime(0);
+      var start = tripTimes().getDepartureTime(0);
+      var otherStart = frequencyTransitLeg.tripTimes().getDepartureTime(0);
       return same && (start == otherStart);
     } else {
       return same;
@@ -46,7 +46,7 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
   }
 
   @Override
-  public List<StopArrival> getIntermediateStops() {
+  public List<StopArrival> listIntermediateStops() {
     List<StopArrival> visits = new ArrayList<>();
 
     for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {

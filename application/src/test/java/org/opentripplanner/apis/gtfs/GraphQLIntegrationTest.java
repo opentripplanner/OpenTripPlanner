@@ -466,7 +466,7 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          var rtt = (RealTimeTripTimes) stl.getTripTimes();
+          var rtt = (RealTimeTripTimes) stl.tripTimes();
 
           for (var i = 0; i < rtt.getNumStops(); i++) {
             rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);

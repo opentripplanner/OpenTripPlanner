@@ -9,7 +9,7 @@ public class FrequencyTransitLegBuilder
 
   public FrequencyTransitLegBuilder(FrequencyTransitLeg original) {
     super(original);
-    frequencyHeadwayInSeconds = original.getHeadway();
+    frequencyHeadwayInSeconds = original.headway();
   }
 
   public FrequencyTransitLegBuilder withFrequencyHeadwayInSeconds(int frequencyHeadwayInSeconds) {

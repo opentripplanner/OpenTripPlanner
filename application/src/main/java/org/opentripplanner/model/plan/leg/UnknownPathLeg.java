@@ -44,22 +44,22 @@ public class UnknownPathLeg implements Leg {
   }
 
   @Override
-  public Place getFrom() {
+  public Place from() {
     return from;
   }
 
   @Override
-  public Place getTo() {
+  public Place to() {
     return to;
   }
 
   @Override
-  public ZonedDateTime getStartTime() {
+  public ZonedDateTime startTime() {
     return startTime;
   }
 
   @Override
-  public ZonedDateTime getEndTime() {
+  public ZonedDateTime endTime() {
     return endTime;
   }
 
@@ -84,23 +84,23 @@ public class UnknownPathLeg implements Leg {
   }
 
   @Override
-  public double getDistanceMeters() {
+  public double distanceMeters() {
     return UNKNOWN;
   }
 
   @Override
   @Nullable
-  public LineString getLegGeometry() {
+  public LineString legGeometry() {
     return null;
   }
 
   @Override
-  public Set<TransitAlert> getTransitAlerts() {
+  public Set<TransitAlert> listTransitAlerts() {
     return Set.of();
   }
 
   @Override
-  public int getGeneralizedCost() {
+  public int generalizedCost() {
     return RaptorCostCalculator.ZERO_COST;
   }
 
@@ -114,7 +114,7 @@ public class UnknownPathLeg implements Leg {
   }
 
   public String description() {
-    return ("Unknown transit " + nTransfers + "tx " + DurationUtils.durationToStr(getDuration()));
+    return ("Unknown transit " + nTransfers + "tx " + DurationUtils.durationToStr(duration()));
   }
 
   @Override

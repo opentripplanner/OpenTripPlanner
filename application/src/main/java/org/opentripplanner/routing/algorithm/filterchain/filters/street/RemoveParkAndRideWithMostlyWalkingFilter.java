@@ -41,7 +41,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements RemoveItinerary
         .filter(StreetLeg.class::isInstance)
         .map(StreetLeg.class::cast)
         .filter(l -> l.getMode() == TraverseMode.CAR)
-        .mapToDouble(l -> l.getDuration().toSeconds())
+        .mapToDouble(l -> l.duration().toSeconds())
         .sum();
       double totalDuration = itinerary.totalDuration().toSeconds();
 

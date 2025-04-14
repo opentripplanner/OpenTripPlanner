@@ -156,14 +156,14 @@ class ScheduledDeviatedTripIntegrationTest {
     var itin = itineraries.get(0);
     var leg = itin.legs().get(0);
 
-    assertEquals("cujv", leg.getFrom().stop.getId().getId());
-    assertEquals("yz85", leg.getTo().stop.getId().getId());
+    assertEquals("cujv", leg.from().stop.getId().getId());
+    assertEquals("yz85", leg.to().stop.getId().getId());
 
-    var intermediateStops = leg.getIntermediateStops();
+    var intermediateStops = leg.listIntermediateStops();
     assertEquals(1, intermediateStops.size());
     assertEquals("zone_1", intermediateStops.get(0).place.stop.getId().getId());
 
-    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.getLegGeometry());
+    EncodedPolyline legGeometry = EncodedPolyline.encode(leg.legGeometry());
     assertThatPolylinesAreEqual(
       legGeometry.points(),
       "kfsmEjojcOa@eBRKfBfHR|ALjBBhVArMG|OCrEGx@OhAKj@a@tAe@hA]l@MPgAnAgw@nr@cDxCm@t@c@t@c@x@_@~@]pAyAdIoAhG}@lE{AzHWhAtt@t~Aj@tAb@~AXdBHn@FlBC`CKnA_@nC{CjOa@dCOlAEz@E|BRtUCbCQ~CWjD??qBvXBl@kBvWOzAc@dDOx@sHv]aIG?q@@c@ZaB\\mA"

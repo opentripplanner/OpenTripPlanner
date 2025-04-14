@@ -62,9 +62,9 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
   }
 
   private static float compute(ScheduledTransitLeg leg) {
-    var fromStop = leg.getFrom().stop.getWheelchairAccessibility();
-    var toStop = leg.getTo().stop.getWheelchairAccessibility();
-    var trip = leg.getTripWheelchairAccessibility();
+    var fromStop = leg.from().stop.getWheelchairAccessibility();
+    var toStop = leg.to().stop.getWheelchairAccessibility();
+    var trip = leg.tripWheelchairAccessibility();
 
     var values = List.of(trip, fromStop, toStop);
     var sum = (float) values
@@ -92,7 +92,7 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
   }
 
   private float compute(StreetLeg leg) {
-    var edges = leg.getWalkSteps().stream().map(WalkStep::getEdges).toList();
+    var edges = leg.listWalkSteps().stream().map(WalkStep::getEdges).toList();
     var streetEdges = edges
       .stream()
       .filter(StreetEdge.class::isInstance)

@@ -37,14 +37,14 @@ class ScheduledTransitLegBuilderTest {
 
     var withScore = newLeg.withAccessibilityScore(4f).build();
 
-    assertEquals(ZoneIds.BERLIN, withScore.getZoneId());
+    assertEquals(ZoneIds.BERLIN, withScore.zoneId());
   }
 
   @Test
   void collectionsAreInitialized() {
     var leg = completeBuilder().build();
 
-    assertNotNull(leg.getTransitAlerts());
+    assertNotNull(leg.listTransitAlerts());
     assertNotNull(leg.fareProducts());
   }
 
@@ -72,7 +72,7 @@ class ScheduledTransitLegBuilderTest {
 
     var withScore = leg.copy().withAccessibilityScore(4f).build();
 
-    assertEquals(Set.of(ALERT), withScore.getTransitAlerts());
+    assertEquals(Set.of(ALERT), withScore.listTransitAlerts());
   }
 
   @Test

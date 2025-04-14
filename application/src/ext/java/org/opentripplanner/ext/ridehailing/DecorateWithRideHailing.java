@@ -68,8 +68,8 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
     try {
       if (leg instanceof StreetLeg sl && sl.getMode().isInCar()) {
         var estimates = service.rideEstimates(
-          leg.getFrom().coordinate,
-          leg.getTo().coordinate,
+          leg.from().coordinate,
+          leg.to().coordinate,
           wheelchairAccessible
         );
         if (estimates.isEmpty()) {

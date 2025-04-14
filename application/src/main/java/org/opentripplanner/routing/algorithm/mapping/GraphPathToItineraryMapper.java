@@ -126,7 +126,7 @@ public class GraphPathToItineraryMapper {
       StreetLeg leg = generateLeg(legStates, previousStep);
       legs.add(leg);
 
-      List<WalkStep> walkSteps = leg.getWalkSteps();
+      List<WalkStep> walkSteps = leg.listWalkSteps();
       if (walkSteps.size() > 0) {
         previousStep = walkSteps.get(walkSteps.size() - 1);
       } else {

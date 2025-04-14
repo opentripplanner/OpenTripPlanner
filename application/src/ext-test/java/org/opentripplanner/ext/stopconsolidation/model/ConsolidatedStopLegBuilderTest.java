@@ -44,8 +44,8 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withFrom(E.stop)
       .withTo(F.stop)
       .build();
-    assertEquals(E.stop, leg.getFrom().stop);
-    assertEquals(F.stop, leg.getTo().stop);
+    assertEquals(E.stop, leg.from().stop);
+    assertEquals(F.stop, leg.to().stop);
   }
 
   @Test
@@ -62,11 +62,11 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withAlerts(Set.of(ALERTS))
       .build();
 
-    assertEquals(leg.getFrom().stop, copy.getFrom().stop);
-    assertEquals(leg.getTo().stop, copy.getTo().stop);
-    assertEquals(Set.of(ALERTS), copy.getTransitAlerts());
+    assertEquals(leg.from().stop, copy.from().stop);
+    assertEquals(leg.to().stop, copy.to().stop);
+    assertEquals(Set.of(ALERTS), copy.listTransitAlerts());
     assertEquals(FARES, copy.fareProducts());
-    assertEquals(ZoneIds.BERLIN, copy.getZoneId());
+    assertEquals(ZoneIds.BERLIN, copy.zoneId());
   }
 
   @Test
@@ -79,9 +79,9 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
     var copy = leg.copy().build();
 
-    assertEquals(E.stop, copy.getFrom().stop);
-    assertEquals(F.stop, copy.getTo().stop);
-    assertEquals(ALERTS, copy.getTransitAlerts());
+    assertEquals(E.stop, copy.from().stop);
+    assertEquals(F.stop, copy.to().stop);
+    assertEquals(ALERTS, copy.listTransitAlerts());
   }
 
   @Test
@@ -93,10 +93,10 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
     var copy = new ConsolidatedStopLegBuilder(leg).withFrom(C.stop).withTo(G.stop).build();
 
-    assertEquals(C.stop, copy.getFrom().stop);
-    assertEquals(G.stop, copy.getTo().stop);
-    assertEquals(Set.of(ALERTS), copy.getTransitAlerts());
+    assertEquals(C.stop, copy.from().stop);
+    assertEquals(G.stop, copy.to().stop);
+    assertEquals(Set.of(ALERTS), copy.listTransitAlerts());
     assertEquals(FARES, copy.fareProducts());
-    assertEquals(ZoneIds.BERLIN, copy.getZoneId());
+    assertEquals(ZoneIds.BERLIN, copy.zoneId());
   }
 }

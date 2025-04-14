@@ -419,7 +419,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)
-      .map(ScheduledTransitLeg::getTripPattern)
+      .map(ScheduledTransitLeg::tripPattern)
       .collect(toList());
   }
 }

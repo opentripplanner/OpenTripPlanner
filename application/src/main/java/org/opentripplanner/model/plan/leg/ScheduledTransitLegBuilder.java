@@ -35,21 +35,21 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   public ScheduledTransitLegBuilder() {}
 
   public ScheduledTransitLegBuilder(ScheduledTransitLeg original) {
-    tripTimes = original.getTripTimes();
-    tripPattern = original.getTripPattern();
-    boardStopIndexInPattern = original.getBoardStopPosInPattern();
-    alightStopIndexInPattern = original.getAlightStopPosInPattern();
-    startTime = original.getStartTime();
-    endTime = original.getEndTime();
-    serviceDate = original.getServiceDate();
-    tripOnServiceDate = original.getTripOnServiceDate();
-    transferFromPreviousLeg = original.getTransferFromPrevLeg();
-    transferToNextLeg = original.getTransferToNextLeg();
-    generalizedCost = original.getGeneralizedCost();
+    tripTimes = original.tripTimes();
+    tripPattern = original.tripPattern();
+    boardStopIndexInPattern = original.boardStopPosInPattern();
+    alightStopIndexInPattern = original.alightStopPosInPattern();
+    startTime = original.startTime();
+    endTime = original.endTime();
+    serviceDate = original.serviceDate();
+    tripOnServiceDate = original.tripOnServiceDate();
+    transferFromPreviousLeg = original.transferFromPrevLeg();
+    transferToNextLeg = original.transferToNextLeg();
+    generalizedCost = original.generalizedCost();
     accessibilityScore = original.accessibilityScore();
-    zoneId = original.getZoneId();
-    alerts = original.getTransitAlerts();
-    distanceMeters = original.getDistanceMeters();
+    zoneId = original.zoneId();
+    alerts = original.listTransitAlerts();
+    distanceMeters = original.distanceMeters();
     fareProducts = original.fareProducts();
   }
 

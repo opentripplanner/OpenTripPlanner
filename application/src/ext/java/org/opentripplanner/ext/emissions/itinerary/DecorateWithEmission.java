@@ -72,15 +72,15 @@ public class DecorateWithEmission implements ItineraryDecorator {
     Gram co2Emissions = new Gram(0.0);
     for (TransitLeg leg : transitLegs) {
       FeedScopedId feedScopedRouteId = new FeedScopedId(
-        leg.getAgency().getId().getFeedId(),
-        leg.getRoute().getId().getId()
+        leg.agency().getId().getFeedId(),
+        leg.route().getId().getId()
       );
       Optional<Emissions> co2EmissionsForRoute = emissionsService.getEmissionsPerMeterForRoute(
         feedScopedRouteId
       );
       if (co2EmissionsForRoute.isPresent()) {
         co2Emissions = co2Emissions.plus(
-          co2EmissionsForRoute.get().getCo2().multiply(leg.getDistanceMeters())
+          co2EmissionsForRoute.get().getCo2().multiply(leg.distanceMeters())
         );
       } else {
         // Partial results would not give an accurate representation of the emissions.
@@ -100,7 +100,7 @@ public class DecorateWithEmission implements ItineraryDecorator {
         new Gram(
           carLegs
             .stream()
-            .mapToDouble(leg -> emissions.getCo2().multiply(leg.getDistanceMeters()).asDouble())
+            .mapToDouble(leg -> emissions.getCo2().multiply(leg.distanceMeters()).asDouble())
             .sum()
         )
       );

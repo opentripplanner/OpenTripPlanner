@@ -44,7 +44,7 @@ public class ItinerariesHelper {
       .stream()
       .filter(StreetLeg.class::isInstance)
       .map(StreetLeg.class::cast)
-      .map(StreetLeg::getWalkSteps)
+      .map(StreetLeg::listWalkSteps)
       .flatMap(List::stream)
       .map(WalkStep::getEdges)
       .filter(StreetEdge.class::isInstance)

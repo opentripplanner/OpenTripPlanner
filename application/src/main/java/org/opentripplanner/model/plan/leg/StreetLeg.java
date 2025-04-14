@@ -86,32 +86,32 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public ZonedDateTime getStartTime() {
+  public ZonedDateTime startTime() {
     return startTime;
   }
 
   @Override
-  public ZonedDateTime getEndTime() {
+  public ZonedDateTime endTime() {
     return endTime;
   }
 
   @Override
-  public double getDistanceMeters() {
+  public double distanceMeters() {
     return distanceMeters;
   }
 
   @Override
-  public Place getFrom() {
+  public Place from() {
     return from;
   }
 
   @Override
-  public Place getTo() {
+  public Place to() {
     return to;
   }
 
   @Override
-  public LineString getLegGeometry() {
+  public LineString legGeometry() {
     return legGeometry;
   }
 
@@ -119,27 +119,27 @@ public class StreetLeg implements Leg {
    * Get elevation profile, with values rounded to two decimals.
    */
   @Override
-  public ElevationProfile getElevationProfile() {
+  public ElevationProfile elevationProfile() {
     return elevationProfile;
   }
 
   @Override
-  public List<WalkStep> getWalkSteps() {
+  public List<WalkStep> listWalkSteps() {
     return walkSteps;
   }
 
   @Override
-  public Set<StreetNote> getStreetNotes() {
+  public Set<StreetNote> listStreetNotes() {
     return streetNotes;
   }
 
   @Override
-  public Set<TransitAlert> getTransitAlerts() {
+  public Set<TransitAlert> listTransitAlerts() {
     return Set.of();
   }
 
   @Override
-  public Boolean getWalkingBike() {
+  public Boolean walkingBike() {
     return walkingBike;
   }
 
@@ -150,17 +150,17 @@ public class StreetLeg implements Leg {
   }
 
   @Override
-  public Boolean getRentedVehicle() {
+  public Boolean rentedVehicle() {
     return rentedVehicle;
   }
 
   @Override
-  public String getVehicleRentalNetwork() {
+  public String vehicleRentalNetwork() {
     return vehicleRentalNetwork;
   }
 
   @Override
-  public int getGeneralizedCost() {
+  public int generalizedCost() {
     return generalizedCost;
   }
 

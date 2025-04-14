@@ -17,8 +17,8 @@ public class ConsolidatedStopLegBuilder
 
   ConsolidatedStopLegBuilder(ConsolidatedStopLeg consolidatedStopLeg) {
     super(consolidatedStopLeg);
-    this.from = consolidatedStopLeg.getFrom();
-    this.to = consolidatedStopLeg.getTo();
+    this.from = consolidatedStopLeg.from();
+    this.to = consolidatedStopLeg.to();
   }
 
   public ConsolidatedStopLegBuilder withFrom(StopLocation stop) {

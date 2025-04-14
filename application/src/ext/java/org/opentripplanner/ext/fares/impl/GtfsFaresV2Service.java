@@ -107,7 +107,7 @@ public final class GtfsFaresV2Service implements Serializable {
     var transitLegs = i.listScheduledTransitLegs();
     var allLegsInProductFeed = transitLegs
       .stream()
-      .allMatch(leg -> leg.getAgency().getId().getFeedId().equals(pwt.legRule().feedId()));
+      .allMatch(leg -> leg.agency().getId().getFeedId().equals(pwt.legRule().feedId()));
 
     return (
       allLegsInProductFeed &&
@@ -129,7 +129,7 @@ public final class GtfsFaresV2Service implements Serializable {
     var feedIdsInItinerary = i
       .listScheduledTransitLegs()
       .stream()
-      .map(l -> l.getAgency().getId().getFeedId())
+      .map(l -> l.agency().getId().getFeedId())
       .collect(Collectors.toSet());
 
     return (
@@ -144,13 +144,13 @@ public final class GtfsFaresV2Service implements Serializable {
   private boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
-      leg.getAgency().getId().getFeedId().equals(rule.feedId()) &&
+      leg.agency().getId().getFeedId().equals(rule.feedId()) &&
       matchesNetworkId(leg, rule) &&
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.getTo().stop, rule.toAreaId(), toAreasWithRules) &&
+      matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
+      matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
       matchesDistance(leg, rule)
     );
   }
@@ -164,7 +164,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
     var transferRulesForLeg = transferRules
       .stream()
-      .filter(t -> t.feedId().equals(leg.getAgency().getId().getFeedId()))
+      .filter(t -> t.feedId().equals(leg.agency().getId().getFeedId()))
       .toList();
 
     var products = legRules
@@ -223,7 +223,7 @@ public final class GtfsFaresV2Service implements Serializable {
    */
   private boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg
-      .getRoute()
+      .route()
       .getGroupsOfRoutes()
       .stream()
       .map(group -> group.getId().getId())
@@ -242,12 +242,12 @@ public final class GtfsFaresV2Service implements Serializable {
 
     FareDistance distance = rule.fareDistance();
     if (distance instanceof FareDistance.Stops ruleDistance) {
-      var numStops = leg.getIntermediateStops().size();
+      var numStops = leg.listIntermediateStops().size();
       return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
     } else if (rule.fareDistance() instanceof FareDistance.LinearDistance ruleDistance) {
       var ruleMax = ruleDistance.max();
       var ruleMin = ruleDistance.min();
-      var legDistance = leg.getDirectDistanceMeters();
+      var legDistance = leg.directDistanceMeters();
 
       return legDistance > ruleMin.toMeters() && legDistance < ruleMax.toMeters();
     } else return true;

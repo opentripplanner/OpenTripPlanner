@@ -38,12 +38,12 @@ public class ItineraryTest implements PlanTestConstants {
 
     // Expected fields on walking leg set
     var firstLeg = result.legs().getFirst();
-    assertSameLocation(A, firstLeg.getFrom());
-    assertEquals(newTime(T11_00), firstLeg.getStartTime());
-    assertEquals(newTime(T11_05), firstLeg.getEndTime());
+    assertSameLocation(A, firstLeg.from());
+    assertEquals(newTime(T11_00), firstLeg.startTime());
+    assertEquals(newTime(T11_05), firstLeg.endTime());
     assertEquals(TraverseMode.WALK, result.streetLeg(0).getMode());
-    assertEquals(420.0d, firstLeg.getDistanceMeters(), 1E-3);
-    assertSameLocation(B, result.legs().getLast().getTo());
+    assertEquals(420.0d, firstLeg.distanceMeters(), 1E-3);
+    assertSameLocation(B, result.legs().getLast().to());
 
     assertEquals("A ~ Walk 5m ~ B [C₁600]", result.toStr());
   }
@@ -62,13 +62,13 @@ public class ItineraryTest implements PlanTestConstants {
 
     // Expected fields on bus leg set
     var firstLeg = result.legs().getFirst();
-    assertSameLocation(A, firstLeg.getFrom());
-    assertSameLocation(B, firstLeg.getTo());
-    assertEquals(newTime(T11_00), firstLeg.getStartTime());
-    assertEquals(newTime(T11_10), firstLeg.getEndTime());
-    assertEquals(TransitMode.BUS, result.transitLeg(0).getMode());
-    assertEquals(TimetableRepositoryForTest.id("55"), firstLeg.getTrip().getId());
-    assertEquals(7500, firstLeg.getDistanceMeters(), 1E-3);
+    assertSameLocation(A, firstLeg.from());
+    assertSameLocation(B, firstLeg.to());
+    assertEquals(newTime(T11_00), firstLeg.startTime());
+    assertEquals(newTime(T11_10), firstLeg.endTime());
+    assertEquals(TransitMode.BUS, result.transitLeg(0).mode());
+    assertEquals(TimetableRepositoryForTest.id("55"), firstLeg.trip().getId());
+    assertEquals(7500, firstLeg.distanceMeters(), 1E-3);
 
     assertEquals("A ~ BUS 55 11:00 11:10 ~ B [C₁720]", result.toStr());
   }
@@ -87,13 +87,13 @@ public class ItineraryTest implements PlanTestConstants {
 
     // Expected fields on bus leg set
     var firstLeg = result.legs().getFirst();
-    assertSameLocation(A, firstLeg.getFrom());
-    assertSameLocation(B, firstLeg.getTo());
-    assertEquals(newTime(T11_05), firstLeg.getStartTime());
-    assertEquals(newTime(T11_15), firstLeg.getEndTime());
-    assertEquals(TransitMode.RAIL, result.transitLeg(0).getMode());
-    assertEquals(TimetableRepositoryForTest.id("20"), firstLeg.getTrip().getId());
-    assertEquals(15_000, firstLeg.getDistanceMeters(), 1E-3);
+    assertSameLocation(A, firstLeg.from());
+    assertSameLocation(B, firstLeg.to());
+    assertEquals(newTime(T11_05), firstLeg.startTime());
+    assertEquals(newTime(T11_15), firstLeg.endTime());
+    assertEquals(TransitMode.RAIL, result.transitLeg(0).mode());
+    assertEquals(TimetableRepositoryForTest.id("20"), firstLeg.trip().getId());
+    assertEquals(15_000, firstLeg.distanceMeters(), 1E-3);
 
     assertEquals("A ~ RAIL R2 11:05 11:15 ~ B [C₁720]", result.toStr());
   }
@@ -156,8 +156,8 @@ public class ItineraryTest implements PlanTestConstants {
     assertEquals(ofMinutes(6), result.totalStreetDuration());
     assertEquals(ofMinutes(11), result.totalWaitingDuration());
     assertFalse(result.isWalkOnly());
-    assertSameLocation(A, result.legs().getFirst().getFrom());
-    assertSameLocation(G, result.legs().getLast().getTo());
+    assertSameLocation(A, result.legs().getFirst().from());
+    assertSameLocation(G, result.legs().getLast().to());
 
     assertEquals(
       "A ~ Walk 2m ~ B ~ BUS 55 11:04 11:14 ~ C ~ BUS 21 11:16 11:20 ~ D " +

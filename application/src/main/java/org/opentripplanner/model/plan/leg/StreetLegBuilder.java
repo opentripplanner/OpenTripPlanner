@@ -33,20 +33,20 @@ public class StreetLegBuilder {
 
   protected StreetLegBuilder(StreetLeg leg) {
     this.mode = leg.getMode();
-    this.startTime = leg.getStartTime();
-    this.endTime = leg.getEndTime();
-    this.from = leg.getFrom();
-    this.to = leg.getTo();
-    this.distanceMeters = leg.getDistanceMeters();
-    this.generalizedCost = leg.getGeneralizedCost();
-    this.geometry = leg.getLegGeometry();
-    this.elevationProfile = leg.getElevationProfile();
-    this.walkSteps = Objects.requireNonNull(leg.getWalkSteps());
-    this.walkingBike = leg.getWalkingBike();
-    this.rentedVehicle = leg.getRentedVehicle();
-    this.vehicleRentalNetwork = leg.getVehicleRentalNetwork();
+    this.startTime = leg.startTime();
+    this.endTime = leg.endTime();
+    this.from = leg.from();
+    this.to = leg.to();
+    this.distanceMeters = leg.distanceMeters();
+    this.generalizedCost = leg.generalizedCost();
+    this.geometry = leg.legGeometry();
+    this.elevationProfile = leg.elevationProfile();
+    this.walkSteps = Objects.requireNonNull(leg.listWalkSteps());
+    this.walkingBike = leg.walkingBike();
+    this.rentedVehicle = leg.rentedVehicle();
+    this.vehicleRentalNetwork = leg.vehicleRentalNetwork();
     this.accessibilityScore = leg.accessibilityScore();
-    streetNotes = Set.copyOf(leg.getStreetNotes());
+    streetNotes = Set.copyOf(leg.listStreetNotes());
   }
 
   public StreetLeg build() {

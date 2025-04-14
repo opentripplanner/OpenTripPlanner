@@ -131,10 +131,10 @@ class ScheduledTransitLegReferenceTest {
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
     assertNotNull(leg);
-    assertEquals(tripId, leg.getTrip().getId());
-    assertEquals(SERVICE_DATE, leg.getServiceDate());
-    assertEquals(boardAtStopPos, leg.getBoardStopPosInPattern());
-    assertEquals(alightAtStopPos, leg.getAlightStopPosInPattern());
+    assertEquals(tripId, leg.trip().getId());
+    assertEquals(SERVICE_DATE, leg.serviceDate());
+    assertEquals(boardAtStopPos, leg.boardStopPosInPattern());
+    assertEquals(alightAtStopPos, leg.alightStopPosInPattern());
   }
 
   @Test
@@ -279,7 +279,7 @@ class ScheduledTransitLegReferenceTest {
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
     assertNotNull(leg);
-    assertEquals(tripId, leg.getTrip().getId());
-    assertEquals(SERVICE_DATE, leg.getServiceDate());
+    assertEquals(tripId, leg.trip().getId());
+    assertEquals(SERVICE_DATE, leg.serviceDate());
   }
 }
