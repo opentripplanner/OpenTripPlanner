@@ -24,6 +24,7 @@ import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.street.model._data.StreetModelForTest;

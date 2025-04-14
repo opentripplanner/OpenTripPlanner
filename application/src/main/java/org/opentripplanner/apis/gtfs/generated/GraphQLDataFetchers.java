@@ -46,7 +46,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.LegRealTimeEstimate;
 import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.graphfinder.NearbyStop;

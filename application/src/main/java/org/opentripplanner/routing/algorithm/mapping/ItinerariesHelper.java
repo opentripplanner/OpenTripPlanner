@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.edge.StreetEdge;
 

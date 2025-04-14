@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
@@ -37,7 +38,7 @@ public class StreetLeg implements Leg {
   private final String vehicleRentalNetwork;
   private final Float accessibilityScore;
 
-  public StreetLeg(StreetLegBuilder builder) {
+  protected StreetLeg(StreetLegBuilder builder) {
     this.mode = Objects.requireNonNull(builder.getMode());
     this.startTime = builder.getStartTime();
     this.endTime = builder.getEndTime();
