@@ -18,7 +18,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;

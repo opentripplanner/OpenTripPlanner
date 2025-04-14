@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.util.List;
+import org.opentripplanner.model.plan.leg.UnknownPathLeg;
 
 /**
  * Calculate derived itinerary fields

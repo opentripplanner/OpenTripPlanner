@@ -43,9 +43,10 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegCallTime;
-import org.opentripplanner.model.plan.LegRealTimeEstimate;
-import org.opentripplanner.model.plan.StopArrival;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
+import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -1557,9 +1558,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> distance();
 
-    public DataFetcher<
-      Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>
-    > elevationProfile();
+    public DataFetcher<Iterable<ElevationProfile.Step>> elevationProfile();
 
     public DataFetcher<String> exit();
 

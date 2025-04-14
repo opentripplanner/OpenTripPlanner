@@ -13,7 +13,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.plan.ElevationProfile;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;

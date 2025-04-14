@@ -42,7 +42,7 @@ import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping._support.mapping.ItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;

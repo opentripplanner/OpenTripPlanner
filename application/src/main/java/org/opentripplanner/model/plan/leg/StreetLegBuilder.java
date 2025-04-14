@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;

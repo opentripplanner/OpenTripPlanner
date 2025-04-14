@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 
 /**
  * This calculator allows you to configure if two interlined legs (those with a stay-seated transfer

@@ -13,7 +13,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;

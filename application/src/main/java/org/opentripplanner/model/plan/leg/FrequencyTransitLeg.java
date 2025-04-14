@@ -1,7 +1,9 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 

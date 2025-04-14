@@ -13,7 +13,7 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;

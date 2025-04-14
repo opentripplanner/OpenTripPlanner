@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;

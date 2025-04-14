@@ -6,7 +6,7 @@ import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
 /**

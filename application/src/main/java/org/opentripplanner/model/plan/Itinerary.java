@@ -15,6 +15,8 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFare;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;

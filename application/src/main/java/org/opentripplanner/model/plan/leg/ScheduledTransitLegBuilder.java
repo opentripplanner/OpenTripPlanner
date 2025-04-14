@@ -1,11 +1,10 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.OptionalDouble;
 import java.util.Set;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;

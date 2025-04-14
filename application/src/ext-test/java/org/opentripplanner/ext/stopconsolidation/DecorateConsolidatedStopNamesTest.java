@@ -17,9 +17,9 @@ import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 
 class DecorateConsolidatedStopNamesTest {
 

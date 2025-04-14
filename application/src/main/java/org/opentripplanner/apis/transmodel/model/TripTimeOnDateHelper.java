@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 

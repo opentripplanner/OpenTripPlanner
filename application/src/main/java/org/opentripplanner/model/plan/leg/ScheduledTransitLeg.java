@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -15,6 +15,8 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;

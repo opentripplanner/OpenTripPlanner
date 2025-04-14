@@ -8,7 +8,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.DirectionMapper;
 import org.opentripplanner.apis.gtfs.mapping.StreetNoteMapper;
-import org.opentripplanner.model.plan.ElevationProfile.Step;
+import org.opentripplanner.model.plan.leg.ElevationProfile.Step;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 

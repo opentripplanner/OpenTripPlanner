@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 public class FrequencyTransitLegBuilder
   extends ScheduledTransitLegBuilder<FrequencyTransitLegBuilder> {

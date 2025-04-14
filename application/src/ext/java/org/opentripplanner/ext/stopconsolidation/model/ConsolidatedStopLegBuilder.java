@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class ConsolidatedStopLegBuilder

@@ -4,8 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 

@@ -20,7 +20,7 @@ import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;

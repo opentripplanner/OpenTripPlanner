@@ -2,9 +2,8 @@ package org.opentripplanner.ext.stopconsolidation.model;
 
 import java.util.Objects;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 
 public class ConsolidatedStopLeg extends ScheduledTransitLeg {
 

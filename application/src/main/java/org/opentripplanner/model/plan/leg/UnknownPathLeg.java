@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 
@@ -8,6 +8,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.utils.time.DurationUtils;

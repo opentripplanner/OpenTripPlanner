@@ -11,8 +11,8 @@ import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 
 @Deprecated

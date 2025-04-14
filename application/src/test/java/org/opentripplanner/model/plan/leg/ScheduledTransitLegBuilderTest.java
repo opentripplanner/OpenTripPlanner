@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.impl.FareModelForTest;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;

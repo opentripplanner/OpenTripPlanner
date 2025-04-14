@@ -24,7 +24,7 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.Money;

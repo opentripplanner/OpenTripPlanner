@@ -3,8 +3,8 @@ package org.opentripplanner.ext.realtimeresolver;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
