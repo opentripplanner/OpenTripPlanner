@@ -415,7 +415,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   private static List<TripPattern> itineraryPatterns(final Itinerary itinerary) {
     return itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)

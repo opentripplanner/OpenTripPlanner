@@ -18,7 +18,7 @@ public class ExcludedRoutesTest extends GtfsTest {
   public void test3d1() {
     Itinerary itinerary = plan(+1388530860L, "3d1", "3d2", null, false, false, null, "3d|1", "", 1);
 
-    Leg leg = itinerary.getLegs().toArray(new Leg[1])[0];
+    Leg leg = itinerary.legs().toArray(new Leg[1])[0];
 
     validateLeg(leg, 1388530860000L, 1388530980000L, "3d2", "3d1", null);
 

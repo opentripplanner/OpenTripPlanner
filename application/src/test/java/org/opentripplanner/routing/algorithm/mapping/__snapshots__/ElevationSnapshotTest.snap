@@ -929,7 +929,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2465,
+      "generalizedCost" : 2464,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -1693,7 +1693,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2787,
+      "generalizedCost" : 2786,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,
@@ -2509,7 +2509,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
           }
         ]
       },
-      "generalizedCost" : 2525,
+      "generalizedCost" : 2524,
       "legs" : [
         {
           "agencyTimeZoneOffset" : -25200000,

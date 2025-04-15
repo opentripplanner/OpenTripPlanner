@@ -39,6 +39,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.api.request.TripRequest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -104,6 +105,7 @@ class ScheduledDeviatedTripIntegrationTest {
       graph,
       new DefaultTransitService(timetableRepository),
       FlexParameters.defaultValues(),
+      TripRequest.of().build(),
       OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
       null,
       1,
@@ -117,12 +119,12 @@ class ScheduledDeviatedTripIntegrationTest {
     var itineraries = router
       .createFlexOnlyItineraries(false)
       .stream()
-      .peek(filter::decorate)
+      .map(filter::decorate)
       .toList();
 
     var itinerary = itineraries.getFirst();
 
-    assertFalse(itinerary.getFares().getLegProducts().isEmpty());
+    assertFalse(itinerary.fare().getLegProducts().isEmpty());
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
@@ -152,7 +154,7 @@ class ScheduledDeviatedTripIntegrationTest {
     assertEquals(2, itineraries.size());
 
     var itin = itineraries.get(0);
-    var leg = itin.getLegs().get(0);
+    var leg = itin.legs().get(0);
 
     assertEquals("cujv", leg.getFrom().stop.getId().getId());
     assertEquals("yz85", leg.getTo().stop.getId().getId());

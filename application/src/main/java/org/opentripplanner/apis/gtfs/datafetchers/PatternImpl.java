@@ -73,7 +73,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
               break;
             case TRIPS:
               getTrips(environment).forEach(trip ->
-                alerts.addAll(alertService.getTripAlerts(trip.getId(), null))
+                alerts.addAll(alertService.getTripAlerts(trip.getId()))
               );
               break;
             case STOPS_ON_PATTERN:

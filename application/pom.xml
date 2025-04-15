@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>otp-root</artifactId>
-        <version>2.7.0</version>
+        <version>2.8.0-SNAPSHOT</version>
     </parent>
     <artifactId>application</artifactId>
     <name>OpenTripPlanner - Application</name>
@@ -172,7 +172,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.15.2</version>
+            <version>5.16.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -289,7 +289,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>6.1.0</version>
+            <version>6.1.2</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -359,17 +359,17 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.55.2</version>
+            <version>1.55.3</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.17.8</version>
+            <version>7.17.10</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.15.3</version>
+            <version>1.15.4</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

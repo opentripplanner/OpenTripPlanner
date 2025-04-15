@@ -39,12 +39,12 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
-import org.opentripplanner.ext.restapi.mapping.ItineraryMapper;
-import org.opentripplanner.ext.restapi.model.ApiLeg;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.routing.algorithm.mapping._support.mapping.ItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
@@ -135,16 +135,16 @@ public abstract class SnapshotTestBase {
       System.out.printf(
         "Itinerary %2d - duration: %s [%5s] (effective: %s [%5s]) - wait time: %s, transit time: %s \n",
         i,
-        TimeUtils.durationToStrCompact(itinerary.getDuration()),
-        itinerary.getDuration(),
+        TimeUtils.durationToStrCompact(itinerary.totalDuration()),
+        itinerary.totalDuration(),
         TimeUtils.durationToStrCompact(itinerary.effectiveDuration()),
         itinerary.effectiveDuration(),
-        itinerary.getWaitingDuration(),
-        itinerary.getTransitDuration()
+        itinerary.totalWaitingDuration(),
+        itinerary.totalTransitDuration()
       );
 
-      for (int j = 0; j < itinerary.getLegs().size(); j++) {
-        Leg leg = itinerary.getLegs().get(j);
+      for (int j = 0; j < itinerary.legs().size(); j++) {
+        Leg leg = itinerary.legs().get(j);
         String mode = (leg instanceof StreetLeg stLeg)
           ? stLeg.getMode().name().substring(0, 1)
           : "T";
@@ -273,8 +273,7 @@ public abstract class SnapshotTestBase {
       .atZone(serverContext().transitService().getTimeZone())
       .toLocalDateTime();
 
-    // TODO: 2022-12-20 filters: this is for REST so there should not be more than one filter
-    //  but technically this is not right
+    // TODO: 2022-12-20 filters: there should not be more than one filter but technically this is not right
     List<MainAndSubMode> transportModes = new ArrayList<>();
     var filter = request.journey().transit().filters().get(0);
     if (filter instanceof TransitFilterRequest filterRequest) {

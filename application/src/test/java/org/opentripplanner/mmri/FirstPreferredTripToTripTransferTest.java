@@ -18,7 +18,7 @@ public class FirstPreferredTripToTripTransferTest extends GtfsTest {
   public void test2e1() {
     Itinerary itinerary = plan(+1388530860L, "2e11", "2e16", null, false, false, null, "", "", 2);
 
-    Leg[] legs = itinerary.getLegs().toArray(new Leg[2]);
+    Leg[] legs = itinerary.legs().toArray(new Leg[2]);
 
     validateLeg(legs[0], 1388530860000L, 1388530920000L, "2e13", "2e11", null);
     validateLeg(legs[1], 1388530980000L, 1388531100000L, "2e16", "2e13", null);

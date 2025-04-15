@@ -35,6 +35,21 @@ class StatesToWalkStepsMapperTest {
   }
 
   @Test
+  void stationEntrance() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking()
+        .streetEdge("name", 1)
+        .entrance("name")
+        .streetEdge()
+        .areaEdge("name", 10)
+    );
+    assertEquals(3, walkSteps.size());
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
+  }
+
+  @Test
   void enterStation() {
     final TestStateBuilder builder = TestStateBuilder.ofWalking()
       .streetEdge()
