@@ -7,7 +7,6 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -16,6 +15,7 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
@@ -143,7 +143,7 @@ public interface OtpServerRequestContext {
   }
 
   @Nullable
-  EmissionsService emissionsService();
+  ItineraryDecorator emissionsItineraryDecorator();
 
   @Nullable
   LuceneIndex lucenceIndex();

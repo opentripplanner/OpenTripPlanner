@@ -20,10 +20,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.ext.emissions.DecorateWithEmission;
-import org.opentripplanner.ext.emissions.DefaultEmissionsService;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
@@ -99,7 +99,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
       .bicycle(T11_05, T11_06, B)
       .rail(30, T11_16, T11_20, C)
       .build();
-    assertEquals(300, shortBikeToStop.getLegs().get(0).getDistanceMeters());
+    assertEquals(300, shortBikeToStop.legs().get(0).getDistanceMeters());
     // should do nothing to non-bike trips but remove a bike+ride route that cycles only for one minute
     assertEquals(List.of(i1), chain.filter(List.of(i1, shortBikeToStop)));
   }
@@ -113,12 +113,12 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
 
     // Walk first, then transit sorted on arrival-time
     assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
-    assertEquals("[]", toStringOfTags(i1.getSystemNotices()));
+    assertEquals("[]", toStringOfTags(i1.systemNotices()));
     assertEquals(
       "[transit-vs-street-filter, transit-vs-walk-filter]",
-      toStringOfTags(i2.getSystemNotices())
+      toStringOfTags(i2.systemNotices())
     );
-    assertEquals("[outside-search-window]", toStringOfTags(i3.getSystemNotices()));
+    assertEquals("[outside-search-window]", toStringOfTags(i3.systemNotices()));
   }
 
   @Test
@@ -393,9 +393,12 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
     void setUpItineraries() {
       bus = newItinerary(A).bus(21, T11_06, T11_09, B).build();
       car = newItinerary(A).drive(T11_30, T11_50, B).build();
+      var eRepository = new DefaultEmissionsRepository();
       Map<FeedScopedId, Double> emissions = new HashMap<>();
       emissions.put(new FeedScopedId("F", "1"), 1.0);
-      eService = new DefaultEmissionsService(new EmissionsDataModel(emissions, 1.0));
+      eRepository.setCo2Emissions(emissions);
+      eRepository.setCarAvgCo2PerMeter(1.0);
+      eService = new DefaultEmissionsService(eRepository);
     }
 
     @Test
@@ -404,7 +407,7 @@ class ItineraryListFilterChainTest implements PlanTestConstants {
         .withEmissions(new DecorateWithEmission(eService))
         .build();
       List<Itinerary> itineraries = chain.filter(List.of(bus, car));
-      assertFalse(itineraries.stream().anyMatch(i -> i.getEmissionsPerPerson().getCo2() == null));
+      assertFalse(itineraries.stream().anyMatch(i -> i.emissionsPerPerson().getCo2() == null));
     }
   }
 }

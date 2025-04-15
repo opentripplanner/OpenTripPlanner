@@ -114,10 +114,10 @@ public class RaptorPathToItineraryMapperTest {
 
     // Assert
     assertNotNull(itinerary);
-    assertEquals(1, itinerary.getLegs().size(), "The wrong number of legs was returned");
+    assertEquals(1, itinerary.legs().size(), "The wrong number of legs was returned");
     assertEquals(
       RaptorCostConverter.toOtpDomainCost(transitLegCost + egressLegCost),
-      itinerary.getLegs().get(0).getGeneralizedCost(),
+      itinerary.legs().get(0).getGeneralizedCost(),
       "Incorrect cost returned"
     );
   }
@@ -128,7 +128,7 @@ public class RaptorPathToItineraryMapperTest {
 
     var path = transferAtSameStopPath();
     var itinerary = mapper.createItinerary(path);
-    assertThat(itinerary.getLegs().stream().map(Object::getClass)).doesNotContain(StreetLeg.class);
+    assertThat(itinerary.legs().stream().map(Object::getClass)).doesNotContain(StreetLeg.class);
   }
 
   @Test
@@ -146,7 +146,7 @@ public class RaptorPathToItineraryMapperTest {
       var itinerary = mapper.createItinerary(path);
       assertEquals(
         List.of(ScheduledTransitLeg.class, StreetLeg.class, ScheduledTransitLeg.class),
-        itinerary.getLegs().stream().map(Leg::getClass).toList()
+        itinerary.legs().stream().map(Leg::getClass).toList()
       );
     });
   }
@@ -170,8 +170,8 @@ public class RaptorPathToItineraryMapperTest {
 
     // Assert
     assertNotNull(itinerary);
-    assertEquals(4708, itinerary.getGeneralizedCost());
-    assertNotEquals(4708, itinerary.getGeneralizedCostIncludingPenalty());
+    assertEquals(4708, itinerary.generalizedCost());
+    assertNotEquals(4708, itinerary.generalizedCostIncludingPenalty().toSeconds());
   }
 
   /**
@@ -222,7 +222,7 @@ public class RaptorPathToItineraryMapperTest {
 
     // Assert
     assertNotNull(itinerary);
-    assertEquals(3, itinerary.getLegs().size(), "The wrong number of legs was returned");
+    assertEquals(3, itinerary.legs().size(), "The wrong number of legs was returned");
   }
 
   private RaptorPath<TestTripSchedule> transferAtSameStopPath() {

@@ -49,7 +49,11 @@ public interface DataSource {
   String path();
 
   /**
-   * @return the URI of the datasource. The URI can be used to identify uniquely the data source.
+   * Return the URI of the datasource. The URI can be used to identify uniquely the data source.
+   * <p>
+   * Note! Do NOT use this to load the file(s), use the datasource abstraction - if you bypass the
+   * framework your code might not work with all supported datasources like filesystems,
+   * zip-archives and cloud storage.
    */
   URI uri();
 

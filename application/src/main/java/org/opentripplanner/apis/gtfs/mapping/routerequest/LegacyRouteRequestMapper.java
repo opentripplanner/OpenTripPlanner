@@ -246,7 +246,7 @@ public class LegacyRouteRequestMapper {
 
   static void mapViaLocations(RouteRequest request, DataFetchingEnvironment env) {
     var args = env.getArgument("via");
-    var locs = ViaLocationMapper.mapToViaLocations((List<Map<String, Map<String, Object>>>) args);
+    var locs = ViaLocationMapper.mapToViaLocations((List<Map<String, Object>>) args);
     request.setViaLocations(locs);
   }
 

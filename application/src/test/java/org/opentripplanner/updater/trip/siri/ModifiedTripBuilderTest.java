@@ -33,7 +33,7 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.spi.UpdateError;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
+import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
 
 class ModifiedTripBuilderTest {
 

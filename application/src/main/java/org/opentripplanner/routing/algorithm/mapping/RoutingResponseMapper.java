@@ -7,7 +7,6 @@ import java.util.Set;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
-import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -23,7 +22,6 @@ public class RoutingResponseMapper {
 
   public static RoutingResponse map(
     RouteRequest request,
-    SearchParams raptorSearchParamsUsed,
     List<Itinerary> itineraries,
     Set<RoutingError> routingErrors,
     DebugTimingAggregator debugTimingAggregator,
@@ -35,7 +33,7 @@ public class RoutingResponseMapper {
     if (
       request.preferences().transit().ignoreRealtimeUpdates() && OTPFeature.RealtimeResolver.isOn()
     ) {
-      populateLegsWithRealtime(itineraries, transitService);
+      itineraries = populateLegsWithRealtime(itineraries, transitService);
     }
 
     // Create response

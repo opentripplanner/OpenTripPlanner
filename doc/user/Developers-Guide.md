@@ -211,10 +211,10 @@ process is handled by the Sonatype Nexus Staging plugin, which is no longer conf
 OpenTripPlanner POM. This step currently requires making a few significant manual modifications to
 the POM.
 
-We no longer trigger deployment of artifacts to Maven Central or deployment of REST API
-documentation to AWS automatically in our build scripts (GitHub Actions). These steps are prone to
-failure and require storing a lot of infrequently used secret information in the repo and
-environment variables on GitHub. Our releases are currently not very frequent so we just carry out
-these steps manually by following the checklist. We aim to make a release every 6 months.
+We no longer trigger deployment of artifacts to Maven Central automatically in our build scripts 
+(GitHub Actions). These steps are prone to failure and require storing a lot of infrequently used 
+secret information in the repo and environment variables on GitHub. Our releases are currently not 
+very frequent so we just carry out these steps manually by following the checklist. We aim to make 
+a release every 6 months.
 
 Use the [Release Checklist](ReleaseChecklist.md) to perform the release.
