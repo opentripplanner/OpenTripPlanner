@@ -318,6 +318,10 @@ public class OsmEntity {
     return Optional.empty();
   }
 
+  public Optional<Duration> getDuration(Consumer<String> errorHandler) {
+    return getTagValueAsDuration("duration", errorHandler);
+  }
+
   /**
    * Some tags are allowed to have values like 55, "true" or "false".
    * <p>

@@ -3,6 +3,28 @@
 The changelog lists most feature changes between each release. The list is automatically created
 based on merged pull requests. Search GitHub issues and pull requests for smaller issues.
 
+## 2.8.0 (under development)
+
+- Add support for coordinate via point in the GTFS GraphQL API [#6490](https://github.com/opentripplanner/OpenTripPlanner/pull/6490)
+- Fix removal of old vehicle positions [#6523](https://github.com/opentripplanner/OpenTripPlanner/pull/6523)
+- Make estimated calls non nullable in the TransModel API [#6526](https://github.com/opentripplanner/OpenTripPlanner/pull/6526)
+- Change the TripRequest and builder to work with include lists instead of just the FilterValues [#6525](https://github.com/opentripplanner/OpenTripPlanner/pull/6525)
+- Optimize routing time vertex linking with areas [#6495](https://github.com/opentripplanner/OpenTripPlanner/pull/6495)
+- Add explanation of underscore-separated units in variable names [ci skip] [#6470](https://github.com/opentripplanner/OpenTripPlanner/pull/6470)
+- Use locale param from plan queries for all translations in the GTFS API if accept-language header is not set [#6546](https://github.com/opentripplanner/OpenTripPlanner/pull/6546)
+- do not discard turn restrictions where the turn description and angle do not match, just add an issue [#6553](https://github.com/opentripplanner/OpenTripPlanner/pull/6553)
+- Use locale param if one is defined over accept-language header in GTFS APIs [#6552](https://github.com/opentripplanner/OpenTripPlanner/pull/6552)
+- Fix entrances being removed from walk steps [#6530](https://github.com/opentripplanner/OpenTripPlanner/pull/6530)
+- Handle duration tags for elevators in the same way as for escalators [#6568](https://github.com/opentripplanner/OpenTripPlanner/pull/6568)
+- Revert arrivalStoptime, departureStoptime and stoptimesForDate behavior changes from #6245 [#6554](https://github.com/opentripplanner/OpenTripPlanner/pull/6554)
+- Filter flex trips by agency and route [#6421](https://github.com/opentripplanner/OpenTripPlanner/pull/6421)
+- Fix crash on itineraries with frequencies where distanceMeters was not computed [#6580](https://github.com/opentripplanner/OpenTripPlanner/pull/6580)
+- Remove REST API [#6578](https://github.com/opentripplanner/OpenTripPlanner/pull/6578)
+- Don't use bicycle as street routing mode when car or scooter rental is requested [#6599](https://github.com/opentripplanner/OpenTripPlanner/pull/6599)
+- Updating SIRI objects used to SIRI 2.1 [#6573](https://github.com/opentripplanner/OpenTripPlanner/pull/6573)
+- Set correct transfer modes for scooters in deprecated `plan` query [#6597](https://github.com/opentripplanner/OpenTripPlanner/pull/6597)
+[](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
+
 ## 2.7.0 (2025-03-12)
 
 ### Notable Changes

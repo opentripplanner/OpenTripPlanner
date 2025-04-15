@@ -16,7 +16,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.test.support.GeoJsonIo;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class SimpleAreaTest {
+class SimpleAreaTest {
 
   @Test
   void walkableArea() {
@@ -53,7 +53,10 @@ public class SimpleAreaTest {
 
     assertFalse(graph.getVertices().isEmpty());
 
-    System.out.println(GeoJsonIo.toUrl(graph));
-    assertEquals(10, graph.getEdgesOfType(AreaEdge.class).size());
+    assertEquals(
+      10,
+      graph.getEdgesOfType(AreaEdge.class).size(),
+      "Incorrect number of edges, check %s".formatted(GeoJsonIo.toUrl(graph))
+    );
   }
 }

@@ -40,6 +40,8 @@ class TurnRestrictionUnifier {
             if (angleDiff < 0) {
               angleDiff += 360;
             }
+            // If the angle seems off for the stated restriction direction, add an issue
+            // to the issue store, but do not ignore the restriction.
             switch (restrictionTag.direction) {
               case LEFT -> {
                 if (angleDiff >= 160) {
@@ -49,7 +51,6 @@ class TurnRestrictionUnifier {
                       "Left turn restriction is not on edges which turn left"
                     )
                   );
-                  continue; // not a left turn
                 }
               }
               case RIGHT -> {
@@ -60,7 +61,6 @@ class TurnRestrictionUnifier {
                       "Right turn restriction is not on edges which turn right"
                     )
                   );
-                  continue; // not a right turn
                 }
               }
               case U -> {
@@ -71,7 +71,6 @@ class TurnRestrictionUnifier {
                       "U-turn restriction is not on U-turn"
                     )
                   );
-                  continue; // not a U turn
                 }
               }
               case STRAIGHT -> {
@@ -82,7 +81,6 @@ class TurnRestrictionUnifier {
                       "Straight turn restriction is not on edges which go straight"
                     )
                   );
-                  continue; // not straight
                 }
               }
             }

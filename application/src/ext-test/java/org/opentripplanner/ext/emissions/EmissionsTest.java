@@ -2,21 +2,25 @@ package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.opentripplanner.model.plan.Itinerary.createScheduledTransitItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.LegConstructionSupport;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
@@ -39,7 +43,7 @@ class EmissionsTest {
     "2023-07-20T17:49:06+03:00"
   ).toZonedDateTime();
 
-  private static final StreetLeg STREET_LEG = StreetLeg.create()
+  private static final StreetLeg STREET_LEG = StreetLeg.of()
     .withMode(TraverseMode.CAR)
     .withDistanceMeters(214.4)
     .withStartTime(TIME)
@@ -61,61 +65,53 @@ class EmissionsTest {
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
     emissions.put(new FeedScopedId("F", "2"), 0.0);
-    EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
-    eService = new DefaultEmissionsService(emissionsDataModel);
+    EmissionsRepository emissionsRepository = new DefaultEmissionsRepository();
+    emissionsRepository.setCo2Emissions(emissions);
+    emissionsRepository.setCarAvgCo2PerMeter(0.131);
+    eService = new DefaultEmissionsService(emissionsRepository);
     decorateWithEmission = new DecorateWithEmission(eService);
   }
 
   @Test
   void testGetEmissionsForItinerary() {
-    Itinerary i = createScheduledTransitItinerary(List.of(createTransitLeg(ROUTE_WITH_EMISSIONS)));
-    decorateWithEmission.decorate(i);
-    assertEquals(new Grams(2223.902), i.getEmissionsPerPerson().getCo2());
+    var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
+    i = decorateWithEmission.decorate(i);
+    assertEquals(new Gram(2223.902), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
-    Itinerary i = createScheduledTransitItinerary(List.of(STREET_LEG));
-    decorateWithEmission.decorate(i);
-    assertEquals(new Grams(28.0864), i.getEmissionsPerPerson().getCo2());
+    var i = createItinerary(STREET_LEG);
+    i = decorateWithEmission.decorate(i);
+    assertEquals(new Gram(28.0864), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED))
-    );
-    decorateWithEmission.decorate(i);
-    assertNull(i.getEmissionsPerPerson());
+    var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED));
+    i = decorateWithEmission.decorate(i);
+    assertNull(i.emissionsPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS))
-    );
-    decorateWithEmission.decorate(i);
-    assertEquals(new Grams(0.0), i.getEmissionsPerPerson().getCo2());
+    var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
+    i = decorateWithEmission.decorate(i);
+    assertEquals(new Gram(0.0), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG)
-    );
-    decorateWithEmission.decorate(i);
-    assertEquals(new Grams(2251.9884), i.getEmissionsPerPerson().getCo2());
+    var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
+    i = decorateWithEmission.decorate(i);
+    assertEquals(new Gram(2251.9884), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
-    Itinerary i = createScheduledTransitItinerary(
-      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG)
-    );
-    decorateWithEmission.decorate(i);
-    var emissionsResult = i.getEmissionsPerPerson() != null
-      ? i.getEmissionsPerPerson().getCo2()
-      : null;
+    var i = createItinerary(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG);
+    i = decorateWithEmission.decorate(i);
+    var emissionsResult = i.emissionsPerPerson() != null ? i.emissionsPerPerson().getCo2() : null;
     assertNull(emissionsResult);
   }
 
@@ -146,5 +142,9 @@ class EmissionsTest {
       .withZoneId(ZoneIds.BERLIN)
       .withDistanceMeters(LegConstructionSupport.computeDistanceMeters(pattern, 0, 2))
       .build();
+  }
+
+  private static Itinerary createItinerary(Leg... legs) {
+    return Itinerary.ofScheduledTransit(Arrays.asList(legs)).withGeneralizedCost(Cost.ZERO).build();
   }
 }

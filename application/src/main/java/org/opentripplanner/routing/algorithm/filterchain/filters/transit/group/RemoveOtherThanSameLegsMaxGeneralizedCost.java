@@ -5,6 +5,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
@@ -42,7 +43,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     // Get all transit trips for an itinerary
     Function<Itinerary, Set<Trip>> getTripsForItinerary = itinerary ->
       itinerary
-        .getLegs()
+        .legs()
         .stream()
         .filter(Leg::isTransitLeg)
         .map(Leg::getTrip)
@@ -63,7 +64,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
       .stream()
       .mapToInt(itinerary ->
         itinerary
-          .getLegs()
+          .legs()
           .stream()
           .filter(Leg::isTransitLeg)
           .filter(leg -> commonTrips.contains(leg.getTrip()))
@@ -77,23 +78,20 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
     }
 
     // Find the lowest cost for any itinerary
-    OptionalInt minimumCost = itineraries
+    int minimumCost = itineraries
       .stream()
-      .mapToInt(Itinerary::getGeneralizedCostIncludingPenalty)
-      .min();
-
-    if (minimumCost.isEmpty()) {
-      return List.of();
-    }
+      .mapToInt(it -> it.generalizedCostIncludingPenalty().toSeconds())
+      .min()
+      .orElseThrow();
 
     // Calculate the maximum limit allowed for itinerary cost
-    double maxLimit =
-      ((minimumCost.getAsInt() - commonCost.getAsInt()) * maxCostOtherLegsFactor) +
-      commonCost.getAsInt();
+    Cost maxLimit = Cost.costOfSeconds(
+      ((minimumCost - commonCost.getAsInt()) * maxCostOtherLegsFactor) + commonCost.getAsInt()
+    );
 
     return itineraries
       .stream()
-      .filter(it -> it.getGeneralizedCostIncludingPenalty() > maxLimit)
-      .collect(Collectors.toList());
+      .filter(it -> it.generalizedCostIncludingPenalty().greaterThan(maxLimit))
+      .toList();
   }
 }
