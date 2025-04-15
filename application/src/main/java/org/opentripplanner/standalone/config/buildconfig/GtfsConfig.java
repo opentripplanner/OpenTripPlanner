@@ -3,8 +3,8 @@ package org.opentripplanner.standalone.config.buildconfig;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParametersBuilder;
+import org.opentripplanner.gtfs.config.GtfsDefaultParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -12,7 +12,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class GtfsConfig {
 
-  public static GtfsFeedParameters mapGtfsDefaultParameters(
+  public static GtfsDefaultParameters mapGtfsDefaultParameters(
     NodeAdapter root,
     String parameterName
   ) {
@@ -23,12 +23,14 @@ public class GtfsConfig {
       .summary("The gtfsDefaults section allows you to specify default properties for GTFS files.")
       .asObject();
 
-    return mapGenericParameters(node, baseDefaults, "").build();
+    return mapGenericParameters(node, baseDefaults, "");
   }
 
-  public static GtfsFeedParameters mapGtfsFeed(NodeAdapter node, GtfsFeedParameters defaults) {
+  public static GtfsFeedParameters mapGtfsFeed(NodeAdapter node, GtfsDefaultParameters defaults) {
     String documentationAddition = " Overrides the value specified in `gtfsDefaults`.";
-    return mapGenericParameters(node, defaults, documentationAddition)
+    var genericParameters = mapGenericParameters(node, defaults, documentationAddition);
+    return genericParameters
+      .withFeedInfo()
       .withFeedId(
         node
           .of("feedId")
@@ -44,9 +46,9 @@ public class GtfsConfig {
       .build();
   }
 
-  private static GtfsFeedParametersBuilder mapGenericParameters(
+  private static GtfsDefaultParameters mapGenericParameters(
     NodeAdapter node,
-    GtfsFeedParameters defaults,
+    GtfsDefaultParameters defaults,
     String documentationAddition
   ) {
     var docDefaults = GtfsFeedParameters.DEFAULT;
@@ -117,6 +119,7 @@ public class GtfsConfig {
           )
           .docDefaultValue(docDefaults.maxInterlineDistance())
           .asInt(defaults.maxInterlineDistance())
-      );
+      )
+      .build();
   }
 }

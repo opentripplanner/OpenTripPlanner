@@ -68,7 +68,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                                                                                                                                              | *Optional* | `false`       |   na  |
 |    [maxNumberOfResultFields](#transmodelApi_maxNumberOfResultFields)                      |       `integer`       | The maximum number of fields in a GraphQL result                                                                                                                                                                     | *Optional* | `1000000`     |  2.6  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                                                                                                                                          | *Optional* |               |   na  |
-| [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
+| [updaters](Realtime-Updaters.md)                                                          |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                                                                                                                                           | *Optional* |               |  1.5  |
 | [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                                                                                                                                            | *Optional* |               |   na  |
 | [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                                                                                                                                              | *Optional* |               |  2.0  |
 
@@ -134,7 +134,7 @@ Maximum processing time for an API request
 
 This timeout limits the server-side processing time for a given API request. This does not include
 network latency nor waiting time in the HTTP server thread pool. The default value is
-`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel & GTFS GraphQL).
+`-1s`(no timeout). The timeout is applied to all APIs (Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
 
 

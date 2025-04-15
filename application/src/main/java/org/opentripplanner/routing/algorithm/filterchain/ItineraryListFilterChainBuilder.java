@@ -97,6 +97,7 @@ public class ItineraryListFilterChainBuilder {
    */
 
   @Sandbox
+  @Nullable
   private ItineraryDecorator emissionDecorator;
 
   @Sandbox
@@ -246,7 +247,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * This will NOT delete itineraries, but tag them as deleted using the {@link
-   * Itinerary#getSystemNotices()}.
+   * Itinerary#systemNotices()}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;
@@ -339,7 +340,9 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(ItineraryDecorator emissionDecorator) {
+  public ItineraryListFilterChainBuilder withEmissions(
+    @Nullable ItineraryDecorator emissionDecorator
+  ) {
     this.emissionDecorator = emissionDecorator;
     return this;
   }

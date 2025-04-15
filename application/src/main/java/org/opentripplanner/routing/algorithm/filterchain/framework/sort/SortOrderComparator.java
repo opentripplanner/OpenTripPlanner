@@ -23,7 +23,7 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
    * before any itineraries with one or more transit legs.
    */
   static final Comparator<ItinerarySortKey> STREET_ONLY_FIRST_COMP = (a, b) ->
-    Boolean.compare(b.isOnStreetAllTheWay(), a.isOnStreetAllTheWay());
+    Boolean.compare(b.isStreetOnly(), a.isStreetOnly());
 
   /** Sort latest arrival-time first */
   static final Comparator<ItinerarySortKey> ARRIVAL_TIME_COMP = comparing(
@@ -34,12 +34,12 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
     ItinerarySortKey::startTimeAsInstant
   ).reversed();
 
-  static final Comparator<ItinerarySortKey> GENERALIZED_COST_COMP = comparingInt(
-    ItinerarySortKey::getGeneralizedCostIncludingPenalty
+  static final Comparator<ItinerarySortKey> GENERALIZED_COST_COMP = comparing(
+    ItinerarySortKey::generalizedCostIncludingPenalty
   );
 
   static final Comparator<ItinerarySortKey> NUM_OF_TRANSFERS_COMP = comparingInt(
-    ItinerarySortKey::getNumberOfTransfers
+    ItinerarySortKey::numberOfTransfers
   );
 
   private static final SortOrderComparator STREET_AND_ARRIVAL_TIME = new SortOrderComparator(

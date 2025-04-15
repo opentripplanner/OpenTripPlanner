@@ -159,7 +159,7 @@ type Contact {
 "A planned journey on a specific day"
 type DatedServiceJourney {
   "Returns scheduled passingTimes for this dated service journey, updated with real-time-updates (if available). "
-  estimatedCalls: [EstimatedCall] @timingData
+  estimatedCalls: [EstimatedCall!]! @timingData
   id: ID!
   "JourneyPattern for the dated service journey."
   journeyPattern: JourneyPattern
@@ -863,19 +863,6 @@ type QueryType {
     """
     relaxTransitGroupPriority: RelaxCostInput = null,
     """
-    Whether non-optimal transit paths at the destination should be returned. Let c be the
-    existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
-    accepted if the following is true:
-    
-    `c' < Math.round(c * relaxTransitSearchGeneralizedCostAtDestination)`
-    
-    The parameter is optional. If not set, a normal comparison is performed.
-    
-    Values less than 1.0 is not allowed, and values greater than 2.0 are not
-    supported, due to performance reasons.
-    """
-    relaxTransitSearchGeneralizedCostAtDestination: Float = null @deprecated(reason : "This is replaced by 'relaxTransitGroupPriority'."),
-    """
     The length of the search-window in minutes. This parameter is optional.
     
     The search-window is defined as the duration between the earliest-departure-time(EDT) and
@@ -1145,7 +1132,7 @@ type ServiceJourney {
   estimatedCalls(
     "Date to get estimated calls for. Defaults to today."
     date: Date
-  ): [EstimatedCall] @timingData
+  ): [EstimatedCall!]! @timingData
   id: ID!
   "JourneyPattern for the service journey, according to scheduled data. If the ServiceJourney is not included in the scheduled data, null is returned."
   journeyPattern: JourneyPattern

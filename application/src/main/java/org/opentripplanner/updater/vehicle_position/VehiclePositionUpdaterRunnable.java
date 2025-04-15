@@ -9,7 +9,7 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositi
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.RealTimeUpdateContext;
 
-public class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
+class VehiclePositionUpdaterRunnable implements GraphWriterRunnable {
 
   private final List<VehiclePosition> updates;
   private final RealtimeVehicleRepository realtimeVehicleRepository;

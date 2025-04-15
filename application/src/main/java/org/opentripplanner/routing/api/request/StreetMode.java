@@ -133,7 +133,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
     """
 
     _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
-    See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
+    See [Configuring GBFS](GBFS-Config.md) on how to add one.
     """;
 
   @Override

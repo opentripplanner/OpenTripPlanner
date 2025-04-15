@@ -28,7 +28,7 @@ Sections follow that describe particular settings in more depth.
 | [graph](#graph)                                                                           |         `uri`        | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
 | [gsCredentials](#gsCredentials)                                                           |       `string`       | Local file system path to Google Cloud Platform service accounts credentials file.                                                                             | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)                   |       `boolean`      | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
-| maxAreaNodes                                                                              |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `150`                             |  2.1  |
+| maxAreaNodes                                                                              |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                                 |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
 | maxElevationPropagationMeters                                                             |       `integer`      | The maximum distance to propagate elevation to vertices which have no elevation.                                                                               | *Optional* | `2000`                            |  1.5  |
 | [maxStopToShapeSnapDistance](#maxStopToShapeSnapDistance)                                 |       `double`       | Maximum distance between route shapes and their stops.                                                                                                         | *Optional* | `150.0`                           |  2.1  |
@@ -273,10 +273,9 @@ for detailed discussion of this.
 
 OTP allows you to adjust the elevation values reported in API responses in two ways. The first way
 is to store ellipsoid (GPS) elevation values internally, but apply a single geoid difference value
-in the OTP client where appropriate to display elevations above sea level. This ellipsoid to geoid
-difference is returned in each trip plan response in the
-[ElevationMetadata](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/ext/java/org/opentripplanner/ext/restapi/model/ElevationMetadata.java)
-field. Using a single value can be sufficient for smaller OTP deployments, but might result in
+in the OTP client where appropriate to display elevations above sea level. 
+
+Using a single value can be sufficient for smaller OTP deployments, but might result in
 incorrect values at the edges of larger OTP deployments. If your OTP instance uses this, it is
 recommended to set a default request value in the `router-config.json` file as follows:
 

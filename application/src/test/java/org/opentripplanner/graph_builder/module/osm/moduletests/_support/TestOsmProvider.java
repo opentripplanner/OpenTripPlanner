@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.osm.OsmProvider;
@@ -115,21 +116,31 @@ public class TestOsmProvider implements OsmProvider {
     }
 
     public Builder addWayFromNodes(OsmNode... nodes) {
-      var wayNodes = Arrays.stream(nodes).toList();
-      this.nodes.addAll(wayNodes);
-      var nodeIds = wayNodes.stream().map(OsmEntity::getId).toList();
+      return addWayFromNodes(counter.incrementAndGet(), Arrays.stream(nodes).toList());
+    }
 
-      var way = new OsmWay();
-      way.setId(counter.incrementAndGet());
-      way.addTag("highway", "pedestrian");
-      way.getNodeRefs().addAll(nodeIds);
+    public Builder addWayFromNodes(long id, List<OsmNode> nodes) {
+      return addWayFromNodes(way -> {}, id, nodes);
+    }
 
-      this.ways.add(way);
-      return this;
+    public Builder addWayFromNodes(Consumer<OsmWay> wayConsumer, OsmNode... nodes) {
+      return addWayFromNodes(wayConsumer, counter.incrementAndGet(), List.of(nodes));
     }
 
     public Builder addRelation(OsmRelation relation) {
       this.relations.add(relation);
+      return this;
+    }
+
+    private Builder addWayFromNodes(Consumer<OsmWay> wayConsumer, long id, List<OsmNode> nodes) {
+      this.nodes.addAll(nodes);
+      var nodeIds = nodes.stream().map(OsmEntity::getId).toList();
+      var way = new OsmWay();
+      way.setId(id);
+      way.addTag("highway", "pedestrian");
+      wayConsumer.accept(way);
+      way.getNodeRefs().addAll(nodeIds);
+      this.ways.add(way);
       return this;
     }
   }

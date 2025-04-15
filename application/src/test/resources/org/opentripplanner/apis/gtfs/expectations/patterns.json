@@ -52,7 +52,7 @@
               }
             ],
             "occupancy": {
-              "occupancyStatus": "FEW_SEATS_AVAILABLE"
+              "occupancyStatus": "NO_DATA_AVAILABLE"
             }
           },
           {
@@ -165,7 +165,8 @@
             "stopRelationship": null,
             "speed": null,
             "heading": null,
-            "lastUpdated": 31556889864403199,
+            "lastUpdated": 1704121200,
+            "lastUpdate": "2024-01-01T16:00:00+01:00",
             "trip": {
               "gtfsId": "F:123"
             }
@@ -183,7 +184,8 @@
             },
             "speed": 10.2,
             "heading": 80.0,
-            "lastUpdated": -31557014167219200,
+            "lastUpdated": 1704132000,
+            "lastUpdate": "2024-01-01T19:00:00+01:00",
             "trip": {
               "gtfsId": "F:123"
             }

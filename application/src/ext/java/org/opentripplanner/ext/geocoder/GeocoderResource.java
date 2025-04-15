@@ -14,7 +14,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.restapi.mapping.FeedScopedIdMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -102,7 +101,7 @@ public class GeocoderResource {
           sl.getCoordinate().latitude(),
           sl.getCoordinate().longitude(),
           stringifyStopLocation(sl),
-          FeedScopedIdMapper.mapToApi(sl.getId())
+          sl.getId().toString()
         )
       )
       .collect(Collectors.toList());
@@ -116,7 +115,7 @@ public class GeocoderResource {
           sc.getCoordinate().latitude(),
           sc.getCoordinate().longitude(),
           Objects.toString(sc.getName()),
-          FeedScopedIdMapper.mapToApi(sc.getId())
+          sc.getId().toString()
         )
       )
       .collect(Collectors.toList());
