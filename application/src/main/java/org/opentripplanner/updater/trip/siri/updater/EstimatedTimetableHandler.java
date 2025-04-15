@@ -5,7 +5,7 @@ import org.opentripplanner.updater.RealTimeUpdateContext;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 /**
  * A consumer of estimated timetables that applies the real-time updates to the transit model.

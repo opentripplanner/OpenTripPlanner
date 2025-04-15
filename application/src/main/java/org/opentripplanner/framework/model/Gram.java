@@ -7,24 +7,24 @@ import java.io.Serializable;
 /**
  * A representation of the weight of something in grams.
  */
-public final class Grams implements Serializable, Comparable<Grams> {
+public final class Gram implements Serializable, Comparable<Gram> {
 
   private final double value;
 
-  public Grams(double value) {
+  public Gram(double value) {
     this.value = value;
   }
 
-  public Grams plus(Grams g) {
-    return new Grams(this.value + g.value);
+  public Gram plus(Gram g) {
+    return new Gram(this.value + g.value);
   }
 
-  public Grams multiply(int factor) {
-    return new Grams(this.value * factor);
+  public Gram multiply(int factor) {
+    return new Gram(this.value * factor);
   }
 
-  public Grams multiply(double factor) {
-    return new Grams(this.value * factor);
+  public Gram multiply(double factor) {
+    return new Gram(this.value * factor);
   }
 
   @Override
@@ -35,12 +35,12 @@ public final class Grams implements Serializable, Comparable<Grams> {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    var that = (Grams) o;
+    var that = (Gram) o;
     return value == that.value;
   }
 
   @Override
-  public int compareTo(Grams o) {
+  public int compareTo(Gram o) {
     return compare(value, o.value);
   }
 

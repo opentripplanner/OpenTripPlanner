@@ -3,12 +3,12 @@ package org.opentripplanner.transit.api.model;
 import java.util.Collection;
 
 /**
- * {@link FilterValuesEmptyIsEverything} is a subclass of {@link FilterValues} that includes
+ * {@link EmptyIsEverythingFilter} is a subclass of {@link FilterValues} that includes
  * everything if the values are null or empty.
  */
-public class FilterValuesEmptyIsEverything<E> extends FilterValues<E> {
+class EmptyIsEverythingFilter<E> extends FilterValues<E> {
 
-  FilterValuesEmptyIsEverything(String name, Collection<E> values) {
+  EmptyIsEverythingFilter(String name, Collection<E> values) {
     super(name, values);
   }
 
@@ -19,6 +19,6 @@ public class FilterValuesEmptyIsEverything<E> extends FilterValues<E> {
 
   @Override
   public boolean equals(Object obj) {
-    return obj instanceof FilterValuesEmptyIsEverything<?> && super.equals(obj);
+    return obj instanceof EmptyIsEverythingFilter<?> && super.equals(obj);
   }
 }

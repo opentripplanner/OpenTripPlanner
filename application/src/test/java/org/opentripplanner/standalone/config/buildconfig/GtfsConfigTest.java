@@ -2,12 +2,11 @@ package org.opentripplanner.standalone.config.buildconfig;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
+import org.opentripplanner.gtfs.config.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 
@@ -31,8 +30,6 @@ class GtfsConfigTest {
 
     var subject = GtfsConfig.mapGtfsDefaultParameters(nodeAdapter, "gtfsDefaults");
 
-    assertNull(subject.source());
-    assertNull(subject.feedId());
     assertFalse(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.PREFERRED, subject.stationTransferPreference());
     assertTrue(subject.discardMinTransferTimes());
@@ -51,8 +48,6 @@ class GtfsConfigTest {
 
     var subject = GtfsConfig.mapGtfsDefaultParameters(nodeAdapter, "gtfsDefaults");
 
-    assertNull(subject.source());
-    assertNull(subject.feedId());
     assertTrue(subject.removeRepeatedStops());
     assertEquals(StopTransferPriority.ALLOWED, subject.stationTransferPreference());
     assertFalse(subject.discardMinTransferTimes());

@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>187</otp.serialization.version.id>
+        <otp.serialization.version.id>188</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>32.2</geotools.version>
@@ -388,7 +388,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.56.0</version>
+                <version>26.59.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.6-jre</version>
+                <version>33.4.7-jre</version>
             </dependency>
 
             <!-- Logging API -->
