@@ -19,6 +19,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -211,6 +212,8 @@ public class ConstantsForTests {
         vehicleParkingRepository
       ).build();
       osmModule.buildGraph();
+      TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(graph);
+      turnRestrictionModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);

@@ -14,9 +14,12 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
@@ -82,6 +85,10 @@ public class TurnRestrictionTest {
     // Hold onto some vertices for the tests
     topRight = maple1;
     bottomLeft = broad3;
+
+    Graph graph = StreetModelForTest.makeGraph(topRight);
+    TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(graph);
+    turnRestrictionModule.buildGraph();
   }
 
   @Test
@@ -172,11 +179,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
-    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
+    assertEquals("maple_1st", states.get(0).getVertex().getMainLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getMainLabelString());
+    assertEquals("broad_1st", states.get(2).getVertex().getMainLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getMainLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getMainLabelString());
   }
 
   /**

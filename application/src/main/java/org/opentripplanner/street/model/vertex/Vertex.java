@@ -161,6 +161,10 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return getLabel().toString();
   }
 
+  public Vertex getParent() {
+    return this;
+  }
+
   public String getMainLabelString() {
     VertexLabel label = getLabel();
     if (label instanceof VertexLabel.SubsidiaryVertexLabel subsidiaryVertexLabel) {

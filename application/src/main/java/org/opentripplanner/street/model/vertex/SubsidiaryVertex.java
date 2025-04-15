@@ -20,6 +20,10 @@ public class SubsidiaryVertex extends IntersectionVertex {
     this.counter = counterSource++;
   }
 
+  public Vertex getParent() {
+    return parent;
+  }
+
   @Override
   public I18NString getName() {
     return NO_NAME;

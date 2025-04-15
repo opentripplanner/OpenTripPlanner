@@ -9,6 +9,7 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
+import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SubsidiaryVertex;
@@ -59,9 +60,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         return e;
       }
     }
-    throw new IllegalStateException(
-      String.format("corresponding edge for %s not found in %s", edge, edges)
-    );
+    System.out.println(String.format("corresponding edge for %s not found in %s", edge, edges));
+    return null;
   }
 
   StreetTraversalPermission streetTraversalPermission(TraverseModeSet traverseModeSet) {
@@ -79,12 +79,15 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   }
 
   void processVertex(IntersectionVertex vertex, TurnRestriction turnRestriction) {
+    var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex.getIncomingStreetEdges());
+    if (fromEdge == null) {
+      return;
+    }
     var mainVertex = (IntersectionVertex) turnRestriction.from.getToVertex();
     var splitVertex = new SubsidiaryVertex(mainVertex);
     graph.addVertex(splitVertex);
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
-    var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex.getIncomingStreetEdges());
     var fromPermission = fromEdge.getPermission();
     var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
     var oldPermission = fromPermission.remove(restrictionPermission);
@@ -102,13 +105,20 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       fromEdge.setPermission(oldPermission);
     }
     for (var toEdge : vertex.getOutgoingStreetEdges()) {
-      if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-        toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+      if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
+        if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+        }
+      } else {
+        if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+        }
       }
     }
   }
 
   void processRestriction(TurnRestriction turnRestriction) {
+    System.out.println("turn restriction: " + turnRestriction);
     var vertex = turnRestriction.from.getToVertex();
     if (vertex instanceof IntersectionVertex intersectionVertex) {
       if (subsidiaryVertices.containsKey(vertex)) {
@@ -121,7 +131,9 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       }
       processVertex(intersectionVertex, turnRestriction);
     } else {
-      throw new IllegalStateException(String.format("Vertex %s is not an OsmVertex", vertex));
+      throw new IllegalStateException(
+        String.format("Vertex %s is not an IntersectionVertex", vertex)
+      );
     }
   }
 

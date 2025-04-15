@@ -1127,7 +1127,9 @@ public class StreetEdge
       // we are searching in - these traversals are always disallowed (they are U-turns in one direction
       // or the other).
       // TODO profiling indicates that this is a hot spot.
-      if (this.isReverseOf(backEdge) || backEdge.isReverseOf(this)) {
+      // isReverseOf is symmetric so we no longer test in both directions. isReverseOf must
+      // be kept symmetric.
+      if (this.isReverseOf(backEdge)) {
         return null;
       }
     }
@@ -1171,17 +1173,6 @@ public class StreetEdge
     if (backEdge instanceof StreetEdge backPSE) {
       TraverseMode backMode = s0.getBackMode();
       final boolean arriveBy = s0.getRequest().arriveBy();
-
-      /*
-      // Apply turn restrictions
-      if (
-        arriveBy
-          ? !canTurnOnto(backPSE, s0, backMode)
-          : !backPSE.canTurnOnto(this, s0, traverseMode)
-      ) {
-        return null;
-      }
-      */
 
       double backSpeed = backPSE.calculateSpeed(preferences, backMode, s0.isBackWalkingBike());
       final double turnDuration; // Units are seconds.
