@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import java.util.OptionalInt;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -15,7 +16,10 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
+
+  @Nullable
   private final Cost generalizedCostMaxLimit;
+
   private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
 
   /**
@@ -25,7 +29,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
    */
   public RemoveTransitIfStreetOnlyIsBetter(
     CostLinearFunction costLimitFunction,
-    Cost generalizedCostMaxLimit
+    @Nullable Cost generalizedCostMaxLimit
   ) {
     this.costLimitFunction = costLimitFunction;
     this.generalizedCostMaxLimit = generalizedCostMaxLimit;
