@@ -12,17 +12,15 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
-import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.graph_builder.issue.report.DataImportIssueReporter;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -36,7 +34,6 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
@@ -107,14 +104,8 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (ConfiguredDataSource<
-      GtfsFeedParameters
-    > gtfsData : dataSources.getGtfsConfiguredDatasource()) {
-      GtfsBundle gtfsBundle = new GtfsBundle(gtfsData);
-
-      gtfsBundle.subwayAccessTime = config.getSubwayAccessTimeSeconds();
-      gtfsBundle.setMaxStopToShapeSnapDistance(config.maxStopToShapeSnapDistance);
-      gtfsBundles.add(gtfsBundle);
+    for (var gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+      gtfsBundles.add(new GtfsBundle(gtfsData.dataSource(), gtfsData.config()));
     }
     return new GtfsModule(
       gtfsBundles,
@@ -122,23 +113,9 @@ public class GraphBuilderModules {
       graph,
       issueStore,
       config.getTransitServicePeriod(),
-      config.fareServiceFactory
-    );
-  }
-
-  @Provides
-  @Singleton
-  static EmissionsModule provideEmissionsModule(
-    GraphBuilderDataSources dataSources,
-    BuildConfig config,
-    @Nullable EmissionsDataModel emissionsDataModel,
-    DataImportIssueStore issueStore
-  ) {
-    return new EmissionsModule(
-      dataSources.getGtfsConfiguredDatasource(),
-      config,
-      emissionsDataModel,
-      issueStore
+      config.fareServiceFactory,
+      config.maxStopToShapeSnapDistance,
+      config.getSubwayAccessTimeSeconds()
     );
   }
 
@@ -175,7 +152,8 @@ public class GraphBuilderModules {
       parkingRepository,
       timetableRepository,
       issueStore,
-      config.areaVisibility
+      config.areaVisibility,
+      config.maxAreaNodes
     );
   }
 
@@ -197,7 +175,8 @@ public class GraphBuilderModules {
         parkingRepository,
         timetableRepository,
         issueStore,
-        config.areaVisibility
+        config.areaVisibility,
+        config.maxAreaNodes
       )
     );
     pruneIslands.setPruningThresholdIslandWithoutStops(

@@ -18,7 +18,6 @@ import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
-import org.opentripplanner.ext.restapi.serialization.JSONObjectMapperProvider;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -100,8 +99,6 @@ public class OTPWebApplication extends Application {
         new OTPExceptionMapper(),
         // Enable Jackson JSON response serialization
         new JacksonJsonProvider(),
-        // Serialize POJOs (unannotated) JSON using Jackson
-        new JSONObjectMapperProvider(),
         // Allow injecting the OTP server object into Jersey resource classes
         makeBinder(contextProvider),
         // Add performance instrumentation of Jersey requests to micrometer

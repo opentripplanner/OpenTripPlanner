@@ -4,12 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 
 class DeduplicationPageCutTest {
 
   public static final Instant DEPARTURE_TIME = Instant.ofEpochSecond(1_000_000);
   public static final Instant ARRIVAL_TIME = Instant.ofEpochSecond(2_000_000);
-  public static final int GENERALIZED_COST = 1700;
+  public static final Cost GENERALIZED_COST = Cost.costOfSeconds(1700);
   public static final int NUM_OF_TRANSFERS = 2;
   public static final boolean ON_STREET = false;
 

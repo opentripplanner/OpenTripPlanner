@@ -2444,7 +2444,11 @@ type Trip implements Node {
     """
     types: [TripAlertType]
   ): [Alert]
-  "Arrival time to the final stop"
+  """
+  Arrival time to the final stop. If the trip does not run on the given date,
+  it will return scheduled times from another date. This field is slightly
+  confusing and will be deprecated when a better replacement is implemented.
+  """
   arrivalStoptime(
     """
     Date for which the arrival time is returned. Format: YYYYMMDD. If this
@@ -2455,7 +2459,11 @@ type Trip implements Node {
   "Whether bikes are allowed on board the vehicle running this trip"
   bikesAllowed: BikesAllowed
   blockId: String
-  "Departure time from the first stop"
+  """
+  Departure time from the first stop. If the trip does not run on the given date,
+  it will return scheduled times from another date. This field is slightly
+  confusing and will be deprecated when a better replacement is implemented.
+  """
   departureStoptime(
     """
     Date for which the departure time is returned. Format: YYYYMMDD. If this
@@ -2494,6 +2502,12 @@ type Trip implements Node {
   stops: [Stop!]!
   "List of times when this trip arrives to or departs from a stop"
   stoptimes: [Stoptime]
+  """
+  List of times when this trip arrives to or departs from each stop on a given date, or
+  today if the date is not given. If the trip does not run on the given date, it will
+  return scheduled times from another date. This field is slightly confusing and
+  will be deprecated when a better replacement is implemented.
+  """
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
     serviceDate: String
@@ -2659,8 +2673,10 @@ type VehiclePosition {
   heading: Float
   "Human-readable label of the vehicle, eg. a publicly visible number or a license plate"
   label: String
+  "When the position of the vehicle was recorded."
+  lastUpdate: OffsetDateTime
   "When the position of the vehicle was recorded in seconds since the UNIX epoch."
-  lastUpdated: Long
+  lastUpdated: Long @deprecated(reason : "Use `lastUpdate` instead.")
   "Latitude of the vehicle"
   lat: Float
   "Longitude of the vehicle"
@@ -4462,10 +4478,14 @@ A visit-via-location is a physical visit to one of the stop locations or coordin
 on-board visit does not count, the traveler must alight or board at the given stop for it to to
 be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
 in the street network from a stop and back to another stop to join the transit network.
-
-NOTE! Coordinates are NOT supported yet.
 """
 input PlanVisitViaLocationInput {
+  """
+  A coordinate to route through. To visit a coordinate, the traveler must walk(bike or drive)
+  to the closest point in the street network from a stop and back to another stop to join the transit
+  network.
+  """
+  coordinate: PlanCoordinateInput
   "The label/name of the location. This is pass-through information and is not used in routing."
   label: String
   """

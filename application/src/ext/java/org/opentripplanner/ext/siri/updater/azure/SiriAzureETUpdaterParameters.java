@@ -29,12 +29,18 @@ public class SiriAzureETUpdaterParameters
 
   @Override
   public String url() {
-    var url = getServiceBusUrl();
-    try {
-      return new ConnectionStringProperties(url).getEndpoint().toString();
-    } catch (IllegalArgumentException e) {
-      return url;
+    // This url is only used for metrics
+    if (getFullyQualifiedNamespace() != null) {
+      return getFullyQualifiedNamespace();
     }
+    // fallback to service bus url
+    if (getServiceBusUrl() != null) {
+      try {
+        // Don't include the preshared key
+        return new ConnectionStringProperties(getServiceBusUrl()).getEndpoint().toString();
+      } catch (IllegalArgumentException ignore) {}
+    }
+    return "unknown";
   }
 
   @Override

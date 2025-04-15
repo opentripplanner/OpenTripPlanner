@@ -390,7 +390,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLEmissions {
-    public DataFetcher<org.opentripplanner.framework.model.Grams> co2();
+    public DataFetcher<org.opentripplanner.framework.model.Gram> co2();
   }
 
   /** Station entrance or exit, originating from OSM or GTFS data. */
@@ -1391,6 +1391,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> heading();
 
     public DataFetcher<String> label();
+
+    public DataFetcher<java.time.OffsetDateTime> lastUpdate();
 
     public DataFetcher<Long> lastUpdated();
 

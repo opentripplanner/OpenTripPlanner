@@ -30,7 +30,7 @@ public class TripPlanMapper {
         new LocalizedString("destination")
       );
     } else {
-      List<Leg> legs = itineraries.get(0).getLegs();
+      List<Leg> legs = itineraries.get(0).legs();
       from = legs.get(0).getFrom();
       to = legs.get(legs.size() - 1).getTo();
     }

@@ -275,11 +275,11 @@ public class StatesToWalkStepsMapper {
         boolean isOnSameStreet = lastStep
           .directionTextNoParens()
           .equals(threeBack.directionTextNoParens());
-        if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet) {
+        if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet && !twoBack.hasEntrance()) {
           if (isUTurn(twoBack, lastStep)) {
             steps.remove(lastIndex - 1);
             processUTurn(lastStep, twoBack);
-          } else {
+          } else if (!lastStep.hasEntrance()) {
             // total hack to remove zags.
             steps.remove(lastIndex);
             steps.remove(lastIndex - 1);

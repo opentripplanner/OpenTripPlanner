@@ -15,7 +15,7 @@ import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.Siri;
 
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
