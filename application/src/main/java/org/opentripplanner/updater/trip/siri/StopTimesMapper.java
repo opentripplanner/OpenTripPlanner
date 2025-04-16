@@ -1,15 +1,16 @@
 package org.opentripplanner.updater.trip.siri;
 
+import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
-import uk.org.siri.siri21.NaturalLanguageStringStructure;
 
 class StopTimesMapper {
 
@@ -24,6 +25,7 @@ class StopTimesMapper {
   /**
    * Map the call to the aimed StopTime or return null if the stop cannot be found in the site repository.
    */
+  @Nullable
   StopTime createAimedStopTime(
     Trip trip,
     ZonedDateTime departureDate,
@@ -68,7 +70,7 @@ class StopTimesMapper {
     stopTime.setDepartureTime(isLastStop ? aimedArrivalTimeSeconds : aimedDepartureTimeSeconds);
 
     // Update destination display
-    var destinationDisplay = getFirstNameFromList(call.getDestinationDisplaies());
+    var destinationDisplay = getFirstStringFromList(call.getDestinationDisplaies());
     if (!destinationDisplay.isEmpty()) {
       stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
     } else if (trip.getHeadsign() != null) {
@@ -85,13 +87,5 @@ class StopTimesMapper {
     );
 
     return stopTime;
-  }
-
-  //TODO move to helper
-  private static String getFirstNameFromList(List<NaturalLanguageStringStructure> names) {
-    if (names == null) {
-      return "";
-    }
-    return names.stream().findFirst().map(NaturalLanguageStringStructure::getValue).orElse("");
   }
 }

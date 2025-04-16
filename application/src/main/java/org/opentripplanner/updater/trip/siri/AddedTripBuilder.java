@@ -6,6 +6,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.CANNOT
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
+import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -39,7 +40,6 @@ import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
-import uk.org.siri.siri21.NaturalLanguageStringStructure;
 import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.VehicleJourneyRef;
 import uk.org.siri.siri21.VehicleModesEnumeration;
@@ -99,7 +99,7 @@ class AddedTripBuilder {
 
     serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
 
-    shortName = getFirstNameFromList(estimatedVehicleJourney.getPublishedLineNames());
+    shortName = getFirstStringFromList(estimatedVehicleJourney.getPublishedLineNames());
 
     List<VehicleModesEnumeration> vehicleModes = estimatedVehicleJourney.getVehicleModes();
     transitMode = mapTransitMainMode(vehicleModes);
@@ -108,7 +108,7 @@ class AddedTripBuilder {
     isJourneyPredictionInaccurate = TRUE.equals(estimatedVehicleJourney.isPredictionInaccurate());
     occupancy = estimatedVehicleJourney.getOccupancy();
     cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
-    headsign = getFirstNameFromList(estimatedVehicleJourney.getDestinationNames());
+    headsign = getFirstStringFromList(estimatedVehicleJourney.getDestinationNames());
 
     calls = CallWrapper.of(estimatedVehicleJourney);
 
@@ -337,13 +337,6 @@ class AddedTripBuilder {
     tripBuilder.withOperator(operator);
 
     return tripBuilder.build();
-  }
-
-  private static String getFirstNameFromList(List<NaturalLanguageStringStructure> names) {
-    if (names == null) {
-      return "";
-    }
-    return names.stream().findFirst().map(NaturalLanguageStringStructure::getValue).orElse("");
   }
 
   /**

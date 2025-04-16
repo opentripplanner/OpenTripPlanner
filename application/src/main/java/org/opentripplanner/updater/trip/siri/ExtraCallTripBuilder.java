@@ -27,17 +27,14 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 import uk.org.siri.siri21.OccupancyEnumeration;
 
 class ExtraCallTripBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ExtraCallTripBuilder.class);
   private final TransitEditorService transitService;
   private final ZoneId timeZone;
-  private final Function<Trip, FeedScopedId> getTripPatternId;
+  private final Function<Trip, FeedScopedId> generateTripPatternId;
   private final Trip trip;
   private final String dataSource;
   private final LocalDate serviceDate;
@@ -51,7 +48,7 @@ class ExtraCallTripBuilder {
     EstimatedVehicleJourney estimatedVehicleJourney,
     TransitEditorService transitService,
     EntityResolver entityResolver,
-    Function<Trip, FeedScopedId> getTripPatternId,
+    Function<Trip, FeedScopedId> generateTripPatternId,
     Trip trip
   ) {
     this.trip = Objects.requireNonNull(trip);
@@ -68,7 +65,7 @@ class ExtraCallTripBuilder {
     calls = CallWrapper.of(estimatedVehicleJourney);
 
     this.transitService = transitService;
-    this.getTripPatternId = getTripPatternId;
+    this.generateTripPatternId = generateTripPatternId;
     timeZone = transitService.getTimeZone();
 
     stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
@@ -150,7 +147,7 @@ class ExtraCallTripBuilder {
     tripTimes.validateNonIncreasingTimes();
     tripTimes.setServiceCode(transitService.getServiceCode(trip.getServiceId()));
 
-    TripPattern pattern = TripPattern.of(getTripPatternId.apply(trip))
+    TripPattern pattern = TripPattern.of(generateTripPatternId.apply(trip))
       .withRoute(trip.getRoute())
       .withMode(trip.getMode())
       .withNetexSubmode(trip.getNetexSubMode())

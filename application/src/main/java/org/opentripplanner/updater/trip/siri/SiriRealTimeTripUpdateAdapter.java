@@ -127,14 +127,15 @@ public class SiriRealTimeTripUpdateAdapter {
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver
   ) {
-    for (var call : CallWrapper.of(journey)) {
+    List<CallWrapper> callWrappers = CallWrapper.of(journey);
+    for (var call : callWrappers) {
       if (StringUtils.hasNoValueOrNullAsString(call.getStopPointRef())) {
         return UpdateError.result(null, EMPTY_STOP_POINT_REF, journey.getDataSource());
       }
     }
     SiriUpdateType siriUpdateType = null;
     try {
-      siriUpdateType = updateType(journey, entityResolver);
+      siriUpdateType = updateType(journey, callWrappers, entityResolver);
       Result<TripUpdate, UpdateError> result =
         switch (siriUpdateType) {
           case REPLACEMENT_DEPARTURE -> new AddedTripBuilder(
@@ -163,23 +164,11 @@ public class SiriRealTimeTripUpdateAdapter {
 
   private SiriUpdateType updateType(
     EstimatedVehicleJourney vehicleJourney,
+    List<CallWrapper> callWrappers,
     EntityResolver entityResolver
   ) {
     // Extra call if at least one of the call is an extra call
-    if (
-      ((vehicleJourney.getRecordedCalls() != null &&
-          vehicleJourney
-            .getRecordedCalls()
-            .getRecordedCalls()
-            .stream()
-            .anyMatch(recordedCall -> Boolean.TRUE.equals(recordedCall.isExtraCall()))) ||
-        (vehicleJourney.getEstimatedCalls() != null &&
-          vehicleJourney
-            .getEstimatedCalls()
-            .getEstimatedCalls()
-            .stream()
-            .anyMatch(estimatedCall -> Boolean.TRUE.equals(estimatedCall.isExtraCall()))))
-    ) {
+    if (callWrappers.stream().anyMatch(CallWrapper::isExtraCall)) {
       return SiriUpdateType.EXTRA_CALL;
     }
 
