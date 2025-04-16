@@ -2,17 +2,12 @@ package org.opentripplanner.graph_builder.module;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
@@ -33,8 +28,6 @@ import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
-import org.opentripplanner.test.support.GeoJsonIo;
 
 public class TurnRestrictionModuleTest {
 
@@ -60,12 +53,13 @@ public class TurnRestrictionModuleTest {
   private TurnRestriction turnRestriction(
     StreetEdge from,
     StreetEdge to,
-    TraverseModeSet traverseModeSet
+    TraverseModeSet traverseModeSet,
+    TurnRestrictionType turnRestrictionType
   ) {
     TurnRestriction restriction = new TurnRestriction(
       from,
       to,
-      TurnRestrictionType.NO_TURN,
+      turnRestrictionType,
       traverseModeSet,
       null
     );
@@ -73,8 +67,16 @@ public class TurnRestrictionModuleTest {
     return restriction;
   }
 
+  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to, TraverseModeSet traverseModeSet) {
+    return turnRestriction(from, to, traverseModeSet, null);
+  }
+
+  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to, TurnRestrictionType turnRestrictionType) {
+    return turnRestriction(from, to, TraverseModeSet.allModes(), turnRestrictionType);
+  }
+
   private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to) {
-    return turnRestriction(from, to, TraverseModeSet.allModes());
+    return turnRestriction(from, to, TraverseModeSet.allModes(), TurnRestrictionType.NO_TURN);
   }
 
   @Test
@@ -190,6 +192,75 @@ public class TurnRestrictionModuleTest {
     assertThat(newEin).containsExactly(B);
     var Ein = E.getIncoming().stream().map(Edge::getFromVertex).toList();
     assertThat(Ein).containsExactly(F, G, H);
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = { 0, 1, 2, 3, 4, 5 })
+  public void tripleTurnRestriction(int order) {
+    //   F D
+    //   | |
+    // G-E-B-C
+    //     |
+    //     A
+    // only turn: A-B-C, D-B-E, B-E-F
+    var graph = new Graph();
+    StreetVertex A = vertex(graph, 1, -1, 0);
+    StreetVertex B = vertex(graph, 2, 0, 0);
+    StreetVertex C = vertex(graph, 3, 0, 1);
+    StreetVertex D = vertex(graph, 4, 1, 0);
+    StreetVertex E = vertex(graph, 5, 0, -1);
+    StreetVertex F = vertex(graph, 6, 1, -1);
+    StreetVertex G = vertex(graph, 7, 0, -2);
+    var AB = edges(A, B, 1.0);
+    var BC = edges(B, C, 1.0);
+    var BD = edges(B, D, 1.0);
+    var BE = edges(B, E, 1.0);
+    var EF = edges(E, F, 1.0);
+    edges(E, G, 1.0);
+    List<TurnRestriction> turnRestrictions = new ArrayList<>();
+    turnRestrictions.add(turnRestriction(AB[0], BC[0], TurnRestrictionType.ONLY_TURN));
+    turnRestrictions.add(turnRestriction(BD[1], BE[0], TurnRestrictionType.ONLY_TURN));
+    turnRestrictions.add(turnRestriction(BE[0], EF[0], TurnRestrictionType.ONLY_TURN));
+    assertEquals(4, B.getOutgoing().size());
+    var module = new TurnRestrictionModule(graph);
+    // Test all orders in which the turn restrictions can be applied.
+    //module.buildGraph();
+    List<TurnRestriction> useTurnRestrictions = new ArrayList<>();
+    useTurnRestrictions.add(turnRestrictions.get(order % 3));
+    turnRestrictions.remove(order % 3);
+    order /= 3;
+    useTurnRestrictions.add(turnRestrictions.get(order % 2));
+    turnRestrictions.remove(order % 2);
+    order /= 2;
+    useTurnRestrictions.add(turnRestrictions.get(0));
+    for (var turnRestriction : useTurnRestrictions) {
+      module.processRestriction(turnRestriction);
+    }
+
+    var Bs = graph
+      .getVertices()
+      .stream()
+      .filter(v -> v.sameLocation(B) && v != B)
+      .toList();
+    var newE = graph
+      .getVertices()
+      .stream()
+      .filter(v -> v.sameLocation(E) && v != E)
+      .findFirst()
+      .get();
+    var B1 = Bs.get(0);
+    var B2 = Bs.get(1);
+    if (B1.getIncoming().stream().map(Edge::getFromVertex).toList().contains(D)) {
+      var swap = B1;
+      B1 = B2;
+      B2 = swap;
+    }
+    assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, F, G, B1, B2, newE);
+    assertThat(B1.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(A);
+    assertThat(B2.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(D);
+    assertThat(B.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(C, E);
+    assertThat(newE.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(B, B2);
+    assertThat(E.getIncoming().stream().map(Edge::getFromVertex)).containsExactly(F, G);
   }
 
   @Test

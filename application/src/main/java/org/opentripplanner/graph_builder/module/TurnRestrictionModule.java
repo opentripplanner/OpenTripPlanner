@@ -1,7 +1,9 @@
 package org.opentripplanner.graph_builder.module;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -46,16 +48,14 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     return getMainVertex(a) == getMainVertex(b);
   }
 
-  StreetEdge getFromCorrespondingEdge(StreetEdge edge, IntersectionVertex intersectionVertex) {
+  List<StreetEdge> getFromCorrespondingEdges(StreetEdge edge, IntersectionVertex intersectionVertex) {
+    List<StreetEdge> edges = new ArrayList<>();
     for (var e : intersectionVertex.getIncomingStreetEdges()) {
       if (isCorrespondingVertex(e.getFromVertex(), edge.getFromVertex())) {
-        return e;
+        edges.add(e);
       }
     }
-    // adjacent turn restrictions might mean that there are no longer any corresponding edges
-    // left, because the original ones weren't traversable by the modes for which this
-    // vertex is accessible
-    return null;
+    return edges;
   }
 
   StreetTraversalPermission streetTraversalPermission(TraverseModeSet traverseModeSet) {
@@ -73,8 +73,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   }
 
   void processVertex(IntersectionVertex vertex, TurnRestriction turnRestriction) {
-    var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex);
-    if (fromEdge == null) {
+    var fromEdges = getFromCorrespondingEdges(turnRestriction.from, vertex);
+    if (fromEdges.isEmpty()) {
       return;
     }
     var mainVertex = (IntersectionVertex) turnRestriction.from.getToVertex();
@@ -83,34 +83,36 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
     addedVertices++;
-    var fromPermission = fromEdge.getPermission();
-    var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
-    var oldPermission = fromPermission.remove(restrictionPermission);
-    var newPermission = fromPermission.intersection(restrictionPermission);
-    if (newPermission.allowsAnything()) {
-      fromEdge
-        .toBuilder()
-        .withToVertex(splitVertex)
-        .withPermission(newPermission)
-        .buildAndConnect();
-      addedEdges++;
-    }
-    if (oldPermission.allowsNothing()) {
-      fromEdge.remove();
-      addedEdges--;
-    } else {
-      fromEdge.setPermission(oldPermission);
-    }
-    for (var toEdge : vertex.getOutgoingStreetEdges()) {
-      if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
-        if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
-          addedEdges++;
-        }
+    for (var fromEdge : fromEdges) {
+      var fromPermission = fromEdge.getPermission();
+      var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
+      var oldPermission = fromPermission.remove(restrictionPermission);
+      var newPermission = fromPermission.intersection(restrictionPermission);
+      if (newPermission.allowsAnything()) {
+        fromEdge
+          .toBuilder()
+          .withToVertex(splitVertex)
+          .withPermission(newPermission)
+          .buildAndConnect();
+        addedEdges++;
+      }
+      if (oldPermission.allowsNothing()) {
+        fromEdge.remove();
+        addedEdges--;
       } else {
-        if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
-          toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
-          addedEdges++;
+        fromEdge.setPermission(oldPermission);
+      }
+      for (var toEdge : vertex.getOutgoingStreetEdges()) {
+        if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
+          if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+            toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+            addedEdges++;
+          }
+        } else {
+          if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
+            toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+            addedEdges++;
+          }
         }
       }
     }
@@ -144,6 +146,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     addedEdges = 0;
     for (var streetEdge : graph.getEdgesOfType(StreetEdge.class)) {
       for (var turnRestriction : streetEdge.getTurnRestrictions()) {
+        System.out.println(turnRestriction);
         processRestriction(turnRestriction);
         turnRestrictionCount++;
       }
