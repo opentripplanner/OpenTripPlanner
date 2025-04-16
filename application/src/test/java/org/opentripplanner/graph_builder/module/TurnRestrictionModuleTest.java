@@ -67,11 +67,19 @@ public class TurnRestrictionModuleTest {
     return restriction;
   }
 
-  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to, TraverseModeSet traverseModeSet) {
+  private TurnRestriction turnRestriction(
+    StreetEdge from,
+    StreetEdge to,
+    TraverseModeSet traverseModeSet
+  ) {
     return turnRestriction(from, to, traverseModeSet, null);
   }
 
-  private TurnRestriction turnRestriction(StreetEdge from, StreetEdge to, TurnRestrictionType turnRestrictionType) {
+  private TurnRestriction turnRestriction(
+    StreetEdge from,
+    StreetEdge to,
+    TurnRestrictionType turnRestrictionType
+  ) {
     return turnRestriction(from, to, TraverseModeSet.allModes(), turnRestrictionType);
   }
 
@@ -237,11 +245,7 @@ public class TurnRestrictionModuleTest {
       module.processRestriction(turnRestriction);
     }
 
-    var Bs = graph
-      .getVertices()
-      .stream()
-      .filter(v -> v.sameLocation(B) && v != B)
-      .toList();
+    var Bs = graph.getVertices().stream().filter(v -> v.sameLocation(B) && v != B).toList();
     var newE = graph
       .getVertices()
       .stream()

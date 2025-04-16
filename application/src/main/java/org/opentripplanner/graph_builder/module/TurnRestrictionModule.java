@@ -48,7 +48,10 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     return getMainVertex(a) == getMainVertex(b);
   }
 
-  List<StreetEdge> getFromCorrespondingEdges(StreetEdge edge, IntersectionVertex intersectionVertex) {
+  List<StreetEdge> getFromCorrespondingEdges(
+    StreetEdge edge,
+    IntersectionVertex intersectionVertex
+  ) {
     List<StreetEdge> edges = new ArrayList<>();
     for (var e : intersectionVertex.getIncomingStreetEdges()) {
       if (isCorrespondingVertex(e.getFromVertex(), edge.getFromVertex())) {
@@ -146,11 +149,15 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     addedEdges = 0;
     for (var streetEdge : graph.getEdgesOfType(StreetEdge.class)) {
       for (var turnRestriction : streetEdge.getTurnRestrictions()) {
-        System.out.println(turnRestriction);
         processRestriction(turnRestriction);
         turnRestrictionCount++;
       }
     }
-    LOG.info("Applied {} turn restrictions, added {} vertices and {} edges", turnRestrictionCount, addedVertices, addedEdges);
+    LOG.info(
+      "Applied {} turn restrictions, added {} vertices and {} edges",
+      turnRestrictionCount,
+      addedVertices,
+      addedEdges
+    );
   }
 }
