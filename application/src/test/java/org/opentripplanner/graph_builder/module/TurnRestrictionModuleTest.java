@@ -72,7 +72,7 @@ public class TurnRestrictionModuleTest {
     StreetEdge to,
     TraverseModeSet traverseModeSet
   ) {
-    return turnRestriction(from, to, traverseModeSet, null);
+    return turnRestriction(from, to, traverseModeSet, TurnRestrictionType.NO_TURN);
   }
 
   private TurnRestriction turnRestriction(
@@ -313,6 +313,9 @@ public class TurnRestrictionModuleTest {
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = spt.getPath(F);
     List<State> states = path.states;
+    for (State state : states) {
+      System.out.println(state);
+    }
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);
