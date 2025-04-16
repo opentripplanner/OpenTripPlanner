@@ -13,6 +13,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -61,7 +62,7 @@ public class SplitEdgeTurnRestrictionsTest {
     // turn restriction and turn around.
     // on top of this, it has a bus stop so this test also makes sure that the turn restrictions work
     // even when the streets are split.
-    var noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
+    var noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg, true);
     assertThatPolylinesAreEqual(
       noRightTurnPermitted,
       "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB"
@@ -147,6 +148,10 @@ public class SplitEdgeTurnRestrictionsTest {
   }
 
   private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
+    return computeCarPolyline(graph, from, to, false);
+  }
+
+  private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to, boolean print) {
     RouteRequest request = new RouteRequest();
     request.setDateTime(dateTime);
     request.setFrom(from);
@@ -184,6 +189,12 @@ public class SplitEdgeTurnRestrictionsTest {
           }
         })
     );
+    if (print) {
+      var path = paths.getFirst();
+      for (var state : path.states) {
+        System.out.println(state);
+      }
+    }
     Geometry geometry = itineraries.get(0).legs().get(0).getLegGeometry();
     return EncodedPolyline.encode(geometry).points();
   }
