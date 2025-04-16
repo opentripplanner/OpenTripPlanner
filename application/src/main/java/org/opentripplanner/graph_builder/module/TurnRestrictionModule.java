@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,6 +24,8 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   final Graph graph;
   final Map<Vertex, Set<SubsidiaryVertex>> subsidiaryVertices;
   final Map<Vertex, IntersectionVertex> mainVertices;
+  int addedVertices;
+  int addedEdges;
 
   public TurnRestrictionModule(Graph graph) {
     this.graph = graph;
@@ -45,22 +46,15 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     return getMainVertex(a) == getMainVertex(b);
   }
 
-  boolean isCorrespondingEdge(StreetEdge a, StreetEdge b) {
-    if (a == b) return true;
-    Vertex aTo = getMainVertex(a.getToVertex());
-    Vertex bTo = getMainVertex(b.getToVertex());
-    Vertex aFrom = getMainVertex(a.getFromVertex());
-    Vertex bFrom = getMainVertex(b.getFromVertex());
-    return aTo == bTo || aFrom == bFrom;
-  }
-
-  StreetEdge getFromCorrespondingEdge(StreetEdge edge, Collection<StreetEdge> edges) {
-    for (var e : edges) {
+  StreetEdge getFromCorrespondingEdge(StreetEdge edge, IntersectionVertex intersectionVertex) {
+    for (var e : intersectionVertex.getIncomingStreetEdges()) {
       if (isCorrespondingVertex(e.getFromVertex(), edge.getFromVertex())) {
         return e;
       }
     }
-    System.out.println(String.format("corresponding edge for %s not found in %s", edge, edges));
+    // adjacent turn restrictions might mean that there are no longer any corresponding edges
+    // left, because the original ones weren't traversable by the modes for which this
+    // vertex is accessible
     return null;
   }
 
@@ -79,7 +73,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   }
 
   void processVertex(IntersectionVertex vertex, TurnRestriction turnRestriction) {
-    var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex.getIncomingStreetEdges());
+    var fromEdge = getFromCorrespondingEdge(turnRestriction.from, vertex);
     if (fromEdge == null) {
       return;
     }
@@ -88,6 +82,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     graph.addVertex(splitVertex);
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
+    addedVertices++;
     var fromPermission = fromEdge.getPermission();
     var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
     var oldPermission = fromPermission.remove(restrictionPermission);
@@ -98,9 +93,11 @@ public class TurnRestrictionModule implements GraphBuilderModule {
         .withToVertex(splitVertex)
         .withPermission(newPermission)
         .buildAndConnect();
+      addedEdges++;
     }
     if (oldPermission.allowsNothing()) {
       fromEdge.remove();
+      addedEdges--;
     } else {
       fromEdge.setPermission(oldPermission);
     }
@@ -108,17 +105,18 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       if (turnRestriction.type == TurnRestrictionType.NO_TURN) {
         if (!isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
           toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+          addedEdges++;
         }
       } else {
         if (isCorrespondingVertex(turnRestriction.to.getToVertex(), toEdge.getToVertex())) {
           toEdge.toBuilder().withFromVertex(splitVertex).buildAndConnect();
+          addedEdges++;
         }
       }
     }
   }
 
   void processRestriction(TurnRestriction turnRestriction) {
-    System.out.println("turn restriction: " + turnRestriction);
     var vertex = turnRestriction.from.getToVertex();
     if (vertex instanceof IntersectionVertex intersectionVertex) {
       if (subsidiaryVertices.containsKey(vertex)) {
@@ -142,12 +140,14 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     LOG.info("Applying turn restrictions to graph");
 
     int turnRestrictionCount = 0;
+    addedVertices = 0;
+    addedEdges = 0;
     for (var streetEdge : graph.getEdgesOfType(StreetEdge.class)) {
       for (var turnRestriction : streetEdge.getTurnRestrictions()) {
         processRestriction(turnRestriction);
         turnRestrictionCount++;
       }
     }
-    LOG.info("Applied {} turn restrictions", turnRestrictionCount);
+    LOG.info("Applied {} turn restrictions, added {} vertices and {} edges", turnRestrictionCount, addedVertices, addedEdges);
   }
 }
