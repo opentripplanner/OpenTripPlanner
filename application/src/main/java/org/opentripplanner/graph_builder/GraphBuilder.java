@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -68,7 +68,7 @@ public class GraphBuilder implements Runnable {
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
-    @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable EmissionsRepository emissionsRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
     boolean loadStreetGraph,
@@ -95,7 +95,7 @@ public class GraphBuilder implements Runnable {
       .timeZoneId(timetableRepository.getTimeZone());
 
     if (OTPFeature.Co2Emissions.isOn()) {
-      builder.emissionsDataModel(emissionsDataModel);
+      builder.emissionsDataModel(emissionsRepository);
     }
 
     var factory = builder.build();

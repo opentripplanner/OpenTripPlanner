@@ -95,6 +95,7 @@ public class QualifiedModeSet implements Serializable {
         case SCOOTER -> {
           if (requestMode.qualifiers.contains(Qualifier.RENT)) {
             mBuilder.withAllStreetModes(StreetMode.SCOOTER_RENTAL);
+            mBuilder.withTransferMode(StreetMode.WALK);
           } else {
             // Only supported as rental mode
             throw new IllegalArgumentException();

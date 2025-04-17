@@ -25,6 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import javax.xml.stream.XMLStreamException;
+import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.opentripplanner.framework.retry.OtpRetry;
@@ -32,11 +33,10 @@ import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.updater.trip.siri.updater.AsyncEstimatedTimetableSource;
 import org.opentripplanner.utils.text.FileSizeToTextConverter;
 import org.opentripplanner.utils.time.DurationUtils;
-import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.ServiceDelivery;
+import uk.org.siri.siri21.Siri;
 
 /**
  * A source of estimated timetables that reads SIRI-ET messages from a Google PubSub subscription.

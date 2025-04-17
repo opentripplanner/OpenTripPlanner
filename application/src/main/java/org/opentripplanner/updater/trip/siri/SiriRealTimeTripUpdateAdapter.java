@@ -33,8 +33,8 @@ import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
+import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 /**
  * Adapts from SIRI-ET EstimatedTimetables to OTP's internal real-time data model.
