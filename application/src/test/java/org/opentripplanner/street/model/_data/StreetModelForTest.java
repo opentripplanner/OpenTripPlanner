@@ -3,7 +3,6 @@ package org.opentripplanner.street.model._data;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
