@@ -313,9 +313,6 @@ public class TurnRestrictionModuleTest {
       .getShortestPathTree();
     GraphPath<State, Edge, Vertex> path = spt.getPath(F);
     List<State> states = path.states;
-    for (State state : states) {
-      System.out.println(state);
-    }
     assertEquals(5, states.size());
     assertEquals(states.get(0).getVertex(), A);
     assertEquals(states.get(1).getVertex(), B);
