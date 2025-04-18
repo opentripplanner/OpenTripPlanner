@@ -113,7 +113,7 @@ class EmissionAggregatorTest {
     assertFalse(subject.validate());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
-      "EmissionStopSeqNr(The emission 'from_stop_sequence'(-1) is out of bounds[1 - 3]: " +
+      "EmissionStopSeqNr(The emission 'from_stop_sequence'(-1) is out of bounds[1, 3]: " +
       "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=-1, co2=3.0g])",
       subject.listIssues().get(0).toString()
     );

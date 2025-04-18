@@ -145,7 +145,7 @@ class EmissionAggregator {
     issues.add(
       OtpError.of(
         "EmissionStopSeqNr",
-        "The emission 'from_stop_sequence'(%d) is out of bounds[1 - %d]: %s",
+        "The emission 'from_stop_sequence'(%d) is out of bounds[1, %d]: %s",
         row.fromStopSequence(),
         upperBoundInclusive,
         row.toString()
