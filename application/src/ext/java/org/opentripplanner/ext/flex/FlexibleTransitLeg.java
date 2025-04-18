@@ -62,6 +62,10 @@ public class FlexibleTransitLeg implements TransitLeg {
     return new FlexibleTransitLegBuilder();
   }
 
+  public FlexibleTransitLegBuilder copyOf() {
+    return new FlexibleTransitLegBuilder(this);
+  }
+
   @Override
   public Agency agency() {
     return trip().getRoute().getAgency();
@@ -165,12 +169,12 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public TransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
-    return copy().withAlerts(alerts).build();
+    return copyOf().withAlerts(alerts).build();
   }
 
   @Override
   public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
-    return copy().withFareProducts(fares).build();
+    return copyOf().withFareProducts(fares).build();
   }
 
   @Override
@@ -210,7 +214,7 @@ public class FlexibleTransitLeg implements TransitLeg {
 
   @Override
   public Leg withTimeShift(Duration duration) {
-    return copy()
+    return copyOf()
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
@@ -219,10 +223,6 @@ public class FlexibleTransitLeg implements TransitLeg {
   @Override
   public List<FareProductUse> fareProducts() {
     return fareProducts;
-  }
-
-  public FlexibleTransitLegBuilder copy() {
-    return new FlexibleTransitLegBuilder(this);
   }
 
   /**

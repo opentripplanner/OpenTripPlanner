@@ -22,6 +22,11 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
   }
 
   @Override
+  public FrequencyTransitLegBuilder copyOf() {
+    return new FrequencyTransitLegBuilder(this);
+  }
+
+  @Override
   public Boolean isNonExactFrequency() {
     return frequencyHeadwayInSeconds != 0;
   }

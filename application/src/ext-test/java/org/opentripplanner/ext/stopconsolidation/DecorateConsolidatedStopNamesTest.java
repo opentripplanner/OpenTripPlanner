@@ -39,7 +39,7 @@ class DecorateConsolidatedStopNamesTest {
       .build();
 
     var first = (ScheduledTransitLeg) itinerary.legs().getFirst();
-    var withFp = first.copy().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
+    var withFp = first.copyOf().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
     var legs = new ArrayList<>(itinerary.legs());
     legs.set(0, withFp);
 

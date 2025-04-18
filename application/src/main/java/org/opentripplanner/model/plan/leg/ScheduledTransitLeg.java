@@ -103,6 +103,10 @@ public class ScheduledTransitLeg implements TransitLeg {
     this.fareProducts = List.copyOf(builder.fareProducts());
   }
 
+  public ScheduledTransitLegBuilder copyOf() {
+    return new ScheduledTransitLegBuilder<>(this);
+  }
+
   public ZoneId zoneId() {
     return zoneId;
   }
@@ -294,12 +298,12 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public ScheduledTransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
-    return copy().withAlerts(alerts).build();
+    return copyOf().withAlerts(alerts).build();
   }
 
   @Override
   public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
-    return copy().withFareProducts(fares).build();
+    return copyOf().withFareProducts(fares).build();
   }
 
   @Override
@@ -393,10 +397,6 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Sandbox
   public Float accessibilityScore() {
     return accessibilityScore;
-  }
-
-  public ScheduledTransitLegBuilder copy() {
-    return new ScheduledTransitLegBuilder<>(this);
   }
 
   /**

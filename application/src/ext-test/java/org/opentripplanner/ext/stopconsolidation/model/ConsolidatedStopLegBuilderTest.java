@@ -56,7 +56,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .build();
 
     var copy = leg
-      .copy()
+      .copyOf()
       .withAccessibilityScore(4f)
       .withFareProducts(FARES)
       .withAlerts(Set.of(ALERTS))
@@ -77,7 +77,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withAlerts(ALERTS)
       .build();
 
-    var copy = leg.copy().build();
+    var copy = leg.copyOf().build();
 
     assertEquals(E.stop, copy.from().stop);
     assertEquals(F.stop, copy.to().stop);
@@ -86,7 +86,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
 
   @Test
   void copyAttributesFromScheduledLeg() {
-    var leg = SCHEDULED_TRANSIT_LEG.copy()
+    var leg = SCHEDULED_TRANSIT_LEG.copyOf()
       .withFareProducts(FARES)
       .withAlerts(Set.of(ALERTS))
       .build();

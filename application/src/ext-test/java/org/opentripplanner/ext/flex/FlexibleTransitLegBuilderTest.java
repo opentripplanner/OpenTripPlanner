@@ -64,7 +64,7 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
   }
 
   @Test
-  void copy() {
+  void copyOf() {
     var leg = new FlexibleTransitLegBuilder()
       .withStartTime(START_TIME)
       .withEndTime(END_TIME)
@@ -73,7 +73,7 @@ class FlexibleTransitLegBuilderTest implements PlanTestConstants {
       .withAlerts(Set.of(ALERT))
       .build();
 
-    var copy = leg.copy().build();
+    var copy = leg.copyOf().build();
 
     assertEquals(copy.flexTripEdge(), EDGE);
     assertEquals(copy.startTime(), START_TIME);

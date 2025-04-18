@@ -373,7 +373,7 @@ class GraphQLIntegrationTest {
 
     var busLeg = i1.transitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.transitLeg(2);
-    railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
+    railLeg = railLeg.copyOf().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
     ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
     i1 = i1.copyOf().withLegs(ignore -> legs).build();

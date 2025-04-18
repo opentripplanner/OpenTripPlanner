@@ -21,6 +21,11 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
   }
 
   @Override
+  public ScheduledTransitLegBuilder copyOf() {
+    return new ConsolidatedStopLegBuilder(this);
+  }
+
+  @Override
   public Place from() {
     return from;
   }
@@ -28,10 +33,5 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
   @Override
   public Place to() {
     return to;
-  }
-
-  @Override
-  public ScheduledTransitLegBuilder copy() {
-    return new ConsolidatedStopLegBuilder(this);
   }
 }

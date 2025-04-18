@@ -70,7 +70,7 @@ class ScheduledTransitLegBuilderTest {
   void copyAlerts() {
     var leg = completeBuilder().withAlerts(Set.of(ALERT)).build();
 
-    var withScore = leg.copy().withAccessibilityScore(4f).build();
+    var withScore = leg.copyOf().withAccessibilityScore(4f).build();
 
     assertEquals(Set.of(ALERT), withScore.listTransitAlerts());
   }
@@ -79,7 +79,7 @@ class ScheduledTransitLegBuilderTest {
   void copyFareProducts() {
     var leg = completeBuilder().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
 
-    var copy = leg.copy().build();
+    var copy = leg.copyOf().build();
 
     assertEquals(List.of(FARE_PRODUCT_USE), copy.fareProducts());
   }
