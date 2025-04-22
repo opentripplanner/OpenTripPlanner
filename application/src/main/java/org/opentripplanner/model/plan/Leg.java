@@ -223,11 +223,13 @@ public interface Leg {
 
   /**
    * The date and time this leg begins.
+   * TODO Does the start-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime startTime();
 
   /**
    * The date and time this leg ends.
+   * TODO Does the end-time incorporate slack and/or wait-time? - This should be documented!
    */
   ZonedDateTime endTime();
 
@@ -459,6 +461,7 @@ public interface Leg {
    * applied to all frontends.
    */
   @Nullable
+  @Sandbox
   default Float accessibilityScore() {
     return null;
   }

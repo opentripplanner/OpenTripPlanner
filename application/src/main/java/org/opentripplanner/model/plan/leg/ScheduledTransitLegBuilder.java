@@ -15,10 +15,16 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>> {
 
+  /**
+   * The Position in pattern is initialized to a negative value. Negative valued are not allowed,
+   * so if not set by the caller the build() method will fail.
+   */
+  private static final int POS_NOT_SET = -1;
+
   private TripTimes tripTimes;
   private TripPattern tripPattern;
-  private int boardStopIndexInPattern;
-  private int alightStopIndexInPattern;
+  private int boardStopIndexInPattern = POS_NOT_SET;
+  private int alightStopIndexInPattern = POS_NOT_SET;
   private ZonedDateTime startTime;
   private ZonedDateTime endTime;
   private LocalDate serviceDate;
@@ -27,10 +33,12 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private ConstrainedTransfer transferFromPreviousLeg;
   private ConstrainedTransfer transferToNextLeg;
   private int generalizedCost;
-  private Float accessibilityScore;
   private Set<TransitAlert> alerts = Set.of();
   private Double distanceMeters;
   private List<FareProductUse> fareProducts = List.of();
+
+  // Sandbox fields
+  private Float accessibilityScore;
 
   public ScheduledTransitLegBuilder() {}
 
@@ -46,11 +54,13 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     transferFromPreviousLeg = original.transferFromPrevLeg();
     transferToNextLeg = original.transferToNextLeg();
     generalizedCost = original.generalizedCost();
-    accessibilityScore = original.accessibilityScore();
     zoneId = original.zoneId();
     alerts = original.listTransitAlerts();
     distanceMeters = original.distanceMeters();
     fareProducts = original.fareProducts();
+
+    // Sandbox fiels
+    accessibilityScore = original.accessibilityScore();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -166,10 +176,6 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return instance();
   }
 
-  public Float accessibilityScore() {
-    return accessibilityScore;
-  }
-
   public B withAlerts(Set<TransitAlert> alerts) {
     this.alerts = Objects.requireNonNull(alerts);
     return instance();
@@ -195,6 +201,10 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   public B withFareProducts(List<FareProductUse> fareProducts) {
     this.fareProducts = Objects.requireNonNull(fareProducts);
     return instance();
+  }
+
+  public Float accessibilityScore() {
+    return accessibilityScore;
   }
 
   public ScheduledTransitLeg build() {

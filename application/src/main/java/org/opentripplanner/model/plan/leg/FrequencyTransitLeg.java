@@ -55,17 +55,21 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
     List<StopArrival> visits = new ArrayList<>();
 
     for (int i = boardStopPosInPattern + 1; i < alightStopPosInPattern; i++) {
-      StopLocation stop = tripPattern.getStop(i);
+      StopLocation stop = tripPattern().getStop(i);
 
-      int arrivalTime = tripTimes.getArrivalTime(i);
-      int departureTime = tripTimes.getDepartureTime(i) + frequencyHeadwayInSeconds;
+      int arrivalTime = tripTimes().getArrivalTime(i);
+      int departureTime = tripTimes().getDepartureTime(i) + frequencyHeadwayInSeconds;
 
       StopArrival visit = new StopArrival(
         Place.forStop(stop),
-        LegCallTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, arrivalTime)),
-        LegCallTime.ofStatic(ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, departureTime)),
+        LegCallTime.ofStatic(
+          ServiceDateUtils.toZonedDateTime(serviceDate(), zoneId(), arrivalTime)
+        ),
+        LegCallTime.ofStatic(
+          ServiceDateUtils.toZonedDateTime(serviceDate(), zoneId(), departureTime)
+        ),
         i,
-        tripTimes.gtfsSequenceOfStopIndex(i)
+        tripTimes().gtfsSequenceOfStopIndex(i)
       );
       visits.add(visit);
     }

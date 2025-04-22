@@ -26,8 +26,8 @@ public class StreetLegBuilder {
   private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
-  private Float accessibilityScore;
   private Set<StreetNote> streetNotes = new HashSet<>();
+  private Float accessibilityScore;
 
   protected StreetLegBuilder() {}
 
@@ -45,8 +45,8 @@ public class StreetLegBuilder {
     this.walkingBike = leg.walkingBike();
     this.rentedVehicle = leg.rentedVehicle();
     this.vehicleRentalNetwork = leg.vehicleRentalNetwork();
+    this.streetNotes = leg.listStreetNotes();
     this.accessibilityScore = leg.accessibilityScore();
-    streetNotes = Set.copyOf(leg.listStreetNotes());
   }
 
   public StreetLeg build() {
@@ -178,13 +178,13 @@ public class StreetLegBuilder {
     return this;
   }
 
-  public StreetLegBuilder withAccessibilityScore(Float accessibilityScore) {
-    this.accessibilityScore = accessibilityScore;
+  public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
+    streetNotes = notes;
     return this;
   }
 
-  public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
-    streetNotes = Set.copyOf(notes);
+  public StreetLegBuilder withAccessibilityScore(Float accessibilityScore) {
+    this.accessibilityScore = accessibilityScore;
     return this;
   }
 }

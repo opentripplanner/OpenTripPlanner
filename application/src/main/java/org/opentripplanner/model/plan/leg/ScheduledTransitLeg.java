@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Place;
@@ -35,6 +36,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -45,8 +47,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class ScheduledTransitLeg implements TransitLeg {
 
-  protected final TripTimes tripTimes;
-  protected final TripPattern tripPattern;
+  private static final int ZERO = 0;
+  private final TripTimes tripTimes;
+  private final TripPattern tripPattern;
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
@@ -54,29 +57,51 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
+  // the posistions are protected to avoid boxing/unboxing when used in subclasses
   protected final int boardStopPosInPattern;
   protected final int alightStopPosInPattern;
   private final int generalizedCost;
-  protected final LocalDate serviceDate;
-  protected final ZoneId zoneId;
+  private final LocalDate serviceDate;
+  private final ZoneId zoneId;
   private final TripOnServiceDate tripOnServiceDate;
   private final double distanceMeters;
   private final double directDistanceMeters;
+
+  // Sandbox fields
   private final Float accessibilityScore;
   private final List<FareProductUse> fareProducts;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
+    // TODO - Add requireNonNull for trip-times. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.tripTimes = builder.tripTimes();
-    this.tripPattern = builder.tripPattern();
+    this.tripPattern = Objects.requireNonNull(builder.tripPattern());
 
-    this.boardStopPosInPattern = builder.boardStopIndexInPattern();
-    this.alightStopPosInPattern = builder.alightStopIndexInPattern();
+    int maxStopPosInPatternLimit = tripPattern.numberOfStops() - 1;
+    this.boardStopPosInPattern = IntUtils.requireInRange(
+      builder.boardStopIndexInPattern(),
+      ZERO,
+      maxStopPosInPatternLimit,
+      "boardStopPosInPattern"
+    );
+    this.alightStopPosInPattern = IntUtils.requireInRange(
+      builder.alightStopIndexInPattern(),
+      boardStopPosInPattern + 1,
+      maxStopPosInPatternLimit,
+      "alightStopPosInPattern"
+    );
 
+    // TODO - Add requireNonNull for start-time. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.startTime = builder.startTime();
+    // TODO - Add requireNonNull for end-tTime. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.endTime = builder.endTime();
 
+    // TODO - Add requireNonNull for service-date. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.serviceDate = builder.serviceDate();
-    this.zoneId = Objects.requireNonNull(builder.zoneId(), "zoneId");
+    this.zoneId = Objects.requireNonNull(builder.zoneId());
 
     this.tripOnServiceDate = builder.tripOnServiceDate();
 
@@ -85,11 +110,10 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     this.generalizedCost = builder.generalizedCost();
 
-    this.accessibilityScore = builder.accessibilityScore();
     List<Coordinate> transitLegCoordinates = LegConstructionSupport.extractTransitLegCoordinates(
       tripPattern,
-      builder.boardStopIndexInPattern(),
-      builder.alightStopIndexInPattern()
+      boardStopPosInPattern,
+      alightStopPosInPattern
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
@@ -101,6 +125,9 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareProducts = List.copyOf(builder.fareProducts());
+
+    // Sandbox
+    this.accessibilityScore = builder.accessibilityScore();
   }
 
   public ScheduledTransitLegBuilder copyOf() {
@@ -414,18 +441,19 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addTime("endTime", endTime)
       .addBool("realTime", isRealTimeUpdated())
       .addNum("distance", distanceMeters, "m")
-      .addNum("cost", generalizedCost)
-      .addNum("routeType", routeType())
+      .addCost("generalizedCost", generalizedCost, Cost.ZERO.toSeconds())
       .addObjOp("agencyId", agency(), AbstractTransitEntity::getId)
+      .addNum("routeType", routeType())
       .addObjOp("routeId", route(), AbstractTransitEntity::getId)
       .addObjOp("tripId", this.trip(), AbstractTransitEntity::getId)
       .addObj("headsign", headsign())
       .addObj("serviceDate", serviceDate)
-      .addColSize("transitAlerts", transitAlerts)
       .addEnum("boardRule", boardRule())
       .addEnum("alightRule", alightRule())
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
+      .addColSize("transitAlerts", transitAlerts)
+      .addColSize("fareProducts", fareProducts)
       .toString();
   }
 }

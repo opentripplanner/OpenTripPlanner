@@ -81,7 +81,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private static final int TRANSIT_START = TimeUtils.time("10:00");
   private static final int TRANSIT_END = TimeUtils.time("11:00");
-  private static final Route ROUTE = TimetableRepositoryForTest.route("route").build();
+  private static final Route ROUTE = TEST_MODEL.route("route").build();
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
     new DefaultCostCalculator<>(
