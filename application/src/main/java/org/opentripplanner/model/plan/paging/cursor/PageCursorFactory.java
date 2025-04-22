@@ -21,6 +21,7 @@ public class PageCursorFactory {
   private boolean wholeSwUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
+  private Instant latestItineraryDeparture = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -66,6 +67,18 @@ public class PageCursorFactory {
     return this;
   }
 
+  /**
+   * If the initial request is of the PREVIOUS_PAGE type, the current search window is misleading.
+   * Instead of using the current search window to set the page cursor of the next page,
+   * the departure time of the latest itinerary result is used.
+   *
+   * @param latestItineraryDeparture the time of the latest departure of the itinerary results
+   */
+  public PageCursorFactory withLatestItineraryDeparture(Instant latestItineraryDeparture) {
+    this.latestItineraryDeparture = latestItineraryDeparture;
+    return this;
+  }
+
   @Nullable
   public PageCursor previousPageCursor() {
     createPageCursors();
@@ -99,7 +112,7 @@ public class PageCursorFactory {
    * ascending, and to PREVIOUS if descending. We do this because the logic for the first search is
    * equivalent when creating new cursors.
    */
-  private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
+  public static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
     return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
@@ -156,6 +169,9 @@ public class PageCursorFactory {
   }
 
   private Instant edtAfterUsedSw() {
+    if (latestItineraryDeparture != null) {
+      return latestItineraryDeparture.plusSeconds(60);
+    }
     return currentEdt.plus(currentSearchWindow);
   }
 }

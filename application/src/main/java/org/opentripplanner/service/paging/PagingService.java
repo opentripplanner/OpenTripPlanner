@@ -1,5 +1,7 @@
 package org.opentripplanner.service.paging;
 
+import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -183,6 +185,15 @@ public class PagingService {
       latestArrivalTime,
       searchWindowUsed
     );
+    // If the first search is an arrive by search, add the latest itinerary's start time to allow setting cursor information correctly
+    // for the page cursor of the next page.
+    if (
+      currentPageType == null &&
+      PageCursorFactory.resolvePageTypeForTheFirstSearch(itinerariesSortOrder) == PREVIOUS_PAGE &&
+      itineraries.size() > 0
+    ) {
+      factory = factory.withLatestItineraryDeparture(itineraries.get(0).startTimeAsInstant());
+    }
 
     if (pageCursorInput != null) {
       factory = factory.withRemovedItineraries(pageCursorInput);
