@@ -157,11 +157,11 @@ class AbstractCsvParserTest {
     assertEquals("EmissionOutsideRange", valueTooSmall.getType());
     assertEquals("EmissionOutsideRange", valueTooBig.getType());
     assertEquals(
-      "The int value '-1' for intValue is outside expected range [0 - 100]: 'F:1, -1, 1.0' (@line:2)",
+      "The int value '-1' for intValue is outside expected range [0, 100]: 'F:1, -1, 1.0' (@line:2)",
       valueTooSmall.getMessage()
     );
     assertEquals(
-      "The int value '101' for intValue is outside expected range [0 - 100]: 'F:4, 101, 1.0' (@line:5)",
+      "The int value '101' for intValue is outside expected range [0, 100]: 'F:4, 101, 1.0' (@line:5)",
       valueTooBig.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size(), () -> issueStore.listIssues().toString());
@@ -219,11 +219,11 @@ class AbstractCsvParserTest {
     assertEquals("EmissionOutsideRange", valueTooSmall.getType());
     assertEquals("EmissionOutsideRange", valueTooBig.getType());
     assertEquals(
-      "The double value '-1.0E-6' for doubleValue is outside expected range [0.0 - 100.0): 'F:1, 1, -0.000001' (@line:2)",
+      "The double value '-1.0E-6' for doubleValue is outside expected range [0.0, 100.0): 'F:1, 1, -0.000001' (@line:2)",
       valueTooSmall.getMessage()
     );
     assertEquals(
-      "The double value '100.0' for doubleValue is outside expected range [0.0 - 100.0): 'F:4, 4, 100.0' (@line:5)",
+      "The double value '100.0' for doubleValue is outside expected range [0.0, 100.0): 'F:4, 4, 100.0' (@line:5)",
       valueTooBig.getMessage()
     );
     assertEquals(2, issueStore.listIssues().size(), () -> issueStore.listIssues().toString());

@@ -32,8 +32,8 @@ class RouteDataReaderTest implements EmissionTestData {
     var issues = issueStore.listIssues();
 
     var expected = List.of(
-      "The double value '-0.001' for avg_co2_per_vehicle_per_km is outside expected range [0.0 - 100000.0): '1004,-0.001,1' (@line:5)",
-      "The double value '0.0' for avg_passenger_count is outside expected range [0.001 - 10000.0): '1005,1,0' (@line:6)",
+      "The double value '-0.001' for avg_co2_per_vehicle_per_km is outside expected range [0.0, 100000.0): '1004,-0.001,1' (@line:5)",
+      "The double value '0.0' for avg_passenger_count is outside expected range [0.001, 10000.0): '1005,1,0' (@line:6)",
       "Value for 'avg_passenger_count' is missing: '1006,1,' (@line:7)",
       "Value for 'avg_co2_per_vehicle_per_km' is missing: '1007,,1' (@line:8)",
       "Value for 'route_id' is missing: ',1,1' (@line:9)"
