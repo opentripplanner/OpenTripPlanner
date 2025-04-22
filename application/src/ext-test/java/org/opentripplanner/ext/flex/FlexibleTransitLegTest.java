@@ -20,7 +20,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 
-class FlexibleTransitLegBuilderTest implements PlanTestConstants {
+class FlexibleTransitLegTest implements PlanTestConstants {
 
   private static final FlexTripEdge EDGE = new FlexTripEdge(
     StreetModelForTest.intersectionVertex(1, 1),
