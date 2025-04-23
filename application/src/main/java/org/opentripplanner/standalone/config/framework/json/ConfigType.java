@@ -71,6 +71,13 @@ public enum ConfigType {
   ),
   TIME_ZONE(JsonType.string, "Time-Zone ID", "UTC", "Europe/Paris", "-05:00"),
   FEED_SCOPED_ID(JsonType.string, "FeedScopedId", "NO:1001", "1:101"),
+  GRAM(
+    JsonType.string,
+    "Weight in grams or kilograms. If no unit is specified the unit is assumed to be grams.",
+    "0g",
+    "170g",
+    "1.7 kg"
+  ),
   COST_LINEAR_FUNCTION(
     JsonType.string,
     """
