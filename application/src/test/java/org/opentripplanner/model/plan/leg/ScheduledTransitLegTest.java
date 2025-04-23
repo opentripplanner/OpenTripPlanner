@@ -182,7 +182,7 @@ class ScheduledTransitLegTest {
       "boardRule: SCHEDULED, " +
       "alightRule: SCHEDULED, " +
       "transitAlerts: 1 items, " +
-      "emissionPerPerson: Emission{CO₂: 23.0g}, " +
+      "emissionPerPerson: Emission{CO₂: 23g}, " +
       "fareProducts: 1 items" +
       "}",
       subject.toString()

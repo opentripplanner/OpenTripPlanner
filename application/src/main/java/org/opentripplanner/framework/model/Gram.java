@@ -6,39 +6,39 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 
 /**
- * A representation of the weight of something in grams. The precision is 1/100g.
+ * A representation of the weight of something in grams. The precision is 1 mg, if needed
+ * it should be possible to refactor this to support micrograms.
  */
 public final class Gram implements Serializable, Comparable<Gram> {
 
   public static final Gram ZERO = new Gram(0);
 
   // PAttern used to split number and unit with an optonal space in between
-  private static final Pattern PATTERN = Pattern.compile("([\\d\\.]+) ?([kg]*)");
-  private static final int PRECISION = 100;
-  private static final int HALF_PRECISION = PRECISION / 2;
-  private static final int KILO_GRAM_PRECISION = 1_000 * PRECISION;
+  private static final Pattern PATTERN = Pattern.compile("([\\d\\.]+) ?([kmg]*)");
+  private static final int GRAM_PRECISION = 1_000;
+  private static final int KILO_GRAM_PRECISION = 1_000 * GRAM_PRECISION;
 
-  private final int value;
+  private final long value;
 
-  private Gram(int value) {
+  private Gram(long value) {
     this.value = value;
   }
 
   private static Gram ofPrecisionDouble(double value) {
-    int v = (int) Math.round(value);
+    long v = Math.round(value);
     return v == 0 ? ZERO : new Gram(v);
   }
 
-  private static Gram ofPrecisionInt(int value) {
+  private static Gram ofPrecisionInt(long value) {
     return value == 0 ? ZERO : new Gram(value);
   }
 
-  public static Gram of(int value) {
-    return ofPrecisionInt(value * PRECISION);
+  public static Gram of(long value) {
+    return ofPrecisionInt(value * GRAM_PRECISION);
   }
 
   public static Gram of(double value) {
-    return ofPrecisionDouble(value * PRECISION);
+    return ofPrecisionDouble(value * GRAM_PRECISION);
   }
 
   /**
@@ -61,7 +61,7 @@ public final class Gram implements Serializable, Comparable<Gram> {
     return new Gram(this.value + g.value);
   }
 
-  public Gram multiply(int factor) {
+  public Gram multiply(long factor) {
     return new Gram(this.value * factor);
   }
 
@@ -69,7 +69,7 @@ public final class Gram implements Serializable, Comparable<Gram> {
     return ofPrecisionDouble(this.value * factor);
   }
 
-  public Gram dividedBy(int scalar) {
+  public Gram dividedBy(long scalar) {
     return ofPrecisionDouble(value / (double) scalar);
   }
 
@@ -104,18 +104,17 @@ public final class Gram implements Serializable, Comparable<Gram> {
     if (value % KILO_GRAM_PRECISION == 0) {
       return value / KILO_GRAM_PRECISION + "kg";
     }
-    if (value % PRECISION == 0) {
-      return value / PRECISION + "g";
+    if (value % GRAM_PRECISION == 0) {
+      return value / GRAM_PRECISION + "g";
     }
-    return asDouble() + "g";
-  }
-
-  public double asInt() {
-    return (value + HALF_PRECISION) / PRECISION;
+    if (value > 1000) {
+      return (value / 1000.0) + "g";
+    }
+    return value + "mg";
   }
 
   public double asDouble() {
-    return (double) this.value / PRECISION;
+    return (double) this.value / GRAM_PRECISION;
   }
 
   public boolean isZero() {
@@ -135,7 +134,10 @@ public final class Gram implements Serializable, Comparable<Gram> {
       return ofPrecisionDouble(KILO_GRAM_PRECISION * v);
     }
     if ("g".equalsIgnoreCase(unit) || unit.isBlank()) {
-      return ofPrecisionDouble(PRECISION * v);
+      return ofPrecisionDouble(GRAM_PRECISION * v);
+    }
+    if ("mg".equalsIgnoreCase(unit)) {
+      return ofPrecisionDouble(v);
     }
     throw new IllegalArgumentException("Parse error! Illegal gram value: '%s'".formatted(value));
   }

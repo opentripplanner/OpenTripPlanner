@@ -19,11 +19,11 @@ class TripDataReaderTest implements EmissionTestData {
     var emissions = subject.read(emissionOnTripLegs());
 
     assertEquals(
-      "TripLegsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5.0g]",
+      "TripLegsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5g]",
       emissions.getFirst().toString()
     );
     assertEquals(
-      "TripLegsRow[tripId=T2, fromStopId=B, fromStopSequence=2, co2=17.0g]",
+      "TripLegsRow[tripId=T2, fromStopId=B, fromStopSequence=2, co2=17g]",
       emissions.getLast().toString()
     );
     assertEquals(4, emissions.size());

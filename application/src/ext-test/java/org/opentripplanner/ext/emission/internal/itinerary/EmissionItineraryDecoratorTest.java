@@ -30,7 +30,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     Map<FeedScopedId, Emission> emissions = new HashMap<>();
     emissions.put(bus.legs().getFirst().route().getId(), Emission.co2_g(0.001));
     repository.addRouteEmissions(emissions);
-    repository.setCarAvgCo2PerMeter(Gram.of(0.0015));
+    repository.setCarAvgCo2PerMeter(Gram.of(0.015));
     emissionService = new DefaultEmissionService(repository);
   }
 
@@ -45,6 +45,6 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   void decorateCar() {
     var subject = new EmissionItineraryDecorator(emissionService);
     var it = subject.decorate(car);
-    assertEquals(Emission.co2_g(45), it.emissionPerPerson());
+    assertEquals(Emission.co2_g(450), it.emissionPerPerson());
   }
 }

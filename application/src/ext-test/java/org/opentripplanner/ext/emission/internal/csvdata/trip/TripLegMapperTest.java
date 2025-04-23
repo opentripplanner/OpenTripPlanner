@@ -63,11 +63,11 @@ class TripLegMapperTest {
 
     assertEquals(2, result.size(), () -> result.toString());
     assertEquals(
-      "TripPatternEmission{emissions: [Emission{CO₂: 2.0g}, Emission{CO₂: 3.0g}, Emission{CO₂: 4.0g}]}",
+      "TripPatternEmission{emissions: [Emission{CO₂: 2g}, Emission{CO₂: 3g}, Emission{CO₂: 4g}]}",
       result.get(SCOPED_TRIP_ID_1).toString()
     );
     assertEquals(
-      "TripPatternEmission{emissions: [Emission{CO₂: 5.0g}]}",
+      "TripPatternEmission{emissions: [Emission{CO₂: 5g}]}",
       result.get(SCOPED_TRIP_ID_2).toString()
     );
   }
@@ -79,7 +79,7 @@ class TripLegMapperTest {
     assertTrue(result.isEmpty());
     assertEquals(
       "Emission 'from_stop_id'(A) not found in stop pattern for trip(E:T:2): " +
-      "TripLegsRow[tripId=T:2, fromStopId=A, fromStopSequence=2, co2=2.0g]",
+      "TripLegsRow[tripId=T:2, fromStopId=A, fromStopSequence=2, co2=2g]",
       issueStore.listIssues().getFirst().getMessage()
     );
   }

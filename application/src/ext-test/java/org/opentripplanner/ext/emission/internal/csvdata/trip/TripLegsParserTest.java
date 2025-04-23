@@ -23,12 +23,12 @@ class TripLegsParserTest {
     assertTrue(subject.headersMatch());
     assertTrue(subject.hasNext());
     assertEquals(
-      "TripLegsRow[tripId=F:1, fromStopId=NSR:Quay:1, fromStopSequence=1, co2=28.0g]",
+      "TripLegsRow[tripId=F:1, fromStopId=NSR:Quay:1, fromStopSequence=1, co2=28g]",
       subject.next().toString()
     );
     assertTrue(subject.hasNext());
     assertEquals(
-      "TripLegsRow[tripId=F:1, fromStopId=NSR:Quay:2, fromStopSequence=2, co2=38.0g]",
+      "TripLegsRow[tripId=F:1, fromStopId=NSR:Quay:2, fromStopSequence=2, co2=38g]",
       subject.next().toString()
     );
     assertFalse(subject.hasNext());

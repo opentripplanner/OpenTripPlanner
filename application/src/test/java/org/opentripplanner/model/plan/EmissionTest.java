@@ -60,6 +60,6 @@ class EmissionTest {
 
   @Test
   void testToString() {
-    assertEquals("Emission{CO₂: 12.0g}", subject.toString());
+    assertEquals("Emission{CO₂: 12g}", subject.toString());
   }
 }

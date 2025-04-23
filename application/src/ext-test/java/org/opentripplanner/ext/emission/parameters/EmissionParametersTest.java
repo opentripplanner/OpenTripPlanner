@@ -30,7 +30,7 @@ class EmissionParametersTest {
   void testToString() {
     assertEquals(
       "EmissionParameters{" +
-      "car: EmissionViechleParameters{carAvgCo2PerKm: 90, carAvgOccupancy: 7.4}, " +
+      "car: EmissionViechleParameters{carAvgCo2PerKm: 90g, carAvgOccupancy: 7.4}, " +
       "fedds: [EmissionFeedParameters{feedId: 'my_feed_id', source: http://host/emsissions}]" +
       "}",
       subject.toString()

@@ -19,7 +19,7 @@ class EmissionViechleParametersTest {
   @Test
   void testToString() {
     assertEquals(
-      "EmissionViechleParameters{carAvgCo2PerKm: 90, carAvgOccupancy: 7.4}",
+      "EmissionViechleParameters{carAvgCo2PerKm: 90g, carAvgOccupancy: 7.4}",
       subject.toString()
     );
   }

@@ -55,7 +55,7 @@ class EmissionAggregatorTest {
     assertEquals(List.of(), subject.listIssues());
 
     assertEquals(
-      "TripPatternEmission{emissions: [Emission{CO₂: 3.0g}, Emission{CO₂: 7.0g}, Emission{CO₂: 10.0g}]}",
+      "TripPatternEmission{emissions: [Emission{CO₂: 3g}, Emission{CO₂: 7g}, Emission{CO₂: 10g}]}",
       subject.build().toString()
     );
   }
@@ -93,12 +93,12 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionStopIdMissmatch(Emission 'from_stop_id'(C) not found in stop pattern for trip(E:T:1): " +
-      "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7.0g])",
+      "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionStopIdMissmatch(Emission 'from_stop_id'(B) not found in stop pattern for trip(E:T:1): " +
-      "TripLegsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10.0g])",
+      "TripLegsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10g])",
       subject.listIssues().get(1).toString()
     );
     var ex = assertThrows(IllegalStateException.class, () -> subject.build());
@@ -114,12 +114,12 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionStopSeqNr(The emission 'from_stop_sequence'(-1) is out of bounds[1, 3]: " +
-      "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=-1, co2=3.0g])",
+      "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=-1, co2=3g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionStopIdMissmatch(Emission 'from_stop_id'(C) not found in stop pattern for trip(E:T:1): " +
-      "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3.0g])",
+      "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3g])",
       subject.listIssues().get(1).toString()
     );
   }

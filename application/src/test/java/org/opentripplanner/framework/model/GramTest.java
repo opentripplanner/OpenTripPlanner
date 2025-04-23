@@ -51,14 +51,14 @@ class GramTest {
   void compareTo() {
     var same = Gram.of(VALUE);
     // Within precission (100)
-    var less = Gram.of(VALUE - 0.01);
+    var less = Gram.of(VALUE - 0.001);
 
     assertTrue(subject.compareTo(same) == 0);
     assertTrue(less.compareTo(subject) < 0);
     assertTrue(subject.compareTo(less) > 0);
 
     // The delta is to small (precission is 100)
-    var sameValue = Gram.of(VALUE - 0.0049);
+    var sameValue = Gram.of(VALUE - 0.00049);
     assertEquals(subject, sameValue);
     assertTrue(sameValue.compareTo(subject) == 0);
   }
@@ -66,8 +66,11 @@ class GramTest {
   @Test
   void testToString() {
     assertEquals("7.5g", subject.toString());
-    assertEquals("0.01g", Gram.of(0.01).toString());
+    assertEquals("1mg", Gram.of(0.001).toString());
+    assertEquals("999mg", Gram.of(0.999).toString());
+    assertEquals("1.001g", Gram.of(1.001).toString());
     assertEquals("19g", Gram.of(19).toString());
+    assertEquals("999g", Gram.of(999).toString());
     assertEquals("1kg", Gram.of(1000).toString());
     assertEquals("1001g", Gram.of(1001).toString());
   }
@@ -75,11 +78,6 @@ class GramTest {
   @Test
   void asDouble() {
     assertEquals(VALUE, subject.asDouble());
-  }
-
-  @Test
-  void asInt() {
-    assertEquals(Math.round(VALUE), subject.asInt());
   }
 
   @Test
@@ -92,11 +90,19 @@ class GramTest {
   @Test
   void ofString() {
     assertEquals(Gram.ZERO, Gram.of("0"));
+    assertEquals(200.0, Gram.of("200").asDouble());
+
     assertEquals(Gram.ZERO, Gram.of("0g"));
+    assertEquals(1.0, Gram.of("1g").asDouble());
+    assertEquals(200.0, Gram.of("200 g").asDouble());
+
     assertEquals(Gram.ZERO, Gram.of("0kg"));
-    assertEquals(200, Gram.of("200").asInt());
-    assertEquals(200, Gram.of("200 g").asInt());
-    assertEquals(2000, Gram.of("2 kg").asInt());
+    assertEquals(1000.0, Gram.of("1kg").asDouble());
+    assertEquals(2200.0, Gram.of("2.2 kg").asDouble());
+
+    assertEquals(Gram.ZERO, Gram.of("0mg"));
+    assertEquals(0.001, Gram.of("1mg").asDouble());
+    assertEquals(0.023, Gram.of("23 mg").asDouble());
 
     var ex = assertThrows(IllegalArgumentException.class, () -> Gram.of("200.0 tonn"));
     assertEquals("Parse error! Illegal gram value: '200.0 tonn'", ex.getMessage());
