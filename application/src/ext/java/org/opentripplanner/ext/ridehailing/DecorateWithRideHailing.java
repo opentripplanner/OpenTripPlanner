@@ -59,7 +59,7 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
         .parallelStream()
         .map(leg -> decorateLegWithRideEstimate(i, leg, service))
         .toList();
-      return builder.withLegs(ignore -> legs).build();
+      return builder.withLegs(legs).build();
     }
     return i;
   }

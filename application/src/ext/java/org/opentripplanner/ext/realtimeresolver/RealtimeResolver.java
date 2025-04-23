@@ -34,7 +34,7 @@ public class RealtimeResolver {
     if (it.isFlaggedForDeletion()) {
       return it;
     }
-    return it.copyOf().withLegs(legs -> legs.stream().map(this::mapLeg).toList()).build();
+    return it.copyOf().transformLegs(this::mapLeg).build();
   }
 
   private Leg mapLeg(Leg leg) {

@@ -66,19 +66,17 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * they are from a different element of the consolidated stop.
    */
   private void removeShortWalkLegs(ItineraryBuilder builder) {
-    builder.withLegs(legs -> {
-      legs = new ArrayList<>(legs);
-      var first = legs.getFirst();
-      if (service.isPartOfConsolidatedStop(first.to().stop) && isShortWalkLeg(first)) {
-        legs.removeFirst();
-      }
-      var last = legs.getLast();
-      if (service.isPartOfConsolidatedStop(last.from().stop) && isShortWalkLeg(last)) {
-        legs.removeLast();
-      }
-
-      return legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
-    });
+    var legs = new ArrayList<>(builder.legs());
+    var first = legs.getFirst();
+    if (service.isPartOfConsolidatedStop(first.to().stop) && isShortWalkLeg(first)) {
+      legs.removeFirst();
+    }
+    var last = legs.getLast();
+    if (service.isPartOfConsolidatedStop(last.from().stop) && isShortWalkLeg(last)) {
+      legs.removeLast();
+    }
+    var filteredLegs = legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
+    builder.withLegs(filteredLegs);
   }
 
   private boolean isTransferWithinConsolidatedStop(Leg l) {

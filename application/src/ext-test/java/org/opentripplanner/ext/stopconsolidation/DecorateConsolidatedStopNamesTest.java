@@ -43,7 +43,7 @@ class DecorateConsolidatedStopNamesTest {
     var legs = new ArrayList<>(itinerary.legs());
     legs.set(0, withFp);
 
-    itinerary = itinerary.copyOf().withLegs(ignore -> legs).build();
+    itinerary = itinerary.copyOf().withLegs(legs).build();
 
     itinerary = filter.decorate(itinerary);
 

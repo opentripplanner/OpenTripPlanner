@@ -376,7 +376,7 @@ class GraphQLIntegrationTest {
     railLeg = railLeg.copyOf().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
     ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
-    i1 = i1.copyOf().withLegs(ignore -> legs).build();
+    i1 = i1.copyOf().withLegs(legs).build();
 
     var fares = new ItineraryFare();
 

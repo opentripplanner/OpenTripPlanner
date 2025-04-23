@@ -41,22 +41,18 @@ public class DecorateWithAccessibilityScore implements ItineraryDecorator {
 
   private Itinerary addAccessibilityScore(Itinerary i) {
     var builder = i.copyOf();
-    var legs = builder
-      .legs()
-      .stream()
-      .map(leg -> {
-        if (leg instanceof ScheduledTransitLeg transitLeg) {
-          return transitLeg.copyOf().withAccessibilityScore(compute(transitLeg)).build();
-        } else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
-          return streetLeg.withAccessibilityScore(compute(streetLeg));
-        } else {
-          return leg;
-        }
-      })
-      .toList();
-    builder.withLegs(ignore -> legs);
+
+    builder.transformLegs(leg -> {
+      if (leg instanceof ScheduledTransitLeg transitLeg) {
+        return transitLeg.copyOf().withAccessibilityScore(compute(transitLeg)).build();
+      } else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
+        return streetLeg.withAccessibilityScore(compute(streetLeg));
+      } else {
+        return leg;
+      }
+    });
     if (i.isWalkOnly() || i.hasTransit()) {
-      builder.withAccessibilityScore(compute(legs));
+      builder.withAccessibilityScore(compute(builder.legs()));
     }
     return builder.build();
   }
