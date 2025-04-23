@@ -199,6 +199,12 @@ type ElevationProfileStep {
   elevation: Float
 }
 
+"Emission information for a trip-pattern or legs."
+type Emission {
+  "The average CO₂ emission per passenger in grams."
+  co2: Float
+}
+
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
@@ -315,6 +321,8 @@ type Leg {
   includes both the start and end coordinate.
   """
   elevationProfile: [ElevationProfileStep]!
+  "The emission per person"
+  emission: Emission
   "The expected, real-time adjusted date and time this leg ends."
   expectedEndTime: DateTime!
   "The expected, real-time adjusted date and time this leg starts."
@@ -1358,6 +1366,12 @@ type TripPattern {
   distance: Float
   "Duration of the trip, in seconds."
   duration: Long
+  """
+  The total emission per preson. The total emission is only available if all transit
+  and car leg emissions can be calculated. If only a partial result is obtained, this
+  will be null.
+  """
+  emission: Emission
   "Time that the trip arrives."
   endTime: DateTime @deprecated(reason : "Replaced with expectedEndTime")
   "The expected, real-time adjusted date and time the trip ends."
