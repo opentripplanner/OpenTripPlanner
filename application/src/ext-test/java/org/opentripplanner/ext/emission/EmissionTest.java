@@ -17,6 +17,7 @@ import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
 import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
@@ -75,7 +76,7 @@ class EmissionTest {
     emission.put(id("2"), Emission.co2_g(0.0));
     EmissionRepository emissionRepository = new DefaultEmissionRepository();
     emissionRepository.addRouteEmissions(emission);
-    emissionRepository.setCarAvgCo2PerMeter(0.131);
+    emissionRepository.setCarAvgCo2PerMeter(Gram.of(0.131));
     eService = new DefaultEmissionService(emissionRepository);
     emissionDecorator = new EmissionItineraryDecorator(eService);
   }

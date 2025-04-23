@@ -6,10 +6,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner._support.net.URIUtils;
+import org.opentripplanner.framework.model.Gram;
 
 class EmissionParametersTest {
 
-  private final EmissionViechleParameters car = new EmissionViechleParameters(90, 7.4);
+  private final EmissionViechleParameters car = new EmissionViechleParameters(Gram.of(90), 7.4);
   private final List<EmissionFeedParameters> feeds = List.of(
     new EmissionFeedParameters("my_feed_id", URIUtils.uri("http://host/emsissions"))
   );

@@ -69,7 +69,7 @@ the `carAvgOccupancy` provides the average number of passengers in a car.
 
 | Config Parameter         |    Type    | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |--------------------------|:----------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| carAvgCo2PerKm           |  `integer` | The average CO₂ emissions of a car in grams per kilometer.                      | *Optional* | `170`         |  2.5  |
+| carAvgCo2PerKm           |   `gram`   | The average CO₂ emissions of a car in grams per kilometer.                      | *Optional* | `"170g"`      |  2.5  |
 | carAvgOccupancy          |  `double`  | The average number of passengers in a car.                                      | *Optional* | `1.3`         |  2.5  |
 | [feeds](#emission_feeds) | `object[]` | List of emmistion feeds.                                                        | *Optional* |               |  2.8  |
 |       feedId             |  `string`  | Specify the feed id to use for matching transit ids in the emission input data. | *Required* |               |  2.8  |

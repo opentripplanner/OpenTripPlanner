@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -29,7 +30,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     Map<FeedScopedId, Emission> emissions = new HashMap<>();
     emissions.put(bus.legs().getFirst().route().getId(), Emission.co2_g(0.001));
     repository.addRouteEmissions(emissions);
-    repository.setCarAvgCo2PerMeter(0.0015);
+    repository.setCarAvgCo2PerMeter(Gram.of(0.0015));
     emissionService = new DefaultEmissionService(repository);
   }
 
