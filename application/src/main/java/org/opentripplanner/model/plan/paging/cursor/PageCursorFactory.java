@@ -21,7 +21,7 @@ public class PageCursorFactory {
   private boolean wholeSwUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
-  private Instant latestItineraryDeparture = null;
+  private Instant firstSearchLatestItineraryDeparture = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -72,10 +72,12 @@ public class PageCursorFactory {
    * Instead of using the current search window to set the page cursor of the next page,
    * the departure time of the latest itinerary result is used.
    *
-   * @param latestItineraryDeparture the time of the latest departure of the itinerary results
+   * @param firstSearchLatestItineraryDeparture the time of the latest departure of the itinerary results from the first search
    */
-  public PageCursorFactory withLatestItineraryDeparture(Instant latestItineraryDeparture) {
-    this.latestItineraryDeparture = latestItineraryDeparture;
+  public PageCursorFactory withFirstSearchLatestItineraryDeparture(
+    Instant firstSearchLatestItineraryDeparture
+  ) {
+    this.firstSearchLatestItineraryDeparture = firstSearchLatestItineraryDeparture;
     return this;
   }
 
@@ -169,8 +171,8 @@ public class PageCursorFactory {
   }
 
   private Instant edtAfterUsedSw() {
-    if (latestItineraryDeparture != null) {
-      return latestItineraryDeparture.plusSeconds(60);
+    if (firstSearchLatestItineraryDeparture != null) {
+      return firstSearchLatestItineraryDeparture.plusSeconds(60);
     }
     return currentEdt.plus(currentSearchWindow);
   }

@@ -192,9 +192,11 @@ public class PagingService {
       PageCursorFactory.resolvePageTypeForTheFirstSearch(itinerariesSortOrder) == PREVIOUS_PAGE
     ) {
       if (itineraries.size() > 0) {
-        factory = factory.withLatestItineraryDeparture(itineraries.get(0).startTimeAsInstant());
+        factory = factory.withFirstSearchLatestItineraryDeparture(
+          itineraries.get(0).startTimeAsInstant()
+        );
       } else {
-        factory = factory.withLatestItineraryDeparture(earliestDepartureTime);
+        factory = factory.withFirstSearchLatestItineraryDeparture(earliestDepartureTime);
       }
     }
 
