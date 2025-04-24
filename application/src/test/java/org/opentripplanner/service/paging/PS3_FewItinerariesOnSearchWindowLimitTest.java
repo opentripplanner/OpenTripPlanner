@@ -6,6 +6,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import static org.opentripplanner.service.paging.TestPagingUtils.cleanStr;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -91,7 +92,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void test(String edt, boolean arriveBy, String testCaseTokens) {
-    PageCursor cursor;
+    PageCursor cursor = null;
     SortOrder expectedSortOrder;
 
     int currTime = TimeUtils.time(edt);
@@ -115,8 +116,21 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
     for (var tc : testCases) {
       if (tc.gotoNewPage()) {
         if (tc.gotoPage() == NEXT_PAGE) {
+          if (arriveBy && cursor == null) {
+            if (driver.kept().size() > 0) {
+              cursor = subject.nextPageCursor();
+              Instant currTimeInstant = TestPagingModel.time(currTime);
+              currTime +=
+                driver.kept().get(0).startTimeAsInstant().getEpochSecond() -
+                currTimeInstant.getEpochSecond() +
+                60;
+            } else {
+              currTime += 60;
+            }
+          } else {
+            currTime += SEARCH_WINDOW_SEC;
+          }
           cursor = subject.nextPageCursor();
-          currTime += SEARCH_WINDOW_SEC;
         } else {
           cursor = subject.previousPageCursor();
           currTime -= SEARCH_WINDOW_SEC;

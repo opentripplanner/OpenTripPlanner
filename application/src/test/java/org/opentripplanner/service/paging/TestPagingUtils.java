@@ -13,7 +13,8 @@ class TestPagingUtils {
       .replaceAll("2020-02-01T(\\d\\d:\\d\\d):00Z", "$1-1d")
       .replaceAll("2020-02-02T(\\d\\d:\\d\\d):00Z", "$1")
       .replaceAll("2020-02-03T(\\d\\d:\\d\\d):00Z", "$1+1d")
-      .replaceAll("0(\\d:00)", "$1");
+      .replaceAll("0(\\d:00)", "$1")
+      .replaceAll("0(\\d:01)", "$1");
   }
 
   static String toString(ItinerarySortKey it) {

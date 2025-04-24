@@ -134,11 +134,13 @@ class PS2_ManyParetoOptimalItinerariesTest {
 
     var nextCursor = subject.nextPageCursor();
 
+    // The earliest departure time is 12:26 here instead of 12:30,
+    // because it is determined from the latest itinerary departure from the results.
     assertPageCursor(
       nextCursor,
       PageType.NEXT_PAGE,
       SortOrder.STREET_AND_DEPARTURE_TIME,
-      "12:30",
+      "12:26",
       ""
     );
 
@@ -152,7 +154,7 @@ class PS2_ManyParetoOptimalItinerariesTest {
         nextSubject.previousPageCursor(),
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_DEPARTURE_TIME,
-        "12:00",
+        "11:56",
         ""
       );
       // NEXT
