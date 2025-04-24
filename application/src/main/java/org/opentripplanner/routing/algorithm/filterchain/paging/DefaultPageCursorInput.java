@@ -1,8 +1,9 @@
 package org.opentripplanner.routing.algorithm.filterchain.paging;
 
+import java.time.Instant;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
-import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilterResult;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetterResult;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -20,18 +21,23 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class DefaultPageCursorInput implements PageCursorInput {
 
-  private final NumItinerariesFilterResult numItinerariesFilterResult;
-  private final RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult;
+  private final Instant earliestRemovedDeparture;
+  private final Instant latestRemovedDeparture;
+  private final ItinerarySortKey pageCut;
+  private final Cost generalizedCostMaxLimit;
 
   private DefaultPageCursorInput() {
-    this.numItinerariesFilterResult = null;
-    this.removeTransitIfStreetOnlyIsBetterResult = null;
+    this.earliestRemovedDeparture = null;
+    this.latestRemovedDeparture = null;
+    this.pageCut = null;
+    this.generalizedCostMaxLimit = null;
   }
 
   private DefaultPageCursorInput(Builder builder) {
-    this.numItinerariesFilterResult = builder.numItinerariesFilterResult();
-    this.removeTransitIfStreetOnlyIsBetterResult =
-      builder.removeTransitIfStreetOnlyIsBetterResult();
+    this.earliestRemovedDeparture = builder.earliestRemovedDeparture();
+    this.latestRemovedDeparture = builder.latestRemovedDeparture();
+    this.pageCut = builder.pageCut();
+    this.generalizedCostMaxLimit = builder.generalizedCostMaxLimit();
   }
 
   public static DefaultPageCursorInput.Builder of() {
@@ -43,53 +49,82 @@ public class DefaultPageCursorInput implements PageCursorInput {
   }
 
   @Override
-  public NumItinerariesFilterResult numItinerariesFilterResult() {
-    return numItinerariesFilterResult;
+  public Instant earliestRemovedDeparture() {
+    return earliestRemovedDeparture;
   }
 
   @Override
-  public RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult() {
-    return removeTransitIfStreetOnlyIsBetterResult;
+  public Instant latestRemovedDeparture() {
+    return latestRemovedDeparture;
+  }
+
+  @Override
+  public ItinerarySortKey pageCut() {
+    return pageCut;
+  }
+
+  @Override
+  public Cost generalizedCostMaxLimit() {
+    return generalizedCostMaxLimit;
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(DefaultPageCursorInput.class)
-      .addObj("numItinerariesFilterResult", numItinerariesFilterResult)
-      .addObj("removeTransitIfStreetOnlyIsBetterResult", removeTransitIfStreetOnlyIsBetterResult)
+      .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
+      .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
+      .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)
+      .addObj("generalizedCostMaxLimit", generalizedCostMaxLimit)
       .toString();
   }
 
   public static class Builder {
 
-    private NumItinerariesFilterResult numItinerariesFilterResult;
-    private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult;
+    private Instant earliestRemovedDeparture;
+    private Instant latestRemovedDeparture;
+    private ItinerarySortKey pageCut;
+    private Cost generalizedCostMaxLimit;
 
     public Builder(DefaultPageCursorInput original) {
-      this.numItinerariesFilterResult = original.numItinerariesFilterResult;
-      this.removeTransitIfStreetOnlyIsBetterResult =
-        original.removeTransitIfStreetOnlyIsBetterResult;
+      this.earliestRemovedDeparture = original.earliestRemovedDeparture;
+      this.latestRemovedDeparture = original.latestRemovedDeparture;
+      this.pageCut = original.pageCut;
+      this.generalizedCostMaxLimit = original.generalizedCostMaxLimit;
     }
 
-    public NumItinerariesFilterResult numItinerariesFilterResult() {
-      return numItinerariesFilterResult;
+    public Instant earliestRemovedDeparture() {
+      return earliestRemovedDeparture;
     }
 
-    public Builder withNumItinerariesFilterResult(
-      NumItinerariesFilterResult numItinerariesFilterResult
-    ) {
-      this.numItinerariesFilterResult = numItinerariesFilterResult;
+    public Builder withEarliestRemovedDeparture(Instant earliestRemovedDeparture) {
+      this.earliestRemovedDeparture = earliestRemovedDeparture;
       return this;
     }
 
-    public RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult() {
-      return removeTransitIfStreetOnlyIsBetterResult;
+    public Instant latestRemovedDeparture() {
+      return latestRemovedDeparture;
     }
 
-    public Builder withRemoveTransitIfStreetOnlyIsBetterResult(
-      RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult
-    ) {
-      this.removeTransitIfStreetOnlyIsBetterResult = removeTransitIfStreetOnlyIsBetterResult;
+    public Builder withLatestRemovedDeparture(Instant latestRemovedDeparture) {
+      this.latestRemovedDeparture = latestRemovedDeparture;
+      return this;
+    }
+
+    public ItinerarySortKey pageCut() {
+      return pageCut;
+    }
+
+    public Builder withPageCut(ItinerarySortKey pageCut) {
+      this.pageCut = pageCut;
+      return this;
+    }
+
+    public Cost generalizedCostMaxLimit() {
+      return generalizedCostMaxLimit;
+    }
+
+    public Builder withGeneralizedCostMaxLimit(Cost generalizedCostMaxLimit) {
+      this.generalizedCostMaxLimit = generalizedCostMaxLimit;
       return this;
     }
 

@@ -31,18 +31,31 @@ public class PageCursorInputAggregator {
   }
 
   public void providePageCursorInput() {
-    pageCursorInputSubscriber.accept(
-      DefaultPageCursorInput.of()
-        .withNumItinerariesFilterResult(
-          numItinerariesFilter != null ? numItinerariesFilter.getNumItinerariesFilterResult() : null
+    DefaultPageCursorInput.Builder pageCursorInputBuilder = DefaultPageCursorInput.of();
+    if (
+      numItinerariesFilter != null && numItinerariesFilter.getNumItinerariesFilterResult() != null
+    ) {
+      pageCursorInputBuilder = pageCursorInputBuilder
+        .withEarliestRemovedDeparture(
+          numItinerariesFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
         )
-        .withRemoveTransitIfStreetOnlyIsBetterResult(
-          removeTransitIfStreetOnlyIsBetter != null
-            ? removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult()
-            : null
+        .withLatestRemovedDeparture(
+          numItinerariesFilter.getNumItinerariesFilterResult().latestRemovedDeparture()
         )
-        .build()
-    );
+        .withPageCut(numItinerariesFilter.getNumItinerariesFilterResult().pageCut());
+    }
+    if (
+      removeTransitIfStreetOnlyIsBetter != null &&
+      removeTransitIfStreetOnlyIsBetter.getRemoveTransitIfStreetOnlyIsBetterResult() != null
+    ) {
+      pageCursorInputBuilder = pageCursorInputBuilder.withGeneralizedCostMaxLimit(
+        removeTransitIfStreetOnlyIsBetter
+          .getRemoveTransitIfStreetOnlyIsBetterResult()
+          .generalizedCostMaxLimit()
+      );
+    }
+
+    pageCursorInputSubscriber.accept(pageCursorInputBuilder.build());
   }
 
   public static class Builder {

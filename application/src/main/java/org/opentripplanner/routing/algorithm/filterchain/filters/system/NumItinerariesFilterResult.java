@@ -50,29 +50,14 @@ public class NumItinerariesFilterResult {
     }
   }
 
-  /**
-   * The earliest removed departure defines the start of the search window following the
-   * current window. To include this removed itinerary (and all other removed itineraries)
-   * in the next page search the search windows must overlap.
-   */
   public Instant earliestRemovedDeparture() {
     return earliestRemovedDeparture;
   }
 
-  /**
-   * The latest removed departure together with a search window duration is used to
-   * calculate the start of the search window preceding the current window.
-   */
   public Instant latestRemovedDeparture() {
     return latestRemovedDeparture;
   }
 
-  /**
-   * If the search has too many results, the {@code numberOfItineraries} request parameter
-   * is less than the number of itineraries found, then we store information from the last
-   * itinerary kept and returned as part of the result. The sort vector will be included
-   * in the page cursor and used in the next/previous page to filter away duplicates.
-   */
   public ItinerarySortKey pageCut() {
     return pageCut;
   }

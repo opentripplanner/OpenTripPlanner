@@ -66,9 +66,9 @@ public class PageCursorFactory {
   public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
     this.pageCursorInput = pageCursorInput;
     // If the whole search window was not used (i.e. if there were removed itineraries)
-    if (pageCursorInput.numItinerariesFilterResult() != null) {
+    if (pageCursorInput.pageCut() != null) {
       this.wholeSearchWindowUsed = false;
-      this.itineraryPageCut = pageCursorInput.numItinerariesFilterResult().pageCut();
+      this.itineraryPageCut = pageCursorInput.pageCut();
     }
     return this;
   }
@@ -127,26 +127,17 @@ public class PageCursorFactory {
     else {
       if (currentPageType == NEXT_PAGE) {
         prevEdt = edtBeforeNewSw();
-        nextEdt = pageCursorInput.numItinerariesFilterResult().earliestRemovedDeparture();
+        nextEdt = pageCursorInput.earliestRemovedDeparture();
       } else {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
-        prevEdt = pageCursorInput
-          .numItinerariesFilterResult()
-          .latestRemovedDeparture()
-          .minus(newSearchWindow)
-          .plusSeconds(60);
+        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
         nextEdt = edtAfterUsedSw();
       }
     }
 
-    Cost generalizedCostMaxLimit = null;
-    if (pageCursorInput.removeTransitIfStreetOnlyIsBetterResult() != null) {
-      generalizedCostMaxLimit = pageCursorInput
-        .removeTransitIfStreetOnlyIsBetterResult()
-        .generalizedCostMaxLimit();
-    }
+    Cost generalizedCostMaxLimit = pageCursorInput.generalizedCostMaxLimit();
 
     prevCursor = new PageCursor(
       PREVIOUS_PAGE,

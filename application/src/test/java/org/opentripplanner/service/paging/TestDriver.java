@@ -112,9 +112,7 @@ final class TestDriver {
   }
 
   ItinerarySortKey expectedCut() {
-    return results != null && results.numItinerariesFilterResult() != null
-      ? results.numItinerariesFilterResult().pageCut()
-      : null;
+    return results == null ? null : results.pageCut();
   }
 
   TestDriver newPage(PageCursor cursor) {
@@ -169,11 +167,18 @@ final class TestDriver {
     var filterResultBox = new Box<PageCursorInput>();
     var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries);
     kept = maxNumFilter.removeMatchesForTest(kept);
-    filterResultBox.set(
-      DefaultPageCursorInput.of()
-        .withNumItinerariesFilterResult(maxNumFilter.getNumItinerariesFilterResult())
-        .build()
-    );
+    DefaultPageCursorInput.Builder pageCursorInputBuilder = DefaultPageCursorInput.of();
+    if (maxNumFilter.getNumItinerariesFilterResult() != null) {
+      pageCursorInputBuilder = pageCursorInputBuilder
+        .withEarliestRemovedDeparture(
+          maxNumFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
+        )
+        .withLatestRemovedDeparture(
+          maxNumFilter.getNumItinerariesFilterResult().latestRemovedDeparture()
+        )
+        .withPageCut(maxNumFilter.getNumItinerariesFilterResult().pageCut());
+    }
+    filterResultBox.set(pageCursorInputBuilder.build());
 
     return new TestDriver(
       nResults,
