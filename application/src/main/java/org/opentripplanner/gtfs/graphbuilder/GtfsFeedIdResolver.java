@@ -4,6 +4,9 @@ import com.csvreader.CsvReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import org.onebusaway.csv_entities.CsvInputSource;
@@ -19,8 +22,12 @@ public class GtfsFeedIdResolver {
    */
   private static AtomicInteger FEED_ID_COUNTER = new AtomicInteger(0);
 
+  private static Map<Object, String> FEED_ID_MAP = Collections.synchronizedMap(new HashMap<>());
+
   /**
-   * Extracts a feed_id from the passed source for a GTFS feed.
+   * Extracts a feed_id from the passed source for a GTFS feed. If not feedId exist an id is
+   * generated. The {@code dataSourceId} is used to ensure the same feedId is used even if a
+   * datasource is read more than once.
    * <p>
    * This will try to fetch the experimental feed_id field from the feed_info.txt file.
    * </p>
@@ -28,12 +35,30 @@ public class GtfsFeedIdResolver {
    * If the feed does not contain a feed_info.txt or a feed_id field, a default GtfsFeedId will be
    * created.
    * </p>
+   * <h5>THIS METHOD IS THREAD SAFE!</h5>
+   * <p>
+   * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does
+   * not exist already. The single access point(this method) gurantee thread-safty.
+   * </p>
    *
    * @param source the input source
+   * @param dataSourceId Any id witch identyfy the datasorce, for example the URI.
    * @return A GtfsFeedId
    * @see <a href="http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
    */
-  public static String fromGtfsFeed(CsvInputSource source) {
+  public static String fromGtfsFeed(CsvInputSource source, Object dataSourceId) {
+    return FEED_ID_MAP.computeIfAbsent(dataSourceId, ignore -> readFeedIdFromDataSource(source));
+  }
+
+  /**
+   * Package local to be unit-testable.
+   */
+  static String normalizeId(String id) {
+    var cleanId = cleanId(id);
+    return cleanId == null ? generateId() : cleanId;
+  }
+
+  private static String readFeedIdFromDataSource(CsvInputSource source) {
     try {
       if (source.hasResource("feed_info.txt")) {
         try (InputStream feedInfoInputStream = source.getResource("feed_info.txt")) {
@@ -43,18 +68,10 @@ public class GtfsFeedIdResolver {
           return normalizeId(result.get("feed_id"));
         }
       }
+      return generateId();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    return generateId();
-  }
-
-  /**
-   * Package local to be unit-testable.
-   */
-  static String normalizeId(String id) {
-    var cleanId = cleanId(id);
-    return cleanId == null ? generateId() : cleanId;
   }
 
   /**
