@@ -189,10 +189,13 @@ public class PagingService {
     // for the page cursor of the next page.
     if (
       currentPageType == null &&
-      PageCursorFactory.resolvePageTypeForTheFirstSearch(itinerariesSortOrder) == PREVIOUS_PAGE &&
-      itineraries.size() > 0
+      PageCursorFactory.resolvePageTypeForTheFirstSearch(itinerariesSortOrder) == PREVIOUS_PAGE
     ) {
-      factory = factory.withLatestItineraryDeparture(itineraries.get(0).startTimeAsInstant());
+      if (itineraries.size() > 0) {
+        factory = factory.withLatestItineraryDeparture(itineraries.get(0).startTimeAsInstant());
+      } else {
+        factory = factory.withLatestItineraryDeparture(earliestDepartureTime);
+      }
     }
 
     if (pageCursorInput != null) {
