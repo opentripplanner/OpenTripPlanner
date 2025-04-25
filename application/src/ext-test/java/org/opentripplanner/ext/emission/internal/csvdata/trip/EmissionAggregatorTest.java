@@ -70,7 +70,7 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionMissingLeg(All legs in a trip(E:T:1) must have an emission value. " +
-      "Leg number 2 and 3 does not have emissions.)",
+      "Leg number 2 and 3 does not have an emission value.)",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
