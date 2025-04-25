@@ -50,7 +50,7 @@ public class EmissionConfig {
     return c
       .of("feeds")
       .since(V2_8)
-      .summary("List of emmistion feeds.")
+      .summary("List of emisstion feeds.")
       .asObjects(List.of(), EmissionConfig::mapFeed);
   }
 

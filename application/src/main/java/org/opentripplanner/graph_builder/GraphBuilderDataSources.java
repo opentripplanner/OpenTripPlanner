@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.DEM;
-import static org.opentripplanner.datastore.api.FileType.EMMISION;
+import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
@@ -127,7 +127,7 @@ public class GraphBuilderDataSources {
   }
 
   public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDatasource() {
-    return ofStream(EMMISION).map(this::mapEmissionFeed).toList();
+    return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
   }
 
   /**

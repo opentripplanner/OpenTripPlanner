@@ -31,11 +31,11 @@ public interface EmissionTestData {
   }
 
   default DataSource emissionOnRoutes() {
-    return resource().dataSource("em-on-routes.txt", FileType.EMMISION);
+    return resource().dataSource("em-on-routes.txt", FileType.EMISSION);
   }
 
   default DataSource emissionOnTripLegs() {
-    return resource().dataSource("em-on-trip-legs.txt", FileType.EMMISION);
+    return resource().dataSource("em-on-trip-legs.txt", FileType.EMISSION);
   }
 
   /**
@@ -43,7 +43,7 @@ public interface EmissionTestData {
    * as a test-case so we can see that the parsers handle it gracefully.
    */
   default DataSource emissionMissingFile() {
-    return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMMISION);
+    return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMISSION);
   }
 
   private ResourceLoader resource() {
