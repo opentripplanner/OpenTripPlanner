@@ -8,6 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.emission.EmissionTestData;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
+import org.opentripplanner.utils.lang.IntBox;
 
 class TripDataReaderTest implements EmissionTestData {
 
@@ -15,9 +16,10 @@ class TripDataReaderTest implements EmissionTestData {
 
   @Test
   void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
+    var stepCounter = new IntBox(0);
     var subject = new TripDataReader(emissionOnTripLegs(), issueStore);
 
-    var emissions = subject.read();
+    var emissions = subject.read(stepCounter::inc);
 
     assertEquals(
       "TripLegsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5g]",
@@ -28,6 +30,7 @@ class TripDataReaderTest implements EmissionTestData {
       emissions.getLast().toString()
     );
     assertEquals(4, emissions.size());
+    assertEquals(4, stepCounter.get());
 
     var issues = issueStore.listIssues();
 
@@ -43,18 +46,22 @@ class TripDataReaderTest implements EmissionTestData {
 
   @Test
   void handleMissingDdataSource() {
+    var stepCounter = new IntBox(0);
     var subject = new TripDataReader(emissionMissingFile(), issueStore);
 
-    var emissions = subject.read();
+    var emissions = subject.read(stepCounter::inc);
     assertTrue(emissions.isEmpty());
+    assertEquals(0, stepCounter.get());
   }
 
   @Test
   void ignoreDataSourceIfHeadersDoesNotMatch() {
+    var stepCounter = new IntBox(0);
     var subject = new TripDataReader(emissionOnRoutes(), issueStore);
 
-    var emissions = subject.read();
+    var emissions = subject.read(stepCounter::inc);
 
     assertTrue(emissions.isEmpty());
+    assertEquals(0, stepCounter.get());
   }
 }

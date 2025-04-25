@@ -22,7 +22,7 @@ public class TripDataReader {
     this.issueStore = issueStore;
   }
 
-  public List<TripLegsRow> read() {
+  public List<TripLegsRow> read(Runnable logStepCallback) {
     if (!emissionDataSource.exists()) {
       return List.of();
     }
@@ -35,6 +35,7 @@ public class TripDataReader {
     }
 
     while (parser.hasNext()) {
+      logStepCallback.run();
       emissionData.add(parser.next());
       dataProcessed = true;
     }

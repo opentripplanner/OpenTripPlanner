@@ -24,7 +24,7 @@ public class RouteDataReader {
     this.issueStore = issueStore;
   }
 
-  public Map<FeedScopedId, Emission> read(String resolvedFeedId) {
+  public Map<FeedScopedId, Emission> read(String resolvedFeedId, Runnable logStepCallback) {
     if (!emissionDataSource.exists()) {
       return Map.of();
     }
@@ -37,6 +37,7 @@ public class RouteDataReader {
     }
 
     while (parser.hasNext()) {
+      logStepCallback.run();
       var value = parser.next();
       emissionData.put(
         new FeedScopedId(resolvedFeedId, value.routeId()),

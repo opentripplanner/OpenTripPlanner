@@ -19,7 +19,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,6 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     if (parameters == null) {
       return;
     }
-    var progress = ProgressTracker.track("Read emission data", 100, -1);
     var tripLegMapper = new TripLegMapper(createStopsByTripIdMap(), issueStore);
     var co2EmissionsDataReader = new EmissionDataReader(
       emissionRepository,
@@ -76,15 +74,12 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     // Read Transit pasenger emission data from configured emission feeds
     for (var data : emissionDataSources) {
       co2EmissionsDataReader.read(data.dataSource(), data.config().feedId());
-      progress.step(m -> LOG.info(m));
     }
     // Read Transit pasenger emission inside gtfs feeds
     for (var data : gtfsDataSources) {
       var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
       co2EmissionsDataReader.read(data.dataSource(), resolvedFeedId);
-      progress.step(m -> LOG.info(m));
     }
-    LOG.info(progress.completeMessage());
   }
 
   private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {

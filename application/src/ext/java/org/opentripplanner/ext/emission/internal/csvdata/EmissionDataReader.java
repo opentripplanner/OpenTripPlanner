@@ -7,6 +7,7 @@ import org.opentripplanner.ext.emission.internal.csvdata.route.RouteDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripLegMapper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,19 +40,41 @@ public class EmissionDataReader {
   }
 
   public void read(DataSource emissionDataSource, String resolvedFeedId) {
+    LOG.info(
+      "Reading EMISSION data: %s (feedId: %s)".formatted(
+          emissionDataSource.detailedInfo(),
+          resolvedFeedId
+        )
+    );
     if (emissionDataSource.exists()) {
+      var progress = ProgressTracker.track("Read " + emissionDataSource.name(), 100, -1);
       // Assume input CO₂ emission data is Route avarage data
       var routeReader = new RouteDataReader(emissionDataSource, issueStore);
-      this.emissionRepository.addRouteEmissions(routeReader.read(resolvedFeedId));
+      this.emissionRepository.addRouteEmissions(
+          routeReader.read(resolvedFeedId, () -> logProgress(progress))
+        );
 
       // Assume input CO₂ emission data is per trip leg
       tripLegMapper.setCurrentFeedId(resolvedFeedId);
       var tripReader = new TripDataReader(emissionDataSource, issueStore);
-      this.emissionRepository.addTripPatternEmissions(tripLegMapper.map(tripReader.read()));
+      this.emissionRepository.addTripPatternEmissions(
+          tripLegMapper.map(tripReader.read(() -> logProgress(progress)))
+        );
 
+      LOG.info(progress.completeMessage());
       if (!(routeReader.isDataProcessed() || tripReader.isDataProcessed())) {
-        LOG.error("No emission data read from: " + emissionDataSource.detailedInfo());
+        LOG.error(
+          "No emission data read from: " +
+          emissionDataSource.detailedInfo() +
+          ". Do the header columns match?"
+        );
       }
     }
+  }
+
+  private static void logProgress(ProgressTracker progress) {
+    // Do not convert this to a lambda expression. The logger will not be
+    // able to log the correct source and line number for the caller.
+    progress.step(m -> LOG.info(m));
   }
 }
