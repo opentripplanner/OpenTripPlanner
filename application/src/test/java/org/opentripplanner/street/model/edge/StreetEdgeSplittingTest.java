@@ -232,13 +232,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
   private TurnRestriction disallowTurn(StreetEdge from, StreetEdge to) {
     TurnRestrictionType restrictionType = TurnRestrictionType.NO_TURN;
     TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
-    TurnRestriction restrict = new TurnRestriction(
-      from,
-      to,
-      restrictionType,
-      restrictedModes,
-      null
-    );
+    TurnRestriction restrict = new TurnRestriction(from, to, restrictionType, restrictedModes);
     from.addTurnRestriction(restrict);
     return restrict;
   }

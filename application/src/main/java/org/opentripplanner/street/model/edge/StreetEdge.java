@@ -500,34 +500,6 @@ public class StreetEdge
     }
   }
 
-  public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
-    for (TurnRestriction turnRestriction : turnRestrictions) {
-      /* FIXME: This is wrong for trips that end in the middle of turnRestriction.to
-       */
-
-      // NOTE(flamholz): edge to be traversed decides equivalence. This is important since
-      // it might be a temporary edge that is equivalent to some graph edge.
-      if (turnRestriction.type == TurnRestrictionType.ONLY_TURN) {
-        if (
-          !e.isEquivalentTo(turnRestriction.to) &&
-          turnRestriction.modes.contains(mode) &&
-          turnRestriction.active(state.getTimeSeconds())
-        ) {
-          return false;
-        }
-      } else {
-        if (
-          e.isEquivalentTo(turnRestriction.to) &&
-          turnRestriction.modes.contains(mode) &&
-          turnRestriction.active(state.getTimeSeconds())
-        ) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   public void shareData(StreetEdge reversedEdge) {
     if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
       compactGeometry = reversedEdge.compactGeometry;
@@ -958,8 +930,7 @@ public class StreetEdge
       fromEdge,
       toEdge,
       restriction.type,
-      restriction.modes,
-      restriction.time
+      restriction.modes
     );
     LOG.debug("Created new restriction for split edges: {}", splitTurnRestriction);
     fromEdge.addTurnRestriction(splitTurnRestriction);

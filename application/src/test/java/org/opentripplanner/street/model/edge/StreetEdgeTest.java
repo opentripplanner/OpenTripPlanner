@@ -273,7 +273,7 @@ public class StreetEdgeTest {
     StreetSearchRequest request = streetSearchRequestBuilder.withMode(StreetMode.WALK).build();
     State state = new State(v2, Instant.EPOCH, StateData.getBaseCaseStateData(request), request);
 
-    e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
+    e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
 
     assertNotNull(e0.traverse(e1.traverse(state)[0])[0]);
   }

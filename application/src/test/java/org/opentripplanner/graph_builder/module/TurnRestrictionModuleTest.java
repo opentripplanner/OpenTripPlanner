@@ -60,8 +60,7 @@ public class TurnRestrictionModuleTest {
       from,
       to,
       turnRestrictionType,
-      traverseModeSet,
-      null
+      traverseModeSet
     );
     from.addTurnRestriction(restriction);
     return restriction;
@@ -100,13 +99,7 @@ public class TurnRestrictionModuleTest {
     edges(B, D, 1.0);
     var BE = edges(B, E, 1.0);
     AB[0].addTurnRestriction(
-        new TurnRestriction(
-          AB[0],
-          BE[0],
-          TurnRestrictionType.NO_TURN,
-          TraverseModeSet.allModes(),
-          null
-        )
+        new TurnRestriction(AB[0], BE[0], TurnRestrictionType.NO_TURN, TraverseModeSet.allModes())
       );
     var module = new TurnRestrictionModule(graph);
     module.buildGraph();

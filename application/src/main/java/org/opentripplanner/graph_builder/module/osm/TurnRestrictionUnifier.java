@@ -88,8 +88,7 @@ class TurnRestrictionUnifier {
               from,
               to,
               restrictionTag.type,
-              restrictionTag.modes,
-              restrictionTag.time
+              restrictionTag.modes
             );
             from.addTurnRestriction(restriction);
           }
