@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.emission.parameters;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,6 +39,13 @@ public class EmissionParameters {
 
   public List<EmissionFeedParameters> feeds() {
     return feeds;
+  }
+
+  /**
+   * List "standalone" emission files, execpt files part of a GTFS feed.
+   */
+  public List<URI> emissionFiles() {
+    return feeds.stream().map(f -> f.source()).toList();
   }
 
   @Override

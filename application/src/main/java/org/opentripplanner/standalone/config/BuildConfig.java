@@ -662,6 +662,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   }
 
   @Override
+  public List<URI> emissionFiles() {
+    return emission.emissionFiles();
+  }
+
+  @Override
   public URI graph() {
     return graph;
   }
