@@ -13,8 +13,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.emissions.internal.DefaultEmissionsService;
+import org.opentripplanner.ext.emissions.itinerary.DecorateWithEmission;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -62,8 +65,10 @@ class EmissionsTest {
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
     emissions.put(new FeedScopedId("F", "2"), 0.0);
-    EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
-    eService = new DefaultEmissionsService(emissionsDataModel);
+    EmissionsRepository emissionsRepository = new DefaultEmissionsRepository();
+    emissionsRepository.setCo2Emissions(emissions);
+    emissionsRepository.setCarAvgCo2PerMeter(0.131);
+    eService = new DefaultEmissionsService(emissionsRepository);
     decorateWithEmission = new DecorateWithEmission(eService);
   }
 
@@ -71,14 +76,14 @@ class EmissionsTest {
   void testGetEmissionsForItinerary() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS));
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(2223.902), i.emissionsPerPerson().getCo2());
+    assertEquals(new Gram(2223.902), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCarRoute() {
     var i = createItinerary(STREET_LEG);
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(28.0864), i.emissionsPerPerson().getCo2());
+    assertEquals(new Gram(28.0864), i.emissionsPerPerson().getCo2());
   }
 
   @Test
@@ -92,14 +97,14 @@ class EmissionsTest {
   void testZeroEmissionsForItineraryWithZeroEmissions() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS));
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(0.0), i.emissionsPerPerson().getCo2());
+    assertEquals(new Gram(0.0), i.emissionsPerPerson().getCo2());
   }
 
   @Test
   void testGetEmissionsForCombinedRoute() {
     var i = createItinerary(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG);
     i = decorateWithEmission.decorate(i);
-    assertEquals(new Grams(2251.9884), i.emissionsPerPerson().getCo2());
+    assertEquals(new Gram(2251.9884), i.emissionsPerPerson().getCo2());
   }
 
   @Test

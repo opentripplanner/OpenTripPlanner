@@ -26,7 +26,6 @@ public class ZipFileDataSource
 
   private static final Logger LOG = LoggerFactory.getLogger(ZipFileDataSource.class);
   private final Collection<DataSource> content = new ArrayList<>();
-  private boolean contentLoaded = false;
   private ZipFile zipFile;
 
   public ZipFileDataSource(File file, FileType type) {
@@ -38,6 +37,7 @@ public class ZipFileDataSource
     try {
       if (zipFile != null) {
         zipFile.close();
+        content.clear();
         zipFile = null;
       }
     } catch (IOException e) {
@@ -60,13 +60,6 @@ public class ZipFileDataSource
   public DataSource entry(String name) {
     loadContent();
     return content.stream().filter(it -> it.name().equals(name)).findFirst().orElse(null);
-  }
-
-  /**
-   * @return the internal zip file if still open. {@code null} is return if the file is closed.
-   */
-  ZipFile zipFile() {
-    return zipFile;
   }
 
   @Override
@@ -96,10 +89,9 @@ public class ZipFileDataSource
 
   private void loadContent() {
     // Load content once
-    if (contentLoaded) {
+    if (zipFile != null) {
       return;
     }
-    contentLoaded = true;
 
     try {
       // The get name on ZipFile returns the full path, we want just the name.

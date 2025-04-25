@@ -74,7 +74,7 @@ class FilterMapperTest {
     assertEquals(expected, actual);
 
     assertEquals(
-      "TripRequest{includeAgencies: FilterValuesNullIsEverything{name: 'includeAgencies', values: [F:a1]}, includeRoutes: FilterValuesNullIsEverything{name: 'includeRoutes', values: [F:r1]}, excludeAgencies: FilterValuesEmptyIsEverything{name: 'excludedAgencies', values: [F:a1]}, excludeRoutes: FilterValuesEmptyIsEverything{name: 'excludedRoutes', values: [F:r1]}, includeNetexInternalPlanningCodes: FilterValuesNullIsEverything{name: 'includeNetexInternalPlanningCodes'}, includeServiceDates: FilterValuesNullIsEverything{name: 'includeServiceDates'}}",
+      "TripRequest{includeAgencies: NullIsEverythingFilter{name: 'includeAgencies', values: [F:a1]}, includeRoutes: NullIsEverythingFilter{name: 'includeRoutes', values: [F:r1]}, excludeAgencies: EmptyIsEverythingFilter{name: 'excludedAgencies', values: [F:a1]}, excludeRoutes: EmptyIsEverythingFilter{name: 'excludedRoutes', values: [F:r1]}, includeNetexInternalPlanningCodes: NullIsEverythingFilter{name: 'includeNetexInternalPlanningCodes'}, includeServiceDates: NullIsEverythingFilter{name: 'includeServiceDates'}}",
       actual.toString()
     );
   }
