@@ -44,10 +44,12 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
       if (value.isZero()) {
         partialResults = true;
       } else {
-        newLegs.add(l.withEmissionPerPerson(value));
+        l = l.withEmissionPerPerson(value);
         sum = sum.plus(value);
       }
+      newLegs.add(l);
     }
+
     if (sum.isZero()) {
       return itinerary;
     }
