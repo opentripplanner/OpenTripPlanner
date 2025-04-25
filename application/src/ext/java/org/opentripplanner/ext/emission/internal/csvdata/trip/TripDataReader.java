@@ -13,14 +13,16 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
  */
 public class TripDataReader {
 
+  private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
   private boolean dataProcessed = false;
 
-  public TripDataReader(DataImportIssueStore issueStore) {
+  public TripDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
+    this.emissionDataSource = emissionDataSource;
     this.issueStore = issueStore;
   }
 
-  public List<TripLegsRow> read(DataSource emissionDataSource) {
+  public List<TripLegsRow> read() {
     if (!emissionDataSource.exists()) {
       return List.of();
     }

@@ -41,17 +41,13 @@ public class EmissionDataReader {
   public void read(DataSource emissionDataSource, String resolvedFeedId) {
     if (emissionDataSource.exists()) {
       // Assume input CO₂ emission data is Route avarage data
-      var routeReader = new RouteDataReader(issueStore);
-      this.emissionRepository.addRouteEmissions(
-          routeReader.read(emissionDataSource, resolvedFeedId)
-        );
+      var routeReader = new RouteDataReader(emissionDataSource, issueStore);
+      this.emissionRepository.addRouteEmissions(routeReader.read(resolvedFeedId));
 
       // Assume input CO₂ emission data is per trip leg
       tripLegMapper.setCurrentFeedId(resolvedFeedId);
-      var tripReader = new TripDataReader(issueStore);
-      this.emissionRepository.addTripPatternEmissions(
-          tripLegMapper.map(tripReader.read(emissionDataSource))
-        );
+      var tripReader = new TripDataReader(emissionDataSource, issueStore);
+      this.emissionRepository.addTripPatternEmissions(tripLegMapper.map(tripReader.read()));
 
       if (!(routeReader.isDataProcessed() || tripReader.isDataProcessed())) {
         LOG.error("No emission data read from: " + emissionDataSource.detailedInfo());

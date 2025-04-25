@@ -22,11 +22,13 @@ class RouteDataReaderTest implements EmissionTestData {
   private static final FeedScopedId ROUTE_F_R1 = new FeedScopedId(FEED_ID, ROUTE_ID_EM_R1.getId());
 
   private final DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-  private final RouteDataReader subject = new RouteDataReader(issueStore);
 
   @Test
   void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
-    var emissions = subject.read(gtfsWithEmissionFile(), FEED_ID);
+    var subject = new RouteDataReader(gtfsWithEmissionFile(), issueStore);
+
+    var emissions = subject.read(FEED_ID);
+
     assertEquals(0.006, emissions.get(ROUTE_D_1001).co2().asDouble(), 0.0001);
     assertEquals(3, emissions.size());
     var issues = issueStore.listIssues();
@@ -46,7 +48,10 @@ class RouteDataReaderTest implements EmissionTestData {
 
   @Test
   void testCo2EmissionsFromFeedDataSource() throws FileNotFoundException {
-    var emissions = subject.read(emissionOnRoutes(), FEED_ID);
+    var subject = new RouteDataReader(emissionOnRoutes(), issueStore);
+
+    var emissions = subject.read(FEED_ID);
+
     assertEquals(0.006, emissions.get(ROUTE_F_R1).co2().asDouble(), 0.0001);
     assertTrue(issueStore.listIssues().isEmpty(), () -> issueStore.toString());
     assertEquals(2, emissions.size());
@@ -54,13 +59,19 @@ class RouteDataReaderTest implements EmissionTestData {
 
   @Test
   void handleMissingDdataSource() {
-    var emissions = subject.read(emissionMissingFile(), FEED_ID);
+    var subject = new RouteDataReader(emissionMissingFile(), issueStore);
+
+    var emissions = subject.read(FEED_ID);
+
     assertTrue(emissions.isEmpty());
   }
 
   @Test
   void ignoreDataSourceIfHeadersDoesNotMatch() {
-    var emissions = subject.read(emissionOnTripLegs(), FEED_ID);
+    var subject = new RouteDataReader(emissionOnTripLegs(), issueStore);
+
+    var emissions = subject.read(FEED_ID);
+
     assertTrue(emissions.isEmpty());
   }
 }

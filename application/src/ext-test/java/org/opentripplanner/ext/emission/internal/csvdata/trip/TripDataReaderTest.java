@@ -12,11 +12,12 @@ import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueSto
 class TripDataReaderTest implements EmissionTestData {
 
   private final DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-  private final TripDataReader subject = new TripDataReader(issueStore);
 
   @Test
   void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
-    var emissions = subject.read(emissionOnTripLegs());
+    var subject = new TripDataReader(emissionOnTripLegs(), issueStore);
+
+    var emissions = subject.read();
 
     assertEquals(
       "TripLegsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5g]",
@@ -42,13 +43,18 @@ class TripDataReaderTest implements EmissionTestData {
 
   @Test
   void handleMissingDdataSource() {
-    var emissions = subject.read(emissionMissingFile());
+    var subject = new TripDataReader(emissionMissingFile(), issueStore);
+
+    var emissions = subject.read();
     assertTrue(emissions.isEmpty());
   }
 
   @Test
   void ignoreDataSourceIfHeadersDoesNotMatch() {
-    var emissions = subject.read(emissionOnRoutes());
+    var subject = new TripDataReader(emissionOnRoutes(), issueStore);
+
+    var emissions = subject.read();
+
     assertTrue(emissions.isEmpty());
   }
 }

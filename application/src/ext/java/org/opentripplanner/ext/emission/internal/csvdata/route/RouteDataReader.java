@@ -15,14 +15,16 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class RouteDataReader {
 
+  private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
   private boolean dataProcessed = false;
 
-  public RouteDataReader(DataImportIssueStore issueStore) {
+  public RouteDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
+    this.emissionDataSource = emissionDataSource;
     this.issueStore = issueStore;
   }
 
-  public Map<FeedScopedId, Emission> read(DataSource emissionDataSource, String resolvedFeedId) {
+  public Map<FeedScopedId, Emission> read(String resolvedFeedId) {
     if (!emissionDataSource.exists()) {
       return Map.of();
     }
