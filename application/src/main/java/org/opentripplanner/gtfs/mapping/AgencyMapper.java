@@ -11,10 +11,10 @@ class AgencyMapper {
 
   private final Map<org.onebusaway.gtfs.model.Agency, Agency> mappedAgencies = new HashMap<>();
 
-  private final IdFactory idGenerator;
+  private final IdFactory idFactory;
 
   public AgencyMapper(IdFactory idFactory) {
-    this.idGenerator = idFactory;
+    this.idFactory = idFactory;
   }
 
   Collection<Agency> map(Collection<org.onebusaway.gtfs.model.Agency> agencies) {
@@ -27,7 +27,7 @@ class AgencyMapper {
   }
 
   private Agency doMap(org.onebusaway.gtfs.model.Agency rhs) {
-    return Agency.of(idGenerator.createId(rhs.getId()))
+    return Agency.of(idFactory.createId(rhs.getId()))
       .withName(rhs.getName())
       .withTimezone(rhs.getTimezone())
       .withUrl(rhs.getUrl())

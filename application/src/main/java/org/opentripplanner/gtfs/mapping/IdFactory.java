@@ -16,10 +16,12 @@ class IdFactory {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
+  @Nullable
   FeedScopedId createId(@Nullable AgencyAndId id) {
     return id == null ? null : new FeedScopedId(feedId, id.getId());
   }
 
+  @Nullable
   FeedScopedId createId(@Nullable String id) {
     return id == null ? null : new FeedScopedId(feedId, id);
   }

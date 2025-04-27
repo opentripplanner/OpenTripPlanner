@@ -56,6 +56,7 @@ class FareTransferRuleMapper {
     @Nullable FeedScopedId fareProductId,
     String ruleId
   ) {
+    // as per the GTFS Fares V2 spec an empty product id means that the transfer is free
     if (fareProductId == null) {
       return List.of();
     }
