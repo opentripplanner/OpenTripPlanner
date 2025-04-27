@@ -1,16 +1,13 @@
 package org.opentripplanner.ext.emissions;
 
 import com.csvreader.CsvReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.Sandbox;
@@ -26,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class Co2EmissionsDataReader {
 
   private static final Logger LOG = LoggerFactory.getLogger(Co2EmissionsDataReader.class);
+  private static final String EMISSIONS_FILE_NAME = "emissions.txt";
 
   private final DataImportIssueStore issueStore;
 
@@ -33,53 +31,19 @@ public class Co2EmissionsDataReader {
     this.issueStore = issueStore;
   }
 
-  /**
-   * Read files in a GTFS directory.
-   * @param directory
-   * @return emissions data
-   */
-  public Map<FeedScopedId, Double> readGtfs(File directory) {
-    String feedId = "";
-    File feedFile = new File(directory + "/feed_info.txt");
-    File emissionsFile = new File(directory + "/emissions.txt");
-    if (feedFile.exists() && emissionsFile.exists()) {
-      try (InputStream feedInfoStream = new FileInputStream(feedFile)) {
-        feedId = readFeedId(feedInfoStream);
-      } catch (IOException e) {
-        issueStore.add("InvalidEmissionData", "Reading feed_info.txt failed.");
-        LOG.error("InvalidEmissionData: reading feed_info.txt failed.", e);
-      }
-      try (InputStream stream = new FileInputStream(emissionsFile)) {
-        return readEmissions(stream, feedId);
-      } catch (IOException e) {
-        issueStore.add("InvalidEmissionData", "Reading emissions.txt failed.");
-        LOG.error("InvalidEmissionData: reading emissions.txt failed.", e);
-      }
-    }
-    return Map.of();
-  }
+  public Map<FeedScopedId, Double> read(CompositeDataSource catalog, String resolvedFeedId) {
+    try {
+      var emissionsDataSource = catalog.entry(EMISSIONS_FILE_NAME);
 
-  /**
-   * Read files in a GTFS zip file.
-   * @param file
-   * @return emissions data
-   */
-  public Map<FeedScopedId, Double> readGtfsZip(File file) {
-    try (ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ)) {
-      ZipEntry feedInfo = zipFile.getEntry("feed_info.txt");
-      ZipEntry emissions = zipFile.getEntry("emissions.txt");
-      if (emissions != null && feedInfo != null) {
-        String feedId = readFeedId(zipFile.getInputStream(feedInfo));
-        InputStream stream = zipFile.getInputStream(emissions);
-        Map<FeedScopedId, Double> emissionsData = readEmissions(stream, feedId);
-        zipFile.close();
-        return emissionsData;
+      if (emissionsDataSource.exists()) {
+        return readEmissions(emissionsDataSource.asInputStream(), resolvedFeedId);
+      } else {
+        return Map.of();
       }
     } catch (IOException e) {
-      issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
-      LOG.error("InvalidEmissionData: Reading emissions data failed.", e);
+      LOG.error("Failed to read emission data. Details: " + e.getMessage(), e);
+      return Map.of();
     }
-    return Map.of();
   }
 
   private Map<FeedScopedId, Double> readEmissions(InputStream stream, String feedId)

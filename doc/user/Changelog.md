@@ -20,6 +20,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Filter flex trips by agency and route [#6421](https://github.com/opentripplanner/OpenTripPlanner/pull/6421)
 - Fix crash on itineraries with frequencies where distanceMeters was not computed [#6580](https://github.com/opentripplanner/OpenTripPlanner/pull/6580)
 - Remove REST API [#6578](https://github.com/opentripplanner/OpenTripPlanner/pull/6578)
+- Don't use bicycle as street routing mode when car or scooter rental is requested [#6599](https://github.com/opentripplanner/OpenTripPlanner/pull/6599)
+- Updating SIRI objects used to SIRI 2.1 [#6573](https://github.com/opentripplanner/OpenTripPlanner/pull/6573)
+- Set correct transfer modes for scooters in deprecated `plan` query [#6597](https://github.com/opentripplanner/OpenTripPlanner/pull/6597)
+- Remove old debug UI [#6478](https://github.com/opentripplanner/OpenTripPlanner/pull/6478)
+- Adjust the maximum allowed speed in our stop time validator to be consistent with MobilityData GTFS validator [#6606](https://github.com/opentripplanner/OpenTripPlanner/pull/6606)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

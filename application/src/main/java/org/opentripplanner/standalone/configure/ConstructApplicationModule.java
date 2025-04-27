@@ -8,13 +8,14 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionsDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -51,7 +52,7 @@ public class ConstructApplicationModule {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
-    EmissionsService emissionsService,
+    @Nullable @EmissionsDecorator ItineraryDecorator emissionsItineraryDecorator,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
@@ -82,7 +83,8 @@ public class ConstructApplicationModule {
       vehicleRentalService,
       viaTransferResolver,
       worldEnvelopeService,
-      emissionsService,
+      // Optional Sandbox services
+      emissionsItineraryDecorator,
       luceneIndex,
       schema,
       sorlandsbanenService,

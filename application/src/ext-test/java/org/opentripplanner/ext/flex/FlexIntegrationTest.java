@@ -190,8 +190,8 @@ public class FlexIntegrationTest {
     FareServiceFactory fareServiceFactory
   ) {
     // GTFS
-    var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::new).toList();
-    GtfsModule gtfsModule = new GtfsModule(
+    var gtfsBundles = gtfsFiles.stream().map(it -> GtfsBundle.forTest(it)).toList();
+    GtfsModule gtfsModule = GtfsModule.forTest(
       gtfsBundles,
       timetableRepository,
       graph,

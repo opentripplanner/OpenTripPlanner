@@ -38,7 +38,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.AddTransitEntitiesToGraph;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
@@ -86,13 +85,18 @@ public class GtfsModule implements GraphBuilderModule {
   private final DataImportIssueStore issueStore;
   private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
+  private final double maxStopToShapeSnapDistance;
+  private final int subwayAccessTime_s;
+
   public GtfsModule(
     List<GtfsBundle> bundles,
     TimetableRepository timetableRepository,
     Graph graph,
     DataImportIssueStore issueStore,
     ServiceDateInterval transitPeriodLimit,
-    FareServiceFactory fareServiceFactory
+    FareServiceFactory fareServiceFactory,
+    double maxStopToShapeSnapDistance,
+    int subwayAccessTime_s
   ) {
     this.gtfsBundles = bundles;
     this.timetableRepository = timetableRepository;
@@ -100,6 +104,28 @@ public class GtfsModule implements GraphBuilderModule {
     this.issueStore = issueStore;
     this.transitPeriodLimit = transitPeriodLimit;
     this.fareServiceFactory = fareServiceFactory;
+    this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
+    this.subwayAccessTime_s = subwayAccessTime_s;
+  }
+
+  /**
+   * Create a new instance for unit-testing.
+   */
+  public static GtfsModule forTest(
+    List<GtfsBundle> bundles,
+    TimetableRepository timetableRepository,
+    Graph graph,
+    ServiceDateInterval transitPeriodLimit
+  ) {
+    return new GtfsModule(
+      bundles,
+      timetableRepository,
+      graph,
+      DataImportIssueStore.NOOP,
+      transitPeriodLimit,
+      150.0,
+      120
+    );
   }
 
   @Override
@@ -114,7 +140,7 @@ public class GtfsModule implements GraphBuilderModule {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
         GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
 
-        final String feedId = gtfsBundle.getFeedId().getId();
+        final String feedId = gtfsBundle.getFeedId();
         verifyUniqueFeedId(gtfsBundle, feedIdsEncountered, feedId);
 
         feedIdsEncountered.put(feedId, gtfsBundle);
@@ -123,9 +149,9 @@ public class GtfsModule implements GraphBuilderModule {
           new OtpTransitServiceBuilder(timetableRepository.getSiteRepository(), issueStore),
           feedId,
           issueStore,
-          gtfsBundle.discardMinTransferTimes(),
+          gtfsBundle.parameters().discardMinTransferTimes(),
           gtfsDao,
-          gtfsBundle.stationTransferPreference()
+          gtfsBundle.parameters().stationTransferPreference()
         );
         mapper.mapStopTripAndRouteDataIntoBuilder();
 
@@ -143,7 +169,7 @@ public class GtfsModule implements GraphBuilderModule {
         validateAndInterpolateStopTimesForEachTrip(
           builder.getStopTimesSortedByTrip(),
           issueStore,
-          gtfsBundle.removeRepeatedStops()
+          gtfsBundle.parameters().removeRepeatedStops()
         );
 
         // We need to run this after the cleaning of the data, as stop indices might have changed
@@ -151,7 +177,7 @@ public class GtfsModule implements GraphBuilderModule {
 
         GeometryProcessor geometryProcessor = new GeometryProcessor(
           builder,
-          gtfsBundle.getMaxStopToShapeSnapDistance(),
+          maxStopToShapeSnapDistance,
           issueStore
         );
 
@@ -170,13 +196,13 @@ public class GtfsModule implements GraphBuilderModule {
         // if this or previously processed gtfs bundle has transit that has not been filtered out
         hasTransit = hasTransit || otpTransitService.hasActiveTransit();
 
-        addTimetableRepositoryToGraph(graph, timetableRepository, gtfsBundle, otpTransitService);
+        addTimetableRepositoryToGraph(graph, timetableRepository, otpTransitService);
 
-        if (gtfsBundle.blockBasedInterlining()) {
+        if (gtfsBundle.parameters().blockBasedInterlining()) {
           new InterlineProcessor(
             timetableRepository.getTransferService(),
             builder.getStaySeatedNotAllowed(),
-            gtfsBundle.maxInterlineDistance(),
+            gtfsBundle.parameters().maxInterlineDistance(),
             issueStore,
             calendarServiceData
           ).run(otpTransitService.getTripPatterns());
@@ -278,12 +304,11 @@ public class GtfsModule implements GraphBuilderModule {
   private void addTimetableRepositoryToGraph(
     Graph graph,
     TimetableRepository timetableRepository,
-    GtfsBundle gtfsBundle,
     OtpTransitService otpTransitService
   ) {
     AddTransitEntitiesToGraph.addToGraph(
       otpTransitService,
-      gtfsBundle.subwayAccessTime,
+      subwayAccessTime_s,
       graph,
       timetableRepository
     );
@@ -292,15 +317,15 @@ public class GtfsModule implements GraphBuilderModule {
   private GtfsMutableRelationalDao loadBundle(GtfsBundle gtfsBundle) throws IOException {
     StoreImpl store = new StoreImpl(new GtfsRelationalDaoImpl());
     store.open();
-    LOG.info("reading {}", gtfsBundle);
+    LOG.info("reading {}", gtfsBundle.feedInfo());
 
-    GtfsFeedId gtfsFeedId = gtfsBundle.getFeedId();
+    String gtfsFeedId = gtfsBundle.getFeedId();
 
     GtfsReader reader = new GtfsReader();
     reader.setInputSource(gtfsBundle.getCsvInputSource());
     reader.setEntityStore(store);
     reader.setInternStrings(true);
-    reader.setDefaultAgencyId(gtfsFeedId.getId());
+    reader.setDefaultAgencyId(gtfsFeedId);
 
     if (LOG.isDebugEnabled()) reader.addEntityHandler(counter);
 
@@ -321,7 +346,7 @@ public class GtfsModule implements GraphBuilderModule {
           LOG.info("This Agency has the ID {}", agencyId);
           // Somehow, when the agency's id field is missing, OBA replaces it with the agency's name.
           // TODO Figure out how and why this is happening.
-          if (agencyId == null || agencyIdsSeen.contains(gtfsFeedId.getId() + agencyId)) {
+          if (agencyId == null || agencyIdsSeen.contains(gtfsFeedId + agencyId)) {
             // Loop in case generated name is already in use.
             String generatedAgencyId = null;
             while (generatedAgencyId == null || agencyIdsSeen.contains(generatedAgencyId)) {
@@ -337,7 +362,7 @@ public class GtfsModule implements GraphBuilderModule {
             agency.setId(generatedAgencyId);
             agencyId = generatedAgencyId;
           }
-          if (agencyId != null) agencyIdsSeen.add(gtfsFeedId.getId() + agencyId);
+          if (agencyId != null) agencyIdsSeen.add(gtfsFeedId + agencyId);
         }
       }
     }

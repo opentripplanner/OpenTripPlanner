@@ -130,7 +130,7 @@ public class SpeedTest {
       TestServerContext.createVehicleRentalService(),
       TestServerContext.createViaTransferResolver(graph, transitService),
       TestServerContext.createWorldEnvelopeService(),
-      TestServerContext.createEmissionsService(),
+      null,
       null,
       null,
       null,
