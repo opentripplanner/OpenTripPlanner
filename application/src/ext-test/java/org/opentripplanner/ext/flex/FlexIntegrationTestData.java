@@ -51,9 +51,7 @@ public final class FlexIntegrationTestData {
       List.of(gtfsBundle),
       timetableRepository,
       graph,
-      DataImportIssueStore.NOOP,
-      new ServiceDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1)),
-      new DefaultFareServiceFactory()
+      new ServiceDateInterval(LocalDate.of(2021, 1, 1), LocalDate.of(2022, 1, 1))
     );
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     module.buildGraph();

@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -210,14 +210,11 @@ public abstract class GtfsTest {
       )
     );
 
-    var fareServiceFactory = new DefaultFareServiceFactory();
     GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
       timetableRepository,
       graph,
-      DataImportIssueStore.NOOP,
-      ServiceDateInterval.unbounded(),
-      fareServiceFactory
+      ServiceDateInterval.unbounded()
     );
 
     gtfsGraphBuilderImpl.buildGraph();

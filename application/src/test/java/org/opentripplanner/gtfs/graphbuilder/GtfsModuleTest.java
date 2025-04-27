@@ -32,7 +32,6 @@ class GtfsModuleTest {
       List.of(bundle),
       model.timetableRepository,
       model.graph,
-      DataImportIssueStore.NOOP,
       ServiceDateInterval.unbounded()
     );
 
@@ -64,9 +63,7 @@ class GtfsModuleTest {
       bundles,
       model.timetableRepository,
       model.graph,
-      DataImportIssueStore.NOOP,
-      ServiceDateInterval.unbounded(),
-      new DefaultFareServiceFactory()
+      ServiceDateInterval.unbounded()
     );
     assertThrows(IllegalArgumentException.class, module::buildGraph);
   }
@@ -115,9 +112,7 @@ class GtfsModuleTest {
         bundles,
         model.timetableRepository,
         model.graph,
-        DataImportIssueStore.NOOP,
-        ServiceDateInterval.unbounded(),
-        new DefaultFareServiceFactory()
+        ServiceDateInterval.unbounded()
       );
 
       module.buildGraph();

@@ -22,6 +22,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emissions.EmissionsRepository;
 import org.opentripplanner.ext.emissions.internal.DefaultEmissionsRepository;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.fares.FareServiceFactory;
@@ -217,7 +218,8 @@ public class GraphSerializationTest {
       DataImportIssueSummary.empty(),
       emissionsRepository,
       null,
-      streetLimitationParameters
+      streetLimitationParameters,
+      new DefaultFareServiceFactory()
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
