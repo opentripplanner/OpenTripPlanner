@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -15,17 +14,11 @@ class FareTransferRuleMapper {
   public final int MISSING_VALUE = -999;
 
   private final IdFactory idFactory;
-  private final DataImportIssueStore issueStore;
   private final FareProductMapper fareProductMapper;
 
-  FareTransferRuleMapper(
-    IdFactory idFactory,
-    FareProductMapper fareProductMapper,
-    DataImportIssueStore issueStore
-  ) {
+  FareTransferRuleMapper(IdFactory idFactory, FareProductMapper fareProductMapper) {
     this.idFactory = idFactory;
     this.fareProductMapper = fareProductMapper;
-    this.issueStore = issueStore;
   }
 
   public Collection<FareTransferRule> map(

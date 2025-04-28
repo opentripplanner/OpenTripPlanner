@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 
 class FareTransferRuleMapperTest {
 
@@ -27,8 +25,7 @@ class FareTransferRuleMapperTest {
   @Test
   void throwOnUnknownFareProduct() {
     var fareProductMapper = new FareProductMapper(ID_FACTORY);
-    var issueStore = new DefaultDataImportIssueStore();
-    var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper, issueStore);
+    var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper);
 
     var rule = new FareTransferRule();
     rule.setFareProductId(id);
@@ -71,11 +68,7 @@ class FareTransferRuleMapperTest {
     rule.setToLegGroupId(groupId2);
 
     var fareProductMapper = new FareProductMapper(ID_FACTORY);
-    var subject = new FareTransferRuleMapper(
-      ID_FACTORY,
-      fareProductMapper,
-      DataImportIssueStore.NOOP
-    );
+    var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper);
     var transferRule = subject.map(List.of(rule)).stream().toList().getFirst();
     assertTrue(transferRule.isFree());
     assertThat(transferRule.fareProducts()).isEmpty();
@@ -98,11 +91,7 @@ class FareTransferRuleMapperTest {
     var fareProductMapper = new FareProductMapper(ID_FACTORY);
     fareProductMapper.map(fareProduct);
 
-    var subject = new FareTransferRuleMapper(
-      ID_FACTORY,
-      fareProductMapper,
-      DataImportIssueStore.NOOP
-    );
+    var subject = new FareTransferRuleMapper(ID_FACTORY, fareProductMapper);
 
     var mapped = subject.map(List.of(rule)).stream().toList();
 
