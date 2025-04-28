@@ -112,6 +112,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   public GtfsRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
+    TripPatternCache tripPatternCache,
     Supplier<LocalDate> localDateNow
   ) {
     this.snapshotManager = snapshotManager;
@@ -123,10 +124,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     );
     this.deduplicator = timetableRepository.getDeduplicator();
     this.serviceCodes = timetableRepository.getServiceCodes();
-    this.tripPatternCache = new TripPatternCache(
-      new TripPatternIdGenerator(),
-      transitEditorService::findPattern
-    );
+    this.tripPatternCache = tripPatternCache;
   }
 
   /**

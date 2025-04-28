@@ -14,6 +14,8 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
+import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 
 @Module
 public abstract class TransitModule {
@@ -54,5 +56,15 @@ public abstract class TransitModule {
   @Provides
   public static TimetableSnapshot timetableSnapshot(TimetableSnapshotManager manager) {
     return manager.getTimetableSnapshot();
+  }
+
+  @Provides
+  @Singleton
+  public static TripPatternCache tripPatternCache(
+    TimetableRepository repo,
+    TimetableSnapshotManager manager
+  ) {
+    var service = new DefaultTransitService(repo, manager.getTimetableSnapshotBuffer());
+    return new TripPatternCache(new TripPatternIdGenerator(), service::findPattern);
   }
 }

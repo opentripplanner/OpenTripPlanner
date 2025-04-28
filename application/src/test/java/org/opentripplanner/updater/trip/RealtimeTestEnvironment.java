@@ -51,9 +51,21 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> SERVICE_DATE
     );
-    siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
-    gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      SERVICE_DATE
+    var service = new DefaultTransitService(
+      timetableRepository,
+      snapshotManager.getTimetableSnapshot()
+    );
+    var tripPatternCache = new TripPatternCache(new TripPatternIdGenerator(), service::findPattern);
+    siriAdapter = new SiriRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      tripPatternCache
+    );
+    gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      tripPatternCache,
+      () -> SERVICE_DATE
     );
     dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
   }

@@ -67,17 +67,15 @@ public class SiriRealTimeTripUpdateAdapter {
 
   public SiriRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
-    TimetableSnapshotManager snapshotManager
+    TimetableSnapshotManager snapshotManager,
+    TripPatternCache tripPatternCache
   ) {
     this.snapshotManager = snapshotManager;
     this.transitEditorService = new DefaultTransitService(
       timetableRepository,
       snapshotManager.getTimetableSnapshotBuffer()
     );
-    this.tripPatternCache = new TripPatternCache(
-      tripPatternIdGenerator,
-      transitEditorService::findPattern
-    );
+    this.tripPatternCache = tripPatternCache;
   }
 
   /**
