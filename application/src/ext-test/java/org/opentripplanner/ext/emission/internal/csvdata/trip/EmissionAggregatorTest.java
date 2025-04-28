@@ -125,6 +125,22 @@ class EmissionAggregatorTest {
   }
 
   @Test
+  void mergeWithMissingStops() {
+    subject = new EmissionAggregator(FEED_SCOPED_TRIP_ID, null);
+
+    // Make sure mapping does not fail
+    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, -1, Gram.of(3.0)));
+
+    assertFalse(subject.validate());
+    assertEquals(1, subject.listIssues().size(), () -> subject.listIssues().toString());
+    assertEquals(
+      "EmissionTripLegMissingTripStopPattern(Warn! No trip with a stop pattern found for " +
+      "trip(E:T:1). The trip is skipped.)",
+      subject.listIssues().get(0).toString()
+    );
+  }
+
+  @Test
   void mergeWithoutCallingValidationMethod() {
     var ex = assertThrows(IllegalStateException.class, () -> subject.build());
     assertEquals("Forgot to call validate()?", ex.getMessage());

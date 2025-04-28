@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission.parameters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
@@ -10,9 +11,10 @@ import org.opentripplanner.framework.model.Gram;
 
 class EmissionParametersTest {
 
+  private static final URI URI = URIUtils.uri("http://host/emsissions");
   private final EmissionViechleParameters car = new EmissionViechleParameters(Gram.of(90), 7.4);
   private final List<EmissionFeedParameters> feeds = List.of(
-    new EmissionFeedParameters("my_feed_id", URIUtils.uri("http://host/emsissions"))
+    new EmissionFeedParameters("my_feed_id", URI)
   );
   private final EmissionParameters subject = new EmissionParameters(car, feeds);
 
@@ -24,6 +26,11 @@ class EmissionParametersTest {
   @Test
   void feeds() {
     assertEquals(feeds, subject.feeds());
+  }
+
+  @Test
+  void emissionFiles() {
+    assertEquals(List.of(URI), subject.emissionFiles());
   }
 
   @Test

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.emission.internal.csvdata.trip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.framework.error.WordList;
@@ -26,7 +27,7 @@ class EmissionAggregator {
   private final List<OtpError> issues = new ArrayList<>();
   private boolean semanticValidationDone = false;
 
-  EmissionAggregator(FeedScopedId tripId, List<StopLocation> stops) {
+  EmissionAggregator(FeedScopedId tripId, @Nullable List<StopLocation> stops) {
     this.tripId = tripId;
     this.stops = stops;
 

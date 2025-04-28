@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.emission.internal.csvdata.trip;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.FileNotFoundException;
@@ -29,6 +30,7 @@ class TripDataReaderTest implements EmissionTestData {
       "TripLegsRow[tripId=T2, fromStopId=B, fromStopSequence=2, co2=17g]",
       emissions.getLast().toString()
     );
+    assertTrue(subject.isDataProcessed());
     assertEquals(4, emissions.size());
     assertEquals(4, stepCounter.get());
 
@@ -50,6 +52,7 @@ class TripDataReaderTest implements EmissionTestData {
     var subject = new TripDataReader(emissionMissingFile(), issueStore);
 
     var emissions = subject.read(stepCounter::inc);
+    assertFalse(subject.isDataProcessed());
     assertTrue(emissions.isEmpty());
     assertEquals(0, stepCounter.get());
   }
@@ -61,6 +64,7 @@ class TripDataReaderTest implements EmissionTestData {
 
     var emissions = subject.read(stepCounter::inc);
 
+    assertFalse(subject.isDataProcessed());
     assertTrue(emissions.isEmpty());
     assertEquals(0, stepCounter.get());
   }
