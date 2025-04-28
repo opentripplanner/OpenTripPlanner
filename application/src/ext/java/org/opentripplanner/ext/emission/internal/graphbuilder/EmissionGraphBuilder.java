@@ -8,7 +8,6 @@ import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripLegMapper;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
-import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
@@ -60,13 +59,6 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       issueStore
     );
 
-    // Init car passenger emission data
-    {
-      Gram carCo2PerKm = parameters.car().avgCo2PerKm();
-      double carAvgOccupancy = parameters.car().avgOccupancy();
-      Gram carCo2PerMeterPerPerson = carCo2PerKm.dividedBy(1000).dividedBy(carAvgOccupancy);
-      this.emissionRepository.setCarAvgCo2PerMeter(carCo2PerMeterPerPerson);
-    }
     // Read Transit pasenger emission data from configured emission feeds
     for (var data : emissionDataSources) {
       co2EmissionsDataReader.read(data.dataSource(), data.config().feedId());

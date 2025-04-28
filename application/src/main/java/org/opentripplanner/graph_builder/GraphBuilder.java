@@ -154,13 +154,13 @@ public class GraphBuilder implements Runnable {
 
       // Analyze routing between stops to generate report
       graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);
+
+      graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
     }
 
     if (loadStreetGraph || hasOsm) {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
-
-    graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
 
     graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
 
