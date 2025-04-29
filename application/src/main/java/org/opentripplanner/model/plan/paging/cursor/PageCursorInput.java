@@ -29,8 +29,8 @@ public interface PageCursorInput {
 
   /**
    * If the search has too many results, the {@code numberOfItineraries} request parameter
-   * is less than the number of itineraries found, then we store information from the last
-   * itinerary kept and returned as part of the result. The sort vector will be included
+   * is less than the number of itineraries found. In this case, we store information from the
+   * last itinerary kept and returned as part of the result. The ItinerarySortKey will be included
    * in the page cursor and used in the next/previous page to filter away duplicates.
    */
   ItinerarySortKey pageCut();
