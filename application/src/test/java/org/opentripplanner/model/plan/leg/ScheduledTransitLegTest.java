@@ -60,7 +60,7 @@ class ScheduledTransitLegTest {
 
   private static final Emission EMISSION = Emission.co2_g(23.0);
   private static final List<FareProduct> FARE_PRODUCTS = List.of(
-    new FareProduct(id("fp"), "fare product", Money.euros(10.00f), null, null, null)
+    FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
   );
 
   static {
