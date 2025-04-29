@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Gram;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -32,6 +33,7 @@ class TripLegMapperTest {
   private static final Gram CO2_BC = Gram.of(3.0);
   private static final Gram CO2_CD = Gram.of(4.0);
   private static final Gram CO2_AD = Gram.of(5.0);
+  private static final Gram CO2_ANY = Gram.of(10.0);
 
   static {
     var builder = TimetableRepositoryForTest.of();
@@ -75,12 +77,21 @@ class TripLegMapperTest {
   @Test
   void testCaseError() {
     subject.setCurrentFeedId(FEED_ID);
-    var result = subject.map(List.of(new TripLegsRow(TRIP_ID_2, STOP_ID_A, 2, CO2_AB)));
+    var result = subject.map(
+      List.of(
+        new TripLegsRow(TRIP_ID_2, STOP_ID_B, 1, CO2_AB),
+        new TripLegsRow(TRIP_ID_1, STOP_ID_A, 4, CO2_AB)
+      )
+    );
     assertTrue(result.isEmpty());
     assertEquals(
-      "Emission 'from_stop_id'(A) not found in stop pattern for trip(E:T:2): " +
-      "TripLegsRow[tripId=T:2, fromStopId=A, fromStopSequence=2, co2=2g]",
-      issueStore.listIssues().getFirst().getMessage()
+      List.of(
+        "Emission 'from_stop_id'(B) not found in stop pattern for trip(E:T:2): " +
+        "TripLegsRow[tripId=T:2, fromStopId=B, fromStopSequence=1, co2=2g]",
+        "The emission 'from_stop_sequence'(4) is out of bounds[1, 3]: " +
+        "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=4, co2=2g]"
+      ),
+      issueStore.listIssues().stream().map(DataImportIssue::getMessage).toList()
     );
   }
 

@@ -56,7 +56,7 @@ route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
 3456,12.3,20.0
 ```
 
-### Emission route format input data files
+### Emission trip hop format input data files
 (by the Entur team)
 
 The emissions are represented in grams per kilometer (g/Km) unit.
@@ -67,7 +67,7 @@ Emission file has the following columns:
 |:---------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `trip_id`                  | The GTFS trip id or the NeTEx ServiceJourney id                                                                                                                                                                                            |
 | `from_stop_id`             | The GTFS stop id or the NeTEx Quey id. This is use together with the `from_stop_sequence` to match the stop. If the emissions data do not match the given transit feed, then the row is dropped and an issue is added to the build report. |
-| `from_stop_sequence`       | The boardins stop sequence number in the trip stop pattern. The first stop is number one(1).                                                                                                                                               |
+| `from_stop_sequence`       | The boardins stop sequence number in the trip stop pattern. The first stop is number one(1), not zero(0).                                                                                                                                  |
 | `co2`                      | Average carbon dioxide equivalent value for the vehicles used on given trip hop starting at the given stop. The unit is grams per person per hop.                                                                                          |
 
 For example:

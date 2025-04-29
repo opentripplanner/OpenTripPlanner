@@ -10,6 +10,7 @@ import org.opentripplanner.framework.error.WordList;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.lang.IntRange;
 
 /**
  * This class is responsible for merging duplicates by calculating the average. This can be
@@ -24,6 +25,7 @@ class EmissionAggregator {
   private final List<StopLocation> stops;
   private final Emission[] emissions;
   private final int[] counts;
+  private final IntRange fromStopSequenceRange;
   private final List<OtpError> issues = new ArrayList<>();
   private boolean semanticValidationDone = false;
 
@@ -34,10 +36,11 @@ class EmissionAggregator {
     if (this.stops == null || this.stops.isEmpty()) {
       this.emissions = null;
       this.counts = null;
+      this.fromStopSequenceRange = null;
       warnOnMissingStopPatternForTrip();
     } else {
       int size = stops.size() - 1;
-
+      this.fromStopSequenceRange = IntRange.ofInclusive(1, size);
       this.emissions = new Emission[size];
       Arrays.fill(emissions, Emission.ZERO);
 
@@ -55,30 +58,30 @@ class EmissionAggregator {
       throw new IllegalStateException("Rows can not be added after validate() is called.");
     }
 
-    var legEmission = Emission.of(row.co2());
-    int boardStopPosInPattern = row.fromStopSequence() - 1;
-
-    if (!verifyStop(boardStopPosInPattern, row)) {
+    if (!verifyStop(row)) {
       return this;
     }
 
-    var existing = emissions[boardStopPosInPattern];
+    var legEmission = Emission.of(row.co2());
+    int boardStopPosition = row.boardStopPosInPattern();
+    var existing = emissions[boardStopPosition];
+
     if (existing.isZero()) {
-      emissions[boardStopPosInPattern] = legEmission;
-      counts[boardStopPosInPattern] = 1;
+      emissions[boardStopPosition] = legEmission;
+      counts[boardStopPosition] = 1;
     } else {
-      emissions[boardStopPosInPattern] = existing.plus(legEmission);
-      counts[boardStopPosInPattern] = ++counts[boardStopPosInPattern];
+      emissions[boardStopPosition] = existing.plus(legEmission);
+      counts[boardStopPosition] = ++counts[boardStopPosition];
     }
     return this;
   }
 
-  private boolean verifyStop(int stopPosInPattern, TripLegsRow row) {
-    if (stopPosInPattern < 0 || stopPosInPattern >= stops.size()) {
-      addEmissionStopStartSeqNrIssue(row, stops.size() - 1);
+  private boolean verifyStop(TripLegsRow row) {
+    if (fromStopSequenceRange.isOutside(row.fromStopSequence())) {
+      addEmissionStopStartSeqNrIssue(row);
       return false;
     }
-    var stop = stops.get(stopPosInPattern);
+    var stop = stops.get(row.boardStopPosInPattern());
     // Ignore feed id when comparing stopId
     if (!stop.getId().getId().equals(row.fromStopId())) {
       addEmissionStopIdMissmatchIssue(row);
@@ -166,13 +169,13 @@ class EmissionAggregator {
     }
   }
 
-  private void addEmissionStopStartSeqNrIssue(TripLegsRow row, int upperBoundInclusive) {
+  private void addEmissionStopStartSeqNrIssue(TripLegsRow row) {
     issues.add(
       OtpError.of(
         "EmissionStopSeqNr",
-        "The emission 'from_stop_sequence'(%d) is out of bounds[1, %d]: %s",
+        "The emission 'from_stop_sequence'(%d) is out of bounds%s: %s",
         row.fromStopSequence(),
-        upperBoundInclusive,
+        fromStopSequenceRange,
         row.toString()
       )
     );
@@ -182,7 +185,8 @@ class EmissionAggregator {
     issues.add(
       OtpError.of(
         "EmissionMissingLeg",
-        "All legs in a trip(%s) must have an emission value. Leg number %s does not have an emission value.",
+        "All legs in a trip(%s) must have an emission value. Leg number %s does not have an " +
+        "emission value.",
         tripId,
         buf.toString()
       )

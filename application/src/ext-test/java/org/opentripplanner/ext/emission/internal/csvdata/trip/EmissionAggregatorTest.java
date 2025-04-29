@@ -51,7 +51,7 @@ class EmissionAggregatorTest {
     subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_B_ID, 2, Gram.of(7.0)));
     subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 3, Gram.of(10.0)));
 
-    assertTrue(subject.validate());
+    assertTrue(subject.validate(), () -> subject.listIssues().toString());
     assertEquals(List.of(), subject.listIssues());
 
     assertEquals(
@@ -107,18 +107,18 @@ class EmissionAggregatorTest {
 
   @Test
   void mergeWithStopIndexOutOfBound() {
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, -1, Gram.of(3.0)));
+    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 0, Gram.of(3.0)));
     subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 4, Gram.of(3.0)));
 
     assertFalse(subject.validate());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
-      "EmissionStopSeqNr(The emission 'from_stop_sequence'(-1) is out of bounds[1, 3]: " +
-      "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=-1, co2=3g])",
+      "EmissionStopSeqNr(The emission 'from_stop_sequence'(0) is out of bounds[1, 3]: " +
+      "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=0, co2=3g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
-      "EmissionStopIdMissmatch(Emission 'from_stop_id'(C) not found in stop pattern for trip(E:T:1): " +
+      "EmissionStopSeqNr(The emission 'from_stop_sequence'(4) is out of bounds[1, 3]: " +
       "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3g])",
       subject.listIssues().get(1).toString()
     );
