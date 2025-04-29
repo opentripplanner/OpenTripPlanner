@@ -27,8 +27,8 @@ public interface EmissionRepository extends Serializable {
 
   /**
    * Return emissions for all legs/sections in the trip pattern for a given trip. The same
-   * trip-pattern may have multiple diffrent emissions depending on the viechle(s) operating the
-   * trip on a given date, but OTP does not keep information about the viechles, so we calculate
+   * trip-pattern may have multiple diffrent emissions depending on the vehicle(s) operating the
+   * trip on a given date, but OTP does not keep information about the vehicles, so we calculate
    * the average emissions for each leg for a given trip.
    */
   TripPatternEmission tripPatternEmissions(FeedScopedId tripId);

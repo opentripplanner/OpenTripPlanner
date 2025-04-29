@@ -12,7 +12,7 @@ import org.opentripplanner.framework.model.Gram;
 class EmissionParametersTest {
 
   private static final URI URI = URIUtils.uri("http://host/emsissions");
-  private final EmissionViechleParameters car = new EmissionViechleParameters(Gram.of(90), 7.4);
+  private final EmissionVehicleParameters car = new EmissionVehicleParameters(Gram.of(90), 7.4);
   private final List<EmissionFeedParameters> feeds = List.of(
     new EmissionFeedParameters("my_feed_id", URI)
   );
@@ -37,7 +37,7 @@ class EmissionParametersTest {
   void testToString() {
     assertEquals(
       "EmissionParameters{" +
-      "car: EmissionViechleParameters{carAvgCo2PerKm: 90g, carAvgOccupancy: 7.4}, " +
+      "car: EmissionVehicleParameters{carAvgCo2PerKm: 90g, carAvgOccupancy: 7.4}, " +
       "fedds: [EmissionFeedParameters{feedId: 'my_feed_id', source: http://host/emsissions}]" +
       "}",
       subject.toString()
@@ -50,7 +50,7 @@ class EmissionParametersTest {
       .sameAs(new EmissionParameters(car, feeds))
       .differentFrom(
         new EmissionParameters(car, List.of()),
-        new EmissionParameters(EmissionViechleParameters.CAR_DEFAULTS, List.of())
+        new EmissionParameters(EmissionVehicleParameters.CAR_DEFAULTS, List.of())
       );
   }
 }

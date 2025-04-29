@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.emission.config;
 
-import static org.opentripplanner.ext.emission.parameters.EmissionViechleParameters.CAR_DEFAULTS;
+import static org.opentripplanner.ext.emission.parameters.EmissionVehicleParameters.CAR_DEFAULTS;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
 import java.util.List;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
-import org.opentripplanner.ext.emission.parameters.EmissionViechleParameters;
+import org.opentripplanner.ext.emission.parameters.EmissionVehicleParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -31,8 +31,8 @@ public class EmissionConfig {
     return EmissionParameters.of().addFeeds(mapFeeds(c)).withCar(mapCar(c)).build();
   }
 
-  private static EmissionViechleParameters mapCar(NodeAdapter c) {
-    return new EmissionViechleParameters(
+  private static EmissionVehicleParameters mapCar(NodeAdapter c) {
+    return new EmissionVehicleParameters(
       c
         .of("carAvgCo2PerKm")
         .since(V2_5)

@@ -13,14 +13,14 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class EmissionParameters {
 
   public static final EmissionParameters DEFAULT = new EmissionParameters(
-    EmissionViechleParameters.CAR_DEFAULTS,
+    EmissionVehicleParameters.CAR_DEFAULTS,
     List.of()
   );
 
-  private final EmissionViechleParameters car;
+  private final EmissionVehicleParameters car;
   private final List<EmissionFeedParameters> feeds;
 
-  public EmissionParameters(EmissionViechleParameters car, List<EmissionFeedParameters> feeds) {
+  public EmissionParameters(EmissionVehicleParameters car, List<EmissionFeedParameters> feeds) {
     this.car = car;
     this.feeds = List.copyOf(feeds);
   }
@@ -33,7 +33,7 @@ public class EmissionParameters {
     return new Builder(DEFAULT);
   }
 
-  public EmissionViechleParameters car() {
+  public EmissionVehicleParameters car() {
     return car;
   }
 
@@ -65,7 +65,7 @@ public class EmissionParameters {
   @Override
   public String toString() {
     return ToStringBuilder.of(EmissionParameters.class)
-      .addObj("car", car, EmissionViechleParameters.CAR_DEFAULTS)
+      .addObj("car", car, EmissionVehicleParameters.CAR_DEFAULTS)
       .addCol("fedds", feeds)
       .toString();
   }
@@ -73,7 +73,7 @@ public class EmissionParameters {
   public static class Builder {
 
     private EmissionParameters origin;
-    private EmissionViechleParameters car;
+    private EmissionVehicleParameters car;
     private List<EmissionFeedParameters> feeds = new ArrayList<>();
 
     public Builder(EmissionParameters origin) {
@@ -86,7 +86,7 @@ public class EmissionParameters {
       return this;
     }
 
-    public Builder withCar(EmissionViechleParameters car) {
+    public Builder withCar(EmissionVehicleParameters car) {
       this.car = car;
       return this;
     }
