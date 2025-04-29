@@ -538,14 +538,10 @@ class GraphQLIntegrationTest {
   }
 
   private static FareProduct fareProduct(String name) {
-    return new FareProduct(
-      id(name),
-      name,
-      Money.euros(10),
-      null,
-      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
-      new FareMedium(id("oyster"), "TfL Oyster Card")
-    );
+    return FareProduct.of(id(name), name, Money.euros(10))
+      .withCategory(new RiderCategory(id("senior-citizens"), "Senior citizens", null))
+      .withMedium(new FareMedium(id("oyster"), "TfL Oyster Card"))
+      .build();
   }
 
   /**

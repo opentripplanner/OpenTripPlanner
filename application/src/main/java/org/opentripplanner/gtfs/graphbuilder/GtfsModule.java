@@ -370,51 +370,6 @@ public class GtfsModule implements GraphBuilderModule {
       }
     }
 
-    for (ShapePoint shapePoint : store.getAllEntitiesForType(ShapePoint.class)) {
-      shapePoint.getShapeId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (Route route : store.getAllEntitiesForType(Route.class)) {
-      route.getId().setAgencyId(reader.getDefaultAgencyId());
-      generateRouteColor(route);
-    }
-    for (Stop stop : store.getAllEntitiesForType(Stop.class)) {
-      stop.getId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (Trip trip : store.getAllEntitiesForType(Trip.class)) {
-      trip.getId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (ServiceCalendar serviceCalendar : store.getAllEntitiesForType(ServiceCalendar.class)) {
-      serviceCalendar.getServiceId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (ServiceCalendarDate serviceCalendarDate : store.getAllEntitiesForType(
-      ServiceCalendarDate.class
-    )) {
-      serviceCalendarDate.getServiceId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (FareAttribute fareAttribute : store.getAllEntitiesForType(FareAttribute.class)) {
-      fareAttribute.getId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (var fareProduct : store.getAllEntitiesForType(FareProduct.class)) {
-      fareProduct.getId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (var transferRule : store.getAllEntitiesForType(FareTransferRule.class)) {
-      if (transferRule.getFareProductId() != null) {
-        transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
-      }
-      if (transferRule.getFromLegGroupId() != null) {
-        transferRule.getFromLegGroupId().setAgencyId(reader.getDefaultAgencyId());
-      }
-      if (transferRule.getToLegGroupId() != null) {
-        transferRule.getToLegGroupId().setAgencyId(reader.getDefaultAgencyId());
-      }
-    }
-    for (var transferRule : store.getAllEntitiesForType(FareLegRule.class)) {
-      transferRule.getFareProductId().setAgencyId(reader.getDefaultAgencyId());
-    }
-    for (Pathway pathway : store.getAllEntitiesForType(Pathway.class)) {
-      pathway.getId().setAgencyId(reader.getDefaultAgencyId());
-    }
-
     store.close();
     return store.dao;
   }

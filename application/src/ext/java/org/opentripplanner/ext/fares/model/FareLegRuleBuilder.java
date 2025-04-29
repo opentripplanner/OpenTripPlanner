@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.util.Collection;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -12,10 +13,10 @@ public class FareLegRuleBuilder {
   private final FeedScopedId id;
   private final Collection<FareProduct> fareProducts;
   private FeedScopedId legGroupId;
-  private String networkId;
-  private String fromAreaId;
+  private FeedScopedId networkId;
+  private FeedScopedId fromAreaId;
+  private FeedScopedId toAreaId;
   private FareDistance fareDistance = null;
-  private String toAreaId;
 
   public FareLegRuleBuilder(FeedScopedId id, Collection<FareProduct> products) {
     this.id = id;
@@ -27,12 +28,12 @@ public class FareLegRuleBuilder {
     return this;
   }
 
-  public FareLegRuleBuilder withNetworkId(String networkId) {
+  public FareLegRuleBuilder withNetworkId(FeedScopedId networkId) {
     this.networkId = networkId;
     return this;
   }
 
-  public FareLegRuleBuilder withFromAreaId(String fromAreaId) {
+  public FareLegRuleBuilder withFromAreaId(FeedScopedId fromAreaId) {
     this.fromAreaId = fromAreaId;
     return this;
   }
@@ -42,7 +43,7 @@ public class FareLegRuleBuilder {
     return this;
   }
 
-  public FareLegRuleBuilder withToAreaId(String toAreaId) {
+  public FareLegRuleBuilder withToAreaId(FeedScopedId toAreaId) {
     this.toAreaId = toAreaId;
     return this;
   }
