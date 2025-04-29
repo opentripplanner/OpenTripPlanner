@@ -481,7 +481,7 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this  be recoverable?
+      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this be recoverable?
     ) {
       LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",
