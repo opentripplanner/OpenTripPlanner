@@ -82,6 +82,10 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{a: true, b: false}",
       subject().addBool("a", true).addBool("b", false).toString()
     );
+    assertEquals("ToStringBuilderTest{}", subject().addBool("x", false, false).toString());
+    assertEquals("ToStringBuilderTest{x: false}", subject().addBool("x", false, true).toString());
+    assertEquals("ToStringBuilderTest{x: true}", subject().addBool("x", true, false).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addBool("x", true, true).toString());
   }
 
   @Test

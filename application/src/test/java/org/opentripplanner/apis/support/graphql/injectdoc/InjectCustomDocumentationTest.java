@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.support.graphql.injectdoc;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.google.common.truth.Truth.assertThat;
 
 import graphql.schema.Coercing;
 import graphql.schema.GraphQLScalarType;
@@ -25,11 +25,6 @@ import org.opentripplanner._support.text.TextAssertions;
  * new schema to an SDL text string. The result is then compared to the
  * "expected" SDL file. The input and expected files are found in the
  * resources - with the same name as this test.
- * <p>
- * Note! There is a bug in the Java GraphQL library. Existing deprecated reasons
- * cannot be changed or replaced. This test adds test-cases for this, but excludes
- * them from the expected result. If this is fixed in the GraphQL library, this
- * test will fail, and should be updated by updating the expected result.
  */
 class InjectCustomDocumentationTest {
 
@@ -109,16 +104,7 @@ class InjectCustomDocumentationTest {
       .filter(it -> !result.contains(it))
       .toList();
 
-    // There is a bug in the Java GraphQL API, existing deprecated
-    // doc is not updated or replaced.
-    var expected = List.of(
-      "AEnum.E3.deprecated",
-      "BType.a.deprecated",
-      "CType.b.deprecated.append",
-      "InputType.c.deprecated"
-    );
-
-    assertEquals(expected, missingValues);
+    assertThat(missingValues).isEmpty();
 
     TextAssertions.assertLinesEquals(sdlExpected, result);
   }

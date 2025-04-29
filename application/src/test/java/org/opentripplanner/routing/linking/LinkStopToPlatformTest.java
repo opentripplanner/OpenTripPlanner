@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.test.support.GeoJsonIo;
@@ -46,14 +47,15 @@ public class LinkStopToPlatformTest {
     var deduplicator = new Deduplicator();
     var siteRepository = new SiteRepository();
     Graph graph = new Graph(deduplicator);
+    var vertexFactory = new VertexFactory(graph);
+
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     ArrayList<IntersectionVertex> vertices = new ArrayList<>();
     Coordinate[] closedGeom = new Coordinate[platform.length + 1];
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      var vertex = new LabelledIntersectionVertex(String.valueOf(i), c.x, c.y, false, false);
-      graph.addVertex(vertex);
+      var vertex = vertexFactory.intersection(String.valueOf(i), c.x, c.y);
       vertices.add(vertex);
       closedGeom[i] = c;
     }
@@ -109,8 +111,7 @@ public class LinkStopToPlatformTest {
     graph.index(timetableRepository.getSiteRepository());
 
     for (RegularStop s : transitStops) {
-      var v = TransitStopVertex.of().withStop(s).build();
-      graph.addVertex(v);
+      vertexFactory.transitStop(TransitStopVertex.of().withStop(s));
     }
 
     return graph;
@@ -209,6 +210,43 @@ public class LinkStopToPlatformTest {
     linkStops(graph, 100, true);
 
     // stop links to a existing vertex with 2 edges
+    assertEquals(10, graph.getEdges().size());
+  }
+
+  /**
+   * Link an interior vertex which is very close to a visibility vertex by
+   * calling directly addPermanentAreaVertex used in boarding location linking
+   * A connecting edge pair is created despite of the small distance
+   */
+  @Test
+  void testAddPermanentAreaVertex() {
+    Coordinate[] platform = {
+      new Coordinate(10, 60.002),
+      new Coordinate(10.004, 60.002),
+      new Coordinate(10.004, 60),
+      new Coordinate(10, 60),
+    };
+    // add one entrance to bottom left corner
+    int[] visibilityPoints = { 3 };
+
+    // No stops
+    Coordinate[] stops = {};
+
+    Graph graph = prepareTest(platform, visibilityPoints, stops);
+
+    // dig up the AreaGroup
+    AreaGroup ag = null;
+    var edge = graph.getEdges().stream().findFirst().get();
+    if (edge instanceof AreaEdge ae) {
+      ag = ae.getArea();
+    }
+    assertNotNull(ag);
+
+    var vertexFactory = new VertexFactory(graph);
+    var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
+    graph.getLinker().addPermanentAreaVertex(v, ag);
+
+    // vertex links to the single visibility point with 2 edges
     assertEquals(10, graph.getEdges().size());
   }
 
