@@ -5,7 +5,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.utils.lang.Sandbox;
 
 /**
- * A service for getting emission.                                                                                                                                                                                                                                                               emissions information for routes.
+ * A service for getting emissions.
  */
 @Sandbox
 public interface EmissionService {
@@ -13,8 +13,8 @@ public interface EmissionService {
    * Calculate the passenger emission for car for a given distance. The calculation is based on the
    * configured number of people in the car and the average car emissions.
    *
-   * @return The emissions per passanger for the whole given distance. {@link Emission#ZERO} is
-   * retuned if no emission exist.
+   * @return The emissions per passenger for the whole given distance. {@link Emission#ZERO} is
+   * returned if no emission exist.
    */
   Emission calculateCarPassengerEmission(double distanceMeters);
 
@@ -23,7 +23,7 @@ public interface EmissionService {
    * to stop ]. The service implementation will decide which of the two calculation methods
    * is used.
    *
-   * @return The emissions per passanger for the whole. {@link Emission#ZERO} is retuned if no
+   * @return The emissions per passenger for the whole. {@link Emission#ZERO} is returned if no
    * emission exist.
    */
   Emission calculateTransitPassengerEmissionForTripLeg(

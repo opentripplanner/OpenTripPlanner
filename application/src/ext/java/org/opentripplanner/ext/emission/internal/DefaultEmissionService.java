@@ -29,13 +29,13 @@ public class DefaultEmissionService implements EmissionService {
     int alightStopPosInPattern,
     double distance_m
   ) {
-    // Calculate emissions based on average passenger emisions for the route
+    // Calculate emissions based on average passenger emissions for the route
     var value = emissionRepository.routePassengerEmissionsPerMeter(trip.getRoute().getId());
     if (!value.isZero()) {
       return value.multiply(distance_m);
     }
 
-    // Calculate emissions based the emisions for each section of a trip, if not found
+    // Calculate emissions based the emissions for each section of a trip, if not found
     // zero is returned.
     var emission = emissionRepository.tripPatternEmissions(trip.getId());
     if (emission != null) {

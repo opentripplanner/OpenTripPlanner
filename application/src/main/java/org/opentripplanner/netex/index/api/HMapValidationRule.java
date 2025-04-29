@@ -21,8 +21,8 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
  */
 public interface HMapValidationRule<K, V> {
   /**
-   * Validate and return status, the caller will take the appropriate acction according to  the
-   * retuned status.
+   * Validate and return status, the caller will take the appropriate acction according to the
+   * returned status.
    */
   Status validate(V value);
 

@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public interface EmissionRepository extends Serializable {
   /**
-   * Return the configured average emisions per meter. If not set ZERO is retuned.
+   * Return the configured average emissions per meter. If not set ZERO is returned.
    */
   Emission carAvgPassengerEmissionPerMeter();
 
@@ -27,7 +27,7 @@ public interface EmissionRepository extends Serializable {
 
   /**
    * Return emissions for all legs/sections in the trip pattern for a given trip. The same
-   * trip-pattern may have multiple diffrent emissions depending on the vehicle(s) operating the
+   * trip-pattern may have multiple different emissions depending on the vehicle(s) operating the
    * trip on a given date, but OTP does not keep information about the vehicles, so we calculate
    * the average emissions for each leg for a given trip.
    */

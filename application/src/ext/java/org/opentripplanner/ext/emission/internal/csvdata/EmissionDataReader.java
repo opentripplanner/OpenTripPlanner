@@ -48,7 +48,7 @@ public class EmissionDataReader {
     );
     if (emissionDataSource.exists()) {
       var progress = ProgressTracker.track("Read " + emissionDataSource.name(), 10_000, -1);
-      // Assume input CO₂ emission data is Route avarage data
+      // Assume input CO₂ emission data is Route average data
       var routeReader = new RouteDataReader(emissionDataSource, issueStore);
       this.emissionRepository.addRouteEmissions(
           routeReader.read(resolvedFeedId, () -> logProgress(progress))
