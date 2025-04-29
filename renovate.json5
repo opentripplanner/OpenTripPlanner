@@ -149,6 +149,7 @@
         "com.google.guava:guava",
         "com.google.cloud:libraries-bom",
         "com.google.protobuf:protobuf-java",
+        "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
         "com.fasterxml.jackson.core:{/,}**",
