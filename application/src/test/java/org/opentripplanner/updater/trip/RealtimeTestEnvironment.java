@@ -53,7 +53,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     );
     var service = new DefaultTransitService(
       timetableRepository,
-      snapshotManager.getTimetableSnapshot()
+      snapshotManager.getTimetableSnapshotBuffer()
     );
     var tripPatternCache = new TripPatternCache(new TripPatternIdGenerator(), service::findPattern);
     siriAdapter = new SiriRealTimeTripUpdateAdapter(

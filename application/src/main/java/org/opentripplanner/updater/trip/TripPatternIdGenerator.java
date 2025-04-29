@@ -9,10 +9,10 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
  * This class generates new unique IDs for TripPatterns created in response to real-time updates
- * from the SIRI updaters. In non-test usage it is important to create only one instance of this
+ * from the updaters. In non-test usage it is important to create only one instance of this
  * class, and inject that single instance wherever it is needed. However, this single-instance
  * usage pattern is not enforced due to differing needs in tests.
- * The ID generation is threadsafe, even if that is probably not needed.
+ * The ID generation is thread-safe, even if that is probably not needed.
  */
 public class TripPatternIdGenerator {
 

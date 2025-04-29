@@ -58,6 +58,10 @@ public abstract class TransitModule {
     return manager.getTimetableSnapshot();
   }
 
+  /**
+   * Provide the cache for both SIRI and GTFS-RT to make sure that trip patterns derived from
+   * real time updates are not created repeatedly.
+   */
   @Provides
   @Singleton
   public static TripPatternCache tripPatternCache(
