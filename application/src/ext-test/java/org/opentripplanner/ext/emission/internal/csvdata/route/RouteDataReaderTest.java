@@ -13,7 +13,7 @@ import org.opentripplanner.utils.lang.IntBox;
 
 class RouteDataReaderTest implements EmissionTestData {
 
-  // We explicit set the feed-id in this test, we do NOT use the feed-id in the teed-info.txt.
+  // We explicit set the feed-id in this test, we do NOT use the feed-id in the feed-info.txt.
   // This way, we test that the feed-id can be overridden.
   private static final String FEED_ID = "F";
   private static final FeedScopedId ROUTE_D_1001 = new FeedScopedId(
@@ -63,7 +63,7 @@ class RouteDataReaderTest implements EmissionTestData {
   }
 
   @Test
-  void handleMissingDdataSource() {
+  void handleMissingDataSource() {
     var lineCounter = new IntBox(0);
     var subject = new RouteDataReader(emissionMissingFile(), issueStore);
 
@@ -74,7 +74,7 @@ class RouteDataReaderTest implements EmissionTestData {
   }
 
   @Test
-  void ignoreDataSourceIfHeadersDoesNotMatch() {
+  void ignoreDataSourceIfHeadersDoNotMatch() {
     var lineCounter = new IntBox(0);
     var subject = new RouteDataReader(emissionOnTripLegs(), issueStore);
 

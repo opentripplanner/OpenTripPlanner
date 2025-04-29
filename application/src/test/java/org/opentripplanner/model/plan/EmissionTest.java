@@ -30,14 +30,14 @@ class EmissionTest {
 
   @Test
   void multiply() {
-    double scalar = 1.5;
-    assertEquals(Emission.co2_g(VALUE * scalar), subject.multiply(scalar));
+    double multiplier = 1.5;
+    assertEquals(Emission.co2_g(VALUE * multiplier), subject.multiply(multiplier));
   }
 
   @Test
   void dividedBy() {
-    double scalar = 1.5;
-    assertEquals(Emission.co2_g(VALUE / scalar), subject.dividedBy(scalar));
+    double divisor = 1.5;
+    assertEquals(Emission.co2_g(VALUE / divisor), subject.dividedBy(divisor));
   }
 
   @Test

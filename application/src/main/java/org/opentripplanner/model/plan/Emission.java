@@ -38,17 +38,17 @@ public final class Emission implements Serializable {
   }
 
   /**
-   * Multiply all emissions with the given scalar and return the new product.
+   * Multiply all emissions with the given {@code multiplier} and return the new product.
    */
-  public Emission multiply(double scalar) {
-    return new Emission(co2.multiply(scalar));
+  public Emission multiply(double multiplier) {
+    return new Emission(co2.multiply(multiplier));
   }
 
   /**
-   * Devide all emissions by the given scalar and return the new result.
+   * Devide all emissions by the given {@code divisor} and return the new result.
    */
-  public Emission dividedBy(double scalar) {
-    return new Emission(co2.dividedBy(scalar));
+  public Emission dividedBy(double divisor) {
+    return new Emission(co2.dividedBy(divisor));
   }
 
   public boolean isZero() {

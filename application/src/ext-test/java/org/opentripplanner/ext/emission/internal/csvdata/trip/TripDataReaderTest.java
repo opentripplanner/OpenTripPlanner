@@ -47,7 +47,7 @@ class TripDataReaderTest implements EmissionTestData {
   }
 
   @Test
-  void handleMissingDdataSource() {
+  void handleMissingDataSource() {
     var stepCounter = new IntBox(0);
     var subject = new TripDataReader(emissionMissingFile(), issueStore);
 
@@ -58,7 +58,7 @@ class TripDataReaderTest implements EmissionTestData {
   }
 
   @Test
-  void ignoreDataSourceIfHeadersDoesNotMatch() {
+  void ignoreDataSourceIfHeadersDoNotMatch() {
     var stepCounter = new IntBox(0);
     var subject = new TripDataReader(emissionOnRoutes(), issueStore);
 

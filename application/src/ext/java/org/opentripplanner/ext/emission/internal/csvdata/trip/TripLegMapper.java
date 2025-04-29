@@ -38,7 +38,7 @@ public class TripLegMapper {
       var b = builders.computeIfAbsent(tripId, id ->
         new EmissionAggregator(tripId, stopsByTripId.get(tripId))
       );
-      b.mergeEmissionForleg(row);
+      b.mergeEmissionsForleg(row);
     }
 
     var map = new HashMap<FeedScopedId, TripPatternEmission>();

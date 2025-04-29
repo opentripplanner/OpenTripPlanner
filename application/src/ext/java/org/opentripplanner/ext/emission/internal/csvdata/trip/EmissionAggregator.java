@@ -49,7 +49,7 @@ class EmissionAggregator {
     }
   }
 
-  EmissionAggregator mergeEmissionForleg(TripLegsRow row) {
+  EmissionAggregator mergeEmissionsForleg(TripLegsRow row) {
     if (stops == null) {
       return this;
     }

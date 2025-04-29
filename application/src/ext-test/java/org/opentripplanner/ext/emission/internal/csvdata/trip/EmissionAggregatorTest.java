@@ -47,9 +47,9 @@ class EmissionAggregatorTest {
 
   @Test
   void mergeAFewRowsOk() {
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_B_ID, 2, Gram.of(7.0)));
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 3, Gram.of(10.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_B_ID, 2, Gram.of(7.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 3, Gram.of(10.0)));
 
     assertTrue(subject.validate(), () -> subject.listIssues().toString());
     assertEquals(List.of(), subject.listIssues());
@@ -63,8 +63,8 @@ class EmissionAggregatorTest {
   @Test
   void mergeWithMissingLegs() {
     // Add same row twice, but no row for 2nd and 3rd leg
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(2.5)));
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.5)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(2.5)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.5)));
 
     assertFalse(subject.validate());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
@@ -85,9 +85,9 @@ class EmissionAggregatorTest {
   @Test
   void mergeWithStopIdMissmatch() {
     // Stop B and C are switched
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 2, Gram.of(7.0)));
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_B_ID, 3, Gram.of(10.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 2, Gram.of(7.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_B_ID, 3, Gram.of(10.0)));
 
     assertFalse(subject.validate());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
@@ -107,8 +107,8 @@ class EmissionAggregatorTest {
 
   @Test
   void mergeWithStopIndexOutOfBound() {
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 0, Gram.of(3.0)));
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 4, Gram.of(3.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 0, Gram.of(3.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 4, Gram.of(3.0)));
 
     assertFalse(subject.validate());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
@@ -129,7 +129,7 @@ class EmissionAggregatorTest {
     subject = new EmissionAggregator(FEED_SCOPED_TRIP_ID, null);
 
     // Make sure mapping does not fail
-    subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, -1, Gram.of(3.0)));
+    subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, -1, Gram.of(3.0)));
 
     assertFalse(subject.validate());
     assertEquals(1, subject.listIssues().size(), () -> subject.listIssues().toString());
@@ -150,7 +150,7 @@ class EmissionAggregatorTest {
   void addRowsAfterValidationIsCalled() {
     subject.validate();
     var ex = assertThrows(IllegalStateException.class, () ->
-      subject.mergeEmissionForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(2.5)))
+      subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(2.5)))
     );
     assertEquals("Rows can not be added after validate() is called.", ex.getMessage());
   }

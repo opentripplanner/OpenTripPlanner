@@ -359,7 +359,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    // TODO - Use itineraryBuilder() here not build() and compleate building the itinerary using
+    // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
     //        the ItineraryBuilder and not going back and forth between the Itinerary and the
     //        builder.
     var i1 = newItinerary(A, T11_00)

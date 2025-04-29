@@ -80,7 +80,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     var rLeg = rail.legs().getFirst();
     assertTrue(
       hopEmissions.size() >= rLeg.alightStopPosInPattern(),
-      "The list of emmisions must be long enough, at least >= alightStopPosInPattern."
+      "The list of emissions must be long enough, at least >= alightStopPosInPattern."
     );
 
     for (int i = rLeg.boardStopPosInPattern(); i < rLeg.alightStopPosInPattern(); ++i) {

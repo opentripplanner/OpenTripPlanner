@@ -56,7 +56,7 @@ class RoutingResult {
    * filter chain is the main place to add decorating filters. This is ment to extend/support the
    * router logic - maybe compansate for diffrences in the specific routers. For example setting
    * the {@code generalizedCost2} for direct FLEX results, to allow them to be compared with
-   * transit results where the transit router alreaddy calculated the {@code generalizedCost2}
+   * transit results where the transit router already calculated the {@code generalizedCost2}
    * value. This should not be used for things like fares witch is just adding more info to the
    * itineraries, this should be done in the filter chain. Another way to look at it is to use
    * this for services witch must allways run, while the filter-chain is for configurable

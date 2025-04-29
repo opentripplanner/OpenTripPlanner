@@ -61,20 +61,20 @@ public final class Gram implements Serializable, Comparable<Gram> {
     return new Gram(this.value + g.value);
   }
 
-  public Gram multiply(long factor) {
-    return new Gram(this.value * factor);
+  public Gram multiply(long multiplier) {
+    return new Gram(this.value * multiplier);
   }
 
-  public Gram multiply(double factor) {
-    return ofPrecisionDouble(this.value * factor);
+  public Gram multiply(double multiplier) {
+    return ofPrecisionDouble(this.value * multiplier);
   }
 
-  public Gram dividedBy(long scalar) {
-    return ofPrecisionDouble(value / (double) scalar);
+  public Gram dividedBy(long divisor) {
+    return ofPrecisionDouble(value / (double) divisor);
   }
 
-  public Gram dividedBy(double scalar) {
-    return ofPrecisionDouble(this.value / scalar);
+  public Gram dividedBy(double divisor) {
+    return ofPrecisionDouble(this.value / divisor);
   }
 
   @Override
