@@ -84,7 +84,7 @@ class EmissionAggregator {
     var stop = stops.get(row.boardStopPosInPattern());
     // Ignore feed id when comparing stopId
     if (!stop.getId().getId().equals(row.fromStopId())) {
-      addEmissionStopIdMissmatchIssue(row);
+      addEmissionStopIdMismatchIssue(row);
       return false;
     }
     return true;
@@ -193,10 +193,10 @@ class EmissionAggregator {
     );
   }
 
-  private void addEmissionStopIdMissmatchIssue(TripLegsRow row) {
+  private void addEmissionStopIdMismatchIssue(TripLegsRow row) {
     issues.add(
       OtpError.of(
-        "EmissionStopIdMissmatch",
+        "EmissionStopIdMismatch",
         "Emission 'from_stop_id'(%s) not found in stop pattern for trip(%s): %s",
         row.fromStopId(),
         tripId,

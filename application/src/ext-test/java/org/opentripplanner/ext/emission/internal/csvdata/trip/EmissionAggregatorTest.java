@@ -83,7 +83,7 @@ class EmissionAggregatorTest {
   }
 
   @Test
-  void mergeWithStopIdMissmatch() {
+  void mergeWithStopIdMismatch() {
     // Stop B and C are switched
     subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
     subject.mergeEmissionsForleg(new TripLegsRow(TRIP_ID, STOP_C_ID, 2, Gram.of(7.0)));
@@ -92,12 +92,12 @@ class EmissionAggregatorTest {
     assertFalse(subject.validate());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
-      "EmissionStopIdMissmatch(Emission 'from_stop_id'(C) not found in stop pattern for trip(E:T:1): " +
+      "EmissionStopIdMismatch(Emission 'from_stop_id'(C) not found in stop pattern for trip(E:T:1): " +
       "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
-      "EmissionStopIdMissmatch(Emission 'from_stop_id'(B) not found in stop pattern for trip(E:T:1): " +
+      "EmissionStopIdMismatch(Emission 'from_stop_id'(B) not found in stop pattern for trip(E:T:1): " +
       "TripLegsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10g])",
       subject.listIssues().get(1).toString()
     );
