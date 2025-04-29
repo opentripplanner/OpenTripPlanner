@@ -39,15 +39,15 @@ public class EmissionGraphBuilderTest implements EmissionTestData {
     );
     subject.buildGraph();
     assertEquals(
-      Emission.co2_g(.006),
+      Emission.ofCo2Gram(.006),
       emissionRepository.routePassengerEmissionsPerMeter(ROUTE_ID_GD_1001)
     );
     assertEquals(
-      Emission.co2_g(0.041),
+      Emission.ofCo2Gram(0.041),
       emissionRepository.routePassengerEmissionsPerMeter(ROUTE_ID_GZ_1002)
     );
     assertEquals(
-      Emission.co2_g(0.006),
+      Emission.ofCo2Gram(0.006),
       emissionRepository.routePassengerEmissionsPerMeter(ROUTE_ID_EM_R1)
     );
   }

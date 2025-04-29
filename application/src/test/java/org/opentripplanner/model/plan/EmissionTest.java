@@ -25,19 +25,19 @@ class EmissionTest {
 
   @Test
   void plus() {
-    assertEquals(Emission.co2_g(VALUE + OTHER_VALUE), subject.plus(other));
+    assertEquals(Emission.ofCo2Gram(VALUE + OTHER_VALUE), subject.plus(other));
   }
 
   @Test
   void multiply() {
     double multiplier = 1.5;
-    assertEquals(Emission.co2_g(VALUE * multiplier), subject.multiply(multiplier));
+    assertEquals(Emission.ofCo2Gram(VALUE * multiplier), subject.multiply(multiplier));
   }
 
   @Test
   void dividedBy() {
     double divisor = 1.5;
-    assertEquals(Emission.co2_g(VALUE / divisor), subject.dividedBy(divisor));
+    assertEquals(Emission.ofCo2Gram(VALUE / divisor), subject.dividedBy(divisor));
   }
 
   @Test

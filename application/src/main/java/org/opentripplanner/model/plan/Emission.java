@@ -25,7 +25,7 @@ public final class Emission implements Serializable {
   }
 
   /** Convinience factory method for creating test data */
-  public static Emission co2_g(double co2_g) {
+  public static Emission ofCo2Gram(double co2_g) {
     return new Emission(Gram.of(co2_g));
   }
 

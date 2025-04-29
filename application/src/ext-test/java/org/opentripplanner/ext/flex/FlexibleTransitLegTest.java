@@ -40,7 +40,7 @@ class FlexibleTransitLegTest implements PlanTestConstants {
   private static final Duration TIME_SHIFT = Duration.ofHours(5);
   private static final ZonedDateTime START_TIME = ZonedDateTime.parse("2025-01-14T14:01:21+01:00");
   private static final ZonedDateTime END_TIME = START_TIME.plusHours(3);
-  private static final Emission EMISSION = Emission.co2_g(23.0);
+  private static final Emission EMISSION = Emission.ofCo2Gram(23.0);
 
   @Test
   void listsAreInitialized() {

@@ -68,14 +68,14 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
     // Set route emissions for bus - using route emission
     Map<FeedScopedId, Emission> routeEmissions = new HashMap<>();
-    routeEmissions.put(bus.legs().getFirst().route().getId(), Emission.co2_g(0.001));
+    routeEmissions.put(bus.legs().getFirst().route().getId(), Emission.ofCo2Gram(0.001));
     repository.addRouteEmissions(routeEmissions);
 
     // Set trip emissions for rail - using trip-pattern emission
     Map<FeedScopedId, TripPatternEmission> tripEmissions = new HashMap<>();
     var hopEmissions = Arrays.asList(10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
       .stream()
-      .map(Emission::co2_g)
+      .map(Emission::ofCo2Gram)
       .toList();
     var rLeg = rail.legs().getFirst();
     assertTrue(
@@ -105,8 +105,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   void decorateBusUsingRouteEmission() {
     var subject = new EmissionItineraryDecorator(emissionService);
     var it = subject.decorate(bus);
-    assertEquals(Emission.co2_g(34.5), it.emissionPerPerson());
-    assertEquals(Emission.co2_g(34.5), it.legs().getFirst().emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(34.5), it.emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(34.5), it.legs().getFirst().emissionPerPerson());
   }
 
   @Test
@@ -121,8 +121,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   void decorateCar() {
     var subject = new EmissionItineraryDecorator(emissionService);
     var it = subject.decorate(car);
-    assertEquals(Emission.co2_g(1035), it.emissionPerPerson());
-    assertEquals(Emission.co2_g(1035), it.legs().getFirst().emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(1035), it.emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(1035), it.legs().getFirst().emissionPerPerson());
   }
 
   @Test
@@ -161,6 +161,6 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   }
 
   private void assertEmission(double expectedCo2, Emission actual) {
-    assertEquals(Emission.co2_g(expectedCo2), actual);
+    assertEquals(Emission.ofCo2Gram(expectedCo2), actual);
   }
 }

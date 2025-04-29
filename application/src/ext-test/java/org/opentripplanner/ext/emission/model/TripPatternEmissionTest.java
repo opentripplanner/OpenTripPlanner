@@ -8,9 +8,9 @@ import org.opentripplanner.model.plan.Emission;
 
 class TripPatternEmissionTest {
 
-  private static final Emission EM_LEG_1 = Emission.co2_g(2.5);
-  private static final Emission EM_LEG_2 = Emission.co2_g(7.5);
-  private static final Emission EM_LEG_3 = Emission.co2_g(2.0);
+  private static final Emission EM_LEG_1 = Emission.ofCo2Gram(2.5);
+  private static final Emission EM_LEG_2 = Emission.ofCo2Gram(7.5);
+  private static final Emission EM_LEG_3 = Emission.ofCo2Gram(2.0);
   private static final Emission EM_LEG_1_2 = EM_LEG_1.plus(EM_LEG_2);
   private static final Emission EM_LEG_2_3 = EM_LEG_2.plus(EM_LEG_3);
   private static final Emission EM_LEG_1_3 = EM_LEG_1_2.plus(EM_LEG_3);

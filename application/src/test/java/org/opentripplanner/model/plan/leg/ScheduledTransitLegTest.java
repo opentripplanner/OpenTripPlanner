@@ -58,7 +58,7 @@ class ScheduledTransitLegTest {
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
   );
 
-  private static final Emission EMISSION = Emission.co2_g(23.0);
+  private static final Emission EMISSION = Emission.ofCo2Gram(23.0);
   private static final List<FareProduct> FARE_PRODUCTS = List.of(
     FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
   );

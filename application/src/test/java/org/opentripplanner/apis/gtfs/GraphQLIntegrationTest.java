@@ -391,7 +391,7 @@ class GraphQLIntegrationTest {
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emission = Emission.co2_g(123.0);
+    var emission = Emission.ofCo2Gram(123.0);
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
