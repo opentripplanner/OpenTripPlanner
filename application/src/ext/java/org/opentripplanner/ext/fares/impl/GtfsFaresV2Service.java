@@ -21,6 +21,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
@@ -31,15 +32,15 @@ public final class GtfsFaresV2Service implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(GtfsFaresV2Service.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final Multimap<FeedScopedId, String> stopAreas;
-  private final Set<String> networksWithRules;
-  private final Set<String> fromAreasWithRules;
-  private final Set<String> toAreasWithRules;
+  private final Multimap<FeedScopedId, FeedScopedId> stopAreas;
+  private final Set<FeedScopedId> networksWithRules;
+  private final Set<FeedScopedId> fromAreasWithRules;
+  private final Set<FeedScopedId> toAreasWithRules;
 
   public GtfsFaresV2Service(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
-    Multimap<FeedScopedId, String> stopAreas
+    Multimap<FeedScopedId, FeedScopedId> stopAreas
   ) {
     this.legRules = legRules;
     this.transferRules = fareTransferRules;
@@ -71,14 +72,14 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary, allLegProducts);
   }
 
-  private static Set<String> findAreasWithRules(
+  private static Set<FeedScopedId> findAreasWithRules(
     List<FareLegRule> legRules,
-    Function<FareLegRule, String> getArea
+    Function<FareLegRule, FeedScopedId> getArea
   ) {
     return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
   }
 
-  private static Set<String> findNetworksWithRules(Collection<FareLegRule> legRules) {
+  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
     return legRules
       .stream()
       .map(FareLegRule::networkId)
@@ -134,10 +135,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       feedIdsInItinerary.size() == 1 &&
-      pwt
-        .transferRules()
-        .stream()
-        .anyMatch(r -> r.fareProducts().stream().anyMatch(fp -> fp.price().isZero()))
+      pwt.transferRules().stream().anyMatch(FareTransferRule::isFree)
     );
   }
 
@@ -209,7 +207,11 @@ public final class GtfsFaresV2Service implements Serializable {
     return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 
-  private boolean matchesArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
+  private boolean matchesArea(
+    StopLocation stop,
+    FeedScopedId areaId,
+    Set<FeedScopedId> areasWithRules
+  ) {
     var stopAreas = this.stopAreas.get(stop.getId());
     return (
       (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
@@ -226,7 +228,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .getRoute()
       .getGroupsOfRoutes()
       .stream()
-      .map(group -> group.getId().getId())
+      .map(group -> group.getId())
       .filter(Objects::nonNull)
       .toList();
 
@@ -241,15 +243,15 @@ public final class GtfsFaresV2Service implements Serializable {
     // If no valid distance type is given, do not consider distances in fare computation
 
     FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops ruleDistance) {
+    if (distance instanceof FareDistance.Stops(int min, int max)) {
       var numStops = leg.getIntermediateStops().size();
-      return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
-    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance ruleDistance) {
-      var ruleMax = ruleDistance.max();
-      var ruleMin = ruleDistance.min();
+      return numStops >= min && max >= numStops;
+    } else if (
+      rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
+    ) {
       var legDistance = leg.getDirectDistanceMeters();
 
-      return legDistance > ruleMin.toMeters() && legDistance < ruleMax.toMeters();
+      return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
   }
 

@@ -16,14 +16,18 @@ import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.organization.Branding;
 
-public class RouteMapperTest {
+class RouteMapperTest {
+
+  private static final String FEED_ID = "A";
 
   private static final Agency AGENCY = new GtfsTestData().agency;
 
-  private static final AgencyAndId ROUTE_ID = new AgencyAndId("A", "1");
+  private static final AgencyAndId ROUTE_ID = new AgencyAndId(FEED_ID, "1");
 
   private static final String SHORT_NAME = "Short Name";
 
@@ -48,8 +52,10 @@ public class RouteMapperTest {
   private static final Integer SORT_ORDER = 1;
 
   private static final Route ROUTE = new Route();
+  private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
   private final RouteMapper subject = new RouteMapper(
-    new AgencyMapper(TimetableRepositoryForTest.FEED_ID),
+    ID_FACTORY,
+    new AgencyMapper(ID_FACTORY),
     DataImportIssueStore.NOOP,
     new TranslationHelper()
   );
@@ -69,14 +75,14 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void testMapCollection() throws Exception {
+  void testMapCollection() throws Exception {
     assertNull(subject.map((Collection<Route>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(ROUTE)).size());
   }
 
   @Test
-  public void testMap() throws Exception {
+  void testMap() throws Exception {
     org.opentripplanner.transit.model.network.Route result = subject.map(ROUTE);
 
     assertEquals("A:1", result.getId().toString());
@@ -98,7 +104,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void testMapWithNulls() throws Exception {
+  void testMapWithNulls() throws Exception {
     Route input = new Route();
 
     // id, agency, mode and name (short or long) is required.
@@ -127,7 +133,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapNetworkId() {
+  void mapNetworkId() {
     Route input = new Route();
 
     input.setId(ROUTE_ID);
@@ -139,8 +145,8 @@ public class RouteMapperTest {
     org.opentripplanner.transit.model.network.Route result = subject.map(input);
 
     assertEquals(
-      List.of(NETWORK_ID),
-      result.getGroupsOfRoutes().stream().map(g -> g.getId().getId()).toList()
+      List.of(new FeedScopedId(FEED_ID, NETWORK_ID)),
+      result.getGroupsOfRoutes().stream().map(AbstractTransitEntity::getId).toList()
     );
   }
 
@@ -162,7 +168,7 @@ public class RouteMapperTest {
    * Mapping the same object twice, should return the same instance.
    */
   @Test
-  public void testMapCache() throws Exception {
+  void testMapCache() throws Exception {
     org.opentripplanner.transit.model.network.Route result1 = subject.map(ROUTE);
     org.opentripplanner.transit.model.network.Route result2 = subject.map(ROUTE);
 

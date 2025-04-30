@@ -19,4 +19,4 @@ jobs:
           # remove all snapshot container images that have not been pulled for a long time
           # --keep-semver makes sure that any image with a x.y.z version scheme is unaffected by this
           pip install prune-container-repo==0.0.4
-          prune-container-repo -u ${CONTAINER_REGISTRY_USER} -r ${CONTAINER_REPO} --days=180 --keep-semver --activate
+          prune-container-repo -u ${CONTAINER_REGISTRY_USER} -r ${CONTAINER_REPO} --days=120 --keep-semver --activate

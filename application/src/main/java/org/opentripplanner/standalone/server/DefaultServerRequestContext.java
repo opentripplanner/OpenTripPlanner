@@ -61,7 +61,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   /* Optional fields */
 
   @Nullable
-  private final ItineraryDecorator emissionsItineraryDecorator;
+  private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
   private final LuceneIndex luceneIndex;
@@ -105,7 +105,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
-    @Nullable ItineraryDecorator emissionsItineraryDecorator,
+    @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable LuceneIndex luceneIndex,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
@@ -131,7 +131,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
 
     // Optional fields
-    this.emissionsItineraryDecorator = emissionsItineraryDecorator;
+    this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.luceneIndex = luceneIndex;
     this.schema = schema;
     this.sorlandsbanenService = sorlandsbanenService;
@@ -264,8 +264,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public ItineraryDecorator emissionsItineraryDecorator() {
-    return emissionsItineraryDecorator;
+  public ItineraryDecorator emissionItineraryDecorator() {
+    return emissionItineraryDecorator;
   }
 
   @Nullable
