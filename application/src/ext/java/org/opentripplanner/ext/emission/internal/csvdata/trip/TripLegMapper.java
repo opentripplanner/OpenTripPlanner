@@ -44,11 +44,12 @@ public class TripLegMapper {
     var map = new HashMap<FeedScopedId, TripPatternEmission>();
 
     for (Map.Entry<FeedScopedId, EmissionAggregator> it : builders.entrySet()) {
-      var aggregator = it.getValue();
-      if (aggregator.validate()) {
-        map.put(it.getKey(), aggregator.build());
+      var builder = it.getValue();
+      var emission = builder.build();
+      if (emission.isPresent()) {
+        map.put(it.getKey(), emission.get());
       } else {
-        aggregator.listIssues().forEach(issueStore::add);
+        issueStore.addAll(builder.listIssues());
       }
     }
     return map;

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.emission.internal.csvdata.trip;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.error.OtpError;
@@ -27,7 +28,6 @@ class EmissionAggregator {
   private final int[] counts;
   private final IntRange fromStopSequenceRange;
   private final List<OtpError> issues = new ArrayList<>();
-  private boolean semanticValidationDone = false;
 
   EmissionAggregator(FeedScopedId tripId, @Nullable List<StopLocation> stops) {
     this.tripId = tripId;
@@ -52,10 +52,6 @@ class EmissionAggregator {
   EmissionAggregator mergeEmissionsForleg(TripLegsRow row) {
     if (stops == null) {
       return this;
-    }
-
-    if (semanticValidationDone) {
-      throw new IllegalStateException("Rows can not be added after validate() is called.");
     }
 
     if (!verifyStop(row)) {
@@ -90,60 +86,23 @@ class EmissionAggregator {
     return true;
   }
 
-  TripPatternEmission build() {
+  Optional<TripPatternEmission> build() {
     if (!issues.isEmpty()) {
-      throw new IllegalStateException("Can not build when there are issues!");
+      return Optional.empty();
     }
-    if (!semanticValidationDone) {
-      throw new IllegalStateException("Forgot to call validate()?");
-    }
+    // Currently semantic rules only add warnings, not errors. Hence, no need to abort after this.
+    new SemanticValidation().verify();
 
     var agerageEmissions = new Emission[emissions.length];
     for (int i = 0; i < emissions.length; ++i) {
       agerageEmissions[i] = emissions[i].dividedBy(counts[i]);
     }
 
-    return new TripPatternEmission(Arrays.asList(agerageEmissions));
-  }
-
-  boolean validate() {
-    if (stops == null) {
-      return false;
-    }
-
-    performSemanticValidation();
-    boolean hasErrors = issues.isEmpty();
-
-    // Process warnings, but do not abort
-    warnOnDuplicates();
-
-    return hasErrors;
+    return Optional.of(new TripPatternEmission(Arrays.asList(agerageEmissions)));
   }
 
   List<OtpError> listIssues() {
     return issues;
-  }
-
-  private void performSemanticValidation() {
-    this.semanticValidationDone = true;
-    // There is no point in doing semantic validation if issues already exists.
-    if (!issues.isEmpty()) {
-      return;
-    }
-    verifyAllLegsHasEmissions();
-  }
-
-  private void verifyAllLegsHasEmissions() {
-    var buf = WordList.of();
-    for (int i = 0; i < emissions.length; ++i) {
-      if (emissions[i].isZero()) {
-        buf.add(Integer.toString(i + 1));
-      }
-    }
-    if (buf.isEmpty()) {
-      return;
-    }
-    addEmissionMissingLegIssue(buf);
   }
 
   private void warnOnMissingStopPatternForTrip() {
@@ -154,19 +113,6 @@ class EmissionAggregator {
         tripId
       )
     );
-  }
-
-  private void warnOnDuplicates() {
-    if (Arrays.stream(counts).anyMatch(i -> i > 1)) {
-      issues.add(
-        OtpError.of(
-          "EmissionTripLegDuplicates",
-          "Warn! The emission import contains duplicate rows for the same leg for trip(%s). " +
-          "An average value is used.",
-          tripId
-        )
-      );
-    }
   }
 
   private void addEmissionStopStartSeqNrIssue(TripLegsRow row) {
@@ -185,7 +131,7 @@ class EmissionAggregator {
     issues.add(
       OtpError.of(
         "EmissionMissingLeg",
-        "All legs in a trip(%s) must have an emission value. Leg number %s does not have an " +
+        "Warning! All legs in a trip(%s) should have an emission value. Hop %s does not have an " +
         "emission value.",
         tripId,
         buf.toString()
@@ -203,5 +149,45 @@ class EmissionAggregator {
         row.toString()
       )
     );
+  }
+
+  /**
+   * Perform sematic validation AFTER all data is added. Currently all sematic checks result in
+   * warings, not errors. This is put in a subclass to make sure the semantic validation is
+   * perormed once, in the build method only.
+   */
+  class SemanticValidation {
+
+    private void verify() {
+      // There is no point in doing semantic validation if issues already exists.
+      warnOnMissingHopEmissions();
+      warnOnDuplicates();
+    }
+
+    private void warnOnMissingHopEmissions() {
+      var missingHops = WordList.of();
+      for (int i = 0; i < emissions.length; ++i) {
+        if (emissions[i].isZero()) {
+          missingHops.add(Integer.toString(i + 1));
+        }
+      }
+      if (missingHops.isEmpty()) {
+        return;
+      }
+      addEmissionMissingLegIssue(missingHops);
+    }
+
+    private void warnOnDuplicates() {
+      if (Arrays.stream(counts).anyMatch(i -> i > 1)) {
+        issues.add(
+          OtpError.of(
+            "EmissionTripLegDuplicates",
+            "Warning! The emission import contains duplicate rows for the same leg for trip(%s). " +
+            "An average value is used.",
+            tripId
+          )
+        );
+      }
+    }
   }
 }
