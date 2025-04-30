@@ -9,7 +9,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * Emissions for each leg in a trip-pattern(set of trip legs). The only relationship to the
  * {@link org.opentripplanner.transit.model.network.TripPattern} class is that it has the same
  * number of legs, and you should use the {@code stopPosInPattern} to get the emissions for
- * a continious subset of legs.
+ * a continuous subset of legs.
  */
 public class TripPatternEmission {
 

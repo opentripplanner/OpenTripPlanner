@@ -162,7 +162,7 @@ class EmissionAggregator {
         OtpError.of(
           "EmissionTripLegDuplicates",
           "Warn! The emission import contains duplicate rows for the same leg for trip(%s). " +
-          "A average value is used.",
+          "An average value is used.",
           tripId
         )
       );

@@ -74,8 +74,8 @@ class EmissionAggregatorTest {
       subject.listIssues().get(0).toString()
     );
     assertEquals(
-      "EmissionTripLegDuplicates(Warn! The emission import contains duplicate rows for the same " +
-      "leg for trip(E:T:1). A average value is used.)",
+      "EmissionTripLegDuplicates(Warn! The emission import contains duplicate rows for " +
+      "the same leg for trip(E:T:1). An average value is used.)",
       subject.listIssues().get(1).toString()
     );
     var ex = assertThrows(IllegalStateException.class, () -> subject.build());
