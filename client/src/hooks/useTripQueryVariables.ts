@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { TripQueryVariables } from '../gql/graphql.ts';
+import { Locale, TripQueryVariables } from '../gql/graphql.ts';
 
 const DEFAULT_VARIABLES: TripQueryVariables = {
   from: {},
   to: {},
   dateTime: new Date().toISOString(),
+  locale: Locale.Us
 };
 
 const getInitialVariables = () => {

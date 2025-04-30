@@ -84,15 +84,15 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
       ).toLocalDate();
     } else {
       // These depend on the tripTimes array being sorted
-      var first = tripTimes.get(0);
+      var first = tripTimes.getFirst();
       this.startOfRunningPeriod = ServiceDateUtils.asDateTime(
         serviceDate,
-        first.getDepartureTime(0)
+        first.firstScheduledDepartureTime()
       ).toLocalDate();
-      var last = tripTimes.get(tripTimes.size() - 1);
+      var last = tripTimes.getLast();
       this.endOfRunningPeriod = ServiceDateUtils.asDateTime(
         serviceDate,
-        last.getArrivalTime(last.getNumStops() - 1)
+        last.lastScheduledArrivalTime()
       ).toLocalDate();
       assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }

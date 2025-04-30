@@ -70,12 +70,22 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
    * <p>
-   * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
+   * These sorted trip times are used to search for trips. OTP assumes one trip does NOT pass another
    * trip down the line.
    */
   default int sortIndex() {
     return getDepartureTime(0);
   }
+
+  /**
+   * Return the first departure time not using a flexible time window.
+   */
+  int firstScheduledDepartureTime();
+
+  /**
+   * Return the last arrival time not using a flexible time window.
+   */
+  int lastScheduledArrivalTime();
 
   /** Sort trips based on first departure time. */
   default Comparator<TripTimes> compare() {
@@ -146,7 +156,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   I18NString getHeadsign(int stop);
 
   /**
-   * Vias are an additional intermediate destinations between the given stop and the terminus, which
+   * Vias are additional intermediate destinations between the given stop and the terminus, which
    * are displayed alongside the terminus headsign. Vias often change or are displayed only at
    * certain stops along the way. While the concept of Headsigns exists in both GTFS (Headsign) and
    * Netex (DestinationDisplay), the Via concept is only present in Transmodel.

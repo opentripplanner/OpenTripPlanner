@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.ArrayUtils;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
@@ -183,6 +184,28 @@ public final class ScheduledTripTimes implements TripTimes {
   @Override
   public int sortIndex() {
     return getDepartureTime(0);
+  }
+
+  @Override
+  public int firstScheduledDepartureTime() {
+    // trips that mix fixed times and flex windows can have negative departure times
+    for (var t : departureTimes) {
+      if (t > -1) {
+        return timeShifted(t);
+      }
+    }
+    return -1;
+  }
+
+  @Override
+  public int lastScheduledArrivalTime() {
+    // trips that mix fixed times and flex windows can have negative arrival times
+    for (var t : ArrayUtils.reversedCopy(arrivalTimes)) {
+      if (t > -1) {
+        return timeShifted(t);
+      }
+    }
+    return -1;
   }
 
   @Override

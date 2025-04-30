@@ -173,4 +173,14 @@ class ScheduledTripTimesTest {
   void copyDepartureTimes() {
     assertArrayEquals(new int[] { T10_01, T11_02, T12_03 }, subject.copyDepartureTimes());
   }
+
+  @Test
+  void firstScheduledDepartureTime() {
+    assertEquals(T10_01, subject.firstScheduledDepartureTime());
+  }
+
+  @Test
+  void lastScheduledArrivalTime() {
+    assertEquals(T12_00, subject.lastScheduledArrivalTime());
+  }
 }

@@ -396,6 +396,16 @@ public final class RealTimeTripTimes implements TripTimes {
     return scheduledTripTimes.getTrip();
   }
 
+  @Override
+  public int firstScheduledDepartureTime() {
+    return scheduledTripTimes.firstScheduledDepartureTime();
+  }
+
+  @Override
+  public int lastScheduledArrivalTime() {
+    return scheduledTripTimes.lastScheduledArrivalTime();
+  }
+
   /**
    * Note: This method only applies for GTFS, not SIRI!
    * This method interpolates the times for SKIPPED stops in between regular stops since GTFS-RT
