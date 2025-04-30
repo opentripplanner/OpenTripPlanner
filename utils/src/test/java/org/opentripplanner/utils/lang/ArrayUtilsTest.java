@@ -17,7 +17,7 @@ class ArrayUtilsTest {
   }
 
   @Test
-  void reversedCopyMultipleElements(){
+  void reversedCopyMultipleElements() {
     int[] original = new int[] { 1, 3, 4 };
     int[] reversed = ArrayUtils.reversedCopy(original);
     assertEquals(4, reversed[0]);
@@ -26,7 +26,7 @@ class ArrayUtilsTest {
   }
 
   @Test
-  void reversedCopySingleElement(){
+  void reversedCopySingleElement() {
     int[] original = new int[] { 1 };
     int[] reversed = ArrayUtils.reversedCopy(original);
     assertEquals(1, reversed[0]);

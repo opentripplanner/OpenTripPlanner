@@ -133,7 +133,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void testStopUpdate() {
+  void testStopUpdate() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(3, 190);
@@ -148,7 +148,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void testPassedUpdate() {
+  void testPassedUpdate() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimesA.updateDepartureTime(0, 30);
@@ -166,7 +166,7 @@ class RealTimeTripTimesTest {
    * interpolation, since 6 would be then less than 5 due to interpolation.
    */
   @Test
-  public void testNegativeHopTimeWithStopCancellations() {
+  void testNegativeHopTimeWithStopCancellations() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.updateDepartureTime(5, 421);
@@ -193,7 +193,7 @@ class RealTimeTripTimesTest {
    * Result: Expect error before interpolation. Expect no errors, after interpolation.
    */
   @Test
-  public void testPositiveHopTimeWithStopCancellationsLate() {
+  void testPositiveHopTimeWithStopCancellationsLate() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.updateDepartureTime(5, 400);
@@ -224,7 +224,7 @@ class RealTimeTripTimesTest {
    * Result: Expect errors, but no errors after interpolation.
    */
   @Test
-  public void testPositiveHopTimeWithStopCancellationsEarly() {
+  void testPositiveHopTimeWithStopCancellationsEarly() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.updateDepartureTime(5, 300);
@@ -253,7 +253,7 @@ class RealTimeTripTimesTest {
    * interpolation.
    */
   @Test
-  public void testPositiveHopTimeWithTerminalCancellation() {
+  void testPositiveHopTimeWithTerminalCancellation() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(0);
@@ -289,7 +289,7 @@ class RealTimeTripTimesTest {
    * end terminal.
    */
   @Test
-  public void testInterpolationWithTerminalCancellation() {
+  void testInterpolationWithTerminalCancellation() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(6);
@@ -308,7 +308,7 @@ class RealTimeTripTimesTest {
    * interpolation.
    */
   @Test
-  public void testInterpolationWithMultipleStopCancellations() {
+  void testInterpolationWithMultipleStopCancellations() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(1);
@@ -342,7 +342,7 @@ class RealTimeTripTimesTest {
    * propagated delay time at 6. Expect no errors after interpolation.
    */
   @Test
-  public void testInterpolationWithMultipleStopCancellations2() {
+  void testInterpolationWithMultipleStopCancellations2() {
     var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(1);
@@ -369,7 +369,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void testNonIncreasingUpdateCrossingMidnight() {
+  void testNonIncreasingUpdateCrossingMidnight() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
@@ -379,7 +379,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void testDelay() {
+  void testDelay() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     updatedTripTimesA.updateDepartureDelay(0, 10);
     updatedTripTimesA.updateArrivalDelay(6, 13);
@@ -389,14 +389,14 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void testCancel() {
+  void testCancel() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     updatedTripTimesA.cancelTrip();
     assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
   }
 
   @Test
-  public void testNoData() {
+  void testNoData() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     updatedTripTimesA.setNoData(1);
     assertFalse(updatedTripTimesA.isNoDataStop(0));
@@ -405,7 +405,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void testRealTimeUpdated() {
+  void testRealTimeUpdated() {
     RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
     updatedTripTimesA.setRealTimeState(RealTimeState.UPDATED);
@@ -439,7 +439,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void validateNegativeDwellTime() {
+  void validateNegativeDwellTime() {
     var expMsg = "NEGATIVE_DWELL_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.";
     var tt = createInitialTripTimes();
     var updatedTt = tt.copyScheduledTimes();
@@ -457,7 +457,7 @@ class RealTimeTripTimesTest {
   }
 
   @Test
-  public void validateNegativeHopTime() {
+  void validateNegativeHopTime() {
     var expMsg = "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.";
     var tt = createInitialTripTimes();
     var updatedTt = tt.copyScheduledTimes();
@@ -472,5 +472,17 @@ class RealTimeTripTimesTest {
     assertEquals(NEGATIVE_HOP_TIME, error.code());
     assertEquals(expMsg, error.message());
     assertEquals(expMsg, ex.getMessage());
+  }
+
+  @Test
+  void firstScheduledDepartureTime() {
+    var tt = createInitialTripTimes().copyScheduledTimes();
+    assertEquals(0, tt.firstScheduledDepartureTime());
+  }
+
+  @Test
+  void lastScheduledArrivalTime() {
+    var tt = createInitialTripTimes().copyScheduledTimes();
+    assertEquals(420, tt.lastScheduledArrivalTime());
   }
 }
