@@ -6,8 +6,10 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import static org.opentripplanner.service.paging.TestPagingUtils.cleanStr;
 
 import java.time.Duration;
-import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -49,6 +51,10 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   private static final boolean ARRIVE_BY = true;
   public static final String EMPTY = "";
 
+  private static final Pattern PAGING_SEQUENCE_TIME_SHIFT_PATTERN = Pattern.compile(
+    "^(N|P)(\\d+)$"
+  );
+
   private final TestPagingModel model = TestPagingModel.testDataWithFewItinerariesCaseB();
   private TestDriver driver;
 
@@ -75,7 +81,11 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
       // test above
       Arguments.of("09:00", DEPART_AFTER, "1 N 2 N - P 2 N - P 2 P 1 N 2 N"),
       // Itineraries depart inside search-window, step NEXT 6 times
-      Arguments.of("10:00-1d", ARRIVE_BY, "3 N - N - N 2 N 1 N - N"),
+      Arguments.of(
+        "10:00-1d",
+        ARRIVE_BY,
+        String.format("3 N%d - N - N 2 N 1 N - N", 60 * 60 * 5 + 60)
+      ),
       // Itineraries depart inside search-window, step PREV 6 times
       Arguments.of("08:00+1d", ARRIVE_BY, "0 P - P - P 1 P 2 P - P"),
       // Itineraries depart inside search-window, step BACK and FORTH
@@ -92,7 +102,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void test(String edt, boolean arriveBy, String testCaseTokens) {
-    PageCursor cursor = null;
+    PageCursor cursor;
     SortOrder expectedSortOrder;
 
     int currTime = TimeUtils.time(edt);
@@ -116,24 +126,11 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
     for (var tc : testCases) {
       if (tc.gotoNewPage()) {
         if (tc.gotoPage() == NEXT_PAGE) {
-          if (arriveBy && cursor == null) {
-            if (driver.kept().size() > 0) {
-              cursor = subject.nextPageCursor();
-              Instant currTimeInstant = TestPagingModel.time(currTime);
-              currTime +=
-                driver.kept().get(0).startTimeAsInstant().getEpochSecond() -
-                currTimeInstant.getEpochSecond() +
-                60;
-            } else {
-              currTime += 60;
-            }
-          } else {
-            currTime += SEARCH_WINDOW_SEC;
-          }
           cursor = subject.nextPageCursor();
+          currTime += tc.timeShift;
         } else {
           cursor = subject.previousPageCursor();
-          currTime -= SEARCH_WINDOW_SEC;
+          currTime -= tc.timeShift;
         }
         String description = tc.testDescription();
         assertEquals(tc.gotoPage(), cursor.type(), description);
@@ -155,34 +152,42 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
     }
   }
 
-  private List<TestCase> parseTestCases(String tokens) {
-    tokens = tokens.replaceAll("\\s+", "");
+  private List<TestCase> parseTestCases(String tokensAsText) {
+    var tokens = tokensAsText.split("\\s+");
     var sequence = new StringBuilder();
-    return tokens.chars().mapToObj(ch -> parseToken(Character.toString(ch), sequence)).toList();
+    return Arrays.stream(tokens).map(token -> parseToken(token, sequence)).toList();
   }
 
   private TestCase parseToken(String token, StringBuilder sequence) {
-    switch (token) {
+    Matcher matcher = PAGING_SEQUENCE_TIME_SHIFT_PATTERN.matcher(token);
+    int timeShift = SEARCH_WINDOW_SEC;
+    String tokenWithTimeShiftRemoved = token;
+    if (matcher.matches()) {
+      tokenWithTimeShiftRemoved = matcher.group(1);
+      timeShift = Integer.parseInt(matcher.group(2));
+    }
+    switch (tokenWithTimeShiftRemoved) {
       case "-":
         sequence.append(" > -");
-        return new TestCase(sequence.substring(3), null, -1, EMPTY);
+        return new TestCase(sequence.substring(3), null, -1, EMPTY, SEARCH_WINDOW_SEC);
       case "0", "1", "2", "3":
-        sequence.append(" > ").append(token);
-        int i = Integer.parseInt(token);
+        sequence.append(" > ").append(tokenWithTimeShiftRemoved);
+        int i = Integer.parseInt(tokenWithTimeShiftRemoved);
         return new TestCase(
           sequence.substring(3),
           null,
           i,
-          cleanStr(driver.all().get(i).keyAsString())
+          cleanStr(driver.all().get(i).keyAsString()),
+          SEARCH_WINDOW_SEC
         );
       case "N":
         sequence.append(" > NEXT");
-        return new TestCase(sequence.substring(3), NEXT_PAGE, -1, EMPTY);
+        return new TestCase(sequence.substring(3), NEXT_PAGE, -1, EMPTY, timeShift);
       case "P":
         sequence.append(" > PREV");
-        return new TestCase(sequence.substring(3), PREVIOUS_PAGE, -1, EMPTY);
+        return new TestCase(sequence.substring(3), PREVIOUS_PAGE, -1, EMPTY, timeShift);
       default:
-        throw new IllegalArgumentException(token);
+        throw new IllegalArgumentException(tokenWithTimeShiftRemoved);
     }
   }
 
@@ -194,7 +199,13 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
       .collect(Collectors.joining());
   }
 
-  record TestCase(String sequence, PageType gotoPage, int expIndex, String expItinerary) {
+  record TestCase(
+    String sequence,
+    PageType gotoPage,
+    int expIndex,
+    String expItinerary,
+    int timeShift
+  ) {
     boolean gotoNewPage() {
       return gotoPage != null;
     }
