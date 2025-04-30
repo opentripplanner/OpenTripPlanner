@@ -109,8 +109,8 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (OTPFeature.Co2Emissions.isOn()) {
-      builder.withEmissions(context.emissionsItineraryDecorator());
+    if (OTPFeature.Emission.isOn()) {
+      builder.withEmissions(context.emissionItineraryDecorator());
     }
 
     if (

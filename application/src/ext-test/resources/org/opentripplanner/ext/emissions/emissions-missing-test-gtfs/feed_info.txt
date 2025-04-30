@@ -1,2 +1,0 @@
-feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version,feed_id
-emissionstest,http://www.emissionstest.fi/,fi,20230623,20230806,2023-06-23 22:42:09,emissionstest
