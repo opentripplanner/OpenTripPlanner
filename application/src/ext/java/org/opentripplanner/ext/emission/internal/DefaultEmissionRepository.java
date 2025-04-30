@@ -3,6 +3,7 @@ package org.opentripplanner.ext.emission.internal;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.emission.EmissionRepository;
+import org.opentripplanner.ext.emission.model.EmissionSummary;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
@@ -45,5 +46,13 @@ public class DefaultEmissionRepository implements EmissionRepository {
   @Override
   public void addTripPatternEmissions(Map<FeedScopedId, TripPatternEmission> tripPatternEmissions) {
     this.emissionForTripId.putAll(tripPatternEmissions);
+  }
+
+  @Override
+  public EmissionSummary summary() {
+    return new EmissionSummary(
+      emissionForRouteId.keySet().size(),
+      emissionForTripId.keySet().size()
+    );
   }
 }

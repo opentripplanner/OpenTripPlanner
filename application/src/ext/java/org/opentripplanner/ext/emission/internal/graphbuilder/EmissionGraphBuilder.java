@@ -18,11 +18,15 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class allows updating the graph with emissions data from external emissions data files.
  */
 public class EmissionGraphBuilder implements GraphBuilderModule {
+
+  private static final Logger LOG = LoggerFactory.getLogger(EmissionGraphBuilder.class);
 
   private final EmissionParameters parameters;
   private final EmissionRepository emissionRepository;
@@ -68,6 +72,8 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
       co2EmissionsDataReader.read(data.dataSource(), resolvedFeedId);
     }
+
+    logEmissionSummary();
   }
 
   private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {
@@ -76,5 +82,9 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       pattern.scheduledTripsAsStream().forEach(it -> map.put(it.getId(), pattern.getStops()));
     }
     return map;
+  }
+
+  private void logEmissionSummary() {
+    LOG.info(emissionRepository.summary().toString());
   }
 }

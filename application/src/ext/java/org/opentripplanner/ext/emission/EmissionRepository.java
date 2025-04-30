@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission;
 
 import java.io.Serializable;
 import java.util.Map;
+import org.opentripplanner.ext.emission.model.EmissionSummary;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.model.plan.Emission;
@@ -34,4 +35,9 @@ public interface EmissionRepository extends Serializable {
   TripPatternEmission tripPatternEmissions(FeedScopedId tripId);
 
   void addTripPatternEmissions(Map<FeedScopedId, TripPatternEmission> tripPatternEmissions);
+
+  /**
+   * Return emission statistics for logging.
+   */
+  EmissionSummary summary();
 }
