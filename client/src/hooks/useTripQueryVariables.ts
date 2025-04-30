@@ -5,7 +5,7 @@ const DEFAULT_VARIABLES: TripQueryVariables = {
   from: {},
   to: {},
   dateTime: new Date().toISOString(),
-  locale: Locale.Us
+  locale: Locale.Us,
 };
 
 const getInitialVariables = () => {
