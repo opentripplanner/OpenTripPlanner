@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class PageCursorFactory {
@@ -22,7 +21,7 @@ public class PageCursorFactory {
   private Duration currentSearchWindow = null;
   private boolean wholeSearchWindowUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
-  private PageCursorInput pageCursorInput = DefaultPageCursorInput.of().build();
+  private PageCursorInput pageCursorInput = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;

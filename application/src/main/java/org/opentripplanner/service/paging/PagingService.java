@@ -97,7 +97,7 @@ public class PagingService {
     }
 
     // SearchWindow cropped -> decrease search-window
-    if (pageCursorInput != null && pageCursorInput.pageCut() != null) {
+    if (pageCursorInput.pageCut() != null) {
       boolean cropSWHead = doCropSearchWindowAtTail();
       Instant rmItineraryStartTime = pageCursorInput.pageCut().startTimeAsInstant();
 
@@ -124,13 +124,13 @@ public class PagingService {
   }
 
   private Instant lastKeptDepartureTime() {
-    return pageCursorInput != null && pageCursorInput.pageCut() != null
+    return pageCursorInput.pageCut() != null
       ? pageCursorInput.pageCut().startTimeAsInstant()
       : null;
   }
 
   private Instant firstKeptDepartureTime() {
-    return pageCursorInput != null && pageCursorInput.pageCut() != null
+    return pageCursorInput.pageCut() != null
       ? pageCursorInput.pageCut().startTimeAsInstant()
       : null;
   }
@@ -188,26 +188,29 @@ public class PagingService {
       searchWindowUsed
     );
 
-    if (pageCursorInput != null) {
-      factory = factory.withPageCursorInput(pageCursorInput);
-    }
+    factory = factory.withPageCursorInput(pageCursorInput);
+
     return factory;
   }
 
   private void assertRequestPrerequisites() {
-    if (noSuccessfulTransitSearchPerformed()) {
+    if (searchWindowUsed == null) {
       throw new IllegalStateException("SearchWindow not set");
     }
     if (earliestDepartureTime == null) {
       throw new IllegalStateException("Earliest departure time not set");
     }
+    if (pageCursorInput == null) {
+      throw new IllegalStateException("Page cursor input not set");
+    }
   }
 
   /**
-   * Both SW and EDT must be available to compute paging tokens.
+   * The search window, earliest departure time, and page cursor input must be available
+   * to compute paging tokens.
    */
   private boolean noSuccessfulTransitSearchPerformed() {
-    return searchWindowUsed == null || earliestDepartureTime == null;
+    return searchWindowUsed == null || earliestDepartureTime == null || pageCursorInput == null;
   }
 
   @Override
