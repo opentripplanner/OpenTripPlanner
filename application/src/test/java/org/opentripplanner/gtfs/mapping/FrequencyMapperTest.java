@@ -32,8 +32,10 @@ public class FrequencyMapperTest {
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
   private static final TranslationHelper translationHelper = new TranslationHelper();
+  private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
   private static final TripMapper TRIP_MAPPER = new TripMapper(
-    new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, translationHelper),
+    ID_FACTORY,
+    new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
     new DirectionMapper(ISSUE_STORE),
     translationHelper
   );

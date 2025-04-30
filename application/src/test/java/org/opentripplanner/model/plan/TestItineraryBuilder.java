@@ -14,6 +14,7 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
@@ -318,12 +319,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int startTime,
     int endTime,
     Place to,
-    String networkId
+    @Nullable FeedScopedId networkId
   ) {
     Route route = RAIL_ROUTE;
     if (networkId != null) {
       var builder = RAIL_ROUTE.copy();
-      var group = GroupOfRoutes.of(new FeedScopedId(FEED_ID, networkId)).build();
+      var group = GroupOfRoutes.of(networkId).build();
       builder.getGroupsOfRoutes().add(group);
       route = builder.build();
     }

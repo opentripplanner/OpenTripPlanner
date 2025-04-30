@@ -6,6 +6,7 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.CANNOT
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN_STOP;
+import static org.opentripplanner.updater.trip.siri.support.NaturalLanguageStringHelper.getFirstStringFromList;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -26,7 +27,6 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -35,14 +35,11 @@ import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
-import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
-import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
-import uk.org.siri.siri21.NaturalLanguageStringStructure;
 import uk.org.siri.siri21.OccupancyEnumeration;
 import uk.org.siri.siri21.VehicleJourneyRef;
 import uk.org.siri.siri21.VehicleModesEnumeration;
@@ -69,6 +66,7 @@ class AddedTripBuilder {
   private final String shortName;
   private final String headsign;
   private final List<TripOnServiceDate> replacedTrips;
+  private final StopTimesMapper stopTimesMapper;
 
   AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
@@ -101,7 +99,7 @@ class AddedTripBuilder {
 
     serviceDate = entityResolver.resolveServiceDate(estimatedVehicleJourney);
 
-    shortName = getFirstNameFromList(estimatedVehicleJourney.getPublishedLineNames());
+    shortName = getFirstStringFromList(estimatedVehicleJourney.getPublishedLineNames());
 
     List<VehicleModesEnumeration> vehicleModes = estimatedVehicleJourney.getVehicleModes();
     transitMode = mapTransitMainMode(vehicleModes);
@@ -110,7 +108,7 @@ class AddedTripBuilder {
     isJourneyPredictionInaccurate = TRUE.equals(estimatedVehicleJourney.isPredictionInaccurate());
     occupancy = estimatedVehicleJourney.getOccupancy();
     cancellation = TRUE.equals(estimatedVehicleJourney.isCancellation());
-    headsign = getFirstNameFromList(estimatedVehicleJourney.getDestinationNames());
+    headsign = getFirstStringFromList(estimatedVehicleJourney.getDestinationNames());
 
     calls = CallWrapper.of(estimatedVehicleJourney);
 
@@ -120,6 +118,7 @@ class AddedTripBuilder {
     timeZone = transitService.getTimeZone();
 
     replacedTrips = getReplacedVehicleJourneys(estimatedVehicleJourney);
+    stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
   }
 
   AddedTripBuilder(
@@ -161,6 +160,7 @@ class AddedTripBuilder {
     this.headsign = headsign;
     this.replacedTrips = replacedTrips;
     this.dataSource = dataSource;
+    stopTimesMapper = new StopTimesMapper(entityResolver, timeZone);
   }
 
   Result<TripUpdate, UpdateError> build() {
@@ -196,7 +196,7 @@ class AddedTripBuilder {
     // Create the "scheduled version" of the trip
     var aimedStopTimes = new ArrayList<StopTime>();
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
-      StopTime stopTime = createStopTime(
+      StopTime stopTime = stopTimesMapper.createAimedStopTime(
         trip,
         departureDate,
         stopSequence,
@@ -337,79 +337,6 @@ class AddedTripBuilder {
     tripBuilder.withOperator(operator);
 
     return tripBuilder.build();
-  }
-
-  /**
-   * Map the call to a StopTime or return null if the stop cannot be found in the site repository.
-   */
-  private StopTime createStopTime(
-    Trip trip,
-    ZonedDateTime departureDate,
-    int stopSequence,
-    CallWrapper call,
-    boolean isFirstStop,
-    boolean isLastStop
-  ) {
-    RegularStop stop = entityResolver.resolveQuay(call.getStopPointRef());
-    if (stop == null) {
-      return null;
-    }
-
-    StopTime stopTime = new StopTime();
-    stopTime.setStopSequence(stopSequence);
-    stopTime.setTrip(trip);
-    stopTime.setStop(stop);
-
-    // Fallback to other time, if one doesn't exist
-    var aimedArrivalTime = call.getAimedArrivalTime() != null
-      ? call.getAimedArrivalTime()
-      : call.getAimedDepartureTime();
-
-    var aimedArrivalTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
-      departureDate,
-      aimedArrivalTime,
-      timeZone
-    );
-
-    var aimedDepartureTime = call.getAimedDepartureTime() != null
-      ? call.getAimedDepartureTime()
-      : call.getAimedArrivalTime();
-
-    var aimedDepartureTimeSeconds = ServiceDateUtils.secondsSinceStartOfService(
-      departureDate,
-      aimedDepartureTime,
-      timeZone
-    );
-
-    // Use departure time for first stop, and arrival time for last stop, to avoid negative dwell times
-    stopTime.setArrivalTime(isFirstStop ? aimedDepartureTimeSeconds : aimedArrivalTimeSeconds);
-    stopTime.setDepartureTime(isLastStop ? aimedArrivalTimeSeconds : aimedDepartureTimeSeconds);
-
-    // Update destination display
-    var destinationDisplay = getFirstNameFromList(call.getDestinationDisplaies());
-    if (!destinationDisplay.isEmpty()) {
-      stopTime.setStopHeadsign(new NonLocalizedString(destinationDisplay));
-    } else if (trip.getHeadsign() != null) {
-      stopTime.setStopHeadsign(trip.getHeadsign());
-    } else {
-      // Fallback to empty string
-      stopTime.setStopHeadsign(new NonLocalizedString(""));
-    }
-
-    // Update pickup / dropoff
-    PickDropMapper.mapPickUpType(call, stopTime.getPickupType()).ifPresent(stopTime::setPickupType);
-    PickDropMapper.mapDropOffType(call, stopTime.getDropOffType()).ifPresent(
-      stopTime::setDropOffType
-    );
-
-    return stopTime;
-  }
-
-  private static String getFirstNameFromList(List<NaturalLanguageStringStructure> names) {
-    if (names == null) {
-      return "";
-    }
-    return names.stream().findFirst().map(NaturalLanguageStringStructure::getValue).orElse("");
   }
 
   /**

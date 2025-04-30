@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.util.Collection;
 import java.util.Currency;
 import java.util.HashMap;
@@ -15,8 +13,13 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
 class FareAttributeMapper {
 
+  private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.FareAttribute, FareAttribute> mappedStops =
     new HashMap<>();
+
+  FareAttributeMapper(IdFactory idFactory) {
+    this.idFactory = idFactory;
+  }
 
   Collection<FareAttribute> map(Collection<org.onebusaway.gtfs.model.FareAttribute> allStops) {
     return MapUtils.mapToList(allStops, this::map);
@@ -32,7 +35,7 @@ class FareAttributeMapper {
       Currency.getInstance(rhs.getCurrencyType()),
       rhs.getPrice()
     );
-    FareAttributeBuilder builder = FareAttribute.of(mapAgencyAndId(rhs.getId()))
+    FareAttributeBuilder builder = FareAttribute.of(idFactory.createId(rhs.getId()))
       .setPrice(price)
       .setPaymentMethod(rhs.getPaymentMethod());
 
