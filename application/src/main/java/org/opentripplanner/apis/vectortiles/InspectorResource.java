@@ -49,8 +49,8 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * Slippy map vector tile API for rendering various graph information for inspection/debugging
  * purposes.
  */
-@Path("/routers/{ignoreRouterId}/inspector/vectortile")
-public class GraphInspectorVectorTileResource {
+@Path("/inspector/")
+public class InspectorResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
   private static final LayerParams AREA_STOPS = new LayerParams("areaStops", AreaStop);
@@ -73,18 +73,9 @@ public class GraphInspectorVectorTileResource {
   );
 
   private final OtpServerRequestContext serverContext;
-  private final String ignoreRouterId;
 
-  public GraphInspectorVectorTileResource(
-    @Context OtpServerRequestContext serverContext,
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
-  ) {
+  public InspectorResource(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
-    this.ignoreRouterId = ignoreRouterId;
   }
 
   @GET
@@ -104,7 +95,7 @@ public class GraphInspectorVectorTileResource {
       grizzlyRequest.getLocale(),
       Arrays.asList(requestedLayers.split(",")),
       DEBUG_LAYERS,
-      GraphInspectorVectorTileResource::createLayerBuilder,
+      InspectorResource::createLayerBuilder,
       serverContext
     );
   }
@@ -119,15 +110,9 @@ public class GraphInspectorVectorTileResource {
   ) {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
     List<FeedInfo> feedInfos = feedInfos();
-    List<String> rlayer = Arrays.asList(requestedLayers.split(","));
+    List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    var url = TileJson.urlWithDefaultPath(
-      uri,
-      headers,
-      rlayer,
-      ignoreRouterId,
-      "inspector/vectortile"
-    );
+    var url = TileJson.urlFromOverriddenBasePath(uri, headers, "/otp/inspector/", layers);
     return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
 
@@ -165,11 +150,7 @@ public class GraphInspectorVectorTileResource {
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    return "%s/otp/routers/%s/inspector/vectortile/%s/tilejson.json".formatted(
-        base,
-        ignoreRouterId,
-        allLayers
-      );
+    return "%s/otp/inspector/%s/tilejson.json".formatted(base, allLayers);
   }
 
   private List<FeedInfo> feedInfos() {
