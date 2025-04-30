@@ -6,7 +6,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filterchain.DeleteResultHandler;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filterchain.RoutingErrorsAttacher;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
-import org.opentripplanner.routing.algorithm.filterchain.paging.PageCursorInputAggregator;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 public class ItineraryListFilterChain {
