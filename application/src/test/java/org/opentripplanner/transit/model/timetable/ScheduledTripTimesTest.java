@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -182,5 +183,12 @@ class ScheduledTripTimesTest {
   @Test
   void lastScheduledArrivalTime() {
     assertEquals(T12_00, subject.lastScheduledArrivalTime());
+  }
+
+  @Test
+  void flexDepartureArrival() {
+    var tt = subject.copyOf(new Deduplicator()).withDepartureTimes(new int[] { -99, -99, 3 }).withArrivalTimes(new int[] { -99, -99, 3 }).build();
+    assertEquals(35961, tt.firstScheduledDepartureTime());
+    assertEquals(36063, tt.lastScheduledArrivalTime());
   }
 }
