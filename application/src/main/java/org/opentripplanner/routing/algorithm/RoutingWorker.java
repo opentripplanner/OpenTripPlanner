@@ -66,8 +66,6 @@ public class RoutingWorker {
   private PageCursorInput pageCursorInput = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
-    // Applying the page cursor modifies the request by removing the direct mode, for example.
-    // If the page cursor doesn't exist, this function does nothing.
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
