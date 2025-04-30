@@ -187,7 +187,11 @@ class ScheduledTripTimesTest {
 
   @Test
   void flexDepartureArrival() {
-    var tt = subject.copyOf(new Deduplicator()).withDepartureTimes(new int[] { -99, -99, 3 }).withArrivalTimes(new int[] { -99, -99, 3 }).build();
+    var tt = subject
+      .copyOf(new Deduplicator())
+      .withDepartureTimes(new int[] { -99, -99, 3 })
+      .withArrivalTimes(new int[] { -99, -99, 3 })
+      .build();
     assertEquals(35961, tt.firstScheduledDepartureTime());
     assertEquals(36063, tt.lastScheduledArrivalTime());
   }
