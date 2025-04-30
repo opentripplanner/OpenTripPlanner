@@ -185,8 +185,20 @@ public class PagingService {
       latestArrivalTime,
       searchWindowUsed
     );
-    // If the first search is an arrive by search, add the latest itinerary's start time to allow setting cursor information correctly
-    // for the page cursor of the next page.
+
+    handleFirstSearch(currentPageType, factory);
+
+    if (pageCursorInput != null) {
+      factory = factory.withRemovedItineraries(pageCursorInput);
+    }
+    return factory;
+  }
+
+  /**
+   * If the first search is an arrive by search, add the latest itinerary's start time
+   * to allow setting cursor information correctly for the page cursor of the next page.
+   */
+  private void handleFirstSearch(@Nullable PageType currentPageType, PageCursorFactory factory) {
     if (
       currentPageType == null &&
       PageCursorFactory.resolvePageTypeForTheFirstSearch(itinerariesSortOrder) == PREVIOUS_PAGE
@@ -199,11 +211,6 @@ public class PagingService {
         factory = factory.withFirstSearchLatestItineraryDeparture(earliestDepartureTime);
       }
     }
-
-    if (pageCursorInput != null) {
-      factory = factory.withRemovedItineraries(pageCursorInput);
-    }
-    return factory;
   }
 
   private void assertRequestPrerequisites() {
