@@ -17,8 +17,8 @@ public class TripTimeOnDateRequest {
 
   private final Set<StopLocation> stopLocations;
   private final Instant time;
-  private final FilterValues<FeedScopedId> selectAgencies;
-  private final FilterValues<FeedScopedId> selectRoutes;
+  private final FilterValues<FeedScopedId> includeAgencies;
+  private final FilterValues<FeedScopedId> includeRoutes;
   private final FilterValues<FeedScopedId> excludeAgencies;
   private final FilterValues<FeedScopedId> excludeRoutes;
   private final FilterValues<TransitMode> includeModes;
@@ -35,8 +35,8 @@ public class TripTimeOnDateRequest {
     ArrivalDeparture arrivalDeparture,
     int numberOfDepartures,
     Comparator<TripTimeOnDate> sortOrder,
-    FilterValues<FeedScopedId> selectAgencies,
-    FilterValues<FeedScopedId> selectRoutes,
+    FilterValues<FeedScopedId> includeAgencies,
+    FilterValues<FeedScopedId> includeRoutes,
     FilterValues<FeedScopedId> excludeAgencies,
     FilterValues<FeedScopedId> excludeRoutes,
     FilterValues<TransitMode> includeModes,
@@ -48,8 +48,8 @@ public class TripTimeOnDateRequest {
     this.arrivalDeparture = arrivalDeparture;
     this.numberOfDepartures = numberOfDepartures;
     this.sortOrder = Objects.requireNonNull(sortOrder);
-    this.selectAgencies = selectAgencies;
-    this.selectRoutes = selectRoutes;
+    this.includeAgencies = includeAgencies;
+    this.includeRoutes = includeRoutes;
     this.excludeAgencies = excludeAgencies;
     this.excludeRoutes = excludeRoutes;
     this.includeModes = includeModes;
@@ -68,23 +68,23 @@ public class TripTimeOnDateRequest {
     return time;
   }
 
-  public FilterValues<FeedScopedId> selectAgencies() {
-    return selectAgencies;
+  public FilterValues<FeedScopedId> includeAgencies() {
+    return includeAgencies;
   }
 
-  public FilterValues<FeedScopedId> selectRoutes() {
-    return selectRoutes;
+  public FilterValues<FeedScopedId> includeRoutes() {
+    return includeRoutes;
   }
 
-  public FilterValues<FeedScopedId> excludeAgencies() {
+  public FilterValues<FeedScopedId> excludAgencies() {
     return excludeAgencies;
   }
 
-  public FilterValues<FeedScopedId> excludeRoutes() {
+  public FilterValues<FeedScopedId> excludRoutes() {
     return excludeRoutes;
   }
 
-  public FilterValues<TransitMode> includedModes() {
+  public FilterValues<TransitMode> includeModes() {
     return includeModes;
   }
 

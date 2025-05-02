@@ -25,11 +25,11 @@ public class TripTimeOnDateMatcherFactory {
   public static Matcher<TripTimeOnDate> of(TripTimeOnDateRequest request) {
     ExpressionBuilder<TripTimeOnDate> expr = ExpressionBuilder.of();
 
-    expr.atLeastOneMatch(request.selectAgencies(), TripTimeOnDateMatcherFactory::agencyId);
-    expr.atLeastOneMatch(request.selectRoutes(), TripTimeOnDateMatcherFactory::routeId);
-    expr.atLeastOneMatch(request.includedModes(), TripTimeOnDateMatcherFactory::mode);
-    expr.matchesNone(request.excludeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
-    expr.matchesNone(request.excludeRoutes(), TripTimeOnDateMatcherFactory::routeId);
+    expr.atLeastOneMatch(request.includeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
+    expr.atLeastOneMatch(request.includeRoutes(), TripTimeOnDateMatcherFactory::routeId);
+    expr.atLeastOneMatch(request.includeModes(), TripTimeOnDateMatcherFactory::mode);
+    expr.matchesNone(request.excludAgencies(), TripTimeOnDateMatcherFactory::agencyId);
+    expr.matchesNone(request.excludRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.matchesNone(request.excludeModes(), TripTimeOnDateMatcherFactory::mode);
     return expr.build();
   }
