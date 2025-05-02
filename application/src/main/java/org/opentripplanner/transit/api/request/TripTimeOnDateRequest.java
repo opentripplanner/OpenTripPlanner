@@ -76,11 +76,11 @@ public class TripTimeOnDateRequest {
     return includeRoutes;
   }
 
-  public FilterValues<FeedScopedId> excludAgencies() {
+  public FilterValues<FeedScopedId> excludeAgencies() {
     return excludeAgencies;
   }
 
-  public FilterValues<FeedScopedId> excludRoutes() {
+  public FilterValues<FeedScopedId> excludeRoutes() {
     return excludeRoutes;
   }
 

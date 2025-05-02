@@ -28,8 +28,8 @@ public class TripTimeOnDateMatcherFactory {
     expr.atLeastOneMatch(request.includeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
     expr.atLeastOneMatch(request.includeRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.atLeastOneMatch(request.includeModes(), TripTimeOnDateMatcherFactory::mode);
-    expr.matchesNone(request.excludAgencies(), TripTimeOnDateMatcherFactory::agencyId);
-    expr.matchesNone(request.excludRoutes(), TripTimeOnDateMatcherFactory::routeId);
+    expr.matchesNone(request.excludeAgencies(), TripTimeOnDateMatcherFactory::agencyId);
+    expr.matchesNone(request.excludeRoutes(), TripTimeOnDateMatcherFactory::routeId);
     expr.matchesNone(request.excludeModes(), TripTimeOnDateMatcherFactory::mode);
     return expr.build();
   }

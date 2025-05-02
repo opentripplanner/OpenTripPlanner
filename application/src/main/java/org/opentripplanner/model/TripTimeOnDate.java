@@ -167,10 +167,16 @@ public class TripTimeOnDate {
     );
   }
 
+  /**
+   * A comparator that uses real time departure if it is available, otherwise the scheduled departure.
+   */
   public static Comparator<TripTimeOnDate> compareByRealtimeDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
   }
 
+  /**
+   * A comparator that uses the scheduled departure time only.
+   */
   public static Comparator<TripTimeOnDate> compareByScheduledDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getScheduledDeparture());
   }
@@ -185,10 +191,6 @@ public class TripTimeOnDate {
 
   public TripTimes getTripTimes() {
     return tripTimes;
-  }
-
-  public int getStopCount() {
-    return tripTimes.getNumStops();
   }
 
   public int getScheduledArrival() {
