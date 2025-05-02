@@ -8,8 +8,9 @@ import jakarta.inject.Inject;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emissions.EmissionsRepository;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -68,7 +69,7 @@ public class GraphBuilder implements Runnable {
     TimetableRepository timetableRepository,
     WorldEnvelopeRepository worldEnvelopeRepository,
     VehicleParkingRepository vehicleParkingService,
-    @Nullable EmissionsRepository emissionsRepository,
+    @Nullable EmissionRepository emissionRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     StreetLimitationParameters streetLimitationParameters,
     boolean loadStreetGraph,
@@ -90,13 +91,10 @@ public class GraphBuilder implements Runnable {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingService)
       .stopConsolidationRepository(stopConsolidationRepository)
+      .emissionRepository(emissionRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .dataSources(dataSources)
       .timeZoneId(timetableRepository.getTimeZone());
-
-    if (OTPFeature.Co2Emissions.isOn()) {
-      builder.emissionsDataModel(emissionsRepository);
-    }
 
     var factory = builder.build();
 
@@ -117,20 +115,17 @@ public class GraphBuilder implements Runnable {
     }
 
     // Consolidate stops only if a stop consolidation repo has been provided
-    if (hasTransitData && factory.stopConsolidationModule() != null) {
-      graphBuilder.addModule(factory.stopConsolidationModule());
-    }
-
     if (hasTransitData) {
+      graphBuilder.addModuleOptional(factory.stopConsolidationModule());
       graphBuilder.addModule(factory.tripPatternNamer());
-    }
+      graphBuilder.addModuleOptional(
+        factory.timeZoneAdjusterModule(),
+        timetableRepository.getAgencyTimeZones().size() > 1
+      );
 
-    if (hasTransitData && timetableRepository.getAgencyTimeZones().size() > 1) {
-      graphBuilder.addModule(factory.timeZoneAdjusterModule());
-    }
-
-    if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
-      graphBuilder.addModule(factory.osmBoardingLocationsModule());
+      if (hasOsm || graphBuilder.graph.hasStreets) {
+        graphBuilder.addModule(factory.osmBoardingLocationsModule());
+      }
     }
 
     // This module is outside the hasGTFS conditional block because it also links things like parking
@@ -152,36 +147,26 @@ public class GraphBuilder implements Runnable {
 
     if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
-      if (OTPFeature.FlexRouting.isOn()) {
-        graphBuilder.addModule(factory.areaStopsToVerticesMapper());
-      }
+      graphBuilder.addModuleOptional(factory.areaStopsToVerticesMapper(), OTPFeature.FlexRouting);
 
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.
       graphBuilder.addModule(factory.directTransferGenerator());
 
       // Analyze routing between stops to generate report
-      if (OTPFeature.TransferAnalyzer.isOn()) {
-        graphBuilder.addModule(factory.directTransferAnalyzer());
-      }
+      graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);
     }
 
     if (loadStreetGraph || hasOsm) {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
-    if (OTPFeature.Co2Emissions.isOn()) {
-      graphBuilder.addModule(factory.emissionsModule());
-    }
+    graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
 
     graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
 
-    if (config.dataImportReport) {
-      graphBuilder.addModule(factory.dataImportIssueReporter());
-    }
+    graphBuilder.addModuleOptional(factory.dataImportIssueReporter(), config.dataImportReport);
 
-    if (OTPFeature.DataOverlay.isOn()) {
-      graphBuilder.addModuleOptional(factory.dataOverlayFactory());
-    }
+    graphBuilder.addModuleOptional(factory.dataOverlayFactory(), OTPFeature.DataOverlay);
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
@@ -210,14 +195,24 @@ public class GraphBuilder implements Runnable {
     validate();
   }
 
-  private void addModule(GraphBuilderModule module) {
-    graphBuilderModules.add(module);
+  private void addModuleOptional(@Nullable GraphBuilderModule module, OTPFeature feature) {
+    addModuleOptional(module, feature.isOn());
+  }
+
+  private void addModuleOptional(@Nullable GraphBuilderModule module, boolean enabled) {
+    if (enabled) {
+      addModuleOptional(module);
+    }
   }
 
   private void addModuleOptional(@Nullable GraphBuilderModule module) {
     if (module != null) {
-      graphBuilderModules.add(module);
+      addModule(module);
     }
+  }
+
+  private void addModule(GraphBuilderModule module) {
+    graphBuilderModules.add(Objects.requireNonNull(module));
   }
 
   private boolean hasTransitData() {

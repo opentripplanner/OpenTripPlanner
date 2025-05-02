@@ -146,7 +146,7 @@ public interface OtpServerRequestContext {
   }
 
   @Nullable
-  ItineraryDecorator emissionsItineraryDecorator();
+  ItineraryDecorator emissionItineraryDecorator();
 
   @Nullable
   LuceneIndex lucenceIndex();

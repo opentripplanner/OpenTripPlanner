@@ -36,8 +36,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FeedScopedId LEG_GROUP4 = id("leg-group4");
   FeedScopedId LEG_GROUP5 = id("leg-group5");
   int ID = 100;
-  String expressNetwork = "express";
-  String localNetwork = "local";
+  FeedScopedId expressNetwork = id("express");
+  FeedScopedId localNetwork = id("local");
 
   FareProduct single = FareProduct.of(
     new FeedScopedId(FEED_ID, "single"),
@@ -99,8 +99,8 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   Place OUTER_ZONE_STOP = Place.forStop(
     testModel.stop("outer city stop").withCoordinate(2, 2).build()
   );
-  String INNER_ZONE = "inner-zone";
-  String OUTER_ZONE = "outer-zone";
+  FeedScopedId INNER_ZONE = id("inner-zone");
+  FeedScopedId OUTER_ZONE = id("outer-zone");
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(

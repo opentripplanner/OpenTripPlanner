@@ -33,6 +33,7 @@ import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 public class StopTimeMapperTest {
 
   private static final String FEED_ID = "FEED";
+  private static final IdFactory ID_FACTORY = new IdFactory(FEED_ID);
 
   private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
@@ -72,16 +73,19 @@ public class StopTimeMapperTest {
   private final SiteRepositoryBuilder siteRepositoryBuilder = SiteRepository.of();
 
   private final StopMapper stopMapper = new StopMapper(
+    ID_FACTORY,
     new TranslationHelper(),
     stationId -> null,
     siteRepositoryBuilder
   );
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
   private final LocationMapper locationMapper = new LocationMapper(
+    ID_FACTORY,
     siteRepositoryBuilder,
     DataImportIssueStore.NOOP
   );
   private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
+    ID_FACTORY,
     stopMapper,
     locationMapper,
     siteRepositoryBuilder
@@ -92,7 +96,8 @@ public class StopTimeMapperTest {
     locationMapper,
     locationGroupMapper,
     new TripMapper(
-      new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, translationHelper),
+      ID_FACTORY,
+      new RouteMapper(ID_FACTORY, new AgencyMapper(ID_FACTORY), ISSUE_STORE, translationHelper),
       new DirectionMapper(ISSUE_STORE),
       translationHelper
     ),
@@ -217,7 +222,7 @@ public class StopTimeMapperTest {
     assertInstanceOf(AreaStop.class, mapped.getStop());
     var areaStop = (AreaStop) mapped.getStop();
     assertEquals(Polygons.BERLIN, areaStop.getGeometry());
-    assertEquals("A:1", areaStop.getId().toString());
+    assertEquals("FEED:1", areaStop.getId().toString());
   }
 
   @Test
@@ -232,6 +237,6 @@ public class StopTimeMapperTest {
     assertInstanceOf(GroupStop.class, mapped.getStop());
 
     var groupStop = (GroupStop) mapped.getStop();
-    assertEquals("[RegularStop{A:1 Stop}]", groupStop.getChildLocations().toString());
+    assertEquals("[RegularStop{FEED:1 Stop}]", groupStop.getChildLocations().toString());
   }
 }
