@@ -19,7 +19,7 @@ class TripLegsParserTest {
 
   @Test
   void test() {
-    var subject = new TripLegsCsvParser(DataImportIssueStore.NOOP, CsvReader.parse(DATA));
+    var subject = new TripHopsCsvParser(DataImportIssueStore.NOOP, CsvReader.parse(DATA));
     assertTrue(subject.headersMatch());
     assertTrue(subject.hasNext());
     assertEquals(

@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
 import org.opentripplanner.utils.lang.IntRange;
 
-class TripLegsCsvParser extends AbstractCsvParser<TripHopsRow> {
+class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
 
   public static final String TRIP_ID = "trip_id";
   public static final String START_STOP_ID = "from_stop_id";
@@ -24,7 +24,7 @@ class TripLegsCsvParser extends AbstractCsvParser<TripHopsRow> {
   private static final IntRange STOP_SEQ_NR_RANGE = IntRange.ofInclusive(0, 1000);
   private static final DoubleRange CO2_RANGE = DoubleRange.of(0.0, 1_000_000_000.0);
 
-  public TripLegsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
+  public TripHopsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
     super(issueStore, reader);
   }
 
