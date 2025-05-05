@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
-import org.opentripplanner.ext.emission.internal.csvdata.trip.TripLegMapper;
+import org.opentripplanner.ext.emission.internal.csvdata.trip.TripHopMapper;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -56,7 +56,7 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     if (parameters == null) {
       return;
     }
-    var tripLegMapper = new TripLegMapper(createStopsByTripIdMap(), issueStore);
+    var tripLegMapper = new TripHopMapper(createStopsByTripIdMap(), issueStore);
     var co2EmissionsDataReader = new EmissionDataReader(
       emissionRepository,
       tripLegMapper,

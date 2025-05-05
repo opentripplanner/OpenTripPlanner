@@ -8,13 +8,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class TripLegMapper {
+public class TripHopMapper {
 
   private String currentFeedId;
   private Map<FeedScopedId, List<StopLocation>> stopsByTripId;
   private DataImportIssueStore issueStore;
 
-  public TripLegMapper(
+  public TripHopMapper(
     Map<FeedScopedId, List<StopLocation>> stopsByTripId,
     DataImportIssueStore issueStore
   ) {

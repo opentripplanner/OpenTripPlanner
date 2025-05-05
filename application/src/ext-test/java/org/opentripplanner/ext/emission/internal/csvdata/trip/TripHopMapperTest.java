@@ -14,7 +14,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-class TripLegMapperTest {
+class TripHopMapperTest {
 
   private static final String FEED_ID = "E";
   private static final String STOP_ID_A = "A";
@@ -49,7 +49,7 @@ class TripLegMapperTest {
     Map.entry(SCOPED_TRIP_ID_2, List.of(STOP_A, STOP_D))
   );
 
-  private final TripLegMapper subject = new TripLegMapper(stopsByTripId, issueStore);
+  private final TripHopMapper subject = new TripHopMapper(stopsByTripId, issueStore);
 
   @Test
   void testCaseOk() {

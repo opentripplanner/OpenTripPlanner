@@ -5,7 +5,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.route.RouteDataReader;
 import org.opentripplanner.ext.emission.internal.csvdata.trip.TripDataReader;
-import org.opentripplanner.ext.emission.internal.csvdata.trip.TripLegMapper;
+import org.opentripplanner.ext.emission.internal.csvdata.trip.TripHopMapper;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
@@ -23,14 +23,14 @@ public class EmissionDataReader {
 
   private final DataImportIssueStore issueStore;
   private final EmissionRepository emissionRepository;
-  private final TripLegMapper tripLegMapper;
+  private final TripHopMapper tripHopMapper;
 
   public EmissionDataReader(
     EmissionRepository emissionRepository,
-    TripLegMapper tripLegMapper,
+    TripHopMapper tripHopMapper,
     DataImportIssueStore issueStore
   ) {
-    this.tripLegMapper = tripLegMapper;
+    this.tripHopMapper = tripHopMapper;
     this.issueStore = issueStore;
     this.emissionRepository = emissionRepository;
   }
@@ -55,10 +55,10 @@ public class EmissionDataReader {
         );
 
       // Assume input CO₂ emission data is per trip leg
-      tripLegMapper.setCurrentFeedId(resolvedFeedId);
+      tripHopMapper.setCurrentFeedId(resolvedFeedId);
       var tripReader = new TripDataReader(emissionDataSource, issueStore);
       this.emissionRepository.addTripPatternEmissions(
-          tripLegMapper.map(tripReader.read(() -> logProgress(progress)))
+          tripHopMapper.map(tripReader.read(() -> logProgress(progress)))
         );
 
       LOG.info(progress.completeMessage());
