@@ -13,7 +13,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import jakarta.xml.bind.JAXBException;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -22,15 +21,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import javax.xml.transform.TransformerException;
+import org.opentripplanner.ext.ojp.config.TriasApiConfig;
 import org.opentripplanner.ext.ojp.id.HideFeedIdResolver;
 import org.opentripplanner.ext.ojp.id.IdResolver;
 import org.opentripplanner.ext.ojp.id.UseFeedIdResolver;
 import org.opentripplanner.ext.ojp.mapping.ErrorMapper;
+import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ojp.service.OjpService;
 import org.opentripplanner.ext.ojp.service.OjpServiceMapper;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,14 +48,14 @@ public class TriasResource {
 
   public TriasResource(@Context OtpServerRequestContext context) {
     var transitService = context.transitService();
-    var zoneId = context.triasApiConfig().timeZone().orElse(transitService.getTimeZone());
+    var zoneId = context.triasApiParameters().timeZone().orElse(transitService.getTimeZone());
     var vdvService = new OjpService(context.transitService(), context.graphFinder());
 
-    IdResolver idResolver = idResolver(context.triasApiConfig());
+    IdResolver idResolver = idResolver(context.triasApiParameters());
     this.ojpService = new OjpServiceMapper(vdvService, idResolver, zoneId);
   }
 
-  private IdResolver idResolver(TriasApiConfig triasApiConfig) {
+  private IdResolver idResolver(TriasApiParameters triasApiConfig) {
     if (triasApiConfig.hideFeedId()) {
       return new HideFeedIdResolver(triasApiConfig.hardcodedInputFeedId());
     } else {

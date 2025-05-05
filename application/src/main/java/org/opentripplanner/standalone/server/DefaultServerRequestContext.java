@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.ojp.parameters.TriasApiParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -30,7 +31,6 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.DebugUiConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
-import org.opentripplanner.standalone.config.sandbox.TriasApiConfig;
 import org.opentripplanner.street.service.StreetLimitationParametersService;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -77,7 +77,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final TraverseVisitor traverseVisitor;
 
-  private final TriasApiConfig triasApiConfig;
+  private final TriasApiParameters triasApiParameters;
 
   /* Lazy initialized fields */
 
@@ -100,7 +100,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
-    TriasApiConfig triasApiConfig,
+    TriasApiParameters triasApiParameters,
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
@@ -124,7 +124,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
-    this.triasApiConfig = triasApiConfig;
+    this.triasApiParameters = triasApiParameters;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
@@ -259,8 +259,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public TriasApiConfig triasApiConfig() {
-    return triasApiConfig;
+  public TriasApiParameters triasApiParameters() {
+    return triasApiParameters;
   }
 
   @Nullable
