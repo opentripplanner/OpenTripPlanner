@@ -30,47 +30,6 @@ the only tool for doing this is the "Graph Visualizer", which is not particularl
 and is intended for use by software developers familiar with OTP who can patch up the code as
 needed.
 
-## Debug layers
-
-OpenTripplanner has option to ease debugging problems with graph. Older option is graph visualizer.
-Which you can enable with `--visualize` parameter instead of `--server` when starting OTP. There you
-can see whole graph. You can click on edges and vertices and see the metadata. It is useful to see
-if street has expected options. And if connections are where they are expected.
-
-It can be hard to use on large graphs since, whole graph is displayed at once. And it can be hard to
-search for specific streets since only street graph is shown without the rest of information.
-
-Another option is to use debug layers, which shows extra layers on top of the
-normal [debug UI map](http://localhost:8080). If you want to see them you need to open the map layer
-selector on the top left hand side and choose the requested layer.
-
-Currently you can choose between:
-
-- Wheelchair access (which colors street edges red if they don't allow wheelchair or green
-  otherwise)
-- [Bicycle safety](Troubleshooting-Routing.md#Bicycle-safety-factor) (colors street edges based on
-  how good are for cycling [smaller is better])
-- Traversal permissions (colors street edges based on what types of transit modes are allowed to
-  travel on them (Pedestrian, cycling, car are currently supported)) Traversal permissions layer
-  also draws links from transit stops/vehicle rentals and P+R to graph. And also draws transit
-  stops, vehicle rentals and P+R vertices with different color.
-- No thru traffic - streets are colored if the edge has thru traffic restrictions (car and bicycle
-  = `red`, car only = `orange`, bicycle only = `blue`, and no-restriction = `light gray`)
-
-### Interpretation Traversal permissions layer
-
-A sample traversal permissions layer looks like the following
-![screen shot 2015-06-26 at 11 45 22](https://cloud.githubusercontent.com/assets/4493762/8374829/df05c438-1bf8-11e5-8ead-c1dea41af122.png)
-
-* Yellow lines is the link between a stop and the street graph.
-* Grey lines are streets one can travel with the mode walk, bike, or car
-* Green lines are paths one can travel with the mode walk only
-* Red lines are streets one can travel with the mode car only
-* Grey dots vertices where edges are connected. If two edges are crossing w/o a vertice at the
-  intersection point, users will not be able to go from one street to the other. But this can be
-  valid in case of over/under pass for example. If it's an error, it's usually caused by improperly
-  connected OSM data (a shared OSM node is required).
-
 ## OpenStreetMap Data
 
 ### Tags affecting permissions and bicycle safety
@@ -158,9 +117,6 @@ you browse through the rules.
 ![Bicycle safety report](images/bicycle-safety-report.png)
 
 To enable it activate the [Report API sandbox feature](sandbox/ReportApi.md).
-
-To view the output of the bicycle safety calculation on a map, check
-the [debug layers](Troubleshooting-Routing.md#Debug-layers).
 
 ### Railway Platforms
 
