@@ -86,14 +86,11 @@ public class FareModelForTest {
     .setTransfers(1)
     .setAgency(OTHER_FEED_AGENCY.getId())
     .build();
-  public static final FareProduct FARE_PRODUCT = new FareProduct(
+  public static final FareProduct FARE_PRODUCT = FareProduct.of(
     id("fp"),
     "fare product",
-    Money.euros(10.00f),
-    null,
-    null,
-    null
-  );
+    Money.euros(10.00f)
+  ).build();
   public static final FareProductUse FARE_PRODUCT_USE = new FareProductUse(
     "c1a04702-1fb6-32d4-ba02-483bf68111ed",
     FARE_PRODUCT

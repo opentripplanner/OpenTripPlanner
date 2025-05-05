@@ -12,6 +12,7 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS Pathway into the OTP model. */
 class PathwayMapper {
 
+  private final IdFactory idFactory;
   private final StopMapper stopMapper;
 
   private final EntranceMapper entranceMapper;
@@ -23,11 +24,13 @@ class PathwayMapper {
   private final Map<org.onebusaway.gtfs.model.Pathway, Pathway> mappedPathways = new HashMap<>();
 
   PathwayMapper(
+    IdFactory idFactory,
     StopMapper stopMapper,
     EntranceMapper entranceMapper,
     PathwayNodeMapper nodeMapper,
     BoardingAreaMapper boardingAreaMapper
   ) {
+    this.idFactory = idFactory;
     this.stopMapper = stopMapper;
     this.entranceMapper = entranceMapper;
     this.nodeMapper = nodeMapper;
@@ -44,7 +47,7 @@ class PathwayMapper {
   }
 
   private Pathway doMap(org.onebusaway.gtfs.model.Pathway rhs) {
-    PathwayBuilder pathway = Pathway.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()))
+    PathwayBuilder pathway = Pathway.of(idFactory.createId(rhs.getId()))
       .withPathwayMode(PathwayModeMapper.map(rhs.getPathwayMode()))
       .withFromStop(mapStationElement(rhs.getFromStop()))
       .withToStop(mapStationElement(rhs.getToStop()))

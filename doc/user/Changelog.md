@@ -25,6 +25,8 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Set correct transfer modes for scooters in deprecated `plan` query [#6597](https://github.com/opentripplanner/OpenTripPlanner/pull/6597)
 - Remove old debug UI [#6478](https://github.com/opentripplanner/OpenTripPlanner/pull/6478)
 - Adjust the maximum allowed speed in our stop time validator to be consistent with MobilityData GTFS validator [#6606](https://github.com/opentripplanner/OpenTripPlanner/pull/6606)
+- Implement SIRI extra calls [#6493](https://github.com/opentripplanner/OpenTripPlanner/pull/6493)
+- Fix ID generation hacks in GTFS mapping, improve FaresV2 spec conformance [#6586](https://github.com/opentripplanner/OpenTripPlanner/pull/6586)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

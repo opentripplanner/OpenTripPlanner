@@ -265,6 +265,7 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
+  @Nullable
   static EdgeUpdaterModule provideDataOverlayFactory(BuildConfig config, Graph graph) {
     return DataOverlayFactory.create(graph, config.dataOverlay);
   }

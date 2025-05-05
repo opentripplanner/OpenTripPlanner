@@ -10,19 +10,19 @@ For the purposes of this document and in many OpenTripPlanner development discus
 
 Broadly speaking there are two kinds of frontends for OTP: debug frontends and production frontends. 
 
-A **Debug frontend** is included in the main OpenTripPlanner repository, and it is intended to work "out of the box" with little to no configuration. The old debug frontend of OTP has been permanently removed and replaced by the new debug UI. It is served by OTP itself or a simple local web server, or set up such that a single deployment is usable by anyone via a content delivery network (CDN). The primary purpose of debug frontends is to allow OTP developers (as well as people evaluating OpenTripPlanner for their organization) to observe, test, and debug an OTP instance they're working on. Debug frontends will expose some internal details of OTP operation such as graph nodes and edges, traversal permissions, or transit data entity identifiers. Their primary role is as a development and deployment tool.
+A **Debug frontend** is included in the main OpenTripPlanner repository, and it is intended to work "out of the box" with little to no configuration. It is served by OTP itself or a simple local web server, or set up such that a single deployment is usable by anyone via a content delivery network (CDN). The primary purpose of debug frontends is to allow OTP developers (as well as people evaluating OpenTripPlanner for their organization) to observe, test, and debug an OTP instance they're working on. The debug frontend will expose some internal details of OTP operation such as graph nodes and edges, traversal permissions, or transit data entity identifiers. Their primary role is as a development and deployment tool.
 
 On the other hand, **production frontends** are intended to be a component of larger public-facing deployments of OTP, with a more polished appearance and user experience. They generally do not work "out of the box", and require a significant amount of configuration and coordination with external components such as map tile servers and geocoders. They are designed to be components of a large professionally maintained and managed OTP deployment, and present a simpler view of OpenTripPlanner options and results to a non-technical audience of end users. 
 
 ## Debug Frontends
 
-OpenTripPlanner comes with one integrated debug web frontend. The frontend source code can be found at
+OpenTripPlanner comes with an integrated debug web frontend. The frontend source code can be found at
 [`/client`](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/client).
 
 The current debug client is a React/TypeScript Single Page App (SPA) that can be served locally or accessed over a content delivery network (CDN). 
 Unlike the original debug client, it connects to the OTP Java backend via the GraphQL API using the Transmodel vocabulary. By default, it is available at the root URL (`http://localhost:8080/` in local operation).
 
-There is a third piece of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, 
+There is another of software that might qualify as an OTP client: a Java Swing application making use of the Processing visualization library, 
 located in the [GraphVisualizer class](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/visualizer/GraphVisualizer.java). 
 While it would not be accurate to call this a "native" desktop application (as it's cross-platform Java) it is not a web app. This very developer-centric 
 UI is also over a decade old and has been very sparsely maintained, but continues to exist because it can visualize the progress of searches through the 
@@ -31,16 +31,13 @@ street network, providing some insight into the internals of the routing algorit
 ## Working with the Debug Frontend
 
 While the debug frontend is enabled by default as of this writing, it may not be in the future, and you may wish to disable it if you've chosen to use a different frontend. 
-Also, to get full use of the existing debug frontend you may want to enable OTP's built-in simple testing geocoder which performs fuzzy searches for 
-transit stops by name, supplying their coordinates to the routing engine. Without it, you will be limited to origins and destinations selected on a map or 
-specified in terms of latitude and longitude coordinates. The debug frontend and the geocoder can be toggled in `otp-config.json`:
+The debug frontend and the geocoder can be toggled in `otp-config.json`:
 
 ```json5
 // otp-config.json
 {
   "otpFeatures": {
-    "DebugUi": true,
-    "SandboxAPIGeocoder": true
+    "DebugUi": true
   }
 }
 ```
