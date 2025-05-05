@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.emission.model;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.model.plan.Emission;
@@ -11,7 +12,7 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * number of legs, and you should use the {@code stopPosInPattern} to get the emissions for
  * a continuous subset of legs.
  */
-public class TripPatternEmission {
+public class TripPatternEmission implements Serializable {
 
   private final List<Emission> emissionsPerLeg;
 
