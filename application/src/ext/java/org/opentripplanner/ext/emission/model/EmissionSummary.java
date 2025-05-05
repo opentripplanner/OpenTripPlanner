@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.emission.model;
 
+import java.util.Locale;
+
 /**
  * Produce a report of imported emissions.
  */
@@ -15,11 +17,13 @@ public class EmissionSummary {
 
   @Override
   public String toString() {
-    return "Emission Summary - route: %,d / trip: %,d / total: %,d".formatted(
-        routeTotal,
-        tripTotal,
-        total()
-      );
+    return String.format(
+      Locale.ROOT,
+      "Emission Summary - route: %,d / trip: %,d / total: %,d",
+      routeTotal,
+      tripTotal,
+      total()
+    );
   }
 
   private int total() {
