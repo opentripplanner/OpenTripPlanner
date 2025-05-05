@@ -318,10 +318,6 @@ public class TripTimeOnDate {
     return tripTimes.getTrip();
   }
 
-  public String getBlockId() {
-    return tripTimes.getTrip().getGtfsBlockId();
-  }
-
   public I18NString getHeadsign() {
     return tripTimes.getHeadsign(stopIndex);
   }
@@ -427,14 +423,14 @@ public class TripTimeOnDate {
   }
 
   /**
-   * Returns the real time arrival, if available.
+   * Returns the real-time arrival, if available.
    */
   public Optional<Instant> realtimeArrival() {
     return optionalInstant(getRealtimeArrival());
   }
 
   /**
-   * Returns the real time departure, if available.
+   * Returns the real-time departure, if available.
    */
   public Optional<Instant> realtimeDeparture() {
     return optionalInstant(getRealtimeDeparture());
