@@ -150,7 +150,10 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(it);
     }
 
-    graphBuilder.addModule(factory.turnRestrictionModule());
+    // Avoid applying turn restrictions twice if doing separate street graph and graph builds.
+    if ((hasOsm && !saveStreetGraph) || loadStreetGraph) {
+      graphBuilder.addModule(factory.turnRestrictionModule());
+    }
 
     if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
