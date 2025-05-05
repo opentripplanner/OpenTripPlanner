@@ -156,6 +156,15 @@ public class TurnRestrictionTest {
     assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
+  /**
+   * Helper to return the label of the parent vertex of a vertex, useful for not
+   * digging too deep in the details of the turn restriction graph application code,
+   * and instead checking that the returned vertex is in the expected group.
+   */
+  public static String getParentLabelString(Vertex vertex) {
+    return vertex.getParent().getLabelString();
+  }
+
   @Test
   public void testForwardAsCar() {
     var request = new RouteRequest();
@@ -179,11 +188,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getMainLabelString());
-    assertEquals("main_1st", states.get(1).getVertex().getMainLabelString());
-    assertEquals("broad_1st", states.get(2).getVertex().getMainLabelString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getMainLabelString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getMainLabelString());
+    assertEquals("maple_1st", getParentLabelString(states.get(0).getVertex()));
+    assertEquals("main_1st", getParentLabelString(states.get(1).getVertex()));
+    assertEquals("broad_1st", getParentLabelString(states.get(2).getVertex()));
+    assertEquals("broad_2nd", getParentLabelString(states.get(3).getVertex()));
+    assertEquals("broad_3rd", getParentLabelString(states.get(4).getVertex()));
   }
 
   /**
