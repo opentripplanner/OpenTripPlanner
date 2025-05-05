@@ -56,10 +56,10 @@ class TripLegMapperTest {
     subject.setCurrentFeedId(FEED_ID);
     var result = subject.map(
       List.of(
-        new TripLegsRow(TRIP_ID_1, STOP_ID_A, 1, CO2_AB),
-        new TripLegsRow(TRIP_ID_1, STOP_ID_B, 2, CO2_BC),
-        new TripLegsRow(TRIP_ID_1, STOP_ID_C, 3, CO2_CD),
-        new TripLegsRow(TRIP_ID_2, STOP_ID_A, 1, CO2_AD)
+        new TripHopsRow(TRIP_ID_1, STOP_ID_A, 1, CO2_AB),
+        new TripHopsRow(TRIP_ID_1, STOP_ID_B, 2, CO2_BC),
+        new TripHopsRow(TRIP_ID_1, STOP_ID_C, 3, CO2_CD),
+        new TripHopsRow(TRIP_ID_2, STOP_ID_A, 1, CO2_AD)
       )
     );
 
@@ -79,8 +79,8 @@ class TripLegMapperTest {
     subject.setCurrentFeedId(FEED_ID);
     var result = subject.map(
       List.of(
-        new TripLegsRow(TRIP_ID_2, STOP_ID_B, 1, CO2_AB),
-        new TripLegsRow(TRIP_ID_1, STOP_ID_A, 4, CO2_AB)
+        new TripHopsRow(TRIP_ID_2, STOP_ID_B, 1, CO2_AB),
+        new TripHopsRow(TRIP_ID_1, STOP_ID_A, 4, CO2_AB)
       )
     );
     assertTrue(result.isEmpty());

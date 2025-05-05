@@ -26,14 +26,14 @@ public class TripLegMapper {
     this.currentFeedId = currentFeedId;
   }
 
-  public Map<FeedScopedId, TripPatternEmission> map(List<TripLegsRow> rows) {
+  public Map<FeedScopedId, TripPatternEmission> map(List<TripHopsRow> rows) {
     if (currentFeedId == null) {
       throw new IllegalStateException("currentFeedId is not set");
     }
 
     Map<FeedScopedId, EmissionAggregator> builders = new HashMap<>();
 
-    for (TripLegsRow row : rows) {
+    for (TripHopsRow row : rows) {
       var tripId = new FeedScopedId(currentFeedId, row.tripId());
       var b = builders.computeIfAbsent(tripId, id ->
         new EmissionAggregator(tripId, stopsByTripId.get(tripId))

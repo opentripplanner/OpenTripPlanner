@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
 import org.opentripplanner.utils.lang.IntRange;
 
-class TripLegsCsvParser extends AbstractCsvParser<TripLegsRow> {
+class TripLegsCsvParser extends AbstractCsvParser<TripHopsRow> {
 
   public static final String TRIP_ID = "trip_id";
   public static final String START_STOP_ID = "from_stop_id";
@@ -34,8 +34,8 @@ class TripLegsCsvParser extends AbstractCsvParser<TripLegsRow> {
   }
 
   @Override
-  protected TripLegsRow createNextRow() throws EmissionHandledParseException {
-    return new TripLegsRow(
+  protected TripHopsRow createNextRow() throws EmissionHandledParseException {
+    return new TripHopsRow(
       getString(TRIP_ID),
       getString(START_STOP_ID),
       getInt(START_STOP_SEQ_NR, STOP_SEQ_NR_RANGE),

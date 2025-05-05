@@ -51,7 +51,7 @@ class EmissionAggregator {
     }
   }
 
-  EmissionAggregator mergeEmissionsForleg(TripLegsRow row) {
+  EmissionAggregator mergeEmissionsForleg(TripHopsRow row) {
     if (stops == null) {
       return this;
     }
@@ -74,7 +74,7 @@ class EmissionAggregator {
     return this;
   }
 
-  private boolean verifyStop(TripLegsRow row) {
+  private boolean verifyStop(TripHopsRow row) {
     if (fromStopSequenceRange.isOutside(row.fromStopSequence())) {
       addEmissionStopStartSeqNrIssue(row);
       return false;
@@ -122,7 +122,7 @@ class EmissionAggregator {
     );
   }
 
-  private void addEmissionStopStartSeqNrIssue(TripLegsRow row) {
+  private void addEmissionStopStartSeqNrIssue(TripHopsRow row) {
     errors.add(
       OtpError.of(
         "EmissionStopSeqNr",
@@ -134,7 +134,7 @@ class EmissionAggregator {
     );
   }
 
-  private void addEmissionStopIdMismatchIssue(TripLegsRow row) {
+  private void addEmissionStopIdMismatchIssue(TripHopsRow row) {
     errors.add(
       OtpError.of(
         "EmissionStopIdMismatch",

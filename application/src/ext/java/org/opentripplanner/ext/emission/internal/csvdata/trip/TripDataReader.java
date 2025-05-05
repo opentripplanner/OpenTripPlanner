@@ -22,11 +22,11 @@ public class TripDataReader {
     this.issueStore = issueStore;
   }
 
-  public List<TripLegsRow> read(Runnable logStepCallback) {
+  public List<TripHopsRow> read(Runnable logStepCallback) {
     if (!emissionDataSource.exists()) {
       return List.of();
     }
-    var emissionData = new ArrayList<TripLegsRow>();
+    var emissionData = new ArrayList<TripHopsRow>();
     var reader = new CsvReader(emissionDataSource.asInputStream(), StandardCharsets.UTF_8);
     var parser = new TripLegsCsvParser(issueStore, reader);
 
