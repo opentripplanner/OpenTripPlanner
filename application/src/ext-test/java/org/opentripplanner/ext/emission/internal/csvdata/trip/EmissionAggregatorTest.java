@@ -45,9 +45,9 @@ class EmissionAggregatorTest {
 
   @Test
   void mergeAFewRowsOk() {
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_B_ID, 2, Gram.of(7.0)));
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_C_ID, 3, Gram.of(10.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_B_ID, 2, Gram.of(7.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_C_ID, 3, Gram.of(10.0)));
 
     var emission = subject.build();
 
@@ -60,23 +60,23 @@ class EmissionAggregatorTest {
   }
 
   @Test
-  void mergeWithMissingLegs() {
-    // Add same row twice, but no row for 2nd and 3rd leg
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(2.5)));
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.5)));
+  void mergeWithMissingHops() {
+    // Add same row twice, but no row for 2nd and 3rd hop
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(2.5)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.5)));
 
     var emission = subject.build();
 
     assertTrue(emission.isPresent());
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
-      "EmissionMissingLeg(Warning! All legs in a trip(E:T:1) should have an emission value. " +
+      "EmissionMissingTripHop(Warning! All hops in a trip(E:T:1) should have an emission value. " +
       "Hop 2 and 3 does not have an emission value.)",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
-      "EmissionTripLegDuplicates(Warning! The emission import contains duplicate rows for " +
-      "the same leg for trip(E:T:1). An average value is used.)",
+      "EmissionTripHopDuplicates(Warning! The emission import contains duplicate rows for " +
+      "the same hop for trip(E:T:1). An average value is used.)",
       subject.listIssues().get(1).toString()
     );
     assertEquals(
@@ -88,9 +88,9 @@ class EmissionAggregatorTest {
   @Test
   void mergeWithStopIdMismatch() {
     // Stop B and C are switched
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_C_ID, 2, Gram.of(7.0)));
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_B_ID, 3, Gram.of(10.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_A_ID, 1, Gram.of(3.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_C_ID, 2, Gram.of(7.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_B_ID, 3, Gram.of(10.0)));
 
     var emission = subject.build();
 
@@ -98,20 +98,20 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionStopIdMismatch(Emission 'from_stop_id'(C) not found in stop pattern for trip(E:T:1): " +
-      "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7g])",
+      "TripHopsRow[tripId=T:1, fromStopId=C, fromStopSequence=2, co2=7g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionStopIdMismatch(Emission 'from_stop_id'(B) not found in stop pattern for trip(E:T:1): " +
-      "TripLegsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10g])",
+      "TripHopsRow[tripId=T:1, fromStopId=B, fromStopSequence=3, co2=10g])",
       subject.listIssues().get(1).toString()
     );
   }
 
   @Test
   void mergeWithStopIndexOutOfBound() {
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_A_ID, 0, Gram.of(3.0)));
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_C_ID, 4, Gram.of(3.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_A_ID, 0, Gram.of(3.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_C_ID, 4, Gram.of(3.0)));
 
     var emission = subject.build();
 
@@ -119,12 +119,12 @@ class EmissionAggregatorTest {
     assertEquals(2, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
       "EmissionStopSeqNr(The emission 'from_stop_sequence'(0) is out of bounds[1, 3]: " +
-      "TripLegsRow[tripId=T:1, fromStopId=A, fromStopSequence=0, co2=3g])",
+      "TripHopsRow[tripId=T:1, fromStopId=A, fromStopSequence=0, co2=3g])",
       subject.listIssues().get(0).toString()
     );
     assertEquals(
       "EmissionStopSeqNr(The emission 'from_stop_sequence'(4) is out of bounds[1, 3]: " +
-      "TripLegsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3g])",
+      "TripHopsRow[tripId=T:1, fromStopId=C, fromStopSequence=4, co2=3g])",
       subject.listIssues().get(1).toString()
     );
   }
@@ -134,7 +134,7 @@ class EmissionAggregatorTest {
     subject = new EmissionAggregator(FEED_SCOPED_TRIP_ID, null);
 
     // Make sure mapping does not fail
-    subject.mergeEmissionsForleg(new TripHopsRow(TRIP_ID, STOP_A_ID, -1, Gram.of(3.0)));
+    subject.mergeEmissionsForHop(new TripHopsRow(TRIP_ID, STOP_A_ID, -1, Gram.of(3.0)));
 
     var emission = subject.build();
     assertTrue(emission.isEmpty());

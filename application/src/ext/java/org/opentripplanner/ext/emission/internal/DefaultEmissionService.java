@@ -23,7 +23,7 @@ public class DefaultEmissionService implements EmissionService {
   }
 
   @Override
-  public Emission calculateTransitPassengerEmissionForTripLeg(
+  public Emission calculateTransitPassengerEmissionForTripHops(
     Trip trip,
     int boardStopPosInPattern,
     int alightStopPosInPattern,
@@ -39,7 +39,7 @@ public class DefaultEmissionService implements EmissionService {
     // zero is returned.
     var emission = emissionRepository.tripPatternEmissions(trip.getId());
     if (emission != null) {
-      return emission.subsection(boardStopPosInPattern, alightStopPosInPattern);
+      return emission.section(boardStopPosInPattern, alightStopPosInPattern);
     }
     return Emission.ZERO;
   }

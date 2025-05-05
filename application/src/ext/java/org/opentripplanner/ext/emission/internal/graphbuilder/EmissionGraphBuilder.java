@@ -56,10 +56,10 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     if (parameters == null) {
       return;
     }
-    var tripLegMapper = new TripHopMapper(createStopsByTripIdMap(), issueStore);
+    var tripHopMapper = new TripHopMapper(createStopsByTripIdMap(), issueStore);
     var co2EmissionsDataReader = new EmissionDataReader(
       emissionRepository,
-      tripLegMapper,
+      tripHopMapper,
       issueStore
     );
 

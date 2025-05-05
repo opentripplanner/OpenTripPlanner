@@ -63,7 +63,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
   }
 
   private Emission calculateCo2EmissionsForTransit(TransitLeg leg) {
-    return emissionService.calculateTransitPassengerEmissionForTripLeg(
+    return emissionService.calculateTransitPassengerEmissionForTripHops(
       leg.trip(),
       leg.boardStopPosInPattern(),
       leg.alightStopPosInPattern(),

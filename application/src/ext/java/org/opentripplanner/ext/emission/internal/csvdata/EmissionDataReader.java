@@ -54,7 +54,7 @@ public class EmissionDataReader {
           routeReader.read(resolvedFeedId, () -> logProgress(progress))
         );
 
-      // Assume input CO₂ emission data is per trip leg
+      // Assume input CO₂ emission data is per trip hop
       tripHopMapper.setCurrentFeedId(resolvedFeedId);
       var tripReader = new TripDataReader(emissionDataSource, issueStore);
       this.emissionRepository.addTripPatternEmissions(

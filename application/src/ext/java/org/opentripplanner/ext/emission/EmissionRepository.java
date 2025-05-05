@@ -27,10 +27,10 @@ public interface EmissionRepository extends Serializable {
   void addRouteEmissions(Map<FeedScopedId, Emission> routeAvgCo2Emissions);
 
   /**
-   * Return emissions for all legs/sections in the trip pattern for a given trip. The same
-   * trip-pattern may have multiple different emissions depending on the vehicle(s) operating the
-   * trip on a given date, but OTP does not keep information about the vehicles, so we calculate
-   * the average emissions for each leg for a given trip.
+   * Return emissions for all hops in the trip pattern for a given trip. The same trip-pattern may
+   * have multiple different emissions depending on the vehicle(s) operating the trip on a given
+   * date, but OTP does not keep information about the vehicles, so we calculate the average
+   * emissions for each hop for a given trip.
    */
   TripPatternEmission tripPatternEmissions(FeedScopedId tripId);
 

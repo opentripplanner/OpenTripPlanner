@@ -51,7 +51,7 @@ class EmissionAggregator {
     }
   }
 
-  EmissionAggregator mergeEmissionsForleg(TripHopsRow row) {
+  EmissionAggregator mergeEmissionsForHop(TripHopsRow row) {
     if (stops == null) {
       return this;
     }
@@ -60,17 +60,12 @@ class EmissionAggregator {
       return this;
     }
 
-    var legEmission = Emission.of(row.co2());
     int boardStopPosition = row.boardStopPosInPattern();
-    var existing = emissions[boardStopPosition];
+    var emission = Emission.of(row.co2());
 
-    if (existing.isZero()) {
-      emissions[boardStopPosition] = legEmission;
-      counts[boardStopPosition] = 1;
-    } else {
-      emissions[boardStopPosition] = existing.plus(legEmission);
-      counts[boardStopPosition] = ++counts[boardStopPosition];
-    }
+    emissions[boardStopPosition] = emissions[boardStopPosition].plus(emission);
+    counts[boardStopPosition] = counts[boardStopPosition] + 1;
+
     return this;
   }
 
@@ -169,15 +164,15 @@ class EmissionAggregator {
       if (missingHops.isEmpty()) {
         return;
       }
-      addEmissionMissingLegIssue(missingHops);
+      addEmissionMissingHopIssue(missingHops);
     }
 
-    private void addEmissionMissingLegIssue(WordList buf) {
+    private void addEmissionMissingHopIssue(WordList buf) {
       warnings.add(
         OtpError.of(
-          "EmissionMissingLeg",
-          "Warning! All legs in a trip(%s) should have an emission value. Hop %s does not have an " +
-          "emission value.",
+          "EmissionMissingTripHop",
+          "Warning! All hops in a trip(%s) should have an emission value. Hop %s does not have " +
+          "an emission value.",
           tripId,
           buf.toString()
         )
@@ -188,9 +183,9 @@ class EmissionAggregator {
       if (Arrays.stream(counts).anyMatch(i -> i > 1)) {
         warnings.add(
           OtpError.of(
-            "EmissionTripLegDuplicates",
-            "Warning! The emission import contains duplicate rows for the same leg for trip(%s). " +
-            "An average value is used.",
+            "EmissionTripHopDuplicates",
+            "Warning! The emission import contains duplicate rows for the same hop for " +
+            "trip(%s). An average value is used.",
             tripId
           )
         );

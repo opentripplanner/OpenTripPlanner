@@ -34,8 +34,8 @@ public interface EmissionTestData {
     return resource().dataSource("em-on-routes.txt", FileType.EMISSION);
   }
 
-  default DataSource emissionOnTripLegs() {
-    return resource().dataSource("em-on-trip-legs.txt", FileType.EMISSION);
+  default DataSource emissionOnTripHops() {
+    return resource().dataSource("em-on-trip-hops.txt", FileType.EMISSION);
   }
 
   /**

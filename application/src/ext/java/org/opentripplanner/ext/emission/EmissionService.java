@@ -19,14 +19,14 @@ public interface EmissionService {
   Emission calculateCarPassengerEmission(double distanceMeters);
 
   /**
-   * Calculate the passenger emissions for a specific [route and distance] or [trip, from stop/time,
+   * Calculate the passenger emissions for a specific [route and distance] or [trip, from stop,
    * to stop ]. The service implementation will decide which of the two calculation methods
    * is used.
    *
    * @return The emissions per passenger for the whole. {@link Emission#ZERO} is returned if no
    * emission exist.
    */
-  Emission calculateTransitPassengerEmissionForTripLeg(
+  Emission calculateTransitPassengerEmissionForTripHops(
     Trip trip,
     int boardStopPosInPattern,
     int alightStopPosInPattern,

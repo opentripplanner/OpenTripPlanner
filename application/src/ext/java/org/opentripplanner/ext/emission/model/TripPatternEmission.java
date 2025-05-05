@@ -24,7 +24,7 @@ public class TripPatternEmission implements Serializable {
    * Return the sum of the emissions for a subsection of the trip-pattern starting from the
    * given {@code boardStopPosInPattern} and ending at the given {@code alightStopPosInPattern}.
    */
-  public Emission subsection(int boardStopPosInPattern, int alightStopPosInPattern) {
+  public Emission section(int boardStopPosInPattern, int alightStopPosInPattern) {
     return emissionsPerHop
       .subList(boardStopPosInPattern, alightStopPosInPattern)
       .stream()

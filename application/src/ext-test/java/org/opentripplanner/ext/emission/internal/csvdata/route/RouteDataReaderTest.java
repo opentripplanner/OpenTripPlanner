@@ -76,7 +76,7 @@ class RouteDataReaderTest implements EmissionTestData {
   @Test
   void ignoreDataSourceIfHeadersDoNotMatch() {
     var lineCounter = new IntBox(0);
-    var subject = new RouteDataReader(emissionOnTripLegs(), issueStore);
+    var subject = new RouteDataReader(emissionOnTripHops(), issueStore);
 
     var emissions = subject.read(FEED_ID, lineCounter::inc);
 

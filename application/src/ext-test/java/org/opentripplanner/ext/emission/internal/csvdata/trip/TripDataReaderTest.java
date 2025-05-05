@@ -18,16 +18,16 @@ class TripDataReaderTest implements EmissionTestData {
   @Test
   void testCo2EmissionsFromGtfsDataSource() throws FileNotFoundException {
     var stepCounter = new IntBox(0);
-    var subject = new TripDataReader(emissionOnTripLegs(), issueStore);
+    var subject = new TripDataReader(emissionOnTripHops(), issueStore);
 
     var emissions = subject.read(stepCounter::inc);
 
     assertEquals(
-      "TripLegsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5g]",
+      "TripHopsRow[tripId=T1, fromStopId=A, fromStopSequence=1, co2=5g]",
       emissions.getFirst().toString()
     );
     assertEquals(
-      "TripLegsRow[tripId=T2, fromStopId=B, fromStopSequence=2, co2=17g]",
+      "TripHopsRow[tripId=T2, fromStopId=B, fromStopSequence=2, co2=17g]",
       emissions.getLast().toString()
     );
     assertTrue(subject.isDataProcessed());
