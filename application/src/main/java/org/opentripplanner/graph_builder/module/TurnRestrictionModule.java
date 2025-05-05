@@ -33,6 +33,17 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     this.graph = graph;
     this.subsidiaryVertices = new HashMap<>();
     this.mainVertices = new HashMap<>();
+    initializeMainAndSubsidiaryVertices();
+  }
+
+  void initializeMainAndSubsidiaryVertices() {
+    for (var vertex : graph.getVerticesOfType(SubsidiaryVertex.class)) {
+      Vertex parent = vertex.getParent();
+      if (parent instanceof IntersectionVertex intersectionVertex) {
+        mainVertices.put(vertex, intersectionVertex);
+        subsidiaryVertices.computeIfAbsent(parent, k -> new HashSet<>()).add(vertex);
+      }
+    }
   }
 
   Vertex getMainVertex(Vertex vertex) {
@@ -86,6 +97,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     subsidiaryVertices.get(mainVertex).add(splitVertex);
     mainVertices.put(splitVertex, mainVertex);
     addedVertices++;
+    boolean hasRemovedInputEdges = false;
     for (var fromEdge : fromEdges) {
       var fromPermission = fromEdge.getPermission();
       var restrictionPermission = streetTraversalPermission(turnRestriction.modes);
@@ -102,6 +114,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
       if (oldPermission.allowsNothing()) {
         fromEdge.remove();
         addedEdges--;
+        hasRemovedInputEdges = true;
       } else {
         fromEdge.setPermission(oldPermission);
       }
@@ -117,6 +130,16 @@ public class TurnRestrictionModule implements GraphBuilderModule {
             addedEdges++;
           }
         }
+      }
+    }
+    if (hasRemovedInputEdges) {
+      if (vertex.getIncoming().isEmpty()) {
+        for (var toEdge : vertex.getOutgoing()) {
+          toEdge.remove();
+          addedEdges--;
+        }
+        graph.remove(vertex);
+        addedVertices--;
       }
     }
   }
