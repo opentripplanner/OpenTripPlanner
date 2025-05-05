@@ -14,7 +14,7 @@ public final class Gram implements Serializable, Comparable<Gram> {
   public static final Gram ZERO = new Gram(0);
 
   // PAttern used to split number and unit with an optonal space in between
-  private static final Pattern PATTERN = Pattern.compile("([\\d\\.]+) ?([kmg]*)");
+  private static final Pattern PATTERN = Pattern.compile("(-?[\\d\\.]+) ?([kmg]*)");
   private static final int GRAM_PRECISION = 1_000;
   private static final int KILO_GRAM_PRECISION = 1_000 * GRAM_PRECISION;
 
@@ -107,7 +107,7 @@ public final class Gram implements Serializable, Comparable<Gram> {
     if (value % GRAM_PRECISION == 0) {
       return value / GRAM_PRECISION + "g";
     }
-    if (value > 1000) {
+    if (Math.abs(value) > 1000) {
       return (value / 1000.0) + "g";
     }
     return value + "mg";

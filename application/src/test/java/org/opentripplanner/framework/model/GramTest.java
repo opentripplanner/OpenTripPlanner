@@ -4,8 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class GramTest {
 
@@ -63,16 +68,36 @@ class GramTest {
     assertTrue(sameValue.compareTo(subject) == 0);
   }
 
-  @Test
-  void testToString() {
-    assertEquals("7.5g", subject.toString());
-    assertEquals("1mg", Gram.of(0.001).toString());
-    assertEquals("999mg", Gram.of(0.999).toString());
-    assertEquals("1.001g", Gram.of(1.001).toString());
-    assertEquals("19g", Gram.of(19).toString());
-    assertEquals("999g", Gram.of(999).toString());
-    assertEquals("1kg", Gram.of(1000).toString());
-    assertEquals("1001g", Gram.of(1001).toString());
+  static List<Arguments> toStringTestCases() {
+    return List.of(
+      Arguments.of("1mg", 0.001),
+      Arguments.of("-1mg", -0.001),
+      Arguments.of("999mg", 0.999),
+      Arguments.of("-999mg", -0.999),
+      Arguments.of("1g", 1.0),
+      Arguments.of("-1g", -1.0),
+      Arguments.of("1.001g", 1.001),
+      Arguments.of("-1.001g", -1.001),
+      Arguments.of("19g", 19),
+      Arguments.of("999g", 999),
+      Arguments.of("-999g", -999),
+      Arguments.of("1kg", 1000),
+      Arguments.of("-1kg", -1000),
+      Arguments.of("1001g", 1001),
+      Arguments.of("-7g", -7)
+    );
+  }
+
+  @ParameterizedTest(name = "{1}")
+  @MethodSource("toStringTestCases")
+  void testToString(String expected, Object input) {
+    if (input instanceof Integer iValue) {
+      assertEquals(expected, Gram.of(iValue.intValue()).toString());
+    } else if (input instanceof Double dValue) {
+      assertEquals(expected, Gram.of(dValue.doubleValue()).toString());
+    } else {
+      fail("Input should be an integer or double: " + input.getClass());
+    }
   }
 
   @Test
@@ -87,23 +112,35 @@ class GramTest {
     assertFalse(subject.isZero());
   }
 
+  static List<Arguments> ofStringTestCases() {
+    return List.of(
+      Arguments.of(0.0, "0"),
+      Arguments.of(200.0, "200"),
+      Arguments.of(20.0, "20.0"),
+      Arguments.of(-7.5, "-7.5"),
+      Arguments.of(0.0, "0g"),
+      Arguments.of(1.0, "1g"),
+      Arguments.of(200.0, "200 g"),
+      Arguments.of(-7.5, "-7.5 g"),
+      Arguments.of(0.0, "0mg"),
+      Arguments.of(0.001, "1mg"),
+      Arguments.of(0.2, "200 mg"),
+      Arguments.of(-0.007, "-7 mg"),
+      Arguments.of(0.0, "0kg"),
+      Arguments.of(1000.0, "1kg"),
+      Arguments.of(2200.0, "2.2 kg"),
+      Arguments.of(-7500.0, "-7.5 kg")
+    );
+  }
+
+  @ParameterizedTest(name = "{1}  >  {0}")
+  @MethodSource("ofStringTestCases")
+  void ofString(Double expected, String input) {
+    assertEquals(expected, Gram.of(input).asDouble());
+  }
+
   @Test
-  void ofString() {
-    assertEquals(Gram.ZERO, Gram.of("0"));
-    assertEquals(200.0, Gram.of("200").asDouble());
-
-    assertEquals(Gram.ZERO, Gram.of("0g"));
-    assertEquals(1.0, Gram.of("1g").asDouble());
-    assertEquals(200.0, Gram.of("200 g").asDouble());
-
-    assertEquals(Gram.ZERO, Gram.of("0kg"));
-    assertEquals(1000.0, Gram.of("1kg").asDouble());
-    assertEquals(2200.0, Gram.of("2.2 kg").asDouble());
-
-    assertEquals(Gram.ZERO, Gram.of("0mg"));
-    assertEquals(0.001, Gram.of("1mg").asDouble());
-    assertEquals(0.023, Gram.of("23 mg").asDouble());
-
+  void ofStringIllegalValues() {
     var ex = assertThrows(IllegalArgumentException.class, () -> Gram.of("200.0 tonn"));
     assertEquals("Parse error! Illegal gram value: '200.0 tonn'", ex.getMessage());
 

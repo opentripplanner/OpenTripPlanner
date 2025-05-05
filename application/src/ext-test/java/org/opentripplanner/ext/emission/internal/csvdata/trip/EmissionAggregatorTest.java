@@ -140,8 +140,8 @@ class EmissionAggregatorTest {
     assertTrue(emission.isEmpty());
     assertEquals(1, subject.listIssues().size(), () -> subject.listIssues().toString());
     assertEquals(
-      "EmissionTripLegMissingTripStopPattern(Warn! No trip with a stop pattern found for " +
-      "trip(E:T:1). The trip is skipped.)",
+      "EmissionMissingTripStopPattern(No trip with stop pattern found for trip(E:T:1). " +
+      "Trip or stop-pattern is missing. The trip is skipped.)",
       subject.listIssues().get(0).toString()
     );
   }
