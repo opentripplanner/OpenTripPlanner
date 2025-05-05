@@ -1,12 +1,13 @@
-package org.opentripplanner.generate.doc;
+package org.opentripplanner.ext.ojp.doc;
 
+import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromPath;
 import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.generate.doc.framework.TemplateUtil;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.test.support.ResourceLoader;
 
 @GeneratesDocumentation
 public class TriasApiDocTest {
@@ -26,8 +28,11 @@ public class TriasApiDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_PATH + "/sandbox", "TriasApi.md");
   private static final File OUT_FILE = new File(USER_DOC_PATH + "/sandbox", "TriasApi.md");
 
-  private static final String ROUTER_CONFIG_FILENAME = "standalone/config/router-config.json";
+  private static final File ROUTER_CONFIG_FILE = ResourceLoader.of(
+    TriasApiDocTest.class
+  ).extTestResourceFile(ROUTER_CONFIG_FILENAME);
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
+  public static final String CONFIG_PARAM = "triasApi";
 
   @Test
   public void update() {
@@ -44,9 +49,9 @@ public class TriasApiDocTest {
   }
 
   private NodeAdapter readTriasConfig() {
-    var json = jsonNodeFromResource(ROUTER_CONFIG_FILENAME);
-    var conf = new RouterConfig(json, ROUTER_CONFIG_FILENAME, false);
-    return conf.asNodeAdapter().child("triasApi");
+    var json = jsonNodeFromPath(ROUTER_CONFIG_FILE.toPath());
+    var conf = new RouterConfig(json, ROUTER_CONFIG_FILE.getName(), false);
+    return conf.asNodeAdapter().child(CONFIG_PARAM);
   }
 
   private String updaterDoc(NodeAdapter node) {
@@ -70,7 +75,7 @@ public class TriasApiDocTest {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject("triasApi").build();
-    buf.header(3, "Example configuration", null).addExample("router-config.json", root);
+    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject(CONFIG_PARAM).build();
+    buf.header(3, "Example configuration", null).addExample(ROUTER_CONFIG_FILENAME, root);
   }
 }
