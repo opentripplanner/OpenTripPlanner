@@ -58,12 +58,12 @@
 
 
     <properties>
-        <otp.serialization.version.id>188</otp.serialization.version.id>
+        <otp.serialization.version.id>191</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>32.2</geotools.version>
-        <google.dagger.version>2.55</google.dagger.version>
-        <jackson.version>2.18.3</jackson.version>
+        <geotools.version>33.0</geotools.version>
+        <google.dagger.version>2.56.2</google.dagger.version>
+        <jackson.version>2.19.0</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.10</jersey.version>
         <junit.version>5.12.1</junit.version>
@@ -71,7 +71,7 @@
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.18</logback.version>
         <lucene.version>10.1.0</lucene.version>
-        <micrometer.version>1.14.5</micrometer.version>
+        <micrometer.version>1.14.6</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.30.2</protobuf.version>
@@ -402,7 +402,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.4.7-jre</version>
+                <version>33.4.8-jre</version>
             </dependency>
 
             <!-- Logging API -->

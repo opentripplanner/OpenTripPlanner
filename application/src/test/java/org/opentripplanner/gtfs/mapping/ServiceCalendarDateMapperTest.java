@@ -24,7 +24,9 @@ public class ServiceCalendarDateMapperTest {
   private static final ServiceDate DATE = new ServiceDate(2017, 10, 15);
 
   private static final int EXCEPTION_TYPE = 2;
-  private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
+  private final ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper(
+    new IdFactory("A")
+  );
 
   static {
     SERVICE_DATE.setId(ID);

@@ -114,6 +114,8 @@ public class SchemaFactory {
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring.newRuntimeWiring()
+        // This is needed because we have our own implementation for the ID scalar
+        .strictMode(false)
         .scalar(GraphQLScalars.DURATION_SCALAR)
         .scalar(GraphQLScalars.POLYLINE_SCALAR)
         .scalar(GraphQLScalars.GEOJSON_SCALAR)

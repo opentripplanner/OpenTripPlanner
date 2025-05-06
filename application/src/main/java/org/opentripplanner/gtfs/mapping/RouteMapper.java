@@ -14,6 +14,7 @@ import org.opentripplanner.utils.collection.MapUtils;
 /** Responsible for mapping GTFS Route into the OTP model. */
 class RouteMapper {
 
+  private final IdFactory idFactory;
   private final AgencyMapper agencyMapper;
 
   private final DataImportIssueStore issueStore;
@@ -23,10 +24,12 @@ class RouteMapper {
   private final Map<org.onebusaway.gtfs.model.Route, Route> mappedRoutes = new HashMap<>();
 
   RouteMapper(
+    IdFactory idFactory,
     AgencyMapper agencyMapper,
     DataImportIssueStore issueStore,
     TranslationHelper helper
   ) {
+    this.idFactory = idFactory;
     this.agencyMapper = agencyMapper;
     this.issueStore = issueStore;
     this.translationHelper = helper;
@@ -42,7 +45,7 @@ class RouteMapper {
   }
 
   private Route doMap(org.onebusaway.gtfs.model.Route rhs) {
-    var lhs = Route.of(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
+    var lhs = Route.of(idFactory.createId(rhs.getId()));
     I18NString longName = null;
     if (rhs.getLongName() != null) {
       longName = translationHelper.getTranslation(
@@ -80,9 +83,7 @@ class RouteMapper {
     lhs.withTextColor(rhs.getTextColor());
     lhs.withBikesAllowed(BikeAccessMapper.mapForRoute(rhs));
     if (rhs.getNetworkId() != null) {
-      var networkId = GroupOfRoutes.of(
-        new FeedScopedId(rhs.getId().getAgencyId(), rhs.getNetworkId())
-      ).build();
+      var networkId = GroupOfRoutes.of(idFactory.createId(rhs.getNetworkId())).build();
       lhs.getGroupsOfRoutes().add(networkId);
     }
 

@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +13,9 @@ import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.utils.collection.MapUtils;
 
-public class LocationGroupMapper {
+class LocationGroupMapper {
 
+  private final IdFactory idFactory;
   private final StopMapper stopMapper;
   private final LocationMapper locationMapper;
   private final SiteRepositoryBuilder siteRepositoryBuilder;
@@ -24,10 +23,12 @@ public class LocationGroupMapper {
   private final Map<LocationGroup, GroupStop> mappedLocationGroups = new HashMap<>();
 
   public LocationGroupMapper(
+    IdFactory idFactory,
     StopMapper stopMapper,
     LocationMapper locationMapper,
     SiteRepositoryBuilder siteRepositoryBuilder
   ) {
+    this.idFactory = idFactory;
     this.stopMapper = stopMapper;
     this.locationMapper = locationMapper;
     this.siteRepositoryBuilder = siteRepositoryBuilder;
@@ -44,7 +45,7 @@ public class LocationGroupMapper {
 
   private GroupStop doMap(LocationGroup element) {
     GroupStopBuilder groupStopBuilder = siteRepositoryBuilder
-      .groupStop(mapAgencyAndId(element.getId()))
+      .groupStop(idFactory.createId(element.getId()))
       .withName(new NonLocalizedString(element.getName()));
 
     for (var location : element.getLocations()) {

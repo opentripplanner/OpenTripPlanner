@@ -98,7 +98,7 @@ public class RouteRequestToFilterChainMapper {
       builder.withTransitGroupPriority();
     }
 
-    var fareService = context.graph().getFareService();
+    var fareService = context.fareService();
     if (fareService != null) {
       builder.withFareDecorator(new DecorateWithFare(fareService));
     }
@@ -109,8 +109,8 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (OTPFeature.Co2Emissions.isOn()) {
-      builder.withEmissions(context.emissionsItineraryDecorator());
+    if (OTPFeature.Emission.isOn()) {
+      builder.withEmissions(context.emissionItineraryDecorator());
     }
 
     if (

@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.EMMISION;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
@@ -20,6 +21,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
+import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
@@ -124,6 +126,10 @@ public class GraphBuilderDataSources {
     return ofStream(NETEX).map(this::mapNetexFeed).toList();
   }
 
+  public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDatasource() {
+    return ofStream(EMMISION).map(this::mapEmissionFeed).toList();
+  }
+
   /**
    * Returns the optional data source for the stop consolidation configuration.
    */
@@ -186,6 +192,16 @@ public class GraphBuilderDataSources {
       .findFirst()
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
     return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
+  }
+
+  private ConfiguredDataSource<EmissionFeedParameters> mapEmissionFeed(DataSource dataSource) {
+    var p = buildConfig.emission
+      .feeds()
+      .stream()
+      .filter(c -> uriMatch(c.source(), dataSource.uri()))
+      .findFirst()
+      .orElseThrow();
+    return new ConfiguredDataSource<>(dataSource, p);
   }
 
   /**
