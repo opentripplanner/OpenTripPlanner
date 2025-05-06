@@ -31,7 +31,9 @@ public class AgencyMapperTest {
 
   private static final String FARE_URL = "www.url.com/fare";
 
-  private final AgencyMapper subject = new AgencyMapper(TimetableRepositoryForTest.FEED_ID);
+  private final AgencyMapper subject = new AgencyMapper(
+    new IdFactory(TimetableRepositoryForTest.FEED_ID)
+  );
 
   static {
     AGENCY.setId(ID);

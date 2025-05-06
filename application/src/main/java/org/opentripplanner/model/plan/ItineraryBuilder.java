@@ -38,7 +38,7 @@ public class ItineraryBuilder {
 
   /* SANDBOX EXPERIMENTAL PROPERTIES */
   Float accessibilityScore;
-  Emissions emissionsPerPerson;
+  Emission emissionPerPerson;
   ItineraryFare fare = ItineraryFare.empty();
 
   ItineraryBuilder(List<Leg> legs, boolean searchWindowAware) {
@@ -75,7 +75,7 @@ public class ItineraryBuilder {
 
     // Sandbox experimental properties
     this.accessibilityScore = original.accessibilityScore();
-    this.emissionsPerPerson = original.emissionsPerPerson();
+    this.emissionPerPerson = original.emissionPerPerson();
     this.fare = original.fare();
   }
 
@@ -185,8 +185,8 @@ public class ItineraryBuilder {
     return this;
   }
 
-  public ItineraryBuilder withEmissionsPerPerson(Emissions emissionsPerPerson) {
-    this.emissionsPerPerson = emissionsPerPerson;
+  public ItineraryBuilder withEmissionPerPerson(Emission emissionPerPerson) {
+    this.emissionPerPerson = emissionPerPerson;
     return this;
   }
 
