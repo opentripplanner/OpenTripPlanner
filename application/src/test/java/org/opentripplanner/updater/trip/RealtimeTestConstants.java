@@ -1,11 +1,8 @@
 package org.opentripplanner.updater.trip;
 
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.SiteRepository;
@@ -17,8 +14,6 @@ public final class RealtimeTestConstants {
   public final String STOP_A1_ID = "A1";
   public final String STOP_B1_ID = "B1";
   public final String STOP_C1_ID = "C1";
-  public final String OPERATOR_1_ID = "TestOperator1";
-  public final Operator OPERATOR1 = Operator.of(id(OPERATOR_1_ID)).withName(OPERATOR_1_ID).build();
 
   public final ZoneId TIME_ZONE = ZoneId.of(TimetableRepositoryForTest.TIME_ZONE_ID);
   public final Station STATION_A = testModel.station("A").build();

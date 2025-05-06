@@ -32,12 +32,11 @@ class ExtraJourneyTest {
   private static final RegularStop STOP_D1 = CONSTANTS.STOP_D1;
 
   private static final Route ROUTE_1 = TimetableRepositoryForTest.route("route-2").build();
-  private static final Operator OPERATOR1 = CONSTANTS.OPERATOR1;
-  private static final String OPERATOR_1_ID = CONSTANTS.OPERATOR_1_ID;
+  private static final Operator OPERATOR_2 = Operator.of(id("o2")).withName("o").build();
   private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
   private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
-    .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())
+    .withRoute(ROUTE_1.copy().withOperator(OPERATOR_2).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();
@@ -135,7 +134,7 @@ class ExtraJourneyTest {
     var createExtraJourney = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
-      .withOperatorRef(OPERATOR_1_ID)
+      .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
@@ -160,7 +159,7 @@ class ExtraJourneyTest {
       .withIsExtraJourney(true)
       // replace trip1
       .withVehicleJourneyRef(TRIP_1_ID)
-      .withOperatorRef(OPERATOR_1_ID)
+      .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
       .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(STOP_C1).arriveAimedExpected("00:03", "00:04"))
@@ -192,7 +191,7 @@ class ExtraJourneyTest {
       .withDatedVehicleJourneyRef(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withVehicleJourneyRef(TRIP_1_ID)
-      .withOperatorRef(OPERATOR_1_ID)
+      .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
@@ -213,7 +212,7 @@ class ExtraJourneyTest {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
-      .withOperatorRef(OPERATOR_1_ID)
+      .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
       .withRecordedCalls(builder -> builder.call(STOP_C1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04"));

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -32,7 +33,11 @@ public record TripInput(String id, Route route, List<StopCall> stops) {
     private final String id;
     private final List<StopCall> stops = new ArrayList<>();
     // can be made configurable if needed
-    private Route route = TimetableRepositoryForTest.route("route-1").build();
+    private Route route = TimetableRepositoryForTest.route("route-1")
+      .withOperator(
+        Operator.of(TimetableRepositoryForTest.id("operator-1")).withName("Operator 1").build()
+      )
+      .build();
 
     TripInputBuilder(String id) {
       this.id = id;
