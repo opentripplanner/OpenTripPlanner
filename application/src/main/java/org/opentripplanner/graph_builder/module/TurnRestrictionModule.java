@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -24,13 +25,18 @@ public class TurnRestrictionModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(TurnRestrictionModule.class);
 
   final Graph graph;
+  final OsmInfoGraphBuildRepository osmInfoGraphBuildRepository;
   final Map<Vertex, Set<SubsidiaryVertex>> subsidiaryVertices;
   final Map<Vertex, IntersectionVertex> mainVertices;
   int addedVertices;
   int addedEdges;
 
-  public TurnRestrictionModule(Graph graph) {
+  public TurnRestrictionModule(
+    Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository
+  ) {
     this.graph = graph;
+    this.osmInfoGraphBuildRepository = osmInfoGraphBuildRepository;
     this.subsidiaryVertices = new HashMap<>();
     this.mainVertices = new HashMap<>();
     initializeMainAndSubsidiaryVertices();
@@ -170,11 +176,9 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     int turnRestrictionCount = 0;
     addedVertices = 0;
     addedEdges = 0;
-    for (var streetEdge : graph.getEdgesOfType(StreetEdge.class)) {
-      for (var turnRestriction : streetEdge.getTurnRestrictions()) {
-        processRestriction(turnRestriction);
-        turnRestrictionCount++;
-      }
+    for (var turnRestriction : osmInfoGraphBuildRepository.getTurnRestrictions()) {
+      processRestriction(turnRestriction);
+      turnRestrictionCount++;
     }
     LOG.info(
       "Applied {} turn restrictions, added {} vertices and {} edges",

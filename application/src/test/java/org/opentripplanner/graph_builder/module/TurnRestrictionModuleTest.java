@@ -15,6 +15,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -62,8 +64,19 @@ public class TurnRestrictionModuleTest {
       turnRestrictionType,
       traverseModeSet
     );
-    from.addTurnRestriction(restriction);
     return restriction;
+  }
+
+  private void turnRestriction(
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetEdge from,
+    StreetEdge to,
+    TraverseModeSet traverseModeSet,
+    TurnRestrictionType turnRestrictionType
+  ) {
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      turnRestriction(from, to, traverseModeSet, turnRestrictionType)
+    );
   }
 
   private TurnRestriction turnRestriction(
@@ -89,6 +102,7 @@ public class TurnRestrictionModuleTest {
   @Test
   public void singleTurnRestriction() {
     var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var A = vertex(graph, 1, -1, 0);
     var B = vertex(graph, 2, 0, 0);
     var C = vertex(graph, 3, 0, 1);
@@ -98,10 +112,10 @@ public class TurnRestrictionModuleTest {
     edges(B, C, 1.0);
     edges(B, D, 1.0);
     var BE = edges(B, E, 1.0);
-    AB[0].addTurnRestriction(
-        new TurnRestriction(AB[0], BE[0], TurnRestrictionType.NO_TURN, TraverseModeSet.allModes())
-      );
-    var module = new TurnRestrictionModule(graph);
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      new TurnRestriction(AB[0], BE[0], TurnRestrictionType.NO_TURN, TraverseModeSet.allModes())
+    );
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     module.buildGraph();
 
     var newB = graph
@@ -126,6 +140,7 @@ public class TurnRestrictionModuleTest {
     //   | |
     //   H A
     var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var A = vertex(graph, 1, -1, 0);
     var B = vertex(graph, 2, 0, 0);
     var C = vertex(graph, 3, 0, 1);
@@ -145,7 +160,7 @@ public class TurnRestrictionModuleTest {
     turnRestrictions.add(turnRestriction(AB[0], BE[0]));
     turnRestrictions.add(turnRestriction(BE[0], EH[0]));
     assertEquals(4, B.getOutgoing().size());
-    var module = new TurnRestrictionModule(graph);
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     // Test all orders in which the turn restrictions can be applied.
     //module.buildGraph();
     List<TurnRestriction> useTurnRestrictions = new ArrayList<>();
@@ -205,6 +220,7 @@ public class TurnRestrictionModuleTest {
     //     A
     // only turn: A-B-C, D-B-E, B-E-F
     var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var A = vertex(graph, 1, -1, 0);
     var B = vertex(graph, 2, 0, 0);
     var C = vertex(graph, 3, 0, 1);
@@ -223,7 +239,7 @@ public class TurnRestrictionModuleTest {
     turnRestrictions.add(turnRestriction(BD[1], BE[0], TurnRestrictionType.ONLY_TURN));
     turnRestrictions.add(turnRestriction(BE[0], EF[0], TurnRestrictionType.ONLY_TURN));
     assertEquals(4, B.getOutgoing().size());
-    var module = new TurnRestrictionModule(graph);
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     // Test all orders in which the turn restrictions can be applied.
     //module.buildGraph();
     List<TurnRestriction> useTurnRestrictions = new ArrayList<>();
@@ -274,6 +290,7 @@ public class TurnRestrictionModuleTest {
     //      A
     // B-D-F is forbidden by a turn restriction
     var graph = new Graph();
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var A = vertex(graph, 1, 0.0, 0.0);
     var B = vertex(graph, 2, 1.0, 0.0);
     var C = vertex(graph, 3, 1.5, 1.0);
@@ -286,9 +303,11 @@ public class TurnRestrictionModuleTest {
     edges(C, D, 1.0);
     edges(D, E, 1.0);
     var DF = edges(D, F, 1.0);
-    turnRestriction(BD[0], DF[0], new TraverseModeSet(TraverseMode.CAR));
+    osmInfoGraphBuildRepository.addTurnRestriction(
+      turnRestriction(BD[0], DF[0], new TraverseModeSet(TraverseMode.CAR))
+    );
 
-    var module = new TurnRestrictionModule(graph);
+    var module = new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
     module.buildGraph();
 
     var request = new RouteRequest();

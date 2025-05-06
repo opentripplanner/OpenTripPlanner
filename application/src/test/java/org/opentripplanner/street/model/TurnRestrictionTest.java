@@ -19,6 +19,8 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
+import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -74,27 +76,25 @@ public class TurnRestrictionTest {
     StreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
     StreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
 
+    var osmInfoGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     // Turn restrictions are only for driving modes.
     // - can't turn from 1st onto Main.
     // - can't turn from 2nd onto Main.
     // - can't turn from 2nd onto Broad.
-    DisallowTurn(maple_main1, main1_2);
-    DisallowTurn(maple_main2, main2_3);
-    DisallowTurn(main_broad2, broad2_3);
+    DisallowTurn(osmInfoGraphBuildRepository, maple_main1, main1_2);
+    DisallowTurn(osmInfoGraphBuildRepository, maple_main2, main2_3);
+    DisallowTurn(osmInfoGraphBuildRepository, main_broad2, broad2_3);
 
     // Hold onto some vertices for the tests
     topRight = maple1;
     bottomLeft = broad3;
 
     Graph graph = StreetModelForTest.makeGraph(topRight);
-    TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(graph);
+    TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(
+      graph,
+      osmInfoGraphBuildRepository
+    );
     turnRestrictionModule.buildGraph();
-  }
-
-  @Test
-  public void testHasExplicitTurnRestrictions() {
-    assertFalse(maple_main1.getTurnRestrictions().isEmpty());
-    assertTrue(broad1_2.getTurnRestrictions().isEmpty());
   }
 
   @Test
@@ -221,10 +221,14 @@ public class TurnRestrictionTest {
       .buildAndConnect();
   }
 
-  private void DisallowTurn(StreetEdge from, StreetEdge to) {
+  private void DisallowTurn(
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository,
+    StreetEdge from,
+    StreetEdge to
+  ) {
     TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
     TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
     TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-    from.addTurnRestriction(restrict);
+    osmInfoGraphBuildRepository.addTurnRestriction(restrict);
   }
 }

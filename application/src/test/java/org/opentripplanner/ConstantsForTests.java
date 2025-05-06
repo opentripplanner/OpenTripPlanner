@@ -218,7 +218,10 @@ public class ConstantsForTests {
         vehicleParkingRepository
       ).build();
       osmModule.buildGraph();
-      TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(graph);
+      TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(
+        graph,
+        osmInfoRepository
+      );
       turnRestrictionModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {

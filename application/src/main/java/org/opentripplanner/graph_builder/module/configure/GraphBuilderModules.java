@@ -298,8 +298,11 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static TurnRestrictionModule provideTurnRestrictionModule(Graph graph) {
-    return new TurnRestrictionModule(graph);
+  static TurnRestrictionModule provideTurnRestrictionModule(
+    Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository
+  ) {
+    return new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
   }
 
   @Provides
