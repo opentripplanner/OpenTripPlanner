@@ -98,7 +98,7 @@ public class RouteRequestToFilterChainMapper {
       builder.withTransitGroupPriority();
     }
 
-    var fareService = context.graph().getFareService();
+    var fareService = context.fareService();
     if (fareService != null) {
       builder.withFareDecorator(new DecorateWithFare(fareService));
     }
