@@ -58,7 +58,6 @@ public class FlexIntegrationTest {
     TestOtpModel model = FlexIntegrationTestData.cobbOsm();
     graph = model.graph();
     timetableRepository = model.timetableRepository();
-
     addGtfsToGraph(
       graph,
       timetableRepository,
@@ -68,7 +67,11 @@ public class FlexIntegrationTest {
         FlexIntegrationTestData.COBB_FLEX_GTFS
       )
     );
-    service = TestServerContext.createServerContext(graph, timetableRepository).routingService();
+    service = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      model.fareServiceFactory().makeFareService()
+    ).routingService();
   }
 
   @Test
@@ -182,7 +185,7 @@ public class FlexIntegrationTest {
     List<File> gtfsFiles
   ) {
     // GTFS
-    var gtfsBundles = gtfsFiles.stream().map(it -> GtfsBundle.forTest(it)).toList();
+    var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::forTest).toList();
     GtfsModule gtfsModule = GtfsModule.forTest(
       gtfsBundles,
       timetableRepository,

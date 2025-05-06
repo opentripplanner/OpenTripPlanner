@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -86,7 +87,8 @@ public class ConstructApplication {
     EmissionRepository emissionRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters
+    StreetLimitationParameters streetLimitationParameters,
+    FareServiceFactory fareServiceFactory
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -109,6 +111,7 @@ public class ConstructApplication {
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .schema(config.routerConfig().routingRequestDefaults())
+      .fareServiceFactory(fareServiceFactory)
       .build();
   }
 
@@ -138,6 +141,7 @@ public class ConstructApplication {
       graphBuilderDataSources,
       graph(),
       osmInfoGraphBuildRepository,
+      fareServiceFactory(),
       factory.timetableRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
@@ -348,5 +352,9 @@ public class ConstructApplication {
 
   public StreetLimitationParameters streetLimitationParameters() {
     return factory.streetLimitationParameters();
+  }
+
+  public FareServiceFactory fareServiceFactory() {
+    return factory.fareServiceFactory();
   }
 }
