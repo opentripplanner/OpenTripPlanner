@@ -6,6 +6,7 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -32,33 +33,36 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
  */
 public final class RealtimeTestEnvironment {
 
-  public final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
-
   public final TimetableRepository timetableRepository;
   public final TimetableSnapshotManager snapshotManager;
   private final SiriRealTimeTripUpdateAdapter siriAdapter;
   private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;
+  private final LocalDate serviceDate;
 
   public static RealtimeTestEnvironmentBuilder of() {
     return new RealtimeTestEnvironmentBuilder();
   }
 
-  RealtimeTestEnvironment(TimetableRepository timetableRepository) {
+  RealtimeTestEnvironment(
+    TimetableRepository timetableRepository,
+    LocalDate defaultServiceDate,
+    ZoneId zoneId
+  ) {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
     this.snapshotManager = new TimetableSnapshotManager(
       null,
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
-      () -> CONSTANTS.SERVICE_DATE
+      () -> defaultServiceDate
     );
     siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
     gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      CONSTANTS.SERVICE_DATE
+      defaultServiceDate
     );
-    dateTimeHelper = new DateTimeHelper(CONSTANTS.TIME_ZONE, CONSTANTS.SERVICE_DATE);
+    dateTimeHelper = new DateTimeHelper(zoneId, defaultServiceDate);
+    this.serviceDate = defaultServiceDate;
   }
 
   /**
@@ -88,7 +92,7 @@ public final class RealtimeTestEnvironment {
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
-    return getPatternForTrip(tripId, SERVICE_DATE);
+    return getPatternForTrip(tripId, serviceDate);
   }
 
   public TripPattern getPatternForTrip(String id) {
@@ -105,7 +109,7 @@ public final class RealtimeTestEnvironment {
    * Find the current TripTimes for a trip id on the default serviceDate
    */
   public TripTimes getTripTimesForTrip(String id) {
-    return getTripTimesForTrip(id(id), SERVICE_DATE);
+    return getTripTimesForTrip(id(id), serviceDate);
   }
 
   public DateTimeHelper getDateTimeHelper() {
@@ -117,7 +121,7 @@ public final class RealtimeTestEnvironment {
   }
 
   public String getRealtimeTimetable(String tripId) {
-    return getRealtimeTimetable(id(tripId), SERVICE_DATE);
+    return getRealtimeTimetable(id(tripId), serviceDate);
   }
 
   public String getRealtimeTimetable(FeedScopedId tripId, LocalDate serviceDate) {

@@ -37,7 +37,6 @@ public class RealtimeTestEnvironmentBuilder {
 
   public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     createTrip(trip);
-    timetableRepository.index();
     return this;
   }
 
@@ -57,7 +56,8 @@ public class RealtimeTestEnvironmentBuilder {
       DataImportIssueStore.NOOP
     );
 
-    return new RealtimeTestEnvironment(timetableRepository);
+    timetableRepository.index();
+    return new RealtimeTestEnvironment(timetableRepository, CONSTANTS.SERVICE_DATE, TIME_ZONE);
   }
 
   private Trip createTrip(TripInput tripInput) {
