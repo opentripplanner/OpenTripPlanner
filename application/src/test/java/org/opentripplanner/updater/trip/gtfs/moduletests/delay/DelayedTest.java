@@ -10,8 +10,11 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
@@ -21,7 +24,16 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 /**
  * Delays should be applied to the first trip but should leave the second trip untouched.
  */
-class DelayedTest implements RealtimeTestConstants {
+class DelayedTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_2_ID = CONSTANTS.TRIP_2_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;
 
   private static final int DELAY = 1;
   private static final int STOP_SEQUENCE = 1;

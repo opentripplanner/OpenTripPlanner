@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
@@ -18,7 +19,13 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * A trip with start date that is outside the service period shouldn't throw an exception and is
  * ignored instead.
  */
-class InvalidInputTest implements RealtimeTestConstants {
+class InvalidInputTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
   public static List<LocalDate> cases() {
     return List.of(SERVICE_DATE.minusYears(10), SERVICE_DATE.plusYears(10));
@@ -33,7 +40,7 @@ class InvalidInputTest implements RealtimeTestConstants {
       .build();
     var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, TIME_ZONE)
+    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, CONSTANTS.TIME_ZONE)
       .addDelayedStopTime(2, 60, 80)
       .build();
 

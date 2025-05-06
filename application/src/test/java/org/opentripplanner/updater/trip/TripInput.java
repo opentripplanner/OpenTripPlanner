@@ -15,12 +15,12 @@ public record TripInput(String id, Route route, List<StopCall> stops) {
     return new TripInputBuilder(id);
   }
 
-  public static class TripInputBuilder implements RealtimeTestConstants {
+  public static class TripInputBuilder {
 
     private final String id;
     private final List<StopCall> stops = new ArrayList<>();
     // can be made configurable if needed
-    private Route route = ROUTE_1;
+    private Route route = new RealtimeTestConstants().ROUTE_1;
 
     TripInputBuilder(String id) {
       this.id = id;

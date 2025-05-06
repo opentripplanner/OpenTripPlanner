@@ -5,9 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
@@ -18,7 +22,20 @@ import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class ExtraJourneyTest implements RealtimeTestConstants {
+class ExtraJourneyTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
+  private static final RegularStop STOP_D1 = CONSTANTS.STOP_D1;
+
+  private static final Route ROUTE_1 = CONSTANTS.ROUTE_1;
+  private static final Operator OPERATOR1 = CONSTANTS.OPERATOR1;
+  private static final String ROUTE_1_ID = CONSTANTS.ROUTE_1_ID;
+  private static final String OPERATOR_1_ID = CONSTANTS.OPERATOR_1_ID;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
   private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR1).build())

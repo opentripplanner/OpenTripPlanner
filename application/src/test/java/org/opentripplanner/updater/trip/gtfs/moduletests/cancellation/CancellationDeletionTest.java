@@ -10,10 +10,13 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
@@ -24,7 +27,17 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * Cancellations and deletions should end up in the internal data model and make trips unavailable
  * for routing.
  */
-public class CancellationDeletionTest implements RealtimeTestConstants {
+public class CancellationDeletionTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String STOP_A1_ID = CONSTANTS.STOP_A1_ID;
+  private static final String STOP_B1_ID = CONSTANTS.STOP_B1_ID;
+  private static final String STOP_C1_ID = CONSTANTS.STOP_C1_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;
 
   static List<Arguments> cases() {
     return List.of(

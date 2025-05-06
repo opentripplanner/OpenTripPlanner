@@ -3,12 +3,19 @@ package org.opentripplanner.updater.trip.siri.moduletests.cancellation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class CancelledStopTest implements RealtimeTestConstants {
+class CancelledStopTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_2_ID = CONSTANTS.TRIP_2_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_2_ID)
     .addStop(STOP_A1, "0:01:00", "0:01:01")

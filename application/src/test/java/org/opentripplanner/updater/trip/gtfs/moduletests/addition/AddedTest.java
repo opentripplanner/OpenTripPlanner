@@ -12,12 +12,15 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
@@ -26,7 +29,15 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
-class AddedTest implements RealtimeTestConstants {
+class AddedTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;
+  private static final String STOP_A1_ID = CONSTANTS.STOP_A1_ID;
+  private static final String STOP_B1_ID = CONSTANTS.STOP_B1_ID;
+  private static final String STOP_C1_ID = CONSTANTS.STOP_C1_ID;
 
   final String ADDED_TRIP_ID = "added_trip";
 

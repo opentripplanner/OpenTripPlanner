@@ -5,20 +5,24 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.MULTIPLE_FUZZY_TRIP_MATCHES;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.STOP_A1;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.STOP_B1;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.TRIP_1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.TRIP_2_ID;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.framework.Result;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import uk.org.siri.siri21.EstimatedVehicleJourney;
 
 class SiriFuzzyTripMatcherTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_2_ID = CONSTANTS.TRIP_2_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
 
   @Test
   void match() {

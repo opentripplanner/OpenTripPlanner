@@ -2,6 +2,8 @@ package org.opentripplanner.updater.trip;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
@@ -11,15 +13,23 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
+import org.opentripplanner.transit.service.SiteRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
 
-public class RealtimeTestEnvironmentBuilder implements RealtimeTestConstants {
+public class RealtimeTestEnvironmentBuilder {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final FeedScopedId SERVICE_ID = CONSTANTS.SERVICE_ID;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  private static final SiteRepository SITE_REPOSITORY = CONSTANTS.SITE_REPOSITORY;
+  private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;
 
   private final TimetableRepository timetableRepository = new TimetableRepository(
     SITE_REPOSITORY,

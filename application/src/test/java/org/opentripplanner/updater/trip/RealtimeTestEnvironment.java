@@ -30,7 +30,10 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 /**
  * This class exists so that you can share the data building logic for GTFS and Siri tests.
  */
-public final class RealtimeTestEnvironment implements RealtimeTestConstants {
+public final class RealtimeTestEnvironment {
+
+  public final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
   public final TimetableRepository timetableRepository;
   public final TimetableSnapshotManager snapshotManager;
@@ -49,13 +52,13 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     this.snapshotManager = new TimetableSnapshotManager(
       null,
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
-      () -> SERVICE_DATE
+      () -> CONSTANTS.SERVICE_DATE
     );
     siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
     gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      SERVICE_DATE
+      CONSTANTS.SERVICE_DATE
     );
-    dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
+    dateTimeHelper = new DateTimeHelper(CONSTANTS.TIME_ZONE, CONSTANTS.SERVICE_DATE);
   }
 
   /**

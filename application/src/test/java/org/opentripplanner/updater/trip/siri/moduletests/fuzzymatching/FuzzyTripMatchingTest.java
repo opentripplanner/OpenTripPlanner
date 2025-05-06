@@ -4,14 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class FuzzyTripMatchingTest implements RealtimeTestConstants {
+class FuzzyTripMatchingTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")

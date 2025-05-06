@@ -11,7 +11,10 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -22,7 +25,15 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 /**
  * A mixture of delayed and skipped stops should result in both delayed and cancelled stops.
  */
-class SkippedTest implements RealtimeTestConstants {
+class SkippedTest {
+
+  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final String TRIP_2_ID = CONSTANTS.TRIP_2_ID;
+  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
+  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
+  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_2_ID)
     .addStop(STOP_A1, "0:01:00", "0:01:01")
