@@ -24,16 +24,16 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class ExtraJourneyTest implements RealtimeTestConstants {
 
-  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final RegularStop STOP_A1 = ENV_BUILDER.stop("A1");
-  private static final RegularStop STOP_B1 = ENV_BUILDER.stop("B1");
-  private static final RegularStop STOP_C1 = ENV_BUILDER.stop("C1");
-  private static final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
-
   private static final Route ROUTE_1 = TimetableRepositoryForTest.route("route-2").build();
   private static final Operator OPERATOR_2 = Operator.of(id("o2")).withName("o").build();
 
-  private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A1 = ENV_BUILDER.stop("A1");
+  private final RegularStop STOP_B1 = ENV_BUILDER.stop("B1");
+  private final RegularStop STOP_C1 = ENV_BUILDER.stop("C1");
+  private final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
+
+  private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR_2).build())
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
@@ -206,7 +206,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     assertFailure(UpdateError.UpdateErrorType.UNKNOWN, result);
   }
 
-  private static SiriEtBuilder createValidAddedJourney(RealtimeTestEnvironment env) {
+  private SiriEtBuilder createValidAddedJourney(RealtimeTestEnvironment env) {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)

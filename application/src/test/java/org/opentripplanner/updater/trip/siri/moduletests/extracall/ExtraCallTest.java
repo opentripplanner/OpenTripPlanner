@@ -20,7 +20,7 @@ class ExtraCallTest implements RealtimeTestConstants {
   private final RegularStop STOP_A1 = ENV_BUILDER.stopAtStation(STOP_A1_ID, "A");
   private final RegularStop STOP_B1 = ENV_BUILDER.stopAtStation(STOP_B1_ID, "B");
   private final RegularStop STOP_C1 = ENV_BUILDER.stopAtStation(STOP_C1_ID, "C");
-  private final RegularStop STOP_D1 = ENV_BUILDER.stopAtStation("D1", "D");
+  private final RegularStop STOP_D1 = ENV_BUILDER.stopAtStation(STOP_D1_ID, "D");
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")

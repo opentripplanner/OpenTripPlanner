@@ -22,10 +22,9 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class InvalidInputTest implements RealtimeTestConstants {
 
-  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
-  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
 
   public static List<LocalDate> cases() {
     return List.of(SERVICE_DATE.minusYears(10), SERVICE_DATE.plusYears(10));

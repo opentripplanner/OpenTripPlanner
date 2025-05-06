@@ -16,7 +16,6 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class CanceledTripTest implements RealtimeTestConstants {
 
-  private static final String TRIP_ID = "TestTrip1";
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
   private final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
   private final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
@@ -24,7 +23,7 @@ public class CanceledTripTest implements RealtimeTestConstants {
   @Test
   void listCanceledTrips() {
     var env = ENV_BUILDER.addTrip(
-      TripInput.of(TRIP_ID)
+      TripInput.of(TRIP_1_ID)
         .addStop(STOP_A1, "0:00:10", "0:00:11")
         .addStop(STOP_B1, "0:00:20", "0:00:21")
         .build()
@@ -32,13 +31,13 @@ public class CanceledTripTest implements RealtimeTestConstants {
 
     assertThat(env.getTransitService().listCanceledTrips()).isEmpty();
 
-    var update = new TripUpdateBuilder(TRIP_ID, SERVICE_DATE, CANCELED, TIME_ZONE).build();
+    var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, CANCELED, TIME_ZONE).build();
     assertSuccess(env.applyTripUpdate(update));
 
     var canceled = env.getTransitService().listCanceledTrips();
     assertThat(canceled).hasSize(1);
     var trip = canceled.getFirst();
-    assertEquals(id(TRIP_ID), trip.getTrip().getId());
+    assertEquals(id(TRIP_1_ID), trip.getTrip().getId());
     assertEquals(SERVICE_DATE, trip.getServiceDate());
   }
 }
