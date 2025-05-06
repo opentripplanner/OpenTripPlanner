@@ -535,18 +535,19 @@ public class OrcaFareService extends DefaultFareService {
       medium = CASH_MEDIUM;
     }
     var duration = Duration.ZERO;
-    var fareProduct = new FareProduct(id, "rideCost", totalFare, duration, riderCategory, medium);
+    var fareProduct = FareProduct.of(id, "rideCost", totalFare)
+      .withValidity(duration)
+      .withCategory(riderCategory)
+      .withMedium(medium)
+      .build();
     itineraryFare.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount.isPositive()) {
-      var transferFareProduct = new FareProduct(
-        id,
-        "transfer",
-        transferDiscount,
-        duration,
-        riderCategory,
-        medium
-      );
+      var transferFareProduct = FareProduct.of(id, "transfer", transferDiscount)
+        .withValidity(duration)
+        .withCategory(riderCategory)
+        .withMedium(medium)
+        .build();
       itineraryFare.addFareProduct(leg, transferFareProduct);
     }
   }

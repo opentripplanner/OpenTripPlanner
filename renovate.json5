@@ -149,6 +149,7 @@
         "com.google.guava:guava",
         "com.google.cloud:libraries-bom",
         "com.google.protobuf:protobuf-java",
+        "com.google.dagger:{/,}**",
         "io.micrometer:micrometer-registry-prometheus",
         "io.micrometer:micrometer-registry-influx",
         "com.fasterxml.jackson.core:{/,}**",
@@ -161,13 +162,20 @@
       "description": "give some projects time to publish a changelog before opening the PR",
       "matchPackageNames": [
         "com.google.dagger:{/,}**",
-        "com.fasterxml.jackson:{/,}**",
-        "com.fasterxml.jackson.datatype::{/,}**",
         "org.apache.httpcomponents.client5:httpclient5"
       ],
       "matchUpdateTypes": ["major", "minor"],
       "minimumReleaseAge": "1 week",
       "schedule": "on the 13th through 14th day of the month"
+    },
+    {
+      "groupName": "Jackson non-patch",
+      "matchPackageNames": [
+        "com.fasterxml.jackson:{/,}**",
+        "com.fasterxml.jackson.datatype::{/,}**",
+      ],
+      "matchUpdateTypes": ["major", "minor"],
+      "minimumReleaseAge": "1 week"
     },
     {
       "description": "Geotools takes a while to publish a changelog and since it pulls in JTS it can change the serialization of the graph",
