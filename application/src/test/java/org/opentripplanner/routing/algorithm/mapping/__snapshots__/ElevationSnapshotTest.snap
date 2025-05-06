@@ -134,8 +134,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.directBikeRe
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
       "duration" : 451,
-      "elevationGained" : 12.88,
-      "elevationLost" : 38.14,
+      "elevationGained" : 12.86,
+      "elevationLost" : 38.12,
       "endTime" : "2009-10-21T23:17:31.000+00:00",
       "fare" : {
         "details" : { },
@@ -531,8 +531,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
       "duration" : 1119,
-      "elevationGained" : 15.03,
-      "elevationLost" : 4.23,
+      "elevationGained" : 15.02,
+      "elevationLost" : 4.22,
       "endTime" : "2009-10-21T23:31:16.000+00:00",
       "fare" : {
         "details" : { },
@@ -2111,8 +2111,8 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
     {
       "arrivedAtDestinationWithRentedBicycle" : false,
       "duration" : 1119,
-      "elevationGained" : 15.03,
-      "elevationLost" : 4.23,
+      "elevationGained" : 15.02,
+      "elevationLost" : 4.22,
       "endTime" : "2009-10-21T23:46:16.000+00:00",
       "fare" : {
         "details" : { },

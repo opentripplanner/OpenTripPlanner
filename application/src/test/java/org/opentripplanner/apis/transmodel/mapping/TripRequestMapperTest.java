@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
@@ -122,6 +123,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     var otpServerRequestContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      new DefaultFareService(),
       null,
       defaultRequest
     );

@@ -157,9 +157,10 @@ public class OTPMain {
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
-        app.emissionsDataModel(),
+        app.emissionRepository(),
         app.stopConsolidationRepository(),
-        app.streetLimitationParameters()
+        app.streetLimitationParameters(),
+        app.fareServiceFactory()
       ).save(app.graphOutputDataSource());
       // Log size info for the deduplicator
       LOG.info("Memory optimized {}", app.graph().deduplicator.toString());
