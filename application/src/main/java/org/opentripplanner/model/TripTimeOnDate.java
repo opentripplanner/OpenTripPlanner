@@ -170,7 +170,7 @@ public class TripTimeOnDate {
   /**
    * A comparator that uses real time departure if it is available, otherwise the scheduled departure.
    */
-  public static Comparator<TripTimeOnDate> compareByRealtimeDeparture() {
+  public static Comparator<TripTimeOnDate> compareByDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
   }
 

@@ -49,7 +49,7 @@ public class TripTimeOnDateRequestBuilder {
   private ArrivalDeparture arrivalDeparture = ArrivalDeparture.BOTH;
   private int numberOfDepartures = 10;
   private Instant time;
-  private Comparator<TripTimeOnDate> sortOrder = TripTimeOnDate.compareByRealtimeDeparture();
+  private Comparator<TripTimeOnDate> sortOrder = TripTimeOnDate.compareByDeparture();
 
   TripTimeOnDateRequestBuilder(Collection<StopLocation> timesAtStops) {
     this.stopLocations = timesAtStops;

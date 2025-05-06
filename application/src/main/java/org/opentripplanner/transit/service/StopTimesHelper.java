@@ -196,7 +196,7 @@ class StopTimesHelper {
       arrivalDeparture,
       includeCancellations,
       true,
-      TripTimeOnDate.compareByRealtimeDeparture()
+      TripTimeOnDate.compareByDeparture()
     );
 
     return new ArrayList<>(pq);

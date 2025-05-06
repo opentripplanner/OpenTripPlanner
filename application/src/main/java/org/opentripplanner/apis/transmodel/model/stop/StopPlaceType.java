@@ -375,7 +375,7 @@ public class StopPlaceType {
               tripTimeOnDateStream,
               departuresPerLineAndDestinationDisplay
             )
-              .sorted(TripTimeOnDate.compareByRealtimeDeparture())
+              .sorted(TripTimeOnDate.compareByDeparture())
               .distinct()
               .limit(numberOfDepartures)
               .collect(Collectors.toList());
@@ -459,7 +459,7 @@ public class StopPlaceType {
         .flatMap(tripTimes ->
           tripTimes
             .stream()
-            .sorted(TripTimeOnDate.compareByRealtimeDeparture())
+            .sorted(TripTimeOnDate.compareByDeparture())
             .distinct()
             .limit(departuresPerLineAndDestinationDisplay)
         );
