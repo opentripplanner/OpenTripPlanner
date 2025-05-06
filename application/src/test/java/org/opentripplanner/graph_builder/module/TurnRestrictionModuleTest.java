@@ -89,11 +89,11 @@ public class TurnRestrictionModuleTest {
   @Test
   public void singleTurnRestriction() {
     var graph = new Graph();
-    StreetVertex A = vertex(graph, 1, -1, 0);
-    StreetVertex B = vertex(graph, 2, 0, 0);
-    StreetVertex C = vertex(graph, 3, 0, 1);
-    StreetVertex D = vertex(graph, 4, 1, 0);
-    StreetVertex E = vertex(graph, 5, 0, -1);
+    var A = vertex(graph, 1, -1, 0);
+    var B = vertex(graph, 2, 0, 0);
+    var C = vertex(graph, 3, 0, 1);
+    var D = vertex(graph, 4, 1, 0);
+    var E = vertex(graph, 5, 0, -1);
     var AB = edges(A, B, 1.0);
     edges(B, C, 1.0);
     edges(B, D, 1.0);
@@ -111,10 +111,10 @@ public class TurnRestrictionModuleTest {
       .findFirst()
       .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, newB);
-    var newBout = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
-    assertThat(newBout).containsExactly(A, C, D);
-    var Bout = B.getOutgoing().stream().map(Edge::getToVertex).toList();
-    assertThat(Bout).containsExactly(A, C, D, E);
+    var newOutB = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(newOutB).containsExactly(A, C, D);
+    var outB = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(outB).containsExactly(A, C, D, E);
   }
 
   @ParameterizedTest
@@ -126,14 +126,14 @@ public class TurnRestrictionModuleTest {
     //   | |
     //   H A
     var graph = new Graph();
-    StreetVertex A = vertex(graph, 1, -1, 0);
-    StreetVertex B = vertex(graph, 2, 0, 0);
-    StreetVertex C = vertex(graph, 3, 0, 1);
-    StreetVertex D = vertex(graph, 4, 1, 0);
-    StreetVertex E = vertex(graph, 5, 0, -1);
-    StreetVertex F = vertex(graph, 6, 1, -1);
-    StreetVertex G = vertex(graph, 7, 0, -2);
-    StreetVertex H = vertex(graph, 8, -1, -1);
+    var A = vertex(graph, 1, -1, 0);
+    var B = vertex(graph, 2, 0, 0);
+    var C = vertex(graph, 3, 0, 1);
+    var D = vertex(graph, 4, 1, 0);
+    var E = vertex(graph, 5, 0, -1);
+    var F = vertex(graph, 6, 1, -1);
+    var G = vertex(graph, 7, 0, -2);
+    var H = vertex(graph, 8, -1, -1);
     var AB = edges(A, B, 1.0);
     edges(B, C, 1.0);
     edges(B, D, 1.0);
@@ -176,23 +176,23 @@ public class TurnRestrictionModuleTest {
       .findFirst()
       .get();
     assertThat(graph.getVertices()).containsExactly(A, B, C, D, E, F, G, H, newB, newE);
-    var newBout = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
-    assertThat(newBout).containsExactly(A, C, D);
-    var Bout = B.getOutgoing().stream().map(Edge::getToVertex).toList();
-    assertThat(Bout).containsExactly(A, C, D, newE);
-    var newEout = newE.getOutgoing().stream().map(Edge::getToVertex).toList();
-    assertThat(newEout).containsExactly(B, F, G);
-    var Eout = E.getOutgoing().stream().map(Edge::getToVertex).toList();
-    assertThat(Eout).containsExactly(B, F, G, H);
+    var newOutB = newB.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(newOutB).containsExactly(A, C, D);
+    var outB = B.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(outB).containsExactly(A, C, D, newE);
+    var newOutE = newE.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(newOutE).containsExactly(B, F, G);
+    var outE = E.getOutgoing().stream().map(Edge::getToVertex).toList();
+    assertThat(outE).containsExactly(B, F, G, H);
 
-    var newBin = newB.getIncoming().stream().map(Edge::getFromVertex).toList();
-    assertThat(newBin).containsExactly(A);
-    var Bin = B.getIncoming().stream().map(Edge::getFromVertex).toList();
-    assertThat(Bin).containsExactly(C, D, E, newE);
-    var newEin = newE.getIncoming().stream().map(Edge::getFromVertex).toList();
-    assertThat(newEin).containsExactly(B);
-    var Ein = E.getIncoming().stream().map(Edge::getFromVertex).toList();
-    assertThat(Ein).containsExactly(F, G, H);
+    var newInB = newB.getIncoming().stream().map(Edge::getFromVertex).toList();
+    assertThat(newInB).containsExactly(A);
+    var inB = B.getIncoming().stream().map(Edge::getFromVertex).toList();
+    assertThat(inB).containsExactly(C, D, E, newE);
+    var newInE = newE.getIncoming().stream().map(Edge::getFromVertex).toList();
+    assertThat(newInE).containsExactly(B);
+    var inE = E.getIncoming().stream().map(Edge::getFromVertex).toList();
+    assertThat(inE).containsExactly(F, G, H);
   }
 
   @ParameterizedTest
@@ -205,13 +205,13 @@ public class TurnRestrictionModuleTest {
     //     A
     // only turn: A-B-C, D-B-E, B-E-F
     var graph = new Graph();
-    StreetVertex A = vertex(graph, 1, -1, 0);
-    StreetVertex B = vertex(graph, 2, 0, 0);
-    StreetVertex C = vertex(graph, 3, 0, 1);
-    StreetVertex D = vertex(graph, 4, 1, 0);
-    StreetVertex E = vertex(graph, 5, 0, -1);
-    StreetVertex F = vertex(graph, 6, 1, -1);
-    StreetVertex G = vertex(graph, 7, 0, -2);
+    var A = vertex(graph, 1, -1, 0);
+    var B = vertex(graph, 2, 0, 0);
+    var C = vertex(graph, 3, 0, 1);
+    var D = vertex(graph, 4, 1, 0);
+    var E = vertex(graph, 5, 0, -1);
+    var F = vertex(graph, 6, 1, -1);
+    var G = vertex(graph, 7, 0, -2);
     var AB = edges(A, B, 1.0);
     var BC = edges(B, C, 1.0);
     var BD = edges(B, D, 1.0);
