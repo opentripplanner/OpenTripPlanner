@@ -85,7 +85,7 @@ public class Itinerary implements ItinerarySortKey {
   /* SANDBOX EXPERIMENTAL PROPERTIES */
 
   private final Float accessibilityScore;
-  private final Emissions emissionsPerPerson;
+  private final Emission emissionPerPerson;
   private final ItineraryFare fare;
 
   Itinerary(ItineraryBuilder builder) {
@@ -106,7 +106,7 @@ public class Itinerary implements ItinerarySortKey {
     this.arrivedAtDestinationWithRentedVehicle = builder.arrivedAtDestinationWithRentedVehicle;
     this.systemNotices = builder.systemNotices;
     this.accessibilityScore = builder.accessibilityScore;
-    this.emissionsPerPerson = builder.emissionsPerPerson;
+    this.emissionPerPerson = builder.emissionPerPerson;
     this.fare = builder.fare;
 
     // Set aggregated data
@@ -570,8 +570,8 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   @Nullable
-  public Emissions emissionsPerPerson() {
-    return this.emissionsPerPerson;
+  public Emission emissionPerPerson() {
+    return this.emissionPerPerson;
   }
 
   /**
@@ -632,7 +632,7 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("elevationGained", totalElevationGained(), "m")
       .addNum("elevationLost", totalElevationLost(), "m")
       .addCol("legs", legs)
-      .addObj("emissionsPerPerson", emissionsPerPerson)
+      .addObj("emissionPerPerson", emissionPerPerson)
       .addObj("fare", fare)
       .toString();
   }

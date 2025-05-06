@@ -27,7 +27,7 @@ public class ShapePointMapperTest {
   private static final int SEQUENCE = 3;
 
   private static final ShapePoint SHAPE_POINT = new ShapePoint();
-  private final ShapePointMapper subject = new ShapePointMapper();
+  private final ShapePointMapper subject = new ShapePointMapper(new IdFactory("A"));
 
   static {
     SHAPE_POINT.setId(ID);

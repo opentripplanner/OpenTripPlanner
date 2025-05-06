@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -254,6 +257,7 @@ public abstract class GtfsTest {
     serverContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      new DefaultFareService(),
       snapshotManager,
       null
     );
