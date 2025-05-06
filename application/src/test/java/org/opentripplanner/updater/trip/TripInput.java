@@ -24,6 +24,9 @@ public record TripInput(String id, Route route, List<StopCall> stops) {
     return route.getId().getId();
   }
 
+  /**
+   * The ID of the operator without the feed ID prefix.
+   */
   public String operatorId() {
     return route.getOperator().getId().getId();
   }
