@@ -5,8 +5,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.time.LocalDate;
 import java.time.ZoneId;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -16,15 +14,11 @@ public final class RealtimeTestConstants {
 
   private final TimetableRepositoryForTest testModel = TimetableRepositoryForTest.of();
   public final LocalDate SERVICE_DATE = LocalDate.of(2024, 5, 8);
-  public final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("CAL_1");
   public final String STOP_A1_ID = "A1";
   public final String STOP_B1_ID = "B1";
   public final String STOP_C1_ID = "C1";
-  public final String TRIP_1_ID = "TestTrip1";
-  public final String TRIP_2_ID = "TestTrip2";
   public final String OPERATOR_1_ID = "TestOperator1";
   public final Operator OPERATOR1 = Operator.of(id(OPERATOR_1_ID)).withName(OPERATOR_1_ID).build();
-  public final String ROUTE_1_ID = "TestRoute1";
 
   public final ZoneId TIME_ZONE = ZoneId.of(TimetableRepositoryForTest.TIME_ZONE_ID);
   public final Station STATION_A = testModel.station("A").build();
@@ -53,6 +47,4 @@ public final class RealtimeTestConstants {
     .withRegularStop(STOP_C1)
     .withRegularStop(STOP_D1)
     .build();
-
-  public final Route ROUTE_1 = TimetableRepositoryForTest.route(ROUTE_1_ID).build();
 }

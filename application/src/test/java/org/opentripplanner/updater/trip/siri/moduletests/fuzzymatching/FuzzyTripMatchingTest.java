@@ -6,8 +6,6 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
@@ -18,7 +16,7 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class FuzzyTripMatchingTest {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_1_ID = "TestTrip1";
   private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
   private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
   private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;

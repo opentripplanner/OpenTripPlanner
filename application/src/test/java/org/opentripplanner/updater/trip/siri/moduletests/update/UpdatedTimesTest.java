@@ -15,7 +15,7 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class UpdatedTimesTest {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_1_ID = "TestTrip1";
   private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
   private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
   private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;

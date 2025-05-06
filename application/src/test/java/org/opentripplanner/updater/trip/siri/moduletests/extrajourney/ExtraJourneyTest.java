@@ -7,7 +7,7 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailu
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.model.FareAttribute;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Operator;
@@ -25,15 +25,14 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class ExtraJourneyTest {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_1_ID = "TestTrip1";
   private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
   private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
   private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
   private static final RegularStop STOP_D1 = CONSTANTS.STOP_D1;
 
-  private static final Route ROUTE_1 = CONSTANTS.ROUTE_1;
+  private static final Route ROUTE_1 = TimetableRepositoryForTest.route("route-2").build();
   private static final Operator OPERATOR1 = CONSTANTS.OPERATOR1;
-  private static final String ROUTE_1_ID = CONSTANTS.ROUTE_1_ID;
   private static final String OPERATOR_1_ID = CONSTANTS.OPERATOR_1_ID;
   private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
@@ -137,7 +136,7 @@ class ExtraJourneyTest {
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_1_ID)
-      .withLineRef(ROUTE_1_ID)
+      .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
           .call(STOP_A1)
@@ -162,7 +161,7 @@ class ExtraJourneyTest {
       // replace trip1
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_1_ID)
-      .withLineRef(ROUTE_1_ID)
+      .withLineRef(TRIP_1_INPUT.routeId())
       .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(STOP_C1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
@@ -194,7 +193,7 @@ class ExtraJourneyTest {
       .withIsExtraJourney(true)
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(OPERATOR_1_ID)
-      .withLineRef(ROUTE_1_ID)
+      .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
           .call(STOP_A1)
@@ -215,7 +214,7 @@ class ExtraJourneyTest {
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_1_ID)
-      .withLineRef(ROUTE_1_ID)
+      .withLineRef(TRIP_1_INPUT.routeId())
       .withRecordedCalls(builder -> builder.call(STOP_C1).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04"));
   }

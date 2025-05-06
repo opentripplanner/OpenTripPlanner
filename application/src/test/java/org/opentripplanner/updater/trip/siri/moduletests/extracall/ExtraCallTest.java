@@ -15,13 +15,12 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 
 class ExtraCallTest {
 
+  private static final String TRIP_1_ID = "TestTrip1";
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
   private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
   private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
   private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
   private static final RegularStop STOP_D1 = CONSTANTS.STOP_D1;
-  private static final String ROUTE_1_ID = CONSTANTS.ROUTE_1_ID;
 
   private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -158,7 +157,7 @@ class ExtraCallTest {
   ) {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
-      .withLineRef(ROUTE_1_ID)
+      .withLineRef(TRIP_1_INPUT.routeId())
       .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
         builder

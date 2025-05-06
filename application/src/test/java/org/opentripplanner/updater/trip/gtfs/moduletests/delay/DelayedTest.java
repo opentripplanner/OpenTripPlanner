@@ -27,8 +27,8 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 class DelayedTest {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
-  private static final String TRIP_2_ID = CONSTANTS.TRIP_2_ID;
+  private static final String TRIP_1_ID = "TestTrip1";
+  private static final String TRIP_2_ID = "TestTrip2";
   private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
   private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
   private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;

@@ -5,7 +5,6 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -26,7 +25,7 @@ import org.opentripplanner.transit.service.TimetableRepository;
 public class RealtimeTestEnvironmentBuilder {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final FeedScopedId SERVICE_ID = CONSTANTS.SERVICE_ID;
+  private static final FeedScopedId SERVICE_ID = TimetableRepositoryForTest.id("CAL_1");
   private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
   private static final SiteRepository SITE_REPOSITORY = CONSTANTS.SITE_REPOSITORY;
   private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;

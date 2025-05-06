@@ -2,8 +2,6 @@ package org.opentripplanner.updater.trip.siri.moduletests.cancellation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -15,14 +13,13 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class CancellationTest {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_1_ID = "TestTrip1";
   private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
   private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
   private static final RegularStop STOP_B2 = CONSTANTS.STOP_B2;
 
   private static final String ADDED_TRIP_ID = "newJourney";
   private static final String OPERATOR_1_ID = CONSTANTS.OPERATOR_1_ID;
-  private static final String ROUTE_1_ID = CONSTANTS.ROUTE_1_ID;
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -96,11 +93,12 @@ class CancellationTest {
   @Test
   void testChangeQuayAndCancelAddedTrip() {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+
     var creation = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
       .withIsExtraJourney(true)
       .withOperatorRef(OPERATOR_1_ID)
-      .withLineRef(ROUTE_1_ID)
+      .withLineRef(TRIP_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
           .call(STOP_A1)

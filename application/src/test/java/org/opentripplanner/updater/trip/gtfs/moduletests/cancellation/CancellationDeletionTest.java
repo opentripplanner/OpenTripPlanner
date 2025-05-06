@@ -30,7 +30,7 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 public class CancellationDeletionTest {
 
   private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = CONSTANTS.TRIP_1_ID;
+  private static final String TRIP_1_ID = "TestTrip1";
   private static final String STOP_A1_ID = CONSTANTS.STOP_A1_ID;
   private static final String STOP_B1_ID = CONSTANTS.STOP_B1_ID;
   private static final String STOP_C1_ID = CONSTANTS.STOP_C1_ID;
