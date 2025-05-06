@@ -89,8 +89,10 @@ public class GrizzlyServer {
     // For the HTTP listener: enable gzip compression, set thread pool, add listener to httpServer.
     CompressionConfig cc = httpListener.getCompressionConfig();
     cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
-    cc.setCompressionMinSize(50000); // the min number of bytes to compress
-    cc.setCompressibleMimeTypes(MediaType.APPLICATION_XML, "text/json", MediaType.APPLICATION_XML); // the mime types to compress
+    // the min number of bytes to compress
+    cc.setCompressionMinSize(50000);
+    // the mime types to compress
+    cc.setCompressibleMimeTypes(MediaType.APPLICATION_XML, MediaType.APPLICATION_XML);
     httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
     httpListener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
     httpServer.addListener(httpListener);
