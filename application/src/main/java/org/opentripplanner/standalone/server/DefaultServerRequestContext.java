@@ -19,6 +19,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuning
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -41,6 +42,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   //                  All 3 sections is sorted alphabetically.
 
   private final DebugUiConfig debugUiConfig;
+  private final FareService fareService;
   private final FlexParameters flexParameters;
   private final Graph graph;
   private final MeterRegistry meterRegistry;
@@ -90,6 +92,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public DefaultServerRequestContext(
     // Keep the same order as in the field declaration
     DebugUiConfig debugUiConfig,
+    FareService fareService,
     FlexParameters flexParameters,
     Graph graph,
     MeterRegistry meterRegistry,
@@ -115,6 +118,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   ) {
     this.debugUiConfig = debugUiConfig;
     this.flexParameters = flexParameters;
+    this.fareService = fareService;
     this.graph = graph;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
@@ -277,5 +281,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   public SorlandsbanenNorwayService sorlandsbanenService() {
     return sorlandsbanenService;
+  }
+
+  @Override
+  public FareService fareService() {
+    return fareService;
   }
 }

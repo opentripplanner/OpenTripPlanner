@@ -6,6 +6,7 @@ import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
@@ -63,7 +64,8 @@ public class LoadApplication {
       obj.issueSummary,
       obj.emissionRepository,
       obj.stopConsolidationRepository,
-      obj.streetLimitationParameters
+      obj.streetLimitationParameters,
+      obj.fareServiceFactory
     );
   }
 
@@ -78,7 +80,8 @@ public class LoadApplication {
       DataImportIssueSummary.empty(),
       factory.emptyEmissionsDataModel(),
       factory.emptyStopConsolidationRepository(),
-      factory.emptyStreetLimitationParameters()
+      factory.emptyStreetLimitationParameters(),
+      factory.emptyFareServiceFactory()
     );
   }
 
@@ -102,7 +105,8 @@ public class LoadApplication {
     DataImportIssueSummary issueSummary,
     @Nullable EmissionRepository emissionRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters
+    StreetLimitationParameters streetLimitationParameters,
+    FareServiceFactory fareServiceFactory
   ) {
     return new ConstructApplication(
       cli,
@@ -116,7 +120,8 @@ public class LoadApplication {
       emissionRepository,
       parkingRepository,
       stopConsolidationRepository,
-      streetLimitationParameters
+      streetLimitationParameters,
+      fareServiceFactory
     );
   }
 }

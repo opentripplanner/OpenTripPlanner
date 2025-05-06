@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
+import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -112,6 +114,7 @@ public class SpeedTest {
 
     this.serverContext = new DefaultServerRequestContext(
       DebugUiConfig.DEFAULT,
+      new DefaultFareService(),
       config.flexConfig,
       graph,
       timer.getRegistry(),
