@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -19,21 +18,20 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class ExtraJourneyTest {
+class ExtraJourneyTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
-  private static final RegularStop STOP_D1 = CONSTANTS.STOP_D1;
+  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop("A1");
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop("B1");
+  private static final RegularStop STOP_C1 = ENV_BUILDER.stop("C1");
+  private static final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
 
   private static final Route ROUTE_1 = TimetableRepositoryForTest.route("route-2").build();
   private static final Operator OPERATOR_2 = Operator.of(id("o2")).withName("o").build();
-  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
 
   private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_1.copy().withOperator(OPERATOR_2).build())
@@ -45,7 +43,7 @@ class ExtraJourneyTest {
 
   @Test
   void testAddJourneyWithExistingRoute() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     Route route = ROUTE_1;
     int numPatternForRoute = env.getTransitService().findPatterns(route).size();
@@ -82,7 +80,7 @@ class ExtraJourneyTest {
   @Test
   void testAddJourneyWithNewRoute() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     String newRouteRef = "new route ref";
     var updates = createValidAddedJourney(env)
@@ -112,7 +110,7 @@ class ExtraJourneyTest {
   @Test
   void testAddJourneyMultipleTimes() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
     var updates = createValidAddedJourney(env).buildEstimatedTimetableDeliveries();
 
     int numTrips = env.getTransitService().listTrips().size();
@@ -127,7 +125,7 @@ class ExtraJourneyTest {
   @Test
   void testAddedJourneyWithInvalidScheduledData() {
     // we actually don't need the trip, but it's the only way to add a route to the index
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     // Create an extra journey with invalid planned data (travel back in time)
     // and valid real time data
@@ -152,7 +150,7 @@ class ExtraJourneyTest {
 
   @Test
   void testReplaceJourney() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedVehicleJourneyCode(ADDED_TRIP_ID)
@@ -185,7 +183,7 @@ class ExtraJourneyTest {
 
   @Test
   void testReplaceJourneyWithoutEstimatedVehicleJourneyCode() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(ADDED_TRIP_ID)

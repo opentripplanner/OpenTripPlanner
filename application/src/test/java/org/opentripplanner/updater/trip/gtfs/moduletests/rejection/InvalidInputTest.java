@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
@@ -19,13 +20,12 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * A trip with start date that is outside the service period shouldn't throw an exception and is
  * ignored instead.
  */
-class InvalidInputTest {
+class InvalidInputTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
   private static final String TRIP_1_ID = "TestTrip1";
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
 
   public static List<LocalDate> cases() {
     return List.of(SERVICE_DATE.minusYears(10), SERVICE_DATE.plusYears(10));
@@ -38,9 +38,9 @@ class InvalidInputTest {
       .addStop(STOP_A1, "0:00:10", "0:00:11")
       .addStop(STOP_B1, "0:00:20", "0:00:21")
       .build();
-    var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
+    var env = ENV_BUILDER.addTrip(tripInput).build();
 
-    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, CONSTANTS.TIME_ZONE)
+    var update = new TripUpdateBuilder(TRIP_1_ID, date, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(2, 60, 80)
       .build();
 

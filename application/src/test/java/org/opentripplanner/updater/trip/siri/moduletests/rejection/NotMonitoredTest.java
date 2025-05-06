@@ -7,15 +7,15 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class NotMonitoredTest {
+class NotMonitoredTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
+  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
 
   private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -24,7 +24,7 @@ class NotMonitoredTest {
 
   @Test
   void testNotMonitored() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withMonitored(false)

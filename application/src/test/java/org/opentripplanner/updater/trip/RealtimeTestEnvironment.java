@@ -8,12 +8,14 @@ import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -85,6 +87,10 @@ public final class RealtimeTestEnvironment {
 
   public String getFeedId() {
     return TimetableRepositoryForTest.FEED_ID;
+  }
+
+  public RegularStop getStop(String id) {
+    return Objects.requireNonNull(timetableRepository.getSiteRepository().getRegularStop(id(id)));
   }
 
   private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {

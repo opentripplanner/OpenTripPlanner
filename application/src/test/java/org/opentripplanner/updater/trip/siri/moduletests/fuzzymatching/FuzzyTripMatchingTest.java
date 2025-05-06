@@ -1,25 +1,22 @@
 package org.opentripplanner.updater.trip.siri.moduletests.fuzzymatching;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertFailure;
 
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class FuzzyTripMatchingTest {
+class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  public static final RealtimeTestEnvironmentBuilder OF = RealtimeTestEnvironment.of();
+  private static final RegularStop STOP_A1 = OF.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = OF.stop(STOP_B1_ID);
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -31,7 +28,7 @@ class FuzzyTripMatchingTest {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatching() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = OF.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetableWithFuzzyMatcher(updates);
@@ -45,7 +42,7 @@ class FuzzyTripMatchingTest {
    */
   @Test
   void testUpdateJourneyWithFuzzyMatchingAndMissingAimedDepartureTime() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = OF.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withFramedVehicleJourneyRef(builder ->

@@ -13,29 +13,31 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class InvalidCallsTest {
+class InvalidCallsTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
+  private static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
   private static final String TRIP_1_ID = "TestTrip1";
-  private static final Station STATION_A = CONSTANTS.STATION_A;
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
-  private static final RegularStop STOP_D1 = CONSTANTS.STOP_D1;
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
+  private static final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_C1_ID);
+  private static final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
+  private static final Station STATION_A = STOP_A1.getParentStation();
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .addStop(STOP_C1, "0:00:40", "0:00:41")
     .build();
+
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
   @Test
   void testTooFewCalls() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -56,7 +58,7 @@ class InvalidCallsTest {
 
   @Test
   void testTooManyCalls() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -81,7 +83,7 @@ class InvalidCallsTest {
 
   @Test
   void testMismatchedStop() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -104,7 +106,7 @@ class InvalidCallsTest {
 
   @Test
   void testUnknownStop() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)

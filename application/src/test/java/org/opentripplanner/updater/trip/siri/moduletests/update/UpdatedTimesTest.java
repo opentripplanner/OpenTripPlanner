@@ -9,16 +9,15 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class UpdatedTimesTest {
+class UpdatedTimesTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
+  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -30,7 +29,7 @@ class UpdatedTimesTest {
    */
   @Test
   void testUpdateJourneyWithDatedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -49,7 +48,7 @@ class UpdatedTimesTest {
    */
   @Test
   void testUpdateJourneyWithFramedVehicleJourneyRef() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env)
       .withFramedVehicleJourneyRef(builder ->
@@ -66,7 +65,7 @@ class UpdatedTimesTest {
    */
   @Test
   void testUpdateJourneyWithoutJourneyRef() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
 
     var updates = updatedJourneyBuilder(env).buildEstimatedTimetableDeliveries();
     var result = env.applyEstimatedTimetable(updates);

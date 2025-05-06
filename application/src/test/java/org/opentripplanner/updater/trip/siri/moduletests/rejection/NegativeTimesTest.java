@@ -7,17 +7,16 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class NegativeTimesTest {
+class NegativeTimesTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final String TRIP_2_ID = "TestTrip2";
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final RegularStop STOP_C1 = CONSTANTS.STOP_C1;
+  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
+  private static final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_C1_ID);
 
   private static final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
@@ -32,7 +31,7 @@ class NegativeTimesTest {
 
   @Test
   void testNegativeHopTime() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_1_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_1_ID)
@@ -52,7 +51,7 @@ class NegativeTimesTest {
 
   @Test
   void testNegativeDwellTime() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_2_INPUT).build();
+    var env = ENV_BUILDER.addTrip(TRIP_2_INPUT).build();
 
     var updates = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(TRIP_2_ID)

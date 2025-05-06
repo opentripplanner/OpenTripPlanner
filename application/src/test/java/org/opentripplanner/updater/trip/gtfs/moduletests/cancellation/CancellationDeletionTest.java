@@ -10,8 +10,6 @@ import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSucce
 import static org.opentripplanner.updater.trip.UpdateIncrementality.DIFFERENTIAL;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,6 +18,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
@@ -27,17 +26,11 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  * Cancellations and deletions should end up in the internal data model and make trips unavailable
  * for routing.
  */
-public class CancellationDeletionTest {
+class CancellationDeletionTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestConstants CONSTANTS = new RealtimeTestConstants();
-  private static final String TRIP_1_ID = "TestTrip1";
-  private static final String STOP_A1_ID = CONSTANTS.STOP_A1_ID;
-  private static final String STOP_B1_ID = CONSTANTS.STOP_B1_ID;
-  private static final String STOP_C1_ID = CONSTANTS.STOP_C1_ID;
-  private static final RegularStop STOP_A1 = CONSTANTS.STOP_A1;
-  private static final RegularStop STOP_B1 = CONSTANTS.STOP_B1;
-  private static final LocalDate SERVICE_DATE = CONSTANTS.SERVICE_DATE;
-  private static final ZoneId TIME_ZONE = CONSTANTS.TIME_ZONE;
+  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
+  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
 
   static List<Arguments> cases() {
     return List.of(
@@ -49,14 +42,12 @@ public class CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelledTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.of()
-      .addTrip(
-        TripInput.of(TRIP_1_ID)
-          .addStop(STOP_A1, "0:00:10", "0:00:11")
-          .addStop(STOP_B1, "0:00:20", "0:00:21")
-          .build()
-      )
-      .build();
+    var env = ENV_BUILDER.addTrip(
+      TripInput.of(TRIP_1_ID)
+        .addStop(STOP_A1, "0:00:10", "0:00:11")
+        .addStop(STOP_B1, "0:00:20", "0:00:21")
+        .build()
+    ).build();
     var pattern1 = env.getPatternForTrip(TRIP_1_ID);
 
     var update = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, relationship, TIME_ZONE).build();
@@ -87,7 +78,7 @@ public class CancellationDeletionTest {
   @ParameterizedTest
   @MethodSource("cases")
   void cancelingAddedTrip(ScheduleRelationship relationship, RealTimeState state) {
-    var env = RealtimeTestEnvironment.of().build();
+    var env = ENV_BUILDER.build();
     var addedTripId = "added-trip";
     // First add ADDED trip
     var update = new TripUpdateBuilder(
