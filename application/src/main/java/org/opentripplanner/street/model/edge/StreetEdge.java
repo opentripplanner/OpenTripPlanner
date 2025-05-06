@@ -115,24 +115,6 @@ public class StreetEdge
 
   private StreetElevationExtension elevationExtension;
 
-  /**
-   * The set of turn restrictions of this edge. Since most instances don't have any, we reuse a
-   * global instance in order to conserve memory.
-   * <p>
-   * This field is optimized for low memory consumption and fast access, but modification is
-   * synchronized since it can happen concurrently.
-   * <p>
-   * Why not use null to represent no turn restrictions? This would mean that the access would also
-   * need to be synchronized but since that is a very hot code path, it needs to be fast.
-   * <p>
-   * Why not use a concurrent collection? That would mean that every StreetEdge has its own empty
-   * instance which would increase memory significantly.
-   * <p>
-   * We use specifically an EmptyList here, in order to get very fast iteration, since it has a
-   * static iterator instance, which always returns false in hasNext
-   */
-  private List<TurnRestriction> turnRestrictions = Collections.emptyList();
-
   protected StreetEdge(StreetEdgeBuilder<?> builder) {
     super(builder.fromVertex(), builder.toVertex());
     this.flags = builder.getFlags();
@@ -674,9 +656,7 @@ public class StreetEdge
     copyRentalRestrictionsToSplitEdge(se1);
     copyRentalRestrictionsToSplitEdge(se2);
 
-    var splitEdges = new SplitStreetEdge(se1, se2);
-    copyRestrictionsToSplitEdges(this, splitEdges);
-    return splitEdges;
+    return new SplitStreetEdge(se1, se2);
   }
 
   /** Split this street edge and return the resulting street edges. The original edge is kept. */
@@ -721,9 +701,7 @@ public class StreetEdge
       tempEdges.addEdge(e2);
     }
 
-    var splitEdges = new SplitStreetEdge(e1, e2);
-    copyRestrictionsToSplitEdges(this, splitEdges);
-    return splitEdges;
+    return new SplitStreetEdge(e1, e2);
   }
 
   public Optional<Edge> createPartialEdge(StreetVertex from, StreetVertex to) {
@@ -768,85 +746,6 @@ public class StreetEdge
   }
 
   /**
-   * Add a {@link TurnRestriction} to this edge.
-   * <p>
-   * This method is thread-safe as modifying the underlying set is synchronized.
-   */
-  public void addTurnRestriction(TurnRestriction turnRestriction) {
-    if (turnRestriction == null) {
-      return;
-    }
-    synchronized (this) {
-      // in order to guarantee fast access without extra allocations
-      // we make the turn restrictions unmodifiable after a copy-on-write modification
-      var temp = new HashSet<>(turnRestrictions);
-      temp.add(turnRestriction);
-      turnRestrictions = List.copyOf(temp);
-    }
-  }
-
-  /**
-   * Remove a {@link TurnRestriction} from this edge.
-   * <p>
-   * This method is thread-safe as modifying the underlying set is synchronized.
-   */
-  public void removeTurnRestriction(TurnRestriction turnRestriction) {
-    if (turnRestriction == null) {
-      return;
-    }
-    synchronized (this) {
-      if (turnRestrictions.contains(turnRestriction)) {
-        if (turnRestrictions.size() == 1) {
-          turnRestrictions = Collections.emptyList();
-        } else {
-          // in order to guarantee fast access without extra allocations
-          // we make the turn restrictions unmodifiable after a copy-on-write modification
-          var withRemoved = new HashSet<>(turnRestrictions);
-          withRemoved.remove(turnRestriction);
-          turnRestrictions = List.copyOf(withRemoved);
-        }
-      }
-    }
-  }
-
-  public void removeAllTurnRestrictions() {
-    if (turnRestrictions == null) {
-      return;
-    }
-    synchronized (this) {
-      turnRestrictions = Collections.emptyList();
-    }
-  }
-
-  @Override
-  public void removeTurnRestrictionsTo(Edge other) {
-    for (TurnRestriction turnRestriction : this.getTurnRestrictions()) {
-      if (turnRestriction.to == other) {
-        this.removeTurnRestriction(turnRestriction);
-      }
-    }
-  }
-
-  /**
-   * Get the immutable {@link List} of {@link TurnRestriction}s that belongs to this
-   * {@link StreetEdge}.
-   * <p>
-   * This method is thread-safe, even if {@link StreetEdge#addTurnRestriction} or
-   * {@link StreetEdge#removeTurnRestriction} is called concurrently.
-   */
-  public List<TurnRestriction> getTurnRestrictions() {
-    // this can be safely returned as it's unmodifiable
-    return turnRestrictions;
-  }
-
-  @Override
-  public void remove() {
-    removeAllTurnRestrictions();
-
-    super.remove();
-  }
-
-  /**
    * Copy inherited properties from a parent edge to a split edge.
    */
   protected void copyPropertiesToSplitEdge(
@@ -885,55 +784,6 @@ public class StreetEdge
 
   int getMillimeterLength() {
     return length_mm;
-  }
-
-  /**
-   * Copy restrictions having former edge as from to appropriate split edge, as well as restrictions
-   * on incoming edges.
-   */
-  private static void copyRestrictionsToSplitEdges(StreetEdge edge, SplitStreetEdge splitEdges) {
-    // Copy turn restriction which have a .to of this edge (present on the incoming edges of fromv)
-    if (splitEdges.head() != null) {
-      edge
-        .getFromVertex()
-        .getIncoming()
-        .stream()
-        .filter(StreetEdge.class::isInstance)
-        .map(StreetEdge.class::cast)
-        .flatMap(originatingEdge -> originatingEdge.getTurnRestrictions().stream())
-        .filter(restriction -> restriction.to == edge)
-        .forEach(restriction ->
-          applyRestrictionsToNewEdge(restriction.from, splitEdges.head(), restriction)
-        );
-    }
-
-    // Copy turn restriction which have a .from of this edge (present on the original street edge)
-    if (splitEdges.tail() != null) {
-      edge
-        .getTurnRestrictions()
-        .forEach(existingTurnRestriction ->
-          applyRestrictionsToNewEdge(
-            splitEdges.tail(),
-            existingTurnRestriction.to,
-            existingTurnRestriction
-          )
-        );
-    }
-  }
-
-  private static void applyRestrictionsToNewEdge(
-    StreetEdge fromEdge,
-    StreetEdge toEdge,
-    TurnRestriction restriction
-  ) {
-    TurnRestriction splitTurnRestriction = new TurnRestriction(
-      fromEdge,
-      toEdge,
-      restriction.type,
-      restriction.modes
-    );
-    LOG.debug("Created new restriction for split edges: {}", splitTurnRestriction);
-    fromEdge.addTurnRestriction(splitTurnRestriction);
   }
 
   private int computeLength(StreetEdgeBuilder<?> builder) {
