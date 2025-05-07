@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -10,6 +10,10 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import java.time.LocalDate;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.TestItineraryBuilder;
 
 public class LegTest implements PlanTestConstants {
 
@@ -21,9 +25,9 @@ public class LegTest implements PlanTestConstants {
     .bicycle(T11_16, T11_20, E)
     .build();
 
-  private final Leg WALK_LEG = ITINERARY.firstLeg();
+  private final Leg WALK_LEG = ITINERARY.legs().getFirst();
   private final Leg BUS_LEG = ITINERARY.legs().get(1);
-  private final Leg BICYCLE_LEG = ITINERARY.lastLeg();
+  private final Leg BICYCLE_LEG = ITINERARY.legs().getLast();
 
   @Test
   public void isTransitLeg() {
@@ -47,10 +51,10 @@ public class LegTest implements PlanTestConstants {
   }
 
   @Test
-  public void getDuration() {
-    assertEquals(ofMinutes(2), WALK_LEG.getDuration());
-    assertEquals(ofMinutes(10), BUS_LEG.getDuration());
-    assertEquals(ofMinutes(4), BICYCLE_LEG.getDuration());
+  public void duration() {
+    assertEquals(ofMinutes(2), WALK_LEG.duration());
+    assertEquals(ofMinutes(10), BUS_LEG.duration());
+    assertEquals(ofMinutes(4), BICYCLE_LEG.duration());
   }
 
   @Test
@@ -161,7 +165,9 @@ public class LegTest implements PlanTestConstants {
     var overlappingStartTime = START_TIME + duration - 1;
 
     Leg subject = leg(b -> b.bus(11, START_TIME, endTime, B));
-    Leg overlappingLeg = leg(overlappingStartTime, b -> b.walk(duration, B).build().firstLeg());
+    Leg overlappingLeg = leg(overlappingStartTime, b ->
+      b.walk(duration, B).build().legs().getFirst()
+    );
     Leg legAfter = leg(endTime, b -> b.walk(D12m, B));
 
     // Overlap in time
@@ -191,6 +197,6 @@ public class LegTest implements PlanTestConstants {
   private static Leg leg(int startTime, Consumer<TestItineraryBuilder> buildOp) {
     var builder = newItinerary(A, startTime);
     buildOp.accept(builder);
-    return builder.build().firstLeg();
+    return builder.build().legs().getFirst();
   }
 }

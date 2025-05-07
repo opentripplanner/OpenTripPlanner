@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.ridehailing.model;
 
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 
 /**
  * This is a special leg for ride hailing that adds information about the ride estimate like

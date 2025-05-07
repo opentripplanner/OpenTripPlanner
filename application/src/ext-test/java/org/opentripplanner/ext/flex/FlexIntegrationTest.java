@@ -89,23 +89,23 @@ public class FlexIntegrationTest {
     assertEquals(WALK, walkToBus.getMode());
 
     var bus = itin.transitLeg(1);
-    assertEquals(BUS, bus.getMode());
-    assertEquals("30", bus.getRoute().getShortName());
+    assertEquals(BUS, bus.mode());
+    assertEquals("30", bus.route().getShortName());
 
     var transfer = itin.streetLeg(2);
     assertEquals(WALK, transfer.getMode());
 
     var flex = itin.transitLeg(3);
-    assertEquals(BUS, flex.getMode());
-    assertEquals("Zone 2", flex.getRoute().getShortName());
+    assertEquals(BUS, flex.mode());
+    assertEquals("Zone 2", flex.route().getShortName());
     assertTrue(flex.isFlexibleTrip());
     assertEquals(
       "corner of Story Place Southwest and service road (part of Flex Zone 2)",
-      flex.getFrom().name.toString()
+      flex.from().name.toString()
     );
-    assertEquals("Destination (part of Flex Zone 2)", flex.getTo().name.toString());
-    assertEquals("2021-12-02T14:30-05:00[America/New_York]", flex.getStartTime().toString());
-    assertEquals("2021-12-02T15:00-05:00[America/New_York]", flex.getEndTime().toString());
+    assertEquals("Destination (part of Flex Zone 2)", flex.to().name.toString());
+    assertEquals("2021-12-02T14:30-05:00[America/New_York]", flex.startTime().toString());
+    assertEquals("2021-12-02T15:00-05:00[America/New_York]", flex.endTime().toString());
   }
 
   @Test
@@ -118,25 +118,25 @@ public class FlexIntegrationTest {
     assertEquals(5, itin.legs().size());
 
     var firstBus = itin.transitLeg(0);
-    assertEquals(BUS, firstBus.getMode());
-    assertEquals("856", firstBus.getRoute().getShortName());
+    assertEquals(BUS, firstBus.mode());
+    assertEquals("856", firstBus.route().getShortName());
 
     var transferToSecondBus = itin.streetLeg(1);
     assertEquals(WALK, transferToSecondBus.getMode());
 
     var secondBus = itin.transitLeg(2);
-    assertEquals(BUS, secondBus.getMode());
-    assertEquals("30", secondBus.getRoute().getShortName());
+    assertEquals(BUS, secondBus.mode());
+    assertEquals("30", secondBus.route().getShortName());
 
     var transferToFlex = itin.streetLeg(3);
     assertEquals(WALK, transferToFlex.getMode());
 
     var finalFlex = itin.transitLeg(4);
-    assertEquals(BUS, finalFlex.getMode());
-    assertEquals("Zone 2", finalFlex.getRoute().getShortName());
+    assertEquals(BUS, finalFlex.mode());
+    assertEquals("Zone 2", finalFlex.route().getShortName());
     assertTrue(finalFlex.isFlexibleTrip());
-    assertEquals("2021-12-02T15:00-05:00[America/New_York]", finalFlex.getStartTime().toString());
-    assertEquals("2021-12-02T15:30-05:00[America/New_York]", finalFlex.getEndTime().toString());
+    assertEquals("2021-12-02T15:00-05:00[America/New_York]", finalFlex.startTime().toString());
+    assertEquals("2021-12-02T15:30-05:00[America/New_York]", finalFlex.endTime().toString());
   }
 
   @Test
@@ -164,14 +164,14 @@ public class FlexIntegrationTest {
     assertEquals(WALK, walkToFlex.getMode());
 
     var flex = itin.transitLeg(1);
-    assertEquals(BUS, flex.getMode());
-    assertEquals("Zone 2", flex.getRoute().getShortName());
+    assertEquals(BUS, flex.mode());
+    assertEquals("Zone 2", flex.route().getShortName());
     assertTrue(flex.isFlexibleTrip());
 
-    assertEquals("Transfer Point for Route 30", flex.getFrom().name.toString());
-    assertEquals("Destination (part of Flex Zone 2)", flex.getTo().name.toString());
+    assertEquals("Transfer Point for Route 30", flex.from().name.toString());
+    assertEquals("Destination (part of Flex Zone 2)", flex.to().name.toString());
 
-    assertEquals("2021-12-02T13:00-05:00[America/New_York]", flex.getStartTime().toString());
+    assertEquals("2021-12-02T13:00-05:00[America/New_York]", flex.startTime().toString());
   }
 
   @AfterAll

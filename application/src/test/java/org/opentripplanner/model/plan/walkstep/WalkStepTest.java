@@ -1,11 +1,12 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.walkstep;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.AbsoluteDirection.EAST;
-import static org.opentripplanner.model.plan.AbsoluteDirection.NORTH;
-import static org.opentripplanner.model.plan.AbsoluteDirection.SOUTHWEST;
+import static org.opentripplanner.model.plan.walkstep.AbsoluteDirection.EAST;
+import static org.opentripplanner.model.plan.walkstep.AbsoluteDirection.NORTH;
+import static org.opentripplanner.model.plan.walkstep.AbsoluteDirection.SOUTHWEST;
 
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -27,7 +28,7 @@ public class WalkStepTest {
 
     builder.withDirections(angle1, angle2, false);
     var step = builder.build();
-    assertEquals(RelativeDirection.RIGHT, step.getRelativeDirection());
+    Assertions.assertEquals(RelativeDirection.RIGHT, step.getRelativeDirection());
     assertEquals(Optional.of(EAST), step.getAbsoluteDirection());
 
     angle1 = degreesToRadians(0);

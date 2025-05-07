@@ -65,7 +65,7 @@ config:
     TripOnServiceDateEdge: graphql.relay.Edge#Edge<TripOnServiceDate>
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
-    elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
+    elevationProfileComponent: org.opentripplanner.model.plan.leg.ElevationProfile.Step
     Emissions: org.opentripplanner.model.plan.Emission#Emission
     Feed: String
     FeedPublisher: org.opentripplanner.apis.gtfs.model.FeedPublisher#FeedPublisher
@@ -73,14 +73,14 @@ config:
     InputField: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField#GraphQLInputField
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
-    LegTime: org.opentripplanner.model.plan.LegCallTime#LegCallTime
+    LegTime: org.opentripplanner.model.plan.leg.LegCallTime#LegCallTime
     Mode: String
     OccupancyStatus: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus#GraphQLOccupancyStatus
     TransitMode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode#GraphQLTransitMode
     PageInfo: Object
     Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
     PickupDropoffType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPickupDropoffType#GraphQLPickupDropoffType
-    Place: org.opentripplanner.model.plan.StopArrival#StopArrival
+    Place: org.opentripplanner.model.plan.leg.StopArrival#StopArrival
     placeAtDistance: org.opentripplanner.routing.graphfinder.PlaceAtDistance#PlaceAtDistance
     placeAtDistanceConnection: graphql.relay.Connection#Connection<PlaceAtDistance>
     placeAtDistanceEdge: graphql.relay.Edge#Edge<PlaceAtDistance>
@@ -94,7 +94,7 @@ config:
     RoutingError: org.opentripplanner.routing.api.response.RoutingError#RoutingError
     RoutingErrorCode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode#GraphQLRoutingErrorCode
     serviceTimeRange: Object
-    step: org.opentripplanner.model.plan.WalkStep#WalkStep
+    step: org.opentripplanner.model.plan.walkstep.WalkStep#WalkStep
     Stop: Object # Can be either Stop or Station
     stopAtDistance: org.opentripplanner.routing.graphfinder.NearbyStop#NearbyStop
     stopAtDistanceConnection: graphql.relay.Connection#Connection<NearbyStop>
@@ -129,7 +129,7 @@ config:
     FareMedium: org.opentripplanner.model.fare.FareMedium#FareMedium
     RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
     StopPosition: org.opentripplanner.apis.gtfs.model.StopPosition#StopPosition
-    RealTimeEstimate: org.opentripplanner.model.plan.LegRealTimeEstimate#LegRealTimeEstimate
+    RealTimeEstimate: org.opentripplanner.model.plan.leg.LegRealTimeEstimate#LegRealTimeEstimate
     EstimatedTime: org.opentripplanner.transit.model.timetable.EstimatedTime#EstimatedTime
     CallRealTime: org.opentripplanner.apis.gtfs.model.CallRealTime#CallRealTime
     RentalPlace: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace

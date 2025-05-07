@@ -148,18 +148,22 @@ public class ItineraryBuilder {
     return this;
   }
 
+  public List<Leg> legs() {
+    return legs;
+  }
+
+  public ItineraryBuilder withLegs(List<Leg> newLegs) {
+    this.legs = newLegs;
+    return this;
+  }
+
   /**
    * Decorate the existing legs with new information. This method takes a lambda to make sure
    * the caller uses the right set of legs as abase for the decoration, and not just set a
    * new set of legs - witch may lead to information loss.
    */
-  public ItineraryBuilder withLegs(Function<List<Leg>, List<Leg>> body) {
-    this.legs = body.apply(legs);
-    return this;
-  }
-
-  public List<Leg> legs() {
-    return legs;
+  public ItineraryBuilder transformLegs(Function<Leg, Leg> legMapper) {
+    return withLegs(legs.stream().map(legMapper).toList());
   }
 
   /**
