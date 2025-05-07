@@ -1,7 +1,16 @@
 package org.opentripplanner.netex.mapping;
 
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
+
+import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.TransportSubmodeStructure;
 
@@ -12,6 +21,13 @@ import org.rutebanken.netex.model.TransportSubmodeStructure;
  * route types</a>
  */
 class TransportModeMapper {
+
+  private static final Set<String> CARS_ALLOWED_WATER_SUBMODES = Set.of(
+    NATIONAL_CAR_FERRY.value(),
+    REGIONAL_CAR_FERRY.value(),
+    LOCAL_CAR_FERRY.value(),
+    HIGH_SPEED_VEHICLE_SERVICE.value()
+  );
 
   public NetexMainAndSubMode map(
     AllVehicleModesOfTransportEnumeration netexMode,
@@ -42,6 +58,26 @@ class TransportModeMapper {
       case WATER -> TransitMode.FERRY;
       default -> throw new UnsupportedModeException(mode);
     };
+  }
+
+  /**
+   * Use sumbmode to determin if a trip/ServiceJourney is allowed for car or not. There are
+   * probably other ways to specify this in NeTEx. The list of included submodes
+   * {@link #CARS_ALLOWED_WATER_SUBMODES} are not complete, feel free to request
+   * changes.
+   */
+  public CarAccess mapCarsAllowed(@Nullable TransportSubmodeStructure submode) {
+    if (submode == null || submode.getWaterSubmode() == null) {
+      return CarAccess.NOT_ALLOWED;
+    }
+    return mapCarsAllowed(submode.getWaterSubmode().value());
+  }
+
+  /**
+   * @see #carsAllowed(TransportSubmodeStructure)
+   */
+  public CarAccess mapCarsAllowed(@Nullable SubMode otpSubmode) {
+    return mapCarsAllowed(otpSubmode == null ? null : otpSubmode.name());
   }
 
   private NetexMainAndSubMode getSubmodeAsString(TransportSubmodeStructure submode) {
@@ -76,5 +112,11 @@ class TransportModeMapper {
     public UnsupportedModeException(AllVehicleModesOfTransportEnumeration mode) {
       this.mode = mode;
     }
+  }
+
+  private CarAccess mapCarsAllowed(@Nullable String submode) {
+    return submode != null && CARS_ALLOWED_WATER_SUBMODES.contains(submode)
+      ? CarAccess.ALLOWED
+      : CarAccess.NOT_ALLOWED;
   }
 }
