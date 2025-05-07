@@ -49,8 +49,8 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * Slippy map vector tile API for rendering various graph information for inspection/debugging
  * purposes.
  */
-@Path("/inspector/")
-public class InspectorResource {
+@Path("/debugvectortiles/")
+public class DebugVectorTilesResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
   private static final LayerParams AREA_STOPS = new LayerParams("areaStops", AreaStop);
@@ -71,10 +71,11 @@ public class InspectorResource {
     VERTICES,
     RENTAL
   );
+  public static final String PATH = "/otp/debugvectortiles/";
 
   private final OtpServerRequestContext serverContext;
 
-  public InspectorResource(@Context OtpServerRequestContext serverContext) {
+  public DebugVectorTilesResource(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
   }
 
@@ -95,7 +96,7 @@ public class InspectorResource {
       grizzlyRequest.getLocale(),
       Arrays.asList(requestedLayers.split(",")),
       DEBUG_LAYERS,
-      InspectorResource::createLayerBuilder,
+      DebugVectorTilesResource::createLayerBuilder,
       serverContext
     );
   }
@@ -112,7 +113,7 @@ public class InspectorResource {
     List<FeedInfo> feedInfos = feedInfos();
     List<String> layers = Arrays.asList(requestedLayers.split(","));
 
-    var url = TileJson.urlFromOverriddenBasePath(uri, headers, "/otp/inspector/", layers);
+    var url = TileJson.urlFromOverriddenBasePath(uri, headers, PATH, layers);
     return new TileJson(url, envelope, feedInfos, MIN_ZOOM, MAX_ZOOM);
   }
 
@@ -150,7 +151,7 @@ public class InspectorResource {
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    return "%s/otp/inspector/%s/tilejson.json".formatted(base, allLayers);
+    return "%s/%s/%s/tilejson.json".formatted(base, PATH, allLayers);
   }
 
   private List<FeedInfo> feedInfos() {

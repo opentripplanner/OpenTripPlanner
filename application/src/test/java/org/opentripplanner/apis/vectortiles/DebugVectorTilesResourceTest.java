@@ -8,15 +8,18 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.HttpForTest;
 import org.opentripplanner.transit.service.TimetableRepository;
 
-class InspectorResourceTest {
+class DebugVectorTilesResourceTest {
 
   @Test
   void tileJson() {
-    var resource = new InspectorResource(
+    var resource = new DebugVectorTilesResource(
       TestServerContext.createServerContext(new Graph(), new TimetableRepository())
     );
     var req = HttpForTest.containerRequest();
     var tileJson = resource.getTileJson(req.getUriInfo(), req, "l1,l2");
-    assertEquals("https://localhost:8080/otp/inspector/l1,l2/{z}/{x}/{y}.pbf", tileJson.tiles[0]);
+    assertEquals(
+      "https://localhost:8080/otp/debugvectortiles/l1,l2/{z}/{x}/{y}.pbf",
+      tileJson.tiles[0]
+    );
   }
 }
