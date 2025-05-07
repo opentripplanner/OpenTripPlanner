@@ -49,7 +49,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * Slippy map vector tile API for rendering various graph information for inspection/debugging
  * purposes.
  */
-@Path("/debugvectortiles/")
+@Path("/debugvectortiles")
 public class DebugVectorTilesResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
@@ -146,12 +146,12 @@ public class DebugVectorTilesResource {
     );
   }
 
-  private String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
+  static String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
     final String allLayers = layers
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    return "%s/%s/%s/tilejson.json".formatted(base, PATH, allLayers);
+    return "%s%s%s/tilejson.json".formatted(base, PATH, allLayers);
   }
 
   private List<FeedInfo> feedInfos() {
