@@ -51,6 +51,10 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   private static final boolean ARRIVE_BY = true;
   public static final String EMPTY = "";
 
+  /**
+   * This matches strings like N60 and P360. It is used to add a time shift value in seconds
+   * to the test cases that differs from the search window.
+   */
   private static final Pattern PAGING_SEQUENCE_TIME_SHIFT_PATTERN = Pattern.compile(
     "^(N|P)(\\d+)$"
   );
@@ -61,12 +65,14 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   /**
    * List of test-cases - for example:
    * <pre>
-   *   Given: "08:00", DEPART_AFTER, "1 N 2 N - P 2 -"
-   *     - "08:00"        : The first search departure time
-   *     - DEPART_AFTER   : If first search is arriveBy or depart after search
-   *     - "1 N 2 N - .." : Paging sequence - N:NEXT or P:PREVIOUS, 0-4 is the expected itinerary
-   *                        index found in the search between paging events, and '-' means no
-   *                        itinerary found.
+   *   Given: "08:00", DEPART_AFTER, "1 N3600 2 N - P 2 -"
+   *     - "08:00"            : The first search departure time
+   *     - DEPART_AFTER       : If first search is arriveBy or depart after search
+   *     - "1 N3600 2 N - .." : Paging sequence - N:NEXT or P:PREVIOUS, a number directly after
+   *                            N or P indicates a time shift value in seconds that differs from
+   *                            the search window, individual integers in the range 0-4 are the
+   *                            expected itinerary index found in the search between
+   *                            paging events, and '-' means no itinerary found.
    * </pre>
    */
   static List<Arguments> testCases() {
