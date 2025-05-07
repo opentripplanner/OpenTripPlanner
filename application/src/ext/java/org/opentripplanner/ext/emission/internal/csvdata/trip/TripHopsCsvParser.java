@@ -21,8 +21,12 @@ class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
     START_STOP_SEQ_NR,
     CO2
   );
-  private static final IntRange STOP_SEQ_NR_RANGE = IntRange.ofInclusive(0, 1000);
-  private static final DoubleRange CO2_RANGE = DoubleRange.of(0.0, 1_000_000_000.0);
+  private static final IntRange STOP_SEQ_NR_RANGE = IntRange.ofInclusive(0, 10_000);
+
+  /**
+   * Electrical vihecles can charge while going downhill, hence the negative range.
+   */
+  private static final DoubleRange CO2_RANGE = DoubleRange.of(-1_000_000.0, 1_000_000_000.0);
 
   public TripHopsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
     super(issueStore, reader);
