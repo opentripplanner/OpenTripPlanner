@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.ext.flex.FlexIntegrationTestData;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
