@@ -11,7 +11,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfShouldReturnTheSameInstanceWhenBuild() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var same = pref.copyOf().build();
     assertSame(pref, same);
     // Change one thing to force making a copy
@@ -31,7 +31,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithCarChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withCar(c -> c.withReluctance(3.5)).build();
 
     assertNotSame(pref, copy);
@@ -41,8 +41,8 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithBikeChanges() {
-    var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withBike(b -> b.withReluctance(2.5)).build();
+    var pref = RoutingPreferences.DEFAULT;
+    var copy = pref.of().withBike(b -> b.withReluctance(2.5)).build();
 
     assertNotSame(pref, copy);
     assertNotSame(pref.bike(), copy.bike());
@@ -51,7 +51,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithScooterChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withScooter(b -> b.withReluctance(2.5)).build();
 
     assertNotSame(pref, copy);
@@ -61,7 +61,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithWalkChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withWalk(w -> w.withReluctance(2.5)).build();
 
     assertNotSame(pref, copy);
@@ -71,7 +71,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithTransferChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withTransfer(t -> t.withSlack(Duration.ofSeconds(2))).build();
 
     assertNotSame(pref, copy);
@@ -81,7 +81,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithWheelchairChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref
       .copyOf()
       .withWheelchair(it ->
@@ -103,7 +103,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithTransitChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withTransit(t -> t.withDefaultBoardSlackSec(2)).build();
 
     assertNotSame(pref, copy);
@@ -113,7 +113,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithStreetChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withStreet(s -> s.withTurnReluctance(2)).build();
 
     assertNotSame(pref, copy);
@@ -122,7 +122,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithItineraryFilterChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withItineraryFilter(i -> i.withGroupSimilarityKeepOne(2)).build();
 
     assertNotSame(pref, copy);
@@ -132,7 +132,7 @@ public class RoutingPreferencesTest {
 
   @Test
   public void copyOfWithSystemChanges() {
-    var pref = new RoutingPreferences();
+    var pref = RoutingPreferences.DEFAULT;
     var copy = pref.copyOf().withSystem(s -> s.withGeoidElevation(true)).build();
 
     assertNotSame(pref, copy);

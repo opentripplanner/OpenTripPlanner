@@ -1,10 +1,14 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
+import java.util.Objects;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 // TODO VIA: Javadoc
 public class JourneyRequest implements Cloneable, Serializable {
+
+  private static final JourneyRequest DEFAULT = new JourneyRequest();
 
   private TransitRequest transit = new TransitRequest();
   private StreetRequest access = new StreetRequest();
@@ -62,5 +66,36 @@ public class JourneyRequest implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    JourneyRequest that = (JourneyRequest) o;
+    return (
+      Objects.equals(transit, that.transit) &&
+      Objects.equals(access, that.access) &&
+      Objects.equals(egress, that.egress) &&
+      Objects.equals(transfer, that.transfer) &&
+      Objects.equals(direct, that.direct)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(transit, access, egress, transfer, direct);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(JourneyRequest.class)
+      .addObj("transit", transit, DEFAULT.transit)
+      .addObj("access", access, DEFAULT.access)
+      .addObj("transfer", transfer, DEFAULT.transfer)
+      .addObj("egress", egress, DEFAULT.egress)
+      .addObj("direct", direct, DEFAULT.direct)
+      .toString();
   }
 }

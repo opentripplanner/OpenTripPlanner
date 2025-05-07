@@ -54,7 +54,7 @@ public class StreetSearchRequest implements AStarRequest {
    */
   private StreetSearchRequest() {
     this.startTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-    this.preferences = new RoutingPreferences();
+    this.preferences = RoutingPreferences.DEFAULT;
     this.mode = StreetMode.WALK;
     this.arriveBy = false;
     this.wheelchair = false;

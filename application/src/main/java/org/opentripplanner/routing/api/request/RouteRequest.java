@@ -19,6 +19,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
@@ -45,6 +46,14 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequest.class);
 
+  /**
+   * This is mutable - be careful do not change this or make it accessable outside this class.
+   * We use it here to avoid creating a new one every time we want to acces default values.
+   */
+  private static final JourneyRequest DEFAULT_JOURNEY_REQUEST = new JourneyRequest();
+
+  private static final int DEFAULT_NUM_ITINERARIES = 50;
+  private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
   /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
@@ -60,6 +69,7 @@ public class RouteRequest implements Cloneable, Serializable {
   @Nullable
   private Duration maxSearchWindow;
 
+  @Nullable
   private Duration searchWindow;
 
   private PageCursor pageCursor;
@@ -68,11 +78,11 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private boolean arriveBy = false;
 
-  private int numItineraries = 50;
+  private int numItineraries = DEFAULT_NUM_ITINERARIES;
 
-  private Locale locale = new Locale("en", "US");
+  private Locale locale = DEFAULT_LOCALE;
 
-  private RoutingPreferences preferences = new RoutingPreferences();
+  private RoutingPreferences preferences = RoutingPreferences.DEFAULT;
 
   private JourneyRequest journey = new JourneyRequest();
 
@@ -107,7 +117,7 @@ public class RouteRequest implements Cloneable, Serializable {
     return preferences;
   }
 
-  public RouteRequest withPreferences(Consumer<RoutingPreferences.Builder> body) {
+  public RouteRequest withPreferences(Consumer<RoutingPreferencesBuilder> body) {
     this.preferences = preferences.copyOf().apply(body).build();
     return this;
   }
@@ -465,9 +475,16 @@ public class RouteRequest implements Cloneable, Serializable {
       .addObj("from", from)
       .addObj("to", to)
       .addDateTime("dateTime", dateTime)
+      .addDateTime("bookingTime", bookingTime)
       .addBoolIfTrue("arriveBy", arriveBy)
-      .addObj("modes", journey.modes())
-      .addCol("filters", journey.transit().filters())
+      .addBoolIfTrue("timetableView: false", !timetableView)
+      .addBoolIfTrue("wheelchair", wheelchair)
+      .addDuration("searchWindow", searchWindow)
+      .addDuration("maxSearchWindow", maxSearchWindow)
+      .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
+      .addObj("locale", locale, DEFAULT_LOCALE)
+      .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
+      .addObj("journey", journey, DEFAULT_JOURNEY_REQUEST)
       .toString();
   }
 }

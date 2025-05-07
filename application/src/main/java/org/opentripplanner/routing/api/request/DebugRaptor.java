@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -104,6 +105,25 @@ public class DebugRaptor implements Serializable {
     this.eventTypes.clear();
     this.eventTypes.addAll(eventTypes);
     return this;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DebugRaptor that = (DebugRaptor) o;
+    return (
+      debugPathFromStopIndex == that.debugPathFromStopIndex &&
+      Objects.equals(stops, that.stops) &&
+      Objects.equals(path, that.path) &&
+      Objects.equals(eventTypes, that.eventTypes)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(stops, path, debugPathFromStopIndex, eventTypes);
   }
 
   @Override

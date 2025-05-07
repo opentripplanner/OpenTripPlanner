@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
 /**
@@ -51,7 +52,7 @@ public class RouteViaRequest implements Serializable {
     this.dateTime = Instant.now();
     this.searchWindow = null;
     this.wheelchair = false;
-    this.preferences = new RoutingPreferences();
+    this.preferences = RoutingPreferences.DEFAULT;
     this.locale = null;
     this.numItineraries = null;
 
@@ -228,7 +229,7 @@ public class RouteViaRequest implements Serializable {
       return this;
     }
 
-    public Builder withPreferences(Consumer<RoutingPreferences.Builder> prefs) {
+    public Builder withPreferences(Consumer<RoutingPreferencesBuilder> prefs) {
       preferences = preferences.copyOf().apply(prefs).build();
       return this;
     }

@@ -4,15 +4,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 // TODO VIA: Javadoc
 public class TransitRequest implements Cloneable, Serializable {
+
+  private static final TransitRequest DEFAULT = new TransitRequest();
 
   private List<FeedScopedId> bannedTrips = new ArrayList<>();
 
@@ -208,5 +212,54 @@ public class TransitRequest implements Cloneable, Serializable {
    */
   public void disable() {
     this.filters = List.of(ExcludeAllTransitFilter.of());
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    TransitRequest that = (TransitRequest) o;
+    return (
+      Objects.equals(bannedTrips, that.bannedTrips) &&
+      Objects.equals(filters, that.filters) &&
+      Objects.equals(preferredAgencies, that.preferredAgencies) &&
+      Objects.equals(unpreferredAgencies, that.unpreferredAgencies) &&
+      Objects.equals(preferredRoutes, that.preferredRoutes) &&
+      Objects.equals(unpreferredRoutes, that.unpreferredRoutes) &&
+      Objects.equals(priorityGroupsByAgency, that.priorityGroupsByAgency) &&
+      Objects.equals(priorityGroupsGlobal, that.priorityGroupsGlobal) &&
+      Objects.equals(raptorDebugging, that.raptorDebugging)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      bannedTrips,
+      filters,
+      preferredAgencies,
+      unpreferredAgencies,
+      preferredRoutes,
+      unpreferredRoutes,
+      priorityGroupsByAgency,
+      priorityGroupsGlobal,
+      raptorDebugging
+    );
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(TransitRequest.class)
+      .addCol("bannedTrips", bannedTrips)
+      .addCol("filters", filters, DEFAULT.filters)
+      .addCol("preferredAgencies", preferredAgencies)
+      .addCol("unpreferredAgencies", unpreferredAgencies)
+      .addCol("preferredRoutes", preferredRoutes)
+      .addCol("unpreferredRoutes", unpreferredRoutes)
+      .addCol("priorityGroupsByAgency", priorityGroupsByAgency)
+      .addCol("priorityGroupsGlobal", priorityGroupsGlobal)
+      .addObj("raptorDebugging", raptorDebugging, DEFAULT.raptorDebugging)
+      .toString();
   }
 }

@@ -27,8 +27,7 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
-import org.opentripplanner.routing.api.request.preference.MaxStopCountLimit;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
@@ -183,7 +182,7 @@ public class RouteRequestConfig {
     return request;
   }
 
-  private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
+  private static void mapPreferences(NodeAdapter c, RoutingPreferencesBuilder preferences) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));

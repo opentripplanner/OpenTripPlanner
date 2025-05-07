@@ -17,7 +17,7 @@ import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.time.DurationUtils;
 
@@ -71,7 +71,7 @@ public class RouteRequestMapper {
   }
 
   private static void setPreferences(
-    RoutingPreferences.Builder prefs,
+    RoutingPreferencesBuilder prefs,
     RouteRequest request,
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args,
     DataFetchingEnvironment environment
@@ -110,7 +110,7 @@ public class RouteRequestMapper {
   }
 
   private static void setStreetPreferences(
-    RoutingPreferences.Builder preferences,
+    RoutingPreferencesBuilder preferences,
     RouteRequest request,
     GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
     DataFetchingEnvironment environment
@@ -130,7 +130,7 @@ public class RouteRequestMapper {
   }
 
   private static void setRentalAvailabilityPreferences(
-    RoutingPreferences.Builder preferences,
+    RoutingPreferencesBuilder preferences,
     RouteRequest request
   ) {
     preferences.withBike(bike ->
