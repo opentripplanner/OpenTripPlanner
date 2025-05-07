@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.api.model.FilterValues;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -21,13 +22,13 @@ public class TripTimeOnDateRequestBuilder {
   private static final String EXCLUDE_ROUTES = "excludeRoutes";
   private static final String EXCLUDE_MODES = "excludeModes";
   private final Collection<StopLocation> stopLocations;
-  private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> includeAgencies = FilterValues.ofNullIsEverything(
     INCLUDE_AGENCIES,
-    List.of()
+    null
   );
-  private FilterValues<FeedScopedId> includeRoutes = FilterValues.ofEmptyIsEverything(
+  private FilterValues<FeedScopedId> includeRoutes = FilterValues.ofNullIsEverything(
     INCLUDE_ROUTES,
-    List.of()
+    null
   );
   private FilterValues<FeedScopedId> excludeAgencies = FilterValues.ofEmptyIsEverything(
     EXCLUDE_AGENCIES,
@@ -37,9 +38,9 @@ public class TripTimeOnDateRequestBuilder {
     EXCLUDE_ROUTES,
     List.of()
   );
-  private FilterValues<TransitMode> includeModes = FilterValues.ofEmptyIsEverything(
+  private FilterValues<TransitMode> includeModes = FilterValues.ofNullIsEverything(
     INCLUDE_MODES,
-    List.of()
+    null
   );
   private FilterValues<TransitMode> excludeModes = FilterValues.ofEmptyIsEverything(
     EXCLUDE_MODES,
@@ -60,13 +61,15 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withIncludeAgencies(Collection<FeedScopedId> agencies) {
-    this.includeAgencies = FilterValues.ofEmptyIsEverything(INCLUDE_AGENCIES, agencies);
+  public TripTimeOnDateRequestBuilder withIncludeAgencies(
+    @Nullable Collection<FeedScopedId> agencies
+  ) {
+    this.includeAgencies = FilterValues.ofNullIsEverything(INCLUDE_AGENCIES, agencies);
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withIncludeRoutes(Collection<FeedScopedId> routes) {
-    this.includeRoutes = FilterValues.ofEmptyIsEverything(INCLUDE_ROUTES, routes);
+  public TripTimeOnDateRequestBuilder withIncludeRoutes(@Nullable Collection<FeedScopedId> routes) {
+    this.includeRoutes = FilterValues.ofNullIsEverything(INCLUDE_ROUTES, routes);
     return this;
   }
 
@@ -80,8 +83,8 @@ public class TripTimeOnDateRequestBuilder {
     return this;
   }
 
-  public TripTimeOnDateRequestBuilder withIncludeModes(Collection<TransitMode> modes) {
-    this.includeModes = FilterValues.ofEmptyIsEverything(INCLUDE_MODES, modes);
+  public TripTimeOnDateRequestBuilder withIncludeModes(@Nullable Collection<TransitMode> modes) {
+    this.includeModes = FilterValues.ofNullIsEverything(INCLUDE_MODES, modes);
     return this;
   }
 

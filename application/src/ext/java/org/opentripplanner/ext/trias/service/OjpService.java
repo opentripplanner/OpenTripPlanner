@@ -100,19 +100,27 @@ public class OjpService {
         "Number of departures must be less than " + MAX_DEPARTURES
       );
     }
-    var request = TripTimeOnDateRequest.of(stopLocations)
+    var builder = TripTimeOnDateRequest.of(stopLocations)
       .withTime(params.time)
       .withArrivalDeparture(params.arrivalDeparture)
       .withTimeWindow(params.timeWindow)
       .withNumberOfDepartures(params.numDepartures)
-      .withIncludeAgencies(params.includedAgencies)
-      .withIncludeRoutes(params.includedRoutes)
       .withExcludeAgencies(params.excludedAgencies)
       .withExcludeRoutes(params.excludedRoutes)
-      .withIncludeModes(params.includedModes)
       .withExcludeModes(params.excludedModes)
-      .withSortOrder(TripTimeOnDate.compareByScheduledDeparture())
-      .build();
+      .withSortOrder(TripTimeOnDate.compareByScheduledDeparture());
+
+    if (params.includesAgencies()) {
+      builder.withIncludeAgencies(params.includedAgencies);
+    }
+    if (params.includesRoutes()) {
+      builder.withIncludeRoutes(params.includedRoutes);
+    }
+    if (params.includesModes()) {
+      builder.withIncludeModes(params.includedModes);
+    }
+
+    var request = builder.build();
     return transitService.findTripTimesOnDate(request).stream().map(CallAtStop::noWalking).toList();
   }
 
@@ -128,5 +136,15 @@ public class OjpService {
     Set<FeedScopedId> excludedRoutes,
     Set<TransitMode> includedModes,
     Set<TransitMode> excludedModes
-  ) {}
+  ) {
+    public boolean includesAgencies() {
+      return !includedAgencies.isEmpty();
+    }
+    public boolean includesRoutes() {
+      return !includedRoutes().isEmpty();
+    }
+    public boolean includesModes() {
+      return !includedModes.isEmpty();
+    }
+  }
 }
