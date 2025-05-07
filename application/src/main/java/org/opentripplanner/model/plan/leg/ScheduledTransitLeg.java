@@ -59,7 +59,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
-  // the posistions are protected to avoid boxing/unboxing when used in subclasses
+  // the positions are protected to avoid boxing/unboxing when used in subclasses
   protected final int boardStopPosInPattern;
   protected final int alightStopPosInPattern;
   private final int generalizedCost;

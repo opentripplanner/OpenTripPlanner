@@ -117,7 +117,7 @@ class ScheduledTransitLegTest {
     assertEquals(Cost.ZERO.toSeconds(), subject.generalizedCost());
     assertEquals(DISTANCE, subject.distanceMeters());
 
-    // None inizialized fields
+    // Uninitialized fields
     assertFalse(subject.isRealTimeUpdated());
     assertEquals(Set.of(), subject.listTransitAlerts());
     assertEquals(List.of(), subject.fareProducts());

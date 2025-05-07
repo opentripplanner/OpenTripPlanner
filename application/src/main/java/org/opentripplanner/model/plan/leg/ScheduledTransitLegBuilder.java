@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>> {
 
   /**
-   * The Position in pattern is initialized to a negative value. Negative valued are not allowed,
+   * The position in pattern is initialized to a negative value. Negative valued are not allowed,
    * so if not set by the caller the build() method will fail.
    */
   private static final int POS_NOT_SET = -1;
@@ -61,7 +61,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     distanceMeters = original.distanceMeters();
     fareProducts = original.fareProducts();
 
-    // Sandbox fiels
+    // Sandbox fields
     accessibilityScore = original.accessibilityScore();
     emissionPerPerson = original.emissionPerPerson();
   }
