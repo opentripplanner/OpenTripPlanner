@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -19,6 +20,11 @@ public class JourneyRequest implements Cloneable, Serializable {
 
   public TransitRequest transit() {
     return transit;
+  }
+
+  public JourneyRequest withTransit(Consumer<TransitRequestBuilder> body) {
+    this.transit = transit.copyOf().apply(body).build();
+    return this;
   }
 
   public StreetRequest access() {
