@@ -72,10 +72,6 @@ class RouteRequestTest {
     var clone = request.clone();
 
     assertNotSame(clone, request);
-    assertNotSame(
-      clone.journey().transit().raptorDebugging(),
-      request.journey().transit().raptorDebugging()
-    );
     assertEquals(50, request.numItineraries());
     assertEquals(50, clone.numItineraries());
   }

@@ -196,7 +196,7 @@ public class TriangleInequalityTest {
       prototypeOptions.journey().setModes(modes);
     }
     if (!filters.isEmpty()) {
-      prototypeOptions.journey().transit().setFilters(filters);
+      prototypeOptions.journey().withTransit(b -> b.setFilters(filters));
     }
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()

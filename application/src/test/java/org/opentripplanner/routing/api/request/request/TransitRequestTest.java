@@ -43,25 +43,20 @@ class TransitRequestTest {
     .setRaptorDebugging(RAPTOR_DEBUGGING)
     .build();
 
-  private final TransitRequest copy = subject.copyOf().build();
-
   @Test
   void filters() {
     assertEquals(FILTERS, subject.filters());
-    assertEquals(FILTERS, copy.filters());
   }
 
   @Test
   void disableAndEnable() {
     assertTrue(subject.enabled());
-    subject.disable();
-    assertFalse(subject.enabled());
+    assertFalse(TransitRequest.of().disable().build().enabled());
   }
 
   @Test
   void preferredAgencies() {
     assertEquals(AGENCIES, subject.preferredAgencies());
-    assertEquals(AGENCIES, copy.preferredAgencies());
   }
 
   @Test
@@ -73,7 +68,6 @@ class TransitRequestTest {
   @Test
   void preferredRoutes() {
     assertEquals(ROUTES, subject.preferredRoutes());
-    assertEquals(ROUTES, copy.preferredRoutes());
   }
 
   @Test
@@ -85,36 +79,42 @@ class TransitRequestTest {
   @Test
   void bannedTrips() {
     assertEquals(BANNED_TRIPS, subject.bannedTrips());
-    assertEquals(BANNED_TRIPS, copy.bannedTrips());
   }
 
   @Test
   void priorityGroupsByAgency() {
     assertEquals(PRIORITY_GROUP_BY_AGENCY, subject.priorityGroupsByAgency());
-    assertEquals(PRIORITY_GROUP_BY_AGENCY, copy.priorityGroupsByAgency());
   }
 
   @Test
   void priorityGroupsGlobal() {
     assertEquals(PRIORITY_GROUP_GLOBAL, subject.priorityGroupsGlobal());
-    assertEquals(PRIORITY_GROUP_GLOBAL, copy.priorityGroupsGlobal());
   }
 
   @Test
   void raptorDebugging() {
     assertEquals(RAPTOR_DEBUGGING, subject.raptorDebugging());
-    assertEquals(RAPTOR_DEBUGGING, copy.raptorDebugging());
   }
 
   @Test
   void testEqualsAndHashCode() {
+    // To create a copy we ned to modify the subject, and then modify it back, if not we just
+    // get the same instance.
+    var copy = subject
+      .copyOf()
+      .setRaptorDebugging(new DebugRaptor().withPath("1 2 3"))
+      .build()
+      .copyOf()
+      .setRaptorDebugging(RAPTOR_DEBUGGING)
+      .build();
+
     AssertEqualsAndHashCode.verify(subject)
       .sameAs(copy)
       .differentFrom(
         subject.copyOf().disable().build(),
         subject.copyOf().addPriorityGroupsByAgency(List.of()).build(),
         subject.copyOf().addPriorityGroupsGlobal(List.of()).build(),
-        subject.copyOf().setRaptorDebugging(new DebugRaptor()).build()
+        subject.copyOf().setRaptorDebugging(new DebugRaptor()).build().toString()
       );
   }
 

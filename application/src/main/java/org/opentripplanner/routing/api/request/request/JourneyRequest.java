@@ -12,7 +12,7 @@ public class JourneyRequest implements Cloneable, Serializable {
 
   private static final JourneyRequest DEFAULT = new JourneyRequest();
 
-  private TransitRequest transit = new TransitRequest();
+  private TransitRequest transit = TransitRequest.DEFAULT;
   private StreetRequest access = StreetRequest.DEFAULT;
   private StreetRequest egress = StreetRequest.DEFAULT;
   private StreetRequest transfer = StreetRequest.DEFAULT;
@@ -91,9 +91,9 @@ public class JourneyRequest implements Cloneable, Serializable {
   public JourneyRequest clone() {
     try {
       var clone = (JourneyRequest) super.clone();
-      clone.transit = this.transit.clone();
 
       // No need to clone immutable objects
+      clone.transit = this.transit;
       clone.access = this.access;
       clone.egress = this.egress;
       clone.transfer = this.transfer;

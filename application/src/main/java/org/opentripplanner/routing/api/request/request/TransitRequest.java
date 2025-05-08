@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.api.request.request;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
@@ -21,44 +19,32 @@ public class TransitRequest implements Cloneable, Serializable {
     List.of(),
     List.of(),
     List.of(),
-    new ArrayList<>(),
-    new ArrayList<>(),
-    new ArrayList<>(),
+    List.of(),
+    List.of(),
+    List.of(),
     new DebugRaptor()
   );
 
-  private List<TransitFilter> filters;
+  private final List<TransitFilter> filters;
 
   @Deprecated
-  private List<FeedScopedId> preferredAgencies;
+  private final List<FeedScopedId> preferredAgencies;
 
-  private List<FeedScopedId> unpreferredAgencies;
+  private final List<FeedScopedId> unpreferredAgencies;
 
   /**
    * @deprecated TODO OTP2 Needs to be implemented
    */
   @Deprecated
-  private List<FeedScopedId> preferredRoutes;
+  private final List<FeedScopedId> preferredRoutes;
 
-  private List<FeedScopedId> unpreferredRoutes;
-  private List<FeedScopedId> bannedTrips;
-  private List<TransitGroupSelect> priorityGroupsByAgency;
-  private List<TransitGroupSelect> priorityGroupsGlobal;
-  private DebugRaptor raptorDebugging;
+  private final List<FeedScopedId> unpreferredRoutes;
+  private final List<FeedScopedId> bannedTrips;
+  private final List<TransitGroupSelect> priorityGroupsByAgency;
+  private final List<TransitGroupSelect> priorityGroupsGlobal;
+  private final DebugRaptor raptorDebugging;
 
-  public TransitRequest() {
-    this.filters = List.of(AllowAllTransitFilter.of());
-    this.preferredAgencies = List.of();
-    this.unpreferredAgencies = List.of();
-    this.preferredRoutes = List.of();
-    this.unpreferredRoutes = List.of();
-    this.bannedTrips = new ArrayList<>();
-    this.priorityGroupsByAgency = new ArrayList<>();
-    this.priorityGroupsGlobal = new ArrayList<>();
-    this.raptorDebugging = new DebugRaptor();
-  }
-
-  public TransitRequest(
+  TransitRequest(
     List<TransitFilter> filters,
     List<FeedScopedId> preferredAgencies,
     List<FeedScopedId> unpreferredAgencies,
@@ -89,21 +75,12 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   @Deprecated
-  public void setBannedTrips(List<FeedScopedId> bannedTrips) {
-    this.bannedTrips = bannedTrips;
-  }
-
   public List<FeedScopedId> bannedTrips() {
     return bannedTrips;
   }
 
   public List<TransitFilter> filters() {
     return filters;
-  }
-
-  @Deprecated
-  public void setFilters(List<TransitFilter> filters) {
-    this.filters = filters;
   }
 
   /**
@@ -118,30 +95,12 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   /**
-   * All patterns matching the same select will be assigned the same group-id.
-   */
-  @Deprecated
-  public void addPriorityGroupsByAgency(Collection<TransitGroupSelect> priorityGroupsByAgency) {
-    this.priorityGroupsByAgency.addAll(priorityGroupsByAgency);
-  }
-
-  /**
    * A unique group-id is assigned all patterns grouped by matching selects.
    * <p>
    * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
    */
   public List<TransitGroupSelect> priorityGroupsGlobal() {
     return priorityGroupsGlobal;
-  }
-
-  @Deprecated
-  public void addPriorityGroupsGlobal(Collection<TransitGroupSelect> priorityGroupsGlobal) {
-    this.priorityGroupsGlobal.addAll(priorityGroupsGlobal);
-  }
-
-  @Deprecated
-  public void setPreferredAgencies(List<FeedScopedId> preferredAgencies) {
-    this.preferredAgencies = preferredAgencies;
   }
 
   /**
@@ -152,18 +111,8 @@ public class TransitRequest implements Cloneable, Serializable {
     return preferredAgencies;
   }
 
-  @Deprecated
-  public void setUnpreferredAgencies(List<FeedScopedId> unpreferredAgencies) {
-    this.unpreferredAgencies = unpreferredAgencies;
-  }
-
   public List<FeedScopedId> unpreferredAgencies() {
     return unpreferredAgencies;
-  }
-
-  @Deprecated
-  public void setPreferredRoutes(List<FeedScopedId> preferredRoutes) {
-    this.preferredRoutes = preferredRoutes;
   }
 
   /**
@@ -174,11 +123,6 @@ public class TransitRequest implements Cloneable, Serializable {
     return preferredRoutes;
   }
 
-  @Deprecated
-  public void setUnpreferredRoutes(List<FeedScopedId> unpreferredRoutes) {
-    this.unpreferredRoutes = unpreferredRoutes;
-  }
-
   /**
    * Set of unpreferred routes for given user and configuration.
    */
@@ -186,35 +130,8 @@ public class TransitRequest implements Cloneable, Serializable {
     return unpreferredRoutes;
   }
 
-  @Deprecated
-  public void setRaptorDebugging(DebugRaptor raptorDebugging) {
-    this.raptorDebugging = raptorDebugging;
-  }
-
   public DebugRaptor raptorDebugging() {
     return raptorDebugging;
-  }
-
-  public TransitRequest clone() {
-    try {
-      var clone = (TransitRequest) super.clone();
-
-      clone.preferredAgencies = List.copyOf(this.preferredAgencies);
-      clone.unpreferredAgencies = List.copyOf(this.unpreferredAgencies);
-      clone.preferredRoutes = List.copyOf(this.preferredRoutes);
-      clone.unpreferredRoutes = List.copyOf(this.unpreferredRoutes);
-      clone.raptorDebugging = new DebugRaptor(this.raptorDebugging);
-      clone.priorityGroupsByAgency = new ArrayList<>(this.priorityGroupsByAgency);
-      clone.priorityGroupsGlobal = new ArrayList<>(this.priorityGroupsGlobal);
-
-      // filters are immutable
-      clone.setFilters(this.filters);
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
   }
 
   /**
@@ -222,13 +139,6 @@ public class TransitRequest implements Cloneable, Serializable {
    */
   public boolean enabled() {
     return filters.stream().noneMatch(ExcludeAllTransitFilter.class::isInstance);
-  }
-
-  /**
-   * Disables the transit search for this request, for example when you only want bike routes.
-   */
-  public void disable() {
-    this.filters = List.of(ExcludeAllTransitFilter.of());
   }
 
   @Override

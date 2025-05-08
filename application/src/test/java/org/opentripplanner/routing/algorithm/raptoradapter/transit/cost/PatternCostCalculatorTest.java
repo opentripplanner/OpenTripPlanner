@@ -58,8 +58,12 @@ public class PatternCostCalculatorTest {
     var unpreferredCostFunctionOtpDomain = CostLinearFunction.of("5m + 1.1 t");
     RouteRequest routingRequest = new RouteRequest();
 
-    routingRequest.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-    routingRequest.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+    routingRequest
+      .journey()
+      .withTransit(b -> {
+        b.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+        b.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+      });
     routingRequest.withPreferences(p ->
       p.withTransit(tr -> tr.setUnpreferredCost(unpreferredCostFunctionOtpDomain))
     );
@@ -200,13 +204,16 @@ public class PatternCostCalculatorTest {
           tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
         });
       });
-
-      if (unPreferredAgency) {
-        request.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
-      }
-      if (unPreferredRoute) {
-        request.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-      }
+      request
+        .journey()
+        .withTransit(b -> {
+          if (unPreferredAgency) {
+            b.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+          }
+          if (unPreferredRoute) {
+            b.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+          }
+        });
       return request;
     }
   }

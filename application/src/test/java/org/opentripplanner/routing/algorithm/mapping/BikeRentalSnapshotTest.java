@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
@@ -12,11 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.error.RoutingValidationException;
 
 @ExtendWith(SnapshotExtension.class)
@@ -64,7 +61,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
 
     request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
 
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
 
     request.setFrom(p1);
     request.setTo(p2);
@@ -87,7 +84,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
 
     allowArrivalWithRentalVehicle(request);
     request.setFrom(p1);
@@ -102,7 +99,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
     request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
 
     allowArrivalWithRentalVehicle(request);
     request.setFrom(p1);
@@ -127,7 +124,6 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
           .withTransferMode(StreetMode.WALK)
           .build()
       );
-    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     request.setFrom(p1);
     request.setTo(p3);
 
@@ -153,7 +149,6 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
           .withDirectMode(StreetMode.NOT_SET)
           .build()
       );
-    request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
     request.setFrom(p3);
     request.setTo(p1);
 

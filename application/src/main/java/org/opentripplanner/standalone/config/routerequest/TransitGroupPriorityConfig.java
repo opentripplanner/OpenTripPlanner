@@ -5,7 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 public class TransitGroupPriorityConfig {
 
-  public static void mapTransitRequest(NodeAdapter root, TransitRequest transit) {
+  public static void mapTransitRequest(NodeAdapter root, TransitRequestBuilder transit) {
     var c = root
       .of("transitGroupPriority")
       .since(OtpVersion.V2_5)

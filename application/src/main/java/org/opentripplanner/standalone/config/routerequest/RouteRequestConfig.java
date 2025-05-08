@@ -33,6 +33,8 @@ import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -148,38 +150,43 @@ public class RouteRequestConfig {
       .asObject();
     request
       .journey()
-      .transit()
-      .setUnpreferredRoutes(
-        unpreferred
-          .of("routes")
-          .since(V2_2)
-          .summary(
-            "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
-          )
-          .description("How much cost is added is configured in `unpreferredCost`.")
-          .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
-      );
-
-    request
-      .journey()
-      .transit()
-      .setUnpreferredAgencies(
-        unpreferred
-          .of("agencies")
-          .since(V2_2)
-          .summary(
-            "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
-          )
-          .description("How much cost is added is configured in `unpreferredCost`.")
-          .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
-      );
-
-    TransitGroupPriorityConfig.mapTransitRequest(c, request.journey().transit());
+      .withTransit(b -> {
+        mapTransit(unpreferred, b, request.journey().transit());
+        TransitGroupPriorityConfig.mapTransitRequest(c, b);
+      });
 
     // Map preferences
     request.withPreferences(preferences -> mapPreferences(c, preferences));
 
     return request;
+  }
+
+  private static void mapTransit(
+    NodeAdapter c,
+    TransitRequestBuilder builder,
+    TransitRequest defaultValues
+  ) {
+    builder.setUnpreferredRoutes(
+      c
+        .of("routes")
+        .since(V2_2)
+        .summary(
+          "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
+        )
+        .description("How much cost is added is configured in `unpreferredCost`.")
+        .asFeedScopedIds(defaultValues.unpreferredRoutes())
+    );
+
+    builder.setUnpreferredAgencies(
+      c
+        .of("agencies")
+        .since(V2_2)
+        .summary(
+          "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
+        )
+        .description("How much cost is added is configured in `unpreferredCost`.")
+        .asFeedScopedIds(defaultValues.unpreferredAgencies())
+    );
   }
 
   private static void mapPreferences(NodeAdapter c, RoutingPreferencesBuilder preferences) {

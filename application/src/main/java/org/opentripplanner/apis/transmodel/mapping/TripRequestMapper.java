@@ -5,7 +5,6 @@ import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDs
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -16,7 +15,6 @@ import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestMapper {
 
@@ -61,41 +59,39 @@ public class TripRequestMapper {
     callWith.argument("numTripPatterns", request::setNumItineraries);
     callWith.argument("arriveBy", request::setArriveBy);
 
-    callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-      request.journey().transit().setPreferredAgencies(mapIDsToDomainNullSafe(authorities))
-    );
-    callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-      request.journey().transit().setUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
-    );
+    request
+      .journey()
+      .withTransit(transitBuilder -> {
+        callWith.argument("preferred.authorities", (Collection<String> authorities) ->
+          transitBuilder.setPreferredAgencies(mapIDsToDomainNullSafe(authorities))
+        );
+        callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
+          transitBuilder.setUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
+        );
 
-    callWith.argument("preferred.lines", (List<String> lines) ->
-      request.journey().transit().setPreferredRoutes(mapIDsToDomainNullSafe(lines))
-    );
-    callWith.argument("unpreferred.lines", (List<String> lines) ->
-      request.journey().transit().setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
-    );
+        callWith.argument("preferred.lines", (List<String> lines) ->
+          transitBuilder.setPreferredRoutes(mapIDsToDomainNullSafe(lines))
+        );
+        callWith.argument("unpreferred.lines", (List<String> lines) ->
+          transitBuilder.setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
+        );
+        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
+          transitBuilder.setBannedTrips(mapIDsToDomainNullSafe(serviceJourneys))
+        );
+
+        if (GqlUtil.hasArgument(environment, "filters")) {
+          transitBuilder.setFilters(
+            FilterMapper.mapFilterNewWay(environment.getArgument("filters"))
+          );
+        } else {
+          FilterMapper.mapFilterOldWay(environment, callWith, request);
+        }
+      });
 
     if (GqlUtil.hasArgument(environment, "modes")) {
       request
         .journey()
         .setModes(RequestModesMapper.mapRequestModes(environment.getArgument("modes")));
-    }
-
-    var bannedTrips = new ArrayList<FeedScopedId>();
-    callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-      bannedTrips.addAll(mapIDsToDomainNullSafe(serviceJourneys))
-    );
-    if (!bannedTrips.isEmpty()) {
-      request.journey().transit().setBannedTrips(bannedTrips);
-    }
-
-    if (GqlUtil.hasArgument(environment, "filters")) {
-      request
-        .journey()
-        .transit()
-        .setFilters(FilterMapper.mapFilterNewWay(environment.getArgument("filters")));
-    } else {
-      FilterMapper.mapFilterOldWay(environment, callWith, request);
     }
 
     request.withPreferences(preferences ->

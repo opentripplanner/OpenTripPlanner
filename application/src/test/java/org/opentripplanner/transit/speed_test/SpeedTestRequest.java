@@ -71,11 +71,11 @@ public class SpeedTestRequest {
 
     var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
     if (tModes.isEmpty()) {
-      request.journey().transit().disable();
+      request.journey().withTransit(b -> b.disable());
     } else {
       var builder = TransitFilterRequest.of()
         .addSelect(SelectRequest.of().withTransportModes(tModes).build());
-      request.journey().transit().setFilters(List.of(builder.build()));
+      request.journey().withTransit(b -> b.setFilters(List.of(builder.build())));
     }
 
     if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {

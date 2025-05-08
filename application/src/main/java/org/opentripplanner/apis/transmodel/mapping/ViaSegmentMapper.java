@@ -14,8 +14,10 @@ public class ViaSegmentMapper {
       journey.setModes(RequestModesMapper.mapRequestModes(modesInput));
     }
     if (viaSegment.containsKey("filters")) {
-      List<Map<String, ?>> filters = (List<Map<String, ?>>) viaSegment.get("filters");
-      journey.transit().setFilters(FilterMapper.mapFilterNewWay(filters));
+      journey.withTransit(tb -> {
+        List<Map<String, ?>> filters = (List<Map<String, ?>>) viaSegment.get("filters");
+        tb.setFilters(FilterMapper.mapFilterNewWay(filters));
+      });
     }
     return journey;
   }

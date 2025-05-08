@@ -38,7 +38,7 @@ public class ModePreferencesMapper {
 
     var transit = modesInput.getGraphQLTransit();
     if (Boolean.TRUE.equals(modesInput.getGraphQLDirectOnly())) {
-      journey.transit().disable();
+      journey.withTransit(b -> b.disable());
     } else if (transit != null) {
       var access = transit.getGraphQLAccess();
       if (access != null) {
@@ -87,7 +87,7 @@ public class ModePreferencesMapper {
         filterRequestBuilder.addSelect(
           SelectRequest.of().withTransportModes(mainAndSubModes).build()
         );
-        journey.transit().setFilters(List.of(filterRequestBuilder.build()));
+        journey.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
       }
     }
   }

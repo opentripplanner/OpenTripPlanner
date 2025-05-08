@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
-import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -69,7 +67,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().withDirect(new StreetRequest(StreetMode.CAR_TO_PARK));
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
     request.setFrom(p1);
     request.setTo(p2);
 
@@ -84,7 +82,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
     request.setFrom(p3);
     request.setTo(p4);
 
@@ -99,7 +97,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
     request.setFrom(p3);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -115,7 +113,7 @@ public class CarSnapshotTest extends SnapshotTestBase {
     // TODO: 2022-08-30 VIA: Previously we were using RequestModesBuilder
     // maybe we should implement similar pattern for new models?
     request.journey().withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
-    request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
+    request.journey().withTransit(b -> b.disable());
     request.setFrom(p1);
     request.setTo(p2);
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));

@@ -167,70 +167,76 @@ public class LegacyRouteRequestMapper {
 
     callWith.argument("arriveBy", request::setArriveBy);
 
-    callWith.argument("preferred.routes", (String v) ->
-      request.journey().withTransit(b -> b.setPreferredRoutes(FeedScopedId.parseList(v)))
-    );
+    request
+      .journey()
+      .withTransit(transitBuilder -> {
+        callWith.argument("preferred.routes", (String v) ->
+          transitBuilder.setPreferredRoutes(FeedScopedId.parseList(v))
+        );
 
-    callWith.argument("preferred.agencies", (String v) ->
-      request.journey().withTransit(b -> b.setPreferredAgencies(FeedScopedId.parseList(v)))
-    );
-    callWith.argument("unpreferred.routes", (String v) ->
-      request.journey().withTransit(b -> b.setUnpreferredRoutes(FeedScopedId.parseList(v)))
-    );
-    callWith.argument("unpreferred.agencies", (String v) ->
-      request.journey().withTransit(b -> b.setUnpreferredAgencies(FeedScopedId.parseList(v)))
-    );
+        callWith.argument("preferred.agencies", (String v) ->
+          transitBuilder.setPreferredAgencies(FeedScopedId.parseList(v))
+        );
+        callWith.argument("unpreferred.routes", (String v) ->
+          transitBuilder.setUnpreferredRoutes(FeedScopedId.parseList(v))
+        );
+        callWith.argument("unpreferred.agencies", (String v) ->
+          transitBuilder.setUnpreferredAgencies(FeedScopedId.parseList(v))
+        );
 
-    var transitDisabled = false;
-    if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
-      var filterRequestBuilder = TransitFilterRequest.of();
+        var transitDisabled = false;
+        if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
+          var filterRequestBuilder = TransitFilterRequest.of();
 
-      callWith.argument("banned.routes", (String v) ->
-        filterRequestBuilder.addNot(
-          SelectRequest.of().withRoutes(FeedScopedId.parseList(v)).build()
-        )
-      );
-
-      callWith.argument("banned.agencies", (String v) ->
-        filterRequestBuilder.addNot(
-          SelectRequest.of().withAgencies(FeedScopedId.parseList(v)).build()
-        )
-      );
-
-      callWith.argument("banned.trips", (String v) ->
-        request.journey().withTransit(b -> b.setBannedTrips(FeedScopedId.parseList(v)))
-      );
-
-      if (hasArgument(environment, "transportModes")) {
-        QualifiedModeSet modes = new QualifiedModeSet("WALK");
-
-        modes.qModes = environment
-          .<List<Map<String, String>>>getArgument("transportModes")
-          .stream()
-          .map(transportMode ->
-            new QualifiedMode(
-              transportMode.get("mode") +
-              (transportMode.get("qualifier") == null ? "" : "_" + transportMode.get("qualifier"))
+          callWith.argument("banned.routes", (String v) ->
+            filterRequestBuilder.addNot(
+              SelectRequest.of().withRoutes(FeedScopedId.parseList(v)).build()
             )
-          )
-          .collect(Collectors.toSet());
+          );
 
-        request.journey().setModes(modes.getRequestModes());
+          callWith.argument("banned.agencies", (String v) ->
+            filterRequestBuilder.addNot(
+              SelectRequest.of().withAgencies(FeedScopedId.parseList(v)).build()
+            )
+          );
 
-        var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
-        if (tModes.isEmpty()) {
-          transitDisabled = true;
-        } else {
-          filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+          callWith.argument("banned.trips", (String v) ->
+            request.journey().withTransit(b -> b.setBannedTrips(FeedScopedId.parseList(v)))
+          );
+
+          if (hasArgument(environment, "transportModes")) {
+            QualifiedModeSet modes = new QualifiedModeSet("WALK");
+
+            modes.qModes = environment
+              .<List<Map<String, String>>>getArgument("transportModes")
+              .stream()
+              .map(transportMode ->
+                new QualifiedMode(
+                  transportMode.get("mode") +
+                  (transportMode.get("qualifier") == null
+                      ? ""
+                      : "_" + transportMode.get("qualifier"))
+                )
+              )
+              .collect(Collectors.toSet());
+
+            request.journey().setModes(modes.getRequestModes());
+
+            var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
+            if (tModes.isEmpty()) {
+              transitDisabled = true;
+            } else {
+              filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+            }
+          }
+
+          if (transitDisabled) {
+            transitBuilder.disable();
+          } else {
+            transitBuilder.setFilters(List.of(filterRequestBuilder.build()));
+          }
         }
-      }
-
-      if (transitDisabled) {
-        request.journey().transit().disable();
-      } else {
-        request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
-      }
-    }
+      });
 
     if (hasArgument(environment, "allowedTicketTypes")) {
       // request.allowedFares = new HashSet();
