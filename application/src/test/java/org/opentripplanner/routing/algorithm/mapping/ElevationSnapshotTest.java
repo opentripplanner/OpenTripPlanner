@@ -68,7 +68,6 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directWalk() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.journey().withDirect(new StreetRequest(StreetMode.WALK));
     request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
 
     request.setFrom(p1);
@@ -121,9 +120,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
     request.journey().withAccess(new StreetRequest(StreetMode.BIKE_RENTAL));
-    request.journey().withEgress(new StreetRequest(StreetMode.WALK));
     request.journey().withDirect(new StreetRequest(StreetMode.NOT_SET));
-    request.journey().withTransfer(new StreetRequest(StreetMode.WALK));
 
     request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
 
@@ -142,9 +139,6 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void transit() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
 
-    request.journey().withAccess(new StreetRequest(StreetMode.WALK));
-    request.journey().withEgress(new StreetRequest(StreetMode.WALK));
-    request.journey().withTransfer(new StreetRequest(StreetMode.WALK));
     request.journey().withDirect(new StreetRequest(StreetMode.NOT_SET));
 
     request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
