@@ -90,14 +90,6 @@ public class RoutingWorker {
   public RoutingResponse route() {
     OTPRequestTimeoutException.checkForTimeout();
 
-    // If no direct mode is set, then we set one.
-    // See {@link FilterTransitWhenDirectModeIsEmpty}
-    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      request.journey().direct().mode()
-    );
-
-    request.journey().withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()));
-
     this.debugTimingAggregator.finishedPrecalculating();
 
     var result = RoutingResult.empty();
@@ -135,8 +127,7 @@ public class RoutingWorker {
         serverContext,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
-        emptyDirectModeHandler.removeWalkAllTheWayResults() ||
-        removeWalkAllTheWayResultsFromDirectFlex,
+        result.removeWalkAllTheWayResults() || removeWalkAllTheWayResultsFromDirectFlex,
         it -> pageCursorInput = it
       );
 
@@ -153,9 +144,6 @@ public class RoutingWorker {
     }
 
     this.debugTimingAggregator.finishedFiltering();
-
-    // Restore original directMode.
-    request.journey().withDirect(new StreetRequest(emptyDirectModeHandler.originalDirectMode()));
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
@@ -226,9 +214,23 @@ public class RoutingWorker {
       return RoutingResult.empty();
     }
 
+    // If no direct mode is set, then we set one.
+    // See {@link FilterTransitWhenDirectModeIsEmpty}
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
+      request.journey().direct().mode()
+    );
+    var directRequest = request.clone();
+
+    directRequest
+      .journey()
+      .withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()));
+
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      return RoutingResult.ok(DirectStreetRouter.route(serverContext, request));
+      return RoutingResult.ok(
+        DirectStreetRouter.route(serverContext, directRequest),
+        emptyDirectModeHandler.removeWalkAllTheWayResults()
+      );
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {

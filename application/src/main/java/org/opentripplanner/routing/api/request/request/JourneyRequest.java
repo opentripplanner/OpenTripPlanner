@@ -7,7 +7,6 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-// TODO VIA: Javadoc
 public class JourneyRequest implements Cloneable, Serializable {
 
   private static final JourneyRequest DEFAULT = new JourneyRequest();
