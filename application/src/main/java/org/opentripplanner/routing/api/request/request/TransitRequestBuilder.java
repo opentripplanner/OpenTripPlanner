@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.api.request.request;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
@@ -56,43 +54,43 @@ public class TransitRequestBuilder {
   }
 
   @Deprecated
-  public TransitRequestBuilder setPreferredAgencies(List<FeedScopedId> preferredAgencies) {
+  public TransitRequestBuilder withPreferredAgencies(List<FeedScopedId> preferredAgencies) {
     this.preferredAgencies = preferredAgencies;
     return this;
   }
 
-  public TransitRequestBuilder setUnpreferredAgencies(List<FeedScopedId> unpreferredAgencies) {
+  public TransitRequestBuilder withUnpreferredAgencies(List<FeedScopedId> unpreferredAgencies) {
     this.unpreferredAgencies = unpreferredAgencies;
     return this;
   }
 
   @Deprecated
-  public TransitRequestBuilder setPreferredRoutes(List<FeedScopedId> preferredRoutes) {
+  public TransitRequestBuilder withPreferredRoutes(List<FeedScopedId> preferredRoutes) {
     this.preferredRoutes = preferredRoutes;
     return this;
   }
 
-  public TransitRequestBuilder setUnpreferredRoutes(List<FeedScopedId> unpreferredRoutes) {
+  public TransitRequestBuilder withUnpreferredRoutes(List<FeedScopedId> unpreferredRoutes) {
     this.unpreferredRoutes = unpreferredRoutes;
     return this;
   }
 
-  public TransitRequestBuilder setBannedTrips(List<FeedScopedId> bannedTrips) {
+  public TransitRequestBuilder withBannedTrips(List<FeedScopedId> bannedTrips) {
     this.bannedTrips = bannedTrips;
     return this;
   }
 
-  public TransitRequestBuilder addPriorityGroupsGlobal(Collection<TransitGroupSelect> newValues) {
-    this.priorityGroupsGlobal = addToList(this.priorityGroupsGlobal, newValues);
+  public TransitRequestBuilder addPriorityGroupsGlobal(List<TransitGroupSelect> value) {
+    this.priorityGroupsGlobal = value;
     return this;
   }
 
-  public TransitRequestBuilder addPriorityGroupsByAgency(Collection<TransitGroupSelect> newValues) {
-    this.priorityGroupsByAgency = addToList(this.priorityGroupsByAgency, newValues);
+  public TransitRequestBuilder withPriorityGroupsByAgency(List<TransitGroupSelect> value) {
+    this.priorityGroupsByAgency = value;
     return this;
   }
 
-  public TransitRequestBuilder setRaptorDebugging(DebugRaptor raptorDebugging) {
+  public TransitRequestBuilder withRaptorDebugging(DebugRaptor raptorDebugging) {
     this.raptorDebugging = raptorDebugging;
     return this;
   }
@@ -115,15 +113,6 @@ public class TransitRequestBuilder {
       raptorDebugging == null ? original.raptorDebugging() : raptorDebugging
     );
     return original.equals(newValue) ? original : newValue;
-  }
-
-  private static <T> List<T> addToList(List<T> list, Collection<T> newValues) {
-    if (list == null) {
-      list = new ArrayList<>(newValues);
-    } else {
-      list.addAll(newValues);
-    }
-    return list;
   }
 
   private static <T> List<T> ifNotNull(List<T> newValue, List<T> original) {

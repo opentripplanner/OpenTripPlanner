@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config.routerequest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
-import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
@@ -34,7 +33,7 @@ public class TransitGroupPriorityConfig {
       .experimentalFeature()
       .asObject();
 
-    transit.addPriorityGroupsByAgency(
+    transit.withPriorityGroupsByAgency(
       TransitGroupPriorityConfig.mapList(
         c,
         "byAgency",
@@ -53,7 +52,7 @@ public class TransitGroupPriorityConfig {
     );
   }
 
-  private static Collection<TransitGroupSelect> mapList(
+  private static List<TransitGroupSelect> mapList(
     NodeAdapter root,
     String parameterName,
     String description

@@ -171,17 +171,17 @@ public class LegacyRouteRequestMapper {
       .journey()
       .withTransit(transitBuilder -> {
         callWith.argument("preferred.routes", (String v) ->
-          transitBuilder.setPreferredRoutes(FeedScopedId.parseList(v))
+          transitBuilder.withPreferredRoutes(FeedScopedId.parseList(v))
         );
 
         callWith.argument("preferred.agencies", (String v) ->
-          transitBuilder.setPreferredAgencies(FeedScopedId.parseList(v))
+          transitBuilder.withPreferredAgencies(FeedScopedId.parseList(v))
         );
         callWith.argument("unpreferred.routes", (String v) ->
-          transitBuilder.setUnpreferredRoutes(FeedScopedId.parseList(v))
+          transitBuilder.withUnpreferredRoutes(FeedScopedId.parseList(v))
         );
         callWith.argument("unpreferred.agencies", (String v) ->
-          transitBuilder.setUnpreferredAgencies(FeedScopedId.parseList(v))
+          transitBuilder.withUnpreferredAgencies(FeedScopedId.parseList(v))
         );
 
         var transitDisabled = false;
@@ -201,7 +201,7 @@ public class LegacyRouteRequestMapper {
           );
 
           callWith.argument("banned.trips", (String v) ->
-            request.journey().withTransit(b -> b.setBannedTrips(FeedScopedId.parseList(v)))
+            request.journey().withTransit(b -> b.withBannedTrips(FeedScopedId.parseList(v)))
           );
 
           if (hasArgument(environment, "transportModes")) {

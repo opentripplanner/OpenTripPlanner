@@ -63,20 +63,20 @@ public class TripRequestMapper {
       .journey()
       .withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.setPreferredAgencies(mapIDsToDomainNullSafe(authorities))
+          transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))
         );
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-          transitBuilder.setUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
+          transitBuilder.withUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
         );
 
         callWith.argument("preferred.lines", (List<String> lines) ->
-          transitBuilder.setPreferredRoutes(mapIDsToDomainNullSafe(lines))
+          transitBuilder.withPreferredRoutes(mapIDsToDomainNullSafe(lines))
         );
         callWith.argument("unpreferred.lines", (List<String> lines) ->
-          transitBuilder.setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
+          transitBuilder.withUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
         );
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-          transitBuilder.setBannedTrips(mapIDsToDomainNullSafe(serviceJourneys))
+          transitBuilder.withBannedTrips(mapIDsToDomainNullSafe(serviceJourneys))
         );
 
         if (GqlUtil.hasArgument(environment, "filters")) {

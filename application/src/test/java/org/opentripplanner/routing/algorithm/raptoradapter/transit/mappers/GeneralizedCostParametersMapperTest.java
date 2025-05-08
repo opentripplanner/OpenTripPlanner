@@ -41,7 +41,9 @@ class GeneralizedCostParametersMapperTest {
   @Test
   public void shouldExtractRoutesFromAgencies() {
     var routingRequest = new RouteRequest();
-    routingRequest.journey().withTransit(b -> b.setUnpreferredAgencies(List.of(unpreferredAgency)));
+    routingRequest
+      .journey()
+      .withTransit(b -> b.withUnpreferredAgencies(List.of(unpreferredAgency)));
 
     BitSet unpreferredPatterns = GeneralizedCostParametersMapper.map(
       routingRequest,
@@ -61,7 +63,7 @@ class GeneralizedCostParametersMapperTest {
     var routingRequest = new RouteRequest();
     routingRequest
       .journey()
-      .withTransit(b -> b.setUnpreferredAgencies(List.of(agencyWithNoRoutes)));
+      .withTransit(b -> b.withUnpreferredAgencies(List.of(agencyWithNoRoutes)));
 
     assertEquals(
       new BitSet(),

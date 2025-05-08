@@ -61,8 +61,8 @@ public class PatternCostCalculatorTest {
     routingRequest
       .journey()
       .withTransit(b -> {
-        b.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-        b.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+        b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+        b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
       });
     routingRequest.withPreferences(p ->
       p.withTransit(tr -> tr.setUnpreferredCost(unpreferredCostFunctionOtpDomain))
@@ -208,10 +208,10 @@ public class PatternCostCalculatorTest {
         .journey()
         .withTransit(b -> {
           if (unPreferredAgency) {
-            b.setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+            b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
           }
           if (unPreferredRoute) {
-            b.setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+            b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
           }
         });
       return request;

@@ -166,7 +166,7 @@ public class RouteRequestConfig {
     TransitRequestBuilder builder,
     TransitRequest defaultValues
   ) {
-    builder.setUnpreferredRoutes(
+    builder.withUnpreferredRoutes(
       c
         .of("routes")
         .since(V2_2)
@@ -177,7 +177,7 @@ public class RouteRequestConfig {
         .asFeedScopedIds(defaultValues.unpreferredRoutes())
     );
 
-    builder.setUnpreferredAgencies(
+    builder.withUnpreferredAgencies(
       c
         .of("agencies")
         .since(V2_2)

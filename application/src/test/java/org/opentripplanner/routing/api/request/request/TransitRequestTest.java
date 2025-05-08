@@ -35,12 +35,12 @@ class TransitRequestTest {
 
   private final TransitRequest subject = TransitRequest.of()
     .setFilters(FILTERS)
-    .setPreferredAgencies(AGENCIES)
-    .setPreferredRoutes(ROUTES)
-    .setBannedTrips(BANNED_TRIPS)
-    .addPriorityGroupsByAgency(PRIORITY_GROUP_BY_AGENCY)
+    .withPreferredAgencies(AGENCIES)
+    .withPreferredRoutes(ROUTES)
+    .withBannedTrips(BANNED_TRIPS)
+    .withPriorityGroupsByAgency(PRIORITY_GROUP_BY_AGENCY)
     .addPriorityGroupsGlobal(PRIORITY_GROUP_GLOBAL)
-    .setRaptorDebugging(RAPTOR_DEBUGGING)
+    .withRaptorDebugging(RAPTOR_DEBUGGING)
     .build();
 
   @Test
@@ -61,7 +61,7 @@ class TransitRequestTest {
 
   @Test
   void unpreferredAgencies() {
-    var subject = TransitRequest.of().setUnpreferredAgencies(AGENCIES).build();
+    var subject = TransitRequest.of().withUnpreferredAgencies(AGENCIES).build();
     assertEquals(AGENCIES, subject.unpreferredAgencies());
   }
 
@@ -72,7 +72,7 @@ class TransitRequestTest {
 
   @Test
   void unpreferredRoutes() {
-    var subject = TransitRequest.of().setUnpreferredRoutes(ROUTES).build();
+    var subject = TransitRequest.of().withUnpreferredRoutes(ROUTES).build();
     assertEquals(ROUTES, subject.unpreferredRoutes());
   }
 
@@ -102,19 +102,19 @@ class TransitRequestTest {
     // get the same instance.
     var copy = subject
       .copyOf()
-      .setRaptorDebugging(new DebugRaptor().withPath("1 2 3"))
+      .withRaptorDebugging(new DebugRaptor().withPath("1 2 3"))
       .build()
       .copyOf()
-      .setRaptorDebugging(RAPTOR_DEBUGGING)
+      .withRaptorDebugging(RAPTOR_DEBUGGING)
       .build();
 
     AssertEqualsAndHashCode.verify(subject)
       .sameAs(copy)
       .differentFrom(
         subject.copyOf().disable().build(),
-        subject.copyOf().addPriorityGroupsByAgency(List.of()).build(),
+        subject.copyOf().withPriorityGroupsByAgency(List.of()).build(),
         subject.copyOf().addPriorityGroupsGlobal(List.of()).build(),
-        subject.copyOf().setRaptorDebugging(new DebugRaptor()).build().toString()
+        subject.copyOf().withRaptorDebugging(new DebugRaptor()).build().toString()
       );
   }
 
