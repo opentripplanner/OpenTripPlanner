@@ -267,7 +267,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
       return AccessEgressRouter.findAccessEgresses(
         request,
         verticesContainer,
-        new StreetRequest(),
+        StreetRequest.DEFAULT,
         null,
         accessEgress,
         durationLimit,

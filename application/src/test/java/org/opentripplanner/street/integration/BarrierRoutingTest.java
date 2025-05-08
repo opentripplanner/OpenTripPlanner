@@ -27,6 +27,7 @@ import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -176,7 +177,7 @@ public class BarrierRoutingTest {
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);
-    request.journey().direct().setMode(streetMode);
+    request.journey().withDirect(new StreetRequest(streetMode));
 
     options.accept(request);
 

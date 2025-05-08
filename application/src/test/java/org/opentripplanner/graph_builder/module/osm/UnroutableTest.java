@@ -9,6 +9,7 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.osm.DefaultOsmProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
@@ -58,7 +59,7 @@ public class UnroutableTest {
   @Test
   public void testOnBoardRouting() {
     RouteRequest options = new RouteRequest();
-    options.journey().direct().setMode(StreetMode.BIKE);
+    options.journey().withDirect(new StreetRequest(StreetMode.BIKE));
 
     Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
     Vertex to = graph.getVertex(VertexLabel.osm(40446276));

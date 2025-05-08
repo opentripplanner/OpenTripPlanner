@@ -5,22 +5,13 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-// TODO VIA: Javadoc
-public class StreetRequest implements Cloneable, Serializable {
+public class StreetRequest implements Serializable {
 
-  private static final StreetRequest DEFAULT = new StreetRequest();
+  public static final StreetRequest DEFAULT = new StreetRequest(StreetMode.WALK);
 
-  private StreetMode mode;
-
-  public StreetRequest() {
-    this(StreetMode.WALK);
-  }
+  private final StreetMode mode;
 
   public StreetRequest(StreetMode mode) {
-    this.mode = mode;
-  }
-
-  public void setMode(StreetMode mode) {
     this.mode = mode;
   }
 
@@ -28,17 +19,11 @@ public class StreetRequest implements Cloneable, Serializable {
     return mode;
   }
 
-  public StreetRequest clone() {
-    try {
-      return (StreetRequest) super.clone();
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
-  }
-
   @Override
   public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }

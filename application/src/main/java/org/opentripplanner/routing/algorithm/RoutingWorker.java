@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectF
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -95,7 +96,7 @@ public class RoutingWorker {
       request.journey().direct().mode()
     );
 
-    request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
+    request.journey().withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()));
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -154,7 +155,7 @@ public class RoutingWorker {
     this.debugTimingAggregator.finishedFiltering();
 
     // Restore original directMode.
-    request.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
+    request.journey().withDirect(new StreetRequest(emptyDirectModeHandler.originalDirectMode()));
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).

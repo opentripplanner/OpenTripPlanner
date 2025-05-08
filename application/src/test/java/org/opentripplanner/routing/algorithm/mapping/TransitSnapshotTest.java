@@ -10,6 +10,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 
 @ExtendWith(SnapshotExtension.class)
@@ -67,7 +68,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.journey().direct().setMode(StreetMode.WALK);
+    request.journey().withDirect(new StreetRequest(StreetMode.WALK));
     request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
 
     request.setFrom(p0);
@@ -80,10 +81,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only_stop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.journey().access().setMode(StreetMode.WALK);
-    request.journey().egress().setMode(StreetMode.WALK);
-    request.journey().direct().setMode(StreetMode.WALK);
-    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().setAllModes(StreetMode.WALK);
     request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
 
     request.setFrom(ps);
@@ -96,10 +94,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only_stop_collection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.journey().access().setMode(StreetMode.WALK);
-    request.journey().egress().setMode(StreetMode.WALK);
-    request.journey().direct().setMode(StreetMode.WALK);
-    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().setAllModes(StreetMode.WALK);
     request.journey().transit().setFilters(List.of(ExcludeAllTransitFilter.of()));
 
     request.setFrom(ptc);
@@ -113,10 +108,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_transit() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.journey().access().setMode(StreetMode.WALK);
-    request.journey().egress().setMode(StreetMode.WALK);
-    request.journey().direct().setMode(StreetMode.WALK);
-    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().setAllModes(StreetMode.WALK);
     request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
 
     request.setFrom(p1);
@@ -129,10 +121,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_transit_stop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.journey().access().setMode(StreetMode.WALK);
-    request.journey().egress().setMode(StreetMode.WALK);
-    request.journey().direct().setMode(StreetMode.WALK);
-    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().setAllModes(StreetMode.WALK);
     request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
 
     request.setFrom(ps);
@@ -146,10 +135,7 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_transit_stop_collection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0);
 
-    request.journey().access().setMode(StreetMode.WALK);
-    request.journey().egress().setMode(StreetMode.WALK);
-    request.journey().direct().setMode(StreetMode.WALK);
-    request.journey().transfer().setMode(StreetMode.WALK);
+    request.journey().setAllModes(StreetMode.WALK);
     request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
 
     request.setFrom(ptc);

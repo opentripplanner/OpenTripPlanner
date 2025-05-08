@@ -25,6 +25,7 @@ import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
@@ -291,7 +292,7 @@ public class TestHalfEdges {
      */
 
     options = new RouteRequest();
-    options.journey().direct().setMode(StreetMode.BIKE);
+    options.journey().withDirect(new StreetRequest(StreetMode.BIKE));
     start = StreetIndex.createTemporaryStreetLocationForTest(
       "start1",
       new NonLocalizedString("start1"),

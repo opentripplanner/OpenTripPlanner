@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.request;
 import java.io.Serializable;
 import java.util.Objects;
 import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 // TODO VIA: Javadoc
@@ -11,10 +12,10 @@ public class JourneyRequest implements Cloneable, Serializable {
   private static final JourneyRequest DEFAULT = new JourneyRequest();
 
   private TransitRequest transit = new TransitRequest();
-  private StreetRequest access = new StreetRequest();
-  private StreetRequest egress = new StreetRequest();
-  private StreetRequest transfer = new StreetRequest();
-  private StreetRequest direct = new StreetRequest();
+  private StreetRequest access = StreetRequest.DEFAULT;
+  private StreetRequest egress = StreetRequest.DEFAULT;
+  private StreetRequest transfer = StreetRequest.DEFAULT;
+  private StreetRequest direct = StreetRequest.DEFAULT;
 
   public TransitRequest transit() {
     return transit;
@@ -24,30 +25,59 @@ public class JourneyRequest implements Cloneable, Serializable {
     return access;
   }
 
+  public JourneyRequest withAccess(StreetRequest access) {
+    this.access = access;
+    return this;
+  }
+
   public StreetRequest egress() {
     return egress;
+  }
+
+  public JourneyRequest withEgress(StreetRequest egress) {
+    this.egress = egress;
+    return this;
   }
 
   public StreetRequest transfer() {
     return transfer;
   }
 
+  public JourneyRequest withTransfer(StreetRequest transfer) {
+    this.transfer = transfer;
+    return this;
+  }
+
   public StreetRequest direct() {
     return direct;
   }
 
+  public JourneyRequest withDirect(StreetRequest direct) {
+    this.direct = direct;
+    return this;
+  }
+
+  /** Set access, egress, transfer and direcet mode to a given mode. */
+  public void setAllModes(StreetMode mode) {
+    var value = new StreetRequest(mode);
+    withAccess(value);
+    withEgress(value);
+    withTransfer(value);
+    withDirect(value);
+  }
+
   public void setModes(RequestModes modes) {
-    transfer().setMode(modes.transferMode);
-    access().setMode(modes.accessMode);
-    egress().setMode(modes.egressMode);
-    direct().setMode(modes.directMode);
+    withAccess(new StreetRequest(modes.accessMode));
+    withEgress(new StreetRequest(modes.egressMode));
+    withTransfer(new StreetRequest(modes.transferMode));
+    withDirect(new StreetRequest(modes.directMode));
   }
 
   public RequestModes modes() {
     return RequestModes.of()
       .withAccessMode(access.mode())
-      .withTransferMode(transfer.mode())
       .withEgressMode(egress.mode())
+      .withTransferMode(transfer.mode())
       .withDirectMode(direct.mode())
       .build();
   }
@@ -56,10 +86,12 @@ public class JourneyRequest implements Cloneable, Serializable {
     try {
       var clone = (JourneyRequest) super.clone();
       clone.transit = this.transit.clone();
-      clone.access = this.access.clone();
-      clone.egress = this.egress.clone();
-      clone.transfer = this.transfer.clone();
-      clone.direct = this.direct.clone();
+
+      // No need to clone immutable objects
+      clone.access = this.access;
+      clone.egress = this.egress;
+      clone.transfer = this.transfer;
+      clone.direct = this.direct;
 
       return clone;
     } catch (CloneNotSupportedException e) {
@@ -93,8 +125,8 @@ public class JourneyRequest implements Cloneable, Serializable {
     return ToStringBuilder.of(JourneyRequest.class)
       .addObj("transit", transit, DEFAULT.transit)
       .addObj("access", access, DEFAULT.access)
-      .addObj("transfer", transfer, DEFAULT.transfer)
       .addObj("egress", egress, DEFAULT.egress)
+      .addObj("transfer", transfer, DEFAULT.transfer)
       .addObj("direct", direct, DEFAULT.direct)
       .toString();
   }

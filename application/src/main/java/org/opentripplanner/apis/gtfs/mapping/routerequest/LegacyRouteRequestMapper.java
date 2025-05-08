@@ -212,11 +212,7 @@ public class LegacyRouteRequestMapper {
           )
           .collect(Collectors.toSet());
 
-        var requestModes = modes.getRequestModes();
-        request.journey().access().setMode(requestModes.accessMode);
-        request.journey().egress().setMode(requestModes.egressMode);
-        request.journey().direct().setMode(requestModes.directMode);
-        request.journey().transfer().setMode(requestModes.transferMode);
+        request.journey().setModes(modes.getRequestModes());
 
         var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
         if (tModes.isEmpty()) {
