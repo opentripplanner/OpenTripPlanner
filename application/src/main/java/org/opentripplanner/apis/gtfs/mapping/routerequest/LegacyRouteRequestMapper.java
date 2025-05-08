@@ -31,6 +31,7 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilterReque
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class LegacyRouteRequestMapper {
 
@@ -166,37 +167,39 @@ public class LegacyRouteRequestMapper {
 
     callWith.argument("arriveBy", request::setArriveBy);
 
-    callWith.argument(
-      "preferred.routes",
-      request.journey().transit()::setPreferredRoutesFromString
+    callWith.argument("preferred.routes", (String v) ->
+      request.journey().withTransit(b -> b.setPreferredRoutes(FeedScopedId.parseList(v)))
     );
 
-    callWith.argument(
-      "preferred.agencies",
-      request.journey().transit()::setPreferredAgenciesFromString
+    callWith.argument("preferred.agencies", (String v) ->
+      request.journey().withTransit(b -> b.setPreferredAgencies(FeedScopedId.parseList(v)))
     );
-    callWith.argument(
-      "unpreferred.routes",
-      request.journey().transit()::setUnpreferredRoutesFromString
+    callWith.argument("unpreferred.routes", (String v) ->
+      request.journey().withTransit(b -> b.setUnpreferredRoutes(FeedScopedId.parseList(v)))
     );
-    callWith.argument(
-      "unpreferred.agencies",
-      request.journey().transit()::setUnpreferredAgenciesFromString
+    callWith.argument("unpreferred.agencies", (String v) ->
+      request.journey().withTransit(b -> b.setUnpreferredAgencies(FeedScopedId.parseList(v)))
     );
 
     var transitDisabled = false;
     if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
       var filterRequestBuilder = TransitFilterRequest.of();
 
-      callWith.argument("banned.routes", s ->
-        filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
+      callWith.argument("banned.routes", (String v) ->
+        filterRequestBuilder.addNot(
+          SelectRequest.of().withRoutes(FeedScopedId.parseList(v)).build()
+        )
       );
 
-      callWith.argument("banned.agencies", s ->
-        filterRequestBuilder.addNot(SelectRequest.of().withAgenciesFromString((String) s).build())
+      callWith.argument("banned.agencies", (String v) ->
+        filterRequestBuilder.addNot(
+          SelectRequest.of().withAgencies(FeedScopedId.parseList(v)).build()
+        )
       );
 
-      callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
+      callWith.argument("banned.trips", (String v) ->
+        request.journey().withTransit(b -> b.setBannedTrips(FeedScopedId.parseList(v)))
+      );
 
       if (hasArgument(environment, "transportModes")) {
         QualifiedModeSet modes = new QualifiedModeSet("WALK");
