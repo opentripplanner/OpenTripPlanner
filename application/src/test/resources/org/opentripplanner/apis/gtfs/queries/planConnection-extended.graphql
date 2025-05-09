@@ -93,15 +93,7 @@
         }
       }
     }
-    filters: [
-      {
-        not: [
-          {
-            routes: ["tampere:1"]
-          }
-        ]
-      }
-    ]
+    filters: [{ not: [{ routes: ["tampere:1"] }] }]
     locale: "en"
   ) {
     searchDateTime

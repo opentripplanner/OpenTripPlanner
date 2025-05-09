@@ -68,10 +68,9 @@ public class RouteRequestMapper {
 
     if (CollectionUtils.hasValue(args.getGraphQLFilters())) {
       var filterArgs = args.getGraphQLFilters();
-      var filters =FilterMapper.mapFilters(filterArgs);
+      var filters = FilterMapper.mapFilters(filterArgs);
       request.journey().transit().setFilters(filters);
     }
-
 
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));

@@ -35,7 +35,7 @@ class SelectRequestMapper {
 
       for (var mode : input.getGraphQLTransportModes()) {
         var m = TransitModeMapper.map(mode);
-          tModes.add(new MainAndSubMode(m));
+        tModes.add(new MainAndSubMode(m));
       }
       selectRequestBuilder.withTransportModes(tModes);
     }
