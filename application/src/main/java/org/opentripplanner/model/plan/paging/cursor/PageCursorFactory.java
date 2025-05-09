@@ -137,10 +137,10 @@ public class PageCursorFactory {
         prevEdt = edtBeforeNewSw();
         nextEdt = pageCursorInput.earliestRemovedDeparture();
       } else {
-        // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
-        // search-window from the last time included in the search window we need to include one extra
-        // minute at the end.
-        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        prevEdt = pageCursorInput
+          .latestRemovedDeparture()
+          .minus(newSearchWindow)
+          .plusSeconds(PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION_SECONDS);
         nextEdt = edtAfterUsedSw();
       }
     }
@@ -172,7 +172,9 @@ public class PageCursorFactory {
 
   private Instant edtAfterUsedSw() {
     if (firstSearchLatestItineraryDeparture != null) {
-      return firstSearchLatestItineraryDeparture.plusSeconds(60);
+      return firstSearchLatestItineraryDeparture.plusSeconds(
+        PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION_SECONDS
+      );
     }
     return currentEdt.plus(currentSearchWindow);
   }
