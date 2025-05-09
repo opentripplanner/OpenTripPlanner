@@ -10,8 +10,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -21,11 +23,29 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RouteRequestTest {
 
+  private static final GenericLocation FROM = GenericLocation.fromCoordinate(60.0, 10.0);
+  private static final GenericLocation TO = GenericLocation.fromCoordinate(59.0, 12.0);
+  private static final List<ViaLocation> VIA = List.of(new VisitViaLocation("Via", Duration.ofMinutes(10), List.of(), List.of(new WgsCoordinate(π))));
+
+
   private static final Duration DURATION_24_HOURS = Duration.ofHours(24);
   private static final Duration DURATION_24_HOURS_AND_ONE_MINUTE = DURATION_24_HOURS.plusMinutes(1);
   private static final Duration DURATION_ZERO = Duration.ofMinutes(0);
   private static final Duration DURATION_ONE_MINUTE = Duration.ofMinutes(1);
   private static final Duration DURATION_MINUS_ONE_MINUTE = DURATION_ONE_MINUTE.negated();
+
+
+
+
+
+
+  private final RouteRequest subject = RouteRequest.of()
+    .setFrom()
+    .setTo()
+    .setDateTime()
+    .build();
+
+
 
   @Test
   public void testRequest() {

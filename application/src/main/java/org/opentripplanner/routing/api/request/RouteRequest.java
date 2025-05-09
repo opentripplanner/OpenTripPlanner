@@ -51,47 +51,85 @@ public class RouteRequest implements Cloneable, Serializable {
   private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
-  /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
+  private static final RouteRequest DEFAULT = new RouteRequest();
 
   private GenericLocation from;
-
   private GenericLocation to;
+  private List<ViaLocation> via;
+  private Instant dateTime;
+  private boolean arriveBy;
+  private boolean timetableView;
 
-  private List<ViaLocation> via = Collections.emptyList();
-
-  private Instant dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+  @Nullable
+  private Duration searchWindow;
 
   @Nullable
   private Duration maxSearchWindow;
 
   @Nullable
-  private Duration searchWindow;
+  private Instant bookingTime;
 
+  @Nullable
   private PageCursor pageCursor;
 
-  private boolean timetableView = true;
-
-  private boolean arriveBy = false;
-
-  private int numItineraries = DEFAULT_NUM_ITINERARIES;
-
-  private Locale locale = DEFAULT_LOCALE;
-
-  private RoutingPreferences preferences = RoutingPreferences.DEFAULT;
-
-  private JourneyRequest journey = JourneyRequest.of().build();
-
-  private boolean wheelchair = false;
-
-  private Instant bookingTime;
+  private boolean wheelchair;
+  private JourneyRequest journey;
+  private RoutingPreferences preferences;
+  private int numItineraries;
+  private Locale locale;
 
   /* CONSTRUCTORS */
 
-  /** Constructor for options; modes defaults to walk and transit */
+  /**
+   * TODO: This is creating an invalid request - validate() is failing, migrate
+   *       to use builder(whitch call validate()) and make this private (for DEFAULT only).
+   */
   public RouteRequest() {
     // So that they are never null.
-    from = GenericLocation.UNKNOWN;
-    to = GenericLocation.UNKNOWN;
+    this.from = GenericLocation.UNKNOWN;
+    this.to = GenericLocation.UNKNOWN;
+    this.via = Collections.emptyList();
+    this.dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+    this.arriveBy = false;
+    this.timetableView = true;
+    this.searchWindow = null;
+    this.maxSearchWindow = null;
+    this.bookingTime = null;
+    this.pageCursor = null;
+    this.wheelchair = false;
+    this.journey = JourneyRequest.DEFAULT;
+    this.preferences = RoutingPreferences.DEFAULT;
+    this.numItineraries = DEFAULT_NUM_ITINERARIES;
+    this.locale = DEFAULT_LOCALE;
+  }
+
+  RouteRequest(RouteRequestBuilder builder) {
+    this.from = builder.from;
+    this.to = builder.to;
+    this.via = builder.via;
+    this.dateTime = builder.dateTime;
+    this.arriveBy = builder.arriveBy;
+    this.timetableView = builder.timetableView;
+    this.searchWindow = builder.searchWindow;
+    this.maxSearchWindow = builder.maxSearchWindow;
+    this.bookingTime = builder.bookingTime;
+    this.pageCursor = builder.pageCursor;
+    // TODO Move to JourneyRequest
+    this.wheelchair = builder.wheelchair;
+    this.journey = builder.journey;
+    this.preferences = builder.preferences;
+    this.numItineraries = builder.numItineraries;
+    // TODO Move to RoutingPreferences
+    this.locale = builder.locale;
+    validate();
+  }
+
+  public static RouteRequestBuilder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public RouteRequestBuilder copyOf() {
+    return new RouteRequestBuilder(this);
   }
 
   /* ACCESSOR/SETTER METHODS */
@@ -469,8 +507,8 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public String toString() {
     return ToStringBuilder.of(RouteRequest.class)
-      .addObj("from", from)
-      .addObj("to", to)
+      .addObj("from", from, DEFAULT.from)
+      .addObj("to", to, DEFAULT.to)
       .addDateTime("dateTime", dateTime)
       .addDateTime("bookingTime", bookingTime)
       .addBoolIfTrue("arriveBy", arriveBy)
@@ -483,5 +521,22 @@ public class RouteRequest implements Cloneable, Serializable {
       .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
       .addObj("journey", journey, JourneyRequest.DEFAULT)
       .toString();
+  }
+
+  private void validate() {
+    validateOriginAndDestination();
+    validateSearchWindow();
+  }
+
+  private void validateSearchWindow() {
+    if (searchWindow != null) {
+      if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
+        throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
+      }
+      if (searchWindow.isNegative()) {
+        throw new IllegalArgumentException("The search window must be a positive duration");
+      }
+    }
+    this.searchWindow = searchWindow;
   }
 }
