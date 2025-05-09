@@ -19,6 +19,7 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageType;
+import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.time.TimeUtils;
 
 /**
@@ -52,12 +53,10 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   public static final String EMPTY = "";
 
   /**
-   * This matches strings like N60 and P360. It is used to add a time shift value in seconds
+   * This matches strings like N5h1m and P1h. It is used to add a time shift value
    * to the test cases that differs from the search window.
    */
-  private static final Pattern PAGING_SEQUENCE_TIME_SHIFT_PATTERN = Pattern.compile(
-    "^(N|P)(\\d+)$"
-  );
+  private static final Pattern PAGING_SEQUENCE_TIME_SHIFT_PATTERN = Pattern.compile("^(N|P)(.+)$");
 
   private final TestPagingModel model = TestPagingModel.testDataWithFewItinerariesCaseB();
   private TestDriver driver;
@@ -68,11 +67,11 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
    *   Given: "08:00", DEPART_AFTER, "1 N3600 2 N - P 2 -"
    *     - "08:00"            : The first search departure time
    *     - DEPART_AFTER       : If first search is arriveBy or depart after search
-   *     - "1 N3600 2 N - .." : Paging sequence - N:NEXT or P:PREVIOUS, a number directly after
-   *                            N or P indicates a time shift value in seconds that differs from
-   *                            the search window, individual integers in the range 0-4 are the
-   *                            expected itinerary index found in the search between
-   *                            paging events, and '-' means no itinerary found.
+   *     - "1 N5h1m 2 N - .." : Paging sequence - N:NEXT or P:PREVIOUS, a duration directly after
+   *                            N or P indicates a time shift value that differs from the search
+   *                            window, individual integers in the range 0-4 are the expected
+   *                            itinerary index found in the search between paging events,
+   *                            and '-' means no itinerary found.
    * </pre>
    */
   static List<Arguments> testCases() {
@@ -87,11 +86,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
       // test above
       Arguments.of("09:00", DEPART_AFTER, "1 N 2 N - P 2 N - P 2 P 1 N 2 N"),
       // Itineraries depart inside search-window, step NEXT 6 times
-      Arguments.of(
-        "10:00-1d",
-        ARRIVE_BY,
-        String.format("3 N%d - N - N 2 N 1 N - N", 60 * 60 * 5 + 60)
-      ),
+      Arguments.of("10:00-1d", ARRIVE_BY, "3 N5h1m - N - N 2 N 1 N - N"),
       // Itineraries depart inside search-window, step PREV 6 times
       Arguments.of("08:00+1d", ARRIVE_BY, "0 P - P - P 1 P 2 P - P"),
       // Itineraries depart inside search-window, step BACK and FORTH
@@ -170,7 +165,7 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
     String tokenWithTimeShiftRemoved = token;
     if (matcher.matches()) {
       tokenWithTimeShiftRemoved = matcher.group(1);
-      timeShift = Integer.parseInt(matcher.group(2));
+      timeShift = (int) DurationUtils.duration(matcher.group(2)).toSeconds();
     }
     switch (tokenWithTimeShiftRemoved) {
       case "-":
