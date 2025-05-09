@@ -176,7 +176,7 @@ public class TurnRestrictionModule implements GraphBuilderModule {
     int turnRestrictionCount = 0;
     addedVertices = 0;
     addedEdges = 0;
-    for (var turnRestriction : osmInfoGraphBuildRepository.getTurnRestrictions()) {
+    for (var turnRestriction : osmInfoGraphBuildRepository.listTurnRestrictions()) {
       processRestriction(turnRestriction);
       turnRestrictionCount++;
     }

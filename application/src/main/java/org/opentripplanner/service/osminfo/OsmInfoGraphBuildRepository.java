@@ -39,5 +39,5 @@ public interface OsmInfoGraphBuildRepository extends Serializable {
    */
   Optional<Platform> findPlatform(Area area);
 
-  Collection<TurnRestriction> getTurnRestrictions();
+  Collection<TurnRestriction> listTurnRestrictions();
 }

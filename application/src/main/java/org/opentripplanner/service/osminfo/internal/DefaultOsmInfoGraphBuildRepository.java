@@ -57,7 +57,7 @@ public class DefaultOsmInfoGraphBuildRepository
   }
 
   @Override
-  public Collection<TurnRestriction> getTurnRestrictions() {
+  public Collection<TurnRestriction> listTurnRestrictions() {
     return turnRestrictions;
   }
 
