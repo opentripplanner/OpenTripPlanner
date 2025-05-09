@@ -9,13 +9,41 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class JourneyRequest implements Cloneable, Serializable {
 
-  private static final JourneyRequest DEFAULT = new JourneyRequest();
+  public static final JourneyRequest DEFAULT = new JourneyRequest(
+    TransitRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    StreetRequest.DEFAULT,
+    StreetRequest.DEFAULT
+  );
 
-  private TransitRequest transit = TransitRequest.DEFAULT;
-  private StreetRequest access = StreetRequest.DEFAULT;
-  private StreetRequest egress = StreetRequest.DEFAULT;
-  private StreetRequest transfer = StreetRequest.DEFAULT;
-  private StreetRequest direct = StreetRequest.DEFAULT;
+  private TransitRequest transit;
+  private StreetRequest access;
+  private StreetRequest egress;
+  private StreetRequest transfer;
+  private StreetRequest direct;
+
+  JourneyRequest(
+    TransitRequest transit,
+    StreetRequest access,
+    StreetRequest egress,
+    StreetRequest transfer,
+    StreetRequest direct
+  ) {
+    this.transit = transit;
+    this.access = access;
+    this.egress = egress;
+    this.transfer = transfer;
+    this.direct = direct;
+  }
+
+  public static JourneyRequestBuilder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public JourneyRequestBuilder copyOf() {
+    return new JourneyRequestBuilder(this);
+  }
 
   public TransitRequest transit() {
     return transit;

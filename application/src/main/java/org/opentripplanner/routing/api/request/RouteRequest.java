@@ -46,12 +46,6 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequest.class);
 
-  /**
-   * This is mutable - be careful do not change this or make it accessable outside this class.
-   * We use it here to avoid creating a new one every time we want to acces default values.
-   */
-  private static final JourneyRequest DEFAULT_JOURNEY_REQUEST = new JourneyRequest();
-
   private static final int DEFAULT_NUM_ITINERARIES = 50;
   private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
@@ -84,7 +78,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private RoutingPreferences preferences = RoutingPreferences.DEFAULT;
 
-  private JourneyRequest journey = new JourneyRequest();
+  private JourneyRequest journey = JourneyRequest.of().build();
 
   private boolean wheelchair = false;
 
@@ -484,7 +478,7 @@ public class RouteRequest implements Cloneable, Serializable {
       .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
       .addObj("locale", locale, DEFAULT_LOCALE)
       .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
-      .addObj("journey", journey, DEFAULT_JOURNEY_REQUEST)
+      .addObj("journey", journey, JourneyRequest.DEFAULT)
       .toString();
   }
 }
