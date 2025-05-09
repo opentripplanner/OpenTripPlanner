@@ -31,6 +31,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
+import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TimetableRepository;
 
@@ -237,19 +238,21 @@ public class FlexIntegrationTest {
       )
     );
 
-    var modes = request.journey().modes().copyOf();
+    request.withJourney(journeyBuilder -> {
+      var modes = JourneyRequest.DEFAULT.modes().copyOf();
 
-    if (onlyDirect) {
-      modes
-        .withDirectMode(FLEXIBLE)
-        .withAccessMode(StreetMode.WALK)
-        .withEgressMode(StreetMode.WALK);
-      request.journey().withTransit(b -> b.disable());
-    } else {
-      modes.withEgressMode(FLEXIBLE);
-    }
+      if (onlyDirect) {
+        modes
+          .withDirectMode(FLEXIBLE)
+          .withAccessMode(StreetMode.WALK)
+          .withEgressMode(StreetMode.WALK);
+        journeyBuilder.withTransit(b -> b.disable());
+      } else {
+        modes.withEgressMode(FLEXIBLE);
+      }
 
-    request.journey().setModes(modes.build());
+      journeyBuilder.setModes(modes.build());
+    });
 
     var result = service.route(request);
     var itineraries = result.getTripPlan().itineraries;

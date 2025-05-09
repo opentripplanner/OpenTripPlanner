@@ -78,9 +78,8 @@ public class RouteRequestConfig {
 
     request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
 
-    request
-      .journey()
-      .setModes(
+    request.withJourney(b ->
+      b.setModes(
         c
           .of("modes")
           .since(V2_0)
@@ -90,7 +89,8 @@ public class RouteRequestConfig {
           .asCustomStringType(RequestModes.defaultRequestModes(), "WALK", s ->
             new QualifiedModeSet(s).getRequestModes()
           )
-      );
+      )
+    );
 
     request.setNumItineraries(
       c
@@ -148,12 +148,12 @@ public class RouteRequestConfig {
         """
       )
       .asObject();
-    request
-      .journey()
-      .withTransit(b -> {
+    request.withJourney(jb ->
+      jb.withTransit(b -> {
         mapTransit(unpreferred, b, request.journey().transit());
         TransitGroupPriorityConfig.mapTransitRequest(c, b);
-      });
+      })
+    );
 
     // Map preferences
     request.withPreferences(preferences -> mapPreferences(c, preferences));

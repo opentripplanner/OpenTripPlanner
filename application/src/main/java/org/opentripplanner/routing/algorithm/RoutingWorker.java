@@ -221,9 +221,9 @@ public class RoutingWorker {
     );
     var directRequest = request.clone();
 
-    directRequest
-      .journey()
-      .withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()));
+    directRequest.withJourney(jb ->
+      jb.withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()))
+    );
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {

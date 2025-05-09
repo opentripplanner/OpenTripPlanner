@@ -177,7 +177,7 @@ public class BarrierRoutingTest {
     request.setDateTime(dateTime);
     request.setFrom(from);
     request.setTo(to);
-    request.journey().withDirect(new StreetRequest(streetMode));
+    request.withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)));
 
     options.accept(request);
 

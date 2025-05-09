@@ -80,7 +80,10 @@ public class BicycleRoutingTest {
       p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
     );
 
-    request.journey().withDirect(new StreetRequest(StreetMode.BIKE));
+    request.withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.BIKE));
+    });
+
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       request.from(),

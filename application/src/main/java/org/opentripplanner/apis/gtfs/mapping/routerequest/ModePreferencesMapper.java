@@ -9,7 +9,7 @@ import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.api.request.request.JourneyRequestBuilder;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -21,7 +21,7 @@ public class ModePreferencesMapper {
    * TODO this doesn't support multiple street modes yet
    */
   static void setModes(
-    JourneyRequest journey,
+    JourneyRequestBuilder journey,
     GraphQLTypes.GraphQLPlanModesInput modesInput,
     DataFetchingEnvironment environment
   ) {
@@ -66,7 +66,9 @@ public class ModePreferencesMapper {
         var streetModes = transfer.stream().map(TransferModeMapper::map).toList();
         journey.withTransfer(new StreetRequest(getStreetModeForRouting(streetModes)));
       }
-      validateStreetModes(journey);
+
+      // TODO: This validation should be moved into the journey constructor (Feature Envy)
+      validateStreetModes(journey.build());
 
       var transitModes = getTransitModes(environment);
       if (transitModes != null) {

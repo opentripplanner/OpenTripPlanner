@@ -26,8 +26,10 @@ class StreetSearchRequestMapperTest {
     routeRequest.setTo(to);
     routeRequest.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
     routeRequest.setWheelchair(true);
-    var modes = RequestModes.of().withAllStreetModes(StreetMode.BIKE).build();
-    routeRequest.journey().setModes(modes);
+
+    routeRequest.withJourney(jb -> {
+      jb.setModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build());
+    });
 
     var subject = StreetSearchRequestMapper.map(routeRequest).build();
 

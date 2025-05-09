@@ -63,7 +63,9 @@ class RideHailingAccessShifterTest {
     req.setTo(FROM);
     req.setFrom(TO);
     req.setDateTime(searchTime);
-    req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
+    req.withJourney(jb ->
+      jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+    );
 
     var result = arrivalDelay(req, List.of(service), TIME);
 
@@ -130,7 +132,9 @@ class RideHailingAccessShifterTest {
     req.setDateTime(time);
     req.setFrom(FROM);
     req.setFrom(TO);
-    req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
+    req.withJourney(jb ->
+      jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+    );
     return req;
   }
 }

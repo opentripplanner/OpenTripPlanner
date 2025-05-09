@@ -63,7 +63,9 @@ public class RouteRequestMapper {
 
     request.withPreferences(preferences -> setPreferences(preferences, request, args, environment));
 
-    setModes(request.journey(), args.getGraphQLModes(), environment);
+    request.withJourney(journeyRequestBuilder ->
+      setModes(journeyRequestBuilder, args.getGraphQLModes(), environment)
+    );
 
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));

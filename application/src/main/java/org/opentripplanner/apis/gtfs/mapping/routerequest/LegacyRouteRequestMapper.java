@@ -167,9 +167,8 @@ public class LegacyRouteRequestMapper {
 
     callWith.argument("arriveBy", request::setArriveBy);
 
-    request
-      .journey()
-      .withTransit(transitBuilder -> {
+    request.withJourney(journeyBuilder -> {
+      journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.routes", (String v) ->
           transitBuilder.withPreferredRoutes(FeedScopedId.parseList(v))
         );
@@ -201,7 +200,7 @@ public class LegacyRouteRequestMapper {
           );
 
           callWith.argument("banned.trips", (String v) ->
-            request.journey().withTransit(b -> b.withBannedTrips(FeedScopedId.parseList(v)))
+            journeyBuilder.withTransit(b -> b.withBannedTrips(FeedScopedId.parseList(v)))
           );
 
           if (hasArgument(environment, "transportModes")) {
@@ -220,7 +219,7 @@ public class LegacyRouteRequestMapper {
               )
               .collect(Collectors.toSet());
 
-            request.journey().setModes(modes.getRequestModes());
+            journeyBuilder.setModes(modes.getRequestModes());
 
             var tModes = modes.getTransitModes().stream().map(MainAndSubMode::new).toList();
             if (tModes.isEmpty()) {
@@ -237,6 +236,7 @@ public class LegacyRouteRequestMapper {
           }
         }
       });
+    });
 
     if (hasArgument(environment, "allowedTicketTypes")) {
       // request.allowedFares = new HashSet();

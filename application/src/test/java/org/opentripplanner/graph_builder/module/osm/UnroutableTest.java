@@ -58,15 +58,17 @@ public class UnroutableTest {
    */
   @Test
   public void testOnBoardRouting() {
-    RouteRequest options = new RouteRequest();
-    options.journey().withDirect(new StreetRequest(StreetMode.BIKE));
+    var request = new RouteRequest()
+      .withJourney(journeyBuilder -> {
+        journeyBuilder.withDirect(new StreetRequest(StreetMode.BIKE));
+      });
 
     Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
     Vertex to = graph.getVertex(VertexLabel.osm(40446276));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(options)
-      .setStreetRequest(options.journey().direct())
+      .setRequest(request)
+      .setStreetRequest(request.journey().direct())
       .setFrom(from)
       .setTo(to)
       .getShortestPathTree();

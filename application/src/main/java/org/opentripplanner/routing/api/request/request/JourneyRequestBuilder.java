@@ -53,6 +53,10 @@ public class JourneyRequestBuilder implements Cloneable, Serializable {
     return this;
   }
 
+  public JourneyRequestBuilder withoutDirect() {
+    return withDirect(new StreetRequest(StreetMode.NOT_SET));
+  }
+
   /**
    * Set access, egress, transfer and direcet mode to a given mode.
    */
@@ -70,6 +74,11 @@ public class JourneyRequestBuilder implements Cloneable, Serializable {
     withEgress(new StreetRequest(modes.egressMode));
     withTransfer(new StreetRequest(modes.transferMode));
     withDirect(new StreetRequest(modes.directMode));
+    return this;
+  }
+
+  public JourneyRequestBuilder apply(Consumer<JourneyRequestBuilder> body) {
+    body.accept(this);
     return this;
   }
 

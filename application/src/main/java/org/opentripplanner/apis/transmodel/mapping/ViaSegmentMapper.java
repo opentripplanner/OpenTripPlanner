@@ -8,7 +8,7 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 public class ViaSegmentMapper {
 
   static JourneyRequest mapViaSegment(RouteRequest defaultRequest, Map<String, Object> viaSegment) {
-    JourneyRequest journey = defaultRequest.journey().clone();
+    var journey = defaultRequest.journey().copyOf();
     if (viaSegment.containsKey("modes")) {
       Map<String, Object> modesInput = (Map<String, Object>) viaSegment.get("modes");
       journey.setModes(RequestModesMapper.mapRequestModes(modesInput));
@@ -19,6 +19,6 @@ public class ViaSegmentMapper {
         tb.setFilters(FilterMapper.mapFilterNewWay(filters));
       });
     }
-    return journey;
+    return journey.build();
   }
 }

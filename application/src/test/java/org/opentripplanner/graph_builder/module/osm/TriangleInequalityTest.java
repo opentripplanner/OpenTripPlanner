@@ -180,10 +180,10 @@ public class TriangleInequalityTest {
     assertNotNull(start);
     assertNotNull(end);
 
-    RouteRequest prototypeOptions = new RouteRequest();
+    var request = new RouteRequest();
 
     // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    prototypeOptions.withPreferences(preferences ->
+    request.withPreferences(preferences ->
       preferences
         .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
         .withStreet(street -> street.withTurnReluctance(1.0))
@@ -192,17 +192,19 @@ public class TriangleInequalityTest {
         .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
     );
 
-    if (modes != null) {
-      prototypeOptions.journey().setModes(modes);
-    }
-    if (!filters.isEmpty()) {
-      prototypeOptions.journey().withTransit(b -> b.setFilters(filters));
-    }
+    request.withJourney(jb -> {
+      if (modes != null) {
+        jb.setModes(modes);
+      }
+      if (!filters.isEmpty()) {
+        jb.withTransit(b -> b.setFilters(filters));
+      }
+    });
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
       .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-      .setRequest(prototypeOptions)
+      .setRequest(request)
       .setFrom(start)
       .setTo(end)
       .setIntersectionTraversalCalculator(calculator)
@@ -224,7 +226,7 @@ public class TriangleInequalityTest {
       }
 
       GraphPath<State, Edge, Vertex> startIntermediatePath = getPath(
-        prototypeOptions,
+        request,
         null,
         start,
         intermediate
@@ -235,7 +237,7 @@ public class TriangleInequalityTest {
 
       Edge back = startIntermediatePath.states.getLast().getBackEdge();
       GraphPath<State, Edge, Vertex> intermediateEndPath = getPath(
-        prototypeOptions,
+        request,
         back,
         intermediate,
         end

@@ -467,17 +467,17 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     if (transitCheckBox.isSelected()) {
       modes.add(ApiRequestMode.TRANSIT.name());
     }
-    RouteRequest options = new RouteRequest();
+    RouteRequest request = new RouteRequest();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
-    options.journey().setModes(qualifiedModeSet.getRequestModes());
+    request.withJourney(b -> b.setModes(qualifiedModeSet.getRequestModes()));
 
-    options.setArriveBy(arriveByCheckBox.isSelected());
-    options.setDateTime(when);
-    options.setFrom(LocationStringParser.fromOldStyleString(from));
-    options.setTo(LocationStringParser.fromOldStyleString(to));
-    options.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
+    request.setArriveBy(arriveByCheckBox.isSelected());
+    request.setDateTime(when);
+    request.setFrom(LocationStringParser.fromOldStyleString(from));
+    request.setTo(LocationStringParser.fromOldStyleString(to));
+    request.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
 
-    options.withPreferences(preferences -> {
+    request.withPreferences(preferences -> {
       preferences.withWalk(walk -> {
         walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
         walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
@@ -501,7 +501,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     System.out.println("--------");
     System.out.println("Path from " + from + " to " + to + " at " + when);
     System.out.println("\tModes: " + qualifiedModeSet);
-    System.out.println("\tOptions: " + options);
+    System.out.println("\tOptions: " + request);
 
     // apply callback if the options call for it
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
@@ -514,14 +514,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        options.from(),
-        options.to(),
-        options.journey().direct().mode(),
-        options.journey().direct().mode()
+        request.from(),
+        request.to(),
+        request.journey().direct().mode(),
+        request.journey().direct().mode()
       )
     ) {
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
-        options,
+        request,
         temporaryVertices
       );
       long dt = System.currentTimeMillis() - t0;

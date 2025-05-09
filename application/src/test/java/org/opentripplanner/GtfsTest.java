@@ -32,7 +32,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -108,30 +107,32 @@ public abstract class GtfsTest {
     }
     routingRequest.setWheelchair(wheelchairAccessible);
 
-    RequestModesBuilder requestModesBuilder = RequestModes.of()
-      .withDirectMode(NOT_SET)
-      .withAccessMode(WALK)
-      .withTransferMode(WALK)
-      .withEgressMode(WALK);
-    routingRequest.journey().setModes(requestModesBuilder.build());
+    routingRequest.withJourney(journeyBuilder -> {
+      var requestModesBuilder = RequestModes.of()
+        .withDirectMode(NOT_SET)
+        .withAccessMode(WALK)
+        .withTransferMode(WALK)
+        .withEgressMode(WALK);
+      journeyBuilder.setModes(requestModesBuilder.build());
 
-    var filterRequestBuilder = TransitFilterRequest.of();
-    if (preferredMode != null) {
-      filterRequestBuilder.addSelect(
-        SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
-      );
-    } else {
-      filterRequestBuilder.addSelect(
-        SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
-      );
-    }
+      var filterRequestBuilder = TransitFilterRequest.of();
+      if (preferredMode != null) {
+        filterRequestBuilder.addSelect(
+          SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
+        );
+      } else {
+        filterRequestBuilder.addSelect(
+          SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
+        );
+      }
 
-    if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
-      filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
-    }
+      if (excludedRoute != null && !excludedRoute.isEmpty()) {
+        List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
+        filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
+      }
 
-    routingRequest.journey().withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+    });
 
     // Init preferences
     routingRequest.withPreferences(preferences -> {

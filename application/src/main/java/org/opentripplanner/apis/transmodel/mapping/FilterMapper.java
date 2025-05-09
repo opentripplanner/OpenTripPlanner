@@ -37,13 +37,13 @@ class FilterMapper {
       return;
     }
 
-    request
-      .journey()
-      .withTransit(transitBuilder ->
+    request.withJourney(jb ->
+      jb.withTransit(transitBuilder ->
         transitBuilder.withFilter(b -> {
           mapFilter(environment, callWith, transitBuilder, b);
         })
-      );
+      )
+    );
   }
 
   private static void mapFilter(

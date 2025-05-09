@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
+import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -67,27 +68,28 @@ public class SpeedTestRequest {
     if (!config.ignoreStreetResults) {
       request.setNumItineraries(opts.numOfItineraries());
     }
-    request.journey().setModes(input.modes().getRequestModes());
+    request.withJourney(journeyBuilder -> {
+      journeyBuilder.setModes(input.modes().getRequestModes());
 
-    var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
-    if (tModes.isEmpty()) {
-      request.journey().withTransit(b -> b.disable());
-    } else {
-      var builder = TransitFilterRequest.of()
-        .addSelect(SelectRequest.of().withTransportModes(tModes).build());
-      request.journey().withTransit(b -> b.setFilters(List.of(builder.build())));
-    }
+      var tModes = input.modes().getTransitModes().stream().map(MainAndSubMode::new).toList();
+      if (tModes.isEmpty()) {
+        journeyBuilder.withTransit(b -> b.disable());
+      } else {
+        var builder = TransitFilterRequest.of()
+          .addSelect(SelectRequest.of().withTransportModes(tModes).build());
+        journeyBuilder.withTransit(b -> b.setFilters(List.of(builder.build())));
+      }
 
-    if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {
-      request.setSearchWindow(Duration.ZERO);
-    }
+      if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {
+        request.setSearchWindow(Duration.ZERO);
+      }
 
-    request
-      .journey()
-      .transit()
-      .raptorDebugging()
-      .withStops(opts.debugStops())
-      .withPath(opts.debugPath());
+      journeyBuilder.withTransit(transitBuilder ->
+        transitBuilder.withRaptorDebugging(
+          new DebugRaptor().withStops(opts.debugStops()).withPath(opts.debugPath())
+        )
+      );
+    });
 
     request.withPreferences(pref -> {
       if (input.departureTimeSet() && input.arrivalTimeSet()) {

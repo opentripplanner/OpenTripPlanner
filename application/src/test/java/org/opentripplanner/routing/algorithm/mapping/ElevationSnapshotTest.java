@@ -63,10 +63,9 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct WALK")
   @Test
   public void directWalk() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().withTransit(b -> b.disable());
-
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb ->
+      jb.withTransit(b -> b.disable())
+    );
     request.setFrom(p1);
     request.setTo(p4);
 
@@ -76,10 +75,10 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().withDirect(new StreetRequest(StreetMode.BIKE_RENTAL));
-    request.journey().withTransit(b -> b.disable());
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.BIKE_RENTAL));
+      jb.withTransit(b -> b.disable());
+    });
 
     request.setFrom(p1);
     request.setTo(p2);
@@ -99,10 +98,10 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
           .withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3))
       )
     );
-
-    request.journey().withDirect(new StreetRequest(StreetMode.BIKE));
-    request.journey().withTransit(b -> b.disable());
-
+    request.withJourney(jb -> {
+      jb.withDirect(new StreetRequest(StreetMode.BIKE));
+      jb.withTransit(b -> b.disable());
+    });
     request.setFrom(p1);
     request.setTo(p4);
     request.setArriveBy(true);
@@ -115,10 +114,10 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @Disabled
   public void accessBikeRental() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
-
-    request.journey().withAccess(new StreetRequest(StreetMode.BIKE_RENTAL));
-    request.journey().withDirect(new StreetRequest(StreetMode.NOT_SET));
-
+    request.withJourney(b -> {
+      b.withAccess(new StreetRequest(StreetMode.BIKE_RENTAL));
+      b.withDirect(new StreetRequest(StreetMode.NOT_SET));
+    });
     request.setFrom(p1);
     request.setTo(p3);
 
@@ -132,9 +131,9 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("TRANSIT")
   @Test
   public void transit() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().withDirect(new StreetRequest(StreetMode.NOT_SET));
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb ->
+      jb.withDirect(new StreetRequest(StreetMode.NOT_SET))
+    );
 
     request.setFrom(p3);
     request.setTo(p1);

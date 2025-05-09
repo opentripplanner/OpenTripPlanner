@@ -57,11 +57,10 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-
-    request.journey().withTransit(b -> b.disable());
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withTransit(b -> b.disable());
+    });
 
     request.setFrom(p1);
     request.setTo(p2);
@@ -81,11 +80,10 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with departAt")
   @Test
   public void directBikeRentalArrivingAtDestinationWithDepartAt() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-    request.journey().withTransit(b -> b.disable());
-
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withTransit(b -> b.disable());
+    });
     allowArrivalWithRentalVehicle(request);
     request.setFrom(p1);
     request.setTo(p2);
@@ -96,11 +94,10 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL while keeping the bicycle at the destination with arriveBy")
   @Test
   public void directBikeRentalArrivingAtDestinationWithArriveBy() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.journey().setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
-    request.journey().withTransit(b -> b.disable());
-
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
+      jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
+      jb.withTransit(b -> b.disable());
+    });
     allowArrivalWithRentalVehicle(request);
     request.setFrom(p1);
     request.setTo(p2);
@@ -112,18 +109,16 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Access BIKE_RENTAL")
   @Test
   public void accessBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
-
-    request
-      .journey()
-      .setModes(
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0).withJourney(jb ->
+      jb.setModes(
         RequestModes.of()
           .withAccessMode(StreetMode.BIKE_RENTAL)
           .withEgressMode(StreetMode.WALK)
           .withDirectMode(StreetMode.NOT_SET)
           .withTransferMode(StreetMode.WALK)
           .build()
-      );
+      )
+    );
     request.setFrom(p1);
     request.setTo(p3);
 
@@ -137,18 +132,16 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
   @DisplayName("Egress BIKE_RENTAL")
   @Test
   public void egressBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request
-      .journey()
-      .setModes(
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb ->
+      jb.setModes(
         RequestModes.of()
           .withAccessMode(StreetMode.WALK)
           .withEgressMode(StreetMode.BIKE_RENTAL)
           .withTransferMode(StreetMode.WALK)
           .withDirectMode(StreetMode.NOT_SET)
           .build()
-      );
+      )
+    );
     request.setFrom(p3);
     request.setTo(p1);
 

@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.api.request.request.JourneyRequestBuilder;
 import org.opentripplanner.routing.api.request.via.ViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -97,6 +98,11 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void setJourney(JourneyRequest journey) {
     this.journey = journey;
+  }
+
+  public RouteRequest withJourney(Consumer<JourneyRequestBuilder> body) {
+    setJourney(journey.copyOf().apply(body).build());
+    return this;
   }
 
   public void setArriveBy(boolean arriveBy) {
@@ -207,7 +213,7 @@ public class RouteRequest implements Cloneable, Serializable {
       this.dateTime = arriveBy
         ? pageCursor.latestArrivalTime()
         : pageCursor.earliestDepartureTime();
-      journey.setModes(journey.modes().copyOf().withDirectMode(StreetMode.NOT_SET).build());
+      journey = journey.copyOf().withoutDirect().build();
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
   }
@@ -265,10 +271,7 @@ public class RouteRequest implements Cloneable, Serializable {
   @Override
   public RouteRequest clone() {
     try {
-      RouteRequest clone = (RouteRequest) super.clone();
-      clone.journey = journey.clone();
-
-      return clone;
+      return (RouteRequest) super.clone();
     } catch (CloneNotSupportedException e) {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);

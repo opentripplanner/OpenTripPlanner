@@ -59,9 +59,8 @@ public class TripRequestMapper {
     callWith.argument("numTripPatterns", request::setNumItineraries);
     callWith.argument("arriveBy", request::setArriveBy);
 
-    request
-      .journey()
-      .withTransit(transitBuilder -> {
+    request.withJourney(journeyBuilder -> {
+      journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
           transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))
         );
@@ -88,11 +87,12 @@ public class TripRequestMapper {
         }
       });
 
-    if (GqlUtil.hasArgument(environment, "modes")) {
-      request
-        .journey()
-        .setModes(RequestModesMapper.mapRequestModes(environment.getArgument("modes")));
-    }
+      if (GqlUtil.hasArgument(environment, "modes")) {
+        journeyBuilder.setModes(
+          RequestModesMapper.mapRequestModes(environment.getArgument("modes"))
+        );
+      }
+    });
 
     request.withPreferences(preferences ->
       PreferencesMapper.mapPreferences(environment, callWith, preferences)

@@ -56,14 +56,13 @@ public class PatternCostCalculatorTest {
   @DisplayName("cost mapper should create penalty map")
   public void testMcCostParameterMapping() {
     var unpreferredCostFunctionOtpDomain = CostLinearFunction.of("5m + 1.1 t");
-    RouteRequest routingRequest = new RouteRequest();
-
-    routingRequest
-      .journey()
-      .withTransit(b -> {
-        b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-        b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
-      });
+    RouteRequest routingRequest = new RouteRequest()
+      .withJourney(jb ->
+        jb.withTransit(b -> {
+          b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+          b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+        })
+      );
     routingRequest.withPreferences(p ->
       p.withTransit(tr -> tr.setUnpreferredCost(unpreferredCostFunctionOtpDomain))
     );
@@ -204,16 +203,16 @@ public class PatternCostCalculatorTest {
           tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
         });
       });
-      request
-        .journey()
-        .withTransit(b -> {
+      request.withJourney(jb ->
+        jb.withTransit(b -> {
           if (unPreferredAgency) {
             b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
           }
           if (unPreferredRoute) {
             b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
           }
-        });
+        })
+      );
       return request;
     }
   }

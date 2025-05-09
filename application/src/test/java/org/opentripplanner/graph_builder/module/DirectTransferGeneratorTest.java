@@ -191,7 +191,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var reqWalk = new RouteRequest();
 
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var transferRequests = List.of(reqWalk, reqBike);
 
@@ -216,7 +216,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var reqWalk = new RouteRequest();
 
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var transferRequests = List.of(reqWalk, reqBike);
 
@@ -276,7 +276,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   @Test
   public void testRequestWithCarsAllowedPatterns() {
     var reqCar = new RouteRequest();
-    reqCar.journey().withTransfer(new StreetRequest(StreetMode.CAR));
+    reqCar.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.CAR)));
 
     var transferRequests = List.of(reqCar);
 
@@ -310,7 +310,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   @Test
   public void testRequestWithCarsAllowedPatternsWithDurationLimit() {
     var reqCar = new RouteRequest();
-    reqCar.journey().withTransfer(new StreetRequest(StreetMode.CAR));
+    reqCar.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.CAR)));
 
     var transferRequests = List.of(reqCar);
 
@@ -342,10 +342,10 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var reqWalk = new RouteRequest();
 
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var reqCar = new RouteRequest();
-    reqCar.journey().withTransfer(new StreetRequest(StreetMode.CAR));
+    reqCar.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.CAR)));
 
     var transferRequests = List.of(reqWalk, reqBike, reqCar);
 
@@ -400,7 +400,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   @Test
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatterns() {
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var transferRequests = List.of(reqBike);
 
@@ -436,7 +436,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
   @Test
   public void testBikeRequestWithPatternsAndWithCarsAllowedPatternsWithoutCarInTransferRequests() {
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var transferRequests = List.of(reqBike);
 
@@ -466,10 +466,10 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var reqWalk = new RouteRequest();
 
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var reqCar = new RouteRequest();
-    reqCar.journey().withTransfer(new StreetRequest(StreetMode.CAR));
+    reqCar.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.CAR)));
 
     var transferRequests = List.of(reqWalk, reqBike, reqCar);
 
@@ -516,7 +516,7 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
     var reqWalk = new RouteRequest();
 
     var reqBike = new RouteRequest();
-    reqBike.journey().withTransfer(new StreetRequest(StreetMode.BIKE));
+    reqBike.withJourney(jb -> jb.withTransfer(new StreetRequest(StreetMode.BIKE)));
 
     var transferRequests = List.of(reqWalk, reqBike);
 

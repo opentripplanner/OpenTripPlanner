@@ -153,7 +153,7 @@ public class SplitEdgeTurnRestrictionsTest {
     request.setFrom(from);
     request.setTo(to);
 
-    request.journey().withDirect(new StreetRequest(StreetMode.CAR));
+    request.withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)));
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       from,
