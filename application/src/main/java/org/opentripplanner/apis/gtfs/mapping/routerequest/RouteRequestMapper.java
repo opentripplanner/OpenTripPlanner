@@ -19,6 +19,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
 public class RouteRequestMapper {
@@ -64,6 +65,13 @@ public class RouteRequestMapper {
     request.withPreferences(preferences -> setPreferences(preferences, request, args, environment));
 
     setModes(request.journey(), args.getGraphQLModes(), environment);
+
+    if (CollectionUtils.hasValue(args.getGraphQLFilters())) {
+      var filterArgs = args.getGraphQLFilters();
+      var filters =FilterMapper.mapFilters(filterArgs);
+      request.journey().transit().setFilters(filters);
+    }
+
 
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));

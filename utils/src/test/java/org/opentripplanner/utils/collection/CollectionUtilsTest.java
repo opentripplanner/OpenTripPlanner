@@ -2,6 +2,7 @@ package org.opentripplanner.utils.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
@@ -64,5 +65,15 @@ class CollectionUtilsTest {
     assertTrue(CollectionUtils.isEmpty((Collection<Object>) null));
     assertTrue(CollectionUtils.isEmpty(List.of()));
     assertFalse(CollectionUtils.isEmpty(Set.of(1)));
+  }
+
+  @Test
+  void requireNullOrNonEmpty() {
+    CollectionUtils.requireNullOrNonEmpty(null, "test");
+    CollectionUtils.requireNullOrNonEmpty(List.of(1), "test");
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      CollectionUtils.requireNullOrNonEmpty(List.of(), "test");
+    });
   }
 }
