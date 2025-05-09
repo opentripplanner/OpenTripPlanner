@@ -1693,6 +1693,11 @@ type QueryType {
     "The destination where the search ends. Usually coordinates but can also be a stop location."
     destination: PlanLabeledLocationInput!,
     """
+    A list of filters for which trips should be included. A trip will be included if it matches with
+    at least one filter. An empty list of filters means that all trips should be included.
+    """
+    filters: [PlanFilterInput!],
+    """
     How many new itineraries should at maximum be returned in either the first search or with
     forward pagination. This parameter is part of the
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
@@ -4289,6 +4294,24 @@ input PlanDateTimeInput @oneOf {
   to define both `earliestDeparture` and `latestArrival`.
   """
   latestArrival: OffsetDateTime
+}
+
+"A collection of selectors for what lines/trips should be included in / excluded from search"
+input PlanFilterInput {
+  "A list of selectors for what lines/trips should be excluded during the search. If line/trip matches with at least one selector it will be excluded."
+  not: [PlanFilterSelectInput!]
+  "A list of selectors for what lines/trips should be allowed during search. In order to be accepted a trip/line has to match with at least one selector. An empty list means that everything should be allowed. "
+  select: [PlanFilterSelectInput!]
+}
+
+"A list of selectors for filter allow-list / exclude-list. An empty list means that everything is allowed. A trip/line will match with selectors if it matches with all non-empty lists. The `select` is always applied first, then `not`. If only `not` not is present, the exclude is applied to the existing set of lines. "
+input PlanFilterSelectInput {
+  "Set of ids for authorities that should be included in/excluded from search"
+  agencies: [String!]
+  "Set of ids for lines that should be included in/excluded from search"
+  routes: [String!]
+  "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
+  transportModes: [TransitMode!]
 }
 
 """
