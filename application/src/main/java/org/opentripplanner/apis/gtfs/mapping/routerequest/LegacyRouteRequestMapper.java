@@ -272,7 +272,7 @@ public class LegacyRouteRequestMapper {
       return new GenericLocation(address, null, lat, lng);
     }
 
-    return new GenericLocation(lat, lng);
+    return GenericLocation.fromCoordinate(lat, lng);
   }
 
   private static void setParkingPreferences(

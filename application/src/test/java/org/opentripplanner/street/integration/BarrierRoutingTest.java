@@ -54,8 +54,8 @@ public class BarrierRoutingTest {
    */
   @Test
   public void shouldWalkForBarriers() {
-    var from = new GenericLocation(48.59384, 8.86848);
-    var to = new GenericLocation(48.59370, 8.87079);
+    var from = GenericLocation.fromCoordinate(48.59384, 8.86848);
+    var to = GenericLocation.fromCoordinate(48.59370, 8.87079);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, BIKE);
@@ -100,8 +100,8 @@ public class BarrierRoutingTest {
    */
   @Test
   public void shouldDriveAroundBarriers() {
-    var from = new GenericLocation(48.59291, 8.87037);
-    var to = new GenericLocation(48.59262, 8.86879);
+    var from = GenericLocation.fromCoordinate(48.59291, 8.87037);
+    var to = GenericLocation.fromCoordinate(48.59262, 8.86879);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, CAR);
@@ -110,8 +110,8 @@ public class BarrierRoutingTest {
 
   @Test
   public void shouldDriveToBarrier() {
-    var from = new GenericLocation(48.59291, 8.87037);
-    var to = new GenericLocation(48.59276, 8.86963);
+    var from = GenericLocation.fromCoordinate(48.59291, 8.87037);
+    var to = GenericLocation.fromCoordinate(48.59276, 8.86963);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, CAR);
@@ -120,8 +120,8 @@ public class BarrierRoutingTest {
 
   @Test
   public void shouldDriveFromBarrier() {
-    var from = new GenericLocation(48.59273, 8.86931);
-    var to = new GenericLocation(48.59291, 8.87037);
+    var from = GenericLocation.fromCoordinate(48.59273, 8.86931);
+    var to = GenericLocation.fromCoordinate(48.59291, 8.87037);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, CAR);

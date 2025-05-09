@@ -47,16 +47,16 @@ class WalkRoutingTest {
    */
   @Test
   void shouldRouteAroundRoundabout() {
-    var start = new GenericLocation(59.94646, 10.77511);
-    var end = new GenericLocation(59.94641, 10.77522);
+    var start = GenericLocation.fromCoordinate(59.94646, 10.77511);
+    var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     assertDoesNotThrow(() -> route(roundabout, start, end, dateTime, false));
   }
 
   @ParameterizedTest
   @ValueSource(ints = { 0, 200, 400, 499, 500, 501, 600, 700, 800, 900, 999 })
   void pathReversalWorks(int offset) {
-    var start = new GenericLocation(59.94646, 10.77511);
-    var end = new GenericLocation(59.94641, 10.77522);
+    var start = GenericLocation.fromCoordinate(59.94646, 10.77511);
+    var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     var base = dateTime.truncatedTo(ChronoUnit.SECONDS);
     var time = base.plusMillis(offset);
     var results = route(roundabout, start, end, time, true);

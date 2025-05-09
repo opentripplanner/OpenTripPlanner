@@ -22,7 +22,7 @@ class StreetSearchRequestMapperTest {
     routeRequest.setDateTime(dateTime);
     var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
     routeRequest.setFrom(from);
-    var to = new GenericLocation(60.0, 20.0);
+    var to = GenericLocation.fromCoordinate(60.0, 20.0);
     routeRequest.setTo(to);
     routeRequest.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
     routeRequest.setWheelchair(true);
@@ -48,7 +48,7 @@ class StreetSearchRequestMapperTest {
     routeRequest.setDateTime(dateTime);
     var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
     routeRequest.setFrom(from);
-    var to = new GenericLocation(60.0, 20.0);
+    var to = GenericLocation.fromCoordinate(60.0, 20.0);
     routeRequest.setTo(to);
     routeRequest.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
     routeRequest.setWheelchair(true);

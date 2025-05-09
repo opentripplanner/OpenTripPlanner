@@ -158,7 +158,7 @@ class RouteRequestTest {
   }
 
   private GenericLocation randomLocation() {
-    return new GenericLocation(Math.random(), Math.random());
+    return GenericLocation.fromCoordinate(Math.random(), Math.random());
   }
 
   private void expectOneRoutingValidationException(

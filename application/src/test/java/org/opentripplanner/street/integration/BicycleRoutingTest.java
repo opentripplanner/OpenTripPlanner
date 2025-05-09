@@ -45,8 +45,8 @@ public class BicycleRoutingTest {
    */
   @Test
   public void shouldRespectGeneralNoThroughTraffic() {
-    var mozartStr = new GenericLocation(48.59713, 8.86107);
-    var fritzLeharStr = new GenericLocation(48.59696, 8.85806);
+    var mozartStr = GenericLocation.fromCoordinate(48.59713, 8.86107);
+    var fritzLeharStr = GenericLocation.fromCoordinate(48.59696, 8.85806);
 
     var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
     assertThatPolylinesAreEqual(polyline1, "_srgHutau@h@B|@Jf@B?PdABJT@jA?DSp@_@fFsAT{@DBpC");
@@ -61,8 +61,8 @@ public class BicycleRoutingTest {
    */
   @Test
   public void shouldNotRespectMotorCarNoThru() {
-    var schiessmauer = new GenericLocation(48.59737, 8.86350);
-    var zeppelinStr = new GenericLocation(48.59972, 8.86239);
+    var schiessmauer = GenericLocation.fromCoordinate(48.59737, 8.86350);
+    var zeppelinStr = GenericLocation.fromCoordinate(48.59972, 8.86239);
 
     var polyline1 = computePolyline(herrenbergGraph, schiessmauer, zeppelinStr);
     assertThatPolylinesAreEqual(polyline1, "otrgH{cbu@S_AU_AmAdAyApAGDs@h@_@\\_ClBe@^?S");

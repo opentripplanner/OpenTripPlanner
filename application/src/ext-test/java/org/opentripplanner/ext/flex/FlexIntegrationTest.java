@@ -40,8 +40,14 @@ import org.opentripplanner.transit.service.TimetableRepository;
  */
 public class FlexIntegrationTest {
 
-  public static final GenericLocation OUTSIDE_FLEX_ZONE = new GenericLocation(33.7552, -84.4631);
-  public static final GenericLocation INSIDE_FLEX_ZONE = new GenericLocation(33.8694, -84.6233);
+  public static final GenericLocation OUTSIDE_FLEX_ZONE = GenericLocation.fromCoordinate(
+    33.7552,
+    -84.4631
+  );
+  public static final GenericLocation INSIDE_FLEX_ZONE = GenericLocation.fromCoordinate(
+    33.8694,
+    -84.6233
+  );
   static Instant dateTime = ZonedDateTime.parse(
     "2021-12-02T12:00:00-05:00[America/New_York]"
   ).toInstant();
@@ -111,7 +117,7 @@ public class FlexIntegrationTest {
   @Test
   void shouldReturnARouteWithTwoTransfers() {
     var from = GenericLocation.fromStopId("ALEX DR@ALEX WAY", "MARTA", "97266");
-    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var to = GenericLocation.fromCoordinate(33.86701256815635, -84.61787939071655);
 
     var itin = getItinerary(from, to, 3);
 
@@ -142,9 +148,9 @@ public class FlexIntegrationTest {
   @Test
   void flexDirect() {
     // near flex zone
-    var from = new GenericLocation(33.85281, -84.60271);
+    var from = GenericLocation.fromCoordinate(33.85281, -84.60271);
     // in the middle of flex zone
-    var to = new GenericLocation(33.86701256815635, -84.61787939071655);
+    var to = GenericLocation.fromCoordinate(33.86701256815635, -84.61787939071655);
 
     List<Itinerary> itineraries = getItineraries(from, to, true);
 

@@ -90,8 +90,8 @@ public class RouteRequest implements Cloneable, Serializable {
   /** Constructor for options; modes defaults to walk and transit */
   public RouteRequest() {
     // So that they are never null.
-    from = new GenericLocation(null, null);
-    to = new GenericLocation(null, null);
+    from = GenericLocation.UNKNOWN;
+    to = GenericLocation.UNKNOWN;
   }
 
   /* ACCESSOR/SETTER METHODS */

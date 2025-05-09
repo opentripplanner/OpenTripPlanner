@@ -99,8 +99,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       Double longitude
     ) ->
       (RouteRequest rr) -> {
-        rr.setFrom(new GenericLocation(latitude, longitude));
-        rr.setTo(new GenericLocation(latitude, longitude));
+        rr.setFrom(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.setTo(GenericLocation.fromCoordinate(latitude, longitude));
       };
 
     assertLinking(setup.apply(47.501, 19.00), "A1A2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
@@ -150,8 +150,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   public void testWheelchairLinking() {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(47.5010, 19.03));
-        rr.setTo(new GenericLocation(47.5010, 19.03));
+        rr.setFrom(GenericLocation.fromCoordinate(47.5010, 19.03));
+        rr.setTo(GenericLocation.fromCoordinate(47.5010, 19.03));
         rr.setWheelchair(true);
       },
       "C1C2 street",
@@ -168,8 +168,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   ) {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(latitude, longitude));
-        rr.setTo(new GenericLocation(latitude, longitude));
+        rr.setFrom(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.setTo(GenericLocation.fromCoordinate(latitude, longitude));
       },
       streetName,
       streetName,
@@ -201,7 +201,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       consumer.accept(routingRequest);
 
       // Remove to, so that origin and destination are different
-      routingRequest.setTo(new GenericLocation(null, null));
+      routingRequest.setTo(GenericLocation.UNKNOWN);
 
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
@@ -226,7 +226,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       consumer.accept(routingRequest);
 
       // Remove from, so that origin and destination are different
-      routingRequest.setFrom(new GenericLocation(null, null));
+      routingRequest.setFrom(GenericLocation.UNKNOWN);
 
       try (
         var temporaryVertices = new TemporaryVerticesContainer(

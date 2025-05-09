@@ -185,6 +185,6 @@ public class ViaRoutingWorkerTest {
   }
 
   private static GenericLocation location(Place p) {
-    return new GenericLocation(p.coordinate.latitude(), p.coordinate.longitude());
+    return GenericLocation.fromCoordinate(p.coordinate.latitude(), p.coordinate.longitude());
   }
 }

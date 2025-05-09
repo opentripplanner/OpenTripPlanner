@@ -206,7 +206,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   /* Helper methods */
 
   private GenericLocation location(WgsCoordinate coordinate) {
-    return new GenericLocation(coordinate.latitude(), coordinate.longitude());
+    return GenericLocation.fromCoordinate(coordinate.latitude(), coordinate.longitude());
   }
 
   private GenericLocation location(FeedScopedId id) {

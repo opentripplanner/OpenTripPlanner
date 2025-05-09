@@ -62,8 +62,8 @@ public class CarRoutingTest {
     );
     var hindenburgStrUnderConstruction = model.index().graph();
 
-    var gueltsteinerStr = new GenericLocation(48.59386, 8.87088);
-    var aufDemGraben = new GenericLocation(48.59487, 8.87133);
+    var gueltsteinerStr = GenericLocation.fromCoordinate(48.59386, 8.87088);
+    var aufDemGraben = GenericLocation.fromCoordinate(48.59487, 8.87133);
 
     var polyline = computePolyline(hindenburgStrUnderConstruction, gueltsteinerStr, aufDemGraben);
 
@@ -75,8 +75,8 @@ public class CarRoutingTest {
 
   @Test
   public void shouldRespectGeneralNoThroughTraffic() {
-    var mozartStr = new GenericLocation(48.59521, 8.88391);
-    var fritzLeharStr = new GenericLocation(48.59460, 8.88291);
+    var mozartStr = GenericLocation.fromCoordinate(48.59521, 8.88391);
+    var fritzLeharStr = GenericLocation.fromCoordinate(48.59460, 8.88291);
 
     var polyline1 = computePolyline(herrenbergGraph, mozartStr, fritzLeharStr);
     assertThatPolylinesAreEqual(polyline1, "_grgHkcfu@OjBC\\ARGjAKzAfBz@j@n@Rk@E}D");
@@ -91,8 +91,8 @@ public class CarRoutingTest {
    */
   @Test
   public void shouldRespectMotorCarNoThru() {
-    var schiessmauer = new GenericLocation(48.59737, 8.86350);
-    var zeppelinStr = new GenericLocation(48.59972, 8.86239);
+    var schiessmauer = GenericLocation.fromCoordinate(48.59737, 8.86350);
+    var zeppelinStr = GenericLocation.fromCoordinate(48.59972, 8.86239);
 
     var polyline1 = computePolyline(herrenbergGraph, schiessmauer, zeppelinStr);
     assertThatPolylinesAreEqual(
@@ -109,8 +109,8 @@ public class CarRoutingTest {
 
   @Test
   public void planningFromNoThroughTrafficPlaceTest() {
-    var noThroughTrafficPlace = new GenericLocation(48.59634, 8.87020);
-    var destination = new GenericLocation(48.59463, 8.87218);
+    var noThroughTrafficPlace = GenericLocation.fromCoordinate(48.59634, 8.87020);
+    var destination = GenericLocation.fromCoordinate(48.59463, 8.87218);
 
     var polyline1 = computePolyline(herrenbergGraph, noThroughTrafficPlace, destination);
     assertThatPolylinesAreEqual(
