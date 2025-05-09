@@ -1780,6 +1780,85 @@ public class GraphQLTypes {
     WALK,
   }
 
+  public static class GraphQLPlanFilterInput {
+
+    private List<GraphQLPlanFilterSelectInput> not;
+    private List<GraphQLPlanFilterSelectInput> select;
+
+    public GraphQLPlanFilterInput(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("not") != null) {
+          this.not = (List<GraphQLPlanFilterSelectInput>) args.get("not");
+        }
+        if (args.get("select") != null) {
+          this.select = (List<GraphQLPlanFilterSelectInput>) args.get("select");
+        }
+      }
+    }
+
+    public List<GraphQLPlanFilterSelectInput> getGraphQLNot() {
+      return this.not;
+    }
+
+    public List<GraphQLPlanFilterSelectInput> getGraphQLSelect() {
+      return this.select;
+    }
+
+    public void setGraphQLNot(List<GraphQLPlanFilterSelectInput> not) {
+      this.not = not;
+    }
+
+    public void setGraphQLSelect(List<GraphQLPlanFilterSelectInput> select) {
+      this.select = select;
+    }
+  }
+
+  public static class GraphQLPlanFilterSelectInput {
+
+    private List<String> agencies;
+    private List<String> routes;
+    private List<GraphQLTransitMode> transportModes;
+
+    public GraphQLPlanFilterSelectInput(Map<String, Object> args) {
+      if (args != null) {
+        this.agencies = (List<String>) args.get("agencies");
+        this.routes = (List<String>) args.get("routes");
+        if (args.get("transportModes") != null) {
+          this.transportModes = ((List<Object>) args.get("transportModes")).stream()
+            .map(item ->
+              item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
+            )
+            .map(GraphQLTransitMode.class::cast)
+            .collect(Collectors.toList());
+        }
+      }
+    }
+
+    public List<String> getGraphQLAgencies() {
+      return this.agencies;
+    }
+
+    public List<String> getGraphQLRoutes() {
+      return this.routes;
+    }
+
+    public List<GraphQLTransitMode> getGraphQLTransportModes() {
+      return this.transportModes;
+    }
+
+    public void setGraphQLAgencies(List<String> agencies) {
+      this.agencies = agencies;
+    }
+
+    public void setGraphQLRoutes(List<String> routes) {
+      this.routes = routes;
+    }
+
+    public void setGraphQLTransportModes(List<GraphQLTransitMode> transportModes) {
+      this.transportModes = transportModes;
+    }
+  }
+
   public static class GraphQLPlanItineraryFilterInput {
 
     private Double groupSimilarityKeepOne;
@@ -3688,6 +3767,7 @@ public class GraphQLTypes {
     private String before;
     private GraphQLPlanDateTimeInput dateTime;
     private GraphQLPlanLabeledLocationInput destination;
+    private List<GraphQLPlanFilterInput> filters;
     private Integer first;
     private GraphQLPlanItineraryFilterInput itineraryFilter;
     private Integer last;
@@ -3706,6 +3786,9 @@ public class GraphQLTypes {
         this.destination = new GraphQLPlanLabeledLocationInput(
           (Map<String, Object>) args.get("destination")
         );
+        if (args.get("filters") != null) {
+          this.filters = (List<GraphQLPlanFilterInput>) args.get("filters");
+        }
         this.first = (Integer) args.get("first");
         this.itineraryFilter = new GraphQLPlanItineraryFilterInput(
           (Map<String, Object>) args.get("itineraryFilter")
@@ -3740,6 +3823,10 @@ public class GraphQLTypes {
 
     public GraphQLPlanLabeledLocationInput getGraphQLDestination() {
       return this.destination;
+    }
+
+    public List<GraphQLPlanFilterInput> getGraphQLFilters() {
+      return this.filters;
     }
 
     public Integer getGraphQLFirst() {
@@ -3792,6 +3879,10 @@ public class GraphQLTypes {
 
     public void setGraphQLDestination(GraphQLPlanLabeledLocationInput destination) {
       this.destination = destination;
+    }
+
+    public void setGraphQLFilters(List<GraphQLPlanFilterInput> filters) {
+      this.filters = filters;
     }
 
     public void setGraphQLFirst(Integer first) {

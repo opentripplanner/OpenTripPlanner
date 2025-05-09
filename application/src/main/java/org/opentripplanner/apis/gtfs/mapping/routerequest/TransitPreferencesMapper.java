@@ -20,6 +20,8 @@ public class TransitPreferencesMapper {
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args,
     DataFetchingEnvironment environment
   ) {
+
+    var filters = args.getGraphQLFilters();
     var modes = args.getGraphQLModes();
     var transit = getTransitModes(environment);
     if (!Boolean.TRUE.equals(modes.getGraphQLDirectOnly()) && !CollectionUtils.isEmpty(transit)) {
