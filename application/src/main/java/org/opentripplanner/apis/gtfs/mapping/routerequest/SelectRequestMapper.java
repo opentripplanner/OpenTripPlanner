@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
-import java.util.ArrayList;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -31,13 +30,13 @@ class SelectRequestMapper {
     }
 
     if (CollectionUtils.hasValue(input.getGraphQLTransportModes())) {
-      var tModes = new ArrayList<MainAndSubMode>();
-
-      for (var mode : input.getGraphQLTransportModes()) {
-        var m = TransitModeMapper.map(mode);
-        tModes.add(new MainAndSubMode(m));
-      }
-      selectRequestBuilder.withTransportModes(tModes);
+      var internalModes = input
+        .getGraphQLTransportModes()
+        .stream()
+        .map(TransitModeMapper::map)
+        .map(MainAndSubMode::new)
+        .toList();
+      selectRequestBuilder.withTransportModes(internalModes);
     }
 
     return selectRequestBuilder.build();

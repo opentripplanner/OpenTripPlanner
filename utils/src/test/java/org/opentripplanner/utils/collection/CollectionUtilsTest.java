@@ -68,7 +68,13 @@ class CollectionUtilsTest {
   }
 
   @Test
-  void requireNullOrNonEmpty() {
+  void testHasValue() {
+    assertFalse(CollectionUtils.hasValue(null));
+    assertFalse(CollectionUtils.hasValue(List.of()));
+  }
+
+  @Test
+  void testRequireNullOrNonEmpty() {
     CollectionUtils.requireNullOrNonEmpty(null, "test");
     CollectionUtils.requireNullOrNonEmpty(List.of(1), "test");
 
