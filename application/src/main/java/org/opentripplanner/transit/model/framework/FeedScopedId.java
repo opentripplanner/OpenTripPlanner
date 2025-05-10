@@ -67,7 +67,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
   public static List<FeedScopedId> parse(Collection<String> value) throws IllegalArgumentException {
     value.forEach(id -> {
       if (id == null) {
-        throw new IllegalArgumentException("Collection of FeedScopedId cannot contain null.");
+        throw new IllegalArgumentException("Collection of FeedScopedId must not contain null.");
       }
     });
     return value.stream().map(FeedScopedId::parse).toList();

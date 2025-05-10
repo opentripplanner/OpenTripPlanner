@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
+import static org.opentripplanner.utils.collection.CollectionUtils.requireNullOrNonEmpty;
+
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -16,9 +18,9 @@ class SelectRequestMapper {
     var routes = input.getGraphQLRoutes();
     var agencies = input.getGraphQLAgencies();
     var modes = input.getGraphQLTransportModes();
-    CollectionUtils.requireNullOrNonEmpty(routes, "filters.%s.routes".formatted(name));
-    CollectionUtils.requireNullOrNonEmpty(agencies, "filters.%s.agencies".formatted(name));
-    CollectionUtils.requireNullOrNonEmpty(modes, "filters.%s.transportModes".formatted(name));
+    requireNullOrNonEmpty(routes, "filters.%s.routes".formatted(name));
+    requireNullOrNonEmpty(agencies, "filters.%s.agencies".formatted(name));
+    requireNullOrNonEmpty(modes, "filters.%s.transportModes".formatted(name));
 
     var selectRequestBuilder = SelectRequest.of();
     if (CollectionUtils.hasValue(routes)) {

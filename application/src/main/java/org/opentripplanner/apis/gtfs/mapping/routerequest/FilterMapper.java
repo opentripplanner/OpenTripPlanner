@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanFilterInput;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.utils.collection.CollectionUtils;
@@ -10,13 +11,17 @@ import org.opentripplanner.utils.collection.ListUtils;
 
 class FilterMapper {
 
-  static List<TransitFilter> mapFilters(List<GraphQLTypes.GraphQLPlanFilterInput> filters) {
+  static List<TransitFilter> mapFilters(List<GraphQLPlanFilterInput> filters) {
     var filterRequests = new ArrayList<TransitFilter>();
     for (var filterInput : filters) {
       var selects = filterInput.getGraphQLSelect();
       var nots = filterInput.getGraphQLNot();
       CollectionUtils.requireNullOrNonEmpty(nots, "filters.not");
       CollectionUtils.requireNullOrNonEmpty(selects, "filters.select");
+
+      if (CollectionUtils.isEmpty(nots) && CollectionUtils.isEmpty(selects)) {
+        throw new IllegalArgumentException("Filter must contain at least one 'select' or 'not'.");
+      }
 
       var filterRequestBuilder = TransitFilterRequest.of();
 
