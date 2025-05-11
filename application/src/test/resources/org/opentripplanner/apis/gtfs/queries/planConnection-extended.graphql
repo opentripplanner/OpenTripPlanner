@@ -93,7 +93,12 @@
         }
       }
     }
-    filters: [{ not: [{ routes: ["tampere:1"] }] }]
+    filters: [
+      { not: [{ routes: ["A:r1"] }] }
+      {
+        select: [{ agencies: ["A:a1"], transportModes: [AIRPLANE, CABLE_CAR] }]
+      }
+    ]
     locale: "en"
   ) {
     searchDateTime
