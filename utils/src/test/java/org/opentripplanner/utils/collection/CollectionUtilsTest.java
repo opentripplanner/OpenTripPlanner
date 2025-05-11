@@ -28,6 +28,13 @@ class CollectionUtilsTest {
   }
 
   @Test
+  void testHasValue() {
+    assertFalse(CollectionUtils.hasValue(null));
+    assertFalse(CollectionUtils.hasValue(List.of()));
+    assertTrue(CollectionUtils.hasValue(List.of(1)));
+  }
+
+  @Test
   void testToString() {
     assertEquals("<null>", CollectionUtils.toString(null, NULL_STRING));
     assertEquals("[]", CollectionUtils.toString(Set.of(), NULL_STRING));
@@ -65,12 +72,6 @@ class CollectionUtilsTest {
     assertTrue(CollectionUtils.isEmpty((Collection<Object>) null));
     assertTrue(CollectionUtils.isEmpty(List.of()));
     assertFalse(CollectionUtils.isEmpty(Set.of(1)));
-  }
-
-  @Test
-  void testHasValue() {
-    assertFalse(CollectionUtils.hasValue(null));
-    assertFalse(CollectionUtils.hasValue(List.of()));
   }
 
   @Test

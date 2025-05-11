@@ -20,10 +20,7 @@ class FilterMapperTest {
         "not",
         List.of(Map.of("routes", List.of("feed:A"))),
         "select",
-        List.of(
-          Map.of("agencies", List.of("feed:A")),
-          Map.of("transportModes", List.of("RAIL"))
-        )
+        List.of(Map.of("agencies", List.of("feed:A")), Map.of("transportModes", List.of("RAIL")))
       )
     );
     var result = FilterMapper.mapFilters(List.of(filter));
