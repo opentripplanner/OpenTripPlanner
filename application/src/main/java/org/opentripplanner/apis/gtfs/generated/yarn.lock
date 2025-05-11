@@ -810,9 +810,9 @@
     "@graphql-codegen/visitor-plugin-common" "2.13.1"
     tslib "~2.6.0"
 
-"@graphql-codegen/java@git+https://github.com/opentripplanner/graphql-code-generator-java.git#main":
+"@graphql-codegen/java@git+https://github.com/opentripplanner/graphql-code-generator-java.git#5190df9e4d85191716e812bc8bf4d3fbca4d54aa":
   version "4.0.1"
-  resolved "git+https://github.com/opentripplanner/graphql-code-generator-java.git#f2aa28c2058ee817656e6d6303f3c5fc71682567"
+  resolved "git+https://github.com/opentripplanner/graphql-code-generator-java.git#5190df9e4d85191716e812bc8bf4d3fbca4d54aa"
   dependencies:
     "@graphql-codegen/java-common" "^3.0.0"
     "@graphql-codegen/plugin-helpers" "^3.0.0"
