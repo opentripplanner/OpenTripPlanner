@@ -2,8 +2,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.time.Duration;
 import java.util.Locale;
@@ -14,9 +12,11 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class RouteRequestMapperTransitTest {
 
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.ENGLISH);
+
   @Test
   void testBoardPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var reluctance = 7.5;
     var slack = Duration.ofSeconds(125);
     args.put(
@@ -33,8 +33,8 @@ class RouteRequestMapperTransitTest {
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transferPreferences = routeRequest.preferences().transfer();
     assertEquals(reluctance, transferPreferences.waitReluctance());
     var transitPreferences = routeRequest.preferences().transit();
@@ -43,7 +43,7 @@ class RouteRequestMapperTransitTest {
 
   @Test
   void testAlightPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var slack = Duration.ofSeconds(125);
     args.put(
       "preferences",
@@ -51,15 +51,15 @@ class RouteRequestMapperTransitTest {
         entry("transit", Map.ofEntries(entry("alight", Map.ofEntries(entry("slack", slack)))))
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transitPreferences = routeRequest.preferences().transit();
     assertEquals(slack, transitPreferences.alightSlack().valueOf(TransitMode.BUS));
   }
 
   @Test
   void testTransferPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var cost = Cost.costOfSeconds(75);
     var slack = Duration.ofSeconds(125);
     var maximumAdditionalTransfers = 1;
@@ -83,8 +83,8 @@ class RouteRequestMapperTransitTest {
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transferPreferences = routeRequest.preferences().transfer();
     assertEquals(cost.toSeconds(), transferPreferences.cost());
     assertEquals(slack, transferPreferences.slack());
@@ -94,7 +94,7 @@ class RouteRequestMapperTransitTest {
 
   @Test
   void testTimetablePreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var excludeRealTimeUpdates = true;
     var includePlannedCancellations = true;
     var includeRealTimeCancellations = true;
@@ -116,8 +116,8 @@ class RouteRequestMapperTransitTest {
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transitPreferences = routeRequest.preferences().transit();
     assertEquals(excludeRealTimeUpdates, transitPreferences.ignoreRealtimeUpdates());
     assertEquals(includePlannedCancellations, transitPreferences.includePlannedCancellations());
