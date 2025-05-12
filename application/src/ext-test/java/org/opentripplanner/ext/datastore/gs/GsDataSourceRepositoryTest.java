@@ -9,7 +9,9 @@ import org.opentripplanner.datastore.api.FileType;
 
 public class GsDataSourceRepositoryTest {
 
-  private final GsDataSourceRepository subject = new GsDataSourceRepository(null);
+  private final GsDataSourceRepository subject = new GsDataSourceRepository(
+    GsParameters.defaultValues()
+  );
 
   @Test
   public void description() {

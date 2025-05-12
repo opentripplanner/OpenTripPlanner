@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.ext.datastore.gs.GsParameters;
 
 /**
  * The {@link OtpDataStore} config, needed to create a store. This should be provided by the OTP
@@ -26,7 +27,7 @@ public interface OtpDataStoreConfig {
    * <p>
    * Optional. May return {@code null}.
    */
-  String gsCredentials();
+  GsParameters gsParameters();
 
   /**
    * Array of URIs to the open street map pbf files (the pbf format is the only one supported).

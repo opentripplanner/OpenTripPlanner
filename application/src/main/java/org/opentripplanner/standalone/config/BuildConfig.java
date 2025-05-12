@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.datastore.gs.GsParameters;
 import org.opentripplanner.ext.emission.config.EmissionConfig;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
@@ -48,6 +49,7 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
+import org.opentripplanner.standalone.config.sandbox.GsConfig;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.ObjectUtils;
@@ -137,8 +139,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   private final Pattern demLocalFilePattern;
 
-  private final String gsCredentials;
-
   private final URI streetGraph;
 
   private final URI graph;
@@ -187,6 +187,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final ZoneId transitModelTimeZone;
   private final List<FeedScopedId> transitRouteToStationCentroid;
   public final URI stopConsolidation;
+  private final GsConfig gsParameters;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -557,20 +558,6 @@ public class BuildConfig implements OtpDataStoreConfig {
       )
       .asPattern(DEFAULT_DEM_PATTERN);
 
-    gsCredentials = root
-      .of("gsCredentials")
-      .since(V2_0)
-      .summary("Local file system path to Google Cloud Platform service accounts credentials file.")
-      .description(
-        """
-        The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
-        need to provide a path the the service credentials. Environment variables in the path are
-        resolved.
-
-        This is a path to a file on the local file system, not an URI.
-        """
-      )
-      .asString(null);
     graph = root
       .of("graph")
       .since(V2_0)
@@ -625,6 +612,8 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
+    gsParameters = GsConfig.fromConfig(root, "gsConfig");
+
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
     }
@@ -636,8 +625,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   }
 
   @Override
-  public String gsCredentials() {
-    return gsCredentials;
+  public GsParameters gsParameters() {
+    return gsParameters;
   }
 
   @Override

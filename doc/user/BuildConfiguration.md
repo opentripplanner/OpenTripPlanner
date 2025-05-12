@@ -26,7 +26,6 @@ Sections follow that describe particular settings in more depth.
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)                       |       `double`       | The distance between elevation samples in meters.                                                                                                              | *Optional* | `10.0`                            |  2.0  |
 | embedRouterConfig                                                                         |       `boolean`      | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                                   | *Optional* | `true`                            |  2.0  |
 | [graph](#graph)                                                                           |         `uri`        | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
-| [gsCredentials](#gsCredentials)                                                           |       `string`       | Local file system path to Google Cloud Platform service accounts credentials file.                                                                             | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)                   |       `boolean`      | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
 | maxAreaNodes                                                                              |       `integer`      | Visibility calculations for an area will not be done if there are more nodes than this limit.                                                                  | *Optional* | `200`                             |  2.1  |
 | [maxDataImportIssuesPerFile](#maxDataImportIssuesPerFile)                                 |       `integer`      | When to split the import report.                                                                                                                               | *Optional* | `1000`                            |  2.0  |
@@ -57,6 +56,7 @@ Sections follow that describe particular settings in more depth.
 | [elevationBucket](#elevationBucket)                                                       |       `object`       | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
 | [emission](sandbox/Emission.md)                                                           |       `object`       | Emissions configuration.                                                                                                                                       | *Optional* |                                   |  2.5  |
 | [fares](sandbox/Fares.md)                                                                 |       `object`       | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
+| gsConfig                                                                                  |       `object`       | Configuration for Google Cloud Storage                                                                                                                         | *Optional* |                                   |  2.8  |
 | gtfsDefaults                                                                              |       `object`       | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
 |    blockBasedInterlining                                                                  |       `boolean`      | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
 |    [discardMinTransferTimes](#gd_discardMinTransferTimes)                                 |       `boolean`      | Should minimum transfer times in GTFS files be discarded.                                                                                                      | *Optional* | `false`                           |  2.3  |
@@ -452,20 +452,6 @@ The default is the approximate resolution of 1/3 arc-second NED data. This shoul
 URI to the graph object file for reading and writing.
 
 The file is created or overwritten if OTP saves the graph to the file.
-
-<h3 id="gsCredentials">gsCredentials</h3>
-
-**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Local file system path to Google Cloud Platform service accounts credentials file.
-
-The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
-need to provide a path the the service credentials. Environment variables in the path are
-resolved.
-
-This is a path to a file on the local file system, not an URI.
-
 
 <h3 id="includeEllipsoidToGeoidDifference">includeEllipsoidToGeoidDifference</h3>
 
