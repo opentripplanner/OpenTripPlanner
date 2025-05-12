@@ -1,10 +1,14 @@
 package org.opentripplanner.service.vehiclerental.street;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
@@ -18,6 +22,10 @@ import org.opentripplanner.street.search.state.StateEditor;
 public class VehicleRentalEdge extends Edge {
 
   public final RentalFormFactor formFactor;
+  /**
+   * Defines how long a vehicle has to be available relative to the start time of the routing.
+   */
+  private static final int MIN_TIME_WINDOW_HOURS = 6;
 
   private VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
     super(vertex, vertex);
@@ -75,7 +83,7 @@ public class VehicleRentalEdge extends Edge {
           // traversing from renting to walking.
           if (
             s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network) ||
-            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
+              !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -89,7 +97,7 @@ public class VehicleRentalEdge extends Edge {
         case RENTING_FROM_STATION -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
+              !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
@@ -97,7 +105,7 @@ public class VehicleRentalEdge extends Edge {
           // and so here it is checked if this bicycle could have been kept at the destination
           if (
             s0.mayKeepRentedVehicleAtDestination() &&
-            !station.isArrivingInRentalVehicleAtDestinationAllowed()
+              !station.isArrivingInRentalVehicleAtDestinationAllowed()
           ) {
             return State.empty();
           }
@@ -114,16 +122,26 @@ public class VehicleRentalEdge extends Edge {
         case BEFORE_RENTING -> {
           if (
             (realtimeAvailability && !station.allowPickupNow()) ||
-            !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
+              !station.availablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
+            Instant departureTime = s0.getTime().plus(preferences.pickupTime());
+            OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
+              departureTime,
+              ZoneId.systemDefault()
+            ).plusHours(MIN_TIME_WINDOW_HOURS);
+            VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
+            OffsetDateTime availableUntil = vehicleRentalVehicle.getAvailableUntil();
+            if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {
+              return State.empty();
+            }
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
               preferences.allowArrivingInRentedVehicleAtDestination() &&
-              station.isArrivingInRentalVehicleAtDestinationAllowed();
+                station.isArrivingInRentalVehicleAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
           }
           pickedUp = true;
