@@ -28,7 +28,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
   private VehicleRentalSystem system = null;
   private String network = NETWORK_1;
   private static final OffsetDateTime DEFAULT_AVAILABLE_UNTIL = OffsetDateTime.of(
-    LocalDateTime.of(LocalDate.of(2025, 1, 1), LocalTime.MIN),
+    LocalDateTime.of(LocalDate.of(2025, 5, 14), LocalTime.MIN),
     ZoneOffset.UTC
   );
 
