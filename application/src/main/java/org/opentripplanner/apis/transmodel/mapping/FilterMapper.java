@@ -10,7 +10,7 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
@@ -26,7 +26,7 @@ class FilterMapper {
   static void mapFilterOldWay(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    RouteRequest request
+    RouteRequestBuilder request
   ) {
     if (
       !(GqlUtil.hasArgument(environment, "modes") &&

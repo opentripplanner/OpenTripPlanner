@@ -14,7 +14,6 @@ import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 public class TripRequestMapper {
 
@@ -23,43 +22,44 @@ public class TripRequestMapper {
    */
   public static RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
-    OtpServerRequestContext serverContext = context.getServerContext();
-    RouteRequest request = serverContext.defaultRouteRequest();
+    var serverContext = context.getServerContext();
+    var requestBuilder = serverContext.defaultRouteRequest().copyOf();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
-    callWith.argument("locale", (String v) -> request.setLocale(Locale.forLanguageTag(v)));
+    callWith.argument("locale", (String v) -> requestBuilder.setLocale(Locale.forLanguageTag(v)));
 
     callWith.argument("from", (Map<String, Object> v) ->
-      request.setFrom(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.setFrom(GenericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("to", (Map<String, Object> v) ->
-      request.setTo(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.setTo(GenericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
-      request.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+      requestBuilder.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
     });
     callWith.argument(TripQuery.TRIP_VIA_PARAMETER, (List<Map<String, Object>> v) -> {
-      request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
+      requestBuilder.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
     });
 
     callWith.argument("dateTime", millisSinceEpoch ->
-      request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      requestBuilder.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
     callWith.argument("bookingTime", millisSinceEpoch ->
-      request.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      requestBuilder.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
-    callWith.argument("searchWindow", (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))
+    callWith.argument("searchWindow", (Integer m) ->
+      requestBuilder.setSearchWindow(Duration.ofMinutes(m))
     );
-    callWith.argument("pageCursor", request::setPageCursorFromEncoded);
-    callWith.argument("timetableView", request::setTimetableView);
-    callWith.argument("wheelchairAccessible", request::setWheelchair);
-    callWith.argument("numTripPatterns", request::setNumItineraries);
-    callWith.argument("arriveBy", request::setArriveBy);
+    callWith.argument("pageCursor", requestBuilder::setPageCursorFromEncoded);
+    callWith.argument("timetableView", requestBuilder::setTimetableView);
+    callWith.argument("wheelchairAccessible", requestBuilder::setWheelchair);
+    callWith.argument("numTripPatterns", requestBuilder::setNumItineraries);
+    callWith.argument("arriveBy", requestBuilder::setArriveBy);
 
-    request.withJourney(journeyBuilder -> {
+    requestBuilder.withJourney(journeyBuilder -> {
       journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
           transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))
@@ -83,7 +83,7 @@ public class TripRequestMapper {
             FilterMapper.mapFilterNewWay(environment.getArgument("filters"))
           );
         } else {
-          FilterMapper.mapFilterOldWay(environment, callWith, request);
+          FilterMapper.mapFilterOldWay(environment, callWith, requestBuilder);
         }
       });
 
@@ -94,10 +94,10 @@ public class TripRequestMapper {
       }
     });
 
-    request.withPreferences(preferences ->
+    requestBuilder.withPreferences(preferences ->
       PreferencesMapper.mapPreferences(environment, callWith, preferences)
     );
 
-    return request;
+    return requestBuilder.build();
   }
 }

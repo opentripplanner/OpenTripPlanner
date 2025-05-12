@@ -180,15 +180,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return bookingTime;
   }
 
-  public RouteRequest setBookingTime(Instant bookingTime) {
-    this.bookingTime = bookingTime;
-    return this;
-  }
-
-  void setPreferences(RoutingPreferences preferences) {
-    this.preferences = preferences;
-  }
-
   /**
    * Whether the trip must be wheelchair-accessible
    */
