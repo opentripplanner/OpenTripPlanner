@@ -43,7 +43,7 @@ public abstract class SiriAzureUpdaterConfig {
         .of("autoDeleteOnIdle")
         .since(V2_5)
         .summary("The time after which an inactive subscription is removed.")
-        .asDuration(Duration.ofHours(1))
+        .asDuration(Duration.ofMinutes(5))
     );
     parameters.setPrefetchCount(
       c

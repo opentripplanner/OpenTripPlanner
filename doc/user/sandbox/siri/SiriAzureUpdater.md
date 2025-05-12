@@ -26,7 +26,7 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 |------------------------------------------------------------|:----------:|------------------------------------------------------------------|:----------:|---------------------|:-----:|
 | type = "siri-azure-et-updater"                             |   `enum`   | The type of the updater.                                         | *Required* |                     |  1.5  |
 | [authenticationType](#u__11__authenticationType)           |   `enum`   | Which authentication type to use                                 | *Optional* | `"sharedaccesskey"` |  2.5  |
-| autoDeleteOnIdle                                           | `duration` | The time after which an inactive subscription is removed.        | *Optional* | `"PT1H"`            |  2.5  |
+| autoDeleteOnIdle                                           | `duration` | The time after which an inactive subscription is removed.        | *Optional* | `"PT5M"`            |  2.5  |
 | [customMidnight](#u__11__customMidnight)                   |  `integer` | Time on which time breaks into new day.                          | *Optional* | `0`                 |  2.2  |
 | feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                      | *Required* |                     |  2.2  |
 | [fullyQualifiedNamespace](#u__11__fullyQualifiedNamespace) |  `string`  | Service Bus fully qualified namespace used for authentication.   | *Optional* |                     |  2.5  |
@@ -114,7 +114,7 @@ Has to be present for authenticationMethod SharedAccessKey. This should be Prima
 |------------------------------------------------------------|:----------:|------------------------------------------------------------------|:----------:|---------------------|:-----:|
 | type = "siri-azure-sx-updater"                             |   `enum`   | The type of the updater.                                         | *Required* |                     |  1.5  |
 | [authenticationType](#u__10__authenticationType)           |   `enum`   | Which authentication type to use                                 | *Optional* | `"sharedaccesskey"` |  2.5  |
-| autoDeleteOnIdle                                           | `duration` | The time after which an inactive subscription is removed.        | *Optional* | `"PT1H"`            |  2.5  |
+| autoDeleteOnIdle                                           | `duration` | The time after which an inactive subscription is removed.        | *Optional* | `"PT5M"`            |  2.5  |
 | [customMidnight](#u__10__customMidnight)                   |  `integer` | Time on which time breaks into new day.                          | *Optional* | `0`                 |  2.2  |
 | feedId                                                     |  `string`  | The ID of the feed to apply the updates to.                      | *Required* |                     |  2.2  |
 | [fullyQualifiedNamespace](#u__10__fullyQualifiedNamespace) |  `string`  | Service Bus fully qualified namespace used for authentication.   | *Optional* |                     |  2.5  |
