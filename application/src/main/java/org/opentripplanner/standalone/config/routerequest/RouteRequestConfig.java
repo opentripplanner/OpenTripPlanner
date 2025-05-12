@@ -150,7 +150,7 @@ public class RouteRequestConfig {
       .asObject();
     request.withJourney(jb ->
       jb.withTransit(b -> {
-        mapTransit(unpreferred, b, request.journey().transit());
+        mapTransit(unpreferred, b, dft.journey().transit());
         TransitGroupPriorityConfig.mapTransitRequest(c, b);
       })
     );
