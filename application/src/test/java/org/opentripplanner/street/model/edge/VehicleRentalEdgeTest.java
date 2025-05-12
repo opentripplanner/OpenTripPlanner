@@ -14,6 +14,7 @@ import static org.opentripplanner.street.model.RentalFormFactor.CAR;
 import static org.opentripplanner.street.model.RentalFormFactor.MOPED;
 import static org.opentripplanner.street.model.RentalFormFactor.SCOOTER;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -155,7 +156,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithFreeFloatingBicycle() {
-    initFreeFloatingEdgeAndRequest(BIKE_RENTAL, BICYCLE, false);
+    initFreeFloatingEdgeAndRequest(BIKE_RENTAL, BICYCLE, false, false);
 
     var s1 = rent();
 
@@ -164,7 +165,12 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithFreeFloatingScooter() {
-    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, false);
+    initFreeFloatingEdgeAndRequest(
+      SCOOTER_RENTAL,
+      SCOOTER,
+      false,
+      false
+    );
 
     var s1 = rent();
 
@@ -173,7 +179,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testRentingWithFreeFloatingCar() {
-    initFreeFloatingEdgeAndRequest(CAR_RENTAL, CAR, false);
+    initFreeFloatingEdgeAndRequest(CAR_RENTAL, CAR, false, false);
 
     var s1 = rent();
 
@@ -191,7 +197,7 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testBannedBicycleNetworkFreeFloating() {
-    initFreeFloatingEdgeAndRequest(BIKE_RENTAL, BICYCLE, true);
+    initFreeFloatingEdgeAndRequest(BIKE_RENTAL, BICYCLE, true, false);
 
     var s1 = rent();
 
@@ -200,7 +206,12 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testBannedScooterNetworkFreeFloating() {
-    initFreeFloatingEdgeAndRequest(SCOOTER_RENTAL, SCOOTER, true);
+    initFreeFloatingEdgeAndRequest(
+      SCOOTER_RENTAL,
+      SCOOTER,
+      true,
+      false
+    );
 
     var s1 = rent();
 
@@ -209,7 +220,16 @@ class VehicleRentalEdgeTest {
 
   @Test
   void testBannedCarNetworkFreeFloating() {
-    initFreeFloatingEdgeAndRequest(CAR_RENTAL, CAR, true);
+    initFreeFloatingEdgeAndRequest(CAR_RENTAL, CAR, true, false);
+
+    var s1 = rent();
+
+    assertTrue(State.isEmpty(s1));
+  }
+
+  @Test
+  void testWithFreeFloatingVehicleWithoutRequiredAvailability() {
+    initFreeFloatingEdgeAndRequest(StreetMode.CAR_RENTAL, RentalFormFactor.CAR, false, true);
 
     var s1 = rent();
 
@@ -341,9 +361,12 @@ class VehicleRentalEdgeTest {
   private void initFreeFloatingEdgeAndRequest(
     StreetMode mode,
     RentalFormFactor formFactor,
-    boolean banNetwork
+    boolean banNetwork,
+    boolean tooEarlyAvailableUntil
   ) {
-    this.vertex = StreetModelForTest.rentalVertex(formFactor);
+    this.vertex = tooEarlyAvailableUntil
+      ? StreetModelForTest.rentalVertex(formFactor, OffsetDateTime.MIN)
+      : StreetModelForTest.rentalVertex(formFactor);
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
 
