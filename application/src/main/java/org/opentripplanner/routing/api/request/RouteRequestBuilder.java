@@ -81,9 +81,13 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     return this;
   }
 
-  public RouteRequestBuilder withPreferences(Consumer<RoutingPreferencesBuilder> body) {
-    this.preferences = preferences.copyOf().apply(body).build();
+  public RouteRequestBuilder withPreferences(RoutingPreferences preferences) {
+    this.preferences = preferences;
     return this;
+  }
+
+  public RouteRequestBuilder withPreferences(Consumer<RoutingPreferencesBuilder> body) {
+    return withPreferences(preferences.copyOf().apply(body).build());
   }
 
   public RouteRequestBuilder setBookingTime(Instant bookingTime) {

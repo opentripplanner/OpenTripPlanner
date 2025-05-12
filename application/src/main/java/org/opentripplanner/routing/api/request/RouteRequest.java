@@ -5,7 +5,10 @@ import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -50,8 +53,16 @@ public class RouteRequest implements Cloneable, Serializable {
   private static final int DEFAULT_NUM_ITINERARIES = 50;
   private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
+  private static final Instant DATE_TIME_NOT_SET = LocalDateTime.of(
+    2000,
+    Month.JANUARY,
+    1,
+    0,
+    0,
+    0
+  ).toInstant(ZoneOffset.UTC);
 
-  private static final RouteRequest DEFAULT = new RouteRequest();
+  public static final RouteRequest DEFAULT = new RouteRequest(DATE_TIME_NOT_SET);
 
   private GenericLocation from;
   private GenericLocation to;
@@ -80,16 +91,20 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* CONSTRUCTORS */
 
+  public RouteRequest() {
+    this(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+  }
+
   /**
    * TODO: This is creating an invalid request - validate() is failing, migrate
    *       to use builder(whitch call validate()) and make this private (for DEFAULT only).
    */
-  public RouteRequest() {
+  public RouteRequest(Instant dateTime) {
     // So that they are never null.
     this.from = GenericLocation.UNKNOWN;
     this.to = GenericLocation.UNKNOWN;
     this.via = Collections.emptyList();
-    this.dateTime = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+    this.dateTime = dateTime;
     this.arriveBy = false;
     this.timetableView = true;
     this.searchWindow = null;
@@ -381,6 +396,7 @@ public class RouteRequest implements Cloneable, Serializable {
     return searchWindow;
   }
 
+  @Deprecated
   public void setSearchWindow(@Nullable Duration searchWindow) {
     if (searchWindow != null) {
       if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
@@ -505,18 +521,65 @@ public class RouteRequest implements Cloneable, Serializable {
     this.numItineraries = numItineraries;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    var other = (RouteRequest) o;
+    return (
+      arriveBy == other.arriveBy &&
+      timetableView == other.timetableView &&
+      wheelchair == other.wheelchair &&
+      numItineraries == other.numItineraries &&
+      Objects.equals(from, other.from) &&
+      Objects.equals(to, other.to) &&
+      Objects.equals(via, other.via) &&
+      Objects.equals(dateTime, other.dateTime) &&
+      Objects.equals(searchWindow, other.searchWindow) &&
+      Objects.equals(maxSearchWindow, other.maxSearchWindow) &&
+      Objects.equals(bookingTime, other.bookingTime) &&
+      Objects.equals(pageCursor, other.pageCursor) &&
+      Objects.equals(journey, other.journey) &&
+      Objects.equals(preferences, other.preferences) &&
+      Objects.equals(locale, other.locale)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      from,
+      to,
+      via,
+      dateTime,
+      arriveBy,
+      timetableView,
+      searchWindow,
+      maxSearchWindow,
+      bookingTime,
+      pageCursor,
+      wheelchair,
+      journey,
+      preferences,
+      numItineraries,
+      locale
+    );
+  }
+
   public String toString() {
     return ToStringBuilder.of(RouteRequest.class)
       .addObj("from", from, DEFAULT.from)
       .addObj("to", to, DEFAULT.to)
-      .addDateTime("dateTime", dateTime)
-      .addDateTime("bookingTime", bookingTime)
+      .addCol("via", via)
+      .addDateTime("dateTime", dateTime, DATE_TIME_NOT_SET)
       .addBoolIfTrue("arriveBy", arriveBy)
       .addBoolIfTrue("timetableView: false", !timetableView)
-      .addBoolIfTrue("wheelchair", wheelchair)
       .addDuration("searchWindow", searchWindow)
       .addDuration("maxSearchWindow", maxSearchWindow)
+      .addDateTime("bookingTime", bookingTime)
       .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
+      .addBoolIfTrue("wheelchair", wheelchair)
       .addObj("locale", locale, DEFAULT_LOCALE)
       .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
       .addObj("journey", journey, JourneyRequest.DEFAULT)
@@ -524,8 +587,39 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   private void validate() {
-    validateOriginAndDestination();
+    // TODO: Use the same strateg for all validation of the RouteRequest, currently
+    //       both RoutingError and IllegalArgumentException is used.
+    List<RoutingError> routingErrors = new ArrayList<>(2);
+    routingErrors.addAll(validateFromAndToLocation());
+
     validateSearchWindow();
+
+    if (!routingErrors.isEmpty()) {
+      throw new RoutingValidationException(routingErrors);
+    }
+  }
+
+  /**
+   * Validate that the routing request contains both a from location(origin) and a to
+   * location(destination). Origin and destination can be specified either by a reference to a stop
+   * place or by geographical coordinates. From/to locations are required in a one-to-one
+   * search, but not in a many-to-one or one-to-many(legacy, not supported any more).
+   *
+   * @throws RoutingValidationException if either origin or destination is missing.
+   */
+  public List<RoutingError> validateFromAndToLocation() {
+    List<RoutingError> routingErrors = new ArrayList<>(2);
+
+    if (from == null || !from.isSpecified()) {
+      routingErrors.add(
+        new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
+      );
+    }
+
+    if (to == null || !to.isSpecified()) {
+      routingErrors.add(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE));
+    }
+    return routingErrors;
   }
 
   private void validateSearchWindow() {
@@ -537,6 +631,5 @@ public class RouteRequest implements Cloneable, Serializable {
         throw new IllegalArgumentException("The search window must be a positive duration");
       }
     }
-    this.searchWindow = searchWindow;
   }
 }
