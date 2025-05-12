@@ -24,7 +24,7 @@ import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.Money;
@@ -96,7 +96,7 @@ public class DefaultFareService implements FareService {
   protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
     return fareLegs
       .stream()
-      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+      .collect(Collectors.groupingBy(leg -> leg.agency().getId().getFeedId()));
   }
 
   @Override
@@ -220,7 +220,7 @@ public class DefaultFareService implements FareService {
 
       if (!applicableLegs.isEmpty()) {
         final var use = new FareProductUse(
-          product.uniqueInstanceId(applicableLegs.getFirst().getStartTime()),
+          product.uniqueInstanceId(applicableLegs.getFirst().startTime()),
           product
         );
         applicableLegs.forEach(leg -> {
@@ -255,24 +255,24 @@ public class DefaultFareService implements FareService {
     int transfersUsed = -1;
 
     var firstRide = legs.get(0);
-    ZonedDateTime startTime = firstRide.getStartTime();
-    String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
+    ZonedDateTime startTime = firstRide.startTime();
+    String startZone = firstRide.from().stop.getFirstZoneAsString();
     String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getAgency().getId().getFeedId();
+    String feedId = firstRide.agency().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-      if (!leg.getAgency().getId().getFeedId().equals(feedId)) {
+      if (!leg.agency().getId().getFeedId().equals(feedId)) {
         LOG.debug("skipped multi-feed ride sequence {}", legs);
         return Optional.empty();
       }
-      lastRideStartTime = leg.getStartTime();
-      lastRideEndTime = leg.getEndTime();
-      endZone = leg.getTo().stop.getFirstZoneAsString();
-      routes.add(leg.getRoute().getId());
-      trips.add(leg.getTrip().getId());
-      for (FareZone z : leg.getFareZones()) {
+      lastRideStartTime = leg.startTime();
+      lastRideEndTime = leg.endTime();
+      endZone = leg.to().stop.getFirstZoneAsString();
+      routes.add(leg.route().getId());
+      trips.add(leg.trip().getId());
+      for (FareZone z : leg.fareZones()) {
         zones.add(z.getId().getId());
       }
       transfersUsed += 1;
