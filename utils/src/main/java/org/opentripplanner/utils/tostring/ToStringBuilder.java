@@ -259,6 +259,10 @@ public class ToStringBuilder {
     return addIfNotNull(name, time, Instant::toString);
   }
 
+  public ToStringBuilder addDateTime(String name, Instant time, Instant ignoreValue) {
+    return addIfNotIgnored(name, time, ignoreValue, Instant::toString);
+  }
+
   /**
    * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss. Note! The
    * DATE is not printed. {@code null} value is ignored.
