@@ -16,6 +16,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -27,9 +28,10 @@ public class RouteRequestMapper {
     DataFetchingEnvironment environment,
     GraphQLRequestContext context
   ) {
-    RouteRequest request = context.defaultRouteRequest();
+    var request = context.defaultRouteRequest().copyOf();
     var args = new GraphQLTypes.GraphQLQueryTypePlanConnectionArgs(environment.getArguments());
     var dateTime = args.getGraphQLDateTime();
+
     if (dateTime.getGraphQLEarliestDeparture() != null) {
       request.setDateTime(args.getGraphQLDateTime().getGraphQLEarliestDeparture().toInstant());
     } else if (dateTime.getGraphQLLatestArrival() != null) {
@@ -38,6 +40,9 @@ public class RouteRequestMapper {
     } else {
       request.setDateTime(Instant.now());
     }
+
+    boolean isTripPlannedForNow = RouteRequest.isAPIGtfsTripPlannedForNow(request.dateTime());
+
     request.setFrom(parseGenericLocation(args.getGraphQLOrigin()));
     request.setTo(parseGenericLocation(args.getGraphQLDestination()));
     request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
@@ -61,7 +66,9 @@ public class RouteRequestMapper {
       request.setNumItineraries(args.getGraphQLFirst());
     }
 
-    request.withPreferences(preferences -> setPreferences(preferences, request, args, environment));
+    request.withPreferences(preferences ->
+      setPreferences(preferences, request, isTripPlannedForNow, args, environment)
+    );
 
     request.withJourney(journeyRequestBuilder ->
       setModes(journeyRequestBuilder, args.getGraphQLModes(), environment)
@@ -69,12 +76,13 @@ public class RouteRequestMapper {
 
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));
-    return request;
+    return request.build();
   }
 
   private static void setPreferences(
     RoutingPreferencesBuilder prefs,
-    RouteRequest request,
+    RouteRequestBuilder requestBuilder,
+    boolean isTripPlannedForNow,
     GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args,
     DataFetchingEnvironment environment
   ) {
@@ -85,8 +93,13 @@ public class RouteRequestMapper {
     prefs.withTransit(transit -> {
       prefs.withTransfer(transfer -> setTransitPreferences(transit, transfer, args, environment));
     });
-    setStreetPreferences(prefs, request, preferenceArgs.getGraphQLStreet(), environment);
-    setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
+    setStreetPreferences(
+      prefs,
+      isTripPlannedForNow,
+      preferenceArgs.getGraphQLStreet(),
+      environment
+    );
+    setAccessibilityPreferences(requestBuilder, preferenceArgs.getGraphQLAccessibility());
   }
 
   private static void setItineraryFilters(
@@ -113,11 +126,11 @@ public class RouteRequestMapper {
 
   private static void setStreetPreferences(
     RoutingPreferencesBuilder preferences,
-    RouteRequest request,
+    boolean isTripPlannedForNow,
     GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
     DataFetchingEnvironment environment
   ) {
-    setRentalAvailabilityPreferences(preferences, request);
+    setRentalAvailabilityPreferences(preferences, isTripPlannedForNow);
 
     if (args == null) {
       return;
@@ -133,28 +146,25 @@ public class RouteRequestMapper {
 
   private static void setRentalAvailabilityPreferences(
     RoutingPreferencesBuilder preferences,
-    RouteRequest request
+    boolean isTripPlannedForNow
   ) {
     preferences.withBike(bike ->
-      bike.withRental(rental -> rental.withUseAvailabilityInformation(request.isTripPlannedForNow())
-      )
+      bike.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
     );
     preferences.withCar(car ->
-      car.withRental(rental -> rental.withUseAvailabilityInformation(request.isTripPlannedForNow()))
+      car.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
     );
     preferences.withScooter(scooter ->
-      scooter.withRental(rental ->
-        rental.withUseAvailabilityInformation(request.isTripPlannedForNow())
-      )
+      scooter.withRental(rental -> rental.withUseAvailabilityInformation(isTripPlannedForNow))
     );
   }
 
   private static void setAccessibilityPreferences(
-    RouteRequest request,
+    RouteRequestBuilder requestBuilder,
     GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
   ) {
     if (preferenceArgs != null && preferenceArgs.getGraphQLWheelchair() != null) {
-      request.setWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled());
+      requestBuilder.setWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled());
     }
   }
 
@@ -185,7 +195,7 @@ public class RouteRequestMapper {
     );
   }
 
-  static void mapViaPoints(RouteRequest request, List<Map<String, Object>> via) {
+  static void mapViaPoints(RouteRequestBuilder request, List<Map<String, Object>> via) {
     request.setViaLocations(ViaLocationMapper.mapToViaLocations(via));
   }
 }

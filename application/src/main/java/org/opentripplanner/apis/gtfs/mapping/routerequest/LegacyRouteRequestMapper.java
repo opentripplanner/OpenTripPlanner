@@ -21,6 +21,7 @@ import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
@@ -39,7 +40,7 @@ public class LegacyRouteRequestMapper {
     DataFetchingEnvironment environment,
     GraphQLRequestContext context
   ) {
-    RouteRequest request = context.defaultRouteRequest();
+    var request = context.defaultRouteRequest().copyOf();
 
     CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
@@ -60,6 +61,7 @@ public class LegacyRouteRequestMapper {
       environment.getArgument("time"),
       ZoneIdFallback.zoneId(context.transitService().getTimeZone())
     );
+    boolean isTripPlannedForNow = RouteRequest.isAPIGtfsTripPlannedForNow(request.dateTime());
 
     callWith.argument("wheelchair", request::setWheelchair);
     callWith.argument("numItineraries", request::setNumItineraries);
@@ -88,14 +90,14 @@ public class LegacyRouteRequestMapper {
         }
 
         bike.withParking(parking -> setParkingPreferences(callWith, parking));
-        bike.withRental(rental -> setRentalPreferences(callWith, request, rental));
+        bike.withRental(rental -> setRentalPreferences(callWith, isTripPlannedForNow, rental));
         bike.withWalking(walking -> setVehicleWalkingPreferences(callWith, walking));
       });
 
       preferences.withCar(car -> {
         callWith.argument("carReluctance", car::withReluctance);
         car.withParking(parking -> setParkingPreferences(callWith, parking));
-        car.withRental(rental -> setRentalPreferences(callWith, request, rental));
+        car.withRental(rental -> setRentalPreferences(callWith, isTripPlannedForNow, rental));
       });
 
       preferences.withScooter(scooter -> {
@@ -117,7 +119,7 @@ public class LegacyRouteRequestMapper {
           });
         }
 
-        scooter.withRental(rental -> setRentalPreferences(callWith, request, rental));
+        scooter.withRental(rental -> setRentalPreferences(callWith, isTripPlannedForNow, rental));
       });
 
       preferences.withWalk(b -> {
@@ -246,10 +248,10 @@ public class LegacyRouteRequestMapper {
     callWith.argument("locale", (String v) ->
       request.setLocale(GraphQLUtils.getLocale(environment, v))
     );
-    return request;
+    return request.build();
   }
 
-  static void mapViaLocations(RouteRequest request, DataFetchingEnvironment env) {
+  static void mapViaLocations(RouteRequestBuilder request, DataFetchingEnvironment env) {
     var args = env.getArgument("via");
     var locs = ViaLocationMapper.mapToViaLocations((List<Map<String, Object>>) args);
     request.setViaLocations(locs);
@@ -294,14 +296,14 @@ public class LegacyRouteRequestMapper {
 
   private static void setRentalPreferences(
     CallerWithEnvironment callWith,
-    RouteRequest request,
+    boolean isTripPlannedForNow,
     VehicleRentalPreferences.Builder rental
   ) {
     callWith.argument(
       "keepingRentedBicycleAtDestinationCost",
       rental::withArrivingInRentalVehicleAtDestinationCost
     );
-    rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
+    rental.withUseAvailabilityInformation(isTripPlannedForNow);
     callWith.argument(
       "allowKeepingRentedBicycleAtDestination",
       rental::withAllowArrivingInRentedVehicleAtDestination

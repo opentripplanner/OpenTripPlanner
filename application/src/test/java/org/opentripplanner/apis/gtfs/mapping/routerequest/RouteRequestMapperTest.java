@@ -36,7 +36,6 @@ class RouteRequestMapperTest {
     assertEquals(testCtx.locale(), routeRequest.locale());
     assertEquals(defaultRequest.wheelchair(), routeRequest.wheelchair());
     assertEquals(defaultRequest.arriveBy(), routeRequest.arriveBy());
-    assertEquals(defaultRequest.isTripPlannedForNow(), routeRequest.isTripPlannedForNow());
     assertEquals(defaultRequest.numItineraries(), routeRequest.numItineraries());
     assertEquals(defaultRequest.searchWindow(), routeRequest.searchWindow());
     assertEquals(defaultRequest.journey().modes(), routeRequest.journey().modes());
@@ -77,7 +76,7 @@ class RouteRequestMapperTest {
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertFalse(routeRequest.arriveBy());
-    assertFalse(routeRequest.isTripPlannedForNow());
+    assertFalse(routeRequest.isAPIGtfsTripPlannedForNow(routeRequest.dateTime()));
   }
 
   @Test
@@ -89,7 +88,7 @@ class RouteRequestMapperTest {
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     assertEquals(dateTime.toInstant(), routeRequest.dateTime());
     assertTrue(routeRequest.arriveBy());
-    assertFalse(routeRequest.isTripPlannedForNow());
+    assertFalse(routeRequest.isAPIGtfsTripPlannedForNow(routeRequest.dateTime()));
   }
 
   @Test

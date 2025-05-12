@@ -105,4 +105,19 @@ class _RouteRequestTestContext {
       .localContext(Map.of("locale", locale))
       .build();
   }
+
+  /**
+   * Add all requiered parameters to a request to bypass the validation.
+   */
+  private static Map<String, Object> decorateWithRequierdParameters(Map<String, Object> params) {
+    var map = new HashMap<>(params);
+
+    if (!(params.containsKey("from") || params.containsKey("fromPlace"))) {
+      map.put("fromPlace", "F:Stop:1");
+    }
+    if (!(params.containsKey("to") || params.containsKey("toPlace"))) {
+      map.put("toPlace", "F:Stop:2");
+    }
+    return map;
+  }
 }

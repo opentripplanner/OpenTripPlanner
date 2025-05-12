@@ -100,6 +100,10 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     return this;
   }
 
+  public Instant dateTime() {
+    return dateTime;
+  }
+
   /**
    * The dateTime will be set to a whole number of seconds. We don't do sub-second accuracy,
    * and if we set the millisecond part to a non-zero value, rounding will not be guaranteed

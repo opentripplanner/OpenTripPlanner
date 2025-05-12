@@ -149,12 +149,8 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* ACCESSOR/SETTER METHODS */
 
-  public void setJourney(JourneyRequest journey) {
-    this.journey = journey;
-  }
-
   public RouteRequest withJourney(Consumer<JourneyRequestBuilder> body) {
-    setJourney(journey.copyOf().apply(body).build());
+    this.journey = journey.copyOf().apply(body).build();
     return this;
   }
 
@@ -234,7 +230,7 @@ public class RouteRequest implements Cloneable, Serializable {
   /**
    * Is the trip originally planned withing the previous/next 15h?
    */
-  public boolean isTripPlannedForNow() {
+  public static boolean isAPIGtfsTripPlannedForNow(Instant dateTime) {
     return Duration.between(dateTime, Instant.now()).abs().toSeconds() < NOW_THRESHOLD_SEC;
   }
 
