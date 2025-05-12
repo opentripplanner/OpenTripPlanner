@@ -18,7 +18,7 @@ To enable this turn on `TriasApi` as a feature in `otp-config.json`.
 ### URLs
 
 - Endpoint: `http://localhost:8080/otp/trias/v1/`
-- API Explorer: `http://localhost:8080/otp/trias/v1/explorer`
+- Visual API Explorer: `http://localhost:8080/otp/trias/v1/explorer`
 
 ## Configuration
 
