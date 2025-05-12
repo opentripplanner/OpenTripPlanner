@@ -134,11 +134,6 @@ query TransmodelExampleQuery {
       updateURL();
     }
 
-    function onEditOperationName(newOperationName) {
-      parameters.operationName = newOperationName;
-      updateURL();
-    }
-
     function onEditHeaders(headers) {
       parameters.headers = headers;
       updateURL();
@@ -214,10 +209,8 @@ query TransmodelExampleQuery {
               query: parameters.query || defaultQueries[apiFlavor],
               variables: parameters.variables,
               headers: parameters.headers,
-              operationName: parameters.operationName,
               onEditQuery: onEditQuery,
               onEditVariables: onEditVariables,
-              onEditOperationName: onEditOperationName,
               onEditHeaders: onEditHeaders,
               defaultEditorToolsVisibility: true
             },
