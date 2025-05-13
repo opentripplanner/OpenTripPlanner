@@ -90,9 +90,9 @@ public class ServerConfig implements OTPWebApplicationParameters {
             .summary("The log event key used.")
             .description(
               """
-              OTP stores the key/value pair in the log MDC(Mapped Diagnostic Context). To use it you normally
-              include the key in the log pattern like this: `%X{LOG-KEY}`. See your log framework for details.
-              Only log4j and logback support this.
+              OTP stores the key/value pair in the log MDC (Mapped Diagnostic Context). To use it
+              you normally include the key in the log pattern like this: `%X{LOG-KEY}`. See your
+              log framework for details. Only log4j and logback support this.
               """
             )
             .asString(null),

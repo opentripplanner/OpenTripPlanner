@@ -113,7 +113,7 @@ public enum ConfigType {
 
       Examples: `0s + 2.5t`, `10m + 0 x` and `1h5m59s + 9.9t`
 
-      The `constant` must be 0 or a positive number(seconds) or a duration.
+      The `constant` must be 0 or a positive number (seconds) or a duration.
       The `coefficient` must be in range: [0.0, 100.0]
     """
   ),

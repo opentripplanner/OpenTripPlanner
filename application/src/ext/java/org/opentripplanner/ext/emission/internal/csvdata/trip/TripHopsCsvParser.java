@@ -24,7 +24,7 @@ class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
   private static final IntRange STOP_SEQ_NR_RANGE = IntRange.ofInclusive(0, 10_000);
 
   /**
-   * Electrical vihecles can charge while going downhill, hence the negative range.
+   * Electrical vehicles can charge while going downhill, hence the negative range.
    */
   private static final DoubleRange CO2_RANGE = DoubleRange.of(-1_000_000.0, 1_000_000_000.0);
 

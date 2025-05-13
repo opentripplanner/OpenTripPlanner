@@ -11,6 +11,7 @@ import org.opentripplanner.framework.error.WordList;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.lang.IntRange;
 
@@ -35,7 +36,7 @@ class EmissionAggregator {
     this.tripId = tripId;
     this.stops = stops;
 
-    if (this.stops == null || this.stops.isEmpty()) {
+    if (CollectionUtils.isEmpty(this.stops)) {
       this.emissions = null;
       this.counts = null;
       this.fromStopSequenceRange = null;
@@ -111,7 +112,8 @@ class EmissionAggregator {
     errors.add(
       OtpError.of(
         "EmissionMissingTripStopPattern",
-        "No trip with stop pattern found for trip(%s). Trip or stop-pattern is missing. The trip is skipped.",
+        "No trip with stop pattern found for trip (%s). Trip or stop-pattern is missing. " +
+        "The trip is skipped.",
         tripId
       )
     );
@@ -121,7 +123,7 @@ class EmissionAggregator {
     errors.add(
       OtpError.of(
         "EmissionStopSeqNr",
-        "The emission 'from_stop_sequence'(%d) is out of bounds%s: %s",
+        "The emission 'from_stop_sequence' (%d) is out of bounds %s: %s",
         row.fromStopSequence(),
         fromStopSequenceRange,
         row.toString()
@@ -133,7 +135,7 @@ class EmissionAggregator {
     errors.add(
       OtpError.of(
         "EmissionStopIdMismatch",
-        "Emission 'from_stop_id'(%s) not found in stop pattern for trip(%s): %s",
+        "Emission 'from_stop_id' (%s) not found in stop pattern for trip (%s): %s",
         row.fromStopId(),
         tripId,
         row.toString()
@@ -142,9 +144,9 @@ class EmissionAggregator {
   }
 
   /**
-   * Perform sematic validation AFTER all data is added. Currently all sematic issues are warings,
-   * not errors. The subclass is used to scope the semantic validation and make sure it is
-   * performed once.
+   * Perform semantic validation AFTER all data is added. Currently all semantic issues are
+   * warnings, not errors. The subclass is used to scope the semantic validation and make sure it
+   * is performed once.
    */
   class SemanticValidation {
 
@@ -171,8 +173,8 @@ class EmissionAggregator {
       warnings.add(
         OtpError.of(
           "EmissionMissingTripHop",
-          "Warning! All hops in a trip(%s) should have an emission value. Hop %s does not have " +
-          "an emission value.",
+          "Warning! All hops in a trip (%s) should have an emission value. " +
+          "Hop %s does not have an emission value.",
           tripId,
           buf.toString()
         )
@@ -185,7 +187,7 @@ class EmissionAggregator {
           OtpError.of(
             "EmissionTripHopDuplicates",
             "Warning! The emission import contains duplicate rows for the same hop for " +
-            "trip(%s). An average value is used.",
+            "trip (%s). An average value is used.",
             tripId
           )
         );

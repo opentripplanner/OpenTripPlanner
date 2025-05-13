@@ -884,26 +884,28 @@ type QueryType {
     """
     The length of the search-window in minutes. This parameter is optional.
     
-    The search-window is defined as the duration between the earliest-departure-time(EDT) and
-    the latest-departure-time(LDT). OTP will search for all itineraries in this departure
-    window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP
-    will dynamically calculate the EDT. Using a short search-window is faster than using a
-    longer one, but the search duration is not linear. Using a "too" short search-window will
-    waste resources server side, while using a search-window that is too long will be slow.
+    The search-window is defined as the duration between the earliest-departure-time (EDT)
+    and the latest-departure-time (LDT). OTP will search for all itineraries in this
+    departure window. If `arriveBy=true` the `dateTime` parameter is the
+    latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short
+    search-window is faster than using a longer one, but the search duration is not linear.
+    Using a "too" short search-window will waste resources server side, while using a
+    search-window that is too long will be slow.
     
-    OTP will dynamically calculate a reasonable value for the search-window, if not provided. The
-    calculation comes with a significant overhead (10-20% extra). Whether you should use the
-    dynamic calculated value or pass in a value depends on your use-case. For a travel planner
-    in a small geographical area, with a dense network of public transportation, a fixed value
-    between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it
-    so that the number of itineraries on average is around the wanted `numTripPatterns`. Make
-    sure you set the `numTripPatterns` to a high number while testing. For a country wide area like
-    Norway, using the dynamic search-window is the best.
+    OTP will dynamically calculate a reasonable value for the search-window, if not
+    provided. The calculation comes with a significant overhead (10-20% extra). Whether
+    you should use the dynamic calculated value or pass in a value depends on your use-case.
+    For a travel planner in a small geographical area, with a dense network of public
+    transportation, a fixed value between 40 minutes and 2 hours makes sense. To find the
+    appropriate search-window, adjust it so that the number of itineraries on average is
+    around the wanted `numTripPatterns`. Make sure you set the `numTripPatterns` to a high
+    number while testing. For a country wide area like Norway, using the dynamic
+    search-window is the best.
     
-    When paginating, the search-window is calculated using the `numTripPatterns` in the original
-    search together with statistics from the search for the last page. This behaviour is
-    configured server side, and can not be overridden from the client. The paging may even
-    exceed the maximum value.
+    When paginating, the search-window is calculated using the `numTripPatterns` in the
+    original search together with statistics from the search for the last page. This
+    behaviour is configured server side, and can not be overridden from the client. The
+    paging may even exceed the maximum value.
     
     The search-window used is returned to the response metadata as `searchWindowUsed`.
     This can be used by the client to calculate the when the next page start/end.
@@ -916,7 +918,7 @@ type QueryType {
     """
     searchWindow: Int,
     """
-    Search for the best trip options within a time window. If `true` two TripPatterns are considered optimal if one is better on arrival time(earliest wins) and the other is better on departure time(latest wins).In combination with `arriveBy` this parameter cover the following 3 use cases:
+    Search for the best trip options within a time window. If `true` two TripPatterns are considered optimal if one is better on arrival time(earliest wins) and the other is better on departure time (latest wins).In combination with `arriveBy` this parameter cover the following 3 use cases:
     
     
       - Traveler want to find the best alternative within a time window. Set     `timetableView=true` and `arriveBy=false`. This is the default, and if     the intention of the traveler is unknown it gives the best result,     because it includes the two next use-cases. This option also work well     with paging. Setting the `arriveBy=true`, covers the same use-case, but     the input time is interpreted as latest-arrival-time, and not     earliest-departure-time.
@@ -969,16 +971,33 @@ type QueryType {
     """
     The length of the search-window. This parameter is optional.
     
-    The search-window is defined as the duration between the earliest-departure-time(EDT) and the latest-departure-time(LDT). OTP will search for all itineraries in this departure window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short search-window is faster than using a longer one, but the search duration is not linear. Using a "too" short search-window will waste resources server side, while using a search-window that is too long will be slow.
+    The search-window is defined as the duration between the earliest-departure-time (EDT)
+    and the latest-departure-time (LDT). OTP will search for all itineraries in this
+    departure window. If `arriveBy=true` the `dateTime` parameter is the
+    latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short
+    search-window is faster than using a longer one, but the search duration is not linear.
+    Using a "too" short search-window will waste resources server side, while using a
+    search-window that is too long will be slow.
     
-    OTP will dynamically calculate a reasonable value for the search-window, if not provided. The calculation comes with a significant overhead (10-20% extra). Whether you should use the dynamic calculated value or pass in a value depends on your use-case. For a travel planner in a small geographical area, with a dense network of public transportation, a fixed value between 40 minutes and 2 hours makes sense. To find the appropriate search-window, adjust it so that the number of itineraries on average is around the wanted `numItineraries`. Make sure you set the `numItineraries` to a high number while testing. For a country wide area like Norway, using the dynamic search-window is the best.
+    OTP will dynamically calculate a reasonable value for the search-window, if not
+    provided. The calculation comes with a significant overhead (10-20% extra). Whether you
+    should use the dynamic calculated value or pass in a value depends on your use-case.
+    For a travel planner in a small geographical area, with a dense network of public
+    transportation, a fixed value between 40 minutes and 2 hours makes sense. To find the
+    appropriate search-window, adjust it so that the number of itineraries on average is
+    around the wanted `numItineraries`. Make sure you set the `numItineraries` to a high
+    number while testing. For a country wide area like Norway, using the dynamic
+    search-window is the best.
     
-    When paginating, the search-window is calculated using the `numItineraries` in the original search together with statistics from the search for the last page. This behaviour is configured server side, and can not be overridden from the client.
+    When paginating, the search-window is calculated using the `numItineraries` in the
+    original search together with statistics from the search for the last page. This
+    behaviour is configured server side, and can not be overridden from the client.
     
-    The search-window used is returned to the response metadata as `searchWindowUsed` for debugging purposes.
+    The search-window used is returned to the response metadata as `searchWindowUsed` for
+    debugging purposes.
     """
     searchWindow: Duration!,
-    "The requests for the individual segments of the search. The first segment is from the start location(`from`) to the first entry in the `via` locations list and the last is from the last entry in the `via` locations list to the end location(`to`). Note that the list must have length of exactly one greater than the `via` field."
+    "The requests for the individual segments of the search. The first segment is from the start location (`from`) to the first entry in the `via` locations list and the last is from the last entry in the `via` locations list to the end location (`to`). Note that the list must have length of exactly one greater than the `via` field."
     segments: [ViaSegmentInput!],
     "The destination location"
     to: Location!,
@@ -1281,7 +1300,7 @@ type TimePenaltyWithCost {
   """
   The time-penalty is applied to either the access-legs and/or egress-legs. Both access
   and egress may contain more than one leg; Hence, the penalty is not a field on leg. The
-  `appliedTo` describe witch part of the itinerary that this instance applies to.
+  `appliedTo` describe which part of the itinerary that this instance applies to.
   """
   appliedTo: String
   """
@@ -1295,7 +1314,7 @@ type TimePenaltyWithCost {
   generalizedCostDelta: Int
   """
   The time-penalty added to the actual time/duration when comparing the itinerary with
-  other itineraries. This is used to decide witch is the best option, but is not visible
+  other itineraries. This is used to decide which is the best option, but is not visible
   - the actual departure and arrival-times are not modified.
   """
   timePenalty: String
@@ -1378,7 +1397,7 @@ type TripPattern {
   "Duration of the trip, in seconds."
   duration: Long
   """
-  The total emission per preson. The total emission is only available if all transit
+  The total emission per person. The total emission is only available if all transit
   and car leg emissions can be calculated. If only a partial result is obtained, this
   will be null.
   """
@@ -1397,7 +1416,7 @@ type TripPattern {
   legs: [Leg!]!
   "Time that the trip departs."
   startTime: DateTime @deprecated(reason : "Replaced with expectedStartTime")
-  "How far the user has to walk, bike and/or drive in meters. It includes all street(none transit) modes."
+  "How far the user has to walk, bike and/or drive in meters. It includes all street (none transit) modes."
   streetDistance: Float
   "Get all system notices."
   systemNotices: [SystemNotice!]!
@@ -2013,9 +2032,9 @@ Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`
 scalar DateTime
 
 """
-A double function `f(t)` is used to calculate a value based on a variable(t). The variable can
+A double function `f(t)` is used to calculate a value based on a variable (t). The variable can
 be the duration/time or cost for a leg or section of a path/itinerary. The function
-`f(t) = a + bt` has a constant(a) and a coefficient(b) that will be used in OTP to compute
+`f(t) = a + bt` has a constant (a) and a coefficient (b) that will be used in OTP to compute
 `f(t)`.
 
 Format: `a + b t`. Example: `30m + 2.0 t`. The constant `a` accept both whole numbers and
@@ -2157,7 +2176,7 @@ input PenaltyForStreetMode {
 
 """
 A relax-cost is used to increase the limit when comparing one cost to another cost.
-This is used to include more results into the result. A `ratio=2.0` means a path(itinerary)
+This is used to include more results into the result. A `ratio=2.0` means a path (itinerary)
 with twice as high cost as another one, is accepted. A `constant=$300` means a "fixed"
 constant is added to the limit. A `{ratio=1.0, constant=0}` is said to be the NORMAL relaxed
 cost - the limit is the same as the cost used to calculate the limit. The NORMAL is usually
@@ -2259,7 +2278,7 @@ A via-location is used to specifying a location as an intermediate place the rou
 route through. The via-location is either a pass-through-location or a visit-via-location.
 """
 input TripViaLocationInput @oneOf {
-  "Board, alight or pass-through(on-board) at the stop location."
+  "Board, alight or pass-through (on-board) at the stop location."
   passThrough: TripPassThroughViaLocationInput
   "Board or alight at a stop location or visit a coordinate."
   visit: TripVisitViaLocationInput
@@ -2268,7 +2287,7 @@ input TripViaLocationInput @oneOf {
 """
 A visit-via-location is a physical visit to one of the stop locations or coordinates listed. An
 on-board visit does not count, the traveler must alight or board at the given stop for it to to
-be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
+be accepted. To visit a coordinate, the traveler must walk (bike or drive) to the closest point
 in the street network from a stop and back to another stop to join the transit network.
 """
 input TripVisitViaLocationInput {

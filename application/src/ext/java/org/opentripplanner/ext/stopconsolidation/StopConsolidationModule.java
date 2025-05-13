@@ -55,7 +55,7 @@ public class StopConsolidationModule implements GraphBuilderModule {
       .stream()
       .filter(pattern -> pattern.containsAnyStopId(stopsToReplace))
       .forEach(pattern -> {
-        LOG.info("Replacing stop(s) in pattern {}", pattern);
+        LOG.info("Replacing stop (s) in pattern {}", pattern);
         var modifiedPattern = modifyStopsInPattern(pattern, replacements);
         timetableRepository.addTripPattern(modifiedPattern.getId(), modifiedPattern);
       });

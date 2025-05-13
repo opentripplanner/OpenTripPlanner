@@ -86,9 +86,9 @@ class TripHopMapperTest {
     assertTrue(result.isEmpty());
     assertEquals(
       List.of(
-        "Emission 'from_stop_id'(B) not found in stop pattern for trip(E:T:2): " +
+        "Emission 'from_stop_id' (B) not found in stop pattern for trip (E:T:2): " +
         "TripHopsRow[tripId=T:2, fromStopId=B, fromStopSequence=1, co2=2g]",
-        "The emission 'from_stop_sequence'(4) is out of bounds[1, 3]: " +
+        "The emission 'from_stop_sequence' (4) is out of bounds [1, 3]: " +
         "TripHopsRow[tripId=T:1, fromStopId=A, fromStopSequence=4, co2=2g]"
       ),
       issueStore.listIssues().stream().map(DataImportIssue::getMessage).toList()

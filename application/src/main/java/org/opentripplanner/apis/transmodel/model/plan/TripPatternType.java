@@ -134,7 +134,7 @@ public class TripPatternType {
           .name("streetDistance")
           .description(
             "How far the user has to walk, bike and/or drive in meters. It includes " +
-            "all street(none transit) modes."
+            "all street (none transit) modes."
           )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> itinerary(env).totalStreetDistanceMeters())
@@ -231,7 +231,7 @@ public class TripPatternType {
           .name("emission")
           .description(
             """
-            The total emission per preson. The total emission is only available if all transit
+            The total emission per person. The total emission is only available if all transit
             and car leg emissions can be calculated. If only a partial result is obtained, this
             will be null.
             """

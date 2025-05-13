@@ -25,7 +25,7 @@ public class GtfsFeedIdResolver {
   private static Map<Object, String> FEED_ID_MAP = Collections.synchronizedMap(new HashMap<>());
 
   /**
-   * Extracts a feed_id from the passed source for a GTFS feed. If not feedId exist an id is
+   * Extracts a feed_id from the passed source for a GTFS feed. If no feedId exist an id is
    * generated. The {@code dataSourceId} is used to ensure the same feedId is used even if a
    * datasource is read more than once.
    * <p>
@@ -38,11 +38,11 @@ public class GtfsFeedIdResolver {
    * <h5>THIS METHOD IS THREAD SAFE!</h5>
    * <p>
    * The generated {@code feedId}s are cached in a synchronized map and only inserted if it does
-   * not exist already. The single access point(this method) gurantee thread-safty.
+   * not exist already. The single access point(this method) guarantee thread-safety.
    * </p>
    *
    * @param source the input source
-   * @param dataSourceId Any id witch identyfy the datasorce, for example the URI.
+   * @param dataSourceId Any id which identify the data sorce, for example the URI.
    * @return A GtfsFeedId
    * @see <a href="http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
    */
