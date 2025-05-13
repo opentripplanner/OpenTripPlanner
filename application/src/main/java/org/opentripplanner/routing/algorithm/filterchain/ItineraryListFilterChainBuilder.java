@@ -274,8 +274,9 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Paging stores information from the original search for use with related requests.
-   * This subscriber stores the input needed for creating the page cursor.
+   * The Paging module (the subscriber) needs information from the itinerary filtering for use
+   * with next/previous requests. This method is used to register a callback to avoid circular
+   * dependencies between the paging module and the itinerary-filter-chain.
    */
   public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
     Consumer<PageCursorInput> pageCursorInputSubscriber
