@@ -24,8 +24,9 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class ExtraJourneyTest implements RealtimeTestConstants {
 
-  private static final Route ROUTE_1 = TimetableRepositoryForTest.route("route-2").build();
-  private static final Operator OPERATOR_2 = Operator.of(id("o2")).withName("o").build();
+  private static final Route ROUTE_2 = TimetableRepositoryForTest.route("route-2")
+    .withOperator(Operator.of(id("o2")).withName("o").build())
+    .build();
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
   private final RegularStop STOP_A1 = ENV_BUILDER.stop("A1");
@@ -34,7 +35,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   private final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
-    .withRoute(ROUTE_1.copy().withOperator(OPERATOR_2).build())
+    .withRoute(ROUTE_2)
     .addStop(STOP_A1, "0:00:10", "0:00:11")
     .addStop(STOP_B1, "0:00:20", "0:00:21")
     .build();
@@ -45,7 +46,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
   void testAddJourneyWithExistingRoute() {
     var env = ENV_BUILDER.addTrip(TRIP_1_INPUT).build();
 
-    Route route = ROUTE_1;
+    Route route = ROUTE_2;
     int numPatternForRoute = env.getTransitService().findPatterns(route).size();
 
     var updates = createValidAddedJourney(env).buildEstimatedTimetableDeliveries();
