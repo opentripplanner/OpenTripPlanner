@@ -20,7 +20,8 @@
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core"
+        "org.processing:core",
+        "edu.ucar:netcdf4"
       ],
       "enabled": false
     },
