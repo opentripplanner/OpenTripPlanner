@@ -6,8 +6,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 public class StreetSearchRequestMapper {
 
   public static StreetSearchRequestBuilder map(RouteRequest opt) {
+    var time = opt.dateTime() == null ? RouteRequest.normalizeNow() : opt.dateTime();
     return StreetSearchRequest.of()
-      .withStartTime(opt.dateTime())
+      .withStartTime(time)
       .withPreferences(opt.preferences())
       .withWheelchair(opt.wheelchair())
       .withFrom(opt.from())

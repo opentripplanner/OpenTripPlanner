@@ -98,6 +98,6 @@ public class TripRequestMapper {
       PreferencesMapper.mapPreferences(environment, callWith, preferences)
     );
 
-    return requestBuilder.build();
+    return requestBuilder.buildRequest();
   }
 }

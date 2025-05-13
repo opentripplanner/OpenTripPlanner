@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -29,6 +30,7 @@ class RouteRequestMapperTest {
     var env = testCtx.executionContext(testCtx.basicRequest());
     var defaultRequest = new RouteRequest();
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
+
     assertEquals(_RouteRequestTestContext.ORIGIN.x, routeRequest.from().lat);
     assertEquals(_RouteRequestTestContext.ORIGIN.y, routeRequest.from().lng);
     assertEquals(_RouteRequestTestContext.DESTINATION.x, routeRequest.to().lat);
@@ -47,10 +49,7 @@ class RouteRequestMapperTest {
       routeRequest.journey().transit().filters().toString()
     );
     assertTrue(
-      Duration.between(defaultRequest.dateTime(), routeRequest.dateTime()).compareTo(
-        Duration.ofSeconds(10)
-      ) <
-      0
+      Duration.between(Instant.now(), routeRequest.dateTime()).compareTo(Duration.ofSeconds(10)) < 0
     );
 
     // Using current time as datetime changes rental availability use preferences, therefore to

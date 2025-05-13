@@ -55,7 +55,7 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    return mapRouteRequest(c, new RouteRequest());
+    return mapRouteRequest(c, RouteRequest.defaultValue());
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
@@ -63,12 +63,12 @@ public class RouteRequestConfig {
       return dft;
     }
 
-    RouteRequest request = dft.clone();
+    var requestBuilder = dft.copyOf();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    request.setArriveBy(
+    requestBuilder.setArriveBy(
       c
         .of("arriveBy")
         .since(V2_0)
@@ -76,9 +76,9 @@ public class RouteRequestConfig {
         .asBoolean(dft.arriveBy())
     );
 
-    request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
+    requestBuilder.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
 
-    request.withJourney(b ->
+    requestBuilder.withJourney(b ->
       b.setModes(
         c
           .of("modes")
@@ -92,14 +92,14 @@ public class RouteRequestConfig {
       )
     );
 
-    request.setNumItineraries(
+    requestBuilder.setNumItineraries(
       c
         .of("numItineraries")
         .since(V2_0)
         .summary("The maximum number of itineraries to return.")
         .asInt(dft.numItineraries())
     );
-    request.setSearchWindow(
+    requestBuilder.setSearchWindow(
       c
         .of("searchWindow")
         .since(V2_0)
@@ -129,7 +129,7 @@ public class RouteRequestConfig {
         .asDuration(dft.searchWindow())
     );
 
-    request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
+    requestBuilder.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
 
     NodeAdapter unpreferred = c
       .of("unpreferred")
@@ -148,7 +148,7 @@ public class RouteRequestConfig {
         """
       )
       .asObject();
-    request.withJourney(jb ->
+    requestBuilder.withJourney(jb ->
       jb.withTransit(b -> {
         mapTransit(unpreferred, b, dft.journey().transit());
         TransitGroupPriorityConfig.mapTransitRequest(c, b);
@@ -156,9 +156,9 @@ public class RouteRequestConfig {
     );
 
     // Map preferences
-    request.withPreferences(preferences -> mapPreferences(c, preferences));
+    requestBuilder.withPreferences(preferences -> mapPreferences(c, preferences));
 
-    return request;
+    return requestBuilder.buildDefault();
   }
 
   private static void mapTransit(

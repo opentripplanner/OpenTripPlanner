@@ -66,6 +66,10 @@ public class StreetSearchRequestBuilder {
     return this;
   }
 
+  Instant startTimeOrNow() {
+    return startTime == null ? Instant.now() : startTime;
+  }
+
   public StreetSearchRequest build() {
     return new StreetSearchRequest(this);
   }

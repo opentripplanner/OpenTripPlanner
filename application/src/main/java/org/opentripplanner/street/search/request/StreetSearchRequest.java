@@ -65,7 +65,7 @@ public class StreetSearchRequest implements AStarRequest {
   }
 
   StreetSearchRequest(StreetSearchRequestBuilder builder) {
-    this.startTime = builder.startTime.truncatedTo(ChronoUnit.SECONDS);
+    this.startTime = RouteRequest.normalizeDateTime(builder.startTimeOrNow());
     this.preferences = builder.preferences;
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;

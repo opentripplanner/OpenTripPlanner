@@ -5,10 +5,7 @@ import static org.opentripplanner.utils.time.DurationUtils.durationInSeconds;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -32,7 +29,6 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.utils.collection.ListSection;
-import org.opentripplanner.utils.lang.ObjectUtils;
 import org.opentripplanner.utils.time.DateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -53,16 +49,8 @@ public class RouteRequest implements Cloneable, Serializable {
   private static final int DEFAULT_NUM_ITINERARIES = 50;
   private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
-  private static final Instant DATE_TIME_NOT_SET = LocalDateTime.of(
-    2000,
-    Month.JANUARY,
-    1,
-    0,
-    0,
-    0
-  ).toInstant(ZoneOffset.UTC);
 
-  public static final RouteRequest DEFAULT = new RouteRequest(DATE_TIME_NOT_SET);
+  private static final RouteRequest DEFAULT = new RouteRequest();
 
   private GenericLocation from;
   private GenericLocation to;
@@ -88,23 +76,16 @@ public class RouteRequest implements Cloneable, Serializable {
   private RoutingPreferences preferences;
   private int numItineraries;
   private Locale locale;
+  private final boolean defaultRequest;
 
   /* CONSTRUCTORS */
 
   public RouteRequest() {
-    this(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-  }
-
-  /**
-   * TODO: This is creating an invalid request - validate() is failing, migrate
-   *       to use builder(whitch call validate()) and make this private (for DEFAULT only).
-   */
-  public RouteRequest(Instant dateTime) {
     // So that they are never null.
-    this.from = GenericLocation.UNKNOWN;
-    this.to = GenericLocation.UNKNOWN;
+    this.from = null;
+    this.to = null;
     this.via = Collections.emptyList();
-    this.dateTime = dateTime;
+    this.dateTime = null;
     this.arriveBy = false;
     this.timetableView = true;
     this.searchWindow = null;
@@ -116,13 +97,14 @@ public class RouteRequest implements Cloneable, Serializable {
     this.preferences = RoutingPreferences.DEFAULT;
     this.numItineraries = DEFAULT_NUM_ITINERARIES;
     this.locale = DEFAULT_LOCALE;
+    this.defaultRequest = true;
   }
 
   RouteRequest(RouteRequestBuilder builder) {
     this.from = builder.from;
     this.to = builder.to;
     this.via = builder.via;
-    this.dateTime = builder.dateTime;
+    this.dateTime = normalizeDateTime(builder.dateTime);
     this.arriveBy = builder.arriveBy;
     this.timetableView = builder.timetableView;
     this.searchWindow = builder.searchWindow;
@@ -136,11 +118,37 @@ public class RouteRequest implements Cloneable, Serializable {
     this.numItineraries = builder.numItineraries;
     // TODO Move to RoutingPreferences
     this.locale = builder.locale;
+    this.defaultRequest = builder.defaultRequest;
+
+    if (!defaultRequest && dateTime == null) {
+      this.dateTime = normalizeNow();
+    }
+
     validate();
   }
 
   public static RouteRequestBuilder of() {
     return DEFAULT.copyOf();
+  }
+
+  public static RouteRequest defaultValue() {
+    return DEFAULT;
+  }
+
+  /**
+   * The given {@code dateTime} will be set to a whole number of seconds. We don't do sub-second
+   * accuracy, and if we set the millisecond part to a non-zero value, rounding will not be
+   * guaranteed to be the same for departAt and arriveBy queries.
+   *
+   * If the given {@code dateTime} is {@code null}, then {@code null} is returned
+   */
+  @Nullable
+  public static Instant normalizeDateTime(@Nullable Instant dateTime) {
+    return dateTime == null ? null : dateTime.truncatedTo(ChronoUnit.SECONDS);
+  }
+
+  public static Instant normalizeNow() {
+    return normalizeDateTime(Instant.now());
   }
 
   public RouteRequestBuilder copyOf() {
@@ -198,7 +206,10 @@ public class RouteRequest implements Cloneable, Serializable {
    * The search time for the current request. If the client have moved to the next page then this is
    * the adjusted search time - the dateTime passed in is ignored and replaced with by a time from
    * the pageToken.
+   *
+   * This method returns {@code null} for default requests.
    */
+  @Nullable
   public Instant dateTime() {
     return dateTime;
   }
@@ -318,7 +329,12 @@ public class RouteRequest implements Cloneable, Serializable {
     }
   }
 
-  /** The start location */
+  /**
+   * The origin/start location.
+   *
+   * Returns {@code null} for default requests.
+   */
+  @Nullable
   public GenericLocation from() {
     return from;
   }
@@ -327,7 +343,12 @@ public class RouteRequest implements Cloneable, Serializable {
     this.from = from;
   }
 
-  /** The end location */
+  /**
+   * The destination/end location.
+   *
+   * Returns {@code null} for default requests.
+   */
+  @Nullable
   public GenericLocation to() {
     return to;
   }
@@ -406,18 +427,6 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public Duration maxSearchWindow() {
     return maxSearchWindow;
-  }
-
-  /**
-   * Initialize the maxSearchWindow from the transit config. This is necessary because the
-   * default route request is configured before the {@link TransitRoutingConfig}.
-   */
-  public void initMaxSearchWindow(Duration maxSearchWindow) {
-    this.maxSearchWindow = ObjectUtils.requireNotInitialized(
-      "maxSearchWindow",
-      this.maxSearchWindow,
-      Objects.requireNonNull(maxSearchWindow)
-    );
   }
 
   public Locale locale() {
@@ -508,12 +517,21 @@ public class RouteRequest implements Cloneable, Serializable {
     this.numItineraries = numItineraries;
   }
 
+  boolean isDefaultRequest() {
+    return defaultRequest;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
     var other = (RouteRequest) o;
+
+    // The 'defaultRequest' field does not need to be part of equals and hashCode
+    // because it is not possible to create the same object where only this field
+    // is diffrent.
+
     return (
       arriveBy == other.arriveBy &&
       timetableView == other.timetableView &&
@@ -556,10 +574,10 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public String toString() {
     return ToStringBuilder.of(RouteRequest.class)
-      .addObj("from", from, DEFAULT.from)
-      .addObj("to", to, DEFAULT.to)
+      .addObj("from", from)
+      .addObj("to", to)
       .addCol("via", via)
-      .addDateTime("dateTime", dateTime, DATE_TIME_NOT_SET)
+      .addDateTime("dateTime", dateTime)
       .addBoolIfTrue("arriveBy", arriveBy)
       .addBoolIfTrue("timetableView: false", !timetableView)
       .addDuration("searchWindow", searchWindow)
@@ -574,6 +592,8 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   private void validate() {
+    validateTimeNotSetIfDefaultRequest();
+
     // TODO: Use the same strateg for all validation of the RouteRequest, currently
     //       both RoutingError and IllegalArgumentException is used.
     List<RoutingError> routingErrors = new ArrayList<>(2);
@@ -586,6 +606,12 @@ public class RouteRequest implements Cloneable, Serializable {
     }
   }
 
+  private void validateTimeNotSetIfDefaultRequest() {
+    if (defaultRequest && dateTime != null) {
+      throw new IllegalStateException();
+    }
+  }
+
   /**
    * Validate that the routing request contains both a from location(origin) and a to
    * location(destination). Origin and destination can be specified either by a reference to a stop
@@ -595,6 +621,13 @@ public class RouteRequest implements Cloneable, Serializable {
    * @throws RoutingValidationException if either origin or destination is missing.
    */
   public List<RoutingError> validateFromAndToLocation() {
+    if (defaultRequest) {
+      if (from != null || to != null) {
+        throw new IllegalStateException("from=" + from + ", to=" + to);
+      }
+      return List.of();
+    }
+
     List<RoutingError> routingErrors = new ArrayList<>(2);
 
     if (from == null || !from.isSpecified()) {

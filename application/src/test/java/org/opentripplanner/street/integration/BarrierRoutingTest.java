@@ -173,11 +173,12 @@ public class BarrierRoutingTest {
     Consumer<RouteRequest> options,
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-    request.withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)));
+    var request = RouteRequest.of()
+      .setDateTime(dateTime)
+      .setFrom(from)
+      .setTo(to)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)))
+      .buildRequest();
 
     options.accept(request);
 

@@ -80,7 +80,6 @@ class RouteRequestTest {
   private static final Locale LOCALE = Locale.FRENCH;
 
   private static final Duration DURATION_24_HOURS = Duration.ofHours(24);
-  private static final Duration DURATION_24_HOURS_AND_ONE_MINUTE = DURATION_24_HOURS.plusMinutes(1);
   private static final Duration DURATION_ZERO = Duration.ofMinutes(0);
   private static final Duration DURATION_ONE_MINUTE = Duration.ofMinutes(1);
   private static final Duration DURATION_MINUS_ONE_MINUTE = DURATION_ONE_MINUTE.negated();
@@ -101,13 +100,13 @@ class RouteRequestTest {
     .withPreferences(PREFERENCES)
     .setNumItineraries(NUM_ITINERARIES)
     .setLocale(LOCALE)
-    .build();
+    .buildRequest();
 
   private final RouteRequest minimal = RouteRequest.of()
     .setFrom(FROM)
     .setTo(TO)
     .setDateTime(DATE_TIME)
-    .build();
+    .buildRequest();
 
   @Test
   void from() {
@@ -180,37 +179,54 @@ class RouteRequestTest {
   }
 
   @Test
+  void testBuildDefault() {
+    // Allow to build request without from, to, and dateTime
+    var subject = RouteRequest.of()
+      .setNumItineraries(NUM_ITINERARIES)
+      .setSearchWindow(SEARCH_WINDOW)
+      .buildDefault();
+    assertEquals("RouteRequest{searchWindow: 2h, numItineraries: 10}", subject.toString());
+
+    assertThrows(IllegalStateException.class, () -> RouteRequest.of().setFrom(FROM).buildDefault());
+    assertThrows(IllegalStateException.class, () -> RouteRequest.of().setTo(TO).buildDefault());
+    assertThrows(IllegalStateException.class, () ->
+      RouteRequest.of().setDateTime(DATE_TIME).buildDefault()
+    );
+    assertThrows(IllegalStateException.class, () -> minimal.copyOf().buildDefault());
+  }
+
+  @Test
   void testEqualsAndHashCode() {
     // Change subject and change back to force a new instance to be created.
     var same = subject
       .copyOf()
       .setArriveBy(!ARRIVE_BY)
-      .build()
+      .buildRequest()
       .copyOf()
       .setArriveBy(ARRIVE_BY)
-      .build();
+      .buildRequest();
 
     AssertEqualsAndHashCode.verify(subject)
       .sameAs(same)
       .differentFrom(
-        subject.copyOf().setFrom(TO).build(),
-        subject.copyOf().setTo(FROM).build(),
-        subject.copyOf().setDateTime(Instant.now()).build(),
-        subject.copyOf().setArriveBy(!ARRIVE_BY).build(),
-        subject.copyOf().setTimetableView(!TIMETABLE_VIEW).build(),
-        subject.copyOf().setSearchWindow(SEARCH_WINDOW.plusSeconds(10)).build(),
-        subject.copyOf().setMaxSearchWindow(MAX_SEARCH_WINDOW.plusHours(1)).build(),
-        subject.copyOf().setBookingTime(BOOKING_TIME.plusSeconds(10)).build(),
-        subject.copyOf().setPageCursorFromEncoded(null).build(),
-        subject.copyOf().setWheelchair(!WHEELCHAIR).build(),
-        subject.copyOf().setJourney(JourneyRequest.DEFAULT).build(),
-        subject.copyOf().withPreferences(RoutingPreferences.DEFAULT).build()
+        subject.copyOf().setFrom(TO).buildRequest(),
+        subject.copyOf().setTo(FROM).buildRequest(),
+        subject.copyOf().setDateTime(Instant.now()).buildRequest(),
+        subject.copyOf().setArriveBy(!ARRIVE_BY).buildRequest(),
+        subject.copyOf().setTimetableView(!TIMETABLE_VIEW).buildRequest(),
+        subject.copyOf().setSearchWindow(SEARCH_WINDOW.plusSeconds(10)).buildRequest(),
+        subject.copyOf().setMaxSearchWindow(MAX_SEARCH_WINDOW.plusHours(1)).buildRequest(),
+        subject.copyOf().setBookingTime(BOOKING_TIME.plusSeconds(10)).buildRequest(),
+        subject.copyOf().setPageCursorFromEncoded(null).buildRequest(),
+        subject.copyOf().setWheelchair(!WHEELCHAIR).buildRequest(),
+        subject.copyOf().setJourney(JourneyRequest.DEFAULT).buildRequest(),
+        subject.copyOf().withPreferences(RoutingPreferences.DEFAULT).buildRequest()
       );
   }
 
   @Test
   void testToString() {
-    assertEqualsIgnoreWhitespace("RouteRequest{}", RouteRequest.DEFAULT.toString());
+    assertEqualsIgnoreWhitespace("RouteRequest{}", RouteRequest.defaultValue().toString());
 
     assertEquals(
       "RouteRequest{from: (60.0, 10.0), to: (59.0, 12.0), dateTime: 2025-05-17T11:15:00Z}",
@@ -241,19 +257,9 @@ class RouteRequestTest {
   }
 
   @Test
-  void testValidateEmptyRequest() {
-    try {
-      RouteRequest.of().build().validateOriginAndDestination();
-      fail();
-    } catch (RoutingValidationException e) {
-      assertEquals(2, e.getRoutingErrors().size());
-    }
-  }
-
-  @Test
   void testValidateMissingFrom() {
     expectOneRoutingValidationException(
-      () -> minimal.copyOf().setFrom(GenericLocation.UNKNOWN).build(),
+      () -> minimal.copyOf().setFrom(GenericLocation.UNKNOWN).buildRequest(),
       RoutingErrorCode.LOCATION_NOT_FOUND,
       InputField.FROM_PLACE
     );
@@ -262,7 +268,7 @@ class RouteRequestTest {
   @Test
   void testValidateMissingTo() {
     expectOneRoutingValidationException(
-      () -> minimal.copyOf().setTo(GenericLocation.UNKNOWN).build(),
+      () -> minimal.copyOf().setTo(GenericLocation.UNKNOWN).buildRequest(),
       RoutingErrorCode.LOCATION_NOT_FOUND,
       InputField.TO_PLACE
     );
@@ -271,7 +277,7 @@ class RouteRequestTest {
   @Test
   void testZeroSearchWindowIsAlowed() {
     // no excaption thrown when search-window is 0s
-    minimal.copyOf().setSearchWindow(DURATION_ZERO).build();
+    minimal.copyOf().setSearchWindow(DURATION_ZERO).buildRequest();
   }
 
   @Test
@@ -281,7 +287,7 @@ class RouteRequestTest {
         .copyOf()
         .setMaxSearchWindow(DURATION_24_HOURS)
         .setSearchWindow(DURATION_24_HOURS.plusMinutes(1))
-        .build()
+        .buildRequest()
     );
     assertEquals("The search window cannot exceed PT24H", ex.getMessage());
   }
@@ -289,7 +295,7 @@ class RouteRequestTest {
   @Test
   void testNegativeSearchWindow() {
     var ex = assertThrows(IllegalArgumentException.class, () ->
-      minimal.copyOf().setSearchWindow(Duration.ofSeconds(-1)).build()
+      minimal.copyOf().setSearchWindow(Duration.ofSeconds(-1)).buildRequest()
     );
     assertEquals("The search window must be a positive duration", ex.getMessage());
   }

@@ -76,7 +76,8 @@ public class RouteRequestMapper {
 
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));
-    return request.build();
+
+    return request.buildRequest();
   }
 
   private static void setPreferences(

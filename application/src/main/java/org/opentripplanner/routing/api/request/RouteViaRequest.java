@@ -90,6 +90,9 @@ public class RouteViaRequest implements Serializable {
   }
 
   public RouteRequestBuilder routeRequestFirstSegment() {
+    // TODO: This should use the configured default, not the code default. This will lead to errors
+    //       where a deployment would expect the same perferences in the via is in a normal routing
+    //       request.
     var request = RouteRequest.of();
 
     request.setFrom(from);

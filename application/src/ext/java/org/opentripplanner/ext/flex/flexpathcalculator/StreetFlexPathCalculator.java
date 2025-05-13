@@ -78,6 +78,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
   }
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
+    // TODO: This is incorrect, the configured defaults are not used.
     RouteRequest routingRequest = new RouteRequest();
     routingRequest.setArriveBy(reverseDirection);
 

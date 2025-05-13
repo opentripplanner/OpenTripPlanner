@@ -64,6 +64,7 @@ import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -467,17 +468,19 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     if (transitCheckBox.isSelected()) {
       modes.add(ApiRequestMode.TRANSIT.name());
     }
-    RouteRequest request = new RouteRequest();
+
+    // TODO: This should use the configured defaults, not the code defaults
+    RouteRequestBuilder builder = RouteRequest.of();
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
-    request.withJourney(b -> b.setModes(qualifiedModeSet.getRequestModes()));
+    builder.withJourney(b -> b.setModes(qualifiedModeSet.getRequestModes()));
 
-    request.setArriveBy(arriveByCheckBox.isSelected());
-    request.setDateTime(when);
-    request.setFrom(LocationStringParser.fromOldStyleString(from));
-    request.setTo(LocationStringParser.fromOldStyleString(to));
-    request.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
+    builder.setArriveBy(arriveByCheckBox.isSelected());
+    builder.setDateTime(when);
+    builder.setFrom(LocationStringParser.fromOldStyleString(from));
+    builder.setTo(LocationStringParser.fromOldStyleString(to));
+    builder.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
 
-    request.withPreferences(preferences -> {
+    builder.withPreferences(preferences -> {
       preferences.withWalk(walk -> {
         walk.withBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
         walk.withSpeed(Float.parseFloat(walkSpeed.getText()));
@@ -498,17 +501,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       );
     });
 
-    System.out.println("--------");
-    System.out.println("Path from " + from + " to " + to + " at " + when);
-    System.out.println("\tModes: " + qualifiedModeSet);
-    System.out.println("\tOptions: " + request);
-
     // apply callback if the options call for it
     // if( dontUseGraphicalCallbackCheckBox.isSelected() ){
     // TODO perhaps avoid using a GraphPathFinder and go one level down the call chain directly to a GenericAStar
     // TODO perhaps instead of giving the pathservice a callback, we can just put the visitor in the routing request
     GraphPathFinder finder = new GraphPathFinder(traverseVisitor);
 
+    var request = builder.buildRequest();
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
     try (

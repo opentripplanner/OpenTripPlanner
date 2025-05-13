@@ -50,8 +50,13 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     StreetIndex index = this.graph.getStreetIndex();
     this.from = from;
     this.to = to;
-    fromVertices = index.getStreetVerticesForLocation(from, accessMode, false, tempEdges);
-    toVertices = index.getStreetVerticesForLocation(to, egressMode, true, tempEdges);
+    fromVertices = from.isSpecified()
+      ? index.getStreetVerticesForLocation(from, accessMode, false, tempEdges)
+      : null;
+
+    toVertices = to.isSpecified()
+      ? index.getStreetVerticesForLocation(to, egressMode, true, tempEdges)
+      : null;
 
     checkIfVerticesFound();
 

@@ -248,7 +248,7 @@ public class LegacyRouteRequestMapper {
     callWith.argument("locale", (String v) ->
       request.setLocale(GraphQLUtils.getLocale(environment, v))
     );
-    return request.build();
+    return request.buildRequest();
   }
 
   static void mapViaLocations(RouteRequestBuilder request, DataFetchingEnvironment env) {

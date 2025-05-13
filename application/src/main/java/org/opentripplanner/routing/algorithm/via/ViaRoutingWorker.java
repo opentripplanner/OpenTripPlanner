@@ -62,7 +62,7 @@ public class ViaRoutingWorker {
 
     this.currentSegmentRequest.setJourney(v.journeyRequest());
 
-    var response = this.routingWorker.apply(this.currentSegmentRequest.build());
+    var response = this.routingWorker.apply(this.currentSegmentRequest.buildRequest());
 
     if (v.viaLocation() == null) {
       return response;

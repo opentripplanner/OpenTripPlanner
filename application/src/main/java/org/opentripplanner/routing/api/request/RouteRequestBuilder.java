@@ -44,6 +44,7 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
   RoutingPreferences preferences;
   int numItineraries;
   Locale locale;
+  boolean defaultRequest;
 
   private final RouteRequest original;
 
@@ -64,6 +65,7 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     this.preferences = original.preferences();
     this.numItineraries = original.numItineraries();
     this.locale = original.locale();
+    this.defaultRequest = original.isDefaultRequest();
   }
 
   public RouteRequestBuilder setJourney(JourneyRequest journey) {
@@ -166,8 +168,28 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     return this;
   }
 
-  public RouteRequest build() {
+  public RouteRequest buildDefault() {
+    if (!defaultRequest) {
+      throw new IllegalStateException(
+        "A default request can only be created based on another default request!"
+      );
+    }
+    return build();
+  }
+
+  public RouteRequest buildRequest() {
+    this.defaultRequest = false;
+    return build();
+  }
+
+  private RouteRequest build() {
     var value = new RouteRequest(this);
+
+    // TODO: Remove, this prevent the deafult from changes, remove when immutable
+    if (original == RouteRequest.defaultValue()) {
+      return value;
+    }
+
     return original.equals(value) ? original : value;
   }
 }

@@ -219,16 +219,16 @@ public class RoutingWorker {
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
       request.journey().direct().mode()
     );
-    var directRequest = request.clone();
+    var directBuilder = request.copyOf();
 
-    directRequest.withJourney(jb ->
+    directBuilder.withJourney(jb ->
       jb.withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()))
     );
 
     debugTimingAggregator.startedDirectStreetRouter();
     try {
       return RoutingResult.ok(
-        DirectStreetRouter.route(serverContext, directRequest),
+        DirectStreetRouter.route(serverContext, directBuilder.buildRequest()),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
     } catch (RoutingValidationException e) {
