@@ -331,6 +331,7 @@ public class GraphQLTypes {
     private List<String> allowedNetworks;
     private List<String> bannedNetworks;
     private GraphQLDestinationBicyclePolicyInput destinationBicyclePolicy;
+    private java.time.Duration rentalDuration;
 
     public GraphQLBicycleRentalPreferencesInput(Map<String, Object> args) {
       if (args != null) {
@@ -339,6 +340,7 @@ public class GraphQLTypes {
         this.destinationBicyclePolicy = new GraphQLDestinationBicyclePolicyInput(
           (Map<String, Object>) args.get("destinationBicyclePolicy")
         );
+        this.rentalDuration = (java.time.Duration) args.get("rentalDuration");
       }
     }
 
@@ -354,6 +356,10 @@ public class GraphQLTypes {
       return this.destinationBicyclePolicy;
     }
 
+    public java.time.Duration getGraphQLRentalDuration() {
+      return this.rentalDuration;
+    }
+
     public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
       this.allowedNetworks = allowedNetworks;
     }
@@ -366,6 +372,10 @@ public class GraphQLTypes {
       GraphQLDestinationBicyclePolicyInput destinationBicyclePolicy
     ) {
       this.destinationBicyclePolicy = destinationBicyclePolicy;
+    }
+
+    public void setGraphQLRentalDuration(java.time.Duration rentalDuration) {
+      this.rentalDuration = rentalDuration;
     }
   }
 
@@ -624,11 +634,13 @@ public class GraphQLTypes {
 
     private List<String> allowedNetworks;
     private List<String> bannedNetworks;
+    private java.time.Duration rentalDuration;
 
     public GraphQLCarRentalPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         this.allowedNetworks = (List<String>) args.get("allowedNetworks");
         this.bannedNetworks = (List<String>) args.get("bannedNetworks");
+        this.rentalDuration = (java.time.Duration) args.get("rentalDuration");
       }
     }
 
@@ -640,12 +652,20 @@ public class GraphQLTypes {
       return this.bannedNetworks;
     }
 
+    public java.time.Duration getGraphQLRentalDuration() {
+      return this.rentalDuration;
+    }
+
     public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
       this.allowedNetworks = allowedNetworks;
     }
 
     public void setGraphQLBannedNetworks(List<String> bannedNetworks) {
       this.bannedNetworks = bannedNetworks;
+    }
+
+    public void setGraphQLRentalDuration(java.time.Duration rentalDuration) {
+      this.rentalDuration = rentalDuration;
     }
   }
 
@@ -4657,6 +4677,7 @@ public class GraphQLTypes {
     private List<String> allowedNetworks;
     private List<String> bannedNetworks;
     private GraphQLDestinationScooterPolicyInput destinationScooterPolicy;
+    private java.time.Duration rentalDuration;
 
     public GraphQLScooterRentalPreferencesInput(Map<String, Object> args) {
       if (args != null) {
@@ -4665,6 +4686,7 @@ public class GraphQLTypes {
         this.destinationScooterPolicy = new GraphQLDestinationScooterPolicyInput(
           (Map<String, Object>) args.get("destinationScooterPolicy")
         );
+        this.rentalDuration = (java.time.Duration) args.get("rentalDuration");
       }
     }
 
@@ -4680,6 +4702,10 @@ public class GraphQLTypes {
       return this.destinationScooterPolicy;
     }
 
+    public java.time.Duration getGraphQLRentalDuration() {
+      return this.rentalDuration;
+    }
+
     public void setGraphQLAllowedNetworks(List<String> allowedNetworks) {
       this.allowedNetworks = allowedNetworks;
     }
@@ -4692,6 +4718,10 @@ public class GraphQLTypes {
       GraphQLDestinationScooterPolicyInput destinationScooterPolicy
     ) {
       this.destinationScooterPolicy = destinationScooterPolicy;
+    }
+
+    public void setGraphQLRentalDuration(java.time.Duration rentalDuration) {
+      this.rentalDuration = rentalDuration;
     }
   }
 

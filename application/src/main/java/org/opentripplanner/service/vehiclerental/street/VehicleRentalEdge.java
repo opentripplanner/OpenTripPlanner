@@ -22,10 +22,6 @@ import org.opentripplanner.street.search.state.StateEditor;
 public class VehicleRentalEdge extends Edge {
 
   public final RentalFormFactor formFactor;
-  /**
-   * Defines how long a vehicle has to be available relative to the start time of the routing.
-   */
-  private static final int MIN_TIME_WINDOW_HOURS = 6;
 
   private VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
     super(vertex, vertex);
@@ -127,15 +123,17 @@ public class VehicleRentalEdge extends Edge {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
-            Instant departureTime = s0.getTime().plus(preferences.pickupTime());
-            OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
-              departureTime,
-              ZoneId.systemDefault()
-            ).plusHours(MIN_TIME_WINDOW_HOURS);
-            VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
-            OffsetDateTime availableUntil = vehicleRentalVehicle.getAvailableUntil();
-            if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {
-              return State.empty();
+            if (preferences.rentalDuration().isPositive()) {
+              Instant departureTime = s0.getTime().plus(preferences.pickupTime());
+              OffsetDateTime rentalEndTime = OffsetDateTime.ofInstant(
+                departureTime,
+                ZoneId.systemDefault()
+              ).plus(preferences.rentalDuration());
+              VehicleRentalVehicle vehicleRentalVehicle = (VehicleRentalVehicle) station;
+              OffsetDateTime availableUntil = vehicleRentalVehicle.getAvailableUntil();
+              if (availableUntil != null && availableUntil.isBefore(rentalEndTime)) {
+                return State.empty();
+              }
             }
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {

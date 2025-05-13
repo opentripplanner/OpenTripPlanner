@@ -376,7 +376,13 @@ class VehicleRentalEdgeTest {
       .withMode(mode)
       .withPreferences(preferences ->
         preferences
-          .withCar(car -> car.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
+          .withCar(car ->
+            car.withRental(rental ->
+              rental
+                .withUseAvailabilityInformation(tooEarlyAvailableUntil)
+                .withBannedNetworks(bannedNetworks)
+            )
+          )
           .withBike(bike -> bike.withRental(rental -> rental.withBannedNetworks(bannedNetworks)))
           .withScooter(scooter ->
             scooter.withRental(rental -> rental.withBannedNetworks(bannedNetworks))
