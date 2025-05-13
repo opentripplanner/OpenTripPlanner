@@ -6,6 +6,7 @@ import graphql.relay.DefaultEdge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
+import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
@@ -915,6 +916,8 @@ public class GraphQLDataFetchers {
   /** Rental vehicle represents a vehicle that belongs to a rental network. */
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
+
+    public DataFetcher<OffsetDateTime> availableUntil();
 
     public DataFetcher<RentalVehicleFuel> fuel();
 

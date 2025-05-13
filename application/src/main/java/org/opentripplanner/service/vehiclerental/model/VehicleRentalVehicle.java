@@ -1,6 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -25,6 +26,7 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
   public VehicleRentalStation station;
   public String pricingPlanId;
   public RentalVehicleFuel fuel;
+  public OffsetDateTime availableUntil;
 
   @Override
   public FeedScopedId getId() {
@@ -136,5 +138,9 @@ public class VehicleRentalVehicle implements VehicleRentalPlace {
 
   public RentalVehicleFuel getFuel() {
     return fuel;
+  }
+
+  public OffsetDateTime getAvailableUntil() {
+    return availableUntil;
   }
 }
