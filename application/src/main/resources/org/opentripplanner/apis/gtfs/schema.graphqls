@@ -4054,6 +4054,8 @@ input BicycleRentalPreferencesInput {
   come with an extra cost.
   """
   destinationBicyclePolicy: DestinationBicyclePolicyInput
+  "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
+  rentalDuration: Duration
 }
 
 "Costs related to walking a bicycle."
@@ -4145,6 +4147,8 @@ input CarRentalPreferencesInput {
   allowedNetworks: [String!]
   "Rental networks which cannot be used as part of an itinerary."
   bannedNetworks: [String!]
+  "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
+  rentalDuration: Duration
 }
 
 "What criteria should be used when optimizing a cycling route."
@@ -4650,6 +4654,8 @@ input ScooterRentalPreferencesInput {
   come with an extra cost.
   """
   destinationScooterPolicy: DestinationScooterPolicyInput
+  "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
+  rentalDuration: Duration
 }
 
 input TimetablePreferencesInput {

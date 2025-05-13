@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -27,6 +28,15 @@ public class VehicleRentalConfig {
           .since(V2_0)
           .summary("Cost to drop-off a rented vehicle.")
           .asInt(dft.dropOffCost().toSeconds())
+      )
+      .withRentalDuration(
+        c
+          .of("rentalDuration")
+          .since(V2_8)
+          .summary(
+            "An assumed duration of the rental trip, to make sure the vehicle is available during this time."
+          )
+          .asDuration(dft.rentalDuration())
       )
       .withDropOffTime(
         c

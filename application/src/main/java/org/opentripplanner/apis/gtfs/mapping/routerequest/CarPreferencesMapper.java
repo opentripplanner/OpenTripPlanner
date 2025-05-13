@@ -77,5 +77,9 @@ public class CarPreferencesMapper {
     if (bannedNetworks != null) {
       preferences.withBannedNetworks(Set.copyOf(bannedNetworks));
     }
+    var rentalDuration = args.getGraphQLRentalDuration();
+    if (rentalDuration != null) {
+      preferences.withRentalDuration(rentalDuration);
+    }
   }
 }
