@@ -171,11 +171,15 @@ public class PageCursorFactory {
   }
 
   private Instant edtAfterUsedSw() {
+    Instant defaultEdt = currentEdt.plus(currentSearchWindow);
     if (firstSearchLatestItineraryDeparture != null) {
-      return firstSearchLatestItineraryDeparture.plusSeconds(
+      Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plusSeconds(
         PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION_SECONDS
       );
+      if (edtFromLatestItineraryDeparture.isBefore(defaultEdt)) {
+        return edtFromLatestItineraryDeparture;
+      }
     }
-    return currentEdt.plus(currentSearchWindow);
+    return defaultEdt;
   }
 }
