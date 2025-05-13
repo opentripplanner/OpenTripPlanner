@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.emission;
 
 import java.io.File;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -44,6 +46,14 @@ public interface EmissionTestData {
    */
   default DataSource emissionMissingFile() {
     return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMISSION);
+  }
+
+  default CompositeDataSource gtfsDirectoryDataSourceWithoutEmissions() {
+    return DataStoreModule.compositeSource(ConstantsForTests.SIMPLE_GTFS, FileType.GTFS);
+  }
+
+  default CompositeDataSource gtfsZipDataSourceWithoutEmissions() {
+    return DataStoreModule.compositeSource(ConstantsForTests.CALTRAIN_GTFS, FileType.GTFS);
   }
 
   private ResourceLoader resource() {

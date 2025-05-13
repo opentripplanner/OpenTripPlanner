@@ -36,7 +36,13 @@ public class EmissionDataReader {
   }
 
   public void read(CompositeDataSource catalog, String resolvedFeedId) {
-    read(catalog.entry(EMISSION_FILE_NAME), resolvedFeedId);
+    var emissionDataSource = catalog.entry(EMISSION_FILE_NAME);
+
+    if (emissionDataSource == null || !emissionDataSource.exists()) {
+      LOG.info("The {} does not contain any {} file.", catalog.detailedInfo(), EMISSION_FILE_NAME);
+      return;
+    }
+    read(emissionDataSource, resolvedFeedId);
   }
 
   public void read(DataSource emissionDataSource, String resolvedFeedId) {
@@ -46,29 +52,36 @@ public class EmissionDataReader {
           resolvedFeedId
         )
     );
-    if (emissionDataSource.exists()) {
-      var progress = ProgressTracker.track("Read " + emissionDataSource.name(), 10_000, -1);
-      // Assume input CO₂ emission data is Route average data
-      var routeReader = new RouteDataReader(emissionDataSource, issueStore);
-      this.emissionRepository.addRouteEmissions(
-          routeReader.read(resolvedFeedId, () -> logProgress(progress))
-        );
 
-      // Assume input CO₂ emission data is per trip hop
-      tripHopMapper.setCurrentFeedId(resolvedFeedId);
-      var tripReader = new TripDataReader(emissionDataSource, issueStore);
-      this.emissionRepository.addTripPatternEmissions(
-          tripHopMapper.map(tripReader.read(() -> logProgress(progress)))
-        );
+    if (!emissionDataSource.exists()) {
+      LOG.info(
+        "Emission datasource does not exist! DataSource: {}",
+        emissionDataSource.detailedInfo()
+      );
+      return;
+    }
 
-      LOG.info(progress.completeMessage());
-      if (!(routeReader.isDataProcessed() || tripReader.isDataProcessed())) {
-        LOG.error(
-          "No emission data read from: " +
-          emissionDataSource.detailedInfo() +
-          ". Do the header columns match?"
-        );
-      }
+    var progress = ProgressTracker.track("Read " + emissionDataSource.name(), 10_000, -1);
+    // Assume input CO₂ emission data is Route average data
+    var routeReader = new RouteDataReader(emissionDataSource, issueStore);
+    this.emissionRepository.addRouteEmissions(
+        routeReader.read(resolvedFeedId, () -> logProgress(progress))
+      );
+
+    // Assume input CO₂ emission data is per trip hop
+    tripHopMapper.setCurrentFeedId(resolvedFeedId);
+    var tripReader = new TripDataReader(emissionDataSource, issueStore);
+    this.emissionRepository.addTripPatternEmissions(
+        tripHopMapper.map(tripReader.read(() -> logProgress(progress)))
+      );
+
+    LOG.info(progress.completeMessage());
+    if (!(routeReader.isDataProcessed() || tripReader.isDataProcessed())) {
+      LOG.error(
+        "No emission data read from: " +
+        emissionDataSource.detailedInfo() +
+        ". Do the header columns match?"
+      );
     }
   }
 

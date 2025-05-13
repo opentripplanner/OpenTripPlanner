@@ -60,7 +60,6 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
    * Use for unit testing
    */
   public static CompositeDataSource compositeSource(File file, FileType type) {
-    // The cast is safe
     return createCompositeSource(file, type);
   }
 

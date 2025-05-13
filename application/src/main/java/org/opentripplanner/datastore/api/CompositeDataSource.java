@@ -2,6 +2,7 @@ package org.opentripplanner.datastore.api;
 
 import java.io.Closeable;
 import java.util.Collection;
+import javax.annotation.Nullable;
 
 /**
  * A composite data source contain a collection of other {@link DataSource}s.
@@ -18,12 +19,15 @@ public interface CompositeDataSource extends DataSource, Closeable {
   Collection<DataSource> content();
 
   /**
-   * Retrieve a single entry by name, or {@code null} if not found.
+   * Retrieve a single entry by name, or {@code null} if the enrty is inaccessable - for example
+   * a none existing file inside a zip composite data source. This method will return a data source
+   * if possible, The datasource might not exist, in case it might be used for output.
    * <p>
    * Example:
    * <p>
    * {@code DataSource routesSrc = gtfsSource.entry("routes.txt")}
    */
+  @Nullable
   DataSource entry(String name);
 
   /**
