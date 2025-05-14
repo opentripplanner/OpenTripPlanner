@@ -87,55 +87,52 @@ public abstract class GtfsTest {
     }
 
     // Init request
-    RouteRequest routingRequest = new RouteRequest();
+    var builder = RouteRequest.of()
+      .setNumItineraries(1)
+      .setArriveBy(dateTime < 0)
+      .setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
 
-    routingRequest.setNumItineraries(1);
-
-    routingRequest.setArriveBy(dateTime < 0);
-    routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
     if (fromVertex != null && !fromVertex.isEmpty()) {
-      routingRequest.setFrom(
-        LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex)
-      );
+      builder.setFrom(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex));
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      routingRequest.setTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
+      builder.setTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
     }
     if (onTripId != null && !onTripId.isEmpty()) {
       // TODO VIA - set different on-board request
       //routingRequest.startingTransitTripId = (new FeedScopedId(FEED_ID, onTripId));
     }
-    routingRequest.setWheelchair(wheelchairAccessible);
+    builder
+      .setWheelchair(wheelchairAccessible)
+      .withJourney(journeyBuilder -> {
+        var requestModesBuilder = RequestModes.of()
+          .withDirectMode(NOT_SET)
+          .withAccessMode(WALK)
+          .withTransferMode(WALK)
+          .withEgressMode(WALK);
+        journeyBuilder.setModes(requestModesBuilder.build());
 
-    routingRequest.withJourney(journeyBuilder -> {
-      var requestModesBuilder = RequestModes.of()
-        .withDirectMode(NOT_SET)
-        .withAccessMode(WALK)
-        .withTransferMode(WALK)
-        .withEgressMode(WALK);
-      journeyBuilder.setModes(requestModesBuilder.build());
+        var filterRequestBuilder = TransitFilterRequest.of();
+        if (preferredMode != null) {
+          filterRequestBuilder.addSelect(
+            SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
+          );
+        } else {
+          filterRequestBuilder.addSelect(
+            SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
+          );
+        }
 
-      var filterRequestBuilder = TransitFilterRequest.of();
-      if (preferredMode != null) {
-        filterRequestBuilder.addSelect(
-          SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
-        );
-      } else {
-        filterRequestBuilder.addSelect(
-          SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
-        );
-      }
+        if (excludedRoute != null && !excludedRoute.isEmpty()) {
+          List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
+          filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
+        }
 
-      if (excludedRoute != null && !excludedRoute.isEmpty()) {
-        List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
-        filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
-      }
-
-      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
-    });
+        journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+      });
 
     // Init preferences
-    routingRequest.withPreferences(preferences -> {
+    builder.withPreferences(preferences -> {
       preferences.withTransfer(tx -> {
         tx.withSlack(Duration.ZERO);
         tx.withWaitReluctance(1);
@@ -151,7 +148,7 @@ public abstract class GtfsTest {
     });
 
     // Route
-    RoutingResponse res = serverContext.routingService().route(routingRequest);
+    RoutingResponse res = serverContext.routingService().route(builder.buildRequest());
 
     // Assert itineraries
     List<Itinerary> itineraries = res.getTripPlan().itineraries;

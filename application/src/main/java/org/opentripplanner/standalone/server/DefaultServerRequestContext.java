@@ -146,11 +146,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RouteRequest defaultRouteRequest() {
-    // Lazy initialize request-scoped request to avoid doing this when not needed
-    if (defaultRouteRequestWithTimeSet == null) {
-      defaultRouteRequestWithTimeSet = routeRequestDefaults.copyWithDateTimeNow();
-    }
-    return defaultRouteRequestWithTimeSet;
+    return routeRequestDefaults;
   }
 
   /**

@@ -92,9 +92,9 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardDefault() {
-    var request = new RouteRequest();
-
-    request.withPreferences(preferences -> preferences.withWalk(w -> w.withSpeed(1.0)));
+    var request = RouteRequest.of()
+      .withPreferences(preferences -> preferences.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -122,8 +122,9 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsPedestrian() {
-    var request = new RouteRequest();
-    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
+    var request = RouteRequest.of()
+      .withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())

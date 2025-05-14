@@ -126,12 +126,12 @@ public class CarRoutingTest {
   }
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-
-    request.withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)));
+    RouteRequest request = RouteRequest.of()
+      .setDateTime(dateTime)
+      .setFrom(from)
+      .setTo(to)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
+      .buildRequest();
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       from,

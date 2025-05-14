@@ -184,12 +184,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
 
   private RouteRequest build() {
     var value = new RouteRequest(this);
-
-    // TODO: Remove, this prevent the deafult from changes, remove when immutable
-    if (original == RouteRequest.defaultValue()) {
-      return value;
-    }
-
     return original.equals(value) ? original : value;
   }
 }

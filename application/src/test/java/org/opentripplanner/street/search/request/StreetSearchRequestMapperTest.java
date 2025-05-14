@@ -16,49 +16,52 @@ class StreetSearchRequestMapperTest {
 
   @Test
   void map() {
-    RouteRequest routeRequest = new RouteRequest();
+    var builder = RouteRequest.of();
 
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
-    routeRequest.setDateTime(dateTime);
+    builder.setDateTime(dateTime);
     var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
-    routeRequest.setFrom(from);
+    builder.setFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    routeRequest.setTo(to);
-    routeRequest.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
-    routeRequest.setWheelchair(true);
+    builder.setTo(to);
+    builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
+    builder.setWheelchair(true);
 
-    routeRequest.withJourney(jb -> {
+    builder.withJourney(jb -> {
       jb.setModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build());
     });
 
-    var subject = StreetSearchRequestMapper.map(routeRequest).build();
+    var request = builder.buildRequest();
+    var subject = StreetSearchRequestMapper.map(request).build();
 
     assertEquals(dateTime, subject.startTime());
     assertEquals(from, subject.from());
     assertEquals(to, subject.to());
-    assertEquals(routeRequest.preferences(), subject.preferences());
+    assertEquals(request.preferences(), subject.preferences());
     assertTrue(subject.wheelchair());
   }
 
   @Test
   void mapToTransferRequest() {
-    RouteRequest routeRequest = new RouteRequest();
+    var builder = RouteRequest.of();
 
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
-    routeRequest.setDateTime(dateTime);
+    builder.setDateTime(dateTime);
     var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
-    routeRequest.setFrom(from);
+    builder.setFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    routeRequest.setTo(to);
-    routeRequest.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
-    routeRequest.setWheelchair(true);
+    builder.setTo(to);
+    builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
+    builder.setWheelchair(true);
 
-    var subject = StreetSearchRequestMapper.mapToTransferRequest(routeRequest).build();
+    var request = builder.buildRequest();
+
+    var subject = StreetSearchRequestMapper.mapToTransferRequest(request).build();
 
     assertEquals(Instant.EPOCH, subject.startTime());
     assertNull(subject.from());
     assertNull(subject.to());
-    assertEquals(routeRequest.preferences(), subject.preferences());
+    assertEquals(request.preferences(), subject.preferences());
     assertTrue(subject.wheelchair());
   }
 }

@@ -232,33 +232,33 @@ public class FlexIntegrationTest {
     GenericLocation to,
     boolean onlyDirect
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-    request.setNumItineraries(10);
-    request.setSearchWindow(Duration.ofHours(2));
-    request.withPreferences(p ->
-      p.withStreet(s ->
-        s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+    RouteRequest request = RouteRequest.of()
+      .setDateTime(dateTime)
+      .setFrom(from)
+      .setTo(to)
+      .setNumItineraries(10)
+      .setSearchWindow(Duration.ofHours(2))
+      .withPreferences(p ->
+        p.withStreet(s ->
+          s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))
+        )
       )
-    );
+      .withJourney(journeyBuilder -> {
+        var modes = JourneyRequest.DEFAULT.modes().copyOf();
 
-    request.withJourney(journeyBuilder -> {
-      var modes = JourneyRequest.DEFAULT.modes().copyOf();
+        if (onlyDirect) {
+          modes
+            .withDirectMode(FLEXIBLE)
+            .withAccessMode(StreetMode.WALK)
+            .withEgressMode(StreetMode.WALK);
+          journeyBuilder.withTransit(b -> b.disable());
+        } else {
+          modes.withEgressMode(FLEXIBLE);
+        }
 
-      if (onlyDirect) {
-        modes
-          .withDirectMode(FLEXIBLE)
-          .withAccessMode(StreetMode.WALK)
-          .withEgressMode(StreetMode.WALK);
-        journeyBuilder.withTransit(b -> b.disable());
-      } else {
-        modes.withEgressMode(FLEXIBLE);
-      }
-
-      journeyBuilder.setModes(modes.build());
-    });
+        journeyBuilder.setModes(modes.build());
+      })
+      .buildRequest();
 
     var result = service.route(request);
     var itineraries = result.getTripPlan().itineraries;

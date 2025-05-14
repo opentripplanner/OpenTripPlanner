@@ -59,13 +59,14 @@ class RideHailingAccessShifterTest {
   @ParameterizedTest
   @MethodSource("testCases")
   void testArrivalDelay(Instant searchTime, Duration expectedArrival) {
-    var req = new RouteRequest();
-    req.setTo(FROM);
-    req.setFrom(TO);
-    req.setDateTime(searchTime);
-    req.withJourney(jb ->
-      jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
-    );
+    var req = RouteRequest.of()
+      .setTo(FROM)
+      .setFrom(TO)
+      .setDateTime(searchTime)
+      .withJourney(jb ->
+        jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+      )
+      .buildRequest();
 
     var result = arrivalDelay(req, List.of(service), TIME);
 
@@ -128,13 +129,13 @@ class RideHailingAccessShifterTest {
   }
 
   private static RouteRequest routeRequest(Instant time) {
-    var req = new RouteRequest();
-    req.setDateTime(time);
-    req.setFrom(FROM);
-    req.setFrom(TO);
-    req.withJourney(jb ->
-      jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
-    );
-    return req;
+    return RouteRequest.of()
+      .setDateTime(time)
+      .setFrom(FROM)
+      .setTo(TO)
+      .withJourney(jb ->
+        jb.setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build())
+      )
+      .buildRequest();
   }
 }

@@ -77,11 +77,12 @@ class WalkRoutingTest {
     Instant instant,
     boolean arriveBy
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(instant);
-    request.setFrom(from);
-    request.setTo(to);
-    request.setArriveBy(arriveBy);
+    RouteRequest request = RouteRequest.of()
+      .setDateTime(instant)
+      .setFrom(from)
+      .setTo(to)
+      .setArriveBy(arriveBy)
+      .buildRequest();
 
     try (
       var temporaryVertices = new TemporaryVerticesContainer(

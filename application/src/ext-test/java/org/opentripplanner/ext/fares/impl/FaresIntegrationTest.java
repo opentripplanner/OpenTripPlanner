@@ -131,13 +131,14 @@ public class FaresIntegrationTest {
     Instant time,
     OtpServerRequestContext serverContext
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(time);
-    request.setFrom(from);
-    request.setTo(to);
-    request.withPreferences(p ->
-      p.withItineraryFilter(it -> it.withDebug(ItineraryFilterDebugProfile.LIST_ALL))
-    );
+    RouteRequest request = RouteRequest.of()
+      .setDateTime(time)
+      .setFrom(from)
+      .setTo(to)
+      .withPreferences(p ->
+        p.withItineraryFilter(it -> it.withDebug(ItineraryFilterDebugProfile.LIST_ALL))
+      )
+      .buildRequest();
 
     var result = serverContext.routingService().route(request);
 

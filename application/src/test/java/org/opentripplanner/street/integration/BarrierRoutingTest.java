@@ -26,6 +26,7 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -170,21 +171,20 @@ public class BarrierRoutingTest {
     GenericLocation from,
     GenericLocation to,
     StreetMode streetMode,
-    Consumer<RouteRequest> options,
+    Consumer<RouteRequestBuilder> options,
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
-    var request = RouteRequest.of()
+    var builder = RouteRequest.of()
       .setDateTime(dateTime)
       .setFrom(from)
       .setTo(to)
-      .withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)))
-      .buildRequest();
+      .withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)));
 
-    options.accept(request);
+    options.accept(builder);
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode, streetMode);
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,

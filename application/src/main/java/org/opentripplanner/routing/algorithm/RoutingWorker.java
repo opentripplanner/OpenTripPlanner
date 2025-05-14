@@ -66,9 +66,12 @@ public class RoutingWorker {
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
-  public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
-    request.applyPageCursor();
-    this.request = request;
+  public RoutingWorker(
+    OtpServerRequestContext serverContext,
+    RouteRequest orginalRequest,
+    ZoneId zoneId
+  ) {
+    this.request = orginalRequest.withPageCursor();
     this.serverContext = serverContext;
     this.debugTimingAggregator = new DebugTimingAggregator(
       serverContext.meterRegistry(),

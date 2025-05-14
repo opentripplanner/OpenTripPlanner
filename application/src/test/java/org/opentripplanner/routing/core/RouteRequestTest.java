@@ -302,13 +302,13 @@ class RouteRequestTest {
 
   @Test
   void allowTransferOptimization() {
-    RouteRequest request = new RouteRequest();
-    assertTrue(request.allowTransferOptimization());
+    var builder = RouteRequest.of();
+    assertTrue(builder.buildDefault().allowTransferOptimization());
 
-    request.setViaLocations(
+    builder.setViaLocations(
       List.of(new VisitViaLocation("VIA", null, List.of(new FeedScopedId("F", "1")), List.of()))
     );
-    assertFalse(request.allowTransferOptimization());
+    assertFalse(builder.buildDefault().allowTransferOptimization());
   }
 
   private void expectOneRoutingValidationException(

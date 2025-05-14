@@ -72,17 +72,17 @@ public class BicycleRoutingTest {
   }
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-    request.withPreferences(p ->
-      p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
-    );
-
-    request.withJourney(jb -> {
-      jb.withDirect(new StreetRequest(StreetMode.BIKE));
-    });
+    RouteRequest request = RouteRequest.of()
+      .setDateTime(dateTime)
+      .setFrom(from)
+      .setTo(to)
+      .withPreferences(p ->
+        p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
+      )
+      .withJourney(jb -> {
+        jb.withDirect(new StreetRequest(StreetMode.BIKE));
+      })
+      .buildRequest();
 
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,

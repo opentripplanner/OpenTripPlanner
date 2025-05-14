@@ -63,11 +63,11 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct WALK")
   @Test
   public void directWalk() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb ->
-      jb.withTransit(b -> b.disable())
-    );
-    request.setFrom(p1);
-    request.setTo(p4);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withJourney(jb -> jb.withTransit(b -> b.disable()))
+      .setFrom(p1)
+      .setTo(p4)
+      .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -75,13 +75,14 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE_RENTAL")
   @Test
   public void directBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb -> {
-      jb.withDirect(new StreetRequest(StreetMode.BIKE_RENTAL));
-      jb.withTransit(b -> b.disable());
-    });
-
-    request.setFrom(p1);
-    request.setTo(p2);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withJourney(jb -> {
+        jb.withDirect(new StreetRequest(StreetMode.BIKE_RENTAL));
+        jb.withTransit(b -> b.disable());
+      })
+      .setFrom(p1)
+      .setTo(p2)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -89,22 +90,22 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("Direct BIKE")
   @Test
   public void directBike() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0);
-
-    request.withPreferences(pref ->
-      pref.withBike(bike ->
-        bike
-          .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
-          .withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3))
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withPreferences(pref ->
+        pref.withBike(bike ->
+          bike
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+            .withOptimizeTriangle(b -> b.withTime(0.3).withSlope(0.4).withSafety(0.3))
+        )
       )
-    );
-    request.withJourney(jb -> {
-      jb.withDirect(new StreetRequest(StreetMode.BIKE));
-      jb.withTransit(b -> b.disable());
-    });
-    request.setFrom(p1);
-    request.setTo(p4);
-    request.setArriveBy(true);
+      .withJourney(jb -> {
+        jb.withDirect(new StreetRequest(StreetMode.BIKE));
+        jb.withTransit(b -> b.disable());
+      })
+      .setFrom(p1)
+      .setTo(p4)
+      .setArriveBy(true)
+      .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -113,13 +114,14 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @Test
   @Disabled
   public void accessBikeRental() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
-    request.withJourney(b -> {
-      b.withAccess(new StreetRequest(StreetMode.BIKE_RENTAL));
-      b.withDirect(new StreetRequest(StreetMode.NOT_SET));
-    });
-    request.setFrom(p1);
-    request.setTo(p3);
+    var request = createTestRequest(2009, 10, 21, 16, 14, 0)
+      .withJourney(b -> {
+        b.withAccess(new StreetRequest(StreetMode.BIKE_RENTAL));
+        b.withDirect(new StreetRequest(StreetMode.NOT_SET));
+      })
+      .setFrom(p1)
+      .setTo(p3)
+      .buildRequest();
 
     try {
       expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -131,12 +133,11 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   @DisplayName("TRANSIT")
   @Test
   public void transit() {
-    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0).withJourney(jb ->
-      jb.withDirect(new StreetRequest(StreetMode.NOT_SET))
-    );
-
-    request.setFrom(p3);
-    request.setTo(p1);
+    RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.NOT_SET)))
+      .setFrom(p3)
+      .setTo(p1)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

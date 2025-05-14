@@ -180,26 +180,25 @@ public class TriangleInequalityTest {
     assertNotNull(start);
     assertNotNull(end);
 
-    var request = new RouteRequest();
-
-    // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
-    request.withPreferences(preferences ->
-      preferences
-        .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
-        .withStreet(street -> street.withTurnReluctance(1.0))
-        .withCar(car -> car.withReluctance(1.0))
-        .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
-        .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
-    );
-
-    request.withJourney(jb -> {
-      if (modes != null) {
-        jb.setModes(modes);
-      }
-      if (!filters.isEmpty()) {
-        jb.withTransit(b -> b.setFilters(filters));
-      }
-    });
+    var request = RouteRequest.of()
+      // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
+      .withPreferences(preferences ->
+        preferences
+          .withWalk(walk -> walk.withStairsReluctance(1.0).withSpeed(1.0).withReluctance(1.0))
+          .withStreet(street -> street.withTurnReluctance(1.0))
+          .withCar(car -> car.withReluctance(1.0))
+          .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
+          .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
+      )
+      .withJourney(jb -> {
+        if (modes != null) {
+          jb.setModes(modes);
+        }
+        if (!filters.isEmpty()) {
+          jb.withTransit(b -> b.setFilters(filters));
+        }
+      })
+      .buildDefault();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())

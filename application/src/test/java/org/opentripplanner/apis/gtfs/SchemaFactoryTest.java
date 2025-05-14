@@ -31,17 +31,18 @@ public class SchemaFactoryTest {
 
   @Test
   void testDefaultValueInjection() {
-    var routeRequest = new RouteRequest();
     double walkSpeed = 15;
-    routeRequest.withPreferences(preferences ->
-      preferences.withWalk(walk -> walk.withSpeed(walkSpeed))
-    );
     var maxTransfers = 2;
-    routeRequest.withPreferences(preferences ->
-      preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1))
-    );
     var numItineraries = 63;
-    routeRequest.setNumItineraries(numItineraries);
+
+    var routeRequest = RouteRequest.of()
+      .withPreferences(preferences -> {
+        preferences.withWalk(walk -> walk.withSpeed(walkSpeed));
+        preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1));
+      })
+      .setNumItineraries(numItineraries)
+      .buildDefault();
+
     var schema = SchemaFactory.createSchemaWithDefaultInjection(routeRequest);
     assertNotNull(schema);
 

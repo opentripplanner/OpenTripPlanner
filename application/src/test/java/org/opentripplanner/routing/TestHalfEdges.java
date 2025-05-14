@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.linearref.LinearLocation;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -181,8 +177,6 @@ public class TestHalfEdges {
     int nVertices = graph.getVertices().size();
     int nEdges = graph.getEdges().size();
 
-    var request = new RouteRequest();
-
     HashSet<Edge> turns = new HashSet<>();
     turns.add(left);
     turns.add(leftBack);
@@ -216,14 +210,12 @@ public class TestHalfEdges {
 
     assertEquals(2, edges.size());
 
-    long startTime = LocalDateTime.of(2009, Month.DECEMBER, 1, 12, 34, 25)
-      .atZone(ZoneIds.NEW_YORK)
-      .toEpochSecond();
-    request.setDateTime(Instant.ofEpochSecond(startTime));
+    var r = RouteRequest.defaultValue();
+
     ShortestPathTree<State, Edge, Vertex> spt1 = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
+      .setRequest(r)
+      .setStreetRequest(r.journey().direct())
       .setFrom(br)
       .setTo(end)
       .getShortestPathTree();
@@ -233,8 +225,8 @@ public class TestHalfEdges {
 
     ShortestPathTree<State, Edge, Vertex> spt2 = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
+      .setRequest(r)
+      .setStreetRequest(r.journey().direct())
       .setFrom(tr)
       .setTo(end)
       .getShortestPathTree();
@@ -248,8 +240,8 @@ public class TestHalfEdges {
 
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
+      .setRequest(r)
+      .setStreetRequest(r.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -263,11 +255,12 @@ public class TestHalfEdges {
       assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
     }
 
-    request.setArriveBy(true);
+    r = RouteRequest.of().setArriveBy(true).buildDefault();
+
     spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
+      .setRequest(r)
+      .setStreetRequest(r.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -291,8 +284,6 @@ public class TestHalfEdges {
      * that (b) it is not preferred to riding a tiny bit longer.
      */
 
-    request = new RouteRequest()
-      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.BIKE)));
     start = StreetIndex.createTemporaryStreetLocationForTest(
       "start1",
       new NonLocalizedString("start1"),
@@ -310,10 +301,14 @@ public class TestHalfEdges {
       tempEdges
     );
 
+    r = RouteRequest.of()
+      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.BIKE)))
+      .buildDefault();
+
     spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
-      .setStreetRequest(request.journey().direct())
+      .setRequest(r)
+      .setStreetRequest(r.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -351,7 +346,7 @@ public class TestHalfEdges {
 
     spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(request)
+      .setRequest(r)
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -373,7 +368,6 @@ public class TestHalfEdges {
 
   @Test
   public void testRouteToSameEdge() {
-    RouteRequest options = new RouteRequest();
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
     HashSet<Edge> turns = new HashSet<>();
@@ -407,14 +401,12 @@ public class TestHalfEdges {
 
     assertEquals(3, edges.size());
 
-    long startTime = LocalDateTime.of(2009, Month.DECEMBER, 1, 12, 34, 25)
-      .atZone(ZoneIds.NEW_YORK)
-      .toEpochSecond();
-    options.setDateTime(Instant.ofEpochSecond(startTime));
+    var request = RouteRequest.defaultValue();
+
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(options)
-      .setStreetRequest(options.journey().direct())
+      .setRequest(request)
+      .setStreetRequest(request.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -428,7 +420,6 @@ public class TestHalfEdges {
 
   @Test
   public void testRouteToSameEdgeBackwards() {
-    RouteRequest options = new RouteRequest();
     DisposableEdgeCollection tempEdges = new DisposableEdgeCollection(graph);
 
     // Sits only on the leftmost edge, not on its reverse.
@@ -461,14 +452,12 @@ public class TestHalfEdges {
     Collection<Edge> edges = end.getIncoming();
     assertEquals(1, edges.size());
 
-    long startTime = LocalDateTime.of(2009, Month.DECEMBER, 1, 12, 34, 25)
-      .atZone(ZoneIds.NEW_YORK)
-      .toEpochSecond();
-    options.setDateTime(Instant.ofEpochSecond(startTime));
+    var request = RouteRequest.defaultValue();
+
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
-      .setRequest(options)
-      .setStreetRequest(options.journey().direct())
+      .setRequest(request)
+      .setStreetRequest(request.journey().direct())
       .setFrom(start)
       .setTo(end)
       .getShortestPathTree();
@@ -622,9 +611,11 @@ public class TestHalfEdges {
   @Test
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
-    RouteRequest walking = new RouteRequest();
-    walking.setFrom(GenericLocation.fromCoordinate(40.004, -74.0));
-    walking.setTo(GenericLocation.fromCoordinate(40.008, -74.0));
+    RouteRequest walking = RouteRequest.of()
+      .setFrom(GenericLocation.fromCoordinate(40.004, -74.0))
+      .setTo(GenericLocation.fromCoordinate(40.008, -74.0))
+      .buildRequest();
+
     try (
       var container = new TemporaryVerticesContainer(
         graph,

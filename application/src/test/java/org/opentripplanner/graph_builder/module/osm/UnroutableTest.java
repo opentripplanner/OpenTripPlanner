@@ -58,10 +58,9 @@ public class UnroutableTest {
    */
   @Test
   public void testOnBoardRouting() {
-    var request = new RouteRequest()
-      .withJourney(journeyBuilder -> {
-        journeyBuilder.withDirect(new StreetRequest(StreetMode.BIKE));
-      });
+    var request = RouteRequest.of()
+      .withJourney(j -> j.withDirect(new StreetRequest(StreetMode.BIKE)))
+      .buildDefault();
 
     Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
     Vertex to = graph.getVertex(VertexLabel.osm(40446276));

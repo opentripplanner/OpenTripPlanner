@@ -157,11 +157,13 @@ class ScheduledDeviatedTripIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     var zoneId = ZoneIds.NEW_YORK;
-    RouteRequest request = new RouteRequest();
     var dateTime = LocalDateTime.of(2021, Month.DECEMBER, 16, 12, 0).atZone(zoneId);
-    request.setDateTime(dateTime.toInstant());
-    request.setFrom(from);
-    request.setTo(to);
+
+    RouteRequest request = RouteRequest.of()
+      .setDateTime(dateTime.toInstant())
+      .setFrom(from)
+      .setTo(to)
+      .buildRequest();
 
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);

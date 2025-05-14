@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -24,6 +25,9 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
  * the tests.
  */
 public class StreetModeLinkingTest extends GraphRoutingTest {
+
+  private static final GenericLocation PLACE_1 = GenericLocation.fromCoordinate(47.5015, 19.015);
+  private static final GenericLocation PLACE_2 = GenericLocation.fromCoordinate(47.5025, 19.015);
 
   private Graph graph;
 
@@ -94,11 +98,11 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @Test
   public void testCarParkLinking() {
-    var setup = (BiFunction<Double, Double, Consumer<RouteRequest>>) (
+    var setup = (BiFunction<Double, Double, Consumer<RouteRequestBuilder>>) (
       Double latitude,
       Double longitude
     ) ->
-      (RouteRequest rr) -> {
+      (RouteRequestBuilder rr) -> {
         rr.setFrom(GenericLocation.fromCoordinate(latitude, longitude));
         rr.setTo(GenericLocation.fromCoordinate(latitude, longitude));
       };
@@ -190,24 +194,26 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   private void assertLinking(
-    Consumer<RouteRequest> consumer,
+    Consumer<RouteRequestBuilder> consumer,
     String fromStreetName,
     String toStreetName,
     StreetMode... streetModes
   ) {
     for (final StreetMode streetMode : streetModes) {
-      var routingRequest = new RouteRequest();
+      var builder = RouteRequest.of();
 
-      consumer.accept(routingRequest);
+      consumer.accept(builder);
 
-      // Remove to, so that origin and destination are different
-      routingRequest.setTo(GenericLocation.UNKNOWN);
+      // Set to, so that origin and destination are different
+      builder.setTo(PLACE_1);
+
+      var request = builder.buildRequest();
 
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          routingRequest.from(),
-          routingRequest.to(),
+          request.from(),
+          request.to(),
           streetMode,
           streetMode
         )
@@ -221,18 +227,19 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         }
       }
 
-      routingRequest = new RouteRequest();
+      builder = RouteRequest.of();
 
-      consumer.accept(routingRequest);
+      consumer.accept(builder);
 
-      // Remove from, so that origin and destination are different
-      routingRequest.setFrom(GenericLocation.UNKNOWN);
+      // Set from, so that origin and destination are different
+      builder.setFrom(PLACE_2);
+      request = builder.buildRequest();
 
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          routingRequest.from(),
-          routingRequest.to(),
+          request.from(),
+          request.to(),
           streetMode,
           streetMode
         )

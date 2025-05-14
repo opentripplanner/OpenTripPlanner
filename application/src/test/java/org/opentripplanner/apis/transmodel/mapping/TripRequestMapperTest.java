@@ -116,18 +116,19 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   @BeforeEach
   void setup() {
-    final RouteRequest defaultRequest = new RouteRequest();
-
     // Change defaults for FLEXIBLE to a lower value than the default 45m. This should restrict the
     // input to be less than 20m, not 45m.
-    defaultRequest.withPreferences(pb ->
-      pb.withStreet(sp ->
-        sp
-          .withAccessEgress(ae -> ae.withMaxDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
-          )
-          .withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+    final RouteRequest defaultRequest = RouteRequest.of()
+      .withPreferences(pb ->
+        pb.withStreet(sp ->
+          sp
+            .withAccessEgress(ae ->
+              ae.withMaxDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+            )
+            .withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+        )
       )
-    );
+      .buildDefault();
 
     var otpServerRequestContext = TestServerContext.createServerContext(
       graph,

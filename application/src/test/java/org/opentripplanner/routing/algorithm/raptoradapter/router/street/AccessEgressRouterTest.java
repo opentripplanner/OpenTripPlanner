@@ -218,10 +218,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   }
 
   private RouteRequest requestFromTo(GenericLocation from, GenericLocation to) {
-    var routeRequest = new RouteRequest();
-    routeRequest.setFrom(from);
-    routeRequest.setTo(to);
-    return routeRequest;
+    return RouteRequest.of().setFrom(from).setTo(to).buildRequest();
   }
 
   private String nearbyStopDescription(NearbyStop nearbyStop) {

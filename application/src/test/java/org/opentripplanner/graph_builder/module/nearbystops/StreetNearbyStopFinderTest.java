@@ -118,8 +118,9 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     // one extra stop.
     var durationLimit = Duration.ofSeconds(101);
     var maxStopCount = 0;
-    var routeRequest = new RouteRequest()
-      .withPreferences(b -> b.withWalk(walkPreferences -> walkPreferences.withSpeed(1.0)));
+    var routeRequest = RouteRequest.of()
+      .withPreferences(b -> b.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
 
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
     var sortedNearbyStops = sort(

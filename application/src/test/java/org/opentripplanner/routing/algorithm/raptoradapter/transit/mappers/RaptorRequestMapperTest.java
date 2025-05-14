@@ -318,7 +318,10 @@ class RaptorRequestMapperTest {
     return RouteRequest.of().setFrom(FROM).setTo(TO);
   }
 
-  private static RouteRequestBuilder setFeaturesOnRequest(RouteRequestBuilder req, RequestFeature feature) {
+  private static RouteRequestBuilder setFeaturesOnRequest(
+    RouteRequestBuilder req,
+    RequestFeature feature
+  ) {
     return switch (feature) {
       case VIA_VISIT -> req.setViaLocations(
         ListUtils.combine(req.buildRequest().getViaLocations(), List.of(VISIT_VIA_LOCATION))

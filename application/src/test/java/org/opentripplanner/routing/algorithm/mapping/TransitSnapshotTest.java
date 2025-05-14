@@ -62,36 +62,39 @@ public class TransitSnapshotTest extends SnapshotTestBase {
 
   @Test
   public void test_trip_planning_with_walk_only() {
-    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0).withJourney(jb ->
-      jb.withTransit(b -> b.disable())
-    );
-
-    request.setFrom(p0);
-    request.setTo(p2);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
+      .withJourney(jb -> jb.withTransit(b -> b.disable()))
+      .setFrom(p0)
+      .setTo(p2)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
 
   @Test
   public void test_trip_planning_with_walk_only_stop() {
-    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0).withJourney(jb -> {
-      jb.setAllModes(StreetMode.WALK);
-      jb.withTransit(b -> b.disable());
-    });
-    request.setFrom(ps);
-    request.setTo(p2);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
+      .withJourney(jb -> {
+        jb.setAllModes(StreetMode.WALK);
+        jb.withTransit(b -> b.disable());
+      })
+      .setFrom(ps)
+      .setTo(p2)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
 
   @Test
   public void test_trip_planning_with_walk_only_stop_collection() {
-    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0).withJourney(jb -> {
-      jb.setAllModes(StreetMode.WALK);
-      jb.withTransit(b -> b.disable());
-    });
-    request.setFrom(ptc);
-    request.setTo(p3);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
+      .withJourney(jb -> {
+        jb.setAllModes(StreetMode.WALK);
+        jb.withTransit(b -> b.disable());
+      })
+      .setFrom(ptc)
+      .setTo(p3)
+      .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
     // not equal - expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -99,24 +102,24 @@ public class TransitSnapshotTest extends SnapshotTestBase {
 
   @Test
   public void test_trip_planning_with_transit() {
-    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0).withJourney(jb -> {
-      jb.setAllModes(StreetMode.WALK);
-    });
-
-    request.setFrom(p1);
-    request.setTo(p2);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
+      .withJourney(jb -> {
+        jb.setAllModes(StreetMode.WALK);
+      })
+      .setFrom(p1)
+      .setTo(p2)
+      .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
 
   @Test
   public void test_trip_planning_with_transit_stop() {
-    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0).withJourney(jb ->
-      jb.setAllModes(StreetMode.WALK)
-    );
-
-    request.setFrom(ps);
-    request.setTo(p3);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
+      .withJourney(jb -> jb.setAllModes(StreetMode.WALK))
+      .setFrom(ps)
+      .setTo(p3)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }
@@ -124,12 +127,11 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   @Test
   @Disabled
   public void test_trip_planning_with_transit_stop_collection() {
-    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0).withJourney(jb ->
-      jb.setAllModes(StreetMode.WALK)
-    );
-
-    request.setFrom(ptc);
-    request.setTo(p3);
+    RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
+      .withJourney(jb -> jb.setAllModes(StreetMode.WALK))
+      .setFrom(ptc)
+      .setTo(p3)
+      .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
   }

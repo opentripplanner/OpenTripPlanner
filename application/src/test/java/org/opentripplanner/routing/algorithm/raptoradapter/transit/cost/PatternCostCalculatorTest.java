@@ -56,16 +56,17 @@ public class PatternCostCalculatorTest {
   @DisplayName("cost mapper should create penalty map")
   public void testMcCostParameterMapping() {
     var unpreferredCostFunctionOtpDomain = CostLinearFunction.of("5m + 1.1 t");
-    RouteRequest routingRequest = new RouteRequest()
+    RouteRequest routingRequest = RouteRequest.of()
       .withJourney(jb ->
         jb.withTransit(b -> {
           b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
           b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
         })
-      );
-    routingRequest.withPreferences(p ->
-      p.withTransit(tr -> tr.setUnpreferredCost(unpreferredCostFunctionOtpDomain))
-    );
+      )
+      .withPreferences(p ->
+        p.withTransit(tr -> tr.setUnpreferredCost(unpreferredCostFunctionOtpDomain))
+      )
+      .buildDefault();
 
     var data = new TestTransitData();
     final TestTripPattern defaultPattern = pattern(false, false);
@@ -190,30 +191,29 @@ public class PatternCostCalculatorTest {
     }
 
     RouteRequest createRouteRequest() {
-      var request = new RouteRequest();
-
-      request.withPreferences(preferences -> {
-        preferences.withTransit(transit ->
-          transit.setUnpreferredCost(
-            CostLinearFunction.of(UNPREFERRED_ROUTE_PENALTY, UNPREFERRED_ROUTE_RELUCTANCE)
-          )
-        );
-        preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));
-        preferences.withTransfer(tx -> {
-          tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
-        });
-      });
-      request.withJourney(jb ->
-        jb.withTransit(b -> {
-          if (unPreferredAgency) {
-            b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
-          }
-          if (unPreferredRoute) {
-            b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
-          }
+      return RouteRequest.of()
+        .withPreferences(preferences -> {
+          preferences.withTransit(transit ->
+            transit.setUnpreferredCost(
+              CostLinearFunction.of(UNPREFERRED_ROUTE_PENALTY, UNPREFERRED_ROUTE_RELUCTANCE)
+            )
+          );
+          preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));
+          preferences.withTransfer(tx -> {
+            tx.withCost(TRANSFER_COST_SEC).withWaitReluctance(WAIT_RELUCTANCE_FACTOR);
+          });
         })
-      );
-      return request;
+        .withJourney(jb ->
+          jb.withTransit(b -> {
+            if (unPreferredAgency) {
+              b.withUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
+            }
+            if (unPreferredRoute) {
+              b.withUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
+            }
+          })
+        )
+        .buildDefault();
     }
   }
 
