@@ -25,7 +25,7 @@ public class GtfsFeedIdResolver {
   private static Map<Object, String> FEED_ID_MAP = Collections.synchronizedMap(new HashMap<>());
 
   /**
-   * Extracts a feed_id from the passed source for a GTFS feed. If no feedId exist an id is
+   * Extracts a feed_id from the passed source for a GTFS feed. If no feedId exists an id is
    * generated. The {@code dataSourceId} is used to ensure the same feedId is used even if a
    * datasource is read more than once.
    * <p>

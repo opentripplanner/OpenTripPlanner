@@ -19,9 +19,9 @@ public interface CompositeDataSource extends DataSource, Closeable {
   Collection<DataSource> content();
 
   /**
-   * Retrieve a single entry by name, or {@code null} if the enrty is inaccessable - for example
-   * a none existing file inside a zip composite data source. This method will return a data source
-   * if possible, The datasource might not exist, in case it might be used for output.
+   * Retrieve a single entry by name, or {@code null} if the entry is inaccessible - for example
+   * a non-existing file inside a zip composite data source. This method will return a data source
+   * if possible. The datasource might not exist and in this case it might be used for output.
    * <p>
    * Example:
    * <p>
