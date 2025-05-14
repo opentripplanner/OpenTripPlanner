@@ -6,7 +6,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
-import org.opentripplanner.routing.api.request.DebugRaptor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RoutingTag;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -82,8 +81,8 @@ public class SpeedTestRequest {
       }
 
       journeyBuilder.withTransit(transitBuilder ->
-        transitBuilder.withRaptorDebugging(
-          new DebugRaptor().withStops(opts.debugStops()).withPath(opts.debugPath())
+        transitBuilder.withRaptorDebugging(d ->
+          d.withStops(opts.debugStops()).withPath(opts.debugPath())
         )
       );
     });

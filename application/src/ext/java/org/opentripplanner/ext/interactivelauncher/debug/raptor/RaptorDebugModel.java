@@ -85,14 +85,7 @@ public class RaptorDebugModel implements LauncherRequestDecorator {
       .copyOf()
       .withJourney(jb ->
         jb.withTransit(tb ->
-          tb.withRaptorDebugging(
-            defaultRequest
-              .journey()
-              .transit()
-              .raptorDebugging()
-              .withEventTypes(eventTypes)
-              .withStops(stops)
-              .withPath(path)
+          tb.withRaptorDebugging(rd -> rd.withEventTypes(eventTypes).withStops(stops).withPath(path)
           )
         )
       )

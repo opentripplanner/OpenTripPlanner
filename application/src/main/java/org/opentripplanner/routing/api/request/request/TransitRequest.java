@@ -22,7 +22,7 @@ public class TransitRequest implements Cloneable, Serializable {
     List.of(),
     List.of(),
     List.of(),
-    new DebugRaptor()
+    DebugRaptor.defaltValue()
   );
 
   private final List<TransitFilter> filters;

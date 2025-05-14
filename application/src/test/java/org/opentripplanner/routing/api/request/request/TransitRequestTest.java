@@ -22,10 +22,13 @@ class TransitRequestTest {
       .addSelect(SelectRequest.of().withAgenciesFromString("A:1").build())
       .build()
   );
+  private static final String DEBUG_STOPS = "1 2";
   private static final List<FeedScopedId> AGENCIES = List.of(new FeedScopedId("F", "A:1"));
   private static final List<FeedScopedId> ROUTES = List.of(new FeedScopedId("F", "R:1"));
   private static final List<FeedScopedId> BANNED_TRIPS = List.of(new FeedScopedId("F", "T:1"));
-  private static final DebugRaptor RAPTOR_DEBUGGING = new DebugRaptor().withStops("1 2");
+  private static final DebugRaptor RAPTOR_DEBUGGING = DebugRaptor.of()
+    .withStops(DEBUG_STOPS)
+    .build();
   private static final List<TransitGroupSelect> PRIORITY_GROUP_BY_AGENCY = List.of(
     TransitGroupSelect.of().addSubModeRegexp(List.of("A.*")).build()
   );
@@ -40,7 +43,7 @@ class TransitRequestTest {
     .withBannedTrips(BANNED_TRIPS)
     .withPriorityGroupsByAgency(PRIORITY_GROUP_BY_AGENCY)
     .addPriorityGroupsGlobal(PRIORITY_GROUP_GLOBAL)
-    .withRaptorDebugging(RAPTOR_DEBUGGING)
+    .withRaptorDebugging(rd -> rd.withStops("1 2"))
     .build();
 
   @Test
@@ -102,10 +105,10 @@ class TransitRequestTest {
     // get the same instance.
     var copy = subject
       .copyOf()
-      .withRaptorDebugging(new DebugRaptor().withPath("1 2 3"))
+      .withRaptorDebugging(d -> d.withPath("1 2 3"))
       .build()
       .copyOf()
-      .withRaptorDebugging(RAPTOR_DEBUGGING)
+      .withRaptorDebugging(d -> d.withStops(DEBUG_STOPS))
       .build();
 
     AssertEqualsAndHashCode.verify(subject)
@@ -114,7 +117,7 @@ class TransitRequestTest {
         subject.copyOf().disable().build(),
         subject.copyOf().withPriorityGroupsByAgency(List.of()).build(),
         subject.copyOf().addPriorityGroupsGlobal(List.of()).build(),
-        subject.copyOf().withRaptorDebugging(new DebugRaptor()).build().toString()
+        subject.copyOf().withRaptorDebugging(d -> d.withStops("")).build().toString()
       );
   }
 
