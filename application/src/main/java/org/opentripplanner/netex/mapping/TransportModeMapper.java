@@ -61,7 +61,7 @@ class TransportModeMapper {
   }
 
   /**
-   * Use sumbmode to determin if a trip/ServiceJourney is allowed for car or not. There are
+   * Use submode to determine if a trip/ServiceJourney is allowed for car or not. There are
    * probably other ways to specify this in NeTEx. The list of included submodes
    * {@link #CARS_ALLOWED_WATER_SUBMODES} are not complete, feel free to request
    * changes.
