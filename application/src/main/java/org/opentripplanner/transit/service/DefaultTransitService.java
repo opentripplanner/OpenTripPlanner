@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.apis.gtfs.GraphQLUtils;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.FeedInfo;
@@ -761,6 +763,58 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public boolean transitFeedCovers(Instant dateTime) {
     return timetableRepository.transitFeedCovers(dateTime);
+  }
+
+  @Override
+  public List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
+    TripPattern originalPattern,
+    StopLocation stop,
+    GraphQLTypes.GraphQLStopStopTimesForPatternArgs args
+  ) {
+    Instant startTime = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
+    LocalDate date = startTime.atZone(getTimeZone()).toLocalDate();
+
+    return Stream.concat(
+        getRealtimeAddedPatternsAsStream(originalPattern, date),
+        Stream.of(originalPattern)
+      )
+      .flatMap(tripPattern ->
+        findTripTimeOnDate(
+          stop,
+          tripPattern,
+          startTime,
+          Duration.ofSeconds(args.getGraphQLTimeRange()),
+          args.getGraphQLNumberOfDepartures(),
+          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+          false
+        )
+          .stream()
+      )
+      .sorted(
+        Comparator.comparing(
+          (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
+        )
+      )
+      .limit(args.getGraphQLNumberOfDepartures())
+      .toList();
+  }
+
+  /**
+   * Get a stream of {@link TripPattern} that were created real-time based of the provided pattern.
+   * Only patterns that don't have removed (stops can still be skipped) or added stops are included.
+   */
+  private Stream<TripPattern> getRealtimeAddedPatternsAsStream(
+    TripPattern originalPattern,
+    LocalDate date
+  ) {
+    return originalPattern
+      .scheduledTripsAsStream()
+      .map(trip -> findNewTripPatternForModifiedTrip(trip.getId(), date))
+      .filter(
+        tripPattern ->
+          tripPattern != null &&
+            tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
+      );
   }
 
   /**
