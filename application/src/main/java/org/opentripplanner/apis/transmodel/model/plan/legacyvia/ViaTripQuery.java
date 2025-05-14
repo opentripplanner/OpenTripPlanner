@@ -138,7 +138,7 @@ public class ViaTripQuery {
             "the search, not implemented for the transit yet."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValueProgrammatic(routing.request.wheelchair())
+          .defaultValueProgrammatic(routing.request.journey().wheelchair())
           .build()
       )
       .argument(

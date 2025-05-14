@@ -326,7 +326,11 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   @Test
   public void testMultipleRequestsWithPatternsAndWithCarsAllowedPatterns() {
-    var transferRequests = List.of(REQUEST_WITH_WALK_TRANSFER, REQUEST_WITH_BIKE_TRANSFER, REQUEST_WITH_CAR_TRANSFER);
+    var transferRequests = List.of(
+      REQUEST_WITH_WALK_TRANSFER,
+      REQUEST_WITH_BIKE_TRANSFER,
+      REQUEST_WITH_CAR_TRANSFER
+    );
 
     var otpModel = model(true, false, false, true);
     var graph = otpModel.graph();
@@ -436,7 +440,11 @@ class DirectTransferGeneratorTest extends GraphRoutingTest {
 
   @Test
   public void testDisableDefaultTransfersForMode() {
-    var transferRequests = List.of(REQUEST_WITH_WALK_TRANSFER, REQUEST_WITH_BIKE_TRANSFER, REQUEST_WITH_CAR_TRANSFER);
+    var transferRequests = List.of(
+      REQUEST_WITH_WALK_TRANSFER,
+      REQUEST_WITH_BIKE_TRANSFER,
+      REQUEST_WITH_CAR_TRANSFER
+    );
 
     var otpModel = model(true, false, false, true);
     var graph = otpModel.graph();

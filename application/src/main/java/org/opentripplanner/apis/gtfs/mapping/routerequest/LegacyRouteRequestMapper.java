@@ -63,7 +63,6 @@ public class LegacyRouteRequestMapper {
     );
     boolean isTripPlannedForNow = RouteRequest.isAPIGtfsTripPlannedForNow(request.dateTime());
 
-    callWith.argument("wheelchair", request::setWheelchair);
     callWith.argument("numItineraries", request::setNumItineraries);
     callWith.argument("searchWindow", (Long m) -> request.setSearchWindow(Duration.ofSeconds(m)));
     callWith.argument("pageCursor", request::setPageCursorFromEncoded);
@@ -170,6 +169,8 @@ public class LegacyRouteRequestMapper {
     callWith.argument("arriveBy", request::setArriveBy);
 
     request.withJourney(journeyBuilder -> {
+      callWith.argument("wheelchair", journeyBuilder::withWheelchair);
+
       journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.routes", (String v) ->
           transitBuilder.withPreferredRoutes(FeedScopedId.parseList(v))

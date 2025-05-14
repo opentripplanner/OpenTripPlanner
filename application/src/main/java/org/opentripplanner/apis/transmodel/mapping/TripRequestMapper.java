@@ -55,11 +55,12 @@ public class TripRequestMapper {
     );
     callWith.argument("pageCursor", requestBuilder::setPageCursorFromEncoded);
     callWith.argument("timetableView", requestBuilder::setTimetableView);
-    callWith.argument("wheelchairAccessible", requestBuilder::setWheelchair);
     callWith.argument("numTripPatterns", requestBuilder::setNumItineraries);
     callWith.argument("arriveBy", requestBuilder::setArriveBy);
 
     requestBuilder.withJourney(journeyBuilder -> {
+      callWith.argument("wheelchairAccessible", journeyBuilder::withWheelchair);
+
       journeyBuilder.withTransit(transitBuilder -> {
         callWith.argument("preferred.authorities", (Collection<String> authorities) ->
           transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))

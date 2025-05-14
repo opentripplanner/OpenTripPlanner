@@ -25,11 +25,12 @@ class StreetSearchRequestMapperTest {
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
     builder.setTo(to);
     builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
-    builder.setWheelchair(true);
 
-    builder.withJourney(jb -> {
-      jb.setModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build());
-    });
+    builder.withJourney(jb ->
+      jb
+        .withWheelchair(true)
+        .setModes(RequestModes.of().withAllStreetModes(StreetMode.BIKE).build())
+    );
 
     var request = builder.buildRequest();
     var subject = StreetSearchRequestMapper.map(request).build();
@@ -52,7 +53,7 @@ class StreetSearchRequestMapperTest {
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
     builder.setTo(to);
     builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
-    builder.setWheelchair(true);
+    builder.withJourney(j -> j.withWheelchair(true));
 
     var request = builder.buildRequest();
 

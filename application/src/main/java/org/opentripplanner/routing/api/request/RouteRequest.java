@@ -65,7 +65,6 @@ public class RouteRequest implements Cloneable, Serializable {
   @Nullable
   private final PageCursor pageCursor;
 
-  private final boolean wheelchair;
   private final JourneyRequest journey;
   private final RoutingPreferences preferences;
   private final int numItineraries;
@@ -86,7 +85,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.maxSearchWindow = null;
     this.bookingTime = null;
     this.pageCursor = null;
-    this.wheelchair = false;
     this.journey = JourneyRequest.DEFAULT;
     this.preferences = RoutingPreferences.DEFAULT;
     this.numItineraries = DEFAULT_NUM_ITINERARIES;
@@ -109,8 +107,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.maxSearchWindow = builder.maxSearchWindow;
     this.bookingTime = builder.bookingTime;
     this.pageCursor = builder.pageCursor;
-    // TODO Move to JourneyRequest
-    this.wheelchair = builder.wheelchair;
     this.journey = builder.journey;
     this.preferences = builder.preferences;
     this.numItineraries = builder.numItineraries;
@@ -166,13 +162,6 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public Instant bookingTime() {
     return bookingTime;
-  }
-
-  /**
-   * Whether the trip must be wheelchair-accessible
-   */
-  public boolean wheelchair() {
-    return wheelchair;
   }
 
   /**
@@ -438,7 +427,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return (
       arriveBy == other.arriveBy &&
       timetableView == other.timetableView &&
-      wheelchair == other.wheelchair &&
       numItineraries == other.numItineraries &&
       Objects.equals(from, other.from) &&
       Objects.equals(to, other.to) &&
@@ -467,7 +455,6 @@ public class RouteRequest implements Cloneable, Serializable {
       maxSearchWindow,
       bookingTime,
       pageCursor,
-      wheelchair,
       journey,
       preferences,
       numItineraries,
@@ -487,7 +474,6 @@ public class RouteRequest implements Cloneable, Serializable {
       .addDuration("maxSearchWindow", maxSearchWindow)
       .addDateTime("bookingTime", bookingTime)
       .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
-      .addBoolIfTrue("wheelchair", wheelchair)
       .addObj("locale", locale, DEFAULT_LOCALE)
       .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
       .addObj("journey", journey, JourneyRequest.DEFAULT)

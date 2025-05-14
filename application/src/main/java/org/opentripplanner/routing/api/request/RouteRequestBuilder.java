@@ -39,7 +39,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
   Duration maxSearchWindow;
   Instant bookingTime;
   PageCursor pageCursor;
-  boolean wheelchair;
   JourneyRequest journey;
   RoutingPreferences preferences;
   int numItineraries;
@@ -60,7 +59,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     this.maxSearchWindow = original.maxSearchWindow();
     this.bookingTime = original.bookingTime();
     this.pageCursor = original.pageCursor();
-    this.wheelchair = original.wheelchair();
     this.journey = original.journey();
     this.preferences = original.preferences();
     this.numItineraries = original.numItineraries();
@@ -94,11 +92,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
 
   public RouteRequestBuilder setBookingTime(Instant bookingTime) {
     this.bookingTime = bookingTime;
-    return this;
-  }
-
-  public RouteRequestBuilder setWheelchair(boolean wheelchair) {
-    this.wheelchair = wheelchair;
     return this;
   }
 

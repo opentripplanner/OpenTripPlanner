@@ -36,7 +36,7 @@ class RouteRequestMapperTest {
     assertEquals(_RouteRequestTestContext.DESTINATION.x, routeRequest.to().lat);
     assertEquals(_RouteRequestTestContext.DESTINATION.y, routeRequest.to().lng);
     assertEquals(testCtx.locale(), routeRequest.locale());
-    assertEquals(defaultRequest.wheelchair(), routeRequest.wheelchair());
+    assertEquals(defaultRequest.journey().wheelchair(), routeRequest.journey().wheelchair());
     assertEquals(defaultRequest.arriveBy(), routeRequest.arriveBy());
     assertEquals(defaultRequest.numItineraries(), routeRequest.numItineraries());
     assertEquals(defaultRequest.searchWindow(), routeRequest.searchWindow());

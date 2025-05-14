@@ -12,6 +12,7 @@ public class JourneyRequestBuilder implements Cloneable, Serializable {
   private StreetRequest egress;
   private StreetRequest transfer;
   private StreetRequest direct;
+  private boolean wheelchair;
 
   private final JourneyRequest original;
 
@@ -22,6 +23,7 @@ public class JourneyRequestBuilder implements Cloneable, Serializable {
     this.egress = original.egress();
     this.transfer = original.transfer();
     this.direct = original.direct();
+    this.wheelchair = original.wheelchair();
   }
 
   public JourneyRequestBuilder withTransit(TransitRequest transit) {
@@ -57,6 +59,11 @@ public class JourneyRequestBuilder implements Cloneable, Serializable {
     return withDirect(new StreetRequest(StreetMode.NOT_SET));
   }
 
+  public JourneyRequestBuilder withWheelchair(boolean wheelchair) {
+    this.wheelchair = wheelchair;
+    return this;
+  }
+
   /**
    * Set access, egress, transfer and direcet mode to a given mode.
    */
@@ -83,10 +90,7 @@ public class JourneyRequestBuilder implements Cloneable, Serializable {
   }
 
   public JourneyRequest build() {
-    var value = new JourneyRequest(transit, access, egress, transfer, direct);
-
-    // TODO: Fix when immutable
-    // return original.equals(value) ? original : value;
-    return value;
+    var value = new JourneyRequest(transit, access, egress, transfer, direct, wheelchair);
+    return original.equals(value) ? original : value;
   }
 }

@@ -26,6 +26,6 @@ class RouteRequestMapperAccessibilityTest {
     );
     var env = testCtx.executionContext(args);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
-    assertEquals(wheelchairEnabled, routeRequest.wheelchair());
+    assertEquals(wheelchairEnabled, routeRequest.journey().wheelchair());
   }
 }

@@ -29,6 +29,7 @@ class JourneyRequestTest {
     .withTransferMode(StreetMode.BIKE)
     .withDirectMode(StreetMode.CAR)
     .build();
+  private static final boolean WHEELCHAR = true;
 
   private final JourneyRequest subject = JourneyRequest.of()
     .withTransit(TRANSIT)
@@ -36,6 +37,7 @@ class JourneyRequestTest {
     .withEgress(EGRESS)
     .withTransfer(TRANSFER)
     .withDirect(DIRECT)
+    .withWheelchair(WHEELCHAR)
     .build();
 
   @Test
@@ -61,6 +63,11 @@ class JourneyRequestTest {
   @Test
   void direct() {
     assertEquals(DIRECT, subject.direct());
+  }
+
+  @Test
+  void wheelchair() {
+    assertEquals(WHEELCHAR, subject.wheelchair());
   }
 
   @Test
@@ -91,7 +98,8 @@ class JourneyRequestTest {
         subject.copyOf().withAccess(WALK).build(),
         subject.copyOf().withEgress(WALK).build(),
         subject.copyOf().withTransfer(WALK).build(),
-        subject.copyOf().withAccess(WALK).build()
+        subject.copyOf().withAccess(WALK).build(),
+        subject.copyOf().withWheelchair(!WHEELCHAR).build()
       );
   }
 
@@ -104,7 +112,8 @@ class JourneyRequestTest {
         access: StreetRequest{mode: BIKE_TO_PARK},
         egress: StreetRequest{mode: SCOOTER_RENTAL},
         transfer:StreetRequest{mode:BIKE},
-        direct:StreetRequest{mode:CAR}
+        direct:StreetRequest{mode:CAR},
+        wheelchair
       }
       """,
       subject.toString()

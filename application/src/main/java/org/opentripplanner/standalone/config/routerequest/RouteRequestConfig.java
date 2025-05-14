@@ -129,8 +129,6 @@ public class RouteRequestConfig {
         .asDuration(dft.searchWindow())
     );
 
-    requestBuilder.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
-
     NodeAdapter unpreferred = c
       .of("unpreferred")
       .since(V2_2)
@@ -148,12 +146,14 @@ public class RouteRequestConfig {
         """
       )
       .asObject();
-    requestBuilder.withJourney(jb ->
+    requestBuilder.withJourney(jb -> {
+      jb.withWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
+
       jb.withTransit(b -> {
         mapTransit(unpreferred, b, dft.journey().transit());
         TransitGroupPriorityConfig.mapTransitRequest(c, b);
-      })
-    );
+      });
+    });
 
     // Map preferences
     requestBuilder.withPreferences(preferences -> mapPreferences(c, preferences));

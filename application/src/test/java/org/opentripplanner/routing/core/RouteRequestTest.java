@@ -81,8 +81,6 @@ class RouteRequestTest {
 
   private static final Duration DURATION_24_HOURS = Duration.ofHours(24);
   private static final Duration DURATION_ZERO = Duration.ofMinutes(0);
-  private static final Duration DURATION_ONE_MINUTE = Duration.ofMinutes(1);
-  private static final Duration DURATION_MINUS_ONE_MINUTE = DURATION_ONE_MINUTE.negated();
 
   private final RouteRequest subject = RouteRequest.of()
     .setFrom(FROM)
@@ -95,7 +93,6 @@ class RouteRequestTest {
     .setMaxSearchWindow(MAX_SEARCH_WINDOW)
     .setBookingTime(BOOKING_TIME)
     .setPageCursorFromEncoded(PAGE_CURSOR.encode())
-    .setWheelchair(WHEELCHAIR)
     .setJourney(JOURNEY)
     .withPreferences(PREFERENCES)
     .setNumItineraries(NUM_ITINERARIES)
@@ -151,11 +148,6 @@ class RouteRequestTest {
   @Test
   void bookingTime() {
     assertEquals(BOOKING_TIME, subject.bookingTime());
-  }
-
-  @Test
-  void wheelchair() {
-    assertEquals(WHEELCHAIR, subject.wheelchair());
   }
 
   @Test
@@ -218,7 +210,6 @@ class RouteRequestTest {
         subject.copyOf().setMaxSearchWindow(MAX_SEARCH_WINDOW.plusHours(1)).buildRequest(),
         subject.copyOf().setBookingTime(BOOKING_TIME.plusSeconds(10)).buildRequest(),
         subject.copyOf().setPageCursorFromEncoded(null).buildRequest(),
-        subject.copyOf().setWheelchair(!WHEELCHAIR).buildRequest(),
         subject.copyOf().setJourney(JourneyRequest.DEFAULT).buildRequest(),
         subject.copyOf().withPreferences(RoutingPreferences.DEFAULT).buildRequest()
       );
@@ -246,7 +237,6 @@ class RouteRequestTest {
         maxSearchWindow:1d12h,
         bookingTime:2025-05-17T11:15:00Z,
         numItineraries:10,
-        wheelchair,
         locale:fr,
         preferences:RoutingPreferences{transfer:TransferPreferences{maxTransfers:10}},
         journey:JourneyRequest{access:StreetRequest{mode:BIKE}}

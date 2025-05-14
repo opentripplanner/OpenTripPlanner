@@ -165,7 +165,9 @@ public class RouteRequestMapper {
     GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
   ) {
     if (preferenceArgs != null && preferenceArgs.getGraphQLWheelchair() != null) {
-      requestBuilder.setWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled());
+      requestBuilder.withJourney(j ->
+        j.withWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled())
+      );
     }
   }
 

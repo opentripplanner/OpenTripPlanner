@@ -66,7 +66,7 @@ public class DirectStreetRouter {
       List<Itinerary> response = graphPathToItineraryMapper.mapItineraries(paths);
       response = ItinerariesHelper.decorateItinerariesWithRequestData(
         response,
-        request.wheelchair(),
+        request.journey().wheelchair(),
         request.preferences().wheelchair()
       );
       return response;

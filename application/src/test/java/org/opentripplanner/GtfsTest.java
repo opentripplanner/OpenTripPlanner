@@ -102,34 +102,35 @@ public abstract class GtfsTest {
       // TODO VIA - set different on-board request
       //routingRequest.startingTransitTripId = (new FeedScopedId(FEED_ID, onTripId));
     }
-    builder
-      .setWheelchair(wheelchairAccessible)
-      .withJourney(journeyBuilder -> {
-        var requestModesBuilder = RequestModes.of()
-          .withDirectMode(NOT_SET)
-          .withAccessMode(WALK)
-          .withTransferMode(WALK)
-          .withEgressMode(WALK);
-        journeyBuilder.setModes(requestModesBuilder.build());
+    builder.withJourney(journeyBuilder -> {
+      journeyBuilder.withWheelchair(wheelchairAccessible);
 
-        var filterRequestBuilder = TransitFilterRequest.of();
-        if (preferredMode != null) {
-          filterRequestBuilder.addSelect(
-            SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
-          );
-        } else {
-          filterRequestBuilder.addSelect(
-            SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
-          );
-        }
+      var requestModesBuilder = RequestModes.of()
+        .withDirectMode(NOT_SET)
+        .withAccessMode(WALK)
+        .withTransferMode(WALK)
+        .withEgressMode(WALK);
 
-        if (excludedRoute != null && !excludedRoute.isEmpty()) {
-          List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
-          filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
-        }
+      journeyBuilder.setModes(requestModesBuilder.build());
 
-        journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
-      });
+      var filterRequestBuilder = TransitFilterRequest.of();
+      if (preferredMode != null) {
+        filterRequestBuilder.addSelect(
+          SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
+        );
+      } else {
+        filterRequestBuilder.addSelect(
+          SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
+        );
+      }
+
+      if (excludedRoute != null && !excludedRoute.isEmpty()) {
+        List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
+        filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
+      }
+
+      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+    });
 
     // Init preferences
     builder.withPreferences(preferences -> {

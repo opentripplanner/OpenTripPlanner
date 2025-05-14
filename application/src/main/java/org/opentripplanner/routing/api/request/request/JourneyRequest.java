@@ -12,27 +12,31 @@ public class JourneyRequest implements Cloneable, Serializable {
     StreetRequest.DEFAULT,
     StreetRequest.DEFAULT,
     StreetRequest.DEFAULT,
-    StreetRequest.DEFAULT
+    StreetRequest.DEFAULT,
+    false
   );
 
-  private TransitRequest transit;
-  private StreetRequest access;
-  private StreetRequest egress;
-  private StreetRequest transfer;
-  private StreetRequest direct;
+  private final TransitRequest transit;
+  private final StreetRequest access;
+  private final StreetRequest egress;
+  private final StreetRequest transfer;
+  private final StreetRequest direct;
+  private final boolean wheelchair;
 
   JourneyRequest(
     TransitRequest transit,
     StreetRequest access,
     StreetRequest egress,
     StreetRequest transfer,
-    StreetRequest direct
+    StreetRequest direct,
+    boolean wheelchair
   ) {
     this.transit = transit;
     this.access = access;
     this.egress = egress;
     this.transfer = transfer;
     this.direct = direct;
+    this.wheelchair = wheelchair;
   }
 
   public static JourneyRequestBuilder of() {
@@ -63,6 +67,13 @@ public class JourneyRequest implements Cloneable, Serializable {
     return direct;
   }
 
+  /**
+   * Whether the trip must be wheelchair-accessible
+   */
+  public boolean wheelchair() {
+    return wheelchair;
+  }
+
   public RequestModes modes() {
     return RequestModes.of()
       .withAccessMode(access.mode())
@@ -72,24 +83,6 @@ public class JourneyRequest implements Cloneable, Serializable {
       .build();
   }
 
-  public JourneyRequest clone() {
-    try {
-      var clone = (JourneyRequest) super.clone();
-
-      // No need to clone immutable objects
-      clone.transit = this.transit;
-      clone.access = this.access;
-      clone.egress = this.egress;
-      clone.transfer = this.transfer;
-      clone.direct = this.direct;
-
-      return clone;
-    } catch (CloneNotSupportedException e) {
-      /* this will never happen since our super is the cloneable object */
-      throw new RuntimeException(e);
-    }
-  }
-
   @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) {
@@ -97,6 +90,7 @@ public class JourneyRequest implements Cloneable, Serializable {
     }
     JourneyRequest that = (JourneyRequest) o;
     return (
+      wheelchair == that.wheelchair &&
       Objects.equals(transit, that.transit) &&
       Objects.equals(access, that.access) &&
       Objects.equals(egress, that.egress) &&
@@ -107,7 +101,7 @@ public class JourneyRequest implements Cloneable, Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(transit, access, egress, transfer, direct);
+    return Objects.hash(transit, access, egress, transfer, direct, wheelchair);
   }
 
   @Override
@@ -118,6 +112,7 @@ public class JourneyRequest implements Cloneable, Serializable {
       .addObj("egress", egress, DEFAULT.egress)
       .addObj("transfer", transfer, DEFAULT.transfer)
       .addObj("direct", direct, DEFAULT.direct)
+      .addBoolIfTrue("wheelchair", wheelchair)
       .toString();
   }
 }

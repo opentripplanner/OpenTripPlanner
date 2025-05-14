@@ -158,7 +158,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
             })
           )
       )
-      .setWheelchair(requireWheelChairAccessible)
+      .withJourney(j -> j.withWheelchair(requireWheelChairAccessible))
       .setArriveBy(arriveBy)
       .buildRequest();
 

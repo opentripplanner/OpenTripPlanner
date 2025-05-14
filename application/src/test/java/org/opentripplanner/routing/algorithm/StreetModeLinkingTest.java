@@ -156,7 +156,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       rr -> {
         rr.setFrom(GenericLocation.fromCoordinate(47.5010, 19.03));
         rr.setTo(GenericLocation.fromCoordinate(47.5010, 19.03));
-        rr.setWheelchair(true);
+        rr.withJourney(j -> j.withWheelchair(true));
       },
       "C1C2 street",
       "C1C2 street",

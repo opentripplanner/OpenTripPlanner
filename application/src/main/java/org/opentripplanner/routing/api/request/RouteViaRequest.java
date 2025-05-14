@@ -22,9 +22,6 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 @Deprecated
 public class RouteViaRequest implements Serializable {
 
-  // TODO: This constant already exists in RoutingRequestToFilterChainMapper, so when POC is done use only constant
-  private static final int MAX_NUMBER_OF_ITINERARIES = 200;
-
   private final GenericLocation from;
   private final List<ViaSegment> viaSegments;
   private final GenericLocation to;
@@ -98,11 +95,11 @@ public class RouteViaRequest implements Serializable {
     request.setFrom(from);
     request.setSearchWindow(searchWindow);
     request.setDateTime(dateTime);
-    request.setWheelchair(wheelchair);
     request.withPreferences(preferences);
     if (numItineraries != null) {
       request.setNumItineraries(numItineraries);
     }
+    request.withJourney(j -> j.withWheelchair(wheelchair));
     return request;
   }
 
