@@ -3,6 +3,7 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 import static java.util.Objects.requireNonNullElse;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
@@ -17,6 +18,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.basic.Ratio;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.logging.Throttle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +87,10 @@ public class GbfsFreeVehicleStatusMapper {
         return null;
       }
       rentalVehicle.fuel = new RentalVehicleFuel(fuelRatio, rangeMeters);
+      String availableUntil = vehicle.getAvailableUntil();
+      if (StringUtils.hasValue(availableUntil)) {
+        rentalVehicle.availableUntil = OffsetDateTime.parse(availableUntil);
+      }
       rentalVehicle.pricingPlanId = vehicle.getPricingPlanId();
       GBFSRentalUris rentalUris = vehicle.getRentalUris();
       if (rentalUris != null) {
