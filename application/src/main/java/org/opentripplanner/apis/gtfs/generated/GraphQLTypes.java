@@ -1788,10 +1788,14 @@ public class GraphQLTypes {
     public GraphQLPlanFilterInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("not") != null) {
-          this.not = (List<GraphQLPlanFilterSelectInput>) args.get("not");
+          this.not = ((List<Map<String, Object>>) args.get("not")).stream()
+            .map(o -> o == null ? null : new GraphQLPlanFilterSelectInput(o))
+            .collect(Collectors.toList());
         }
         if (args.get("select") != null) {
-          this.select = (List<GraphQLPlanFilterSelectInput>) args.get("select");
+          this.select = ((List<Map<String, Object>>) args.get("select")).stream()
+            .map(o -> o == null ? null : new GraphQLPlanFilterSelectInput(o))
+            .collect(Collectors.toList());
         }
       }
     }
@@ -3787,15 +3791,9 @@ public class GraphQLTypes {
           (Map<String, Object>) args.get("destination")
         );
         if (args.get("filters") != null) {
-          this.filters = new ArrayList<GraphQLPlanFilterInput>();
-          for (var o : (List<Map<String, Object>>) args.get("filters")) {
-            if (o != null) {
-              this.filters.add(new GraphQLPlanFilterInput(o));
-            }
-            else {
-              this.filters.add(null);
-            }
-          }
+          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+            .map(o -> o == null ? null : new GraphQLPlanFilterInput(o))
+            .collect(Collectors.toList());
         }
         this.first = (Integer) args.get("first");
         this.itineraryFilter = new GraphQLPlanItineraryFilterInput(
