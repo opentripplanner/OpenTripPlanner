@@ -377,7 +377,7 @@ class WalkableAreaBuilder {
       mode = StreetMode.CAR;
     }
     // TODO: This is incorrect, the configured defaults are not used.
-    RouteRequest request = new RouteRequest();
+    RouteRequest request = RouteRequest.defaultValue();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()

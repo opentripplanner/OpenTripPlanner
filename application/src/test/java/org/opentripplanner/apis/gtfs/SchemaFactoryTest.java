@@ -25,7 +25,7 @@ public class SchemaFactoryTest {
 
   @Test
   void createSchema() {
-    var schema = SchemaFactory.createSchemaWithDefaultInjection(new RouteRequest());
+    var schema = SchemaFactory.createSchemaWithDefaultInjection(RouteRequest.defaultValue());
     assertNotNull(schema);
   }
 
@@ -72,12 +72,12 @@ public class SchemaFactoryTest {
   @ParameterizedTest(name = "\"{0}\" must be a an async fetcher")
   void asyncDataFetchers(String fieldName) {
     OTPFeature.AsyncGraphQLFetchers.testOn(() -> {
-      var schema = SchemaFactory.createSchemaWithDefaultInjection(new RouteRequest());
+      var schema = SchemaFactory.createSchemaWithDefaultInjection(RouteRequest.defaultValue());
       var fetcher = getQueryType(fieldName, schema);
       assertSame(fetcher.getClass(), AsyncDataFetcher.class);
     });
     OTPFeature.AsyncGraphQLFetchers.testOff(() -> {
-      var schema = SchemaFactory.createSchemaWithDefaultInjection(new RouteRequest());
+      var schema = SchemaFactory.createSchemaWithDefaultInjection(RouteRequest.defaultValue());
       var fetcher = getQueryType(fieldName, schema);
       assertNotSame(fetcher.getClass(), AsyncDataFetcher.class);
     });

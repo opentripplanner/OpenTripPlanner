@@ -98,7 +98,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       B,
       C,
       false,
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       StreetMode.BIKE
     );
 
@@ -112,7 +112,7 @@ public class BikeRentalTest extends GraphRoutingTest {
       B,
       C,
       false,
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       StreetMode.BIKE
     );
 

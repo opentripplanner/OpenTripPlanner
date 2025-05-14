@@ -70,7 +70,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /* CONSTRUCTORS */
 
-  public RouteRequest() {
+  private RouteRequest() {
     // So that they are never null.
     this.from = null;
     this.to = null;

@@ -56,7 +56,7 @@ class _RouteRequestTestContext {
     var timetableRepository = new TimetableRepository();
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
-    var routeRequest = new RouteRequest();
+    var routeRequest = RouteRequest.defaultValue();
     this.context = new GraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,

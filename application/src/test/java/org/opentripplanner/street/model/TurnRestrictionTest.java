@@ -152,7 +152,7 @@ public class TurnRestrictionTest {
 
   @Test
   public void testForwardAsCar() {
-    var request = new RouteRequest();
+    var request = RouteRequest.defaultValue();
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())

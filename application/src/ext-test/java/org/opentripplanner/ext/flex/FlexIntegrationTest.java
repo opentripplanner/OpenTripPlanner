@@ -207,7 +207,7 @@ public class FlexIntegrationTest {
     new AreaStopsToVerticesMapper(graph, timetableRepository).buildGraph();
 
     // generate direct transfers
-    var req = new RouteRequest();
+    var req = RouteRequest.defaultValue();
 
     // we don't have a complete coverage of the entire area so use straight lines for transfers
     new DirectTransferGenerator(

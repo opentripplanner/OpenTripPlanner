@@ -64,7 +64,10 @@ class RouteRequestMapperTest {
     futureArgs.put("dateTime", Map.ofEntries(entry("earliestDeparture", futureTime)));
     var futureEnv = testCtx.executionContext(futureArgs);
     var futureRequest = RouteRequestMapper.toRouteRequest(futureEnv, testCtx.context());
-    assertEquals(defaultRequest.preferences().copyOf().withLocale(LOCALE).build(), futureRequest.preferences());
+    assertEquals(
+      defaultRequest.preferences().copyOf().withLocale(LOCALE).build(),
+      futureRequest.preferences()
+    );
   }
 
   @Test

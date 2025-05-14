@@ -70,7 +70,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
 
     var nearbyStops = finder.findNearbyStops(
       isolatedStop,
-      new RouteRequest(),
+      RouteRequest.defaultValue(),
       StreetRequest.DEFAULT,
       false
     );
@@ -87,7 +87,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, new RouteRequest(), StreetRequest.DEFAULT, false)
+      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetRequest.DEFAULT, false)
     );
 
     assertThat(sortedNearbyStops).hasSize(4);
@@ -104,7 +104,7 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, new RouteRequest(), StreetRequest.DEFAULT, false)
+      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetRequest.DEFAULT, false)
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -140,7 +140,12 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null, ignore);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(Set.of(stopA), new RouteRequest(), StreetRequest.DEFAULT, false)
+      finder.findNearbyStops(
+        Set.of(stopA),
+        RouteRequest.defaultValue(),
+        StreetRequest.DEFAULT,
+        false
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(2);
@@ -156,7 +161,12 @@ class StreetNearbyStopFinderTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null, ignore);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(Set.of(stopA), new RouteRequest(), StreetRequest.DEFAULT, false)
+      finder.findNearbyStops(
+        Set.of(stopA),
+        RouteRequest.defaultValue(),
+        StreetRequest.DEFAULT,
+        false
+      )
     );
 
     assertThat(sortedNearbyStops).hasSize(1);
