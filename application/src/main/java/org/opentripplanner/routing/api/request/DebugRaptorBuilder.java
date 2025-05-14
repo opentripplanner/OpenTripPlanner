@@ -27,7 +27,6 @@ public class DebugRaptorBuilder implements Serializable {
   private Set<DebugEventType> eventTypes;
   private final DebugRaptor original;
 
-  /** Avoid using clone(), use copy-constructor instead (Josh Bloch). */
   public DebugRaptorBuilder(DebugRaptor original) {
     this.original = original;
 

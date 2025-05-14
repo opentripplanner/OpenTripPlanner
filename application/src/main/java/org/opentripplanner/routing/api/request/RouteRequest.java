@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * in web services that create RouteRequests. This establishes a priority chain for default values:
  * RouteRequest field initializers, then JSON router config, then query parameters.
  */
-public class RouteRequest implements Cloneable, Serializable {
+public class RouteRequest implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequest.class);
 

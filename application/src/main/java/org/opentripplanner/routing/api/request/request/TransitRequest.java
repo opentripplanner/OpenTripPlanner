@@ -11,7 +11,7 @@ import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public class TransitRequest implements Cloneable, Serializable {
+public class TransitRequest implements Serializable {
 
   public static final TransitRequest DEFAULT = new TransitRequest(
     List.of(AllowAllTransitFilter.of()),

@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
-public class JourneyRequest implements Cloneable, Serializable {
+public class JourneyRequest implements Serializable {
 
   public static final JourneyRequest DEFAULT = new JourneyRequest(
     TransitRequest.DEFAULT,

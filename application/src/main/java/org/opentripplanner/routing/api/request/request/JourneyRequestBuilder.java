@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
 
-public class JourneyRequestBuilder implements Cloneable, Serializable {
+public class JourneyRequestBuilder implements Serializable {
 
   private TransitRequest transit;
   private StreetRequest access;
