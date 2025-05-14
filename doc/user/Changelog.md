@@ -30,6 +30,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix transfer for rental modes in deprecated `plan` query [#6630](https://github.com/opentripplanner/OpenTripPlanner/pull/6630)
 - Find best route in presence of turn restrictions [#6611](https://github.com/opentripplanner/OpenTripPlanner/pull/6611)
 - Add availableUntil to rental vehicles in the GTFS GraphQL API [#6643](https://github.com/opentripplanner/OpenTripPlanner/pull/6643)
+- Deprecate vertexType in GTFS API [#6632](https://github.com/opentripplanner/OpenTripPlanner/pull/6632)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
