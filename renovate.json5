@@ -193,7 +193,7 @@
       ],
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
-      "reviewers": ["habrahamsson-skanetrafiken"]
+      "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
     }
   ],
   "timezone": "Europe/Berlin"
