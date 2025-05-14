@@ -200,7 +200,8 @@ public final class ScheduledTripTimes implements TripTimes {
   @Override
   public int lastScheduledArrivalTime() {
     // trips that mix fixed times and flex windows can have negative arrival times
-    for (var t : ArrayUtils.reversedCopy(arrivalTimes)) {
+    for (int i = arrivalTimes.length - 1; i >= 0; i--) {
+      var t = arrivalTimes[i];
       if (t > -1) {
         return timeShifted(t);
       }
