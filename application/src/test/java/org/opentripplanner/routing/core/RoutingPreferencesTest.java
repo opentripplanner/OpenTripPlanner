@@ -1,13 +1,17 @@
 package org.opentripplanner.routing.core;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.time.Duration;
+import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 
 public class RoutingPreferencesTest {
+
+  private static final Locale LOCALE = Locale.FRENCH;
 
   @Test
   public void copyOfShouldReturnTheSameInstanceWhenBuild() {
@@ -138,5 +142,14 @@ public class RoutingPreferencesTest {
     assertNotSame(pref, copy);
     assertNotSame(pref.system(), copy.system());
     assertSame(pref.car(), copy.car());
+  }
+
+  @Test
+  public void copyOfWithLocaleChanges() {
+    var pref = RoutingPreferences.DEFAULT;
+    var copy = pref.copyOf().withLocale(LOCALE).build();
+
+    assertEquals(LOCALE, copy.locale());
+    assertNotSame(pref, copy);
   }
 }

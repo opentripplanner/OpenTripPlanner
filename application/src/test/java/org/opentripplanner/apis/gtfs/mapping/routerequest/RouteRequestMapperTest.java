@@ -23,19 +23,20 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class RouteRequestMapperTest {
 
-  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.GERMAN);
+  private static final Locale LOCALE = Locale.GERMAN;
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(LOCALE);
 
   @Test
   void testMinimalArgs() {
     var env = testCtx.executionContext(testCtx.basicRequest());
-    var defaultRequest = new RouteRequest();
+    var defaultRequest = RouteRequest.defaultValue();
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
 
     assertEquals(_RouteRequestTestContext.ORIGIN.x, routeRequest.from().lat);
     assertEquals(_RouteRequestTestContext.ORIGIN.y, routeRequest.from().lng);
     assertEquals(_RouteRequestTestContext.DESTINATION.x, routeRequest.to().lat);
     assertEquals(_RouteRequestTestContext.DESTINATION.y, routeRequest.to().lng);
-    assertEquals(testCtx.locale(), routeRequest.locale());
+    assertEquals(testCtx.locale(), routeRequest.preferences().locale());
     assertEquals(defaultRequest.journey().wheelchair(), routeRequest.journey().wheelchair());
     assertEquals(defaultRequest.arriveBy(), routeRequest.arriveBy());
     assertEquals(defaultRequest.numItineraries(), routeRequest.numItineraries());
@@ -63,7 +64,7 @@ class RouteRequestMapperTest {
     futureArgs.put("dateTime", Map.ofEntries(entry("earliestDeparture", futureTime)));
     var futureEnv = testCtx.executionContext(futureArgs);
     var futureRequest = RouteRequestMapper.toRouteRequest(futureEnv, testCtx.context());
-    assertEquals(defaultRequest.preferences(), futureRequest.preferences());
+    assertEquals(defaultRequest.preferences().copyOf().withLocale(LOCALE).build(), futureRequest.preferences());
   }
 
   @Test
@@ -149,7 +150,7 @@ class RouteRequestMapperTest {
     localeArgs.put("locale", englishLocale);
     var env = testCtx.executionContext(localeArgs);
     var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
-    assertEquals(englishLocale, routeRequest.locale());
+    assertEquals(englishLocale, routeRequest.preferences().locale());
   }
 
   @Test

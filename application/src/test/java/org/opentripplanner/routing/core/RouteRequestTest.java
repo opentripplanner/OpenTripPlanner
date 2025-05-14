@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -77,7 +76,6 @@ class RouteRequestTest {
     .withTransfer(tb -> tb.withMaxTransfers(10))
     .build();
   private static final int NUM_ITINERARIES = 10;
-  private static final Locale LOCALE = Locale.FRENCH;
 
   private static final Duration DURATION_24_HOURS = Duration.ofHours(24);
   private static final Duration DURATION_ZERO = Duration.ofMinutes(0);
@@ -96,7 +94,6 @@ class RouteRequestTest {
     .setJourney(JOURNEY)
     .withPreferences(PREFERENCES)
     .setNumItineraries(NUM_ITINERARIES)
-    .setLocale(LOCALE)
     .buildRequest();
 
   private final RouteRequest minimal = RouteRequest.of()
@@ -166,11 +163,6 @@ class RouteRequestTest {
   }
 
   @Test
-  void locale() {
-    assertEquals(LOCALE, subject.locale());
-  }
-
-  @Test
   void testBuildDefault() {
     // Allow to build request without from, to, and dateTime
     var subject = RouteRequest.of()
@@ -237,7 +229,6 @@ class RouteRequestTest {
         maxSearchWindow:1d12h,
         bookingTime:2025-05-17T11:15:00Z,
         numItineraries:10,
-        locale:fr,
         preferences:RoutingPreferences{transfer:TransferPreferences{maxTransfers:10}},
         journey:JourneyRequest{access:StreetRequest{mode:BIKE}}
       }

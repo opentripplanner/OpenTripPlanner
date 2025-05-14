@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public class RoutingPreferencesBuilder {
@@ -17,6 +18,7 @@ public class RoutingPreferencesBuilder {
   private ScooterPreferences scooter = null;
   private SystemPreferences system = null;
   private ItineraryFilterPreferences itineraryFilter = null;
+  private Locale locale = null;
 
   public RoutingPreferencesBuilder(RoutingPreferences original) {
     this.original = original;
@@ -126,6 +128,15 @@ public class RoutingPreferencesBuilder {
       .copyOf()
       .apply(body)
       .build();
+    return this;
+  }
+
+  public Locale locale() {
+    return locale == null ? original.locale() : locale;
+  }
+
+  public RoutingPreferencesBuilder withLocale(Locale locale) {
+    this.locale = ifNotNull(locale, original.locale());
     return this;
   }
 

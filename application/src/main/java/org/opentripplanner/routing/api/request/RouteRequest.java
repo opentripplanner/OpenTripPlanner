@@ -9,7 +9,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
@@ -41,7 +40,6 @@ public class RouteRequest implements Cloneable, Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(RouteRequest.class);
 
   private static final int DEFAULT_NUM_ITINERARIES = 50;
-  private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
   private static final long NOW_THRESHOLD_SEC = durationInSeconds("15h");
 
   private static final RouteRequest DEFAULT = new RouteRequest();
@@ -68,7 +66,6 @@ public class RouteRequest implements Cloneable, Serializable {
   private final JourneyRequest journey;
   private final RoutingPreferences preferences;
   private final int numItineraries;
-  private final Locale locale;
   private final boolean defaultRequest;
 
   /* CONSTRUCTORS */
@@ -88,7 +85,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.journey = JourneyRequest.DEFAULT;
     this.preferences = RoutingPreferences.DEFAULT;
     this.numItineraries = DEFAULT_NUM_ITINERARIES;
-    this.locale = DEFAULT_LOCALE;
     this.defaultRequest = true;
   }
 
@@ -110,8 +106,6 @@ public class RouteRequest implements Cloneable, Serializable {
     this.journey = builder.journey;
     this.preferences = builder.preferences;
     this.numItineraries = builder.numItineraries;
-    // TODO Move to RoutingPreferences
-    this.locale = builder.locale;
     this.defaultRequest = builder.defaultRequest;
 
     validate();
@@ -337,10 +331,6 @@ public class RouteRequest implements Cloneable, Serializable {
     return maxSearchWindow;
   }
 
-  public Locale locale() {
-    return locale;
-  }
-
   /**
    * Use the cursor to go to the next or previous "page" of trips. You should pass in the original
    * request as is.
@@ -437,8 +427,7 @@ public class RouteRequest implements Cloneable, Serializable {
       Objects.equals(bookingTime, other.bookingTime) &&
       Objects.equals(pageCursor, other.pageCursor) &&
       Objects.equals(journey, other.journey) &&
-      Objects.equals(preferences, other.preferences) &&
-      Objects.equals(locale, other.locale)
+      Objects.equals(preferences, other.preferences)
     );
   }
 
@@ -457,8 +446,7 @@ public class RouteRequest implements Cloneable, Serializable {
       pageCursor,
       journey,
       preferences,
-      numItineraries,
-      locale
+      numItineraries
     );
   }
 
@@ -474,7 +462,6 @@ public class RouteRequest implements Cloneable, Serializable {
       .addDuration("maxSearchWindow", maxSearchWindow)
       .addDateTime("bookingTime", bookingTime)
       .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
-      .addObj("locale", locale, DEFAULT_LOCALE)
       .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
       .addObj("journey", journey, JourneyRequest.DEFAULT)
       .toString();

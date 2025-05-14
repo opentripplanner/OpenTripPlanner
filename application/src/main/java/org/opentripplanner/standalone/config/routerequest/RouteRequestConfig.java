@@ -76,8 +76,6 @@ public class RouteRequestConfig {
         .asBoolean(dft.arriveBy())
     );
 
-    requestBuilder.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
-
     requestBuilder.withJourney(b ->
       b.setModes(
         c
@@ -200,6 +198,9 @@ public class RouteRequestConfig {
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
+
+    var dft = RouteRequest.defaultValue().preferences();
+    preferences.withLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {

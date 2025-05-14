@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -12,6 +13,8 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 /** User/trip cost/time/slack/reluctance search config. */
 @SuppressWarnings("UnusedReturnValue")
 public final class RoutingPreferences implements Serializable {
+
+  private static final Locale DEFAULT_LOCALE = new Locale("en", "US");
 
   public static final RoutingPreferences DEFAULT = new RoutingPreferences();
 
@@ -25,6 +28,7 @@ public final class RoutingPreferences implements Serializable {
   private final ScooterPreferences scooter;
   private final SystemPreferences system;
   private final ItineraryFilterPreferences itineraryFilter;
+  private final Locale locale;
 
   private RoutingPreferences() {
     this.transit = TransitPreferences.DEFAULT;
@@ -37,6 +41,7 @@ public final class RoutingPreferences implements Serializable {
     this.scooter = ScooterPreferences.DEFAULT;
     this.system = SystemPreferences.DEFAULT;
     this.itineraryFilter = ItineraryFilterPreferences.DEFAULT;
+    this.locale = DEFAULT_LOCALE;
   }
 
   RoutingPreferences(RoutingPreferencesBuilder builder) {
@@ -50,6 +55,7 @@ public final class RoutingPreferences implements Serializable {
     this.scooter = requireNonNull(builder.scooter());
     this.system = requireNonNull(builder.system());
     this.itineraryFilter = requireNonNull(builder.itineraryFilter());
+    this.locale = requireNonNull(builder.locale());
   }
 
   public static RoutingPreferencesBuilder of() {
@@ -135,6 +141,10 @@ public final class RoutingPreferences implements Serializable {
     return system;
   }
 
+  public Locale locale() {
+    return locale;
+  }
+
   /**
    * The road speed for a specific traverse mode.
    *
@@ -164,7 +174,8 @@ public final class RoutingPreferences implements Serializable {
       Objects.equals(car, that.car) &&
       Objects.equals(scooter, that.scooter) &&
       Objects.equals(system, that.system) &&
-      Objects.equals(itineraryFilter, that.itineraryFilter)
+      Objects.equals(itineraryFilter, that.itineraryFilter) &&
+      Objects.equals(locale, that.locale)
     );
   }
 
@@ -180,7 +191,8 @@ public final class RoutingPreferences implements Serializable {
       car,
       scooter,
       system,
-      itineraryFilter
+      itineraryFilter,
+      locale
     );
   }
 
@@ -197,6 +209,7 @@ public final class RoutingPreferences implements Serializable {
       .addObj("scooter", scooter, DEFAULT.scooter)
       .addObj("system", system, DEFAULT.system)
       .addObj("itineraryFilter", itineraryFilter, DEFAULT.itineraryFilter)
+      .addObj("locale", locale, DEFAULT_LOCALE)
       .toString();
   }
 }

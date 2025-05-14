@@ -164,6 +164,9 @@ public class LegacyRouteRequestMapper {
         callWith.argument("maxTransfers", tx::withMaxTransfers);
         callWith.argument("nonpreferredTransferPenalty", tx::withNonpreferredCost);
       });
+      callWith.argument("locale", (String v) ->
+        preferences.withLocale(GraphQLUtils.getLocale(environment, v))
+      );
     });
 
     callWith.argument("arriveBy", request::setArriveBy);
@@ -246,9 +249,6 @@ public class LegacyRouteRequestMapper {
       // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
     }
 
-    callWith.argument("locale", (String v) ->
-      request.setLocale(GraphQLUtils.getLocale(environment, v))
-    );
     return request.buildRequest();
   }
 

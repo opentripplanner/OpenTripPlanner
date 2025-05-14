@@ -45,7 +45,6 @@ public class RouteRequestMapper {
 
     request.setFrom(parseGenericLocation(args.getGraphQLOrigin()));
     request.setTo(parseGenericLocation(args.getGraphQLDestination()));
-    request.setLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
     request.setSearchWindow(
       args.getGraphQLSearchWindow() != null
         ? DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
@@ -101,6 +100,7 @@ public class RouteRequestMapper {
       environment
     );
     setAccessibilityPreferences(requestBuilder, preferenceArgs.getGraphQLAccessibility());
+    prefs.withLocale(GraphQLUtils.getLocale(environment, args.getGraphQLLocale()));
   }
 
   private static void setItineraryFilters(

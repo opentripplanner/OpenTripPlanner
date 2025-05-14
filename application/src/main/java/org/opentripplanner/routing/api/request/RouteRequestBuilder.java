@@ -7,7 +7,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.GenericLocation;
@@ -42,7 +41,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
   JourneyRequest journey;
   RoutingPreferences preferences;
   int numItineraries;
-  Locale locale;
   boolean defaultRequest;
 
   private final RouteRequest original;
@@ -62,7 +60,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     this.journey = original.journey();
     this.preferences = original.preferences();
     this.numItineraries = original.numItineraries();
-    this.locale = original.locale();
     this.defaultRequest = original.isDefaultRequest();
   }
 
@@ -138,11 +135,6 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
 
   public RouteRequestBuilder setMaxSearchWindow(Duration maxSearchWindow) {
     this.maxSearchWindow = maxSearchWindow;
-    return this;
-  }
-
-  public RouteRequestBuilder setLocale(Locale locale) {
-    this.locale = locale;
     return this;
   }
 

@@ -7,7 +7,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
@@ -26,8 +25,6 @@ public class TripRequestMapper {
     var requestBuilder = serverContext.defaultRouteRequest().copyOf();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
-
-    callWith.argument("locale", (String v) -> requestBuilder.setLocale(Locale.forLanguageTag(v)));
 
     callWith.argument("from", (Map<String, Object> v) ->
       requestBuilder.setFrom(GenericLocationMapper.toGenericLocation(v))
