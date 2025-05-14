@@ -8,15 +8,15 @@
 ## Documentation
 
 The emission module enables import of CO₂ Emissions data which OTP can use to decorate itineraries
-and itinerary legs. Emissions data is loaded during the graph build process. OTP support two data
+and itinerary legs. Emissions data is loaded during the graph build process. OTP supports two data
 import formats (yet to be standarized).
 
-- The _Route format_ provided by HSL decorate each route with a avegare co2 emission per kilometers
+- The _Route format_ provided by HSL decorates each route with a average co2 emission per kilometers
   per person. The input parameters are `route_id`, `avg_co2_per_vehicle_per_km` and
   `avg_passenger_count`.
-- The _Trip format_ provided by Entur decorate each trip hop. The plan is to expand this to include
+- The _Trip format_ provided by Entur decorates each trip hop. The plan is to expand this to include
   service date. This allows the emission provider to calculate acurate data down to each trip
-  depature (except depatures operated by more than one vehicle). The input parameters are 
+  departure (except departures operated by more than one vehicle). The input parameters are 
   `trip_id`, `from_stop_id`, `from_stop_sequence` and `co2`.
  
 
