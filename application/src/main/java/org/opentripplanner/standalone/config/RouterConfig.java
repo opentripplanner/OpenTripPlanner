@@ -70,7 +70,7 @@ public class RouterConfig implements Serializable {
     this.transitConfig = new TransitRoutingConfig("transit", root, request);
     this.routingRequestDefaults = request
       .copyOf()
-      .setMaxSearchWindow(transitConfig.maxSearchWindow())
+      .withMaxSearchWindow(transitConfig.maxSearchWindow())
       .buildDefault();
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);

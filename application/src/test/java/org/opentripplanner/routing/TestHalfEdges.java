@@ -255,7 +255,7 @@ public class TestHalfEdges {
       assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
     }
 
-    r = RouteRequest.of().setArriveBy(true).buildDefault();
+    r = RouteRequest.of().withArriveBy(true).buildDefault();
 
     spt = StreetSearchBuilder.of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -612,8 +612,8 @@ public class TestHalfEdges {
   public void testTemporaryVerticesContainer() {
     // test that it is possible to travel between two splits on the same street
     RouteRequest walking = RouteRequest.of()
-      .setFrom(GenericLocation.fromCoordinate(40.004, -74.0))
-      .setTo(GenericLocation.fromCoordinate(40.008, -74.0))
+      .withFrom(GenericLocation.fromCoordinate(40.004, -74.0))
+      .withTo(GenericLocation.fromCoordinate(40.008, -74.0))
       .buildRequest();
 
     try (

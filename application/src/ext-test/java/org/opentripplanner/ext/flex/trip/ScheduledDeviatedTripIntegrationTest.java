@@ -160,9 +160,9 @@ class ScheduledDeviatedTripIntegrationTest {
     var dateTime = LocalDateTime.of(2021, Month.DECEMBER, 16, 12, 0).atZone(zoneId);
 
     RouteRequest request = RouteRequest.of()
-      .setDateTime(dateTime.toInstant())
-      .setFrom(from)
-      .setTo(to)
+      .withDateTime(dateTime.toInstant())
+      .withFrom(from)
+      .withTo(to)
       .buildRequest();
 
     var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);

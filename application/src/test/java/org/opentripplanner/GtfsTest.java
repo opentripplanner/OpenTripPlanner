@@ -88,15 +88,15 @@ public abstract class GtfsTest {
 
     // Init request
     var builder = RouteRequest.of()
-      .setNumItineraries(1)
-      .setArriveBy(dateTime < 0)
-      .setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
+      .withNumItineraries(1)
+      .withArriveBy(dateTime < 0)
+      .withDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
 
     if (fromVertex != null && !fromVertex.isEmpty()) {
-      builder.setFrom(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex));
+      builder.withFrom(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex));
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      builder.setTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
+      builder.withTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
     }
     if (onTripId != null && !onTripId.isEmpty()) {
       // TODO VIA - set different on-board request

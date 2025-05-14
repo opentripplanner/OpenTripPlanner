@@ -33,36 +33,36 @@ public class RouteRequestMapper {
     var dateTime = args.getGraphQLDateTime();
 
     if (dateTime.getGraphQLEarliestDeparture() != null) {
-      request.setDateTime(args.getGraphQLDateTime().getGraphQLEarliestDeparture().toInstant());
+      request.withDateTime(args.getGraphQLDateTime().getGraphQLEarliestDeparture().toInstant());
     } else if (dateTime.getGraphQLLatestArrival() != null) {
-      request.setDateTime(args.getGraphQLDateTime().getGraphQLLatestArrival().toInstant());
-      request.setArriveBy(true);
+      request.withDateTime(args.getGraphQLDateTime().getGraphQLLatestArrival().toInstant());
+      request.withArriveBy(true);
     } else {
-      request.setDateTime(Instant.now());
+      request.withDateTime(Instant.now());
     }
 
     boolean isTripPlannedForNow = RouteRequest.isAPIGtfsTripPlannedForNow(request.dateTime());
 
-    request.setFrom(parseGenericLocation(args.getGraphQLOrigin()));
-    request.setTo(parseGenericLocation(args.getGraphQLDestination()));
-    request.setSearchWindow(
+    request.withFrom(parseGenericLocation(args.getGraphQLOrigin()));
+    request.withTo(parseGenericLocation(args.getGraphQLDestination()));
+    request.withSearchWindow(
       args.getGraphQLSearchWindow() != null
         ? DurationUtils.requireNonNegativeMax2days(args.getGraphQLSearchWindow(), "searchWindow")
         : null
     );
 
     if (args.getGraphQLBefore() != null) {
-      request.setPageCursorFromEncoded(args.getGraphQLBefore());
+      request.withPageCursorFromEncoded(args.getGraphQLBefore());
       if (args.getGraphQLLast() != null) {
-        request.setNumItineraries(args.getGraphQLLast());
+        request.withNumItineraries(args.getGraphQLLast());
       }
     } else if (args.getGraphQLAfter() != null) {
-      request.setPageCursorFromEncoded(args.getGraphQLAfter());
+      request.withPageCursorFromEncoded(args.getGraphQLAfter());
       if (args.getGraphQLFirst() != null) {
-        request.setNumItineraries(args.getGraphQLFirst());
+        request.withNumItineraries(args.getGraphQLFirst());
       }
     } else if (args.getGraphQLFirst() != null) {
-      request.setNumItineraries(args.getGraphQLFirst());
+      request.withNumItineraries(args.getGraphQLFirst());
     }
 
     request.withPreferences(preferences ->
@@ -199,6 +199,6 @@ public class RouteRequestMapper {
   }
 
   static void mapViaPoints(RouteRequestBuilder request, List<Map<String, Object>> via) {
-    request.setViaLocations(ViaLocationMapper.mapToViaLocations(via));
+    request.withViaLocations(ViaLocationMapper.mapToViaLocations(via));
   }
 }

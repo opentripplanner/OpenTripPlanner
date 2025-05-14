@@ -90,7 +90,7 @@ public class StreetGraphFinder implements GraphFinder {
     // TODO: This is incorrect, the configured defaults are not used.
     var request = RouteRequest.of()
       .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
-      .setNumItineraries(1)
+      .withNumItineraries(1)
       .buildDefault();
 
     // RR dateTime defaults to currentTime.

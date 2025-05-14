@@ -113,14 +113,14 @@ public abstract class SnapshotTestBase {
     var builder = serverContext
       .defaultRouteRequest()
       .copyOf()
-      .setDateTime(
+      .withDateTime(
         LocalDateTime.of(year, month, day, hour, minute, second)
           .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
           .toInstant()
       )
       .withPreferences(pref -> pref.withTransfer(tx -> tx.withMaxTransfers(6)))
-      .setNumItineraries(6)
-      .setSearchWindow(Duration.ofHours(5));
+      .withNumItineraries(6)
+      .withSearchWindow(Duration.ofHours(5));
 
     return builder;
   }
@@ -192,8 +192,8 @@ public abstract class SnapshotTestBase {
 
     RouteRequest arriveBy = request
       .copyOf()
-      .setArriveBy(true)
-      .setDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
+      .withArriveBy(true)
+      .withDateTime(departByItineraries.get(0).legs().getLast().endTime().toInstant())
       .buildRequest();
 
     List<Itinerary> arriveByItineraries = retrieveItineraries(arriveBy);

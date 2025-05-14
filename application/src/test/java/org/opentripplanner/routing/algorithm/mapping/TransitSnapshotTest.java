@@ -64,8 +64,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_walk_only() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
       .withJourney(jb -> jb.withTransit(b -> b.disable()))
-      .setFrom(p0)
-      .setTo(p2)
+      .withFrom(p0)
+      .withTo(p2)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -78,8 +78,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         jb.setAllModes(StreetMode.WALK);
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(ps)
-      .setTo(p2)
+      .withFrom(ps)
+      .withTo(p2)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -92,8 +92,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
         jb.setAllModes(StreetMode.WALK);
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(ptc)
-      .setTo(p3)
+      .withFrom(ptc)
+      .withTo(p3)
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
@@ -106,8 +106,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
       .withJourney(jb -> {
         jb.setAllModes(StreetMode.WALK);
       })
-      .setFrom(p1)
-      .setTo(p2)
+      .withFrom(p1)
+      .withTo(p2)
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
@@ -117,8 +117,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_transit_stop() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
       .withJourney(jb -> jb.setAllModes(StreetMode.WALK))
-      .setFrom(ps)
-      .setTo(p3)
+      .withFrom(ps)
+      .withTo(p3)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -129,8 +129,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
   public void test_trip_planning_with_transit_stop_collection() {
     RouteRequest request = createTestRequest(2009, 11, 17, 10, 0, 0)
       .withJourney(jb -> jb.setAllModes(StreetMode.WALK))
-      .setFrom(ptc)
-      .setTo(p3)
+      .withFrom(ptc)
+      .withTo(p3)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);

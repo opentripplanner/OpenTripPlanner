@@ -103,8 +103,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       Double longitude
     ) ->
       (RouteRequestBuilder rr) -> {
-        rr.setFrom(GenericLocation.fromCoordinate(latitude, longitude));
-        rr.setTo(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.withFrom(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.withTo(GenericLocation.fromCoordinate(latitude, longitude));
       };
 
     assertLinking(setup.apply(47.501, 19.00), "A1A2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
@@ -114,8 +114,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
-        rr.setTo(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
+        rr.withFrom(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
+        rr.withTo(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
       },
       "E1E2 street",
       "D1D2 street",
@@ -154,8 +154,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   public void testWheelchairLinking() {
     assertLinking(
       rr -> {
-        rr.setFrom(GenericLocation.fromCoordinate(47.5010, 19.03));
-        rr.setTo(GenericLocation.fromCoordinate(47.5010, 19.03));
+        rr.withFrom(GenericLocation.fromCoordinate(47.5010, 19.03));
+        rr.withTo(GenericLocation.fromCoordinate(47.5010, 19.03));
         rr.withJourney(j -> j.withWheelchair(true));
       },
       "C1C2 street",
@@ -172,8 +172,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   ) {
     assertLinking(
       rr -> {
-        rr.setFrom(GenericLocation.fromCoordinate(latitude, longitude));
-        rr.setTo(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.withFrom(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.withTo(GenericLocation.fromCoordinate(latitude, longitude));
       },
       streetName,
       streetName,
@@ -184,8 +184,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
-        rr.setTo(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
+        rr.withFrom(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
+        rr.withTo(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
       },
       streetName,
       streetName,
@@ -205,7 +205,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       consumer.accept(builder);
 
       // Set to, so that origin and destination are different
-      builder.setTo(PLACE_1);
+      builder.withTo(PLACE_1);
 
       var request = builder.buildRequest();
 
@@ -232,7 +232,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       consumer.accept(builder);
 
       // Set from, so that origin and destination are different
-      builder.setFrom(PLACE_2);
+      builder.withFrom(PLACE_2);
       request = builder.buildRequest();
 
       try (

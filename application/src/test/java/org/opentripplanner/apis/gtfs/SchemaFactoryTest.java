@@ -40,7 +40,7 @@ public class SchemaFactoryTest {
         preferences.withWalk(walk -> walk.withSpeed(walkSpeed));
         preferences.withTransfer(transfer -> transfer.withMaxTransfers(maxTransfers + 1));
       })
-      .setNumItineraries(numItineraries)
+      .withNumItineraries(numItineraries)
       .buildDefault();
 
     var schema = SchemaFactory.createSchemaWithDefaultInjection(routeRequest);

@@ -211,8 +211,8 @@ public class RouteRequest implements Cloneable, Serializable {
     }
 
     var request = copyOf()
-      .setArriveBy(arriveBy)
-      .setDateTime(arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime())
+      .withArriveBy(arriveBy)
+      .withDateTime(arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime())
       .withJourney(jb -> jb.withoutDirect())
       .buildRequest();
 

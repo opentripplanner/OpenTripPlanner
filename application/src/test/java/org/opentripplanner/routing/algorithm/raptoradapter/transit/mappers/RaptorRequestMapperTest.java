@@ -101,7 +101,7 @@ class RaptorRequestMapperTest {
     var req = requestBuilder();
     var minWaitTime = Duration.ofMinutes(13);
 
-    req.setViaLocations(
+    req.withViaLocations(
       List.of(new VisitViaLocation("Via A", minWaitTime, List.of(STOP_A.getId()), List.of()))
     );
 
@@ -118,7 +118,7 @@ class RaptorRequestMapperTest {
   void testPassThroughPoints() {
     var req = requestBuilder();
 
-    req.setViaLocations(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
+    req.withViaLocations(List.of(new PassThroughViaLocation("Via A", List.of(STOP_A.getId()))));
 
     var result = map(req.buildRequest());
 
@@ -134,7 +134,7 @@ class RaptorRequestMapperTest {
     var req = requestBuilder();
     Duration minimumWaitTime = Duration.ofMinutes(10);
 
-    req.setViaLocations(
+    req.withViaLocations(
       List.of(
         new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), List.of(VIA_COORDINATE))
       )
@@ -315,7 +315,7 @@ class RaptorRequestMapperTest {
   }
 
   private static RouteRequestBuilder requestBuilder() {
-    return RouteRequest.of().setFrom(FROM).setTo(TO);
+    return RouteRequest.of().withFrom(FROM).withTo(TO);
   }
 
   private static RouteRequestBuilder setFeaturesOnRequest(
@@ -323,10 +323,10 @@ class RaptorRequestMapperTest {
     RequestFeature feature
   ) {
     return switch (feature) {
-      case VIA_VISIT -> req.setViaLocations(
+      case VIA_VISIT -> req.withViaLocations(
         ListUtils.combine(req.buildRequest().getViaLocations(), List.of(VISIT_VIA_LOCATION))
       );
-      case VIA_PASS_THROUGH -> req.setViaLocations(
+      case VIA_PASS_THROUGH -> req.withViaLocations(
         ListUtils.combine(req.buildRequest().getViaLocations(), List.of(PASS_THROUGH_VIA_LOCATION))
       );
       case TRANSIT_GROUP_PRIORITY -> req.withPreferences(p ->

@@ -381,7 +381,7 @@ public class BikeWalkingTest extends GraphRoutingTest {
               )
           )
       )
-      .setArriveBy(arriveBy)
+      .withArriveBy(arriveBy)
       .buildDefault();
 
     var tree = StreetSearchBuilder.of()

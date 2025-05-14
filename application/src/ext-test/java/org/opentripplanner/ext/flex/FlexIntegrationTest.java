@@ -233,11 +233,11 @@ public class FlexIntegrationTest {
     boolean onlyDirect
   ) {
     RouteRequest request = RouteRequest.of()
-      .setDateTime(dateTime)
-      .setFrom(from)
-      .setTo(to)
-      .setNumItineraries(10)
-      .setSearchWindow(Duration.ofHours(2))
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withNumItineraries(10)
+      .withSearchWindow(Duration.ofHours(2))
       .withPreferences(p ->
         p.withStreet(s ->
           s.withAccessEgress(ae -> ae.withPenalty(Map.of(FLEXIBLE, TimeAndCostPenalty.ZERO)))

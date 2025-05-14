@@ -55,12 +55,12 @@ public class ViaRoutingWorker {
   private RoutingResponse routeSegment(RouteViaRequest.ViaSegment v) {
     // If viaLocation is null then we are at last search
     if (v.viaLocation() != null) {
-      this.currentSegmentRequest.setTo(v.viaLocation().point());
+      this.currentSegmentRequest.withTo(v.viaLocation().point());
     } else {
-      this.currentSegmentRequest.setTo(viaRequest.to());
+      this.currentSegmentRequest.withTo(viaRequest.to());
     }
 
-    this.currentSegmentRequest.setJourney(v.journeyRequest());
+    this.currentSegmentRequest.withJourney(v.journeyRequest());
 
     var response = this.routingWorker.apply(this.currentSegmentRequest.buildRequest());
 
@@ -74,12 +74,12 @@ public class ViaRoutingWorker {
     var maxSlack = v.viaLocation().maxSlack();
     var searchWindow = Duration.between(firstArrival, lastArrival).plus(maxSlack);
 
-    this.currentSegmentRequest.setFrom(v.viaLocation().point());
-    this.currentSegmentRequest.setDateTime(
+    this.currentSegmentRequest.withFrom(v.viaLocation().point());
+    this.currentSegmentRequest.withDateTime(
         firstArrival.plus(v.viaLocation().minSlack()).toInstant()
       );
-    this.currentSegmentRequest.setSearchWindow(searchWindow);
-    this.currentSegmentRequest.setNumItineraries(MAX_NUMBER_OF_ITINERARIES);
+    this.currentSegmentRequest.withSearchWindow(searchWindow);
+    this.currentSegmentRequest.withNumItineraries(MAX_NUMBER_OF_ITINERARIES);
 
     return response;
   }

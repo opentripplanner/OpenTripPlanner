@@ -137,8 +137,8 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     boolean arriveBy
   ) {
     var request = RouteRequest.of()
-      .setFrom(GenericLocation.fromCoordinate(fromVertex.getLat(), fromVertex.getLon()))
-      .setTo(GenericLocation.fromCoordinate(toVertex.getLat(), toVertex.getLon()))
+      .withFrom(GenericLocation.fromCoordinate(fromVertex.getLat(), fromVertex.getLon()))
+      .withTo(GenericLocation.fromCoordinate(toVertex.getLat(), toVertex.getLon()))
       .withPreferences(preferences ->
         preferences
           .withBike(b ->
@@ -159,7 +159,7 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
           )
       )
       .withJourney(j -> j.withWheelchair(requireWheelChairAccessible))
-      .setArriveBy(arriveBy)
+      .withArriveBy(arriveBy)
       .buildRequest();
 
     var tree = StreetSearchBuilder.of()

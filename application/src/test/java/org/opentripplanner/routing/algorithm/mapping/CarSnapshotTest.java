@@ -67,8 +67,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
         jb.withDirect(new StreetRequest(StreetMode.CAR_TO_PARK));
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p1)
-      .setTo(p2)
+      .withFrom(p1)
+      .withTo(p2)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -82,8 +82,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
         jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p3)
-      .setTo(p4)
+      .withFrom(p3)
+      .withTo(p4)
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
@@ -97,9 +97,9 @@ public class CarSnapshotTest extends SnapshotTestBase {
         jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p3)
-      .setTo(p4)
-      .setArriveBy(true)
+      .withFrom(p3)
+      .withTo(p4)
+      .withArriveBy(true)
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
@@ -113,8 +113,8 @@ public class CarSnapshotTest extends SnapshotTestBase {
         jb.withDirect(new StreetRequest(StreetMode.CAR_PICKUP));
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p1)
-      .setTo(p2)
+      .withFrom(p1)
+      .withTo(p2)
       .withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)))
       .buildRequest();
 

@@ -27,33 +27,33 @@ public class TripRequestMapper {
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
     callWith.argument("from", (Map<String, Object> v) ->
-      requestBuilder.setFrom(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withFrom(GenericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("to", (Map<String, Object> v) ->
-      requestBuilder.setTo(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withTo(GenericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
-      requestBuilder.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+      requestBuilder.withViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
     });
     callWith.argument(TripQuery.TRIP_VIA_PARAMETER, (List<Map<String, Object>> v) -> {
-      requestBuilder.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
+      requestBuilder.withViaLocations(TripViaLocationMapper.mapToViaLocations(v));
     });
 
     callWith.argument("dateTime", millisSinceEpoch ->
-      requestBuilder.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      requestBuilder.withDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
     callWith.argument("bookingTime", millisSinceEpoch ->
-      requestBuilder.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      requestBuilder.withBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
     callWith.argument("searchWindow", (Integer m) ->
-      requestBuilder.setSearchWindow(Duration.ofMinutes(m))
+      requestBuilder.withSearchWindow(Duration.ofMinutes(m))
     );
-    callWith.argument("pageCursor", requestBuilder::setPageCursorFromEncoded);
-    callWith.argument("timetableView", requestBuilder::setTimetableView);
-    callWith.argument("numTripPatterns", requestBuilder::setNumItineraries);
-    callWith.argument("arriveBy", requestBuilder::setArriveBy);
+    callWith.argument("pageCursor", requestBuilder::withPageCursorFromEncoded);
+    callWith.argument("timetableView", requestBuilder::withTimetableView);
+    callWith.argument("numTripPatterns", requestBuilder::withNumItineraries);
+    callWith.argument("arriveBy", requestBuilder::withArriveBy);
 
     requestBuilder.withJourney(journeyBuilder -> {
       callWith.argument("wheelchairAccessible", journeyBuilder::withWheelchair);

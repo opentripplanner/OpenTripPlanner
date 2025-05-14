@@ -65,8 +65,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void directWalk() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
       .withJourney(jb -> jb.withTransit(b -> b.disable()))
-      .setFrom(p1)
-      .setTo(p4)
+      .withFrom(p1)
+      .withTo(p4)
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
@@ -80,8 +80,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         jb.withDirect(new StreetRequest(StreetMode.BIKE_RENTAL));
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p1)
-      .setTo(p2)
+      .withFrom(p1)
+      .withTo(p2)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -102,9 +102,9 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         jb.withDirect(new StreetRequest(StreetMode.BIKE));
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p1)
-      .setTo(p4)
-      .setArriveBy(true)
+      .withFrom(p1)
+      .withTo(p4)
+      .withArriveBy(true)
       .buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
@@ -119,8 +119,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
         b.withAccess(new StreetRequest(StreetMode.BIKE_RENTAL));
         b.withDirect(new StreetRequest(StreetMode.NOT_SET));
       })
-      .setFrom(p1)
-      .setTo(p3)
+      .withFrom(p1)
+      .withTo(p3)
       .buildRequest();
 
     try {
@@ -135,8 +135,8 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
   public void transit() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 10, 0)
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.NOT_SET)))
-      .setFrom(p3)
-      .setTo(p1)
+      .withFrom(p3)
+      .withTo(p1)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);

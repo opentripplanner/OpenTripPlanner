@@ -63,8 +63,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
         jb.setModes(RequestModes.of().withDirectMode(StreetMode.BIKE_RENTAL).build());
         jb.withTransit(b -> b.disable());
       })
-      .setFrom(p1)
-      .setTo(p2)
+      .withFrom(p1)
+      .withTo(p2)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
@@ -87,7 +87,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       jb.withTransit(b -> b.disable());
     });
     allowArrivalWithRentalVehicle(builder);
-    var request = builder.setFrom(p1).setTo(p2).buildRequest();
+    var request = builder.withFrom(p1).withTo(p2).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -100,7 +100,7 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
       jb.withTransit(b -> b.disable());
     });
     allowArrivalWithRentalVehicle(builder);
-    var request = builder.setFrom(p1).setTo(p2).setArriveBy(true).buildRequest();
+    var request = builder.withFrom(p1).withTo(p2).withArriveBy(true).buildRequest();
 
     expectRequestResponseToMatchSnapshot(request);
   }
@@ -119,8 +119,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
             .build()
         )
       )
-      .setFrom(p1)
-      .setTo(p3)
+      .withFrom(p1)
+      .withTo(p3)
       .buildRequest();
 
     try {
@@ -144,8 +144,8 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
             .build()
         )
       )
-      .setFrom(p3)
-      .setTo(p1)
+      .withFrom(p3)
+      .withTo(p1)
       .buildRequest();
 
     expectArriveByToMatchDepartAtAndSnapshot(request);

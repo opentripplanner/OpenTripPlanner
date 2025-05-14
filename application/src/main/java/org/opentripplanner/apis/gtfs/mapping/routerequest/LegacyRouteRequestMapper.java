@@ -45,27 +45,27 @@ public class LegacyRouteRequestMapper {
     CallerWithEnvironment callWith = new CallerWithEnvironment(environment);
 
     callWith.argument("fromPlace", (String from) ->
-      request.setFrom(LocationStringParser.fromOldStyleString(from))
+      request.withFrom(LocationStringParser.fromOldStyleString(from))
     );
     callWith.argument("toPlace", (String to) ->
-      request.setTo(LocationStringParser.fromOldStyleString(to))
+      request.withTo(LocationStringParser.fromOldStyleString(to))
     );
 
-    callWith.argument("from", (Map<String, Object> v) -> request.setFrom(toGenericLocation(v)));
-    callWith.argument("to", (Map<String, Object> v) -> request.setTo(toGenericLocation(v)));
+    callWith.argument("from", (Map<String, Object> v) -> request.withFrom(toGenericLocation(v)));
+    callWith.argument("to", (Map<String, Object> v) -> request.withTo(toGenericLocation(v)));
 
     mapViaLocations(request, environment);
 
-    request.setDateTime(
+    request.withDateTime(
       environment.getArgument("date"),
       environment.getArgument("time"),
       ZoneIdFallback.zoneId(context.transitService().getTimeZone())
     );
     boolean isTripPlannedForNow = RouteRequest.isAPIGtfsTripPlannedForNow(request.dateTime());
 
-    callWith.argument("numItineraries", request::setNumItineraries);
-    callWith.argument("searchWindow", (Long m) -> request.setSearchWindow(Duration.ofSeconds(m)));
-    callWith.argument("pageCursor", request::setPageCursorFromEncoded);
+    callWith.argument("numItineraries", request::withNumItineraries);
+    callWith.argument("searchWindow", (Long m) -> request.withSearchWindow(Duration.ofSeconds(m)));
+    callWith.argument("pageCursor", request::withPageCursorFromEncoded);
 
     request.withPreferences(preferences -> {
       preferences.withBike(bike -> {
@@ -169,7 +169,7 @@ public class LegacyRouteRequestMapper {
       );
     });
 
-    callWith.argument("arriveBy", request::setArriveBy);
+    callWith.argument("arriveBy", request::withArriveBy);
 
     request.withJourney(journeyBuilder -> {
       callWith.argument("wheelchair", journeyBuilder::withWheelchair);
@@ -255,7 +255,7 @@ public class LegacyRouteRequestMapper {
   static void mapViaLocations(RouteRequestBuilder request, DataFetchingEnvironment env) {
     var args = env.getArgument("via");
     var locs = ViaLocationMapper.mapToViaLocations((List<Map<String, Object>>) args);
-    request.setViaLocations(locs);
+    request.withViaLocations(locs);
   }
 
   private static <T> boolean hasArgument(Map<String, T> m, String name) {

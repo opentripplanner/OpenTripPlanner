@@ -175,9 +175,9 @@ public class BarrierRoutingTest {
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
     var builder = RouteRequest.of()
-      .setDateTime(dateTime)
-      .setFrom(from)
-      .setTo(to)
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
       .withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)));
 
     options.accept(builder);

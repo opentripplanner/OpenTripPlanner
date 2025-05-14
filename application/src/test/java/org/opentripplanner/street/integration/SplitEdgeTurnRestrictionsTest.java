@@ -158,9 +158,9 @@ public class SplitEdgeTurnRestrictionsTest {
 
   private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
     RouteRequest request = RouteRequest.of()
-      .setDateTime(dateTime)
-      .setFrom(from)
-      .setTo(to)
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 

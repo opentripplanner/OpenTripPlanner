@@ -63,17 +63,17 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     this.defaultRequest = original.isDefaultRequest();
   }
 
-  public RouteRequestBuilder setJourney(JourneyRequest journey) {
+  public RouteRequestBuilder withJourney(JourneyRequest journey) {
     this.journey = journey;
     return this;
   }
 
   public RouteRequestBuilder withJourney(Consumer<JourneyRequestBuilder> body) {
-    setJourney(journey.copyOf().apply(body).build());
+    withJourney(journey.copyOf().apply(body).build());
     return this;
   }
 
-  public RouteRequestBuilder setArriveBy(boolean arriveBy) {
+  public RouteRequestBuilder withArriveBy(boolean arriveBy) {
     this.arriveBy = arriveBy;
     return this;
   }
@@ -87,7 +87,7 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
     return withPreferences(preferences.copyOf().apply(body).build());
   }
 
-  public RouteRequestBuilder setBookingTime(Instant bookingTime) {
+  public RouteRequestBuilder withBookingTime(Instant bookingTime) {
     this.bookingTime = bookingTime;
     return this;
   }
@@ -102,53 +102,53 @@ public class RouteRequestBuilder implements Cloneable, Serializable {
    * to be the same for departAt and arriveBy queries.
    * @param dateTime Either a departAt time or an arriveBy time, one second's accuracy
    */
-  public RouteRequestBuilder setDateTime(Instant dateTime) {
+  public RouteRequestBuilder withDateTime(Instant dateTime) {
     this.dateTime = dateTime.truncatedTo(ChronoUnit.SECONDS);
     return this;
   }
 
-  public RouteRequestBuilder setDateTime(String date, String time, ZoneId tz) {
+  public RouteRequestBuilder withDateTime(String date, String time, ZoneId tz) {
     ZonedDateTime dateObject = DateUtils.toZonedDateTime(date, time, tz);
-    setDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
+    withDateTime(dateObject == null ? Instant.now() : dateObject.toInstant());
     return this;
   }
 
-  public RouteRequestBuilder setFrom(GenericLocation from) {
+  public RouteRequestBuilder withFrom(GenericLocation from) {
     this.from = from;
     return this;
   }
 
-  public RouteRequestBuilder setTo(GenericLocation to) {
+  public RouteRequestBuilder withTo(GenericLocation to) {
     this.to = to;
     return this;
   }
 
-  public RouteRequestBuilder setViaLocations(final List<ViaLocation> via) {
+  public RouteRequestBuilder withViaLocations(final List<ViaLocation> via) {
     this.via = via;
     return this;
   }
 
-  public RouteRequestBuilder setSearchWindow(@Nullable Duration searchWindow) {
+  public RouteRequestBuilder withSearchWindow(@Nullable Duration searchWindow) {
     this.searchWindow = searchWindow;
     return this;
   }
 
-  public RouteRequestBuilder setMaxSearchWindow(Duration maxSearchWindow) {
+  public RouteRequestBuilder withMaxSearchWindow(Duration maxSearchWindow) {
     this.maxSearchWindow = maxSearchWindow;
     return this;
   }
 
-  public RouteRequestBuilder setPageCursorFromEncoded(String pageCursor) {
+  public RouteRequestBuilder withPageCursorFromEncoded(String pageCursor) {
     this.pageCursor = PageCursor.decode(pageCursor);
     return this;
   }
 
-  public RouteRequestBuilder setTimetableView(boolean timetableView) {
+  public RouteRequestBuilder withTimetableView(boolean timetableView) {
     this.timetableView = timetableView;
     return this;
   }
 
-  public RouteRequestBuilder setNumItineraries(int numItineraries) {
+  public RouteRequestBuilder withNumItineraries(int numItineraries) {
     this.numItineraries = numItineraries;
     return this;
   }

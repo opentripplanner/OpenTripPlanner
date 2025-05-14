@@ -175,7 +175,7 @@ public class CarPickupTest extends GraphRoutingTest {
     var request = RouteRequest.of()
       //.setFrom(GenericLocation.fromCoordinate(fromVertex.getLat(), fromVertex.getLon()))
       //.setTo(GenericLocation.fromCoordinate(toVertex.getLat(), toVertex.getLon()))
-      .setArriveBy(arriveBy)
+      .withArriveBy(arriveBy)
       .buildDefault();
 
     var tree = StreetSearchBuilder.of()

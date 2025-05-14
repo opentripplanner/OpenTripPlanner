@@ -79,7 +79,7 @@ public class StreetFlexPathCalculator implements FlexPathCalculator {
 
   private ShortestPathTree<State, Edge, Vertex> routeToMany(Vertex vertex) {
     // TODO: This is incorrect, the configured defaults are not used.
-    var routingRequest = RouteRequest.of().setArriveBy(reverseDirection).buildDefault();
+    var routingRequest = RouteRequest.of().withArriveBy(reverseDirection).buildDefault();
 
     return StreetSearchBuilder.of()
       .setSkipEdgeStrategy(new DurationSkipEdgeStrategy<>(maxFlexTripDuration))

@@ -92,12 +92,12 @@ public class RouteViaRequest implements Serializable {
     //       request.
     var request = RouteRequest.of();
 
-    request.setFrom(from);
-    request.setSearchWindow(searchWindow);
-    request.setDateTime(dateTime);
+    request.withFrom(from);
+    request.withSearchWindow(searchWindow);
+    request.withDateTime(dateTime);
     request.withPreferences(preferences);
     if (numItineraries != null) {
-      request.setNumItineraries(numItineraries);
+      request.withNumItineraries(numItineraries);
     }
     request.withJourney(j -> j.withWheelchair(wheelchair));
     return request;

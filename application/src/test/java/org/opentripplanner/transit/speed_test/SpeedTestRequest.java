@@ -48,21 +48,21 @@ public class SpeedTestRequest {
     var input = testCase.definition();
 
     if (input.departureTimeSet()) {
-      builder.setDateTime(time(input.departureTime())).setArriveBy(false);
+      builder.withDateTime(time(input.departureTime())).withArriveBy(false);
     } else if (input.arrivalTimeSet()) {
-      builder.setDateTime(time(input.arrivalTime())).setArriveBy(true);
+      builder.withDateTime(time(input.arrivalTime())).withArriveBy(true);
     }
 
     if (input.window() != null) {
-      builder.setSearchWindow(input.window());
+      builder.withSearchWindow(input.window());
     }
 
-    builder.setFrom(input.fromPlace()).setTo(input.toPlace());
+    builder.withFrom(input.fromPlace()).withTo(input.toPlace());
 
     // Filter the results inside the SpeedTest, not in the itineraries filter,
     // when ignoring street results. This will use the default which is 50.
     if (!config.ignoreStreetResults) {
-      builder.setNumItineraries(opts.numOfItineraries());
+      builder.withNumItineraries(opts.numOfItineraries());
     }
     builder.withJourney(journeyBuilder -> {
       journeyBuilder.setModes(input.modes().getRequestModes());
@@ -77,7 +77,7 @@ public class SpeedTestRequest {
       }
 
       if (profile.raptorProfile().is(MIN_TRAVEL_DURATION)) {
-        builder.setSearchWindow(Duration.ZERO);
+        builder.withSearchWindow(Duration.ZERO);
       }
 
       journeyBuilder.withTransit(transitBuilder ->

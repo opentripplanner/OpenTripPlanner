@@ -73,9 +73,9 @@ public class BicycleRoutingTest {
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
     RouteRequest request = RouteRequest.of()
-      .setDateTime(dateTime)
-      .setFrom(from)
-      .setTo(to)
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
       .withPreferences(p ->
         p.withBike(it -> it.withOptimizeType(VehicleRoutingOptimizeType.SHORTEST_DURATION))
       )

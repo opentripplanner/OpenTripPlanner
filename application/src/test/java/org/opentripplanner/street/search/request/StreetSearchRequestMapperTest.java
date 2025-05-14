@@ -19,11 +19,11 @@ class StreetSearchRequestMapperTest {
     var builder = RouteRequest.of();
 
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
-    builder.setDateTime(dateTime);
+    builder.withDateTime(dateTime);
     var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
-    builder.setFrom(from);
+    builder.withFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    builder.setTo(to);
+    builder.withTo(to);
     builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
 
     builder.withJourney(jb ->
@@ -47,11 +47,11 @@ class StreetSearchRequestMapperTest {
     var builder = RouteRequest.of();
 
     Instant dateTime = Instant.parse("2022-11-10T10:00:00Z");
-    builder.setDateTime(dateTime);
+    builder.withDateTime(dateTime);
     var from = new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null);
-    builder.setFrom(from);
+    builder.withFrom(from);
     var to = GenericLocation.fromCoordinate(60.0, 20.0);
-    builder.setTo(to);
+    builder.withTo(to);
     builder.withPreferences(it -> it.withWalk(walk -> walk.withSpeed(2.4)));
     builder.withJourney(j -> j.withWheelchair(true));
 

@@ -119,7 +119,7 @@ public class AStarTest {
   public void testBack() {
     var request = RouteRequest.of()
       .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)))
-      .setArriveBy(true)
+      .withArriveBy(true)
       .buildDefault();
 
     Vertex from = graph.getVertex("56th_24th");
@@ -202,7 +202,7 @@ public class AStarTest {
   public void testBackExtraEdges() {
     var request = RouteRequest.of()
       .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)))
-      .setArriveBy(true)
+      .withArriveBy(true)
       .buildDefault();
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(

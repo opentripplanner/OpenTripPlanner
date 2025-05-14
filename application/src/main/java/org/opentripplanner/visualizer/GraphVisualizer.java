@@ -474,11 +474,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     QualifiedModeSet qualifiedModeSet = new QualifiedModeSet(modes.toArray(String[]::new));
     builder.withJourney(b -> b.setModes(qualifiedModeSet.getRequestModes()));
 
-    builder.setArriveBy(arriveByCheckBox.isSelected());
-    builder.setDateTime(when);
-    builder.setFrom(LocationStringParser.fromOldStyleString(from));
-    builder.setTo(LocationStringParser.fromOldStyleString(to));
-    builder.setNumItineraries(Integer.parseInt(this.nPaths.getText()));
+    builder.withArriveBy(arriveByCheckBox.isSelected());
+    builder.withDateTime(when);
+    builder.withFrom(LocationStringParser.fromOldStyleString(from));
+    builder.withTo(LocationStringParser.fromOldStyleString(to));
+    builder.withNumItineraries(Integer.parseInt(this.nPaths.getText()));
 
     builder.withPreferences(preferences -> {
       preferences.withWalk(walk -> {

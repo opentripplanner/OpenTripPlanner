@@ -78,10 +78,10 @@ class WalkRoutingTest {
     boolean arriveBy
   ) {
     RouteRequest request = RouteRequest.of()
-      .setDateTime(instant)
-      .setFrom(from)
-      .setTo(to)
-      .setArriveBy(arriveBy)
+      .withDateTime(instant)
+      .withFrom(from)
+      .withTo(to)
+      .withArriveBy(arriveBy)
       .buildRequest();
 
     try (

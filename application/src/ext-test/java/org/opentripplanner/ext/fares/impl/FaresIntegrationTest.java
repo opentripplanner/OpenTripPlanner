@@ -132,9 +132,9 @@ public class FaresIntegrationTest {
     OtpServerRequestContext serverContext
   ) {
     RouteRequest request = RouteRequest.of()
-      .setDateTime(time)
-      .setFrom(from)
-      .setTo(to)
+      .withDateTime(time)
+      .withFrom(from)
+      .withTo(to)
       .withPreferences(p ->
         p.withItineraryFilter(it -> it.withDebug(ItineraryFilterDebugProfile.LIST_ALL))
       )

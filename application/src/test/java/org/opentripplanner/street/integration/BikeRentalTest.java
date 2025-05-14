@@ -607,7 +607,7 @@ public class BikeRentalTest extends GraphRoutingTest {
     boolean arriveBy,
     Consumer<RouteRequestBuilder> optionsSetter
   ) {
-    var builder = RouteRequest.of().setArriveBy(arriveBy);
+    var builder = RouteRequest.of().withArriveBy(arriveBy);
 
     optionsSetter.accept(builder);
 

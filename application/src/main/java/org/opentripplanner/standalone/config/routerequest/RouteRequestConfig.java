@@ -68,7 +68,7 @@ public class RouteRequestConfig {
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    requestBuilder.setArriveBy(
+    requestBuilder.withArriveBy(
       c
         .of("arriveBy")
         .since(V2_0)
@@ -90,14 +90,14 @@ public class RouteRequestConfig {
       )
     );
 
-    requestBuilder.setNumItineraries(
+    requestBuilder.withNumItineraries(
       c
         .of("numItineraries")
         .since(V2_0)
         .summary("The maximum number of itineraries to return.")
         .asInt(dft.numItineraries())
     );
-    requestBuilder.setSearchWindow(
+    requestBuilder.withSearchWindow(
       c
         .of("searchWindow")
         .since(V2_0)
