@@ -4,7 +4,7 @@ import de.vdv.ojp20.siri.ParticipantRefStructure;
 import de.vdv.ojp20.siri.ServiceDelivery;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import org.rutebanken.time.XmlDateTime;
+import org.opentripplanner.ojp.time.XmlDateTime;
 
 public class ServiceDeliveryMapper {
 

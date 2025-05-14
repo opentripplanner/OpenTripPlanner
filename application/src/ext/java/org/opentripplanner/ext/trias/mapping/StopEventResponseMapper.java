@@ -39,9 +39,9 @@ import org.opentripplanner.ext.trias.service.CallAtStop;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.ojp.time.XmlDateTime;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.rutebanken.time.XmlDateTime;
 
 /**
  * Maps the OTP-internal data types into OJP responses.
