@@ -17,7 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
-import org.opentripplanner.standalone.config.sandbox.GsConfig;
+import org.opentripplanner.datastore.api.GsParameters;
+import org.opentripplanner.ext.datastore.gs.config.GsConfig;
 
 /**
  * This is a manual integration test to test the Google Cloud Storage integration. To set up the

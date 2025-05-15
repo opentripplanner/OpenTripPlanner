@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
-import org.opentripplanner.ext.datastore.gs.GsParameters;
+import org.opentripplanner.ext.datastore.gs.config.GsConfig;
 import org.opentripplanner.ext.emission.config.EmissionConfig;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.ext.fares.FaresConfiguration;
@@ -49,7 +49,6 @@ import org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig;
 import org.opentripplanner.standalone.config.buildconfig.TransitFeeds;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayConfigMapper;
-import org.opentripplanner.standalone.config.sandbox.GsConfig;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.lang.ObjectUtils;
@@ -187,7 +186,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final ZoneId transitModelTimeZone;
   private final List<FeedScopedId> transitRouteToStationCentroid;
   public final URI stopConsolidation;
-  private final GsConfig gsParameters;
+  private final GsConfig gsConfig;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -612,7 +611,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
-    gsParameters = GsConfig.fromConfig(root, "gsConfig");
+    gsConfig = GsConfig.fromConfig(root, "gsConfig");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
       root.logAllWarnings(LOG::warn);
@@ -625,8 +624,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   }
 
   @Override
-  public GsParameters gsParameters() {
-    return gsParameters;
+  public GsConfig gsParameters() {
+    return gsConfig;
   }
 
   @Override

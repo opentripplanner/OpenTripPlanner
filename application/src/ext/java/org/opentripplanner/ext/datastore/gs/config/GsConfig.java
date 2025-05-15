@@ -1,6 +1,6 @@
-package org.opentripplanner.standalone.config.sandbox;
+package org.opentripplanner.ext.datastore.gs.config;
 
-import org.opentripplanner.ext.datastore.gs.GsParameters;
+import org.opentripplanner.datastore.api.GsParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
@@ -22,14 +22,14 @@ public class GsConfig implements GsParameters {
       .asObject();
 
     String host = gsRoot
-      .of("host")
+      .of("cloudServiceHost")
       .since(OtpVersion.V2_8)
       .summary(
         """
         Host of the Google Cloud Storage server. In case of a real GCS Bucket this parameter can be
         omitted. When the host differs from the usual GCS host, for example when emulating GCS in a
         docker container for testing purposes, the host has to be specified including the port.
-        Eg: http//localhost:4443"""
+        Eg: http://localhost:4443"""
       )
       .asString(null);
 
