@@ -271,21 +271,31 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             return null;
           }
 
+          var arrivalDeparture = args.getGraphQLOmitNonPickups()
+            ? ArrivalDeparture.DEPARTURES
+            : ArrivalDeparture.BOTH;
+
+          var time = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
+          var timeRange = Duration.ofSeconds(args.getGraphQLTimeRange());
+
           if (transitService.hasNewTripPatternsForModifiedTrips()) {
             return transitService.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-              pattern,
               stop,
-              args
+              pattern,
+              time,
+              timeRange,
+              args.getGraphQLNumberOfDepartures(),
+              arrivalDeparture
             );
           }
 
           return transitService.findTripTimeOnDate(
             stop,
             pattern,
-            GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
-            Duration.ofSeconds(args.getGraphQLTimeRange()),
+            time,
+            timeRange,
             args.getGraphQLNumberOfDepartures(),
-            args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+            arrivalDeparture,
             !args.getGraphQLOmitCanceled()
           );
         },

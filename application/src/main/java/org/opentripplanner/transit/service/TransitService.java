@@ -7,16 +7,12 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.apis.gtfs.GraphQLUtils;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.PathTransfer;
@@ -411,8 +407,11 @@ public interface TransitService {
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
 
   List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-    TripPattern originalPattern,
     StopLocation stop,
-    GraphQLTypes.GraphQLStopStopTimesForPatternArgs args
+    TripPattern originalPattern,
+    Instant startTime,
+    Duration timeRange,
+    int graphQLNumberOfDepartures,
+    ArrivalDeparture arrivalDeparture
   );
 }

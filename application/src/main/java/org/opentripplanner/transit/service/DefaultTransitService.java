@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.apis.gtfs.GraphQLUtils;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.FeedInfo;
@@ -767,11 +765,13 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-    TripPattern originalPattern,
     StopLocation stop,
-    GraphQLTypes.GraphQLStopStopTimesForPatternArgs args
+    TripPattern originalPattern,
+    Instant startTime,
+    Duration timeRange,
+    int numDepartures,
+    ArrivalDeparture arrivalDeparture
   ) {
-    Instant startTime = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
     LocalDate date = startTime.atZone(getTimeZone()).toLocalDate();
 
     return Stream.concat(
@@ -784,9 +784,9 @@ public class DefaultTransitService implements TransitEditorService {
           stop,
           tripPattern,
           startTime,
-          Duration.ofSeconds(args.getGraphQLTimeRange()),
-          args.getGraphQLNumberOfDepartures(),
-          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+          timeRange,
+          numDepartures,
+          arrivalDeparture,
           false
         ).stream()
       )
@@ -795,7 +795,7 @@ public class DefaultTransitService implements TransitEditorService {
           (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
         )
       )
-      .limit(args.getGraphQLNumberOfDepartures())
+      .limit(numDepartures)
       .toList();
   }
 
