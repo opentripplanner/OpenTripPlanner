@@ -49,7 +49,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * Slippy map vector tile API for rendering various graph information for inspection/debugging
  * purposes.
  */
-@Path("/debugvectortiles")
+@Path("/debug/vectortiles")
 public class DebugVectorTilesResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
@@ -71,7 +71,7 @@ public class DebugVectorTilesResource {
     VERTICES,
     RENTAL
   );
-  public static final String PATH = "/otp/debugvectortiles/";
+  public static final String PATH = "/otp/debug/vectortiles/";
 
   private final OtpServerRequestContext serverContext;
 

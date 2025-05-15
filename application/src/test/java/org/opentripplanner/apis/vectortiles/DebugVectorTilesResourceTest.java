@@ -38,7 +38,7 @@ class DebugVectorTilesResourceTest {
     var req = HttpForTest.containerRequest();
     var tileJson = resource.getTileJson(req.getUriInfo(), req, "l1,l2");
     assertEquals(
-      "https://localhost:8080/otp/debugvectortiles/l1,l2/{z}/{x}/{y}.pbf",
+      "https://localhost:8080/otp/debug/vectortiles/l1,l2/{z}/{x}/{y}.pbf",
       tileJson.tiles[0]
     );
   }
@@ -46,6 +46,6 @@ class DebugVectorTilesResourceTest {
   @Test
   void tileJsonUrl() {
     var url = DebugVectorTilesResource.tileJsonUrl("http://example.com", LAYERS);
-    assertEquals("http://example.com/otp/debugvectortiles/edge,areaStop/tilejson.json", url);
+    assertEquals("http://example.com/otp/debug/vectortiles/edge,areaStop/tilejson.json", url);
   }
 }
