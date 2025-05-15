@@ -775,9 +775,10 @@ public class DefaultTransitService implements TransitEditorService {
     LocalDate date = startTime.atZone(getTimeZone()).toLocalDate();
 
     return Stream.concat(
-        getRealtimeAddedPatternsAsStream(originalPattern, date),
-        Stream.of(originalPattern)
-      )
+      getRealtimeAddedPatternsAsStream(originalPattern, date),
+      Stream.of(originalPattern)
+    )
+      .distinct()
       .flatMap(tripPattern ->
         findTripTimeOnDate(
           stop,
@@ -787,8 +788,7 @@ public class DefaultTransitService implements TransitEditorService {
           args.getGraphQLNumberOfDepartures(),
           args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
           false
-        )
-          .stream()
+        ).stream()
       )
       .sorted(
         Comparator.comparing(
@@ -813,7 +813,7 @@ public class DefaultTransitService implements TransitEditorService {
       .filter(
         tripPattern ->
           tripPattern != null &&
-            tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
+          tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
       );
   }
 

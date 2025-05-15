@@ -410,10 +410,9 @@ public interface TransitService {
    */
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
 
-
   List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
     TripPattern originalPattern,
     StopLocation stop,
     GraphQLTypes.GraphQLStopStopTimesForPatternArgs args
-  ) ;
+  );
 }
