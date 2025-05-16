@@ -34,6 +34,7 @@ public class BuildConfigurationDocTest {
     .skip("fares", "sandbox/Fares.md")
     .skip("transferRequests", "RouteRequest.md")
     .skip("emission", "sandbox/Emission.md")
+    .skip("Google Cloud Storage", "sandbox/GoogleCloudStorage.md")
     .build();
 
   /**

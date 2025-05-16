@@ -24,8 +24,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 @GeneratesDocumentation
 public class GsConfigurationDocTest implements DocsTestConstants {
 
-  private static final File TEMPLATE = new File(TEMPLATE_PATH, "GcStorage.md");
-  private static final File OUT_FILE = new File(SANDBOX_USER_DOC_PATH, "GcStorage.md");
+  private static final File TEMPLATE = new File(TEMPLATE_PATH, "GoogleCloudStorage.md");
+  private static final File OUT_FILE = new File(SANDBOX_USER_DOC_PATH, "GoogleCloudStorage.md");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
   @Test
