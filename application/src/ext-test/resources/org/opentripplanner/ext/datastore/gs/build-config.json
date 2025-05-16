@@ -1,0 +1,6 @@
+{
+  "gsConfig": {
+    "cloudServiceHost": "http://fake-gcp:4443",
+    "credentialFile": "/path/to/file"
+  }
+}

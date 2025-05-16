@@ -24,7 +24,8 @@ public class GsConfig implements GsParameters {
     String host = gsRoot
       .of("cloudServiceHost")
       .since(OtpVersion.V2_8)
-      .summary(
+      .summary("Host of the Google Cloud Storage Server")
+      .description(
         """
         Host of the Google Cloud Storage server. In case of a real GCS Bucket this parameter can be
         omitted. When the host differs from the usual GCS host, for example when emulating GCS in a
