@@ -1,0 +1,169 @@
+package org.opentripplanner.ext.siri.updater.mqtt;
+
+import jakarta.xml.bind.JAXBException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Optional;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.xml.stream.XMLStreamException;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.entur.siri21.util.SiriXml;
+import org.opentripplanner.updater.trip.siri.updater.AsyncEstimatedTimetableSource;
+import org.opentripplanner.utils.text.FileSizeToTextConverter;
+import org.opentripplanner.utils.time.DurationUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.org.siri.siri21.ServiceDelivery;
+import uk.org.siri.siri21.Siri;
+
+public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSource {
+
+  private static final Logger LOG = LoggerFactory.getLogger(MqttEstimatedTimetableSource.class);
+
+  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
+  private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
+  private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
+
+  private final MqttSiriETUpdaterParameters parameters;
+
+  private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
+  private volatile boolean primed;
+
+  private MqttClient client;
+
+  public MqttEstimatedTimetableSource(MqttSiriETUpdaterParameters parameters) {
+    this.parameters = parameters;
+  }
+
+  @Override
+  public void start(@Nonnull Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer) {
+    this.serviceDeliveryConsumer = serviceDeliveryConsumer;
+
+    try {
+      String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
+      MemoryPersistence persistence = new MemoryPersistence();
+      client = new MqttClient(parameters.url(), clientId, persistence);
+
+      MqttConnectOptions connOpts = new MqttConnectOptions();
+      connOpts.setCleanSession(true);
+      connOpts.setAutomaticReconnect(true);
+      URI parsedUrl = new URI(parameters.url());
+      if (parsedUrl.getUserInfo() != null) {
+        String[] userinfo = parsedUrl.getUserInfo().split(":");
+        connOpts.setUserName(userinfo[0]);
+        connOpts.setPassword(userinfo[1].toCharArray());
+      }
+      client.setCallback(new Callback());
+
+      LOG.debug("Connecting to broker: {}", parameters.url());
+      client.connect(connOpts);
+    } catch (MqttException | URISyntaxException e) {
+      LOG.warn("Failed to connect to broker: {}", parameters.url(), e);
+    }
+
+  }
+
+  @Override
+  public boolean isPrimed() {
+    return primed;
+  }
+
+  @Override
+  public void teardown() {
+    try {
+      client.disconnect();
+    } catch (MqttException e) {
+      LOG.error("Error disconnecting", e);
+    }
+  }
+
+  private class Callback implements MqttCallbackExtended {
+
+    private final Instant startTime = Instant.now();
+
+    @Override
+    public void connectComplete(boolean reconnect, String serverURI) {
+      try {
+        LOG.debug("Connected");
+        client.subscribe(parameters.topic(), parameters.qos());
+      } catch (MqttException e) {
+        LOG.warn("Could not subscribe to: {}", parameters.topic());
+      }
+    }
+
+    @Override
+    public void connectionLost(Throwable cause) {
+      LOG.debug("Connection to MQTT broker lost: {}", parameters.url());
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+      serviceDelivery(message.getPayload())
+        .ifPresent(serviceDelivery -> {
+          logMqttMessage(serviceDelivery);
+          serviceDeliveryConsumer.apply(serviceDelivery);
+        });
+      primed = true;
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+
+    }
+
+    private Optional<ServiceDelivery> serviceDelivery(byte[] payload) {
+      Siri siri;
+      try {
+        siri = SiriXml.parseXml(new String(payload, StandardCharsets.UTF_8));
+      } catch (XMLStreamException | JAXBException e) {
+        LOG.warn("Failed to parse Siri XML", e);
+        return Optional.empty();
+      }
+      return Optional.ofNullable(siri.getServiceDelivery());
+    }
+
+    private void logMqttMessage(ServiceDelivery serviceDelivery) {
+      // ToDo: better track with micrometer
+      int numberOfUpdatedTrips = 0;
+      try {
+        numberOfUpdatedTrips = serviceDelivery
+          .getEstimatedTimetableDeliveries()
+          .getFirst()
+          .getEstimatedJourneyVersionFrames()
+          .getFirst()
+          .getEstimatedVehicleJourneies()
+          .size();
+      } catch (Exception e) {
+        //ignore
+      }
+      long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
+      long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
+
+      if (numberOfMessages % 1000 == 0) {
+        LOG.info(
+          "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
+          numberOfMessages,
+          numberOfUpdates,
+          FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
+          Duration.between(
+            serviceDelivery.getResponseTimestamp().toInstant(),
+            Instant.now()
+          ).toMillis(),
+          DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
+        );
+      }
+    }
+  }
+}
