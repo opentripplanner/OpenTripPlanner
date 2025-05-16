@@ -32,10 +32,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private static final Logger LOG = LoggerFactory.getLogger(MqttEstimatedTimetableSource.class);
 
-  private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
-  private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
-  private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
-
   private final MqttSiriETUpdaterParameters parameters;
 
   private Function<ServiceDelivery, Future<?>> serviceDeliveryConsumer;
@@ -92,6 +88,10 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
   private class Callback implements MqttCallbackExtended {
 
     private final Instant startTime = Instant.now();
+
+    private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
+    private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
+    private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
 
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
