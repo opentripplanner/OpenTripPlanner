@@ -135,7 +135,7 @@ public class RouterConfig implements Serializable {
     return flexConfig;
   }
 
-  public TriasApiParameters triasApiConfig() {
+  public TriasApiParameters triasApiParameters() {
     return triasApiParameters;
   }
 

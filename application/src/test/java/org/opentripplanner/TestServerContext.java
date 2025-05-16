@@ -105,7 +105,7 @@ public class TestServerContext {
       createStreetLimitationParametersService(),
       routerConfig.transitTuningConfig(),
       transitService,
-      routerConfig.triasApiConfig(),
+      routerConfig.triasApiParameters(),
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),
