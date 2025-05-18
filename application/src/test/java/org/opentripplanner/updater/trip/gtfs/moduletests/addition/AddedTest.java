@@ -27,15 +27,13 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 class AddedTest implements RealtimeTestConstants {
 
+  private static final String ADDED_TRIP_ID = "added_trip";
   private final RealtimeTestEnvironment env = RealtimeTestEnvironment.of()
-    .withStops(STOP_A1_ID, STOP_B1_ID, STOP_C1_ID).build();
-
-  final String ADDED_TRIP_ID = "added_trip";
+    .withStops(STOP_A1_ID, STOP_B1_ID, STOP_C1_ID)
+    .build();
 
   @Test
   void addedTrip() {
-    var env = ENV_BUILDER.build();
-
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addStopTime(STOP_A1_ID, 30)
       .addStopTime(STOP_B1_ID, 40)
@@ -43,12 +41,11 @@ class AddedTest implements RealtimeTestConstants {
       .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
-    assertAddedTrip(this.ADDED_TRIP_ID, env);
+    assertAddedTrip(ADDED_TRIP_ID, env);
   }
 
   @Test
   void addedTripWithNewRoute() {
-    var env = ENV_BUILDER.build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addTripExtension()
       .addStopTime(STOP_A1_ID, 30, DropOffPickupType.PHONE_AGENCY)
@@ -83,7 +80,6 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void addedWithUnknownStop() {
-    var env = ENV_BUILDER.build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
@@ -107,7 +103,6 @@ class AddedTest implements RealtimeTestConstants {
 
   @Test
   void repeatedlyAddedTripWithNewRoute() {
-    var env = ENV_BUILDER.build();
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       // add extension to set route name, url, mode
       .addTripExtension()
