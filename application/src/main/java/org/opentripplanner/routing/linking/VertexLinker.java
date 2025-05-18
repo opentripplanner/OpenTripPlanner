@@ -80,6 +80,12 @@ public class VertexLinker {
   );
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
+  private static final Set<TraverseMode> NO_THRU_MODES = Set.of(
+    TraverseMode.WALK,
+    TraverseMode.BICYCLE,
+    TraverseMode.CAR
+  );
+
   private final Graph graph;
 
   private final VertexFactory vertexFactory;
@@ -663,17 +669,11 @@ public class VertexLinker {
     return true;
   }
 
-  static final Set<TraverseMode> noThruModes = Set.of(
-    TraverseMode.WALK,
-    TraverseMode.BICYCLE,
-    TraverseMode.CAR
-  );
-
-  private Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
-    var modes = new HashSet<>(noThruModes);
+  private static Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
+    var modes = new HashSet<>(NO_THRU_MODES);
     for (Edge e : edges) {
       if (e instanceof StreetEdge se) {
-        for (TraverseMode tm : noThruModes) {
+        for (TraverseMode tm : NO_THRU_MODES) {
           if (!se.isNoThruTraffic(tm)) {
             modes.remove(tm);
           }
