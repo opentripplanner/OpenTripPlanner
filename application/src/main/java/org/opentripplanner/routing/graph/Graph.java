@@ -17,9 +17,7 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.linking.Scope;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
