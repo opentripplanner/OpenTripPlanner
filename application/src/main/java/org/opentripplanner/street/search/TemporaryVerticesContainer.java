@@ -95,7 +95,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   }
 
   /**
-   * Get the stop vertices that corresponds to the from location. If the from location only contains
+   * Get the stop vertices that correspond to the from location. If the from location only contains
    * coordinates, this will return an empty set. If the from location is a station id this will
    * return the child stops of that station.
    */
@@ -122,7 +122,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
   /**
    * Gets a set of vertices corresponding to the location provided. It first tries to match one of
-   * the stop or station types by id, and if not successful it uses the coordinates if provided.
+   * the stop or station types by id, and if not successful, it uses the coordinates if provided.
    *
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
@@ -187,7 +187,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     return nonTransitMode;
   }
 
-  Vertex createVertexFromCoordinate(
+  private Vertex createVertexFromCoordinate(
     Coordinate coordinate,
     @Nullable String label,
     StreetMode streetMode,
@@ -282,7 +282,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     }
   }
 
-  private boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
+  private static boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
     // Not connected if linking was not attempted, and vertices were not specified in the request.
     if (vertices == null) {
       return true;
