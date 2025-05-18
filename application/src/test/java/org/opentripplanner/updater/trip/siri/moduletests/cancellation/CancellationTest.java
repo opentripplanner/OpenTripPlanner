@@ -1,9 +1,6 @@
 package org.opentripplanner.updater.trip.siri.moduletests.cancellation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.STATION_B_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.STOP_A1_ID;
-import static org.opentripplanner.updater.trip.RealtimeTestConstants.STOP_B1_ID;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -17,14 +14,14 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class CancellationTest implements RealtimeTestConstants {
 
   private static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
-  private static final RegularStop STOP_B1 = ENV_BUILDER.stopAtStation(STOP_B1_ID, STATION_B_ID);
-  private static final RegularStop STOP_B2 = ENV_BUILDER.stopAtStation("B2", STATION_B_ID);
+  private static final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private static final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, STATION_OMEGA_ID);
+  private static final RegularStop STOP_C = ENV_BUILDER.stopAtStation(STOP_D_ID, STATION_OMEGA_ID);
   private static final String ADDED_TRIP_ID = "newJourney";
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
-    .addStop(STOP_A1, "0:00:10", "0:00:11")
-    .addStop(STOP_B1, "0:00:20", "0:00:21")
+    .addStop(STOP_A, "0:00:10", "0:00:11")
+    .addStop(STOP_B, "0:00:20", "0:00:21")
     .build();
 
   @Test
@@ -38,10 +35,10 @@ class CancellationTest implements RealtimeTestConstants {
       .withCancellation(true)
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .arriveAimedExpected("0:00:10", "0:00:10")
           .departAimedExpected("0:00:11", "0:00:11")
-          .call(STOP_B1)
+          .call(STOP_B)
           .arriveAimedExpected("0:00:20", "0:00:20")
           .departAimedExpected("0:00:21", "0:00:21")
       )
@@ -102,10 +99,10 @@ class CancellationTest implements RealtimeTestConstants {
       .withLineRef(TRIP_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .arriveAimedExpected("0:00:10", "0:00:10")
           .departAimedExpected("0:00:11", "0:00:11")
-          .call(STOP_B1)
+          .call(STOP_B)
           .arriveAimedExpected("0:00:20", "0:00:20")
           .departAimedExpected("0:00:21", "0:00:21")
       )
@@ -131,10 +128,10 @@ class CancellationTest implements RealtimeTestConstants {
       .withDatedVehicleJourneyRef(tripId)
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // change to another quay in the same station
-          .call(STOP_B2)
+          .call(STOP_C)
           .arriveAimedExpected("00:00:20", "00:00:25")
       )
       .buildEstimatedTimetableDeliveries();
@@ -142,7 +139,7 @@ class CancellationTest implements RealtimeTestConstants {
     var modificationResult = env.applyEstimatedTimetable(modification);
     assertEquals(1, modificationResult.successful());
     assertEquals(
-      "MODIFIED | A1 0:00:15 0:00:15 | B2 0:00:25 0:00:25",
+      "MODIFIED | A1 0:00:15 0:00:15 | C1 0:00:25 0:00:25",
       env.getRealtimeTimetable(tripId)
     );
 
@@ -151,10 +148,10 @@ class CancellationTest implements RealtimeTestConstants {
       .withCancellation(true)
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // change to another quay in the same station
-          .call(STOP_B2)
+          .call(STOP_C)
           .arriveAimedExpected("00:00:20", "00:00:25")
       )
       .buildEstimatedTimetableDeliveries();

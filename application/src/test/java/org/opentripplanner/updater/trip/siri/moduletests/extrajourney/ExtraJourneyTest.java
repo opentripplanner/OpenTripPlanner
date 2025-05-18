@@ -29,15 +29,15 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     .build();
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private final RegularStop STOP_A1 = ENV_BUILDER.stop("A1");
-  private final RegularStop STOP_B1 = ENV_BUILDER.stop("B1");
+  private final RegularStop STOP_A = ENV_BUILDER.stop("A1");
+  private final RegularStop STOP_B = ENV_BUILDER.stop("B1");
   private final RegularStop STOP_C1 = ENV_BUILDER.stop("C1");
   private final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_2)
-    .addStop(STOP_A1, "0:00:10", "0:00:11")
-    .addStop(STOP_B1, "0:00:20", "0:00:21")
+    .addStop(STOP_A, "0:00:10", "0:00:11")
+    .addStop(STOP_B, "0:00:20", "0:00:21")
     .build();
 
   private static final String ADDED_TRIP_ID = "newJourney";
@@ -137,9 +137,9 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("10:58", "10:48")
-          .call(STOP_B1)
+          .call(STOP_B)
           .arriveAimedExpected("10:08", "10:58")
       )
       .buildEstimatedTimetableDeliveries();
@@ -160,7 +160,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withVehicleJourneyRef(TRIP_1_ID)
       .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
-      .withRecordedCalls(builder -> builder.call(STOP_A1).departAimedActual("00:01", "00:02"))
+      .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:01", "00:02"))
       .withEstimatedCalls(builder -> builder.call(STOP_C1).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
 
@@ -194,7 +194,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withLineRef(TRIP_1_INPUT.routeId())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:01", "00:02")
           .call(STOP_C1)
           .arriveAimedExpected("00:03", "00:04")

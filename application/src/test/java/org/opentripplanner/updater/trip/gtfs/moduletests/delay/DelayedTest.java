@@ -28,8 +28,8 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 class DelayedTest implements RealtimeTestConstants {
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private final RegularStop STOP_A1 = ENV_BUILDER.stop("A1");
-  private final RegularStop STOP_B1 = ENV_BUILDER.stop("B1");
+  private final RegularStop STOP_A = ENV_BUILDER.stop("A1");
+  private final RegularStop STOP_B = ENV_BUILDER.stop("B1");
   private final RegularStop STOP_C1 = ENV_BUILDER.stop("C1");
 
   private static final int DELAY = 1;
@@ -39,8 +39,8 @@ class DelayedTest implements RealtimeTestConstants {
   @Test
   void singleStopDelay() {
     var tripInput = TripInput.of(TRIP_1_ID)
-      .addStop(STOP_A1, "0:00:10", "0:00:11")
-      .addStop(STOP_B1, "0:00:20", "0:00:21")
+      .addStop(STOP_A, "0:00:10", "0:00:11")
+      .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();
 
@@ -81,8 +81,8 @@ class DelayedTest implements RealtimeTestConstants {
   @Test
   void complexDelay() {
     var tripInput = TripInput.of(TRIP_2_ID)
-      .addStop(STOP_A1, "0:01:00", "0:01:01")
-      .addStop(STOP_B1, "0:01:10", "0:01:11")
+      .addStop(STOP_A, "0:01:00", "0:01:01")
+      .addStop(STOP_B, "0:01:10", "0:01:11")
       .addStop(STOP_C1, "0:01:20", "0:01:21")
       .build();
     var env = ENV_BUILDER.addTrip(tripInput).build();

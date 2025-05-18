@@ -14,13 +14,13 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 class CancelledStopTest implements RealtimeTestConstants {
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
-  private final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
-  private final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_C1_ID);
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_D_ID);
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
-    .addStop(STOP_A1, "0:01:00", "0:01:01")
-    .addStop(STOP_B1, "0:01:10", "0:01:11")
+    .addStop(STOP_A, "0:01:00", "0:01:01")
+    .addStop(STOP_B, "0:01:10", "0:01:11")
     .addStop(STOP_C1, "0:01:20", "0:01:21")
     .build();
 
@@ -32,9 +32,9 @@ class CancelledStopTest implements RealtimeTestConstants {
       .withDatedVehicleJourneyRef(TRIP_1_ID)
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:01:01", "00:01:01")
-          .call(STOP_B1)
+          .call(STOP_B)
           .withIsCancellation(true)
           .call(STOP_C1)
           .arriveAimedExpected("00:01:30", "00:01:30")

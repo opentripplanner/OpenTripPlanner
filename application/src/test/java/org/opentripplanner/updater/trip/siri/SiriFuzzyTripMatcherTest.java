@@ -20,8 +20,8 @@ import uk.org.siri.siri21.EstimatedVehicleJourney;
 class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
-  private final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
   @Test
   void match() {
@@ -54,12 +54,12 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var trip1input = tripInput(TRIP_1_ID);
 
     var env = ENV_BUILDER.addTrip(trip1input).build();
-    env.timetableRepository.addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B1));
+    env.timetableRepository.addScheduledStopPointMapping(Map.of(id(scheduledStopPointId), STOP_B));
 
     var journey = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:10:00", "00:10:00")
           .call(scheduledStopPointId)
           .arriveAimedExpected("00:20:00", "00:20:00")
@@ -79,7 +79,7 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     var journey = new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:10:00", "00:10:00")
           .call("SOME_MADE_UP_ID")
           .arriveAimedExpected("00:20:00", "00:20:00")
@@ -109,9 +109,9 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
     return new SiriEtBuilder(env.getDateTimeHelper())
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_A1)
+          .call(STOP_A)
           .departAimedExpected("00:10:00", "00:10:00")
-          .call(STOP_B1)
+          .call(STOP_B)
           .arriveAimedExpected("00:20:00", "00:20:00")
       )
       .buildEstimatedVehicleJourney();
@@ -119,8 +119,8 @@ class SiriFuzzyTripMatcherTest implements RealtimeTestConstants {
 
   private TripInput tripInput(String trip1Id) {
     return TripInput.of(trip1Id)
-      .addStop(STOP_A1, "0:10:00", "0:10:00")
-      .addStop(STOP_B1, "0:20:00", "0:20:00")
+      .addStop(STOP_A, "0:10:00", "0:10:00")
+      .addStop(STOP_B, "0:20:00", "0:20:00")
       .build();
   }
 }

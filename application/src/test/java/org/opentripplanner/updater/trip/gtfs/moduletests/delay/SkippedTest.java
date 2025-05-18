@@ -27,13 +27,13 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 class SkippedTest implements RealtimeTestConstants {
 
   private static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
-  private static final RegularStop STOP_B1 = ENV_BUILDER.stop(STOP_B1_ID);
-  private static final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_C1_ID);
+  private static final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private static final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private static final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_D_ID);
 
   private static final TripInput TRIP_INPUT = TripInput.of(TRIP_2_ID)
-    .addStop(STOP_A1, "0:01:00", "0:01:01")
-    .addStop(STOP_B1, "0:01:10", "0:01:11")
+    .addStop(STOP_A, "0:01:00", "0:01:01")
+    .addStop(STOP_B, "0:01:10", "0:01:11")
     .addStop(STOP_C1, "0:01:20", "0:01:21")
     .build();
 
