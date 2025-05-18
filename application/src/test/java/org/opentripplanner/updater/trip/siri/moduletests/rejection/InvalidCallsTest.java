@@ -23,14 +23,14 @@ class InvalidCallsTest implements RealtimeTestConstants {
   private final String TRIP_1_ID = "TestTrip1";
   private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
   private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
-  private final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_D_ID);
-  private final RegularStop STOP_D1 = ENV_BUILDER.stop(STOP_E_ID);
+  private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
+  private final RegularStop STOP_D = ENV_BUILDER.stop(STOP_D_ID);
   private final Station STATION_A = STOP_A.getParentStation();
 
   private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A, "0:00:10", "0:00:11")
     .addStop(STOP_B, "0:00:20", "0:00:21")
-    .addStop(STOP_C1, "0:00:40", "0:00:41")
+    .addStop(STOP_C, "0:00:40", "0:00:41")
     .build();
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
@@ -68,9 +68,9 @@ class InvalidCallsTest implements RealtimeTestConstants {
           .departAimedExpected("00:00:10", "00:00:11")
           .call(STOP_B)
           .departAimedExpected("00:00:21", "00:00:25")
-          .call(STOP_C1)
+          .call(STOP_C)
           .departAimedExpected("00:00:40", "00:00:41")
-          .call(STOP_D1)
+          .call(STOP_D)
           .departAimedExpected("00:00:50", "00:00:51")
       )
       .buildEstimatedTimetableDeliveries();
@@ -91,9 +91,9 @@ class InvalidCallsTest implements RealtimeTestConstants {
         builder
           .call(STOP_A)
           .departAimedExpected("00:00:10", "00:00:11")
-          .call(STOP_D1)
+          .call(STOP_D)
           .departAimedExpected("00:00:21", "00:00:25")
-          .call(STOP_C1)
+          .call(STOP_C)
           .departAimedExpected("00:00:40", "00:00:41")
       )
       .buildEstimatedTimetableDeliveries();
@@ -116,7 +116,7 @@ class InvalidCallsTest implements RealtimeTestConstants {
           .departAimedExpected("00:00:10", "00:00:11")
           .call(TEST_MODEL.stop("Unknown stop").withParentStation(STATION_A).build())
           .departAimedExpected("00:00:21", "00:00:25")
-          .call(STOP_C1)
+          .call(STOP_C)
           .departAimedExpected("00:00:40", "00:00:41")
       )
       .buildEstimatedTimetableDeliveries();

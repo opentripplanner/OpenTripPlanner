@@ -12,9 +12,8 @@ public interface RealtimeTestConstants {
   String TRIP_2_ID = "TestTrip2";
 
   String STATION_OMEGA_ID = "Station-Omega";
-  String STOP_A_ID = "A1";
-  String STOP_B_ID = "B1";
-  String STOP_C_ID = "B2";
-  String STOP_D_ID = "C1";
-  String STOP_E_ID = "D1";
+  String STOP_A_ID = "A";
+  String STOP_B_ID = "B";
+  String STOP_C_ID = "C";
+  String STOP_D_ID = "D";
 }

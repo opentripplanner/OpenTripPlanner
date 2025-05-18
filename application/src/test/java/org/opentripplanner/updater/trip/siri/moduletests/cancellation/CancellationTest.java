@@ -13,13 +13,13 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class CancellationTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
-  private static final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, STATION_OMEGA_ID);
-  private static final RegularStop STOP_C = ENV_BUILDER.stopAtStation(STOP_D_ID, STATION_OMEGA_ID);
   private static final String ADDED_TRIP_ID = "newJourney";
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, STATION_OMEGA_ID);
+  private final RegularStop STOP_C = ENV_BUILDER.stopAtStation(STOP_D_ID, STATION_OMEGA_ID);
 
-  private static final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
+  private final TripInput TRIP_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A, "0:00:10", "0:00:11")
     .addStop(STOP_B, "0:00:20", "0:00:21")
     .build();
@@ -73,13 +73,13 @@ class CancellationTest implements RealtimeTestConstants {
   void testChangeQuayAndCancelScheduledTrip() {
     var env = ENV_BUILDER.addTrip(TRIP_INPUT).build();
     assertEquals(
-      "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      "SCHEDULED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
     changeQuayAndCancelTrip(env, TRIP_1_ID);
 
     assertEquals(
-      "CANCELED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      "CANCELED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
@@ -110,7 +110,7 @@ class CancellationTest implements RealtimeTestConstants {
     var creationResult = env.applyEstimatedTimetable(creation);
     assertEquals(1, creationResult.successful());
     assertEquals(
-      "ADDED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      "ADDED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getRealtimeTimetable(ADDED_TRIP_ID)
     );
     changeQuayAndCancelTrip(env, ADDED_TRIP_ID);
@@ -118,12 +118,12 @@ class CancellationTest implements RealtimeTestConstants {
     // the arrival time on first stop is adjusted to the departure time to avoid negative dwell time
     // conversely the departure time on last stop is adjusted to the arrival time
     assertEquals(
-      "CANCELED | A1 0:00:11 0:00:11 | B1 0:00:20 0:00:20",
+      "CANCELED | A 0:00:11 0:00:11 | B 0:00:20 0:00:20",
       env.getRealtimeTimetable(ADDED_TRIP_ID)
     );
   }
 
-  private static void changeQuayAndCancelTrip(RealtimeTestEnvironment env, String tripId) {
+  private void changeQuayAndCancelTrip(RealtimeTestEnvironment env, String tripId) {
     var modification = new SiriEtBuilder(env.getDateTimeHelper())
       .withDatedVehicleJourneyRef(tripId)
       .withEstimatedCalls(builder ->
@@ -139,7 +139,7 @@ class CancellationTest implements RealtimeTestConstants {
     var modificationResult = env.applyEstimatedTimetable(modification);
     assertEquals(1, modificationResult.successful());
     assertEquals(
-      "MODIFIED | A1 0:00:15 0:00:15 | C1 0:00:25 0:00:25",
+      "MODIFIED | A 0:00:15 0:00:15 | D 0:00:25 0:00:25",
       env.getRealtimeTimetable(tripId)
     );
 

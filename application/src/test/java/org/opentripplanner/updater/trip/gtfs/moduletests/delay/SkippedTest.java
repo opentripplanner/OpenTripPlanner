@@ -26,15 +26,15 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class SkippedTest implements RealtimeTestConstants {
 
-  private static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
-  private static final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
-  private static final RegularStop STOP_C1 = ENV_BUILDER.stop(STOP_D_ID);
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
 
-  private static final TripInput TRIP_INPUT = TripInput.of(TRIP_2_ID)
+  private final TripInput TRIP_INPUT = TripInput.of(TRIP_2_ID)
     .addStop(STOP_A, "0:01:00", "0:01:01")
     .addStop(STOP_B, "0:01:10", "0:01:11")
-    .addStop(STOP_C1, "0:01:20", "0:01:21")
+    .addStop(STOP_C, "0:01:20", "0:01:21")
     .build();
 
   @Test
@@ -54,7 +54,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 
     assertEquals(
-      "UPDATED | A1 0:01 0:01:01 | B1 [C] 0:01:52 0:01:58 | C1 0:02:50 0:02:51",
+      "UPDATED | A 0:01 0:01:01 | B [C] 0:01:52 0:01:58 | C 0:02:50 0:02:51",
       env.getRealtimeTimetable(TRIP_2_ID)
     );
   }
@@ -100,11 +100,11 @@ class SkippedTest implements RealtimeTestConstants {
     assertNewTripTimesIsUpdated(env, TRIP_2_ID);
 
     assertEquals(
-      "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
+      "SCHEDULED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
       env.getScheduledTimetable(TRIP_2_ID)
     );
     assertEquals(
-      "UPDATED | A1 0:01 0:01:01 | B1 0:02 0:02:01 | C1 0:02:50 0:02:51",
+      "UPDATED | A 0:01 0:01:01 | B 0:02 0:02:01 | C 0:02:50 0:02:51",
       env.getRealtimeTimetable(id(TRIP_2_ID), SERVICE_DATE)
     );
   }
@@ -131,7 +131,7 @@ class SkippedTest implements RealtimeTestConstants {
     assertNewTripTimesIsUpdated(env, tripId);
 
     assertEquals(
-      "UPDATED | A1 [ND] 0:01 0:01:01 | B1 [C] 0:01:10 0:01:11 | C1 [ND] 0:01:20 0:01:21",
+      "UPDATED | A [ND] 0:01 0:01:01 | B [C] 0:01:10 0:01:11 | C [ND] 0:01:20 0:01:21",
       env.getRealtimeTimetable(tripId)
     );
   }
@@ -156,7 +156,7 @@ class SkippedTest implements RealtimeTestConstants {
     );
 
     assertEquals(
-      "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
+      "SCHEDULED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
       TripTimesStringBuilder.encodeTripTimes(tripTimes, originalTripPattern)
     );
 

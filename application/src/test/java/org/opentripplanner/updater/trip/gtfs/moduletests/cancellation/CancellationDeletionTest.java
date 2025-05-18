@@ -28,9 +28,9 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class CancellationDeletionTest implements RealtimeTestConstants {
 
-  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private static final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
-  private static final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
 
   static List<Arguments> cases() {
     return List.of(
@@ -89,7 +89,7 @@ class CancellationDeletionTest implements RealtimeTestConstants {
     )
       .addStopTime(STOP_A_ID, 30)
       .addStopTime(STOP_B_ID, 40)
-      .addStopTime(STOP_D_ID, 55)
+      .addStopTime(STOP_C_ID, 55)
       .build();
 
     assertSuccess(env.applyTripUpdate(update, DIFFERENTIAL));

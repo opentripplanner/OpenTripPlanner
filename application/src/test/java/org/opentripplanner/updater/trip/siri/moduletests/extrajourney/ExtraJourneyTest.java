@@ -24,23 +24,22 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class ExtraJourneyTest implements RealtimeTestConstants {
 
+  private static final String ADDED_TRIP_ID = "newJourney";
   private static final Route ROUTE_2 = TimetableRepositoryForTest.route("route-2")
     .withOperator(Operator.of(id("o2")).withName("o").build())
     .build();
 
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
-  private final RegularStop STOP_A = ENV_BUILDER.stop("A1");
-  private final RegularStop STOP_B = ENV_BUILDER.stop("B1");
-  private final RegularStop STOP_C1 = ENV_BUILDER.stop("C1");
-  private final RegularStop STOP_D1 = ENV_BUILDER.stop("D1");
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
+  private final RegularStop STOP_D = ENV_BUILDER.stop(STOP_D_ID);
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .withRoute(ROUTE_2)
     .addStop(STOP_A, "0:00:10", "0:00:11")
     .addStop(STOP_B, "0:00:20", "0:00:21")
     .build();
-
-  private static final String ADDED_TRIP_ID = "newJourney";
 
   @Test
   void testAddJourneyWithExistingRoute() {
@@ -54,14 +53,8 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(
-      "ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04",
-      env.getRealtimeTimetable(ADDED_TRIP_ID)
-    );
-    assertEquals(
-      "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
-      env.getScheduledTimetable(ADDED_TRIP_ID)
-    );
+    assertEquals("ADDED | C [R] 0:02 0:02 | D 0:04 0:04", env.getRealtimeTimetable(ADDED_TRIP_ID));
+    assertEquals("SCHEDULED | C 0:01 0:01 | D 0:03 0:03", env.getScheduledTimetable(ADDED_TRIP_ID));
     FeedScopedId tripId = id(ADDED_TRIP_ID);
     TransitService transitService = env.getTransitService();
     Trip trip = transitService.getTrip(tripId);
@@ -92,14 +85,8 @@ class ExtraJourneyTest implements RealtimeTestConstants {
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
-    assertEquals(
-      "ADDED | C1 [R] 0:02 0:02 | D1 0:04 0:04",
-      env.getRealtimeTimetable(ADDED_TRIP_ID)
-    );
-    assertEquals(
-      "SCHEDULED | C1 0:01 0:01 | D1 0:03 0:03",
-      env.getScheduledTimetable(ADDED_TRIP_ID)
-    );
+    assertEquals("ADDED | C [R] 0:02 0:02 | D 0:04 0:04", env.getRealtimeTimetable(ADDED_TRIP_ID));
+    assertEquals("SCHEDULED | C 0:01 0:01 | D 0:03 0:03", env.getScheduledTimetable(ADDED_TRIP_ID));
     TransitService transitService = env.getTransitService();
     assertEquals(numRoutes + 1, transitService.listRoutes().size());
     FeedScopedId newRouteId = id(newRouteRef);
@@ -161,21 +148,15 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(STOP_C1).arriveAimedExpected("00:03", "00:04"))
+      .withEstimatedCalls(builder -> builder.call(STOP_C).arriveAimedExpected("00:03", "00:04"))
       .buildEstimatedTimetableDeliveries();
 
     var result = env.applyEstimatedTimetable(updates);
 
     assertEquals(1, result.successful());
 
-    assertEquals(
-      "ADDED | A1 [R] 0:02 0:02 | C1 0:04 0:04",
-      env.getRealtimeTimetable(ADDED_TRIP_ID)
-    );
-    assertEquals(
-      "SCHEDULED | A1 0:01 0:01 | C1 0:03 0:03",
-      env.getScheduledTimetable(ADDED_TRIP_ID)
-    );
+    assertEquals("ADDED | A [R] 0:02 0:02 | C 0:04 0:04", env.getRealtimeTimetable(ADDED_TRIP_ID));
+    assertEquals("SCHEDULED | A 0:01 0:01 | C 0:03 0:03", env.getScheduledTimetable(ADDED_TRIP_ID));
 
     // Original trip should not get canceled
     var originalTripTimes = env.getTripTimesForTrip(TRIP_1_ID);
@@ -196,7 +177,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
         builder
           .call(STOP_A)
           .departAimedExpected("00:01", "00:02")
-          .call(STOP_C1)
+          .call(STOP_C)
           .arriveAimedExpected("00:03", "00:04")
       )
       .buildEstimatedTimetableDeliveries();
@@ -213,7 +194,7 @@ class ExtraJourneyTest implements RealtimeTestConstants {
       .withIsExtraJourney(true)
       .withOperatorRef(TRIP_1_INPUT.operatorId())
       .withLineRef(TRIP_1_INPUT.routeId())
-      .withRecordedCalls(builder -> builder.call(STOP_C1).departAimedActual("00:01", "00:02"))
-      .withEstimatedCalls(builder -> builder.call(STOP_D1).arriveAimedExpected("00:03", "00:04"));
+      .withRecordedCalls(builder -> builder.call(STOP_C).departAimedActual("00:01", "00:02"))
+      .withEstimatedCalls(builder -> builder.call(STOP_D).arriveAimedExpected("00:03", "00:04"));
   }
 }

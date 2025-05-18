@@ -74,7 +74,7 @@ class FuzzyTripMatchingTest implements RealtimeTestConstants {
 
   private static void assertTripUpdated(RealtimeTestEnvironment env) {
     assertEquals(
-      "UPDATED | A1 0:00:15 0:00:15 | B1 0:00:25 0:00:25",
+      "UPDATED | A 0:00:15 0:00:15 | B 0:00:25 0:00:25",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
   }

@@ -19,8 +19,8 @@ class ExtraCallTest implements RealtimeTestConstants {
   private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
   private final RegularStop STOP_A = ENV_BUILDER.stopAtStation(STOP_A_ID, "A");
   private final RegularStop STOP_B = ENV_BUILDER.stopAtStation(STOP_B_ID, "B");
+  private final RegularStop STOP_C = ENV_BUILDER.stopAtStation(STOP_C_ID, "C");
   private final RegularStop STOP_D = ENV_BUILDER.stopAtStation(STOP_D_ID, "D");
-  private final RegularStop STOP_E = ENV_BUILDER.stopAtStation(STOP_E_ID, "E");
 
   private final TripInput TRIP_1_INPUT = TripInput.of(TRIP_1_ID)
     .addStop(STOP_A, "0:00:10", "0:00:11")
@@ -37,7 +37,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
     assertEquals(
-      "MODIFIED | A1 [R] 0:00:15 0:00:15 | D1 0:00:20 0:00:25 | B1 0:00:33 0:00:33",
+      "MODIFIED | A [R] 0:00:15 0:00:15 | D 0:00:20 0:00:25 | B 0:00:33 0:00:33",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
@@ -52,7 +52,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
     assertEquals(
-      "MODIFIED | A1 [R] 0:00:15 0:00:15 | D1 0:00:20 0:00:25 | B1 0:00:33 0:00:33",
+      "MODIFIED | A [R] 0:00:15 0:00:15 | D 0:00:20 0:00:25 | B 0:00:33 0:00:33",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
@@ -76,7 +76,7 @@ class ExtraCallTest implements RealtimeTestConstants {
 
     assertEquals(1, result.successful());
     assertEquals(
-      "CANCELED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      "CANCELED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
@@ -92,7 +92,7 @@ class ExtraCallTest implements RealtimeTestConstants {
           .call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
           // Unexpected extra stop without isExtraCall flag
-          .call(STOP_E)
+          .call(STOP_D)
           .arriveAimedExpected("00:00:19", "00:00:20")
           .departAimedExpected("00:00:24", "00:00:25")
           .call(STOP_B)
@@ -137,12 +137,12 @@ class ExtraCallTest implements RealtimeTestConstants {
         builder
           .call(STOP_A)
           .departAimedExpected("00:00:11", "00:00:15")
-          .call(STOP_E)
+          .call(STOP_D)
           .withIsExtraCall(true)
           .arriveAimedExpected("00:00:19", "00:00:20")
           .departAimedExpected("00:00:24", "00:00:25")
           // this scheduled stop should not be changed
-          .call(STOP_D)
+          .call(STOP_C)
           .arriveAimedExpected("00:00:30", "00:00:33")
       )
       .buildEstimatedTimetableDeliveries();
@@ -161,7 +161,7 @@ class ExtraCallTest implements RealtimeTestConstants {
       .withRecordedCalls(builder -> builder.call(STOP_A).departAimedActual("00:00:11", "00:00:15"))
       .withEstimatedCalls(builder ->
         builder
-          .call(STOP_E)
+          .call(STOP_D)
           .withIsExtraCall(true)
           .arriveAimedExpected("00:00:18", "00:00:20")
           .departAimedExpected("00:00:19", "00:00:25")

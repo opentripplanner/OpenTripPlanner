@@ -28,7 +28,7 @@ class AddedTest implements RealtimeTestConstants {
 
   private static final String ADDED_TRIP_ID = "added_trip";
   private final RealtimeTestEnvironment env = RealtimeTestEnvironment.of()
-    .withStops(STOP_A_ID, STOP_B_ID, STOP_D_ID)
+    .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID)
     .build();
 
   @Test
@@ -36,7 +36,7 @@ class AddedTest implements RealtimeTestConstants {
     var tripUpdate = new TripUpdateBuilder(ADDED_TRIP_ID, SERVICE_DATE, ADDED, TIME_ZONE)
       .addStopTime(STOP_A_ID, 30)
       .addStopTime(STOP_B_ID, 40)
-      .addStopTime(STOP_D_ID, 55)
+      .addStopTime(STOP_C_ID, 55)
       .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
@@ -49,7 +49,7 @@ class AddedTest implements RealtimeTestConstants {
       .addTripExtension()
       .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_B_ID, 55, DropOffPickupType.NONE)
+      .addStopTime(STOP_C_ID, 55, DropOffPickupType.NONE)
       .build();
 
     var result = env.applyTripUpdate(tripUpdate);
@@ -84,7 +84,7 @@ class AddedTest implements RealtimeTestConstants {
       .addTripExtension()
       .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime("UNKNOWN_STOP_ID", 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_D_ID, 55, DropOffPickupType.NONE)
+      .addStopTime(STOP_C_ID, 55, DropOffPickupType.NONE)
       .build();
 
     var result = env.applyTripUpdate(tripUpdate);
@@ -107,7 +107,7 @@ class AddedTest implements RealtimeTestConstants {
       .addTripExtension()
       .addStopTime(STOP_A_ID, 30, DropOffPickupType.PHONE_AGENCY)
       .addStopTime(STOP_B_ID, 40, DropOffPickupType.COORDINATE_WITH_DRIVER)
-      .addStopTime(STOP_D_ID, 55, DropOffPickupType.NONE)
+      .addStopTime(STOP_C_ID, 55, DropOffPickupType.NONE)
       .build();
 
     assertSuccess(env.applyTripUpdate(tripUpdate));
