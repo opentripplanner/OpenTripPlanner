@@ -27,8 +27,8 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 class AddedTest implements RealtimeTestConstants {
 
-  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of()
-    .withStops(STOP_A1_ID, STOP_B1_ID, STOP_C1_ID);
+  private final RealtimeTestEnvironment env = RealtimeTestEnvironment.of()
+    .withStops(STOP_A1_ID, STOP_B1_ID, STOP_C1_ID).build();
 
   final String ADDED_TRIP_ID = "added_trip";
 

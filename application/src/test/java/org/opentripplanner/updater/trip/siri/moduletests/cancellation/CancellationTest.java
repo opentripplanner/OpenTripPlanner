@@ -16,7 +16,7 @@ import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
 class CancellationTest implements RealtimeTestConstants {
 
-  public static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private static final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
   private static final RegularStop STOP_A1 = ENV_BUILDER.stop(STOP_A1_ID);
   private static final RegularStop STOP_B1 = ENV_BUILDER.stopAtStation(STOP_B1_ID, STATION_B_ID);
   private static final RegularStop STOP_B2 = ENV_BUILDER.stopAtStation("B2", STATION_B_ID);
