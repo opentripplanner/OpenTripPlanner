@@ -37,6 +37,7 @@ public class ApiTransitService {
       getRealtimeAddedPatternsAsStream(originalPattern, date),
       Stream.of(originalPattern)
     )
+      .distinct()
       .flatMap(tripPattern ->
         transitService
           .findTripTimeOnDate(
