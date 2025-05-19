@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission.internal;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.model.EmissionSummary;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
@@ -33,9 +34,8 @@ public class DefaultEmissionRepository implements EmissionRepository {
   }
 
   @Override
-  public Emission routePassengerEmissionsPerMeter(FeedScopedId routeId) {
-    var value = this.emissionForRouteId.get(routeId);
-    return value == null ? Emission.ZERO : value;
+  public Optional<Emission> routePassengerEmissionsPerMeter(FeedScopedId routeId) {
+    return Optional.ofNullable(this.emissionForRouteId.get(routeId));
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.emission.internal.itinerary;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
@@ -33,7 +34,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
       Emission value;
 
       if (l instanceof TransitLeg tl) {
-        value = calculateCo2EmissionsForTransit(tl);
+        value = calculateCo2EmissionsForTransit(tl).orElse(null);
       } else if (l instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
         value = calculateCo2EmissionsForCar(sl);
       } else {
@@ -41,7 +42,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
         continue;
       }
 
-      if (value.isZero()) {
+      if (value == null) {
         partialResults = true;
       } else {
         l = l.withEmissionPerPerson(value);
@@ -50,9 +51,6 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
       newLegs.add(l);
     }
 
-    if (sum.isZero()) {
-      return itinerary;
-    }
     var builder = itinerary.copyOf();
     builder.withLegs(newLegs);
 
@@ -62,7 +60,7 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
     return builder.build();
   }
 
-  private Emission calculateCo2EmissionsForTransit(TransitLeg leg) {
+  private Optional<Emission> calculateCo2EmissionsForTransit(TransitLeg leg) {
     return emissionService.calculateTransitPassengerEmissionForTripHops(
       leg.trip(),
       leg.boardStopPosInPattern(),

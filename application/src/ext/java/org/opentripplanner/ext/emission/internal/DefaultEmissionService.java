@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.emission.internal;
 
 import jakarta.inject.Inject;
+import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.model.plan.Emission;
@@ -23,7 +24,7 @@ public class DefaultEmissionService implements EmissionService {
   }
 
   @Override
-  public Emission calculateTransitPassengerEmissionForTripHops(
+  public Optional<Emission> calculateTransitPassengerEmissionForTripHops(
     Trip trip,
     int boardStopPosInPattern,
     int alightStopPosInPattern,
@@ -31,16 +32,16 @@ public class DefaultEmissionService implements EmissionService {
   ) {
     // Calculate emissions based on average passenger emissions for the route
     var value = emissionRepository.routePassengerEmissionsPerMeter(trip.getRoute().getId());
-    if (!value.isZero()) {
-      return value.multiply(distance_m);
+    if (value.isPresent()) {
+      return Optional.of(value.get().multiply(distance_m));
     }
 
     // Calculate emissions based the emissions for each section of a trip, if not found
     // zero is returned.
     var emission = emissionRepository.tripPatternEmissions(trip.getId());
     if (emission != null) {
-      return emission.section(boardStopPosInPattern, alightStopPosInPattern);
+      return Optional.of(emission.section(boardStopPosInPattern, alightStopPosInPattern));
     }
-    return Emission.ZERO;
+    return Optional.empty();
   }
 }

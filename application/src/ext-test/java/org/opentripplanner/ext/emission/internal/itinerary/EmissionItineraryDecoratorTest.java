@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,6 +28,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
   // Apply route emissions
   private Itinerary bus;
+  // Apply route emissions with zero emissions
+  private Itinerary busZeroEmission;
   // Apply trip hop emissions
   private Itinerary rail;
   // Car emissions
@@ -42,7 +45,11 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
   @BeforeEach
   void setUpItineraries() {
-    bus = newItinerary(A).bus(21, startTime, endTime, B).build();
+    var routeA = route("R1").build();
+    var routeB = route("R2").build();
+
+    bus = newItinerary(A).bus(routeA, 21, startTime, endTime, B).build();
+    busZeroEmission = newItinerary(A).bus(routeB, 22, startTime, endTime, B).build();
     rail = newItinerary(A).rail(3, startTime, endTime, B).build();
     car = newItinerary(A).drive(startTime, endTime, B).build();
     flex = newItinerary(A).flex(startTime, endTime, B).build();
@@ -51,14 +58,15 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     combinedWithFlex = newItinerary(A)
       .drive(t0, t0 += 90, C)
       .rail(4, t0 += 90, t0 += 90, D)
-      .bus(20, t0, t0 += 90, E)
+      .bus(routeA, 20, t0, t0 += 90, E)
       .flex(t0 + 90, endTime, B)
       .build();
 
     combinedNoFlex = newItinerary(A)
       .drive(t0, t0 += 90, C)
       .rail(4, t0 += 90, t0 + 90, D)
-      .bus(20, t0 + 90, endTime, B)
+      .bus(routeA, 20, t0, t0 += 90, E)
+      .bus(routeB, 23, t0, endTime, B)
       .build();
 
     var repository = new DefaultEmissionRepository();
@@ -68,7 +76,8 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
     // Set route emissions for bus - using route emission
     Map<FeedScopedId, Emission> routeEmissions = new HashMap<>();
-    routeEmissions.put(bus.legs().getFirst().route().getId(), Emission.ofCo2Gram(0.001));
+    routeEmissions.put(routeA.getId(), Emission.ofCo2Gram(0.01));
+    routeEmissions.put(routeB.getId(), Emission.ZERO);
     repository.addRouteEmissions(routeEmissions);
 
     // Set trip emissions for rail - using trip-pattern emission
@@ -105,8 +114,16 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
   void decorateBusUsingRouteEmission() {
     var subject = new EmissionItineraryDecorator(emissionService);
     var it = subject.decorate(bus);
-    assertEquals(Emission.ofCo2Gram(34.5), it.emissionPerPerson());
-    assertEquals(Emission.ofCo2Gram(34.5), it.legs().getFirst().emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(345), it.emissionPerPerson());
+    assertEquals(Emission.ofCo2Gram(345), it.legs().getFirst().emissionPerPerson());
+  }
+
+  @Test
+  void decorateBusUsingZeroRouteEmission() {
+    var subject = new EmissionItineraryDecorator(emissionService);
+    var it = subject.decorate(busZeroEmission);
+    assertEquals(Emission.ZERO, it.emissionPerPerson());
+    assertEquals(Emission.ZERO, it.legs().getFirst().emissionPerPerson());
   }
 
   @Test
@@ -143,7 +160,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     // car - bus - rail - flex
     assertEmission(33.75, it.legs().get(0).emissionPerPerson());
     assertEmission(31, it.legs().get(1).emissionPerPerson());
-    assertEmission(1.125, it.legs().get(2).emissionPerPerson());
+    assertEmission(11.25, it.legs().get(2).emissionPerPerson());
     assertNull(it.legs().get(3).emissionPerPerson());
   }
 
@@ -153,11 +170,11 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
 
     var it = subject.decorate(combinedNoFlex);
 
-    assertEmission(91.375, it.emissionPerPerson());
+    assertEmission(76.0, it.emissionPerPerson());
     // car - bus - rail
     assertEmission(33.75, it.legs().get(0).emissionPerPerson());
     assertEmission(31, it.legs().get(1).emissionPerPerson());
-    assertEmission(26.625, it.legs().get(2).emissionPerPerson());
+    assertEmission(11.25, it.legs().get(2).emissionPerPerson());
   }
 
   private void assertEmission(double expectedCo2, Emission actual) {

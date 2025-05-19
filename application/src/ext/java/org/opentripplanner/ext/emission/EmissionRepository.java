@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emission;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Optional;
 import org.opentripplanner.ext.emission.model.EmissionSummary;
 import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.framework.model.Gram;
@@ -22,7 +23,7 @@ public interface EmissionRepository extends Serializable {
   /**
    * Return average pasenger emissions per meter for a given route.
    */
-  Emission routePassengerEmissionsPerMeter(FeedScopedId routeId);
+  Optional<Emission> routePassengerEmissionsPerMeter(FeedScopedId routeId);
 
   void addRouteEmissions(Map<FeedScopedId, Emission> routeAvgCo2Emissions);
 
