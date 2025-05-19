@@ -133,7 +133,8 @@
       "groupName": "logging dependencies",
       "matchPackageNames": [
         "org.slf4j:{/,}**",
-        "ch.qos.logback:{/,}**"
+        "ch.qos.logback:{/,}**",
+        "net.logstash.logback:logstash-logback-encoder"
       ],
       "automerge": true,
       "schedule": "on the 4th day of the month"

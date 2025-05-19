@@ -41,11 +41,11 @@ import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
-import uk.org.siri.siri20.OccupancyEnumeration;
-import uk.org.siri.siri20.VehicleJourneyRef;
-import uk.org.siri.siri20.VehicleModesEnumeration;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.NaturalLanguageStringStructure;
+import uk.org.siri.siri21.OccupancyEnumeration;
+import uk.org.siri.siri21.VehicleJourneyRef;
+import uk.org.siri.siri21.VehicleModesEnumeration;
 
 class AddedTripBuilder {
 

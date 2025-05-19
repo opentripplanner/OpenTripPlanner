@@ -10,20 +10,20 @@ import javax.annotation.Nullable;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import uk.org.siri.siri20.DataFrameRefStructure;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
-import uk.org.siri.siri20.EstimatedCall;
-import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.EstimatedVersionFrameStructure;
-import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.OperatorRefStructure;
-import uk.org.siri.siri20.QuayRefStructure;
-import uk.org.siri.siri20.RecordedCall;
-import uk.org.siri.siri20.StopAssignmentStructure;
-import uk.org.siri.siri20.StopPointRef;
-import uk.org.siri.siri20.VehicleJourneyRef;
+import uk.org.siri.siri21.DataFrameRefStructure;
+import uk.org.siri.siri21.DatedVehicleJourneyRef;
+import uk.org.siri.siri21.EstimatedCall;
+import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.EstimatedVersionFrameStructure;
+import uk.org.siri.siri21.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri21.LineRef;
+import uk.org.siri.siri21.OperatorRefStructure;
+import uk.org.siri.siri21.QuayRefStructure;
+import uk.org.siri.siri21.RecordedCall;
+import uk.org.siri.siri21.StopAssignmentStructure;
+import uk.org.siri.siri21.StopPointRefStructure;
+import uk.org.siri.siri21.VehicleJourneyRef;
 
 /**
  * This is a helper class for constucting Siri ET messages to use in tests.
@@ -191,7 +191,7 @@ public class SiriEtBuilder {
       var call = new RecordedCall();
       call.setOrder(BigInteger.valueOf(orderOffset + calls.size()));
 
-      var ref = new StopPointRef();
+      var ref = new StopPointRefStructure();
       ref.setValue(stop.getId().getId());
       call.setStopPointRef(ref);
 
@@ -250,7 +250,7 @@ public class SiriEtBuilder {
       var call = new EstimatedCall();
       call.setOrder(BigInteger.valueOf(orderOffset + calls.size()));
 
-      var ref = new StopPointRef();
+      var ref = new StopPointRefStructure();
       ref.setValue(stopPointRef);
       call.setStopPointRef(ref);
 
@@ -315,7 +315,7 @@ public class SiriEtBuilder {
       }
 
       var call = calls.getLast();
-      call.setArrivalStopAssignment(stopAssignmentStructure);
+      call.getArrivalStopAssignments().add(stopAssignmentStructure);
       return this;
     }
 

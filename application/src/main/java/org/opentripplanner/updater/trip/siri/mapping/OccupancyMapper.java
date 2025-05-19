@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.trip.siri.mapping;
 
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
-import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri21.OccupancyEnumeration;
 
 /**
- * Maps the (very limited) SIRI 2.0 OccupancyEnum to internal OccupancyStatus
+ * Maps SIRI 2.1 OccupancyEnum to internal OccupancyStatus
  */
 public class OccupancyMapper {
 
@@ -13,9 +13,15 @@ public class OccupancyMapper {
       return OccupancyStatus.NO_DATA_AVAILABLE;
     }
     return switch (occupancy) {
-      case SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
+      case EMPTY -> OccupancyStatus.EMPTY;
+      case SEATS_AVAILABLE, MANY_SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
+      case FEW_SEATS_AVAILABLE -> OccupancyStatus.FEW_SEATS_AVAILABLE;
       case STANDING_AVAILABLE -> OccupancyStatus.STANDING_ROOM_ONLY;
+      case STANDING_ROOM_ONLY -> OccupancyStatus.STANDING_ROOM_ONLY;
+      case CRUSHED_STANDING_ROOM_ONLY -> OccupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
       case FULL -> OccupancyStatus.FULL;
+      case NOT_ACCEPTING_PASSENGERS -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
+      case UNDEFINED, UNKNOWN -> OccupancyStatus.NO_DATA_AVAILABLE;
     };
   }
 }

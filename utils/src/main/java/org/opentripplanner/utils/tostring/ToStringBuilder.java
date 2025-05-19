@@ -111,6 +111,10 @@ public class ToStringBuilder {
     return this;
   }
 
+  public ToStringBuilder addBool(String name, boolean value, boolean defaultValue) {
+    return addObj(name, value, defaultValue);
+  }
+
   public ToStringBuilder addStr(String name, String value, String ignoreValue) {
     return addIfNotIgnored(name, value, ignoreValue, v -> "'" + v + "'");
   }

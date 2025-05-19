@@ -7,7 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.updater.spi.HttpHeaders;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri21.NaturalLanguageStringStructure;
 
 class SiriLiteHttpLoaderTest {
 

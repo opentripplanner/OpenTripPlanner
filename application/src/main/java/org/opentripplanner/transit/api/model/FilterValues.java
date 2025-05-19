@@ -41,7 +41,7 @@ public abstract class FilterValues<E> {
     String name,
     @Nullable Collection<E> values
   ) {
-    return new FilterValuesEmptyIsEverything<>(name, values);
+    return new EmptyIsEverythingFilter<>(name, values);
   }
 
   /**
@@ -56,7 +56,7 @@ public abstract class FilterValues<E> {
     String name,
     @Nullable Collection<E> values
   ) {
-    return new FilterValuesNullIsEverything<>(name, values);
+    return new NullIsEverythingFilter<>(name, values);
   }
 
   /**

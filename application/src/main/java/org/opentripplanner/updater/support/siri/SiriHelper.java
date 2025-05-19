@@ -6,13 +6,13 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.xml.stream.XMLStreamException;
-import org.rutebanken.siri20.util.SiriXml;
-import uk.org.siri.siri20.EstimatedTimetableRequestStructure;
-import uk.org.siri.siri20.MessageQualifierStructure;
-import uk.org.siri.siri20.RequestorRef;
-import uk.org.siri.siri20.ServiceRequest;
-import uk.org.siri.siri20.Siri;
-import uk.org.siri.siri20.SituationExchangeRequestStructure;
+import org.entur.siri21.util.SiriXml;
+import uk.org.siri.siri21.EstimatedTimetableRequestStructure;
+import uk.org.siri.siri21.MessageQualifierStructure;
+import uk.org.siri.siri21.RequestorRef;
+import uk.org.siri.siri21.ServiceRequest;
+import uk.org.siri.siri21.Siri;
+import uk.org.siri.siri21.SituationExchangeRequestStructure;
 
 public class SiriHelper {
 

@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import javax.imageio.ImageIO;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.ext.debugrastertiles.MapTile;
 import org.opentripplanner.ext.debugrastertiles.TileRenderer;

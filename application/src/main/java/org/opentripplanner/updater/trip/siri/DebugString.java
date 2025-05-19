@@ -1,12 +1,12 @@
 package org.opentripplanner.updater.trip.siri;
 
 import org.opentripplanner.utils.tostring.ToStringBuilder;
-import uk.org.siri.siri20.DataFrameRefStructure;
-import uk.org.siri.siri20.DatedVehicleJourneyRef;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.LineRef;
-import uk.org.siri.siri20.OperatorRefStructure;
-import uk.org.siri.siri20.VehicleRef;
+import uk.org.siri.siri21.DataFrameRefStructure;
+import uk.org.siri.siri21.DatedVehicleJourneyRef;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.LineRef;
+import uk.org.siri.siri21.OperatorRefStructure;
+import uk.org.siri.siri21.VehicleRef;
 
 /**
  * Create pretty strings for various SIRI elements, which is useful for debug printing.

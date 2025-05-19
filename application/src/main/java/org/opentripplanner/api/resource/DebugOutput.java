@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
 /**
- * Holds information to be included in the REST Response for debugging and profiling purposes.
+ * Holds information to be included in the response for debugging and profiling purposes.
  */
 public class DebugOutput {
 

@@ -27,8 +27,8 @@ import org.opentripplanner.updater.trip.siri.mapping.PickDropMapper;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.OccupancyEnumeration;
 
 /**
  * A helper class for creating new StopPattern and TripTimes based on a SIRI-ET

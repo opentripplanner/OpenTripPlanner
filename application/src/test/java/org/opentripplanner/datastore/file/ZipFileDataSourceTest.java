@@ -91,6 +91,14 @@ public class ZipFileDataSourceTest {
 
     // Close zip
     subject.close();
+
+    // Reload - this should load the entries again
+    names = subject.content().stream().map(DataSource::name).toList();
+    assertTrue(
+      names.containsAll(List.of("agency.txt", "stops.txt", "trips.txt")),
+      names.toString()
+    );
+    subject.close();
   }
 
   @Test

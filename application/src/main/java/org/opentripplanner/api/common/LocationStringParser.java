@@ -6,10 +6,10 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * This class is used by the REST API to parse strings representing the from and to places for a
+ * This class is used by the GTFS GraphQL API to parse strings representing the from and to places for a
  * search. These strings can contain a user-specified name for the location, as well as a latitude
  * and longitude or a stop ID. We'd rather not be parsing multiple data items out of a single
- * string, and will avoid doing so in OTP2, but this is how the OTP1 REST API works and we're
+ * string, and avoid doing so in newer API queries, but this is how the old queries work and we're
  * keeping this parsing logic so we can keep providing that legacy API.
  * <p>
  * These from/to strings are in the following format: An optional place name followed by two colons,
