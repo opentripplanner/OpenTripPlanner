@@ -68,7 +68,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     } catch (MqttException | URISyntaxException e) {
       LOG.warn("Failed to connect to broker: {}", parameters.url(), e);
     }
-
   }
 
   @Override
@@ -96,7 +95,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
       try {
-        LOG.debug("Connected");
+        LOG.info("Connected to MQTT broker: {}", serverURI);
         client.subscribe(parameters.topic(), parameters.qos());
       } catch (MqttException e) {
         LOG.warn("Could not subscribe to: {}", parameters.topic());
@@ -110,18 +109,16 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
     @Override
     public void messageArrived(String topic, MqttMessage message) throws Exception {
-      serviceDelivery(message.getPayload())
-        .ifPresent(serviceDelivery -> {
-          logMqttMessage(serviceDelivery);
-          serviceDeliveryConsumer.apply(serviceDelivery);
-        });
+      LOG.info("Message arrived: {}", topic);
+      serviceDelivery(message.getPayload()).ifPresent(serviceDelivery -> {
+        logMqttMessage(serviceDelivery);
+        serviceDeliveryConsumer.apply(serviceDelivery);
+      });
       primed = true;
     }
 
     @Override
-    public void deliveryComplete(IMqttDeliveryToken token) {
-
-    }
+    public void deliveryComplete(IMqttDeliveryToken token) {}
 
     private Optional<ServiceDelivery> serviceDelivery(byte[] payload) {
       Siri siri;
@@ -151,7 +148,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
       long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
 
-      if (numberOfMessages % 1000 == 0) {
+      if (numberOfMessages % 1 == 0) {
         LOG.info(
           "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
           numberOfMessages,

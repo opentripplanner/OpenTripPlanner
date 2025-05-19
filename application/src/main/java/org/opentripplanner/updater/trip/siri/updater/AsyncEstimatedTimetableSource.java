@@ -26,8 +26,7 @@ public interface AsyncEstimatedTimetableSource {
    * example, when OTP is shutting down), this method is called. This allows for a clean shut down,
    * the closing of any open connections and a release of resources.
    */
-  default void teardown() {
-  }
+  default void teardown() {}
 
   /**
    * Return true if the message backlog is processed and the source is ready to listen to the feed.

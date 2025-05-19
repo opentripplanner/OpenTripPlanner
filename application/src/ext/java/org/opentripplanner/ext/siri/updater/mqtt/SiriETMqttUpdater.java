@@ -41,7 +41,6 @@ public class SiriETMqttUpdater implements GraphUpdater {
 
   @Override
   public void run() throws Exception {
-
     AsyncEstimatedTimetableProcessor asyncEstimatedTimetableProcessor =
       new AsyncEstimatedTimetableProcessor(
         estimatedTimetableHandler,
