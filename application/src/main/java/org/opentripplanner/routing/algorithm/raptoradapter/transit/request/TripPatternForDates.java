@@ -88,7 +88,7 @@ public class TripPatternForDates
     this.numberOfTripSchedules = numberOfTripSchedules;
     this.isFrequencyBased = hasFrequencies;
 
-    wheelchairBoardings = new Accessibility[numberOfTripSchedules];
+    this.wheelchairBoardings = new Accessibility[numberOfTripSchedules];
 
     final int nStops = tripPattern.numberOfStopsInPattern();
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
@@ -119,8 +119,8 @@ public class TripPatternForDates
       : IntIterators.intDecIterator(tripPatternForDates.length, 0);
   }
 
-  public TripPatternForDate tripPatternForDate(int index) {
-    return tripPatternForDates[index];
+  public TripPatternForDate tripPatternForDate(int dayIndex) {
+    return tripPatternForDates[dayIndex];
   }
 
   /**
@@ -128,8 +128,8 @@ public class TripPatternForDates
    * an implementation detail that should not leak outside the class.
    */
   @Deprecated
-  public int tripPatternForDateOffsets(int index) {
-    return offsets[index];
+  public int tripPatternForDateOffsets(int dayIndex) {
+    return offsets[dayIndex];
   }
 
   // Implementing RaptorRoute
@@ -200,30 +200,30 @@ public class TripPatternForDates
   }
 
   @Override
-  public TripSchedule getTripSchedule(int index) {
-    return new TripScheduleWithOffset(this, index);
+  public TripSchedule getTripSchedule(int tripIndex) {
+    return new TripScheduleWithOffset(this, tripIndex);
   }
 
   @Override
   public IntUnaryOperator getArrivalTimes(int stopPositionInPattern) {
     final int base = stopPositionInPattern * numberOfTripSchedules;
-    return (int index) -> arrivalTimes[base + index];
+    return (int tripIndex) -> arrivalTimes[base + tripIndex];
   }
 
   @Override
   public IntUnaryOperator getDepartureTimes(int stopPositionInPattern) {
     final int base = stopPositionInPattern * numberOfTripSchedules;
-    return (int index) -> departureTimes[base + index];
+    return (int tripIndex) -> departureTimes[base + tripIndex];
   }
 
-  public IntUnaryOperator getArrivalTimesForTrip(int index) {
+  public IntUnaryOperator getArrivalTimesForTrip(int tripIndex) {
     return (int stopPositionInPattern) ->
-      arrivalTimes[stopPositionInPattern * numberOfTripSchedules + index];
+      arrivalTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
   }
 
-  public IntUnaryOperator getDepartureTimesForTrip(int index) {
+  public IntUnaryOperator getDepartureTimesForTrip(int tripIndex) {
     return (int stopPositionInPattern) ->
-      departureTimes[stopPositionInPattern * numberOfTripSchedules + index];
+      departureTimes[stopPositionInPattern * numberOfTripSchedules + tripIndex];
   }
 
   @Override
@@ -270,7 +270,7 @@ public class TripPatternForDates
       .toString();
   }
 
-  public Accessibility wheelchairBoardingForTrip(int index) {
-    return wheelchairBoardings[index];
+  public Accessibility wheelchairBoardingForTrip(int tripIndex) {
+    return wheelchairBoardings[tripIndex];
   }
 }
