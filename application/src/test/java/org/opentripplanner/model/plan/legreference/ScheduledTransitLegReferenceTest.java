@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -131,10 +131,10 @@ class ScheduledTransitLegReferenceTest {
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
     assertNotNull(leg);
-    assertEquals(tripId, leg.getTrip().getId());
-    assertEquals(SERVICE_DATE, leg.getServiceDate());
-    assertEquals(boardAtStopPos, leg.getBoardStopPosInPattern());
-    assertEquals(alightAtStopPos, leg.getAlightStopPosInPattern());
+    assertEquals(tripId, leg.trip().getId());
+    assertEquals(SERVICE_DATE, leg.serviceDate());
+    assertEquals(boardAtStopPos, leg.boardStopPosInPattern());
+    assertEquals(alightAtStopPos, leg.alightStopPosInPattern());
   }
 
   @Test
@@ -279,7 +279,7 @@ class ScheduledTransitLegReferenceTest {
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
     assertNotNull(leg);
-    assertEquals(tripId, leg.getTrip().getId());
-    assertEquals(SERVICE_DATE, leg.getServiceDate());
+    assertEquals(tripId, leg.trip().getId());
+    assertEquals(SERVICE_DATE, leg.serviceDate());
   }
 }

@@ -199,10 +199,14 @@ public class GraphQLTypes {
     public GraphQLBicycleParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = (List<GraphQLParkingFilterInput>) args.get("filters");
+          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
+            .collect(Collectors.toList());
         }
         if (args.get("preferred") != null) {
-          this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
+          this.preferred = ((List<Map<String, Object>>) args.get("preferred")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
+            .collect(Collectors.toList());
         }
         this.unpreferredCost = (org.opentripplanner.framework.model.Cost) args.get(
           "unpreferredCost"
@@ -521,10 +525,14 @@ public class GraphQLTypes {
     public GraphQLCarParkingPreferencesInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = (List<GraphQLParkingFilterInput>) args.get("filters");
+          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
+            .collect(Collectors.toList());
         }
         if (args.get("preferred") != null) {
-          this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
+          this.preferred = ((List<Map<String, Object>>) args.get("preferred")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
+            .collect(Collectors.toList());
         }
         this.unpreferredCost = (org.opentripplanner.framework.model.Cost) args.get(
           "unpreferredCost"
@@ -1562,10 +1570,14 @@ public class GraphQLTypes {
     public GraphQLParkingFilterInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("not") != null) {
-          this.not = (List<GraphQLParkingFilterOperationInput>) args.get("not");
+          this.not = ((List<Map<String, Object>>) args.get("not")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterOperationInput(o))
+            .collect(Collectors.toList());
         }
         if (args.get("select") != null) {
-          this.select = (List<GraphQLParkingFilterOperationInput>) args.get("select");
+          this.select = ((List<Map<String, Object>>) args.get("select")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterOperationInput(o))
+            .collect(Collectors.toList());
         }
       }
     }
@@ -2178,7 +2190,9 @@ public class GraphQLTypes {
             .collect(Collectors.toList());
         }
         if (args.get("transit") != null) {
-          this.transit = (List<GraphQLPlanTransitModePreferenceInput>) args.get("transit");
+          this.transit = ((List<Map<String, Object>>) args.get("transit")).stream()
+            .map(o -> o == null ? null : new GraphQLPlanTransitModePreferenceInput(o))
+            .collect(Collectors.toList());
         }
       }
     }
@@ -3085,9 +3099,11 @@ public class GraphQLTypes {
         this.heuristicStepsPerMainStep = (Integer) args.get("heuristicStepsPerMainStep");
         this.ignoreRealtimeUpdates = (Boolean) args.get("ignoreRealtimeUpdates");
         if (args.get("intermediatePlaces") != null) {
-          this.intermediatePlaces = (List<GraphQLInputCoordinatesInput>) args.get(
-            "intermediatePlaces"
-          );
+          this.intermediatePlaces = ((List<Map<String, Object>>) args.get(
+              "intermediatePlaces"
+            )).stream()
+            .map(o -> o == null ? null : new GraphQLInputCoordinatesInput(o))
+            .collect(Collectors.toList());
         }
         this.itineraryFiltering = (Double) args.get("itineraryFiltering");
         this.keepingRentedBicycleAtDestinationCost = (Integer) args.get(
@@ -3123,14 +3139,18 @@ public class GraphQLTypes {
         this.toPlace = (String) args.get("toPlace");
         this.transferPenalty = (Integer) args.get("transferPenalty");
         if (args.get("transportModes") != null) {
-          this.transportModes = (List<GraphQLTransportModeInput>) args.get("transportModes");
+          this.transportModes = ((List<Map<String, Object>>) args.get("transportModes")).stream()
+            .map(o -> o == null ? null : new GraphQLTransportModeInput(o))
+            .collect(Collectors.toList());
         }
         this.triangle = new GraphQLInputTriangleInput((Map<String, Object>) args.get("triangle"));
         this.unpreferred = new GraphQLInputUnpreferredInput(
           (Map<String, Object>) args.get("unpreferred")
         );
         if (args.get("via") != null) {
-          this.via = (List<GraphQLPlanViaLocationInput>) args.get("via");
+          this.via = ((List<Map<String, Object>>) args.get("via")).stream()
+            .map(o -> o == null ? null : new GraphQLPlanViaLocationInput(o))
+            .collect(Collectors.toList());
         }
         this.waitAtBeginningFactor = (Double) args.get("waitAtBeginningFactor");
         this.waitReluctance = (Double) args.get("waitReluctance");
@@ -3699,7 +3719,9 @@ public class GraphQLTypes {
         );
         this.searchWindow = (java.time.Duration) args.get("searchWindow");
         if (args.get("via") != null) {
-          this.via = (List<GraphQLPlanViaLocationInput>) args.get("via");
+          this.via = ((List<Map<String, Object>>) args.get("via")).stream()
+            .map(o -> o == null ? null : new GraphQLPlanViaLocationInput(o))
+            .collect(Collectors.toList());
         }
       }
     }
@@ -5458,10 +5480,14 @@ public class GraphQLTypes {
     public GraphQLVehicleParkingInput(Map<String, Object> args) {
       if (args != null) {
         if (args.get("filters") != null) {
-          this.filters = (List<GraphQLParkingFilterInput>) args.get("filters");
+          this.filters = ((List<Map<String, Object>>) args.get("filters")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
+            .collect(Collectors.toList());
         }
         if (args.get("preferred") != null) {
-          this.preferred = (List<GraphQLParkingFilterInput>) args.get("preferred");
+          this.preferred = ((List<Map<String, Object>>) args.get("preferred")).stream()
+            .map(o -> o == null ? null : new GraphQLParkingFilterInput(o))
+            .collect(Collectors.toList());
         }
         this.unpreferredCost = (Integer) args.get("unpreferredCost");
       }

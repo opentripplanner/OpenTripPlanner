@@ -6,7 +6,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -67,17 +66,5 @@ public class DebugRasterTileResource {
     cc.setMaxAge(3600);
     cc.setNoCache(false);
     return Response.ok(baos.toByteArray()).type(format.toString()).cacheControl(cc).build();
-  }
-
-  /**
-   * Returns all layers.
-   * <p>
-   * Used in the classic debug client to create a layer menu.
-   */
-  @GET
-  @Path("layers")
-  @Produces(MediaType.APPLICATION_JSON)
-  public DebugLayersList getLayers() {
-    return new DebugLayersList(tileRendererManager.getRenderers());
   }
 }

@@ -1,5 +1,10 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -21,6 +26,10 @@ public class TestFreeFloatingRentalVehicleBuilder {
   private Double currentRangeMeters = DEFAULT_CURRENT_RANGE_METERS;
   private VehicleRentalSystem system = null;
   private String network = NETWORK_1;
+  private static final OffsetDateTime DEFAULT_AVAILABLE_UNTIL = OffsetDateTime.of(
+    LocalDateTime.of(LocalDate.of(2025, 1, 1), LocalTime.MIN),
+    ZoneOffset.UTC
+  );
 
   private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
 
@@ -105,6 +114,7 @@ public class TestFreeFloatingRentalVehicleBuilder {
       currentFuelPercent,
       Distance.ofMetersBoxed(currentRangeMeters, ignore -> {}).orElse(null)
     );
+    vehicle.availableUntil = DEFAULT_AVAILABLE_UNTIL;
     return vehicle;
   }
 

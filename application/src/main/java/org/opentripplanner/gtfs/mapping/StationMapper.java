@@ -1,7 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +19,7 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
  */
 class StationMapper {
 
+  private final IdFactory idFactory;
   /** @see StationMapper (this class JavaDoc) for way we need this. */
   private final Map<Stop, Station> mappedStops = new HashMap<>();
 
@@ -28,9 +27,11 @@ class StationMapper {
   private final StopTransferPriority stationTransferPreference;
 
   StationMapper(
+    IdFactory idFactory,
     TranslationHelper translationHelper,
     StopTransferPriority stationTransferPreference
   ) {
+    this.idFactory = idFactory;
     this.translationHelper = translationHelper;
     this.stationTransferPreference = stationTransferPreference;
   }
@@ -50,7 +51,7 @@ class StationMapper {
           )
       );
     }
-    StationBuilder builder = Station.of(mapAgencyAndId(rhs.getId()))
+    StationBuilder builder = Station.of(idFactory.createId(rhs.getId()))
       .withCoordinate(WgsCoordinateMapper.mapToDomain(rhs))
       .withCode(rhs.getCode());
 

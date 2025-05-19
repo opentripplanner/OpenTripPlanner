@@ -9,22 +9,32 @@ import java.io.Serializable;
  */
 public final class Gram implements Serializable, Comparable<Gram> {
 
+  public static final Gram ZERO = new Gram(0.0);
+
   private final double value;
 
-  public Gram(double value) {
+  private Gram(double value) {
     this.value = value;
   }
 
-  public Gram plus(Gram g) {
-    return new Gram(this.value + g.value);
+  public static Gram of(double value) {
+    return value == 0.0 ? ZERO : new Gram(value);
   }
 
-  public Gram multiply(int factor) {
-    return new Gram(this.value * factor);
+  public static Gram ofNullable(Double value) {
+    return value == null ? ZERO : Gram.of(value);
+  }
+
+  public Gram plus(Gram g) {
+    return of(this.value + g.value);
   }
 
   public Gram multiply(double factor) {
-    return new Gram(this.value * factor);
+    return of(this.value * factor);
+  }
+
+  public Gram dividedBy(double scalar) {
+    return new Gram(this.value / scalar);
   }
 
   @Override
@@ -40,6 +50,11 @@ public final class Gram implements Serializable, Comparable<Gram> {
   }
 
   @Override
+  public int hashCode() {
+    return Double.hashCode(value);
+  }
+
+  @Override
   public int compareTo(Gram o) {
     return compare(value, o.value);
   }
@@ -51,5 +66,9 @@ public final class Gram implements Serializable, Comparable<Gram> {
 
   public double asDouble() {
     return this.value;
+  }
+
+  public boolean isZero() {
+    return value == 0.0;
   }
 }

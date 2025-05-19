@@ -7,7 +7,6 @@ import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
@@ -101,8 +100,8 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
-  public DataFetcher<Emissions> emissionsPerPerson() {
-    return environment -> getSource(environment).emissionsPerPerson();
+  public DataFetcher<org.opentripplanner.model.plan.Emission> emissionsPerPerson() {
+    return environment -> getSource(environment).emissionPerPerson();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

@@ -31,8 +31,8 @@ public class TripPlanMapper {
       );
     } else {
       List<Leg> legs = itineraries.get(0).legs();
-      from = legs.get(0).getFrom();
-      to = legs.get(legs.size() - 1).getTo();
+      from = legs.get(0).from();
+      to = legs.get(legs.size() - 1).to();
     }
     return new TripPlan(from, to, request.dateTime(), itineraries);
   }

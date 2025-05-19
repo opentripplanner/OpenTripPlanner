@@ -3,8 +3,8 @@ package org.opentripplanner.ext.realtimeresolver;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
@@ -34,11 +34,11 @@ public class RealtimeResolver {
     if (it.isFlaggedForDeletion()) {
       return it;
     }
-    return it.copyOf().withLegs(legs -> legs.stream().map(this::mapLeg).toList()).build();
+    return it.copyOf().transformLegs(this::mapLeg).build();
   }
 
   private Leg mapLeg(Leg leg) {
-    var ref = leg.getLegReference();
+    var ref = leg.legReference();
     if (ref == null) {
       return leg;
     }
@@ -62,9 +62,9 @@ public class RealtimeResolver {
     ScheduledTransitLeg original
   ) {
     return new ScheduledTransitLegBuilder<>(reference)
-      .withTransferFromPreviousLeg(original.getTransferFromPrevLeg())
-      .withTransferToNextLeg(original.getTransferToNextLeg())
-      .withGeneralizedCost(original.getGeneralizedCost())
+      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
+      .withTransferToNextLeg(original.transferToNextLeg())
+      .withGeneralizedCost(original.generalizedCost())
       .withAccessibilityScore(original.accessibilityScore())
       .build();
   }

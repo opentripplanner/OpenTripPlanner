@@ -43,9 +43,4 @@ public class WalkSafetyEdgeRenderer implements EdgeVertexRenderer {
     }
     return Optional.empty();
   }
-
-  @Override
-  public String getName() {
-    return "Walk safety";
-  }
 }

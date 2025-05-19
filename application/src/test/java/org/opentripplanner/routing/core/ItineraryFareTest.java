@@ -65,6 +65,6 @@ class ItineraryFareTest {
   }
 
   private static FareProduct fareProduct(String id) {
-    return new FareProduct(id(id), id, Money.euros(10), null, null, null);
+    return FareProduct.of(id(id), id, Money.euros(10)).build();
   }
 }

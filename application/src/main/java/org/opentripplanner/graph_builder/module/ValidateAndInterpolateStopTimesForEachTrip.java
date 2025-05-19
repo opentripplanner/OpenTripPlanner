@@ -251,16 +251,21 @@ public class ValidateAndInterpolateStopTimesForEachTrip {
   }
 
   private double getMaxSpeedForMode(TransitMode mode) {
-    return switch (mode) {
-      // 1000 km/h
-      case AIRPLANE -> 280;
-      // 250 km/h
-      case RAIL -> 70;
-      // max in the world is 9 m/s for gondolas, 6 m/s for funiculars
-      case GONDOLA, FUNICULAR -> 10;
-      // 108km/h
-      default -> 30;
-    };
+    // The following numbers (except airplane) are copied from the GTFS validator
+    // https://github.com/MobilityData/gtfs-validator/blob/master/main/src/main/java/org/mobilitydata/gtfsvalidator/validator/StopTimeTravelSpeedValidator.java#L310
+    return (
+      switch (mode) {
+        case AIRPLANE -> 1000;
+        case TRAM -> 100;
+        case RAIL -> 500;
+        case SUBWAY, MONORAIL, BUS, TROLLEYBUS, COACH -> 150;
+        case FERRY -> 80;
+        case CABLE_CAR -> 30;
+        case GONDOLA, FUNICULAR -> 50;
+        default -> 200;
+      } /
+      3.6
+    );
   }
 
   /**

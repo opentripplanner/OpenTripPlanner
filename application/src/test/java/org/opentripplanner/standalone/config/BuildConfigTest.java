@@ -7,12 +7,14 @@ import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFI
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
-public class BuildConfigTest {
+class BuildConfigTest {
 
   private static final String SOURCE = "BuildConfigTest";
 
@@ -48,6 +50,6 @@ public class BuildConfigTest {
   public void fareService() {
     var node = jsonNodeForTest("{ 'fares' : \"highestFareInFreeTransferWindow\" }");
     var conf = new BuildConfig(node, "Test", false);
-    assertInstanceOf(DefaultFareService.class, conf.fareServiceFactory.makeFareService());
+    assertInstanceOf(JsonNode.class, conf.fareConfig);
   }
 }

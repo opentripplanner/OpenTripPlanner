@@ -1,0 +1,7 @@
+trip_id,from_stop_id,from_stop_sequence,ignore_this_value,co2
+T1,A,1,ignore,5.0
+T1,B,2,999,7.0
+T2,A,1,xyz,15.0
+T2,B,2,xyz,17.0
+E1,A,-1,xyz,25.0
+E2,B,1,xyz,-0.01

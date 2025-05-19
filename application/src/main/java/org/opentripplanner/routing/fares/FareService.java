@@ -5,7 +5,7 @@ import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 
 /**
- * Computes a fare for a given sequence of Rides. The FareService is serialized as part of the
+ * Computes a fare for a given sequence of legs. The FareService is serialized as part of the
  * Graph; Hence it should be {@link Serializable}.
  */
 public interface FareService extends Serializable {

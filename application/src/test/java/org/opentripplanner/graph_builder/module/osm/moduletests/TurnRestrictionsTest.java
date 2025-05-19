@@ -88,12 +88,6 @@ class TurnRestrictionsTest {
 
     osmModule.buildGraph();
 
-    var edgesWithTurnRestrictions = graph
-      .getStreetEdges()
-      .stream()
-      .filter(e -> !e.getTurnRestrictions().isEmpty())
-      .toList();
-    assertThat(edgesWithTurnRestrictions).hasSize(1);
     assertThat(
       issueStore.listIssues().stream().filter(i -> i instanceof TurnRestrictionBad).toList()
     ).hasSize(shouldWarn ? 1 : 0);

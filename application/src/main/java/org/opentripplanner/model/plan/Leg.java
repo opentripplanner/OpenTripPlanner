@@ -12,7 +12,12 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.model.plan.legreference.LegReference;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -70,8 +75,8 @@ public interface Leg {
   /**
    * The leg's duration in seconds
    */
-  default Duration getDuration() {
-    return Duration.between(getStartTime(), getEndTime());
+  default Duration duration() {
+    return Duration.between(startTime(), endTime());
   }
 
   /**
@@ -86,19 +91,19 @@ public interface Leg {
     }
 
     // Must be on the same service date
-    if (!getServiceDate().equals(other.getServiceDate())) {
+    if (!serviceDate().equals(other.serviceDate())) {
       return false;
     }
 
     // If NOT the same trip, return false
-    if (!getTrip().getId().equals(other.getTrip().getId())) {
+    if (!trip().getId().equals(other.trip().getId())) {
       return false;
     }
 
     // Return true if legs overlap
     return (
-      getBoardStopPosInPattern() < other.getAlightStopPosInPattern() &&
-      getAlightStopPosInPattern() > other.getBoardStopPosInPattern()
+      boardStopPosInPattern() < other.alightStopPosInPattern() &&
+      alightStopPosInPattern() > other.boardStopPosInPattern()
     );
   }
 
@@ -129,7 +134,7 @@ public interface Leg {
     // Transit leg
     else {
       // If NOT the same trip, return false
-      if (!getTrip().getId().equals(other.getTrip().getId())) {
+      if (!trip().getId().equals(other.trip().getId())) {
         return false;
       }
 
@@ -139,8 +144,8 @@ public interface Leg {
       // scheduled for the next service day. They both visit the same stops, with overlapping
       // times, but the stop positions will be different.
       return (
-        getBoardStopPosInPattern() < other.getAlightStopPosInPattern() &&
-        getAlightStopPosInPattern() > other.getBoardStopPosInPattern()
+        boardStopPosInPattern() < other.alightStopPosInPattern() &&
+        alightStopPosInPattern() > other.boardStopPosInPattern()
       );
     }
   }
@@ -153,8 +158,8 @@ public interface Leg {
     return (
       // We convert to epoch seconds to ignore nanos (save CPU),
       // in favor of using the methods isAfter(...) and isBefore(...)
-      getStartTime().toEpochSecond() < other.getEndTime().toEpochSecond() &&
-      other.getStartTime().toEpochSecond() < getEndTime().toEpochSecond()
+      startTime().toEpochSecond() < other.endTime().toEpochSecond() &&
+      other.startTime().toEpochSecond() < endTime().toEpochSecond()
     );
   }
 
@@ -162,7 +167,7 @@ public interface Leg {
    * For transit legs, the route agency. For non-transit legs {@code null}.
    */
   @Nullable
-  default Agency getAgency() {
+  default Agency agency() {
     return null;
   }
 
@@ -173,7 +178,7 @@ public interface Leg {
    * @see Trip#getOperator()
    */
   @Nullable
-  default Operator getOperator() {
+  default Operator operator() {
     return null;
   }
 
@@ -181,7 +186,7 @@ public interface Leg {
    * For transit legs, the route. For non-transit legs, null.
    */
   @Nullable
-  default Route getRoute() {
+  default Route route() {
     return null;
   }
 
@@ -189,7 +194,7 @@ public interface Leg {
    * For transit legs, the trip. For non-transit legs, null.
    */
   @Nullable
-  default Trip getTrip() {
+  default Trip trip() {
     return null;
   }
 
@@ -197,12 +202,12 @@ public interface Leg {
    * For transit legs, the trip on service date, if it exists. For non-transit legs, null.
    */
   @Nullable
-  default TripOnServiceDate getTripOnServiceDate() {
+  default TripOnServiceDate tripOnServiceDate() {
     return null;
   }
 
   @Nullable
-  default Accessibility getTripWheelchairAccessibility() {
+  default Accessibility tripWheelchairAccessibility() {
     return null;
   }
 
@@ -218,19 +223,21 @@ public interface Leg {
 
   /**
    * The date and time this leg begins.
+   * TODO Does the start-time incorporate slack and/or wait-time? - This should be documented!
    */
-  ZonedDateTime getStartTime();
+  ZonedDateTime startTime();
 
   /**
    * The date and time this leg ends.
+   * TODO Does the end-time incorporate slack and/or wait-time? - This should be documented!
    */
-  ZonedDateTime getEndTime();
+  ZonedDateTime endTime();
 
   /**
    * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
    * "scheduled time of departure at boarding stop" = startTime - departureDelay Unit: seconds.
    */
-  default int getDepartureDelay() {
+  default int departureDelay() {
     return 0;
   }
 
@@ -238,7 +245,7 @@ public interface Leg {
    * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
    * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay Unit: seconds.
    */
-  default int getArrivalDelay() {
+  default int arrivalDelay() {
     return 0;
   }
 
@@ -250,7 +257,7 @@ public interface Leg {
   }
 
   @Nullable
-  default RealTimeState getRealTimeState() {
+  default RealTimeState realTimeState() {
     return null;
   }
 
@@ -267,7 +274,7 @@ public interface Leg {
    * Is this a frequency-based trip with non-strict departure times?
    */
   @Nullable
-  default Boolean getNonExactFrequency() {
+  default Boolean isNonExactFrequency() {
     return null;
   }
 
@@ -277,21 +284,21 @@ public interface Leg {
    * trips, and scheduled trips with empirical headways.
    */
   @Nullable
-  default Integer getHeadway() {
+  default Integer headway() {
     return null;
   }
 
   /**
    * The distance traveled while traversing the leg in meters.
    */
-  double getDistanceMeters();
+  double distanceMeters();
 
   /**
    * Get the timezone offset in milliseconds.
    */
-  default int getAgencyTimeZoneOffset() {
+  default int agencyTimeZoneOffset() {
     int MILLIS_TO_SECONDS = 1000;
-    return getStartTime().getOffset().getTotalSeconds() * MILLIS_TO_SECONDS;
+    return startTime().getOffset().getTotalSeconds() * MILLIS_TO_SECONDS;
   }
 
   /**
@@ -301,7 +308,7 @@ public interface Leg {
    * http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
    */
   @Nullable
-  default Integer getRouteType() {
+  default Integer routeType() {
     return null;
   }
 
@@ -309,7 +316,7 @@ public interface Leg {
    * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
    */
   @Nullable
-  default I18NString getHeadsign() {
+  default I18NString headsign() {
     return null;
   }
 
@@ -322,7 +329,7 @@ public interface Leg {
    * time would be Mach 26th 01:00.
    */
   @Nullable
-  default LocalDate getServiceDate() {
+  default LocalDate serviceDate() {
     return null;
   }
 
@@ -330,26 +337,26 @@ public interface Leg {
    * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
    */
   @Nullable
-  default String getRouteBrandingUrl() {
+  default String routeBrandingUrl() {
     return null;
   }
 
   /**
    * The Place where the leg originates.
    */
-  Place getFrom();
+  Place from();
 
   /**
    * The Place where the leg begins.
    */
-  Place getTo();
+  Place to();
 
   /**
    * For transit legs, intermediate stops between the Place where the leg originates and the Place
    * where the leg ends. For non-transit legs, {@code null}.
    */
   @Nullable
-  default List<StopArrival> getIntermediateStops() {
+  default List<StopArrival> listIntermediateStops() {
     return null;
   }
 
@@ -357,7 +364,7 @@ public interface Leg {
    * The leg's geometry.
    */
   @Nullable
-  LineString getLegGeometry();
+  LineString legGeometry();
 
   /**
    * The leg's elevation profile.
@@ -366,70 +373,70 @@ public interface Leg {
    * of the leg, y is the elevation at this distance.
    */
   @Nullable
-  default ElevationProfile getElevationProfile() {
+  default ElevationProfile elevationProfile() {
     return null;
   }
 
   /**
    * A series of turn by turn instructions used for walking, biking and driving.
    */
-  default List<WalkStep> getWalkSteps() {
+  default List<WalkStep> listWalkSteps() {
     return List.of();
   }
 
-  default Set<StreetNote> getStreetNotes() {
+  default Set<StreetNote> listStreetNotes() {
     return Set.of();
   }
 
-  Set<TransitAlert> getTransitAlerts();
+  Set<TransitAlert> listTransitAlerts();
 
   @Nullable
-  default PickDrop getBoardRule() {
+  default PickDrop boardRule() {
     return null;
   }
 
   @Nullable
-  default PickDrop getAlightRule() {
+  default PickDrop alightRule() {
     return null;
   }
 
   @Nullable
-  default BookingInfo getDropOffBookingInfo() {
+  default BookingInfo dropOffBookingInfo() {
     return null;
   }
 
   @Nullable
-  default BookingInfo getPickupBookingInfo() {
+  default BookingInfo pickupBookingInfo() {
     return null;
   }
 
   @Nullable
-  default ConstrainedTransfer getTransferFromPrevLeg() {
+  default ConstrainedTransfer transferFromPrevLeg() {
     return null;
   }
 
   @Nullable
-  default ConstrainedTransfer getTransferToNextLeg() {
+  default ConstrainedTransfer transferToNextLeg() {
     return null;
   }
 
   @Nullable
-  default Integer getBoardStopPosInPattern() {
+  default Integer boardStopPosInPattern() {
     return null;
   }
 
   @Nullable
-  default Integer getAlightStopPosInPattern() {
+  default Integer alightStopPosInPattern() {
     return null;
   }
 
   @Nullable
-  default Integer getBoardingGtfsStopSequence() {
+  default Integer boardingGtfsStopSequence() {
     return null;
   }
 
   @Nullable
-  default Integer getAlightGtfsStopSequence() {
+  default Integer alightGtfsStopSequence() {
     return null;
   }
 
@@ -437,7 +444,7 @@ public interface Leg {
    * Is this leg walking with a bike?
    */
   @Nullable
-  default Boolean getWalkingBike() {
+  default Boolean walkingBike() {
     return null;
   }
 
@@ -454,17 +461,18 @@ public interface Leg {
    * applied to all frontends.
    */
   @Nullable
+  @Sandbox
   default Float accessibilityScore() {
     return null;
   }
 
   @Nullable
-  default Boolean getRentedVehicle() {
+  default Boolean rentedVehicle() {
     return null;
   }
 
   @Nullable
-  default String getVehicleRentalNetwork() {
+  default String vehicleRentalNetwork() {
     return null;
   }
 
@@ -476,10 +484,10 @@ public interface Leg {
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
-  int getGeneralizedCost();
+  int generalizedCost();
 
   @Nullable
-  default LegReference getLegReference() {
+  default LegReference legReference() {
     return null;
   }
 
@@ -487,13 +495,13 @@ public interface Leg {
     throw new UnsupportedOperationException();
   }
 
-  default Set<FareZone> getFareZones() {
-    var intermediate = getIntermediateStops()
+  default Set<FareZone> fareZones() {
+    var intermediate = listIntermediateStops()
       .stream()
       .flatMap(stopArrival -> stopArrival.place.stop.getFareZones().stream());
 
-    var start = getFareZones(this.getFrom());
-    var end = getFareZones(this.getTo());
+    var start = fareZones(this.from());
+    var end = fareZones(this.to());
 
     return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
@@ -504,7 +512,7 @@ public interface Leg {
   @Sandbox
   List<FareProductUse> fareProducts();
 
-  private static Stream<FareZone> getFareZones(Place place) {
+  private static Stream<FareZone> fareZones(Place place) {
     if (place.stop == null) {
       return Stream.empty();
     } else {

@@ -23,10 +23,10 @@ public class FlexibleTransitLegBuilder {
 
   FlexibleTransitLegBuilder(FlexibleTransitLeg original) {
     flexTripEdge = original.flexTripEdge();
-    startTime = original.getStartTime();
-    endTime = original.getEndTime();
-    generalizedCost = original.getGeneralizedCost();
-    transitAlerts = original.getTransitAlerts();
+    startTime = original.startTime();
+    endTime = original.endTime();
+    generalizedCost = original.generalizedCost();
+    transitAlerts = original.listTransitAlerts();
     fareProducts = original.fareProducts();
   }
 

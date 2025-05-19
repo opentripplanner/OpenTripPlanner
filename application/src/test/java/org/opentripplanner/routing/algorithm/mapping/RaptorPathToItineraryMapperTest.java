@@ -28,8 +28,8 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorCostConverter;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -81,7 +81,7 @@ public class RaptorPathToItineraryMapperTest {
 
   private static final int TRANSIT_START = TimeUtils.time("10:00");
   private static final int TRANSIT_END = TimeUtils.time("11:00");
-  private static final Route ROUTE = TimetableRepositoryForTest.route("route").build();
+  private static final Route ROUTE = TEST_MODEL.route("route").build();
 
   public static final RaptorCostCalculator<TestTripSchedule> COST_CALCULATOR =
     new DefaultCostCalculator<>(
@@ -117,7 +117,7 @@ public class RaptorPathToItineraryMapperTest {
     assertEquals(1, itinerary.legs().size(), "The wrong number of legs was returned");
     assertEquals(
       RaptorCostConverter.toOtpDomainCost(transitLegCost + egressLegCost),
-      itinerary.legs().get(0).getGeneralizedCost(),
+      itinerary.legs().get(0).generalizedCost(),
       "Incorrect cost returned"
     );
   }

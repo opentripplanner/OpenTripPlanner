@@ -28,12 +28,19 @@ public class PathwayMapperTest {
   private static final Stop FROM_STOP = new Stop();
 
   private static final Stop TO_STOP = new Stop();
+  private static final IdFactory ID_FACTORY = new IdFactory("A");
 
   private final PathwayMapper subject = new PathwayMapper(
-    new StopMapper(TRANSLATION_HELPER, stationId -> null, new SiteRepository().withContext()),
-    new EntranceMapper(TRANSLATION_HELPER, stationId -> null),
-    new PathwayNodeMapper(TRANSLATION_HELPER, stationId -> null),
-    new BoardingAreaMapper(TRANSLATION_HELPER, stationId -> null)
+    ID_FACTORY,
+    new StopMapper(
+      ID_FACTORY,
+      TRANSLATION_HELPER,
+      stationId -> null,
+      new SiteRepository().withContext()
+    ),
+    new EntranceMapper(ID_FACTORY, TRANSLATION_HELPER, stationId -> null),
+    new PathwayNodeMapper(ID_FACTORY, TRANSLATION_HELPER, stationId -> null),
+    new BoardingAreaMapper(ID_FACTORY, TRANSLATION_HELPER, stationId -> null)
   );
 
   static {

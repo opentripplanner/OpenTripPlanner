@@ -14,6 +14,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.CarAccess;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.DirectionTypeEnumeration;
@@ -130,6 +131,11 @@ class TripMapper {
       }
       builder.withMode(transitMode.mainMode());
       builder.withNetexSubmode(transitMode.subMode());
+      builder.withCarsAllowed(
+        transportModeMapper.mapCarsAllowed(serviceJourney.getTransportSubmode())
+      );
+    } else {
+      builder.withCarsAllowed(transportModeMapper.mapCarsAllowed(route.getNetexSubmode()));
     }
 
     builder.withDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));

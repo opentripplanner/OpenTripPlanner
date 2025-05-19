@@ -320,10 +320,10 @@ public class GraphQLScalars {
         @Override
         public Gram parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
-            return new Gram(doubleValue);
+            return Gram.of(doubleValue);
           }
           if (input instanceof Integer intValue) {
-            return new Gram(intValue);
+            return Gram.of(intValue);
           }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -333,10 +333,10 @@ public class GraphQLScalars {
         @Override
         public Gram parseLiteral(Object input) throws CoercingParseLiteralException {
           if (input instanceof FloatValue floatValue) {
-            return new Gram(floatValue.getValue().doubleValue());
+            return Gram.of(floatValue.getValue().doubleValue());
           }
           if (input instanceof IntValue intValue) {
-            return new Gram(intValue.getValue().doubleValue());
+            return Gram.of(intValue.getValue().doubleValue());
           }
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()

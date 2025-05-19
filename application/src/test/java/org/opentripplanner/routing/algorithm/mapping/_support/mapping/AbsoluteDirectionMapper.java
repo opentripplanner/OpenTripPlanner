@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
-import org.opentripplanner.model.plan.AbsoluteDirection;
+import org.opentripplanner.model.plan.walkstep.AbsoluteDirection;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiAbsoluteDirection;
 
 @Deprecated

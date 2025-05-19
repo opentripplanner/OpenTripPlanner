@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 
 public record LegProducts(
   Leg leg,

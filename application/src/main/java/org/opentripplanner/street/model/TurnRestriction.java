@@ -9,31 +9,18 @@ public class TurnRestriction implements Serializable {
   public final TurnRestrictionType type;
   public final StreetEdge from;
   public final StreetEdge to;
-  public final RepeatingTimePeriod time;
   public final TraverseModeSet modes;
 
   public TurnRestriction(
     StreetEdge from,
     StreetEdge to,
     TurnRestrictionType type,
-    TraverseModeSet modes,
-    RepeatingTimePeriod time
+    TraverseModeSet modes
   ) {
     this.from = from;
     this.to = to;
     this.type = type;
     this.modes = modes;
-    this.time = time;
-  }
-
-  /**
-   * Return true if the turn restriction is in force at the time described by the long.
-   */
-  public boolean active(long time) {
-    if (this.time != null) {
-      return this.time.active(time);
-    }
-    return true;
   }
 
   @Override

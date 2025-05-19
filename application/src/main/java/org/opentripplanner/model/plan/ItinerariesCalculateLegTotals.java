@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.util.List;
+import org.opentripplanner.model.plan.leg.UnknownPathLeg;
 
 /**
  * Calculate derived itinerary fields
@@ -33,10 +34,10 @@ class ItinerariesCalculateLegTotals {
   }
 
   private void calculate(List<Leg> legs) {
-    totalDuration = Duration.between(legs.getFirst().getStartTime(), legs.getLast().getEndTime());
+    totalDuration = Duration.between(legs.getFirst().startTime(), legs.getLast().endTime());
 
     for (Leg leg : legs) {
-      Duration dt = leg.getDuration();
+      Duration dt = leg.duration();
 
       if (leg.isTransitLeg()) {
         transitDuration = transitDuration.plus(dt);
@@ -45,14 +46,14 @@ class ItinerariesCalculateLegTotals {
         }
       } else if (leg.isStreetLeg()) {
         onStreetDuration = onStreetDuration.plus(dt);
-        onStreetDistanceMeters += leg.getDistanceMeters();
+        onStreetDistanceMeters += leg.distanceMeters();
 
         if (leg.isWalkingLeg()) {
-          walkDuration = walkDuration.plus(leg.getDuration());
-          walkDistanceMeters = walkDistanceMeters + leg.getDistanceMeters();
+          walkDuration = walkDuration.plus(leg.duration());
+          walkDistanceMeters = walkDistanceMeters + leg.distanceMeters();
         }
-      } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
-        nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
+      } else if (leg instanceof UnknownPathLeg unknownPathLeg) {
+        nTransitLegs += unknownPathLeg.getNumberOfTransfers() + 1;
       }
 
       if (!leg.isWalkingLeg()) {
@@ -63,8 +64,8 @@ class ItinerariesCalculateLegTotals {
         this.streetOnly = false;
       }
 
-      if (leg.getElevationProfile() != null) {
-        var p = leg.getElevationProfile();
+      if (leg.elevationProfile() != null) {
+        var p = leg.elevationProfile();
         this.elevationGained_m += p.elevationGained();
         this.elevationLost_m += p.elevationLost();
       }

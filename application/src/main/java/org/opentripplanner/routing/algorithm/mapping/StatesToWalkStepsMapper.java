@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import static org.opentripplanner.model.plan.RelativeDirection.ENTER_STATION;
-import static org.opentripplanner.model.plan.RelativeDirection.EXIT_STATION;
-import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.ENTER_STATION;
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.EXIT_STATION;
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_SIGNS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,10 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.plan.ElevationProfile;
-import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.plan.WalkStepBuilder;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;

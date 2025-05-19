@@ -60,4 +60,11 @@ public class DefaultDataImportIssueStore implements DataImportIssueStore {
   public List<DataImportIssue> listIssues() {
     return this.issues;
   }
+
+  @Override
+  public String toString() {
+    throw new UnsupportedOperationException(
+      "Printing the DefaultDataImportIssueStore is not a good idea!"
+    );
+  }
 }

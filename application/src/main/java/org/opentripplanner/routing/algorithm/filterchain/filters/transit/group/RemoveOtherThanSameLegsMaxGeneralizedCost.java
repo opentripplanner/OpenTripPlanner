@@ -46,7 +46,7 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
         .legs()
         .stream()
         .filter(Leg::isTransitLeg)
-        .map(Leg::getTrip)
+        .map(Leg::trip)
         .collect(Collectors.toSet());
 
     // Find the trips that are shared between all itineraries
@@ -67,8 +67,8 @@ public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItinerar
           .legs()
           .stream()
           .filter(Leg::isTransitLeg)
-          .filter(leg -> commonTrips.contains(leg.getTrip()))
-          .mapToInt(leg -> leg.getGeneralizedCost())
+          .filter(leg -> commonTrips.contains(leg.trip()))
+          .mapToInt(leg -> leg.generalizedCost())
           .sum()
       )
       .min();

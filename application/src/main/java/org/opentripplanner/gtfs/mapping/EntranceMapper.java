@@ -14,15 +14,18 @@ import org.opentripplanner.utils.collection.MapUtils;
  */
 class EntranceMapper {
 
+  private final IdFactory idFactory;
   private final Map<org.onebusaway.gtfs.model.Stop, Entrance> mappedEntrances = new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
 
   EntranceMapper(
+    IdFactory idFactory,
     TranslationHelper translationHelper,
     Function<FeedScopedId, Station> stationLookUp
   ) {
+    this.idFactory = idFactory;
     this.translationHelper = translationHelper;
     this.stationLookUp = stationLookUp;
   }
@@ -46,7 +49,7 @@ class EntranceMapper {
       );
     }
 
-    StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
+    StopMappingWrapper base = new StopMappingWrapper(idFactory, gtfsStop);
 
     var builder = Entrance.of(base.getId())
       .withCode(base.getCode())
