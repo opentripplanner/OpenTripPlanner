@@ -1,7 +1,7 @@
 package org.opentripplanner.apis.gtfs.service;
 
-import static com.google.common.truth.Truth.assertThat;
 import static com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET;
@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
@@ -51,11 +52,18 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
       ArrivalDeparture.BOTH
     );
 
-    assertThat(calls).hasSize(2);
+    var tripIds = calls.stream().map(t -> t.getTrip().getId().getId()).toList();
+    assertEquals(List.of(TRIP_1_ID, TRIP_2_ID), tripIds);
   }
 
+  /**
+   * Tests that you get a single {@link TripTimeOnDate} for a stop in a pattern even if several
+   * trips in the pattern have the same stop skipped.
+   *
+   * @see https://github.com/opentripplanner/OpenTripPlanner/issues/6654
+   */
   @Test
-  void skipStop() {
+  void skipStopInMultipleTripsInPattern() {
     var env = RealtimeTestEnvironment.of().addTrip(TRIP1_INPUT).addTrip(TRIP2_INPUT).build();
     var res = env.applyTripUpdates(
       List.of(skipSecondStop(TRIP_1_ID), skipSecondStop(TRIP_2_ID)),
@@ -76,7 +84,8 @@ class ApiTransitServiceTest implements RealtimeTestConstants {
       ArrivalDeparture.BOTH
     );
 
-    assertThat(calls).hasSize(2);
+    var tripIds = calls.stream().map(t -> t.getTrip().getId().getId()).toList();
+    assertEquals(List.of(TRIP_1_ID, TRIP_2_ID), tripIds);
   }
 
   private static GtfsRealtime.TripUpdate skipSecondStop(String tripId) {

@@ -23,6 +23,9 @@ public class ApiTransitService {
     this.transitService = transitService;
   }
 
+  /**
+   * Domain-specific method to get a list of {@link TripTimeOnDate} for a given stop in a pattern.
+   */
   public List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
     StopLocation stop,
     TripPattern originalPattern,
