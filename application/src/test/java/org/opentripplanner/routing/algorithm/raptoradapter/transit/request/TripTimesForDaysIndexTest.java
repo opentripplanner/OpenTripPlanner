@@ -1,0 +1,133 @@
+package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TripTimesForDaysIndex.applyOffsets;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+class TripTimesForDaysIndexTest {
+
+  @Test
+  void testHappyDayAccessors() {
+    int[] offsets = { 8, 16 };
+    var departureTimesPerDay = List.of(new int[] { 10, 30 }, new int[] { 20, 40 });
+    var subject = TripTimesForDaysIndex.ofTripTimesForDay(departureTimesPerDay, offsets);
+
+    assertEquals(0, subject.day(0));
+    assertEquals(1, subject.day(1));
+    assertEquals(0, subject.day(2));
+    assertEquals(1, subject.day(3));
+
+    assertEquals(0, subject.tripIndexForDay(0));
+    assertEquals(0, subject.tripIndexForDay(1));
+    assertEquals(1, subject.tripIndexForDay(2));
+    assertEquals(1, subject.tripIndexForDay(3));
+
+    assertEquals(4, subject.size());
+  }
+
+  static List<Arguments> initsializationTestCases() {
+    return List.of(
+      Arguments.of("1", "0:0"),
+      Arguments.of("1 2", "0:0 0:1"),
+      Arguments.of("1 1", "0:0 0:1"),
+      // Test with two trip times
+      Arguments.of("1 2", "0:0 0:1"),
+      Arguments.of("1 | 2", "0:0 1:0"),
+      Arguments.of("2 | 1", "1:0 0:0"),
+      Arguments.of("1 | 1", "0:0 1:0"),
+      Arguments.of("1 2 3", "0:0 0:1 0:2"),
+      Arguments.of("1 2 | 3", "0:0 0:1 1:0"),
+      Arguments.of("1 3 | 2", "0:0 1:0 0:1"),
+      Arguments.of("2 3 | 1", "1:0 0:0 0:1"),
+      Arguments.of("1 | 2 3", "0:0 1:0 1:1"),
+      Arguments.of("2 | 1 3", "1:0 0:0 1:1"),
+      Arguments.of("3 | 1 2", "1:0 1:1 0:0"),
+      Arguments.of("1 | 2 | 3", "0:0 1:0 2:0"),
+      Arguments.of("2 | 1 | 3", "1:0 0:0 2:0"),
+      Arguments.of("1 | 3 | 2", "0:0 2:0 1:0"),
+      Arguments.of("1 | 2 | 2", "0:0 1:0 2:0"),
+      Arguments.of("1 | 1 | 2", "0:0 1:0 2:0"),
+      // Case "1 | 1 | 1" is not valid, only two following days may overlap in time
+
+      // Test overlaping times with 3 days
+      Arguments.of("1 2 3 | 4 | 5", "0:0 0:1 0:2 1:0 2:0"),
+      Arguments.of("1 2 3 | 5 | 4", "0:0 0:1 0:2 2:0 1:0"),
+      Arguments.of("1 2 | 3 4 | 5", "0:0 0:1 1:0 1:1 2:0"),
+      Arguments.of("1 2 | 3 5 | 4", "0:0 0:1 1:0 2:0 1:1"),
+      Arguments.of("1 2 | 4 5 | 3", "0:0 0:1 2:0 1:0 1:1"),
+      Arguments.of("1 3 | 2 4 | 5", "0:0 1:0 0:1 1:1 2:0"),
+      Arguments.of("1 3 | 2 5 | 4", "0:0 1:0 0:1 2:0 1:1"),
+      Arguments.of("1 4 | 2 3 | 5", "0:0 1:0 1:1 0:1 2:0"),
+      Arguments.of("2 3 | 1 4 | 5", "1:0 0:0 0:1 1:1 2:0"),
+      Arguments.of("2 3 | 1 5 | 4", "1:0 0:0 0:1 2:0 1:1"),
+      Arguments.of("1 2 | 3 | 4 5", "0:0 0:1 1:0 2:0 2:1"),
+      Arguments.of("1 2 | 4 | 3 5", "0:0 0:1 2:0 1:0 2:1"),
+      Arguments.of("1 2 | 5 | 3 4", "0:0 0:1 2:0 2:1 1:0"),
+      Arguments.of("1 3 | 2 | 4 5", "0:0 1:0 0:1 2:0 2:1"),
+      Arguments.of("2 3 | 1 | 4 5", "1:0 0:0 0:1 2:0 2:1"),
+      Arguments.of("1 | 2 3 4 | 5", "0:0 1:0 1:1 1:2 2:0"),
+      Arguments.of("1 | 2 3 5 | 4", "0:0 1:0 1:1 2:0 1:2"),
+      Arguments.of("1 | 2 4 5 | 3", "0:0 1:0 2:0 1:1 1:2"),
+      Arguments.of("1 | 3 4 5 | 2", "0:0 2:0 1:0 1:1 1:2"),
+      Arguments.of("2 | 1 3 4 | 5", "1:0 0:0 1:1 1:2 2:0"),
+      Arguments.of("2 | 1 3 5 | 4", "1:0 0:0 1:1 2:0 1:2"),
+      Arguments.of("2 | 1 4 5 | 3", "1:0 0:0 2:0 1:1 1:2"),
+      Arguments.of("3 | 1 2 4 | 5", "1:0 1:1 0:0 1:2 2:0"),
+      Arguments.of("3 | 1 2 5 | 4", "1:0 1:1 0:0 2:0 1:2"),
+      Arguments.of("4 | 1 2 3 | 5", "1:0 1:1 1:2 0:0 2:0"),
+      Arguments.of("1 | 2 3 | 4 5", "0:0 1:0 1:1 2:0 2:1"),
+      Arguments.of("1 | 2 4 | 3 5", "0:0 1:0 2:0 1:1 2:1"),
+      Arguments.of("2 | 1 4 | 3 5", "1:0 0:0 2:0 1:1 2:1"),
+      Arguments.of("1 | 2 5 | 3 4", "0:0 1:0 2:0 2:1 1:1"),
+      Arguments.of("2 | 1 5 | 3 4", "1:0 0:0 2:0 2:1 1:1"),
+      Arguments.of("1 | 3 4 | 2 5", "0:0 2:0 1:0 1:1 2:1"),
+      Arguments.of("1 | 3 5 | 2 4", "0:0 2:0 1:0 2:1 1:1"),
+      Arguments.of("1 | 4 5 | 2 3", "0:0 2:0 2:1 1:0 1:1"),
+      Arguments.of("1 | 2 | 3 4 5", "0:0 1:0 2:0 2:1 2:2"),
+      Arguments.of("2 | 1 | 3 4 5", "1:0 0:0 2:0 2:1 2:2"),
+      Arguments.of("1 | 3 | 2 4 5", "0:0 2:0 1:0 2:1 2:2"),
+      Arguments.of("1 | 4 | 2 3 5", "0:0 2:0 2:1 1:0 2:2"),
+      Arguments.of("1 | 5 | 2 3 4", "0:0 2:0 2:1 2:2 1:0")
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("initsializationTestCases")
+  void testInitsialization(String input, String expected) {
+    var subject = new TripTimesForDaysIndex(toTimes(input));
+    assertEquals(expected, subject.toString());
+  }
+
+  static List<Arguments> applyOffsetsTestCases() {
+    return List.of(
+      Arguments.of("[11]", "1", new int[] { 10 }),
+      Arguments.of("[11] [22]", "1 | 2", new int[] { 10, 20 }),
+      Arguments.of("[11, 12] [23]", "1 2 | 3", new int[] { 10, 20 }),
+      Arguments.of("[11 111] [29]", "1 101 | 9", new int[] { 10, 20 })
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("applyOffsetsTestCases")
+  void testApplyOffsets(String expected, String input, int[] ofsetts) {
+    assertEquals(expected, toString(applyOffsets(toTimes(input), ofsetts)));
+  }
+
+  private String toString(List<int[]> times) {
+    return times.stream().map(Arrays::toString).collect(Collectors.joining(" "));
+  }
+
+  static List<int[]> toTimes(String list) {
+    var args = list.split("\\|");
+    return Arrays.stream(args)
+      .map(it -> Arrays.stream(it.trim().split(" ")).mapToInt(Integer::parseInt).toArray())
+      .toList();
+  }
+}

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
@@ -29,6 +30,8 @@ public class TripPatternForDates
     RaptorTimeTable<TripSchedule>,
     DefaultTripPattern,
     TripSearchTimetable<TripSchedule> {
+
+  private static final int FIRST_STOP_POS_IN_PATTERN = 0;
 
   private final RoutingTripPattern tripPattern;
 
@@ -93,16 +96,18 @@ public class TripPatternForDates
     final int nStops = tripPattern.numberOfStopsInPattern();
     this.arrivalTimes = new int[nStops * numberOfTripSchedules];
     this.departureTimes = new int[nStops * numberOfTripSchedules];
-    int i = 0;
-    for (int d = 0; d < this.tripPatternForDates.length; d++) {
-      int offset = this.offsets[d];
-      for (var trip : this.tripPatternForDates[d].tripTimes()) {
-        wheelchairBoardings[i] = trip.getWheelchairAccessibility();
-        for (int s = 0; s < nStops; s++) {
-          this.arrivalTimes[s * numberOfTripSchedules + i] = trip.getArrivalTime(s) + offset;
-          this.departureTimes[s * numberOfTripSchedules + i] = trip.getDepartureTime(s) + offset;
-        }
-        i++;
+
+    var tripIndex = createTripTimesForDaysIndex(tripPatternForDates, offsets);
+
+    for (int i = 0; i < tripIndex.size(); ++i) {
+      int day = tripIndex.day(i);
+      int offset = this.offsets[day];
+      var tt = tripPatternForDates[day].tripTimes().get(tripIndex.tripIndexForDay(i));
+
+      wheelchairBoardings[i] = tt.getWheelchairAccessibility();
+      for (int s = 0; s < nStops; s++) {
+        this.arrivalTimes[s * numberOfTripSchedules + i] = tt.getArrivalTime(s) + offset;
+        this.departureTimes[s * numberOfTripSchedules + i] = tt.getDepartureTime(s) + offset;
       }
     }
   }
@@ -272,5 +277,22 @@ public class TripPatternForDates
 
   public Accessibility wheelchairBoardingForTrip(int tripIndex) {
     return wheelchairBoardings[tripIndex];
+  }
+
+  /**
+   * Return a list with all depature times for the fisrt stop for each trip per day.
+   *
+   * There is not unit-test on this method, so keep the surface to {@link TripPatternForDate}
+   * as thin as possible.
+   */
+  private static TripTimesForDaysIndex createTripTimesForDaysIndex(
+    TripPatternForDate[] tripPatternForDates,
+    int[] offsets
+  ) {
+    var depatureTimes = Arrays.stream(tripPatternForDates)
+      .map(TripPatternForDate::tripTimes)
+      .map(l -> l.stream().mapToInt(t -> t.getDepartureTime(FIRST_STOP_POS_IN_PATTERN)).toArray())
+      .toList();
+    return TripTimesForDaysIndex.ofTripTimesForDay(depatureTimes, offsets);
   }
 }
