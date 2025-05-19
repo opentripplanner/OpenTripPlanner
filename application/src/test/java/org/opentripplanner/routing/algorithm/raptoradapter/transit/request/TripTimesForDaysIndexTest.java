@@ -32,70 +32,86 @@ class TripTimesForDaysIndexTest {
     assertEquals(4, subject.size());
   }
 
+  /**
+   * Return a list of test-cases with the input and the expected result, both as Strings.
+   *  - input format:  1 2 | 3 4  Trips times, where each day is separated by a '|'.
+   *  - expected format: (<day>:<tripIndex for day>) for each departure.
+   *
+   *  Note!
+   *    A case like "1 | 1 | 1" is not valid, only two following days may overlap in time, and
+   *    the behaviour of {@link TripTimesForDaysIndex} in such cases is undefined.
+   */
   static List<Arguments> initsializationTestCases() {
-    return List.of(
-      Arguments.of("1", "0:0"),
-      Arguments.of("1 2", "0:0 0:1"),
-      Arguments.of("1 1", "0:0 0:1"),
-      // Test with two trip times
-      Arguments.of("1 2", "0:0 0:1"),
-      Arguments.of("1 | 2", "0:0 1:0"),
-      Arguments.of("2 | 1", "1:0 0:0"),
-      Arguments.of("1 | 1", "0:0 1:0"),
-      Arguments.of("1 2 3", "0:0 0:1 0:2"),
-      Arguments.of("1 2 | 3", "0:0 0:1 1:0"),
-      Arguments.of("1 3 | 2", "0:0 1:0 0:1"),
-      Arguments.of("2 3 | 1", "1:0 0:0 0:1"),
-      Arguments.of("1 | 2 3", "0:0 1:0 1:1"),
-      Arguments.of("2 | 1 3", "1:0 0:0 1:1"),
-      Arguments.of("3 | 1 2", "1:0 1:1 0:0"),
-      Arguments.of("1 | 2 | 3", "0:0 1:0 2:0"),
-      Arguments.of("2 | 1 | 3", "1:0 0:0 2:0"),
-      Arguments.of("1 | 3 | 2", "0:0 2:0 1:0"),
-      Arguments.of("1 | 2 | 2", "0:0 1:0 2:0"),
-      Arguments.of("1 | 1 | 2", "0:0 1:0 2:0"),
-      // Case "1 | 1 | 1" is not valid, only two following days may overlap in time
+    return Arrays.stream(
+      """
+      # Test with one day
+      1              ->  0:0
+      1 2            ->  0:0 0:1
+      1 1            ->  0:0 0:1
 
-      // Test overlaping times with 3 days
-      Arguments.of("1 2 3 | 4 | 5", "0:0 0:1 0:2 1:0 2:0"),
-      Arguments.of("1 2 3 | 5 | 4", "0:0 0:1 0:2 2:0 1:0"),
-      Arguments.of("1 2 | 3 4 | 5", "0:0 0:1 1:0 1:1 2:0"),
-      Arguments.of("1 2 | 3 5 | 4", "0:0 0:1 1:0 2:0 1:1"),
-      Arguments.of("1 2 | 4 5 | 3", "0:0 0:1 2:0 1:0 1:1"),
-      Arguments.of("1 3 | 2 4 | 5", "0:0 1:0 0:1 1:1 2:0"),
-      Arguments.of("1 3 | 2 5 | 4", "0:0 1:0 0:1 2:0 1:1"),
-      Arguments.of("1 4 | 2 3 | 5", "0:0 1:0 1:1 0:1 2:0"),
-      Arguments.of("2 3 | 1 4 | 5", "1:0 0:0 0:1 1:1 2:0"),
-      Arguments.of("2 3 | 1 5 | 4", "1:0 0:0 0:1 2:0 1:1"),
-      Arguments.of("1 2 | 3 | 4 5", "0:0 0:1 1:0 2:0 2:1"),
-      Arguments.of("1 2 | 4 | 3 5", "0:0 0:1 2:0 1:0 2:1"),
-      Arguments.of("1 2 | 5 | 3 4", "0:0 0:1 2:0 2:1 1:0"),
-      Arguments.of("1 3 | 2 | 4 5", "0:0 1:0 0:1 2:0 2:1"),
-      Arguments.of("2 3 | 1 | 4 5", "1:0 0:0 0:1 2:0 2:1"),
-      Arguments.of("1 | 2 3 4 | 5", "0:0 1:0 1:1 1:2 2:0"),
-      Arguments.of("1 | 2 3 5 | 4", "0:0 1:0 1:1 2:0 1:2"),
-      Arguments.of("1 | 2 4 5 | 3", "0:0 1:0 2:0 1:1 1:2"),
-      Arguments.of("1 | 3 4 5 | 2", "0:0 2:0 1:0 1:1 1:2"),
-      Arguments.of("2 | 1 3 4 | 5", "1:0 0:0 1:1 1:2 2:0"),
-      Arguments.of("2 | 1 3 5 | 4", "1:0 0:0 1:1 2:0 1:2"),
-      Arguments.of("2 | 1 4 5 | 3", "1:0 0:0 2:0 1:1 1:2"),
-      Arguments.of("3 | 1 2 4 | 5", "1:0 1:1 0:0 1:2 2:0"),
-      Arguments.of("3 | 1 2 5 | 4", "1:0 1:1 0:0 2:0 1:2"),
-      Arguments.of("4 | 1 2 3 | 5", "1:0 1:1 1:2 0:0 2:0"),
-      Arguments.of("1 | 2 3 | 4 5", "0:0 1:0 1:1 2:0 2:1"),
-      Arguments.of("1 | 2 4 | 3 5", "0:0 1:0 2:0 1:1 2:1"),
-      Arguments.of("2 | 1 4 | 3 5", "1:0 0:0 2:0 1:1 2:1"),
-      Arguments.of("1 | 2 5 | 3 4", "0:0 1:0 2:0 2:1 1:1"),
-      Arguments.of("2 | 1 5 | 3 4", "1:0 0:0 2:0 2:1 1:1"),
-      Arguments.of("1 | 3 4 | 2 5", "0:0 2:0 1:0 1:1 2:1"),
-      Arguments.of("1 | 3 5 | 2 4", "0:0 2:0 1:0 2:1 1:1"),
-      Arguments.of("1 | 4 5 | 2 3", "0:0 2:0 2:1 1:0 1:1"),
-      Arguments.of("1 | 2 | 3 4 5", "0:0 1:0 2:0 2:1 2:2"),
-      Arguments.of("2 | 1 | 3 4 5", "1:0 0:0 2:0 2:1 2:2"),
-      Arguments.of("1 | 3 | 2 4 5", "0:0 2:0 1:0 2:1 2:2"),
-      Arguments.of("1 | 4 | 2 3 5", "0:0 2:0 2:1 1:0 2:2"),
-      Arguments.of("1 | 5 | 2 3 4", "0:0 2:0 2:1 2:2 1:0")
-    );
+      # Test with two days
+      1 | 2          ->  0:0 1:0
+      2 | 1          ->  1:0 0:0
+      1 | 1          ->  0:0 1:0
+      1 2 3          ->  0:0 0:1 0:2
+      1 2 | 3        ->  0:0 0:1 1:0
+      1 3 | 2        ->  0:0 1:0 0:1
+      2 3 | 1        ->  1:0 0:0 0:1
+      1 | 2 3        ->  0:0 1:0 1:1
+      2 | 1 3        ->  1:0 0:0 1:1
+      3 | 1 2        ->  1:0 1:1 0:0
+      1 | 2 | 3      ->  0:0 1:0 2:0
+      2 | 1 | 3      ->  1:0 0:0 2:0
+      1 | 3 | 2      ->  0:0 2:0 1:0
+      1 | 2 | 2      ->  0:0 1:0 2:0
+      1 | 1 | 2      ->  0:0 1:0 2:0
+
+      # Test all overlaping times with 3 days and 5 times
+      1 2 3 | 4 | 5  ->  0:0 0:1 0:2 1:0 2:0
+      1 2 3 | 5 | 4  ->  0:0 0:1 0:2 2:0 1:0
+      1 2 | 3 4 | 5  ->  0:0 0:1 1:0 1:1 2:0
+      1 2 | 3 5 | 4  ->  0:0 0:1 1:0 2:0 1:1
+      1 2 | 4 5 | 3  ->  0:0 0:1 2:0 1:0 1:1
+      1 3 | 2 4 | 5  ->  0:0 1:0 0:1 1:1 2:0
+      1 3 | 2 5 | 4  ->  0:0 1:0 0:1 2:0 1:1
+      1 4 | 2 3 | 5  ->  0:0 1:0 1:1 0:1 2:0
+      2 3 | 1 4 | 5  ->  1:0 0:0 0:1 1:1 2:0
+      2 3 | 1 5 | 4  ->  1:0 0:0 0:1 2:0 1:1
+      1 2 | 3 | 4 5  ->  0:0 0:1 1:0 2:0 2:1
+      1 2 | 4 | 3 5  ->  0:0 0:1 2:0 1:0 2:1
+      1 2 | 5 | 3 4  ->  0:0 0:1 2:0 2:1 1:0
+      1 3 | 2 | 4 5  ->  0:0 1:0 0:1 2:0 2:1
+      2 3 | 1 | 4 5  ->  1:0 0:0 0:1 2:0 2:1
+      1 | 2 3 4 | 5  ->  0:0 1:0 1:1 1:2 2:0
+      1 | 2 3 5 | 4  ->  0:0 1:0 1:1 2:0 1:2
+      1 | 2 4 5 | 3  ->  0:0 1:0 2:0 1:1 1:2
+      1 | 3 4 5 | 2  ->  0:0 2:0 1:0 1:1 1:2
+      2 | 1 3 4 | 5  ->  1:0 0:0 1:1 1:2 2:0
+      2 | 1 3 5 | 4  ->  1:0 0:0 1:1 2:0 1:2
+      2 | 1 4 5 | 3  ->  1:0 0:0 2:0 1:1 1:2
+      3 | 1 2 4 | 5  ->  1:0 1:1 0:0 1:2 2:0
+      3 | 1 2 5 | 4  ->  1:0 1:1 0:0 2:0 1:2
+      4 | 1 2 3 | 5  ->  1:0 1:1 1:2 0:0 2:0
+      1 | 2 3 | 4 5  ->  0:0 1:0 1:1 2:0 2:1
+      1 | 2 4 | 3 5  ->  0:0 1:0 2:0 1:1 2:1
+      2 | 1 4 | 3 5  ->  1:0 0:0 2:0 1:1 2:1
+      1 | 2 5 | 3 4  ->  0:0 1:0 2:0 2:1 1:1
+      2 | 1 5 | 3 4  ->  1:0 0:0 2:0 2:1 1:1
+      1 | 3 4 | 2 5  ->  0:0 2:0 1:0 1:1 2:1
+      1 | 3 5 | 2 4  ->  0:0 2:0 1:0 2:1 1:1
+      1 | 4 5 | 2 3  ->  0:0 2:0 2:1 1:0 1:1
+      1 | 2 | 3 4 5  ->  0:0 1:0 2:0 2:1 2:2
+      2 | 1 | 3 4 5  ->  1:0 0:0 2:0 2:1 2:2
+      1 | 3 | 2 4 5  ->  0:0 2:0 1:0 2:1 2:2
+      1 | 4 | 2 3 5  ->  0:0 2:0 2:1 1:0 2:2
+      1 | 5 | 2 3 4  ->  0:0 2:0 2:1 2:2 1:0
+      """.split("\n")
+    )
+      .map(String::trim)
+      .filter(s -> s.length() > 0)
+      .filter(s -> !s.startsWith("#"))
+      .map(s -> Arguments.of(s.substring(0, 14).trim(), s.substring(18).trim()))
+      .toList();
   }
 
   @ParameterizedTest
@@ -110,7 +126,7 @@ class TripTimesForDaysIndexTest {
       Arguments.of("[11]", "1", new int[] { 10 }),
       Arguments.of("[11] [22]", "1 | 2", new int[] { 10, 20 }),
       Arguments.of("[11, 12] [23]", "1 2 | 3", new int[] { 10, 20 }),
-      Arguments.of("[11 111] [29]", "1 101 | 9", new int[] { 10, 20 })
+      Arguments.of("[11, 111] [29]", "1 101 | 9", new int[] { 10, 20 })
     );
   }
 
