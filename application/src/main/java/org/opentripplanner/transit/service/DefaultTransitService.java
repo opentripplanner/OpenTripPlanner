@@ -763,60 +763,6 @@ public class DefaultTransitService implements TransitEditorService {
     return timetableRepository.transitFeedCovers(dateTime);
   }
 
-  @Override
-  public List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-    StopLocation stop,
-    TripPattern originalPattern,
-    Instant startTime,
-    Duration timeRange,
-    int numDepartures,
-    ArrivalDeparture arrivalDeparture
-  ) {
-    LocalDate date = startTime.atZone(getTimeZone()).toLocalDate();
-
-    return Stream.concat(
-      getRealtimeAddedPatternsAsStream(originalPattern, date),
-      Stream.of(originalPattern)
-    )
-      .distinct()
-      .flatMap(tripPattern ->
-        findTripTimeOnDate(
-          stop,
-          tripPattern,
-          startTime,
-          timeRange,
-          numDepartures,
-          arrivalDeparture,
-          false
-        ).stream()
-      )
-      .sorted(
-        Comparator.comparing(
-          (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
-        )
-      )
-      .limit(numDepartures)
-      .toList();
-  }
-
-  /**
-   * Get a stream of {@link TripPattern} that were created real-time based of the provided pattern.
-   * Only patterns that don't have removed (stops can still be skipped) or added stops are included.
-   */
-  private Stream<TripPattern> getRealtimeAddedPatternsAsStream(
-    TripPattern originalPattern,
-    LocalDate date
-  ) {
-    return originalPattern
-      .scheduledTripsAsStream()
-      .map(trip -> findNewTripPatternForModifiedTrip(trip.getId(), date))
-      .filter(
-        tripPattern ->
-          tripPattern != null &&
-          tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
-      );
-  }
-
   /**
    * Take a stream of T, count the occurrences of each value and return it in order of frequency
    * from high to low.

@@ -17,6 +17,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -279,7 +280,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           var timeRange = Duration.ofSeconds(args.getGraphQLTimeRange());
 
           if (transitService.hasNewTripPatternsForModifiedTrips()) {
-            return transitService.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
+            var service = new ApiTransitService(transitService);
+            return service.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
               stop,
               pattern,
               time,

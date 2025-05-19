@@ -70,6 +70,12 @@ public class RealtimeTestEnvironmentBuilder {
       DataImportIssueStore.NOOP
     );
 
+    timetableRepository
+      .getAllTripPatterns()
+      .forEach(pattern -> {
+        pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
+      });
+
     timetableRepository.index();
     return new RealtimeTestEnvironment(timetableRepository, SERVICE_DATE, TIME_ZONE);
   }
@@ -122,19 +128,40 @@ public class RealtimeTestEnvironmentBuilder {
 
     TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, null);
 
-    final TripPattern pattern = TimetableRepositoryForTest.tripPattern(
-      tripInput.id() + "Pattern",
-      tripInput.route()
-    )
-      .withStopPattern(
-        TimetableRepositoryForTest.stopPattern(
-          tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
-        )
-      )
-      .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
-      .build();
+    var stopPattern = TimetableRepositoryForTest.stopPattern(
+      tripInput.stops().stream().map(TripInput.StopCall::stop).toList()
+    );
 
-    timetableRepository.addTripPattern(pattern.getId(), pattern);
+    var existingPatterns = timetableRepository
+      .getAllTripPatterns()
+      .stream()
+      .filter(p -> p.getStopPattern().equals(stopPattern))
+      .toList();
+
+    if (existingPatterns.size() > 1) {
+      throw new RuntimeException(
+        "Multiple patterns found for stop pattern %s. This indicates an error during test setup.".formatted(
+            stopPattern
+          )
+      );
+    } else if (existingPatterns.size() == 1) {
+      var pattern = existingPatterns.getFirst();
+      var newPattern = pattern
+        .copy()
+        .withScheduledTimeTableBuilder(b -> b.addTripTimes(tripTimes))
+        .build();
+      timetableRepository.addTripPattern(pattern.getId(), newPattern);
+    } else {
+      var pattern = TimetableRepositoryForTest.tripPattern(
+        tripInput.id() + "Pattern",
+        tripInput.route()
+      )
+        .withStopPattern(stopPattern)
+        .withScheduledTimeTableBuilder(builder -> builder.addTripTimes(tripTimes))
+        .build();
+
+      timetableRepository.addTripPattern(pattern.getId(), pattern);
+    }
 
     return trip;
   }

@@ -332,7 +332,7 @@ public final class TripPattern
   /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
 
   /**
-   * Checks that this is TripPattern is based of the provided TripPattern and contains same stops
+   * Checks that this is TripPattern is based off the provided TripPattern and contains the same stops
    * (but not necessarily with same pickup and dropoff values).
    */
   public boolean isModifiedFromTripPatternWithEqualStops(TripPattern other) {

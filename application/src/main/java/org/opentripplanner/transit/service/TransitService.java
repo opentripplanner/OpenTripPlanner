@@ -405,13 +405,4 @@ public interface TransitService {
    * Returns a list of {@link StopLocation}s that match the filtering defined in the request.
    */
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
-
-  List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-    StopLocation stop,
-    TripPattern originalPattern,
-    Instant startTime,
-    Duration timeRange,
-    int graphQLNumberOfDepartures,
-    ArrivalDeparture arrivalDeparture
-  );
 }
