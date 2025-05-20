@@ -134,12 +134,14 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testStopUpdate() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimesA.updateArrivalTime(3, 190);
-    updatedTripTimesA.updateDepartureTime(3, 190);
-    updatedTripTimesA.updateArrivalTime(5, 311);
-    updatedTripTimesA.updateDepartureTime(5, 312);
+    builder.withArrivalTime(3, 190);
+    builder.withDepartureTime(3, 190);
+    builder.withArrivalTime(5, 311);
+    builder.withDepartureTime(5, 312);
+
+    var updatedTripTimesA = builder.build();
 
     assertEquals(3 * 60 + 10, updatedTripTimesA.getArrivalTime(3));
     assertEquals(3 * 60 + 10, updatedTripTimesA.getDepartureTime(3));
@@ -149,9 +151,10 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testPassedUpdate() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimesA.updateDepartureTime(0, 30);
+    builder.withDepartureTime(0, 30);
+    var updatedTripTimesA = builder.build();
 
     assertEquals(30, updatedTripTimesA.getDepartureTime(0));
     assertEquals(60, updatedTripTimesA.getArrivalTime(1));
@@ -167,18 +170,15 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.updateDepartureTime(5, 421);
-    updatedTripTimes.updateArrivalTime(6, 481);
-    updatedTripTimes.updateDepartureTime(6, 481);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 420);
+    builder.withDepartureTime(5, 421);
+    builder.withArrivalTime(6, 481);
+    builder.withDepartureTime(6, 481);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 420);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
@@ -194,26 +194,23 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsLate() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.updateDepartureTime(5, 400);
-    updatedTripTimes.updateArrivalTime(6, 460);
-    updatedTripTimes.updateDepartureTime(6, 460);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 420);
+    builder.withDepartureTime(5, 400);
+    builder.withArrivalTime(6, 460);
+    builder.withDepartureTime(6, 460);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 420);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
 
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    assertTrue(builder.interpolateMissingTimes());
 
-    updatedTripTimes.validateNonIncreasingTimes();
+    builder.build();
   }
 
   /**
@@ -225,23 +222,20 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.updateDepartureTime(5, 300);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 320);
+    builder.withDepartureTime(5, 300);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 320);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
 
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-    updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(builder.interpolateMissingTimes());
+    builder.build();
   }
 
   /**
@@ -254,27 +248,21 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.setCancelled(0);
-    updatedTripTimes.setCancelled(1);
-    updatedTripTimes.updateArrivalTime(2, 0);
-    updatedTripTimes.updateDepartureTime(2, 10);
+    builder.withCanceled(0);
+    builder.withCanceled(1);
+    builder.withArrivalTime(2, 0);
+    builder.withDepartureTime(2, 10);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
 
-    assertFalse(updatedTripTimes.interpolateMissingTimes());
-    error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    assertFalse(builder.interpolateMissingTimes());
+    error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
@@ -290,14 +278,14 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testInterpolationWithTerminalCancellation() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.setCancelled(7);
+    builder.withCanceled(6);
+    builder.withCanceled(7);
 
-    assertFalse(updatedTripTimes.interpolateMissingTimes());
+    assertFalse(builder.interpolateMissingTimes());
 
-    updatedTripTimes.validateNonIncreasingTimes();
+    builder.build();
   }
 
   /**
@@ -309,29 +297,26 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testInterpolationWithMultipleStopCancellations() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.setCancelled(1);
-    updatedTripTimes.setCancelled(2);
-    updatedTripTimes.setCancelled(3);
-    updatedTripTimes.setCancelled(4);
-    updatedTripTimes.setCancelled(5);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 350);
-    updatedTripTimes.updateDepartureTime(7, 350);
+    builder.withCanceled(1);
+    builder.withCanceled(2);
+    builder.withCanceled(3);
+    builder.withCanceled(4);
+    builder.withCanceled(5);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 350);
+    builder.withDepartureTime(7, 350);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
 
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    assertTrue(builder.interpolateMissingTimes());
 
-    updatedTripTimes.validateNonIncreasingTimes();
+    builder.build();
   }
 
   /**
@@ -343,62 +328,60 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testInterpolationWithMultipleStopCancellations2() {
-    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimes.setCancelled(1);
-    updatedTripTimes.setCancelled(2);
-    updatedTripTimes.updateArrivalTime(3, 90);
-    updatedTripTimes.updateDepartureTime(3, 90);
-    updatedTripTimes.setCancelled(4);
-    updatedTripTimes.setCancelled(5);
-    updatedTripTimes.setCancelled(6);
-    updatedTripTimes.updateArrivalTime(7, 240);
-    updatedTripTimes.updateDepartureTime(7, 240);
+    builder.withCanceled(1);
+    builder.withCanceled(2);
+    builder.withArrivalTime(3, 90);
+    builder.withDepartureTime(3, 90);
+    builder.withCanceled(4);
+    builder.withCanceled(5);
+    builder.withCanceled(6);
+    builder.withArrivalTime(7, 240);
+    builder.withDepartureTime(7, 240);
 
-    var error = assertThrows(
-      DataValidationException.class,
-      updatedTripTimes::validateNonIncreasingTimes
-    );
+    var error = assertThrows(DataValidationException.class, builder::build);
     assertEquals(
       "NEGATIVE_HOP_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.",
       error.error().message()
     );
 
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-    updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(builder.interpolateMissingTimes());
+    builder.build();
   }
 
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().copyScheduledTimes();
 
-    updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
-    updatedTripTimesA.updateDepartureTime(0, 50);
+    builder.withArrivalTime(0, -300); //"Yesterday"
+    builder.withDepartureTime(0, 50);
 
-    updatedTripTimesA.validateNonIncreasingTimes();
+    builder.build();
   }
 
   @Test
   public void testDelay() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    updatedTripTimesA.updateDepartureDelay(0, 10);
-    updatedTripTimesA.updateArrivalDelay(6, 13);
+    var builder = createInitialTripTimes().copyScheduledTimes();
+    builder.withDepartureDelay(0, 10);
+    builder.withArrivalDelay(6, 13);
 
-    assertEquals(10, updatedTripTimesA.getDepartureTime(0));
-    assertEquals(6 * 60 + 13, updatedTripTimesA.getArrivalTime(6));
+    assertEquals(10, builder.getDepartureTime(0));
+    assertEquals(6 * 60 + 13, builder.getArrivalTime(6));
   }
 
   @Test
   public void testCancel() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    updatedTripTimesA.cancelTrip();
-    assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
+    var builder = createInitialTripTimes().copyScheduledTimes();
+    builder.cancelTrip();
+    assertEquals(RealTimeState.CANCELED, builder.build().getRealTimeState());
   }
 
   @Test
   public void testNoData() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    updatedTripTimesA.setNoData(1);
+    var builder = createInitialTripTimes().copyScheduledTimes();
+    builder.withNoData(1);
+    var updatedTripTimesA = builder.build();
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
     assertFalse(updatedTripTimesA.isNoDataStop(2));
@@ -406,11 +389,12 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testRealTimeUpdated() {
-    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
-    assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
-    updatedTripTimesA.setRealTimeState(RealTimeState.UPDATED);
-    assertTrue(updatedTripTimesA.isRealTimeUpdated(1));
-    updatedTripTimesA.setNoData(1);
+    var builder = createInitialTripTimes().copyScheduledTimes();
+    assertFalse(builder.build().isRealTimeUpdated(1));
+    builder.withRealTimeState(RealTimeState.UPDATED);
+    assertTrue(builder.build().isRealTimeUpdated(1));
+    builder.withNoData(1);
+    var updatedTripTimesA = builder.build();
     assertTrue(updatedTripTimesA.isRealTimeUpdated(0));
     assertFalse(updatedTripTimesA.isRealTimeUpdated(1));
   }
@@ -444,10 +428,10 @@ class RealTimeTripTimesTest {
     var tt = createInitialTripTimes();
     var updatedTt = tt.copyScheduledTimes();
 
-    updatedTt.updateArrivalTime(3, 69);
-    updatedTt.updateDepartureTime(3, 68);
+    updatedTt.withArrivalTime(3, 69);
+    updatedTt.withDepartureTime(3, 68);
 
-    var ex = assertThrows(DataValidationException.class, updatedTt::validateNonIncreasingTimes);
+    var ex = assertThrows(DataValidationException.class, updatedTt::build);
     var error = (TimetableValidationError) ex.error();
 
     assertEquals(3, error.stopIndex());
@@ -462,10 +446,10 @@ class RealTimeTripTimesTest {
     var tt = createInitialTripTimes();
     var updatedTt = tt.copyScheduledTimes();
 
-    updatedTt.updateDepartureTime(1, 100);
-    updatedTt.updateArrivalTime(2, 99);
+    updatedTt.withDepartureTime(1, 100);
+    updatedTt.withArrivalTime(2, 99);
 
-    var ex = assertThrows(DataValidationException.class, updatedTt::validateNonIncreasingTimes);
+    var ex = assertThrows(DataValidationException.class, updatedTt::build);
     var error = (TimetableValidationError) ex.error();
 
     assertEquals(2, error.stopIndex());

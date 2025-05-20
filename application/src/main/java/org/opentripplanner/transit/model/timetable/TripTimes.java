@@ -24,10 +24,13 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * Copy scheduled times, but not the actual times.
    */
-  RealTimeTripTimes copyScheduledTimes();
+  RealTimeTripTimesBuilder copyScheduledTimes();
 
   /** The code for the service on which this trip runs. For departure search optimizations. */
   int getServiceCode();
+
+  /** Make a copy of the TripTimes with the new service code, for use while adding trips to Timetable */
+  TripTimes withServiceCode(int serviceCode);
 
   /**
    * The time in seconds after midnight at which the vehicle should arrive at the given stop
@@ -132,6 +135,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * @return the whole trip's headsign. Individual stops can have different headsigns.
    */
+  @Nullable
   I18NString getTripHeadsign();
 
   /**

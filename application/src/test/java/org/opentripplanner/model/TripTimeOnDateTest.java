@@ -47,8 +47,10 @@ class TripTimeOnDateTest implements PlanTestConstants {
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, "11:00");
 
-    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    tripTimes.setRecorded(1);
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
+      .copyScheduledTimes()
+      .withRecorded(1)
+      .build();
 
     var subject = new TripTimeOnDate(tripTimes, 0, pattern);
 

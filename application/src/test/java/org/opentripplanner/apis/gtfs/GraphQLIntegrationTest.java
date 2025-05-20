@@ -106,6 +106,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -253,8 +254,13 @@ class GraphQLIntegrationTest {
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    tripTimes2.cancelTrip();
-    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+    timetableSnapshot.update(
+      new RealTimeTripUpdate(
+        pattern,
+        tripTimes2.copyScheduledTimes().cancelTrip().build(),
+        secondDate
+      )
+    );
 
     var routes = Arrays.stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
@@ -279,8 +285,7 @@ class GraphQLIntegrationTest {
         t,
         TEST_MODEL.stopTimesEvery5Minutes(4, t, "00:00"),
         new Deduplicator()
-      );
-      realTimeTripTimes.setServiceCode(SERVICE_CODE);
+      ).withServiceCode(SERVICE_CODE);
       timetableSnapshot.update(
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
@@ -465,12 +470,15 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          var rtt = (RealTimeTripTimes) stl.tripTimes();
+          TripTimes scheduledTimes = stl.tripTimes();
+          var builder = scheduledTimes.copyScheduledTimes();
 
-          for (var i = 0; i < rtt.getNumStops(); i++) {
-            rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
-            rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+          for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
+            builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);
+            builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
           }
+
+          return stl.copyOf().withTripTimes(builder.build()).build();
         }
         return tl;
       })
