@@ -32,13 +32,13 @@ class DecorateTransitAlertTest implements PlanTestConstants {
     i1 = decorator.decorate(i1);
 
     // Then: expect correct alerts to be added
-    assertEquals(1, i1.legs().getFirst().getTransitAlerts().size());
-    assertEquals(ID, i1.legs().getFirst().getTransitAlerts().iterator().next().getId());
+    assertEquals(1, i1.legs().getFirst().listTransitAlerts().size());
+    assertEquals(ID, i1.legs().getFirst().listTransitAlerts().iterator().next().getId());
 
     var i2 = newItinerary(B).rail(21, 0, 30, E).build();
     i2 = decorator.decorate(i2);
 
-    assertEquals(0, i2.legs().getFirst().getTransitAlerts().size());
+    assertEquals(0, i2.legs().getFirst().listTransitAlerts().size());
   }
 
   @Test
@@ -54,8 +54,8 @@ class DecorateTransitAlertTest implements PlanTestConstants {
     i1 = decorator.decorate(i1);
 
     // Then: expect correct alerts to be added
-    assertEquals(1, i1.legs().getFirst().getTransitAlerts().size());
-    assertEquals(ID, i1.legs().getFirst().getTransitAlerts().iterator().next().getId());
+    assertEquals(1, i1.legs().getFirst().listTransitAlerts().size());
+    assertEquals(ID, i1.legs().getFirst().listTransitAlerts().iterator().next().getId());
   }
 
   private static TransitAlertServiceImpl buildService(TransitAlertBuilder builder) {

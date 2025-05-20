@@ -3,7 +3,6 @@ package org.opentripplanner.ext.fares.impl;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.OTHER_FEED_AGENCY;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
-import java.util.List;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;

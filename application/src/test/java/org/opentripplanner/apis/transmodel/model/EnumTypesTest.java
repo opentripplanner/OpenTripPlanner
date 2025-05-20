@@ -3,7 +3,6 @@ package org.opentripplanner.apis.transmodel.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.RELATIVE_DIRECTION;
 import static org.opentripplanner.apis.transmodel.model.EnumTypes.ROUTING_ERROR_CODE;
@@ -18,7 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.opentripplanner.apis.transmodel.mapping.RelativeDirectionMapper;
 import org.opentripplanner.framework.doc.DocumentedEnum;
-import org.opentripplanner.model.plan.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.RelativeDirection;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 class EnumTypesTest {

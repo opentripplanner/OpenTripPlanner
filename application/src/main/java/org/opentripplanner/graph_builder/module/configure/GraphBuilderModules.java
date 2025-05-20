@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -295,6 +296,15 @@ public class GraphBuilderModules {
   @Singleton
   static DataImportIssueSummary providesDataImportIssueSummary(DataImportIssueStore issueStore) {
     return new DataImportIssueSummary(issueStore.listIssues());
+  }
+
+  @Provides
+  @Singleton
+  static TurnRestrictionModule provideTurnRestrictionModule(
+    Graph graph,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository
+  ) {
+    return new TurnRestrictionModule(graph, osmInfoGraphBuildRepository);
   }
 
   @Provides

@@ -9,7 +9,7 @@ import org.opentripplanner.GtfsTest;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegs;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;

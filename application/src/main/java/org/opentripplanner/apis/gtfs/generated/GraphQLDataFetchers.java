@@ -6,6 +6,7 @@ import graphql.relay.DefaultEdge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
+import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
@@ -43,10 +44,10 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegCallTime;
-import org.opentripplanner.model.plan.LegRealTimeEstimate;
-import org.opentripplanner.model.plan.StopArrival;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.LegRealTimeEstimate;
+import org.opentripplanner.model.plan.leg.StopArrival;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -915,6 +916,8 @@ public class GraphQLDataFetchers {
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
 
+    public DataFetcher<OffsetDateTime> availableUntil();
+
     public DataFetcher<RentalVehicleFuel> fuel();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -1558,7 +1561,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> distance();
 
     public DataFetcher<
-      Iterable<org.opentripplanner.model.plan.ElevationProfile.Step>
+      Iterable<org.opentripplanner.model.plan.leg.ElevationProfile.Step>
     > elevationProfile();
 
     public DataFetcher<String> exit();

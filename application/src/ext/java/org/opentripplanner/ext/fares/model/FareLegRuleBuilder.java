@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.util.Collection;
-import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
