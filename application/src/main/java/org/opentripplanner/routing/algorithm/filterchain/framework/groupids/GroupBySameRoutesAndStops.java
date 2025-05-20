@@ -26,9 +26,9 @@ public class GroupBySameRoutesAndStops implements GroupId<GroupBySameRoutesAndSt
       .filter(Leg::isTransitLeg)
       .flatMap(leg ->
         Stream.of(
-          leg.getFrom().stop.getStationOrStopId(),
-          leg.getRoute().getId(),
-          leg.getTo().stop.getStationOrStopId()
+          leg.from().stop.getStationOrStopId(),
+          leg.route().getId(),
+          leg.to().stop.getStationOrStopId()
         )
       )
       .toList();

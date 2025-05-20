@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.walkstep;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.site.Entrance;

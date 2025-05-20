@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.module.RouteToCentroidStationIdsValidat
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -68,6 +69,8 @@ public interface GraphBuilderFactory {
 
   @Nullable
   EdgeUpdaterModule dataOverlayFactory();
+
+  TurnRestrictionModule turnRestrictionModule();
 
   @Nullable
   EmissionGraphBuilder emissionGraphBuilder();

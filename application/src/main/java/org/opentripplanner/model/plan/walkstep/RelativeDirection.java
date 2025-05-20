@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.walkstep;
 
 /**
  * Represents a turn direction, relative to the current heading.

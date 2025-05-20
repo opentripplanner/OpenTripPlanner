@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping._support.mapping;
 
-import org.opentripplanner.model.plan.ElevationProfile;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
 
 @Deprecated
 class ElevationMapper {

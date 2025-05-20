@@ -58,7 +58,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>191</otp.serialization.version.id>
+        <otp.serialization.version.id>192</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>33.0</geotools.version>
@@ -66,12 +66,12 @@
         <jackson.version>2.19.0</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.10</jersey.version>
-        <junit.version>5.12.1</junit.version>
+        <junit.version>5.12.2</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.18</logback.version>
         <lucene.version>10.1.0</lucene.version>
-        <micrometer.version>1.14.6</micrometer.version>
+        <micrometer.version>1.14.7</micrometer.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <protobuf.version>4.30.2</protobuf.version>
@@ -189,7 +189,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
+                <version>3.5.3</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -258,7 +258,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.13</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -476,12 +476,12 @@
             <dependency>
                 <groupId>com.tngtech.archunit</groupId>
                 <artifactId>archunit</artifactId>
-                <version>1.4.0</version>
+                <version>1.4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.16.1</version>
+                <version>5.17.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>
