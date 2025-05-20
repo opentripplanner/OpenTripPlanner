@@ -1693,8 +1693,8 @@ type QueryType {
     "The destination where the search ends. Usually coordinates but can also be a stop location."
     destination: PlanLabeledLocationInput!,
     """
-    A list of filters for which trips should be included or exclued. A trip will be included if it matches with
-    at least one filter. An empty list of filters or no value means that all trips should be included.
+    A list of filters for which trips should be included or excluded. A trip will be included if it matches with
+    at least one filter. Empty list of filters or no value means that all trips should be included.
     """
     filters: [PlanFilterInput!],
     """
@@ -4296,11 +4296,11 @@ input PlanDateTimeInput @oneOf {
   latestArrival: OffsetDateTime
 }
 
-"A collection of selectors for what routes/agencies/modes should be included in or excluded from the search."
+"A collection of selectors for what routes/agencies should be included in or excluded from the search."
 input PlanFilterInput {
-  "A list of selectors for what routes/agencies/modes should be excluded during the search. If route/agency/mode matches with at least one selector it will be excluded. An empty list or a list containing null is forbidden."
+  "A list of selectors for what routes/agencies should be excluded during the search. If route/agency/mode matches with at least one selector it will be excluded. An empty list or a list containing `null` is forbidden."
   not: [PlanFilterSelectInput!]
-  "A list of selectors for what routes/agencies/modes should be allowed during search. In order to be accepted a route/agency/mode has to match with at least one selector. An empty list or a list containing `null` is forbidden."
+  "A list of selectors for what routes/agencies should be allowed during search. In order to be accepted a route/agency has to match with at least one selector. An empty list or a list containing `null` is forbidden."
   select: [PlanFilterSelectInput!]
 }
 
