@@ -18,7 +18,6 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaGroup;
@@ -54,7 +53,6 @@ public class PruneIslands implements GraphBuilderModule {
   private int pruningThresholdWithStops;
   private int adaptivePruningDistance;
   private double adaptivePruningFactor;
-  private VertexLinker vertexLinker;
 
   public PruneIslands(
     Graph graph,
@@ -78,8 +76,6 @@ public class PruneIslands implements GraphBuilderModule {
       adaptivePruningFactor,
       adaptivePruningDistance
     );
-
-    this.vertexLinker = graph.getLinkerSafe();
 
     pruneIslands(TraverseMode.BICYCLE);
     pruneIslands(TraverseMode.WALK);
