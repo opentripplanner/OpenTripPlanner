@@ -40,7 +40,7 @@ public class GsConfig implements GsParameters {
       .summary("Local file system path to Google Cloud Platform service accounts credentials file.")
       .description(
         """
-        The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
+        The credentials are used to access GCS URLs. When using GCS from outside of Google Cloud you
         need to provide a path the the service credentials. Environment variables in the path are
         resolved.
 
