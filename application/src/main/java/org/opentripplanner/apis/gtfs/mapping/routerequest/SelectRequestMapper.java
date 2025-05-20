@@ -17,10 +17,8 @@ class SelectRequestMapper {
   ) {
     var routes = input.getGraphQLRoutes();
     var agencies = input.getGraphQLAgencies();
-    var modes = input.getGraphQLTransportModes();
     requireNullOrNonEmpty(routes, "filters.%s.routes".formatted(name));
     requireNullOrNonEmpty(agencies, "filters.%s.agencies".formatted(name));
-    requireNullOrNonEmpty(modes, "filters.%s.transportModes".formatted(name));
 
     var selectRequestBuilder = SelectRequest.of();
     if (CollectionUtils.hasValue(routes)) {
@@ -29,16 +27,6 @@ class SelectRequestMapper {
 
     if (CollectionUtils.hasValue(agencies)) {
       selectRequestBuilder.withAgencies(FeedScopedId.parse(agencies));
-    }
-
-    if (CollectionUtils.hasValue(input.getGraphQLTransportModes())) {
-      var internalModes = input
-        .getGraphQLTransportModes()
-        .stream()
-        .map(TransitModeMapper::map)
-        .map(MainAndSubMode::new)
-        .toList();
-      selectRequestBuilder.withTransportModes(internalModes);
     }
 
     return selectRequestBuilder.build();

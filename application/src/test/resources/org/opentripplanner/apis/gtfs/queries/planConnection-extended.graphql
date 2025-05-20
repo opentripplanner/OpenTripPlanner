@@ -95,9 +95,7 @@
     }
     filters: [
       { not: [{ routes: ["A:r1"] }] }
-      {
-        select: [{ agencies: ["A:a1"], transportModes: [AIRPLANE, CABLE_CAR] }]
-      }
+      { select: [{ agencies: ["A:a1"] }] }
     ]
     locale: "en"
   ) {

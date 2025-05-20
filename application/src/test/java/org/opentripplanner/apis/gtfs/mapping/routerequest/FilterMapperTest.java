@@ -20,12 +20,12 @@ class FilterMapperTest {
         "not",
         List.of(Map.of("routes", List.of("feed:A"))),
         "select",
-        List.of(Map.of("agencies", List.of("feed:A")), Map.of("transportModes", List.of("RAIL")))
+        List.of(Map.of("agencies", List.of("feed:A")))
       )
     );
     var result = FilterMapper.mapFilters(List.of(filter));
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [], agencies: [feed:A]}, SelectRequest{transportModes: [RAIL]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: [], agencies: [feed:A]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
       result.toString()
     );
   }
@@ -50,13 +50,7 @@ class FilterMapperTest {
         "select",
         List.of(Map.of("agencies", List.of()))
       ),
-      Map.of(
-        "not",
-        List.of(Map.of("transportModes", List.of())),
-        "select",
-        List.of(Map.of("transportModes", List.of()))
-      ),
-      Map.of("select", List.of(Map.of("transportModes", List.of("RAIL"), "routes", List.of()))),
+      Map.of("select", List.of(Map.of("routes", List.of()))),
       Map.of("not", emptyAgencies),
       Map.of("select", emptyAgencies),
       Map.of("select", List.of()),

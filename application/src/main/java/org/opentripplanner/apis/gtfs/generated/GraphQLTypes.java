@@ -1821,20 +1821,11 @@ public class GraphQLTypes {
 
     private List<String> agencies;
     private List<String> routes;
-    private List<GraphQLTransitMode> transportModes;
 
     public GraphQLPlanFilterSelectInput(Map<String, Object> args) {
       if (args != null) {
         this.agencies = (List<String>) args.get("agencies");
         this.routes = (List<String>) args.get("routes");
-        if (args.get("transportModes") != null) {
-          this.transportModes = ((List<Object>) args.get("transportModes")).stream()
-            .map(item ->
-              item instanceof GraphQLTransitMode ? item : GraphQLTransitMode.valueOf((String) item)
-            )
-            .map(GraphQLTransitMode.class::cast)
-            .collect(Collectors.toList());
-        }
       }
     }
 
@@ -1846,20 +1837,12 @@ public class GraphQLTypes {
       return this.routes;
     }
 
-    public List<GraphQLTransitMode> getGraphQLTransportModes() {
-      return this.transportModes;
-    }
-
     public void setGraphQLAgencies(List<String> agencies) {
       this.agencies = agencies;
     }
 
     public void setGraphQLRoutes(List<String> routes) {
       this.routes = routes;
-    }
-
-    public void setGraphQLTransportModes(List<GraphQLTransitMode> transportModes) {
-      this.transportModes = transportModes;
     }
   }
 

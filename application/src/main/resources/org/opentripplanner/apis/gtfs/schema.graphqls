@@ -4310,8 +4310,6 @@ input PlanFilterSelectInput {
   agencies: [String!]
   "Set of ids for lines that should be included in/excluded from search"
   routes: [String!]
-  "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
-  transportModes: [TransitMode!]
 }
 
 """
