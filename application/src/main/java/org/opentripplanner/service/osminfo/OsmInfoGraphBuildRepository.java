@@ -1,8 +1,10 @@
 package org.opentripplanner.service.osminfo;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Optional;
 import org.opentripplanner.service.osminfo.model.Platform;
+import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.Edge;
 
@@ -23,6 +25,11 @@ public interface OsmInfoGraphBuildRepository extends Serializable {
   void addPlatform(Area area, Platform platform);
 
   /**
+   * Add a known turn restriction
+   */
+  void addTurnRestriction(TurnRestriction turnRestriction);
+
+  /**
    * Find the platform the edge belongs to
    */
   Optional<Platform> findPlatform(Edge edge);
@@ -31,4 +38,6 @@ public interface OsmInfoGraphBuildRepository extends Serializable {
    * Find the platform which relates to an area
    */
   Optional<Platform> findPlatform(Area area);
+
+  Collection<TurnRestriction> listTurnRestrictions();
 }

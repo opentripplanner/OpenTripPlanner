@@ -27,7 +27,7 @@ class EmissionItineraryDecoratorTest implements PlanTestConstants {
     car = newItinerary(A).drive(T11_30, T11_50, B).build();
     var repository = new DefaultEmissionRepository();
     Map<FeedScopedId, Emission> emissions = new HashMap<>();
-    emissions.put(bus.firstLeg().getRoute().getId(), Emission.co2_g(0.001));
+    emissions.put(bus.legs().getFirst().route().getId(), Emission.co2_g(0.001));
     repository.addRouteEmissions(emissions);
     repository.setCarAvgCo2PerMeter(0.0015);
     emissionService = new DefaultEmissionService(repository);

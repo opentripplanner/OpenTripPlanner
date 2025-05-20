@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
@@ -18,7 +17,6 @@ class TurnRestrictionTag {
   long relationOsmID;
   TurnRestrictionType type;
   Direction direction;
-  RepeatingTimePeriod time;
   public List<StreetEdge> possibleFrom = new ArrayList<>();
   public List<StreetEdge> possibleTo = new ArrayList<>();
   public TraverseModeSet modes;

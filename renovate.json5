@@ -20,7 +20,8 @@
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core"
+        "org.processing:core",
+        "edu.ucar:netcdf4"
       ],
       "enabled": false
     },
@@ -102,7 +103,7 @@
       "schedule": "on the 7th through 8th day of the month"
     },
     {
-      "groupName": "Update GTFS API code generation in a single PR",
+      "groupName": "GTFS API code generation",
       "matchFiles": ["application/src/main/java/org/opentripplanner/apis/gtfs/generated/package.json"],
       "reviewers": ["optionsome", "leonardehrenfried"],
       "schedule": "on the 11th through 12th day of the month"
@@ -192,7 +193,7 @@
       ],
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
-      "reviewers": ["habrahamsson-skanetrafiken"]
+      "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
     }
   ],
   "timezone": "Europe/Berlin"

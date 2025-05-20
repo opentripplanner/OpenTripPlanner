@@ -24,10 +24,10 @@ public class InterliningTest extends GtfsTest {
     // the same route and with zero transfers.
     Itinerary itinerary = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
 
-    assertEquals(itinerary.legs().get(0).getRoute().getId().getId(), "route1");
+    assertEquals(itinerary.legs().get(0).route().getId().getId(), "route1");
 
     var secondLeg = itinerary.legs().get(1);
-    assertEquals(secondLeg.getRoute().getId().getId(), "route1");
+    assertEquals(secondLeg.route().getId().getId(), "route1");
     assertTrue(secondLeg.isInterlinedWithPreviousLeg());
     assertEquals(0, itinerary.numberOfTransfers());
   }
@@ -36,10 +36,10 @@ public class InterliningTest extends GtfsTest {
   public void interlineOnDifferentRoute() {
     var itinerary = plan(time, "stop0", "stop6", null, false, false, null, null, null, 2);
 
-    assertEquals(itinerary.legs().get(0).getRoute().getId().getId(), "route0");
+    assertEquals(itinerary.legs().get(0).route().getId().getId(), "route0");
 
     var secondLeg = itinerary.legs().get(1);
-    assertEquals(secondLeg.getRoute().getId().getId(), "route3");
+    assertEquals(secondLeg.route().getId().getId(), "route3");
     assertTrue(secondLeg.isInterlinedWithPreviousLeg());
     assertEquals(0, itinerary.numberOfTransfers());
   }
@@ -48,10 +48,10 @@ public class InterliningTest extends GtfsTest {
   public void staySeatedNotAllowed() {
     var itinerary = plan(time, "stop0", "stop5", null, false, false, null, null, null, 2);
 
-    assertEquals(itinerary.legs().get(0).getRoute().getId().getId(), "route2");
+    assertEquals(itinerary.legs().get(0).route().getId().getId(), "route2");
 
     var secondLeg = itinerary.legs().get(1);
-    assertEquals(secondLeg.getRoute().getId().getId(), "route2");
+    assertEquals(secondLeg.route().getId().getId(), "route2");
     assertFalse(secondLeg.isInterlinedWithPreviousLeg());
     assertEquals(1, itinerary.numberOfTransfers());
   }

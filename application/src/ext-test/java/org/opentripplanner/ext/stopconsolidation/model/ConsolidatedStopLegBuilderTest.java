@@ -12,8 +12,8 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -44,8 +44,8 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withFrom(E.stop)
       .withTo(F.stop)
       .build();
-    assertEquals(E.stop, leg.getFrom().stop);
-    assertEquals(F.stop, leg.getTo().stop);
+    assertEquals(E.stop, leg.from().stop);
+    assertEquals(F.stop, leg.to().stop);
   }
 
   @Test
@@ -56,17 +56,17 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .build();
 
     var copy = leg
-      .copy()
+      .copyOf()
       .withAccessibilityScore(4f)
       .withFareProducts(FARES)
       .withAlerts(Set.of(ALERTS))
       .build();
 
-    assertEquals(leg.getFrom().stop, copy.getFrom().stop);
-    assertEquals(leg.getTo().stop, copy.getTo().stop);
-    assertEquals(Set.of(ALERTS), copy.getTransitAlerts());
+    assertEquals(leg.from().stop, copy.from().stop);
+    assertEquals(leg.to().stop, copy.to().stop);
+    assertEquals(Set.of(ALERTS), copy.listTransitAlerts());
     assertEquals(FARES, copy.fareProducts());
-    assertEquals(ZoneIds.BERLIN, copy.getZoneId());
+    assertEquals(ZoneIds.BERLIN, copy.zoneId());
   }
 
   @Test
@@ -77,26 +77,26 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withAlerts(ALERTS)
       .build();
 
-    var copy = leg.copy().build();
+    var copy = leg.copyOf().build();
 
-    assertEquals(E.stop, copy.getFrom().stop);
-    assertEquals(F.stop, copy.getTo().stop);
-    assertEquals(ALERTS, copy.getTransitAlerts());
+    assertEquals(E.stop, copy.from().stop);
+    assertEquals(F.stop, copy.to().stop);
+    assertEquals(ALERTS, copy.listTransitAlerts());
   }
 
   @Test
   void copyAttributesFromScheduledLeg() {
-    var leg = SCHEDULED_TRANSIT_LEG.copy()
+    var leg = SCHEDULED_TRANSIT_LEG.copyOf()
       .withFareProducts(FARES)
       .withAlerts(Set.of(ALERTS))
       .build();
 
     var copy = new ConsolidatedStopLegBuilder(leg).withFrom(C.stop).withTo(G.stop).build();
 
-    assertEquals(C.stop, copy.getFrom().stop);
-    assertEquals(G.stop, copy.getTo().stop);
-    assertEquals(Set.of(ALERTS), copy.getTransitAlerts());
+    assertEquals(C.stop, copy.from().stop);
+    assertEquals(G.stop, copy.to().stop);
+    assertEquals(Set.of(ALERTS), copy.listTransitAlerts());
     assertEquals(FARES, copy.fareProducts());
-    assertEquals(ZoneIds.BERLIN, copy.getZoneId());
+    assertEquals(ZoneIds.BERLIN, copy.zoneId());
   }
 }

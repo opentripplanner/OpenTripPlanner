@@ -29,7 +29,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
  * @see TileRendererManager
  * @see TileRenderer
  */
-@Path("/debugrastertiles")
+@Path("/debug/rastertiles")
 public class DebugRasterTileResource {
 
   private final TileRendererManager tileRendererManager;

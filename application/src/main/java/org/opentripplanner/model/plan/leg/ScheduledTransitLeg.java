@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -13,8 +13,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -33,6 +36,7 @@ import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -43,8 +47,9 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  */
 public class ScheduledTransitLeg implements TransitLeg {
 
-  protected final TripTimes tripTimes;
-  protected final TripPattern tripPattern;
+  private static final int ZERO = 0;
+  private final TripTimes tripTimes;
+  private final TripPattern tripPattern;
 
   private final ZonedDateTime startTime;
   private final ZonedDateTime endTime;
@@ -52,29 +57,51 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts;
   private final ConstrainedTransfer transferFromPrevLeg;
   private final ConstrainedTransfer transferToNextLeg;
+  // the positions are protected to avoid boxing/unboxing when used in subclasses
   protected final int boardStopPosInPattern;
   protected final int alightStopPosInPattern;
   private final int generalizedCost;
-  protected final LocalDate serviceDate;
-  protected final ZoneId zoneId;
+  private final LocalDate serviceDate;
+  private final ZoneId zoneId;
   private final TripOnServiceDate tripOnServiceDate;
   private final double distanceMeters;
   private final double directDistanceMeters;
+
+  // Sandbox fields
   private final Float accessibilityScore;
   private final List<FareProductUse> fareProducts;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
+    // TODO - Add requireNonNull for trip-times. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.tripTimes = builder.tripTimes();
-    this.tripPattern = builder.tripPattern();
+    this.tripPattern = Objects.requireNonNull(builder.tripPattern());
 
-    this.boardStopPosInPattern = builder.boardStopIndexInPattern();
-    this.alightStopPosInPattern = builder.alightStopIndexInPattern();
+    int maxStopPosInPatternLimit = tripPattern.numberOfStops() - 1;
+    this.boardStopPosInPattern = IntUtils.requireInRange(
+      builder.boardStopIndexInPattern(),
+      ZERO,
+      maxStopPosInPatternLimit,
+      "boardStopPosInPattern"
+    );
+    this.alightStopPosInPattern = IntUtils.requireInRange(
+      builder.alightStopIndexInPattern(),
+      boardStopPosInPattern + 1,
+      maxStopPosInPatternLimit,
+      "alightStopPosInPattern"
+    );
 
+    // TODO - Add requireNonNull for start-time. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.startTime = builder.startTime();
+    // TODO - Add requireNonNull for end-tTime. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.endTime = builder.endTime();
 
+    // TODO - Add requireNonNull for service-date. Some tests fails when this is done, these tests
+    //        should be fixed.
     this.serviceDate = builder.serviceDate();
-    this.zoneId = Objects.requireNonNull(builder.zoneId(), "zoneId");
+    this.zoneId = Objects.requireNonNull(builder.zoneId());
 
     this.tripOnServiceDate = builder.tripOnServiceDate();
 
@@ -83,11 +110,10 @@ public class ScheduledTransitLeg implements TransitLeg {
 
     this.generalizedCost = builder.generalizedCost();
 
-    this.accessibilityScore = builder.accessibilityScore();
     List<Coordinate> transitLegCoordinates = LegConstructionSupport.extractTransitLegCoordinates(
       tripPattern,
-      builder.boardStopIndexInPattern(),
-      builder.alightStopIndexInPattern()
+      boardStopPosInPattern,
+      alightStopPosInPattern
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
@@ -99,21 +125,28 @@ public class ScheduledTransitLeg implements TransitLeg {
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareProducts = List.copyOf(builder.fareProducts());
+
+    // Sandbox
+    this.accessibilityScore = builder.accessibilityScore();
   }
 
-  public ZoneId getZoneId() {
+  public ScheduledTransitLegBuilder copyOf() {
+    return new ScheduledTransitLegBuilder<>(this);
+  }
+
+  public ZoneId zoneId() {
     return zoneId;
   }
 
-  public TripTimes getTripTimes() {
+  public TripTimes tripTimes() {
     return tripTimes;
   }
 
-  public TripPattern getTripPattern() {
+  public TripPattern tripPattern() {
     return tripPattern;
   }
 
-  public Instant getServiceDateMidnight() {
+  public Instant serviceDateMidnight() {
     return ServiceDateUtils.asStartOfService(serviceDate, zoneId).toInstant();
   }
 
@@ -136,35 +169,35 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public Agency getAgency() {
+  public Agency agency() {
     return trip().getRoute().getAgency();
   }
 
   @Override
   @Nullable
-  public Operator getOperator() {
+  public Operator operator() {
     return trip().getOperator();
   }
 
   @Override
-  public Route getRoute() {
+  public Route route() {
     return trip().getRoute();
   }
 
   @Override
-  public Trip getTrip() {
-    return trip();
+  public Trip trip() {
+    return tripTimes.getTrip();
   }
 
   @Override
-  public Accessibility getTripWheelchairAccessibility() {
+  public Accessibility tripWheelchairAccessibility() {
     return tripTimes.getWheelchairAccessibility();
   }
 
   @Override
   public LegCallTime start() {
     if (isRealTimeUpdated()) {
-      return LegCallTime.of(startTime, getDepartureDelay());
+      return LegCallTime.of(startTime, departureDelay());
     } else {
       return LegCallTime.ofStatic(startTime);
     }
@@ -173,29 +206,29 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public LegCallTime end() {
     if (isRealTimeUpdated()) {
-      return LegCallTime.of(endTime, getArrivalDelay());
+      return LegCallTime.of(endTime, arrivalDelay());
     } else {
       return LegCallTime.ofStatic(endTime);
     }
   }
 
   @Override
-  public TransitMode getMode() {
+  public TransitMode mode() {
     return trip().getMode();
   }
 
   @Override
-  public ZonedDateTime getStartTime() {
+  public ZonedDateTime startTime() {
     return startTime;
   }
 
   @Override
-  public ZonedDateTime getEndTime() {
+  public ZonedDateTime endTime() {
     return endTime;
   }
 
   @Override
-  public int getDepartureDelay() {
+  public int departureDelay() {
     return (
         tripTimes.isCancelledStop(boardStopPosInPattern) ||
         tripTimes.isNoDataStop(boardStopPosInPattern)
@@ -205,7 +238,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public int getArrivalDelay() {
+  public int arrivalDelay() {
     return (
         tripTimes.isCancelledStop(alightStopPosInPattern) ||
         tripTimes.isNoDataStop(alightStopPosInPattern)
@@ -223,52 +256,52 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public RealTimeState getRealTimeState() {
+  public RealTimeState realTimeState() {
     return tripTimes.getRealTimeState();
   }
 
   @Override
-  public double getDistanceMeters() {
+  public double distanceMeters() {
     return distanceMeters;
   }
 
-  public double getDirectDistanceMeters() {
+  public double directDistanceMeters() {
     return directDistanceMeters;
   }
 
   @Override
-  public Integer getRouteType() {
+  public Integer routeType() {
     return trip().getRoute().getGtfsType();
   }
 
   @Override
-  public I18NString getHeadsign() {
+  public I18NString headsign() {
     return tripTimes.getHeadsign(boardStopPosInPattern);
   }
 
   @Override
-  public LocalDate getServiceDate() {
+  public LocalDate serviceDate() {
     return serviceDate;
   }
 
   @Override
   @Nullable
-  public TripOnServiceDate getTripOnServiceDate() {
+  public TripOnServiceDate tripOnServiceDate() {
     return tripOnServiceDate;
   }
 
   @Override
-  public Place getFrom() {
+  public Place from() {
     return Place.forStop(tripPattern.getStop(boardStopPosInPattern));
   }
 
   @Override
-  public Place getTo() {
+  public Place to() {
     return Place.forStop(tripPattern.getStop(alightStopPosInPattern));
   }
 
   @Override
-  public List<StopArrival> getIntermediateStops() {
+  public List<StopArrival> listIntermediateStops() {
     List<StopArrival> visits = new ArrayList<>();
     var mapper = new StopArrivalMapper(zoneId, serviceDate, tripTimes);
 
@@ -281,28 +314,28 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public LineString getLegGeometry() {
+  public LineString legGeometry() {
     return legGeometry;
   }
 
   @Override
-  public Set<TransitAlert> getTransitAlerts() {
+  public Set<TransitAlert> listTransitAlerts() {
     return transitAlerts;
   }
 
   @Override
   public ScheduledTransitLeg decorateWithAlerts(Set<TransitAlert> alerts) {
-    return copy().withAlerts(alerts).build();
+    return copyOf().withAlerts(alerts).build();
   }
 
   @Override
   public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
-    return copy().withFareProducts(fares).build();
+    return copyOf().withFareProducts(fares).build();
   }
 
   @Override
   @Nullable
-  public PickDrop getBoardRule() {
+  public PickDrop boardRule() {
     if (transferFromPrevLeg != null && transferFromPrevLeg.getTransferConstraint().isStaySeated()) {
       return null;
     }
@@ -311,7 +344,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   @Nullable
-  public PickDrop getAlightRule() {
+  public PickDrop alightRule() {
     if (transferToNextLeg != null && transferToNextLeg.getTransferConstraint().isStaySeated()) {
       return null;
     }
@@ -319,47 +352,47 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public BookingInfo getDropOffBookingInfo() {
+  public BookingInfo dropOffBookingInfo() {
     return tripTimes.getDropOffBookingInfo(alightStopPosInPattern);
   }
 
   @Override
-  public BookingInfo getPickupBookingInfo() {
+  public BookingInfo pickupBookingInfo() {
     return tripTimes.getPickupBookingInfo(boardStopPosInPattern);
   }
 
   @Override
-  public ConstrainedTransfer getTransferFromPrevLeg() {
+  public ConstrainedTransfer transferFromPrevLeg() {
     return transferFromPrevLeg;
   }
 
   @Override
-  public ConstrainedTransfer getTransferToNextLeg() {
+  public ConstrainedTransfer transferToNextLeg() {
     return transferToNextLeg;
   }
 
   @Override
-  public Integer getBoardStopPosInPattern() {
+  public Integer boardStopPosInPattern() {
     return boardStopPosInPattern;
   }
 
   @Override
-  public Integer getAlightStopPosInPattern() {
+  public Integer alightStopPosInPattern() {
     return alightStopPosInPattern;
   }
 
   @Override
-  public Integer getBoardingGtfsStopSequence() {
+  public Integer boardingGtfsStopSequence() {
     return tripTimes.gtfsSequenceOfStopIndex(boardStopPosInPattern);
   }
 
   @Override
-  public Integer getAlightGtfsStopSequence() {
+  public Integer alightGtfsStopSequence() {
     return tripTimes.gtfsSequenceOfStopIndex(alightStopPosInPattern);
   }
 
   @Override
-  public int getGeneralizedCost() {
+  public int generalizedCost() {
     return generalizedCost;
   }
 
@@ -369,7 +402,7 @@ public class ScheduledTransitLeg implements TransitLeg {
    * TripOnServiceDate id instead of the Trip id.
    */
   @Override
-  public LegReference getLegReference() {
+  public LegReference legReference() {
     return new ScheduledTransitLegReference(
       tripOnServiceDate == null ? tripTimes.getTrip().getId() : null,
       serviceDate,
@@ -393,10 +426,6 @@ public class ScheduledTransitLeg implements TransitLeg {
     return accessibilityScore;
   }
 
-  public ScheduledTransitLegBuilder copy() {
-    return new ScheduledTransitLegBuilder<>(this);
-  }
-
   /**
    * Should be used for debug logging only
    * <p>
@@ -406,31 +435,25 @@ public class ScheduledTransitLeg implements TransitLeg {
   @Override
   public String toString() {
     return ToStringBuilder.of(ScheduledTransitLeg.class)
-      .addObj("from", getFrom())
-      .addObj("to", getTo())
+      .addObj("from", from())
+      .addObj("to", to())
       .addTime("startTime", startTime)
       .addTime("endTime", endTime)
       .addBool("realTime", isRealTimeUpdated())
       .addNum("distance", distanceMeters, "m")
-      .addNum("cost", generalizedCost)
-      .addNum("routeType", getRouteType())
-      .addObjOp("agencyId", getAgency(), AbstractTransitEntity::getId)
-      .addObjOp("routeId", getRoute(), AbstractTransitEntity::getId)
-      .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
-      .addObj("headsign", getHeadsign())
+      .addCost("generalizedCost", generalizedCost, Cost.ZERO.toSeconds())
+      .addObjOp("agencyId", agency(), AbstractTransitEntity::getId)
+      .addNum("routeType", routeType())
+      .addObjOp("routeId", route(), AbstractTransitEntity::getId)
+      .addObjOp("tripId", this.trip(), AbstractTransitEntity::getId)
+      .addObj("headsign", headsign())
       .addObj("serviceDate", serviceDate)
-      .addColSize("transitAlerts", transitAlerts)
-      .addEnum("boardRule", getBoardRule())
-      .addEnum("alightRule", getAlightRule())
+      .addEnum("boardRule", boardRule())
+      .addEnum("alightRule", alightRule())
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
+      .addColSize("transitAlerts", transitAlerts)
+      .addColSize("fareProducts", fareProducts)
       .toString();
-  }
-
-  /**
-   * Non-null getter for trip
-   */
-  private Trip trip() {
-    return tripTimes.getTrip();
   }
 }

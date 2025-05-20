@@ -18,7 +18,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -75,14 +75,14 @@ class RealtimeResolverTest {
     var leg1ArrivalDelay = legs
       .get(0)
       .asScheduledTransitLeg()
-      .getTripPattern()
+      .tripPattern()
       .getScheduledTimetable()
       .getTripTimes()
       .getFirst()
       .getArrivalDelay(1);
     assertEquals(123, leg1ArrivalDelay);
-    assertEquals(0, legs.get(0).getTransitAlerts().size());
-    assertEquals(1, legs.get(1).getTransitAlerts().size());
+    assertEquals(0, legs.get(0).listTransitAlerts().size());
+    assertEquals(1, legs.get(1).listTransitAlerts().size());
     assertEquals(1, itinerariesWithRealtime.size());
   }
 
@@ -125,7 +125,7 @@ class RealtimeResolverTest {
 
     assertEquals(1, itineraries.size());
 
-    var constrained = itineraries.get(0).legs().get(1).getTransferFromPrevLeg();
+    var constrained = itineraries.get(0).legs().get(1).transferFromPrevLeg();
     assertNotNull(constrained);
     assertTrue(constrained.getTransferConstraint().isStaySeated());
   }
@@ -157,7 +157,7 @@ class RealtimeResolverTest {
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)
-      .map(ScheduledTransitLeg::getTripPattern)
+      .map(ScheduledTransitLeg::tripPattern)
       .collect(Collectors.toList());
   }
 

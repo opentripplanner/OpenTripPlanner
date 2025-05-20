@@ -132,10 +132,10 @@ public class OrcaFareService extends DefaultFareService {
 
     public Money getDiscountedLegPrice(Leg leg, Money legPrice) {
       if (transferStartTime != null) {
-        var inFreeTransferWindow = inFreeTransferWindow(transferStartTime, leg.getStartTime());
+        var inFreeTransferWindow = inFreeTransferWindow(transferStartTime, leg.startTime());
         if (inFreeTransferWindow) {
           if (legPrice.greaterThan(transferDiscount)) {
-            this.transferStartTime = leg.getStartTime();
+            this.transferStartTime = leg.startTime();
             var discountedLegFare = legPrice.minus(this.transferDiscount);
             this.transferDiscount = legPrice;
             return discountedLegFare;
@@ -145,7 +145,7 @@ public class OrcaFareService extends DefaultFareService {
       }
       // Start a new transfer
       this.transferDiscount = legPrice;
-      this.transferStartTime = leg.getStartTime();
+      this.transferStartTime = leg.startTime();
       return legPrice;
     }
   }
@@ -157,9 +157,9 @@ public class OrcaFareService extends DefaultFareService {
    * @return RideType classification
    */
   static RideType getRideType(Leg leg) {
-    var agencyId = leg.getAgency().getId().getId();
-    var route = leg.getRoute();
-    var tripId = leg.getTrip().getId().getId();
+    var agencyId = leg.agency().getId().getId();
+    var route = leg.route();
+    var tripId = leg.trip().getId().getId();
     return switch (agencyId) {
       case COMM_TRANS_AGENCY_ID, COMM_TRANS_FLEX_AGENCY_ID -> {
         try {
@@ -268,9 +268,7 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   private static Optional<Money> getCTLocalReducedFare(Leg leg) {
-    if (
-      leg.getStartTime().isBefore(CT_FARE_CHANGE_DATE.atStartOfDay(leg.getStartTime().getZone()))
-    ) {
+    if (leg.startTime().isBefore(CT_FARE_CHANGE_DATE.atStartOfDay(leg.startTime().getZone()))) {
       return optionalUSD(1.25f);
     } else {
       return optionalUSD(1.00f);
@@ -286,7 +284,7 @@ public class OrcaFareService extends DefaultFareService {
     Money defaultFare,
     Leg leg
   ) {
-    Route route = leg.getRoute();
+    Route route = leg.route();
     if (route == null) {
       return Optional.of(defaultFare);
     }
@@ -315,7 +313,7 @@ public class OrcaFareService extends DefaultFareService {
    * Apply Orca lift discount fares based on the ride type.
    */
   private Optional<Money> getLiftFare(RideType rideType, Money defaultFare, Leg leg) {
-    var route = leg.getRoute();
+    var route = leg.route();
     if (route == null) {
       return Optional.of(defaultFare);
     }
@@ -355,7 +353,7 @@ public class OrcaFareService extends DefaultFareService {
     Money defaultFare,
     Leg leg
   ) {
-    var route = leg.getRoute();
+    var route = leg.route();
     if (route == null) {
       return Optional.of(defaultFare);
     }
@@ -476,11 +474,11 @@ public class OrcaFareService extends DefaultFareService {
         cost = cost.plus(discountedFare);
       } else if (transferType == TransferType.SAME_AGENCY_TRANSFER) {
         TransferData transferData;
-        if (perAgencyTransferDiscount.containsKey(leg.getAgency().getName())) {
-          transferData = perAgencyTransferDiscount.get(leg.getAgency().getName());
+        if (perAgencyTransferDiscount.containsKey(leg.agency().getName())) {
+          transferData = perAgencyTransferDiscount.get(leg.agency().getName());
         } else {
           transferData = new TransferData();
-          perAgencyTransferDiscount.put(leg.getAgency().getName(), transferData);
+          perAgencyTransferDiscount.put(leg.agency().getName(), transferData);
         }
         var transferDiscount = transferData.getTransferDiscount();
         var discountedFare = transferData.getDiscountedLegPrice(leg, legFare);
