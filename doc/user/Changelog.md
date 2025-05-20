@@ -27,6 +27,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Adjust the maximum allowed speed in our stop time validator to be consistent with MobilityData GTFS validator [#6606](https://github.com/opentripplanner/OpenTripPlanner/pull/6606)
 - Implement SIRI extra calls [#6493](https://github.com/opentripplanner/OpenTripPlanner/pull/6493)
 - Fix ID generation hacks in GTFS mapping, improve FaresV2 spec conformance [#6586](https://github.com/opentripplanner/OpenTripPlanner/pull/6586)
+- Fix transfer for rental modes in deprecated `plan` query [#6630](https://github.com/opentripplanner/OpenTripPlanner/pull/6630)
+- Find best route in presence of turn restrictions [#6611](https://github.com/opentripplanner/OpenTripPlanner/pull/6611)
+- Add availableUntil to rental vehicles in the GTFS GraphQL API [#6643](https://github.com/opentripplanner/OpenTripPlanner/pull/6643)
+- Deprecate vertexType in GTFS API [#6632](https://github.com/opentripplanner/OpenTripPlanner/pull/6632)
+- Enable CAR transfers with ferries with NeTEx import [#6640](https://github.com/opentripplanner/OpenTripPlanner/pull/6640)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)

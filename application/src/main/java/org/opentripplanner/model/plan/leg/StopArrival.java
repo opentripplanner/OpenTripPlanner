@@ -1,5 +1,6 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**

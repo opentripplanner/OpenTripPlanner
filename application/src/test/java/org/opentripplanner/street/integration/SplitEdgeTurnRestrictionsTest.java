@@ -13,7 +13,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -64,7 +64,7 @@ public class SplitEdgeTurnRestrictionsTest {
     var noRightTurnPermitted = computeCarPolyline(graph, hardtheimerWeg, steinhaldenWeg);
     assertThatPolylinesAreEqual(
       noRightTurnPermitted,
-      "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB"
+      "ijbhHuycu@g@Uq@[e@|BMf@YxA]xAYz@Yp@Yj@^n@JDN_@?Wa@i@Xq@X{@\\yAXyACGAIB]j@_DPaA@e@MDCB"
     );
 
     // when to drive in reverse direction it's fine to go this way
@@ -73,7 +73,7 @@ public class SplitEdgeTurnRestrictionsTest {
 
     // make sure that going straight on a straight-only turn direction also works
     var straightAhead = computeCarPolyline(graph, hardtheimerWeg, k1022);
-    assertThatPolylinesAreEqual(straightAhead, "ijbhHuycu@g@Uq@[e@|BENGVYxA]xAXn@Hd@");
+    assertThatPolylinesAreEqual(straightAhead, "ijbhHuycu@g@Uq@[e@|BMf@YxA]xAXn@Hd@");
 
     var straightAheadBack = computeCarPolyline(graph, k1022, hardtheimerWeg);
     assertThatPolylinesAreEqual(straightAheadBack, "kobhHwmcu@Ie@Yo@\\yAXyAFWDOd@}Bp@Zf@T");
@@ -184,7 +184,7 @@ public class SplitEdgeTurnRestrictionsTest {
           }
         })
     );
-    Geometry geometry = itineraries.get(0).legs().get(0).getLegGeometry();
+    Geometry geometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.encode(geometry).points();
   }
 }

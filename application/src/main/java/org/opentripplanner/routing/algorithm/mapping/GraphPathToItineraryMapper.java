@@ -20,14 +20,14 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
-import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.StreetLegBuilder;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLegBuilder;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -126,7 +126,7 @@ public class GraphPathToItineraryMapper {
       StreetLeg leg = generateLeg(legStates, previousStep);
       legs.add(leg);
 
-      List<WalkStep> walkSteps = leg.getWalkSteps();
+      List<WalkStep> walkSteps = leg.listWalkSteps();
       if (walkSteps.size() > 0) {
         previousStep = walkSteps.get(walkSteps.size() - 1);
       } else {

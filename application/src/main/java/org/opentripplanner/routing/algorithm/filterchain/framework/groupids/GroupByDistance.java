@@ -4,8 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
@@ -89,7 +89,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
 
   /** package local to be unit-testable */
   static double calculateTotalDistance(List<Leg> legs) {
-    return legs.stream().mapToDouble(Leg::getDistanceMeters).sum();
+    return legs.stream().mapToDouble(Leg::distanceMeters).sum();
   }
 
   /** package local to be unit-testable */
@@ -97,7 +97,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
     // Sort legs descending on distance
     legs = legs
       .stream()
-      .sorted(Comparator.comparingDouble(Leg::getDistanceMeters).reversed())
+      .sorted(Comparator.comparingDouble(Leg::distanceMeters).reversed())
       .toList();
 
     double sum = 0.0;
@@ -108,7 +108,7 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
       if (i == legs.size()) {
         throw new IllegalStateException("Did not expect to get here...");
       }
-      sum += legs.get(i).getDistanceMeters();
+      sum += legs.get(i).distanceMeters();
       ++i;
     }
     return legs.stream().limit(i).toList();
@@ -142,11 +142,11 @@ public class GroupByDistance implements GroupId<GroupByDistance> {
 
   private static String keySetToString(Leg leg) {
     var builder = ToStringBuilder.of(leg.getClass())
-      .addTime("start", leg.getStartTime())
-      .addTime("end", leg.getStartTime());
+      .addTime("start", leg.startTime())
+      .addTime("end", leg.startTime());
 
     if (leg instanceof TransitLeg trLeg) {
-      builder.addEnum("mode", trLeg.getMode()).addObj("tripId", leg.getTrip().getId());
+      builder.addEnum("mode", trLeg.mode()).addObj("tripId", leg.trip().getId());
     } else if (leg instanceof StreetLeg stLeg) {
       builder.addEnum("mode", stLeg.getMode());
     } else {

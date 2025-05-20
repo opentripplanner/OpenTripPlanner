@@ -40,10 +40,17 @@ public class DoubleRange {
   }
 
   /**
-   * Check if {@code start <= value <= end}
+   * Check if {@code start <= value and value < end}
    */
   public boolean contains(double value) {
     return start <= value && value < end;
+  }
+
+  /**
+   * Check if {@code value < start or end <= value}
+   */
+  public boolean isOutside(double value) {
+    return value < start || end <= value;
   }
 
   @Override
@@ -61,6 +68,6 @@ public class DoubleRange {
 
   @Override
   public String toString() {
-    return "[" + start + " - " + end + ')';
+    return "[" + start + ", " + end + ')';
   }
 }

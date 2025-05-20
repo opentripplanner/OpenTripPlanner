@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.leg;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 
@@ -24,27 +26,27 @@ public class StreetLegBuilder {
   private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
-  private Float accessibilityScore;
   private Set<StreetNote> streetNotes = new HashSet<>();
+  private Float accessibilityScore;
 
   protected StreetLegBuilder() {}
 
   protected StreetLegBuilder(StreetLeg leg) {
     this.mode = leg.getMode();
-    this.startTime = leg.getStartTime();
-    this.endTime = leg.getEndTime();
-    this.from = leg.getFrom();
-    this.to = leg.getTo();
-    this.distanceMeters = leg.getDistanceMeters();
-    this.generalizedCost = leg.getGeneralizedCost();
-    this.geometry = leg.getLegGeometry();
-    this.elevationProfile = leg.getElevationProfile();
-    this.walkSteps = Objects.requireNonNull(leg.getWalkSteps());
-    this.walkingBike = leg.getWalkingBike();
-    this.rentedVehicle = leg.getRentedVehicle();
-    this.vehicleRentalNetwork = leg.getVehicleRentalNetwork();
+    this.startTime = leg.startTime();
+    this.endTime = leg.endTime();
+    this.from = leg.from();
+    this.to = leg.to();
+    this.distanceMeters = leg.distanceMeters();
+    this.generalizedCost = leg.generalizedCost();
+    this.geometry = leg.legGeometry();
+    this.elevationProfile = leg.elevationProfile();
+    this.walkSteps = Objects.requireNonNull(leg.listWalkSteps());
+    this.walkingBike = leg.walkingBike();
+    this.rentedVehicle = leg.rentedVehicle();
+    this.vehicleRentalNetwork = leg.vehicleRentalNetwork();
+    this.streetNotes = leg.listStreetNotes();
     this.accessibilityScore = leg.accessibilityScore();
-    streetNotes = Set.copyOf(leg.getStreetNotes());
   }
 
   public StreetLeg build() {
@@ -176,13 +178,13 @@ public class StreetLegBuilder {
     return this;
   }
 
-  public StreetLegBuilder withAccessibilityScore(Float accessibilityScore) {
-    this.accessibilityScore = accessibilityScore;
+  public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
+    streetNotes = notes;
     return this;
   }
 
-  public StreetLegBuilder withStreetNotes(Set<StreetNote> notes) {
-    streetNotes = Set.copyOf(notes);
+  public StreetLegBuilder withAccessibilityScore(Float accessibilityScore) {
+    this.accessibilityScore = accessibilityScore;
     return this;
   }
 }
