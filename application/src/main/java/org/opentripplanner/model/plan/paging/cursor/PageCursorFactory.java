@@ -140,7 +140,7 @@ public class PageCursorFactory {
         prevEdt = pageCursorInput
           .latestRemovedDeparture()
           .minus(newSearchWindow)
-          .plusSeconds(PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION_SECONDS);
+          .plus(PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION);
         nextEdt = edtAfterUsedSw();
       }
     }
@@ -173,8 +173,8 @@ public class PageCursorFactory {
   private Instant edtAfterUsedSw() {
     Instant defaultEdt = currentEdt.plus(currentSearchWindow);
     if (firstSearchLatestItineraryDeparture != null) {
-      Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plusSeconds(
-        PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION_SECONDS
+      Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plus(
+        PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION
       );
       if (edtFromLatestItineraryDeparture.isBefore(defaultEdt)) {
         return edtFromLatestItineraryDeparture;

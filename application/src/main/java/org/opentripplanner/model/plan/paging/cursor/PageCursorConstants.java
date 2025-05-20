@@ -1,5 +1,7 @@
 package org.opentripplanner.model.plan.paging.cursor;
 
+import java.time.Duration;
+
 public class PageCursorConstants {
 
   /**
@@ -9,5 +11,5 @@ public class PageCursorConstants {
    * <p>
    * The value is set to 60 seconds because raptor operates in one minute increments.
    */
-  public static final int SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION_SECONDS = 60;
+  public static final Duration SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION = Duration.ofSeconds(60);
 }
