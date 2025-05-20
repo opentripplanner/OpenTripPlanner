@@ -59,10 +59,10 @@ import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.plan.WalkStepBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -373,10 +373,10 @@ class GraphQLIntegrationTest {
 
     var busLeg = i1.transitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.transitLeg(2);
-    railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
+    railLeg = railLeg.copyOf().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
     ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
-    i1 = i1.copyOf().withLegs(ignore -> legs).build();
+    i1 = i1.copyOf().withLegs(legs).build();
 
     var fares = new ItineraryFare();
 
@@ -465,7 +465,7 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          var rtt = (RealTimeTripTimes) stl.getTripTimes();
+          var rtt = (RealTimeTripTimes) stl.tripTimes();
 
           for (var i = 0; i < rtt.getNumStops(); i++) {
             rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);

@@ -166,13 +166,13 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.16.1</version>
+            <version>5.17.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -318,7 +318,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>23.1</version>
+            <version>24.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -369,7 +369,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.15.4</version>
+            <version>1.16.1</version>
             <scope>compile</scope>
         </dependency>
         <dependency>

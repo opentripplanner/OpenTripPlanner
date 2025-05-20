@@ -19,7 +19,8 @@
       "fuel": {
         "percent": 0.5,
         "range": 5501
-      }
+      },
+      "availableUntil": "2025-01-01T00:00:00Z"
     }
   }
 }

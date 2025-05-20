@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.walkstep;
 
 /**
  * An absolute cardinal or intermediate direction.

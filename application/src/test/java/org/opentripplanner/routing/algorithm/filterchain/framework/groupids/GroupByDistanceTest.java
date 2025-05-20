@@ -56,8 +56,8 @@ public class GroupByDistanceTest implements PlanTestConstants {
     Leg l2 = i.legs().get(1);
     Leg l3 = i.legs().get(2);
 
-    double d1 = l1.getDistanceMeters();
-    double d3 = l3.getDistanceMeters();
+    double d1 = l1.distanceMeters();
+    double d3 = l3.distanceMeters();
 
     // These test relay on the internal sort by distance, which make the implementation
     // a bit simpler, but strictly is not something the method grantees

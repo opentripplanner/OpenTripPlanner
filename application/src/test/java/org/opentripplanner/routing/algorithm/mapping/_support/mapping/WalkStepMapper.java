@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiWalkStep;
 
 @Deprecated

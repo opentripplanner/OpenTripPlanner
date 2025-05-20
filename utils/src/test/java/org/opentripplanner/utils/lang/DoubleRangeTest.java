@@ -12,13 +12,14 @@ class DoubleRangeTest {
 
   public static final double START = 1.0;
   public static final double END = 2.0;
+  private static final double EPSILON = 0.000_000_000_001;
   private final DoubleRange subject = DoubleRange.of(START, END);
 
   @Test
   void testCreateNew() {
     var ex = assertThrows(IllegalArgumentException.class, () -> DoubleRange.of(2.0, 1.9));
     assertEquals(
-      "The start of the range must be less then or equal to the end: [2.0 - 1.9)",
+      "The start of the range must be less then or equal to the end: [2.0, 1.9)",
       ex.getMessage()
     );
   }
@@ -35,9 +36,18 @@ class DoubleRangeTest {
 
   @Test
   void contains() {
+    assertFalse(subject.contains(START - EPSILON));
     assertTrue(subject.contains(START));
-    assertTrue(subject.contains(END - 0.000_000_000_001));
+    assertTrue(subject.contains(END - EPSILON));
     assertFalse(subject.contains(END));
+  }
+
+  @Test
+  void isOutside() {
+    assertTrue(subject.isOutside(START - EPSILON));
+    assertFalse(subject.isOutside(START));
+    assertFalse(subject.isOutside(END - EPSILON));
+    assertTrue(subject.isOutside(END));
   }
 
   @Test
@@ -57,6 +67,6 @@ class DoubleRangeTest {
 
   @Test
   void testToString() {
-    assertEquals("[1.0 - 2.0)", subject.toString());
+    assertEquals("[1.0, 2.0)", subject.toString());
   }
 }
