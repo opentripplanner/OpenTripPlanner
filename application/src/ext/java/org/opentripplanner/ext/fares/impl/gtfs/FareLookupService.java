@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -112,13 +112,13 @@ class FareLookupService implements Serializable {
   boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
-      leg.getAgency().getId().getFeedId().equals(rule.feedId()) &&
+      leg.agency().getId().getFeedId().equals(rule.feedId()) &&
       matchesNetworkId(leg, rule) &&
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.getTo().stop, rule.toAreaId(), toAreasWithRules) &&
+      matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
+      matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
       matchesDistance(leg, rule)
     );
   }
@@ -161,7 +161,7 @@ class FareLookupService implements Serializable {
    */
   public boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg
-      .getRoute()
+      .route()
       .getGroupsOfRoutes()
       .stream()
       .map(AbstractTransitEntity::getId)
@@ -194,12 +194,12 @@ class FareLookupService implements Serializable {
     // If no valid distance type is given, do not consider distances in fare computation
     FareDistance distance = rule.fareDistance();
     if (distance instanceof FareDistance.Stops(int min, int max)) {
-      var numStops = leg.getIntermediateStops().size();
+      var numStops = leg.listIntermediateStops().size();
       return numStops >= min && max >= numStops;
     } else if (
       rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
     ) {
-      var legDistance = leg.getDirectDistanceMeters();
+      var legDistance = leg.directDistanceMeters();
 
       return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;

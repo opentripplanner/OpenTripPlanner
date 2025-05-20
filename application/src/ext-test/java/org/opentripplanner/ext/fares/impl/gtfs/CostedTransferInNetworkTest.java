@@ -55,8 +55,8 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertEquals(Set.of(), result.itineraryProducts());
-    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.firstLeg()));
-    assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.lastLeg()));
+    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.legs().getFirst()));
+    assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().getLast()));
   }
 
   @Test
@@ -70,9 +70,9 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertEquals(Set.of(), result.itineraryProducts());
-    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.firstLeg()));
+    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.legs().getFirst()));
     assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().get(1)));
-    assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.lastLeg()));
+    assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().getLast()));
   }
 
   @Test
@@ -86,9 +86,9 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertEquals(Set.of(), result.itineraryProducts());
-    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.firstLeg()));
+    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.legs().getFirst()));
     assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().get(1)));
-    assertEquals(Set.of(), result.productsForLeg(i1.lastLeg()));
+    assertEquals(Set.of(), result.productsForLeg(i1.legs().getLast()));
   }
 
   private static Route route(String id) {

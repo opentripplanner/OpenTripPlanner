@@ -132,7 +132,7 @@ class DistancesTest {
       )
     );
     assertEquals(
-      faresV2Service.calculateFares(i1).productsForLeg(i1.firstLeg()),
+      faresV2Service.calculateFares(i1).productsForLeg(i1.legs().getLast()),
       Set.of(twelveStopProduct)
     );
   }
