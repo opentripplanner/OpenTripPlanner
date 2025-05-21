@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -171,22 +172,22 @@ public abstract class GtfsTest {
     String fromStopId,
     String alert
   ) {
-    assertEquals(startTime, leg.getStartTime().toInstant().toEpochMilli());
-    assertEquals(endTime, leg.getEndTime().toInstant().toEpochMilli());
-    assertEquals(toStopId, leg.getTo().stop.getId().getId());
-    assertEquals(FEED_ID, leg.getTo().stop.getId().getFeedId());
+    assertEquals(startTime, leg.startTime().toInstant().toEpochMilli());
+    assertEquals(endTime, leg.endTime().toInstant().toEpochMilli());
+    assertEquals(toStopId, leg.to().stop.getId().getId());
+    assertEquals(FEED_ID, leg.to().stop.getId().getFeedId());
     if (fromStopId != null) {
-      assertEquals(FEED_ID, leg.getFrom().stop.getId().getFeedId());
-      assertEquals(fromStopId, leg.getFrom().stop.getId().getId());
+      assertEquals(FEED_ID, leg.from().stop.getId().getFeedId());
+      assertEquals(fromStopId, leg.from().stop.getId().getId());
     } else {
-      assertNull(leg.getFrom().stop.getId());
+      assertNull(leg.from().stop.getId());
     }
     if (alert != null) {
-      assertNotNull(leg.getStreetNotes());
-      assertEquals(1, leg.getStreetNotes().size());
-      assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
+      assertNotNull(leg.listStreetNotes());
+      assertEquals(1, leg.listStreetNotes().size());
+      assertEquals(alert, leg.listStreetNotes().iterator().next().note.toString());
     } else {
-      assertThat(leg.getStreetNotes()).isEmpty();
+      assertThat(leg.listStreetNotes()).isEmpty();
     }
   }
 
@@ -257,6 +258,7 @@ public abstract class GtfsTest {
     serverContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      new DefaultFareService(),
       snapshotManager,
       null
     );
