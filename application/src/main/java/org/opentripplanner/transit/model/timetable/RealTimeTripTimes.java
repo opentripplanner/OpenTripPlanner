@@ -89,10 +89,6 @@ public final class RealTimeTripTimes implements TripTimes {
     return scheduledTripTimes;
   }
 
-  public RealTimeTripTimesBuilder copy() {
-    return new RealTimeTripTimesBuilder(this);
-  }
-
   @Override
   public RealTimeTripTimesBuilder copyScheduledTimes() {
     return new RealTimeTripTimesBuilder(this);
