@@ -13,6 +13,13 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * scheduled data. This is a "cache" in the sense that it will keep returning the same TripPattern
  * when presented with the same StopPattern, so if realtime messages add many trips passing through
  * the same sequence of stops, they will all end up on this same TripPattern.
+ * <p>
+ * TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and
+ *             the flow between them.
+ *             With the increased usage of DatedServiceJourneys, this should probably be part of the
+ *             main model - not a separate cache. It is possible that this class works when it comes
+ *             to the thread-safety, but just by looking at a few lines of code I see problems - a
+ *             strategy needs to be analysed, designed and documented.
  */
 public class TripPatternCache {
 
