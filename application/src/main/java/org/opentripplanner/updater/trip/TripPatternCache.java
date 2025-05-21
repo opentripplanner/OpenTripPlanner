@@ -17,7 +17,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * <h3>Thread-safety</h3>
  *
  * The thread safety is guaranteed by only a single thread being allowed to access this cache through
- * {@link org.opentripplanner.updater.GraphWriterRunnable}. 
+ * {@link org.opentripplanner.updater.GraphWriterRunnable}.
+ * <p>
  * <a href="https://github.com/opentripplanner/OpenTripPlanner/pull/6629#pullrequestreview-2854296598">Further reading</a>
  * <p>
  * TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and
