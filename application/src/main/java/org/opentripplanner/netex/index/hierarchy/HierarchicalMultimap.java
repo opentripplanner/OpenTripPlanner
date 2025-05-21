@@ -9,7 +9,7 @@ import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 /**
  * A concrete multimap implementation of {@link AbstractHierarchicalMap}.
  * <p>
- * Note that the collection retuned by the {@link ReadOnlyHierarchicalMap#lookup(Object)} is not
+ * Note that the collection returned by the {@link ReadOnlyHierarchicalMap#lookup(Object)} is not
  * <em>ReadOnly</em>, but should be treated as such. It is just to painful to achieve this with the
  * current verion of the Java Collection API - without any side-effects.
  *
