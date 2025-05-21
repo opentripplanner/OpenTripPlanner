@@ -69,7 +69,7 @@ public class GraphBuilderModules {
     List<OsmProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<
       OsmExtractParameters
-    > osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+    > osmConfiguredDataSource : dataSources.getOsmConfiguredDataSource()) {
       providers.add(
         new DefaultOsmProvider(
           osmConfiguredDataSource.dataSource(),
@@ -107,7 +107,7 @@ public class GraphBuilderModules {
     FareServiceFactory fareServiceFactory
   ) {
     List<GtfsBundle> gtfsBundles = new ArrayList<>();
-    for (var gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+    for (var gtfsData : dataSources.getGtfsConfiguredDataSource()) {
       gtfsBundles.add(new GtfsBundle(gtfsData.dataSource(), gtfsData.config()));
     }
     return new GtfsModule(
@@ -133,7 +133,7 @@ public class GraphBuilderModules {
     DataImportIssueStore issueStore
   ) {
     return new NetexConfigure(config).createNetexModule(
-      dataSources.getNetexConfiguredDatasource(),
+      dataSources.getNetexConfiguredDataSource(),
       timetableRepository,
       parkingService,
       graph,
@@ -210,7 +210,7 @@ public class GraphBuilderModules {
       );
     } else if (dataSources.has(DEM)) {
       gridCoverageFactories.addAll(
-        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDatasource())
+        createDemGeotiffGridCoverageFactories(dataSources.getDemConfiguredDataSource())
       );
     }
     // Refactoring this class, it was made clear that this allows for adding multiple elevation

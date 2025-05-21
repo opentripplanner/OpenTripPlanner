@@ -130,6 +130,11 @@ class TripMapper {
       }
       builder.withMode(transitMode.mainMode());
       builder.withNetexSubmode(transitMode.subMode());
+      builder.withCarsAllowed(
+        transportModeMapper.mapCarsAllowed(serviceJourney.getTransportSubmode())
+      );
+    } else {
+      builder.withCarsAllowed(transportModeMapper.mapCarsAllowed(route.getNetexSubmode()));
     }
 
     builder.withDirection(DirectionMapper.map(resolveDirectionType(serviceJourney)));

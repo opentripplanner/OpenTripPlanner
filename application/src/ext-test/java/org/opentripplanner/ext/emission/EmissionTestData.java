@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.emission;
 
 import java.io.File;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -31,11 +33,11 @@ public interface EmissionTestData {
   }
 
   default DataSource emissionOnRoutes() {
-    return resource().dataSource("em-on-routes.txt", FileType.EMMISION);
+    return resource().dataSource("em-on-routes.txt", FileType.EMISSION);
   }
 
-  default DataSource emissionOnTripLegs() {
-    return resource().dataSource("em-on-trip-legs.txt", FileType.EMMISION);
+  default DataSource emissionOnTripHops() {
+    return resource().dataSource("em-on-trip-hops.txt", FileType.EMISSION);
   }
 
   /**
@@ -43,7 +45,15 @@ public interface EmissionTestData {
    * as a test-case so we can see that the parsers handle it gracefully.
    */
   default DataSource emissionMissingFile() {
-    return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMMISION);
+    return new FileDataSource(new File("file-does-not-exist.txt"), FileType.EMISSION);
+  }
+
+  default CompositeDataSource gtfsDirectoryDataSourceWithoutEmissions() {
+    return DataStoreModule.compositeSource(ConstantsForTests.SIMPLE_GTFS, FileType.GTFS);
+  }
+
+  default CompositeDataSource gtfsZipDataSourceWithoutEmissions() {
+    return DataStoreModule.compositeSource(ConstantsForTests.CALTRAIN_GTFS, FileType.GTFS);
   }
 
   private ResourceLoader resource() {
