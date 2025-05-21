@@ -6,13 +6,16 @@ import static org.opentripplanner.updater.trip.UpdateIncrementality.FULL_DATASET
 
 import com.google.transit.realtime.GtfsRealtime;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.DateTimeHelper;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesStringBuilder;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -30,32 +33,38 @@ import uk.org.siri.siri21.EstimatedTimetableDeliveryStructure;
 /**
  * This class exists so that you can share the data building logic for GTFS and Siri tests.
  */
-public final class RealtimeTestEnvironment implements RealtimeTestConstants {
+public final class RealtimeTestEnvironment {
 
   public final TimetableRepository timetableRepository;
   public final TimetableSnapshotManager snapshotManager;
   private final SiriRealTimeTripUpdateAdapter siriAdapter;
   private final GtfsRealTimeTripUpdateAdapter gtfsAdapter;
   private final DateTimeHelper dateTimeHelper;
+  private final LocalDate serviceDate;
 
   public static RealtimeTestEnvironmentBuilder of() {
     return new RealtimeTestEnvironmentBuilder();
   }
 
-  RealtimeTestEnvironment(TimetableRepository timetableRepository) {
+  RealtimeTestEnvironment(
+    TimetableRepository timetableRepository,
+    LocalDate defaultServiceDate,
+    ZoneId zoneId
+  ) {
     this.timetableRepository = timetableRepository;
 
     this.timetableRepository.index();
     this.snapshotManager = new TimetableSnapshotManager(
       null,
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
-      () -> SERVICE_DATE
+      () -> defaultServiceDate
     );
     siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
     gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      SERVICE_DATE
+      defaultServiceDate
     );
-    dateTimeHelper = new DateTimeHelper(TIME_ZONE, SERVICE_DATE);
+    dateTimeHelper = new DateTimeHelper(zoneId, defaultServiceDate);
+    this.serviceDate = defaultServiceDate;
   }
 
   /**
@@ -80,12 +89,16 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
     return TimetableRepositoryForTest.FEED_ID;
   }
 
+  public RegularStop getStop(String id) {
+    return Objects.requireNonNull(timetableRepository.getSiteRepository().getRegularStop(id(id)));
+  }
+
   private EstimatedTimetableHandler getEstimatedTimetableHandler(boolean fuzzyMatching) {
     return new EstimatedTimetableHandler(siriAdapter, fuzzyMatching, getFeedId());
   }
 
   public TripPattern getPatternForTrip(FeedScopedId tripId) {
-    return getPatternForTrip(tripId, SERVICE_DATE);
+    return getPatternForTrip(tripId, serviceDate);
   }
 
   public TripPattern getPatternForTrip(String id) {
@@ -102,7 +115,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
    * Find the current TripTimes for a trip id on the default serviceDate
    */
   public TripTimes getTripTimesForTrip(String id) {
-    return getTripTimesForTrip(id(id), SERVICE_DATE);
+    return getTripTimesForTrip(id(id), serviceDate);
   }
 
   public DateTimeHelper getDateTimeHelper() {
@@ -114,7 +127,7 @@ public final class RealtimeTestEnvironment implements RealtimeTestConstants {
   }
 
   public String getRealtimeTimetable(String tripId) {
-    return getRealtimeTimetable(id(tripId), SERVICE_DATE);
+    return getRealtimeTimetable(id(tripId), serviceDate);
   }
 
   public String getRealtimeTimetable(FeedScopedId tripId, LocalDate serviceDate) {

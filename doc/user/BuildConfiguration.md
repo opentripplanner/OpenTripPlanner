@@ -863,7 +863,7 @@ it is considered a match. Any legal Java Regular expression is allowed.
 
 Pattern for matching group NeTEx files.
 
-This field is used to match *group files* in the module file(zip file entries).
+This field is used to match *group files* in the module file (zip file entries).
 *group files* are loaded right the after *shared group files* are loaded.
 Files are grouped together by the first group pattern in the regular expression.
 The pattern `"(\w{3})-.*\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
@@ -877,7 +877,7 @@ with group `"RUT"`.
 
 Pattern for matching ignored files in a NeTEx bundle.
 
-This field is used to exclude matching *files* in the module file(zip file entries).
+This field is used to exclude matching *files* in the module file (zip file entries).
 The *ignored* files are *not* loaded.
 
 
@@ -908,7 +908,7 @@ File names are matched in the following order - and treated accordingly to the f
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
 
-This field is used to match *shared group files* in the module file(zip file entries).
+This field is used to match *shared group files* in the module file (zip file entries).
 Typically this is used to group all files from one agency together.
 
 *Shared group files* are loaded after shared files, but before the matching group
@@ -1118,7 +1118,7 @@ with the `stopBoardAlightDuringTransferCost` parameter in the router configurati
 
 Pattern for matching group NeTEx files.
 
-This field is used to match *group files* in the module file(zip file entries).
+This field is used to match *group files* in the module file (zip file entries).
 *group files* are loaded right the after *shared group files* are loaded.
 Files are grouped together by the first group pattern in the regular expression.
 The pattern `"(\w{3})-.*\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
@@ -1132,7 +1132,7 @@ with group `"RUT"`.
 
 Pattern for matching ignored files in a NeTEx bundle.
 
-This field is used to exclude matching *files* in the module file(zip file entries).
+This field is used to exclude matching *files* in the module file (zip file entries).
 The *ignored* files are *not* loaded.
 
 
@@ -1163,7 +1163,7 @@ File names are matched in the following order - and treated accordingly to the f
 
 Pattern for matching shared group NeTEx files in a NeTEx bundle.
 
-This field is used to match *shared group files* in the module file(zip file entries).
+This field is used to match *shared group files* in the module file (zip file entries).
 Typically this is used to group all files from one agency together.
 
 *Shared group files* are loaded after shared files, but before the matching group

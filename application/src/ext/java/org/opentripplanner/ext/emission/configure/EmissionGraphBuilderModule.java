@@ -29,8 +29,8 @@ public class EmissionGraphBuilderModule {
     }
 
     return new EmissionGraphBuilder(
-      dataSources.getGtfsConfiguredDatasource(),
-      dataSources.getEmissionConfiguredDatasource(),
+      dataSources.getGtfsConfiguredDataSource(),
+      dataSources.getEmissionConfiguredDataSource(),
       config.emission,
       emissionRepository,
       timetableRepository,

@@ -55,6 +55,7 @@ public class LegType {
     GraphQLObjectType placeType,
     GraphQLObjectType pathGuidanceType,
     GraphQLType elevationStepType,
+    GraphQLObjectType emissionType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -405,6 +406,14 @@ public class LegType {
           .dataFetcher(env ->
             ElevationProfileStepType.mapElevationProfile(leg(env).elevationProfile())
           )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("emission")
+          .description("The emission per person")
+          .type(emissionType)
+          .dataFetcher(e -> leg(e).emissionPerPerson())
           .build()
       )
       .field(
