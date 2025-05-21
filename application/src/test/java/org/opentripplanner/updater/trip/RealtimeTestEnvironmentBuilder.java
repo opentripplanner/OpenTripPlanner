@@ -34,9 +34,7 @@ public class RealtimeTestEnvironmentBuilder {
   private final HashMap<String, Station> stations = new HashMap<>();
   private final List<TripInput> tripInputs = new ArrayList<>();
 
-  public RealtimeTestEnvironmentBuilder() {
-    timetableRepository.initTimeZone(TIME_ZONE);
-  }
+  RealtimeTestEnvironmentBuilder() {}
 
   public RealtimeTestEnvironmentBuilder addTrip(TripInput... trip) {
     for (var t : trip) {
@@ -87,7 +85,6 @@ public class RealtimeTestEnvironmentBuilder {
         pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
       });
 
-
     timetableRepository.index();
     return new RealtimeTestEnvironment(timetableRepository, SERVICE_DATE, TIME_ZONE);
   }
@@ -101,7 +98,6 @@ public class RealtimeTestEnvironmentBuilder {
     var stop = testModel.stop(id).build();
     stops.add(stop);
     return stop;
-
   }
 
   public RegularStop stopAtStation(String stopId, String stationId) {

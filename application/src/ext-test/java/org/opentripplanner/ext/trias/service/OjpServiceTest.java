@@ -24,20 +24,29 @@ import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.utils.time.TimeUtils;
 
 class OjpServiceTest implements RealtimeTestConstants {
 
-  private static final TripInput TRIP_INPUT = TripInput.of("t1")
-    .addStop(STOP_A1, "12:00", "12:01")
-    .addStop(STOP_B1, "12:10", "12:11")
-    .addStop(STOP_C1, "12:20", "12:21")
+  private final RealtimeTestEnvironmentBuilder envBuilder = RealtimeTestEnvironment.of();
+
+  private final RegularStop STOP_A = envBuilder.stopAtStation(STOP_A_ID, STATION_OMEGA_ID);
+  private final RegularStop STOP_B = envBuilder.stop(STOP_B_ID);
+  private final RegularStop STOP_C = envBuilder.stop(STOP_C_ID);
+
+  private final TripInput TRIP_INPUT = TripInput.of("t1")
+    .addStop(STOP_A, "12:00", "12:01")
+    .addStop(STOP_B, "12:10", "12:11")
+    .addStop(STOP_C, "12:20", "12:21")
     .build();
+
   public static final OjpService.StopEventRequestParams PARAMS = params(100);
 
   private static OjpService.StopEventRequestParams params(int departures) {
@@ -57,23 +66,23 @@ class OjpServiceTest implements RealtimeTestConstants {
   }
 
   public static List<FeedScopedId> stopPointRefCases() {
-    return List.of(STOP_A1.getId(), STATION_A.getId());
+    return List.of(id(STOP_A_ID), id(STATION_OMEGA_ID));
   }
 
   @ParameterizedTest
   @MethodSource("stopPointRefCases")
   void stopPointRef(FeedScopedId ref) {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     var result = service.findCallsAtStop(ref, PARAMS);
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
-    assertEquals(STOP_A1.getId(), stopId);
+    assertEquals(STOP_A.getId(), stopId);
   }
 
   @Test
   void notFound() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(EntityNotFoundException.class, () -> service.findCallsAtStop(id("unknown"), PARAMS)
     );
@@ -85,7 +94,7 @@ class OjpServiceTest implements RealtimeTestConstants {
       @Override
       public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
         return List.of(
-          new NearbyStop(STOP_A1, 100, List.of(), TestStateBuilder.ofWalking().streetEdge().build())
+          new NearbyStop(STOP_A, 100, List.of(), TestStateBuilder.ofWalking().streetEdge().build())
         );
       }
 
@@ -107,20 +116,20 @@ class OjpServiceTest implements RealtimeTestConstants {
         return List.of();
       }
     };
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), finder);
     var result = service.findCallsAtStop(WgsCoordinate.GREENWICH, PARAMS);
     assertThat(result).hasSize(1);
     var stopId = result.getFirst().tripTimeOnDate().getStop().getId();
-    assertEquals(STOP_A1.getId(), stopId);
+    assertEquals(STOP_A.getId(), stopId);
   }
 
   @Test
   void tooManyDepartures() {
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
     assertThrows(IllegalArgumentException.class, () ->
-      service.findCallsAtStop(STOP_A1.getId(), params(101))
+      service.findCallsAtStop(STOP_A.getId(), params(101))
     );
   }
 
