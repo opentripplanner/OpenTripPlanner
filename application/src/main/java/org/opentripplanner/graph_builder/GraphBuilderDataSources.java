@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import static org.opentripplanner.datastore.api.FileType.DEM;
+import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
@@ -20,6 +21,7 @@ import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
+import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.model.ConfiguredDataSource;
@@ -106,22 +108,26 @@ public class GraphBuilderDataSources {
     return inputData.containsKey(type);
   }
 
-  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDataSource() {
     return ofStream(OSM).map(this::mapOsmData).toList();
   }
 
-  public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<DemExtractParameters>> getDemConfiguredDataSource() {
     return ofStream(DEM).map(this::mapDemData).toList();
   }
 
-  public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDatasource() {
+  public Iterable<ConfiguredCompositeDataSource<GtfsFeedParameters>> getGtfsConfiguredDataSource() {
     return ofStream(GTFS).map(this::mapGtfsFeed).toList();
   }
 
   public Iterable<
     ConfiguredCompositeDataSource<NetexFeedParameters>
-  > getNetexConfiguredDatasource() {
+  > getNetexConfiguredDataSource() {
     return ofStream(NETEX).map(this::mapNetexFeed).toList();
+  }
+
+  public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDataSource() {
+    return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
   }
 
   /**
@@ -186,6 +192,16 @@ public class GraphBuilderDataSources {
       .findFirst()
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
     return new ConfiguredCompositeDataSource<>((CompositeDataSource) dataSource, p);
+  }
+
+  private ConfiguredDataSource<EmissionFeedParameters> mapEmissionFeed(DataSource dataSource) {
+    var p = buildConfig.emission
+      .feeds()
+      .stream()
+      .filter(c -> uriMatch(c.source(), dataSource.uri()))
+      .findFirst()
+      .orElseThrow();
+    return new ConfiguredDataSource<>(dataSource, p);
   }
 
   /**

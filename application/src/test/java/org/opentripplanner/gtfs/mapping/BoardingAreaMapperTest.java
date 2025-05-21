@@ -48,6 +48,7 @@ public class BoardingAreaMapperTest {
   private static final Stop STOP = new Stop();
 
   private final BoardingAreaMapper subject = new BoardingAreaMapper(
+    new IdFactory("A"),
     new TranslationHelper(),
     stationId -> PARENT_STOP
   );

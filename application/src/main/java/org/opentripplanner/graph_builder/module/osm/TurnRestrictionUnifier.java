@@ -2,12 +2,17 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 class TurnRestrictionUnifier {
 
-  static void unifyTurnRestrictions(OsmDatabase osmdb, DataImportIssueStore issueStore) {
+  static void unifyTurnRestrictions(
+    OsmDatabase osmdb,
+    DataImportIssueStore issueStore,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository
+  ) {
     // Note that usually when the from or to way is not found, it's because OTP has already
     // filtered that way. So many missing edges are not really problems worth issuing warnings on.
     for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
@@ -88,10 +93,9 @@ class TurnRestrictionUnifier {
               from,
               to,
               restrictionTag.type,
-              restrictionTag.modes,
-              restrictionTag.time
+              restrictionTag.modes
             );
-            from.addTurnRestriction(restriction);
+            osmInfoGraphBuildRepository.addTurnRestriction(restriction);
           }
         }
       }

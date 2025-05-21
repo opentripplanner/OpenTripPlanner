@@ -61,7 +61,7 @@ public class FileUtils {
       if (!expected.equals(result)) {
         throw new IllegalStateException(
           """
-          The file(%s) differ from the expected document.
+          The file (%s) differ from the expected document.
             Expected (line: %3d): %s
             Result   (line: %3d): %s
           """.formatted(newFile.getAbsolutePath(), i, expected, j, result)
@@ -73,12 +73,12 @@ public class FileUtils {
 
     if (i < expectedLines.length) {
       throw new IllegalStateException(
-        "Lines missing in new file(" + newFile.getAbsolutePath() + "): " + expectedLines[i]
+        "Lines missing in new file (" + newFile.getAbsolutePath() + "): " + expectedLines[i]
       );
     }
     if (j < resultLines.length) {
       throw new IllegalStateException(
-        "Lines not expected in new file(" + newFile.getAbsolutePath() + "): " + resultLines[j]
+        "Lines not expected in new file (" + newFile.getAbsolutePath() + "): " + resultLines[j]
       );
     }
   }

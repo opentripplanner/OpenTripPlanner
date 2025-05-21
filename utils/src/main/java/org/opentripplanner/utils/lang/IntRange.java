@@ -2,6 +2,7 @@ package org.opentripplanner.utils.lang;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.IntFunction;
 
 /**
  * An integer range is an ordered tuple of integers where the 'start' is less than or equal
@@ -73,6 +74,13 @@ public class IntRange {
     return startInclusive <= value && value <= endInclusive;
   }
 
+  /**
+   * Check if {@code value < start or value > end }
+   */
+  public boolean isOutside(int value) {
+    return value < startInclusive || value > endInclusive;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -88,7 +96,13 @@ public class IntRange {
 
   @Override
   public String toString() {
+    return toString(Integer::toString);
+  }
+
+  public String toString(IntFunction<String> valueToString) {
+    var v1 = valueToString.apply(startInclusive);
+    var v2 = valueToString.apply(endInclusive);
     // First argument must be a String not a character to force String concatenation
-    return "[" + startInclusive + " - " + endInclusive + ']';
+    return "[" + v1 + ", " + v2 + ']';
   }
 }

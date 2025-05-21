@@ -5,6 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.opentripplanner.transit.model.network.CarAccess.ALLOWED;
+import static org.opentripplanner.transit.model.network.CarAccess.NOT_ALLOWED;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.HIGH_SPEED_VEHICLE_SERVICE;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.LOCAL_CAR_FERRY;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.NATIONAL_CAR_FERRY;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.POST_BOAT;
+import static org.rutebanken.netex.model.WaterSubmodeEnumeration.REGIONAL_CAR_FERRY;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -14,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.netex.mapping.TransportModeMapper.UnsupportedModeException;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.rutebanken.netex.model.AirSubmodeEnumeration;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
@@ -126,10 +134,38 @@ class TransportModeMapperTest {
     assertThrows(UnsupportedModeException.class, () -> transportModeMapper.map(null, null));
   }
 
+  @Test
+  void carsAllowedBasedOnSubMode() {
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(SubMode.of("nationalCarFerry")));
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(SubMode.of("regionalCarFerry")));
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(SubMode.of("localCarFerry")));
+    assertEquals(
+      ALLOWED,
+      transportModeMapper.mapCarsAllowed(SubMode.of("highSpeedVehicleService"))
+    );
+    assertEquals(NOT_ALLOWED, transportModeMapper.mapCarsAllowed(SubMode.UNKNOWN));
+    assertEquals(NOT_ALLOWED, transportModeMapper.mapCarsAllowed((SubMode) null));
+  }
+
+  @Test
+  void carsAllowedBasedOn() {
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(tsm(NATIONAL_CAR_FERRY)));
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(tsm(REGIONAL_CAR_FERRY)));
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(tsm(LOCAL_CAR_FERRY)));
+    assertEquals(ALLOWED, transportModeMapper.mapCarsAllowed(tsm(HIGH_SPEED_VEHICLE_SERVICE)));
+    assertEquals(NOT_ALLOWED, transportModeMapper.mapCarsAllowed(tsm(POST_BOAT)));
+    assertEquals(NOT_ALLOWED, transportModeMapper.mapCarsAllowed(tsm(null)));
+    assertEquals(NOT_ALLOWED, transportModeMapper.mapCarsAllowed((TransportSubmodeStructure) null));
+  }
+
   private static List<Arguments> createSubModeTestCases() {
     return VALID_SUBMODE_STRUCTURES.entrySet()
       .stream()
       .map(entry -> Arguments.of(entry.getKey(), entry.getValue()))
       .toList();
+  }
+
+  private static TransportSubmodeStructure tsm(WaterSubmodeEnumeration waterSubMode) {
+    return new TransportSubmodeStructure().withWaterSubmode(waterSubMode);
   }
 }

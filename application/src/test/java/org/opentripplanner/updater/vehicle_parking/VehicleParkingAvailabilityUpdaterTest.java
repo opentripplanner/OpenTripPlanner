@@ -51,7 +51,7 @@ class VehicleParkingAvailabilityUpdaterTest {
     var service = buildParkingRepository(VehicleParkingSpaces.builder().carSpaces(10).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
-      new StubDatasource(DEFAULT_UPDATE),
+      new StubDataSource(DEFAULT_UPDATE),
       service
     );
 
@@ -68,7 +68,7 @@ class VehicleParkingAvailabilityUpdaterTest {
     var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
-      new StubDatasource(DEFAULT_UPDATE),
+      new StubDataSource(DEFAULT_UPDATE),
       service
     );
 
@@ -85,7 +85,7 @@ class VehicleParkingAvailabilityUpdaterTest {
     var service = buildParkingRepository(VehicleParkingSpaces.builder().bicycleSpaces(15).build());
     var updater = new VehicleParkingAvailabilityUpdater(
       PARAMETERS,
-      new StubDatasource(new AvailabiltyUpdate(id("not-found"), 100)),
+      new StubDataSource(new AvailabiltyUpdate(id("not-found"), 100)),
       service
     );
 
@@ -139,11 +139,11 @@ class VehicleParkingAvailabilityUpdaterTest {
     graphUpdaterManager.stop(false);
   }
 
-  private static class StubDatasource implements DataSource<AvailabiltyUpdate> {
+  private static class StubDataSource implements DataSource<AvailabiltyUpdate> {
 
     private final AvailabiltyUpdate update;
 
-    private StubDatasource(AvailabiltyUpdate update) {
+    private StubDataSource(AvailabiltyUpdate update) {
       this.update = update;
     }
 

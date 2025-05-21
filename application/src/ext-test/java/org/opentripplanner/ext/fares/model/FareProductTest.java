@@ -57,13 +57,10 @@ class FareProductTest {
   }
 
   private static FareProduct fareProduct(Duration duration, RiderCategory cat, FareMedium medium) {
-    return new FareProduct(
-      new FeedScopedId("fares", "daypass"),
-      "day pass",
-      Money.euros(10),
-      duration,
-      cat,
-      medium
-    );
+    return FareProduct.of(new FeedScopedId("fares", "daypass"), "day pass", Money.euros(10))
+      .withValidity(duration)
+      .withCategory(cat)
+      .withMedium(medium)
+      .build();
   }
 }

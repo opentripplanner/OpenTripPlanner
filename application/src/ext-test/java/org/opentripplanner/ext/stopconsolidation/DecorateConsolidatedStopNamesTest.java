@@ -17,9 +17,9 @@ import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 
 class DecorateConsolidatedStopNamesTest {
 
@@ -39,17 +39,17 @@ class DecorateConsolidatedStopNamesTest {
       .build();
 
     var first = (ScheduledTransitLeg) itinerary.legs().getFirst();
-    var withFp = first.copy().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
+    var withFp = first.copyOf().withFareProducts(List.of(FARE_PRODUCT_USE)).build();
     var legs = new ArrayList<>(itinerary.legs());
     legs.set(0, withFp);
 
-    itinerary = itinerary.copyOf().withLegs(ignore -> legs).build();
+    itinerary = itinerary.copyOf().withLegs(legs).build();
 
     itinerary = filter.decorate(itinerary);
 
     var updatedLeg = itinerary.legs().getFirst();
-    assertEquals(STOP_C.getName(), updatedLeg.getFrom().name);
-    assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
+    assertEquals(STOP_C.getName(), updatedLeg.from().name);
+    assertEquals(STOP_D.getName(), updatedLeg.to().name);
 
     // Check that the fares were carried over
     assertEquals(List.of(FARE_PRODUCT_USE), updatedLeg.fareProducts());

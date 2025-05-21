@@ -22,8 +22,8 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -83,7 +83,7 @@ public class BarrierRoutingTest {
                   i
                     .legs()
                     .get(0)
-                    .getWalkSteps()
+                    .listWalkSteps()
                     .stream()
                     .map(WalkStep::isWalkingBike)
                     .collect(Collectors.toList())
@@ -194,7 +194,7 @@ public class BarrierRoutingTest {
 
     assertAll(assertions.apply(itineraries));
 
-    Geometry legGeometry = itineraries.get(0).legs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     temporaryVertices.close();
 
     return EncodedPolyline.encode(legGeometry).points();

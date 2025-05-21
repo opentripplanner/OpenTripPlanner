@@ -36,11 +36,21 @@ class IntRangeTest {
   @Test
   void testContains() {
     var w = range(2, 4);
+
     assertFalse(w.contains(1));
     assertTrue(w.contains(2));
-    assertTrue(w.contains(3));
     assertTrue(w.contains(4));
     assertFalse(w.contains(5));
+  }
+
+  @Test
+  void isOutside() {
+    var w = range(2, 4);
+
+    assertTrue(w.isOutside(1));
+    assertFalse(w.isOutside(2));
+    assertFalse(w.isOutside(4));
+    assertTrue(w.isOutside(5));
   }
 
   @Test
@@ -62,7 +72,8 @@ class IntRangeTest {
 
   @Test
   void testToString() {
-    assertEquals("[2 - 17]", range(2, 17).toString());
+    assertEquals("[2, 17]", range(2, 17).toString());
+    assertEquals("[v2, v17]", range(2, 17).toString(i -> "v" + i));
   }
 
   @Test

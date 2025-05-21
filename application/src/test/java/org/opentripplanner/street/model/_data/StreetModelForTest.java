@@ -2,12 +2,15 @@ package org.opentripplanner.street.model._data;
 
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -15,12 +18,14 @@ import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaGroup;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.Entrance;
 
 public class StreetModelForTest {
@@ -136,5 +141,47 @@ public class StreetModelForTest {
 
   public static VehicleParking.VehicleParkingBuilder vehicleParking() {
     return VehicleParking.builder().id(id("vehicle-parking-1")).coordinate(WgsCoordinate.GREENWICH);
+  }
+
+  static class GraphBuilder {
+
+    Set<Vertex> knownVertices;
+    Set<Vertex> inProgressVertices;
+    Graph graph;
+
+    public GraphBuilder() {
+      knownVertices = new HashSet<>();
+      inProgressVertices = new HashSet<>();
+      graph = new Graph();
+    }
+
+    void process(Vertex vertex) {
+      graph.addVertex(vertex);
+      for (Edge edge : vertex.getOutgoing()) {
+        add(edge.getToVertex());
+      }
+      for (Edge edge : vertex.getIncoming()) {
+        add(edge.getFromVertex());
+      }
+    }
+
+    public void add(Vertex vertex) {
+      if (!knownVertices.contains(vertex)) {
+        if (!inProgressVertices.contains(vertex)) {
+          inProgressVertices.add(vertex);
+          process(vertex);
+        }
+      }
+    }
+
+    public Graph build() {
+      return graph;
+    }
+  }
+
+  public static Graph makeGraph(Vertex vertex) {
+    GraphBuilder builder = new GraphBuilder();
+    builder.add(vertex);
+    return builder.build();
   }
 }

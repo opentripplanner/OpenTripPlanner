@@ -233,11 +233,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     }
   }
 
-  @Override
-  public String getName() {
-    return evRenderer.getName();
-  }
-
   public interface EdgeVertexRenderer {
     Comparator<Vertex> defaultVertexComparator = Comparator.comparing((Vertex v) ->
       v instanceof StreetVertex
@@ -257,13 +252,6 @@ public class EdgeVertexTileRenderer implements TileRenderer {
      * @return  vertex to render, or empty otherwise.
      */
     Optional<VertexVisualAttributes> renderVertex(Vertex v);
-
-    /**
-     * Name of this tile Render which would be shown in frontend
-     *
-     * @return Name of tile render
-     */
-    String getName();
 
     default boolean hasEdgeSegments(Edge edge) {
       return false;

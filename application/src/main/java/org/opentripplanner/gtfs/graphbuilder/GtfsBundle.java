@@ -55,7 +55,7 @@ public class GtfsBundle {
    */
   public String getFeedId() {
     if (feedId == null) {
-      feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource());
+      feedId = GtfsFeedIdResolver.fromGtfsFeed(getCsvInputSource(), dataSource.uri());
     }
     return feedId;
   }

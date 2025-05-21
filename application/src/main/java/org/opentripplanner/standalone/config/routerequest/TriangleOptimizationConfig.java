@@ -27,21 +27,21 @@ public class TriangleOptimizationConfig {
         c
           .of("time")
           .since(V2_0)
-          .summary("Relative importance of duration of travel (range 0-1).")
+          .summary("Relative importance of duration of travel (range 0.0, 1.0).")
           .asDouble(builder.time())
       )
       .withSlope(
         c
           .of("flatness")
           .since(V2_0)
-          .summary("Relative importance of flat terrain (range 0-1).")
+          .summary("Relative importance of flat terrain (range 0.0, 1.0).")
           .asDouble(builder.slope())
       )
       .withSafety(
         c
           .of("safety")
           .since(V2_0)
-          .summary("Relative importance of safety (range 0-1).")
+          .summary("Relative importance of safety (range 0.0, 1.0).")
           .description(
             """
             This factor can also include other concerns such as convenience and general cyclist

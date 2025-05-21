@@ -13,7 +13,7 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class HSLFareService extends DefaultFareService {
     Collection<FareRuleSet> fareRules
   ) {
     Set<String> zones = new HashSet<>();
-    ZonedDateTime startTime = legs.get(0).getStartTime();
+    ZonedDateTime startTime = legs.get(0).startTime();
     ZonedDateTime lastRideStartTime = startTime;
 
     Money specialRouteFare = MAX_PRICE;
@@ -60,17 +60,17 @@ public class HSLFareService extends DefaultFareService {
       .collect(Collectors.toSet());
     Set<String> legFeedIds = legs
       .stream()
-      .map(leg -> leg.getAgency().getId().getFeedId())
+      .map(leg -> leg.agency().getId().getFeedId())
       .collect(Collectors.toSet());
     if (!Sets.difference(legFeedIds, fareRuleFeedIds).isEmpty()) {
       return Optional.empty();
     }
 
     for (Leg leg : legs) {
-      lastRideStartTime = leg.getStartTime();
+      lastRideStartTime = leg.startTime();
       if (agency == null) {
-        agency = leg.getAgency().getId().getId().toString();
-      } else if (agency != leg.getAgency().getId().getId().toString()) {
+        agency = leg.agency().getId().getId().toString();
+      } else if (agency != leg.agency().getId().getId().toString()) {
         singleAgency = false;
       }
 
@@ -81,15 +81,14 @@ public class HSLFareService extends DefaultFareService {
       Set<String> ruleZones = null;
       for (FareRuleSet ruleSet : fareRules) {
         if (
-          ruleSet.hasAgencyDefined() &&
-          leg.getAgency().getId().getId() != ruleSet.getAgency().getId()
+          ruleSet.hasAgencyDefined() && leg.agency().getId().getId() != ruleSet.getAgency().getId()
         ) {
           continue;
         }
         RouteOriginDestination routeOriginDestination = new RouteOriginDestination(
-          leg.getRoute().getId().toString(),
-          leg.getFrom().stop.getFirstZoneAsString(),
-          leg.getTo().stop.getFirstZoneAsString()
+          leg.route().getId().toString(),
+          leg.from().stop.getFirstZoneAsString(),
+          leg.to().stop.getFirstZoneAsString()
         );
         boolean isSpecialRoute = false;
 
@@ -105,9 +104,9 @@ public class HSLFareService extends DefaultFareService {
         }
         if (
           isSpecialRoute ||
-          (ruleSet.getRoutes().contains(leg.getRoute().getId()) &&
-            ruleSet.getContains().contains(leg.getFrom().stop.getFirstZoneAsString()) &&
-            ruleSet.getContains().contains(leg.getTo().stop.getFirstZoneAsString()))
+          (ruleSet.getRoutes().contains(leg.route().getId()) &&
+            ruleSet.getContains().contains(leg.from().stop.getFirstZoneAsString()) &&
+            ruleSet.getContains().contains(leg.to().stop.getFirstZoneAsString()))
         ) {
           // check validity of this special rule and that it is the cheapest applicable one
           FareAttribute attribute = ruleSet.getFareAttribute();
@@ -132,12 +131,12 @@ public class HSLFareService extends DefaultFareService {
       if (ruleZones != null) { // the special case
         // evaluate boolean ride.zones AND rule.zones
         Set<String> zoneIntersection = new HashSet<String>(
-          leg.getFareZones().stream().map(z -> z.getId().getId()).toList()
+          leg.fareZones().stream().map(z -> z.getId().getId()).toList()
         );
         zoneIntersection.retainAll(ruleZones); // don't add temporarily visited zones
         zones.addAll(zoneIntersection);
       } else {
-        zones.addAll(leg.getFareZones().stream().map(z -> z.getId().getId()).toList());
+        zones.addAll(leg.fareZones().stream().map(z -> z.getId().getId()).toList());
       }
     }
 

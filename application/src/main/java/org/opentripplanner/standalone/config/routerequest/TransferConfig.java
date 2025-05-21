@@ -123,7 +123,7 @@ class TransferConfig {
           .summary("Used to set a maximum wait-time cost, base on min-safe-transfer-time.")
           .description(
             "This defines the maximum cost for the logarithmic function relative to the " +
-            "min-safe-transfer-time (t0) when wait time goes towards zero(0). f(0) = n * t0"
+            "min-safe-transfer-time (t0) when wait time goes towards zero (0). f(0) = n * t0"
           )
           .asDouble(dft.minSafeWaitTimeFactor())
       )

@@ -18,7 +18,6 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -109,8 +108,6 @@ public class Graph implements Serializable {
   // TODO refactoring transit model: remove  and instead always serialize directly from and to the
   //  static variable in CompactElevationProfile in SerializedGraphObject
   private double distanceBetweenElevationSamples;
-
-  private FareService fareService;
 
   /**
    * Hack. I've tried three different ways of generating unique labels. Previously we were just
@@ -358,14 +355,6 @@ public class Graph implements Serializable {
   public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
     this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
-  }
-
-  public FareService getFareService() {
-    return fareService;
-  }
-
-  public void setFareService(FareService fareService) {
-    this.fareService = fareService;
   }
 
   private void indexIfNotIndexed(SiteRepository siteRepository) {

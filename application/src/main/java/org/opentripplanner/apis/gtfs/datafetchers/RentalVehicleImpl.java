@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.graphql.GraphQLUtils.getLocale;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.OffsetDateTime;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -22,6 +23,11 @@ public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehic
   @Override
   public DataFetcher<RentalVehicleFuel> fuel() {
     return environment -> getSource(environment).getFuel();
+  }
+
+  @Override
+  public DataFetcher<OffsetDateTime> availableUntil() {
+    return environment -> getSource(environment).getAvailableUntil();
   }
 
   @Override

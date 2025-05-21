@@ -8,7 +8,7 @@ import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.apis.transmodel.mapping.RelativeDirectionMapper;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 
 public class PathGuidanceType {
 

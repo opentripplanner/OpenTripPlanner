@@ -8,12 +8,12 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegCallTime;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
-import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.leg.LegCallTime;
+import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.Route;
@@ -37,23 +37,23 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     this.second = second;
   }
 
-  public Agency getAgency() {
-    return first.getAgency();
+  public Agency agency() {
+    return first.agency();
   }
 
   @Override
-  public TransitMode getMode() {
-    return first.getMode();
+  public TransitMode mode() {
+    return first.mode();
   }
 
   @Override
-  public Route getRoute() {
-    return first.getRoute();
+  public Route route() {
+    return first.route();
   }
 
   @Override
-  public Trip getTrip() {
-    return first.getTrip();
+  public Trip trip() {
+    return first.trip();
   }
 
   @Override
@@ -67,61 +67,61 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   }
 
   @Override
-  public ZonedDateTime getStartTime() {
-    return first.getStartTime();
+  public ZonedDateTime startTime() {
+    return first.startTime();
   }
 
   @Override
-  public ZonedDateTime getEndTime() {
-    return second.getStartTime();
+  public ZonedDateTime endTime() {
+    return second.startTime();
   }
 
   @Override
-  public double getDistanceMeters() {
-    return first.getDistanceMeters() + second.getDistanceMeters();
+  public double distanceMeters() {
+    return first.distanceMeters() + second.distanceMeters();
   }
 
   @Override
-  public Place getFrom() {
-    return first.getFrom();
+  public Place from() {
+    return first.from();
   }
 
   @Override
-  public Place getTo() {
-    return second.getTo();
+  public Place to() {
+    return second.to();
   }
 
   @Override
-  public List<StopArrival> getIntermediateStops() {
-    return ListUtils.combine(first.getIntermediateStops(), second.getIntermediateStops());
+  public List<StopArrival> listIntermediateStops() {
+    return ListUtils.combine(first.listIntermediateStops(), second.listIntermediateStops());
   }
 
   @Override
   @Nullable
-  public LineString getLegGeometry() {
+  public LineString legGeometry() {
     return null;
   }
 
   @Override
-  public Set<TransitAlert> getTransitAlerts() {
+  public Set<TransitAlert> listTransitAlerts() {
     return Set.of();
   }
 
   @Override
-  public int getGeneralizedCost() {
-    if (first.getGeneralizedCost() == UNKNOWN) {
-      return second.getGeneralizedCost();
+  public int generalizedCost() {
+    if (first.generalizedCost() == UNKNOWN) {
+      return second.generalizedCost();
     }
-    if (second.getGeneralizedCost() == UNKNOWN) {
-      return first.getGeneralizedCost();
+    if (second.generalizedCost() == UNKNOWN) {
+      return first.generalizedCost();
     }
-    return first.getGeneralizedCost() + second.getGeneralizedCost();
+    return first.generalizedCost() + second.generalizedCost();
   }
 
   @Override
-  public Set<FareZone> getFareZones() {
-    Set<FareZone> fareZones = first.getFareZones();
-    fareZones.addAll(second.getFareZones());
+  public Set<FareZone> fareZones() {
+    Set<FareZone> fareZones = first.fareZones();
+    fareZones.addAll(second.fareZones());
 
     return fareZones;
   }
@@ -136,6 +136,19 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
    */
   public List<Leg> originalLegs() {
     return List.of(first, second);
+  }
+
+  @Nullable
+  @Override
+  public Emission emissionPerPerson() {
+    // There is no way to set the emission, hence it will always be null
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public Leg withEmissionPerPerson(Emission emissionPerPerson) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

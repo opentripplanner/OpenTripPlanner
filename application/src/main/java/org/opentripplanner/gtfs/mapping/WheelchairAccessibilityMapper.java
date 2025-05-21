@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.transit.model.basic.Accessibility;
 
-public class WheelchairAccessibilityMapper {
+class WheelchairAccessibilityMapper {
 
   static Accessibility map(int gtfsCode) {
     return switch (gtfsCode) {

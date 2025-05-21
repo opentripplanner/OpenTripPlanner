@@ -57,7 +57,7 @@ public final class CoordinateArrayListSequence implements CoordinateSequence, Cl
       case 0 -> coordinates.get(index).x;
       case 1 -> coordinates.get(index).y;
       default -> throw new IllegalArgumentException(
-        "ordinateIndex out of range[0,1]: " + ordinateIndex
+        "ordinateIndex out of range[0, 1]: " + ordinateIndex
       );
     };
   }

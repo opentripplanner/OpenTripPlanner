@@ -7,6 +7,8 @@ import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.CAR_HAILING;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_RENTAL;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR_TO_PARK;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.WALK;
@@ -24,6 +26,7 @@ import static org.opentripplanner.transit.model.basic.TransitMode.TRAM;
 import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
 
 import jakarta.ws.rs.BadRequestException;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -66,16 +69,41 @@ class QualifiedModeSetTest {
   }
 
   @Test
-  void singleWalkAndBicycleRental() {
+  void walkAndBikeRental() {
     QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "BICYCLE_RENT" });
     assertEquals(
       Set.of(new QualifiedMode("WALK"), new QualifiedMode("BICYCLE_RENT")),
       modeSet.qModes
     );
-    assertEquals(
-      RequestModes.of().withAllStreetModes(BIKE_RENTAL).build(),
-      modeSet.getRequestModes()
+    var modes = modeSet.getRequestModes();
+
+    assertEquals(BIKE_RENTAL, modes.accessMode);
+    assertEquals(BIKE_RENTAL, modes.directMode);
+    assertEquals(BIKE_RENTAL, modes.egressMode);
+    assertEquals(WALK, modes.transferMode);
+  }
+
+  @Test
+  void transitAndBikeRental() {
+    QualifiedModeSet modeSet = new QualifiedModeSet(
+      new String[] { "WALK", "RAIL", "BICYCLE_RENT" }
     );
+    assertEquals(
+      Set.of(
+        new QualifiedMode("WALK"),
+        new QualifiedMode("RAIL"),
+        new QualifiedMode("BICYCLE_RENT")
+      ),
+      modeSet.qModes
+    );
+    var modes = modeSet.getRequestModes();
+
+    assertEquals(BIKE_RENTAL, modes.accessMode);
+    assertEquals(BIKE_RENTAL, modes.directMode);
+    assertEquals(BIKE_RENTAL, modes.egressMode);
+    assertEquals(WALK, modes.transferMode);
+
+    assertEquals(List.of(RAIL), modeSet.getTransitModes());
   }
 
   @Test
@@ -231,11 +259,40 @@ class QualifiedModeSetTest {
   }
 
   @Test
+  void carRentAndTransit() {
+    QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "TRAM", "CAR_RENT" });
+    assertEquals(
+      Set.of(new QualifiedMode("WALK"), new QualifiedMode("TRAM"), new QualifiedMode("CAR_RENT")),
+      modeSet.qModes
+    );
+    var modes = modeSet.getRequestModes();
+    assertEquals(CAR_RENTAL, modes.accessMode);
+    assertEquals(CAR_RENTAL, modes.directMode);
+    assertEquals(CAR_RENTAL, modes.egressMode);
+    assertEquals(WALK, modes.transferMode);
+  }
+
+  @Test
+  void carParkAndTransit() {
+    QualifiedModeSet modeSet = new QualifiedModeSet(new String[] { "WALK", "TRAM", "CAR_PARK" });
+    assertEquals(
+      Set.of(new QualifiedMode("WALK"), new QualifiedMode("TRAM"), new QualifiedMode("CAR_PARK")),
+      modeSet.qModes
+    );
+    var modes = modeSet.getRequestModes();
+    assertEquals(CAR_TO_PARK, modes.accessMode);
+    assertEquals(CAR_TO_PARK, modes.directMode);
+    assertEquals(WALK, modes.egressMode);
+    assertEquals(WALK, modes.transferMode);
+  }
+
+  @Test
   void scooterTransfer() {
     var modeSet = new QualifiedModeSet("SCOOTER_RENT,BUS,RAIL,SUBWAY");
     assertEquals(Set.of(BUS, RAIL, SUBWAY), Set.copyOf(modeSet.getTransitModes()));
 
     var requestModes = modeSet.getRequestModes();
+    assertEquals(SCOOTER_RENTAL, requestModes.accessMode);
     assertEquals(SCOOTER_RENTAL, requestModes.directMode);
     assertEquals(WALK, requestModes.transferMode);
     assertEquals(SCOOTER_RENTAL, requestModes.egressMode);

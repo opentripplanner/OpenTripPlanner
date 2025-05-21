@@ -203,7 +203,7 @@ public class OsmModule implements GraphBuilderModule {
     var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);
     elevatorProcessor.buildElevatorEdges(graph);
 
-    TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
+    TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore, osmInfoGraphBuildRepository);
 
     params.edgeNamer().postprocess();
 

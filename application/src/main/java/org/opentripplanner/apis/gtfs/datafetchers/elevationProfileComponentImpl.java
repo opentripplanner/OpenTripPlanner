@@ -3,7 +3,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.model.plan.ElevationProfile;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
 
 public class elevationProfileComponentImpl
   implements GraphQLDataFetchers.GraphQLElevationProfileComponent {

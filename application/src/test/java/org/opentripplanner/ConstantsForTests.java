@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.ConfiguredCompositeDataSource;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TurnRestrictionModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -142,6 +143,7 @@ public class ConstantsForTests {
       var deduplicator = new Deduplicator();
       var graph = new Graph(deduplicator);
       var timetableRepository = new TimetableRepository(new SiteRepository(), deduplicator);
+      var fareFactory = new DefaultFareServiceFactory();
       // Add street data from OSM
       {
         var osmProvider = new DefaultOsmProvider(PORTLAND_CENTRAL_OSM, false);
@@ -160,13 +162,7 @@ public class ConstantsForTests {
       }
       // Add transit data from GTFS
       {
-        addGtfsToGraph(
-          graph,
-          timetableRepository,
-          PORTLAND_GTFS,
-          new DefaultFareServiceFactory(),
-          "prt"
-        );
+        addGtfsToGraph(graph, timetableRepository, PORTLAND_GTFS, fareFactory, "prt");
       }
       // Link transit stops to streets
       TestStreetLinkerModule.link(graph, timetableRepository);
@@ -194,7 +190,7 @@ public class ConstantsForTests {
 
       graph.index(timetableRepository.getSiteRepository());
 
-      return new TestOtpModel(graph, timetableRepository);
+      return new TestOtpModel(graph, timetableRepository, fareFactory);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -217,6 +213,11 @@ public class ConstantsForTests {
         vehicleParkingRepository
       ).build();
       osmModule.buildGraph();
+      TurnRestrictionModule turnRestrictionModule = new TurnRestrictionModule(
+        graph,
+        osmInfoRepository
+      );
+      turnRestrictionModule.buildGraph();
       return new TestOtpModel(graph, timetableRepository);
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -250,7 +251,7 @@ public class ConstantsForTests {
     var graph = new Graph(deduplicator);
     var timetableRepository = new TimetableRepository(siteRepository, deduplicator);
     addGtfsToGraph(graph, timetableRepository, gtfsFile, fareServiceFactory, null);
-    return new TestOtpModel(graph, timetableRepository);
+    return new TestOtpModel(graph, timetableRepository, fareServiceFactory);
   }
 
   public static TestOtpModel buildNewMinimalNetexGraph() {

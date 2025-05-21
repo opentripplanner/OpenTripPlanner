@@ -34,7 +34,11 @@ public class FaresIntegrationTest {
 
     var feedId = timetableRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, timetableRepository);
+    var serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      model.fareServiceFactory().makeFareService()
+    );
 
     var start = LocalDateTime.of(2009, Month.AUGUST, 7, 12, 0, 0)
       .atZone(ZoneIds.LOS_ANGELES)
@@ -55,7 +59,11 @@ public class FaresIntegrationTest {
     TimetableRepository timetableRepository = model.timetableRepository();
     var portlandId = timetableRepository.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, timetableRepository);
+    var serverContext = TestServerContext.createServerContext(
+      graph,
+      timetableRepository,
+      model.fareServiceFactory().makeFareService()
+    );
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId(

@@ -18,9 +18,9 @@ public class DoubleFunctionFactory {
 
   private static final String DOCUMENTATION =
     """
-    A double function `f(t)` is used to calculate a value based on a variable(t). The variable can
+    A double function `f(t)` is used to calculate a value based on a variable (t). The variable can
     be the duration/time or cost for a leg or section of a path/itinerary. The function
-    `f(t) = a + bt` has a constant(a) and a coefficient(b) that will be used in OTP to compute
+    `f(t) = a + bt` has a constant (a) and a coefficient (b) that will be used in OTP to compute
     `f(t)`.
 
     Format: `a + b t`. Example: `30m + 2.0 t`. The constant `a` accept both whole numbers and

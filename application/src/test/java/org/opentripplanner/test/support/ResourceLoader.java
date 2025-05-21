@@ -12,7 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
 
 /**
@@ -50,6 +52,11 @@ public class ResourceLoader {
    */
   public CompositeDataSource catalogDataSource(String relativePath, FileType fileType) {
     return FileDataSourceRepository.compositeSource(file(relativePath), fileType);
+  }
+
+  /** Return a file datasource with the given {@code filename}. */
+  public DataSource dataSource(String filename, FileType fileType) {
+    return new FileDataSource(file(filename), fileType);
   }
 
   /**

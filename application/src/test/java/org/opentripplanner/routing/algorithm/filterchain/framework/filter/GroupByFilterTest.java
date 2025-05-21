@@ -94,7 +94,7 @@ public class GroupByFilterTest implements PlanTestConstants {
    */
   private GroupByFilter<AGroupId> createFilter(int maxNumberOfItinerariesPrGroup) {
     return new GroupByFilter<>(
-      i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
+      i -> new AGroupId(i.legs().getFirst().trip().getId().getId()),
       List.of(
         new SortingFilter(SortOrderComparator.defaultComparatorDepartAfter()),
         new RemoveFilter(new MaxLimit(TEST_FILTER_TAG, maxNumberOfItinerariesPrGroup))

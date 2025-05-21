@@ -2,11 +2,22 @@ schema {
   query: QueryType
 }
 
+"This directive allows results to be deferred during execution"
+directive @defer(
+    "Deferred behaviour is controlled by this argument"
+    if: Boolean! = true,
+    "A unique label that represents the fragment being deferred"
+    label: String
+  ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
 "Marks the field, argument, input field or enum value as deprecated"
 directive @deprecated(
     "The reason for the deprecation"
-    reason: String = "No longer supported"
+    reason: String! = "No longer supported"
   ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"This directive disables error propagation when a non nullable field returns null for the given operation."
+directive @experimental_disableErrorPropagation on QUERY | MUTATION | SUBSCRIPTION
 
 "Directs the executor to include this field or fragment only when the `if` argument is true"
 directive @include(
@@ -49,7 +60,7 @@ type AType {
 "BType.description"
 type BType {
   "BType.a.description"
-  a: String @deprecated(reason : "REPLACE")
+  a: String @deprecated(reason : "BType.a.deprecated")
 }
 
 """
@@ -60,11 +71,11 @@ CType.description.append
 type CType {
   """
   APPENT TO
-
+  
   CType.a.description.append
   """
   a: Duration
-  b: String @deprecated(reason : "APPEND TO")
+  b: String @deprecated(reason : "APPEND TO\n\nCType.b.deprecated.append")
 }
 
 type QueryType {
@@ -80,7 +91,7 @@ enum AEnum {
   "AEnum.E1.description"
   E1
   E2 @deprecated(reason : "AEnum.E2.deprecated")
-  E3 @deprecated(reason : "REPLACE")
+  E3 @deprecated(reason : "AEnum.E3.deprecated")
 }
 
 "Duration.description"
@@ -91,5 +102,5 @@ input InputType {
   "InputType.a.description"
   a: String
   b: String @deprecated(reason : "InputType.b.deprecated")
-  c: String @deprecated(reason : "REPLACE")
+  c: String @deprecated(reason : "InputType.c.deprecated")
 }

@@ -10,6 +10,8 @@ import org.opentripplanner.transit.model.basic.Money;
 
 class FareProductMapperTest {
 
+  public static final IdFactory ID_FACTORY = new IdFactory("1");
+
   @Test
   void map() {
     var gtfs = new FareProduct();
@@ -20,7 +22,7 @@ class FareProductMapperTest {
     gtfs.setDurationAmount(1);
     gtfs.setDurationUnit(5);
 
-    var mapper = new FareProductMapper();
+    var mapper = new FareProductMapper(ID_FACTORY);
     var internal = mapper.map(gtfs);
 
     assertEquals(internal.validity(), Duration.ofDays(31));
@@ -36,7 +38,7 @@ class FareProductMapperTest {
     gtfs.setName("day pass");
     gtfs.setCurrency("JPY");
 
-    var mapper = new FareProductMapper();
+    var mapper = new FareProductMapper(ID_FACTORY);
     var internal = mapper.map(gtfs);
 
     assertEquals(internal.price().toString(), "¥100");

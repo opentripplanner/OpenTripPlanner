@@ -19,7 +19,7 @@ class SiriFmUpdaterTest {
       Duration.ofSeconds(30),
       HttpHeaders.empty()
     );
-    var updater = new SiriFmDatasource(parameters);
+    var updater = new SiriFmDataSource(parameters);
     updater.update();
     var updates = updater.getUpdates();
 

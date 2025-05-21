@@ -26,4 +26,9 @@ class DefaultOtpError implements OtpError {
   public Object[] messageArguments() {
     return messageArguments;
   }
+
+  @Override
+  public String toString() {
+    return errorCode + "(" + message() + ")";
+  }
 }

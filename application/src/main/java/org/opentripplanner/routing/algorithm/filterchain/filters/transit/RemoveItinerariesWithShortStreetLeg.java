@@ -47,7 +47,7 @@ public class RemoveItinerariesWithShortStreetLeg implements RemoveItineraryFlagg
       var distance = itinerary
         .streetLegs()
         .filter(l -> l.getMode().equals(traverseMode))
-        .mapToDouble(Leg::getDistanceMeters)
+        .mapToDouble(Leg::distanceMeters)
         .sum();
 
       return distance <= minDistance;

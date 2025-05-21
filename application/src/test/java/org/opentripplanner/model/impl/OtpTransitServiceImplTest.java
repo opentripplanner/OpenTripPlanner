@@ -117,7 +117,7 @@ public class OtpTransitServiceImplTest {
 
     assertEquals(88, stopTimes.size());
     assertEquals(
-      "StopTime(seq=1 stop=F:A trip=agency:1.1 times=00:00:00-00:00:00)",
+      "StopTime(seq=1 stop=F:A trip=F:1.1 times=00:00:00-00:00:00)",
       first(stopTimes).toString()
     );
   }
@@ -127,7 +127,7 @@ public class OtpTransitServiceImplTest {
     Collection<Trip> trips = subject.getAllTrips();
 
     assertEquals(34, trips.size());
-    assertEquals("Trip{agency:1.1 1}", first(trips).toString());
+    assertEquals("Trip{F:1.1 1}", first(trips).toString());
   }
 
   @Test

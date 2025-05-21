@@ -1,6 +1,7 @@
 package org.opentripplanner.utils.lang;
 
 import java.util.Objects;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 
 /**
@@ -35,6 +36,10 @@ public class Box<T> {
 
   public void set(@Nullable T value) {
     this.value = value;
+  }
+
+  public void modify(@Nullable Function<T, T> body) {
+    this.value = body.apply(value);
   }
 
   public boolean isEmpty() {

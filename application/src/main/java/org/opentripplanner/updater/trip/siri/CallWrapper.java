@@ -46,6 +46,7 @@ public interface CallWrapper {
   String getStopPointRef();
   Boolean isCancellation();
   Boolean isPredictionInaccurate();
+  boolean isExtraCall();
   OccupancyEnumeration getOccupancy();
   List<NaturalLanguageStringStructure> getDestinationDisplaies();
   ZonedDateTime getAimedArrivalTime();
@@ -80,6 +81,11 @@ public interface CallWrapper {
     @Override
     public Boolean isPredictionInaccurate() {
       return call.isPredictionInaccurate();
+    }
+
+    @Override
+    public boolean isExtraCall() {
+      return Boolean.TRUE.equals(call.isExtraCall());
     }
 
     @Override
@@ -177,6 +183,11 @@ public interface CallWrapper {
     @Override
     public Boolean isPredictionInaccurate() {
       return call.isPredictionInaccurate();
+    }
+
+    @Override
+    public boolean isExtraCall() {
+      return Boolean.TRUE.equals(call.isExtraCall());
     }
 
     @Override

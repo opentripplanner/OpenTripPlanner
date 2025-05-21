@@ -80,6 +80,11 @@ public class TestCall implements CallWrapper {
   }
 
   @Override
+  public boolean isExtraCall() {
+    return false;
+  }
+
+  @Override
   public OccupancyEnumeration getOccupancy() {
     return occupancy;
   }

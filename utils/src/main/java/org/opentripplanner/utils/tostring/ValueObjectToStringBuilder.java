@@ -159,14 +159,14 @@ public class ValueObjectToStringBuilder {
   }
 
   /**
-   * Add  a cost in the format $N, as in "transit seconds", not centi-seconds as used by Raptor.
+   * Add a cost in the format $N, as in "transit seconds", not centi-seconds as used by Raptor.
    */
   public ValueObjectToStringBuilder addCost(Integer costSeconds) {
     return addIt(costSeconds, OtpNumberFormat::formatCost);
   }
 
   /**
-   * Add  a cost in the format $N.NN or $N (if decimals are zero). The cost is interoperated as
+   * Add a cost in the format $N.NN or $N (if decimals are zero). The cost is interoperated as
    * a generalized-cost like the cost used by Raptor in "centi-seconds"
    */
   public ValueObjectToStringBuilder addCostCenti(Integer costCentiSeconds) {
@@ -185,7 +185,7 @@ public class ValueObjectToStringBuilder {
     return sb.toString();
   }
 
-  /* private methods  */
+  /* private methods */
 
   private ValueObjectToStringBuilder addIt(String value) {
     return addIt(value, it -> it);

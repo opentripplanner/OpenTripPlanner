@@ -33,6 +33,11 @@ public interface DataImportIssueStore {
    */
   void add(String type, String message, Object... arguments);
 
+  /** Add all issues to the issue report. */
+  default void addAll(Iterable<OtpError> issues) {
+    issues.forEach(it -> add(it));
+  }
+
   /**
    * Starts processing a {@code source}. This will add the source to all created issues until the
    * processing is stopped or a new source is processed.

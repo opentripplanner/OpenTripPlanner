@@ -11,8 +11,8 @@ import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping._support.model.ApiLeg;
 
 @Deprecated
@@ -42,8 +42,8 @@ class LegMapper {
     final int lastIdx = size - 1;
 
     for (int i = 0; i < size; ++i) {
-      ZonedDateTime arrivalTimeFromPlace = (i == 0) ? null : domain.get(i - 1).getEndTime();
-      ZonedDateTime departureTimeToPlace = (i == lastIdx) ? null : domain.get(i + 1).getStartTime();
+      ZonedDateTime arrivalTimeFromPlace = (i == 0) ? null : domain.get(i - 1).endTime();
+      ZonedDateTime departureTimeToPlace = (i == lastIdx) ? null : domain.get(i + 1).startTime();
 
       apiLegs.add(mapLeg(domain.get(i), arrivalTimeFromPlace, departureTimeToPlace));
     }
@@ -59,52 +59,52 @@ class LegMapper {
       return null;
     }
     ApiLeg api = new ApiLeg();
-    api.startTime = GregorianCalendar.from(domain.getStartTime());
-    api.endTime = GregorianCalendar.from(domain.getEndTime());
+    api.startTime = GregorianCalendar.from(domain.startTime());
+    api.endTime = GregorianCalendar.from(domain.endTime());
 
     // Set the arrival and departure times, even if this is redundant information
     api.from = placeMapper.mapPlace(
-      domain.getFrom(),
+      domain.from(),
       arrivalTimeFromPlace,
-      domain.getStartTime(),
-      domain.getBoardStopPosInPattern(),
-      domain.getBoardingGtfsStopSequence()
+      domain.startTime(),
+      domain.boardStopPosInPattern(),
+      domain.boardingGtfsStopSequence()
     );
     api.to = placeMapper.mapPlace(
-      domain.getTo(),
-      domain.getEndTime(),
+      domain.to(),
+      domain.endTime(),
       departureTimeToPlace,
-      domain.getAlightStopPosInPattern(),
-      domain.getAlightGtfsStopSequence()
+      domain.alightStopPosInPattern(),
+      domain.alightGtfsStopSequence()
     );
 
-    api.departureDelay = domain.getDepartureDelay();
-    api.arrivalDelay = domain.getArrivalDelay();
+    api.departureDelay = domain.departureDelay();
+    api.arrivalDelay = domain.arrivalDelay();
     api.realTime = domain.isRealTimeUpdated();
-    api.isNonExactFrequency = domain.getNonExactFrequency();
-    api.headway = domain.getHeadway();
-    api.distance = round3Decimals(domain.getDistanceMeters());
-    api.generalizedCost = domain.getGeneralizedCost();
-    api.agencyTimeZoneOffset = domain.getAgencyTimeZoneOffset();
+    api.isNonExactFrequency = domain.isNonExactFrequency();
+    api.headway = domain.headway();
+    api.distance = round3Decimals(domain.distanceMeters());
+    api.generalizedCost = domain.generalizedCost();
+    api.agencyTimeZoneOffset = domain.agencyTimeZoneOffset();
 
     if (domain instanceof TransitLeg trLeg) {
       api.transitLeg = true;
-      var agency = domain.getAgency();
+      var agency = domain.agency();
       api.agencyId = FeedScopedIdMapper.mapToApi(agency.getId());
       api.agencyName = agency.getName();
       api.agencyUrl = agency.getUrl();
-      api.mode = ModeMapper.mapToApi(trLeg.getMode());
+      api.mode = ModeMapper.mapToApi(trLeg.mode());
 
-      var route = domain.getRoute();
+      var route = domain.route();
       api.route = i18NStringMapper.mapToApi(route.getLongName());
       api.routeColor = route.getColor();
-      api.routeType = domain.getRouteType();
+      api.routeType = domain.routeType();
       api.routeId = FeedScopedIdMapper.mapToApi(route.getId());
       api.routeShortName = route.getShortName();
       api.routeLongName = i18NStringMapper.mapToApi(route.getLongName());
       api.routeTextColor = route.getTextColor();
 
-      var trip = domain.getTrip();
+      var trip = domain.trip();
       api.tripId = FeedScopedIdMapper.mapToApi(trip.getId());
       api.tripShortName = trip.getShortName();
       api.tripBlockId = trip.getGtfsBlockId();
@@ -117,18 +117,18 @@ class LegMapper {
     }
 
     api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();
-    api.headsign = i18NStringMapper.mapToApi(domain.getHeadsign());
-    api.serviceDate = LocalDateMapper.mapToApi(domain.getServiceDate());
-    api.routeBrandingUrl = domain.getRouteBrandingUrl();
+    api.headsign = i18NStringMapper.mapToApi(domain.headsign());
+    api.serviceDate = LocalDateMapper.mapToApi(domain.serviceDate());
+    api.routeBrandingUrl = domain.routeBrandingUrl();
     if (addIntermediateStops) {
-      api.intermediateStops = placeMapper.mapStopArrivals(domain.getIntermediateStops());
+      api.intermediateStops = placeMapper.mapStopArrivals(domain.listIntermediateStops());
     }
-    api.legGeometry = EncodedPolyline.encode(domain.getLegGeometry());
-    api.legElevation = mapElevation(domain.getElevationProfile());
-    api.steps = walkStepMapper.mapWalkSteps(domain.getWalkSteps());
+    api.legGeometry = EncodedPolyline.encode(domain.legGeometry());
+    api.legElevation = mapElevation(domain.elevationProfile());
+    api.steps = walkStepMapper.mapWalkSteps(domain.listWalkSteps());
 
-    api.rentedBike = domain.getRentedVehicle();
-    api.walkingBike = domain.getWalkingBike();
+    api.rentedBike = domain.rentedVehicle();
+    api.walkingBike = domain.walkingBike();
 
     return api;
   }

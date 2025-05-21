@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 public class FlexibleTransitLegBuilder {
@@ -18,16 +19,18 @@ public class FlexibleTransitLegBuilder {
   private int generalizedCost;
   private Set<TransitAlert> transitAlerts = new HashSet<>();
   private List<FareProductUse> fareProducts = new ArrayList<>();
+  private Emission emissionPerPerson;
 
   FlexibleTransitLegBuilder() {}
 
   FlexibleTransitLegBuilder(FlexibleTransitLeg original) {
     flexTripEdge = original.flexTripEdge();
-    startTime = original.getStartTime();
-    endTime = original.getEndTime();
-    generalizedCost = original.getGeneralizedCost();
-    transitAlerts = original.getTransitAlerts();
+    startTime = original.startTime();
+    endTime = original.endTime();
+    generalizedCost = original.generalizedCost();
+    transitAlerts = original.listTransitAlerts();
     fareProducts = original.fareProducts();
+    emissionPerPerson = original.emissionPerPerson();
   }
 
   public FlexibleTransitLegBuilder withFlexTripEdge(FlexTripEdge flexTripEdge) {
@@ -82,6 +85,15 @@ public class FlexibleTransitLegBuilder {
 
   public List<FareProductUse> fareProducts() {
     return fareProducts;
+  }
+
+  public FlexibleTransitLegBuilder withEmissionPerPerson(Emission emissionPerPerson) {
+    this.emissionPerPerson = emissionPerPerson;
+    return this;
+  }
+
+  public Emission emissionPerPerson() {
+    return emissionPerPerson;
   }
 
   public FlexibleTransitLeg build() {
