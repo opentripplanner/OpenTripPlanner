@@ -13,6 +13,15 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * scheduled data. This is a "cache" in the sense that it will keep returning the same TripPattern
  * when presented with the same StopPattern, so if realtime messages add many trips passing through
  * the same sequence of stops, they will all end up on this same TripPattern.
+ *
+ * <h3>Thread-safety</h3>
+ *
+ * The thread safety is guaranteed by only a single thread being allowed to access this cache through
+ * {@link org.opentripplanner.updater.GraphWriterRunnable}. This, however, also means that a thread
+ * could modify the underlying snapshot buffer and then immediately afterwards access this cache
+ * which has access to the very same snapshot.
+ * <p>
+ * <a href="https://github.com/opentripplanner/OpenTripPlanner/pull/6629#pullrequestreview-2854296598">Further reading</a>
  * <p>
  * TODO RT_TG: There is no clear strategy for what should be in the cache and the transit model and
  *             the flow between them.
@@ -50,6 +59,9 @@ public class TripPatternCache {
 
   /**
    * Get cached trip pattern or create one if it doesn't exist yet.
+   * <p>
+   * Note: The synchronized key word leads to a false sense of security. Thread safety is achieved
+   * by a single thread being allowed to access - see class documentation.
    *
    * @param stopPattern stop pattern to retrieve/create trip pattern
    * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
