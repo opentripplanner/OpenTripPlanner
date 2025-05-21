@@ -2,16 +2,19 @@ package org.opentripplanner.ext.emission.parameters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.asserts.AssertEqualsAndHashCode;
 import org.opentripplanner._support.net.URIUtils;
+import org.opentripplanner.framework.model.Gram;
 
 class EmissionParametersTest {
 
-  private final EmissionViechleParameters car = new EmissionViechleParameters(90, 7.4);
+  private static final URI URI = URIUtils.uri("http://host/emsissions");
+  private final EmissionVehicleParameters car = new EmissionVehicleParameters(Gram.of(90), 7.4);
   private final List<EmissionFeedParameters> feeds = List.of(
-    new EmissionFeedParameters("my_feed_id", URIUtils.uri("http://host/emsissions"))
+    new EmissionFeedParameters("my_feed_id", URI)
   );
   private final EmissionParameters subject = new EmissionParameters(car, feeds);
 
@@ -26,10 +29,15 @@ class EmissionParametersTest {
   }
 
   @Test
+  void emissionFiles() {
+    assertEquals(List.of(URI), subject.emissionFiles());
+  }
+
+  @Test
   void testToString() {
     assertEquals(
       "EmissionParameters{" +
-      "car: EmissionViechleParameters{carAvgCo2PerKm: 90, carAvgOccupancy: 7.4}, " +
+      "car: EmissionVehicleParameters{carAvgCo2PerKm: 90g, carAvgOccupancy: 7.4}, " +
       "fedds: [EmissionFeedParameters{feedId: 'my_feed_id', source: http://host/emsissions}]" +
       "}",
       subject.toString()
@@ -42,7 +50,7 @@ class EmissionParametersTest {
       .sameAs(new EmissionParameters(car, feeds))
       .differentFrom(
         new EmissionParameters(car, List.of()),
-        new EmissionParameters(EmissionViechleParameters.CAR_DEFAULTS, List.of())
+        new EmissionParameters(EmissionVehicleParameters.CAR_DEFAULTS, List.of())
       );
   }
 }

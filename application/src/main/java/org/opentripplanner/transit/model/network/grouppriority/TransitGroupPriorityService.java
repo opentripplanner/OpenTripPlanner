@@ -151,7 +151,7 @@ public class TransitGroupPriorityService {
   }
 
   /**
-   * This is the group-id assigned to all transit trips/patterns witch does not match a
+   * This is the group-id assigned to all transit trips/patterns which does not match a
    * specific group.
    */
   public int baseGroupId() {

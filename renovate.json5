@@ -20,7 +20,8 @@
         // need code changes, don't want to upgrade
         "io.github.origin-energy:java-snapshot-testing-junit5",
         "commons-cli:commons-cli",
-        "org.processing:core"
+        "org.processing:core",
+        "edu.ucar:netcdf4"
       ],
       "enabled": false
     },
@@ -192,7 +193,7 @@
       ],
       "matchUpdateTypes": ["major", "minor"],
       "schedule": "on the 14th day of the month",
-      "reviewers": ["habrahamsson-skanetrafiken"]
+      "reviewers": ["habrahamsson-skanetrafiken", "svedbod"]
     }
   ],
   "timezone": "Europe/Berlin"

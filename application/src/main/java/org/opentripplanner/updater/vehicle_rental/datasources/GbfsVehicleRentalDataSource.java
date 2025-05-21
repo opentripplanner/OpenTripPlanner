@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * VehicleRentalServiceDirectoryFetcher endpoint (which may be outside our control) will not be
  * used.
  */
-class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
+class GbfsVehicleRentalDataSource implements VehicleRentalDataSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
 
