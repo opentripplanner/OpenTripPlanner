@@ -17,7 +17,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.basic.Money;
@@ -58,6 +58,7 @@ class ScheduledTransitLegTest {
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
   );
 
+  private static final Emission EMISSION = Emission.ofCo2Gram(23.0);
   private static final List<FareProduct> FARE_PRODUCTS = List.of(
     FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
   );
@@ -81,8 +82,16 @@ class ScheduledTransitLegTest {
     .withGeneralizedCost(GENERALIZED_COST)
     .withDistanceMeters(DISTANCE)
     .withAlerts(ALERTS)
+    .withEmissionPerPerson(EMISSION)
     .withFareProducts(FARE_PRODUCTS)
     .build();
+
+  static {
+    REAL_TIME_TRIP_TIMES.updateDepartureTime(
+      BOARD_STOP_INDEX_IN_PATTERN,
+      TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
+    );
+  }
 
   @Test
   void testMinimalSetOfFieldsSet() {
@@ -129,6 +138,7 @@ class ScheduledTransitLegTest {
     assertTrue(subject.isRealTimeUpdated());
     assertEquals(DELAY, subject.start().estimated().delay());
     assertNotNull(subject.end().estimated());
+    assertEquals(EMISSION, subject.emissionPerPerson());
     assertEquals(FARE_PRODUCTS, subject.fareProducts());
   }
 
@@ -147,6 +157,7 @@ class ScheduledTransitLegTest {
     assertEquals(ZONE_ID, copy.zoneId());
     assertEquals(GENERALIZED_COST, copy.generalizedCost());
     assertEquals(ALERTS, copy.listTransitAlerts());
+    assertEquals(EMISSION, copy.emissionPerPerson());
     assertEquals(FARE_PRODUCTS, copy.fareProducts());
 
     // We change something else, not distance and make sure distance is unchanged
@@ -171,23 +182,10 @@ class ScheduledTransitLegTest {
       "boardRule: SCHEDULED, " +
       "alightRule: SCHEDULED, " +
       "transitAlerts: 1 items, " +
+      "emissionPerPerson: Emission{CO₂: 23g}, " +
       "fareProducts: 1 items" +
       "}",
       subject.toString()
     );
-  }
-
-  @Test
-  void copyFareProducts() {
-    var fareProductUse = new FareProductUse(
-      "id2324",
-      FareProduct.of(id("fp"), "fare product", Money.euros(10.00f)).build()
-    );
-
-    var leg = subject.copyOf().withFareProducts(List.of(fareProductUse)).build();
-    assertEquals(List.of(fareProductUse), leg.fareProducts());
-
-    var copy = leg.copyOf().build();
-    assertEquals(List.of(fareProductUse), copy.fareProducts());
   }
 }

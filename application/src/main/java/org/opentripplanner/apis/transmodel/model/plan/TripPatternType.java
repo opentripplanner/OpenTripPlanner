@@ -17,6 +17,7 @@ public class TripPatternType {
     GraphQLOutputType systemNoticeType,
     GraphQLObjectType legType,
     GraphQLObjectType timePenaltyType,
+    GraphQLObjectType emissionType,
     GraphQLScalarType dateTimeScalar
   ) {
     return GraphQLObjectType.newObject()
@@ -133,7 +134,7 @@ public class TripPatternType {
           .name("streetDistance")
           .description(
             "How far the user has to walk, bike and/or drive in meters. It includes " +
-            "all street(none transit) modes."
+            "all street (none transit) modes."
           )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> itinerary(env).totalStreetDistanceMeters())
@@ -223,6 +224,20 @@ public class TripPatternType {
           )
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(timePenaltyType))))
           .dataFetcher(env -> TripPlanTimePenaltyDto.of(itinerary(env)))
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition.newFieldDefinition()
+          .name("emission")
+          .description(
+            """
+            The total emission per person. The total emission is only available if all transit
+            and car leg emissions can be calculated. If only a partial result is obtained, this
+            will be null.
+            """
+          )
+          .type(emissionType)
+          .dataFetcher(env -> itinerary(env).emissionPerPerson())
           .build()
       )
       .build();

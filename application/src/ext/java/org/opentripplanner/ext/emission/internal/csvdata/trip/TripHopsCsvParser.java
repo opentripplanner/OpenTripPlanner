@@ -9,7 +9,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.utils.lang.DoubleRange;
 import org.opentripplanner.utils.lang.IntRange;
 
-class TripLegsCsvParser extends AbstractCsvParser<TripLegsRow> {
+class TripHopsCsvParser extends AbstractCsvParser<TripHopsRow> {
 
   public static final String TRIP_ID = "trip_id";
   public static final String START_STOP_ID = "from_stop_id";
@@ -21,10 +21,14 @@ class TripLegsCsvParser extends AbstractCsvParser<TripLegsRow> {
     START_STOP_SEQ_NR,
     CO2
   );
-  private static final IntRange STOP_SEQ_NR_RANGE = IntRange.ofInclusive(0, 1000);
-  private static final DoubleRange CO2_RANGE = DoubleRange.of(0.0, 1_000_000_000.0);
+  private static final IntRange STOP_SEQ_NR_RANGE = IntRange.ofInclusive(0, 10_000);
 
-  public TripLegsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
+  /**
+   * Electrical vehicles can charge while going downhill, hence the negative range.
+   */
+  private static final DoubleRange CO2_RANGE = DoubleRange.of(-1_000_000.0, 1_000_000_000.0);
+
+  public TripHopsCsvParser(DataImportIssueStore issueStore, CsvReader reader) {
     super(issueStore, reader);
   }
 
@@ -34,8 +38,8 @@ class TripLegsCsvParser extends AbstractCsvParser<TripLegsRow> {
   }
 
   @Override
-  protected TripLegsRow createNextRow() throws EmissionHandledParseException {
-    return new TripLegsRow(
+  protected TripHopsRow createNextRow() throws EmissionHandledParseException {
+    return new TripHopsRow(
       getString(TRIP_ID),
       getString(START_STOP_ID),
       getInt(START_STOP_SEQ_NR, STOP_SEQ_NR_RANGE),

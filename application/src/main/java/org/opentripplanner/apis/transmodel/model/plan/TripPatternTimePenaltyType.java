@@ -26,7 +26,7 @@ public class TripPatternTimePenaltyType {
             """
             The time-penalty is applied to either the access-legs and/or egress-legs. Both access
             and egress may contain more than one leg; Hence, the penalty is not a field on leg. The
-            `appliedTo` describe witch part of the itinerary that this instance applies to.
+            `appliedTo` describe which part of the itinerary that this instance applies to.
             """
           )
           .type(Scalars.GraphQLString)
@@ -39,7 +39,7 @@ public class TripPatternTimePenaltyType {
           .description(
             """
             The time-penalty added to the actual time/duration when comparing the itinerary with
-            other itineraries. This is used to decide witch is the best option, but is not visible
+            other itineraries. This is used to decide which is the best option, but is not visible
             - the actual departure and arrival-times are not modified.
             """
           )

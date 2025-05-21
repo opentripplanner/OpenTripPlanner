@@ -60,7 +60,7 @@ public abstract class AbstractCsvParser<T> {
       } catch (IOException e) {
         throw new RuntimeException(e);
       } catch (EmissionHandledParseException ignore) {
-        // Issue is alreaddy handled. Continue with next row until file is compleate
+        // Issue is already handled. Continue with next row until file is complete
       }
     }
   }

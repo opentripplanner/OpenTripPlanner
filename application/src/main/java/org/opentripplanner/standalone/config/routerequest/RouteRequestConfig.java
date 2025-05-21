@@ -27,7 +27,6 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
-import org.opentripplanner.routing.api.request.preference.MaxStopCountLimit;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -105,8 +104,8 @@ public class RouteRequestConfig {
         .summary("The duration of the search-window.")
         .description(
           """
-          This is the time/duration in seconds from the earliest-departure-time(EDT) to the
-          latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+          This is the time/duration in seconds from the earliest-departure-time (EDT) to the
+          latest-departure-time (LDT). In case of a reverse search it will be the time from earliest to
           latest arrival time (LAT - EAT).
 
           All optimal travels that depart within the search window is guaranteed to be found.
@@ -476,7 +475,7 @@ public class RouteRequestConfig {
                 Use this to add a time and cost penalty to an access/egress legs for a given street
                 mode. This will favour other street-modes and transit. This has a performance penalty,
                 since the search-window is increased with the same amount as the maximum penalty for
-                the access legs used. In other cases where the access(CAR) is faster than transit the
+                the access legs used. In other cases where the access (CAR) is faster than transit the
                 performance will be better.
 
                 The default values are
@@ -513,7 +512,7 @@ public class RouteRequestConfig {
                 """
                 This is a performance limit and should therefore be set high. Results close to the limit are not
                 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-                duration can be set per mode(`maxDurationForMode`), because some street modes searches
+                duration can be set per mode (`maxDurationForMode`), because some street modes searches
                 are much more resource intensive than others. A default value is applied if the mode specific value
                 does not exist.
                 """
@@ -566,7 +565,7 @@ public class RouteRequestConfig {
             """
             This is a performance limit and should therefore be set high. Results close to the limit are not
             guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-            duration can be set per mode(`maxDirectStreetDurationForMode`), because some street modes searches
+            duration can be set per mode (`maxDirectStreetDurationForMode`), because some street modes searches
             are much more resource intensive than others. A default value is applied if the mode specific value
             does not exist."
             """
@@ -601,7 +600,7 @@ public class RouteRequestConfig {
           )
           .description(
             """
-            The street search(AStar) aborts after this duration and any paths found are returned to the client.
+            The street search (AStar) aborts after this duration and any paths found are returned to the client.
             The street part of the routing may take a long time if searching very long distances. You can set
             the street routing timeout to avoid tying up server resources on pointless searches and ensure that
             your users receive a timely response. You can also limit the max duration. There are is also a
@@ -743,7 +742,7 @@ public class RouteRequestConfig {
             days/periods like holidays into account. In other words, pick the two points within your area that
             has the worst connection and then try to travel on the worst possible day, and find the maximum
             journey duration. Using a value that is too high has the effect of including more patterns in the
-            search, hence, making it a bit slower. Recommended values would be from 12 hours(small town/city),
+            search, hence, making it a bit slower. Recommended values would be from 12 hours (small town/city),
             1 day (region) to 2 days (country like Norway)."
             """
           )

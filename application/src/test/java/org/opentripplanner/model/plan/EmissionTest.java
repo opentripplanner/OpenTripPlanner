@@ -25,19 +25,19 @@ class EmissionTest {
 
   @Test
   void plus() {
-    assertEquals(Emission.co2_g(VALUE + OTHER_VALUE), subject.plus(other));
+    assertEquals(Emission.ofCo2Gram(VALUE + OTHER_VALUE), subject.plus(other));
   }
 
   @Test
   void multiply() {
-    double scalar = 1.5;
-    assertEquals(Emission.co2_g(VALUE * scalar), subject.multiply(scalar));
+    double multiplier = 1.5;
+    assertEquals(Emission.ofCo2Gram(VALUE * multiplier), subject.multiply(multiplier));
   }
 
   @Test
   void dividedBy() {
-    double scalar = 1.5;
-    assertEquals(Emission.co2_g(VALUE / scalar), subject.dividedBy(scalar));
+    double divisor = 1.5;
+    assertEquals(Emission.ofCo2Gram(VALUE / divisor), subject.dividedBy(divisor));
   }
 
   @Test
@@ -60,6 +60,6 @@ class EmissionTest {
 
   @Test
   void testToString() {
-    assertEquals("Emission{CO₂: 12.0g}", subject.toString());
+    assertEquals("Emission{CO₂: 12g}", subject.toString());
   }
 }

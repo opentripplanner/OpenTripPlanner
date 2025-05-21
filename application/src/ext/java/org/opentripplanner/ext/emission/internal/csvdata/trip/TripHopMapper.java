@@ -8,13 +8,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class TripLegMapper {
+public class TripHopMapper {
 
   private String currentFeedId;
   private Map<FeedScopedId, List<StopLocation>> stopsByTripId;
   private DataImportIssueStore issueStore;
 
-  public TripLegMapper(
+  public TripHopMapper(
     Map<FeedScopedId, List<StopLocation>> stopsByTripId,
     DataImportIssueStore issueStore
   ) {
@@ -26,29 +26,30 @@ public class TripLegMapper {
     this.currentFeedId = currentFeedId;
   }
 
-  public Map<FeedScopedId, TripPatternEmission> map(List<TripLegsRow> rows) {
+  public Map<FeedScopedId, TripPatternEmission> map(List<TripHopsRow> rows) {
     if (currentFeedId == null) {
       throw new IllegalStateException("currentFeedId is not set");
     }
 
     Map<FeedScopedId, EmissionAggregator> builders = new HashMap<>();
 
-    for (TripLegsRow row : rows) {
+    for (TripHopsRow row : rows) {
       var tripId = new FeedScopedId(currentFeedId, row.tripId());
       var b = builders.computeIfAbsent(tripId, id ->
         new EmissionAggregator(tripId, stopsByTripId.get(tripId))
       );
-      b.mergeEmissionForleg(row);
+      b.mergeEmissionsForHop(row);
     }
 
     var map = new HashMap<FeedScopedId, TripPatternEmission>();
 
     for (Map.Entry<FeedScopedId, EmissionAggregator> it : builders.entrySet()) {
-      var aggregator = it.getValue();
-      if (aggregator.validate()) {
-        map.put(it.getKey(), aggregator.build());
+      var builder = it.getValue();
+      var emission = builder.build();
+      if (emission.isPresent()) {
+        map.put(it.getKey(), emission.get());
       } else {
-        aggregator.listIssues().forEach(issueStore::add);
+        issueStore.addAll(builder.listIssues());
       }
     }
     return map;

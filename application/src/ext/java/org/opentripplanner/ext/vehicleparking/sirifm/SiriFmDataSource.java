@@ -21,15 +21,15 @@ import uk.org.siri.siri21.FacilityConditionStructure;
  * Parses SIRI 2.1 XML data into parking availability updates. The data needs to conform to the
  * Italian profile of SIRI-FM.
  */
-public class SiriFmDatasource implements DataSource<AvailabiltyUpdate> {
+public class SiriFmDataSource implements DataSource<AvailabiltyUpdate> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SiriFmDatasource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriFmDataSource.class);
   private final SiriFmUpdaterParameters params;
   private final OtpHttpClient httpClient;
   private final Map<String, String> headers;
   private List<AvailabiltyUpdate> updates = List.of();
 
-  public SiriFmDatasource(SiriFmUpdaterParameters parameters) {
+  public SiriFmDataSource(SiriFmUpdaterParameters parameters) {
     params = parameters;
     headers = HttpHeaders.of().acceptApplicationXML().add(parameters.httpHeaders()).build().asMap();
     httpClient = new OtpHttpClientFactory().create(LOG);

@@ -42,7 +42,7 @@ public class VehicleParkingConfig {
           )
           .description(
             """
-            Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+            Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
             """
           )
           .asStringSet(List.of())
@@ -56,7 +56,7 @@ public class VehicleParkingConfig {
           )
           .description(
             """
-            Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+            Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
             """
           )
           .asStringSet(List.of())
@@ -84,7 +84,7 @@ public class VehicleParkingConfig {
           )
           .description(
             """
-            Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+            Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
             """
           )
           .asStringSet(List.of())

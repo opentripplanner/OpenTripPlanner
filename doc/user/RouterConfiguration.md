@@ -166,9 +166,9 @@ on how-to configure the "server.traceParameters" instance.
 
 The log event key used.
 
-OTP stores the key/value pair in the log MDC(Mapped Diagnostic Context). To use it you normally
-include the key in the log pattern like this: `%X{LOG-KEY}`. See your log framework for details.
-Only log4j and logback support this.
+OTP stores the key/value pair in the log MDC (Mapped Diagnostic Context). To use it
+you normally include the key in the log pattern like this: `%X{LOG-KEY}`. See your
+log framework for details. Only log4j and logback support this.
 
 
 <h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
@@ -274,14 +274,14 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
 
-The dynamic search window coefficients is used to calculate EDT(*earliest-departure-time*),
-LAT(*latest-arrival-time*) and SW(*raptor-search-window*) request parameters using heuristics. The
+The dynamic search window coefficients is used to calculate EDT (*earliest-departure-time*),
+LAT (*latest-arrival-time*) and SW (*raptor-search-window*) request parameters using heuristics. The
 heuristics perform a Raptor search (one-iteration) to find a trip which we use to find a lower
 bound for the travel duration time - the "minTransitTime". The heuristic search is used for other
 purposes too, and is very fast.
 
 At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
-unknown/missing the parameters(EDT, LAT, DW) are dynamically calculated. The dynamic coefficients
+unknown/missing the parameters (EDT, LAT, DW) are dynamically calculated. The dynamic coefficients
 affect the performance and should be tuned to match the deployment.
 
 The request parameters are calculated like this:

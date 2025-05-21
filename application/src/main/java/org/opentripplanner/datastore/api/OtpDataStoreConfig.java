@@ -29,32 +29,38 @@ public interface OtpDataStoreConfig {
   String gsCredentials();
 
   /**
-   * Array of URIs to the open street map pbf files (the pbf format is the only one supported).
+   * List of URIs to the open street map pbf files (the pbf format is the only one supported).
    * <p>
    * This parameter is optional. If {@code null} OSM files are loaded from {@code baseDirectory}.
    */
   List<URI> osmFiles();
 
   /**
-   * Array of URIs to elevation data files.
+   * List of URIs to elevation data files.
    * <p>
    * This parameter is optional. If {@code null} DEM files are loaded from {@code baseDirectory}.
    */
   List<URI> demFiles();
 
   /**
-   * Array of URIs to GTFS data files .
+   * List of URIs to GTFS data files .
    * <p>
    * This parameter is optional. If {@code null} GTFS files are loaded from {@code baseDirectory}.
    */
   List<URI> gtfsFiles();
 
   /**
-   * Array of URIs to Netex data files.
+   * List of URIs to Netex data files.
    * <p>
    * This parameter is optional. If {@code null} Netex files are loaded from {@code baseDirectory}.
    */
   List<URI> netexFiles();
+
+  /**
+   * List of URIs to Emission data files. This does not include emission files inside a
+   * GTFS bundle, only configured emission feed files.
+   */
+  List<URI> emissionFiles();
 
   /**
    * The URI to the graph object file to load and/or save.

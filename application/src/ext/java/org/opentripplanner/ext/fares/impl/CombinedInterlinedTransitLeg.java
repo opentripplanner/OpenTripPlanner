@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -135,6 +136,19 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
    */
   public List<Leg> originalLegs() {
     return List.of(first, second);
+  }
+
+  @Nullable
+  @Override
+  public Emission emissionPerPerson() {
+    // There is no way to set the emission, hence it will always be null
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public Leg withEmissionPerPerson(Emission emissionPerPerson) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

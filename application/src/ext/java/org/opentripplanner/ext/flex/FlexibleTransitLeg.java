@@ -12,6 +12,7 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -44,6 +45,9 @@ public class FlexibleTransitLeg implements TransitLeg {
   private final Set<TransitAlert> transitAlerts;
 
   private final int generalizedCost;
+
+  private final Emission emissionPerPerson;
+
   private final List<FareProductUse> fareProducts;
 
   FlexibleTransitLeg(FlexibleTransitLegBuilder builder) {
@@ -53,6 +57,7 @@ public class FlexibleTransitLeg implements TransitLeg {
     this.generalizedCost = builder.generalizedCost();
     this.transitAlerts = Set.copyOf(builder.alerts());
     this.fareProducts = List.copyOf(builder.fareProducts());
+    this.emissionPerPerson = builder.emissionPerPerson();
   }
 
   /**
@@ -218,6 +223,18 @@ public class FlexibleTransitLeg implements TransitLeg {
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
+  }
+
+  @Nullable
+  @Override
+  public Emission emissionPerPerson() {
+    return emissionPerPerson;
+  }
+
+  @Nullable
+  @Override
+  public Leg withEmissionPerPerson(Emission emissionPerPerson) {
+    return copyOf().withEmissionPerPerson(emissionPerPerson).build();
   }
 
   @Override

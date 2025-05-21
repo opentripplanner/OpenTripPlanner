@@ -76,7 +76,7 @@ class MemEfficientArrayBuilderTest {
     DayOfWeek[] candidate = { TUESDAY, WEDNESDAY };
     var array = MemEfficientArrayBuilder.of(WEEKEND);
 
-    // Without changes, we expect the original to be retuned
+    // Without changes, we expect the original to be returned
     assertSame(WEEKEND, array.build(candidate));
 
     // Second value set, but not first

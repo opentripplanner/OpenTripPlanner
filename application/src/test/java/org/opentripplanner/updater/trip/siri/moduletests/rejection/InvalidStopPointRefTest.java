@@ -12,7 +12,7 @@ import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
 import org.opentripplanner.updater.trip.siri.SiriEtBuilder;
 
-class InvalidStopPointRefTest implements RealtimeTestConstants {
+class InvalidStopPointRefTest {
 
   private static Stream<Arguments> cases() {
     return Stream.of("", " ", "   ", "\n", "null", "\t", null).flatMap(id ->

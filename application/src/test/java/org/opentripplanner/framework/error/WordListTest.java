@@ -9,6 +9,11 @@ import org.junit.jupiter.api.Test;
 class WordListTest {
 
   @Test
+  void addInt() {
+    assertEquals("1, 2 and 3", WordList.of().add(1).add(2).add(3).toString());
+  }
+
+  @Test
   void testToString() {
     assertEquals("", WordList.of().toString());
     assertEquals("one", WordList.of("one").toString());

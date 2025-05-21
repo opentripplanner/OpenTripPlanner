@@ -2,7 +2,9 @@ package org.opentripplanner.updater.trip;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.utils.time.TimeUtils;
 
@@ -15,12 +17,30 @@ public record TripInput(String id, Route route, List<StopCall> stops) {
     return new TripInputBuilder(id);
   }
 
-  public static class TripInputBuilder implements RealtimeTestConstants {
+  /**
+   * The ID of the route without the feed ID prefix.
+   */
+  public String routeId() {
+    return route.getId().getId();
+  }
+
+  /**
+   * The ID of the operator without the feed ID prefix.
+   */
+  public String operatorId() {
+    return route.getOperator().getId().getId();
+  }
+
+  public static class TripInputBuilder {
 
     private final String id;
     private final List<StopCall> stops = new ArrayList<>();
     // can be made configurable if needed
-    private Route route = ROUTE_1;
+    private Route route = TimetableRepositoryForTest.route("route-1")
+      .withOperator(
+        Operator.of(TimetableRepositoryForTest.id("operator-1")).withName("Operator 1").build()
+      )
+      .build();
 
     TripInputBuilder(String id) {
       this.id = id;

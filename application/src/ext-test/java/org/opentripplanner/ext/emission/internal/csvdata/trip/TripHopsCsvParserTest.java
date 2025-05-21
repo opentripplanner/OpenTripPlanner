@@ -8,7 +8,7 @@ import com.csvreader.CsvReader;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 
-class TripLegsParserTest {
+class TripHopsCsvParserTest {
 
   private static final String DATA =
     """
@@ -19,16 +19,16 @@ class TripLegsParserTest {
 
   @Test
   void test() {
-    var subject = new TripLegsCsvParser(DataImportIssueStore.NOOP, CsvReader.parse(DATA));
+    var subject = new TripHopsCsvParser(DataImportIssueStore.NOOP, CsvReader.parse(DATA));
     assertTrue(subject.headersMatch());
     assertTrue(subject.hasNext());
     assertEquals(
-      "TripLegsRow[tripId=F:1, fromStopId=NSR:Quay:1, fromStopSequence=1, co2=28.0g]",
+      "TripHopsRow[tripId=F:1, fromStopId=NSR:Quay:1, fromStopSequence=1, co2=28g]",
       subject.next().toString()
     );
     assertTrue(subject.hasNext());
     assertEquals(
-      "TripLegsRow[tripId=F:1, fromStopId=NSR:Quay:2, fromStopSequence=2, co2=38.0g]",
+      "TripHopsRow[tripId=F:1, fromStopId=NSR:Quay:2, fromStopSequence=2, co2=38g]",
       subject.next().toString()
     );
     assertFalse(subject.hasNext());

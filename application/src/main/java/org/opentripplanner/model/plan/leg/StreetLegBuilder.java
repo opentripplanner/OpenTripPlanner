@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -28,6 +29,7 @@ public class StreetLegBuilder {
   private String vehicleRentalNetwork;
   private Set<StreetNote> streetNotes = new HashSet<>();
   private Float accessibilityScore;
+  private Emission emissionPerPerson;
 
   protected StreetLegBuilder() {}
 
@@ -45,8 +47,9 @@ public class StreetLegBuilder {
     this.walkingBike = leg.walkingBike();
     this.rentedVehicle = leg.rentedVehicle();
     this.vehicleRentalNetwork = leg.vehicleRentalNetwork();
-    this.streetNotes = leg.listStreetNotes();
+    this.streetNotes = Set.copyOf(leg.listStreetNotes());
     this.accessibilityScore = leg.accessibilityScore();
+    this.emissionPerPerson = leg.emissionPerPerson();
   }
 
   public StreetLeg build() {
@@ -111,6 +114,10 @@ public class StreetLegBuilder {
 
   public Set<StreetNote> getStreetNotes() {
     return streetNotes;
+  }
+
+  public Emission emissionPerPerson() {
+    return emissionPerPerson;
   }
 
   public StreetLegBuilder withMode(TraverseMode mode) {
@@ -185,6 +192,11 @@ public class StreetLegBuilder {
 
   public StreetLegBuilder withAccessibilityScore(Float accessibilityScore) {
     this.accessibilityScore = accessibilityScore;
+    return this;
+  }
+
+  public StreetLegBuilder withEmissionPerPerson(Emission emissionPerPerson) {
+    this.emissionPerPerson = emissionPerPerson;
     return this;
   }
 }

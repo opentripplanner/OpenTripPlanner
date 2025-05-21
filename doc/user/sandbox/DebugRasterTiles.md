@@ -3,7 +3,7 @@
 <b>These are only meant to be used when using vector tiles is not an option (mainly JOSM).</b>
 
 The raster tiles are available with the following path structure:
-`/otp/debugrastertiles/{layer}/{z}/{x}/{y}.png`
+`/otp/debug/rastertiles/{layer}/{z}/{x}/{y}.png`
 
 The available layers are:
 
@@ -20,7 +20,8 @@ The available layers are:
 
 ## Changelog
 
-- 2024-02-13: Moved raster tiles from core code into sandbox.
+- 2025-02-13: Moved raster tiles from core code into sandbox.
+- 2025-05-16: Changed API path slightly.
 
 
 ### Configuration

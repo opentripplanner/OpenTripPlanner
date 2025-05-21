@@ -13,7 +13,7 @@ import org.opentripplanner.utils.time.DurationUtils;
 /**
  * The progress tracker notify the caller based a time interval.
  * <p>
- * To avoid the caller from being notified to often the tracker  uses a 'timer'. The 'timer' prevent
+ * To avoid the caller from being notified to often the tracker uses a 'timer'. The 'timer' prevent
  * notification unless a minimum amount of time is passed since last time the caller was notified.
  * The quiet period is set to 5 seconds.
  * <p>

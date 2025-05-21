@@ -26,6 +26,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class NodeAdapterTest {
@@ -466,6 +467,14 @@ public class NodeAdapterTest {
       () -> subject.of("uris").asUris(),
       "'uris': 'no array'" + "Source: Test"
     );
+  }
+
+  @Test
+  void asGram() {
+    NodeAdapter subject = newNodeAdapterForTest("{ weight : '5g' }");
+    assertEquals(Gram.of(5), subject.of("weight").asGram(Gram.ZERO));
+    Gram defaultValue = Gram.of(178);
+    assertEquals(defaultValue, subject.of("missingField").asGram(defaultValue));
   }
 
   @Test

@@ -240,7 +240,7 @@ public class TimeUtils {
     long value = rnd.nextLong();
 
     // Print wait, this method is for debugging only
-    System.err.printf(Locale.ROOT, "BUSY-WAIT(%.1fs)%n", (waitMs / 1000.0));
+    System.err.printf(Locale.ROOT, "BUSY-WAIT (%.1fs)%n", (waitMs / 1000.0));
 
     while (System.currentTimeMillis() < waitUntil) {
       value |= rnd.nextLong();

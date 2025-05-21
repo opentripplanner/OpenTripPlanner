@@ -5,7 +5,7 @@ import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.updater.spi.DataSource;
 
-public interface VehicleRentalDatasource extends DataSource<VehicleRentalPlace> {
+public interface VehicleRentalDataSource extends DataSource<VehicleRentalPlace> {
   default List<GeofencingZone> getGeofencingZones() {
     return List.of();
   }

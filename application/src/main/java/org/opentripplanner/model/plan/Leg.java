@@ -467,6 +467,14 @@ public interface Leg {
   }
 
   @Nullable
+  @Sandbox
+  Emission emissionPerPerson();
+
+  @Nullable
+  @Sandbox
+  Leg withEmissionPerPerson(Emission emissionPerPerson);
+
+  @Nullable
   default Boolean rentedVehicle() {
     return null;
   }

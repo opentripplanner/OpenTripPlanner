@@ -227,11 +227,12 @@ public class SerializedGraphObject implements Serializable {
 
   @SuppressWarnings("Convert2MethodRef")
   private static OutputStream wrapOutputStreamWithProgressTracker(
+    String name,
     OutputStream outputStream,
     long size
   ) {
     return ProgressTracker.track(
-      "Save graph",
+      "Save " + name,
       500_000,
       size,
       outputStream,
@@ -260,7 +261,7 @@ public class SerializedGraphObject implements Serializable {
 
   private void save(OutputStream outputStream, String graphName, long size) {
     LOG.info("Writing graph {}  ...", graphName);
-    outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
+    outputStream = wrapOutputStreamWithProgressTracker(graphName, outputStream, size);
     Kryo kryo = KryoBuilder.create();
     Output output = new Output(outputStream);
     output.write(OtpProjectInfo.projectInfo().graphFileHeaderInfo.header());

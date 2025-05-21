@@ -7,23 +7,27 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
 public class CanceledTripTest implements RealtimeTestConstants {
 
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+
   @Test
   void listCanceledTrips() {
-    var env = RealtimeTestEnvironment.of()
-      .addTrip(
-        TripInput.of(TRIP_1_ID)
-          .addStop(STOP_A1, "0:00:10", "0:00:11")
-          .addStop(STOP_B1, "0:00:20", "0:00:21")
-          .build()
-      )
-      .build();
+    var env = ENV_BUILDER.addTrip(
+      TripInput.of(TRIP_1_ID)
+        .addStop(STOP_A, "0:00:10", "0:00:11")
+        .addStop(STOP_B, "0:00:20", "0:00:21")
+        .build()
+    ).build();
 
     assertThat(env.getTransitService().listCanceledTrips()).isEmpty();
 

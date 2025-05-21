@@ -19,15 +19,15 @@ import org.opentripplanner.updater.DefaultRealTimeUpdateContext;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.spi.HttpHeaders;
-import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
+import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.RentalPickupType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 class VehicleRentalUpdaterTest {
 
   @Test
-  void failingDatasourceCountsAsPrimed() {
-    var source = new FailingDatasource();
+  void failingDataSourceCountsAsPrimed() {
+    var source = new FailingDataSource();
     var updater = new VehicleRentalUpdater(
       new VehicleRentalUpdaterParameters("A", Duration.ofMinutes(1), new FakeParams()),
       source,
@@ -58,7 +58,7 @@ class VehicleRentalUpdaterTest {
     }
   }
 
-  static class FailingDatasource implements VehicleRentalDatasource {
+  static class FailingDataSource implements VehicleRentalDataSource {
 
     private final CompletableFuture<Boolean> hasFailed = new CompletableFuture<>();
 
