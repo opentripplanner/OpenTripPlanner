@@ -48,14 +48,14 @@ public class GsConfigurationDocTest implements DocsTestConstants {
 
     var json = JsonSupport.jsonNodeFromPath(buildConfigFile.toPath());
     var conf = new BuildConfig(json, buildConfigFile.toString(), false);
-    return conf.asNodeAdapter().child("gsConfig");
+    return conf.asNodeAdapter();
   }
 
   private String updaterDoc(NodeAdapter node) {
     DocBuilder buf = new DocBuilder();
     addExample(buf, node);
-    addParameterSummaryTable(buf, node);
-    addDetailsSection(buf, node);
+    addParameterSummaryTable(buf, node.child("gsConfig"));
+    addDetailsSection(buf, node.child("gsConfig"));
     return buf.toString();
   }
 
@@ -72,7 +72,7 @@ public class GsConfigurationDocTest implements DocsTestConstants {
   }
 
   private void addExample(DocBuilder buf, NodeAdapter node) {
-    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject("gsConfig").build();
+    var root = TemplateUtil.jsonExampleBuilder(node.rawNode()).build();
     buf.header(3, "Example configuration", null).addExample("build-config.json", root);
   }
 }

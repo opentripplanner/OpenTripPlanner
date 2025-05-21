@@ -17,31 +17,6 @@ more Google Cloud Storge locations. Each artifact must be configured in the _bui
 See [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
 on how to configure artifacts.
 
-Example for path configurations for different data sources (build-config.json):
-
-```json
-{
-  "graph": "gs://otp-test-bucket/a/b/graph.obj",
-  "buildReportDir": "gs://otp-test-bucket/a/b/np-report",
-  "osm": [
-    {
-      "source": "gs://otp-test-bucket/a/b/northpole.pbf"
-    }
-    ],
-  "dem": [
-    {
-      "source": "gs://otp-test-bucket/a/b/northpole.dem.tif"
-    }
-    ],
-  "transitFeeds": [
-    {
-      "type": "gtfs",
-      "source": "gs://otp-test-bucket/a/b/gtfs.zip"
-    }
-    ]
-}
-```
-
 <!-- config BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
@@ -53,7 +28,25 @@ Example for path configurations for different data sources (build-config.json):
   "gsConfig" : {
     "cloudServiceHost" : "http://fake-gcp:4443",
     "credentialFile" : "/path/to/file"
-  }
+  },
+  "graph" : "gs://otp-test-bucket/a/b/graph.obj",
+  "buildReportDir" : "gs://otp-test-bucket/a/b/np-report",
+  "osm" : [
+    {
+      "source" : "gs://otp-test-bucket/a/b/northpole.pbf"
+    }
+  ],
+  "dem" : [
+    {
+      "source" : "gs://otp-test-bucket/a/b/northpole.dem.tif"
+    }
+  ],
+  "transitFeeds" : [
+    {
+      "type" : "gtfs",
+      "source" : "gs://otp-test-bucket/a/b/gtfs.zip"
+    }
+  ]
 }
 ```
 ### Overview
