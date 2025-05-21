@@ -2,7 +2,6 @@ package org.opentripplanner.routing.api.request;
 
 import static org.opentripplanner.utils.lang.ObjectUtils.ifNotNull;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 public class DebugRaptorBuilder implements Serializable {
 
-  @Serial
   private static final Logger LOG = LoggerFactory.getLogger(DebugRaptorBuilder.class);
 
   private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");

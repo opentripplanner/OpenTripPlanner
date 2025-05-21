@@ -22,7 +22,7 @@ import org.opentripplanner.utils.time.DateUtils;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
  * itineraries.
  * <p>
- * All defaults should be specified here in the RouteRequest, NOT as annotations on query parameters
+ * All defaults should be specified here in the RouteRequest, NOT as default values of parameters
  * in web services that create RouteRequests. This establishes a priority chain for default values:
  * RouteRequest field initializers, then JSON router config, then query parameters.
  */
