@@ -17,11 +17,10 @@ more Google Cloud Storge locations. Each artifact must be configured in the _bui
 See [`BuildConfig`](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/application/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java)
 on how to configure artifacts.
 
-Example (build-config.json):
+Example for path configurations for different data sources (build-config.json):
 
 ```json
 {
-  "gcsCredentials": "file:///Users/alf/secret/otp-test-1234567890.json",
   "graph": "gs://otp-test-bucket/a/b/graph.obj",
   "buildReportDir": "gs://otp-test-bucket/a/b/np-report",
   "osm": [
@@ -86,7 +85,7 @@ Eg: http://localhost:4443
 
 Local file system path to Google Cloud Platform service accounts credentials file.
 
-The credentials is used to access GCS urls. When using GCS from outside of Google Cloud you
+The credentials are used to access GCS URLs. When using GCS from outside of Google Cloud you
 need to provide a path the the service credentials. Environment variables in the path are
 resolved.
 
