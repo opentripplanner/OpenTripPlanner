@@ -67,7 +67,6 @@ import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
 import org.opentripplanner.updater.trip.TripPatternCache;
-import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -846,7 +845,6 @@ public class GtfsRealTimeTripUpdateAdapter {
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
 
-    final TripPattern originalTripPattern = transitEditorService.findPattern(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
     final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip);
 

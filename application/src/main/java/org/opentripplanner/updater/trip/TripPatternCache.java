@@ -55,9 +55,11 @@ public class TripPatternCache {
   ) {
     TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 
-    // TODO RT_AB: Verify implementation, which is different than the GTFS-RT version.
-    //   It can return a TripPattern from the scheduled data, but protective copies are handled in
-    //   TimetableSnapshot.update. Better document this aspect of the contract in this method's Javadoc.
+    // if a scheduled or a real-time-added pattern already exists then return that instead
+    // of looking at the cache.
+    // here GTFS and SIRI behave differently when dealing with ADDED/ExtraJourney
+    // as SIRI already creates a pattern and adds it to the timetable snapshot before this class
+    // is queried, but GTFS-RT doesn't. i'm not sure why that is.
     if (originalTripPattern != null && originalTripPattern.getStopPattern().equals(stopPattern)) {
       return originalTripPattern;
     }
