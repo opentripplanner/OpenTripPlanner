@@ -26,6 +26,17 @@ public class PageCursorFactory {
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
 
+  /**
+   * The search-window start and end is [inclusive, exclusive], so to calculate the start of the
+   * search-window from the last time included in the search window we need to include one extra
+   * minute at the end.
+   * <p>
+   * The value is set to 60 seconds because raptor operates in one minute increments.
+   */
+  private static final Duration SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION = Duration.ofSeconds(
+    60
+  );
+
   public PageCursorFactory(SortOrder sortOrder, Duration newSearchWindow) {
     this.sortOrder = sortOrder;
     this.newSearchWindow = newSearchWindow;
@@ -140,7 +151,7 @@ public class PageCursorFactory {
         prevEdt = pageCursorInput
           .latestRemovedDeparture()
           .minus(newSearchWindow)
-          .plus(PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION);
+          .plus(SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION);
         nextEdt = edtAfterUsedSw();
       }
     }
@@ -174,7 +185,7 @@ public class PageCursorFactory {
     Instant defaultEdt = currentEdt.plus(currentSearchWindow);
     if (firstSearchLatestItineraryDeparture != null) {
       Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plus(
-        PageCursorConstants.SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION
+        SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION
       );
       if (edtFromLatestItineraryDeparture.isBefore(defaultEdt)) {
         return edtFromLatestItineraryDeparture;
