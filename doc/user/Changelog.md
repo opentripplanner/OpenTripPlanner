@@ -33,6 +33,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Deprecate vertexType in GTFS API [#6632](https://github.com/opentripplanner/OpenTripPlanner/pull/6632)
 - Enable CAR transfers with ferries with NeTEx import [#6640](https://github.com/opentripplanner/OpenTripPlanner/pull/6640)
 - Upgrade to GraphiQL 4 [#6652](https://github.com/opentripplanner/OpenTripPlanner/pull/6652)
+- Deprecate vehicle type in GTFS API [#6663](https://github.com/opentripplanner/OpenTripPlanner/pull/6663)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
