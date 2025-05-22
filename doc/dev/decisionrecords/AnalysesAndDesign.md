@@ -37,7 +37,7 @@ plugin (Diagrams.net), web application and desktop application.
 
 A domain model focusses on the language and the relationships. All implementation details can be left 
 out. Details which is not relevant for the problem you are solving can also be left out, focus on 
-the elements witch helps understand the problem. Use plain english and not tech to describe 
+the elements which helps understand the problem. Use plain english and not tech to describe 
 the model. For example, only listing the field name, and not the type is ok if the type is obvious.
 
 Notation is not important, but try to follow the UML syntax below. You may use more advanced UML 

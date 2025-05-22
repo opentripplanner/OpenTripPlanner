@@ -257,7 +257,7 @@ This is the maximum duration for a direct street search for each mode.
 
 This is a performance limit and should therefore be set high. Results close to the limit are not
 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-duration can be set per mode(`maxDirectStreetDurationForMode`), because some street modes searches
+duration can be set per mode (`maxDirectStreetDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
 does not exist."
 
@@ -276,7 +276,7 @@ access, egress, wait-time and transit time for the whole journey. It should also
 days/periods like holidays into account. In other words, pick the two points within your area that
 has the worst connection and then try to travel on the worst possible day, and find the maximum
 journey duration. Using a value that is too high has the effect of including more patterns in the
-search, hence, making it a bit slower. Recommended values would be from 12 hours(small town/city),
+search, hence, making it a bit slower. Recommended values would be from 12 hours (small town/city),
 1 day (region) to 2 days (country like Norway)."
 
 
@@ -325,8 +325,8 @@ supported, due to performance reasons.
 
 The duration of the search-window.
 
-This is the time/duration in seconds from the earliest-departure-time(EDT) to the
-latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
+This is the time/duration in seconds from the earliest-departure-time (EDT) to the
+latest-departure-time (LDT). In case of a reverse search it will be the time from earliest to
 latest arrival time (LAT - EAT).
 
 All optimal travels that depart within the search window is guaranteed to be found.
@@ -352,7 +352,7 @@ increase/decrease the search-window when paging to match the requested number of
 
 The maximum time a street routing request is allowed to take before returning the results.
 
-The street search(AStar) aborts after this duration and any paths found are returned to the client.
+The street search (AStar) aborts after this duration and any paths found are returned to the client.
 The street part of the routing may take a long time if searching very long distances. You can set
 the street routing timeout to avoid tying up server resources on pointless searches and ensure that
 your users receive a timely response. You can also limit the max duration. There are is also a
@@ -406,7 +406,7 @@ This is the maximum duration for access/egress for street searches.
 
 This is a performance limit and should therefore be set high. Results close to the limit are not
 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-duration can be set per mode(`maxDurationForMode`), because some street modes searches
+duration can be set per mode (`maxDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
 does not exist.
 
@@ -456,7 +456,7 @@ Penalty for access/egress by street mode.
 Use this to add a time and cost penalty to an access/egress legs for a given street
 mode. This will favour other street-modes and transit. This has a performance penalty,
 since the search-window is increased with the same amount as the maximum penalty for
-the access legs used. In other cases where the access(CAR) is faster than transit the
+the access legs used. In other cases where the access (CAR) is faster than transit the
 performance will be better.
 
 The default values are
@@ -527,7 +527,7 @@ See `preferredVehicleParkingTags`.
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned.
 
-Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
 <h3 id="rd_bicycle_parking_preferredVehicleParkingTags">preferredVehicleParkingTags</h3>
@@ -537,7 +537,7 @@ Vehicle parking tags can originate from different places depending on the origin
 
 Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
 
-Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
 <h3 id="rd_bicycle_parking_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
@@ -547,7 +547,7 @@ Vehicle parking tags can originate from different places depending on the origin
 
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
-Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
 <h3 id="rd_bicycle_rental_allowedNetworks">allowedNetworks</h3>
@@ -643,7 +643,7 @@ See `preferredVehicleParkingTags`.
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned.
 
-Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
 <h3 id="rd_car_parking_preferredVehicleParkingTags">preferredVehicleParkingTags</h3>
@@ -653,7 +653,7 @@ Vehicle parking tags can originate from different places depending on the origin
 
 Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
 
-Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
 <h3 id="rd_car_parking_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
@@ -663,7 +663,7 @@ Vehicle parking tags can originate from different places depending on the origin
 
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
 
-Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+Vehicle parking tags can originate from different places depending on the origin of the parking (OSM or RT feed).
 
 
 <h3 id="rd_car_rental_allowedNetworks">allowedNetworks</h3>
@@ -699,7 +699,7 @@ filter debugging.
 #### Group by similarity filters
 
 The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
-with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
+with `searchWindow` and the three group-by parameters (`groupSimilarityKeepOne`,
 `groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
 
 The group-by-filter work by grouping itineraries together and then reducing the number of
@@ -876,7 +876,7 @@ The filter compares all itineraries against every other itinerary. If the genera
 dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
 *relative cost* for the distance in time between the itineraries. The *relative cost* is the
 `intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be
-_1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
+_1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value (3000s) use: `3000 + 0x`
 
 
 <h3 id="rd_if_transitGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
@@ -1027,7 +1027,7 @@ doubled. Stop priority is only supported by the NeTEx import, not GTFS.
 
 Used to set a maximum wait-time cost, base on min-safe-transfer-time.
 
-This defines the maximum cost for the logarithmic function relative to the min-safe-transfer-time (t0) when wait time goes towards zero(0). f(0) = n * t0
+This defines the maximum cost for the logarithmic function relative to the min-safe-transfer-time (t0) when wait time goes towards zero (0). f(0) = n * t0
 
 <h3 id="rd_to_optimizeTransferWaitTime">optimizeTransferWaitTime</h3>
 

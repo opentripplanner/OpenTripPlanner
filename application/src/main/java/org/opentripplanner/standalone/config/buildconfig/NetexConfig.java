@@ -86,7 +86,7 @@ public class NetexConfig {
           .summary("Pattern for matching shared group NeTEx files in a NeTEx bundle.")
           .description(
             """
-            This field is used to match *shared group files* in the module file(zip file entries).
+            This field is used to match *shared group files* in the module file (zip file entries).
             Typically this is used to group all files from one agency together.
 
             *Shared group files* are loaded after shared files, but before the matching group
@@ -107,7 +107,7 @@ public class NetexConfig {
           .summary("Pattern for matching group NeTEx files.")
           .description(
             """
-            This field is used to match *group files* in the module file(zip file entries).
+            This field is used to match *group files* in the module file (zip file entries).
             *group files* are loaded right the after *shared group files* are loaded.
             Files are grouped together by the first group pattern in the regular expression.
             The pattern `"(\\w{3})-.*\\.xml"` matches `"RUT-Line-208-Hagalia-Nevlunghavn.xml"`
@@ -124,7 +124,7 @@ public class NetexConfig {
           .summary("Pattern for matching ignored files in a NeTEx bundle.")
           .description(
             """
-            This field is used to exclude matching *files* in the module file(zip file entries).
+            This field is used to exclude matching *files* in the module file (zip file entries).
             The *ignored* files are *not* loaded.
             """
           )

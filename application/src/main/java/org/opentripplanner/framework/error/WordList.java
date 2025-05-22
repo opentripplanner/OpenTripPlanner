@@ -37,6 +37,11 @@ public class WordList {
     return this;
   }
 
+  public WordList add(int value) {
+    this.words.add(Integer.toString(value));
+    return this;
+  }
+
   public WordList add(String... words) {
     this.words.addAll(Arrays.asList(words));
     return this;

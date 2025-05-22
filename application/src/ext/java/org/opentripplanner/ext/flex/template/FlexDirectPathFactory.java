@@ -77,7 +77,7 @@ public class FlexDirectPathFactory {
       //      - of the alight-restriction check?
       //      - nearest stop to trip match?
       //      Fix: Find out why and refactor out the business logic and reuse it.
-      //      Problem: Any asymmetrical restriction witch apply/do not apply to the egress,
+      //      Problem: Any asymmetrical restriction which apply/do not apply to the egress,
       //               but do not apply/apply to the access, like booking-notice.
       if (
         flexEgressTemplates.stream().anyMatch(t -> t.getAccessEgressStop().equals(transferStop))

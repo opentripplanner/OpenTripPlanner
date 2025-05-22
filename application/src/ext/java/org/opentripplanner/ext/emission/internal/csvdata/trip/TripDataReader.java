@@ -13,26 +13,29 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
  */
 public class TripDataReader {
 
+  private final DataSource emissionDataSource;
   private final DataImportIssueStore issueStore;
   private boolean dataProcessed = false;
 
-  public TripDataReader(DataImportIssueStore issueStore) {
+  public TripDataReader(DataSource emissionDataSource, DataImportIssueStore issueStore) {
+    this.emissionDataSource = emissionDataSource;
     this.issueStore = issueStore;
   }
 
-  public List<TripLegsRow> read(DataSource emissionDataSource) {
+  public List<TripHopsRow> read(Runnable logStepCallback) {
     if (!emissionDataSource.exists()) {
       return List.of();
     }
-    var emissionData = new ArrayList<TripLegsRow>();
+    var emissionData = new ArrayList<TripHopsRow>();
     var reader = new CsvReader(emissionDataSource.asInputStream(), StandardCharsets.UTF_8);
-    var parser = new TripLegsCsvParser(issueStore, reader);
+    var parser = new TripHopsCsvParser(issueStore, reader);
 
     if (!parser.headersMatch()) {
       return List.of();
     }
 
     while (parser.hasNext()) {
+      logStepCallback.run();
       emissionData.add(parser.next());
       dataProcessed = true;
     }

@@ -359,7 +359,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    // TODO - Use itineraryBuilder() here not build() and compleate building the itinerary using
+    // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
     //        the ItineraryBuilder and not going back and forth between the Itinerary and the
     //        builder.
     var i1 = newItinerary(A, T11_00)
@@ -391,7 +391,7 @@ class GraphQLIntegrationTest {
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emission = Emission.co2_g(123.0);
+    var emission = Emission.ofCo2Gram(123.0);
     i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
