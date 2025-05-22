@@ -5,7 +5,9 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -50,7 +52,8 @@ public class PageCursorFactory {
     @Nullable PageType pageType,
     Instant edt,
     Instant lat,
-    Duration searchWindow
+    Duration searchWindow,
+    List<Itinerary> itineraries
   ) {
     this.currentPageType = pageType == null
       ? resolvePageTypeForTheFirstSearch(sortOrder)
@@ -59,6 +62,11 @@ public class PageCursorFactory {
     this.currentEdt = edt;
     this.currentLat = lat;
     this.currentSearchWindow = searchWindow;
+    this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
+      pageType,
+      itineraries,
+      edt
+    );
     return this;
   }
 
@@ -125,8 +133,27 @@ public class PageCursorFactory {
    * ascending, and to PREVIOUS if descending. We do this because the logic for the first search is
    * equivalent when creating new cursors.
    */
-  public static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
+  private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
     return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
+  }
+
+  /**
+   * If the first search is an arrive by search, store the latest itinerary's start time
+   * to allow setting cursor information correctly for the page cursor of the next page.
+   */
+  private Instant resolveFirstSearchLatestItineraryDeparture(
+    @Nullable PageType pageType,
+    List<Itinerary> itineraries,
+    Instant edt
+  ) {
+    if (pageType == null && resolvePageTypeForTheFirstSearch(sortOrder) == PREVIOUS_PAGE) {
+      if (itineraries.size() > 0) {
+        return itineraries.get(0).startTimeAsInstant();
+      } else {
+        return edt;
+      }
+    }
+    return null;
   }
 
   /** Create page cursor pair (next and previous) */
