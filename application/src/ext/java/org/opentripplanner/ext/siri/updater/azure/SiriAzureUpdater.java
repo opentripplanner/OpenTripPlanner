@@ -12,6 +12,7 @@ import com.azure.messaging.servicebus.administration.ServiceBusAdministrationCli
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -223,7 +224,6 @@ public class SiriAzureUpdater implements GraphUpdater {
           eventProcessor.close();
         }
         if (serviceBusAdmin != null) {
-          LOG.info("Deliting subscription");
           serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
           LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
         }
@@ -322,7 +322,14 @@ public class SiriAzureUpdater implements GraphUpdater {
     // Client with permissions to create subscription
     if (authenticationType == AuthenticationType.FederatedIdentity) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
-        .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
+        .credential(
+          fullyQualifiedNamespace,
+          new DefaultAzureCredentialBuilder()
+            // We use the current thread for fetching credentials since the default executor
+            // service can't be used in the shutdownHook where we want to delete the subscription
+            .executorService(MoreExecutors.newDirectExecutorService())
+            .build()
+        )
         .buildClient();
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
@@ -332,11 +339,10 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     // Set options
     CreateSubscriptionOptions options = new CreateSubscriptionOptions()
-      .setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS)) // maybe decrease this
       .setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
-    if (Boolean.TRUE.equals(serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName))) {
+    if (serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName)) {
       LOG.info(
         "Subscription '{}' already exists. Deleting existing subscription.",
         subscriptionName
