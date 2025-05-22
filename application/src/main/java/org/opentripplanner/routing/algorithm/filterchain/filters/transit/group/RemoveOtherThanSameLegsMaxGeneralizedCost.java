@@ -17,6 +17,22 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * itineraries have a much higher cost for the other legs. This is similar to {@link
  * org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
  * but is used together with {@link GroupByFilter} to filter within the groups.
+ *
+ * <h3>Example</h3>
+ *
+ * Lets give 5% slack: f=1.05
+ *
+ * <pre>
+ * Itin A:  | ### cost of legs common trips - $42 ### | ########## other legs - $41 ########## |    (Total: $83)
+ * Itin B:  | ######## cost of legs common trips - $52 ######## | ### other legs - $27 ### |        (Total: $79)
+ * </pre>
+ *
+ * <ul>
+ * <li>Min cost common legs: a=$42</li>
+ * <li>Min cost all itineraries: b=$79</li>
+ * <li>maxLimit = a + (b - a) * f = 42 + 37 * 1.05 = 81</li>
+ * <li><b>Result:</b> Keep itinerary A, and drop B ($83 > limit $81)</li>
+ * </ul>
  */
 public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItineraryFlagger {
 
