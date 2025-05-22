@@ -7,7 +7,7 @@ import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
-import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
+import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
@@ -91,7 +91,7 @@ public class SiriAzureUpdater implements GraphUpdater {
   private final int prefetchCount;
 
   private ServiceBusProcessorClient eventProcessor;
-  private ServiceBusAdministrationAsyncClient serviceBusAdmin;
+  private ServiceBusAdministrationClient serviceBusAdmin;
   private boolean isPrimed = false;
   private String subscriptionName;
 
@@ -223,7 +223,8 @@ public class SiriAzureUpdater implements GraphUpdater {
           eventProcessor.close();
         }
         if (serviceBusAdmin != null) {
-          serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+          LOG.info("Deliting subscription");
+          serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
           LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
         }
       });
@@ -322,32 +323,28 @@ public class SiriAzureUpdater implements GraphUpdater {
     if (authenticationType == AuthenticationType.FederatedIdentity) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
         .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
-        .buildAsyncClient();
+        .buildClient();
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
         .connectionString(serviceBusUrl)
-        .buildAsyncClient();
+        .buildClient();
     }
 
     // Set options
     CreateSubscriptionOptions options = new CreateSubscriptionOptions()
-      .setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS))
+      .setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS)) // maybe decrease this
       .setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
-    if (
-      Boolean.TRUE.equals(
-        serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName).block()
-      )
-    ) {
+    if (Boolean.TRUE.equals(serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName))) {
       LOG.info(
         "Subscription '{}' already exists. Deleting existing subscription.",
         subscriptionName
       );
-      serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+      serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
       LOG.info("Service Bus deleted subscription {}.", subscriptionName);
     }
-    serviceBusAdmin.createSubscription(topicName, subscriptionName, options).block();
+    serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
     LOG.info("{} created subscription {}", getClass().getSimpleName(), subscriptionName);
   }
