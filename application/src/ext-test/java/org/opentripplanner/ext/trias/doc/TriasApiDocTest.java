@@ -4,8 +4,8 @@ import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONF
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_PATH;
-import static org.opentripplanner.generate.doc.framework.DocsTestConstants.USER_DOC_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.SANDBOX_TEMPLATE_PATH;
+import static org.opentripplanner.generate.doc.framework.DocsTestConstants.SANDBOX_USER_DOC_PATH;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromPath;
 import static org.opentripplanner.utils.text.MarkdownFormatter.HEADER_4;
@@ -25,8 +25,8 @@ import org.opentripplanner.test.support.ResourceLoader;
 @GeneratesDocumentation
 public class TriasApiDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_PATH + "/sandbox", "TriasApi.md");
-  private static final File OUT_FILE = new File(USER_DOC_PATH + "/sandbox", "TriasApi.md");
+  private static final File TEMPLATE = new File(SANDBOX_TEMPLATE_PATH, "TriasApi.md");
+  private static final File OUT_FILE = new File(SANDBOX_USER_DOC_PATH, "TriasApi.md");
 
   private static final File ROUTER_CONFIG_FILE = ResourceLoader.of(
     TriasApiDocTest.class
