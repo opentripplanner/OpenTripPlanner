@@ -66,7 +66,7 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  Set<TransferMatch> transferForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+  Set<TransferMatch> transferForPairs(ScheduledTransitLeg from, ScheduledTransitLeg to) {
     return this.transferRules.stream()
       .flatMap(r -> {
         var fromRule = findFareLegRule(r.fromLegGroup());

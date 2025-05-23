@@ -3,8 +3,9 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLDependentFareProductDependenciesArgs;
 import org.opentripplanner.model.fare.FareMedium;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductLike;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
@@ -13,7 +14,15 @@ public class DependentFareProductImpl implements GraphQLDataFetchers.GraphQLDepe
 
   @Override
   public DataFetcher<Iterable<FareProductLike>> dependencies() {
-    return env -> getSource(env).dependencies();
+    return env -> {
+      var fpl = getSource(env);
+      var filter = new GraphQLDependentFareProductDependenciesArgs(env.getArguments()).getGraphQLFilter();
+      return switch(filter){
+        case null -> fpl.dependencies();
+        case ALL -> fpl.dependencies();
+        case MATCH_CATEGORY_AND_MEDIUM -> fpl.dependenciesMatchingCategoryAndMedium();
+      };
+    };
   }
 
   @Override

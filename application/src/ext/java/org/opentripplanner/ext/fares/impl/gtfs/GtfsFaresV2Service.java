@@ -1,14 +1,15 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -27,7 +28,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public FareResult calculateFares(Itinerary itinerary) {
-    SetMultimap<Leg, TransferFareProduct> legProducts = HashMultimap.create();
+    Multimap<Leg, TransferFareProduct> legProducts = ArrayListMultimap.create();
     itinerary
       .listScheduledTransitLegs()
       .forEach(leg -> {
@@ -42,17 +43,19 @@ public final class GtfsFaresV2Service implements Serializable {
 
     var pairs = ListUtils.partitionIntoOverlappingPairs(itinerary.listScheduledTransitLegs());
     pairs.forEach(pair ->
-      lookup
-        .transferForPair(pair.first(), pair.second())
-        .forEach(transfer -> {
-          transfer
-            .transferRule()
-            .fareProducts()
-            .forEach(p -> {
-              var ftp = new TransferFareProduct(p, transfer.fromLegRule().fareProducts());
-              legProducts.put(pair.second(), ftp);
-            });
-        })
+      {
+        final Set<TransferMatch> transferMatches = lookup.transferForPairs(pair.first(), pair.second());
+        transferMatches
+          .forEach(transfer -> {
+            transfer
+              .transferRule()
+              .fareProducts()
+              .forEach(p -> {
+                var ftp = new TransferFareProduct(p, transfer.fromLegRule().fareProducts());
+                legProducts.put(pair.second(), ftp);
+              });
+          });
+      }
     );
 
     var itinProducts = lookup

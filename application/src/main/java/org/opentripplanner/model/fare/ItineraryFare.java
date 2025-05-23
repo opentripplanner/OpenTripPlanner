@@ -92,13 +92,6 @@ public class ItineraryFare {
       );
   }
 
-  /**
-   * Add several fare products to a leg.
-   */
-  public void addFareProduct(Leg leg, Collection<FareProductLike> fareProduct) {
-    fareProduct.forEach(fp -> addFareProduct(leg, fp));
-  }
-
   public void addFareProductUses(Multimap<Leg, FareProductUse> fareProducts) {
     legProducts.putAll(fareProducts);
   }

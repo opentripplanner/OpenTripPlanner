@@ -754,6 +754,34 @@ public class GraphQLTypes {
     }
   }
 
+  public static class GraphQLDependentFareProductDependenciesArgs {
+
+    private GraphQLDependentFareProductFilter filter;
+
+    public GraphQLDependentFareProductDependenciesArgs(Map<String, Object> args) {
+      if (args != null) {
+        if (args.get("filter") instanceof GraphQLDependentFareProductFilter) {
+          this.filter = (GraphQLDependentFareProductFilter) args.get("filter");
+        } else if (args.get("filter") != null) {
+          this.filter = GraphQLDependentFareProductFilter.valueOf((String) args.get("filter"));
+        }
+      }
+    }
+
+    public GraphQLDependentFareProductFilter getGraphQLFilter() {
+      return this.filter;
+    }
+
+    public void setGraphQLFilter(GraphQLDependentFareProductFilter filter) {
+      this.filter = filter;
+    }
+  }
+
+  public enum GraphQLDependentFareProductFilter {
+    ALL,
+    MATCH_CATEGORY_AND_MEDIUM,
+  }
+
   public static class GraphQLDestinationBicyclePolicyInput {
 
     private Boolean allowKeeping;
