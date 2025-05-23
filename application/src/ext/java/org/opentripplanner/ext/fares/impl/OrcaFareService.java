@@ -20,6 +20,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductLike;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Leg;
@@ -538,14 +539,14 @@ public class OrcaFareService extends DefaultFareService {
       .withCategory(riderCategory)
       .withMedium(medium)
       .build();
-    itineraryFare.addFareProduct(leg, fareProduct);
+    itineraryFare.addFareProduct(leg, new FareProductLike(fareProduct, List.of()));
     // If a transfer was used, then also add a transfer fare product.
     if (transferDiscount.isPositive()) {
       var transferFareProduct = FareProduct.of(id, "transfer", transferDiscount)
         .withCategory(riderCategory)
         .withMedium(medium)
         .build();
-      itineraryFare.addFareProduct(leg, transferFareProduct);
+      itineraryFare.addFareProduct(leg, new FareProductLike(transferFareProduct, List.of()));
     }
   }
 

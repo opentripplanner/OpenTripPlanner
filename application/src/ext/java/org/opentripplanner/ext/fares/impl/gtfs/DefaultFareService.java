@@ -22,6 +22,7 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductLike;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
@@ -219,7 +220,7 @@ public class DefaultFareService implements FareService {
       if (!applicableLegs.isEmpty()) {
         final var use = new FareProductUse(
           product.uniqueInstanceId(applicableLegs.getFirst().startTime()),
-          product
+          new FareProductLike(product, List.of())
         );
         applicableLegs.forEach(leg -> {
           fareProductUses.put(leg, use);

@@ -3,7 +3,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductLike;
 import org.opentripplanner.model.fare.FareProductUse;
 
 public class FareProductUseImpl implements GraphQLDataFetchers.GraphQLFareProductUse {
@@ -14,7 +14,7 @@ public class FareProductUseImpl implements GraphQLDataFetchers.GraphQLFareProduc
   }
 
   @Override
-  public DataFetcher<FareProduct> product() {
+  public DataFetcher<FareProductLike> product() {
     return env -> getSource(env).product();
   }
 

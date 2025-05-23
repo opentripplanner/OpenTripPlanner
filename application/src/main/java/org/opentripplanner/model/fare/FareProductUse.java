@@ -9,4 +9,4 @@ import org.opentripplanner.utils.lang.Sandbox;
  * The id identifies the fare product across the legs.
  */
 @Sandbox
-public record FareProductUse(String id, FareProduct product) {}
+public record FareProductUse(String id, FareProductLike product) {}

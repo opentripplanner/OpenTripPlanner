@@ -463,6 +463,17 @@ type DefaultFareProduct implements FareProduct {
   riderCategory: RiderCategory
 }
 
+type DependentFareProduct implements FareProduct {
+  id: String!
+  medium: FareMedium
+  name: String!
+  "The price of the product"
+  price: Money!
+  "The category of riders this product applies to, for example students or pensioners."
+  riderCategory: RiderCategory
+  dependencies: [FareProduct!]!
+}
+
 """
 Departure row is a combination of a pattern and a stop of that pattern.
 

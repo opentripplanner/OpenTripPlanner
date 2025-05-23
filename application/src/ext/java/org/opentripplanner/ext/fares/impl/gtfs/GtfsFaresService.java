@@ -2,8 +2,10 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.google.common.collect.Multimap;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductLike;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -28,11 +30,21 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
   /**
    * Add a complex set of fare products for a specific leg;
    */
-  private static void addLegProducts(Multimap<Leg, FareProduct> legProducts, ItineraryFare fares) {
+  private static void addLegProducts(
+    Multimap<Leg, TransferFareProduct> legProducts,
+    ItineraryFare fares
+  ) {
     legProducts
       .entries()
       .forEach(e -> {
-        fares.addFareProduct(e.getKey(), e.getValue());
+        final TransferFareProduct value = e.getValue();
+        final Collection<FareProductLike> dependencies = value
+          .dependencies()
+          .stream()
+          .map(fp -> new FareProductLike(fp, List.of()))
+          .toList();
+        var productLike = new FareProductLike(value.transferProduct(), dependencies);
+        fares.addFareProduct(e.getKey(), productLike);
       });
   }
 }
