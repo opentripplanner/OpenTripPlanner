@@ -43,6 +43,7 @@ import org.opentripplanner.osm.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -144,19 +145,18 @@ public class GraphBuilderModules {
   @Provides
   @Singleton
   static StreetLinkerModule provideStreetLinkerModule(
-    BuildConfig config,
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    VertexLinker linker
   ) {
     return new StreetLinkerModule(
       graph,
       parkingRepository,
       timetableRepository,
       issueStore,
-      config.areaVisibility,
-      config.maxAreaNodes
+      linker
     );
   }
 
@@ -167,20 +167,14 @@ public class GraphBuilderModules {
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    VertexLinker linker
   ) {
     PruneIslands pruneIslands = new PruneIslands(
       graph,
       timetableRepository,
       issueStore,
-      new StreetLinkerModule(
-        graph,
-        parkingRepository,
-        timetableRepository,
-        issueStore,
-        config.areaVisibility,
-        config.maxAreaNodes
-      )
+      new StreetLinkerModule(graph, parkingRepository, timetableRepository, issueStore, linker)
     );
     pruneIslands.setPruningThresholdIslandWithoutStops(
       config.islandPruning.pruningThresholdIslandWithoutStops
@@ -254,11 +248,13 @@ public class GraphBuilderModules {
   static DirectTransferAnalyzer provideDirectTransferAnalyzer(
     BuildConfig config,
     Graph graph,
+    VertexLinker linker,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore
   ) {
     return new DirectTransferAnalyzer(
       graph,
+      linker,
       timetableRepository,
       issueStore,
       config.maxTransferDuration.toSeconds() * WalkPreferences.DEFAULT.speed()

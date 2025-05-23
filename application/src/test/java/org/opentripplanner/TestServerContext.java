@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.service.DefaultViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -109,6 +110,7 @@ public class TestServerContext {
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),
+      createVertexLinker(graph),
       createViaTransferResolver(graph, transitService),
       createWorldEnvelopeService(),
       createEmissionsItineraryDecorator(),
@@ -118,6 +120,10 @@ public class TestServerContext {
       null,
       null
     );
+  }
+
+  private static VertexLinker createVertexLinker(Graph graph) {
+    return new VertexLinker(graph);
   }
 
   /** Static factory method to create a service for test purposes. */

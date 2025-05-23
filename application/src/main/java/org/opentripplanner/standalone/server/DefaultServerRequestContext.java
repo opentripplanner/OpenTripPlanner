@@ -20,6 +20,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -80,6 +81,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final TriasApiParameters triasApiParameters;
 
+  private final VertexLinker vertexLinker;
+
   /* Lazy initialized fields */
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
@@ -106,6 +109,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
+    VertexLinker vertexLinker,
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
     @Nullable ItineraryDecorator emissionItineraryDecorator,
@@ -131,6 +135,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
+    this.vertexLinker = vertexLinker;
     this.viaTransferResolver = viaTransferResolver;
     this.worldEnvelopeService = worldEnvelopeService;
 
@@ -273,5 +278,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public FareService fareService() {
     return fareService;
+  }
+
+  @Override
+  public VertexLinker vertexLinker() {
+    return vertexLinker;
   }
 }

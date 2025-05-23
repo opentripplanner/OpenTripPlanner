@@ -71,8 +71,6 @@ public class Graph implements Serializable {
   @Nullable
   private final OpeningHoursCalendarService openingHoursCalendarService;
 
-  private final transient VertexLinker linker;
-
   private transient StreetIndex streetIndex;
 
   /** The convex hull of all the graph vertices. Generated at the time the Graph is built. */
@@ -126,7 +124,6 @@ public class Graph implements Serializable {
   ) {
     this.deduplicator = deduplicator;
     this.openingHoursCalendarService = openingHoursCalendarService;
-    this.linker = new VertexLinker(this);
   }
 
   public Graph(Deduplicator deduplicator) {
@@ -342,24 +339,6 @@ public class Graph implements Serializable {
   public void insert(StreetEdge edge, Scope scope) {
     requireIndex();
     streetIndex.insert(edge, scope);
-  }
-
-  /**
-   * Get VertexLinker, safe to use while routing, but do not use during graph build.
-   * @see #getLinkerSafe()
-   */
-  public VertexLinker getLinker() {
-    requireIndex();
-    return linker;
-  }
-
-  /**
-   * Get VertexLinker during graph build, both OSM street data and transit data must be loaded
-   * before calling this.
-   */
-  public VertexLinker getLinkerSafe() {
-    indexIfNotIndexed();
-    return linker;
   }
 
   /**

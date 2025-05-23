@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -180,6 +181,7 @@ public class ConstructApplication {
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
+      vertexLinker(),
       realtimeVehicleRepository(),
       vehicleRentalRepository(),
       vehicleParkingRepository(),
@@ -308,6 +310,10 @@ public class ConstructApplication {
 
   public Graph graph() {
     return factory.graph();
+  }
+
+  public VertexLinker vertexLinker() {
+    return factory.vertexLinker();
   }
 
   public WorldEnvelopeRepository worldEnvelopeRepository() {

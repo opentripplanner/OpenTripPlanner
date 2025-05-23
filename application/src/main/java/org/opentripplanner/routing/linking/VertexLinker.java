@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.linking;
 
+import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -97,6 +98,7 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
+  @Inject
   public VertexLinker(Graph graph) {
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
