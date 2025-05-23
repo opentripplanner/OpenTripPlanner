@@ -5,9 +5,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -46,27 +44,28 @@ public class PageCursorFactory {
 
   /**
    * Set the original search earliest-departure-time({@code edt}), latest-arrival-time ({@code lat},
-   * optional) and the search-window used.
+   * optional) and the search-window used. Also resolve the page-type and
+   * first-search-latest-itinerary-departure.
    */
   public PageCursorFactory withOriginalSearch(
     @Nullable PageType pageType,
+    @Nullable Instant firstItineraryResultDeparture,
     Instant edt,
     Instant lat,
-    Duration searchWindow,
-    List<Itinerary> itineraries
+    Duration searchWindow
   ) {
     this.currentPageType = pageType == null
       ? resolvePageTypeForTheFirstSearch(sortOrder)
       : pageType;
+    this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
+      pageType,
+      firstItineraryResultDeparture,
+      edt
+    );
 
     this.currentEdt = edt;
     this.currentLat = lat;
     this.currentSearchWindow = searchWindow;
-    this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
-      pageType,
-      itineraries,
-      edt
-    );
     return this;
   }
 
@@ -83,20 +82,6 @@ public class PageCursorFactory {
     this.wholeSwUsed = false;
     this.pageCursorInput = pageCursorFactoryParams;
     this.itineraryPageCut = pageCursorFactoryParams.pageCut();
-    return this;
-  }
-
-  /**
-   * If the initial request is of the PREVIOUS_PAGE type, the current search window is misleading.
-   * Instead of using the current search window to set the page cursor of the next page,
-   * the departure time of the latest itinerary result is used.
-   *
-   * @param firstSearchLatestItineraryDeparture the time of the latest departure of the itinerary results from the first search
-   */
-  public PageCursorFactory withFirstSearchLatestItineraryDeparture(
-    Instant firstSearchLatestItineraryDeparture
-  ) {
-    this.firstSearchLatestItineraryDeparture = firstSearchLatestItineraryDeparture;
     return this;
   }
 
@@ -138,17 +123,18 @@ public class PageCursorFactory {
   }
 
   /**
-   * If the first search is an arrive by search, store the latest itinerary's start time
-   * to allow setting cursor information correctly for the page cursor of the next page.
+   * If the first search is an arrive by search (PREVIOUS_PAGE type), the current search window is
+   * misleading. Instead of using the current search window to set the page cursor of the next
+   * page, the departure time of the latest itinerary result is used to avoid missing itineraries.
    */
   private Instant resolveFirstSearchLatestItineraryDeparture(
     @Nullable PageType pageType,
-    List<Itinerary> itineraries,
+    @Nullable Instant firstItineraryResultDeparture,
     Instant edt
   ) {
     if (pageType == null && resolvePageTypeForTheFirstSearch(sortOrder) == PREVIOUS_PAGE) {
-      if (itineraries.size() > 0) {
-        return itineraries.get(0).startTimeAsInstant();
+      if (firstItineraryResultDeparture != null) {
+        return firstItineraryResultDeparture;
       } else {
         return edt;
       }
