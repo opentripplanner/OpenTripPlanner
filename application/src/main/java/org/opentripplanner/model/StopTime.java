@@ -191,14 +191,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.shapeDistTraveled = shapeDistTraveled;
   }
 
-  public String getFarePeriodId() {
-    return farePeriodId;
-  }
-
-  public void setFarePeriodId(String farePeriodId) {
-    this.farePeriodId = farePeriodId;
-  }
-
   public int getFlexWindowStart() {
     return flexWindowStart;
   }
