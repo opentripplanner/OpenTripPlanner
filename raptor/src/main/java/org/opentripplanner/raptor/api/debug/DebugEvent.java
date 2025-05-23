@@ -86,7 +86,7 @@ public class DebugEvent<E> {
   }
 
   /**
-   * The element was dominated  by the this element. This may or may not affect the final result
+   * The element was dominated by the this element. This may or may not affect the final result
    * depending on the round/iteration the original element was accepted.
    * <p/>
    * The rejectedDroppedByElement is optional. It can be {@code null}.

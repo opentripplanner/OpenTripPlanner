@@ -14,7 +14,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -162,7 +162,7 @@ public class CarRoutingTest {
           }
         })
     );
-    Geometry legGeometry = itineraries.get(0).legs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.encode(legGeometry).points();
   }
 }

@@ -46,7 +46,6 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.RealTimeTripUpdate;
@@ -56,14 +55,14 @@ import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
-import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.plan.WalkStepBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
+import org.opentripplanner.model.plan.walkstep.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -360,7 +359,7 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    // TODO - Use itineraryBuilder() here not build() and compleate building the itinerary using
+    // TODO - Use itineraryBuilder() here not build() and complete building the itinerary using
     //        the ItineraryBuilder and not going back and forth between the Itinerary and the
     //        builder.
     var i1 = newItinerary(A, T11_00)
@@ -374,10 +373,10 @@ class GraphQLIntegrationTest {
 
     var busLeg = i1.transitLeg(1);
     var railLeg = (ScheduledTransitLeg) i1.transitLeg(2);
-    railLeg = railLeg.copy().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
+    railLeg = railLeg.copyOf().withAlerts(Set.of(alert)).withAccessibilityScore(3f).build();
     ArrayList<Leg> legs = new ArrayList<>(i1.legs());
     legs.set(2, railLeg);
-    i1 = i1.copyOf().withLegs(ignore -> legs).build();
+    i1 = i1.copyOf().withLegs(legs).build();
 
     var fares = new ItineraryFare();
 
@@ -392,8 +391,8 @@ class GraphQLIntegrationTest {
 
     i1 = i1.copyOf().withAccessibilityScore(0.5f).build();
 
-    var emissions = new Emissions(new Gram(123.0));
-    i1 = i1.copyOf().withEmissionsPerPerson(emissions).build();
+    var emission = Emission.ofCo2Gram(123.0);
+    i1 = i1.copyOf().withEmissionPerPerson(emission).build();
 
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
@@ -466,7 +465,7 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          var rtt = (RealTimeTripTimes) stl.getTripTimes();
+          var rtt = (RealTimeTripTimes) stl.tripTimes();
 
           for (var i = 0; i < rtt.getNumStops(); i++) {
             rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
@@ -538,14 +537,10 @@ class GraphQLIntegrationTest {
   }
 
   private static FareProduct fareProduct(String name) {
-    return new FareProduct(
-      id(name),
-      name,
-      Money.euros(10),
-      null,
-      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
-      new FareMedium(id("oyster"), "TfL Oyster Card")
-    );
+    return FareProduct.of(id(name), name, Money.euros(10))
+      .withCategory(new RiderCategory(id("senior-citizens"), "Senior citizens", null))
+      .withMedium(new FareMedium(id("oyster"), "TfL Oyster Card"))
+      .build();
   }
 
   /**

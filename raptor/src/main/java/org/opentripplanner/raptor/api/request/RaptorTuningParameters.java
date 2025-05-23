@@ -21,7 +21,7 @@ public interface RaptorTuningParameters {
   }
 
   /**
-   * Coefficients used to calculate raptor-search-window parameters dynamically  from heuristics.
+   * Coefficients used to calculate raptor-search-window parameters dynamically from heuristics.
    */
   default DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients() {
     return new DynamicSearchWindowCoefficients() {};
