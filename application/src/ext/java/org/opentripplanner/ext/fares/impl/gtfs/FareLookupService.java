@@ -66,17 +66,19 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  Set<TransferMatch> transferForPairs(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+  Set<TransferMatch> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
     return this.transferRules.stream()
       .flatMap(r -> {
-        var fromRule = findFareLegRule(r.fromLegGroup());
-        var toRule = findFareLegRule(r.toLegGroup());
-        if (fromRule.isEmpty() || toRule.isEmpty()) {
+        var fromRules = findFareLegRule(r.fromLegGroup());
+        var toRules = findFareLegRule(r.toLegGroup());
+        if (fromRules.isEmpty() || toRules.isEmpty()) {
           return Stream.of();
-        } else if (legMatchesRule(from, fromRule.get()) && legMatchesRule(to, toRule.get())) {
-          return Stream.of(new TransferMatch(r, fromRule.get(), toRule.get()));
         } else {
-          return Stream.of();
+          return fromRules
+            .stream()
+            .flatMap(fromRule ->
+              toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule))
+            ).filter(match -> legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule()));
         }
       })
       .collect(Collectors.toSet());
@@ -87,8 +89,8 @@ class FareLookupService implements Serializable {
     List<ScheduledTransitLeg> transitLegs
   ) {
     var pairs = ListUtils.partitionIntoOverlappingPairs(transitLegs);
-    var fromRule = findFareLegRule(transferRule.fromLegGroup());
-    var toRule = findFareLegRule(transferRule.toLegGroup());
+    var fromRule = Optional.ofNullable(findFareLegRule(transferRule.fromLegGroup()).getFirst());
+    var toRule = Optional.ofNullable(findFareLegRule(transferRule.toLegGroup()).getLast());
 
     // no need to compute transfers if there is only a single leg or the rules cannot be found
     if (pairs.isEmpty() || fromRule.isEmpty() || toRule.isEmpty()) {
@@ -123,8 +125,8 @@ class FareLookupService implements Serializable {
     );
   }
 
-  private Optional<FareLegRule> findFareLegRule(FeedScopedId id) {
-    return legRules.stream().filter(r -> r.legGroupId().equals(id)).findFirst();
+  private List<FareLegRule> findFareLegRule(FeedScopedId id) {
+    return legRules.stream().filter(r -> r.legGroupId().equals(id)).toList();
   }
 
   private static List<FareTransferRule> stripWildcards(Collection<FareTransferRule> rules) {

@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +26,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public FareResult calculateFares(Itinerary itinerary) {
-    Multimap<Leg, TransferFareProduct> legProducts = ArrayListMultimap.create();
+    Multimap<Leg, TransferFareProduct> legProducts = HashMultimap.create();
     itinerary
       .listScheduledTransitLegs()
       .forEach(leg -> {
@@ -42,21 +40,21 @@ public final class GtfsFaresV2Service implements Serializable {
       });
 
     var pairs = ListUtils.partitionIntoOverlappingPairs(itinerary.listScheduledTransitLegs());
-    pairs.forEach(pair ->
-      {
-        final Set<TransferMatch> transferMatches = lookup.transferForPairs(pair.first(), pair.second());
-        transferMatches
-          .forEach(transfer -> {
-            transfer
-              .transferRule()
-              .fareProducts()
-              .forEach(p -> {
-                var ftp = new TransferFareProduct(p, transfer.fromLegRule().fareProducts());
-                legProducts.put(pair.second(), ftp);
-              });
+    pairs.forEach(pair -> {
+      final Set<TransferMatch> transferMatches = lookup.findTransfersForPair(
+        pair.first(),
+        pair.second()
+      );
+      transferMatches.forEach(transfer -> {
+        transfer
+          .transferRule()
+          .fareProducts()
+          .forEach(p -> {
+            var ftp = new TransferFareProduct(p, transfer.fromLegRule().fareProducts());
+            legProducts.put(pair.second(), ftp);
           });
-      }
-    );
+      });
+    });
 
     var itinProducts = lookup
       .transfersMatchingAllLegs(itinerary.listScheduledTransitLegs())

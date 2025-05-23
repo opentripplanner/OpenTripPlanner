@@ -55,8 +55,8 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertEquals(Set.of(), result.itineraryProducts());
-    assertEquals(Set.of(FARE_PRODUCT), result.productsForLeg(i1.legs().getFirst()));
-    assertEquals(Set.of(ONE_EUR_TRANSFER), result.productsForLeg(i1.legs().getLast()));
+    assertEquals(Set.of(new TransferFareProduct(FARE_PRODUCT, List.of())), result.productsForLeg(i1.legs().getFirst()));
+    assertEquals(Set.of(new TransferFareProduct(ONE_EUR_TRANSFER, List.of())), result.productsForLeg(i1.legs().getLast()));
   }
 
   @Test

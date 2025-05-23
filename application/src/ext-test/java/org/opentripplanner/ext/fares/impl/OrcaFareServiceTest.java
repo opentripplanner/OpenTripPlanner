@@ -101,25 +101,30 @@ public class OrcaFareServiceTest {
       .stream()
       .map(FareProductUse::product)
       .filter(
-        fp ->
-          fp.medium().name().equals("electronic") &&
+        fpl -> {
+          var fp = fpl.fareProduct();
+          return (fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
-          fp.name().equals("rideCost")
+          fp.name().equals("rideCost"));
+        }
       )
       .findFirst();
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().price().minorUnitAmount());
+    Assertions.assertEquals(fare, rideCost.get().fareProduct().price().minorUnitAmount());
 
     var transfer = legFareProducts
       .stream()
       .map(FareProductUse::product)
       .filter(
-        fp ->
+        fpl -> {
+          var fp = fpl.fareProduct();
+          return (
           fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
-          fp.name().equals("transfer")
+          fp.name().equals("transfer"));
+        }
       )
       .findFirst();
     Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
@@ -535,16 +540,16 @@ public class OrcaFareServiceTest {
     assertFalse(fares.getItineraryProducts().isEmpty());
     assertFalse(fares.getLegProducts().isEmpty());
 
-    var firstLeg = itinerary.legs().get(0);
+    var firstLeg = itinerary.legs().getFirst();
     var uses = fares.getLegProducts().get(firstLeg);
     assertEquals(7, uses.size());
 
     var regular = uses
       .stream()
-      .filter(u -> u.product().category().name().equals("regular"))
+      .filter(u -> u.product().fareProduct().category().name().equals("regular"))
       .toList()
-      .get(0);
-    assertEquals(Money.usDollars(3.49f), regular.product().price());
+      .getFirst();
+    assertEquals(Money.usDollars(3.49f), regular.product().fareProduct().price());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {

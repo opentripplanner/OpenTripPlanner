@@ -16,8 +16,10 @@ public class DependentFareProductImpl implements GraphQLDataFetchers.GraphQLDepe
   public DataFetcher<Iterable<FareProductLike>> dependencies() {
     return env -> {
       var fpl = getSource(env);
-      var filter = new GraphQLDependentFareProductDependenciesArgs(env.getArguments()).getGraphQLFilter();
-      return switch(filter){
+      var filter = new GraphQLDependentFareProductDependenciesArgs(
+        env.getArguments()
+      ).getGraphQLFilter();
+      return switch (filter) {
         case null -> fpl.dependencies();
         case ALL -> fpl.dependencies();
         case MATCH_CATEGORY_AND_MEDIUM -> fpl.dependenciesMatchingCategoryAndMedium();

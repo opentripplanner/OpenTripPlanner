@@ -2,11 +2,17 @@ package org.opentripplanner.model.fare;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.utils.lang.Sandbox;
 
 @Sandbox
 public record FareProductLike(FareProduct fareProduct, Collection<FareProductLike> dependencies) {
+
+  public FareProductLike(FareProduct fp) {
+    this(fp, List.of());
+  }
+
   public String uniqueInstanceId(ZonedDateTime zonedDateTime) {
     return fareProduct.uniqueInstanceId(zonedDateTime);
   }

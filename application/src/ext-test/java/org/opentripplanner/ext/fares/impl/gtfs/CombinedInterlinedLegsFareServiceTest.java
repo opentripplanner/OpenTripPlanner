@@ -80,7 +80,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
       .values()
       .stream()
       .distinct()
-      .map(p -> p.product().price())
+      .map(p -> p.product().fareProduct().price())
       .reduce(Money.ZERO_USD, Money::plus);
     assertEquals(totalPrice, sum);
   }
@@ -101,14 +101,14 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     assertEquals(1, uses.size());
 
     var firstLegUse = uses.getFirst();
-    assertEquals(tenDollars, firstLegUse.product().price());
+    assertEquals(tenDollars, firstLegUse.product().fareProduct().price());
 
     var secondLeg = itinerary.transitLeg(1);
     uses = List.copyOf(fare.getLegProducts().get(secondLeg));
     assertEquals(1, uses.size());
 
     var secondLegUse = uses.getFirst();
-    assertEquals(tenDollars, secondLegUse.product().price());
+    assertEquals(tenDollars, secondLegUse.product().fareProduct().price());
 
     // the same far product is used for both legs as you only need to buy one
     assertEquals(secondLegUse, firstLegUse);

@@ -45,7 +45,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
         .getLegProducts()
         .values()
         .stream()
-        .map(u -> u.product().id())
+        .map(u -> u.product().fareProduct().id())
         .toArray()
     );
   }
