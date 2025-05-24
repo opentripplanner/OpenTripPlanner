@@ -4,10 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
@@ -39,14 +41,15 @@ class LocationGroupMapper {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  GroupStop map(LocationGroup original) {
+  GroupStop map(@Nullable LocationGroup original) {
     return original == null ? null : mappedLocationGroups.computeIfAbsent(original, this::doMap);
   }
 
   private GroupStop doMap(LocationGroup element) {
-    GroupStopBuilder groupStopBuilder = siteRepositoryBuilder
-      .groupStop(idFactory.createId(element.getId()))
-      .withName(new NonLocalizedString(element.getName()));
+    var id = idFactory.createId(element.getId());
+    // the GTFS spec allows name-less location groups: https://gtfs.org/documentation/schedule/reference/#location_groupstxt
+    var name = NonLocalizedString.ofNullableOrElse(element.getName(), id.toString());
+    var groupStopBuilder = siteRepositoryBuilder.groupStop(id).withName(name);
 
     for (var location : element.getLocations()) {
       Objects.requireNonNull(
