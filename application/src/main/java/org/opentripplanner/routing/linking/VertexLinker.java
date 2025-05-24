@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.linking;
 
-import jakarta.inject.Inject;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -91,17 +90,22 @@ public class VertexLinker {
 
   private final VertexFactory vertexFactory;
 
-  private boolean areaVisibility = true;
-  private int maxAreaNodes = StreetConstants.DEFAULT_MAX_AREA_NODES;
+  private final VisibilityMode visibilityMode;
+  private final int maxAreaNodes;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  @Inject
-  public VertexLinker(Graph graph) {
+  public VertexLinker(Graph graph, VisibilityMode visibilityMode, int maxAreaNodes) {
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
+    this.visibilityMode = visibilityMode;
+    this.maxAreaNodes = maxAreaNodes;
+  }
+
+  public VertexLinker(Graph graph) {
+    this(graph, VisibilityMode.COMPUTE_AREA_VISIBILITY, StreetConstants.DEFAULT_MAX_AREA_NODES);
   }
 
   public void linkVertexPermanently(
@@ -136,14 +140,6 @@ public class VertexLinker {
     if (edge.getGeometry() != null) {
       graph.removeEdge(edge, scope);
     }
-  }
-
-  public void setAreaVisibility(boolean areaVisibility) {
-    this.areaVisibility = areaVisibility;
-  }
-
-  public void setMaxAreaNodes(int maxAreaNodes) {
-    this.maxAreaNodes = maxAreaNodes;
   }
 
   /** projected distance from stop to edge, in latitude degrees */
@@ -395,7 +391,10 @@ public class VertexLinker {
     IntersectionVertex split = findSplitVertex(vertex, edge, xScale, scope, direction, tempEdges);
 
     // check if vertex is inside an area
-    if (this.areaVisibility && edge instanceof AreaEdge aEdge) {
+    if (
+      this.visibilityMode == VisibilityMode.COMPUTE_AREA_VISIBILITY &&
+      edge instanceof AreaEdge aEdge
+    ) {
       AreaGroup ag = aEdge.getArea();
       // is area already linked ?
       start = linkedAreas.get(ag);
@@ -781,6 +780,19 @@ public class VertexLinker {
     AreaEdge reverseAreaEdge = reverseAreaEdgeBuilder.buildAndConnect();
     if (scope != Scope.PERMANENT) {
       tempEdges.addEdge(reverseAreaEdge);
+    }
+  }
+
+  public enum VisibilityMode {
+    COMPUTE_AREA_VISIBILITY,
+    SKIP_AREA_VISIBILITY;
+
+    public static VisibilityMode ofBoolean(boolean computeVisibility) {
+      if (computeVisibility) {
+        return COMPUTE_AREA_VISIBILITY;
+      } else {
+        return SKIP_AREA_VISIBILITY;
+      }
     }
   }
 }

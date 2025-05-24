@@ -13,6 +13,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -209,9 +210,11 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
       var request = builder.buildRequest();
 
+      var linker = new VertexLinker(graph);
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
+          linker,
           request.from(),
           request.to(),
           streetMode,
@@ -238,6 +241,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
+          linker,
           request.from(),
           request.to(),
           streetMode,

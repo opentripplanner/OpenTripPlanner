@@ -346,7 +346,7 @@ public class ConstantsForTests {
 
   private static void addPortlandVehicleRentals(Graph graph) {
     try {
-      VertexLinker linker = graph.getLinker();
+      VertexLinker linker = new VertexLinker(graph);
       CsvReader reader = new CsvReader(PORTLAND_BIKE_SHARE_CSV, ',', StandardCharsets.UTF_8);
       reader.readHeaders();
       while (reader.readRecord()) {

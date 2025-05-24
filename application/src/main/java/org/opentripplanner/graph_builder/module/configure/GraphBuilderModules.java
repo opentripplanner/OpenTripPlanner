@@ -153,10 +153,10 @@ public class GraphBuilderModules {
   ) {
     return new StreetLinkerModule(
       graph,
+      linker,
       parkingRepository,
       timetableRepository,
-      issueStore,
-      linker
+      issueStore
     );
   }
 
@@ -174,7 +174,7 @@ public class GraphBuilderModules {
       graph,
       timetableRepository,
       issueStore,
-      new StreetLinkerModule(graph, parkingRepository, timetableRepository, issueStore, linker)
+      new StreetLinkerModule(graph, linker, parkingRepository, timetableRepository, issueStore)
     );
     pruneIslands.setPruningThresholdIslandWithoutStops(
       config.islandPruning.pruningThresholdIslandWithoutStops

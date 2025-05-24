@@ -37,6 +37,7 @@ import org.opentripplanner.routing.api.request.preference.TransferPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingService;
@@ -69,7 +70,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-      GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
+      GraphFinder.getInstance(graph, new VertexLinker(graph), transitService::findRegularStopsByBoundingBox),
       routeRequest
     );
   }

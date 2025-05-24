@@ -18,7 +18,6 @@ import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.linking.Scope;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -323,14 +322,15 @@ public class Graph implements Serializable {
    */
   public Collection<Edge> findEdges(Envelope env) {
     requireIndex();
-    return streetIndex.getEdgesForEnvelope(env);
+    return streetIndex.findEdges(env);
   }
 
   /**
    * Find all edges with the given scope inside the bounding box defined by {@code env}.
    */
   public Collection<Edge> findEdges(Envelope env, Scope scope) {
-    return streetIndex.getEdgesForEnvelope(env, scope);
+    requireIndex();
+    return streetIndex.findEdges(env, scope);
   }
 
   /**

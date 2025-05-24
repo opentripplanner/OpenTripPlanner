@@ -3,6 +3,7 @@ package org.opentripplanner.routing.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.linking.VertexLinker.VisibilityMode.COMPUTE_AREA_VISIBILITY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -244,7 +245,7 @@ public class LinkStopToPlatformTest {
 
     var vertexFactory = new VertexFactory(graph);
     var v = vertexFactory.intersection("boardingLocation", 10.00000001, 60.00000001);
-    graph.getLinker().addPermanentAreaVertex(v, ag);
+    new VertexLinker(graph).addPermanentAreaVertex(v, ag);
 
     // vertex links to the single visibility point with 2 edges
     assertEquals(10, graph.getEdges().size());
@@ -412,8 +413,7 @@ public class LinkStopToPlatformTest {
   }
 
   private void linkStops(Graph graph, int maxAreaNodes, boolean permanent) {
-    VertexLinker linker = graph.getLinker();
-    linker.setMaxAreaNodes(maxAreaNodes);
+    var linker = new VertexLinker(graph, COMPUTE_AREA_VISIBILITY, maxAreaNodes);
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       if (permanent) {
         linker.linkVertexPermanently(

@@ -64,7 +64,7 @@ class TestGraph {
     timetableRepository.index();
     graph.index();
 
-    VertexLinker linker = graph.getLinker();
+    VertexLinker linker = new VertexLinker(graph);
 
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       linker.linkVertexPermanently(

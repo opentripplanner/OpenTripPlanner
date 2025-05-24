@@ -73,8 +73,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   @Inject
   public OsmBoardingLocationsModule(
     Graph graph,
-    OsmInfoGraphBuildService osmInfoGraphBuildService,
-    VertexLinker linker
+    VertexLinker linker,
+    OsmInfoGraphBuildService osmInfoGraphBuildService
   ) {
     this.graph = graph;
     this.osmInfoGraphBuildService = osmInfoGraphBuildService;

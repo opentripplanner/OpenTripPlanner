@@ -15,6 +15,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
@@ -255,6 +256,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     try (
       var verticesContainer = new TemporaryVerticesContainer(
         graph,
+        new VertexLinker(graph),
         from,
         to,
         StreetMode.WALK,

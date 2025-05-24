@@ -82,7 +82,7 @@ class StreetIndex {
    * Return the edges whose geometry intersect with the specified envelope. Warning: edges disconnected from the graph
    * will not be indexed.
    */
-  Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
+  Collection<Edge> findEdges(Envelope envelope) {
     return edgeIndex
       .query(envelope, Scope.PERMANENT)
       .filter(
@@ -129,7 +129,7 @@ class StreetIndex {
     return Collections.unmodifiableSet(getStopOrChildStopsVertices(id));
   }
 
-  Collection<Edge> getEdgesForEnvelope(Envelope env, Scope scope) {
+  Collection<Edge> findEdges(Envelope env, Scope scope) {
     return edgeIndex.query(env, scope).toList();
   }
 

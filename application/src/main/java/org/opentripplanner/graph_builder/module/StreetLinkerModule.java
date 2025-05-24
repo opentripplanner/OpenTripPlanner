@@ -57,10 +57,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
   public StreetLinkerModule(
     Graph graph,
+    VertexLinker linker,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
-    DataImportIssueStore issueStore,
-    VertexLinker linker
+    DataImportIssueStore issueStore
   ) {
     this.graph = graph;
     this.parkingRepository = parkingRepository;
@@ -72,6 +72,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     timetableRepository.index();
+    graph.index();
 
     if (graph.hasStreets) {
       linkTransitStops(graph, timetableRepository);

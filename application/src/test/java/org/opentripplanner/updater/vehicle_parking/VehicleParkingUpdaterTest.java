@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestGraphData;
 import org.opentripplanner.service.vehicleparking.VehicleParkingTestUtil;
@@ -78,7 +79,7 @@ class VehicleParkingUpdaterTest {
     vehicleParkingUpdater = new VehicleParkingUpdater(
       parameters,
       dataSource,
-      graph.getLinker(),
+      new VertexLinker(graph),
       parkingRepository
     );
   }

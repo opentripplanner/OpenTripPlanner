@@ -18,6 +18,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
@@ -60,7 +61,14 @@ public class TemporaryVerticesContainerTest {
   @Test
   public void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, from, to, StreetMode.WALK, StreetMode.WALK);
+    subject = new TemporaryVerticesContainer(
+      g,
+      new VertexLinker(g),
+      from,
+      to,
+      StreetMode.WALK,
+      StreetMode.WALK
+    );
 
     // Then:
     originAndDestinationInsertedCorrect();
