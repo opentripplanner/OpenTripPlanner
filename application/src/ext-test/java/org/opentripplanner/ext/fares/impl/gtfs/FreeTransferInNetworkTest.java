@@ -57,7 +57,7 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
     var i1 = newItinerary(A, 0).bus(ROUTE, 1, 0, 50, B).build();
     var result = service.calculateFares(i1);
     assertEquals(
-      Set.of(new TransferFareProduct(REGULAR)),
+      Set.of(new LegFareProductResult(REGULAR)),
       result.productsForLeg(i1.legs().getFirst())
     );
   }

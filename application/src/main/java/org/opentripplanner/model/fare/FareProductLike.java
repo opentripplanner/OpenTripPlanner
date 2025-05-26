@@ -2,32 +2,36 @@ package org.opentripplanner.model.fare;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.opentripplanner.utils.lang.Sandbox;
 
 @Sandbox
-public record FareProductLike(FareProduct fareProduct, Collection<FareProductLike> dependencies) {
-  public FareProductLike(FareProduct fp) {
-    this(fp, List.of());
+public sealed interface FareProductLike
+  permits FareProductLike.DefaultFareProduct, FareProductLike.DependentFareProduct {
+  default String uniqueInstanceId(ZonedDateTime zonedDateTime) {
+    return fareProduct().uniqueInstanceId(zonedDateTime);
   }
 
-  public String uniqueInstanceId(ZonedDateTime zonedDateTime) {
-    return fareProduct.uniqueInstanceId(zonedDateTime);
-  }
+  FareProduct fareProduct();
 
-  public boolean hasDependencies() {
-    return !dependencies.isEmpty();
-  }
+  record DefaultFareProduct(FareProduct fareProduct) implements FareProductLike {}
 
-  public Collection<FareProductLike> dependenciesMatchingCategoryAndMedium() {
-    return dependencies
-      .stream()
-      .filter(
-        fp ->
-          Objects.equals(fp.fareProduct.category(), fareProduct.category()) &&
-          Objects.equals(fp.fareProduct.medium(), fareProduct.medium())
-      )
-      .toList();
+  record DependentFareProduct(FareProduct fareProduct, Set<FareProductLike> dependencies)
+    implements FareProductLike {
+    public DependentFareProduct(FareProduct fp, Collection<FareProductLike> dependencies) {
+      this(fp, Set.copyOf(dependencies));
+    }
+
+    public Collection<FareProductLike> dependenciesMatchingCategoryAndMedium() {
+      return dependencies
+        .stream()
+        .filter(
+          fp ->
+            Objects.equals(fp.fareProduct().category(), fareProduct.category()) &&
+            Objects.equals(fp.fareProduct().medium(), fareProduct.medium())
+        )
+        .toList();
+    }
   }
 }

@@ -52,7 +52,7 @@ public class DependentFareProductImpl implements GraphQLDataFetchers.GraphQLDepe
     return env -> getSource(env).fareProduct().category();
   }
 
-  private FareProductLike getSource(DataFetchingEnvironment environment) {
+  private FareProductLike.DependentFareProduct getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

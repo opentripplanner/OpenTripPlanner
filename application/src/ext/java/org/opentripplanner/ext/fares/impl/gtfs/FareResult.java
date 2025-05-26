@@ -2,7 +2,6 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.SetMultimap;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.model.fare.FareProduct;
@@ -14,12 +13,12 @@ import org.opentripplanner.model.plan.Leg;
  */
 record FareResult(
   Set<FareProduct> itineraryProducts,
-  Multimap<Leg, TransferFareProduct> legProducts
+  Multimap<Leg, LegFareProductResult> legProducts
 ) {
   public FareResult {
     legProducts = ImmutableSetMultimap.copyOf(legProducts);
   }
-  public Collection<TransferFareProduct> productsForLeg(Leg leg) {
+  public Collection<LegFareProductResult> productsForLeg(Leg leg) {
     return legProducts.get(leg);
   }
 }

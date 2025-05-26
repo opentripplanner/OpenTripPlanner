@@ -73,13 +73,13 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.productsForLeg(i1.legs().getFirst())).containsExactly(
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
     assertThat(result.productsForLeg(i1.legs().getLast())).containsExactly(
-      new TransferFareProduct(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
   }
 
@@ -95,18 +95,18 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     assertThat(result.itineraryProducts()).isEmpty();
     assertThat(result.productsForLeg(i1.legs().getFirst())).containsExactly(
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
     assertThat(result.productsForLeg(i1.legs().get(1))).containsExactly(
-      new TransferFareProduct(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
     assertThat(result.productsForLeg(i1.legs().getLast())).containsExactly(
-      new TransferFareProduct(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
   }
 
@@ -122,13 +122,13 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     assertEquals(Set.of(), result.itineraryProducts());
     assertThat(result.productsForLeg(i1.legs().getFirst())).containsExactly(
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
     assertThat(result.productsForLeg(i1.legs().get(1))).containsExactly(
-      new TransferFareProduct(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
-      new TransferFareProduct(ADULT_PRODUCT),
-      new TransferFareProduct(YOUTH_PRODUCT)
+      new LegFareProductResult(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      new LegFareProductResult(ADULT_PRODUCT),
+      new LegFareProductResult(YOUTH_PRODUCT)
     );
     assertEquals(Set.of(), result.productsForLeg(i1.legs().getLast()));
   }

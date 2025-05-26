@@ -2,10 +2,10 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareProductLike.DefaultFareProduct;
+import org.opentripplanner.model.fare.FareProductLike.DependentFareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -31,19 +31,20 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
    * Add a complex set of fare products for a specific leg;
    */
   private static void addLegProducts(
-    Multimap<Leg, TransferFareProduct> legProducts,
+    Multimap<Leg, LegFareProductResult> legProducts,
     ItineraryFare fares
   ) {
     legProducts
       .entries()
       .forEach(e -> {
-        final TransferFareProduct value = e.getValue();
+        final LegFareProductResult value = e.getValue();
         final Collection<FareProductLike> dependencies = value
           .dependencies()
           .stream()
-          .map(fp -> new FareProductLike(fp, List.of()))
+          .map(DefaultFareProduct::new)
+          .map(FareProductLike.class::cast)
           .toList();
-        var productLike = new FareProductLike(value.transferProduct(), dependencies);
+        var productLike = new DependentFareProduct(value.transferProduct(), dependencies);
         fares.addFareProduct(e.getKey(), productLike);
       });
   }

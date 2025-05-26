@@ -68,7 +68,7 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  Set<TransferFareProduct> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+  Set<LegFareProductResult> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
@@ -77,15 +77,7 @@ class FareLookupService implements Serializable {
           if (fromRules.isEmpty() || toRules.isEmpty()) {
             return Stream.of();
           } else {
-            return fromRules
-              .stream()
-              .flatMap(fromRule ->
-                toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule))
-              )
-              .filter(
-                match ->
-                  legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule())
-              );
+            return findTransferMatches(from, to, r, fromRules, toRules);
           }
         })
         .collect(Collectors.toSet());
@@ -102,8 +94,23 @@ class FareLookupService implements Serializable {
     return multiMap
       .keySet()
       .stream()
-      .map(product -> new TransferFareProduct(product, multiMap.get(product)))
+      .map(product -> new LegFareProductResult(product, multiMap.get(product)))
       .collect(Collectors.toSet());
+  }
+
+  private Stream<TransferMatch> findTransferMatches(
+    ScheduledTransitLeg from,
+    ScheduledTransitLeg to,
+    FareTransferRule r,
+    List<FareLegRule> fromRules,
+    List<FareLegRule> toRules
+  ) {
+    return fromRules
+      .stream()
+      .flatMap(fromRule -> toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule)))
+      .filter(
+        match -> legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule())
+      );
   }
 
   private Optional<TransferMatch> findTransferMatch(
@@ -228,5 +235,4 @@ class FareLookupService implements Serializable {
       return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
   }
-
 }
