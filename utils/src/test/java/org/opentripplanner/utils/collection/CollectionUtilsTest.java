@@ -79,8 +79,9 @@ class CollectionUtilsTest {
     CollectionUtils.requireNullOrNonEmpty(null, "test");
     CollectionUtils.requireNullOrNonEmpty(List.of(1), "test");
 
-    assertThrows(IllegalArgumentException.class, () -> {
+    var ex = assertThrows(IllegalArgumentException.class, () -> {
       CollectionUtils.requireNullOrNonEmpty(List.of(), "test");
     });
+    assertEquals("'test' must not be empty.", ex.getMessage());
   }
 }
