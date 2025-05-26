@@ -17,7 +17,6 @@ import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -219,7 +218,7 @@ public class SiriAzureUpdater implements GraphUpdater {
       setPrimed();
 
       ApplicationShutdownSupport.addShutdownHook("azure-siri-updater-shutdown", () -> {
-        LOG.info("Calling shutdownHook on AbstractAzureSiriUpdater");
+        LOG.info("Calling shutdownHook on {} updater", updaterType);
         if (eventProcessor != null) {
           eventProcessor.close();
         }
@@ -352,7 +351,7 @@ public class SiriAzureUpdater implements GraphUpdater {
     }
     serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
-    LOG.info("{} created subscription {}", getClass().getSimpleName(), subscriptionName);
+    LOG.info("{} updater created subscription {}", updaterType, subscriptionName);
   }
 
   /**
