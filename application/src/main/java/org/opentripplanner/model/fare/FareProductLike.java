@@ -8,7 +8,6 @@ import org.opentripplanner.utils.lang.Sandbox;
 
 @Sandbox
 public record FareProductLike(FareProduct fareProduct, Collection<FareProductLike> dependencies) {
-
   public FareProductLike(FareProduct fp) {
     this(fp, List.of());
   }

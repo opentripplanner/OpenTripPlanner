@@ -34,28 +34,21 @@ public final class GtfsFaresV2Service implements Serializable {
           .legRules(leg)
           .stream()
           .flatMap(r -> r.fareProducts().stream())
-          .map(f -> new TransferFareProduct(f, List.of()))
+          .map(TransferFareProduct::new)
           .collect(Collectors.toUnmodifiableSet());
         legProducts.putAll(leg, products);
       });
 
     var pairs = ListUtils.partitionIntoOverlappingPairs(itinerary.listScheduledTransitLegs());
     pairs.forEach(pair -> {
-      final Set<TransferMatch> transferMatches = lookup.findTransfersForPair(
+      final Set<TransferFareProduct> transferMatches = lookup.findTransfersForPair(
         pair.first(),
         pair.second()
       );
       transferMatches.forEach(transfer -> {
-        transfer
-          .transferRule()
-          .fareProducts()
-          .forEach(p -> {
-            var ftp = new TransferFareProduct(p, transfer.fromLegRule().fareProducts());
-            legProducts.put(pair.second(), ftp);
-          });
+        legProducts.put(pair.second(), transfer);
       });
     });
-
     var itinProducts = lookup
       .transfersMatchingAllLegs(itinerary.listScheduledTransitLegs())
       .stream()

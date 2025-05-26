@@ -100,14 +100,14 @@ public class OrcaFareServiceTest {
     var rideCost = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(
-        fpl -> {
-          var fp = fpl.fareProduct();
-          return (fp.medium().name().equals("electronic") &&
+      .filter(fpl -> {
+        var fp = fpl.fareProduct();
+        return (
+          fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
-          fp.name().equals("rideCost"));
-        }
-      )
+          fp.name().equals("rideCost")
+        );
+      })
       .findFirst();
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
@@ -117,15 +117,14 @@ public class OrcaFareServiceTest {
     var transfer = legFareProducts
       .stream()
       .map(FareProductUse::product)
-      .filter(
-        fpl -> {
-          var fp = fpl.fareProduct();
-          return (
+      .filter(fpl -> {
+        var fp = fpl.fareProduct();
+        return (
           fp.medium().name().equals("electronic") &&
           fp.category().name().equals("regular") &&
-          fp.name().equals("transfer"));
-        }
-      )
+          fp.name().equals("transfer")
+        );
+      })
       .findFirst();
     Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
   }

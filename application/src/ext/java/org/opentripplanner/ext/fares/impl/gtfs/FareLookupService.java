@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
@@ -66,21 +68,41 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  Set<TransferMatch> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
-    return this.transferRules.stream()
-      .flatMap(r -> {
-        var fromRules = findFareLegRule(r.fromLegGroup());
-        var toRules = findFareLegRule(r.toLegGroup());
-        if (fromRules.isEmpty() || toRules.isEmpty()) {
-          return Stream.of();
-        } else {
-          return fromRules
-            .stream()
-            .flatMap(fromRule ->
-              toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule))
-            ).filter(match -> legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule()));
-        }
-      })
+  Set<TransferFareProduct> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+    Set<TransferMatch> rules =
+      this.transferRules.stream()
+        .flatMap(r -> {
+          var fromRules = findFareLegRule(r.fromLegGroup());
+          var toRules = findFareLegRule(r.toLegGroup());
+          if (fromRules.isEmpty() || toRules.isEmpty()) {
+            return Stream.of();
+          } else {
+            return fromRules
+              .stream()
+              .flatMap(fromRule ->
+                toRules.stream().map(toRule -> new TransferMatch(r, fromRule, toRule))
+              )
+              .filter(
+                match ->
+                  legMatchesRule(from, match.fromLegRule()) && legMatchesRule(to, match.toLegRule())
+              );
+          }
+        })
+        .collect(Collectors.toSet());
+
+    Multimap<FareProduct, FareProduct> multiMap = HashMultimap.create();
+
+    rules.forEach(transfer ->
+      transfer
+        .transferRule()
+        .fareProducts()
+        .forEach(p -> multiMap.putAll(p, transfer.fromLegRule().fareProducts()))
+    );
+
+    return multiMap
+      .keySet()
+      .stream()
+      .map(product -> new TransferFareProduct(product, multiMap.get(product)))
       .collect(Collectors.toSet());
   }
 
