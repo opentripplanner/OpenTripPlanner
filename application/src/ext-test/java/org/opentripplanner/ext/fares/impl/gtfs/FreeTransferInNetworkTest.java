@@ -28,11 +28,15 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
     .build();
   private static final FeedScopedId LEG_GROUP = id("leg-group1");
 
-  FareProduct regular = FareProduct.of(id("regular"), "regular", Money.euros(5)).build();
+  private static final FareProduct REGULAR = FareProduct.of(
+    id("regular"),
+    "regular",
+    Money.euros(5)
+  ).build();
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      FareLegRule.of(id("6"), regular)
+      FareLegRule.of(id("6"), REGULAR)
         .withLegGroupId(LEG_GROUP)
         .withNetworkId(NETWORK.getId())
         .build()
@@ -52,13 +56,16 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
   void singleLeg() {
     var i1 = newItinerary(A, 0).bus(ROUTE, 1, 0, 50, B).build();
     var result = service.calculateFares(i1);
-    assertEquals(Set.of(regular), result.productsForLeg(i1.legs().getFirst()));
+    assertEquals(
+      Set.of(new TransferFareProduct(REGULAR)),
+      result.productsForLeg(i1.legs().getFirst())
+    );
   }
 
   @Test
   void severalLegs() {
     var i1 = newItinerary(A, 0).bus(ROUTE, 1, 0, 50, B).bus(ROUTE, 1, 0, 50, C).build();
     var result = service.calculateFares(i1);
-    assertEquals(Set.of(regular), result.itineraryProducts());
+    assertEquals(Set.of(REGULAR), result.itineraryProducts());
   }
 }

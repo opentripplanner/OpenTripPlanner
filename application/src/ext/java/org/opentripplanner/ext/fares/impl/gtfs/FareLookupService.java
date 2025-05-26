@@ -228,4 +228,5 @@ class FareLookupService implements Serializable {
       return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
   }
+
 }

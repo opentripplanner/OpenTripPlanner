@@ -34,7 +34,7 @@ class DistancesTest {
   FeedScopedId INNER_ZONE = id("inner-zone");
   FeedScopedId OUTER_ZONE = id("outer-zone");
 
-  private static int ID = 100;
+  private static final int ID = 100;
   FeedScopedId DISTANCE_ID = id("distance");
   FareProduct threeStopProduct = FareProduct.of(
     new FeedScopedId(FEED_ID, "three-stop-product"),
@@ -133,7 +133,7 @@ class DistancesTest {
     );
     assertEquals(
       faresV2Service.calculateFares(i1).productsForLeg(i1.legs().getLast()),
-      Set.of(twelveStopProduct)
+      Set.of(new TransferFareProduct(twelveStopProduct))
     );
   }
 
@@ -154,7 +154,7 @@ class DistancesTest {
     );
     assertEquals(
       faresV2Service.calculateFares(i1).productsForLeg(i1.transitLeg(0)),
-      Set.of(threeKmProduct)
+      Set.of(new TransferFareProduct(threeKmProduct))
     );
   }
 }
