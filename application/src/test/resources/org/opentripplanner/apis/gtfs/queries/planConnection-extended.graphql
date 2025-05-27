@@ -91,12 +91,13 @@
           includePlannedCancellations: false
           includeRealTimeCancellations: true
         }
+        filters: [
+          { include: [{ routes: ["A:r1"] }] }
+          { exclude: [{ agencies: ["A:a1"] }] }
+        ]
       }
     }
-    filters: [
-      { not: [{ routes: ["A:r1"] }] }
-      { select: [{ agencies: ["A:a1"] }] }
-    ]
+
     locale: "en"
   ) {
     searchDateTime

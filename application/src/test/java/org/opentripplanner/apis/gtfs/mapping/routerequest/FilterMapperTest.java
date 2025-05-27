@@ -9,17 +9,17 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanFilterInput;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitFilterInput;
 
 class FilterMapperTest {
 
   @Test
   void map() {
-    var filter = new GraphQLPlanFilterInput(
+    var filter = new GraphQLTransitFilterInput(
       Map.of(
-        "not",
+        "exclude",
         List.of(Map.of("routes", List.of("feed:A"))),
-        "select",
+        "include",
         List.of(Map.of("agencies", List.of("feed:A")))
       )
     );
@@ -39,24 +39,24 @@ class FilterMapperTest {
 
     return List.of(
       Map.of(
-        "not",
+        "exclude",
         List.of(Map.of("routes", List.of())),
-        "select",
+        "include",
         List.of(Map.of("routes", List.of()))
       ),
       Map.of(
-        "not",
+        "exclude",
         List.of(Map.of("agencies", List.of())),
-        "select",
+        "include",
         List.of(Map.of("agencies", List.of()))
       ),
-      Map.of("select", List.of(Map.of("routes", List.of()))),
-      Map.of("not", emptyAgencies),
-      Map.of("select", emptyAgencies),
-      Map.of("select", List.of()),
-      Map.of("not", List.of()),
-      Map.of("not", List.of(Map.of("routes", listWithNull))),
-      Map.of("not", List.of(Map.of("agencies", listWithNull))),
+      Map.of("include", List.of(Map.of("routes", List.of()))),
+      Map.of("exclude", emptyAgencies),
+      Map.of("include", emptyAgencies),
+      Map.of("include", List.of()),
+      Map.of("exclude", List.of()),
+      Map.of("exclude", List.of(Map.of("routes", listWithNull))),
+      Map.of("exclude", List.of(Map.of("agencies", listWithNull))),
       Map.of()
     );
   }
@@ -64,7 +64,7 @@ class FilterMapperTest {
   @ParameterizedTest
   @MethodSource("emptyListCases")
   void emptyList(Map<String, Object> args) {
-    var input = new GraphQLPlanFilterInput(args);
+    var input = new GraphQLTransitFilterInput(args);
     assertThrows(IllegalArgumentException.class, () -> FilterMapper.mapFilters(List.of(input)));
   }
 }

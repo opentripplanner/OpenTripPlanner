@@ -3,7 +3,6 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanFilterInput;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.utils.collection.CollectionUtils;
@@ -11,26 +10,28 @@ import org.opentripplanner.utils.collection.ListUtils;
 
 class FilterMapper {
 
-  static List<TransitFilter> mapFilters(List<GraphQLPlanFilterInput> filters) {
+  static List<TransitFilter> mapFilters(List<GraphQLTypes.GraphQLTransitFilterInput> filters) {
     var filterRequests = new ArrayList<TransitFilter>();
     for (var filterInput : filters) {
-      var selects = filterInput.getGraphQLSelect();
-      var nots = filterInput.getGraphQLNot();
-      CollectionUtils.requireNullOrNonEmpty(nots, "filters.not");
-      CollectionUtils.requireNullOrNonEmpty(selects, "filters.select");
+      var includes = filterInput.getGraphQLInclude();
+      var excludes = filterInput.getGraphQLExclude();
+      CollectionUtils.requireNullOrNonEmpty(includes, "filters.include");
+      CollectionUtils.requireNullOrNonEmpty(excludes, "filters.exclude");
 
-      if (CollectionUtils.isEmpty(nots) && CollectionUtils.isEmpty(selects)) {
+      if (CollectionUtils.isEmpty(excludes) && CollectionUtils.isEmpty(includes)) {
         throw new IllegalArgumentException("Filter must contain at least one 'select' or 'not'.");
       }
 
       var filterRequestBuilder = TransitFilterRequest.of();
 
-      for (var selectInput : ListUtils.nullSafeImmutableList(selects)) {
-        filterRequestBuilder.addSelect(SelectRequestMapper.mapSelectRequest(selectInput, "select"));
+      for (var selectInput : ListUtils.nullSafeImmutableList(includes)) {
+        filterRequestBuilder.addSelect(
+          SelectRequestMapper.mapSelectRequest(selectInput, "include")
+        );
       }
 
-      for (var selectInput : ListUtils.nullSafeImmutableList(nots)) {
-        filterRequestBuilder.addNot(SelectRequestMapper.mapSelectRequest(selectInput, "not"));
+      for (var selectInput : ListUtils.nullSafeImmutableList(excludes)) {
+        filterRequestBuilder.addNot(SelectRequestMapper.mapSelectRequest(selectInput, "exclude"));
       }
 
       filterRequests.add(filterRequestBuilder.build());

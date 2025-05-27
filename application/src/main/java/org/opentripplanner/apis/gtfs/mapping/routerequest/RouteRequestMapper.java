@@ -11,8 +11,12 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanPreferencesInput;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitPreferencesInput;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -66,12 +70,6 @@ public class RouteRequestMapper {
 
     setModes(request.journey(), args.getGraphQLModes(), environment);
 
-    if (CollectionUtils.hasValue(args.getGraphQLFilters())) {
-      var filterArgs = args.getGraphQLFilters();
-      var filters = FilterMapper.mapFilters(filterArgs);
-      request.journey().transit().setFilters(filters);
-    }
-
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));
     return request;
@@ -90,8 +88,23 @@ public class RouteRequestMapper {
     prefs.withTransit(transit -> {
       prefs.withTransfer(transfer -> setTransitPreferences(transit, transfer, args, environment));
     });
+    setTransitFilters(request, args);
     setStreetPreferences(prefs, request, preferenceArgs.getGraphQLStreet(), environment);
     setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
+  }
+
+  private static void setTransitFilters(
+    RouteRequest request,
+    GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
+  ) {
+    var graphQlFilters = Optional.ofNullable(args.getGraphQLPreferences())
+      .map(GraphQLPlanPreferencesInput::getGraphQLTransit)
+      .map(GraphQLTransitPreferencesInput::getGraphQLFilters)
+      .orElse(List.of());
+    if (CollectionUtils.hasValue(graphQlFilters)) {
+      var filters = FilterMapper.mapFilters(graphQlFilters);
+      request.journey().transit().setFilters(filters);
+    }
   }
 
   private static void setItineraryFilters(
@@ -119,7 +132,7 @@ public class RouteRequestMapper {
   private static void setStreetPreferences(
     RoutingPreferences.Builder preferences,
     RouteRequest request,
-    GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
+    @Nullable GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
     DataFetchingEnvironment environment
   ) {
     setRentalAvailabilityPreferences(preferences, request);
@@ -156,7 +169,7 @@ public class RouteRequestMapper {
 
   private static void setAccessibilityPreferences(
     RouteRequest request,
-    GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
+    @Nullable GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
   ) {
     if (preferenceArgs != null && preferenceArgs.getGraphQLWheelchair() != null) {
       request.setWheelchair(preferenceArgs.getGraphQLWheelchair().getGraphQLEnabled());
