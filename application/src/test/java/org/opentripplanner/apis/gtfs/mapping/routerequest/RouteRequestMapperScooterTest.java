@@ -4,6 +4,7 @@ import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.time.Duration;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -112,6 +113,7 @@ class RouteRequestMapperScooterTest {
     var banned = Set.of("not");
     var allowKeeping = true;
     var keepingCost = Cost.costOfSeconds(150);
+    var rentalDuration = Duration.ofHours(1);
     scooterArgs.put(
       "preferences",
       Map.ofEntries(
@@ -132,7 +134,8 @@ class RouteRequestMapperScooterTest {
                         entry("allowKeeping", allowKeeping),
                         entry("keepingCost", keepingCost)
                       )
-                    )
+                    ),
+                    entry("rentalDuration", rentalDuration)
                   )
                 )
               )
@@ -151,6 +154,7 @@ class RouteRequestMapperScooterTest {
       scooterRentalPreferences.allowArrivingInRentedVehicleAtDestination()
     );
     assertEquals(keepingCost, scooterRentalPreferences.arrivingInRentalVehicleAtDestinationCost());
+    assertEquals(rentalDuration, scooterRentalPreferences.rentalDuration());
   }
 
   @Test
