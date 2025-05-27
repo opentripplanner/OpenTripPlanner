@@ -45,7 +45,7 @@ class LocationGroupMapperTest {
 
     lg.addLocation(stop());
     var groupStop = mapper.map(lg);
-    assertEquals("F:group-1", groupStop.getName().toString());
+    assertEquals("Location group", groupStop.getName().toString());
   }
 
   private static LocationGroupMapper defaultMapper() {

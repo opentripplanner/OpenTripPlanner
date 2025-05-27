@@ -8,15 +8,15 @@ import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.service.SiteRepositoryBuilder;
 import org.opentripplanner.utils.collection.MapUtils;
 
 class LocationGroupMapper {
 
+  private static final LocalizedString FALLBACK_NAME = new LocalizedString("locationGroup");
   private final IdFactory idFactory;
   private final StopMapper stopMapper;
   private final LocationMapper locationMapper;
@@ -48,7 +48,7 @@ class LocationGroupMapper {
   private GroupStop doMap(LocationGroup element) {
     var id = idFactory.createId(element.getId());
     // the GTFS spec allows name-less location groups: https://gtfs.org/documentation/schedule/reference/#location_groupstxt
-    var name = NonLocalizedString.ofNullableOrElse(element.getName(), id.toString());
+    var name = NonLocalizedString.ofNullableOrElse(element.getName(), FALLBACK_NAME);
     var groupStopBuilder = siteRepositoryBuilder.groupStop(id).withName(name);
 
     for (var location : element.getLocations()) {
