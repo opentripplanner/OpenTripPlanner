@@ -6,6 +6,7 @@ import static org.opentripplanner.apis.gtfs.mapping.routerequest.StreetModeMappe
 
 import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -13,6 +14,7 @@ import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.utils.collection.CollectionUtils;
 
 public class ModePreferencesMapper {
 
@@ -21,9 +23,10 @@ public class ModePreferencesMapper {
    */
   static void setModes(
     JourneyRequest journey,
-    GraphQLTypes.GraphQLPlanModesInput modesInput,
+    GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args,
     DataFetchingEnvironment environment
   ) {
+    var modesInput = args.getGraphQLModes();
     var direct = modesInput.getGraphQLDirect();
     if (Boolean.TRUE.equals(modesInput.getGraphQLTransitOnly())) {
       journey.direct().setMode(StreetMode.NOT_SET);
@@ -38,7 +41,11 @@ public class ModePreferencesMapper {
     var transit = modesInput.getGraphQLTransit();
     if (Boolean.TRUE.equals(modesInput.getGraphQLDirectOnly())) {
       journey.transit().disable();
-    } else if (transit != null) {
+    } else if (transit == null) {
+      // even if there are no transit modes set, we need to set the filter to get the route/agency
+      // filters for flex
+      setTransitFilters(journey, MainAndSubMode.all(), args);
+    } else {
       var access = transit.getGraphQLAccess();
       if (access != null) {
         if (access.isEmpty()) {
@@ -68,11 +75,14 @@ public class ModePreferencesMapper {
       validateStreetModes(journey);
 
       var transitModes = getTransitModes(environment);
-      if (transitModes != null) {
+      if (transitModes == null) {
+        // even when there are no transit modes set we need to set the filters because of the route/agency
+        // includes/excludes
+        setTransitFilters(journey, MainAndSubMode.all(), args);
+      } else {
         if (transitModes.isEmpty()) {
           throw new IllegalArgumentException("Transit modes must not be empty.");
         }
-        var filterRequestBuilder = TransitFilterRequest.of();
         var mainAndSubModes = transitModes
           .stream()
           .map(mode ->
@@ -83,11 +93,36 @@ public class ModePreferencesMapper {
             )
           )
           .toList();
-        filterRequestBuilder.addSelect(
-          SelectRequest.of().withTransportModes(mainAndSubModes).build()
-        );
-        journey.transit().setFilters(List.of(filterRequestBuilder.build()));
+        setTransitFilters(journey, mainAndSubModes, args);
       }
+    }
+  }
+
+  /**
+   * It may be a little surprising that the transit filters are mapped here. This
+   * is because the mapping function needs to know the modes to build the correct
+   * select request as it needs to be the first select request in each transit filter request.
+   */
+  private static void setTransitFilters(
+    JourneyRequest request,
+    List<MainAndSubMode> modes,
+    GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
+  ) {
+    var graphQlFilters = Optional.ofNullable(args.getGraphQLPreferences())
+      .map(GraphQLTypes.GraphQLPlanPreferencesInput::getGraphQLTransit)
+      .map(GraphQLTypes.GraphQLTransitPreferencesInput::getGraphQLFilters)
+      .orElse(List.of());
+    if (CollectionUtils.hasValue(graphQlFilters)) {
+      var filters = FilterMapper.mapFilters(modes, graphQlFilters);
+      request.transit().setFilters(filters);
+    }
+    // if there isn't a transit filter or a mode set, then we can keep the default which is to include
+    // everything
+    else if (!modes.equals(MainAndSubMode.all())) {
+      var filter = TransitFilterRequest.of()
+        .addSelect(SelectRequest.of().withTransportModes(modes).build())
+        .build();
+      request.transit().setFilters(List.of(filter));
     }
   }
 }

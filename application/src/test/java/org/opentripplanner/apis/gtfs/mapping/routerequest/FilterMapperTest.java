@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitFilterInput;
+import org.opentripplanner.transit.model.basic.MainAndSubMode;
 
 class FilterMapperTest {
 
@@ -23,9 +24,9 @@ class FilterMapperTest {
         List.of(Map.of("agencies", List.of("feed:A")))
       )
     );
-    var result = FilterMapper.mapFilters(List.of(filter));
+    var result = FilterMapper.mapFilters(MainAndSubMode.all(), List.of(filter)).stream().toList();
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [], agencies: [feed:A]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}, SelectRequest{transportModes: [], agencies: [feed:A]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
       result.toString()
     );
   }
@@ -65,6 +66,8 @@ class FilterMapperTest {
   @MethodSource("emptyListCases")
   void emptyList(Map<String, Object> args) {
     var input = new GraphQLTransitFilterInput(args);
-    assertThrows(IllegalArgumentException.class, () -> FilterMapper.mapFilters(List.of(input)));
+    assertThrows(IllegalArgumentException.class, () ->
+      FilterMapper.mapFilters(MainAndSubMode.all(), List.of(input))
+    );
   }
 }

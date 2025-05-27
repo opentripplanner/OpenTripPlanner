@@ -11,19 +11,15 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPlanPreferencesInput;
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitPreferencesInput;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.DurationUtils;
 
 public class RouteRequestMapper {
@@ -68,7 +64,7 @@ public class RouteRequestMapper {
 
     request.withPreferences(preferences -> setPreferences(preferences, request, args, environment));
 
-    setModes(request.journey(), args.getGraphQLModes(), environment);
+    setModes(request.journey(), args, environment);
 
     // sadly we need to use the raw collection because it is cast to the wrong type
     mapViaPoints(request, environment.getArgument("via"));
@@ -88,23 +84,8 @@ public class RouteRequestMapper {
     prefs.withTransit(transit -> {
       prefs.withTransfer(transfer -> setTransitPreferences(transit, transfer, args, environment));
     });
-    setTransitFilters(request, args);
     setStreetPreferences(prefs, request, preferenceArgs.getGraphQLStreet(), environment);
     setAccessibilityPreferences(request, preferenceArgs.getGraphQLAccessibility());
-  }
-
-  private static void setTransitFilters(
-    RouteRequest request,
-    GraphQLTypes.GraphQLQueryTypePlanConnectionArgs args
-  ) {
-    var graphQlFilters = Optional.ofNullable(args.getGraphQLPreferences())
-      .map(GraphQLPlanPreferencesInput::getGraphQLTransit)
-      .map(GraphQLTransitPreferencesInput::getGraphQLFilters)
-      .orElse(List.of());
-    if (CollectionUtils.hasValue(graphQlFilters)) {
-      var filters = FilterMapper.mapFilters(graphQlFilters);
-      request.journey().transit().setFilters(filters);
-    }
   }
 
   private static void setItineraryFilters(
