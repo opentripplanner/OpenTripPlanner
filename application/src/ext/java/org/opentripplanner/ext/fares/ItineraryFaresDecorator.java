@@ -33,7 +33,7 @@ public final class ItineraryFaresDecorator {
       .stream()
       .map(fp -> {
         var instanceId = fp.uniqueInstanceId(i.legs().getFirst().startTime());
-        return new FareProductUse(instanceId, new FareProductLike(fp, List.of()));
+        return new FareProductUse(instanceId, new FareProductLike.DefaultFareProduct(fp));
       })
       .toList();
   }

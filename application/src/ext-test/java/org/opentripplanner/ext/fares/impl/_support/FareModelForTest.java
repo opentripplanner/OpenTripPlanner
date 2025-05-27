@@ -8,6 +8,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareProductLike.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -87,7 +88,7 @@ public class FareModelForTest implements FareTestConstants {
     .build();
   public static final FareProductUse FARE_PRODUCT_USE = new FareProductUse(
     "c1a04702-1fb6-32d4-ba02-483bf68111ed",
-    new FareProductLike(FareTestConstants.FARE_PRODUCT)
+    new DefaultFareProduct(FareTestConstants.FARE_PRODUCT)
   );
 
   // Fare rule sets

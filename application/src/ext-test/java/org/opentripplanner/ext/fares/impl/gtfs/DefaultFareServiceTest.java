@@ -20,6 +20,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareProductLike.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Place;
@@ -68,7 +69,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
         // plus some properties from the product itself like the id, price, rider category and medium
         new FareProductUse(
           "1d270201-412b-3b86-80f6-92ab144fa2e5",
-          new FareProductLike(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareProduct(AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts
@@ -103,7 +104,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     ).build();
     assertEquals(
       List.of(
-        new FareProductUse("ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6", new FareProductLike(regular))
+        new FareProductUse("ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6", new DefaultFareProduct(regular))
       ),
       firstProducts
     );
@@ -139,7 +140,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "ccadd1d3-f284-31a4-9d58-0a300198950f",
-          new FareProductLike(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareProduct(AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(firstLeg)
@@ -148,7 +149,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "c58974dd-9a2f-3f42-90ec-c62a7b0dfd51",
-          new FareProductLike(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareProduct(AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(secondLeg)
@@ -208,7 +209,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "1d270201-412b-3b86-80f6-92ab144fa2e5",
-          new FareProductLike(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareProduct(AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(firstBusLeg)
@@ -218,7 +219,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "678d201c-e839-35c3-ae7b-1bc3834da5e5",
-          new FareProductLike(OTHER_FEED_PRODUCT)
+          new DefaultFareProduct(OTHER_FEED_PRODUCT)
         )
       ),
       legProducts.get(secondBusLeg)
@@ -248,7 +249,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "5d0d58f4-b97a-38db-921c-8b5fc6392b54",
-          new FareProductLike(OTHER_FEED_PRODUCT)
+          new DefaultFareProduct(OTHER_FEED_PRODUCT)
         )
       ),
       legProducts.get(firstBusLeg)
@@ -257,7 +258,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "1d270201-412b-3b86-80f6-92ab144fa2e5",
-          new FareProductLike(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareProduct(AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(secondBusLeg)
@@ -266,7 +267,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "5d0d58f4-b97a-38db-921c-8b5fc6392b54",
-          new FareProductLike(OTHER_FEED_PRODUCT)
+          new DefaultFareProduct(OTHER_FEED_PRODUCT)
         )
       ),
       legProducts.get(finalBusLeg)

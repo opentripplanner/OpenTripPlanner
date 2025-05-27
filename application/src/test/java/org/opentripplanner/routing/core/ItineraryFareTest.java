@@ -18,6 +18,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareProductLike.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
@@ -66,6 +67,6 @@ class ItineraryFareTest {
   }
 
   private static FareProductLike fareProduct(String id) {
-    return new FareProductLike(FareProduct.of(id(id), id, Money.euros(10)).build());
+    return new DefaultFareProduct(FareProduct.of(id(id), id, Money.euros(10)).build());
   }
 }
