@@ -168,6 +168,7 @@ class RouteRequestMapperBicycleTest {
     var banned = Set.of("not");
     var allowKeeping = true;
     var keepingCost = Cost.costOfSeconds(150);
+    var rentalDuration = Duration.ofHours(1);
     bicycleArgs.put(
       "preferences",
       Map.ofEntries(
@@ -188,7 +189,8 @@ class RouteRequestMapperBicycleTest {
                         entry("allowKeeping", allowKeeping),
                         entry("keepingCost", keepingCost)
                       )
-                    )
+                    ),
+                    entry("rentalDuration", rentalDuration)
                   )
                 )
               )
@@ -204,6 +206,7 @@ class RouteRequestMapperBicycleTest {
     assertEquals(banned, bikeRentalPreferences.bannedNetworks());
     assertEquals(allowKeeping, bikeRentalPreferences.allowArrivingInRentedVehicleAtDestination());
     assertEquals(keepingCost, bikeRentalPreferences.arrivingInRentalVehicleAtDestinationCost());
+    assertEquals(rentalDuration, bikeRentalPreferences.rentalDuration());
   }
 
   @Test
