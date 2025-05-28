@@ -36,6 +36,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
@@ -243,7 +244,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return env -> {
       var args = new GraphQLTypes.GraphQLStopRoutesArgs(env.getArguments());
       var routes = getRoutes(env);
-      if (LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates())) {
+      if (
+        LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates()) &&
+        !CollectionUtils.isEmpty(routes)
+      ) {
         var filter = PatternByDateFilterUtil.ofGraphQL(
           args.getGraphQLServiceDates(),
           getTransitService(env)
