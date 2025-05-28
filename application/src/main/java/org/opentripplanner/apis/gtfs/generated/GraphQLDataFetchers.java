@@ -6,7 +6,6 @@ import graphql.relay.DefaultEdge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
-import java.time.OffsetDateTime;
 import java.util.Currency;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
@@ -916,7 +915,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLRentalVehicle {
     public DataFetcher<Boolean> allowPickupNow();
 
-    public DataFetcher<OffsetDateTime> availableUntil();
+    public DataFetcher<java.time.OffsetDateTime> availableUntil();
 
     public DataFetcher<RentalVehicleFuel> fuel();
 
@@ -1263,6 +1262,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> gtfsId();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
+    public DataFetcher<String> netexMode();
+
+    public DataFetcher<String> netexSubmode();
 
     public DataFetcher<TripOccupancy> occupancy();
 

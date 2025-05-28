@@ -22,14 +22,17 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.TransmodelSubmodeMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
+import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -42,6 +45,8 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
+
+  TransmodelSubmodeMapper submodeMapper = new TransmodelSubmodeMapper();
 
   @Override
   public DataFetcher<Iterable<String>> activeDates() {
@@ -248,6 +253,24 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment ->
       new Relay.ResolvedGlobalId("Trip", getSource(environment).getId().toString());
+  }
+
+  @Override
+  public DataFetcher<String> netexMode() {
+    return environment -> getSource(environment).getMode().toString();
+  }
+
+  @Override
+  public DataFetcher<String> netexSubmode() {
+    return environment -> {
+      Trip trip = getSource(environment);
+      if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
+        return trip.getNetexSubMode().toString();
+      }
+      Integer gtfsType = getTransitService(environment).findPattern(trip).getRoute().getGtfsType();
+      Optional<TransmodelTransportSubmode> netexType = submodeMapper.map(gtfsType);
+      return netexType.map(Enum::toString).orElse(null);
+    };
   }
 
   @Override

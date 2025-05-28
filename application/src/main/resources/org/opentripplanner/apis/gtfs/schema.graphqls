@@ -2496,6 +2496,10 @@ type Trip implements Node {
   gtfsId: String!
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
+  """Mode of the trip as a netex mode (string), gtfs modes of routes are mapped into them if necessary."""
+  netexMode: String
+  """Submobe of the trip as a netex submode (string), gtfs types of routes are mapped into them if necessary."""
+  netexSubmode: String
   """
   The latest real-time occupancy information for the latest occurance of this
   trip.
