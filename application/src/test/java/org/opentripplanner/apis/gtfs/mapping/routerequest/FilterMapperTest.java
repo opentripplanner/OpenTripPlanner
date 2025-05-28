@@ -26,15 +26,13 @@ class FilterMapperTest {
     );
     var result = FilterMapper.mapFilters(MainAndSubMode.all(), List.of(filter)).stream().toList();
     assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}, SelectRequest{transportModes: [], agencies: [feed:A]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES, agencies: [feed:A]}], not: [SelectRequest{transportModes: [], routes: [feed:A]}]}]",
       result.toString()
     );
   }
 
   private static List<Map<String, Object>> emptyListCases() {
-    var emptyAgencies = List.of(
-      Map.of("transportModes", List.of("RAIL"), "routes", List.of("feed:A"), "agencies", List.of())
-    );
+    var emptyAgencies = List.of(Map.of("routes", List.of("feed:A"), "agencies", List.of()));
     List<String> listWithNull = new ArrayList<>();
     listWithNull.add(null);
 
@@ -56,6 +54,8 @@ class FilterMapperTest {
       Map.of("include", emptyAgencies),
       Map.of("include", List.of()),
       Map.of("exclude", List.of()),
+      Map.of("include", List.of(Map.of())),
+      Map.of("exclude", List.of(Map.of())),
       Map.of("exclude", List.of(Map.of("routes", listWithNull))),
       Map.of("exclude", List.of(Map.of("agencies", listWithNull))),
       Map.of()

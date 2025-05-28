@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
@@ -24,20 +25,31 @@ class FilterMapper {
       CollectionUtils.requireNullOrNonEmpty(excludes, "filters.exclude");
 
       if (CollectionUtils.isEmpty(excludes) && CollectionUtils.isEmpty(includes)) {
-        throw new IllegalArgumentException("Filter must contain at least one 'select' or 'not'.");
-      }
-
-      var filterRequestBuilder = TransitFilterRequest.of()
-        .addSelect(SelectRequest.of().withTransportModes(modes).build());
-
-      for (var selectInput : ListUtils.nullSafeImmutableList(includes)) {
-        filterRequestBuilder.addSelect(
-          SelectRequestMapper.mapSelectRequest(selectInput, "include")
+        var typeName = GraphQLUtils.typeName(filterInput);
+        throw new IllegalArgumentException(
+          "%s must contain at least one 'include' or 'exclude'.".formatted(typeName)
         );
       }
 
+      var filterRequestBuilder = TransitFilterRequest.of();
+
+      // in the GTFS API modes can only be included but not excluded.
+      if (CollectionUtils.isEmpty(includes)) {
+        var modeSelect = SelectRequest.of().withTransportModes(modes).build();
+        filterRequestBuilder.addSelect(modeSelect);
+      } else {
+        // for every inclusion we also need to add the modes, otherwise the filter will not work
+        for (var selectInput : ListUtils.nullSafeImmutableList(includes)) {
+          var builder = SelectRequestMapper.mapSelectRequest(selectInput, "include");
+          builder.withTransportModes(modes);
+          filterRequestBuilder.addSelect(builder.build());
+        }
+      }
+
       for (var selectInput : ListUtils.nullSafeImmutableList(excludes)) {
-        filterRequestBuilder.addNot(SelectRequestMapper.mapSelectRequest(selectInput, "exclude"));
+        filterRequestBuilder.addNot(
+          SelectRequestMapper.mapSelectRequest(selectInput, "exclude").build()
+        );
       }
 
       filterRequests.add(filterRequestBuilder.build());

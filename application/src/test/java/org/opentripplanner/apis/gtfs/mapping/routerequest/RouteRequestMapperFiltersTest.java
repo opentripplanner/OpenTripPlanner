@@ -1,10 +1,6 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
 import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
@@ -42,7 +38,7 @@ class RouteRequestMapperFiltersTest {
     args.put("modes", TRAM_AND_FERRY_MODES);
     args.put("preferences", INCLUDE_ROUTE_FILTERS);
     assertTransitFilters(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}, SelectRequest{transportModes: [], routes: [f:r1]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM], routes: [f:r1]}]}]",
       args
     );
   }
@@ -62,7 +58,7 @@ class RouteRequestMapperFiltersTest {
     var args = createArgsCopy(RouteRequestMapperTest.ARGS);
     args.put("preferences", INCLUDE_ROUTE_FILTERS);
     assertTransitFilters(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}, SelectRequest{transportModes: [], routes: [f:r1]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES, routes: [f:r1]}]}]",
       args
     );
   }
@@ -72,7 +68,7 @@ class RouteRequestMapperFiltersTest {
     var args = createArgsCopy(RouteRequestMapperTest.ARGS);
     args.put("preferences", INCLUDE_ROUTE_EXCLUDE_AGENCY_FILTERS);
     assertTransitFilters(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}, SelectRequest{transportModes: [], routes: [f:r1]}]}, TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}], not: [SelectRequest{transportModes: [], agencies: [f:a1]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES, routes: [f:r1]}]}, TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}], not: [SelectRequest{transportModes: [], agencies: [f:a1]}]}]",
       args
     );
   }
@@ -83,7 +79,7 @@ class RouteRequestMapperFiltersTest {
     args.put("modes", TRAM_AND_FERRY_MODES);
     args.put("preferences", INCLUDE_ROUTE_EXCLUDE_AGENCY_FILTERS);
     assertTransitFilters(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}, SelectRequest{transportModes: [], routes: [f:r1]}]}, TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}], not: [SelectRequest{transportModes: [], agencies: [f:a1]}]}]",
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM], routes: [f:r1]}]}, TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}], not: [SelectRequest{transportModes: [], agencies: [f:a1]}]}]",
       args
     );
   }
