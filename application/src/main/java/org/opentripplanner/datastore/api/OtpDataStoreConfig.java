@@ -18,15 +18,9 @@ public interface OtpDataStoreConfig {
   URI reportDirectory();
 
   /**
-   * Local file system path to Google Cloud Platform service accounts credentials file. The
-   * credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
-   * need to provide a path the the service credentials.
-   * <p>
-   * This is a path to a file on the local file system, not an URI.
-   * <p>
-   * Optional. May return {@code null}.
+   * Parameters used to connect to Google Cloud Storage.
    */
-  String gsCredentials();
+  GsParameters gsParameters();
 
   /**
    * List of URIs to the open street map pbf files (the pbf format is the only one supported).

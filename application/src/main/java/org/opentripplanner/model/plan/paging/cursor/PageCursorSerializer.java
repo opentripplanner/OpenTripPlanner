@@ -6,14 +6,11 @@ import org.opentripplanner.framework.token.TokenSchema;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 final class PageCursorSerializer {
 
   private static final byte VERSION_ONE = 1;
   private static final byte VERSION_TWO = 2;
-  private static final Logger LOG = LoggerFactory.getLogger(PageCursor.class);
 
   private static final String TYPE_FIELD = "Type";
   private static final String EDT_FIELD = "EDT";

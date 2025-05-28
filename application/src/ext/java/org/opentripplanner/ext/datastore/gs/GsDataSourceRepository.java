@@ -12,6 +12,7 @@ import java.util.Collections;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.api.GsParameters;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
 
@@ -21,10 +22,12 @@ import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
 public class GsDataSourceRepository implements DataSourceRepository {
 
   private final String credentialsFilename;
+  private final String host;
   private Storage storage;
 
-  public GsDataSourceRepository(String credentialsFilename) {
-    this.credentialsFilename = credentialsFilename;
+  public GsDataSourceRepository(GsParameters gsParameters) {
+    this.credentialsFilename = gsParameters.credentialFile();
+    this.host = gsParameters.host();
   }
 
   @Override
@@ -90,8 +93,13 @@ public class GsDataSourceRepository implements DataSourceRepository {
   }
 
   private Storage connectToStorage() {
+    StorageOptions.Builder builder;
     try {
-      StorageOptions.Builder builder = StorageOptions.getDefaultInstance().toBuilder();
+      if (host != null) {
+        builder = StorageOptions.newBuilder().setHost(host);
+      } else {
+        builder = StorageOptions.getDefaultInstance().toBuilder();
+      }
 
       if (credentialsFilename != null) {
         GoogleCredentials credentials = GoogleCredentials.fromStream(

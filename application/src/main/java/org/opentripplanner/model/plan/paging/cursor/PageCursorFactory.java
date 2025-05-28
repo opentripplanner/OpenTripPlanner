@@ -6,6 +6,7 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -18,7 +19,7 @@ public class PageCursorFactory {
   private Instant currentEdt = null;
   private Instant currentLat = null;
   private Duration currentSearchWindow = null;
-  private boolean wholeSwUsed = true;
+  private boolean wholeSearchWindowUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
 
@@ -51,18 +52,23 @@ public class PageCursorFactory {
   }
 
   /**
+   * This adds the page cursor input to the factory. The cursor input contains information about filtering results.
+   * <p>
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
    * removed in the next and previous pages. This means we will use information from when we cropped
    * the list of itineraries to create the new search encoded in the page cursors. We will also add
    * information necessary for removing potential duplicates when paging.
    *
-   * @param pageCursorFactoryParams contains the result from the {@code PagingDuplicateFilter}
+   * @param pageCursorInput contains the generated page cursor input
    */
-  public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
-    this.wholeSwUsed = false;
-    this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut = pageCursorFactoryParams.pageCut();
+  public PageCursorFactory withPageCursorInput(PageCursorInput pageCursorInput) {
+    this.pageCursorInput = pageCursorInput;
+    // If the whole search window was not used (i.e. if there were removed itineraries)
+    if (pageCursorInput.pageCut() != null) {
+      this.wholeSearchWindowUsed = false;
+      this.itineraryPageCut = pageCursorInput.pageCut();
+    }
     return this;
   }
 
@@ -87,7 +93,7 @@ public class PageCursorFactory {
       .addDateTime("currentLat", currentLat)
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
-      .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
+      .addBoolIfTrue("searchWindowCropped", !wholeSearchWindowUsed)
       .addObj("pageCursorFactoryParams", pageCursorInput)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
@@ -112,7 +118,7 @@ public class PageCursorFactory {
     Instant prevEdt;
     Instant nextEdt;
 
-    if (wholeSwUsed) {
+    if (wholeSearchWindowUsed) {
       prevEdt = edtBeforeNewSw();
       nextEdt = edtAfterUsedSw();
     }
@@ -129,7 +135,9 @@ public class PageCursorFactory {
         nextEdt = edtAfterUsedSw();
       }
     }
-    // TODO - insert generalizedCostMaxLimit here
+
+    Cost generalizedCostMaxLimit = pageCursorInput.generalizedCostMaxLimit();
+
     prevCursor = new PageCursor(
       PREVIOUS_PAGE,
       sortOrder,
@@ -137,9 +145,8 @@ public class PageCursorFactory {
       currentLat,
       newSearchWindow,
       itineraryPageCut,
-      null
+      generalizedCostMaxLimit
     );
-    // TODO - insert generalizedCostMaxLimit here
     nextCursor = new PageCursor(
       NEXT_PAGE,
       sortOrder,
@@ -147,7 +154,7 @@ public class PageCursorFactory {
       null,
       newSearchWindow,
       itineraryPageCut,
-      null
+      generalizedCostMaxLimit
     );
   }
 

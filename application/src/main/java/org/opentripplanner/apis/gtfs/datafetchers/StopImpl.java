@@ -453,7 +453,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     };
   }
 
-  // TODO
+  @Deprecated
   @Override
   public DataFetcher<Integer> vehicleType() {
     return environment -> null;

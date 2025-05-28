@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
-import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.utils.collection.ListSection;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -16,13 +15,23 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
  * details about the first itinerary removed (bottom of the head, or top of the tail) and whether
  * itineraries were cropped at the head or the tail.
  */
-class NumItinerariesFilterResults implements PageCursorInput {
+public class NumItinerariesFilterResult {
 
   private final Instant earliestRemovedDeparture;
   private final Instant latestRemovedDeparture;
   private final ItinerarySortKey pageCut;
 
-  public NumItinerariesFilterResults(
+  public NumItinerariesFilterResult(
+    Instant earliestRemovedDeparture,
+    Instant latestRemovedDeparture,
+    ItinerarySortKey pageCut
+  ) {
+    this.earliestRemovedDeparture = earliestRemovedDeparture;
+    this.latestRemovedDeparture = latestRemovedDeparture;
+    this.pageCut = pageCut;
+  }
+
+  public NumItinerariesFilterResult(
     List<Itinerary> keptItineraries,
     List<Itinerary> removedItineraries,
     ListSection cropSection
@@ -41,24 +50,21 @@ class NumItinerariesFilterResults implements PageCursorInput {
     }
   }
 
-  @Override
   public Instant earliestRemovedDeparture() {
     return earliestRemovedDeparture;
   }
 
-  @Override
   public Instant latestRemovedDeparture() {
     return latestRemovedDeparture;
   }
 
-  @Override
   public ItinerarySortKey pageCut() {
     return pageCut;
   }
 
   @Override
   public String toString() {
-    return ToStringBuilder.of(NumItinerariesFilterResults.class)
+    return ToStringBuilder.of(NumItinerariesFilterResult.class)
       .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
       .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
       .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)
