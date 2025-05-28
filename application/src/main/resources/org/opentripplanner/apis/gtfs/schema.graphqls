@@ -4623,7 +4623,15 @@ input TransitFilterInput {
   include: [TransitFilterSelectInput!]
 }
 
-"A list of selectors for filter allow-list / exclude-list. An empty list means that everything is allowed. A trip/line will match with selectors if it matches with all non-empty lists. The `select` is always applied first, then `not`. If only `not` not is present, the exclude is applied to the existing set of lines. "
+"""
+A list of selectors for filter including or excluding entities from the routing results. Null
+means everything is allowed to be returned and empty lists a not allowed.
+
+An entity will match with selectors if it matches with all non-empty lists.
+
+The `include` is always applied first, then `exclude`. If only `exclude` is present, the exclude is
+applied to the existing set of results.
+"""
 input TransitFilterSelectInput {
   "Set of ids for agencies that should be included in/excluded from search"
   agencies: [String!]
@@ -4647,8 +4655,37 @@ input TransitPreferencesInput {
   """
   board: BoardPreferencesInput
   """
-  A list of filters for which trips should be included or excluded. A trip will be included if it matches with
-  at least one filter. Empty list of filters or no value means that all trips should be included.
+  A list of filters for which trips should be included or excluded. A trip will be included if it matches with at least one filter.
+  
+  An empty list of filters or no value means that all trips should be included.
+  
+  **AND/OR Logic**
+  
+  Several filters can be defined and form an OR-condition.
+  
+  The following pseudo-GraphQL example means "include all trips with `route1` _or_ `agency1`":
+  
+  ```
+  filters:
+     include:
+        routes: ["route1"]
+     include:
+        agencies: ["agency1"]
+  ```
+  
+  The following example means "include all trips with `route1` _and_ `agency1`":
+  
+  ```
+  filters:
+    include:
+        routes: ["route1"]
+        agencies: ["agency1"]
+  ```
+  
+  If `route1` is not is not operated by `agency1` this leads to zero results.
+  
+  **Note**: This parameter also interacts with the modes set in `modes.transit` by forming
+  an AND-condition.
   """
   filters: [TransitFilterInput!]
   "Preferences related to cancellations and real-time."
