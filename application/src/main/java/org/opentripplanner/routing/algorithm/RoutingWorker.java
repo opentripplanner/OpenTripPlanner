@@ -92,7 +92,8 @@ public class RoutingWorker {
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      request.journey().direct().mode()
+      request.journey().direct().mode(),
+      request.pageCursor() != null
     );
 
     request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());

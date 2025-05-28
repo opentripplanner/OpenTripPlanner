@@ -1,0 +1,25 @@
+{
+  "gsConfig": {
+    "cloudServiceHost": "http://fake-gcp:4443",
+    "credentialFile": "/path/to/file"
+  },
+
+  "graph": "gs://otp-test-bucket/a/b/graph.obj",
+  "buildReportDir": "gs://otp-test-bucket/a/b/np-report",
+  "osm": [
+    {
+      "source": "gs://otp-test-bucket/a/b/northpole.pbf"
+    }
+  ],
+  "dem": [
+    {
+      "source": "gs://otp-test-bucket/a/b/northpole.dem.tif"
+    }
+  ],
+  "transitFeeds": [
+    {
+      "type": "gtfs",
+      "source": "gs://otp-test-bucket/a/b/gtfs.zip"
+    }
+  ]
+}

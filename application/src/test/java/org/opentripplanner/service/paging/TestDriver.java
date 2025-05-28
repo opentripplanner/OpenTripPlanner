@@ -13,6 +13,7 @@ import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.paging.DefaultPageCursorInput;
 import org.opentripplanner.utils.collection.ListSection;
 import org.opentripplanner.utils.lang.Box;
 
@@ -164,8 +165,20 @@ final class TestDriver {
 
     // Filter nResults
     var filterResultBox = new Box<PageCursorInput>();
-    var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries, filterResultBox::set);
+    var maxNumFilter = new NumItinerariesFilter(nResults, cropItineraries);
     kept = maxNumFilter.removeMatchesForTest(kept);
+    DefaultPageCursorInput.Builder pageCursorInputBuilder = DefaultPageCursorInput.of();
+    if (maxNumFilter.getNumItinerariesFilterResult() != null) {
+      pageCursorInputBuilder = pageCursorInputBuilder
+        .withEarliestRemovedDeparture(
+          maxNumFilter.getNumItinerariesFilterResult().earliestRemovedDeparture()
+        )
+        .withLatestRemovedDeparture(
+          maxNumFilter.getNumItinerariesFilterResult().latestRemovedDeparture()
+        )
+        .withPageCut(maxNumFilter.getNumItinerariesFilterResult().pageCut());
+    }
+    filterResultBox.set(pageCursorInputBuilder.build());
 
     return new TestDriver(
       nResults,

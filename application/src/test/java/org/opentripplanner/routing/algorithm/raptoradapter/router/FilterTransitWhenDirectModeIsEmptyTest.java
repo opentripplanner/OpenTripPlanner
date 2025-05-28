@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -12,7 +11,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 public class FilterTransitWhenDirectModeIsEmptyTest {
 
   @Test
-  public void directModeIsExistAndIsNotWalking() {
+  public void directModeExistsAndIsNotWalking() {
     var modes = RequestModes.of()
       .withAccessMode(null)
       .withEgressMode(null)
@@ -20,7 +19,7 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
       .withTransferMode(null)
       .build();
 
-    var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
+    var subject = new FilterTransitWhenDirectModeIsEmpty(modes, false);
 
     assertEquals(StreetMode.BIKE, subject.resolveDirectMode());
     assertFalse(subject.removeWalkAllTheWayResults());
@@ -28,10 +27,10 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
   }
 
   @Test
-  public void directModeIsExistAndIsWalking() {
+  public void directModeExistsAndIsWalking() {
     var modes = RequestModes.of().withDirectMode(StreetMode.WALK).build();
 
-    var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
+    var subject = new FilterTransitWhenDirectModeIsEmpty(modes, false);
 
     assertEquals(StreetMode.WALK, subject.resolveDirectMode());
     assertFalse(subject.removeWalkAllTheWayResults());
@@ -47,10 +46,37 @@ public class FilterTransitWhenDirectModeIsEmptyTest {
       .withTransferMode(null)
       .build();
 
-    var subject = new FilterTransitWhenDirectModeIsEmpty(modes);
+    var subject = new FilterTransitWhenDirectModeIsEmpty(modes, false);
 
     assertEquals(StreetMode.WALK, subject.resolveDirectMode());
     assertTrue(subject.removeWalkAllTheWayResults());
     assertEquals(StreetMode.NOT_SET, subject.originalDirectMode());
+  }
+
+  @Test
+  public void directModeIsEmptyAndPageCursorExists() {
+    var modes = RequestModes.of()
+      .withAccessMode(null)
+      .withEgressMode(null)
+      .withDirectMode(null)
+      .withTransferMode(null)
+      .build();
+
+    var subject = new FilterTransitWhenDirectModeIsEmpty(modes, true);
+
+    assertEquals(StreetMode.NOT_SET, subject.resolveDirectMode());
+    assertTrue(!subject.removeWalkAllTheWayResults());
+    assertEquals(StreetMode.NOT_SET, subject.originalDirectMode());
+  }
+
+  @Test
+  public void directModeExistsAndIsWalkingAndPageCursorExists() {
+    var modes = RequestModes.of().withDirectMode(StreetMode.WALK).build();
+
+    var subject = new FilterTransitWhenDirectModeIsEmpty(modes, true);
+
+    assertEquals(StreetMode.WALK, subject.resolveDirectMode());
+    assertFalse(subject.removeWalkAllTheWayResults());
+    assertEquals(StreetMode.WALK, subject.originalDirectMode());
   }
 }

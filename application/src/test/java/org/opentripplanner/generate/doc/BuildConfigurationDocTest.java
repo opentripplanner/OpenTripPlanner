@@ -34,6 +34,7 @@ public class BuildConfigurationDocTest {
     .skip("dataOverlay", "sandbox/DataOverlay.md")
     .skip("emission", "sandbox/Emission.md")
     .skip("fares", "sandbox/Fares.md")
+    .skip("Google Cloud Storage", "sandbox/GoogleCloudStorage.md")
     .build();
 
   /**

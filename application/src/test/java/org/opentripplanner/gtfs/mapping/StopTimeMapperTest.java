@@ -45,8 +45,6 @@ public class StopTimeMapperTest {
 
   private static final int DROP_OFF_TYPE = 2;
 
-  private static final String FARE_PERIOD_ID = "Fare Period Id";
-
   private static final int PICKUP_TYPE = 3;
 
   private static final String ROUTE_SHORT_NAME = "Route Short Name";
@@ -138,7 +136,6 @@ public class StopTimeMapperTest {
     stopTime.setArrivalTime(ARRIVAL_TIME);
     stopTime.setDepartureTime(DEPARTURE_TIME);
     stopTime.setDropOffType(DROP_OFF_TYPE);
-    stopTime.setFarePeriodId(FARE_PERIOD_ID);
     stopTime.setPickupType(PICKUP_TYPE);
     stopTime.setRouteShortName(ROUTE_SHORT_NAME);
     stopTime.setShapeDistTraveled(SHAPE_DIST_TRAVELED);
@@ -163,7 +160,6 @@ public class StopTimeMapperTest {
     assertEquals(ARRIVAL_TIME, result.getArrivalTime());
     assertEquals(DEPARTURE_TIME, result.getDepartureTime());
     assertEquals(PickDrop.CALL_AGENCY, result.getDropOffType());
-    assertEquals(FARE_PERIOD_ID, result.getFarePeriodId());
     assertEquals(PickDrop.COORDINATE_WITH_DRIVER, result.getPickupType());
     assertEquals(ROUTE_SHORT_NAME, result.getRouteShortName());
     assertEquals(SHAPE_DIST_TRAVELED, result.getShapeDistTraveled(), 0.0001d);
@@ -183,7 +179,6 @@ public class StopTimeMapperTest {
     assertFalse(result.isArrivalTimeSet());
     assertFalse(result.isDepartureTimeSet());
     assertEquals(PickDrop.SCHEDULED, result.getDropOffType());
-    assertNull(result.getFarePeriodId());
     assertEquals(PickDrop.SCHEDULED, result.getPickupType());
     assertNull(result.getRouteShortName());
     assertFalse(result.isShapeDistTraveledSet());

@@ -18,7 +18,9 @@
   "streetGraph": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_BASE_GRAPH_PATH}",
   "graph": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_WORK_DIR}/Graph-otp2-${otp.serialization.version.id}.obj",
   "buildReportDir": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_WORK_DIR}/report",
-  "gsCredentials": "/etc/otp2/credentials.json",
+  "gsConfig": {
+    "credentialFile": "/etc/otp2/credentials.json"
+  },
   "netexDefaults": {
     "sharedFilePattern": "_stops.xml",
     "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",

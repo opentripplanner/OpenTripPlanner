@@ -2263,7 +2263,7 @@ type Stop implements Node & PlaceInterface {
   https://developers.google.com/transit/gtfs/reference/#routestxt and
   https://developers.google.com/transit/gtfs/reference/extended-route-types
   """
-  vehicleType: Int
+  vehicleType: Int @deprecated(reason : "Not implemented. Use `vehicleMode`.")
   "Whether wheelchair boarding is possible for at least some of vehicles on this stop"
   wheelchairBoarding: WheelchairBoarding
   "ID of the zone where this stop is located"
