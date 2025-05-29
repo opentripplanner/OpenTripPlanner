@@ -57,7 +57,7 @@ public class RealTimeTripTimesBuilder {
   }
 
   public int[] arrivalTimes() {
-    // TODO: add propagation
+    // TODO: remove copying of scheduled trip times - this should be done by the interpolation
     var result = scheduledTripTimes.copyArrivalTimes();
     for (int i = 0; i < arrivalTimes.length; i++) {
       if (arrivalTimes[i] != null) {
@@ -72,8 +72,10 @@ public class RealTimeTripTimesBuilder {
   }
 
   /** @return the difference between the scheduled and actual arrival times at this stop. */
-  // TODO: handle null arrivalTime
-  public int getArrivalDelay(int stop) {
+  public Integer getArrivalDelay(int stop) {
+    if (arrivalTimes[stop] == null) {
+      return null;
+    }
     return arrivalTimes[stop] - scheduledTripTimes.getScheduledArrivalTime(stop);
   }
 
@@ -94,7 +96,7 @@ public class RealTimeTripTimesBuilder {
   }
 
   public int[] departureTimes() {
-    // TODO: add propagation
+    // TODO: remove copying of scheduled trip times - this should be done by the interpolation
     var result = scheduledTripTimes.copyDepartureTimes();
     for (int i = 0; i < departureTimes.length; i++) {
       if (departureTimes[i] != null) {
@@ -105,7 +107,10 @@ public class RealTimeTripTimesBuilder {
   }
 
   /** @return the difference between the scheduled and actual departure times at this stop. */
-  public int getDepartureDelay(int stop) {
+  public Integer getDepartureDelay(int stop) {
+    if (departureTimes[stop] == null) {
+      return null;
+    }
     return departureTimes[stop] - scheduledTripTimes.getScheduledDepartureTime(stop);
   }
 
