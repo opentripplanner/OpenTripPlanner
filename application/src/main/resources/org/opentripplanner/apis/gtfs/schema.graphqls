@@ -4625,17 +4625,25 @@ input TransitFilterInput {
 
 """
 A list of selectors for filter including or excluding entities from the routing results. Null
-means everything is allowed to be returned and empty lists a not allowed.
+means everything is allowed to be returned and empty lists are not allowed.
 
 An entity will match with selectors if it matches with all non-empty lists.
 
 The `include` is always applied first, then `exclude`. If only `exclude` is present, the exclude is
 applied to the existing set of results.
 """
-input TransitFilterSelectInput {
-  "Set of ids for agencies that should be included in/excluded from search"
+input TransitFilterSelectInput @oneOf {
+  """
+  Set of ids for agencies that should be included in/excluded from the search.
+    
+  Format: `FeedId:StopId`
+  """
   agencies: [String!]
-  "Set of ids for routes that should be included in/excluded from search"
+  """
+  Set of ids for routes that should be included in/excluded from the search.
+    
+  Format: `FeedId:StopId`
+  """
   routes: [String!]
 }
 
@@ -4655,35 +4663,45 @@ input TransitPreferencesInput {
   """
   board: BoardPreferencesInput
   """
-  A list of filters for which trips should be included or excluded. A trip will be included if it matches with at least one filter.
-  
+  A list of filters for which trips should be included or excluded. A trip will be included if it matches 
+  with at least one filter.
+    
   An empty list of filters or no value means that all trips should be included.
-  
+    
   **AND/OR Logic**
-  
+    
   Several filters can be defined and form an OR-condition.
-  
+    
   The following pseudo-GraphQL example means "include all trips with `route1` _or_ `agency1`":
-  
+    
   ```
-  filters:
-     include:
-        routes: ["route1"]
-     include:
-        agencies: ["agency1"]
+  filters: [
+    {
+      include: {
+        routes: ["F:route1"]
+      }
+    },
+    { 
+      include: {
+        agencies: ["F:agency1"]
+      }
+    }
+  }]
   ```
-  
-  The following example means "include all trips with `route1` _and_ `agency1`":
-  
+    
+  The following example means "include all trips with `F:route1` _and_ `F:agency1`":
+    
   ```
-  filters:
-    include:
-        routes: ["route1"]
-        agencies: ["agency1"]
+  filters: [{
+    include: {
+      routes: ["F:route1"]
+      agencies: ["F:agency1"]
+    }
+  }]
   ```
-  
-  If `route1` is not is not operated by `agency1` this leads to zero results.
-  
+    
+  If `F:route1` is not is not operated by `F:agency1` this leads to zero results.
+    
   **Note**: This parameter also interacts with the modes set in `modes.transit` by forming
   an AND-condition.
   """
