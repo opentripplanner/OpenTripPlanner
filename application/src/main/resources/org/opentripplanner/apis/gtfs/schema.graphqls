@@ -4606,8 +4606,8 @@ input TransferPreferencesInput {
 """
 A collection of selectors for what routes/agencies should be included in or excluded from the search.
 
-The `include` is always applied first, then `exclude`. If only `exclude` is present, the exclude is
-applied to the existing set of results.
+The `include` is always applied to select the initial set, then `exclude` to remove elements.
+If only `exclude` is present, the exclude is applied to the existing set of results.
 
 Therefore, if an entity is both included _and_ excluded the exclusion takes precedence.
 """
@@ -4631,10 +4631,10 @@ input TransitFilterInput {
 }
 
 """
-A list of selectors for filter including or excluding entities from the routing. Null
+A list of selectors for including or excluding entities from the routing results. Null
 means everything is allowed to be returned and empty lists are not allowed.
 
-An entity will match with selectors if it matches with all non-empty lists.
+An entity will match with selectors if it matches with all lists.
 """
 input TransitFilterSelectInput @oneOf {
   """
