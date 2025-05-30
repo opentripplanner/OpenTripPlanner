@@ -1,0 +1,27 @@
+# Dictionary
+
+Usually, we use transit terms from
+the [GTFS specification](https://gtfs.org/documentation/schedule/reference/#) when possible. Terms
+from [https://transmodel-cen.eu/](Transmodel specification) are used for NETEX/Transmodel specific
+concepts, or when we do not feel like the GTFS terms are the most optimal. For rental, we use terms
+from the [GBFS specification](https://gbfs.org/documentation/). For algorithms, we use terminology
+from scientific literature.
+
+This document includes terms we use for concepts that are not fully covered by the aforementioned
+specifications or when we find it important to clarify what the terms mean in OTP's context. Note,
+this document will be updated over time, and it does not yet cover everything it should cover.
+
+## Dates
+
+| Term         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Running date | The actual calendar date. One departure can start and end on a different running date.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Service date | Service dates are used in transit data and they are partly based on how the transit authorities operate. They typically in practice start and end later than a running date, but the starting point for the time of the service date is noon - 12 hours. For example, a trip starting at 1am is often still considered to be part of the previous "calendar date's" service date and in service date terminology, the starting time would be 25:00. There can be trips that last for 24+ hours, but each departure only has one service date and its chosen based on when the trip starts. |
+
+## Stops in patterns
+
+| Term               | Description                                                                                                                                                              |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Stop position      | Zero-based index, incremented by 1 for each stop in the stop pattern.                                                                                                    |
+| GTFS stop sequence | Comes from the GTFS data. Only pass-through information in OTP that can be fetched from the APIs.                                                                        |
+| Stop index         | The global integer index of stops used internally in OTP and in Raptor to reference stops by a single integer. There is a 1-to-1 mapping between stop index and Stop:id. |

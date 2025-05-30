@@ -54,6 +54,7 @@ nav:
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
     - Visual Identity: 'Visual-Identity.md'
+    - Dictionary: 'Dictionary.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
     - Netex and SIRI Tutorial: 'Netex-Tutorial.md'
