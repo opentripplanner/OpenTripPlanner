@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -486,6 +487,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     );
   }
 
+  @Nullable
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
       environment,
