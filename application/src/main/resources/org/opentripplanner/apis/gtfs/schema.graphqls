@@ -4603,7 +4603,14 @@ input TransferPreferencesInput {
   slack: Duration
 }
 
-"A collection of selectors for what routes/agencies should be included in or excluded from the search."
+"""
+A collection of selectors for what routes/agencies should be included in or excluded from the search.
+
+The `include` is always applied first, then `exclude`. If only `exclude` is present, the exclude is
+applied to the existing set of results.
+
+Therefore, if an entity is both included _and_ excluded the exclusion takes precedence.
+"""
 input TransitFilterInput {
   """
   A list of selectors for what routes/agencies should be allowed during search.
@@ -4624,25 +4631,22 @@ input TransitFilterInput {
 }
 
 """
-A list of selectors for filter including or excluding entities from the routing results. Null
+A list of selectors for filter including or excluding entities from the routing. Null
 means everything is allowed to be returned and empty lists are not allowed.
 
 An entity will match with selectors if it matches with all non-empty lists.
-
-The `include` is always applied first, then `exclude`. If only `exclude` is present, the exclude is
-applied to the existing set of results.
 """
 input TransitFilterSelectInput @oneOf {
   """
   Set of ids for agencies that should be included in/excluded from the search.
     
-  Format: `FeedId:StopId`
+  Format: `FeedId:AgencyId`
   """
   agencies: [String!]
   """
   Set of ids for routes that should be included in/excluded from the search.
     
-  Format: `FeedId:StopId`
+  Format: `FeedId:AgencyId`
   """
   routes: [String!]
 }
@@ -4700,7 +4704,7 @@ input TransitPreferencesInput {
   }]
   ```
     
-  If `F:route1` is not is not operated by `F:agency1` this leads to zero results.
+  If `F:route1` is not operated by `F:agency1` this leads to zero results.
     
   **Note**: This parameter also interacts with the modes set in `modes.transit` by forming
   an AND-condition.
