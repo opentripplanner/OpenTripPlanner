@@ -4615,7 +4615,7 @@ input TransitFilterInput {
   """
   A list of selectors for what routes/agencies should be excluded during search.
     
-  In order to be excluded a route/agency has to match with at least one selector.
+  In order to be excluded, a route/agency has to match with at least one selector.
     
   An empty list or a list containing `null` is forbidden.
   """
