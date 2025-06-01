@@ -4691,18 +4691,20 @@ input TransitPreferencesInput {
   }]
   ```
     
-  The following example means "include all trips with `F:route1` _and_ `F:agency1`":
+  The following example means "include all trips of `F:agency1` _and_ exclude `F:route1`":
     
   ```
   filters: [{
     include: {
-      routes: ["F:route1"]
       agencies: ["F:agency1"]
+    },
+    exclude: {
+      routes: ["F:route1"]
     }
   }]
   ```
     
-  If `F:route1` is not operated by `F:agency1` this leads to zero results.
+  Be aware that AND-conditions can lead to zero results.
     
   **Note**: This parameter also interacts with the modes set in `modes.transit` by forming
   an AND-condition.
