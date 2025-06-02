@@ -25,6 +25,6 @@ public class GsDataSourceModule {
       return null;
     }
     LOG.info("Google Cloud Store Repository enabled - GS resources detected.");
-    return new GsDataSourceRepository(config.gsCredentials());
+    return new GsDataSourceRepository(config.gsParameters());
   }
 }

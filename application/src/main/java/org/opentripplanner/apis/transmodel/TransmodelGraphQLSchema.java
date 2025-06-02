@@ -57,6 +57,7 @@ import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.TransmodelPlaceType;
 import org.opentripplanner.apis.transmodel.model.framework.AuthorityType;
 import org.opentripplanner.apis.transmodel.model.framework.BrandingType;
+import org.opentripplanner.apis.transmodel.model.framework.EmissionType;
 import org.opentripplanner.apis.transmodel.model.framework.InfoLinkType;
 import org.opentripplanner.apis.transmodel.model.framework.MultilingualStringType;
 import org.opentripplanner.apis.transmodel.model.framework.NoticeType;
@@ -326,6 +327,7 @@ public class TransmodelGraphQLSchema {
       quayType
     );
     GraphQLObjectType elevationStepType = ElevationProfileStepType.create();
+    GraphQLObjectType emissionType = EmissionType.create();
     GraphQLObjectType pathGuidanceType = PathGuidanceType.create(elevationStepType);
     GraphQLObjectType legType = LegType.create(
       bookingArrangementType,
@@ -342,12 +344,14 @@ public class TransmodelGraphQLSchema {
       placeType,
       pathGuidanceType,
       elevationStepType,
+      emissionType,
       dateTimeScalar
     );
     GraphQLObjectType tripPatternType = TripPatternType.create(
       systemNoticeType,
       legType,
       tripPatternTimePenaltyType,
+      emissionType,
       dateTimeScalar
     );
     GraphQLObjectType routingErrorType = RoutingErrorType.create();
