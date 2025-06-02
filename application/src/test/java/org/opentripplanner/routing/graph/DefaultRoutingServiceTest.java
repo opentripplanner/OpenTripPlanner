@@ -13,6 +13,7 @@ import org.opentripplanner.GtfsTest;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.transit.model.framework.Feed;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -56,12 +57,12 @@ public class DefaultRoutingServiceTest extends GtfsTest {
     }
 
     /* Agencies */
-    String feedId = transitService.listFeedIds().iterator().next();
+    Feed feed = transitService.listFeeds().iterator().next();
     Agency agency;
-    agency = transitService.getAgency(new FeedScopedId(feedId, "azerty"));
+    agency = transitService.getAgency(feed.scopedId("azerty"));
     assertNull(agency);
-    agency = transitService.getAgency(new FeedScopedId(feedId, "agency"));
-    assertEquals(feedId + ":" + "agency", agency.getId().toString());
+    agency = transitService.getAgency(feed.scopedId("agency"));
+    assertEquals(feed + ":" + "agency", agency.getId().toString());
     assertEquals("Fake Agency", agency.getName());
 
     /* Stops */
@@ -99,12 +100,12 @@ public class DefaultRoutingServiceTest extends GtfsTest {
 
   @Test
   public void testSpatialIndex() {
-    String feedId = transitService.listFeedIds().iterator().next();
-    FeedScopedId idJ = new FeedScopedId(feedId, "J");
+    Feed feed = transitService.listFeeds().iterator().next();
+    FeedScopedId idJ = feed.scopedId("J");
     var stopJ = transitService.getRegularStop(idJ);
-    FeedScopedId idL = new FeedScopedId(feedId, "L");
+    FeedScopedId idL = feed.scopedId("L");
     var stopL = transitService.getRegularStop(idL);
-    FeedScopedId idM = new FeedScopedId(feedId, "M");
+    FeedScopedId idM = feed.scopedId("M");
     var stopM = transitService.getRegularStop(idM);
     TransitStopVertex stopvJ = graph.getStopVertexForStopId(idJ);
     TransitStopVertex stopvL = graph.getStopVertexForStopId(idL);
