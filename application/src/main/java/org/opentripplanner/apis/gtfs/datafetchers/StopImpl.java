@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -36,6 +37,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
@@ -243,7 +245,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return env -> {
       var args = new GraphQLTypes.GraphQLStopRoutesArgs(env.getArguments());
       var routes = getRoutes(env);
-      if (LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates())) {
+      if (
+        LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates()) &&
+        !CollectionUtils.isEmpty(routes)
+      ) {
         var filter = PatternByDateFilterUtil.ofGraphQL(
           args.getGraphQLServiceDates(),
           getTransitService(env)
@@ -482,6 +487,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     );
   }
 
+  @Nullable
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
       environment,
