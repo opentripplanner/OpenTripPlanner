@@ -45,7 +45,7 @@ public class BarrierRoutingTest {
       ResourceLoader.of(BarrierRoutingTest.class).file("herrenberg-barrier-gates.osm.pbf")
     );
     graph = model.graph();
-    graph.index(model.timetableRepository().getSiteRepository());
+    graph.index();
   }
 
   /**

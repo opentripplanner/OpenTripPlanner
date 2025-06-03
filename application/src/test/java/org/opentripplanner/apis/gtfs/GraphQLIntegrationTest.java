@@ -103,6 +103,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -117,6 +118,7 @@ class GraphQLIntegrationTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
+  private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
   private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
@@ -155,8 +157,6 @@ class GraphQLIntegrationTest {
       .withCurrentFuelPercent(null)
       .build();
 
-  static final Graph GRAPH = new Graph();
-
   static final Instant ALERT_START_TIME = OffsetDateTime.parse(
     "2023-02-15T12:03:28+01:00"
   ).toInstant();
@@ -187,6 +187,7 @@ class GraphQLIntegrationTest {
 
     var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     STOP_LOCATIONS.forEach(siteRepositoryBuilder::withRegularStop);
+    siteRepositoryBuilder.withStation(OMEGA);
     var siteRepository = siteRepositoryBuilder.build();
     var timetableRepository = new TimetableRepository(siteRepository, DEDUPLICATOR);
 

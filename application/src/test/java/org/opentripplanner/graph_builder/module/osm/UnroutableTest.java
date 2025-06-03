@@ -28,7 +28,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
  *
  * @author abyrd
  */
-public class UnroutableTest {
+class UnroutableTest {
 
   private Graph graph;
 

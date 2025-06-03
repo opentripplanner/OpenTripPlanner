@@ -38,6 +38,7 @@ import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -184,6 +185,7 @@ public class ConstructApplication {
       vehicleParkingRepository(),
       timetableRepository(),
       snapshotManager(),
+      tripPatternCache(),
       routerConfig().updaterConfig()
     );
 
@@ -290,6 +292,10 @@ public class ConstructApplication {
 
   private TimetableSnapshotManager snapshotManager() {
     return factory.timetableSnapshotManager();
+  }
+
+  private TripPatternCache tripPatternCache() {
+    return factory.tripPatternCache();
   }
 
   public VehicleParkingService vehicleParkingService() {

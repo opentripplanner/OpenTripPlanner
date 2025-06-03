@@ -8,9 +8,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -21,9 +23,13 @@ import org.opentripplanner.street.model.edge.AreaGroup;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.Entrance;
@@ -183,5 +189,115 @@ public class StreetModelForTest {
     GraphBuilder builder = new GraphBuilder();
     builder.add(vertex);
     return builder.build();
+  }
+
+  /**
+   * Creates a TemporaryStreetLocation on the given street (set of PlainStreetEdges). How far along
+   * is controlled by the location parameter, which represents a distance along the edge between 0
+   * (the from vertex) and 1 (the to vertex).
+   *
+   * @param edges A collection of nearby edges, which represent one street.
+   * @return the new TemporaryStreetLocation
+   */
+  public static TemporaryStreetLocation createTemporaryStreetLocationForTest(
+    String label,
+    I18NString name,
+    Iterable<StreetEdge> edges,
+    Coordinate nearestPoint,
+    boolean endVertex,
+    DisposableEdgeCollection tempEdges
+  ) {
+    boolean wheelchairAccessible = false;
+
+    TemporaryStreetLocation location = new TemporaryStreetLocation(nearestPoint, name);
+
+    for (StreetEdge street : edges) {
+      Vertex fromv = street.getFromVertex();
+      Vertex tov = street.getToVertex();
+      wheelchairAccessible |= street.isWheelchairAccessible();
+
+      /* forward edges and vertices */
+      Vertex edgeLocation;
+      if (SphericalDistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
+        // no need to link to area edges caught on-end
+        edgeLocation = fromv;
+
+        if (endVertex) {
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
+        } else {
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
+        }
+      } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
+        // no need to link to area edges caught on-end
+        edgeLocation = tov;
+
+        if (endVertex) {
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
+        } else {
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
+        }
+      } else {
+        // creates links from street head -> location -> street tail.
+        createHalfLocationForTest(location, name, nearestPoint, street, endVertex, tempEdges);
+      }
+    }
+    location.setWheelchairAccessible(wheelchairAccessible);
+    return location;
+  }
+
+  private static void createHalfLocationForTest(
+    TemporaryStreetLocation base,
+    I18NString name,
+    Coordinate nearestPoint,
+    StreetEdge street,
+    boolean endVertex,
+    DisposableEdgeCollection tempEdges
+  ) {
+    StreetVertex tov = (StreetVertex) street.getToVertex();
+    StreetVertex fromv = (StreetVertex) street.getFromVertex();
+    LineString geometry = street.getGeometry();
+
+    SplitLineString geometries = getGeometry(street, nearestPoint);
+
+    double totalGeomLength = geometry.getLength();
+    double lengthRatioIn = geometries.beginning().getLength() / totalGeomLength;
+
+    double lengthIn = street.getDistanceMeters() * lengthRatioIn;
+    double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
+
+    if (endVertex) {
+      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(street)
+        .withFromVertex(fromv)
+        .withToVertex(base)
+        .withGeometry(geometries.beginning())
+        .withName(name)
+        .withMeterLength(lengthIn)
+        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
+        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
+        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
+        .withLink(street.isLink())
+        .buildAndConnect();
+      tempEdges.addEdge(tpse);
+    } else {
+      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(street)
+        .withFromVertex(base)
+        .withToVertex(tov)
+        .withGeometry(geometries.ending())
+        .withName(name)
+        .withMeterLength(lengthOut)
+        .withLink(street.isLink())
+        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
+        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
+        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
+        .buildAndConnect();
+      tempEdges.addEdge(tpse);
+    }
+  }
+
+  private static SplitLineString getGeometry(StreetEdge e, Coordinate nearestPoint) {
+    LineString geometry = e.getGeometry();
+    return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
   }
 }

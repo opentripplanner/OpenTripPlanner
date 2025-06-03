@@ -74,9 +74,8 @@ public class StreetLinkerModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
-    graph.getLinker().setAreaVisibility(this.areaVisibility);
-    graph.getLinker().setMaxAreaNodes(this.maxAreaNodes);
+    graph.getLinkerSafe().setAreaVisibility(this.areaVisibility);
+    graph.getLinkerSafe().setMaxAreaNodes(this.maxAreaNodes);
 
     if (graph.hasStreets) {
       linkTransitStops(graph, timetableRepository);

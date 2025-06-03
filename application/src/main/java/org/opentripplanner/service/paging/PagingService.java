@@ -183,6 +183,7 @@ public class PagingService {
 
     factory = factory.withOriginalSearch(
       currentPageType,
+      itineraries.size() > 0 ? itineraries.get(0).startTimeAsInstant() : null,
       earliestDepartureTime,
       latestArrivalTime,
       searchWindowUsed

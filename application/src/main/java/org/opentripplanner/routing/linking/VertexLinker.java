@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -16,12 +17,10 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.locationtech.jts.operation.distance.DistanceOp;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -38,7 +37,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.transit.service.SiteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,14 +79,15 @@ public class VertexLinker {
     1000
   );
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
-  /**
-   * Spatial index of StreetEdges in the graph.
-   */
-  private final EdgeSpatialIndex edgeSpatialIndex;
+
+  private static final Set<TraverseMode> NO_THRU_MODES = Set.of(
+    TraverseMode.WALK,
+    TraverseMode.BICYCLE,
+    TraverseMode.CAR
+  );
 
   private final Graph graph;
 
-  private final SiteRepository siteRepository;
   private final VertexFactory vertexFactory;
 
   private boolean areaVisibility = true;
@@ -98,15 +97,9 @@ public class VertexLinker {
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
    * given time.
    */
-  public VertexLinker(
-    Graph graph,
-    SiteRepository siteRepository,
-    EdgeSpatialIndex edgeSpatialIndex
-  ) {
-    this.edgeSpatialIndex = edgeSpatialIndex;
+  public VertexLinker(Graph graph) {
     this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
-    this.siteRepository = siteRepository;
   }
 
   public void linkVertexPermanently(
@@ -136,15 +129,11 @@ public class VertexLinker {
     return link(vertex, traverseModes, direction, Scope.REQUEST, edgeFunction);
   }
 
-  public void removeEdgeFromIndex(Edge edge, Scope scope) {
+  private void removeEdgeFromIndex(Edge edge, Scope scope) {
     // Edges without geometry will not have been added to the index in the first place
     if (edge.getGeometry() != null) {
-      edgeSpatialIndex.remove(edge.getGeometry().getEnvelopeInternal(), edge, scope);
+      graph.removeEdge(edge, scope);
     }
-  }
-
-  public void removePermanentEdgeFromIndex(Edge edge) {
-    removeEdgeFromIndex(edge, Scope.PERMANENT);
   }
 
   public void setAreaVisibility(boolean areaVisibility) {
@@ -288,8 +277,9 @@ public class VertexLinker {
     // street edges traversable by at least one of the given modes and are still present in the
     // graph. Calculate a distance to each of those edges, and keep only the ones within the search
     // radius.
-    List<DistanceTo<StreetEdge>> candidateEdges = edgeSpatialIndex
-      .query(env, scope)
+    List<DistanceTo<StreetEdge>> candidateEdges = graph
+      .findEdges(env, scope)
+      .stream()
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
       .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
@@ -440,9 +430,16 @@ public class VertexLinker {
       start = split;
     }
 
-    // TODO Consider moving this code
     if (OTPFeature.FlexRouting.isOn()) {
-      FlexLocationAdder.addFlexLocations(edge, start, siteRepository);
+      var areaStops = Stream.concat(start.getIncoming().stream(), start.getOutgoing().stream())
+        .flatMap(e ->
+          Stream.concat(
+            e.getFromVertex().areaStops().stream(),
+            e.getToVertex().areaStops().stream()
+          )
+        )
+        .toList();
+      start.addAreaStops(areaStops);
     }
 
     return start;
@@ -487,7 +484,6 @@ public class VertexLinker {
    * Split the street edge at the given fraction
    *
    * @param originalEdge to be split
-   * @param ll           fraction at which to split the edge
    * @param scope        the scope of the split
    * @param direction    what direction to link the edges
    * @param tempEdges    collection of temporary edges
@@ -511,10 +507,10 @@ public class VertexLinker {
     if (scope == Scope.REALTIME || scope == Scope.PERMANENT) {
       // update indices of new edges
       if (newEdges.head() != null) {
-        edgeSpatialIndex.insert(newEdges.head().getGeometry(), newEdges.head(), scope);
+        graph.insert(newEdges.head(), scope);
       }
       if (newEdges.tail() != null) {
-        edgeSpatialIndex.insert(newEdges.tail().getGeometry(), newEdges.tail(), scope);
+        graph.insert(newEdges.tail(), scope);
       }
 
       if (scope == Scope.PERMANENT) {
@@ -673,17 +669,11 @@ public class VertexLinker {
     return true;
   }
 
-  static final Set<TraverseMode> noThruModes = Set.of(
-    TraverseMode.WALK,
-    TraverseMode.BICYCLE,
-    TraverseMode.CAR
-  );
-
-  private Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
-    var modes = new HashSet<>(noThruModes);
+  private static Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
+    var modes = new HashSet<>(NO_THRU_MODES);
     for (Edge e : edges) {
       if (e instanceof StreetEdge se) {
-        for (TraverseMode tm : noThruModes) {
+        for (TraverseMode tm : NO_THRU_MODES) {
           if (!se.isNoThruTraffic(tm)) {
             modes.remove(tm);
           }

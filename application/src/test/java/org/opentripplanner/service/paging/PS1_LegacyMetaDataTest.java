@@ -51,16 +51,10 @@ class PS1_LegacyMetaDataTest {
     var subject = testDriver.pagingService();
 
     assertEquals(D30m, subject.createTripSearchMetadata().searchWindowUsed);
-    assertEquals(
-      "08:15",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime)
-    );
+    assertEquals("8:15", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime));
     // 12:11 will drop results, the solution is to use the complete sort-vector.
     // The cursor implementation does that
-    assertEquals(
-      "09:15",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime)
-    );
+    assertEquals("9:15", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime));
   }
 
   @Test
@@ -89,13 +83,7 @@ class PS1_LegacyMetaDataTest {
     var subject = testDriver.pagingService();
 
     assertEquals(D30m, subject.createTripSearchMetadata().searchWindowUsed);
-    assertEquals(
-      "08:45",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime)
-    );
-    assertEquals(
-      "09:45",
-      TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime)
-    );
+    assertEquals("8:45", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime));
+    assertEquals("9:45", TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime));
   }
 }
