@@ -45,6 +45,13 @@ public class RouteRequestToFilterChainMapper {
       builder = builder.withPagingDeduplicationFilter(request.pageCursor().itineraryPageCut());
     }
 
+    // The page cursor has generalizedCostMaxLimit information only when paging is used and
+    // when the RemoveTransitIfStreetOnlyIsBetter filter is enabled.
+    // The generalizedCostMaxLimit is the best street only cost found in the first search.
+    if (request.pageCursor() != null && request.pageCursor().containsGeneralizedCostMaxLimit()) {
+      builder = builder.withGeneralizedCostMaxLimit(request.pageCursor().generalizedCostMaxLimit());
+    }
+
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne() >= 0.5) {

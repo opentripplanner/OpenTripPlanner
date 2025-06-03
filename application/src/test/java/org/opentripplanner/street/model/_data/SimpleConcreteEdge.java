@@ -1,31 +1,24 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.model._data;
 
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.TemporaryEdge;
-import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
-public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
+public class SimpleConcreteEdge extends Edge {
 
-  private TemporaryConcreteEdge(TemporaryVertex v1, Vertex v2) {
-    super((Vertex) v1, v2);
+  /**
+   * Constructor without ID.
+   */
+  private SimpleConcreteEdge(Vertex v1, Vertex v2) {
+    super(v1, v2);
   }
 
-  private TemporaryConcreteEdge(Vertex v1, TemporaryVertex v2) {
-    super(v1, (Vertex) v2);
-  }
-
-  public static TemporaryConcreteEdge createTemporaryConcreteEdge(TemporaryVertex v1, Vertex v2) {
-    return connectToGraph(new TemporaryConcreteEdge(v1, v2));
-  }
-
-  public static TemporaryConcreteEdge createTemporaryConcreteEdge(Vertex v1, TemporaryVertex v2) {
-    return connectToGraph(new TemporaryConcreteEdge(v1, v2));
+  public static SimpleConcreteEdge createSimpleConcreteEdge(Vertex v1, Vertex v2) {
+    return connectToGraph(new SimpleConcreteEdge(v1, v2));
   }
 
   @Override

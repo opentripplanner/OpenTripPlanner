@@ -289,7 +289,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>6.1.2</version>
+            <version>7.0.0</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -318,7 +318,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>24.0</version>
+            <version>24.1</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>

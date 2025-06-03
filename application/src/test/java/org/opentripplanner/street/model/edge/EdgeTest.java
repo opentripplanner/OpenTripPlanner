@@ -1,13 +1,12 @@
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.SimpleConcreteEdge;
 import org.opentripplanner.street.model._data.StreetModelForTest;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
