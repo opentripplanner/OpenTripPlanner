@@ -142,6 +142,7 @@ public interface TransitService {
 
   Operator getOperator(FeedScopedId id);
 
+  @Nullable
   RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();

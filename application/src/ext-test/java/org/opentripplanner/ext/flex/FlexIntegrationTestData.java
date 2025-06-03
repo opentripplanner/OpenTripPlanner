@@ -54,7 +54,7 @@ public final class FlexIntegrationTestData {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
     module.buildGraph();
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
     assertTrue(timetableRepository.hasFlexTrips());
     return new TestOtpModel(graph, timetableRepository);

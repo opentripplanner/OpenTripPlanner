@@ -217,7 +217,7 @@ public abstract class GtfsTest {
 
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
 
     createRaptorTransitData(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
 

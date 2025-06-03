@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph.index;
+package org.opentripplanner.routing.graph;
 
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
@@ -30,25 +30,35 @@ import org.opentripplanner.street.model.edge.Edge;
  * <p>
  * See #3351
  */
-public class EdgeSpatialIndex {
+class EdgeSpatialIndex {
 
   private final HashGridSpatialIndex<Edge> permanentEdgeIndex = new HashGridSpatialIndex<>();
 
   private final HashGridSpatialIndex<Edge> realTimeEdgeIndex = new HashGridSpatialIndex<>();
 
-  public void insert(LineString lineString, Object obj, Scope scope) {
+  public void insert(Edge edge, Scope scope) {
+    if (edge.hasGeometry()) {
+      final LineString geometry = edge.getGeometry();
+      insert(geometry, edge, scope);
+    }
+  }
+
+  public void insert(LineString geometry, Edge edge, Scope scope) {
     switch (scope) {
-      case PERMANENT -> permanentEdgeIndex.insert(lineString, obj);
-      case REALTIME -> realTimeEdgeIndex.insert(lineString, obj);
+      case PERMANENT -> permanentEdgeIndex.insert(geometry, edge);
+      case REALTIME -> realTimeEdgeIndex.insert(geometry, edge);
       case REQUEST -> throw new IllegalArgumentException();
     }
   }
 
-  public void remove(Envelope envelope, final Object item, Scope scope) {
-    switch (scope) {
-      case PERMANENT -> permanentEdgeIndex.remove(envelope, item);
-      case REALTIME -> realTimeEdgeIndex.remove(envelope, item);
-      case REQUEST -> throw new IllegalArgumentException();
+  public void remove(final Edge edge, Scope scope) {
+    if (edge.hasGeometry()) {
+      var envelope = edge.getGeometry().getEnvelopeInternal();
+      switch (scope) {
+        case PERMANENT -> permanentEdgeIndex.remove(envelope, edge);
+        case REALTIME -> realTimeEdgeIndex.remove(envelope, edge);
+        case REQUEST -> throw new IllegalArgumentException();
+      }
     }
   }
 
