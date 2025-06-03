@@ -52,17 +52,34 @@ public class RealTimeTripTimesBuilder {
     wheelchairAccessibility = original.getWheelchairAccessibility();
   }
 
+  static RealTimeTripTimesBuilder fromScheduledTimes(ScheduledTripTimes tripTimes) {
+    var instance = new RealTimeTripTimesBuilder(tripTimes);
+    instance.copyMissingTimesFromScheduledTimetable();
+    return instance;
+  }
+
+  static RealTimeTripTimesBuilder fromScheduledTimes(RealTimeTripTimes tripTimes) {
+    var instance = new RealTimeTripTimesBuilder(tripTimes);
+    instance.copyMissingTimesFromScheduledTimetable();
+    return instance;
+  }
+
   public ScheduledTripTimes scheduledTripTimes() {
     return scheduledTripTimes;
   }
 
   public int[] arrivalTimes() {
-    // TODO: remove copying of scheduled trip times - this should be done by the interpolation
-    var result = scheduledTripTimes.copyArrivalTimes();
+    var result = new int[arrivalTimes.length];
     for (int i = 0; i < arrivalTimes.length; i++) {
-      if (arrivalTimes[i] != null) {
-        result[i] = arrivalTimes[i];
+      if (arrivalTimes[i] == null) {
+        throw new IllegalArgumentException(
+          "The arrival time is not provided at stop %d for trip %s".formatted(
+              i,
+              scheduledTripTimes.getTrip().getId()
+            )
+        );
       }
+      result[i] = arrivalTimes[i];
     }
     return result;
   }
@@ -96,12 +113,17 @@ public class RealTimeTripTimesBuilder {
   }
 
   public int[] departureTimes() {
-    // TODO: remove copying of scheduled trip times - this should be done by the interpolation
-    var result = scheduledTripTimes.copyDepartureTimes();
+    var result = new int[departureTimes.length];
     for (int i = 0; i < departureTimes.length; i++) {
-      if (departureTimes[i] != null) {
-        result[i] = departureTimes[i];
+      if (departureTimes[i] == null) {
+        throw new IllegalArgumentException(
+          "The departure time is not provided at stop %d for trip %s".formatted(
+              i,
+              scheduledTripTimes.getTrip().getId()
+            )
+        );
       }
+      result[i] = departureTimes[i];
     }
     return result;
   }
@@ -247,9 +269,7 @@ public class RealTimeTripTimesBuilder {
    * @return true if there is interpolated times, false if there is no interpolation.
    */
   public boolean interpolateMissingTimes() {
-    copyMissingTimesFromScheduledTimetable();
-
-    boolean hasInterpolatedTimes = false;
+    boolean hasInterpolatedTimes = copyMissingTimesFromScheduledTimetable();
     final int numStops = scheduledTripTimes.getNumStops();
     boolean startInterpolate = false;
     boolean hasPrevTimes = false;
@@ -321,15 +341,19 @@ public class RealTimeTripTimesBuilder {
    * A transitional method to emulate the past behavior of copying ScheduledTripTimes to
    * RealTimeTripTimes. To be removed after the interpolation logic is refactored out.
    */
-  private void copyMissingTimesFromScheduledTimetable() {
+  public boolean copyMissingTimesFromScheduledTimetable() {
+    var hasCopiedTimes = false;
     for (var i = 0; i < scheduledTripTimes.getNumStops(); i++) {
       if (arrivalTimes[i] == null) {
         arrivalTimes[i] = scheduledTripTimes.getScheduledArrivalTime(i);
+        hasCopiedTimes = true;
       }
       if (departureTimes[i] == null) {
         departureTimes[i] = scheduledTripTimes.getScheduledDepartureTime(i);
+        hasCopiedTimes = true;
       }
     }
+    return hasCopiedTimes;
   }
 
   public RealTimeTripTimes build() {

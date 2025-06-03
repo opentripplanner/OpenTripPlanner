@@ -22,7 +22,14 @@ import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
  */
 public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
-   * Copy scheduled times, but not the actual times.
+   * Create a RealTimeTripTimesBuilder using the information, but not the actual times, from this
+   * TripTimes.
+   */
+  RealTimeTripTimesBuilder createRealTimeBuilder();
+
+  /**
+   * Create a RealTimeTripTimesBuilder using the information from this TripTimes, with the actual
+   * times pre-filled from scheduled times.
    */
   RealTimeTripTimesBuilder copyScheduledTimes();
 
