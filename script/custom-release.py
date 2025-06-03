@@ -86,28 +86,28 @@ class CliOptions:
 class ScriptState:
 
     def __init__(self):
-        self.current_ser_ver_id = None
-        self.new_ser_ver_id = None
+        self.latest_ser_ver_id = None
+        self.next_ser_ver_id = None
         self.major_version = None
-        self.current_version = None
-        self.new_version = None
+        self.latest_version = None
+        self.next_version = None
         self.pr_labels = {}
         self.pr_titles = {}
         self.prs_bump_ser_ver_id = False
         self.gotoStep = False
         self.step = None
 
-    def new_version_tag(self):
-        return f'v{self.new_version}'
+    def next_version_tag(self):
+        return f'v{self.next_version}'
 
-    def curr_version_tag(self):
-        return f'v{self.current_version}'
+    def latest_version_tag(self):
+        return f'v{self.latest_version}'
 
-    def new_version_description(self):
-        return f'Version {self.new_version} ({self.new_ser_ver_id})'
+    def next_version_description(self):
+        return f'Version {self.next_version} ({self.next_ser_ver_id})'
 
-    def is_ser_ver_id_new(self):
-        return self.new_ser_ver_id != self.current_ser_ver_id
+    def is_ser_ver_id_next(self):
+        return self.next_ser_ver_id != self.latest_ser_ver_id
 
     def run(self, step):
         if not self.gotoStep:
@@ -158,7 +158,7 @@ def main():
     set_maven_pom_version()
     set_ser_ver_id()
     run_maven_test()
-    commit_new_versions()
+    commit_next_versions()
     tag_release()
     push_release_branch_and_tag()
     print_summary()
@@ -182,9 +182,9 @@ def setup_and_verify():
         verify_release_base_and_release_branch_exist()
         verify_no_local_git_changes()
         resolve_version_number()
-        resolve_new_version()
+        resolve_next_version()
         list_labeled_prs()
-        resolve_new_ser_ver_id()
+        resolve_next_ser_ver_id()
     print_setup()
 
 
@@ -222,7 +222,7 @@ def merge_in_ext_branches():
             info(f'Config branch merged: {config.release_path(branch)}')
 
 
-# Merge the old version into the new version. This only keep a reference to the old version, the
+# Merge the old version into the next version. This only keep a reference to the old version, the
 # resulting git tree of the merge is that of the new branch head, effectively ignoring all changes
 # from the old release. This creates a continuous line of releases in the release branch.
 def merge_in_old_release_with_no_changes():
@@ -243,41 +243,41 @@ def run_custom_release_extensions():
 
 def set_maven_pom_version():
     section('Set Maven project version ...')
-    execute('mvn', 'versions:set', f'-DnewVersion={state.new_version}',
+    execute('mvn', 'versions:set', f'-DnewVersion={state.next_version}',
             '-DgenerateBackupPoms=false', quiet=True)
-    info(f'New version set: {state.new_version}')
+    info(f'New version set: {state.next_version}')
 
 
 def set_ser_ver_id():
     section('Set serialization.version.id ...')
-    new_ser_ver_id_element = f'<{SER_VER_ID_PROPERTY}>{state.new_ser_ver_id}</{SER_VER_ID_PROPERTY}>'
+    next_ser_ver_id_element = f'<{SER_VER_ID_PROPERTY}>{state.next_ser_ver_id}</{SER_VER_ID_PROPERTY}>'
 
     with open(POM_FILE_NAME, 'r') as input_stream:
         pom_file = input_stream.read()
-        pom_file = re.sub(SER_VER_ID_PATTERN, new_ser_ver_id_element, pom_file, count=1)
+        pom_file = re.sub(SER_VER_ID_PATTERN, next_ser_ver_id_element, pom_file, count=1)
     with open(POM_FILE_NAME, 'w') as output:
         output.write(pom_file)
-    prefix = 'New' if (state.is_ser_ver_id_new()) else 'Same'
-    info(f'{prefix} serialization.version.id set: {state.new_ser_ver_id}')
+    prefix = 'New' if (state.is_ser_ver_id_next()) else 'Same'
+    info(f'{prefix} serialization.version.id set: {state.next_ser_ver_id}')
 
 
-def commit_new_versions():
-    section('Commit new version with version and serialization version id set ...')
+def commit_next_versions():
+    section('Commit pom.xml with next version and serialization version id set ...')
     git('add', '.')
-    git_dr('commit', '--all', '-m', state.new_version_description())
-    info(f'Commit done: {state.new_version_description()}')
+    git_dr('commit', '--all', '-m', state.next_version_description())
+    info(f'Commit done: {state.next_version_description()}')
 
 
 def tag_release():
-    section(f'Tag release with {state.new_version} ...')
-    git_im('tag', '-a', state.new_version_tag(), '-m', state.new_version_description())
-    info(f'Tag done: {state.new_version_tag()}')
+    section(f'Tag release with {state.next_version} ...')
+    git_im('tag', '-a', state.next_version_tag(), '-m', state.next_version_description())
+    info(f'Tag done: {state.next_version_tag()}')
 
 
 def push_release_branch_and_tag():
-    section('Push new release with pom.xml versions and new tag')
+    section('Push new release with pom.xml changes and new tag')
     git_dr('push', '-f', f'{config.release_remote}', f'{config.release_branch}')
-    git_dr('push', '-f', f'{config.release_remote}', f'v{state.new_version}')
+    git_dr('push', '-f', f'{config.release_remote}', f'v{state.next_version}')
     info(f'Release pushed to: {config.release_branch_path()}')
     delete_script_state()
     info('\nRELEASE SUCCESS!\n')
@@ -293,9 +293,9 @@ def print_summary():
 
 ## Version
 
-  - New version/git tag: `{state.new_version}` 
-  - New serialization version: `{state.new_ser_ver_id}` 
-  - Old serialization version: `{state.current_ser_ver_id}`
+  - New version/git tag: `{state.next_version}` 
+  - New serialization version: `{state.next_ser_ver_id}` 
+  - Old serialization version: `{state.latest_ser_ver_id}`
 
 """
     with open(SUMMARY_FILE, mode="w", encoding="UTF-8") as f:
@@ -307,7 +307,7 @@ def print_summary():
             url = f"https://github.com/opentripplanner/OpenTripPlanner/pull/{pr}"
             print(f"  -  {state.pr_titles[pr]} [#{pr}]({url}) {state.pr_labels[pr]}".replace("'", "`"),
                   file=f)
-        p = execute("./script/changelog-diff.py", state.curr_version_tag(), state.new_version_tag())
+        p = execute("./script/changelog-diff.py", state.latest_version_tag(), state.next_version_tag())
         print(p.stdout, file=f)
 
 
@@ -430,16 +430,16 @@ def resolve_version_number():
     state.major_version = read_major_version_from_pom(version_qualifier, options.release_base())
 
 
-def resolve_new_version():
-    info('Resolve new version number ...')
+def resolve_next_version():
+    info('Resolve next version number ...')
     p = git('tag', '--list', '--sort=-v:refname', error_msg='Fetch git tags failed!')
     tags = p.stdout.splitlines()
 
     prefix = f'{state.major_version}-{config.release_remote}-'
     pattern = re.compile('v' + prefix.replace('.', r'\.') + r'(\d+)')
     max_tag_version = max((int(m.group(1)) for tag in tags if (m := pattern.match(tag))), default=0)
-    state.current_version = prefix + str(max_tag_version)
-    state.new_version = prefix + str(1 + max_tag_version)
+    state.latest_version = prefix + str(max_tag_version)
+    state.next_version = prefix + str(1 + max_tag_version)
 
 
 def list_labeled_prs():
@@ -501,10 +501,10 @@ def list_labeled_prs():
         LBL_BUMP_SER_VER_ID in labels for labels in state.pr_labels.values())
 
 
-def resolve_new_ser_ver_id():
-    info('Resolve the new serialization version id ...')
-    curr_release_hash = git_show_ref(git_tag(state.current_version))
-    curr_ser_ver_id = read_ser_ver_id_from_pom_file(curr_release_hash)
+def resolve_next_ser_ver_id():
+    info('Resolve the next serialization version id ...')
+    latest_release_hash = git_show_ref(git_tag(state.latest_version))
+    latest_ser_ver_id = read_ser_ver_id_from_pom_file(latest_release_hash)
     bump_ser_ver_id = options.bump_ser_ver_id
 
     # If none of the PRs have the 'bump serialization id' label set, then find the upstream
@@ -514,23 +514,23 @@ def resolve_new_ser_ver_id():
     # not matching the project serialization version id prefix - this is assumed to be the latest
     # serialization version from the upstream project.
     if not bump_ser_ver_id:
-        info('  - Find upstream serialization version id for current release ...')
-        curr_upstream_id = find_upstream_ser_ver_id_in_history(curr_release_hash)
+        info('  - Find upstream serialization version id for latest release ...')
+        latest_upstream_id = find_upstream_ser_ver_id_in_history(latest_release_hash)
 
         info(f'  - Find base serialization version id ...')
         base_hash = git_show_ref(options.release_base())
         base_upstream_id = find_upstream_ser_ver_id_in_history(base_hash)
 
         # Update serialization version id in release if serialization version id has changed
-        bump_ser_ver_id = curr_upstream_id != base_upstream_id
-        info(f'  - The current upstream serialization.ver.id is {curr_upstream_id} '
+        bump_ser_ver_id = latest_upstream_id != base_upstream_id
+        info(f'  - The latest upstream serialization.ver.id is {latest_upstream_id} '
              f'and the base upstream id is {base_upstream_id}.')
 
-    state.current_ser_ver_id = curr_ser_ver_id
+    state.latest_ser_ver_id = latest_ser_ver_id
     if bump_ser_ver_id:
-        state.new_ser_ver_id = bump_release_ser_ver_id(curr_ser_ver_id)
+        state.next_ser_ver_id = bump_release_ser_ver_id(latest_ser_ver_id)
     else:
-        state.new_ser_ver_id = curr_ser_ver_id
+        state.next_ser_ver_id = latest_ser_ver_id
 
 
 # Find the serialization-version-id for the upstream git project using the git log starting
@@ -555,7 +555,7 @@ CLI Options
   - Bump ser.ver.id ............. : {options.bump_ser_ver_id}
   - Dry run  .................... : {options.dry_run}
   - Debugging ................... : {options.debugging}
-  - Release ...................... : {options.releaseOnly}
+  - Release ..................... : {options.releaseOnly}
 
 Config
   - Upstream git repo remote name : {config.upstream_remote}
@@ -571,10 +571,10 @@ Config
     info(f'''
 Release info
   - Project major version ....... : {state.major_version}
-  - Current version ............. : {state.current_version}
-  - New version ................. : {state.new_version}
-  - Current ser.ver.id .......... : {state.current_ser_ver_id}
-  - New ser.ver.id .............. : {state.new_ser_ver_id}
+  - Latest version .............. : {state.latest_version}
+  - Next version ................ : {state.next_version}
+  - Latest ser.ver.id ........... : {state.latest_ser_ver_id}
+  - Next ser.ver.id ............. : {state.next_ser_ver_id}
 ''')
 
 
@@ -623,16 +623,16 @@ def git_tag(version):
     return f'v{version}'
 
 
-def bump_release_ser_ver_id(current_id):
+def bump_release_ser_ver_id(latest_id):
     # The id format can be either 'A-00053' or 'AA-0053'
     if len(config.ser_ver_id_prefix) == 1:
-        ver_number = int(current_id[2:])
+        ver_number = int(latest_id[2:])
         ser_format = '{:05d}'
     else:
-        ver_number = int(current_id[3:])
+        ver_number = int(latest_id[3:])
         ser_format = '{:04d}'
     v = config.ser_ver_id_prefix + '-' + ser_format.format(ver_number + 1)
-    debug(f'New serialization version id: {v}')
+    debug(f'Next serialization version id: {v}')
     return v
 
 
