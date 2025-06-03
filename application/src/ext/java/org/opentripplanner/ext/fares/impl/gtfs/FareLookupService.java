@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -72,9 +71,7 @@ class FareLookupService implements Serializable {
     return this.transferRules.stream()
       .filter(FareTransferRule::unlimitedTransfers)
       .filter(FareTransferRule::isFree)
-      .map(r -> findTransferMatch(r, legs))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
+      .flatMap(r -> findTransferMatches(r, legs).stream())
       .flatMap(transferRule ->
         ListUtils.combine(
           transferRule.fromLegRule().fareProducts(),
@@ -133,30 +130,33 @@ class FareLookupService implements Serializable {
       );
   }
 
-  private Optional<TransferMatch> findTransferMatch(
+  private List<TransferMatch> findTransferMatches(
     FareTransferRule transferRule,
     List<ScheduledTransitLeg> transitLegs
   ) {
     var pairs = ListUtils.partitionIntoOverlappingPairs(transitLegs);
-    var fromRule = Optional.ofNullable(findFareLegRule(transferRule.fromLegGroup()).getFirst());
-    var toRule = Optional.ofNullable(findFareLegRule(transferRule.toLegGroup()).getLast());
+    var fromRules = findFareLegRule(transferRule.fromLegGroup());
+    var toRules = findFareLegRule(transferRule.toLegGroup());
 
     // no need to compute transfers if there is only a single leg or the rules cannot be found
-    if (pairs.isEmpty() || fromRule.isEmpty() || toRule.isEmpty()) {
-      return Optional.empty();
+    if (pairs.isEmpty() || fromRules.isEmpty() || toRules.isEmpty()) {
+      return List.of();
     } else {
-      var matches = pairs
+      return pairs
         .stream()
-        .allMatch(
-          pair ->
-            legMatchesRule(pair.first(), fromRule.get()) &&
-            legMatchesRule(pair.second(), toRule.get())
-        );
-      if (matches) {
-        return Optional.of(new TransferMatch(transferRule, fromRule.get(), toRule.get()));
-      } else {
-        return Optional.empty();
-      }
+        .flatMap(pair -> {
+          var from = pair.first();
+          var to = pair.second();
+          var matchingFrom = fromRules.stream().filter(rule -> legMatchesRule(from, rule)).toList();
+          var matchingTo = toRules.stream().filter(rule -> legMatchesRule(to, rule)).toList();
+
+          return matchingFrom
+            .stream()
+            .flatMap(fromR ->
+              matchingTo.stream().map(toR -> new TransferMatch(transferRule, fromR, toR))
+            );
+        })
+        .toList();
     }
   }
 

@@ -505,20 +505,16 @@ For example, when taking the train into a city, you might get a discounted "tran
 switching to the bus for the second leg.
 """
 type DependentFareProduct implements FareProduct {
-  """
-  The fare product is _not_ valid without purchasing at least _one of
-  """
+  "The fare product is _not_ valid without purchasing at least _one of"
   dependencies(filter: DependentFareProductFilter = ALL): [FareProduct!]!
   id: String!
   """
   The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
-
+    
   This communicates to riders that a specific way of buying or keeping this product is required.
   """
   medium: FareMedium
-  """
-  Human readable name of the product, for example example "Day pass" or "Single ticket".
-  """
+  "Human readable name of the product, for example example \"Day pass\" or \"Single ticket\"."
   name: String!
   "The price of the product"
   price: Money!
