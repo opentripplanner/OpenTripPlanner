@@ -131,7 +131,7 @@ class RealTimeTripTimesTest {
       assertEquals(DIRECTION, headsignSecondStop);
     }
   }
-  
+
   @Test
   public void testStopUpdate() {
     RealTimeTripTimesBuilder builder = createInitialTripTimes().copyScheduledTimes();
@@ -153,12 +153,18 @@ class RealTimeTripTimesTest {
   public void testOnlyScheduledTimesAreCopied() {
     var initialTripTimes = createInitialTripTimes();
     var realTimeTripTimes = initialTripTimes.copyScheduledTimes().withArrivalTime(3, 190).build();
-    assertEquals(initialTripTimes.getArrivalTime(3), realTimeTripTimes.copyScheduledTimes().build().getArrivalTime(3));
+    assertEquals(
+      initialTripTimes.getArrivalTime(3),
+      realTimeTripTimes.copyScheduledTimes().build().getArrivalTime(3)
+    );
   }
 
   @Test
   public void testIncompleteTimes() {
-    assertThrows(IllegalStateException.class, createInitialTripTimes().createRealTimeBuilder()::build);
+    assertThrows(
+      IllegalStateException.class,
+      createInitialTripTimes().createRealTimeBuilder()::build
+    );
   }
 
   @Test

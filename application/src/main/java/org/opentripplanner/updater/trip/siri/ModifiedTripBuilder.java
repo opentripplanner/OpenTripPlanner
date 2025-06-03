@@ -150,12 +150,12 @@ class ModifiedTripBuilder {
       builder.withRealTimeState(RealTimeState.MODIFIED);
     }
 
-    int numStopsInUpdate = builder.scheduledTripTimes().getNumStops();
+    int numStopsInUpdate = builder.getNumStops();
     int numStopsInPattern = pattern.numberOfStops();
     if (numStopsInUpdate != numStopsInPattern) {
       LOG.info(
         "Invalid SIRI-ET data for trip {} - Inconsistent number of updated stops ({}) and stops in pattern ({})",
-        builder.scheduledTripTimes().getTrip().getId(),
+        builder.getTrip().getId(),
         numStopsInUpdate,
         numStopsInPattern
       );
@@ -170,7 +170,7 @@ class ModifiedTripBuilder {
     } catch (DataValidationException e) {
       LOG.info(
         "Invalid SIRI-ET data for trip {} - TripTimes failed to validate after applying SIRI delay propagation. {}",
-        builder.scheduledTripTimes().getTrip().getId(),
+        builder.getTrip().getId(),
         e.getMessage()
       );
       return DataValidationExceptionMapper.toResult(e, dataSource);
@@ -217,7 +217,7 @@ class ModifiedTripBuilder {
         throw new IllegalStateException(
           "The stop at index %d on the trip %s cannot be matched with any call. This implies a bug.".formatted(
               stopIndex,
-              builder.scheduledTripTimes().getTrip().getId()
+              builder.getTrip().getId()
             )
         );
       }

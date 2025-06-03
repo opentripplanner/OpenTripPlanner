@@ -75,14 +75,14 @@ class TimetableHelper {
       builder.withCanceled(index);
     }
 
-    int scheduledArrivalTime = builder.scheduledTripTimes().getArrivalTime(index);
+    int scheduledArrivalTime = builder.getArrivalTime(index);
     int realTimeArrivalTime = getAvailableTime(
       departureDate,
       call::getActualArrivalTime,
       call::getExpectedArrivalTime
     );
 
-    int scheduledDepartureTime = builder.scheduledTripTimes().getDepartureTime(index);
+    int scheduledDepartureTime = builder.getDepartureTime(index);
     int realTimeDepartureTime = getAvailableTime(
       departureDate,
       call::getActualDepartureTime,

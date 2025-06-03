@@ -68,15 +68,16 @@ public class RealTimeTripTimesBuilder {
     return scheduledTripTimes;
   }
 
+  public Trip getTrip() {
+    return scheduledTripTimes.getTrip();
+  }
+
   public int[] arrivalTimes() {
     var result = new int[arrivalTimes.length];
     for (int i = 0; i < arrivalTimes.length; i++) {
       if (arrivalTimes[i] == null) {
         throw new IllegalArgumentException(
-          "The arrival time is not provided at stop %d for trip %s".formatted(
-              i,
-              scheduledTripTimes.getTrip().getId()
-            )
+          "The arrival time is not provided at stop %d for trip %s".formatted(i, getTrip().getId())
         );
       }
       result[i] = arrivalTimes[i];
@@ -88,12 +89,16 @@ public class RealTimeTripTimesBuilder {
     return arrivalTimes[stop];
   }
 
+  public int getScheduledArrivalTime(int stop) {
+    return scheduledTripTimes().getScheduledArrivalTime(stop);
+  }
+
   /** @return the difference between the scheduled and actual arrival times at this stop. */
   public Integer getArrivalDelay(int stop) {
     if (arrivalTimes[stop] == null) {
       return null;
     }
-    return arrivalTimes[stop] - scheduledTripTimes.getScheduledArrivalTime(stop);
+    return arrivalTimes[stop] - getScheduledArrivalTime(stop);
   }
 
   public RealTimeTripTimesBuilder withArrivalTime(int stop, int time) {
@@ -104,12 +109,16 @@ public class RealTimeTripTimesBuilder {
 
   public RealTimeTripTimesBuilder withArrivalDelay(int stop, int delay) {
     updated = true;
-    arrivalTimes[stop] = scheduledTripTimes.getScheduledArrivalTime(stop) + delay;
+    arrivalTimes[stop] = getScheduledArrivalTime(stop) + delay;
     return this;
   }
 
   public Integer getDepartureTime(int stop) {
     return departureTimes[stop];
+  }
+
+  public int getScheduledDepartureTime(int stop) {
+    return scheduledTripTimes().getScheduledDepartureTime(stop);
   }
 
   public int[] departureTimes() {
@@ -119,7 +128,7 @@ public class RealTimeTripTimesBuilder {
         throw new IllegalArgumentException(
           "The departure time is not provided at stop %d for trip %s".formatted(
               i,
-              scheduledTripTimes.getTrip().getId()
+              getTrip().getId()
             )
         );
       }
@@ -133,7 +142,7 @@ public class RealTimeTripTimesBuilder {
     if (departureTimes[stop] == null) {
       return null;
     }
-    return departureTimes[stop] - scheduledTripTimes.getScheduledDepartureTime(stop);
+    return departureTimes[stop] - getScheduledDepartureTime(stop);
   }
 
   public RealTimeTripTimesBuilder withDepartureTime(int stop, int time) {
@@ -144,7 +153,7 @@ public class RealTimeTripTimesBuilder {
 
   public RealTimeTripTimesBuilder withDepartureDelay(int stop, int delay) {
     updated = true;
-    departureTimes[stop] = scheduledTripTimes.getScheduledDepartureTime(stop) + delay;
+    departureTimes[stop] = getScheduledDepartureTime(stop) + delay;
     return this;
   }
 
@@ -280,8 +289,8 @@ public class RealTimeTripTimesBuilder {
     // Loop through all stops
     for (int s = 0; s < numStops; s++) {
       final boolean isCancelledStop = stopRealTimeStates[s] == StopRealTimeState.CANCELLED;
-      final int scheduledArrival = scheduledTripTimes.getScheduledArrivalTime(s);
-      final int scheduledDeparture = scheduledTripTimes.getScheduledDepartureTime(s);
+      final int scheduledArrival = getScheduledArrivalTime(s);
+      final int scheduledDeparture = getScheduledDepartureTime(s);
       final int arrival = getArrivalTime(s);
       final int departure = getDepartureTime(s);
 
@@ -304,12 +313,8 @@ public class RealTimeTripTimesBuilder {
 
         // Fill out interpolated time for cancelled stops, using the calculated ratio.
         for (int cancelledIndex = prevStopIndex + 1; cancelledIndex < s; cancelledIndex++) {
-          final int scheduledArrivalCancelled = scheduledTripTimes.getScheduledArrivalTime(
-            cancelledIndex
-          );
-          final int scheduledDepartureCancelled = scheduledTripTimes.getScheduledDepartureTime(
-            cancelledIndex
-          );
+          final int scheduledArrivalCancelled = getScheduledArrivalTime(cancelledIndex);
+          final int scheduledDepartureCancelled = getScheduledDepartureTime(cancelledIndex);
 
           // Interpolate
           int scheduledArrivalDiff = scheduledArrivalCancelled - prevScheduledDeparture;
@@ -345,11 +350,11 @@ public class RealTimeTripTimesBuilder {
     var hasCopiedTimes = false;
     for (var i = 0; i < scheduledTripTimes.getNumStops(); i++) {
       if (arrivalTimes[i] == null) {
-        arrivalTimes[i] = scheduledTripTimes.getScheduledArrivalTime(i);
+        arrivalTimes[i] = getScheduledArrivalTime(i);
         hasCopiedTimes = true;
       }
       if (departureTimes[i] == null) {
-        departureTimes[i] = scheduledTripTimes.getScheduledDepartureTime(i);
+        departureTimes[i] = getScheduledDepartureTime(i);
         hasCopiedTimes = true;
       }
     }

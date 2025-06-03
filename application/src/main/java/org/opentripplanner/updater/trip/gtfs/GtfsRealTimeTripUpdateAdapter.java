@@ -862,14 +862,8 @@ public class GtfsRealTimeTripUpdateAdapter {
     // Update all times to mark trip times as realtime
     // TODO: should we incorporate the delay field if present?
     for (int stopIndex = 0; stopIndex < stopTimes.size(); stopIndex++) {
-      builder.withArrivalTime(
-        stopIndex,
-        builder.scheduledTripTimes().getScheduledArrivalTime(stopIndex)
-      );
-      builder.withDepartureTime(
-        stopIndex,
-        builder.scheduledTripTimes().getScheduledDepartureTime(stopIndex)
-      );
+      builder.withArrivalTime(stopIndex, builder.getScheduledArrivalTime(stopIndex));
+      builder.withDepartureTime(stopIndex, builder.getScheduledDepartureTime(stopIndex));
     }
 
     // Set service code of new trip times
