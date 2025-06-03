@@ -152,7 +152,7 @@ class RealTimeTripTimesTest {
   @Test
   public void testOnlyScheduledTimesAreCopied() {
     var initialTripTimes = createInitialTripTimes();
-    var realTimeTripTimes = initialTripTimes.copyScheduledTimes().withArrivalTime(3, 190).build();
+    var realTimeTripTimes = initialTripTimes.copyScheduledTimes().withArrivalDelay(3, -1).build();
     assertEquals(
       initialTripTimes.getArrivalTime(3),
       realTimeTripTimes.copyScheduledTimes().build().getArrivalTime(3)
@@ -165,6 +165,20 @@ class RealTimeTripTimesTest {
       IllegalStateException.class,
       createInitialTripTimes().createRealTimeBuilder()::build
     );
+  }
+
+  @Test
+  public void testCompleteTimes() {
+    var builder = createInitialTripTimes().createRealTimeBuilder();
+    var delay = 30;
+    for (var i = 0; i < builder.numberOfStops(); ++i) {
+      builder.withArrivalDelay(i, delay).withDepartureDelay(i, delay);
+    }
+    var tripTimes = builder.build();
+    for (var i = 0; i < tripTimes.getNumStops(); ++i) {
+      assertEquals(delay, tripTimes.getArrivalDelay(i));
+      assertEquals(delay, tripTimes.getDepartureDelay(i));
+    }
   }
 
   @Test

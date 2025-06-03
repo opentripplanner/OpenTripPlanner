@@ -80,7 +80,7 @@ public class RealTimeTripTimesBuilder {
     var result = new int[arrivalTimes.length];
     for (int i = 0; i < arrivalTimes.length; i++) {
       if (arrivalTimes[i] == null) {
-        throw new IllegalArgumentException(
+        throw new IllegalStateException(
           "The arrival time is not provided at stop %d for trip %s".formatted(i, getTrip().getId())
         );
       }
@@ -129,7 +129,7 @@ public class RealTimeTripTimesBuilder {
     var result = new int[departureTimes.length];
     for (int i = 0; i < departureTimes.length; i++) {
       if (departureTimes[i] == null) {
-        throw new IllegalArgumentException(
+        throw new IllegalStateException(
           "The departure time is not provided at stop %d for trip %s".formatted(
               i,
               getTrip().getId()
