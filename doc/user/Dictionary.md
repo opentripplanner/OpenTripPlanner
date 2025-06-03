@@ -23,5 +23,5 @@ this document will be updated over time, and it does not yet cover everything it
 | Term               | Description                                                                                                                                                              |
 |--------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Stop position      | Zero-based index, incremented by 1 for each stop in the stop pattern.                                                                                                    |
-| GTFS stop sequence | Comes from the GTFS data. Only pass-through information in OTP that can be fetched from the APIs.                                                                        |
+| GTFS stop sequence | Comes from the GTFS data. Can be used for real-time data matching but also be fetched from the APIs.                                                                        |
 | Stop index         | The global integer index of stops used internally in OTP and in Raptor to reference stops by a single integer. There is a 1-to-1 mapping between stop index and Stop:id. |
