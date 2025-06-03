@@ -72,6 +72,10 @@ public class RealTimeTripTimesBuilder {
     return scheduledTripTimes.getTrip();
   }
 
+  public int numberOfStops() {
+    return scheduledTripTimes().getNumStops();
+  }
+
   public int[] arrivalTimes() {
     var result = new int[arrivalTimes.length];
     for (int i = 0; i < arrivalTimes.length; i++) {

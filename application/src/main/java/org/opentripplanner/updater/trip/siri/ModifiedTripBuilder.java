@@ -150,7 +150,7 @@ class ModifiedTripBuilder {
       builder.withRealTimeState(RealTimeState.MODIFIED);
     }
 
-    int numStopsInUpdate = builder.getNumStops();
+    int numStopsInUpdate = builder.numberOfStops();
     int numStopsInPattern = pattern.numberOfStops();
     if (numStopsInUpdate != numStopsInPattern) {
       LOG.info(
