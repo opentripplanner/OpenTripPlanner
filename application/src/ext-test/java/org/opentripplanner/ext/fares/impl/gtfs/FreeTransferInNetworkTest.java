@@ -12,6 +12,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
@@ -56,10 +57,7 @@ class FreeTransferInNetworkTest implements PlanTestConstants {
   void singleLeg() {
     var i1 = newItinerary(A, 0).bus(ROUTE, 1, 0, 50, B).build();
     var result = service.calculateFares(i1);
-    assertEquals(
-      Set.of(new LegFareProductResult(REGULAR)),
-      result.productsForLeg(i1.legs().getFirst())
-    );
+    assertEquals(Set.of(FareOffer.of(REGULAR)), result.productsForLeg(i1.legs().getFirst()));
   }
 
   @Test

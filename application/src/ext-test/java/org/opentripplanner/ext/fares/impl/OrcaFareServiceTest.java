@@ -112,7 +112,7 @@ public class OrcaFareServiceTest {
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().fareProduct().price().minorUnitAmount());
+    assertEquals(fare, rideCost.get().fareProduct().price().minorUnitAmount());
 
     var transfer = legFareProducts
       .stream()
@@ -126,7 +126,7 @@ public class OrcaFareServiceTest {
         );
       })
       .findFirst();
-    Assertions.assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
+    assertEquals(hasXfer, transfer.isPresent(), "Incorrect transfer leg fare product.");
   }
 
   /**

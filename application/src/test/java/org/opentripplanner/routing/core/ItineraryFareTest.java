@@ -17,7 +17,7 @@ import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.fare.FareOffer.DefaultFareProduct;
+import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
@@ -67,6 +67,6 @@ class ItineraryFareTest {
   }
 
   private static FareOffer fareProduct(String id) {
-    return new DefaultFareProduct(FareProduct.of(id(id), id, Money.euros(10)).build());
+    return new DefaultFareOffer(FareProduct.of(id(id), id, Money.euros(10)).build());
   }
 }

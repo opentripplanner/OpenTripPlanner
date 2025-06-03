@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -25,7 +26,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public FareResult calculateFares(Itinerary itinerary) {
-    Multimap<Leg, LegFareProductResult> legProducts = HashMultimap.create();
+    Multimap<Leg, FareOffer> legProducts = HashMultimap.create();
     itinerary
       .listScheduledTransitLegs()
       .forEach(leg -> {
@@ -33,7 +34,7 @@ public final class GtfsFaresV2Service implements Serializable {
           .legRules(leg)
           .stream()
           .flatMap(r -> r.fareProducts().stream())
-          .map(LegFareProductResult::new)
+          .map(FareOffer.DefaultFareOffer::new)
           .collect(Collectors.toUnmodifiableSet());
         legProducts.putAll(leg, products);
       });

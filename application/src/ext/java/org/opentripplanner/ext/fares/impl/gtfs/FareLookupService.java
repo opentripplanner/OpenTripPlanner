@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.transit.model.basic.Distance;
@@ -68,7 +69,7 @@ class FareLookupService implements Serializable {
       .collect(Collectors.toSet());
   }
 
-  Set<LegFareProductResult> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+  Set<FareOffer> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
@@ -94,7 +95,7 @@ class FareLookupService implements Serializable {
     return multiMap
       .keySet()
       .stream()
-      .map(product -> new LegFareProductResult(product, multiMap.get(product)))
+      .map(product -> FareOffer.of(product, multiMap.get(product)))
       .collect(Collectors.toSet());
   }
 

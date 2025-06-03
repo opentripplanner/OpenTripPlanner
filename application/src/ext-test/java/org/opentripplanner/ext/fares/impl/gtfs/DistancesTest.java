@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -133,7 +134,7 @@ class DistancesTest {
     );
     assertEquals(
       faresV2Service.calculateFares(i1).productsForLeg(i1.legs().getLast()),
-      Set.of(new LegFareProductResult(twelveStopProduct))
+      Set.of(FareOffer.of(twelveStopProduct))
     );
   }
 
@@ -154,7 +155,7 @@ class DistancesTest {
     );
     assertEquals(
       faresV2Service.calculateFares(i1).productsForLeg(i1.transitLeg(0)),
-      Set.of(new LegFareProductResult(threeKmProduct))
+      Set.of(FareOffer.of(threeKmProduct))
     );
   }
 }

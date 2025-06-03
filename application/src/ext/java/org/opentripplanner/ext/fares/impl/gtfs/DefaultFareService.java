@@ -21,7 +21,7 @@ import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareSer
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
-import org.opentripplanner.model.fare.FareOffer.DefaultFareProduct;
+import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
@@ -220,7 +220,7 @@ public class DefaultFareService implements FareService {
       if (!applicableLegs.isEmpty()) {
         var use = new FareProductUse(
           product.uniqueInstanceId(applicableLegs.getFirst().startTime()),
-          new DefaultFareProduct(product)
+          new DefaultFareOffer(product)
         );
         applicableLegs.forEach(leg -> {
           fareProductUses.put(leg, use);

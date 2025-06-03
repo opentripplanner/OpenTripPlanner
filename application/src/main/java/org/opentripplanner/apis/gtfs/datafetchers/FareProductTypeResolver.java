@@ -13,9 +13,9 @@ public class FareProductTypeResolver implements TypeResolver {
     Object o = environment.getObject();
     GraphQLSchema schema = environment.getSchema();
 
-    if (o instanceof FareOffer.DefaultFareProduct) {
+    if (o instanceof FareOffer.DefaultFareOffer) {
       return schema.getObjectType("DefaultFareProduct");
-    } else if (o instanceof FareOffer.DependentFareProduct) {
+    } else if (o instanceof FareOffer.DependentFareOffer) {
       return schema.getObjectType("DependentFareProduct");
     }
     return null;
