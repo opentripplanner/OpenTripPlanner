@@ -497,10 +497,28 @@ type DepartureRow implements Node & PlaceInterface {
   ): [Stoptime]
 }
 
+"""
+A (possibly discounted) fare product that requires another fare product to be purchased previously
+in order to be valid.
+
+For example, when taking the train into a city, you might get a discounted "transfer fare" when
+switching to the bus for the second leg.
+"""
 type DependentFareProduct implements FareProduct {
+  """
+  The fare product is _not_ valid without purchasing at least _one of
+  """
   dependencies(filter: DependentFareProductFilter = ALL): [FareProduct!]!
   id: String!
+  """
+  The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+
+  This communicates to riders that a specific way of buying or keeping this product is required.
+  """
   medium: FareMedium
+  """
+  Human readable name of the product, for example example "Day pass" or "Single ticket".
+  """
   name: String!
   "The price of the product"
   price: Money!
@@ -3086,8 +3104,16 @@ enum CyclingOptimizationType {
   SHORTEST_DURATION
 }
 
+"""
+Dependent fare products can lead to many combinations of fares, however it is often not useful
+information to the passenger.
+
+This enum allows filtering of the dependencies.
+"""
 enum DependentFareProductFilter {
+  "Show all dependencies"
   ALL
+  "Show only dependencies where the rider category and medium is the same es the main fare product."
   MATCH_CATEGORY_AND_MEDIUM
 }
 
