@@ -42,20 +42,10 @@ public final class GtfsFaresV2Service implements Serializable {
     var pairs = ListUtils.partitionIntoOverlappingPairs(itinerary.listScheduledTransitLegs());
     pairs.forEach(pair ->
       lookup
-        .findTransfersForPair(pair.first(), pair.second())
+        .findOffersForPair(pair.first(), pair.second())
         .forEach(transfer -> legProducts.put(pair.second(), transfer))
     );
-    var itinProducts = lookup
-      .transfersMatchingAllLegs(itinerary.listScheduledTransitLegs())
-      .stream()
-      .flatMap(transferRule ->
-        ListUtils.combine(
-          transferRule.fromLegRule().fareProducts(),
-          transferRule.toLegRule().fareProducts(),
-          transferRule.transferRule().fareProducts()
-        ).stream()
-      )
-      .collect(Collectors.toUnmodifiableSet());
+    var itinProducts = lookup.findTransfersMatchingAllLegs(itinerary.listScheduledTransitLegs());
 
     return new FareResult(itinProducts, legProducts);
   }

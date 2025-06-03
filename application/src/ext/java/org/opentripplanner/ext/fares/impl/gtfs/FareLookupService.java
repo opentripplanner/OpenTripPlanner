@@ -51,25 +51,44 @@ class FareLookupService implements Serializable {
     this.stopAreas = stopAreas;
   }
 
+  /**
+   * Returns true if the service contains no data at all.
+   */
   boolean isEmpty() {
     return legRules.isEmpty() && transferRules.isEmpty();
   }
 
+  /**
+   * Returns the fare leg rules for a specific leg.
+   */
   Set<FareLegRule> legRules(ScheduledTransitLeg leg) {
     return this.legRules.stream().filter(r -> legMatchesRule(leg, r)).collect(Collectors.toSet());
   }
 
-  Set<TransferMatch> transfersMatchingAllLegs(List<ScheduledTransitLeg> legs) {
+  /**
+   * Find those fare products that match all legs through an unlimited transfer.
+   */
+  Set<FareProduct> findTransfersMatchingAllLegs(List<ScheduledTransitLeg> legs) {
     return this.transferRules.stream()
       .filter(FareTransferRule::unlimitedTransfers)
       .filter(FareTransferRule::isFree)
       .map(r -> findTransferMatch(r, legs))
       .filter(Optional::isPresent)
       .map(Optional::get)
-      .collect(Collectors.toSet());
+      .flatMap(transferRule ->
+        ListUtils.combine(
+          transferRule.fromLegRule().fareProducts(),
+          transferRule.toLegRule().fareProducts(),
+          transferRule.transferRule().fareProducts()
+        ).stream()
+      )
+      .collect(Collectors.toUnmodifiableSet());
   }
 
-  Set<FareOffer> findTransfersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+  /**
+   * Find fare offers for a specific pair of legs.
+   */
+  Set<FareOffer> findOffersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
@@ -141,7 +160,7 @@ class FareLookupService implements Serializable {
     }
   }
 
-  boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
+  private boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
       leg.agency().getId().getFeedId().equals(rule.feedId()) &&
@@ -191,7 +210,7 @@ class FareLookupService implements Serializable {
    * Get the fare products that match the network_id. If the network id of the product is null it
    * depends on the presence/absence of other rules with that network id.
    */
-  public boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
+  private boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg
       .route()
       .getGroupsOfRoutes()
