@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares;
 
 import java.util.List;
-import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.FareProductAware;
@@ -33,7 +33,7 @@ public final class ItineraryFaresDecorator {
       .stream()
       .map(fp -> {
         var instanceId = fp.uniqueInstanceId(i.legs().getFirst().startTime());
-        return new FareProductUse(instanceId, new FareProductLike.DefaultFareProduct(fp));
+        return new FareProductUse(instanceId, new FareOffer.DefaultFareProduct(fp));
       })
       .toList();
   }

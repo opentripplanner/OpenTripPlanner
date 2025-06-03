@@ -18,9 +18,8 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.FareOffer.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductLike;
-import org.opentripplanner.model.fare.FareProductLike.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Place;

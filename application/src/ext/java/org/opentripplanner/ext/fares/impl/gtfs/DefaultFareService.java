@@ -21,9 +21,8 @@ import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareSer
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.fare.FareOffer.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductLike;
-import org.opentripplanner.model.fare.FareProductLike.DefaultFareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;

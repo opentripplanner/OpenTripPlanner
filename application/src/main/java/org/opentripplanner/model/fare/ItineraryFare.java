@@ -85,7 +85,7 @@ public class ItineraryFare {
   /**
    * Add a single fare product for a single leg.
    */
-  public void addFareProduct(Leg leg, FareProductLike fareProduct) {
+  public void addFareProduct(Leg leg, FareOffer fareProduct) {
     this.legProducts.put(
         leg,
         new FareProductUse(fareProduct.uniqueInstanceId(leg.startTime()), fareProduct)

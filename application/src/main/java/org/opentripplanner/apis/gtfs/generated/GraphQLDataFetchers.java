@@ -2,11 +2,7 @@
 package org.opentripplanner.apis.gtfs.generated;
 
 import graphql.relay.Connection;
-import graphql.relay.Connection;
-import graphql.relay.Connection;
 import graphql.relay.DefaultEdge;
-import graphql.relay.Edge;
-import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
@@ -32,21 +28,16 @@ import org.opentripplanner.apis.gtfs.model.CallSchedule;
 import org.opentripplanner.apis.gtfs.model.FeedPublisher;
 import org.opentripplanner.apis.gtfs.model.PlanPageInfo;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
-import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
-import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
-import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
-import org.opentripplanner.apis.gtfs.model.UnknownModel;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.fare.FareMedium;
-import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emission;
@@ -64,8 +55,6 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.vehicleparking.model.VehicleParking;
-import org.opentripplanner.service.vehicleparking.model.VehicleParking;
-import org.opentripplanner.service.vehicleparking.model.VehicleParking;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingSpaces;
 import org.opentripplanner.service.vehicleparking.model.VehicleParkingState;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
@@ -73,9 +62,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleFuel;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
@@ -403,7 +390,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLDependentFareProduct {
-    public DataFetcher<Iterable<FareProductLike>> dependencies();
+    public DataFetcher<Iterable<FareOffer>> dependencies();
 
     public DataFetcher<String> id();
 
@@ -470,7 +457,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLFareProductUse {
     public DataFetcher<String> id();
 
-    public DataFetcher<FareProductLike> product();
+    public DataFetcher<FareOffer> product();
   }
 
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */

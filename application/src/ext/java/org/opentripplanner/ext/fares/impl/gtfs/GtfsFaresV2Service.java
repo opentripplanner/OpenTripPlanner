@@ -60,7 +60,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   /**
-   * Returns false if this services contains any Fares V2 data, true otherwise.
+   * Returns false if this service contains any Fares V2 data, true otherwise.
    */
   boolean isEmpty() {
     return lookup.isEmpty();

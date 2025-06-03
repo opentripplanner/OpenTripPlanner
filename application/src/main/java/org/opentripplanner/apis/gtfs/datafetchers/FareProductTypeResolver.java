@@ -4,8 +4,7 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductLike;
+import org.opentripplanner.model.fare.FareOffer;
 
 public class FareProductTypeResolver implements TypeResolver {
 
@@ -14,9 +13,9 @@ public class FareProductTypeResolver implements TypeResolver {
     Object o = environment.getObject();
     GraphQLSchema schema = environment.getSchema();
 
-    if (o instanceof FareProductLike.DefaultFareProduct) {
+    if (o instanceof FareOffer.DefaultFareProduct) {
       return schema.getObjectType("DefaultFareProduct");
-    } else if (o instanceof FareProductLike.DependentFareProduct) {
+    } else if (o instanceof FareOffer.DependentFareProduct) {
       return schema.getObjectType("DependentFareProduct");
     }
     return null;

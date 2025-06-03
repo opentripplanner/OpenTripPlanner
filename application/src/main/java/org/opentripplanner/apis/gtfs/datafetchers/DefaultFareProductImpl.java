@@ -4,8 +4,8 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductLike;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 
@@ -37,6 +37,6 @@ public class DefaultFareProductImpl implements GraphQLDataFetchers.GraphQLDefaul
   }
 
   private FareProduct getSource(DataFetchingEnvironment environment) {
-    return ((FareProductLike) environment.getSource()).fareProduct();
+    return ((FareOffer) environment.getSource()).fareProduct();
   }
 }
