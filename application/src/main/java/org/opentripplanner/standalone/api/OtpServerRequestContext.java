@@ -123,7 +123,7 @@ public interface OtpServerRequestContext {
   TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(graph(), transitService()::findRegularStopsByBoundingBox);
+    return GraphFinder.getInstance(graph(), transitService());
   }
 
   FlexParameters flexParameters();
