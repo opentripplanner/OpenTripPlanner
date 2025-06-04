@@ -81,6 +81,24 @@ class CliOptions:
                 f"skip_prs: '{self.skip_prs}', "
                 f"printSummary: '{self.printSummary}'>")
 
+# PR information
+class PullRequest:
+    def __init__(self):
+        self.number = None
+        self.title = None
+        self.commitHash = None
+        self.labels = []
+        self.serLabelSet = False
+
+    def description(self):
+        return f'{self.title} #{self.number}'
+
+    def description_w_labels(self):
+        return f'{self.description()} {self.labels}'
+
+    def description_link(self):
+        url = f"https://github.com/opentripplanner/OpenTripPlanner/pull/{self.number}"
+        return f"[{self.description()}]({url}) {self.labels}".replace("'", "`")
 
 # The execution state of the script + the CLI arguments
 class ScriptState:
@@ -91,8 +109,7 @@ class ScriptState:
         self.major_version = None
         self.latest_version = None
         self.next_version = None
-        self.pr_labels = {}
-        self.pr_titles = {}
+        self.prs = []
         self.prs_bump_ser_ver_id = False
         self.gotoStep = False
         self.step = None
@@ -201,11 +218,11 @@ def reset_release_branch_to_base_revision():
 
 def merge_in_labeled_prs():
     section('Merge in labeled PRs ...')
-    for pr in state.pr_labels:
+    for pr in state.prs:
         # A temp branch is needed here since the PR is in the upstream remote repo
-        temp_branch = f'pull-request-{pr}'
-        if section_w_resume(temp_branch, f'Merge in PR #{pr} - {state.pr_titles[pr]}'):
-            git('fetch', config.upstream_remote, f'pull/{pr}/head:{temp_branch}')
+        temp_branch = f'pull-request-{pr.number}'
+        if section_w_resume(temp_branch, f'Merge in PR {pr.description()}'):
+            git('fetch', config.upstream_remote, f'pull/{pr.number}/head:{temp_branch}')
             git('merge', temp_branch)
             git('branch', '-D', temp_branch)
 
@@ -300,13 +317,11 @@ def print_summary():
 """
     with open(SUMMARY_FILE, mode="w", encoding="UTF-8") as f:
         print(release_version_summary, file=f)
-        if len(state.pr_titles) > 0:
+        if len(state.prs) > 0:
             print("## Pull Requests", file=f)
             print(f"These PRs are tagged with {config.include_prs_label}.\n", file=f)
-        for pr in state.pr_titles:
-            url = f"https://github.com/opentripplanner/OpenTripPlanner/pull/{pr}"
-            print(f"  -  {state.pr_titles[pr]} [#{pr}]({url}) {state.pr_labels[pr]}".replace("'", "`"),
-                  file=f)
+        for pr in state.prs:
+            print(f"  -  {pr.link()}", file=f)
         p = execute("./script/changelog-diff.py", state.latest_version_tag(), state.next_version_tag())
         print(p.stdout, file=f)
 
@@ -485,20 +500,23 @@ def list_labeled_prs():
     #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"bump serialization id"},{"name":"Entur Test"}]}}]}}}}
     json_doc = json.loads(result.stdout)
     for node in json_doc['data']['repository']['pullRequests']['nodes']:
-        pr_number = node['number']
-        state.pr_titles[str(pr_number)] = node['title']
-        pr_labels = []
+        pr = PullRequest()
+        pr.number = node['number']
+        pr.title = node['title']
+        pr.commitHash = node['headRefOid']
         labels = node['labels']['nodes']
-        # GitHub labels are not case-sensitive, hence the '(?i)'
-        ptn = re.compile(f'(?i)({LBL_BUMP_SER_VER_ID}|{config.include_prs_label})')
+        # GitHub labels are not case-sensitive, hence using 'lower()'
+        include_prs_label_lc = config.include_prs_label.lower()
         for label in labels:
             lbl_name = label['name']
-            if ptn.match(lbl_name):
-                pr_labels.append(lbl_name)
-        state.pr_labels[str(pr_number)] = pr_labels
+            lbl_name_lc= lbl_name.lower()
+            if include_prs_label_lc == lbl_name_lc:
+                pr.labels.append(lbl_name)
+            if LBL_BUMP_SER_VER_ID == lbl_name_lc:
+                pr.labels.append(lbl_name)
+                state.prs_bump_ser_ver_id = True
+        state.prs.append(pr)
 
-    state.prs_bump_ser_ver_id = any(
-        LBL_BUMP_SER_VER_ID in labels for labels in state.pr_labels.values())
 
 
 def resolve_next_ser_ver_id():
@@ -566,8 +584,8 @@ Config
 ''')
     if config.include_prs_label:
         info(f'PRs to merge')
-        for pr in state.pr_labels:
-            info(f'  - {pr} with labels {state.pr_labels[pr]}')
+        for pr in state.prs:
+            info(f'  - {pr.description_w_labels()}')
     info(f'''
 Release info
   - Project major version ....... : {state.major_version}
