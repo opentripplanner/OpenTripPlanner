@@ -17,6 +17,7 @@ SER_VER_ID_PROPERTY = 'otp.serialization.version.id'
 SER_VER_ID_PROPERTY_PTN = SER_VER_ID_PROPERTY.replace('.', r'\.')
 SER_VER_ID_PATTERN = re.compile(
     '<' + SER_VER_ID_PROPERTY_PTN + r'>\s*(.*)\s*</' + SER_VER_ID_PROPERTY_PTN + '>')
+OTP_GITHUB_PULLREQUEST_URL = "https://github.com/opentripplanner/OpenTripPlanner/pull/"
 STATE_FILE = '.custom_release_resume_state.json'
 SUMMARY_FILE = '.custom_release_summary.md'
 
@@ -100,8 +101,7 @@ class PullRequest:
         return f'{self.description()} {self.labels}'
 
     def description_link(self):
-        url = f"https://github.com/opentripplanner/OpenTripPlanner/pull/{self.number}"
-        return f"[{self.description()}]({url}) {self.labels}".replace("'", "`")
+        return f"[{self.description()}]({OTP_GITHUB_PULLREQUEST_URL}{self.number}) {self.labels}".replace("'", "`")
 
 # The execution state of the script + the CLI arguments
 class ScriptState:
@@ -116,14 +116,14 @@ class ScriptState:
         self.gotoStep = False
         self.step = None
 
-    def next_version_tag(self):
-        return f'v{self.next_version}'
-
     def latest_version_tag(self):
         return f'v{self.latest_version}'
 
     def latest_version_git_hash(self):
         return git_commit_hash(self.latest_version_tag())
+
+    def next_version_tag(self):
+        return f'v{self.next_version}'
 
     def next_version_description(self):
         return f'Version {self.next_version} ({self.next_ser_ver_id})'
@@ -207,6 +207,7 @@ def setup_and_verify():
         resolve_version_number()
         resolve_next_version()
         read_pull_request_info_from_github()
+        check_if_prs_exist_in_latest_release()
         resolve_next_ser_ver_id()
     print_setup()
 
@@ -328,7 +329,11 @@ def print_summary():
             print(f"These PRs are tagged with {config.include_prs_label}.\n", file=f)
         for pr in pullRequests:
             print(f"  -  {pr.link()}", file=f)
-        p = execute("./script/changelog-diff.py", state.latest_version_tag(), state.next_version_tag())
+        p = execute(
+            "./script/changelog-diff.py",
+            state.latest_version_tag(),
+            state.next_version_tag()
+        )
         print(p.stdout, file=f)
 
 
@@ -506,6 +511,8 @@ def read_pull_request_info_from_github():
     # Example response
     #   {"data":{"repository":{"pullRequests":{"nodes":[{"number":2222,"labels":{"nodes":[{"name":"bump serialization id"},{"name":"Entur Test"}]}}]}}}}
     json_doc = json.loads(result.stdout)
+    defined_labels = [LBL_BUMP_SER_VER_ID.lower(), config.include_prs_label.lower()]
+
     for node in json_doc['data']['repository']['pullRequests']['nodes']:
         pr = PullRequest()
         pr.number = node['number']
@@ -513,16 +520,24 @@ def read_pull_request_info_from_github():
         pr.commitHash = node['headRefOid']
         labels = node['labels']['nodes']
         # GitHub labels are not case-sensitive, hence using 'lower()'
-        include_prs_label_lc = config.include_prs_label.lower()
         for label in labels:
             lbl_name = label['name']
             lbl_name_lc= lbl_name.lower()
-            if include_prs_label_lc == lbl_name_lc:
+            if lbl_name_lc in defined_labels:
                 pr.labels.append(lbl_name)
-            if LBL_BUMP_SER_VER_ID == lbl_name_lc:
-                pr.labels.append(lbl_name)
-                state.prs_bump_ser_ver_id = True
         pullRequests.append(pr)
+
+
+def check_if_prs_exist_in_latest_release():
+    info(f'Check if one of the PRs labeled with {LBL_BUMP_SER_VER_ID} does not exist in the '
+         f'latest release. If so, bump the ser.ver.id ...')
+    latest_release_hash = state.latest_version_git_hash()
+
+    for pr in pullRequests:
+        if pr.serLabelSet and not git_is_commit_ancestor(pr.commitHash, latest_release_hash):
+            info(f'  - The top commit does not exist in the latest release. Bumping ser.ver.id. ({pr.description()})')
+            state.prs_bump_ser_ver_id = True
+            return
 
 
 # The script will resolve what the next serialization version id (SID) should be. This is a complex task.
@@ -658,18 +673,6 @@ def delete_script_state():
 ##                                   Utility functions                                  ##
 ## ------------------------------------------------------------------------------------ ##
 
-# Get the full git hash for a qualified branch name, tag or hash
-def git_commit_hash(ref):
-    if re.compile(r'[0-9a-f]{40}').match(ref):
-        return ref
-    output = execute('git', 'show-ref', ref).stdout
-    return output.split()[0]
-
-
-# Create a tag name used in git for a given version
-def git_tag(version):
-    return f'v{version}'
-
 
 def bump_release_ser_ver_id(latest_id):
     # The id format can be either 'A-00053' or 'AA-0053'
@@ -709,6 +712,19 @@ def read_ser_ver_id_from_pom_file(git_hash):
 def run_maven_test():
     if section_w_resume('run_maven_test', 'Run unit tests'):
         mvn('clean', '-PprettierSkip', 'test')
+
+
+# Get the full git hash for a qualified branch name, tag or hash
+def git_commit_hash(ref):
+    if re.compile(r'[0-9a-f]{40}').match(ref):
+        return ref
+    output = execute('git', 'show-ref', ref).stdout
+    return output.split()[0]
+
+
+def git_is_commit_ancestor(childCommit: str, parentCommit : str):
+    p = subprocess.run("git", "merge-base" "--is-ancestor", childCommit, parentCommit, timeout=5)
+    return p.returncode == 0
 
 
 def git(*cmd, error_msg=None):
