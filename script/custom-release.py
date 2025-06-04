@@ -112,7 +112,6 @@ class ScriptState:
         self.major_version = None
         self.latest_version = None
         self.next_version = None
-        self.prs = []
         self.prs_bump_ser_ver_id = False
         self.gotoStep = False
         self.step = None
@@ -161,6 +160,7 @@ class ScriptState:
 config: Config = Config()
 options = CliOptions()
 state = ScriptState()
+pullRequests = []
 
 
 ## ------------------------------------------------------------------------------------ ##
@@ -206,7 +206,7 @@ def setup_and_verify():
         verify_no_local_git_changes()
         resolve_version_number()
         resolve_next_version()
-        list_labeled_prs()
+        read_pull_request_info_from_github()
         resolve_next_ser_ver_id()
     print_setup()
 
@@ -224,7 +224,7 @@ def reset_release_branch_to_base_revision():
 
 def merge_in_labeled_prs():
     section('Merge in labeled PRs ...')
-    for pr in state.prs:
+    for pr in pullRequests:
         # A temp branch is needed here since the PR is in the upstream remote repo
         temp_branch = f'pull-request-{pr.number}'
         if section_w_resume(temp_branch, f'Merge in PR {pr.description()}'):
@@ -323,10 +323,10 @@ def print_summary():
 """
     with open(SUMMARY_FILE, mode="w", encoding="UTF-8") as f:
         print(release_version_summary, file=f)
-        if len(state.prs) > 0:
+        if len(pullRequests) > 0:
             print("## Pull Requests", file=f)
             print(f"These PRs are tagged with {config.include_prs_label}.\n", file=f)
-        for pr in state.prs:
+        for pr in pullRequests:
             print(f"  -  {pr.link()}", file=f)
         p = execute("./script/changelog-diff.py", state.latest_version_tag(), state.next_version_tag())
         print(p.stdout, file=f)
@@ -463,7 +463,7 @@ def resolve_next_version():
     state.next_version = prefix + str(1 + max_tag_version)
 
 
-def list_labeled_prs():
+def read_pull_request_info_from_github():
     if options.skip_prs or (not config.include_prs_label):
         info('Skip merging in GitHub PRs.')
         return
@@ -522,8 +522,7 @@ def list_labeled_prs():
             if LBL_BUMP_SER_VER_ID == lbl_name_lc:
                 pr.labels.append(lbl_name)
                 state.prs_bump_ser_ver_id = True
-        state.prs.append(pr)
-
+        pullRequests.append(pr)
 
 
 def resolve_next_ser_ver_id():
@@ -591,7 +590,7 @@ Config
 ''')
     if config.include_prs_label:
         info(f'PRs to merge')
-        for pr in state.prs:
+        for pr in pullRequests:
             info(f'  - {pr.description_w_labels()}')
     info(f'''
 Release info
@@ -609,21 +608,29 @@ Release info
 
 def read_script_state():
     info('The script will resume and print the state of the previous process.')
-    global options, config, state
-    with open(STATE_FILE, 'r') as f:
+    global options, config, state, pullRequests
+    with (open(STATE_FILE, 'r') as f):
         doc = json.load(f)
         options.__dict__ = doc['options']
         config.__dict__ = doc['config']
         state.__dict__ = doc['state']
+        for it in doc['pull-requests']:
+            pr = PullRequest()
+            pr.__dict__ = it
+            pullRequests.append(pr)
         state.gotoStep = True
 
 
 def save_script_state(step):
     state.step = step
-    doc = {'options': options.__dict__, 'config': config.__dict__, 'state': state.__dict__}
+    doc = {
+        'options': options.__dict__,
+        'config': config.__dict__,
+        'state': state.__dict__,
+        'pull-requests' : list(pr.__dict__ for pr in pullRequests)
+    }
     with open(STATE_FILE, 'w') as f:
         json.dump(doc, f)
-
 
 # Delete the script state file - this avoids going into resume the nest time the
 # script is run.
