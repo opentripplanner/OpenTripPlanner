@@ -71,6 +71,9 @@ class CliOptions:
     def release_base(self):
         return self.base_revision if self.base_revision else 'HEAD'
 
+    def release_base_git_hash(self):
+        return git_commit_hash(self.release_base())
+
     def __str__(self):
         return (f"<"
                 f"base_revision: {self.base_revision}, "
@@ -119,6 +122,9 @@ class ScriptState:
 
     def latest_version_tag(self):
         return f'v{self.latest_version}'
+
+    def latest_version_git_hash(self):
+        return git_commit_hash(self.latest_version_tag())
 
     def next_version_description(self):
         return f'Version {self.next_version} ({self.next_ser_ver_id})'
@@ -521,7 +527,7 @@ def list_labeled_prs():
 
 def resolve_next_ser_ver_id():
     info('Resolve the next serialization version id ...')
-    latest_release_hash = git_show_ref(git_tag(state.latest_version))
+    latest_release_hash = state.latest_version_git_hash()
     latest_ser_ver_id = read_ser_ver_id_from_pom_file(latest_release_hash)
     bump_ser_ver_id = options.bump_ser_ver_id
 
@@ -536,7 +542,7 @@ def resolve_next_ser_ver_id():
         latest_upstream_id = find_upstream_ser_ver_id_in_history(latest_release_hash)
 
         info(f'  - Find base serialization version id ...')
-        base_hash = git_show_ref(options.release_base())
+        base_hash = options.release_base_git_hash()
         base_upstream_id = find_upstream_ser_ver_id_in_history(base_hash)
 
         # Update serialization version id in release if serialization version id has changed
@@ -629,7 +635,7 @@ def delete_script_state():
 ## ------------------------------------------------------------------------------------ ##
 
 # Get the full git hash for a qualified branch name, tag or hash
-def git_show_ref(ref):
+def git_commit_hash(ref):
     if re.compile(r'[0-9a-f]{40}').match(ref):
         return ref
     output = execute('git', 'show-ref', ref).stdout
