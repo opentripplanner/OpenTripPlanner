@@ -37,6 +37,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add `generalizedCostMaxLimit` field to the `PageCursor` to enable using `RemoveTransitIfStreetOnlyIsBetter` filter with paging [#6474](https://github.com/opentripplanner/OpenTripPlanner/pull/6474)
 - Fix issue with paging when going to the next page after initial arrive by search [#6621](https://github.com/opentripplanner/OpenTripPlanner/pull/6621)
 - Fix route filter application for stations in GTFS API [#6678](https://github.com/opentripplanner/OpenTripPlanner/pull/6678)
+- Allow location groups without names [#6674](https://github.com/opentripplanner/OpenTripPlanner/pull/6674)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
