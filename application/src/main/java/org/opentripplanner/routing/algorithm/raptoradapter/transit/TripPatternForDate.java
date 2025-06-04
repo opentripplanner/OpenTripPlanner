@@ -94,7 +94,6 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
         serviceDate,
         last.getArrivalTime(last.getNumStops() - 1)
       ).toLocalDate();
-      assertValidRunningPeriod(startOfRunningPeriod, endOfRunningPeriod, first, last);
     }
   }
 
@@ -222,6 +221,20 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     }
 
     return new TripPatternForDate(tripPattern, filteredTripTimes, filteredFrequencies, serviceDate);
+  }
+
+  /**
+   * Asserts that the running period is valid and throws an {@link IllegalArgumentException} if it
+   * is not.
+   * This is the last line of defense against invalid real-time updates.
+   */
+  public void assertValidRunningPeriod() throws IllegalArgumentException {
+    assertValidRunningPeriod(
+      startOfRunningPeriod,
+      endOfRunningPeriod,
+      tripTimes[0],
+      tripTimes[tripTimes.length - 1]
+    );
   }
 
   private static void assertValidRunningPeriod(

@@ -123,6 +123,9 @@ public class RealTimeRaptorTransitDataUpdater {
 
       try {
         newTripPatternForDate = tripPatternForDateMapper.map(timetable, timetable.getServiceDate());
+        if (newTripPatternForDate != null) {
+          newTripPatternForDate.assertValidRunningPeriod();
+        }
       } catch (IllegalArgumentException exception) {
         // There is some issue with finding the correct running period, using old pattern instead
         newTripPatternForDate = oldTripPatternForDate;
