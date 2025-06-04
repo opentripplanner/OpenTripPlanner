@@ -477,6 +477,7 @@ def list_labeled_prs():
           nodes {
             number, 
             title, 
+            headRefOid,
             labels(first: 20) {
               nodes {
                 name
