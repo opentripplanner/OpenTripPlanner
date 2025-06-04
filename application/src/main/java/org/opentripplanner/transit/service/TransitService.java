@@ -142,6 +142,7 @@ public interface TransitService {
 
   Operator getOperator(FeedScopedId id);
 
+  @Nullable
   RegularStop getRegularStop(FeedScopedId id);
 
   Collection<StopLocation> listStopLocations();
@@ -303,8 +304,6 @@ public interface TransitService {
   TripOnServiceDate getTripOnServiceDate(FeedScopedId id);
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
-
-  Set<TransitMode> listTransitModes();
 
   Collection<PathTransfer> findPathTransfers(StopLocation stop);
 

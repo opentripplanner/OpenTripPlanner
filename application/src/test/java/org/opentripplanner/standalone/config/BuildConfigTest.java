@@ -10,8 +10,6 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.j
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 class BuildConfigTest {

@@ -22,6 +22,7 @@ import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.utils.lang.DoubleUtils;
+import org.opentripplanner.utils.lang.Sandbox;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -560,6 +561,12 @@ public class Itinerary implements ItinerarySortKey {
       .toList();
   }
 
+  /**
+   * The agregated sum of emission for all legs in the itinerary. This method return a value
+   * (none {@code null}) if the emission can be computed for all transit and car legs. This method
+   * return {@code null} if at least one leg can not be computed.
+   */
+  @Sandbox
   @Nullable
   public Emission emissionPerPerson() {
     return this.emissionPerPerson;

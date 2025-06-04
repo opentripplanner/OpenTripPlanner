@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
@@ -39,6 +40,7 @@ public class StreetLeg implements Leg {
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
   private final Float accessibilityScore;
+  private final Emission emissionPerPerson;
 
   protected StreetLeg(StreetLegBuilder builder) {
     this.mode = Objects.requireNonNull(builder.getMode());
@@ -56,6 +58,7 @@ public class StreetLeg implements Leg {
     this.rentedVehicle = builder.getRentedVehicle();
     this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
     this.accessibilityScore = builder.getAccessibilityScore();
+    this.emissionPerPerson = builder.emissionPerPerson();
   }
 
   public static StreetLegBuilder of() {
@@ -194,6 +197,18 @@ public class StreetLeg implements Leg {
 
   public StreetLeg withAccessibilityScore(float accessibilityScore) {
     return copyOf().withAccessibilityScore(accessibilityScore).build();
+  }
+
+  @Nullable
+  @Override
+  public Emission emissionPerPerson() {
+    return emissionPerPerson;
+  }
+
+  @Nullable
+  @Override
+  public Leg withEmissionPerPerson(Emission emissionPerPerson) {
+    return copyOf().withEmissionPerPerson(emissionPerPerson).build();
   }
 
   /**

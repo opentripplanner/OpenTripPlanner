@@ -40,7 +40,7 @@ public class ItineraryFiltersConfig {
         #### Group by similarity filters
 
         The group-by-filter is a bit complex, but should be simple to use. Set `debug=true` and experiment
-        with `searchWindow` and the three group-by parameters(`groupSimilarityKeepOne`,
+        with `searchWindow` and the three group-by parameters (`groupSimilarityKeepOne`,
         `groupSimilarityKeepThree` and `groupedOtherThanSameLegsMaxCostMultiplier`).
 
         The group-by-filter work by grouping itineraries together and then reducing the number of
@@ -122,7 +122,7 @@ public class ItineraryFiltersConfig {
               dropped. The `transitGeneralizedCostLimit` is calculated using the `costLimitFunction` plus a
               *relative cost* for the distance in time between the itineraries. The *relative cost* is the
               `intervalRelaxFactor` multiplied with the interval in seconds. To set the `costLimitFunction` to be
-              _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) use: `3000 + 0x`
+              _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value (3000s) use: `3000 + 0x`
               """
             )
             .asObject(),

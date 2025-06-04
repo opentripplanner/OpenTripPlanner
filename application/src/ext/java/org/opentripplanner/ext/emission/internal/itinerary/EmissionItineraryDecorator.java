@@ -1,8 +1,11 @@
 package org.opentripplanner.ext.emission.internal.itinerary;
 
+import java.util.ArrayList;
+import java.util.Optional;
 import org.opentripplanner.ext.emission.EmissionService;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -23,31 +26,42 @@ public class EmissionItineraryDecorator implements ItineraryDecorator {
 
   @Override
   public Itinerary decorate(Itinerary itinerary) {
+    boolean partialResults = false;
     var sum = Emission.ZERO;
+    var newLegs = new ArrayList<Leg>();
 
     for (var l : itinerary.legs()) {
       Emission value;
+
       if (l instanceof TransitLeg tl) {
-        value = calculateCo2EmissionsForTransit(tl);
+        value = calculateCo2EmissionsForTransit(tl).orElse(null);
       } else if (l instanceof StreetLeg sl && sl.getMode() == TraverseMode.CAR) {
         value = calculateCo2EmissionsForCar(sl);
       } else {
+        newLegs.add(l);
         continue;
       }
 
-      // Note! Partial results would not give an accurate representation of the emissions, not all
-      // legs have emissions. This should be fixed by setting the emission on each leg and mark
-      // legs witch have UNKNOWN emissions.
-      if (value.isZero()) {
-        return itinerary;
+      if (value == null) {
+        partialResults = true;
+      } else {
+        l = l.withEmissionPerPerson(value);
+        sum = sum.plus(value);
       }
-      sum = sum.plus(value);
+      newLegs.add(l);
     }
-    return sum.isZero() ? itinerary : itinerary.copyOf().withEmissionPerPerson(sum).build();
+
+    var builder = itinerary.copyOf();
+    builder.withLegs(newLegs);
+
+    if (!partialResults) {
+      builder.withEmissionPerPerson(sum);
+    }
+    return builder.build();
   }
 
-  private Emission calculateCo2EmissionsForTransit(TransitLeg leg) {
-    return emissionService.calculateTransitPassengerEmissionForTripLeg(
+  private Optional<Emission> calculateCo2EmissionsForTransit(TransitLeg leg) {
+    return emissionService.calculateTransitPassengerEmissionForTripHops(
       leg.trip(),
       leg.boardStopPosInPattern(),
       leg.alightStopPosInPattern(),
