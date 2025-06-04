@@ -525,36 +525,52 @@ def read_pull_request_info_from_github():
         pullRequests.append(pr)
 
 
+# The script will resolve what the next serialization version id (SID) should be. This is a complex task.
+# Here is an overview:
+#  1. If the --serVerId option exist, then the latest SID is bumped and used.
+#  2. If the --release option exist, then the current pom.xml SID is validated, if ok it is used,
+#     if not the script exit.
+#  3. All merged in PRs are checked. If a PR is labeled with 'bump serialization id' and the the
+#     HEAD commit is not in the latest release, then the last release SID is bumped and used.
+#  4. Finally, the script look at the upstream SID for the last release and the base. If the SID
+#     is not the same the SID of the last release is bumped. To find the *upstream* SIDs the script
+#     look at the git history/log NOT matching the project serialization version id prefix - this
+#     is assumed to be the latest SID for the upstream project.
+#
+# Tip! If the '--release' option is used, then the serialization version id is NOT updated. Use the
+# '--serVerId' option together with the '--release' to force update the serialization version id.
+#
 def resolve_next_ser_ver_id():
     info('Resolve the next serialization version id ...')
     latest_release_hash = state.latest_version_git_hash()
-    latest_ser_ver_id = read_ser_ver_id_from_pom_file(latest_release_hash)
-    bump_ser_ver_id = options.bump_ser_ver_id
+    state.latest_ser_ver_id = read_ser_ver_id_from_pom_file(latest_release_hash)
 
-    # If none of the PRs have the 'bump serialization id' label set, then find the upstream
-    # serialization-version-id for the release-base and the current version. If these
-    # serialization-version-ids are different, then we need to bump the new release serialization
-    # version id. To find the *upstream* ids we step back in the git history looking for an id
-    # not matching the project serialization version id prefix - this is assumed to be the latest
-    # serialization version from the upstream project.
-    if not bump_ser_ver_id:
+    if options.bump_ser_ver_id:
+        state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
+    elif options.releaseOnly:
+        current_ser_ver_id = read_ser_ver_id_from_pom_file("HEAD")
+        if current_ser_ver_id.startswith(config.ser_ver_id_prefix):
+            state.next_ser_ver_id = current_ser_ver_id
+        else:
+            error(f'The serialization-version-id ({current_ser_ver_id}) in the pom.xml must start with {config.ser_ver_id_prefix}.')
+    elif state.prs_bump_ser_ver_id:
+        state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
+    else:
         info('  - Find upstream serialization version id for latest release ...')
-        latest_upstream_id = find_upstream_ser_ver_id_in_history(latest_release_hash)
+        latest_upstream_ser_id = find_upstream_ser_ver_id_in_history(latest_release_hash)
 
         info(f'  - Find base serialization version id ...')
         base_hash = options.release_base_git_hash()
-        base_upstream_id = find_upstream_ser_ver_id_in_history(base_hash)
+        base_upstream_ser_id = find_upstream_ser_ver_id_in_history(base_hash)
 
         # Update serialization version id in release if serialization version id has changed
-        bump_ser_ver_id = latest_upstream_id != base_upstream_id
-        info(f'  - The latest upstream serialization.ver.id is {latest_upstream_id} '
-             f'and the base upstream id is {base_upstream_id}.')
-
-    state.latest_ser_ver_id = latest_ser_ver_id
-    if bump_ser_ver_id:
-        state.next_ser_ver_id = bump_release_ser_ver_id(latest_ser_ver_id)
-    else:
-        state.next_ser_ver_id = latest_ser_ver_id
+        if latest_upstream_ser_id != base_upstream_ser_id:
+            info(f'  - The latest upstream serialization.ver.id {latest_upstream_ser_id} '
+                 f'and the base upstream id {base_upstream_ser_id} is diffrent. '
+                 'The serialization.ver.id is bumped.')
+            state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
+        else:
+            state.next_ser_ver_id = state.latest_ser_ver_id
 
 
 # Find the serialization-version-id for the upstream git project using the git log starting
@@ -801,14 +817,13 @@ def print_help():
     print(f"""
     This script is used to create a new release in a downstream fork of OTP. It will set both
     the Maven version(2.7.0-entur-23) and the serialization-version-id(EN-0020) to a unique id
-    using the fork project name. For the script to work the git remote name must match the
-    GitHub 'owner' name.
+    using the provided configuration.
 
     Release process overview
-      1. The configured release-branch is reset hard to the <base-revision>.
-      2. Then the labeled PRs are merged into the release-branch, if configured.
-      3. The config-branches are merged into the release-branch.
-      4. The pom.xml file is updated with a new version and serialization version id.
+      1. The configured release-branch is reset hard to the <base-revision> script argument.
+      2. Then the labeled PRs are merged into the release-branch [if configured].
+      3. The config-branches are merged into the release-branch [if configured].
+      4. The pom.xml file is updated with a new version and serialization version id [if requiered].
       5. The release is tested, tagged and pushed to Git repo.
 
     See the RELEASE_README.md for more details.
@@ -818,17 +833,18 @@ def print_help():
 
     Arguments
         <base-revision> : The base branch or commit to use as the base for the release. The
-                          'otp/dev-2.x' is the most common base branch to use, but you can
-                          create a new release on top of any <commit>.
-                          This parameter is required unless option --release is used.
+                          'otp/dev-2.x' is the most common base branch to use, but you can create a
+                          new release on top of any <commit>. This parameter is required unless
+                          option --release is used.
 
     Options
       -h, --help : Print this help.
       --debug    : Run script with debug output enabled.
       --dryRun   : Run script locally, nothing is pushed to remote server.
-      --release  : Create a new release from the current local Git repo HEAD. It updates the
-                   maven-project-version and the serialization-version-id, creates a new tag
-                   and push the release. You should apply all fixes and commit BEFORE running
+      --release  : Create a new release from the checked out local Git repo HEAD. It updates the
+                   maven-project-version, but NOT the serialization-version-id. To increment the 
+                   serialization-version-id use the --serVerId option as well. This create a new 
+                   tag and push the release. You should apply all fixes and commit BEFORE running
                    this script. Can not be used with the <base-revision> argument set. The 
                    'custom-release-extension' script is NOT run.
       --serVerId : Force incrementation of the serialization version id.
