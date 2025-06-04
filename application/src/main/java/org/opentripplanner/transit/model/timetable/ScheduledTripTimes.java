@@ -312,7 +312,7 @@ public final class ScheduledTripTimes implements TripTimes {
 
   /**
    * Returns a time-shifted copy of this TripTimes in which the vehicle passes the given stop index
-   * (not stop sequence number) at the given time.
+   * at the given time.
    */
   public ScheduledTripTimes timeShift(final int stop, final int time, final boolean depart) {
     // Adjust 0-based times to match desired stoptime.
