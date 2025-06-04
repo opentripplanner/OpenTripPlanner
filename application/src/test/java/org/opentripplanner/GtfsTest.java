@@ -24,8 +24,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
-import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -54,6 +52,8 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
+import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
@@ -219,7 +219,7 @@ public abstract class GtfsTest {
 
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
 
     createRaptorTransitData(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
 
@@ -231,6 +231,7 @@ public abstract class GtfsTest {
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
       timetableRepository,
       snapshotManager,
+      new TripPatternCache(new TripPatternIdGenerator(), t -> null),
       LocalDate::now
     );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);

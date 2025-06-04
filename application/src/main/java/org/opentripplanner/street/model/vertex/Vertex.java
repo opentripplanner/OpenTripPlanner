@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -16,6 +17,7 @@ import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,6 +256,13 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   public void removeRentalRestriction(RentalRestrictionExtension ext) {
     rentalRestrictions = rentalRestrictions.remove(ext);
+  }
+
+  /**
+   * Returns the (flex) area stops that this vertex is inside.
+   */
+  public Set<AreaStop> areaStops() {
+    return Set.of();
   }
 
   /**

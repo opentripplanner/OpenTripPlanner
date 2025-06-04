@@ -5,7 +5,7 @@ import org.opentripplanner.model.plan.Itinerary;
 /**
  * An item is a decorated itinerary. The extra information added is the index in the input list
  * (sort order) and a groupCount. The sort order is used to break ties, while the group-count is
- * used to select the itinerary witch exist in the highest number of groups. The group dynamically
+ * used to select the itinerary which exist in the highest number of groups. The group dynamically
  * updates the group-count; The count is incremented when an item is added to a group, and
  * decremented when the group is removed from the State.
  */

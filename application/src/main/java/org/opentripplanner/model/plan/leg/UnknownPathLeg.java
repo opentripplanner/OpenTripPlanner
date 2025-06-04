@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
@@ -97,6 +98,18 @@ public class UnknownPathLeg implements Leg {
   @Override
   public Set<TransitAlert> listTransitAlerts() {
     return Set.of();
+  }
+
+  @Nullable
+  @Override
+  public Emission emissionPerPerson() {
+    return null;
+  }
+
+  @Nullable
+  @Override
+  public Leg withEmissionPerPerson(Emission emissionPerPerson) {
+    return null;
   }
 
   @Override
