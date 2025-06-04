@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.csvdata.EmissionDataReader;
-import org.opentripplanner.ext.emission.internal.csvdata.trip.TripLegMapper;
+import org.opentripplanner.ext.emission.internal.csvdata.trip.TripHopMapper;
 import org.opentripplanner.ext.emission.parameters.EmissionFeedParameters;
 import org.opentripplanner.ext.emission.parameters.EmissionParameters;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -18,7 +18,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TimetableRepository;
-import org.opentripplanner.utils.logging.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,33 +56,24 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
     if (parameters == null) {
       return;
     }
-    var progress = ProgressTracker.track("Read emission data", 100, -1);
-    var tripLegMapper = new TripLegMapper(createStopsByTripIdMap(), issueStore);
+    var tripHopMapper = new TripHopMapper(createStopsByTripIdMap(), issueStore);
     var co2EmissionsDataReader = new EmissionDataReader(
       emissionRepository,
-      tripLegMapper,
+      tripHopMapper,
       issueStore
     );
 
-    // Init car passenger emission data
-    {
-      double carAvgCo2PerKm = parameters.car().avgCo2PerKm();
-      double carAvgOccupancy = parameters.car().avgOccupancy();
-      double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
-      this.emissionRepository.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
-    }
     // Read Transit pasenger emission data from configured emission feeds
     for (var data : emissionDataSources) {
       co2EmissionsDataReader.read(data.dataSource(), data.config().feedId());
-      progress.step(m -> LOG.info(m));
     }
     // Read Transit pasenger emission inside gtfs feeds
     for (var data : gtfsDataSources) {
       var resolvedFeedId = new GtfsBundle(data.dataSource(), data.config()).getFeedId();
       co2EmissionsDataReader.read(data.dataSource(), resolvedFeedId);
-      progress.step(m -> LOG.info(m));
     }
-    LOG.info(progress.completeMessage());
+
+    logEmissionSummary();
   }
 
   private Map<FeedScopedId, List<StopLocation>> createStopsByTripIdMap() {
@@ -92,5 +82,9 @@ public class EmissionGraphBuilder implements GraphBuilderModule {
       pattern.scheduledTripsAsStream().forEach(it -> map.put(it.getId(), pattern.getStops()));
     }
     return map;
+  }
+
+  private void logEmissionSummary() {
+    LOG.info(emissionRepository.summary().toString());
   }
 }
