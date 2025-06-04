@@ -692,13 +692,17 @@ def git_dr(*cmd, error_msg=None):
     if options.dry_run:
         return git(*cmd, '--dry-run', error_msg=error_msg)
     else:
-        return execute('git', *cmd, error_msg=error_msg)
+        return git(*cmd, error_msg=error_msg)
 
 
 # Similar as 'git_dr()', but the command is just printed, not executed with the git '--dry-run'
-# flag set. This is required if the git command do not support the '--dry-run' flag.
+# flag set. This is required if the git command do not support the '--dry-run' flag. Note!
+# Return None if the command is not run.
 def git_im(*cmd, error_msg=None):
-    return execute('git', *cmd, error_msg=error_msg, impact=True)
+    if options.dry_run:
+        info(f'=> {cmd}  (--dryRun SKIPPED)')
+        return None
+    return git(*cmd, error_msg=error_msg)
 
 
 # Run maven and pipe the output to sdtout and stderr
@@ -710,10 +714,7 @@ def mvn(*cmd):
         exit(p.returncode)
 
 
-def execute(*cmd, quiet=True, quiet_err=False, error_msg=None, impact=False):
-    if options.dry_run and impact:
-        info(f'=> {cmd}  (--dryRun SKIPPED)')
-        return
+def execute(*cmd, quiet=True, quiet_err=False, error_msg=None):
     info(f'Run: {cmd}')
     p = subprocess.run(args=list(cmd), capture_output=True, text=True, timeout=20)
 
