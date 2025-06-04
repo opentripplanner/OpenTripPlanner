@@ -71,6 +71,13 @@ public enum ConfigType {
   ),
   TIME_ZONE(JsonType.string, "Time-Zone ID", "UTC", "Europe/Paris", "-05:00"),
   FEED_SCOPED_ID(JsonType.string, "FeedScopedId", "NO:1001", "1:101"),
+  GRAM(
+    JsonType.string,
+    "Weight in grams or kilograms. If no unit is specified the unit is assumed to be grams.",
+    "0g",
+    "170g",
+    "1.7 kg"
+  ),
   COST_LINEAR_FUNCTION(
     JsonType.string,
     """
@@ -106,7 +113,7 @@ public enum ConfigType {
 
       Examples: `0s + 2.5t`, `10m + 0 x` and `1h5m59s + 9.9t`
 
-      The `constant` must be 0 or a positive number(seconds) or a duration.
+      The `constant` must be 0 or a positive number (seconds) or a duration.
       The `coefficient` must be in range: [0.0, 100.0]
     """
   ),

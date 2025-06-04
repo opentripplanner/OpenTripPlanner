@@ -66,6 +66,7 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
@@ -86,7 +87,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   private static final long MAX_ARRIVAL_DEPARTURE_TIME = 48 * 60 * 60;
 
   /** A synchronized cache of trip patterns added to the graph due to GTFS-realtime messages. */
-  private final TripPatternCache tripPatternCache = new TripPatternCache();
+  private final TripPatternCache tripPatternCache;
 
   private final ZoneId timeZone;
 
@@ -110,6 +111,7 @@ public class GtfsRealTimeTripUpdateAdapter {
   public GtfsRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
+    TripPatternCache tripPatternCache,
     Supplier<LocalDate> localDateNow
   ) {
     this.snapshotManager = snapshotManager;
@@ -121,6 +123,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     );
     this.deduplicator = timetableRepository.getDeduplicator();
     this.serviceCodes = timetableRepository.getServiceCodes();
+    this.tripPatternCache = tripPatternCache;
   }
 
   /**
@@ -403,7 +406,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
 
     // If there are skipped stops, we need to change the pattern from the scheduled one
-    if (skippedStopIndices.size() > 0) {
+    if (!skippedStopIndices.isEmpty()) {
       StopPattern newStopPattern = pattern
         .copyPlannedStopPattern()
         .cancelStops(skippedStopIndices)
@@ -411,11 +414,7 @@ public class GtfsRealTimeTripUpdateAdapter {
 
       final Trip trip = transitEditorService.getTrip(tripId);
       // Get cached trip pattern or create one if it doesn't exist yet
-      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(
-        newStopPattern,
-        trip,
-        pattern
-      );
+      final TripPattern newPattern = tripPatternCache.getOrCreateTripPattern(newStopPattern, trip);
 
       cancelScheduledTrip(tripId, serviceDate, CancelationType.DELETE);
       return snapshotManager.updateBuffer(
@@ -879,13 +878,8 @@ public class GtfsRealTimeTripUpdateAdapter {
     // Create StopPattern
     final StopPattern stopPattern = new StopPattern(stopTimes);
 
-    final TripPattern originalTripPattern = transitEditorService.findPattern(trip);
     // Get cached trip pattern or create one if it doesn't exist yet
-    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(
-      stopPattern,
-      trip,
-      originalTripPattern
-    );
+    final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip);
 
     // Create new trip times
     final RealTimeTripTimes newTripTimes = TripTimesFactory.tripTimes(

@@ -16,6 +16,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.model.plan.legreference.LegReference;
@@ -69,6 +71,7 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   // Sandbox fields
   private final Float accessibilityScore;
+  private final Emission emissionPerPerson;
   private final List<FareProductUse> fareProducts;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
@@ -124,10 +127,11 @@ public class ScheduledTransitLeg implements TransitLeg {
       List.of(transitLegCoordinates.getFirst(), transitLegCoordinates.getLast())
     );
     this.transitAlerts = Set.copyOf(builder.alerts());
-    this.fareProducts = List.copyOf(builder.fareProducts());
 
     // Sandbox
     this.accessibilityScore = builder.accessibilityScore();
+    this.emissionPerPerson = builder.emissionPerPerson();
+    this.fareProducts = List.copyOf(builder.fareProducts());
   }
 
   public ScheduledTransitLegBuilder copyOf() {
@@ -415,15 +419,27 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
-  }
-
-  @Override
   @Nullable
   @Sandbox
   public Float accessibilityScore() {
     return accessibilityScore;
+  }
+
+  @Nullable
+  @Override
+  public Emission emissionPerPerson() {
+    return emissionPerPerson;
+  }
+
+  @Nullable
+  @Override
+  public Leg withEmissionPerPerson(Emission emissionPerPerson) {
+    return copyOf().withEmissionPerPerson(emissionPerPerson).build();
+  }
+
+  @Override
+  public List<FareProductUse> fareProducts() {
+    return fareProducts;
   }
 
   /**
@@ -453,6 +469,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
       .addObj("transferToNextLeg", transferToNextLeg)
       .addColSize("transitAlerts", transitAlerts)
+      .addObj("emissionPerPerson", emissionPerPerson)
       .addColSize("fareProducts", fareProducts)
       .toString();
   }

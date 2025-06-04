@@ -20,7 +20,6 @@ public enum OTPFeature {
     false,
     "Starts a background thread to continuously publish metrics about alerts. Needs to be enabled together with `ActuactorAPI`."
   ),
-  APIBikeRental(true, false, "Enable the bike rental endpoint."),
   APIServerInfo(true, false, "Enable the server info endpoint."),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
   IncludeEmptyRailStopsInTransfers(

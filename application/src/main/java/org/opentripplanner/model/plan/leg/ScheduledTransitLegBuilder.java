@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -35,10 +36,11 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   private int generalizedCost;
   private Set<TransitAlert> alerts = Set.of();
   private Double distanceMeters;
-  private List<FareProductUse> fareProducts = List.of();
 
   // Sandbox fields
   private Float accessibilityScore;
+  private Emission emissionPerPerson;
+  private List<FareProductUse> fareProducts = List.of();
 
   public ScheduledTransitLegBuilder() {}
 
@@ -61,6 +63,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
 
     // Sandbox fields
     accessibilityScore = original.accessibilityScore();
+    emissionPerPerson = original.emissionPerPerson();
   }
 
   public B withTripTimes(TripTimes tripTimes) {
@@ -194,6 +197,19 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return distanceMeters;
   }
 
+  public Float accessibilityScore() {
+    return accessibilityScore;
+  }
+
+  public Emission emissionPerPerson() {
+    return emissionPerPerson;
+  }
+
+  public B withEmissionPerPerson(Emission emissionPerPerson) {
+    this.emissionPerPerson = emissionPerPerson;
+    return instance();
+  }
+
   public List<FareProductUse> fareProducts() {
     return fareProducts;
   }
@@ -201,10 +217,6 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
   public B withFareProducts(List<FareProductUse> fareProducts) {
     this.fareProducts = Objects.requireNonNull(fareProducts);
     return instance();
-  }
-
-  public Float accessibilityScore() {
-    return accessibilityScore;
   }
 
   public ScheduledTransitLeg build() {

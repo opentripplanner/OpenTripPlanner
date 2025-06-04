@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_A;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.TestTransitCaseData.STOP_B;
 import static org.opentripplanner.updater.trip.gtfs.moduletests.addition.AddedTest.assertAddedTrip;
 
 import org.junit.jupiter.api.Test;
@@ -24,11 +26,14 @@ public class ModifiedTest implements RealtimeTestConstants {
   @Test
   void modifiedTrip() {
     var TRIP_INPUT = TripInput.of(TRIP_1_ID)
-      .addStop(STOP_A1, "8:30:00", "8:30:00")
-      .addStop(STOP_B1, "8:40:00", "8:40:00")
+      .addStop(STOP_A, "8:30:00", "8:30:00")
+      .addStop(STOP_B, "8:40:00", "8:40:00")
       .withHeadsign("Original Headsign")
       .build();
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = RealtimeTestEnvironment.of()
+      .withStops(STOP_A_ID, STOP_B_ID, STOP_C_ID, STOP_D_ID)
+      .addTrip(TRIP_INPUT)
+      .build();
     var builder = new TripUpdateBuilder(
       TRIP_1_ID,
       SERVICE_DATE,
@@ -37,9 +42,9 @@ public class ModifiedTest implements RealtimeTestConstants {
       "New Headsign"
     );
     builder
-      .addStopTime(STOP_A1_ID, 30)
-      .addStopTime(STOP_B1_ID, 45, "Changed Headsign")
-      .addStopTime(STOP_C1_ID, 60);
+      .addStopTime(STOP_A_ID, 30)
+      .addStopTime(STOP_B_ID, 45, "Changed Headsign")
+      .addStopTime(STOP_C_ID, 60);
 
     var tripUpdate = builder.build();
 
