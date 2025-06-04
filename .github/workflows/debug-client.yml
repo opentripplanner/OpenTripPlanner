@@ -36,7 +36,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Set version
         run: echo "VERSION=`date +%Y/%m/%Y-%m-%dT%H:%M`" >> $GITHUB_ENV

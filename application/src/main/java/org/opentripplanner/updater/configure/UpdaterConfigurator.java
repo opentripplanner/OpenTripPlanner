@@ -22,12 +22,13 @@ import org.opentripplanner.updater.alert.gtfs.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.TimetableSnapshotFlush;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.gtfs.updater.http.PollingTripUpdater;
 import org.opentripplanner.updater.trip.gtfs.updater.mqtt.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
 import org.opentripplanner.updater.trip.siri.updater.google.SiriETGooglePubsubUpdater;
-import org.opentripplanner.updater.vehicle_parking.AvailabilityDatasourceFactory;
+import org.opentripplanner.updater.vehicle_parking.AvailabilityDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingAvailabilityUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
@@ -51,6 +52,7 @@ public class UpdaterConfigurator {
   private final VehicleRentalRepository vehicleRentalRepository;
   private final VehicleParkingRepository parkingRepository;
   private final TimetableSnapshotManager snapshotManager;
+  private final TripPatternCache tripPatternCache;
 
   private UpdaterConfigurator(
     Graph graph,
@@ -59,6 +61,7 @@ public class UpdaterConfigurator {
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
+    TripPatternCache tripPatternCache,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
@@ -68,6 +71,7 @@ public class UpdaterConfigurator {
     this.updatersParameters = updatersParameters;
     this.parkingRepository = parkingRepository;
     this.snapshotManager = snapshotManager;
+    this.tripPatternCache = tripPatternCache;
   }
 
   public static void configure(
@@ -77,6 +81,7 @@ public class UpdaterConfigurator {
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     TimetableSnapshotManager snapshotManager,
+    TripPatternCache tripPatternCache,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
@@ -86,6 +91,7 @@ public class UpdaterConfigurator {
       parkingRepository,
       timetableRepository,
       snapshotManager,
+      tripPatternCache,
       updatersParameters
     ).configure();
   }
@@ -208,7 +214,7 @@ public class UpdaterConfigurator {
           );
         }
         case AVAILABILITY_ONLY -> {
-          var source = AvailabilityDatasourceFactory.create(configItem);
+          var source = AvailabilityDataSourceFactory.create(configItem);
           updaters.add(
             new VehicleParkingAvailabilityUpdater(configItem, source, parkingRepository)
           );
@@ -226,12 +232,19 @@ public class UpdaterConfigurator {
   }
 
   private SiriRealTimeTripUpdateAdapter provideSiriAdapter() {
-    return new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
+    return new SiriRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      tripPatternCache
+    );
   }
 
   private GtfsRealTimeTripUpdateAdapter provideGtfsAdapter() {
-    return new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
-      LocalDate.now(timetableRepository.getTimeZone())
+    return new GtfsRealTimeTripUpdateAdapter(
+      timetableRepository,
+      snapshotManager,
+      tripPatternCache,
+      () -> LocalDate.now(timetableRepository.getTimeZone())
     );
   }
 

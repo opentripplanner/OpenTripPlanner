@@ -1,14 +1,10 @@
 package org.opentripplanner.routing.graphfinder;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -20,13 +16,10 @@ public interface GraphFinder {
    * Get a new GraphFinder instance depending on whether the graph includes a street network or
    * not.
    */
-  static GraphFinder getInstance(
-    Graph graph,
-    Function<Envelope, Collection<RegularStop>> queryNearbyStops
-  ) {
+  static GraphFinder getInstance(Graph graph, TransitService transitService) {
     return graph.hasStreets
       ? new StreetGraphFinder(graph)
-      : new DirectGraphFinder(queryNearbyStops);
+      : new DirectGraphFinder(transitService::findRegularStopsByBoundingBox);
   }
 
   /**

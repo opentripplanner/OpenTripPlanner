@@ -16,7 +16,7 @@ public record TestOtpModel(
 
   public TestOtpModel index() {
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
     return this;
   }
 }

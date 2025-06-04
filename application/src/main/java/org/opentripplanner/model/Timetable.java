@@ -47,7 +47,7 @@ public class Timetable implements Serializable {
   }
 
   /**
-   * Copy timetable into a builder witch can be used to modify the timetable.
+   * Copy timetable into a builder which can be used to modify the timetable.
    */
   public TimetableBuilder copyOf() {
     return new TimetableBuilder(this);

@@ -84,8 +84,9 @@ public abstract class StreetVertex extends Vertex {
   }
 
   /**
-   * Returns the list of area stops that this vertex is inside of.
+   * Returns the list of area stops that this vertex is inside.
    */
+  @Override
   public Set<AreaStop> areaStops() {
     return areaStops;
   }
