@@ -11,7 +11,12 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
-// TODO VIA: Javadoc
+/**
+ * Represents a transit request with various configuration options such as
+ * banned trips, preferred/unpreferred agencies, and routes, as well as
+ * filters and debugging capabilities. This class is designed to allow for
+ * customization of transit-related searches.
+ */
 public class TransitRequest implements Cloneable, Serializable {
 
   private List<FeedScopedId> bannedTrips = new ArrayList<>();
@@ -58,7 +63,7 @@ public class TransitRequest implements Cloneable, Serializable {
   }
 
   /**
-   * A unique group-id is assigned all patterns grouped by matching select and agency.
+   * A unique group-id is assigned to all patterns grouped by matching select and agency.
    * In other words, two patterns matching the same select and with the same agency-id
    * will get the same group-id.
    * <p>
