@@ -259,10 +259,12 @@ def merge_in_old_release_with_no_changes():
 def run_custom_release_extensions():
     section('Run custom release extensions bash script ...')
     ext_script = 'script/custom-release-extension'
-    if os.path.exists(ext_script):
-        execute(ext_script)
+    if not os.path.exists(ext_script):
+        warn(f"Script '{ext_script}' not found!")
     else:
-        print(f"Script '{ext_script}' not found!")
+        p = subprocess.run(ext_script, text=True, timeout=20)
+        if p.returncode != 0:
+            error(f'Custom script {ext_script} failed. Return code: {p.returncode}')
 
 
 def set_maven_pom_version():
@@ -808,6 +810,10 @@ def section(msg: str):
 
 def info(msg):
     print(f'{msg}', flush=True)
+
+
+def warn(msg):
+    print(f'\nWARNING {msg}\n', flush=True)
 
 
 def error(msg):
