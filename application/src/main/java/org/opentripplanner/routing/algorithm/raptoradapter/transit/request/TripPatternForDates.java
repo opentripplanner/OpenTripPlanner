@@ -280,10 +280,10 @@ public class TripPatternForDates
   }
 
   /**
-   * Return a list with all depature times for the fisrt stop for each trip per day.
+   * Return a list with all departure times for the first stop for each trip per day.
    *
-   * There is not unit-test on this method, so keep the surface to {@link TripPatternForDate}
-   * as thin as possible.
+   * There are no unit-tests on this method, so the surface to {@link TripPatternForDate}
+   * should be kept as thin as possible.
    */
   private static TripTimesForDaysIndex createTripTimesForDaysIndex(
     TripPatternForDate[] tripPatternForDates,

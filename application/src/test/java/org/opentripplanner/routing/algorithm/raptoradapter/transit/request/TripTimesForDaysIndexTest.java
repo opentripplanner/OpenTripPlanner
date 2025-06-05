@@ -41,7 +41,7 @@ class TripTimesForDaysIndexTest {
    *    A case like "1 | 1 | 1" is not valid, only two following days may overlap in time, and
    *    the behaviour of {@link TripTimesForDaysIndex} in such cases is undefined.
    */
-  static List<Arguments> initsializationTestCases() {
+  static List<Arguments> initializationTestCases() {
     return Arrays.stream(
       """
       # Test with one day
@@ -115,8 +115,8 @@ class TripTimesForDaysIndexTest {
   }
 
   @ParameterizedTest
-  @MethodSource("initsializationTestCases")
-  void testInitsialization(String input, String expected) {
+  @MethodSource("initializationTestCases")
+  void testIniitalization(String input, String expected) {
     var subject = new TripTimesForDaysIndex(toTimes(input));
     assertEquals(expected, subject.toString());
   }

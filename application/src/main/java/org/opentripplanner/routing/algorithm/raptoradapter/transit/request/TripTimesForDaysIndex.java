@@ -3,25 +3,25 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.List;
 
 /**
- * This class build an tripIndex for {@link TripPatternForDates} to (day, tripIndexForDay).
- * In most cases concatenating the depature times would be correct, but the last depature on a
+ * This class builds a tripIndex for {@link TripPatternForDates} to (day, tripIndexForDay).
+ * In most cases concatenating the departure times would be correct, but the last departure on a
  * specific day, may depart after the first departure on the following day. In these cases we need
- * to swap the two depatures in the timetable Raptor searches. The reason we need this, is that
- * trips on two diffrent datys may have overlapping trip-times. A nightbus on Saturdays may leave
+ * to swap the two departures in the timetable Raptor searches. The reason we need this, is that
+ * trips on two different days may have overlapping trip-times. A night bus on Saturdays may leave
  * at 04:05+1d, while the first bus on Sundays may leave at 03:00. Be aware, these two trips may
- * not have the same service calendar, normally they are diffrent. For example "Sundays" might be
+ * not have the same service calendar, normally they are different. For example "Sundays" might be
  * all Sundays and public holidays.
  * </p>
- * The trip index is a sorted list of trips based on the first stop depature time. The index
+ * The trip index is a sorted list of trips based on the first stop departure time. The index
  * contains two pointers, the first is the day and the second is the trip index on that day:
  * ```
  *   tripIndexForTripPatternPerDates -> (day, tripIndexForTripPatternPerDate)
  * ```
  * </p>
- * This class might at first look a bit complicated. A much easier approch would be to just sort
- * on depature times using a Java build in sort, but sorting is expencive. This code will merge
- * the  timetables instead - witch is faster. In 99% of the cases we will just do one extra
- * comparasons for each depature time.
+ * This class might at first look a bit complicated. A much easier approach would be to just sort
+ * on departure times using a Java built in sort, but sorting is expensive. This code will merge
+ * the  timetables instead - which is faster. In 99% of the cases we will just do one extra
+ * comparison for each departure time.
  */
 final class TripTimesForDaysIndex {
 
