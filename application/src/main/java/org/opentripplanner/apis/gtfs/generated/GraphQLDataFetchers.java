@@ -1263,9 +1263,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
-    public DataFetcher<String> netexMode();
-
-    public DataFetcher<String> netexSubmode();
+    public DataFetcher<GraphQLTransitMode> mode();
 
     public DataFetcher<TripOccupancy> occupancy();
 
@@ -1286,6 +1284,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
 
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimesForDate();
+
+    public DataFetcher<String> submode();
 
     public DataFetcher<Geometry> tripGeometry();
 

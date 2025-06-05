@@ -22,6 +22,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
+import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.apis.gtfs.mapping.TransmodelSubmodeMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
@@ -256,12 +257,12 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   @Override
-  public DataFetcher<String> netexMode() {
-    return environment -> getSource(environment).getMode().toString();
+  public DataFetcher<GraphQLTypes.GraphQLTransitMode> mode() {
+    return environment -> TransitModeMapper.map(getSource(environment).getMode());
   }
 
   @Override
-  public DataFetcher<String> netexSubmode() {
+  public DataFetcher<String> submode() {
     return environment -> {
       Trip trip = getSource(environment);
       if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
