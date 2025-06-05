@@ -140,7 +140,7 @@ public class ToStringBuilder {
   }
 
   /**
-   * Add the result of the given supplier. If the supplier return {@code  null} or an exceptions
+   * Add the result of the given supplier. If the supplier return {@code null} or an exceptions
    * is thrown, then nothing is added - the result is ignored.
    */
   public ToStringBuilder addObjOpSafe(String name, Supplier<?> body) {

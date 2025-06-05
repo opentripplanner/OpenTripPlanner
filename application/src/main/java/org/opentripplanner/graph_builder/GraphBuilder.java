@@ -135,6 +135,11 @@ public class GraphBuilder implements Runnable {
     // which need to be handled even when there's no transit.
     graphBuilder.addModule(factory.streetLinkerModule());
 
+    // Avoid applying turn restrictions twice if doing separate street graph and graph builds.
+    if (hasOsm) {
+      graphBuilder.addModule(factory.turnRestrictionModule());
+    }
+
     // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily
@@ -157,13 +162,13 @@ public class GraphBuilder implements Runnable {
 
       // Analyze routing between stops to generate report
       graphBuilder.addModuleOptional(factory.directTransferAnalyzer(), OTPFeature.TransferAnalyzer);
+
+      graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
     }
 
     if (loadStreetGraph || hasOsm) {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
-
-    graphBuilder.addModuleOptional(factory.emissionGraphBuilder(), OTPFeature.Emission);
 
     graphBuilder.addModuleOptional(factory.routeToCentroidStationIdValidator());
 

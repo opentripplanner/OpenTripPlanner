@@ -7,6 +7,8 @@ import java.io.File;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.util.BitSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,9 +24,12 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
+import org.opentripplanner.ext.emission.model.TripPatternEmission;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.osminfo.internal.DefaultOsmInfoGraphBuildRepository;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
@@ -35,6 +40,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.street.model.StreetLimitationParameters;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TimetableRepository;
 
 /**
@@ -47,6 +53,10 @@ import org.opentripplanner.transit.service.TimetableRepository;
  * Created by abyrd on 2018-10-26
  */
 public class GraphSerializationTest {
+
+  private static final FeedScopedId A_TRIP_ID = new FeedScopedId("F", "T:1");
+  private static final Gram CO2 = Gram.of(2);
+  private static final Emission A_EMISSION = Emission.of(CO2);
 
   static Class<?>[] IGNORED_CLASSES = Set.of(
     // Skip AtomicInteger, it does not implement equals/hashCode
@@ -71,7 +81,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var weRepo = new DefaultWorldEnvelopeRepository();
-    var emissionRepository = new DefaultEmissionRepository();
+    var emissionRepository = createEmissionRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -91,7 +101,7 @@ public class GraphSerializationTest {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var osmGraphBuildRepository = new DefaultOsmInfoGraphBuildRepository();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    var emissionRepository = new DefaultEmissionRepository();
+    var emissionRepository = createEmissionRepository();
     var parkingRepository = new DefaultVehicleParkingRepository();
     testRoundTrip(
       model.graph(),
@@ -241,5 +251,15 @@ public class GraphSerializationTest {
     copiedTimetableRepository2.index();
     copiedGraph2.index(copiedTimetableRepository2.getSiteRepository());
     assertNoDifferences(copiedGraph1, copiedGraph2);
+  }
+
+  private static EmissionRepository createEmissionRepository() {
+    var emissionRepository = new DefaultEmissionRepository();
+    emissionRepository.setCarAvgCo2PerMeter(CO2);
+    emissionRepository.addRouteEmissions(Map.of(A_TRIP_ID, A_EMISSION));
+    emissionRepository.addTripPatternEmissions(
+      Map.of(A_TRIP_ID, new TripPatternEmission(List.of(A_EMISSION)))
+    );
+    return emissionRepository;
   }
 }

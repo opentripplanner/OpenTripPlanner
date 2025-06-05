@@ -1036,7 +1036,7 @@ type Place {
   Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop) Mostly
   used for better localization of bike sharing and P+R station names
   """
-  vertexType: VertexType
+  vertexType: VertexType @deprecated(reason : "Unmaintained. Use `stop`, `rentalVehicle`, `vehicleParking` or `vehicleRentalStation` to tell which type it is.")
 }
 
 type Plan {
@@ -1900,6 +1900,8 @@ type RealTimeEstimate {
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
+  "The vehicle should be returned before this deadline."
+  availableUntil: OffsetDateTime
   "Fuel or battery status of the rental vehicle"
   fuel: RentalVehicleFuel
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
