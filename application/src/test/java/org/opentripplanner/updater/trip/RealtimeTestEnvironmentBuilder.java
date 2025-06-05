@@ -33,6 +33,15 @@ public class RealtimeTestEnvironmentBuilder {
   private final HashMap<String, Station> stations = new HashMap<>();
   private final List<TripInput> tripInputs = new ArrayList<>();
 
+  RealtimeTestEnvironmentBuilder() {}
+
+  public RealtimeTestEnvironmentBuilder addTrip(TripInput... trip) {
+    for (var t : trip) {
+      addTrip(t);
+    }
+    return this;
+  }
+
   public RealtimeTestEnvironmentBuilder addTrip(TripInput trip) {
     this.tripInputs.add(trip);
     return this;
@@ -62,12 +71,18 @@ public class RealtimeTestEnvironmentBuilder {
       SERVICE_ID,
       List.of(SERVICE_DATE.minusDays(1), SERVICE_DATE, SERVICE_DATE.plusDays(1))
     );
+
     timetableRepository.getServiceCodes().put(SERVICE_ID, 0);
     timetableRepository.updateCalendarServiceData(
       true,
       calendarServiceData,
       DataImportIssueStore.NOOP
     );
+    timetableRepository
+      .getAllTripPatterns()
+      .forEach(pattern -> {
+        pattern.getScheduledTimetable().setServiceCodes(timetableRepository.getServiceCodes());
+      });
 
     timetableRepository
       .getAllTripPatterns()

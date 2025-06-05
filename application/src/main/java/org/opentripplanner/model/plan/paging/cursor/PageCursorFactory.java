@@ -13,6 +13,15 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 public class PageCursorFactory {
 
+  /**
+   * The search-window start and end is [inclusive, exclusive], so to calculate the start of the
+   * search-window from the last time included in the search window we need to include one extra
+   * minute at the end.
+   * <p>
+   * The value is set to a minute because raptor operates in one minute increments.
+   */
+  private static final Duration SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION = Duration.ofMinutes(1);
+
   private final SortOrder sortOrder;
   private final Duration newSearchWindow;
   private PageType currentPageType;
@@ -22,6 +31,7 @@ public class PageCursorFactory {
   private boolean wholeSearchWindowUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
+  private Instant firstSearchLatestItineraryDeparture = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -33,10 +43,12 @@ public class PageCursorFactory {
 
   /**
    * Set the original search earliest-departure-time({@code edt}), latest-arrival-time ({@code lat},
-   * optional) and the search-window used.
+   * optional) and the search-window used. Also resolve the page-type and
+   * first-search-latest-itinerary-departure.
    */
   public PageCursorFactory withOriginalSearch(
     @Nullable PageType pageType,
+    @Nullable Instant firstItineraryResultDeparture,
     Instant edt,
     Instant lat,
     Duration searchWindow
@@ -44,6 +56,11 @@ public class PageCursorFactory {
     this.currentPageType = pageType == null
       ? resolvePageTypeForTheFirstSearch(sortOrder)
       : pageType;
+    this.firstSearchLatestItineraryDeparture = resolveFirstSearchLatestItineraryDeparture(
+      pageType,
+      firstItineraryResultDeparture,
+      edt
+    );
 
     this.currentEdt = edt;
     this.currentLat = lat;
@@ -109,6 +126,26 @@ public class PageCursorFactory {
     return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
+  /**
+   * If the first search is an arrive by search (PREVIOUS_PAGE type), the current search window is
+   * misleading. Instead of using the current search window to set the page cursor of the next
+   * page, the departure time of the latest itinerary result is used to avoid missing itineraries.
+   */
+  private Instant resolveFirstSearchLatestItineraryDeparture(
+    @Nullable PageType pageType,
+    @Nullable Instant firstItineraryResultDeparture,
+    Instant edt
+  ) {
+    if (pageType == null && resolvePageTypeForTheFirstSearch(sortOrder) == PREVIOUS_PAGE) {
+      if (firstItineraryResultDeparture != null) {
+        return firstItineraryResultDeparture;
+      } else {
+        return edt;
+      }
+    }
+    return null;
+  }
+
   /** Create page cursor pair (next and previous) */
   private void createPageCursors() {
     if (currentEdt == null || nextCursor != null || prevCursor != null) {
@@ -128,10 +165,10 @@ public class PageCursorFactory {
         prevEdt = edtBeforeNewSw();
         nextEdt = pageCursorInput.earliestRemovedDeparture();
       } else {
-        // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
-        // search-window from the last time included in the search window we need to include one extra
-        // minute at the end.
-        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        prevEdt = pageCursorInput
+          .latestRemovedDeparture()
+          .minus(newSearchWindow)
+          .plus(SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION);
         nextEdt = edtAfterUsedSw();
       }
     }
@@ -163,6 +200,15 @@ public class PageCursorFactory {
   }
 
   private Instant edtAfterUsedSw() {
-    return currentEdt.plus(currentSearchWindow);
+    Instant defaultEdt = currentEdt.plus(currentSearchWindow);
+    if (firstSearchLatestItineraryDeparture != null) {
+      Instant edtFromLatestItineraryDeparture = firstSearchLatestItineraryDeparture.plus(
+        SEARCH_WINDOW_END_EXCLUSIVITY_TIME_ADDITION
+      );
+      if (edtFromLatestItineraryDeparture.isBefore(defaultEdt)) {
+        return edtFromLatestItineraryDeparture;
+      }
+    }
+    return defaultEdt;
   }
 }

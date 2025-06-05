@@ -11,6 +11,7 @@ import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeo
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIParkAndRideApi;
 import static org.opentripplanner.framework.application.OTPFeature.TransmodelGraphQlApi;
+import static org.opentripplanner.framework.application.OTPFeature.TriasApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,12 +21,13 @@ import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
-import org.opentripplanner.apis.vectortiles.GraphInspectorVectorTileResource;
+import org.opentripplanner.apis.vectortiles.DebugVectorTilesResource;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileResource;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
+import org.opentripplanner.ext.trias.trias.TriasResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 
@@ -41,7 +43,7 @@ public class APIEndpoints {
     // See the OTPFeature enum for details.
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
-    addIfEnabled(DebugUi, GraphInspectorVectorTileResource.class);
+    addIfEnabled(DebugUi, DebugVectorTilesResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     // scheduled to be removed and only here for backwards compatibility
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.GtfsGraphQLAPIOldPath.class);
@@ -56,6 +58,7 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
+    addIfEnabled(TriasApi, TriasResource.class);
   }
 
   /**
