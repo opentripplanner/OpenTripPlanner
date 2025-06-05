@@ -141,6 +141,13 @@ class StreetIndex {
     edgeIndex.remove(e, scope);
   }
 
+  /**
+   * Remove a vertex from the index.
+   */
+  void remove(Vertex vertex) {
+    vertexIndex.remove(new Envelope(vertex.getCoordinate()), vertex);
+  }
+
   private static LineString edgeGeometryOrStraightLine(Edge e) {
     LineString geometry = e.getGeometry();
     if (geometry == null) {

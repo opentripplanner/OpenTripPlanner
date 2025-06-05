@@ -208,6 +208,7 @@ public class Graph implements Serializable {
    */
   @Nullable
   public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
+    requireIndex();
     return streetIndex.findTransitStopVertex(id);
   }
 
@@ -253,6 +254,9 @@ public class Graph implements Serializable {
 
   public void remove(Vertex vertex) {
     vertices.remove(vertex.getLabel());
+    if (streetIndex != null) {
+      streetIndex.remove(vertex);
+    }
   }
 
   public void removeIfUnconnected(Vertex v) {
@@ -282,7 +286,7 @@ public class Graph implements Serializable {
   /**
    * Perform indexing on vertices, edges and create transient data structures. This used to be done
    * in readObject methods upon deserialization, but stand-alone mode now allows passing graphs from
-   * graphbuilder to server in memory, without a round trip through serialization.
+   * graph builder to server in memory, without a round trip through serialization.
    * <p>
    * TODO OTP2 - Indexing the streetIndex is not something that should be delegated outside the
    *           - graph. This allows a module to index the streetIndex BEFORE another module add
@@ -292,6 +296,15 @@ public class Graph implements Serializable {
     LOG.info("Index street model...");
     streetIndex = new StreetIndex(this);
     LOG.info("Index street model complete.");
+  }
+
+  /**
+   * Index this graph if it hasn't been already.
+   */
+  public void requestIndex() {
+    if (streetIndex == null) {
+      index();
+    }
   }
 
   @Nullable
@@ -314,6 +327,7 @@ public class Graph implements Serializable {
    * the station centroid if the station is configured to route to centroid.
    */
   public Set<Vertex> findStopVertices(FeedScopedId stopId) {
+    requireIndex();
     return streetIndex.findStopVertices(stopId);
   }
 
@@ -372,12 +386,6 @@ public class Graph implements Serializable {
   public void setDistanceBetweenElevationSamples(double distanceBetweenElevationSamples) {
     this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
     CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
-  }
-
-  private void indexIfNotIndexed() {
-    if (streetIndex == null) {
-      index();
-    }
   }
 
   private void requireIndex() {

@@ -72,7 +72,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     timetableRepository.index();
-    graph.index();
+    graph.requestIndex();
 
     if (graph.hasStreets) {
       linkTransitStops(graph, timetableRepository);
