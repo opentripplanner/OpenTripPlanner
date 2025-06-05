@@ -4,6 +4,7 @@ import static org.opentripplanner.routing.linking.VertexLinker.VisibilityMode.CO
 
 import dagger.Module;
 import dagger.Provides;
+import jakarta.inject.Singleton;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetLimitationParameters;
@@ -15,6 +16,7 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
 public class VertexLinkerRoutingModule {
 
   @Provides
+  @Singleton
   static VertexLinker linker(Graph graph, StreetLimitationParameters params) {
     return new VertexLinker(graph, COMPUTE_AREA_VISIBILITY, params.maxAreaNodes());
   }
