@@ -98,14 +98,10 @@ public class VertexLinker {
    * given time.
    */
   public VertexLinker(Graph graph, VisibilityMode visibilityMode, int maxAreaNodes) {
-    this.graph = graph;
+    this.graph = Objects.requireNonNull(graph);
     this.vertexFactory = new VertexFactory(graph);
-    this.visibilityMode = visibilityMode;
+    this.visibilityMode = Objects.requireNonNull(visibilityMode);
     this.maxAreaNodes = maxAreaNodes;
-  }
-
-  public VertexLinker(Graph graph) {
-    this(graph, VisibilityMode.COMPUTE_AREA_VISIBILITY, StreetConstants.DEFAULT_MAX_AREA_NODES);
   }
 
   public void linkVertexPermanently(

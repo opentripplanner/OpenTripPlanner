@@ -199,10 +199,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     );
   }
 
-  private void linkVehicleParkingWithLinker(
-    Graph graph,
-    VehicleParkingEntranceVertex vehicleParkingVertex
-  ) {
+  private void linkVehicleParkingWithLinker(VehicleParkingEntranceVertex vehicleParkingVertex) {
     if (vehicleParkingVertex.isWalkAccessible()) {
       vertexLinker.linkVertexPermanently(
         vehicleParkingVertex,
@@ -301,7 +298,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
       }
 
       if (vehicleParkingEntranceVertex.getParkingEntrance().getVertex() == null) {
-        linkVehicleParkingWithLinker(graph, vehicleParkingEntranceVertex);
+        linkVehicleParkingWithLinker(vehicleParkingEntranceVertex);
         continue;
       }
 

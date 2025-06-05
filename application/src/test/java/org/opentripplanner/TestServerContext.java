@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.graph_builder.module.linking.TestVertexLinker;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -123,7 +124,7 @@ public class TestServerContext {
   }
 
   private static VertexLinker createVertexLinker(Graph graph) {
-    return new VertexLinker(graph);
+    return TestVertexLinker.of(graph);
   }
 
   /** Static factory method to create a service for test purposes. */
@@ -165,7 +166,7 @@ public class TestServerContext {
   ) {
     return new DefaultViaCoordinateTransferFactory(
       graph,
-      new VertexLinker(graph),
+      TestVertexLinker.of(graph),
       transitService,
       Duration.ofMinutes(30)
     );
