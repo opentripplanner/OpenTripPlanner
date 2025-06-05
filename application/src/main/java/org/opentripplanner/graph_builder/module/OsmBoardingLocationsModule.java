@@ -86,6 +86,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public void buildGraph() {
     LOG.info("Improving boarding locations by checking OSM entities...");
 
+    graph.index();
     int successes = 0;
 
     for (TransitStopVertex ts : graph.getVerticesOfType(TransitStopVertex.class)) {
