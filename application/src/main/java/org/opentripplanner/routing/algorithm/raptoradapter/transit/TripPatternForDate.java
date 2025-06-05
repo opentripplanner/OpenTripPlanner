@@ -229,31 +229,19 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
    * This is the last line of defense against invalid real-time updates.
    */
   public void assertValidRunningPeriod() throws IllegalArgumentException {
-    assertValidRunningPeriod(
-      startOfRunningPeriod,
-      endOfRunningPeriod,
-      tripTimes[0],
-      tripTimes[tripTimes.length - 1]
-    );
-  }
-
-  private static void assertValidRunningPeriod(
-    LocalDate startOfRunningPeriod,
-    LocalDate endOfRunningPeriod,
-    TripTimes first,
-    TripTimes last
-  ) {
-    if (first.getTrip().getRoute().getFlexibleLineType() != null) {
+    var firstTrip = tripTimes[0].getTrip();
+    if (firstTrip.getRoute().getFlexibleLineType() != null) {
       // do not validate running period for flexible trips
       return;
     }
     if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
+      var lastTripId = tripTimes[tripTimes.length - 1].getTrip();
       LOG.warn(
         "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",
         startOfRunningPeriod,
-        first.getTrip().getId(),
+        firstTrip.getId(),
         endOfRunningPeriod,
-        last.getTrip().getId()
+        lastTripId.getId()
       );
       throw new IllegalArgumentException(
         "Start of the running period is after end of the running period"
