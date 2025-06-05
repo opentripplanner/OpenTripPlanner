@@ -286,7 +286,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             );
           }
 
-          return transitService.findTripTimeOnDate(
+          return transitService.findTripTimesOnDate(
             stop,
             pattern,
             GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
@@ -518,7 +518,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     )
       .flatMap(tripPattern ->
         transitService
-          .findTripTimeOnDate(
+          .findTripTimesOnDate(
             stop,
             tripPattern,
             startTime,

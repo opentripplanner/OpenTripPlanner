@@ -12,6 +12,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -130,6 +131,8 @@ public interface OtpServerRequestContext {
   VectorTileConfig vectorTileConfig();
 
   ViaCoordinateTransferFactory viaTransferResolver();
+
+  TriasApiParameters triasApiParameters();
 
   /* Sandbox modules */
 
