@@ -75,6 +75,17 @@ public class ResourceLoader {
   }
 
   /**
+   * Returns the string content of a file.
+   */
+  public String fileToString(String p) {
+    try {
+      return Files.readString(file(p).toPath());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
    * Returns a File instance in the original main resources folder.
    */
   public File mainResourceFile(String path) {
