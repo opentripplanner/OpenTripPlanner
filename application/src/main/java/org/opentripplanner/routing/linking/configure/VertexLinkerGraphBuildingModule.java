@@ -10,7 +10,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
  * Provides the vertex linker for the graph build.
  */
 @Module
-public class VertexLinkerGraphBuilderModule {
+public class VertexLinkerGraphBuildingModule {
 
   /**
    * The linker doesn't need to be a singleton as all state is kept in the graph.

@@ -12,7 +12,7 @@ import org.opentripplanner.street.model.StreetLimitationParameters;
  * Provides the vertex linker for the routing application (not graph building).
  */
 @Module
-public class VertexLinkerModule {
+public class VertexLinkerRoutingModule {
 
   @Provides
   static VertexLinker linker(Graph graph, StreetLimitationParameters params) {

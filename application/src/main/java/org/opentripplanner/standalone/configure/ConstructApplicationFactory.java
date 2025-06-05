@@ -23,7 +23,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
-import org.opentripplanner.routing.linking.configure.VertexLinkerModule;
+import org.opentripplanner.routing.linking.configure.VertexLinkerRoutingModule;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.configure.ViaModule;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -79,7 +79,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalRepositoryModule.class,
     VehicleRentalServiceModule.class,
     ViaModule.class,
-    VertexLinkerModule.class,
+    VertexLinkerRoutingModule.class,
     WorldEnvelopeServiceModule.class,
   }
 )
