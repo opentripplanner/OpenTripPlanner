@@ -43,7 +43,7 @@ public class ApiTransitService {
       .distinct()
       .flatMap(tripPattern ->
         transitService
-          .findTripTimeOnDate(
+          .findTripTimesOnDate(
             stop,
             tripPattern,
             startTime,
