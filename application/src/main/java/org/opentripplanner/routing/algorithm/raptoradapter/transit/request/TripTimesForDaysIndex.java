@@ -27,31 +27,50 @@ final class TripTimesForDaysIndex {
 
   private final int[] tripIndex;
 
+  /**
+   * Build a trip index over the provided trip departure times per day and offsets. The trip order
+   * is trip(i) <= trip(i+1) (departure-time for the first stop).
+   */
+
   static TripTimesForDaysIndex ofTripTimesForDay(List<int[]> departureTimes, int[] offsets) {
     departureTimes = applyOffsets(departureTimes, offsets);
     return new TripTimesForDaysIndex(departureTimes);
   }
 
+  /**
+   * Goal: Read the JavaDoc for the class and factory method, and study the unit-test.
+   *
+   * Implementation notes!
+   * <p>
+   * We need to order trips based on the "actual" departure time, not day and departure-time. We do
+   * this by merging the trip-departure times for each day. Each day is already sorted, so we need
+   * to merge the end of each 'day' with the start of the next 'day+1'. We avoid sorting for
+   * performance reasons.
+   */
   TripTimesForDaysIndex(List<int[]> firstStopDepartureTimesPerDay) {
     // 'list' is an alias to make the logic below easier to read
     final List<int[]> list = firstStopDepartureTimesPerDay;
     this.tripIndex = new int[list.stream().mapToInt(a -> a.length).sum() * 2];
     int[] a;
 
+    // 'day' is the current day index
+    // 'i' and 'j' is the trip index for the current and next day
+    // 'u' and 'v' is the departure time for the current trip on the current day and next day
+    // 'tripIndexIndex' points to the next element to set in the target 'tripIndex'
     int day = 0;
     a = list.get(day);
-    int tripIndexForDays = 0;
+    int tripIndexIndex = 0;
     int i = 0;
     int j = 0;
-    int v = a[i];
-    int u = safeValueNextDayAt(list, day, j);
+    int u = a[i];
+    int v = safeValueNextDayAt(list, day, j);
 
     do {
-      if (v <= u) {
-        tripIndexForDays = setIndexValue(tripIndexForDays, day, i);
+      if (u <= v) {
+        tripIndexIndex = setIndexValue(tripIndexIndex, day, i);
         ++i;
         if (i < a.length) {
-          v = a[i];
+          u = a[i];
         } else {
           ++day;
           if (day == list.size()) {
@@ -68,15 +87,15 @@ final class TripTimesForDaysIndex {
             a = list.get(day);
           }
           j = 0;
-          v = a[i];
-          u = safeValueNextDayAt(list, day, j);
+          u = a[i];
+          v = safeValueNextDayAt(list, day, j);
         }
       }
       // v > u
       else {
-        tripIndexForDays = setIndexValue(tripIndexForDays, day + 1, j);
+        tripIndexIndex = setIndexValue(tripIndexIndex, day + 1, j);
         ++j;
-        u = safeValueNextDayAt(list, day, j);
+        v = safeValueNextDayAt(list, day, j);
       }
     } while (true);
   }
@@ -102,10 +121,10 @@ final class TripTimesForDaysIndex {
     return tripIndex.length / 2;
   }
 
-  private int setIndexValue(int tripIndexForDays, int day, int tripIndexForDay) {
-    this.tripIndex[tripIndexForDays * 2] = day;
-    this.tripIndex[tripIndexForDays * 2 + 1] = tripIndexForDay;
-    return tripIndexForDays + 1;
+  private int setIndexValue(int tripIndexIndex, int day, int tripIndexForDay) {
+    this.tripIndex[tripIndexIndex * 2] = day;
+    this.tripIndex[tripIndexIndex * 2 + 1] = tripIndexForDay;
+    return tripIndexIndex + 1;
   }
 
   static List<int[]> applyOffsets(List<int[]> list, int[] offsets) {
