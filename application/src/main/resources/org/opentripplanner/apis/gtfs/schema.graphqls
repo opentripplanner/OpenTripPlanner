@@ -4694,14 +4694,16 @@ input TransitPreferencesInput {
   The following example means "include all trips of `F:agency1` _and_ exclude `F:route1`":
     
   ```
-  filters: [{
-    include: {
-      agencies: ["F:agency1"]
-    },
-    exclude: {
-      routes: ["F:route1"]
+  filters: [
+    {
+      include: {
+        agencies: ["F:agency1"]
+      },
+      exclude: {
+        routes: ["F:route1"]
+      }
     }
-  }]
+  ]
   ```
     
   Be aware that AND-conditions can lead to zero results.
