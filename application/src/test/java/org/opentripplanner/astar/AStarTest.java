@@ -88,9 +88,9 @@ public class AStarTest {
 
   @Test
   public void testForward() {
-    var request = new RouteRequest();
-
-    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
+    var request = RouteRequest.of()
+      .withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = StreetSearchBuilder.of()
@@ -117,10 +117,11 @@ public class AStarTest {
 
   @Test
   public void testBack() {
-    var request = new RouteRequest();
+    var request = RouteRequest.of()
+      .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)))
+      .withArriveBy(true)
+      .buildDefault();
 
-    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
-    request.setArriveBy(true);
     Vertex from = graph.getVertex("56th_24th");
     Vertex to = graph.getVertex("leary_20th");
     ShortestPathTree tree = StreetSearchBuilder.of()
@@ -157,9 +158,9 @@ public class AStarTest {
 
   @Test
   public void testForwardExtraEdges() {
-    var request = new RouteRequest();
-
-    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
+    var request = RouteRequest.of()
+      .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
       new Coordinate(-122.385050, 47.666620),
@@ -199,10 +200,10 @@ public class AStarTest {
 
   @Test
   public void testBackExtraEdges() {
-    var request = new RouteRequest();
-
-    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
-    request.setArriveBy(true);
+    var request = RouteRequest.of()
+      .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)))
+      .withArriveBy(true)
+      .buildDefault();
 
     TemporaryStreetLocation from = new TemporaryStreetLocation(
       new Coordinate(-122.385050, 47.666620),
@@ -242,9 +243,9 @@ public class AStarTest {
 
   @Test
   public void testMultipleTargets() {
-    var request = new RouteRequest();
-
-    request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
+    var request = RouteRequest.of()
+      .withPreferences(p -> p.withWalk(w -> w.withSpeed(1.0)))
+      .buildDefault();
 
     Set<Vertex> targets = new HashSet<>();
     targets.add(graph.getVertex("shilshole_22nd"));

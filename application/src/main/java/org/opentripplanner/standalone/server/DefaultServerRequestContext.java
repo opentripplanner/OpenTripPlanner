@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.server;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -151,19 +150,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RouteRequest defaultRouteRequest() {
-    // Lazy initialize request-scoped request to avoid doing this when not needed
-    if (defaultRouteRequestWithTimeSet == null) {
-      defaultRouteRequestWithTimeSet = routeRequestDefaults.copyWithDateTimeNow();
-    }
-    return defaultRouteRequestWithTimeSet;
-  }
-
-  /**
-   * Return the default routing request locale(without cloning the request).
-   */
-  @Override
-  public Locale defaultLocale() {
-    return routeRequestDefaults.locale();
+    return routeRequestDefaults;
   }
 
   @Override

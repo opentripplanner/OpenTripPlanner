@@ -27,12 +27,14 @@ import org.opentripplanner.routing.api.request.preference.AccessEgressPreference
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.EscalatorPreferences;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 import org.opentripplanner.routing.api.request.preference.ScooterPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
+import org.opentripplanner.routing.api.request.request.TransitRequest;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -53,7 +55,7 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    return mapRouteRequest(c, new RouteRequest());
+    return mapRouteRequest(c, RouteRequest.defaultValue());
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
@@ -61,12 +63,12 @@ public class RouteRequestConfig {
       return dft;
     }
 
-    RouteRequest request = dft.clone();
+    var requestBuilder = dft.copyOf();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    request.setArriveBy(
+    requestBuilder.withArriveBy(
       c
         .of("arriveBy")
         .since(V2_0)
@@ -74,11 +76,8 @@ public class RouteRequestConfig {
         .asBoolean(dft.arriveBy())
     );
 
-    request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
-
-    request
-      .journey()
-      .setModes(
+    requestBuilder.withJourney(b ->
+      b.setModes(
         c
           .of("modes")
           .since(V2_0)
@@ -88,16 +87,17 @@ public class RouteRequestConfig {
           .asCustomStringType(RequestModes.defaultRequestModes(), "WALK", s ->
             new QualifiedModeSet(s).getRequestModes()
           )
-      );
+      )
+    );
 
-    request.setNumItineraries(
+    requestBuilder.withNumItineraries(
       c
         .of("numItineraries")
         .since(V2_0)
         .summary("The maximum number of itineraries to return.")
         .asInt(dft.numItineraries())
     );
-    request.setSearchWindow(
+    requestBuilder.withSearchWindow(
       c
         .of("searchWindow")
         .since(V2_0)
@@ -127,8 +127,6 @@ public class RouteRequestConfig {
         .asDuration(dft.searchWindow())
     );
 
-    request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
-
     NodeAdapter unpreferred = c
       .of("unpreferred")
       .since(V2_2)
@@ -146,43 +144,50 @@ public class RouteRequestConfig {
         """
       )
       .asObject();
-    request
-      .journey()
-      .transit()
-      .setUnpreferredRoutes(
-        unpreferred
-          .of("routes")
-          .since(V2_2)
-          .summary(
-            "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
-          )
-          .description("How much cost is added is configured in `unpreferredCost`.")
-          .asFeedScopedIds(request.journey().transit().unpreferredRoutes())
-      );
+    requestBuilder.withJourney(jb -> {
+      jb.withWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
 
-    request
-      .journey()
-      .transit()
-      .setUnpreferredAgencies(
-        unpreferred
-          .of("agencies")
-          .since(V2_2)
-          .summary(
-            "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
-          )
-          .description("How much cost is added is configured in `unpreferredCost`.")
-          .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
-      );
-
-    TransitGroupPriorityConfig.mapTransitRequest(c, request.journey().transit());
+      jb.withTransit(b -> {
+        mapTransit(unpreferred, b, dft.journey().transit());
+        TransitGroupPriorityConfig.mapTransitRequest(c, b);
+      });
+    });
 
     // Map preferences
-    request.withPreferences(preferences -> mapPreferences(c, preferences));
+    requestBuilder.withPreferences(preferences -> mapPreferences(c, preferences));
 
-    return request;
+    return requestBuilder.buildDefault();
   }
 
-  private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
+  private static void mapTransit(
+    NodeAdapter c,
+    TransitRequestBuilder builder,
+    TransitRequest defaultValues
+  ) {
+    builder.withUnpreferredRoutes(
+      c
+        .of("routes")
+        .since(V2_2)
+        .summary(
+          "The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`"
+        )
+        .description("How much cost is added is configured in `unpreferredCost`.")
+        .asFeedScopedIds(defaultValues.unpreferredRoutes())
+    );
+
+    builder.withUnpreferredAgencies(
+      c
+        .of("agencies")
+        .since(V2_2)
+        .summary(
+          "The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`"
+        )
+        .description("How much cost is added is configured in `unpreferredCost`.")
+        .asFeedScopedIds(defaultValues.unpreferredAgencies())
+    );
+  }
+
+  private static void mapPreferences(NodeAdapter c, RoutingPreferencesBuilder preferences) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
@@ -193,6 +198,9 @@ public class RouteRequestConfig {
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
+
+    var dft = RouteRequest.defaultValue().preferences();
+    preferences.withLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
   }
 
   private static void mapTransitPreferences(NodeAdapter c, TransitPreferences.Builder builder) {

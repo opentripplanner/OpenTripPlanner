@@ -1,15 +1,16 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.RouteRequest;
 
 class RouteRequestMapperFiltersTest {
+
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.GERMAN);
 
   private static final Map<String, Object> TRAM_AND_FERRY_MODES = Map.of(
     "transit",
@@ -34,7 +35,7 @@ class RouteRequestMapperFiltersTest {
 
   @Test
   void modesAndFilter() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     args.put("modes", TRAM_AND_FERRY_MODES);
     args.put("preferences", INCLUDE_ROUTE_FILTERS);
     assertTransitFilters(
@@ -45,7 +46,7 @@ class RouteRequestMapperFiltersTest {
 
   @Test
   void modesOnly() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     args.put("modes", TRAM_AND_FERRY_MODES);
     assertTransitFilters(
       "[TransitFilterRequest{select: [SelectRequest{transportModes: [FERRY, TRAM]}]}]",
@@ -55,7 +56,7 @@ class RouteRequestMapperFiltersTest {
 
   @Test
   void filtersOnly() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     args.put("preferences", INCLUDE_ROUTE_FILTERS);
     assertTransitFilters(
       "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES, routes: [f:r1]}]}]",
@@ -65,7 +66,7 @@ class RouteRequestMapperFiltersTest {
 
   @Test
   void twoFilters() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     args.put("preferences", INCLUDE_ROUTE_EXCLUDE_AGENCY_FILTERS);
     assertTransitFilters(
       "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES, routes: [f:r1]}]}, TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}], not: [SelectRequest{transportModes: [], agencies: [f:a1]}]}]",
@@ -75,7 +76,7 @@ class RouteRequestMapperFiltersTest {
 
   @Test
   void modesAndtwoFilters() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     args.put("modes", TRAM_AND_FERRY_MODES);
     args.put("preferences", INCLUDE_ROUTE_EXCLUDE_AGENCY_FILTERS);
     assertTransitFilters(
@@ -84,9 +85,12 @@ class RouteRequestMapperFiltersTest {
     );
   }
 
-  private static void assertTransitFilters(String expected, Map<String, Object> modesArgs) {
-    var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+  private void assertTransitFilters(String expected, Map<String, Object> modesArgs) {
+    var env = testCtx.executionContext(modesArgs);
+
+    //var env = executionContext(modesArgs, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var filtersAsString = routeRequest.journey().transit().filters().toString();
     assertEquals(expected, filtersAsString);
   }

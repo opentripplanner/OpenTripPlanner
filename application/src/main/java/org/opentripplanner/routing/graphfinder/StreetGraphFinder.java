@@ -84,17 +84,21 @@ public class StreetGraphFinder implements GraphFinder {
     TraverseVisitor<State, Edge> visitor,
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy
   ) {
-    RouteRequest rr = new RouteRequest();
-    rr.setFrom(new GenericLocation(null, null, lat, lon));
-    rr.withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)));
-    rr.setNumItineraries(1);
+    // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+    // TODO make a function that builds normal routing requests from profile requests
+    // TODO: This is incorrect, the configured defaults are not used.
+    var request = RouteRequest.of()
+      .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
+      .withNumItineraries(1)
+      .buildDefault();
+
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         graph,
-        rr.from(),
-        rr.to(),
+        GenericLocation.fromCoordinate(lat, lon),
+        GenericLocation.UNKNOWN,
         StreetMode.WALK,
         StreetMode.WALK
       )
@@ -103,7 +107,7 @@ public class StreetGraphFinder implements GraphFinder {
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
-        .setRequest(rr)
+        .setRequest(request)
         .setVerticesContainer(temporaryVertices)
         .getShortestPathTree();
     }
