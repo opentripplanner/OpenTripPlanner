@@ -318,6 +318,7 @@
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
                         <entrypoint>/docker-entrypoint.sh</entrypoint>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                         <volumes>
                             <volume>
                                 /var/opentripplanner/
@@ -329,7 +330,7 @@
                         </ports>
                     </container>
                     <from>
-                        <image>eclipse-temurin:21-jre</image>
+                        <image>eclipse-temurin:24-jre</image>
                         <platforms>
                             <platform>
                                 <architecture>amd64</architecture>
