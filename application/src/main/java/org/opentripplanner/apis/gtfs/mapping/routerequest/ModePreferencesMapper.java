@@ -12,6 +12,7 @@ import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.JourneyRequestBuilder;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
@@ -41,7 +42,7 @@ public class ModePreferencesMapper {
 
     var transit = modesInput.getGraphQLTransit();
     if (Boolean.TRUE.equals(modesInput.getGraphQLDirectOnly())) {
-      journey.withTransit(b -> b.disable());
+      journey.withTransit(TransitRequestBuilder::disable);
     } else if (transit == null) {
       // even if there are no transit modes set, we need to set the filter to get the route/agency
       // filters for flex

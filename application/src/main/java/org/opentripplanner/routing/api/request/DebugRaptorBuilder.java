@@ -34,6 +34,13 @@ public class DebugRaptorBuilder implements Serializable {
     this.eventTypes = null;
   }
 
+  /**
+   * Add a list of stops to debug as a string. Both Raptor stop indexes and stop ids are acepted.
+   * Use a space and/or comma to separate the stops. Example:
+   * {@code "12322, 567, 1234"}
+   * <p>
+   * See {@link DebugRaptor} for more info.
+   */
   public DebugRaptorBuilder withStops(String stops) {
     if (stops == null) {
       return this;
@@ -42,6 +49,14 @@ public class DebugRaptorBuilder implements Serializable {
     return this;
   }
 
+  /**
+   * Add a list of stops that define the path you want to debug. Only paths visiting all stops
+   * are debugged. You may add an asterisk {@code '*'} after one of the stops. Stop events for the
+   * stops before the tagged stop are ignored. Both Raptor stop indexes and stop ids are accepted.
+   * Use a space and/or comma to separate the stops. Example: {@code "12322, 567*, 1234"}
+   * <p>
+   * See {@link DebugRaptor} for more info.
+   */
   public DebugRaptorBuilder withPath(String path) {
     if (path == null) {
       return this;
