@@ -11,6 +11,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -69,8 +70,7 @@ public class RouteRequestMapper {
       setPreferences(preferences, request, isTripPlannedForNow, args, environment)
     );
 
-    request.withJourney(journeyRequestBuilder ->
-      setModes(journeyRequestBuilder, args.getGraphQLModes(), environment)
+    request.withJourney(journeyRequestBuilder -> setModes(journeyRequestBuilder, args, environment)
     );
 
     // sadly we need to use the raw collection because it is cast to the wrong type
@@ -128,7 +128,7 @@ public class RouteRequestMapper {
   private static void setStreetPreferences(
     RoutingPreferencesBuilder preferences,
     boolean isTripPlannedForNow,
-    GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
+    @Nullable GraphQLTypes.GraphQLPlanStreetPreferencesInput args,
     DataFetchingEnvironment environment
   ) {
     setRentalAvailabilityPreferences(preferences, isTripPlannedForNow);
@@ -162,7 +162,7 @@ public class RouteRequestMapper {
 
   private static void setAccessibilityPreferences(
     RouteRequestBuilder requestBuilder,
-    GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
+    @Nullable GraphQLTypes.GraphQLAccessibilityPreferencesInput preferenceArgs
   ) {
     if (preferenceArgs != null && preferenceArgs.getGraphQLWheelchair() != null) {
       requestBuilder.withJourney(j ->

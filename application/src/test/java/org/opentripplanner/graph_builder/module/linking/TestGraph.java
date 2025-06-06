@@ -62,7 +62,7 @@ class TestGraph {
   /** link the stops in the graph */
   public static void link(Graph graph, TimetableRepository timetableRepository) {
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
 
     VertexLinker linker = graph.getLinker();
 

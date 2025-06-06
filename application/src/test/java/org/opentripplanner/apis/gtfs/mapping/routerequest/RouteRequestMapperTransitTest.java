@@ -4,6 +4,7 @@ import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -78,6 +79,10 @@ class RouteRequestMapperTransitTest {
                 entry("maximumAdditionalTransfers", maximumAdditionalTransfers),
                 entry("maximumTransfers", maximumTransfers)
               )
+            ),
+            entry(
+              "filters",
+              List.of(Map.of("exclude", List.of(Map.of("routes", List.of("f:route1")))))
             )
           )
         )
@@ -90,6 +95,10 @@ class RouteRequestMapperTransitTest {
     assertEquals(slack, transferPreferences.slack());
     assertEquals(maximumAdditionalTransfers, transferPreferences.maxAdditionalTransfers());
     assertEquals(maximumTransfers + 1, transferPreferences.maxTransfers());
+    assertEquals(
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}], not: [SelectRequest{transportModes: [], routes: [f:route1]}]}]",
+      routeRequest.journey().transit().filters().toString()
+    );
   }
 
   @Test

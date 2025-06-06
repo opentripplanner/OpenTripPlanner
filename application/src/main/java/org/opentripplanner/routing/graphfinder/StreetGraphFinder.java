@@ -86,7 +86,6 @@ public class StreetGraphFinder implements GraphFinder {
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
-
     // TODO: This is incorrect, the configured defaults are not used.
     var request = RouteRequest.of()
       .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))

@@ -10,6 +10,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -77,6 +78,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final TraverseVisitor traverseVisitor;
 
+  private final TriasApiParameters triasApiParameters;
+
   /* Lazy initialized fields */
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
@@ -99,6 +102,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
+    TriasApiParameters triasApiParameters,
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
@@ -123,6 +127,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.triasApiParameters = triasApiParameters;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
@@ -242,6 +247,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public ViaCoordinateTransferFactory viaTransferResolver() {
     return viaTransferResolver;
+  }
+
+  @Override
+  public TriasApiParameters triasApiParameters() {
+    return triasApiParameters;
   }
 
   @Nullable

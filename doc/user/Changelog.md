@@ -33,6 +33,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Deprecate vertexType in GTFS API [#6632](https://github.com/opentripplanner/OpenTripPlanner/pull/6632)
 - Enable CAR transfers with ferries with NeTEx import [#6640](https://github.com/opentripplanner/OpenTripPlanner/pull/6640)
 - Upgrade to GraphiQL 4 [#6652](https://github.com/opentripplanner/OpenTripPlanner/pull/6652)
+- Deprecate vehicle type in GTFS API [#6663](https://github.com/opentripplanner/OpenTripPlanner/pull/6663)
+- Add `generalizedCostMaxLimit` field to the `PageCursor` to enable using `RemoveTransitIfStreetOnlyIsBetter` filter with paging [#6474](https://github.com/opentripplanner/OpenTripPlanner/pull/6474)
+- Fix issue with paging when going to the next page after initial arrive by search [#6621](https://github.com/opentripplanner/OpenTripPlanner/pull/6621)
+- Fix route filter application for stations in GTFS API [#6678](https://github.com/opentripplanner/OpenTripPlanner/pull/6678)
+- Allow location groups without names [#6674](https://github.com/opentripplanner/OpenTripPlanner/pull/6674)
+- Fix duplicate stop times when stops are skipped in multiple trips of pattern [#6665](https://github.com/opentripplanner/OpenTripPlanner/pull/6665)
+- Transit filters for GTFS API's `planConnection` [#6668](https://github.com/opentripplanner/OpenTripPlanner/pull/6668)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.7.0 (2025-03-12)
