@@ -4708,7 +4708,7 @@ input TransitPreferencesInput {
     
   Be aware of the following pitfalls:
     - It is easy to construct AND-conditions that can lead to zero results.
-    - OR-conditions that have one element which consists of only an exclude are likely to be
+    - OR-conditions that have an element which consists of only an exclude are likely to be
       unwanted and may lead to unexpected results.
     
   **Note**: This parameter also interacts with the modes set in `modes.transit` by forming
