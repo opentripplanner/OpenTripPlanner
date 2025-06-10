@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class AssertEqualsAndHashCode {
 
+  private static final Object otherClass = "Not the same class";
   private final Object subject;
 
   @SuppressWarnings("EqualsWithItself")
@@ -14,6 +15,8 @@ public class AssertEqualsAndHashCode {
   }
 
   public static AssertEqualsAndHashCode verify(Object subject) {
+    assertEquals(subject, subject);
+    assertNotEquals(otherClass, subject);
     return new AssertEqualsAndHashCode(subject);
   }
 

@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.util.Objects;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -12,6 +13,8 @@ import org.opentripplanner.utils.tostring.ValueObjectToStringBuilder;
  * routing can start.
  */
 public class GenericLocation {
+
+  public static final GenericLocation UNKNOWN = new GenericLocation(null, null, null, null);
 
   /**
    * A label for the place, if provided. This is pass-through information and does not affect
@@ -49,15 +52,16 @@ public class GenericLocation {
     this.lng = lng;
   }
 
-  public GenericLocation(Double lat, Double lng) {
-    this.label = null;
-    this.stopId = null;
-    this.lat = lat;
-    this.lng = lng;
-  }
-
   public static GenericLocation fromStopId(String name, String feedId, String stopId) {
     return new GenericLocation(name, new FeedScopedId(feedId, stopId), null, null);
+  }
+
+  /**
+   * Create a new location based on a coordinate - the input is primitive doubles to prevent
+   * inserting {@code null} values.
+   */
+  public static GenericLocation fromCoordinate(double lat, double lng) {
+    return new GenericLocation(null, null, lat, lng);
   }
 
   /**
@@ -76,10 +80,33 @@ public class GenericLocation {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    var that = (GenericLocation) o;
+    return (
+      Objects.equals(label, that.label) &&
+      Objects.equals(stopId, that.stopId) &&
+      Objects.equals(lat, that.lat) &&
+      Objects.equals(lng, that.lng)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(label, stopId, lat, lng);
+  }
+
+  @Override
   public String toString() {
+    if (UNKNOWN.equals(this)) {
+      return "Unknown location";
+    }
+
     ValueObjectToStringBuilder buf = ValueObjectToStringBuilder.of().skipNull();
     if (StringUtils.hasValue(label)) {
-      buf.addText(label);
+      buf.addText(label).addText(" ");
     }
     buf.addObj(stopId);
     buf.addCoordinate(lat, lng);

@@ -85,7 +85,7 @@ merged in. This is ilustrated with the _feature-branch-in-progress_ above.
 You should create one or more branches in the local git repository where you keep your 
 deployment-specific config. Put the following in this(these) branch(es):
 
-The branch(es) must include(requiered):
+The branch(es) must include(required):
 
 - The `script/custom-release-env.json`, containing the release configuration. The branch containing
   this file must be merged into the `release brach` before the first release. If you make changes

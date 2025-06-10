@@ -5,18 +5,14 @@ import static org.opentripplanner.apis.transmodel.mapping.TransitIdMapper.mapIDs
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.model.plan.TripQuery;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class TripRequestMapper {
 
@@ -25,83 +21,81 @@ public class TripRequestMapper {
    */
   public static RouteRequest createRequest(DataFetchingEnvironment environment) {
     TransmodelRequestContext context = environment.getContext();
-    OtpServerRequestContext serverContext = context.getServerContext();
-    RouteRequest request = serverContext.defaultRouteRequest();
+    var serverContext = context.getServerContext();
+    var requestBuilder = serverContext.defaultRouteRequest().copyOf();
 
     DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
-    callWith.argument("locale", (String v) -> request.setLocale(Locale.forLanguageTag(v)));
-
     callWith.argument("from", (Map<String, Object> v) ->
-      request.setFrom(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withFrom(GenericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("to", (Map<String, Object> v) ->
-      request.setTo(GenericLocationMapper.toGenericLocation(v))
+      requestBuilder.withTo(GenericLocationMapper.toGenericLocation(v))
     );
     callWith.argument("passThroughPoints", (List<Map<String, Object>> v) -> {
-      request.setViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
+      requestBuilder.withViaLocations(TripViaLocationMapper.toLegacyPassThroughLocations(v));
     });
     callWith.argument(TripQuery.TRIP_VIA_PARAMETER, (List<Map<String, Object>> v) -> {
-      request.setViaLocations(TripViaLocationMapper.mapToViaLocations(v));
+      requestBuilder.withViaLocations(TripViaLocationMapper.mapToViaLocations(v));
     });
 
     callWith.argument("dateTime", millisSinceEpoch ->
-      request.setDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      requestBuilder.withDateTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
     callWith.argument("bookingTime", millisSinceEpoch ->
-      request.setBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
+      requestBuilder.withBookingTime(Instant.ofEpochMilli((long) millisSinceEpoch))
     );
 
-    callWith.argument("searchWindow", (Integer m) -> request.setSearchWindow(Duration.ofMinutes(m))
+    callWith.argument("searchWindow", (Integer m) ->
+      requestBuilder.withSearchWindow(Duration.ofMinutes(m))
     );
-    callWith.argument("pageCursor", request::setPageCursorFromEncoded);
-    callWith.argument("timetableView", request::setTimetableView);
-    callWith.argument("wheelchairAccessible", request::setWheelchair);
-    callWith.argument("numTripPatterns", request::setNumItineraries);
-    callWith.argument("arriveBy", request::setArriveBy);
+    callWith.argument("pageCursor", requestBuilder::withPageCursorFromEncoded);
+    callWith.argument("timetableView", requestBuilder::withTimetableView);
+    callWith.argument("numTripPatterns", requestBuilder::withNumItineraries);
+    callWith.argument("arriveBy", requestBuilder::withArriveBy);
 
-    callWith.argument("preferred.authorities", (Collection<String> authorities) ->
-      request.journey().transit().setPreferredAgencies(mapIDsToDomainNullSafe(authorities))
-    );
-    callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
-      request.journey().transit().setUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
-    );
+    requestBuilder.withJourney(journeyBuilder -> {
+      callWith.argument("wheelchairAccessible", journeyBuilder::withWheelchair);
 
-    callWith.argument("preferred.lines", (List<String> lines) ->
-      request.journey().transit().setPreferredRoutes(mapIDsToDomainNullSafe(lines))
-    );
-    callWith.argument("unpreferred.lines", (List<String> lines) ->
-      request.journey().transit().setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
-    );
+      journeyBuilder.withTransit(transitBuilder -> {
+        callWith.argument("preferred.authorities", (Collection<String> authorities) ->
+          transitBuilder.withPreferredAgencies(mapIDsToDomainNullSafe(authorities))
+        );
+        callWith.argument("unpreferred.authorities", (Collection<String> authorities) ->
+          transitBuilder.withUnpreferredAgencies(mapIDsToDomainNullSafe(authorities))
+        );
 
-    if (GqlUtil.hasArgument(environment, "modes")) {
-      request
-        .journey()
-        .setModes(RequestModesMapper.mapRequestModes(environment.getArgument("modes")));
-    }
+        callWith.argument("preferred.lines", (List<String> lines) ->
+          transitBuilder.withPreferredRoutes(mapIDsToDomainNullSafe(lines))
+        );
+        callWith.argument("unpreferred.lines", (List<String> lines) ->
+          transitBuilder.withUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
+        );
+        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
+          transitBuilder.withBannedTrips(mapIDsToDomainNullSafe(serviceJourneys))
+        );
 
-    var bannedTrips = new ArrayList<FeedScopedId>();
-    callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) ->
-      bannedTrips.addAll(mapIDsToDomainNullSafe(serviceJourneys))
-    );
-    if (!bannedTrips.isEmpty()) {
-      request.journey().transit().setBannedTrips(bannedTrips);
-    }
+        if (GqlUtil.hasArgument(environment, "filters")) {
+          transitBuilder.setFilters(
+            FilterMapper.mapFilterNewWay(environment.getArgument("filters"))
+          );
+        } else {
+          FilterMapper.mapFilterOldWay(environment, callWith, requestBuilder);
+        }
+      });
 
-    if (GqlUtil.hasArgument(environment, "filters")) {
-      request
-        .journey()
-        .transit()
-        .setFilters(FilterMapper.mapFilterNewWay(environment.getArgument("filters")));
-    } else {
-      FilterMapper.mapFilterOldWay(environment, callWith, request);
-    }
+      if (GqlUtil.hasArgument(environment, "modes")) {
+        journeyBuilder.setModes(
+          RequestModesMapper.mapRequestModes(environment.getArgument("modes"))
+        );
+      }
+    });
 
-    request.withPreferences(preferences ->
+    requestBuilder.withPreferences(preferences ->
       PreferencesMapper.mapPreferences(environment, callWith, preferences)
     );
 
-    return request;
+    return requestBuilder.buildRequest();
   }
 }

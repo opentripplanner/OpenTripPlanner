@@ -376,13 +376,14 @@ class WalkableAreaBuilder {
     } else {
       mode = StreetMode.CAR;
     }
-    RouteRequest options = new RouteRequest();
+    // TODO: This is incorrect, the configured defaults are not used.
+    RouteRequest request = RouteRequest.defaultValue();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-        .setRequest(options)
+        .setRequest(request)
         .setStreetRequest(new StreetRequest(mode))
         .setFrom(vertex)
         .getShortestPathTree();

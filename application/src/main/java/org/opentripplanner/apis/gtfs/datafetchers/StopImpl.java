@@ -5,7 +5,6 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.text.ParseException;
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,10 +13,12 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.service.ApiTransitService;
 import org.opentripplanner.apis.gtfs.support.filter.PatternByDateFilterUtil;
 import org.opentripplanner.apis.gtfs.support.time.LocalDateRangeUtil;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -36,6 +37,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.ArrivalDeparture;
 import org.opentripplanner.transit.service.TransitService;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
@@ -243,7 +245,10 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     return env -> {
       var args = new GraphQLTypes.GraphQLStopRoutesArgs(env.getArguments());
       var routes = getRoutes(env);
-      if (LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates())) {
+      if (
+        LocalDateRangeUtil.hasServiceDateFilter(args.getGraphQLServiceDates()) &&
+        !CollectionUtils.isEmpty(routes)
+      ) {
         var filter = PatternByDateFilterUtil.ofGraphQL(
           args.getGraphQLServiceDates(),
           getTransitService(env)
@@ -272,22 +277,32 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             return null;
           }
 
+          var arrivalDeparture = args.getGraphQLOmitNonPickups()
+            ? ArrivalDeparture.DEPARTURES
+            : ArrivalDeparture.BOTH;
+
+          var time = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
+          var timeRange = Duration.ofSeconds(args.getGraphQLTimeRange());
+
           if (transitService.hasNewTripPatternsForModifiedTrips()) {
-            return getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-              pattern,
+            var service = new ApiTransitService(transitService);
+            return service.getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
               stop,
-              transitService,
-              args
+              pattern,
+              time,
+              timeRange,
+              args.getGraphQLNumberOfDepartures(),
+              arrivalDeparture
             );
           }
 
-          return transitService.findTripTimeOnDate(
+          return transitService.findTripTimesOnDate(
             stop,
             pattern,
-            GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
-            Duration.ofSeconds(args.getGraphQLTimeRange()),
+            time,
+            timeRange,
             args.getGraphQLNumberOfDepartures(),
-            args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+            arrivalDeparture,
             !args.getGraphQLOmitCanceled()
           );
         },
@@ -482,6 +497,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     );
   }
 
+  @Nullable
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
       environment,
@@ -492,63 +508,6 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
-  }
-
-  /**
-   * TODO this functionality should be supported by {@link StopTimesHelper#stopTimesForPatternAtStop}
-   */
-  private List<TripTimeOnDate> getTripTimeOnDatesForPatternAtStopIncludingTripsWithSkippedStops(
-    TripPattern originalPattern,
-    StopLocation stop,
-    TransitService transitService,
-    GraphQLTypes.GraphQLStopStopTimesForPatternArgs args
-  ) {
-    Instant startTime = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
-    LocalDate date = startTime.atZone(transitService.getTimeZone()).toLocalDate();
-
-    return Stream.concat(
-      getRealtimeAddedPatternsAsStream(originalPattern, transitService, date),
-      Stream.of(originalPattern)
-    )
-      .flatMap(tripPattern ->
-        transitService
-          .findTripTimeOnDate(
-            stop,
-            tripPattern,
-            startTime,
-            Duration.ofSeconds(args.getGraphQLTimeRange()),
-            args.getGraphQLNumberOfDepartures(),
-            args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
-            false
-          )
-          .stream()
-      )
-      .sorted(
-        Comparator.comparing(
-          (TripTimeOnDate tts) -> tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
-        )
-      )
-      .limit(args.getGraphQLNumberOfDepartures())
-      .toList();
-  }
-
-  /**
-   * Get a stream of {@link TripPattern} that were created real-time based of the provided pattern.
-   * Only patterns that don't have removed (stops can still be skipped) or added stops are included.
-   */
-  private Stream<TripPattern> getRealtimeAddedPatternsAsStream(
-    TripPattern originalPattern,
-    TransitService transitService,
-    LocalDate date
-  ) {
-    return originalPattern
-      .scheduledTripsAsStream()
-      .map(trip -> transitService.findNewTripPatternForModifiedTrip(trip.getId(), date))
-      .filter(
-        tripPattern ->
-          tripPattern != null &&
-          tripPattern.isModifiedFromTripPatternWithEqualStops(originalPattern)
-      );
   }
 
   private static <T> T getValue(
