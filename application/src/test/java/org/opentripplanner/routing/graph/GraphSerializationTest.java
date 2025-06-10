@@ -185,7 +185,10 @@ public class GraphSerializationTest {
       "realtimeRaptorTransitData",
       "dateTime",
       "notesForEdge",
-      "uniqueMatchers"
+      "uniqueMatchers",
+      "linker",
+      // for some reason the object differ struggles with ImmutableSetMultimap
+      "stopVerticesByParentId"
     );
     // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
     objectDiffer.setKeyExtractor("turnRestrictions", Object::toString);
@@ -238,10 +241,10 @@ public class GraphSerializationTest {
     // might be indexed by other tests.
 
     originalTimetableRepository.index();
-    originalGraph.index(originalTimetableRepository.getSiteRepository());
+    originalGraph.index();
 
     copiedTimetableRepository1.index();
-    copiedGraph1.index(copiedTimetableRepository1.getSiteRepository());
+    copiedGraph1.index();
 
     assertNoDifferences(originalGraph, copiedGraph1);
 
@@ -249,7 +252,7 @@ public class GraphSerializationTest {
     Graph copiedGraph2 = deserializedGraph2.graph;
     TimetableRepository copiedTimetableRepository2 = deserializedGraph2.timetableRepository;
     copiedTimetableRepository2.index();
-    copiedGraph2.index(copiedTimetableRepository2.getSiteRepository());
+    copiedGraph2.index();
     assertNoDifferences(copiedGraph1, copiedGraph2);
   }
 

@@ -60,16 +60,14 @@ public class EdgeVertexTileRenderer implements TileRenderer {
     // Grow a bit the envelope to prevent rendering glitches between tiles
     Envelope bboxWithMargins = context.expandPixels(lineWidth * 2.0, lineWidth * 2.0);
 
-    var streetIndex = context.graph.getStreetIndex();
-
-    Collection<Vertex> vertices = streetIndex
-      .getVerticesForEnvelope(bboxWithMargins)
+    Collection<Vertex> vertices = context.graph
+      .findVertices(bboxWithMargins)
       .stream()
       .sorted(evRenderer::vertexSorter)
       .toList();
 
-    Collection<Edge> edges = streetIndex
-      .getEdgesForEnvelope(bboxWithMargins)
+    Collection<Edge> edges = context.graph
+      .findEdges(bboxWithMargins)
       .stream()
       .distinct()
       .sorted(evRenderer::edgeSorter)

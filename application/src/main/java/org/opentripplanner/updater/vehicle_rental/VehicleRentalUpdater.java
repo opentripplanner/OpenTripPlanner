@@ -228,9 +228,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
         latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
 
-        var updater = new GeofencingVertexUpdater(
-          context.graph().getStreetIndex()::getEdgesForEnvelope
-        );
+        var updater = new GeofencingVertexUpdater(context.graph()::findEdges);
         latestModifiedEdges = updater.applyGeofencingZones(geofencingZones);
         latestAppliedGeofencingZones = geofencingZones;
 

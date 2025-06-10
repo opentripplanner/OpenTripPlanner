@@ -54,7 +54,7 @@ public class TemporaryVerticesContainerTest {
     createStreetEdge(a, b, "a -> b");
     createStreetEdge(b, a, "b -> a");
     createStreetEdge(a, c, "a -> c");
-    g.index(new SiteRepository());
+    g.index();
   }
 
   @Test

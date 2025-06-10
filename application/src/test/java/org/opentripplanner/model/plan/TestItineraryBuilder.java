@@ -303,7 +303,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
   /**
    * Add a rail/train leg to the itinerary
    */
-  public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
+  public TestItineraryBuilder rail(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    @Nullable Integer cost
+  ) {
     return transit(
       RAIL_ROUTE,
       Integer.toString(tripId),
@@ -314,8 +320,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to,
       null,
       null,
-      null
+      null,
+      cost
     );
+  }
+
+  public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
+    return rail(tripId, startTime, endTime, to, null);
   }
 
   public TestItineraryBuilder faresV2Rail(
@@ -465,13 +476,45 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Integer headwaySecs,
     ConstrainedTransfer transferFromPreviousLeg
   ) {
+    return transit(
+      route,
+      tripId,
+      start,
+      end,
+      fromStopIndex,
+      toStopIndex,
+      to,
+      serviceDate,
+      headwaySecs,
+      transferFromPreviousLeg,
+      null
+    );
+  }
+
+  public TestItineraryBuilder transit(
+    Route route,
+    String tripId,
+    int start,
+    int end,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to,
+    LocalDate serviceDate,
+    Integer headwaySecs,
+    ConstrainedTransfer transferFromPreviousLeg,
+    @Nullable Integer cost
+  ) {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
     }
     int waitTime = start - lastEndTime(start);
     int legCost = 0;
-    legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
-    legCost += cost(1.0f, end - start) + BOARD_COST;
+    if (cost != null) {
+      legCost = cost;
+    } else {
+      legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
+      legCost += cost(1.0f, end - start) + BOARD_COST;
+    }
 
     Trip trip = trip(tripId, route);
 
