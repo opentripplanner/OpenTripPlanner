@@ -59,13 +59,13 @@ class CliOptions:
         self.base_revision = None
         self.dry_run = False
         self.debugging = False
-        self.releaseOnly = False
+        self.release_only = False
         self.bump_ser_ver_id = False
         self.skip_prs = False
-        self.printSummary = False
+        self.print_summary = False
 
     def verify(self):
-        if self.releaseOnly and self.base_revision:
+        if self.release_only and self.base_revision:
             error(f"<base-revision> is not allowed with option '--release', was: {options.base_revision}")
 
     # Return the script <base revision> argument if set, if not use 'HEAD'(--release)
@@ -80,19 +80,19 @@ class CliOptions:
                 f"base_revision: {self.base_revision}, "
                 f"dry_run: {self.dry_run}, "
                 f"debugging: {self.debugging}, "
-                f"releaseOnly: '{self.releaseOnly}', "
+                f"release_only: '{self.release_only}', "
                 f"bump_ser_ver_id: '{self.bump_ser_ver_id}', "
                 f"skip_prs: '{self.skip_prs}', "
-                f"printSummary: '{self.printSummary}'>")
+                f"print_summary: '{self.print_summary}'>")
 
 # PR information
 class PullRequest:
     def __init__(self):
         self.number = None
         self.title = None
-        self.commitHash = None
+        self.commit_hash = None
         self.labels = []
-        self.serLabelSet = False
+        self.ser_label_set = False
 
     def description(self):
         return f'{self.title} #{self.number}'
@@ -113,7 +113,7 @@ class ScriptState:
         self.latest_version = None
         self.next_version = None
         self.prs_bump_ser_ver_id = False
-        self.gotoStep = False
+        self.goto_step = False
         self.step = None
 
     def latest_version_tag(self):
@@ -132,11 +132,11 @@ class ScriptState:
         return self.next_ser_ver_id != self.latest_ser_ver_id
 
     def run(self, step):
-        if not self.gotoStep:
+        if not self.goto_step:
             debug(f'Run step: {step}')
             return True
         if self.step == step:
-            self.gotoStep = False
+            self.goto_step = False
             debug(f'Resume step: {step}')
             return True
         else:
@@ -149,7 +149,7 @@ class ScriptState:
 
     def delete_progress_file(self):
         execute('rm', STATE_FILE)
-        self.gotoStep = False
+        self.goto_step = False
         self.step = None
 
 
@@ -170,7 +170,7 @@ def main():
     setup_and_verify()
 
     # Prepare release
-    if not options.releaseOnly:
+    if not options.release_only:
         reset_release_branch_to_base_revision()
         merge_in_labeled_prs()
         merge_in_ext_branches()
@@ -310,7 +310,7 @@ def push_release_branch_and_tag():
 
 
 def print_summary():
-    if not options.printSummary:
+    if not options.print_summary:
         return
     section(f'Print summary file: {SUMMARY_FILE}')
 
@@ -355,13 +355,13 @@ def parse_and_verify_cli_arguments_and_options():
         elif re.match(r'(--debug)', arg):
             options.debugging = True
         elif re.match(r'(--release)', arg):
-            options.releaseOnly = True
+            options.release_only = True
         elif re.match(r'(--serVerId)', arg):
             options.bump_ser_ver_id = True
         elif re.match(r'(--skipPRs)', arg):
             options.skip_prs = True
         elif re.match(r'(--summary)', arg):
-            options.printSummary = True
+            options.print_summary = True
         else:
             options.base_revision = arg
             args.append(arg)
@@ -432,7 +432,7 @@ def verify_maven_installed():
 
 
 def verify_release_base_and_release_branch_exist():
-    if options.releaseOnly:
+    if options.release_only:
         info('Verify release branch/commit exist ...')
     else:
         info('Verify base revision and release branch/commit exist ...')
@@ -519,7 +519,7 @@ def read_pull_request_info_from_github():
         pr = PullRequest()
         pr.number = node['number']
         pr.title = node['title']
-        pr.commitHash = node['headRefOid']
+        pr.commit_hash = node['headRefOid']
         labels = node['labels']['nodes']
         # GitHub labels are not case-sensitive, hence using 'lower()'
         for label in labels:
@@ -536,7 +536,7 @@ def check_if_prs_exist_in_latest_release():
     latest_release_hash = state.latest_version_git_hash()
 
     for pr in pullRequests:
-        if pr.serLabelSet and not git_is_commit_ancestor(pr.commitHash, latest_release_hash):
+        if pr.ser_label_set and not git_is_commit_ancestor(pr.commit_hash, latest_release_hash):
             info(f'  - The top commit does not exist in the latest release. Bumping ser.ver.id. ({pr.description()})')
             state.prs_bump_ser_ver_id = True
             return
@@ -564,7 +564,7 @@ def resolve_next_ser_ver_id():
 
     if options.bump_ser_ver_id:
         state.next_ser_ver_id = bump_release_ser_ver_id(state.latest_ser_ver_id)
-    elif options.releaseOnly:
+    elif options.release_only:
         current_ser_ver_id = read_ser_ver_id_from_pom_file("HEAD")
         if current_ser_ver_id.startswith(config.ser_ver_id_prefix):
             state.next_ser_ver_id = current_ser_ver_id
@@ -612,7 +612,7 @@ CLI Options
   - Bump ser.ver.id ............. : {options.bump_ser_ver_id}
   - Dry run  .................... : {options.dry_run}
   - Debugging ................... : {options.debugging}
-  - Release ..................... : {options.releaseOnly}
+  - Release ..................... : {options.release_only}
 
 Config
   - Upstream git repo remote name : {config.upstream_remote}
@@ -651,7 +651,7 @@ def read_script_state():
             pr = PullRequest()
             pr.__dict__ = it
             pullRequests.append(pr)
-        state.gotoStep = True
+        state.goto_step = True
 
 
 def save_script_state(step):
