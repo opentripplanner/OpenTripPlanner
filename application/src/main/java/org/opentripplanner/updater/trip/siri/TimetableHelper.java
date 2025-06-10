@@ -109,12 +109,18 @@ class TimetableHelper {
       : journeyOccupancy;
 
     if (callOccupancy != null) {
-      tripTimesBuilder.withOccupancyStatus(index, OccupancyMapper.mapOccupancyStatus(callOccupancy));
+      tripTimesBuilder.withOccupancyStatus(
+        index,
+        OccupancyMapper.mapOccupancyStatus(callOccupancy)
+      );
     }
 
     if (call.getDestinationDisplaies() != null && !call.getDestinationDisplaies().isEmpty()) {
       NaturalLanguageStringStructure destinationDisplay = call.getDestinationDisplaies().get(0);
-      tripTimesBuilder.withStopHeadsign(index, new NonLocalizedString(destinationDisplay.getValue()));
+      tripTimesBuilder.withStopHeadsign(
+        index,
+        new NonLocalizedString(destinationDisplay.getValue())
+      );
     }
   }
 }
