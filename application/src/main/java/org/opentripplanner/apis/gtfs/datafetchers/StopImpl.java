@@ -105,14 +105,17 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)
         ) {
-          getRoutes(environment).forEach(route -> {
-            if (types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES)) {
-              alerts.addAll(alertService.getRouteAlerts(route.getId()));
-            }
-            if (types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
-              alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
-            }
-          });
+          var routes = getRoutes(environment);
+          if (routes != null) {
+            routes.forEach(route -> {
+              if (types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES)) {
+                alerts.addAll(alertService.getRouteAlerts(route.getId()));
+              }
+              if (types.contains(GraphQLTypes.GraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
+                alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
+              }
+            });
+          }
         }
         return alerts.stream().distinct().collect(Collectors.toList());
       } else {
@@ -486,7 +489,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       station -> null
     );
   }
-
+  
+  @Nullable
   private Collection<Route> getRoutes(DataFetchingEnvironment environment) {
     return getValue(
       environment,
