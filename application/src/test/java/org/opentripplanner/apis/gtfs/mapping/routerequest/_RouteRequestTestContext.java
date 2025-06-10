@@ -17,7 +17,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
-import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.ext.fares.impl.gtfs.DefaultFareService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
