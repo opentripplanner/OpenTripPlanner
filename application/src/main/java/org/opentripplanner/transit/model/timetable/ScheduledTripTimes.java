@@ -388,7 +388,7 @@ public final class ScheduledTripTimes implements TripTimes {
    * increasing. The first stop arrival time and the last stops departure time is NOT checked -
    * these should be ignored by raptor.
    *
-   * TODO: This should be make private as the builder should ensure the data consistency
+   * TODO: This should be make private as the constructor should ensure the data consistency
    */
   public void validateNonIncreasingTimes() {
     final int lastStop = arrivalTimes.length - 1;
