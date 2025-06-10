@@ -5,8 +5,9 @@ import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +53,13 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
 
   private Itinerary addRideHailingInformation(Itinerary i, RideHailingService service) {
     if (!i.isFlaggedForDeletion()) {
-      var legs = i
-        .getLegs()
+      ItineraryBuilder builder = i.copyOf();
+      var legs = builder
+        .legs()
         .parallelStream()
         .map(leg -> decorateLegWithRideEstimate(i, leg, service))
         .toList();
-
-      i.setLegs(legs);
+      return builder.withLegs(legs).build();
     }
     return i;
   }
@@ -67,8 +68,8 @@ public class DecorateWithRideHailing implements ItineraryListFilter {
     try {
       if (leg instanceof StreetLeg sl && sl.getMode().isInCar()) {
         var estimates = service.rideEstimates(
-          leg.getFrom().coordinate,
-          leg.getTo().coordinate,
+          leg.from().coordinate,
+          leg.to().coordinate,
           wheelchairAccessible
         );
         if (estimates.isEmpty()) {

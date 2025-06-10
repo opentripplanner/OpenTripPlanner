@@ -3,14 +3,14 @@ package org.opentripplanner.updater.trip.siri;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import uk.org.siri.siri20.ArrivalBoardingActivityEnumeration;
-import uk.org.siri.siri20.CallStatusEnumeration;
-import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
-import uk.org.siri.siri20.EstimatedCall;
-import uk.org.siri.siri20.EstimatedVehicleJourney;
-import uk.org.siri.siri20.NaturalLanguageStringStructure;
-import uk.org.siri.siri20.OccupancyEnumeration;
-import uk.org.siri.siri20.RecordedCall;
+import uk.org.siri.siri21.ArrivalBoardingActivityEnumeration;
+import uk.org.siri.siri21.CallStatusEnumeration;
+import uk.org.siri.siri21.DepartureBoardingActivityEnumeration;
+import uk.org.siri.siri21.EstimatedCall;
+import uk.org.siri.siri21.EstimatedVehicleJourney;
+import uk.org.siri.siri21.NaturalLanguageStringStructure;
+import uk.org.siri.siri21.OccupancyEnumeration;
+import uk.org.siri.siri21.RecordedCall;
 
 /**
  * This class is a wrapper around either a {@link RecordedCall} or an {@link EstimatedCall}, making
@@ -46,6 +46,7 @@ public interface CallWrapper {
   String getStopPointRef();
   Boolean isCancellation();
   Boolean isPredictionInaccurate();
+  boolean isExtraCall();
   OccupancyEnumeration getOccupancy();
   List<NaturalLanguageStringStructure> getDestinationDisplaies();
   ZonedDateTime getAimedArrivalTime();
@@ -80,6 +81,11 @@ public interface CallWrapper {
     @Override
     public Boolean isPredictionInaccurate() {
       return call.isPredictionInaccurate();
+    }
+
+    @Override
+    public boolean isExtraCall() {
+      return Boolean.TRUE.equals(call.isExtraCall());
     }
 
     @Override
@@ -177,6 +183,11 @@ public interface CallWrapper {
     @Override
     public Boolean isPredictionInaccurate() {
       return call.isPredictionInaccurate();
+    }
+
+    @Override
+    public boolean isExtraCall() {
+      return Boolean.TRUE.equals(call.isExtraCall());
     }
 
     @Override

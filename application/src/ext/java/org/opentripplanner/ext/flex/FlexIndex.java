@@ -60,10 +60,6 @@ public class FlexIndex {
     return flexTripsByStop.get(stopLocation);
   }
 
-  public Route getRouteById(FeedScopedId id) {
-    return routeById.get(id);
-  }
-
   public boolean contains(Route route) {
     return routeById.containsKey(route.getId());
   }

@@ -20,11 +20,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -53,11 +52,15 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
+import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest {
+
+  protected static final String FEED_ID = "FEED";
 
   public Graph graph;
   public TimetableRepository timetableRepository;
@@ -66,7 +69,6 @@ public abstract class GtfsTest {
   GtfsRealTimeTripUpdateAdapter tripUpdateAdapter;
   TransitAlertServiceImpl alertPatchServiceImpl;
   public OtpServerRequestContext serverContext;
-  public GtfsFeedId feedId;
 
   public abstract String getFeedName();
 
@@ -96,17 +98,15 @@ public abstract class GtfsTest {
     routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
     if (fromVertex != null && !fromVertex.isEmpty()) {
       routingRequest.setFrom(
-        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex)
+        LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex)
       );
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      routingRequest.setTo(
-        LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex)
-      );
+      routingRequest.setTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
     }
     if (onTripId != null && !onTripId.isEmpty()) {
       // TODO VIA - set different on-board request
-      //routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
+      //routingRequest.startingTransitTripId = (new FeedScopedId(FEED_ID, onTripId));
     }
     routingRequest.setWheelchair(wheelchairAccessible);
 
@@ -129,7 +129,7 @@ public abstract class GtfsTest {
     }
 
     if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      List<FeedScopedId> routeIds = List.of(new FeedScopedId(feedId.getId(), excludedRoute));
+      List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
       filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
     }
 
@@ -159,7 +159,7 @@ public abstract class GtfsTest {
     // Stored in instance field for use in individual tests
     Itinerary itinerary = itineraries.get(0);
 
-    assertEquals(legCount, itinerary.getLegs().size());
+    assertEquals(legCount, itinerary.legs().size());
 
     return itinerary;
   }
@@ -172,22 +172,22 @@ public abstract class GtfsTest {
     String fromStopId,
     String alert
   ) {
-    assertEquals(startTime, leg.getStartTime().toInstant().toEpochMilli());
-    assertEquals(endTime, leg.getEndTime().toInstant().toEpochMilli());
-    assertEquals(toStopId, leg.getTo().stop.getId().getId());
-    assertEquals(feedId.getId(), leg.getTo().stop.getId().getFeedId());
+    assertEquals(startTime, leg.startTime().toInstant().toEpochMilli());
+    assertEquals(endTime, leg.endTime().toInstant().toEpochMilli());
+    assertEquals(toStopId, leg.to().stop.getId().getId());
+    assertEquals(FEED_ID, leg.to().stop.getId().getFeedId());
     if (fromStopId != null) {
-      assertEquals(feedId.getId(), leg.getFrom().stop.getId().getFeedId());
-      assertEquals(fromStopId, leg.getFrom().stop.getId().getId());
+      assertEquals(FEED_ID, leg.from().stop.getId().getFeedId());
+      assertEquals(fromStopId, leg.from().stop.getId().getId());
     } else {
-      assertNull(leg.getFrom().stop.getId());
+      assertNull(leg.from().stop.getId());
     }
     if (alert != null) {
-      assertNotNull(leg.getStreetNotes());
-      assertEquals(1, leg.getStreetNotes().size());
-      assertEquals(alert, leg.getStreetNotes().iterator().next().note.toString());
+      assertNotNull(leg.listStreetNotes());
+      assertEquals(1, leg.listStreetNotes().size());
+      assertEquals(alert, leg.listStreetNotes().iterator().next().note.toString());
     } else {
-      assertThat(leg.getStreetNotes()).isEmpty();
+      assertThat(leg.listStreetNotes()).isEmpty();
     }
   }
 
@@ -195,10 +195,9 @@ public abstract class GtfsTest {
   protected void setUp() throws Exception {
     File gtfs = new File("src/test/resources/" + getFeedName());
     File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
-    GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
-    feedId = new GtfsFeedId.Builder().id("FEED").build();
-    gtfsBundle.setFeedId(feedId);
-    List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
+
+    GtfsBundle gtfsBundle = GtfsBundle.forTest(gtfs, FEED_ID);
+    List<GtfsBundle> gtfsBundleList = List.of(gtfsBundle);
 
     alertsUpdateHandler = new AlertsUpdateHandler(false);
     var deduplicator = new Deduplicator();
@@ -211,7 +210,7 @@ public abstract class GtfsTest {
       )
     );
 
-    GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+    GtfsModule gtfsGraphBuilderImpl = GtfsModule.forTest(
       gtfsBundleList,
       timetableRepository,
       graph,
@@ -220,7 +219,7 @@ public abstract class GtfsTest {
 
     gtfsGraphBuilderImpl.buildGraph();
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
 
     createRaptorTransitData(timetableRepository, RouterConfig.DEFAULT.transitTuningConfig());
 
@@ -232,11 +231,12 @@ public abstract class GtfsTest {
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
       timetableRepository,
       snapshotManager,
+      new TripPatternCache(new TripPatternIdGenerator(), t -> null),
       LocalDate::now
     );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);
     alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
-    alertsUpdateHandler.setFeedId(feedId.getId());
+    alertsUpdateHandler.setFeedId(FEED_ID);
 
     try {
       InputStream inputStream = new FileInputStream(gtfsRealTime);
@@ -251,13 +251,14 @@ public abstract class GtfsTest {
         REQUIRED_NO_DATA,
         UpdateIncrementality.DIFFERENTIAL,
         updates,
-        feedId.getId()
+        FEED_ID
       );
       alertsUpdateHandler.update(feedMessage, null);
     } catch (FileNotFoundException exception) {}
     serverContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      new DefaultFareService(),
       snapshotManager,
       null
     );

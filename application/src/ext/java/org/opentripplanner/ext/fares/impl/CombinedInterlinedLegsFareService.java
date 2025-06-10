@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 
 /**
  * This calculator allows you to configure if two interlined legs (those with a stay-seated transfer
@@ -27,7 +27,7 @@ public class CombinedInterlinedLegsFareService extends DefaultFareService {
   ) {
     return switch (mode) {
       case ALWAYS -> true;
-      case SAME_ROUTE -> currentLeg.getRoute().getId().equals(previousLeg.getRoute().getId());
+      case SAME_ROUTE -> currentLeg.route().getId().equals(previousLeg.route().getId());
     };
   }
 

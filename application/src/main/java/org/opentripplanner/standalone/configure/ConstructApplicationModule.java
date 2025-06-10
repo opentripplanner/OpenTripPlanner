@@ -4,17 +4,21 @@ import dagger.Module;
 import dagger.Provides;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
+import jakarta.inject.Singleton;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.interactivelauncher.api.LauncherRequestDecorator;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.ext.EmissionDecorator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -48,11 +52,12 @@ public class ConstructApplicationModule {
     @Nullable StopConsolidationService stopConsolidationService,
     StreetLimitationParametersService streetLimitationParametersService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
-    EmissionsService emissionsService,
+    @Nullable @EmissionDecorator ItineraryDecorator emissionItineraryDecorator,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
     LauncherRequestDecorator launcherRequestDecorator,
-    @Nullable LuceneIndex luceneIndex
+    @Nullable LuceneIndex luceneIndex,
+    FareService fareService
   ) {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
@@ -62,6 +67,7 @@ public class ConstructApplicationModule {
 
     return new DefaultServerRequestContext(
       debugUiConfig,
+      fareService,
       flexParameters,
       graph,
       Metrics.globalRegistry,
@@ -77,13 +83,20 @@ public class ConstructApplicationModule {
       vehicleRentalService,
       viaTransferResolver,
       worldEnvelopeService,
-      emissionsService,
+      // Optional Sandbox services
+      emissionItineraryDecorator,
       luceneIndex,
       schema,
       sorlandsbanenService,
       stopConsolidationService,
       traverseVisitor
     );
+  }
+
+  @Singleton
+  @Provides
+  public FareService fareService(FareServiceFactory fareServiceFactory) {
+    return fareServiceFactory.makeFareService();
   }
 
   @Provides

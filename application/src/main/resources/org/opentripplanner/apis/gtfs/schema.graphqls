@@ -12,11 +12,22 @@ This is only worth it when the execution is long running, i.e. more than ~50 mil
 """
 directive @async on FIELD_DEFINITION
 
+"This directive allows results to be deferred during execution"
+directive @defer(
+    "Deferred behaviour is controlled by this argument"
+    if: Boolean! = true,
+    "A unique label that represents the fragment being deferred"
+    label: String
+  ) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
 "Marks the field, argument, input field or enum value as deprecated"
 directive @deprecated(
     "The reason for the deprecation"
-    reason: String = "No longer supported"
+    reason: String! = "No longer supported"
   ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"This directive disables error propagation when a non nullable field returns null for the given operation."
+directive @experimental_disableErrorPropagation on QUERY | MUTATION | SUBSCRIPTION
 
 "Directs the executor to include this field or fragment only when the `if` argument is true"
 directive @include(
@@ -1025,7 +1036,7 @@ type Place {
   Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit stop) Mostly
   used for better localization of bike sharing and P+R station names
   """
-  vertexType: VertexType
+  vertexType: VertexType @deprecated(reason : "Unmaintained. Use `stop`, `rentalVehicle`, `vehicleParking` or `vehicleRentalStation` to tell which type it is.")
 }
 
 type Plan {
@@ -1889,6 +1900,8 @@ type RealTimeEstimate {
 type RentalVehicle implements Node & PlaceInterface {
   "If true, vehicle is currently available for renting."
   allowPickupNow: Boolean
+  "The vehicle should be returned before this deadline."
+  availableUntil: OffsetDateTime
   "Fuel or battery status of the rental vehicle"
   fuel: RentalVehicleFuel
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
@@ -2250,7 +2263,7 @@ type Stop implements Node & PlaceInterface {
   https://developers.google.com/transit/gtfs/reference/#routestxt and
   https://developers.google.com/transit/gtfs/reference/extended-route-types
   """
-  vehicleType: Int
+  vehicleType: Int @deprecated(reason : "Not implemented. Use `vehicleMode`.")
   "Whether wheelchair boarding is possible for at least some of vehicles on this stop"
   wheelchairBoarding: WheelchairBoarding
   "ID of the zone where this stop is located"
@@ -2444,7 +2457,11 @@ type Trip implements Node {
     """
     types: [TripAlertType]
   ): [Alert]
-  "Arrival time to the final stop"
+  """
+  Arrival time to the final stop. If the trip does not run on the given date,
+  it will return scheduled times from another date. This field is slightly
+  confusing and will be deprecated when a better replacement is implemented.
+  """
   arrivalStoptime(
     """
     Date for which the arrival time is returned. Format: YYYYMMDD. If this
@@ -2455,7 +2472,11 @@ type Trip implements Node {
   "Whether bikes are allowed on board the vehicle running this trip"
   bikesAllowed: BikesAllowed
   blockId: String
-  "Departure time from the first stop"
+  """
+  Departure time from the first stop. If the trip does not run on the given date,
+  it will return scheduled times from another date. This field is slightly
+  confusing and will be deprecated when a better replacement is implemented.
+  """
   departureStoptime(
     """
     Date for which the departure time is returned. Format: YYYYMMDD. If this
@@ -2494,6 +2515,12 @@ type Trip implements Node {
   stops: [Stop!]!
   "List of times when this trip arrives to or departs from a stop"
   stoptimes: [Stoptime]
+  """
+  List of times when this trip arrives to or departs from each stop on a given date, or
+  today if the date is not given. If the trip does not run on the given date, it will
+  return scheduled times from another date. This field is slightly confusing and
+  will be deprecated when a better replacement is implemented.
+  """
   stoptimesForDate(
     "Date for which stoptimes are returned. Format: YYYYMMDD"
     serviceDate: String
@@ -2659,8 +2686,10 @@ type VehiclePosition {
   heading: Float
   "Human-readable label of the vehicle, eg. a publicly visible number or a license plate"
   label: String
+  "When the position of the vehicle was recorded."
+  lastUpdate: OffsetDateTime
   "When the position of the vehicle was recorded in seconds since the UNIX epoch."
-  lastUpdated: Long
+  lastUpdated: Long @deprecated(reason : "Use `lastUpdate` instead.")
   "Latitude of the vehicle"
   lat: Float
   "Longitude of the vehicle"
@@ -4462,10 +4491,14 @@ A visit-via-location is a physical visit to one of the stop locations or coordin
 on-board visit does not count, the traveler must alight or board at the given stop for it to to
 be accepted. To visit a coordinate, the traveler must walk(bike or drive) to the closest point
 in the street network from a stop and back to another stop to join the transit network.
-
-NOTE! Coordinates are NOT supported yet.
 """
 input PlanVisitViaLocationInput {
+  """
+  A coordinate to route through. To visit a coordinate, the traveler must walk(bike or drive)
+  to the closest point in the street network from a stop and back to another stop to join the transit
+  network.
+  """
+  coordinate: PlanCoordinateInput
   "The label/name of the location. This is pass-through information and is not used in routing."
   label: String
   """

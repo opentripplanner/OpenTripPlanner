@@ -7,16 +7,16 @@ import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
-import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
+import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -28,19 +28,21 @@ import javax.annotation.Nullable;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TimetableRepository;
+import org.opentripplanner.updater.alert.TransitAlertProvider;
 import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.siri.SiriRealTimeTripUpdateAdapter;
-import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri21.ServiceDelivery;
+import uk.org.siri.siri21.Siri;
 
 /**
  * This is the main handler for siri messages over azure. It handles the generic code for communicating
@@ -89,13 +91,13 @@ public class SiriAzureUpdater implements GraphUpdater {
   private final int prefetchCount;
 
   private ServiceBusProcessorClient eventProcessor;
-  private ServiceBusAdministrationAsyncClient serviceBusAdmin;
+  private ServiceBusAdministrationClient serviceBusAdmin;
   private boolean isPrimed = false;
   private String subscriptionName;
 
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
 
-  private final SiriAzureMessageHandler messageHandler;
+  protected final SiriAzureMessageHandler messageHandler;
 
   /**
    * The URL used to fetch all initial updates, null means don't fetch initial data
@@ -158,7 +160,29 @@ public class SiriAzureUpdater implements GraphUpdater {
     TimetableRepository timetableRepository
   ) {
     var messageHandler = new SiriAzureSXUpdater(config, timetableRepository);
-    return new SiriAzureUpdater(config, messageHandler);
+    return new SxWrapper(config, messageHandler);
+  }
+
+  /**
+   * This wrapper class is a SiriAzureUpdater that implements the TransitAlertProvider interface so it can
+   * be registered to handle SX messages. It delegates the actual SIRI-SX
+   * message processing to the contained SiriAzureSXUpdater.
+   */
+  public static class SxWrapper extends SiriAzureUpdater implements TransitAlertProvider {
+
+    SxWrapper(SiriAzureUpdaterParameters config, SiriAzureSXUpdater messageHandler) {
+      super(config, messageHandler);
+    }
+
+    /**
+     * Implements the TransitAlertProvider interface to allow this updater to be detected
+     * as a source of transit alerts. This method delegates to the internal SiriAzureSXUpdater
+     * @return TransitAlertService from the SiriAzureSXUpdater
+     */
+    @Override
+    public TransitAlertService getTransitAlertService() {
+      return ((SiriAzureSXUpdater) messageHandler).getTransitAlertService();
+    }
   }
 
   @Override
@@ -194,12 +218,12 @@ public class SiriAzureUpdater implements GraphUpdater {
       setPrimed();
 
       ApplicationShutdownSupport.addShutdownHook("azure-siri-updater-shutdown", () -> {
-        LOG.info("Calling shutdownHook on AbstractAzureSiriUpdater");
+        LOG.info("Calling shutdownHook on {} updater", updaterType);
         if (eventProcessor != null) {
           eventProcessor.close();
         }
         if (serviceBusAdmin != null) {
-          serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+          serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
           LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
         }
       });
@@ -297,35 +321,37 @@ public class SiriAzureUpdater implements GraphUpdater {
     // Client with permissions to create subscription
     if (authenticationType == AuthenticationType.FederatedIdentity) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
-        .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
-        .buildAsyncClient();
+        .credential(
+          fullyQualifiedNamespace,
+          new DefaultAzureCredentialBuilder()
+            // We use the current thread for fetching credentials since the default executor
+            // service can't be used in the shutdownHook where we want to delete the subscription
+            .executorService(MoreExecutors.newDirectExecutorService())
+            .build()
+        )
+        .buildClient();
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
         .connectionString(serviceBusUrl)
-        .buildAsyncClient();
+        .buildClient();
     }
 
     // Set options
     CreateSubscriptionOptions options = new CreateSubscriptionOptions()
-      .setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS))
       .setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
-    if (
-      Boolean.TRUE.equals(
-        serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName).block()
-      )
-    ) {
+    if (serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName)) {
       LOG.info(
         "Subscription '{}' already exists. Deleting existing subscription.",
         subscriptionName
       );
-      serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+      serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
       LOG.info("Service Bus deleted subscription {}.", subscriptionName);
     }
-    serviceBusAdmin.createSubscription(topicName, subscriptionName, options).block();
+    serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
-    LOG.info("{} created subscription {}", getClass().getSimpleName(), subscriptionName);
+    LOG.info("{} updater created subscription {}", updaterType, subscriptionName);
   }
 
   /**
@@ -481,7 +507,7 @@ public class SiriAzureUpdater implements GraphUpdater {
 
     if (
       reason == ServiceBusFailureReason.MESSAGING_ENTITY_DISABLED ||
-      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this  be recoverable?
+      reason == ServiceBusFailureReason.MESSAGING_ENTITY_NOT_FOUND // should this be recoverable?
     ) {
       LOG.error(
         "An unrecoverable error occurred. Stopping processing with reason {} {}",

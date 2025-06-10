@@ -1,53 +1,60 @@
 package org.opentripplanner.ext.realtimeresolver;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
 
+  private final TransitService transitService;
+
+  public RealtimeResolver(TransitService transitService) {
+    this.transitService = transitService;
+  }
+
   /**
    * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
    */
-  public static void populateLegsWithRealtime(
+  public static List<Itinerary> populateLegsWithRealtime(
     List<Itinerary> itineraries,
     TransitService transitService
   ) {
-    itineraries.forEach(it -> {
-      if (it.isFlaggedForDeletion()) {
-        return;
-      }
-      var legs = it
-        .getLegs()
-        .stream()
-        .map(leg -> {
-          var ref = leg.getLegReference();
-          if (ref == null) {
-            return leg;
-          }
+    return new RealtimeResolver(transitService).addRealtimeInfo(itineraries);
+  }
 
-          // Only ScheduledTransitLeg has leg references atm, so this check is just to be future-proof
-          if (!(leg.isScheduledTransitLeg())) {
-            return leg;
-          }
+  private List<Itinerary> addRealtimeInfo(List<Itinerary> itineraries) {
+    return itineraries.stream().map(this::decorateItinerary).toList();
+  }
 
-          var realTimeLeg = ref.getLeg(transitService);
-          if (realTimeLeg != null) {
-            return combineReferenceWithOriginal(
-              realTimeLeg.asScheduledTransitLeg(),
-              leg.asScheduledTransitLeg()
-            );
-          }
-          return leg;
-        })
-        .collect(Collectors.toList());
+  private Itinerary decorateItinerary(Itinerary it) {
+    // TODO Skip if leg does not contain transit
+    if (it.isFlaggedForDeletion()) {
+      return it;
+    }
+    return it.copyOf().transformLegs(this::mapLeg).build();
+  }
 
-      it.setLegs(legs);
-    });
+  private Leg mapLeg(Leg leg) {
+    var ref = leg.legReference();
+    if (ref == null) {
+      return leg;
+    }
+
+    // Only ScheduledTransitLeg has leg references atm, so this check is just to be future-proof
+    if (!(leg.isScheduledTransitLeg())) {
+      return leg;
+    }
+    var realTimeLeg = ref.getLeg(transitService);
+    if (realTimeLeg == null) {
+      return leg;
+    }
+    return combineReferenceWithOriginal(
+      realTimeLeg.asScheduledTransitLeg(),
+      leg.asScheduledTransitLeg()
+    );
   }
 
   private static Leg combineReferenceWithOriginal(
@@ -55,9 +62,9 @@ public class RealtimeResolver {
     ScheduledTransitLeg original
   ) {
     return new ScheduledTransitLegBuilder<>(reference)
-      .withTransferFromPreviousLeg(original.getTransferFromPrevLeg())
-      .withTransferToNextLeg(original.getTransferToNextLeg())
-      .withGeneralizedCost(original.getGeneralizedCost())
+      .withTransferFromPreviousLeg(original.transferFromPrevLeg())
+      .withTransferToNextLeg(original.transferToNextLeg())
+      .withGeneralizedCost(original.generalizedCost())
       .withAccessibilityScore(original.accessibilityScore())
       .build();
   }

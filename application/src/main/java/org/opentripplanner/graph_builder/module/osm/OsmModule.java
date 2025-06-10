@@ -132,6 +132,7 @@ public class OsmModule implements GraphBuilderModule {
     build();
     graph.hasStreets = true;
     streetLimitationParameters.initMaxCarSpeed(getMaxCarSpeed());
+    streetLimitationParameters.initMaxAreaNodes(params.maxAreaNodes());
   }
 
   @Override
@@ -202,7 +203,7 @@ public class OsmModule implements GraphBuilderModule {
     var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);
     elevatorProcessor.buildElevatorEdges(graph);
 
-    TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
+    TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore, osmInfoGraphBuildRepository);
 
     params.edgeNamer().postprocess();
 

@@ -2,12 +2,17 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
+import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 class TurnRestrictionUnifier {
 
-  static void unifyTurnRestrictions(OsmDatabase osmdb, DataImportIssueStore issueStore) {
+  static void unifyTurnRestrictions(
+    OsmDatabase osmdb,
+    DataImportIssueStore issueStore,
+    OsmInfoGraphBuildRepository osmInfoGraphBuildRepository
+  ) {
     // Note that usually when the from or to way is not found, it's because OTP has already
     // filtered that way. So many missing edges are not really problems worth issuing warnings on.
     for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
@@ -40,6 +45,8 @@ class TurnRestrictionUnifier {
             if (angleDiff < 0) {
               angleDiff += 360;
             }
+            // If the angle seems off for the stated restriction direction, add an issue
+            // to the issue store, but do not ignore the restriction.
             switch (restrictionTag.direction) {
               case LEFT -> {
                 if (angleDiff >= 160) {
@@ -49,7 +56,6 @@ class TurnRestrictionUnifier {
                       "Left turn restriction is not on edges which turn left"
                     )
                   );
-                  continue; // not a left turn
                 }
               }
               case RIGHT -> {
@@ -60,7 +66,6 @@ class TurnRestrictionUnifier {
                       "Right turn restriction is not on edges which turn right"
                     )
                   );
-                  continue; // not a right turn
                 }
               }
               case U -> {
@@ -71,7 +76,6 @@ class TurnRestrictionUnifier {
                       "U-turn restriction is not on U-turn"
                     )
                   );
-                  continue; // not a U turn
                 }
               }
               case STRAIGHT -> {
@@ -82,7 +86,6 @@ class TurnRestrictionUnifier {
                       "Straight turn restriction is not on edges which go straight"
                     )
                   );
-                  continue; // not straight
                 }
               }
             }
@@ -90,10 +93,9 @@ class TurnRestrictionUnifier {
               from,
               to,
               restrictionTag.type,
-              restrictionTag.modes,
-              restrictionTag.time
+              restrictionTag.modes
             );
-            from.addTurnRestriction(restriction);
+            osmInfoGraphBuildRepository.addTurnRestriction(restriction);
           }
         }
       }

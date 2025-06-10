@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -17,8 +17,22 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
 
   private final CostLinearFunction costLimitFunction;
 
-  public RemoveTransitIfStreetOnlyIsBetter(CostLinearFunction costLimitFunction) {
+  @Nullable
+  private final Cost generalizedCostMaxLimit;
+
+  private RemoveTransitIfStreetOnlyIsBetterResult removeTransitIfStreetOnlyIsBetterResult = null;
+
+  /**
+   * Constructs the RemoveTransitIfStreetOnlyIsBetter filter.
+   * @param costLimitFunction the cost limit function to use with the filter
+   * @param generalizedCostMaxLimit this limit is not null when paging is used
+   */
+  public RemoveTransitIfStreetOnlyIsBetter(
+    CostLinearFunction costLimitFunction,
+    @Nullable Cost generalizedCostMaxLimit
+  ) {
     this.costLimitFunction = costLimitFunction;
+    this.generalizedCostMaxLimit = generalizedCostMaxLimit;
   }
 
   /**
@@ -34,20 +48,35 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    // Find the best street-all-the-way option
-    OptionalInt minStreetCost = itineraries
-      .stream()
-      .filter(Itinerary::isOnStreetAllTheWay)
-      .mapToInt(Itinerary::getGeneralizedCost)
-      .min();
+    Cost minStreetCost = null;
 
-    if (minStreetCost.isEmpty()) {
+    if (generalizedCostMaxLimit != null) {
+      // The best street only cost is used from the cursor, if it can be found.
+      minStreetCost = generalizedCostMaxLimit;
+    } else {
+      // Find the best street-all-the-way option.
+      OptionalInt minStreetCostOption = itineraries
+        .stream()
+        .filter(Itinerary::isStreetOnly)
+        .mapToInt(Itinerary::generalizedCost)
+        .min();
+
+      if (minStreetCostOption.isPresent()) {
+        minStreetCost = Cost.costOfSeconds(minStreetCostOption.getAsInt());
+      }
+    }
+
+    // If no cost is found an empty list is returned.
+    if (minStreetCost == null) {
       return List.of();
     }
 
-    var limit = costLimitFunction
-      .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))
-      .toSeconds();
+    // This result is used for paging. It is collected by an aggregator.
+    removeTransitIfStreetOnlyIsBetterResult = new RemoveTransitIfStreetOnlyIsBetterResult(
+      minStreetCost
+    );
+
+    var limit = costLimitFunction.calculate(minStreetCost).toSeconds();
 
     // Filter away itineraries that have higher cost than limit cost computed above
     return itineraries
@@ -55,12 +84,16 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       // we use the cost without the access/egress penalty since we don't want to give
       // searches that are only on the street network an unfair advantage (they don't have
       // access/egress so cannot have these penalties)
-      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isStreetOnly() && it.generalizedCost() >= limit)
       .toList();
   }
 
   @Override
   public boolean skipAlreadyFlaggedItineraries() {
     return false;
+  }
+
+  public RemoveTransitIfStreetOnlyIsBetterResult getRemoveTransitIfStreetOnlyIsBetterResult() {
+    return removeTransitIfStreetOnlyIsBetterResult;
   }
 }

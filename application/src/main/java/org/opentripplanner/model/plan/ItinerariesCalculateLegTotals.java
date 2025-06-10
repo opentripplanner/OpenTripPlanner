@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.util.List;
+import org.opentripplanner.model.plan.leg.UnknownPathLeg;
 
 /**
  * Calculate derived itinerary fields
@@ -11,15 +12,15 @@ class ItinerariesCalculateLegTotals {
   Duration totalDuration = Duration.ZERO;
   Duration transitDuration = Duration.ZERO;
   int nTransitLegs = 0;
-  Duration nonTransitDuration = Duration.ZERO;
-  double nonTransitDistanceMeters = 0.0;
+  Duration onStreetDuration = Duration.ZERO;
+  double onStreetDistanceMeters = 0.0;
   Duration walkDuration = Duration.ZERO;
   double walkDistanceMeters = 0.0;
   Duration waitingDuration = Duration.ZERO;
   boolean walkOnly = true;
   boolean streetOnly = true;
-  double totalElevationGained = 0.0;
-  double totalElevationLost = 0.0;
+  double elevationGained_m = 0.0;
+  double elevationLost_m = 0.0;
 
   public ItinerariesCalculateLegTotals(List<Leg> legs) {
     if (legs.isEmpty()) {
@@ -33,10 +34,10 @@ class ItinerariesCalculateLegTotals {
   }
 
   private void calculate(List<Leg> legs) {
-    totalDuration = Duration.between(legs.getFirst().getStartTime(), legs.getLast().getEndTime());
+    totalDuration = Duration.between(legs.getFirst().startTime(), legs.getLast().endTime());
 
     for (Leg leg : legs) {
-      Duration dt = leg.getDuration();
+      Duration dt = leg.duration();
 
       if (leg.isTransitLeg()) {
         transitDuration = transitDuration.plus(dt);
@@ -44,15 +45,15 @@ class ItinerariesCalculateLegTotals {
           ++nTransitLegs;
         }
       } else if (leg.isStreetLeg()) {
-        nonTransitDuration = nonTransitDuration.plus(dt);
-        nonTransitDistanceMeters += leg.getDistanceMeters();
+        onStreetDuration = onStreetDuration.plus(dt);
+        onStreetDistanceMeters += leg.distanceMeters();
 
         if (leg.isWalkingLeg()) {
-          walkDuration = walkDuration.plus(leg.getDuration());
-          walkDistanceMeters = walkDistanceMeters + leg.getDistanceMeters();
+          walkDuration = walkDuration.plus(leg.duration());
+          walkDistanceMeters = walkDistanceMeters + leg.distanceMeters();
         }
-      } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
-        nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
+      } else if (leg instanceof UnknownPathLeg unknownPathLeg) {
+        nTransitLegs += unknownPathLeg.getNumberOfTransfers() + 1;
       }
 
       if (!leg.isWalkingLeg()) {
@@ -63,12 +64,12 @@ class ItinerariesCalculateLegTotals {
         this.streetOnly = false;
       }
 
-      if (leg.getElevationProfile() != null) {
-        var p = leg.getElevationProfile();
-        this.totalElevationGained += p.elevationGained();
-        this.totalElevationLost += p.elevationLost();
+      if (leg.elevationProfile() != null) {
+        var p = leg.elevationProfile();
+        this.elevationGained_m += p.elevationGained();
+        this.elevationLost_m += p.elevationLost();
       }
     }
-    this.waitingDuration = totalDuration.minus(transitDuration).minus(nonTransitDuration);
+    this.waitingDuration = totalDuration.minus(transitDuration).minus(onStreetDuration);
   }
 }

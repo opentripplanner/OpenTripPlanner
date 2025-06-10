@@ -7,7 +7,7 @@ import java.util.List;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.plan.Emissions;
+import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
@@ -20,17 +20,17 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   @Override
   public DataFetcher<Long> duration() {
-    return environment -> (long) getSource(environment).getDuration().toSeconds();
+    return environment -> (long) getSource(environment).totalDuration().toSeconds();
   }
 
   @Override
   public DataFetcher<Double> elevationGained() {
-    return environment -> getSource(environment).getElevationGained();
+    return environment -> getSource(environment).totalElevationGained();
   }
 
   @Override
   public DataFetcher<Double> elevationLost() {
-    return environment -> getSource(environment).getElevationLost();
+    return environment -> getSource(environment).totalElevationLost();
   }
 
   @Override
@@ -51,17 +51,17 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   @Override
   public DataFetcher<Integer> generalizedCost() {
-    return environment -> getSource(environment).getGeneralizedCost();
+    return environment -> getSource(environment).generalizedCost();
   }
 
   @Override
   public DataFetcher<Iterable<Leg>> legs() {
-    return environment -> getSource(environment).getLegs();
+    return environment -> getSource(environment).legs();
   }
 
   @Override
   public DataFetcher<Integer> numberOfTransfers() {
-    return environment -> getSource(environment).getNumberOfTransfers();
+    return environment -> getSource(environment).numberOfTransfers();
   }
 
   @Override
@@ -77,32 +77,32 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   @Override
   public DataFetcher<Iterable<SystemNotice>> systemNotices() {
-    return environment -> getSource(environment).getSystemNotices();
+    return environment -> getSource(environment).systemNotices();
   }
 
   @Override
   public DataFetcher<Long> waitingTime() {
-    return environment -> (long) getSource(environment).getWaitingDuration().toSeconds();
+    return environment -> (long) getSource(environment).totalWaitingDuration().toSeconds();
   }
 
   @Override
   public DataFetcher<Double> walkDistance() {
-    return environment -> getSource(environment).walkDistanceMeters();
+    return environment -> getSource(environment).totalWalkDistanceMeters();
   }
 
   @Override
   public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).walkDuration().toSeconds();
+    return environment -> (long) getSource(environment).totalWalkDuration().toSeconds();
   }
 
   @Override
   public DataFetcher<Double> accessibilityScore() {
-    return environment -> NumberMapper.toDouble(getSource(environment).getAccessibilityScore());
+    return environment -> NumberMapper.toDouble(getSource(environment).accessibilityScore());
   }
 
   @Override
-  public DataFetcher<Emissions> emissionsPerPerson() {
-    return environment -> getSource(environment).getEmissionsPerPerson();
+  public DataFetcher<Emission> emissionsPerPerson() {
+    return environment -> getSource(environment).emissionPerPerson();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

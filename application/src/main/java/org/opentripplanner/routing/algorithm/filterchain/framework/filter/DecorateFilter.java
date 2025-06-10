@@ -19,9 +19,6 @@ public final class DecorateFilter implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    for (var it : itineraries) {
-      decorator.decorate(it);
-    }
-    return itineraries;
+    return itineraries.stream().map(decorator::decorate).toList();
   }
 }

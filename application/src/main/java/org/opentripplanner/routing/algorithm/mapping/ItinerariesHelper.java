@@ -1,41 +1,50 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 public class ItinerariesHelper {
 
-  public static void decorateItinerariesWithRequestData(
+  public static List<Itinerary> decorateItinerariesWithRequestData(
     List<Itinerary> itineraries,
     boolean wheelchairEnabled,
     WheelchairPreferences wheelchairPreferences
   ) {
     if (!wheelchairEnabled) {
-      return;
+      return itineraries;
     }
+    var result = new ArrayList<Itinerary>();
+    boolean dirty = false;
+
     for (Itinerary it : itineraries) {
       // Communicate the fact that the only way we were able to get a response
       // was by removing a slope limit.
       OptionalDouble maxSlope = getMaxSlope(it);
       if (maxSlope.isPresent()) {
-        it.setTooSloped(maxSlope.getAsDouble() > wheelchairPreferences.maxSlope());
-        it.setMaxSlope(maxSlope.getAsDouble());
+        dirty = true;
+        itineraries.add(
+          it.copyOf().withMaxSlope(wheelchairPreferences.maxSlope(), maxSlope.getAsDouble()).build()
+        );
+      } else {
+        result.add(it);
       }
     }
+    return dirty ? result : itineraries;
   }
 
   private static OptionalDouble getMaxSlope(Itinerary it) {
     return it
-      .getLegs()
+      .legs()
       .stream()
       .filter(StreetLeg.class::isInstance)
       .map(StreetLeg.class::cast)
-      .map(StreetLeg::getWalkSteps)
+      .map(StreetLeg::listWalkSteps)
       .flatMap(List::stream)
       .map(WalkStep::getEdges)
       .filter(StreetEdge.class::isInstance)

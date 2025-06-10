@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
@@ -46,7 +44,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
@@ -167,6 +164,8 @@ class WalkableAreaBuilder {
     // Edges which are part of the rings
     Set<Edge> ringEdges = new HashSet<>();
 
+    HashMap<AreaGroup, HashSet<IntersectionVertex>> visibilityVertexCandidates = new HashMap<>();
+
     // OSM ways that this area group consists of
     Set<Long> osmWayIds = group.areas
       .stream()
@@ -189,7 +188,6 @@ class WalkableAreaBuilder {
       HashSet<IntersectionVertex> platformLinkingVertices = new HashSet<>();
       HashSet<IntersectionVertex> visibilityVertices = new HashSet<>();
       GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
       OsmEntity areaEntity = group.getSomeOsmObject();
 
       for (OsmArea area : group.areas) {
@@ -293,13 +291,11 @@ class WalkableAreaBuilder {
         }
         continue;
       }
-
-      areaGroup.addVisibilityVertices(visibilityVertices);
-      createAreas(areaGroup, ring, group.areas);
-
       if (visibilityVertices.size() > maxAreaNodes) {
         issueStore.add(new AreaTooComplicated(group, visibilityVertices.size(), maxAreaNodes));
       }
+      visibilityVertexCandidates.put(areaGroup, visibilityVertices);
+      createAreas(areaGroup, ring, group.areas);
 
       // if area is too complex, consider only part of visibility nodes
       // so that at least some edges passing through the area are added
@@ -343,6 +339,21 @@ class WalkableAreaBuilder {
       }
     }
     pruneAreaEdges(startingVertices, edges, ringEdges);
+
+    visibilityVertexCandidates.forEach((areaGroup, vertices) -> {
+      if (vertices.size() > maxAreaNodes) {
+        // keep nodes which have most connections
+        areaGroup.addVisibilityVertices(
+          vertices
+            .stream()
+            .sorted((v1, v2) -> Long.compare((v2.getDegreeOut()), v1.getDegreeOut()))
+            .limit(maxAreaNodes)
+            .collect(Collectors.toSet())
+        );
+      } else {
+        areaGroup.addVisibilityVertices(vertices);
+      }
+    });
   }
 
   /**

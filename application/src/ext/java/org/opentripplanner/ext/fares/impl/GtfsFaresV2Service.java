@@ -20,7 +20,8 @@ import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.slf4j.Logger;
@@ -31,15 +32,15 @@ public final class GtfsFaresV2Service implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(GtfsFaresV2Service.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final Multimap<FeedScopedId, String> stopAreas;
-  private final Set<String> networksWithRules;
-  private final Set<String> fromAreasWithRules;
-  private final Set<String> toAreasWithRules;
+  private final Multimap<FeedScopedId, FeedScopedId> stopAreas;
+  private final Set<FeedScopedId> networksWithRules;
+  private final Set<FeedScopedId> fromAreasWithRules;
+  private final Set<FeedScopedId> toAreasWithRules;
 
   public GtfsFaresV2Service(
     List<FareLegRule> legRules,
     List<FareTransferRule> fareTransferRules,
-    Multimap<FeedScopedId, String> stopAreas
+    Multimap<FeedScopedId, FeedScopedId> stopAreas
   ) {
     this.legRules = legRules;
     this.transferRules = fareTransferRules;
@@ -50,7 +51,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public ProductResult getProducts(Itinerary itinerary) {
-    var transitLegs = itinerary.getScheduledTransitLegs();
+    var transitLegs = itinerary.listScheduledTransitLegs();
 
     var allLegProducts = new HashSet<LegProducts>();
     for (int i = 0; i < transitLegs.size(); i++) {
@@ -71,14 +72,14 @@ public final class GtfsFaresV2Service implements Serializable {
     return new ProductResult(coveringItinerary, allLegProducts);
   }
 
-  private static Set<String> findAreasWithRules(
+  private static Set<FeedScopedId> findAreasWithRules(
     List<FareLegRule> legRules,
-    Function<FareLegRule, String> getArea
+    Function<FareLegRule, FeedScopedId> getArea
   ) {
     return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
   }
 
-  private static Set<String> findNetworksWithRules(Collection<FareLegRule> legRules) {
+  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
     return legRules
       .stream()
       .map(FareLegRule::networkId)
@@ -104,15 +105,15 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   private boolean coversItinerary(Itinerary i, LegProducts.ProductWithTransfer pwt) {
-    var transitLegs = i.getScheduledTransitLegs();
+    var transitLegs = i.listScheduledTransitLegs();
     var allLegsInProductFeed = transitLegs
       .stream()
-      .allMatch(leg -> leg.getAgency().getId().getFeedId().equals(pwt.legRule().feedId()));
+      .allMatch(leg -> leg.agency().getId().getFeedId().equals(pwt.legRule().feedId()));
 
     return (
       allLegsInProductFeed &&
       (transitLegs.size() == 1 ||
-        (pwt.products().stream().anyMatch(p -> p.coversDuration(i.getTransitDuration())) &&
+        (pwt.products().stream().anyMatch(p -> p.coversDuration(i.totalTransitDuration())) &&
           appliesToAllLegs(pwt.legRule(), transitLegs)) ||
         coversItineraryWithFreeTransfers(i, pwt))
     );
@@ -127,30 +128,27 @@ public final class GtfsFaresV2Service implements Serializable {
     LegProducts.ProductWithTransfer pwt
   ) {
     var feedIdsInItinerary = i
-      .getScheduledTransitLegs()
+      .listScheduledTransitLegs()
       .stream()
-      .map(l -> l.getAgency().getId().getFeedId())
+      .map(l -> l.agency().getId().getFeedId())
       .collect(Collectors.toSet());
 
     return (
       feedIdsInItinerary.size() == 1 &&
-      pwt
-        .transferRules()
-        .stream()
-        .anyMatch(r -> r.fareProducts().stream().anyMatch(fp -> fp.price().isZero()))
+      pwt.transferRules().stream().anyMatch(FareTransferRule::isFree)
     );
   }
 
   private boolean legMatchesRule(ScheduledTransitLeg leg, FareLegRule rule) {
     // make sure that you only get rules for the correct feed
     return (
-      leg.getAgency().getId().getFeedId().equals(rule.feedId()) &&
+      leg.agency().getId().getFeedId().equals(rule.feedId()) &&
       matchesNetworkId(leg, rule) &&
       // apply only those fare leg rules which have the correct area ids
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
-      matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.getTo().stop, rule.toAreaId(), toAreasWithRules) &&
+      matchesArea(leg.from().stop, rule.fromAreaId(), fromAreasWithRules) &&
+      matchesArea(leg.to().stop, rule.toAreaId(), toAreasWithRules) &&
       matchesDistance(leg, rule)
     );
   }
@@ -164,7 +162,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
     var transferRulesForLeg = transferRules
       .stream()
-      .filter(t -> t.feedId().equals(leg.getAgency().getId().getFeedId()))
+      .filter(t -> t.feedId().equals(leg.agency().getId().getFeedId()))
       .toList();
 
     var products = legRules
@@ -209,7 +207,11 @@ public final class GtfsFaresV2Service implements Serializable {
     return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 
-  private boolean matchesArea(StopLocation stop, String areaId, Set<String> areasWithRules) {
+  private boolean matchesArea(
+    StopLocation stop,
+    FeedScopedId areaId,
+    Set<FeedScopedId> areasWithRules
+  ) {
     var stopAreas = this.stopAreas.get(stop.getId());
     return (
       (isNull(areaId) && stopAreas.stream().noneMatch(areasWithRules::contains)) ||
@@ -223,10 +225,10 @@ public final class GtfsFaresV2Service implements Serializable {
    */
   private boolean matchesNetworkId(ScheduledTransitLeg leg, FareLegRule rule) {
     var routesNetworkIds = leg
-      .getRoute()
+      .route()
       .getGroupsOfRoutes()
       .stream()
-      .map(group -> group.getId().getId())
+      .map(group -> group.getId())
       .filter(Objects::nonNull)
       .toList();
 
@@ -241,15 +243,15 @@ public final class GtfsFaresV2Service implements Serializable {
     // If no valid distance type is given, do not consider distances in fare computation
 
     FareDistance distance = rule.fareDistance();
-    if (distance instanceof FareDistance.Stops ruleDistance) {
-      var numStops = leg.getIntermediateStops().size();
-      return numStops >= ruleDistance.min() && ruleDistance.max() >= numStops;
-    } else if (rule.fareDistance() instanceof FareDistance.LinearDistance ruleDistance) {
-      var ruleMax = ruleDistance.max();
-      var ruleMin = ruleDistance.min();
-      var legDistance = leg.getDirectDistanceMeters();
+    if (distance instanceof FareDistance.Stops(int min, int max)) {
+      var numStops = leg.listIntermediateStops().size();
+      return numStops >= min && max >= numStops;
+    } else if (
+      rule.fareDistance() instanceof FareDistance.LinearDistance(Distance min, Distance max)
+    ) {
+      var legDistance = leg.directDistanceMeters();
 
-      return legDistance > ruleMin.toMeters() && legDistance < ruleMax.toMeters();
+      return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
   }
 

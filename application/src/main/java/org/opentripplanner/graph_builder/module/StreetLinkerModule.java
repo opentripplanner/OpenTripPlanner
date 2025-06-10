@@ -52,27 +52,30 @@ public class StreetLinkerModule implements GraphBuilderModule {
   private final VehicleParkingRepository parkingRepository;
   private final TimetableRepository timetableRepository;
   private final DataImportIssueStore issueStore;
-  private final Boolean addExtraEdgesToAreas;
+  private final boolean areaVisibility;
+  private final int maxAreaNodes;
 
   public StreetLinkerModule(
     Graph graph,
     VehicleParkingRepository parkingRepository,
     TimetableRepository timetableRepository,
     DataImportIssueStore issueStore,
-    boolean addExtraEdgesToAreas
+    boolean areaVisibility,
+    int maxAreaNodes
   ) {
     this.graph = graph;
     this.parkingRepository = parkingRepository;
     this.timetableRepository = timetableRepository;
     this.issueStore = issueStore;
-    this.addExtraEdgesToAreas = addExtraEdgesToAreas;
+    this.areaVisibility = areaVisibility;
+    this.maxAreaNodes = maxAreaNodes;
   }
 
   @Override
   public void buildGraph() {
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
-    graph.getLinker().setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
+    graph.getLinkerSafe().setAreaVisibility(this.areaVisibility);
+    graph.getLinkerSafe().setMaxAreaNodes(this.maxAreaNodes);
 
     if (graph.hasStreets) {
       linkTransitStops(graph, timetableRepository);

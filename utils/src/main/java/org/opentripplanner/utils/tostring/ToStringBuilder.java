@@ -111,6 +111,10 @@ public class ToStringBuilder {
     return this;
   }
 
+  public ToStringBuilder addBool(String name, boolean value, boolean defaultValue) {
+    return addObj(name, value, defaultValue);
+  }
+
   public ToStringBuilder addStr(String name, String value, String ignoreValue) {
     return addIfNotIgnored(name, value, ignoreValue, v -> "'" + v + "'");
   }
@@ -136,7 +140,7 @@ public class ToStringBuilder {
   }
 
   /**
-   * Add the result of the given supplier. If the supplier return {@code  null} or an exceptions
+   * Add the result of the given supplier. If the supplier return {@code null} or an exceptions
    * is thrown, then nothing is added - the result is ignored.
    */
   public ToStringBuilder addObjOpSafe(String name, Supplier<?> body) {

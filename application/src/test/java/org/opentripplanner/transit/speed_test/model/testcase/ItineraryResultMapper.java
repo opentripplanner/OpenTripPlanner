@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.model.plan.UnknownTransitPathLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.leg.UnknownPathLeg;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.organization.Agency;
@@ -75,26 +75,26 @@ class ItineraryResultMapper {
   public static String details(Itinerary itin) {
     PathStringBuilder buf = new PathStringBuilder(Integer::toString);
 
-    for (Leg leg : itin.getLegs()) {
-      var fromStop = leg.getFrom().stop;
+    for (Leg leg : itin.legs()) {
+      var fromStop = leg.from().stop;
       if (fromStop != null) {
         buf.stop(formatStop(fromStop));
       }
 
       if (leg.isWalkingLeg()) {
-        buf.walk((int) leg.getDuration().toSeconds());
+        buf.walk((int) leg.duration().toSeconds());
       } else if (
-        leg instanceof StreetLeg streetLeg && streetLeg.getFrom().vehicleRentalPlace != null
+        leg instanceof StreetLeg streetLeg && streetLeg.from().vehicleRentalPlace != null
       ) {
-        var name = streetLeg.getFrom().vehicleRentalPlace.getName().toString();
-        buf.pickupRental(name, (int) leg.getDuration().toSeconds());
+        var name = streetLeg.from().vehicleRentalPlace.getName().toString();
+        buf.pickupRental(name, (int) leg.duration().toSeconds());
       } else if (leg instanceof TransitLeg transitLeg) {
         buf.transit(
-          transitLeg.getMode().name() + " " + leg.getRoute().getShortName(),
-          leg.getStartTime().get(ChronoField.SECOND_OF_DAY),
-          leg.getEndTime().get(ChronoField.SECOND_OF_DAY)
+          transitLeg.mode().name() + " " + leg.route().getShortName(),
+          leg.startTime().get(ChronoField.SECOND_OF_DAY),
+          leg.endTime().get(ChronoField.SECOND_OF_DAY)
         );
-      } else if (leg instanceof UnknownTransitPathLeg d) {
+      } else if (leg instanceof UnknownPathLeg d) {
         buf.text(d.description());
       }
     }
@@ -123,27 +123,27 @@ class ItineraryResultMapper {
     Set<TransitMode> modes = EnumSet.noneOf(TransitMode.class);
     List<String> stops = new ArrayList<>();
 
-    for (Leg it : itinerary.getLegs()) {
+    for (Leg it : itinerary.legs()) {
       if (it instanceof TransitLeg trLeg) {
-        agencies.add(agencyShortName(it.getAgency()));
-        routes.add(it.getRoute().getName());
-        modes.add(trLeg.getMode());
+        agencies.add(agencyShortName(it.agency()));
+        routes.add(it.route().getName());
+        modes.add(trLeg.mode());
       }
-      if (it.getTo().stop != null) {
-        stops.add(it.getTo().stop.getId().toString());
+      if (it.to().stop != null) {
+        stops.add(it.to().stop.getId().toString());
       }
     }
 
     return new Result(
       testCaseId,
-      itinerary.getNumberOfTransfers(),
-      itinerary.getDuration(),
-      itinerary.getGeneralizedCost(),
+      itinerary.numberOfTransfers(),
+      itinerary.totalDuration(),
+      itinerary.generalizedCost(),
       itinerary
-        .getLegs()
+        .legs()
         .stream()
         .filter(Leg::isWalkingLeg)
-        .mapToInt(l -> IntUtils.round(l.getDistanceMeters()))
+        .mapToInt(l -> IntUtils.round(l.distanceMeters()))
         .sum(),
       itinerary.startTime().get(ChronoField.SECOND_OF_DAY),
       itinerary.endTime().get(ChronoField.SECOND_OF_DAY),

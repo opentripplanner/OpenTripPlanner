@@ -3,16 +3,19 @@ package org.opentripplanner.ext.stopconsolidation;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
-import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLegBuilder;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 
 /**
  * A decorating filter that checks if a transit leg contains any consolidated stops and if it does,
  * then replaces it with the appropriate, agency-specific stop name. This is so that the physical
  * signage and in-vehicle display matches what OTP returns as a board/alight stop name.
+ *
+ * TODO: Split removing short legs out of this clas, even if it is a Sandbox feature the filter
+ *       contract is broken.
  */
 public class DecorateConsolidatedStopNames implements ItineraryDecorator {
 
@@ -24,9 +27,11 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
   }
 
   @Override
-  public void decorate(Itinerary itinerary) {
-    replaceConsolidatedStops(itinerary);
-    removeShortWalkLegs(itinerary);
+  public Itinerary decorate(Itinerary itinerary) {
+    var builder = itinerary.copyOf();
+    replaceConsolidatedStops(builder);
+    removeShortWalkLegs(builder);
+    return builder.build();
   }
 
   /**
@@ -41,14 +46,14 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * <p>
    * This follows the somewhat idiosyncratic logic of the consolidated stops feature.
    */
-  private void replaceConsolidatedStops(Itinerary i) {
-    i.transformTransitLegs(leg -> {
+  private void replaceConsolidatedStops(ItineraryBuilder builder) {
+    builder.transformTransitLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
-        var agency = leg.getAgency();
+        var agency = leg.agency();
         // to show the name on the stop signage we use the primary stop's name
-        var from = service.primaryStop(stl.getFrom().stop.getId()).orElse(stl.getFrom().stop);
+        var from = service.primaryStop(stl.from().stop.getId()).orElse(stl.from().stop);
         // to show the name that's on the display inside the vehicle we use the agency-specific name
-        var to = service.agencySpecificStop(stl.getTo().stop, agency);
+        var to = service.agencySpecificStop(stl.to().stop, agency);
         return ConsolidatedStopLeg.of(stl).withFrom(from).withTo(to).build();
       } else {
         return leg;
@@ -60,32 +65,30 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * Removes walk legs from and to a consolidated stop if they are deemed "short". This means that
    * they are from a different element of the consolidated stop.
    */
-  private void removeShortWalkLegs(Itinerary itinerary) {
-    var legs = new ArrayList<>(itinerary.getLegs());
+  private void removeShortWalkLegs(ItineraryBuilder builder) {
+    var legs = new ArrayList<>(builder.legs());
     var first = legs.getFirst();
-    if (service.isPartOfConsolidatedStop(first.getTo().stop) && isShortWalkLeg(first)) {
+    if (service.isPartOfConsolidatedStop(first.to().stop) && isShortWalkLeg(first)) {
       legs.removeFirst();
     }
     var last = legs.getLast();
-    if (service.isPartOfConsolidatedStop(last.getFrom().stop) && isShortWalkLeg(last)) {
+    if (service.isPartOfConsolidatedStop(last.from().stop) && isShortWalkLeg(last)) {
       legs.removeLast();
     }
-
-    var transfersRemoved = legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
-
-    itinerary.setLegs(transfersRemoved);
+    var filteredLegs = legs.stream().filter(l -> !isTransferWithinConsolidatedStop(l)).toList();
+    builder.withLegs(filteredLegs);
   }
 
   private boolean isTransferWithinConsolidatedStop(Leg l) {
     return (
       isShortWalkLeg(l) &&
-      service.isPartOfConsolidatedStop(l.getFrom().stop) &&
-      service.isPartOfConsolidatedStop(l.getTo().stop)
+      service.isPartOfConsolidatedStop(l.from().stop) &&
+      service.isPartOfConsolidatedStop(l.to().stop)
     );
   }
 
   private static boolean isShortWalkLeg(Leg leg) {
-    return leg.isWalkingLeg() && leg.getDistanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS;
+    return leg.isWalkingLeg() && leg.distanceMeters() < MAX_INTRA_STOP_WALK_DISTANCE_METERS;
   }
 
   /**
@@ -97,6 +100,6 @@ public class DecorateConsolidatedStopNames implements ItineraryDecorator {
    * for the from/to stops.
    */
   private boolean needsToRenameStops(ScheduledTransitLeg stl) {
-    return (service.isSecondaryStop(stl.getFrom().stop) || service.isPrimaryStop(stl.getTo().stop));
+    return (service.isSecondaryStop(stl.from().stop) || service.isPrimaryStop(stl.to().stop));
   }
 }

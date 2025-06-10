@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.street.search.TraverseMode;
 
@@ -36,14 +36,14 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements RemoveItinerary
       }
 
       double carDuration = itinerary
-        .getLegs()
+        .legs()
         .stream()
         .filter(StreetLeg.class::isInstance)
         .map(StreetLeg.class::cast)
         .filter(l -> l.getMode() == TraverseMode.CAR)
-        .mapToDouble(l -> l.getDuration().toSeconds())
+        .mapToDouble(l -> l.duration().toSeconds())
         .sum();
-      double totalDuration = itinerary.getDuration().toSeconds();
+      double totalDuration = itinerary.totalDuration().toSeconds();
 
       return (carDuration != 0 && (carDuration / totalDuration) <= parkAndRideDurationRatio);
     };

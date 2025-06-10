@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -14,10 +13,12 @@ import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -40,6 +41,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   //                  All 3 sections is sorted alphabetically.
 
   private final DebugUiConfig debugUiConfig;
+  private final FareService fareService;
   private final FlexParameters flexParameters;
   private final Graph graph;
   private final MeterRegistry meterRegistry;
@@ -59,7 +61,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   /* Optional fields */
 
   @Nullable
-  private final EmissionsService emissionsService;
+  private final ItineraryDecorator emissionItineraryDecorator;
 
   @Nullable
   private final LuceneIndex luceneIndex;
@@ -87,6 +89,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public DefaultServerRequestContext(
     // Keep the same order as in the field declaration
     DebugUiConfig debugUiConfig,
+    FareService fareService,
     FlexParameters flexParameters,
     Graph graph,
     MeterRegistry meterRegistry,
@@ -102,7 +105,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     ViaCoordinateTransferFactory viaTransferResolver,
     WorldEnvelopeService worldEnvelopeService,
-    @Nullable EmissionsService emissionsService,
+    @Nullable ItineraryDecorator emissionItineraryDecorator,
     @Nullable LuceneIndex luceneIndex,
     @Nullable GraphQLSchema schema,
     @Nullable SorlandsbanenNorwayService sorlandsbanenService,
@@ -111,6 +114,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   ) {
     this.debugUiConfig = debugUiConfig;
     this.flexParameters = flexParameters;
+    this.fareService = fareService;
     this.graph = graph;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
@@ -127,7 +131,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
 
     // Optional fields
-    this.emissionsService = emissionsService;
+    this.emissionItineraryDecorator = emissionItineraryDecorator;
     this.luceneIndex = luceneIndex;
     this.schema = schema;
     this.sorlandsbanenService = sorlandsbanenService;
@@ -260,12 +264,17 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public EmissionsService emissionsService() {
-    return emissionsService;
+  public ItineraryDecorator emissionItineraryDecorator() {
+    return emissionItineraryDecorator;
   }
 
   @Nullable
   public SorlandsbanenNorwayService sorlandsbanenService() {
     return sorlandsbanenService;
+  }
+
+  @Override
+  public FareService fareService() {
+    return fareService;
   }
 }

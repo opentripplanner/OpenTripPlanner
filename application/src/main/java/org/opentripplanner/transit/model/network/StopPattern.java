@@ -43,8 +43,6 @@ import org.opentripplanner.utils.lang.MemEfficientArrayBuilder;
  */
 public final class StopPattern implements Serializable {
 
-  public static final int NOT_FOUND = -1;
-
   private final StopLocation[] stops;
   private final PickDrop[] pickups;
   private final PickDrop[] dropoffs;

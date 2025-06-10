@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.WheelchairTraversalInformation;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
  * An experimental feature for calculating a numeric score between 0 and 1 which indicates how
@@ -25,21 +26,41 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  * calculating them on the backend makes life a little easier and changes are automatically applied
  * to all frontends.
  */
-public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
-  implements ItineraryDecorator {
-  public static Float compute(List<Leg> legs) {
-    return legs
-      .stream()
-      .map(Leg::accessibilityScore)
-      .filter(Objects::nonNull)
-      .min(Comparator.comparingDouble(Float::doubleValue))
-      .orElse(null);
+public class DecorateWithAccessibilityScore implements ItineraryDecorator {
+
+  private final double wheelchairMaxSlope;
+
+  public DecorateWithAccessibilityScore(double wheelchairMaxSlope) {
+    this.wheelchairMaxSlope = wheelchairMaxSlope;
   }
 
-  public static float compute(ScheduledTransitLeg leg) {
-    var fromStop = leg.getFrom().stop.getWheelchairAccessibility();
-    var toStop = leg.getTo().stop.getWheelchairAccessibility();
-    var trip = leg.getTripWheelchairAccessibility();
+  @Override
+  public Itinerary decorate(Itinerary itinerary) {
+    return addAccessibilityScore(itinerary);
+  }
+
+  private Itinerary addAccessibilityScore(Itinerary i) {
+    var builder = i.copyOf();
+
+    builder.transformLegs(leg -> {
+      if (leg instanceof ScheduledTransitLeg transitLeg) {
+        return transitLeg.copyOf().withAccessibilityScore(compute(transitLeg)).build();
+      } else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
+        return streetLeg.withAccessibilityScore(compute(streetLeg));
+      } else {
+        return leg;
+      }
+    });
+    if (i.isWalkOnly() || i.hasTransit()) {
+      builder.withAccessibilityScore(compute(builder.legs()));
+    }
+    return builder.build();
+  }
+
+  private static float compute(ScheduledTransitLeg leg) {
+    var fromStop = leg.from().stop.getWheelchairAccessibility();
+    var toStop = leg.to().stop.getWheelchairAccessibility();
+    var trip = leg.tripWheelchairAccessibility();
 
     var values = List.of(trip, fromStop, toStop);
     var sum = (float) values
@@ -49,9 +70,13 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
     return sum / values.size();
   }
 
-  @Override
-  public void decorate(Itinerary itinerary) {
-    addAccessibilityScore(itinerary);
+  private static Float compute(List<Leg> legs) {
+    return legs
+      .stream()
+      .map(Leg::accessibilityScore)
+      .filter(Objects::nonNull)
+      .min(Comparator.comparingDouble(Float::doubleValue))
+      .orElse(null);
   }
 
   private static double accessibilityScore(Accessibility wheelchair) {
@@ -63,7 +88,7 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
   }
 
   private float compute(StreetLeg leg) {
-    var edges = leg.getWalkSteps().stream().map(WalkStep::getEdges).toList();
+    var edges = leg.listWalkSteps().stream().map(WalkStep::getEdges).toList();
     var streetEdges = edges
       .stream()
       .filter(StreetEdge.class::isInstance)
@@ -109,23 +134,10 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
     return Math.max(score, 0);
   }
 
-  private Itinerary addAccessibilityScore(Itinerary i) {
-    var scoredLegs = i
-      .getLegs()
-      .stream()
-      .map(leg -> {
-        if (leg instanceof ScheduledTransitLeg transitLeg) {
-          return transitLeg.copy().withAccessibilityScore(compute(transitLeg)).build();
-        } else if (leg instanceof StreetLeg streetLeg && leg.isWalkingLeg()) {
-          return streetLeg.withAccessibilityScore(compute(streetLeg));
-        } else {
-          return leg;
-        }
-      })
-      .toList();
-
-    i.setLegs(scoredLegs);
-    i.setAccessibilityScore(compute(scoredLegs));
-    return i;
+  @Override
+  public String toString() {
+    return ToStringBuilder.of(getClass())
+      .addNum("wheelchairMaxSlope", wheelchairMaxSlope)
+      .toString();
   }
 }

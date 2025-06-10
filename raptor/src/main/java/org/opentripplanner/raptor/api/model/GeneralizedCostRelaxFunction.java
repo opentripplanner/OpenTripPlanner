@@ -3,8 +3,11 @@ package org.opentripplanner.raptor.api.model;
 import java.time.Duration;
 import java.util.Locale;
 import java.util.Objects;
+import org.opentripplanner.utils.lang.DoubleRange;
+import org.opentripplanner.utils.lang.IntRange;
 import org.opentripplanner.utils.lang.IntUtils;
 import org.opentripplanner.utils.lang.OtpNumberFormat;
+import org.opentripplanner.utils.time.DurationUtils;
 
 /**
  * This relax-function is used to relax increasing values by:
@@ -20,17 +23,17 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
 
   private static final int FOUR_HOURS = (int) Duration.ofHours(4).toSeconds();
 
-  public static final int MIN_SLACK = 0;
+  private static final int SLACK_PRECISSION = 100;
+
   /**
-   * Max cost slack is set to the cost equivalent of riding transit for 1 hour.
+   * Min slack is 0s, max slack is set to the cost equivalent of riding transit for 4 hours.
    * Raptor cost is in centi-seconds.
    */
-  public static final int MAX_SLACK = FOUR_HOURS * 100;
+  static final IntRange SLACK_RANGE = IntRange.ofInclusive(0, FOUR_HOURS * SLACK_PRECISSION);
 
   /** Keep the RATIO_RESOLUTION a power of 2 for performance reasons. */
   private static final int RATIO_RESOLUTION = 0x100;
-  public static final double MIN_RATIO = 1.0;
-  public static final double MAX_RATIO = 4.0;
+  private static final DoubleRange RATIO_RANGE = DoubleRange.of(1.0, 4.0);
   private final int normalizedRatio;
   private final int slack;
 
@@ -56,7 +59,7 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
   }
 
   public static RelaxFunction of(double ratio) {
-    return of(ratio, MIN_SLACK);
+    return of(ratio, SLACK_RANGE.startInclusive());
   }
 
   public int relax(int value) {
@@ -69,7 +72,7 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
       Locale.ROOT,
       "f(x) = %.2f * x + %s",
       normalizedRatio / (double) RATIO_RESOLUTION,
-      OtpNumberFormat.formatTwoDecimals(slack / 100.0)
+      OtpNumberFormat.formatTwoDecimals(slack / (double) SLACK_PRECISSION)
     );
   }
 
@@ -95,23 +98,20 @@ public final class GeneralizedCostRelaxFunction implements RelaxFunction {
   }
 
   private static void assertSlackInRange(int slack) {
-    if (slack < MIN_SLACK || slack > MAX_SLACK) {
+    if (SLACK_RANGE.isOutside(slack)) {
       throw new IllegalArgumentException(
-        "Cost slack is not in range: %d not in [%d..%d]".formatted(slack, MIN_SLACK, MAX_SLACK)
+        "Cost slack is not in range: %d not in %s".formatted(
+            slack,
+            SLACK_RANGE.toString(v -> DurationUtils.durationToStr(v / SLACK_PRECISSION))
+          )
       );
     }
   }
 
   private static void assertRatioInRange(double ratio) {
-    if (ratio < MIN_RATIO || ratio > MAX_RATIO) {
+    if (RATIO_RANGE.isOutside(ratio)) {
       throw new IllegalArgumentException(
-        String.format(
-          Locale.ROOT,
-          "Cost ratio is not in range: %.2f not in [%.1f..%.1f]",
-          ratio,
-          MIN_RATIO,
-          MAX_RATIO
-        )
+        String.format(Locale.ROOT, "Cost ratio is not in range: %.2f not in %s", ratio, RATIO_RANGE)
       );
     }
   }

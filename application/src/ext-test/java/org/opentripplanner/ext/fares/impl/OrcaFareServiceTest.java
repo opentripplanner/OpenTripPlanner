@@ -13,7 +13,6 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_A
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WHATCOM_AGENCY_ID;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
-import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.core.FareType.regular;
 import static org.opentripplanner.transit.model.basic.Money.USD;
@@ -37,8 +36,9 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.fare.FareProductUse;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -79,7 +79,7 @@ public class OrcaFareServiceTest {
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
-    var itinerary = Itinerary.createScheduledTransitItinerary(legs);
+    var itinerary = Itinerary.ofScheduledTransit(legs).withGeneralizedCost(Cost.ZERO).build();
     var itineraryFares = orcaFareService.calculateFares(itinerary);
     assertEquals(
       expectedPrice,
@@ -93,12 +93,7 @@ public class OrcaFareServiceTest {
     );
   }
 
-  private static void assertLegFareEquals(
-    int fare,
-    Leg leg,
-    ItineraryFares fares,
-    boolean hasXfer
-  ) {
+  private static void assertLegFareEquals(int fare, Leg leg, ItineraryFare fares, boolean hasXfer) {
     var legFareProducts = fares.getLegProducts().get(leg);
 
     var rideCost = legFareProducts
@@ -539,7 +534,7 @@ public class OrcaFareServiceTest {
     assertFalse(fares.getItineraryProducts().isEmpty());
     assertFalse(fares.getLegProducts().isEmpty());
 
-    var firstLeg = itinerary.getLegs().get(0);
+    var firstLeg = itinerary.legs().get(0);
     var uses = fares.getLegProducts().get(firstLeg);
     assertEquals(7, uses.size());
 
@@ -646,7 +641,7 @@ public class OrcaFareServiceTest {
       lastStopName
     );
 
-    return itin.getLegs().get(0);
+    return itin.legs().get(0);
   }
 
   private static Itinerary createItinerary(
@@ -696,10 +691,10 @@ public class OrcaFareServiceTest {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
-    var itin = newItinerary(Place.forStop(firstStop), start)
-      .transit(route, tripId, start, T11_12, 5, 7, Place.forStop(lastStop), null, null, null)
+    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
+    return newItinerary(Place.forStop(firstStop), start)
+      .transit(route, tripId, start, end, 5, 7, Place.forStop(lastStop), null, null, null)
       .build();
-    return itin;
   }
 
   private static class TestOrcaFareService extends OrcaFareService {

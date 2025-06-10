@@ -12,7 +12,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.plan.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -35,7 +35,7 @@ public class BicycleRoutingTest {
     herrenbergGraph = model.graph();
 
     model.timetableRepository().index();
-    herrenbergGraph.index(model.timetableRepository().getSiteRepository());
+    herrenbergGraph.index();
   }
 
   /**
@@ -102,7 +102,7 @@ public class BicycleRoutingTest {
     // make sure that we only get BICYCLE legs
     itineraries.forEach(i ->
       i
-        .getLegs()
+        .legs()
         .forEach(l -> {
           if (l instanceof StreetLeg stLeg) {
             assertEquals(TraverseMode.BICYCLE, stLeg.getMode());
@@ -111,7 +111,7 @@ public class BicycleRoutingTest {
           }
         })
     );
-    Geometry legGeometry = itineraries.get(0).getLegs().get(0).getLegGeometry();
+    Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
     return EncodedPolyline.encode(legGeometry).points();
   }
 }

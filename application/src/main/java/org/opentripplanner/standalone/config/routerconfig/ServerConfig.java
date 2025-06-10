@@ -39,7 +39,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
         """
         This timeout limits the server-side processing time for a given API request. This does not include
         network latency nor waiting time in the HTTP server thread pool. The default value is
-        `-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel & GTFS GraphQL).
+        `-1s`(no timeout). The timeout is applied to all APIs (Transmodel & GTFS GraphQL).
         The timeout is not enforced when the parallel routing OTP feature is in use.
         """
       )
@@ -90,9 +90,9 @@ public class ServerConfig implements OTPWebApplicationParameters {
             .summary("The log event key used.")
             .description(
               """
-              OTP stores the key/value pair in the log MDC(Mapped Diagnostic Context). To use it you normally
-              include the key in the log pattern like this: `%X{LOG-KEY}`. See your log framework for details.
-              Only log4j and logback support this.
+              OTP stores the key/value pair in the log MDC (Mapped Diagnostic Context). To use it
+              you normally include the key in the log pattern like this: `%X{LOG-KEY}`. See your
+              log framework for details. Only log4j and logback support this.
               """
             )
             .asString(null),

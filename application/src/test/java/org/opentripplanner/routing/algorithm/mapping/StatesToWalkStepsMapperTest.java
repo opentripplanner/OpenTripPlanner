@@ -2,15 +2,15 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.plan.RelativeDirection.ENTER_STATION;
-import static org.opentripplanner.model.plan.RelativeDirection.EXIT_STATION;
-import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.ENTER_STATION;
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.EXIT_STATION;
+import static org.opentripplanner.model.plan.walkstep.RelativeDirection.FOLLOW_SIGNS;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
-import org.opentripplanner.model.plan.RelativeDirection;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.walkstep.RelativeDirection;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -32,6 +32,21 @@ class StatesToWalkStepsMapperTest {
     var elevatorStep = walkSteps.get(3);
     assertEquals(RelativeDirection.ELEVATOR, elevatorStep.getRelativeDirection());
     assertTrue(elevatorStep.getAbsoluteDirection().isEmpty());
+  }
+
+  @Test
+  void stationEntrance() {
+    var walkSteps = buildWalkSteps(
+      TestStateBuilder.ofWalking()
+        .streetEdge("name", 1)
+        .entrance("name")
+        .streetEdge()
+        .areaEdge("name", 10)
+    );
+    assertEquals(3, walkSteps.size());
+    assertEquals(RelativeDirection.DEPART, walkSteps.get(0).getRelativeDirection());
+    assertEquals(RelativeDirection.ENTER_OR_EXIT_STATION, walkSteps.get(1).getRelativeDirection());
+    assertEquals(RelativeDirection.CONTINUE, walkSteps.get(2).getRelativeDirection());
   }
 
   @Test

@@ -2,14 +2,15 @@ package org.opentripplanner.gtfs;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.gtfs.graphbuilder.GtfsFeedIdResolver;
 
 class GtfsImport {
 
-  private GtfsFeedId feedId = null;
+  private final String feedId;
 
   private GtfsMutableRelationalDao dao = null;
 
@@ -20,7 +21,7 @@ class GtfsImport {
     if (defaultFeedId != null) {
       reader.setDefaultAgencyId(defaultFeedId);
     }
-    readFeedId(defaultFeedId, reader);
+    this.feedId = resolveFeedId(defaultFeedId, reader, path.toURI());
     readDao(reader);
   }
 
@@ -28,7 +29,7 @@ class GtfsImport {
     return dao;
   }
 
-  GtfsFeedId getFeedId() {
+  String getFeedId() {
     return feedId;
   }
 
@@ -37,15 +38,13 @@ class GtfsImport {
   private void readDao(GtfsReader reader) throws IOException {
     dao = new GtfsRelationalDaoImpl();
     reader.setEntityStore(dao);
-    reader.setDefaultAgencyId(getFeedId().getId());
+    reader.setDefaultAgencyId(getFeedId());
     reader.run();
   }
 
-  private void readFeedId(String defaultFeedId, GtfsReader reader) {
-    if (defaultFeedId == null) {
-      feedId = new GtfsFeedId.Builder().fromGtfsFeed(reader.getInputSource()).build();
-    } else {
-      feedId = new GtfsFeedId.Builder().id(defaultFeedId).build();
-    }
+  private static String resolveFeedId(String defaultFeedId, GtfsReader reader, URI uri) {
+    return defaultFeedId == null
+      ? GtfsFeedIdResolver.fromGtfsFeed(reader.getInputSource(), uri)
+      : defaultFeedId;
   }
 }

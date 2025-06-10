@@ -5,16 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.trip;
 import static org.opentripplanner.updater.spi.UpdateResultAssertions.assertSuccess;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.updater.trip.RealtimeTestConstants;
 import org.opentripplanner.updater.trip.RealtimeTestEnvironment;
+import org.opentripplanner.updater.trip.RealtimeTestEnvironmentBuilder;
 import org.opentripplanner.updater.trip.TripInput;
 import org.opentripplanner.updater.trip.TripUpdateBuilder;
 
@@ -23,17 +23,22 @@ import org.opentripplanner.updater.trip.TripUpdateBuilder;
  */
 class DelayedTest implements RealtimeTestConstants {
 
+  private final RealtimeTestEnvironmentBuilder ENV_BUILDER = RealtimeTestEnvironment.of();
+  private final RegularStop STOP_A = ENV_BUILDER.stop(STOP_A_ID);
+  private final RegularStop STOP_B = ENV_BUILDER.stop(STOP_B_ID);
+  private final RegularStop STOP_C = ENV_BUILDER.stop(STOP_C_ID);
+
   private static final int DELAY = 1;
   private static final int STOP_SEQUENCE = 1;
   private static final FeedScopedId TRIP_ID = id(TRIP_1_ID);
 
   @Test
   void singleStopDelay() {
-    var TRIP_INPUT = TripInput.of(TRIP_1_ID)
-      .addStop(STOP_A1, "0:00:10", "0:00:11")
-      .addStop(STOP_B1, "0:00:20", "0:00:21")
+    var tripInput = TripInput.of(TRIP_1_ID)
+      .addStop(STOP_A, "0:00:10", "0:00:11")
+      .addStop(STOP_B, "0:00:20", "0:00:21")
       .build();
-    var env = RealtimeTestEnvironment.of().addTrip(TRIP_INPUT).build();
+    var env = ENV_BUILDER.addTrip(tripInput).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_1_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(STOP_SEQUENCE, DELAY)
@@ -57,11 +62,11 @@ class DelayedTest implements RealtimeTestConstants {
     assertEquals(RealTimeState.SCHEDULED, trip1Scheduled.getTripTimes(TRIP_ID).getRealTimeState());
 
     assertEquals(
-      "SCHEDULED | A1 0:00:10 0:00:11 | B1 0:00:20 0:00:21",
+      "SCHEDULED | A 0:00:10 0:00:11 | B 0:00:20 0:00:21",
       env.getScheduledTimetable(TRIP_1_ID)
     );
     assertEquals(
-      "UPDATED | A1 [ND] 0:00:10 0:00:11 | B1 0:00:21 0:00:22",
+      "UPDATED | A [ND] 0:00:10 0:00:11 | B 0:00:21 0:00:22",
       env.getRealtimeTimetable(TRIP_1_ID)
     );
   }
@@ -72,11 +77,11 @@ class DelayedTest implements RealtimeTestConstants {
   @Test
   void complexDelay() {
     var tripInput = TripInput.of(TRIP_2_ID)
-      .addStop(STOP_A1, "0:01:00", "0:01:01")
-      .addStop(STOP_B1, "0:01:10", "0:01:11")
-      .addStop(STOP_C1, "0:01:20", "0:01:21")
+      .addStop(STOP_A, "0:01:00", "0:01:01")
+      .addStop(STOP_B, "0:01:10", "0:01:11")
+      .addStop(STOP_C, "0:01:20", "0:01:21")
       .build();
-    var env = RealtimeTestEnvironment.of().addTrip(tripInput).build();
+    var env = ENV_BUILDER.addTrip(tripInput).build();
 
     var tripUpdate = new TripUpdateBuilder(TRIP_2_ID, SERVICE_DATE, SCHEDULED, TIME_ZONE)
       .addDelayedStopTime(0, 0)
@@ -108,11 +113,11 @@ class DelayedTest implements RealtimeTestConstants {
     assertNotNull(realtimeTt, "Original trip should be found in time table for service date");
 
     assertEquals(
-      "SCHEDULED | A1 0:01 0:01:01 | B1 0:01:10 0:01:11 | C1 0:01:20 0:01:21",
+      "SCHEDULED | A 0:01 0:01:01 | B 0:01:10 0:01:11 | C 0:01:20 0:01:21",
       env.getScheduledTimetable(TRIP_2_ID)
     );
     assertEquals(
-      "UPDATED | A1 0:01 0:01:01 | B1 0:02:10 0:02:31 | C1 0:02:50 0:02:51",
+      "UPDATED | A 0:01 0:01:01 | B 0:02:10 0:02:31 | C 0:02:50 0:02:51",
       env.getRealtimeTimetable(TRIP_2_ID)
     );
   }

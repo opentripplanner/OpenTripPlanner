@@ -4,7 +4,6 @@ import static java.time.ZoneOffset.UTC;
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.route;
 
@@ -14,6 +13,7 @@ import java.time.Month;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
@@ -22,7 +22,13 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.leg.FrequencyTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -72,7 +78,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
   private Place lastPlace;
   private int lastEndTime;
   private int c1 = 0;
-  private int c2 = NOT_SET;
   private boolean isSearchWindowAware = true;
 
   private TestItineraryBuilder(Place origin, int startTime) {
@@ -147,7 +152,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
     streetLeg(BICYCLE, startTime, endTime, to, legCost, List.of());
     var leg = ((StreetLeg) this.legs.get(0));
-    var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
+    var updatedLeg = leg.copyOf().withRentedVehicle(true).build();
     this.legs.add(0, updatedLeg);
     return this;
   }
@@ -298,7 +303,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
   /**
    * Add a rail/train leg to the itinerary
    */
-  public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
+  public TestItineraryBuilder rail(
+    int tripId,
+    int startTime,
+    int endTime,
+    Place to,
+    @Nullable Integer cost
+  ) {
     return transit(
       RAIL_ROUTE,
       Integer.toString(tripId),
@@ -309,8 +320,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to,
       null,
       null,
-      null
+      null,
+      cost
     );
+  }
+
+  public TestItineraryBuilder rail(int tripId, int startTime, int endTime, Place to) {
+    return rail(tripId, startTime, endTime, to, null);
   }
 
   public TestItineraryBuilder faresV2Rail(
@@ -318,12 +334,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int startTime,
     int endTime,
     Place to,
-    String networkId
+    @Nullable FeedScopedId networkId
   ) {
     Route route = RAIL_ROUTE;
     if (networkId != null) {
       var builder = RAIL_ROUTE.copy();
-      var group = GroupOfRoutes.of(new FeedScopedId(FEED_ID, networkId)).build();
+      var group = GroupOfRoutes.of(networkId).build();
       builder.getGroupsOfRoutes().add(group);
       route = builder.build();
     }
@@ -402,11 +418,6 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return this;
   }
 
-  public TestItineraryBuilder withGeneralizedCost2(int c2) {
-    this.c2 = c2;
-    return this;
-  }
-
   public TestItineraryBuilder withIsSearchWindowAware(boolean searchWindowAware) {
     this.isSearchWindowAware = searchWindowAware;
     return this;
@@ -417,27 +428,26 @@ public class TestItineraryBuilder implements PlanTestConstants {
     return build();
   }
 
+  public ItineraryBuilder itineraryBuilder() {
+    ItineraryBuilder builder = isSearchWindowAware
+      ? Itinerary.ofScheduledTransit(legs)
+      : Itinerary.ofDirect(legs);
+
+    builder.withGeneralizedCost(Cost.costOfSeconds(c1));
+
+    return builder;
+  }
+
+  public Itinerary build() {
+    return itineraryBuilder().build();
+  }
+
   /**
    * Override any value set for c1. The given value will be assigned to the itinerary
    * independent of any values set on the legs.
    */
   public Itinerary build(int c1) {
-    this.c1 = c1;
-    return build();
-  }
-
-  public Itinerary build() {
-    Itinerary itinerary;
-    if (isSearchWindowAware) {
-      itinerary = Itinerary.createScheduledTransitItinerary(legs);
-    } else {
-      itinerary = Itinerary.createDirectItinerary(legs);
-    }
-    itinerary.setGeneralizedCost(c1);
-    if (c2 != NOT_SET) {
-      itinerary.setGeneralizedCost2(c2);
-    }
-    return itinerary;
+    return itineraryBuilder().withGeneralizedCost(Cost.costOfSeconds(c1)).build();
   }
 
   /* private methods */
@@ -466,13 +476,45 @@ public class TestItineraryBuilder implements PlanTestConstants {
     Integer headwaySecs,
     ConstrainedTransfer transferFromPreviousLeg
   ) {
+    return transit(
+      route,
+      tripId,
+      start,
+      end,
+      fromStopIndex,
+      toStopIndex,
+      to,
+      serviceDate,
+      headwaySecs,
+      transferFromPreviousLeg,
+      null
+    );
+  }
+
+  public TestItineraryBuilder transit(
+    Route route,
+    String tripId,
+    int start,
+    int end,
+    int fromStopIndex,
+    int toStopIndex,
+    Place to,
+    LocalDate serviceDate,
+    Integer headwaySecs,
+    ConstrainedTransfer transferFromPreviousLeg,
+    @Nullable Integer cost
+  ) {
     if (lastPlace == null) {
       throw new IllegalStateException("Trip from place is unknown!");
     }
     int waitTime = start - lastEndTime(start);
     int legCost = 0;
-    legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
-    legCost += cost(1.0f, end - start) + BOARD_COST;
+    if (cost != null) {
+      legCost = cost;
+    } else {
+      legCost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
+      legCost += cost(1.0f, end - start) + BOARD_COST;
+    }
 
     Trip trip = trip(tripId, route);
 
@@ -560,7 +602,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int legCost,
     List<WalkStep> walkSteps
   ) {
-    StreetLeg leg = StreetLeg.create()
+    StreetLeg leg = StreetLeg.of()
       .withMode(mode)
       .withStartTime(newTime(startTime))
       .withEndTime(newTime(endTime))

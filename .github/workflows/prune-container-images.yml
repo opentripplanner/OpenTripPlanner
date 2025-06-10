@@ -16,7 +16,7 @@ jobs:
           CONTAINER_REGISTRY_USER: otpbot
           CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
-          # remove all snapshot container images that have not been pulled for over a year
+          # remove all snapshot container images that have not been pulled for a long time
           # --keep-semver makes sure that any image with a x.y.z version scheme is unaffected by this
           pip install prune-container-repo==0.0.4
-          prune-container-repo -u ${CONTAINER_REGISTRY_USER} -r ${CONTAINER_REPO} --days=365 --keep-semver --activate
+          prune-container-repo -u ${CONTAINER_REGISTRY_USER} -r ${CONTAINER_REPO} --days=120 --keep-semver --activate

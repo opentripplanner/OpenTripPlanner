@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.site.Station;
 

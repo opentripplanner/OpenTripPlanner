@@ -47,6 +47,13 @@ class TestPagingModel {
   static final int T09_00_PLUS_1d = TimeUtils.time("09:00:00+1d");
   static final int T09_30_PLUS_1d = TimeUtils.time("09:30:00+1d");
 
+  // Times CASE - C
+  static final int T16_15_00 = TimeUtils.time("16:15:00");
+  static final int T16_30_00 = TimeUtils.time("16:30:00");
+  static final int T16_44_30 = TimeUtils.time("16:44:30");
+  static final int T17_00_00 = TimeUtils.time("17:00:00");
+  static final int T17_30_00 = TimeUtils.time("17:30:00");
+
   static final Duration D30m = Duration.ofMinutes(30);
 
   // The SEARCH-WINDOW is set to "fixed" 30m in this test for simplicity
@@ -123,6 +130,27 @@ class TestPagingModel {
     .sorted(SortOrderComparator.comparator(SortOrder.STREET_AND_DEPARTURE_TIME))
     .toList();
 
+  /**
+   * Case C has 2 itineraries with seconds included:
+   * <pre>
+   *  - departure 16:15:00, arrival 17:00:00
+   *  - departure 16:44:30, arrival 17:30:00
+   *  </pre>
+   */
+
+  private static final List<Itinerary> ITINERARIES_CASE_C = List.of(
+    itinerary(T16_15_00, T17_00_00, COST_HIGH, TX_1, TRANSIT),
+    itinerary(T16_44_30, T17_30_00, COST_HIGH, TX_1, TRANSIT)
+  );
+
+  static final List<Itinerary> ITINERARIES_CASE_C_DEPART_AFTER = ITINERARIES_CASE_C.stream()
+    .sorted(SortOrderComparator.comparator(STREET_AND_ARRIVAL_TIME))
+    .toList();
+
+  static final List<Itinerary> ITINERARIES_CASE_C_ARRIVE_BY = ITINERARIES_CASE_C.stream()
+    .sorted(SortOrderComparator.comparator(SortOrder.STREET_AND_DEPARTURE_TIME))
+    .toList();
+
   private final List<Itinerary> itinerariesDepartAfter;
   private final List<Itinerary> itinerariesArriveBy;
 
@@ -140,6 +168,10 @@ class TestPagingModel {
 
   static TestPagingModel testDataWithFewItinerariesCaseB() {
     return new TestPagingModel(ITINERARIES_CASE_B_DEPART_AFTER, ITINERARIES_CASE_B_ARRIVE_BY);
+  }
+
+  static TestPagingModel testDataWithFewItinerariesCaseC() {
+    return new TestPagingModel(ITINERARIES_CASE_C_DEPART_AFTER, ITINERARIES_CASE_C_ARRIVE_BY);
   }
 
   static PagingService pagingService(TestDriver testDriver) {
@@ -224,8 +256,6 @@ class TestPagingModel {
     } else {
       builder.drive(departureTime, arrivalTime, B);
     }
-    var it = builder.build();
-    it.setGeneralizedCost(cost);
-    return it;
+    return builder.build(cost);
   }
 }

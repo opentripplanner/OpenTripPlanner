@@ -7,7 +7,6 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -16,10 +15,12 @@ import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
@@ -121,7 +122,7 @@ public interface OtpServerRequestContext {
   TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {
-    return GraphFinder.getInstance(graph(), transitService()::findRegularStopsByBoundingBox);
+    return GraphFinder.getInstance(graph(), transitService());
   }
 
   FlexParameters flexParameters();
@@ -143,7 +144,7 @@ public interface OtpServerRequestContext {
   }
 
   @Nullable
-  EmissionsService emissionsService();
+  ItineraryDecorator emissionItineraryDecorator();
 
   @Nullable
   LuceneIndex lucenceIndex();
@@ -156,4 +157,6 @@ public interface OtpServerRequestContext {
 
   @Nullable
   GraphQLSchema schema();
+
+  FareService fareService();
 }

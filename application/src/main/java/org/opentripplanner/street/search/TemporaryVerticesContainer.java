@@ -6,9 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.LocalizedString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
@@ -16,11 +20,16 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
+import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.street.model.edge.LinkingDirection;
+import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class is responsible for linking the RouteRequest origin and destination to the Graph used
@@ -30,12 +39,15 @@ import org.opentripplanner.street.model.vertex.Vertex;
  */
 public class TemporaryVerticesContainer implements AutoCloseable {
 
+  private static final Logger LOG = LoggerFactory.getLogger(TemporaryVerticesContainer.class);
+
   private final Graph graph;
   private final Set<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
   private final GenericLocation from;
   private final GenericLocation to;
+  private final VertexLinker vertexLinker;
 
   public TemporaryVerticesContainer(
     Graph graph,
@@ -47,11 +59,11 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     this.tempEdges = new HashSet<>();
 
     this.graph = graph;
-    StreetIndex index = this.graph.getStreetIndex();
+    this.vertexLinker = graph.getLinker();
     this.from = from;
     this.to = to;
-    fromVertices = index.getStreetVerticesForLocation(from, accessMode, false, tempEdges);
-    toVertices = index.getStreetVerticesForLocation(to, egressMode, true, tempEdges);
+    fromVertices = getStreetVerticesForLocation(from, accessMode, false, tempEdges);
+    toVertices = getStreetVerticesForLocation(to, egressMode, true, tempEdges);
 
     checkIfVerticesFound();
 
@@ -83,16 +95,15 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   }
 
   /**
-   * Get the stop vertices that corresponds to the from location. If the from location only contains
+   * Get the stop vertices that correspond to the from location. If the from location only contains
    * coordinates, this will return an empty set. If the from location is a station id this will
    * return the child stops of that station.
    */
   public Set<TransitStopVertex> getFromStopVertices() {
-    StreetIndex index = this.graph.getStreetIndex();
     if (from.stopId == null) {
       return Set.of();
     }
-    return index.getStopOrChildStopsVertices(from.stopId);
+    return graph.findStopOrChildStopsVertices(from.stopId);
   }
 
   /**
@@ -101,14 +112,143 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    * return the child stops of that station.
    */
   public Set<TransitStopVertex> getToStopVertices() {
-    StreetIndex index = this.graph.getStreetIndex();
     if (to.stopId == null) {
       return Set.of();
     }
-    return index.getStopOrChildStopsVertices(to.stopId);
+    return graph.findStopOrChildStopsVertices(to.stopId);
   }
 
   /* PRIVATE METHODS */
+
+  /**
+   * Gets a set of vertices corresponding to the location provided. It first tries to match one of
+   * the stop or station types by id, and if not successful, it uses the coordinates if provided.
+   *
+   * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
+   */
+  @Nullable
+  private Set<Vertex> getStreetVerticesForLocation(
+    GenericLocation location,
+    StreetMode streetMode,
+    boolean endVertex,
+    Set<DisposableEdgeCollection> tempEdges
+  ) {
+    // Differentiate between driving and non-driving, as driving is not available from transit stops
+    TraverseMode mode = getTraverseModeForLinker(streetMode, endVertex);
+
+    if (mode.isInCar()) {
+      // Fetch coordinate from stop, if not given in request
+      if (location.stopId != null && location.getCoordinate() == null) {
+        var stopVertex = graph.getStopVertexForStopId(location.stopId);
+        if (stopVertex != null) {
+          var c = stopVertex.getStop().getCoordinate();
+          location = new GenericLocation(
+            location.label,
+            location.stopId,
+            c.latitude(),
+            c.longitude()
+          );
+        }
+      }
+    } else {
+      // Check if Stop/StopCollection is found by FeedScopeId
+      if (location.stopId != null) {
+        var streetVertices = graph.findStopVertices(location.stopId);
+        if (!streetVertices.isEmpty()) {
+          return streetVertices;
+        }
+      }
+    }
+
+    // Check if coordinate is provided and connect it to graph
+    if (location.getCoordinate() != null) {
+      return Set.of(
+        createVertexFromCoordinate(
+          location.getCoordinate(),
+          location.label,
+          streetMode,
+          endVertex,
+          tempEdges
+        )
+      );
+    }
+
+    return null;
+  }
+
+  private TraverseMode getTraverseModeForLinker(StreetMode streetMode, boolean endVertex) {
+    TraverseMode nonTransitMode = TraverseMode.WALK;
+    // for park and ride we will start in car mode and walk to the end vertex
+    boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && !endVertex;
+    boolean onlyCarAvailable = streetMode == StreetMode.CAR;
+    if (onlyCarAvailable || parkAndRideDepart) {
+      nonTransitMode = TraverseMode.CAR;
+    }
+    return nonTransitMode;
+  }
+
+  private Vertex createVertexFromCoordinate(
+    Coordinate coordinate,
+    @Nullable String label,
+    StreetMode streetMode,
+    boolean endVertex,
+    Set<DisposableEdgeCollection> tempEdges
+  ) {
+    if (endVertex) {
+      LOG.debug("Creating end vertex for {}", coordinate);
+    } else {
+      LOG.debug("Creating start vertex for {}", coordinate);
+    }
+
+    I18NString name;
+    if (label == null || label.isEmpty()) {
+      if (endVertex) {
+        name = new LocalizedString("destination");
+      } else {
+        name = new LocalizedString("origin");
+      }
+    } else {
+      name = new NonLocalizedString(label);
+    }
+
+    var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
+
+    TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
+
+    tempEdges.add(
+      vertexLinker.linkVertexForRequest(
+        temporaryStreetLocation,
+        new TraverseModeSet(nonTransitMode),
+        endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
+        endVertex
+          ? (vertex, streetVertex) ->
+            List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(
+                streetVertex,
+                (TemporaryStreetLocation) vertex
+              )
+            )
+          : (vertex, streetVertex) ->
+            List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(
+                (TemporaryStreetLocation) vertex,
+                streetVertex
+              )
+            )
+      )
+    );
+
+    if (
+      temporaryStreetLocation.getIncoming().isEmpty() &&
+      temporaryStreetLocation.getOutgoing().isEmpty()
+    ) {
+      LOG.warn("Couldn't link {}", coordinate);
+    }
+
+    temporaryStreetLocation.setWheelchairAccessible(true);
+
+    return temporaryStreetLocation;
+  }
 
   private void checkIfVerticesFound() {
     List<RoutingError> routingErrors = new ArrayList<>();
@@ -142,7 +282,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     }
   }
 
-  private boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
+  private static boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
     // Not connected if linking was not attempted, and vertices were not specified in the request.
     if (vertices == null) {
       return true;

@@ -18,14 +18,16 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.ZoneIdFallback;
-import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItineraryBuilder;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.model.plan.StreetLegBuilder;
-import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.leg.ElevationProfile;
+import org.opentripplanner.model.plan.leg.StreetLeg;
+import org.opentripplanner.model.plan.leg.StreetLegBuilder;
+import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -96,7 +98,7 @@ public class GraphPathToItineraryMapper {
     List<Itinerary> itineraries = new LinkedList<>();
     for (GraphPath<State, Edge, Vertex> path : paths) {
       Itinerary itinerary = generateItinerary(path);
-      if (itinerary.getLegs().isEmpty()) {
+      if (itinerary.legs().isEmpty()) {
         continue;
       }
       itineraries.add(itinerary);
@@ -124,7 +126,7 @@ public class GraphPathToItineraryMapper {
       StreetLeg leg = generateLeg(legStates, previousStep);
       legs.add(leg);
 
-      List<WalkStep> walkSteps = leg.getWalkSteps();
+      List<WalkStep> walkSteps = leg.listWalkSteps();
       if (walkSteps.size() > 0) {
         previousStep = walkSteps.get(walkSteps.size() - 1);
       } else {
@@ -132,15 +134,15 @@ public class GraphPathToItineraryMapper {
       }
     }
 
-    Itinerary itinerary = Itinerary.createDirectItinerary(legs);
-
-    calculateElevations(itinerary, path.edges);
-
     State lastState = path.states.getLast();
-    itinerary.setGeneralizedCost((int) lastState.weight);
-    itinerary.setArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
+    var cost = Cost.costOfSeconds(lastState.weight);
+    var builder = Itinerary.ofDirect(legs).withGeneralizedCost(cost);
 
-    return itinerary;
+    builder.withArrivedAtDestinationWithRentedVehicle(lastState.isRentingVehicleFromStation());
+
+    calculateElevations(builder, path.edges);
+
+    return builder.build();
   }
 
   /**
@@ -205,7 +207,7 @@ public class GraphPathToItineraryMapper {
    * @param itinerary The itinerary to calculate the elevation changes for
    * @param edges     The edges that go with the itinerary
    */
-  private static void calculateElevations(Itinerary itinerary, List<Edge> edges) {
+  private static void calculateElevations(ItineraryBuilder builder, List<Edge> edges) {
     for (Edge edge : edges) {
       if (!(edge instanceof StreetEdge edgeWithElevation)) {
         continue;
@@ -218,12 +220,7 @@ public class GraphPathToItineraryMapper {
 
       for (int i = 0; i < coordinates.size() - 1; i++) {
         double change = coordinates.getOrdinate(i + 1, 1) - coordinates.getOrdinate(i, 1);
-
-        if (change > 0) {
-          itinerary.setElevationGained(itinerary.getElevationGained() + change);
-        } else if (change < 0) {
-          itinerary.setElevationLost(itinerary.getElevationLost() - change);
-        }
+        builder.addElevationChange(change);
       }
     }
   }
@@ -386,7 +383,7 @@ public class GraphPathToItineraryMapper {
 
     State startTimeState = previousStateIsVehicleParking ? firstState.getBackState() : firstState;
 
-    StreetLegBuilder leg = StreetLeg.create()
+    StreetLegBuilder leg = StreetLeg.of()
       .withMode(resolveMode(states))
       .withStartTime(startTimeState.getTime().atZone(timeZone))
       .withEndTime(lastState.getTime().atZone(timeZone))

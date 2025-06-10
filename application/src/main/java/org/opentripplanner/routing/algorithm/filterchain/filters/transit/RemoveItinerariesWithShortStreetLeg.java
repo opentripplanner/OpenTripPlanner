@@ -42,12 +42,12 @@ public class RemoveItinerariesWithShortStreetLeg implements RemoveItineraryFlagg
   }
 
   private boolean removeItineraryWithShortStreetLeg(Itinerary itinerary) {
-    var hasLegsOfMode = itinerary.getStreetLegs().anyMatch(l -> l.getMode().equals(traverseMode));
+    var hasLegsOfMode = itinerary.streetLegs().anyMatch(l -> l.getMode().equals(traverseMode));
     if (hasLegsOfMode && itinerary.hasTransit()) {
       var distance = itinerary
-        .getStreetLegs()
+        .streetLegs()
         .filter(l -> l.getMode().equals(traverseMode))
-        .mapToDouble(Leg::getDistanceMeters)
+        .mapToDouble(Leg::distanceMeters)
         .sum();
 
       return distance <= minDistance;

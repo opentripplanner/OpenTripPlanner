@@ -4,7 +4,7 @@ import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emission.EmissionRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransit
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RaptorTransitDataMapper;
+import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.osminfo.OsmInfoGraphBuildRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -37,6 +38,7 @@ import org.opentripplanner.street.model.elevation.ElevationUtils;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
 import org.opentripplanner.utils.logging.ProgressTracker;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -83,10 +85,11 @@ public class ConstructApplication {
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
-    EmissionsDataModel emissionsDataModel,
+    EmissionRepository emissionRepository,
     VehicleParkingRepository vehicleParkingRepository,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
-    StreetLimitationParameters streetLimitationParameters
+    StreetLimitationParameters streetLimitationParameters,
+    FareServiceFactory fareServiceFactory
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -96,18 +99,20 @@ public class ConstructApplication {
     // use Dagger DI to do it - passing in a parameter to enable it or not.
     var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
-    this.factory = DaggerConstructApplicationFactory.builder()
+    ConstructApplicationFactory.Builder builder = DaggerConstructApplicationFactory.builder();
+    this.factory = builder
       .configModel(config)
       .graph(graph)
       .timetableRepository(timetableRepository)
       .graphVisualizer(graphVisualizer)
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .vehicleParkingRepository(vehicleParkingRepository)
-      .emissionsDataModel(emissionsDataModel)
+      .emissionRepository(emissionRepository)
       .dataImportIssueSummary(issueSummary)
       .stopConsolidationRepository(stopConsolidationRepository)
       .streetLimitationParameters(streetLimitationParameters)
       .schema(config.routerConfig().routingRequestDefaults())
+      .fareServiceFactory(fareServiceFactory)
       .build();
   }
 
@@ -137,10 +142,11 @@ public class ConstructApplication {
       graphBuilderDataSources,
       graph(),
       osmInfoGraphBuildRepository,
+      fareServiceFactory(),
       factory.timetableRepository(),
       factory.worldEnvelopeRepository(),
       factory.vehicleParkingRepository(),
-      factory.emissionsDataModel(),
+      factory.emissionRepository(),
       factory.stopConsolidationRepository(),
       factory.streetLimitationParameters(),
       cli.doLoadStreetGraph(),
@@ -179,6 +185,7 @@ public class ConstructApplication {
       vehicleParkingRepository(),
       timetableRepository(),
       snapshotManager(),
+      tripPatternCache(),
       routerConfig().updaterConfig()
     );
 
@@ -287,6 +294,10 @@ public class ConstructApplication {
     return factory.timetableSnapshotManager();
   }
 
+  private TripPatternCache tripPatternCache() {
+    return factory.tripPatternCache();
+  }
+
   public VehicleParkingService vehicleParkingService() {
     return factory.vehicleParkingService();
   }
@@ -341,11 +352,15 @@ public class ConstructApplication {
     factory.metricsLogging();
   }
 
-  public EmissionsDataModel emissionsDataModel() {
-    return factory.emissionsDataModel();
+  public EmissionRepository emissionRepository() {
+    return factory.emissionRepository();
   }
 
   public StreetLimitationParameters streetLimitationParameters() {
     return factory.streetLimitationParameters();
+  }
+
+  public FareServiceFactory fareServiceFactory() {
+    return factory.fareServiceFactory();
   }
 }

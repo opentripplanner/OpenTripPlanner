@@ -251,7 +251,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
   private static Leg createLeg(String agencyId, String shortName, long startTimeMins) {
     final var itin = createItinerary(agencyId, shortName, startTimeMins);
-    return itin.getLegs().get(0);
+    return itin.legs().get(0);
   }
 
   private static Itinerary createItinerary(String agencyId, String shortName, long startTimeMins) {
@@ -282,8 +282,9 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
+    int end = (int) (T11_00 + ((startTimeMins + 12) * 60));
     return newItinerary(Place.forStop(firstStop), start)
-      .bus(route, 1, start, T11_12, Place.forStop(lastStop))
+      .bus(route, 1, start, end, Place.forStop(lastStop))
       .build();
   }
 
@@ -295,11 +296,11 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
     @Override
     protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
-      var routeShortName = leg.getRoute().getShortName();
+      var routeShortName = leg.route().getShortName();
       if (routeShortName == null) {
         return DEFAULT_TEST_RIDE_PRICE;
       }
-      routeShortName = leg.getRoute().getShortName().toLowerCase();
+      routeShortName = leg.route().getShortName().toLowerCase();
 
       // Testing, return default test ride price.
       return switch (routeShortName) {

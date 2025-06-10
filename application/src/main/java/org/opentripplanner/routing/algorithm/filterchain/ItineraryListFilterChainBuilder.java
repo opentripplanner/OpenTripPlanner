@@ -13,6 +13,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -78,7 +79,7 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Consumer<PageCursorInput> pageCursorInputSubscriber;
+  private Consumer<PageCursorInput> pageCursorInputSubscriber = i -> {};
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -89,6 +90,7 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItinerarySortKey itineraryPageCut;
+  private Cost generalizedCostMaxLimit = null;
   private boolean transitGroupPriorityUsed = false;
   private boolean filterDirectFlexBySearchWindow = true;
 
@@ -97,6 +99,7 @@ public class ItineraryListFilterChainBuilder {
    */
 
   @Sandbox
+  @Nullable
   private ItineraryDecorator emissionDecorator;
 
   @Sandbox
@@ -246,7 +249,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * This will NOT delete itineraries, but tag them as deleted using the {@link
-   * Itinerary#getSystemNotices()}.
+   * Itinerary#systemNotices()}.
    */
   public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;
@@ -272,15 +275,25 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
-   * The paging service needs this information to adjust the paging cursor. The 'maxLimit' check is
-   * the last thing* happening in the filter-chain after the final sort. So, if another filter
-   * removes an itinerary, the itinerary is not considered with respect to this limit.
+   * The Paging module (the subscriber) needs information from the itinerary filtering for use
+   * with next/previous requests. This method is used to register a callback to avoid circular
+   * dependencies between the paging module and the itinerary-filter-chain.
    */
   public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
     Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
     this.pageCursorInputSubscriber = pageCursorInputSubscriber;
+    return this;
+  }
+
+  /**
+   * If the search is done with a page cursor that contains an encoded best street only cost, then
+   * this function adds the information to the {@link RemoveTransitIfStreetOnlyIsBetter} filter.
+   *
+   * @param generalizedCostMaxLimit the best street only cost used in filtering.
+   */
+  public ItineraryListFilterChainBuilder withGeneralizedCostMaxLimit(Cost generalizedCostMaxLimit) {
+    this.generalizedCostMaxLimit = generalizedCostMaxLimit;
     return this;
   }
 
@@ -339,7 +352,9 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(ItineraryDecorator emissionDecorator) {
+  public ItineraryListFilterChainBuilder withEmissions(
+    @Nullable ItineraryDecorator emissionDecorator
+  ) {
     this.emissionDecorator = emissionDecorator;
     return this;
   }
@@ -383,6 +398,8 @@ public class ItineraryListFilterChainBuilder {
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
+    NumItinerariesFilter numItinerariesFilter = null;
+    RemoveTransitIfStreetOnlyIsBetter removeTransitIfStreetOnlyIsBetter = null;
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
@@ -433,10 +450,11 @@ public class ItineraryListFilterChainBuilder {
     {
       // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-        addRemoveFilter(
-          filters,
-          new RemoveTransitIfStreetOnlyIsBetter(removeTransitWithHigherCostThanBestOnStreetOnly)
+        removeTransitIfStreetOnlyIsBetter = new RemoveTransitIfStreetOnlyIsBetter(
+          removeTransitWithHigherCostThanBestOnStreetOnly,
+          generalizedCostMaxLimit
         );
+        addRemoveFilter(filters, removeTransitIfStreetOnlyIsBetter);
       }
 
       if (removeTransitIfWalkingIsBetter) {
@@ -490,14 +508,11 @@ public class ItineraryListFilterChainBuilder {
       // Remove itineraries if max limit is set
       if (maxNumberOfItineraries > 0) {
         addSort(filters, SortOrderComparator.comparator(sortOrder));
-        addRemoveFilter(
-          filters,
-          new NumItinerariesFilter(
-            maxNumberOfItineraries,
-            maxNumberOfItinerariesCropSection,
-            pageCursorInputSubscriber
-          )
+        numItinerariesFilter = new NumItinerariesFilter(
+          maxNumberOfItineraries,
+          maxNumberOfItinerariesCropSection
         );
+        addRemoveFilter(filters, numItinerariesFilter);
       }
     }
 
@@ -538,8 +553,13 @@ public class ItineraryListFilterChainBuilder {
     }
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
+    PageCursorInputAggregator pageCursorInputAggregator = PageCursorInputAggregator.of()
+      .withNumItinerariesFilter(numItinerariesFilter)
+      .withRemoveTransitIfStreetOnlyIsBetter(removeTransitIfStreetOnlyIsBetter)
+      .withPageCursorInputSubscriber(pageCursorInputSubscriber)
+      .build();
 
-    return new ItineraryListFilterChain(filters, debugHandler);
+    return new ItineraryListFilterChain(filters, debugHandler, pageCursorInputAggregator);
   }
 
   public ItineraryListFilterChainBuilder withFilterDirectFlexBySearchWindow(boolean b) {

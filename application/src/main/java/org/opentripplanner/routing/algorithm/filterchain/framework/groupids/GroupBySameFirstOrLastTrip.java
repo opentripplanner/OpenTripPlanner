@@ -18,7 +18,7 @@ public class GroupBySameFirstOrLastTrip implements GroupId<GroupBySameFirstOrLas
   private final List<Leg> keySet;
 
   public GroupBySameFirstOrLastTrip(Itinerary itinerary) {
-    keySet = itinerary.getLegs().stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
+    keySet = itinerary.legs().stream().filter(Leg::isTransitLeg).collect(Collectors.toList());
   }
 
   @Override
@@ -57,13 +57,13 @@ public class GroupBySameFirstOrLastTrip implements GroupId<GroupBySameFirstOrLas
   }
 
   private static boolean isTheSame(Leg a, Leg b) {
-    final FeedScopedId idA = a.getTrip() != null ? a.getTrip().getId() : null;
-    final FeedScopedId idB = b.getTrip() != null ? b.getTrip().getId() : null;
+    final FeedScopedId idA = a.trip() != null ? a.trip().getId() : null;
+    final FeedScopedId idB = b.trip() != null ? b.trip().getId() : null;
 
     if (!Objects.equals(idA, idB)) {
       return false;
     }
 
-    return Objects.equals(a.getServiceDate(), b.getServiceDate());
+    return Objects.equals(a.serviceDate(), b.serviceDate());
   }
 }

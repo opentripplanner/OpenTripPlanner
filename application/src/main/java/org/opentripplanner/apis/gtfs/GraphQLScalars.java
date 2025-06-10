@@ -21,7 +21,7 @@ import org.opentripplanner.framework.graphql.scalar.DateScalarFactory;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.framework.model.Grams;
+import org.opentripplanner.framework.model.Gram;
 import org.opentripplanner.utils.time.OffsetDateTimeParser;
 
 public class GraphQLScalars {
@@ -307,23 +307,23 @@ public class GraphQLScalars {
   public static final GraphQLScalarType GRAMS_SCALAR = GraphQLScalarType.newScalar()
     .name("Grams")
     .coercing(
-      new Coercing<Grams, Double>() {
+      new Coercing<Gram, Double>() {
         @Override
         public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
-          if (dataFetcherResult instanceof Grams) {
-            var grams = (Grams) dataFetcherResult;
-            return Double.valueOf(grams.asDouble());
+          if (dataFetcherResult instanceof Gram) {
+            var gram = (Gram) dataFetcherResult;
+            return Double.valueOf(gram.asDouble());
           }
           return null;
         }
 
         @Override
-        public Grams parseValue(Object input) throws CoercingParseValueException {
+        public Gram parseValue(Object input) throws CoercingParseValueException {
           if (input instanceof Double doubleValue) {
-            return new Grams(doubleValue);
+            return Gram.of(doubleValue);
           }
           if (input instanceof Integer intValue) {
-            return new Grams(intValue);
+            return Gram.of(intValue);
           }
           throw new CoercingParseValueException(
             "Expected a number, got %s %s".formatted(input.getClass().getSimpleName(), input)
@@ -331,12 +331,12 @@ public class GraphQLScalars {
         }
 
         @Override
-        public Grams parseLiteral(Object input) throws CoercingParseLiteralException {
-          if (input instanceof FloatValue coordinate) {
-            return new Grams(coordinate.getValue().doubleValue());
+        public Gram parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof FloatValue floatValue) {
+            return Gram.of(floatValue.getValue().doubleValue());
           }
-          if (input instanceof IntValue coordinate) {
-            return new Grams(coordinate.getValue().doubleValue());
+          if (input instanceof IntValue intValue) {
+            return Gram.of(intValue.getValue().doubleValue());
           }
           throw new CoercingParseLiteralException(
             "Expected a number, got: " + input.getClass().getSimpleName()

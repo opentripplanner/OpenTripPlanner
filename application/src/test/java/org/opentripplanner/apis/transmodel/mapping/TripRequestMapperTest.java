@@ -29,13 +29,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
+import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -122,6 +123,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     var otpServerRequestContext = TestServerContext.createServerContext(
       graph,
       timetableRepository,
+      new DefaultFareService(),
       null,
       defaultRequest
     );
@@ -415,11 +417,11 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   private static List<TripPattern> itineraryPatterns(final Itinerary itinerary) {
     return itinerary
-      .getLegs()
+      .legs()
       .stream()
       .filter(Leg::isScheduledTransitLeg)
       .map(Leg::asScheduledTransitLeg)
-      .map(ScheduledTransitLeg::getTripPattern)
+      .map(ScheduledTransitLeg::tripPattern)
       .collect(toList());
   }
 }

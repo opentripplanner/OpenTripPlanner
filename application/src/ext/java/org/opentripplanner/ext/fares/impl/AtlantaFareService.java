@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
@@ -104,7 +104,7 @@ public class AtlantaFareService extends DefaultFareService {
 
       Leg latestRide = legs.get(legs.size() - 1);
       // TODO: Potential problem if the first trip of a transfer is a pay on exit?
-      var transferStartTime = legs.get(0).getStartTime();
+      var transferStartTime = legs.get(0).startTime();
       RideType fromRideType = classify(latestRide);
       TransferMeta transferClassification = classifyTransfer(
         toRideType,
@@ -112,9 +112,7 @@ public class AtlantaFareService extends DefaultFareService {
         this.fareType
       );
 
-      var transferUseTime = transferClassification.payOnExit
-        ? leg.getEndTime()
-        : leg.getStartTime();
+      var transferUseTime = transferClassification.payOnExit ? leg.endTime() : leg.startTime();
 
       // If transfer is NO_TRANSFER, it will not have a window or maxTransfers set,
       // so we only check if it's valid if the transfer is going to be used.
@@ -196,7 +194,7 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   private static RideType classify(Leg ride) {
-    Route getRoute = ride.getRoute();
+    Route getRoute = ride.route();
     String shortName = getRoute.getShortName();
     if (shortName != null) {
       shortName = shortName.toLowerCase();
@@ -213,7 +211,7 @@ public class AtlantaFareService extends DefaultFareService {
       }
       case XPRESS_AGENCY_ID -> {
         // Get hour of trip start
-        long hours = ride.getStartTime().withZoneSameInstant(NEW_YORK_ZONE_ID).getHour();
+        long hours = ride.startTime().withZoneSameInstant(NEW_YORK_ZONE_ID).getHour();
         if (hours >= 12) {
           return RideType.XPRESS_AFTERNOON;
         } else {
@@ -378,7 +376,7 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   @Override
-  public ItineraryFares calculateFaresForType(
+  public ItineraryFare calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -403,15 +401,12 @@ public class AtlantaFareService extends DefaultFareService {
     for (ATLTransfer transfer : transfers) {
       cost = cost.plus(transfer.getTotal());
     }
-    var fareProduct = new FareProduct(
+    var fareProduct = FareProduct.of(
       new FeedScopedId(FEED_ID, fareType.name()),
       fareType.name(),
-      cost,
-      null,
-      null,
-      null
-    );
-    var fare = ItineraryFares.empty();
+      cost
+    ).build();
+    var fare = ItineraryFare.empty();
     fare.addItineraryProducts(List.of(fareProduct));
     return fare;
   }
