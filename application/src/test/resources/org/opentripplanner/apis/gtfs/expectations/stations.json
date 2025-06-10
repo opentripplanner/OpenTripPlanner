@@ -1,0 +1,10 @@
+{
+  "data": {
+    "stations": [
+      {
+        "gtfsId": "F:STATION",
+        "alerts": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,9 @@
+{
+  stations {
+    gtfsId
+    # The following should always be empty because the pattern list of station is always empty
+    alerts(types: [PATTERNS]) {
+      id
+    }
+  }
+}
