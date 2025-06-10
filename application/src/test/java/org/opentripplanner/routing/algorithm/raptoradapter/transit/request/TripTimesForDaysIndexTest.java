@@ -66,7 +66,7 @@ class TripTimesForDaysIndexTest {
       1 | 2 | 2      ->  0:0 1:0 2:0
       1 | 1 | 2      ->  0:0 1:0 2:0
 
-      # Test all overlaping times with 3 days and 5 times
+      # Test all overlapping times with 3 days and 5 times
       1 2 3 | 4 | 5  ->  0:0 0:1 0:2 1:0 2:0
       1 2 3 | 5 | 4  ->  0:0 0:1 0:2 2:0 1:0
       1 2 | 3 4 | 5  ->  0:0 0:1 1:0 1:1 2:0
@@ -132,8 +132,8 @@ class TripTimesForDaysIndexTest {
 
   @ParameterizedTest
   @MethodSource("applyOffsetsTestCases")
-  void testApplyOffsets(String expected, String input, int[] ofsetts) {
-    assertEquals(expected, toString(applyOffsets(toTimes(input), ofsetts)));
+  void testApplyOffsets(String expected, String input, int[] offsets) {
+    assertEquals(expected, toString(applyOffsets(toTimes(input), offsets)));
   }
 
   private String toString(List<int[]> times) {

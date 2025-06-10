@@ -31,7 +31,6 @@ final class TripTimesForDaysIndex {
    * Build a trip index over the provided trip departure times per day and offsets. The trip order
    * is trip(i) <= trip(i+1) (departure-time for the first stop).
    */
-
   static TripTimesForDaysIndex ofTripTimesForDay(List<int[]> departureTimes, int[] offsets) {
     departureTimes = applyOffsets(departureTimes, offsets);
     return new TripTimesForDaysIndex(departureTimes);
