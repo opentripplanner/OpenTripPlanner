@@ -27,9 +27,9 @@ public class RealTimeTripTimesBuilder {
 
   private boolean updated;
 
-  RealTimeTripTimesBuilder(ScheduledTripTimes scheduledTripTimes) {
-    this.scheduledTripTimes = scheduledTripTimes;
-    var numStops = scheduledTripTimes.getNumStops();
+  RealTimeTripTimesBuilder(ScheduledTripTimes tripTimes) {
+    this.scheduledTripTimes = tripTimes;
+    var numStops = tripTimes.getNumStops();
     arrivalTimes = new Integer[numStops];
     departureTimes = new Integer[numStops];
     stopRealTimeStates = new StopRealTimeState[numStops];
@@ -39,26 +39,7 @@ public class RealTimeTripTimesBuilder {
     Arrays.fill(occupancyStatus, OccupancyStatus.NO_DATA_AVAILABLE);
   }
 
-  RealTimeTripTimesBuilder(RealTimeTripTimes original) {
-    scheduledTripTimes = original.scheduledTripTimes();
-    var numStops = scheduledTripTimes.getNumStops();
-    arrivalTimes = new Integer[numStops];
-    departureTimes = new Integer[numStops];
-    realTimeState = original.getRealTimeState();
-    stopRealTimeStates = original.copyStopRealTimeStates();
-    tripHeadsign = original.getTripHeadsign();
-    stopHeadsigns = original.copyStopHeadsigns();
-    occupancyStatus = original.copyOccupancyStatus();
-    wheelchairAccessibility = original.getWheelchairAccessibility();
-  }
-
   static RealTimeTripTimesBuilder fromScheduledTimes(ScheduledTripTimes tripTimes) {
-    var instance = new RealTimeTripTimesBuilder(tripTimes);
-    instance.copyMissingTimesFromScheduledTimetable();
-    return instance;
-  }
-
-  static RealTimeTripTimesBuilder fromScheduledTimes(RealTimeTripTimes tripTimes) {
     var instance = new RealTimeTripTimesBuilder(tripTimes);
     instance.copyMissingTimesFromScheduledTimetable();
     return instance;
