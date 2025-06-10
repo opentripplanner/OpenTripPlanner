@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -81,21 +82,24 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
           types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS) ||
           types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)
         ) {
-          getPatterns(environment).forEach(pattern -> {
-            if (types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS)) {
-              alerts.addAll(
-                alertService.getDirectionAndRouteAlerts(
-                  pattern.getDirection(),
-                  pattern.getRoute().getId()
-                )
-              );
-            }
-            if (types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)) {
-              pattern
-                .scheduledTripsAsStream()
-                .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
-            }
-          });
+          var patterns = getPatterns(environment);
+          if (patterns != null) {
+            patterns.forEach(pattern -> {
+              if (types.contains(GraphQLTypes.GraphQLStopAlertType.PATTERNS)) {
+                alerts.addAll(
+                  alertService.getDirectionAndRouteAlerts(
+                    pattern.getDirection(),
+                    pattern.getRoute().getId()
+                  )
+                );
+              }
+              if (types.contains(GraphQLTypes.GraphQLStopAlertType.TRIPS)) {
+                pattern
+                  .scheduledTripsAsStream()
+                  .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
+              }
+            });
+          }
         }
         if (
           types.contains(GraphQLTypes.GraphQLStopAlertType.ROUTES) ||
@@ -474,6 +478,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
       getValue(environment, StopLocation::getFirstZoneAsString, station -> null);
   }
 
+  @Nullable
   private Collection<TripPattern> getPatterns(DataFetchingEnvironment environment) {
     return getValue(
       environment,
