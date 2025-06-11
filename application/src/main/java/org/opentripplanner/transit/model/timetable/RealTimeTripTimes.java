@@ -90,12 +90,12 @@ public final class RealTimeTripTimes implements TripTimes {
   }
 
   @Override
-  public RealTimeTripTimesBuilder createRealTimeBuilder() {
+  public RealTimeTripTimesBuilder createRealTimeWithoutScheduledTimes() {
     return new RealTimeTripTimesBuilder(scheduledTripTimes);
   }
 
   @Override
-  public RealTimeTripTimesBuilder copyScheduledTimes() {
+  public RealTimeTripTimesBuilder createRealTimeFromScheduledTimes() {
     return RealTimeTripTimesBuilder.fromScheduledTimes(scheduledTripTimes);
   }
 

@@ -91,7 +91,7 @@ class TripTimesUpdater {
       LOG.trace("tripId {} found in timetable.", tripId);
     }
 
-    RealTimeTripTimesBuilder builder = tripTimes.copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.

@@ -569,7 +569,7 @@ class RouteRequestTransitDataProviderFilterTest {
       null,
       Accessibility.NOT_POSSIBLE,
       TripAlteration.PLANNED
-    ).copyScheduledTimes();
+    ).createRealTimeFromScheduledTimes();
 
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
@@ -680,7 +680,7 @@ class RouteRequestTransitDataProviderFilterTest {
       Accessibility.NOT_POSSIBLE,
       TripAlteration.PLANNED
     )
-      .copyScheduledTimes()
+      .createRealTimeFromScheduledTimes()
       .cancelTrip()
       .build();
 

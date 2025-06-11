@@ -102,7 +102,7 @@ class ModifiedTripBuilder {
    * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
-    RealTimeTripTimesBuilder builder = existingTripTimes.copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = existingTripTimes.createRealTimeFromScheduledTimes();
 
     if (cancellation) {
       return cancelTrip(builder);

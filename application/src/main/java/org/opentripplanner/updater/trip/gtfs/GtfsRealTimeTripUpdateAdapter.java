@@ -851,7 +851,7 @@ public class GtfsRealTimeTripUpdateAdapter {
       trip,
       stopTimes,
       deduplicator
-    ).copyScheduledTimes();
+    ).createRealTimeFromScheduledTimes();
 
     // Update all times to mark trip times as realtime
     // TODO: should we incorporate the delay field if present?
@@ -980,7 +980,7 @@ public class GtfsRealTimeTripUpdateAdapter {
     TripPattern pattern,
     TripTimes tripTimes
   ) {
-    final RealTimeTripTimesBuilder builder = tripTimes.copyScheduledTimes();
+    final RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
     switch (cancelationType) {
       case CANCEL -> builder.cancelTrip();
       case DELETE -> builder.deleteTrip();

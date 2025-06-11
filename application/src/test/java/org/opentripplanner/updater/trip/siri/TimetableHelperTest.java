@@ -77,7 +77,7 @@ public class TimetableHelperTest {
       trip,
       List.of(stopTime),
       new Deduplicator()
-    ).copyScheduledTimes();
+    ).createRealTimeFromScheduledTimes();
   }
 
   @Test

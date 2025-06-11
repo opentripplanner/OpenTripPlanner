@@ -134,7 +134,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testStopUpdate() {
-    RealTimeTripTimesBuilder builder = createInitialTripTimes().copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withArrivalTime(3, 190);
     builder.withDepartureTime(3, 190);
@@ -152,10 +152,13 @@ class RealTimeTripTimesTest {
   @Test
   public void testOnlyScheduledTimesAreCopied() {
     var initialTripTimes = createInitialTripTimes();
-    var realTimeTripTimes = initialTripTimes.copyScheduledTimes().withArrivalDelay(3, -1).build();
+    var realTimeTripTimes = initialTripTimes
+      .createRealTimeFromScheduledTimes()
+      .withArrivalDelay(3, -1)
+      .build();
     assertEquals(
       initialTripTimes.getArrivalTime(3),
-      realTimeTripTimes.copyScheduledTimes().build().getArrivalTime(3)
+      realTimeTripTimes.createRealTimeFromScheduledTimes().build().getArrivalTime(3)
     );
   }
 
@@ -163,13 +166,13 @@ class RealTimeTripTimesTest {
   public void testIncompleteTimes() {
     assertThrows(
       IllegalStateException.class,
-      createInitialTripTimes().createRealTimeBuilder()::build
+      createInitialTripTimes().createRealTimeWithoutScheduledTimes()::build
     );
   }
 
   @Test
   public void testCompleteTimes() {
-    var builder = createInitialTripTimes().createRealTimeBuilder();
+    var builder = createInitialTripTimes().createRealTimeWithoutScheduledTimes();
     var delay = 30;
     for (var i = 0; i < builder.numberOfStops(); ++i) {
       builder.withArrivalDelay(i, delay).withDepartureDelay(i, delay);
@@ -183,7 +186,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testPassedUpdate() {
-    RealTimeTripTimesBuilder builder = createInitialTripTimes().copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withDepartureTime(0, 30);
     var updatedTripTimesA = builder.build();
@@ -202,7 +205,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withDepartureTime(5, 421);
     builder.withArrivalTime(6, 481);
@@ -226,7 +229,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsLate() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withDepartureTime(5, 400);
     builder.withArrivalTime(6, 460);
@@ -254,7 +257,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withDepartureTime(5, 300);
     builder.withCanceled(6);
@@ -280,7 +283,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withCanceled(0);
     builder.withCanceled(1);
@@ -310,7 +313,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testInterpolationWithTerminalCancellation() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withCanceled(6);
     builder.withCanceled(7);
@@ -329,7 +332,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testInterpolationWithMultipleStopCancellations() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withCanceled(1);
     builder.withCanceled(2);
@@ -360,7 +363,7 @@ class RealTimeTripTimesTest {
    */
   @Test
   public void testInterpolationWithMultipleStopCancellations2() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withCanceled(1);
     builder.withCanceled(2);
@@ -384,7 +387,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
 
     builder.withArrivalTime(0, -300); //"Yesterday"
     builder.withDepartureTime(0, 50);
@@ -394,7 +397,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testDelay() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     builder.withDepartureDelay(0, 10);
     builder.withArrivalDelay(6, 13);
 
@@ -404,14 +407,14 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testCancel() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     builder.cancelTrip();
     assertEquals(RealTimeState.CANCELED, builder.build().getRealTimeState());
   }
 
   @Test
   public void testNoData() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     builder.withNoData(1);
     var updatedTripTimesA = builder.build();
     assertFalse(updatedTripTimesA.isNoDataStop(0));
@@ -421,7 +424,7 @@ class RealTimeTripTimesTest {
 
   @Test
   public void testRealTimeUpdated() {
-    var builder = createInitialTripTimes().copyScheduledTimes();
+    var builder = createInitialTripTimes().createRealTimeFromScheduledTimes();
     assertFalse(builder.build().isRealTimeUpdated(1));
     builder.withRealTimeState(RealTimeState.UPDATED);
     assertTrue(builder.build().isRealTimeUpdated(1));
@@ -458,7 +461,7 @@ class RealTimeTripTimesTest {
   public void validateNegativeDwellTime() {
     var expMsg = "NEGATIVE_DWELL_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.";
     var tt = createInitialTripTimes();
-    var updatedTt = tt.copyScheduledTimes();
+    var updatedTt = tt.createRealTimeFromScheduledTimes();
 
     updatedTt.withArrivalTime(3, 69);
     updatedTt.withDepartureTime(3, 68);
@@ -476,7 +479,7 @@ class RealTimeTripTimesTest {
   public void validateNegativeHopTime() {
     var expMsg = "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.";
     var tt = createInitialTripTimes();
-    var updatedTt = tt.copyScheduledTimes();
+    var updatedTt = tt.createRealTimeFromScheduledTimes();
 
     updatedTt.withDepartureTime(1, 100);
     updatedTt.withArrivalTime(2, 99);

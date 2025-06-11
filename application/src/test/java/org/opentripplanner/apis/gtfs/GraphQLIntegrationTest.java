@@ -70,7 +70,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -257,7 +256,7 @@ class GraphQLIntegrationTest {
     timetableSnapshot.update(
       new RealTimeTripUpdate(
         pattern,
-        tripTimes2.copyScheduledTimes().cancelTrip().build(),
+        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
         secondDate
       )
     );
@@ -471,7 +470,7 @@ class GraphQLIntegrationTest {
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
           TripTimes scheduledTimes = stl.tripTimes();
-          var builder = scheduledTimes.copyScheduledTimes();
+          var builder = scheduledTimes.createRealTimeFromScheduledTimes();
 
           for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
             builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);

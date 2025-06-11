@@ -25,13 +25,13 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
    * Create a RealTimeTripTimesBuilder using the information, but not the times, from this
    * TripTimes.
    */
-  RealTimeTripTimesBuilder createRealTimeBuilder();
+  RealTimeTripTimesBuilder createRealTimeWithoutScheduledTimes();
 
   /**
    * Create a RealTimeTripTimesBuilder using the information from this TripTimes, with the actual
    * times pre-filled from scheduled times.
    */
-  RealTimeTripTimesBuilder copyScheduledTimes();
+  RealTimeTripTimesBuilder createRealTimeFromScheduledTimes();
 
   /** The code for the service on which this trip runs. For departure search optimizations. */
   int getServiceCode();

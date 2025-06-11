@@ -56,7 +56,7 @@ class TripTimeOnDateTest {
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
     var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
-      .copyScheduledTimes()
+      .createRealTimeFromScheduledTimes()
       .withRecorded(1)
       .build();
 

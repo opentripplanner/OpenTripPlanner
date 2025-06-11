@@ -94,7 +94,7 @@ class DefaultTransitServiceTest {
   private static final LocalDate NO_SERVICE_DATE = LocalDate.of(2024, 1, 2);
 
   private static RealTimeTripTimes getRealTimeTripTimes() {
-    var builder = SCHEDULED_TRIP_TIMES.copyScheduledTimes();
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
     for (var i = 0; i < SCHEDULED_TRIP_TIMES.getNumStops(); ++i) {
       builder.withArrivalDelay(i, DefaultTransitServiceTest.DELAY);
       builder.withDepartureDelay(i, DefaultTransitServiceTest.DELAY);
@@ -114,7 +114,7 @@ class DefaultTransitServiceTest {
     var transitModel = new TimetableRepository(siteRepository, deduplicator);
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
     var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
-      .copyScheduledTimes()
+      .createRealTimeFromScheduledTimes()
       .cancelTrip()
       .build();
     transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);

@@ -154,7 +154,7 @@ class ExtraCallTripBuilder {
       .withCreatedByRealtimeUpdater(true)
       .build();
 
-    RealTimeTripTimesBuilder builder = tripTimes.copyScheduledTimes();
+    RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
 
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {

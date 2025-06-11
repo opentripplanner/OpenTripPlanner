@@ -403,7 +403,7 @@ public class SiriRealTimeTripUpdateAdapter {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final RealTimeTripTimesBuilder builder = tripTimes.copyScheduledTimes();
+        final RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
         builder.deleteTrip();
         snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, builder.build(), serviceDate));
         success = true;

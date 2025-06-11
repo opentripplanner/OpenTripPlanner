@@ -143,7 +143,7 @@ class RealtimeResolverTest {
   }
 
   private static TripTimes delay(TripTimes tt, int seconds) {
-    var builder = tt.copyScheduledTimes();
+    var builder = tt.createRealTimeFromScheduledTimes();
     IntStream.range(0, tt.getNumStops()).forEach(i -> {
       builder.withArrivalDelay(i, seconds);
       builder.withDepartureDelay(i, seconds);

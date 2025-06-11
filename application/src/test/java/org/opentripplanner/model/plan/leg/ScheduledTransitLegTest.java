@@ -52,12 +52,13 @@ class ScheduledTransitLegTest {
   private static final double DISTANCE = 900.0;
   private static final ZoneId ZONE_ID = ZoneIds.BERLIN;
   private static final Duration DELAY = Duration.ofMinutes(4);
-  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES = TRIP_TIMES.copyScheduledTimes()
-    .withDepartureTime(
-      BOARD_STOP_INDEX_IN_PATTERN,
-      TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
-    )
-    .build();
+  private static final RealTimeTripTimes REAL_TIME_TRIP_TIMES =
+    TRIP_TIMES.createRealTimeFromScheduledTimes()
+      .withDepartureTime(
+        BOARD_STOP_INDEX_IN_PATTERN,
+        TRIP_TIMES.getScheduledDepartureTime(BOARD_STOP_INDEX_IN_PATTERN) + (int) DELAY.toSeconds()
+      )
+      .build();
 
   private static final Set<TransitAlert> ALERTS = Set.of(
     TransitAlert.of(id("alert")).withDescriptionText(I18NString.of("alert")).build()
