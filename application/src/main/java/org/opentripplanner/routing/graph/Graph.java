@@ -299,7 +299,9 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Index this graph if it hasn't been already.
+   * Index this graph if it hasn't been already. If the index already exists, this is a no-op.
+   * <p>
+   * TODO: The indexing process (and the index itself) should be completely hidden from the callers.
    */
   public void requestIndex() {
     if (streetIndex == null) {
