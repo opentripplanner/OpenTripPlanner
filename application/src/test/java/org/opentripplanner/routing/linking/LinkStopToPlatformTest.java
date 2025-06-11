@@ -3,7 +3,7 @@ package org.opentripplanner.routing.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.linking.VertexLinker.VisibilityMode.COMPUTE_AREA_VISIBILITY;
+import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -413,7 +413,7 @@ public class LinkStopToPlatformTest {
   }
 
   private void linkStops(Graph graph, int maxAreaNodes, boolean permanent) {
-    var linker = new VertexLinker(graph, COMPUTE_AREA_VISIBILITY, maxAreaNodes);
+    var linker = new VertexLinker(graph, COMPUTE_AREA_VISIBILITY_LINES, maxAreaNodes);
     for (TransitStopVertex tStop : graph.getVerticesOfType(TransitStopVertex.class)) {
       if (permanent) {
         linker.linkVertexPermanently(

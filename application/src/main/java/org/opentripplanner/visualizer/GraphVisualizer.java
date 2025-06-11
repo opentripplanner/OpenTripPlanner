@@ -69,6 +69,7 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VisibilityMode;
 import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -517,7 +518,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         graph,
         new VertexLinker(
           graph,
-          VertexLinker.VisibilityMode.SKIP_AREA_VISIBILITY,
+          VisibilityMode.TRAVERSE_AREA_EDGES,
           StreetConstants.DEFAULT_MAX_AREA_NODES
         ),
         request.from(),

@@ -109,7 +109,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   }
 
   /**
-   * Get the stop vertices that corresponds to the to location. If the to location only contains
+   * Get the stop vertices that correspond to the to location. If the to location only contains
    * coordinates, this will return an empty set. If the to location is a station id this will
    * return the child stops of that station.
    */

@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.routing.linking.VisibilityMode;
 import org.opentripplanner.service.vehicleparking.VehicleParkingRepository;
 import org.opentripplanner.service.vehicleparking.internal.DefaultVehicleParkingRepository;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -21,7 +22,7 @@ public class TestStreetLinkerModule {
   ) {
     new StreetLinkerModule(
       graph,
-      new VertexLinker(graph, VertexLinker.VisibilityMode.SKIP_AREA_VISIBILITY, 0),
+      new VertexLinker(graph, VisibilityMode.TRAVERSE_AREA_EDGES, 0),
       parkingRepository,
       timetableRepository,
       DataImportIssueStore.NOOP

@@ -21,7 +21,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.StreetConstants;
 import org.opentripplanner.street.model.edge.Area;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -388,7 +387,7 @@ public class VertexLinker {
 
     // check if vertex is inside an area
     if (
-      this.visibilityMode == VisibilityMode.COMPUTE_AREA_VISIBILITY &&
+      this.visibilityMode == VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES &&
       edge instanceof AreaEdge aEdge
     ) {
       AreaGroup ag = aEdge.getArea();
@@ -776,19 +775,6 @@ public class VertexLinker {
     AreaEdge reverseAreaEdge = reverseAreaEdgeBuilder.buildAndConnect();
     if (scope != Scope.PERMANENT) {
       tempEdges.addEdge(reverseAreaEdge);
-    }
-  }
-
-  public enum VisibilityMode {
-    COMPUTE_AREA_VISIBILITY,
-    SKIP_AREA_VISIBILITY;
-
-    public static VisibilityMode ofBoolean(boolean computeVisibility) {
-      if (computeVisibility) {
-        return COMPUTE_AREA_VISIBILITY;
-      } else {
-        return SKIP_AREA_VISIBILITY;
-      }
     }
   }
 }

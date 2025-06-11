@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.linking.configure;
 
-import static org.opentripplanner.routing.linking.VertexLinker.VisibilityMode.COMPUTE_AREA_VISIBILITY;
+import static org.opentripplanner.routing.linking.VisibilityMode.COMPUTE_AREA_VISIBILITY_LINES;
 
 import dagger.Module;
 import dagger.Provides;
@@ -18,6 +18,6 @@ public class VertexLinkerRoutingModule {
   @Provides
   @Singleton
   static VertexLinker linker(Graph graph, StreetLimitationParameters params) {
-    return new VertexLinker(graph, COMPUTE_AREA_VISIBILITY, params.maxAreaNodes());
+    return new VertexLinker(graph, COMPUTE_AREA_VISIBILITY_LINES, params.maxAreaNodes());
   }
 }
