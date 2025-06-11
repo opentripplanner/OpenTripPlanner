@@ -118,6 +118,7 @@ class GraphQLIntegrationTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
+  private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
   private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
@@ -126,8 +127,6 @@ class GraphQLIntegrationTest {
   private static final Place F = TEST_MODEL.place("F", 9.0, 10.5);
   private static final Place G = TEST_MODEL.place("G", 9.5, 11.0);
   private static final Place H = TEST_MODEL.place("H", 10.0, 11.5);
-
-  private static final Station STATION = TEST_MODEL.station("STATION").build();
 
   private static final List<RegularStop> STOP_LOCATIONS = Stream.of(A, B, C, D, E, F, G, H)
     .map(p -> (RegularStop) p.stop)
@@ -157,8 +156,6 @@ class GraphQLIntegrationTest {
       .withCurrentRangeMeters(null)
       .withCurrentFuelPercent(null)
       .build();
-
-  static final Graph GRAPH = new Graph();
 
   static final Instant ALERT_START_TIME = OffsetDateTime.parse(
     "2023-02-15T12:03:28+01:00"
@@ -190,7 +187,7 @@ class GraphQLIntegrationTest {
 
     var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     STOP_LOCATIONS.forEach(siteRepositoryBuilder::withRegularStop);
-    siteRepositoryBuilder.withStation(STATION);
+    siteRepositoryBuilder.withStation(OMEGA);
     var siteRepository = siteRepositoryBuilder.build();
     var timetableRepository = new TimetableRepository(siteRepository, DEDUPLICATOR);
 
@@ -431,7 +428,7 @@ class GraphQLIntegrationTest {
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
 
-    var routeRequest = new RouteRequest();
+    var routeRequest = RouteRequest.defaultValue();
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,

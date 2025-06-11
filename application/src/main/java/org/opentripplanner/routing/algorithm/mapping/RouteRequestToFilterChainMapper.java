@@ -83,7 +83,7 @@ public class RouteRequestToFilterChainMapper {
       )
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
       .withAccessibilityScore(
-        params.useAccessibilityScore() && request.wheelchair(),
+        params.useAccessibilityScore() && request.journey().wheelchair(),
         request.preferences().wheelchair().maxSlope()
       )
       .withMinBikeParkingDistance(minBikeParkingDistance(request))
@@ -112,7 +112,7 @@ public class RouteRequestToFilterChainMapper {
 
     if (!context.rideHailingServices().isEmpty()) {
       builder.withRideHailingDecoratingFilter(
-        new DecorateWithRideHailing(context.rideHailingServices(), request.wheelchair())
+        new DecorateWithRideHailing(context.rideHailingServices(), request.journey().wheelchair())
       );
     }
 

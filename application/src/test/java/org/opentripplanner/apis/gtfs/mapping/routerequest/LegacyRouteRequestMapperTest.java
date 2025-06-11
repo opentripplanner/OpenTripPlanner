@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
+import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -14,6 +15,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,7 +60,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     var timetableRepository = new TimetableRepository(stopModelBuilder.build(), new Deduplicator());
     timetableRepository.initTimeZone(ZoneIds.BERLIN);
     final DefaultTransitService transitService = new DefaultTransitService(timetableRepository);
-    var routeRequest = new RouteRequest();
+    var routeRequest = RouteRequest.defaultValue();
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of()),
       transitService,
@@ -67,29 +69,33 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultVehicleParkingService(new DefaultVehicleParkingRepository()),
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
-      GraphFinder.getInstance(graph, transitService),
+      GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
       routeRequest
     );
   }
 
   @Test
   void parkingFilters() {
-    Map<String, Object> arguments = Map.of(
-      "parking",
-      Map.of(
-        "unpreferredCost",
-        555,
-        "filters",
-        List.of(
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.ofEntries(
+        entry(
+          "parking",
           Map.of(
-            "not",
-            List.of(Map.of("tags", List.of("wheelbender"))),
-            "select",
-            List.of(Map.of("tags", List.of("roof", "locker")))
+            "unpreferredCost",
+            555,
+            "filters",
+            List.of(
+              Map.of(
+                "not",
+                List.of(Map.of("tags", List.of("wheelbender"))),
+                "select",
+                List.of(Map.of("tags", List.of("roof", "locker")))
+              )
+            ),
+            "preferred",
+            List.of(Map.of("select", List.of(Map.of("tags", List.of("a", "b")))))
           )
-        ),
-        "preferred",
-        List.of(Map.of("select", List.of(Map.of("tags", List.of("a", "b")))))
+        )
       )
     );
 
@@ -128,7 +134,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   @ParameterizedTest
   @MethodSource("banningCases")
   void banning(Map<String, Object> banned, String expectedFilters) {
-    Map<String, Object> arguments = Map.of("banned", banned);
+    Map<String, Object> arguments = decorateWithRequiredParams(Map.of("banned", banned));
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(arguments),
@@ -161,7 +167,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   @ParameterizedTest
   @MethodSource("transportModesCases")
   void modes(List<Map<String, Object>> modes, String expectedFilters) {
-    Map<String, Object> arguments = Map.of("transportModes", modes);
+    Map<String, Object> arguments = decorateWithRequiredParams(Map.of("transportModes", modes));
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(arguments),
@@ -178,7 +184,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   @Test
   void defaultBikeOptimize() {
-    Map<String, Object> arguments = Map.of();
+    Map<String, Object> arguments = decorateWithRequiredParams(Map.of());
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(arguments),
       context
@@ -188,11 +194,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
 
   @Test
   void bikeTriangle() {
-    Map<String, Object> arguments = Map.of(
-      "optimize",
-      "TRIANGLE",
-      "triangle",
-      Map.of("safetyFactor", 0.2, "slopeFactor", 0.1, "timeFactor", 0.7)
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.of(
+        "optimize",
+        "TRIANGLE",
+        "triangle",
+        Map.of("safetyFactor", 0.2, "slopeFactor", 0.1, "timeFactor", 0.7)
+      )
     );
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
@@ -216,11 +224,13 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   @ParameterizedTest
   @MethodSource("noTriangleCases")
   void noTriangle(GraphQLTypes.GraphQLOptimizeType bot) {
-    Map<String, Object> arguments = Map.of(
-      "optimize",
-      bot.name(),
-      "triangle",
-      Map.of("safetyFactor", 0.2, "slopeFactor", 0.1, "timeFactor", 0.7)
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.of(
+        "optimize",
+        bot.name(),
+        "triangle",
+        Map.of("safetyFactor", 0.2, "slopeFactor", 0.1, "timeFactor", 0.7)
+      )
     );
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
@@ -238,7 +248,9 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   @Test
   void walkReluctance() {
     var reluctance = 119d;
-    Map<String, Object> arguments = Map.of("walkReluctance", reluctance);
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.of("walkReluctance", reluctance)
+    );
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(arguments),
@@ -247,7 +259,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     assertEquals(reluctance, routeRequest.preferences().walk().reluctance());
 
     var noParamsRequest = LegacyRouteRequestMapper.toRouteRequest(
-      executionContext(Map.of()),
+      executionContext(decorateWithRequiredParams(Map.of())),
       context
     );
     assertNotEquals(reluctance, noParamsRequest.preferences().walk().reluctance());
@@ -256,7 +268,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
   @Test
   void transferSlack() {
     var seconds = 119;
-    Map<String, Object> arguments = Map.of("minTransferTime", seconds);
+    Map<String, Object> arguments = decorateWithRequiredParams(Map.of("minTransferTime", seconds));
 
     var routeRequest = LegacyRouteRequestMapper.toRouteRequest(
       executionContext(arguments),
@@ -264,16 +276,21 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
     );
     assertEquals(Duration.ofSeconds(seconds), routeRequest.preferences().transfer().slack());
 
-    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(decorateWithRequiredParams(Map.of())),
+      context
+    );
     assertEquals(TransferPreferences.DEFAULT.slack(), noParamsReq.preferences().transfer().slack());
   }
 
   @Test
   void via() {
-    Map<String, Object> arguments = Map.of(
-      "via",
-      List.of(
-        Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
+    Map<String, Object> arguments = decorateWithRequiredParams(
+      Map.of(
+        "via",
+        List.of(
+          Map.of("passThrough", Map.of("stopLocationIds", List.of("F:stop1"), "label", "a label"))
+        )
       )
     );
 
@@ -286,7 +303,10 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       routeRequest.getViaLocations().toString()
     );
 
-    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    var noParamsReq = LegacyRouteRequestMapper.toRouteRequest(
+      executionContext(decorateWithRequiredParams(Map.of())),
+      context
+    );
     assertEquals(List.of(), noParamsReq.getViaLocations());
   }
 
@@ -317,5 +337,12 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       parkingPreferences.preferred().toString()
     );
     assertEquals(555, parkingPreferences.unpreferredVehicleParkingTagCost().toSeconds());
+  }
+
+  private static Map<String, Object> decorateWithRequiredParams(Map<String, Object> args) {
+    var map = new HashMap<>(args);
+    map.put("fromPlace", "F:Stop:1");
+    map.put("toPlace", "F:Stop:2");
+    return map;
   }
 }

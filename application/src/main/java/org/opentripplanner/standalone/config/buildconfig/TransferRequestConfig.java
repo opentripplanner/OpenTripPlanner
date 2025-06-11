@@ -36,6 +36,6 @@ public class TransferRequestConfig {
         ```
         """
       )
-      .asObjects(List.of(new RouteRequest()), RouteRequestConfig::mapRouteRequest);
+      .asObjects(List.of(RouteRequest.defaultValue()), RouteRequestConfig::mapRouteRequest);
   }
 }

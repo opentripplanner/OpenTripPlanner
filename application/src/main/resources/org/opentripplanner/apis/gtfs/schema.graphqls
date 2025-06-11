@@ -4603,6 +4603,52 @@ input TransferPreferencesInput {
   slack: Duration
 }
 
+"""
+A collection of selectors for what routes/agencies should be included in or excluded from the search.
+
+The `include` is always applied to select the initial set, then `exclude` to remove elements.
+If only `exclude` is present, the exclude is applied to the existing set of results.
+
+Therefore, if an entity is both included _and_ excluded the exclusion takes precedence.
+"""
+input TransitFilterInput {
+  """
+  A list of selectors for what routes/agencies should be excluded during search.
+    
+  In order to be excluded, a route/agency has to match with at least one selector.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  exclude: [TransitFilterSelectInput!]
+  """
+  A list of selectors for what routes/agencies should be allowed during the search.
+    
+  If route/agency matches with at least one selector it will be included.
+    
+  An empty list or a list containing `null` is forbidden.
+  """
+  include: [TransitFilterSelectInput!]
+}
+
+"""
+A list of selectors for including or excluding entities from the routing results. Null
+means everything is allowed to be returned and empty lists are not allowed.
+"""
+input TransitFilterSelectInput @oneOf {
+  """
+  Set of ids for agencies that should be included in/excluded from the search.
+    
+  Format: `FeedId:AgencyId`
+  """
+  agencies: [String!]
+  """
+  Set of ids for routes that should be included in/excluded from the search.
+    
+  Format: `FeedId:AgencyId`
+  """
+  routes: [String!]
+}
+
 "Costs related to using a transit mode."
 input TransitModePreferenceCostInput {
   "A cost multiplier of transit leg travel time."
@@ -4618,6 +4664,57 @@ input TransitPreferencesInput {
   can be found under the street mode preferences.
   """
   board: BoardPreferencesInput
+  """
+  A list of filters for which trips should be included or excluded. A trip will be considered in the
+  result if it is included by at least one filter and isn't excluded by another one at the same time.
+    
+  An empty list of filters or no value means that all trips should be included.
+    
+  **AND/OR Logic**
+    
+  Several filters can be defined and form an OR-condition.
+    
+  The following example means "include all trips with `F:route1` _or_ `F:agency1`":
+    
+  ```
+  filters: [
+    {
+      include: {
+        routes: ["F:route1"]
+      }
+    },
+    { 
+      include: {
+        agencies: ["F:agency1"]
+      }
+    }
+  }]
+  ```
+    
+  The following example means "include all trips of `F:agency1` _and_ exclude `F:route1`":
+    
+  ```
+  filters: [
+    {
+      include: {
+        agencies: ["F:agency1"]
+      },
+      exclude: {
+        routes: ["F:route1"]
+      }
+    }
+  ]
+  ```
+    
+  Be aware of the following pitfalls:
+    - It is easy to construct AND-conditions that can lead to zero results.
+    - OR-conditions that have an element which consists of only an exclude are likely to be
+      unwanted and may lead to unexpected results.
+    
+  **Note**: This parameter also interacts with the modes set in `modes.transit` by forming
+  an AND-condition.
+  """
+  filters: [TransitFilterInput!]
   "Preferences related to cancellations and real-time."
   timetable: TimetablePreferencesInput
   "Preferences related to transfers between transit vehicles (typically between stops)."
