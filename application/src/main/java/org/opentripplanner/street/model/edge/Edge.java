@@ -163,6 +163,10 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     return null;
   }
 
+  public boolean hasGeometry() {
+    return getGeometry() != null;
+  }
+
   public double getDistanceMeters() {
     return 0;
   }

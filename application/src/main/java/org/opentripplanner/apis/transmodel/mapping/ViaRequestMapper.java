@@ -56,7 +56,7 @@ public class ViaRequestMapper {
         environment.getArgumentOrDefault("numTripPatterns", request.numItineraries())
       )
       .withWheelchair(
-        environment.getArgumentOrDefault("wheelchairAccessible", request.wheelchair())
+        environment.getArgumentOrDefault("wheelchairAccessible", request.journey().wheelchair())
       )
       .withLocale(GraphQLUtils.getLocale(environment))
       .build();

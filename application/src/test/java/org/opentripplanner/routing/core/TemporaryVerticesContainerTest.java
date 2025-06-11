@@ -42,9 +42,9 @@ public class TemporaryVerticesContainerTest {
   private final StreetVertex c = StreetModelForTest.intersectionVertex("C", 0.0, 1.0);
   private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
   // - And travel *origin* is 0,4 degrees on the road from B to A
-  private final GenericLocation from = new GenericLocation(1.0, 0.4);
+  private final GenericLocation from = GenericLocation.fromCoordinate(1.0, 0.4);
   // - and *destination* is slightly off 0.7 degrees on road from C to A
-  private final GenericLocation to = new GenericLocation(0.701, 1.001);
+  private final GenericLocation to = GenericLocation.fromCoordinate(0.701, 1.001);
   private TemporaryVerticesContainer subject;
 
   // - and some roads
@@ -54,7 +54,7 @@ public class TemporaryVerticesContainerTest {
     createStreetEdge(a, b, "a -> b");
     createStreetEdge(b, a, "b -> a");
     createStreetEdge(a, c, "a -> c");
-    g.index(new SiteRepository());
+    g.index();
   }
 
   @Test

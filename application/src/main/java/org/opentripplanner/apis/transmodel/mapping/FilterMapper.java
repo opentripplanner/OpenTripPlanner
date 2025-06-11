@@ -10,7 +10,8 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
+import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -25,7 +26,7 @@ class FilterMapper {
   static void mapFilterOldWay(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    RouteRequest request
+    RouteRequestBuilder request
   ) {
     if (
       !(GqlUtil.hasArgument(environment, "modes") &&
@@ -36,24 +37,21 @@ class FilterMapper {
       return;
     }
 
-    var filterRequestBuilder = TransitFilterRequest.of();
-
-    var bannedAgencies = new ArrayList<FeedScopedId>();
-    callWith.argument("banned.authorities", (Collection<String> authorities) ->
-      bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+    request.withJourney(jb ->
+      jb.withTransit(transitBuilder ->
+        transitBuilder.withFilter(b -> {
+          mapFilter(environment, callWith, transitBuilder, b);
+        })
+      )
     );
-    if (!bannedAgencies.isEmpty()) {
-      filterRequestBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
-    }
+  }
 
-    var bannedLines = new ArrayList<FeedScopedId>();
-    callWith.argument("banned.lines", (List<String> lines) ->
-      bannedLines.addAll(mapIDsToDomainNullSafe(lines))
-    );
-    if (!bannedLines.isEmpty()) {
-      filterRequestBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
-    }
-
+  private static void mapFilter(
+    DataFetchingEnvironment environment,
+    DataFetcherDecorator callWith,
+    TransitRequestBuilder transitBuilder,
+    TransitFilterRequest.Builder filterBuilder
+  ) {
     var selectors = new ArrayList<SelectRequest.Builder>();
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
@@ -82,7 +80,7 @@ class FilterMapper {
         );
         // Disable transit if transit modes is defined and empty
         if (transportModes.isEmpty()) {
-          request.journey().transit().disable();
+          transitBuilder.disable();
           return;
         }
 
@@ -113,13 +111,27 @@ class FilterMapper {
     // If no selectors specified, create new one
     if (!selectors.isEmpty()) {
       for (var selector : selectors) {
-        filterRequestBuilder.addSelect(selector.withTransportModes(tModes).build());
+        filterBuilder.addSelect(selector.withTransportModes(tModes).build());
       }
     } else {
-      filterRequestBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
+      filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
     }
 
-    request.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+    var bannedAgencies = new ArrayList<FeedScopedId>();
+    callWith.argument("banned.authorities", (Collection<String> authorities) ->
+      bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+    );
+    if (!bannedAgencies.isEmpty()) {
+      filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
+    }
+
+    var bannedLines = new ArrayList<FeedScopedId>();
+    callWith.argument("banned.lines", (List<String> lines) ->
+      bannedLines.addAll(mapIDsToDomainNullSafe(lines))
+    );
+    if (!bannedLines.isEmpty()) {
+      filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
+    }
   }
 
   @SuppressWarnings("unchecked")

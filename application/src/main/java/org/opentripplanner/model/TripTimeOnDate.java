@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -16,6 +18,7 @@ import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.booking.BookingInfo;
+import org.opentripplanner.utils.lang.IntUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,8 +167,18 @@ public class TripTimeOnDate {
     );
   }
 
+  /**
+   * A comparator that uses real time departure if it is available, otherwise the scheduled departure.
+   */
   public static Comparator<TripTimeOnDate> compareByDeparture() {
     return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture());
+  }
+
+  /**
+   * A comparator that uses the scheduled departure time only.
+   */
+  public static Comparator<TripTimeOnDate> compareByScheduledDeparture() {
+    return Comparator.comparing(t -> t.getServiceDayMidnight() + t.getScheduledDeparture());
   }
 
   public StopLocation getStop() {
@@ -180,12 +193,15 @@ public class TripTimeOnDate {
     return tripTimes;
   }
 
-  public int getStopCount() {
-    return tripTimes.getNumStops();
-  }
-
   public int getScheduledArrival() {
     return tripTimes.getScheduledArrivalTime(stopIndex);
+  }
+
+  /**
+   * Returns the scheduled arrival as an Instant.
+   */
+  public Instant scheduledArrival() {
+    return toInstant(getScheduledArrival());
   }
 
   /**
@@ -197,6 +213,13 @@ public class TripTimeOnDate {
 
   public int getScheduledDeparture() {
     return tripTimes.getScheduledDepartureTime(stopIndex);
+  }
+
+  /**
+   * Returns the scheduled departure as an Instant.
+   */
+  public Instant scheduledDeparture() {
+    return toInstant(getScheduledDeparture());
   }
 
   public int getRealtimeArrival() {
@@ -295,10 +318,6 @@ public class TripTimeOnDate {
     return tripTimes.getTrip();
   }
 
-  public String getBlockId() {
-    return tripTimes.getTrip().getGtfsBlockId();
-  }
-
   public I18NString getHeadsign() {
     return tripTimes.getHeadsign(stopIndex);
   }
@@ -370,5 +389,77 @@ public class TripTimeOnDate {
   @Override
   public int hashCode() {
     return Objects.hash(tripTimes, stopIndex, tripPattern, serviceDate, midnight);
+  }
+
+  public TripPattern pattern() {
+    return tripPattern;
+  }
+
+  /**
+   * Returns the previous stop times in the trip. If it's the first stop in the trip, it returns an
+   * empty list.
+   */
+  public List<TripTimeOnDate> previousTimes() {
+    if (stopIndex == 0) {
+      return List.of();
+    } else {
+      // IntStream.range is (inclusive, exclusive)
+      return IntStream.range(0, stopIndex).mapToObj(this::atStopIndex).toList();
+    }
+  }
+
+  /**
+   * Returns the next stop times in the trip. If it's the stop in the trip it returns an empty list.
+   */
+  public List<TripTimeOnDate> nextTimes() {
+    if (stopIndex == tripTimes.getNumStops() - 1) {
+      return List.of();
+    } else {
+      // IntStream.range is (inclusive, exclusive)
+      return IntStream.range(stopIndex + 1, tripTimes.getNumStops())
+        .mapToObj(this::atStopIndex)
+        .toList();
+    }
+  }
+
+  /**
+   * Returns the real-time arrival, if available.
+   */
+  public Optional<Instant> realtimeArrival() {
+    return optionalInstant(getRealtimeArrival());
+  }
+
+  /**
+   * Returns the real-time departure, if available.
+   */
+  public Optional<Instant> realtimeDeparture() {
+    return optionalInstant(getRealtimeDeparture());
+  }
+
+  private TripTimeOnDate atStopIndex(int stopIndex) {
+    IntUtils.requireInRange(stopIndex, 0, tripTimes.getNumStops() - 1, "stopIndex");
+    return new TripTimeOnDate(
+      tripTimes,
+      stopIndex,
+      tripPattern,
+      serviceDate,
+      Instant.ofEpochSecond(midnight)
+    );
+  }
+
+  /**
+   * If real time data is available for this stop (call) then it is returned or an empty Optional
+   * otherwise.
+   */
+  private Optional<Instant> optionalInstant(int secondsSinceMidnight) {
+    if (isCancelledStop() || isRealtime()) {
+      return Optional.of(toInstant(secondsSinceMidnight));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private Instant toInstant(int secondsSinceMidnight) {
+    return Instant.ofEpochSecond(midnight).plusSeconds(secondsSinceMidnight);
   }
 }

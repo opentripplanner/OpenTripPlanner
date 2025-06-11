@@ -60,7 +60,7 @@ class StreetNearbyStopFinderMultipleLinksTest extends GraphRoutingTest {
     var finder = new StreetNearbyStopFinder(durationLimit, maxStopCount, null);
 
     var sortedNearbyStops = sort(
-      finder.findNearbyStops(stopA, new RouteRequest(), new StreetRequest(), false)
+      finder.findNearbyStops(stopA, RouteRequest.defaultValue(), StreetRequest.DEFAULT, false)
     );
 
     assertThat(sortedNearbyStops).hasSize(3);

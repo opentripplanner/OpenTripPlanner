@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -384,7 +383,7 @@ public class OsmModuleTest {
 
     loader.buildGraph();
 
-    RouteRequest request = new RouteRequest();
+    RouteRequest request = RouteRequest.defaultValue();
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
     //It tests if it is possible to route over area without visibility calculations
