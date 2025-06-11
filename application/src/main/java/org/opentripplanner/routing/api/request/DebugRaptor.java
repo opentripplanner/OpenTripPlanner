@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.api.request;
 
+import static org.opentripplanner.routing.api.request.DebugEventType.DESTINATION_ARRIVALS;
+import static org.opentripplanner.routing.api.request.DebugEventType.STOP_ARRIVALS;
+
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.opentripplanner.utils.collection.EnumSetUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
 
 /**
@@ -37,6 +39,11 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class DebugRaptor implements Serializable {
 
   private static final int FIRST_STOP_INDEX = 0;
+  private static final int DEFAULT_DEBUG_PATH_FROM_STOP_INDEX = 0;
+  private static final Set<DebugEventType> DEFAULT_EVENT_TYPES = Set.of(
+    STOP_ARRIVALS,
+    DESTINATION_ARRIVALS
+  );
   private static final DebugRaptor DEFAULT = new DebugRaptor();
 
   private final List<Integer> stops;
@@ -53,11 +60,11 @@ public class DebugRaptor implements Serializable {
     this.stops = List.copyOf(stops);
     this.path = List.copyOf(path);
     this.debugPathFromStopIndex = debugPathFromStopIndex;
-    this.eventTypes = Collections.unmodifiableSet(eventTypes);
+    this.eventTypes = EnumSetUtils.unmodifiableEnumSet(eventTypes, DebugEventType.class);
   }
 
   public DebugRaptor() {
-    this(List.of(), List.of(), 0, EnumSet.noneOf(DebugEventType.class));
+    this(List.of(), List.of(), DEFAULT_DEBUG_PATH_FROM_STOP_INDEX, DEFAULT_EVENT_TYPES);
   }
 
   public static DebugRaptor defaltValue() {
@@ -116,7 +123,7 @@ public class DebugRaptor implements Serializable {
     return ToStringBuilder.of(DebugRaptor.class)
       .addObj("stops", stopsToString(stops, FIRST_STOP_INDEX))
       .addObj("path", stopsToString(path, debugPathFromStopIndex))
-      .addCol("eventType", eventTypes)
+      .addCol("eventType", eventTypes, DEFAULT_EVENT_TYPES)
       .toString();
   }
 
