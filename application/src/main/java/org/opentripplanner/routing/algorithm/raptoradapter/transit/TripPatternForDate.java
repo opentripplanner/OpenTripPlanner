@@ -226,7 +226,8 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
   /**
    * Asserts that the running period is valid and throws an {@link IllegalArgumentException} if it
    * is not.
-   * This is the last line of defense against invalid real-time updates.
+   * This validation is only needed for real-time updates and should not be applied to flex trips
+   * where it would fail.
    */
   public void assertValidRunningPeriod() throws IllegalArgumentException {
     if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
