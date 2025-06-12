@@ -29,7 +29,7 @@ public class StreetModeMapper {
   public static StreetMode getStreetModeForRouting(List<StreetMode> modes) {
     if (modes.size() > 2) {
       throw new IllegalArgumentException(
-        "Only one or two modes can be specified for a leg, got: %.".formatted(modes)
+        "Only one or two modes can be specified for a leg, got: %s.".formatted(modes)
       );
     }
     if (modes.size() == 1) {
