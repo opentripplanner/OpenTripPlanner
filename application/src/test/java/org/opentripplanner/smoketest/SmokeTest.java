@@ -50,7 +50,7 @@ public class SmokeTest {
    */
   public static LocalDateTime weekdayAtNoon() {
     var today = LocalDate.now();
-    return today.with(TemporalAdjusters.next(DayOfWeek.FRIDAY)).atTime(LocalTime.of(12, 0));
+    return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY)).atTime(LocalTime.of(12, 0));
   }
 
   public static void assertThatThereAreVehicleRentalStations() {
