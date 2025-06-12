@@ -22,7 +22,7 @@ class IdFactory {
    *                   in case of invalid values.
    */
   FeedScopedId createId(AgencyAndId id, String entityName) {
-    Objects.requireNonNull(id, "id of %s must not be null".formatted(entityName));
+    Objects.requireNonNull(id, idErrorMessage(entityName));
     return createId(id.getId(), entityName);
   }
 
@@ -32,7 +32,7 @@ class IdFactory {
    *                   in case of invalid values.
    */
   FeedScopedId createId(String id, String entityName) {
-    Objects.requireNonNull(id, "id of %s must not be null".formatted(entityName));
+    Objects.requireNonNull(id, idErrorMessage(entityName));
     return new FeedScopedId(feedId, id);
   }
 
@@ -48,5 +48,9 @@ class IdFactory {
   @Nullable
   FeedScopedId createNullableId(@Nullable String id) {
     return id == null ? null : new FeedScopedId(feedId, id);
+  }
+
+  private static String idErrorMessage(String entityName) {
+    return "Error during GTFS processing: id of %s must not be null".formatted(entityName);
   }
 }

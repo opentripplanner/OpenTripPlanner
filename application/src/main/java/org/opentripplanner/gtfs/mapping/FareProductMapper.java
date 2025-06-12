@@ -1,6 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import com.esotericsoftware.kryo.util.Null;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
