@@ -35,14 +35,14 @@ final class FareLegRuleMapper {
     return allFareLegRules
       .stream()
       .map(r -> {
-        var fareProductId = idFactory.createId(r.getFareProductId());
+        var fareProductId = idFactory.createNullableId(r.getFareProductId());
         var productsForRule = fareProductMapper.getByFareProductId(fareProductId);
 
         if (!productsForRule.isEmpty()) {
           FareDistance fareDistance = createFareDistance(r);
           var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule.of(ruleId, productsForRule)
-            .withLegGroupId(idFactory.createId(r.getLegGroupId()))
+            .withLegGroupId(idFactory.createNullableId(r.getLegGroupId()))
             .withNetworkId(idFactory.createNullableId(r.getNetworkId()))
             .withFromAreaId(areaId(r.getFromArea()))
             .withToAreaId(areaId(r.getToArea()))
@@ -66,7 +66,7 @@ final class FareLegRuleMapper {
     if (area == null) {
       return null;
     } else {
-      return idFactory.createId(area.getAreaId());
+      return idFactory.createId(area.getAreaId(), "area");
     }
   }
 

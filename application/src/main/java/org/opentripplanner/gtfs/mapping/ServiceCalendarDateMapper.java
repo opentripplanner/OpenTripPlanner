@@ -33,7 +33,7 @@ class ServiceCalendarDateMapper {
 
   private ServiceCalendarDate doMap(org.onebusaway.gtfs.model.ServiceCalendarDate rhs) {
     return new ServiceCalendarDate(
-      idFactory.createId(rhs.getServiceId()),
+      idFactory.createNullableId(rhs.getServiceId()),
       ServiceDateMapper.mapLocalDate(rhs.getDate()),
       rhs.getExceptionType()
     );

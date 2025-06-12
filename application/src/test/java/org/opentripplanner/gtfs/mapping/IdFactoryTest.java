@@ -19,7 +19,7 @@ class IdFactoryTest {
       "1"
     );
 
-    FeedScopedId mappedId = FACTORY.createId(inputId);
+    FeedScopedId mappedId = FACTORY.createNullableId(inputId);
 
     assertEquals("B", mappedId.getFeedId());
     assertEquals("1", mappedId.getId());
@@ -28,12 +28,12 @@ class IdFactoryTest {
   @Test
   public void emptyAgencyAndId() {
     assertThrows(IllegalArgumentException.class, () ->
-      FACTORY.createId(new org.onebusaway.gtfs.model.AgencyAndId())
+      FACTORY.createNullableId(new org.onebusaway.gtfs.model.AgencyAndId())
     );
   }
 
   @Test
   public void nullAgencyAndId() {
-    assertNull(FACTORY.createId((AgencyAndId) null));
+    assertNull(FACTORY.createNullableId((AgencyAndId) null));
   }
 }
