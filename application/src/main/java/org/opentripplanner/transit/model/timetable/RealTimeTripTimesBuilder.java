@@ -31,6 +31,9 @@ public class RealTimeTripTimesBuilder {
    * This constructor take a ScheduledTripTimes (not base TripTimes) to enforce creating a new
    * RealTimeTripTimes based on the scheduled info. RT updates are  NOT cumulative and this
    * enforce copying the scheduled information, not the previous real-time update.
+   * <p>
+   * The arrival and departure times are left uninitialized by this constructor, and they need to
+   * be set explicitly.
    */
   RealTimeTripTimesBuilder(ScheduledTripTimes tripTimes) {
     this.scheduledTripTimes = tripTimes;
