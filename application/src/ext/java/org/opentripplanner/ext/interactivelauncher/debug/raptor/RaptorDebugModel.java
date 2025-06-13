@@ -89,7 +89,7 @@ public class RaptorDebugModel implements LauncherRequestDecorator {
           )
         )
       )
-      .buildRequest();
+      .buildDefault();
   }
 
   private void save() {
