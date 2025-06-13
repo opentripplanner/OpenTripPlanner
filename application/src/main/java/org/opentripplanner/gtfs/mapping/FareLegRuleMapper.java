@@ -35,8 +35,11 @@ final class FareLegRuleMapper {
     return allFareLegRules
       .stream()
       .map(r -> {
-        var fareProductId = idFactory.createNullableId(r.getFareProductId());
-        var productsForRule = fareProductMapper.getByFareProductId(fareProductId);
+        var fareProductId = idFactory.createId(
+          r.getFareProductId(),
+          "fare leg rule's fare product id"
+        );
+        var productsForRule = fareProductMapper.findFareProducts(fareProductId);
 
         if (!productsForRule.isEmpty()) {
           FareDistance fareDistance = createFareDistance(r);

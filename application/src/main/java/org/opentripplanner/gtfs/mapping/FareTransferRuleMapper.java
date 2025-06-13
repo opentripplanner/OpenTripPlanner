@@ -53,7 +53,7 @@ class FareTransferRuleMapper {
     if (fareProductId == null) {
       return List.of();
     }
-    var products = fareProductMapper.getByFareProductId(fareProductId);
+    var products = fareProductMapper.findFareProducts(fareProductId);
     if (products.isEmpty()) {
       throw new IllegalArgumentException(
         "Cannot find fare product '%s' for transfer rule '%s'".formatted(fareProductId, ruleId)

@@ -50,7 +50,7 @@ class FareProductMapper {
     return allFareProducts.stream().map(this::map).toList();
   }
 
-  public Collection<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
+  public Collection<FareProduct> findFareProducts(FeedScopedId fareProductId) {
     return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
