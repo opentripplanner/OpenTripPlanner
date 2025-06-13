@@ -78,6 +78,7 @@ public class RealTimeTripTimesBuilder {
     return result;
   }
 
+  @Nullable
   public Integer getArrivalTime(int stop) {
     return arrivalTimes[stop];
   }
@@ -87,6 +88,7 @@ public class RealTimeTripTimesBuilder {
   }
 
   /** @return the difference between the scheduled and actual arrival times at this stop. */
+  @Nullable
   public Integer getArrivalDelay(int stop) {
     if (arrivalTimes[stop] == null) {
       return null;
@@ -106,6 +108,7 @@ public class RealTimeTripTimesBuilder {
     return this;
   }
 
+  @Nullable
   public Integer getDepartureTime(int stop) {
     return departureTimes[stop];
   }
@@ -131,6 +134,7 @@ public class RealTimeTripTimesBuilder {
   }
 
   /** @return the difference between the scheduled and actual departure times at this stop. */
+  @Nullable
   public Integer getDepartureDelay(int stop) {
     if (departureTimes[stop] == null) {
       return null;
