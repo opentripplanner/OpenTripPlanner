@@ -330,7 +330,7 @@ def print_summary():
             print("## Pull Requests", file=f)
             print(f"These PRs are tagged with {config.include_prs_label}.\n", file=f)
         for pr in pullRequests:
-            print(f"  -  {pr.link()}", file=f)
+            print(f"  -  {pr.description_link()}", file=f)
         p = execute(
             "./script/changelog-diff.py",
             state.latest_version_tag(),
