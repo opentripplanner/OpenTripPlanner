@@ -52,8 +52,6 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
-import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
@@ -231,7 +229,6 @@ public abstract class GtfsTest {
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
       timetableRepository,
       snapshotManager,
-      new TripPatternCache(new TripPatternIdGenerator(), t -> null),
       LocalDate::now
     );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);

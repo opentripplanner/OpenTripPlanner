@@ -305,6 +305,8 @@ public interface TransitService {
 
   Collection<TripOnServiceDate> listTripsOnServiceDate();
 
+  Set<TransitMode> listTransitModes();
+
   Collection<PathTransfer> findPathTransfers(StopLocation stop);
 
   RaptorTransitData getRaptorTransitData();

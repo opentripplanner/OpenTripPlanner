@@ -45,8 +45,6 @@ import org.opentripplanner.transit.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.configure.UpdaterConfigurator;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
-import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 
 /**
  * Test response times for a large batch of origin/destination points. Also demonstrates how to run
@@ -102,7 +100,6 @@ public class SpeedTest {
       new DefaultVehicleParkingRepository(),
       timetableRepository,
       new TimetableSnapshotManager(null, TimetableSnapshotParameters.DEFAULT, LocalDate::now),
-      new TripPatternCache(new TripPatternIdGenerator(), t -> null),
       config.updatersConfig
     );
     if (timetableRepository.getUpdaterManager() != null) {

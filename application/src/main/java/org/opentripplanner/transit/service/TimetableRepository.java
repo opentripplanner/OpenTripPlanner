@@ -39,6 +39,7 @@ import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -88,6 +89,8 @@ public class TimetableRepository implements Serializable {
 
   private final Multimap<AbstractTransitEntity, Notice> noticesByElement = HashMultimap.create();
   private final DefaultTransferService transferService = new DefaultTransferService();
+
+  private final HashSet<TransitMode> transitModes = new HashSet<>();
 
   private final Map<FeedScopedId, Integer> serviceCodes = new HashMap<>();
 
@@ -202,6 +205,19 @@ public class TimetableRepository implements Serializable {
       !time.isBefore(this.transitServiceStarts.toInstant()) &&
       time.isBefore(this.transitServiceEnds.toInstant())
     );
+  }
+
+  /**
+   * Adds mode of transport to transit modes in graph
+   */
+  public void addTransitMode(TransitMode mode) {
+    invalidateIndex();
+    transitModes.add(mode);
+  }
+
+  /** List of transit modes that are available in GTFS data used in this graph **/
+  public HashSet<TransitMode> getTransitModes() {
+    return transitModes;
   }
 
   public CalendarService getCalendarService() {

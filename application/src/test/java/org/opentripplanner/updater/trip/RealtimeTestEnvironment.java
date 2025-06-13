@@ -59,21 +59,9 @@ public final class RealtimeTestEnvironment {
       TimetableSnapshotParameters.PUBLISH_IMMEDIATELY,
       () -> defaultServiceDate
     );
-    var service = new DefaultTransitService(
-      timetableRepository,
-      snapshotManager.getTimetableSnapshotBuffer()
-    );
-    var tripPatternCache = new TripPatternCache(new TripPatternIdGenerator(), service::findPattern);
-    siriAdapter = new SiriRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      tripPatternCache
-    );
-    gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(
-      timetableRepository,
-      snapshotManager,
-      tripPatternCache,
-      () -> defaultServiceDate
+    siriAdapter = new SiriRealTimeTripUpdateAdapter(timetableRepository, snapshotManager);
+    gtfsAdapter = new GtfsRealTimeTripUpdateAdapter(timetableRepository, snapshotManager, () ->
+      defaultServiceDate
     );
     dateTimeHelper = new DateTimeHelper(zoneId, defaultServiceDate);
     this.serviceDate = defaultServiceDate;

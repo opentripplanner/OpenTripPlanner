@@ -95,10 +95,12 @@ public final class TripPattern
   private final byte[][] hopGeometries;
 
   /**
-   * If this TripPattern instance was created to hold trips that were originally on a different
-   * TripPattern, that previous TripPattern is recorded here. This happens when a realtime update
-   * changes a trip such that its sequence of stops is different and does not match any
-   * existing TripPattern.
+   * The original TripPattern this replaces at least for one modified trip.
+   *
+   * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
+   * SiriTripPatternCache.
+   *
+   * FIXME RT_AB: Revise comments to make it clear how this is used (it is only used rarely).
    */
   private final TripPattern originalTripPattern;
 
