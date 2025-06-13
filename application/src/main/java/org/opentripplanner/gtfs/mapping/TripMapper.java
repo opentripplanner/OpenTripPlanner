@@ -56,7 +56,7 @@ class TripMapper {
     var lhs = Trip.of(idFactory.createId(rhs.getId(), "trip"));
 
     lhs.withRoute(routeMapper.map(rhs.getRoute()));
-    lhs.withServiceId(idFactory.createNullableId(rhs.getServiceId()));
+    lhs.withServiceId(idFactory.createId(rhs.getServiceId(), "trip's service id"));
     lhs.withShortName(rhs.getTripShortName());
     I18NString tripHeadsign = null;
     if (rhs.getTripHeadsign() != null) {
