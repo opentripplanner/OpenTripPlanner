@@ -4,9 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner._support.geometry.Polygons;
+import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.service.SiteRepository;
 
 class IdFactoryTest {
 
@@ -26,14 +32,30 @@ class IdFactoryTest {
   }
 
   @Test
-  public void emptyAgencyAndId() {
+  void emptyAgencyAndId() {
     assertThrows(IllegalArgumentException.class, () ->
       FACTORY.createNullableId(new org.onebusaway.gtfs.model.AgencyAndId())
     );
   }
 
   @Test
-  public void nullAgencyAndId() {
+  void nullAgencyAndId() {
     assertNull(FACTORY.createNullableId((AgencyAndId) null));
+  }
+
+  private static Stream<AgencyAndId> invalidCases() {
+    return Stream.of(
+      null,
+      new AgencyAndId("1", null),
+      new AgencyAndId("1", ""),
+      new AgencyAndId("1", "\t")
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("invalidCases")
+  void invalidId(AgencyAndId id) {
+    var ex = assertThrows(RuntimeException.class, () -> FACTORY.createId(id, "thing"));
+    assertEquals("Error during GTFS processing: id of thing must not be null", ex.getMessage());
   }
 }

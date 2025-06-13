@@ -4,6 +4,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.utils.lang.StringUtils;
 
 /**
  * Responsible for creating feed-scoped from OBA's {@code AgencyAndId} or strings.
@@ -32,7 +33,9 @@ class IdFactory {
    *                   in case of invalid values.
    */
   FeedScopedId createId(String id, String entityName) {
-    Objects.requireNonNull(id, idErrorMessage(entityName));
+    if (StringUtils.hasNoValue(id)) {
+      throw new IllegalArgumentException(idErrorMessage(entityName));
+    }
     return new FeedScopedId(feedId, id);
   }
 

@@ -61,18 +61,13 @@ class LocationMapperTest {
     );
   }
 
-  private static Stream<AgencyAndId> nullCases() {
-    return Stream.of(null, new AgencyAndId("1", null));
-  }
-
-  @ParameterizedTest
-  @MethodSource("nullCases")
+  @Test
   void nullId() {
     var gtfsLocation = getLocation("invalid", Polygons.OSLO);
     gtfsLocation.setId(null);
     var issueStore = new DefaultDataImportIssueStore();
     var mapper = new LocationMapper(ID_FACTORY, SiteRepository.of(), issueStore);
-    var ex = assertThrows(NullPointerException.class, () -> mapper.map(gtfsLocation));
+    var ex = assertThrows(RuntimeException.class, () -> mapper.map(gtfsLocation));
     assertEquals("Error during GTFS processing: id of location must not be null", ex.getMessage());
   }
 
