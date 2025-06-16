@@ -2,6 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -58,6 +59,16 @@ class LocationMapperTest {
       ).toString(),
       issueStore.listIssues().toString()
     );
+  }
+
+  @Test
+  void nullId() {
+    var gtfsLocation = getLocation("invalid", Polygons.OSLO);
+    gtfsLocation.setId(null);
+    var issueStore = new DefaultDataImportIssueStore();
+    var mapper = new LocationMapper(ID_FACTORY, SiteRepository.of(), issueStore);
+    var ex = assertThrows(RuntimeException.class, () -> mapper.map(gtfsLocation));
+    assertEquals("Error during GTFS processing: id of location must not be null", ex.getMessage());
   }
 
   private static Location getLocation(String name, Polygon polygon) {

@@ -45,7 +45,7 @@ class LocationMapper {
   private AreaStop doMap(Location gtfsLocation) {
     var name = NonLocalizedString.ofNullable(gtfsLocation.getName());
     try {
-      var id = idFactory.createId(gtfsLocation.getId());
+      var id = idFactory.createId(gtfsLocation.getId(), "location");
       Geometry geometry = GeometryUtils.convertGeoJsonToJtsGeometry(gtfsLocation.getGeometry());
       var isValidOp = new IsValidOp(geometry);
       if (!isValidOp.isValid()) {
