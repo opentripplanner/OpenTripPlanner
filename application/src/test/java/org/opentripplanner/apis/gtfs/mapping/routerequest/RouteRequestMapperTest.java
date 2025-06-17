@@ -27,6 +27,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -74,7 +75,8 @@ class RouteRequestMapperTest {
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
-      routeRequest
+      routeRequest,
+      new SubmodeMappingService(null)
     );
   }
 

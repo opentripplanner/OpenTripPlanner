@@ -55,6 +55,7 @@ import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.fare.RiderCategory;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -437,7 +438,8 @@ class GraphQLIntegrationTest {
       realtimeVehicleService,
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       finder,
-      routeRequest
+      routeRequest,
+      new SubmodeMappingService(null)
     );
   }
 

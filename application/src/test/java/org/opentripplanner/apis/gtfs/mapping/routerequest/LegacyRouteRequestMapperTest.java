@@ -28,6 +28,7 @@ import org.opentripplanner.apis.gtfs.SchemaFactory;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
@@ -68,7 +69,8 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       new DefaultRealtimeVehicleService(transitService),
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
-      routeRequest
+      routeRequest,
+      new SubmodeMappingService(null)
     );
   }
 

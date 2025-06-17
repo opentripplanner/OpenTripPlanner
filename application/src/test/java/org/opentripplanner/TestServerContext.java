@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionService;
 import org.opentripplanner.ext.emission.internal.itinerary.EmissionItineraryDecorator;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -103,6 +104,7 @@ public class TestServerContext {
       List.of(),
       request,
       createStreetLimitationParametersService(),
+      new SubmodeMappingService(null),
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.vectorTileConfig(),

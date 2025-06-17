@@ -5,10 +5,13 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
+import org.opentripplanner.transit.model.basic.SubMode;
 
 public class TransmodelSubmodeMapper {
 
   record Mapping(TransmodelTransportSubmode submode, int gtfsMode) {}
+
+  record ExtraMapping(String submode, int gtfsMode) {}
 
   // Mapping from
   // https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/825393529/Norwegian+submodes+and+their+definitions
@@ -50,16 +53,32 @@ public class TransmodelSubmodeMapper {
     new Mapping(TransmodelTransportSubmode.TELECABIN, 1300),
     new Mapping(TransmodelTransportSubmode.FUNICULAR, 1400),
   };
-  Map<Integer, TransmodelTransportSubmode> mappingCache;
+
+  static final ExtraMapping[] extraMappings = {
+    // Finnish state railway VR speciality
+    new ExtraMapping("replacementRailService", 714),
+  };
+  Map<Integer, SubMode> mappingToTransmodel;
+  Map<SubMode, Integer> mappingToGtfs;
 
   public TransmodelSubmodeMapper() {
-    mappingCache = new HashMap<>();
+    mappingToTransmodel = new HashMap<>();
+    mappingToGtfs = new HashMap<>();
     for (Mapping mapping : mappings) {
-      mappingCache.put(mapping.gtfsMode, mapping.submode);
+      mappingToTransmodel.put(mapping.gtfsMode, SubMode.of(mapping.submode.getValue()));
+      mappingToGtfs.put(SubMode.of(mapping.submode.getValue()), mapping.gtfsMode);
+    }
+    for (ExtraMapping extraMapping : extraMappings) {
+      mappingToTransmodel.put(extraMapping.gtfsMode, SubMode.of(extraMapping.submode));
+      mappingToGtfs.put(SubMode.of(extraMapping.submode), extraMapping.gtfsMode);
     }
   }
 
-  public Optional<TransmodelTransportSubmode> map(@Nullable Integer submode) {
-    return Optional.ofNullable(mappingCache.get(submode));
+  public Optional<SubMode> map(@Nullable Integer submode) {
+    return Optional.ofNullable(mappingToTransmodel.get(submode));
+  }
+
+  public Optional<Integer> map(@Nullable SubMode submode) {
+    return Optional.ofNullable(mappingToGtfs.get(submode));
   }
 }

@@ -11,6 +11,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -50,6 +51,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final List<RideHailingService> rideHailingServices;
   private final RouteRequest routeRequestDefaults;
   private final StreetLimitationParametersService streetLimitationParametersService;
+  private final SubmodeMappingService submodeMappingService;
   private final TransitRoutingConfig transitRoutingConfig;
   private final TransitService transitService;
   private final VectorTileConfig vectorTileConfig;
@@ -98,6 +100,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     List<RideHailingService> rideHailingServices,
     RouteRequest routeRequestDefaults,
     StreetLimitationParametersService streetLimitationParametersService,
+    SubmodeMappingService submodeMappingService,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
     VectorTileConfig vectorTileConfig,
@@ -122,6 +125,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.rideHailingServices = rideHailingServices;
     this.routeRequestDefaults = routeRequestDefaults;
     this.streetLimitationParametersService = streetLimitationParametersService;
+    this.submodeMappingService = submodeMappingService;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
     this.vectorTileConfig = vectorTileConfig;
@@ -230,6 +234,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public StreetLimitationParametersService streetLimitationParametersService() {
     return streetLimitationParametersService;
+  }
+
+  @Override
+  public SubmodeMappingService submodeMappingService() {
+    return submodeMappingService;
   }
 
   @Override

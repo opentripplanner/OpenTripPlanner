@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -122,6 +123,7 @@ public class SpeedTest {
       List.of(),
       config.request,
       TestServerContext.createStreetLimitationParametersService(),
+      new SubmodeMappingService(null),
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
       VectorTileConfig.DEFAULT,

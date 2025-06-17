@@ -34,6 +34,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | Config Parameter                                                                          |          Type         | Summary                                                                                                                                                                                                              |  Req./Opt. | Default Value | Since |
 |-------------------------------------------------------------------------------------------|:---------------------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                                                                                                                                      | *Optional* |               |  2.1  |
+| [submodeMapping](#submodeMapping)                                                         |        `string`       | CSV file with submode mapping configuration                                                                                                                                                                          | *Optional* |               |  2.8  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |               |  2.1  |
 | [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                                                                                                                                            | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                                                                                                                                        | *Optional* |               |  2.0  |
@@ -97,6 +98,13 @@ or format check on the version and it can be any string.
 
 Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
 
+
+<h3 id="submodeMapping">submodeMapping</h3>
+
+**Since version:** `2.8` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+CSV file with submode mapping configuration
 
 <h3 id="server">server</h3>
 
