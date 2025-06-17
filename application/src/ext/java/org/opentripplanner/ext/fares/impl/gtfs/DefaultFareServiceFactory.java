@@ -54,6 +54,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     fillFareRules(fareRulesData.fareAttributes(), fareRulesData.fareRules(), regularFareRules);
     this.fareLegRules.addAll(fareRulesData.fareLegRules());
     this.fareTransferRules.addAll(fareRulesData.fareTransferRules());
+    this.stopAreas.putAll(fareRulesData.stopAreas());
   }
 
   public void configure(JsonNode config) {

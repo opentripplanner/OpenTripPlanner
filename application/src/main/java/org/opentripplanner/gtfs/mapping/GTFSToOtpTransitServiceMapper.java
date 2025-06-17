@@ -83,6 +83,8 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareRulesData fareRulesBuilder = new FareRulesData();
 
+  private final StopAreaMapper stopAreaMapper;
+
   private final TranslationHelper translationHelper;
   private final boolean discardMinTransferTimes;
 
@@ -151,6 +153,7 @@ public class GTFSToOtpTransitServiceMapper {
     fareProductMapper = new FareProductMapper(idFactory);
     fareLegRuleMapper = new FareLegRuleMapper(idFactory, fareProductMapper, issueStore);
     fareTransferRuleMapper = new FareTransferRuleMapper(idFactory, fareProductMapper);
+    stopAreaMapper = new StopAreaMapper(idFactory);
   }
 
   public OtpTransitServiceBuilder getBuilder() {
@@ -197,6 +200,7 @@ public class GTFSToOtpTransitServiceMapper {
     fareRulesBuilder
       .fareTransferRules()
       .addAll(fareTransferRuleMapper.map(data.getAllFareTransferRules()));
+    fareRulesBuilder.stopAreas().putAll(stopAreaMapper.map(data.getAllStopAreaElements()));
   }
 
   private void mapGtfsStopsToOtpTypes(Collection<Stop> stops) {

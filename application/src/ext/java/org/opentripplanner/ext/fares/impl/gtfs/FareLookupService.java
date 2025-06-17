@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.Collection;
@@ -42,12 +43,12 @@ class FareLookupService implements Serializable {
     List<FareTransferRule> fareTransferRules,
     Multimap<FeedScopedId, FeedScopedId> stopAreas
   ) {
-    this.legRules = legRules;
+    this.legRules = List.copyOf(legRules);
     this.transferRules = stripWildcards(fareTransferRules);
     this.networksWithRules = findNetworksWithRules(legRules);
     this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
     this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
-    this.stopAreas = stopAreas;
+    this.stopAreas = ImmutableMultimap.copyOf(stopAreas);
   }
 
   /**
