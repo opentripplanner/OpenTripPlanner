@@ -68,7 +68,10 @@ class LocationMapperTest {
     var issueStore = new DefaultDataImportIssueStore();
     var mapper = new LocationMapper(ID_FACTORY, SiteRepository.of(), issueStore);
     var ex = assertThrows(RuntimeException.class, () -> mapper.map(gtfsLocation));
-    assertEquals("Error during GTFS processing: id of location must not be null", ex.getMessage());
+    assertEquals(
+      "Error during GTFS processing: id of location is null or consists of whitespace only",
+      ex.getMessage()
+    );
   }
 
   private static Location getLocation(String name, Polygon polygon) {

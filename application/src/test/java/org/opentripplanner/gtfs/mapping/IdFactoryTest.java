@@ -56,6 +56,9 @@ class IdFactoryTest {
   @MethodSource("invalidCases")
   void invalidId(AgencyAndId id) {
     var ex = assertThrows(RuntimeException.class, () -> FACTORY.createId(id, "thing"));
-    assertEquals("Error during GTFS processing: id of thing must not be null", ex.getMessage());
+    assertEquals(
+      "Error during GTFS processing: id of thing is null or consists of whitespace only",
+      ex.getMessage()
+    );
   }
 }
