@@ -263,7 +263,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<GraphQLTypes.GraphQLTransitMode> replacementMode() {
     return environment -> {
       var submodeMappingService = getSubmodeMappingService(environment);
-      Trip trip = getSource(environment);
+      var trip = getSource(environment);
       if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
         Optional<SubmodeMappingService.SubmodeMappingRow> mapping =
           submodeMappingService.mapNetexSubmode(trip.getNetexSubMode());
@@ -271,9 +271,15 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
           return TransitModeMapper.map(mapping.get().replacementMode());
         }
       }
-      return TransitModeMapper.map(
-        getTransitService(environment).findPattern(trip).getRoute().getMode()
-      );
+      var route = getTransitService(environment).findPattern(trip).getRoute();
+      if (route.getGtfsType() != null) {
+        Optional<SubmodeMappingService.SubmodeMappingRow> mapping =
+          submodeMappingService.mapGtfsExtendedType(route.getGtfsType());
+        if (mapping.isPresent()) {
+          return TransitModeMapper.map(mapping.get().replacementMode());
+        }
+      }
+      return null;
     };
   }
 

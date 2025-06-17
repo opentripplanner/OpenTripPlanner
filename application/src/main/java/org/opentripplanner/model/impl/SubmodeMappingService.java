@@ -39,8 +39,10 @@ public class SubmodeMappingService {
     }
   }
 
-  public Optional<SubmodeMappingRow> mapGtfsSubmode(String inputLabel) {
-    return Optional.ofNullable(map.get(new SubmodeMappingMatcher("GTFS", inputLabel)));
+  public Optional<SubmodeMappingRow> mapGtfsExtendedType(int extendedType) {
+    return Optional.ofNullable(
+      map.get(new SubmodeMappingMatcher("GTFS", Integer.toString(extendedType)))
+    );
   }
 
   public Optional<SubmodeMappingRow> mapNetexSubmode(SubMode submode) {
