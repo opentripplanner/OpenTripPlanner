@@ -214,7 +214,6 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           graph,
           request.from(),
           request.to(),
-          streetMode,
           streetMode
         )
       ) {
@@ -240,7 +239,6 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           graph,
           request.from(),
           request.to(),
-          streetMode,
           streetMode
         )
       ) {

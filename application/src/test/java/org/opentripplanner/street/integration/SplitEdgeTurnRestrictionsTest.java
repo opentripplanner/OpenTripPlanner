@@ -15,6 +15,7 @@ import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -157,22 +158,21 @@ public class SplitEdgeTurnRestrictionsTest {
   }
 
   private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
+    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, StreetMode.CAR);
+    var gpf = new GraphPathFinder(null);
     RouteRequest request = RouteRequest.of()
       .withDateTime(dateTime)
       .withFrom(from)
       .withTo(to)
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
+      .withVertexService(
+        new DefaultRequestVertexService(
+          temporaryVertices.getFromVertices(),
+          temporaryVertices.getToVertices()
+        )
+      )
       .buildRequest();
-
-    var temporaryVertices = new TemporaryVerticesContainer(
-      graph,
-      from,
-      to,
-      StreetMode.CAR,
-      StreetMode.CAR
-    );
-    var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    var paths = gpf.graphPathFinderEntryPoint(request);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,

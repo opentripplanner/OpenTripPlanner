@@ -38,17 +38,17 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   public StreetSearchBuilder setRequest(RouteRequest request) {
     this.routeRequest = request;
     setArriveBy(request.arriveBy());
+    if (!request.vertexService().from().isEmpty()) {
+      setFrom(request.vertexService().from());
+    }
+    if (!request.vertexService().to().isEmpty()) {
+      setTo(request.vertexService().to());
+    }
     return this;
   }
 
   public StreetSearchBuilder setStreetRequest(StreetRequest streetRequest) {
     this.streetRequest = streetRequest;
-    return this;
-  }
-
-  public StreetSearchBuilder setVerticesContainer(TemporaryVerticesContainer container) {
-    setFrom(container.getFromVertices());
-    setTo(container.getToVertices());
     return this;
   }
 

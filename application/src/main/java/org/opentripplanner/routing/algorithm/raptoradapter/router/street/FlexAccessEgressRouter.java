@@ -14,7 +14,6 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {
@@ -23,7 +22,6 @@ public class FlexAccessEgressRouter {
 
   public static Collection<FlexAccessEgress> routeAccessEgress(
     RouteRequest request,
-    TemporaryVerticesContainer verticesContainer,
     OtpServerRequestContext serverContext,
     AdditionalSearchDays searchDays,
     FlexParameters config,
@@ -37,7 +35,6 @@ public class FlexAccessEgressRouter {
     Collection<NearbyStop> accessStops = accessOrEgress.isAccess()
       ? AccessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         AccessEgressType.ACCESS,
@@ -49,7 +46,6 @@ public class FlexAccessEgressRouter {
     Collection<NearbyStop> egressStops = accessOrEgress.isEgress()
       ? AccessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         new StreetRequest(StreetMode.WALK),
         dataOverlayContext,
         AccessEgressType.EGRESS,

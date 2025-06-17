@@ -23,10 +23,13 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
+import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -159,24 +162,39 @@ class ScheduledDeviatedTripIntegrationTest {
     var zoneId = ZoneIds.NEW_YORK;
     var dateTime = LocalDateTime.of(2021, Month.DECEMBER, 16, 12, 0).atZone(zoneId);
 
-    RouteRequest request = RouteRequest.of()
-      .withDateTime(dateTime.toInstant())
-      .withFrom(from)
-      .withTo(to)
-      .buildRequest();
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        from,
+        to,
+        StreetMode.WALK
+      )
+    ) {
+      RouteRequest request = RouteRequest.of()
+        .withDateTime(dateTime.toInstant())
+        .withFrom(from)
+        .withTo(to)
+        .withVertexService(
+          new DefaultRequestVertexService(
+            temporaryVertices.getFromVertices(),
+            temporaryVertices.getToVertices()
+          )
+        )
+        .buildRequest();
 
-    var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
-    var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
-    var result = TransitRouter.route(
-      request,
-      serverContext,
-      TransitGroupPriorityService.empty(),
-      transitStartOfTime,
-      additionalSearchDays,
-      new DebugTimingAggregator()
-    );
+      var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
+      var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
+      var result = TransitRouter.route(
+        request,
+        serverContext,
+        TransitGroupPriorityService.empty(),
+        transitStartOfTime,
+        additionalSearchDays,
+        new DebugTimingAggregator()
+      );
 
-    return result.getItineraries();
+      return result.getItineraries();
+    }
   }
 
   private static FlexTrip<?, ?> getFlexTrip() {

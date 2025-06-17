@@ -2,6 +2,7 @@ package org.opentripplanner.routing;
 
 import static com.google.common.collect.Iterables.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -18,6 +19,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -556,27 +558,22 @@ public class TestHalfEdges {
 
   @Test
   public void testTemporaryVerticesContainer() {
+    var from = GenericLocation.fromCoordinate(40.004, -74.0);
+    var to = GenericLocation.fromCoordinate(40.008, -74.0);
     // test that it is possible to travel between two splits on the same street
-    RouteRequest walking = RouteRequest.of()
-      .withFrom(GenericLocation.fromCoordinate(40.004, -74.0))
-      .withTo(GenericLocation.fromCoordinate(40.008, -74.0))
-      .buildRequest();
-
-    try (
-      var container = new TemporaryVerticesContainer(
-        graph,
-        walking.from(),
-        walking.to(),
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
-    ) {
-      assertNotNull(container.getFromVertices());
-      assertNotNull(container.getToVertices());
+    try (var container = new TemporaryVerticesContainer(graph, from, to, StreetMode.WALK)) {
+      RouteRequest walking = RouteRequest.of()
+        .withFrom(from)
+        .withTo(to)
+        .withVertexService(
+          new DefaultRequestVertexService(container.getFromVertices(), container.getToVertices())
+        )
+        .buildRequest();
+      assertFalse(container.getFromVertices().isEmpty());
+      assertFalse(container.getToVertices().isEmpty());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
-        .setVerticesContainer(container)
         .getShortestPathTree();
       GraphPath<State, Edge, Vertex> path = spt.getPath(
         container.getToVertices().iterator().next()

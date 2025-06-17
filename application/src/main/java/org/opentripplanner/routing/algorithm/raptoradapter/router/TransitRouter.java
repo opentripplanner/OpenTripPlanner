@@ -44,7 +44,6 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.framework.EntityNotFoundException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
@@ -60,7 +59,6 @@ public class TransitRouter {
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
-  private final TemporaryVerticesContainer temporaryVerticesContainer;
   private final ViaCoordinateTransferFactory viaTransferResolver;
 
   private TransitRouter(
@@ -77,7 +75,6 @@ public class TransitRouter {
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
-    this.temporaryVerticesContainer = createTemporaryVerticesContainer(request, serverContext);
     this.viaTransferResolver = serverContext.viaTransferResolver();
   }
 
@@ -98,15 +95,7 @@ public class TransitRouter {
       debugTimingAggregator
     );
 
-    return transitRouter.routeAndCleanupAfter();
-  }
-
-  private TransitRouterResult routeAndCleanupAfter() {
-    // try(auto-close):
-    //   Make sure we clean up graph by removing temp-edges from the graph before we exit.
-    try (temporaryVerticesContainer) {
-      return route();
-    }
+    return transitRouter.route();
   }
 
   private TransitRouterResult route() {
@@ -271,7 +260,6 @@ public class TransitRouter {
 
     var nearbyStops = AccessEgressRouter.findAccessEgresses(
       accessRequest,
-      temporaryVerticesContainer,
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
       type,
@@ -287,7 +275,6 @@ public class TransitRouter {
     if (OTPFeature.FlexRouting.isOn() && mode == StreetMode.FLEXIBLE) {
       var flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
         accessRequest,
-        temporaryVerticesContainer,
         serverContext,
         additionalSearchDays,
         serverContext.flexParameters(),
@@ -372,19 +359,6 @@ public class TransitRouter {
         List.of(new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null))
       );
     }
-  }
-
-  private TemporaryVerticesContainer createTemporaryVerticesContainer(
-    RouteRequest request,
-    OtpServerRequestContext serverContext
-  ) {
-    return new TemporaryVerticesContainer(
-      serverContext.graph(),
-      request.from(),
-      request.to(),
-      request.journey().access().mode(),
-      request.journey().egress().mode()
-    );
   }
 
   private IntStream listStopIndexes(FeedScopedId stopLocationId) {

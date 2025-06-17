@@ -24,6 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -97,20 +99,46 @@ public class RoutingWorker {
 
     var result = RoutingResult.empty();
 
-    if (OTPFeature.ParallelRouting.isOn()) {
-      // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
-      //       log-trace-parameters-propagation and graceful timeout handling here.
-      try {
-        var r1 = CompletableFuture.supplyAsync(this::routeDirectStreet);
-        var r2 = CompletableFuture.supplyAsync(this::routeDirectFlex);
-        var r3 = CompletableFuture.supplyAsync(this::routeTransit);
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        serverContext.graph(),
+        request.from(),
+        request.to(),
+        request.journey().access().mode(),
+        request.journey().egress().mode(),
+        request.journey().direct().mode()
+      )
+    ) {
+      var requestVertexService = new DefaultRequestVertexService(
+        temporaryVertices.getFromVertices(),
+        temporaryVertices.getToVertices()
+      );
+      var requestWithTemporaryVertices = request
+        .copyOf()
+        .withVertexService(requestVertexService)
+        .buildRequest();
+      if (OTPFeature.ParallelRouting.isOn()) {
+        // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
+        //       log-trace-parameters-propagation and graceful timeout handling here.
+        try {
+          var r1 = CompletableFuture.supplyAsync(() ->
+            routeDirectStreet(requestWithTemporaryVertices)
+          );
+          var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex(requestWithTemporaryVertices)
+          );
+          var r3 = CompletableFuture.supplyAsync(() -> routeTransit(requestWithTemporaryVertices));
 
-        result.merge(r1.join(), r2.join(), r3.join());
-      } catch (CompletionException e) {
-        RoutingValidationException.unwrapAndRethrowCompletionException(e);
+          result.merge(r1.join(), r2.join(), r3.join());
+        } catch (CompletionException e) {
+          RoutingValidationException.unwrapAndRethrowCompletionException(e);
+        }
+      } else {
+        result.merge(
+          routeDirectStreet(requestWithTemporaryVertices),
+          routeDirectFlex(requestWithTemporaryVertices),
+          routeTransit(requestWithTemporaryVertices)
+        );
       }
-    } else {
-      result.merge(routeDirectStreet(), routeDirectFlex(), routeTransit());
     }
 
     // Set C2 value for Street and FLEX if transit-group-priority is used
@@ -208,22 +236,22 @@ public class RoutingWorker {
       : Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
   }
 
-  private RoutingResult routeDirectStreet() {
+  private RoutingResult routeDirectStreet(RouteRequest requestWithTemporaryVertices) {
     // TODO: Add support for via search to the direct-street search and remove this.
     //       The direct search is used to prune away silly transit results and it
     //       would be nice to also support via as a feature in the direct-street
     //       search.
-    if (request.isViaSearch()) {
+    if (requestWithTemporaryVertices.isViaSearch()) {
       return RoutingResult.empty();
     }
 
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      request.journey().direct().mode(),
-      request.pageCursor() != null
+      requestWithTemporaryVertices.journey().direct().mode(),
+      requestWithTemporaryVertices.pageCursor() != null
     );
-    var directBuilder = request.copyOf();
+    var directBuilder = requestWithTemporaryVertices.copyOf();
 
     directBuilder.withJourney(jb ->
       jb.withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()))
@@ -242,13 +270,15 @@ public class RoutingWorker {
     }
   }
 
-  private RoutingResult routeDirectFlex() {
+  private RoutingResult routeDirectFlex(RouteRequest requestWithTemporaryVertices) {
     if (!OTPFeature.FlexRouting.isOn()) {
       return RoutingResult.ok(List.of());
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      return RoutingResult.ok(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
+      return RoutingResult.ok(
+        DirectFlexRouter.route(serverContext, requestWithTemporaryVertices, additionalSearchDays)
+      );
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {
@@ -256,11 +286,11 @@ public class RoutingWorker {
     }
   }
 
-  private RoutingResult routeTransit() {
+  private RoutingResult routeTransit(RouteRequest requestWithTemporaryVertices) {
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
-        request,
+        requestWithTemporaryVertices,
         serverContext,
         transitGroupPriorityService,
         transitSearchTimeZero,

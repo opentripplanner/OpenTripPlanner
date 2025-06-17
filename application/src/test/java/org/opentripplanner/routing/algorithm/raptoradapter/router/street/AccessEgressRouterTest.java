@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
+import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -250,20 +251,19 @@ class AccessEgressRouterTest extends GraphRoutingTest {
   ) {
     var maxStopCount = 10;
     var durationLimit = Duration.ofMinutes(10);
-    var request = requestFromTo(from, to);
 
-    try (
-      var verticesContainer = new TemporaryVerticesContainer(
-        graph,
-        from,
-        to,
-        StreetMode.WALK,
-        StreetMode.WALK
-      )
-    ) {
+    try (var verticesContainer = new TemporaryVerticesContainer(graph, from, to, StreetMode.WALK)) {
+      var request = requestFromTo(from, to)
+        .copyOf()
+        .withVertexService(
+          new DefaultRequestVertexService(
+            verticesContainer.getFromVertices(),
+            verticesContainer.getToVertices()
+          )
+        )
+        .buildRequest();
       return AccessEgressRouter.findAccessEgresses(
         request,
-        verticesContainer,
         StreetRequest.DEFAULT,
         null,
         accessEgress,

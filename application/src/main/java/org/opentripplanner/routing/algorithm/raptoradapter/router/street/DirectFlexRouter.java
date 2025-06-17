@@ -13,7 +13,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.search.TemporaryVerticesContainer;
 
 public class DirectFlexRouter {
 
@@ -26,49 +25,37 @@ public class DirectFlexRouter {
       return Collections.emptyList();
     }
     OTPRequestTimeoutException.checkForTimeout();
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        serverContext.graph(),
-        request.from(),
-        request.to(),
-        request.journey().direct().mode(),
-        request.journey().direct().mode()
-      )
-    ) {
-      // Prepare access/egress transfers
-      Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
-        request,
-        temporaryVertices,
-        request.journey().direct(),
-        serverContext.dataOverlayContext(request),
-        AccessEgressType.ACCESS,
-        serverContext.flexParameters().maxAccessWalkDuration(),
-        0
-      );
-      Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
-        request,
-        temporaryVertices,
-        request.journey().direct(),
-        serverContext.dataOverlayContext(request),
-        AccessEgressType.EGRESS,
-        serverContext.flexParameters().maxEgressWalkDuration(),
-        0
-      );
+    // Prepare access/egress transfers
+    Collection<NearbyStop> accessStops = AccessEgressRouter.findAccessEgresses(
+      request,
+      request.journey().direct(),
+      serverContext.dataOverlayContext(request),
+      AccessEgressType.ACCESS,
+      serverContext.flexParameters().maxAccessWalkDuration(),
+      0
+    );
+    Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
+      request,
+      request.journey().direct(),
+      serverContext.dataOverlayContext(request),
+      AccessEgressType.EGRESS,
+      serverContext.flexParameters().maxEgressWalkDuration(),
+      0
+    );
 
-      var flexRouter = new FlexRouter(
-        serverContext.graph(),
-        serverContext.transitService(),
-        serverContext.flexParameters(),
-        FilterMapper.map(request.journey().transit().filters()),
-        request.dateTime(),
-        request.bookingTime(),
-        additionalSearchDays.additionalSearchDaysInPast(),
-        additionalSearchDays.additionalSearchDaysInFuture(),
-        accessStops,
-        egressStops
-      );
+    var flexRouter = new FlexRouter(
+      serverContext.graph(),
+      serverContext.transitService(),
+      serverContext.flexParameters(),
+      FilterMapper.map(request.journey().transit().filters()),
+      request.dateTime(),
+      request.bookingTime(),
+      additionalSearchDays.additionalSearchDaysInPast(),
+      additionalSearchDays.additionalSearchDaysInFuture(),
+      accessStops,
+      egressStops
+    );
 
-      return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
-    }
+    return new ArrayList<>(flexRouter.createFlexOnlyItineraries(request.arriveBy()));
   }
 }

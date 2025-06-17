@@ -14,6 +14,7 @@ import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -72,6 +73,8 @@ public class BicycleRoutingTest {
   }
 
   private static String computePolyline(Graph graph, GenericLocation from, GenericLocation to) {
+    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, StreetMode.BIKE);
+    var gpf = new GraphPathFinder(null);
     RouteRequest request = RouteRequest.of()
       .withDateTime(dateTime)
       .withFrom(from)
@@ -82,17 +85,14 @@ public class BicycleRoutingTest {
       .withJourney(jb -> {
         jb.withDirect(new StreetRequest(StreetMode.BIKE));
       })
+      .withVertexService(
+        new DefaultRequestVertexService(
+          temporaryVertices.getFromVertices(),
+          temporaryVertices.getToVertices()
+        )
+      )
       .buildRequest();
-
-    var temporaryVertices = new TemporaryVerticesContainer(
-      graph,
-      request.from(),
-      request.to(),
-      request.journey().direct().mode(),
-      request.journey().direct().mode()
-    );
-    var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    var paths = gpf.graphPathFinderEntryPoint(request);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,

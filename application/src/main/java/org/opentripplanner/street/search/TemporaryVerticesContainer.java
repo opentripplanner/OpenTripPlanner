@@ -2,6 +2,7 @@ package org.opentripplanner.street.search;
 
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,8 +54,18 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     Graph graph,
     GenericLocation from,
     GenericLocation to,
+    StreetMode streetMode
+  ) {
+    this(graph, from, to, streetMode, streetMode, streetMode);
+  }
+
+  public TemporaryVerticesContainer(
+    Graph graph,
+    GenericLocation from,
+    GenericLocation to,
     StreetMode accessMode,
-    StreetMode egressMode
+    StreetMode egressMode,
+    StreetMode directMode
   ) {
     this.tempEdges = new HashSet<>();
 
@@ -62,16 +73,24 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     this.vertexLinker = graph.getLinker();
     this.from = from;
     this.to = to;
-    fromVertices = getStreetVerticesForLocation(from, accessMode, false, tempEdges);
-    toVertices = getStreetVerticesForLocation(to, egressMode, true, tempEdges);
+    fromVertices = getStreetVerticesForLocation(
+      from,
+      EnumSet.of(accessMode, directMode),
+      false,
+      tempEdges
+    );
+    toVertices = getStreetVerticesForLocation(
+      to,
+      EnumSet.of(egressMode, directMode),
+      true,
+      tempEdges
+    );
 
     checkIfVerticesFound();
 
-    if (fromVertices != null && toVertices != null) {
-      for (Vertex fromVertex : fromVertices) {
-        for (Vertex toVertex : toVertices) {
-          tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
-        }
+    for (Vertex fromVertex : fromVertices) {
+      for (Vertex toVertex : toVertices) {
+        tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
       }
     }
   }
@@ -126,21 +145,35 @@ public class TemporaryVerticesContainer implements AutoCloseable {
    *
    * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
-  @Nullable
   private Set<Vertex> getStreetVerticesForLocation(
     GenericLocation location,
-    StreetMode streetMode,
+    EnumSet<StreetMode> streetModes,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
     if (!location.isSpecified()) {
-      return null;
+      return Set.of();
     }
 
     // Differentiate between driving and non-driving, as driving is not available from transit stops
-    TraverseMode mode = getTraverseModeForLinker(streetMode, endVertex);
+    List<TraverseMode> modes = streetModes
+      .stream()
+      .map(streetMode -> getTraverseModeForLinker(streetMode, endVertex))
+      .distinct()
+      .toList();
 
-    if (mode.isInCar()) {
+    var results = new HashSet<Vertex>();
+    if (!modes.stream().allMatch(TraverseMode::isInCar)) {
+      // Check if Stop/StopCollection is found by FeedScopeId
+      if (location.stopId != null) {
+        var streetVertices = graph.findStopVertices(location.stopId);
+        if (!streetVertices.isEmpty()) {
+          results.addAll(streetVertices);
+        }
+      }
+    }
+
+    if (modes.stream().anyMatch(TraverseMode::isInCar)) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
         var stopVertex = graph.getStopVertexForStopId(location.stopId);
@@ -154,30 +187,22 @@ public class TemporaryVerticesContainer implements AutoCloseable {
           );
         }
       }
-    } else {
-      // Check if Stop/StopCollection is found by FeedScopeId
-      if (location.stopId != null) {
-        var streetVertices = graph.findStopVertices(location.stopId);
-        if (!streetVertices.isEmpty()) {
-          return streetVertices;
-        }
-      }
     }
 
     // Check if coordinate is provided and connect it to graph
     if (location.getCoordinate() != null) {
-      return Set.of(
+      results.add(
         createVertexFromCoordinate(
           location.getCoordinate(),
           location.label,
-          streetMode,
+          modes,
           endVertex,
           tempEdges
         )
       );
     }
 
-    return null;
+    return results;
   }
 
   private TraverseMode getTraverseModeForLinker(StreetMode streetMode, boolean endVertex) {
@@ -194,7 +219,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private Vertex createVertexFromCoordinate(
     Coordinate coordinate,
     @Nullable String label,
-    StreetMode streetMode,
+    List<TraverseMode> modes,
     boolean endVertex,
     Set<DisposableEdgeCollection> tempEdges
   ) {
@@ -217,12 +242,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
     var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
-    TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
-
     tempEdges.add(
       vertexLinker.linkVertexForRequest(
         temporaryStreetLocation,
-        new TraverseModeSet(nonTransitMode),
+        new TraverseModeSet(modes),
         endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
         endVertex
           ? (vertex, streetVertex) ->
@@ -273,11 +296,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
     // if from and to share any vertices, the user is already at their destination, and the result
     // is a trivial path
-    if (
-      fromVertices != null &&
-      toVertices != null &&
-      !Sets.intersection(fromVertices, toVertices).isEmpty()
-    ) {
+    if (!Sets.intersection(fromVertices, toVertices).isEmpty()) {
       routingErrors.add(new RoutingError(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, null));
     }
 
@@ -288,7 +307,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
   private static boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
     // Not connected if linking was not attempted, and vertices were not specified in the request.
-    if (vertices == null) {
+    if (vertices.isEmpty()) {
       return true;
     }
 
