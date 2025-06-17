@@ -49,6 +49,8 @@ import org.opentripplanner.transit.configure.TransitModule;
 import org.opentripplanner.transit.service.TimetableRepository;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
+import org.opentripplanner.updater.trip.TripPatternCache;
+import org.opentripplanner.updater.trip.configure.TripUpdateModule;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
 /**
@@ -72,6 +74,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     StreetLimitationParametersServiceModule.class,
     SubmodeMappingModule.class,
     TransitModule.class,
+    TripUpdateModule.class,
     VehicleParkingServiceModule.class,
     VehicleRentalRepositoryModule.class,
     VehicleRentalServiceModule.class,
@@ -93,6 +96,7 @@ public interface ConstructApplicationFactory {
   VehicleParkingRepository vehicleParkingRepository();
   VehicleParkingService vehicleParkingService();
   TimetableSnapshotManager timetableSnapshotManager();
+  TripPatternCache tripPatternCache();
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable

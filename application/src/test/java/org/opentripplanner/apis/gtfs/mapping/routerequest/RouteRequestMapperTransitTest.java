@@ -2,10 +2,9 @@ package org.opentripplanner.apis.gtfs.mapping.routerequest;
 
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.createArgsCopy;
-import static org.opentripplanner.apis.gtfs.mapping.routerequest.RouteRequestMapperTest.executionContext;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -14,9 +13,11 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 
 class RouteRequestMapperTransitTest {
 
+  private final _RouteRequestTestContext testCtx = _RouteRequestTestContext.of(Locale.ENGLISH);
+
   @Test
   void testBoardPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var reluctance = 7.5;
     var slack = Duration.ofSeconds(125);
     args.put(
@@ -33,8 +34,8 @@ class RouteRequestMapperTransitTest {
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transferPreferences = routeRequest.preferences().transfer();
     assertEquals(reluctance, transferPreferences.waitReluctance());
     var transitPreferences = routeRequest.preferences().transit();
@@ -43,7 +44,7 @@ class RouteRequestMapperTransitTest {
 
   @Test
   void testAlightPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var slack = Duration.ofSeconds(125);
     args.put(
       "preferences",
@@ -51,15 +52,15 @@ class RouteRequestMapperTransitTest {
         entry("transit", Map.ofEntries(entry("alight", Map.ofEntries(entry("slack", slack)))))
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transitPreferences = routeRequest.preferences().transit();
     assertEquals(slack, transitPreferences.alightSlack().valueOf(TransitMode.BUS));
   }
 
   @Test
   void testTransferPreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var cost = Cost.costOfSeconds(75);
     var slack = Duration.ofSeconds(125);
     var maximumAdditionalTransfers = 1;
@@ -78,23 +79,31 @@ class RouteRequestMapperTransitTest {
                 entry("maximumAdditionalTransfers", maximumAdditionalTransfers),
                 entry("maximumTransfers", maximumTransfers)
               )
+            ),
+            entry(
+              "filters",
+              List.of(Map.of("exclude", List.of(Map.of("routes", List.of("f:route1")))))
             )
           )
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transferPreferences = routeRequest.preferences().transfer();
     assertEquals(cost.toSeconds(), transferPreferences.cost());
     assertEquals(slack, transferPreferences.slack());
     assertEquals(maximumAdditionalTransfers, transferPreferences.maxAdditionalTransfers());
     assertEquals(maximumTransfers + 1, transferPreferences.maxTransfers());
+    assertEquals(
+      "[TransitFilterRequest{select: [SelectRequest{transportModes: ALL-MAIN-MODES}], not: [SelectRequest{transportModes: [], routes: [f:route1]}]}]",
+      routeRequest.journey().transit().filters().toString()
+    );
   }
 
   @Test
   void testTimetablePreferences() {
-    var args = createArgsCopy(RouteRequestMapperTest.ARGS);
+    var args = testCtx.basicRequest();
     var excludeRealTimeUpdates = true;
     var includePlannedCancellations = true;
     var includeRealTimeCancellations = true;
@@ -116,8 +125,8 @@ class RouteRequestMapperTransitTest {
         )
       )
     );
-    var env = executionContext(args, Locale.ENGLISH, RouteRequestMapperTest.CONTEXT);
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, RouteRequestMapperTest.CONTEXT);
+    var env = testCtx.executionContext(args);
+    var routeRequest = RouteRequestMapper.toRouteRequest(env, testCtx.context());
     var transitPreferences = routeRequest.preferences().transit();
     assertEquals(excludeRealTimeUpdates, transitPreferences.ignoreRealtimeUpdates());
     assertEquals(includePlannedCancellations, transitPreferences.includePlannedCancellations());

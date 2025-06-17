@@ -64,6 +64,7 @@ public class ConstructApplicationModule {
     var defaultRequest = launcherRequestDecorator.intercept(routerConfig.routingRequestDefaults());
 
     var transitRoutingConfig = routerConfig.transitTuningConfig();
+    var triasApiParameters = routerConfig.triasApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
 
@@ -81,6 +82,7 @@ public class ConstructApplicationModule {
       submodeMappingService,
       transitRoutingConfig,
       transitService,
+      triasApiParameters,
       vectorTileConfig,
       vehicleParkingService,
       vehicleRentalService,

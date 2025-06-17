@@ -185,10 +185,10 @@ public class ConstantsForTests {
         timetableRepository,
         DataImportIssueStore.NOOP,
         Duration.ofMinutes(30),
-        List.of(new RouteRequest())
+        List.of(RouteRequest.defaultValue())
       ).buildGraph();
 
-      graph.index(timetableRepository.getSiteRepository());
+      graph.index();
 
       return new TestOtpModel(graph, timetableRepository, fareFactory);
     } catch (Exception e) {
@@ -341,7 +341,7 @@ public class ConstantsForTests {
     module.buildGraph();
 
     timetableRepository.index();
-    graph.index(timetableRepository.getSiteRepository());
+    graph.index();
   }
 
   private static void addPortlandVehicleRentals(Graph graph) {

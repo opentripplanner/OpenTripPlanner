@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.MultiLineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.astar.model.GraphPath;
@@ -46,7 +44,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
-import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
@@ -379,13 +376,14 @@ class WalkableAreaBuilder {
     } else {
       mode = StreetMode.CAR;
     }
-    RouteRequest options = new RouteRequest();
+    // TODO: This is incorrect, the configured defaults are not used.
+    RouteRequest request = RouteRequest.defaultValue();
     Set<Edge> usedEdges = new HashSet<>();
     for (Vertex vertex : startingVertices) {
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setSkipEdgeStrategy(new ListedEdgesOnly(edges))
         .setDominanceFunction(new DominanceFunctions.EarliestArrival())
-        .setRequest(options)
+        .setRequest(request)
         .setStreetRequest(new StreetRequest(mode))
         .setFrom(vertex)
         .getShortestPathTree();

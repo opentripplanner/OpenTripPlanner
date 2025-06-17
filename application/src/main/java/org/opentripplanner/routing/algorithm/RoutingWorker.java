@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectF
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -65,9 +66,12 @@ public class RoutingWorker {
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
-  public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
-    request.applyPageCursor();
-    this.request = request;
+  public RoutingWorker(
+    OtpServerRequestContext serverContext,
+    RouteRequest orginalRequest,
+    ZoneId zoneId
+  ) {
+    this.request = orginalRequest.withPageCursor();
     this.serverContext = serverContext;
     this.debugTimingAggregator = new DebugTimingAggregator(
       serverContext.meterRegistry(),
@@ -88,14 +92,6 @@ public class RoutingWorker {
 
   public RoutingResponse route() {
     OTPRequestTimeoutException.checkForTimeout();
-
-    // If no direct mode is set, then we set one.
-    // See {@link FilterTransitWhenDirectModeIsEmpty}
-    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      request.journey().direct().mode()
-    );
-
-    request.journey().direct().setMode(emptyDirectModeHandler.resolveDirectMode());
 
     this.debugTimingAggregator.finishedPrecalculating();
 
@@ -134,8 +130,7 @@ public class RoutingWorker {
         serverContext,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
-        emptyDirectModeHandler.removeWalkAllTheWayResults() ||
-        removeWalkAllTheWayResultsFromDirectFlex,
+        result.removeWalkAllTheWayResults() || removeWalkAllTheWayResultsFromDirectFlex,
         it -> pageCursorInput = it
       );
 
@@ -152,9 +147,6 @@ public class RoutingWorker {
     }
 
     this.debugTimingAggregator.finishedFiltering();
-
-    // Restore original directMode.
-    request.journey().direct().setMode(emptyDirectModeHandler.originalDirectMode());
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
@@ -225,9 +217,24 @@ public class RoutingWorker {
       return RoutingResult.empty();
     }
 
+    // If no direct mode is set, then we set one.
+    // See {@link FilterTransitWhenDirectModeIsEmpty}
+    var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
+      request.journey().direct().mode(),
+      request.pageCursor() != null
+    );
+    var directBuilder = request.copyOf();
+
+    directBuilder.withJourney(jb ->
+      jb.withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()))
+    );
+
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      return RoutingResult.ok(DirectStreetRouter.route(serverContext, request));
+      return RoutingResult.ok(
+        DirectStreetRouter.route(serverContext, directBuilder.buildRequest()),
+        emptyDirectModeHandler.removeWalkAllTheWayResults()
+      );
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
     } finally {

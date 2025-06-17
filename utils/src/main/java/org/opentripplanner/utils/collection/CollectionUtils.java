@@ -52,6 +52,14 @@ public class CollectionUtils {
   }
 
   /**
+   * Returns true if the collection is non-null and has at least one element. If it is null,
+   * it returns false.
+   */
+  public static boolean hasValue(@Nullable Collection<?> c) {
+    return !isEmpty(c);
+  }
+
+  /**
    * A null-safe version of isEmpty() for a collection.
    * <p>
    * If the collection is {@code null} then {@code true} is returned.
@@ -76,5 +84,14 @@ public class CollectionUtils {
       return null;
     }
     return map.get(key);
+  }
+
+  /**
+   * Throws an IllegalArgumentException if the given collection is empty but doesn't if it is null.
+   */
+  public static void requireNullOrNonEmpty(Collection<?> coll, String name) {
+    if (coll != null && coll.isEmpty()) {
+      throw new IllegalArgumentException("'%s' must not be empty.".formatted(name));
+    }
   }
 }

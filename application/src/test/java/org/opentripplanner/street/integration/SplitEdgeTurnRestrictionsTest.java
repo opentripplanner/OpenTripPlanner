@@ -17,6 +17,7 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -36,15 +37,24 @@ public class SplitEdgeTurnRestrictionsTest {
     .atZone(ZoneIds.BERLIN)
     .toInstant();
   // Deufringen
-  static final GenericLocation hardtheimerWeg = new GenericLocation(48.67765, 8.87212);
-  static final GenericLocation steinhaldenWeg = new GenericLocation(48.67815, 8.87305);
-  static final GenericLocation k1022 = new GenericLocation(48.67846, 8.87021);
+  static final GenericLocation hardtheimerWeg = GenericLocation.fromCoordinate(48.67765, 8.87212);
+  static final GenericLocation steinhaldenWeg = GenericLocation.fromCoordinate(48.67815, 8.87305);
+  static final GenericLocation k1022 = GenericLocation.fromCoordinate(48.67846, 8.87021);
   // Böblingen
-  static final GenericLocation paulGerhardtWegEast = new GenericLocation(48.68363, 9.00728);
-  static final GenericLocation paulGerhardtWegWest = new GenericLocation(48.68297, 9.00520);
-  static final GenericLocation parkStrasse = new GenericLocation(48.68358, 9.00826);
-  static final GenericLocation herrenbergerStrasse = new GenericLocation(48.68497, 9.00909);
-  static final GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
+  static final GenericLocation paulGerhardtWegEast = GenericLocation.fromCoordinate(
+    48.68363,
+    9.00728
+  );
+  static final GenericLocation paulGerhardtWegWest = GenericLocation.fromCoordinate(
+    48.68297,
+    9.00520
+  );
+  static final GenericLocation parkStrasse = GenericLocation.fromCoordinate(48.68358, 9.00826);
+  static final GenericLocation herrenbergerStrasse = GenericLocation.fromCoordinate(
+    48.68497,
+    9.00909
+  );
+  static final GenericLocation steinbeissWeg = GenericLocation.fromCoordinate(48.68172, 9.00599);
   private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(
     SplitEdgeTurnRestrictionsTest.class
   );
@@ -147,12 +157,13 @@ public class SplitEdgeTurnRestrictionsTest {
   }
 
   private static String computeCarPolyline(Graph graph, GenericLocation from, GenericLocation to) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
+    RouteRequest request = RouteRequest.of()
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
+      .buildRequest();
 
-    request.journey().direct().setMode(StreetMode.CAR);
     var temporaryVertices = new TemporaryVerticesContainer(
       graph,
       from,

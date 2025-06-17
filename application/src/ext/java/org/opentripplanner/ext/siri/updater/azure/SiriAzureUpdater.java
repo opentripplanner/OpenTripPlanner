@@ -7,16 +7,16 @@ import com.azure.messaging.servicebus.ServiceBusException;
 import com.azure.messaging.servicebus.ServiceBusFailureReason;
 import com.azure.messaging.servicebus.ServiceBusProcessorClient;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
-import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsyncClient;
+import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClient;
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.azure.messaging.servicebus.models.ServiceBusReceiveMode;
 import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.MoreExecutors;
 import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -91,7 +91,7 @@ public class SiriAzureUpdater implements GraphUpdater {
   private final int prefetchCount;
 
   private ServiceBusProcessorClient eventProcessor;
-  private ServiceBusAdministrationAsyncClient serviceBusAdmin;
+  private ServiceBusAdministrationClient serviceBusAdmin;
   private boolean isPrimed = false;
   private String subscriptionName;
 
@@ -218,12 +218,12 @@ public class SiriAzureUpdater implements GraphUpdater {
       setPrimed();
 
       ApplicationShutdownSupport.addShutdownHook("azure-siri-updater-shutdown", () -> {
-        LOG.info("Calling shutdownHook on AbstractAzureSiriUpdater");
+        LOG.info("Calling shutdownHook on {} updater", updaterType);
         if (eventProcessor != null) {
           eventProcessor.close();
         }
         if (serviceBusAdmin != null) {
-          serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+          serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
           LOG.info("Subscription '{}' deleted on topic '{}'.", subscriptionName, topicName);
         }
       });
@@ -321,35 +321,37 @@ public class SiriAzureUpdater implements GraphUpdater {
     // Client with permissions to create subscription
     if (authenticationType == AuthenticationType.FederatedIdentity) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
-        .credential(fullyQualifiedNamespace, new DefaultAzureCredentialBuilder().build())
-        .buildAsyncClient();
+        .credential(
+          fullyQualifiedNamespace,
+          new DefaultAzureCredentialBuilder()
+            // We use the current thread for fetching credentials since the default executor
+            // service can't be used in the shutdownHook where we want to delete the subscription
+            .executorService(MoreExecutors.newDirectExecutorService())
+            .build()
+        )
+        .buildClient();
     } else if (authenticationType == AuthenticationType.SharedAccessKey) {
       serviceBusAdmin = new ServiceBusAdministrationClientBuilder()
         .connectionString(serviceBusUrl)
-        .buildAsyncClient();
+        .buildClient();
     }
 
     // Set options
     CreateSubscriptionOptions options = new CreateSubscriptionOptions()
-      .setDefaultMessageTimeToLive(Duration.of(25, ChronoUnit.HOURS))
       .setAutoDeleteOnIdle(autoDeleteOnIdle);
 
     // Make sure there is no old subscription on serviceBus
-    if (
-      Boolean.TRUE.equals(
-        serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName).block()
-      )
-    ) {
+    if (serviceBusAdmin.getSubscriptionExists(topicName, subscriptionName)) {
       LOG.info(
         "Subscription '{}' already exists. Deleting existing subscription.",
         subscriptionName
       );
-      serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
+      serviceBusAdmin.deleteSubscription(topicName, subscriptionName);
       LOG.info("Service Bus deleted subscription {}.", subscriptionName);
     }
-    serviceBusAdmin.createSubscription(topicName, subscriptionName, options).block();
+    serviceBusAdmin.createSubscription(topicName, subscriptionName, options);
 
-    LOG.info("{} created subscription {}", getClass().getSimpleName(), subscriptionName);
+    LOG.info("{} updater created subscription {}", updaterType, subscriptionName);
   }
 
   /**

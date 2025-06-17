@@ -107,6 +107,7 @@ public class TestServerContext {
       new SubmodeMappingService(null),
       routerConfig.transitTuningConfig(),
       transitService,
+      routerConfig.triasApiParameters(),
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),

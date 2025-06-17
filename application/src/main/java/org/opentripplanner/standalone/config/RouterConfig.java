@@ -12,6 +12,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
+import org.opentripplanner.ext.trias.config.TriasApiConfig;
+import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
@@ -55,6 +57,7 @@ public class RouterConfig implements Serializable {
   private final FlexConfig flexConfig;
   private final TransmodelAPIConfig transmodelApi;
   private final VectorTileConfig vectorTileConfig;
+  private final TriasApiParameters triasApiParameters;
 
   public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
     this(new NodeAdapter(node, source), logUnusedParams);
@@ -79,12 +82,16 @@ public class RouterConfig implements Serializable {
 
     this.server = new ServerConfig("server", root);
     this.transmodelApi = new TransmodelAPIConfig("transmodelApi", root);
-    this.routingRequestDefaults = mapDefaultRouteRequest("routingDefaults", root);
-    this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
-    this.routingRequestDefaults.initMaxSearchWindow(transitConfig.maxSearchWindow());
+    var request = mapDefaultRouteRequest("routingDefaults", root);
+    this.transitConfig = new TransitRoutingConfig("transit", root, request);
+    this.routingRequestDefaults = request
+      .copyOf()
+      .withMaxSearchWindow(transitConfig.maxSearchWindow())
+      .buildDefault();
     this.updatersParameters = new UpdatersConfig(root);
     this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileConfig = VectorTileConfig.mapVectorTilesParameters(root, "vectorTiles");
+    this.triasApiParameters = TriasApiConfig.mapParameters("triasApi", root);
     this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
@@ -147,6 +154,10 @@ public class RouterConfig implements Serializable {
 
   public FlexParameters flexParameters() {
     return flexConfig;
+  }
+
+  public TriasApiParameters triasApiParameters() {
+    return triasApiParameters;
   }
 
   public NodeAdapter asNodeAdapter() {

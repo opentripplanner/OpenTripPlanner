@@ -1,16 +1,15 @@
 package org.opentripplanner.service.paging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.service.paging.TestPagingModel.D30m;
 import static org.opentripplanner.service.paging.TestPagingModel.T12_00;
 import static org.opentripplanner.service.paging.TestPagingModel.T12_30;
 import static org.opentripplanner.service.paging.TestPagingModel.T13_00;
 import static org.opentripplanner.service.paging.TestPagingModel.T13_30;
+import static org.opentripplanner.service.paging.TestPagingUtils.assertPageCursor;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageType;
 
 /**
@@ -56,7 +55,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
       PageType.NEXT_PAGE,
       SortOrder.STREET_AND_ARRIVAL_TIME,
       "12:09",
-      ""
+      "",
+      SEARCH_WINDOW_USED
     );
 
     // TEST PAGING AFTER NEXT -> NEXT & PREVIOUS
@@ -70,7 +70,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_ARRIVAL_TIME,
         "11:39",
-        ""
+        "",
+        SEARCH_WINDOW_USED
       );
       // NEXT
       assertPageCursor(
@@ -78,7 +79,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.NEXT_PAGE,
         SortOrder.STREET_AND_ARRIVAL_TIME,
         "12:29",
-        ""
+        "",
+        SEARCH_WINDOW_USED
       );
     }
   }
@@ -97,7 +99,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
       PageType.PREVIOUS_PAGE,
       SortOrder.STREET_AND_ARRIVAL_TIME,
       "12:00",
-      ""
+      "",
+      SEARCH_WINDOW_USED
     );
 
     // TEST PAGING AFTER PREVIOUS
@@ -111,7 +114,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_ARRIVAL_TIME,
         "11:41",
-        ""
+        "",
+        SEARCH_WINDOW_USED
       );
       // NEXT
       assertPageCursor(
@@ -119,7 +123,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.NEXT_PAGE,
         SortOrder.STREET_AND_ARRIVAL_TIME,
         "12:30",
-        ""
+        "",
+        SEARCH_WINDOW_USED
       );
     }
   }
@@ -129,17 +134,20 @@ class PS2_ManyParetoOptimalItinerariesTest {
    */
   @Test
   void testPagingArriveByAndNext() {
-    var testDriver = model.arriveByDriver(T12_00, T13_00, D30m, 3);
+    var testDriver = model.arriveByDriver(T12_00, T13_00, SEARCH_WINDOW_USED, 3);
     var subject = testDriver.pagingService();
 
     var nextCursor = subject.nextPageCursor();
 
+    // The earliest departure time is 12:26 here, because it is determined from the
+    // latest itinerary departure from the results.
     assertPageCursor(
       nextCursor,
       PageType.NEXT_PAGE,
       SortOrder.STREET_AND_DEPARTURE_TIME,
-      "12:30",
-      ""
+      "12:26",
+      "",
+      SEARCH_WINDOW_USED
     );
 
     // TEST PAGING AFTER NEXT -> NEXT & PREVIOUS
@@ -152,8 +160,9 @@ class PS2_ManyParetoOptimalItinerariesTest {
         nextSubject.previousPageCursor(),
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_DEPARTURE_TIME,
-        "12:00",
-        ""
+        "11:56",
+        "",
+        SEARCH_WINDOW_USED
       );
       // NEXT
       assertPageCursor(
@@ -161,7 +170,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.NEXT_PAGE,
         SortOrder.STREET_AND_DEPARTURE_TIME,
         "12:40",
-        ""
+        "",
+        SEARCH_WINDOW_USED
       );
     }
   }
@@ -181,7 +191,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
       PageType.PREVIOUS_PAGE,
       SortOrder.STREET_AND_DEPARTURE_TIME,
       "12:11",
-      "13:30"
+      "13:30",
+      SEARCH_WINDOW_USED
     );
 
     // TEST PAGING AFTER PREVIOUS
@@ -195,7 +206,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_DEPARTURE_TIME,
         "12:00",
-        "13:30"
+        "13:30",
+        SEARCH_WINDOW_USED
       );
       // NEXT
       assertPageCursor(
@@ -203,22 +215,9 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.NEXT_PAGE,
         SortOrder.STREET_AND_DEPARTURE_TIME,
         "12:41",
-        ""
+        "",
+        SEARCH_WINDOW_USED
       );
     }
-  }
-
-  private static void assertPageCursor(
-    PageCursor cursor,
-    PageType pageType,
-    SortOrder sortOrder,
-    String edt,
-    String lat
-  ) {
-    assertEquals(pageType, cursor.type());
-    assertEquals(sortOrder, cursor.originalSortOrder());
-    assertEquals(D30m, cursor.searchWindow());
-    assertEquals(edt, TestPagingUtils.cleanStr(cursor.earliestDepartureTime()));
-    assertEquals(lat, TestPagingUtils.cleanStr(cursor.latestArrivalTime()));
   }
 }

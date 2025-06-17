@@ -100,6 +100,7 @@ public class TripMapperTest {
   void testMapWithNulls() throws Exception {
     Trip input = new Trip();
     input.setId(AGENCY_AND_ID);
+    input.setServiceId(AGENCY_AND_ID);
     input.setRoute(new GtfsTestData().route);
 
     org.opentripplanner.transit.model.timetable.Trip result = subject.map(input);
@@ -108,7 +109,7 @@ public class TripMapperTest {
     assertNotNull(result.getRoute());
 
     assertNull(result.getGtfsBlockId());
-    assertNull(result.getServiceId());
+    assertEquals("FEED:1", result.getServiceId().toString());
     assertNull(result.getShapeId());
     assertNull(result.getHeadsign());
     assertNull(result.getShortName());
@@ -144,6 +145,7 @@ public class TripMapperTest {
   ) {
     var flexTrip = new Trip();
     flexTrip.setId(new AgencyAndId("1", "1"));
+    flexTrip.setServiceId(AGENCY_AND_ID);
     flexTrip.setSafeDurationFactor(inputFactor);
     flexTrip.setSafeDurationOffset(inputOffset);
     flexTrip.setRoute(new GtfsTestData().route);
