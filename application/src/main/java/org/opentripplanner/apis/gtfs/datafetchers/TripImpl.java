@@ -23,7 +23,6 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.mapping.BikesAllowedMapper;
 import org.opentripplanner.apis.gtfs.mapping.TransitModeMapper;
-import org.opentripplanner.apis.gtfs.mapping.TransmodelSubmodeMapper;
 import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.model.Timetable;
@@ -47,8 +46,6 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
 public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
-
-  TransmodelSubmodeMapper submodeMapper = new TransmodelSubmodeMapper();
 
   @Override
   public DataFetcher<Iterable<String>> activeDates() {
