@@ -16,7 +16,7 @@ public class ViaSegmentMapper {
     if (viaSegment.containsKey("filters")) {
       journey.withTransit(tb -> {
         List<Map<String, ?>> filters = (List<Map<String, ?>>) viaSegment.get("filters");
-        tb.setFilters(TransitFilterNewWayMapper.mapFilterNewWay(filters));
+        tb.setFilters(TransitFilterNewWayMapper.mapFilter(filters));
       });
     }
     return journey.build();

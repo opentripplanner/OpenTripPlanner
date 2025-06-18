@@ -23,7 +23,7 @@ class TransitFilterOldWayMapper {
   private TransitFilterOldWayMapper() {}
 
   @SuppressWarnings("unchecked")
-  static void mapFilterOldWay(
+  static void mapFilter(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
     TransitRequestBuilder transitBuilder
@@ -36,14 +36,6 @@ class TransitFilterOldWayMapper {
     ) {
       return;
     }
-    mapFilter(environment, callWith, transitBuilder);
-  }
-
-  private static void mapFilter(
-    DataFetchingEnvironment environment,
-    DataFetcherDecorator callWith,
-    TransitRequestBuilder transitBuilder
-  ) {
     var selectorBuilders = new ArrayList<SelectRequest.Builder>();
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();

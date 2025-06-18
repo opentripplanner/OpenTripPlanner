@@ -12,27 +12,26 @@ public class TransitFilterNewWayMapper {
   private TransitFilterNewWayMapper() {}
 
   @SuppressWarnings("unchecked")
-  static List<TransitFilter> mapFilterNewWay(List<Map<String, ?>> filters) {
+  static List<TransitFilter> mapFilter(List<Map<String, ?>> filters) {
     var filterRequests = new ArrayList<TransitFilter>();
 
     for (var filterInput : filters) {
       var filterRequestBuilder = TransitFilterRequest.of();
 
       if (filterInput.containsKey("select")) {
-        for (var selectInput : (List<Map<String, List<?>>>) filterInput.get("select")) {
-          filterRequestBuilder.addSelect(SelectRequestMapper.mapSelectRequest(selectInput));
+        var select = (List<Map<String, List<?>>>) filterInput.get("select");
+        for (var it : select) {
+          filterRequestBuilder.addSelect(SelectRequestMapper.mapSelectRequest(it));
         }
       }
-
       if (filterInput.containsKey("not")) {
-        for (var selectInput : (List<Map<String, List<?>>>) filterInput.get("not")) {
-          filterRequestBuilder.addNot(SelectRequestMapper.mapSelectRequest(selectInput));
+        var not = (List<Map<String, List<?>>>) filterInput.get("not");
+        for (var it : not) {
+          filterRequestBuilder.addNot(SelectRequestMapper.mapSelectRequest(it));
         }
       }
-
       filterRequests.add(filterRequestBuilder.build());
     }
-
     return filterRequests;
   }
 }

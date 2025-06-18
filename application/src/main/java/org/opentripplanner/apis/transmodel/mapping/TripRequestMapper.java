@@ -78,10 +78,10 @@ public class TripRequestMapper {
 
         if (GqlUtil.hasArgument(environment, "filters")) {
           transitBuilder.setFilters(
-            TransitFilterNewWayMapper.mapFilterNewWay(environment.getArgument("filters"))
+            TransitFilterNewWayMapper.mapFilter(environment.getArgument("filters"))
           );
         } else {
-          TransitFilterOldWayMapper.mapFilterOldWay(environment, callWith, transitBuilder);
+          TransitFilterOldWayMapper.mapFilter(environment, callWith, transitBuilder);
         }
       });
 
