@@ -73,13 +73,7 @@ class FareLookupService implements Serializable {
       .filter(FareTransferRule::unlimitedTransfers)
       .filter(FareTransferRule::isFree)
       .flatMap(r -> findTransferMatches(r, legs).stream())
-      .flatMap(transferRule ->
-        ListUtils.combine(
-          transferRule.fromLegRule().fareProducts(),
-          transferRule.toLegRule().fareProducts(),
-          transferRule.transferRule().fareProducts()
-        ).stream()
-      )
+      .flatMap(transferRule -> transferRule.fromLegRule().fareProducts().stream())
       .collect(Collectors.toUnmodifiableSet());
   }
 
