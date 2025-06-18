@@ -24,10 +24,7 @@ class TransitFilterNewWayMapperTest {
     var result = TransitFilterNewWayMapper.mapFilter(
       list(map("select", list(map("lines", list("F:Line:1")))))
     );
-    assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [], routes: [F:Line:1]}]}]",
-      result.toString()
-    );
+    assertEquals("[(select: [(transportModes: EMPTY, routes: [F:Line:1])])]", result.toString());
   }
 
   @Test
@@ -36,10 +33,7 @@ class TransitFilterNewWayMapperTest {
       list(map("select", list(map(entry("transportModes", list(map("transportMode", BUS)))))))
     );
 
-    assertEquals(
-      "[TransitFilterRequest{select: [SelectRequest{transportModes: [BUS]}]}]",
-      result.toString()
-    );
+    assertEquals("[(select: [(transportModes: [BUS])])]", result.toString());
   }
 
   @Test
@@ -47,10 +41,7 @@ class TransitFilterNewWayMapperTest {
     var result = TransitFilterNewWayMapper.mapFilter(
       list(map("not", list(map("lines", list("F:Line:1")))))
     );
-    assertEquals(
-      "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [F:Line:1]}]}]",
-      result.toString()
-    );
+    assertEquals("[(not: [(transportModes: EMPTY, routes: [F:Line:1])])]", result.toString());
   }
 
   private static <T> Map.Entry<String, List<T>> e(String key, T... values) {

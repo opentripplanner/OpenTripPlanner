@@ -35,7 +35,7 @@ class SelectRequestMapperTest {
       )
     );
     assertEquals(
-      "SelectRequest{transportModes: [BUS, RAIL::local, RAIL::regionalRail], agencies: [F:Auth:1, F:Auth:1], routes: [F:Line:1, F:Line:2]}",
+      "(transportModes: [BUS, RAIL::local, RAIL::regionalRail], agencies: [F:Auth:1, F:Auth:1], routes: [F:Line:1, F:Line:2])",
       result.toString()
     );
   }
@@ -43,6 +43,6 @@ class SelectRequestMapperTest {
   @Test
   void mapEmptySelectRequest() throws JsonProcessingException {
     var result = SelectRequestMapper.mapSelectRequest(map());
-    assertEquals("SelectRequest{transportModes: []}", result.toString());
+    assertEquals("(transportModes: EMPTY)", result.toString());
   }
 }
