@@ -90,9 +90,9 @@ public class ToStringBuilderTest {
 
   @Test
   public void addStr() {
-    assertEquals("{a: 'text'}", ToStringBuilder.of().addStr("a", "text").toString());
-    assertEquals("{}", ToStringBuilder.of().addStr("a", null).toString());
-    assertEquals("{}", ToStringBuilder.of().addStr("a", "text", "text").toString());
+    assertEquals("(a: 'text')", ToStringBuilder.of().addStr("a", "text").toString());
+    assertEquals("()", ToStringBuilder.of().addStr("a", null).toString());
+    assertEquals("()", ToStringBuilder.of().addStr("a", "text", "text").toString());
   }
 
   @Test

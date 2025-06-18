@@ -262,7 +262,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
 
   public String toString() {
     if (isRegularTransfer()) {
-      return "{no constraints}";
+      return "(no constraints)";
     }
 
     return ToStringBuilder.of()
