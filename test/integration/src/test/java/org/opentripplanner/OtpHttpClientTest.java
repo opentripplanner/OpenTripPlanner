@@ -21,7 +21,9 @@ class OtpHttpClientTest {
 
   @ParameterizedTest
   @ValueSource(strings = {
+    // a few entur URLs
     "https://api.entur.io/mobility/v2/gbfs/",
+    "https://storage.googleapis.com/marduk-production/outbound/gtfs/rb_sjn-aggregated-gtfs.zip",
     // Apache HTTP Client broke handling of S3 SSL certificates previously
     "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb"
   })

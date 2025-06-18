@@ -14,4 +14,4 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Run integration tests
-        run: mvn failsafe:integration-test
+        run: mvn test-compile failsafe:integration-test -PprettierSkip
