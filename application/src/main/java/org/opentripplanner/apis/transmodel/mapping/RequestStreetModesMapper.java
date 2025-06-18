@@ -8,7 +8,7 @@ import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 
-class RequestModesMapper {
+class RequestStreetModesMapper {
 
   private static final Predicate<StreetMode> IS_BIKE_OR_CAR = m ->
     m == StreetMode.BIKE || m == StreetMode.CAR;

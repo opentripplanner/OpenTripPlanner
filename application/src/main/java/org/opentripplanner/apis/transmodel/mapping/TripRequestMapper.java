@@ -87,7 +87,7 @@ public class TripRequestMapper {
 
       if (GqlUtil.hasArgument(environment, "modes")) {
         journeyBuilder.setModes(
-          RequestModesMapper.mapRequestStreetModes(environment.getArgument("modes"))
+          RequestStreetModesMapper.mapRequestStreetModes(environment.getArgument("modes"))
         );
       }
     });
