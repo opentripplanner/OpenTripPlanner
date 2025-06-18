@@ -14,6 +14,10 @@ import org.opentripplanner.framework.io.OtpHttpClientFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This integration test makes sure that Apache HTTP client still works with important hosts and
+ * HTTP servers.
+ */
 class OtpHttpClientTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClientTest.class);
