@@ -10,7 +10,6 @@ import java.util.Map;
 import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
-import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.request.TransitRequestBuilder;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
@@ -26,7 +25,7 @@ class FilterMapper {
   static void mapFilterOldWay(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    RouteRequestBuilder request
+    TransitRequestBuilder transitBuilder
   ) {
     if (
       !(GqlUtil.hasArgument(environment, "modes") &&
@@ -36,30 +35,22 @@ class FilterMapper {
     ) {
       return;
     }
-
-    request.withJourney(jb ->
-      jb.withTransit(transitBuilder ->
-        transitBuilder.withFilter(b -> {
-          mapFilter(environment, callWith, transitBuilder, b);
-        })
-      )
-    );
+    mapFilter(environment, callWith, transitBuilder);
   }
 
   private static void mapFilter(
     DataFetchingEnvironment environment,
     DataFetcherDecorator callWith,
-    TransitRequestBuilder transitBuilder,
-    TransitFilterRequest.Builder filterBuilder
+    TransitRequestBuilder transitBuilder
   ) {
-    var selectors = new ArrayList<SelectRequest.Builder>();
+    var selectorBuilders = new ArrayList<SelectRequest.Builder>();
 
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument("whiteListed.authorities", (Collection<String> authorities) ->
       whiteListedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
     );
     if (!whiteListedAgencies.isEmpty()) {
-      selectors.add(SelectRequest.of().withAgencies(whiteListedAgencies));
+      selectorBuilders.add(SelectRequest.of().withAgencies(whiteListedAgencies));
     }
 
     var whiteListedLines = new ArrayList<FeedScopedId>();
@@ -67,11 +58,43 @@ class FilterMapper {
       whiteListedLines.addAll(mapIDsToDomainNullSafe(lines))
     );
     if (!whiteListedLines.isEmpty()) {
-      selectors.add(SelectRequest.of().withRoutes(whiteListedLines));
+      selectorBuilders.add(SelectRequest.of().withRoutes(whiteListedLines));
     }
 
     // Create modes filter for the request
-    List<MainAndSubMode> tModes = new ArrayList<>();
+    final List<MainAndSubMode> tModes = mapTransitModes(environment);
+    if (tModes.isEmpty()) {
+      transitBuilder.disable();
+      return;
+    }
+
+    var selectors = buildFiltersWithModes(selectorBuilders, tModes);
+
+    transitBuilder.withFilter(filterBuilder -> {
+      for (var s : selectors) {
+        filterBuilder.addSelect(s);
+      }
+
+      var bannedAgencies = new ArrayList<FeedScopedId>();
+      callWith.argument("banned.authorities", (Collection<String> authorities) ->
+        bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
+      );
+      if (!bannedAgencies.isEmpty()) {
+        filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
+      }
+
+      var bannedLines = new ArrayList<FeedScopedId>();
+      callWith.argument("banned.lines", (List<String> lines) ->
+        bannedLines.addAll(mapIDsToDomainNullSafe(lines))
+      );
+      if (!bannedLines.isEmpty()) {
+        filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
+      }
+    });
+  }
+
+  private static List<MainAndSubMode> mapTransitModes(DataFetchingEnvironment environment) {
+    final List<MainAndSubMode> tModes = new ArrayList<>();
     if (GqlUtil.hasArgument(environment, "modes")) {
       Map<String, Object> modesInput = environment.getArgument("modes");
       if (modesInput.get("transportModes") != null) {
@@ -80,8 +103,7 @@ class FilterMapper {
         );
         // Disable transit if transit modes is defined and empty
         if (transportModes.isEmpty()) {
-          transitBuilder.disable();
-          return;
+          return List.of();
         }
 
         for (Map<String, ?> modeWithSubmodes : transportModes) {
@@ -100,38 +122,35 @@ class FilterMapper {
             }
           }
         }
-      } else {
-        tModes = MainAndSubMode.all();
       }
-    } else {
-      tModes = MainAndSubMode.all();
-    }
-
-    // Add modes filter to all existing selectors
-    // If no selectors specified, create new one
-    if (!selectors.isEmpty()) {
-      for (var selector : selectors) {
-        filterBuilder.addSelect(selector.withTransportModes(tModes).build());
+      // The "transportModes" is not set
+      else {
+        return MainAndSubMode.all();
       }
-    } else {
-      filterBuilder.addSelect(SelectRequest.of().withTransportModes(tModes).build());
     }
+    // The "modes" is not set
+    else {
+      return MainAndSubMode.all();
+    }
+    return tModes;
+  }
 
-    var bannedAgencies = new ArrayList<FeedScopedId>();
-    callWith.argument("banned.authorities", (Collection<String> authorities) ->
-      bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
-    );
-    if (!bannedAgencies.isEmpty()) {
-      filterBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
+  /**
+   * Finnish building the selectors. Add modes to all existing selectors, or create a new
+   * selector using the provided modes.
+   */
+  private static List<SelectRequest> buildFiltersWithModes(
+    ArrayList<SelectRequest.Builder> selectors,
+    List<MainAndSubMode> tModes
+  ) {
+    if (selectors.isEmpty()) {
+      return List.of(SelectRequest.of().withTransportModes(tModes).build());
     }
-
-    var bannedLines = new ArrayList<FeedScopedId>();
-    callWith.argument("banned.lines", (List<String> lines) ->
-      bannedLines.addAll(mapIDsToDomainNullSafe(lines))
-    );
-    if (!bannedLines.isEmpty()) {
-      filterBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
-    }
+    return selectors
+      .stream()
+      .peek(it -> it.withTransportModes(tModes))
+      .map(it -> it.build())
+      .toList();
   }
 
   @SuppressWarnings("unchecked")

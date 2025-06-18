@@ -81,7 +81,7 @@ public class TripRequestMapper {
             FilterMapper.mapFilterNewWay(environment.getArgument("filters"))
           );
         } else {
-          FilterMapper.mapFilterOldWay(environment, callWith, requestBuilder);
+          FilterMapper.mapFilterOldWay(environment, callWith, transitBuilder);
         }
       });
 
