@@ -1,0 +1,17 @@
+name: Integration tests
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  label-check:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'integration test'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run integration tests
+        run: mvn failsafe:integration-test

@@ -104,6 +104,7 @@
         <module>gtfs-realtime-protobuf</module>
         <module>application</module>
         <module>otp-shaded</module>
+        <module>test/integration</module>
     </modules>
 
 

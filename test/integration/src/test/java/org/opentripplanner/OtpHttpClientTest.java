@@ -1,0 +1,36 @@
+package org.opentripplanner;
+
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
+import jakarta.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.Map;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+class OtpHttpClientTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClientTest.class);
+  private static final OtpHttpClient OTP_HTTP_CLIENT = new OtpHttpClientFactory().create(LOG);
+
+  @ParameterizedTest
+  @ValueSource(strings = {
+    "https://api.entur.io/mobility/v2/gbfs/",
+    // Apache HTTP Client broke handling of S3 SSL certificates previously
+    "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb"
+  })
+  void httpGetRequest(String url) throws IOException {
+    var uri = UriBuilder.fromUri(url).build();
+
+    var stream = OTP_HTTP_CLIENT.getAsInputStream(uri, Duration.ofSeconds(30), Map.of());
+    var bytes = IOUtils.toByteArray(stream);
+
+    assertNotEquals(0, bytes.length, "Empty response body for %s".formatted(url));
+  }
+}
