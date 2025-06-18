@@ -176,7 +176,7 @@
       ],
       "minimumReleaseAge": "1 week",
       "changelogUrl": "https://github.com/apache/httpcomponents-client/blob/master/RELEASE_NOTES.txt",
-      "addLabels": ["Integration test"]
+      "addLabels": ["Integration Test"]
     },
     {
       "groupName": "Jackson non-patch",
