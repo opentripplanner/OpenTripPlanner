@@ -4,6 +4,7 @@ on:
   pull_request:
     types:
       - labeled
+      - synchronize
 env:
   MAVEN_ARGS: "--no-transfer-progress -Dstyle.color=always"
 
