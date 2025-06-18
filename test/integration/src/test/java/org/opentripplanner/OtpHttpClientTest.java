@@ -24,13 +24,15 @@ class OtpHttpClientTest {
   private static final OtpHttpClient OTP_HTTP_CLIENT = new OtpHttpClientFactory().create(LOG);
 
   @ParameterizedTest
-  @ValueSource(strings = {
-    // a few entur URLs
-    "https://api.entur.io/mobility/v2/gbfs/",
-    "https://storage.googleapis.com/marduk-production/outbound/gtfs/rb_sjn-aggregated-gtfs.zip",
-    // Apache HTTP Client broke handling of S3 SSL certificates previously
-    "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb"
-  })
+  @ValueSource(
+    strings = {
+      // a few entur URLs
+      "https://api.entur.io/mobility/v2/gbfs/",
+      "https://storage.googleapis.com/marduk-production/outbound/gtfs/rb_sjn-aggregated-gtfs.zip",
+      // Apache HTTP Client broke handling of S3 SSL certificates previously
+      "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb",
+    }
+  )
   void httpGetRequest(String url) throws IOException {
     var uri = UriBuilder.fromUri(url).build();
 
