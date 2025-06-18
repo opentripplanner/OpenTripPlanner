@@ -19,7 +19,7 @@ class RequestModesMapperTest {
   void testMapRequestModesEmptyMapReturnsDefaults() {
     Map<String, StreetMode> inputModes = Map.of();
 
-    RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
+    RequestModes mappedModes = RequestModesMapper.mapRequestStreetModes(inputModes);
 
     assertEquals(MODES_NOT_SET, mappedModes);
   }
@@ -34,7 +34,7 @@ class RequestModesMapperTest {
       .withDirectMode(null)
       .build();
 
-    RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
+    RequestModes mappedModes = RequestModesMapper.mapRequestStreetModes(inputModes);
 
     assertEquals(wantModes, mappedModes);
   }
@@ -49,7 +49,7 @@ class RequestModesMapperTest {
       .withDirectMode(null)
       .build();
 
-    RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
+    RequestModes mappedModes = RequestModesMapper.mapRequestStreetModes(inputModes);
 
     assertEquals(wantModes, mappedModes);
   }
@@ -63,7 +63,7 @@ class RequestModesMapperTest {
       .withDirectMode(null)
       .build();
 
-    RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
+    RequestModes mappedModes = RequestModesMapper.mapRequestStreetModes(inputModes);
 
     assertEquals(wantModes, mappedModes);
   }
@@ -74,7 +74,7 @@ class RequestModesMapperTest {
 
     RequestModes wantModes = MODES_NOT_SET.copyOf().withDirectMode(StreetMode.CAR).build();
 
-    RequestModes mappedModes = RequestModesMapper.mapRequestModes(inputModes);
+    RequestModes mappedModes = RequestModesMapper.mapRequestStreetModes(inputModes);
 
     assertEquals(wantModes, mappedModes);
   }

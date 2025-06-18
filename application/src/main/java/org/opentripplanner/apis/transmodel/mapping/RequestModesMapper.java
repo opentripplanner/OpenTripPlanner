@@ -21,7 +21,7 @@ class RequestModesMapper {
    * <p>
    * This only maps access, egress, direct & transfer modes. Transport modes are set using filters.
    */
-  static RequestModes mapRequestModes(Map<String, ?> modesInput) {
+  static RequestModes mapRequestStreetModes(Map<String, ?> modesInput) {
     RequestModesBuilder mBuilder = RequestModes.of();
 
     final StreetMode accessMode = (StreetMode) modesInput.get(ACCESS_MODE_KEY);
