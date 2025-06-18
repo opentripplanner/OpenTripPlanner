@@ -62,7 +62,7 @@ class FilterMapper {
     }
 
     // Create modes filter for the request
-    final List<MainAndSubMode> tModes = mapTransitModes(environment);
+    final var tModes = mapTransitModes(environment);
     if (tModes.isEmpty()) {
       transitBuilder.disable();
       return;
@@ -93,44 +93,38 @@ class FilterMapper {
     });
   }
 
+  /**
+   * Return transit modes. If this method returns empty the transit search should be disabled.
+   * This happens is the transit "modes" is defined and empty. If not defined the default is
+   * ALL transit modes.
+   */
   private static List<MainAndSubMode> mapTransitModes(DataFetchingEnvironment environment) {
     final List<MainAndSubMode> tModes = new ArrayList<>();
-    if (GqlUtil.hasArgument(environment, "modes")) {
-      Map<String, Object> modesInput = environment.getArgument("modes");
-      if (modesInput.get("transportModes") != null) {
-        List<Map<String, ?>> transportModes = (List<Map<String, ?>>) modesInput.get(
-          "transportModes"
-        );
-        // Disable transit if transit modes is defined and empty
-        if (transportModes.isEmpty()) {
-          return List.of();
-        }
-
-        for (Map<String, ?> modeWithSubmodes : transportModes) {
-          if (modeWithSubmodes.containsKey("transportMode")) {
-            var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
-
-            if (modeWithSubmodes.containsKey("transportSubModes")) {
-              var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
-                "transportSubModes"
-              );
-              for (TransmodelTransportSubmode submode : transportSubModes) {
-                tModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
-              }
-            } else {
-              tModes.add(new MainAndSubMode(mainMode));
-            }
-          }
-        }
-      }
-      // The "transportModes" is not set
-      else {
-        return MainAndSubMode.all();
-      }
-    }
-    // The "modes" is not set
-    else {
+    if (!GqlUtil.hasArgument(environment, "modes")) {
       return MainAndSubMode.all();
+    }
+    Map<String, Object> modesInput = environment.getArgument("modes");
+    if (modesInput.get("transportModes") == null) {
+      return MainAndSubMode.all();
+    }
+
+    List<Map<String, ?>> transportModes = (List<Map<String, ?>>) modesInput.get("transportModes");
+
+    for (Map<String, ?> modeWithSubmodes : transportModes) {
+      if (modeWithSubmodes.containsKey("transportMode")) {
+        var mainMode = (TransitMode) modeWithSubmodes.get("transportMode");
+
+        if (modeWithSubmodes.containsKey("transportSubModes")) {
+          var transportSubModes = (List<TransmodelTransportSubmode>) modeWithSubmodes.get(
+            "transportSubModes"
+          );
+          for (TransmodelTransportSubmode submode : transportSubModes) {
+            tModes.add(new MainAndSubMode(mainMode, SubMode.of(submode.getValue())));
+          }
+        } else {
+          tModes.add(new MainAndSubMode(mainMode));
+        }
+      }
     }
     return tModes;
   }
