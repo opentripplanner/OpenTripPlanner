@@ -82,7 +82,7 @@ public class ToStringBuilder {
    * Using this builder enforce "name : value", if you only want to print the value use
    * {@link ValueObjectToStringBuilder}.
    */
-  public static ToStringBuilder of() {
+  public static ToStringBuilder ofEmbeddedType() {
     return new ToStringBuilder(null, '(', ')');
   }
 
