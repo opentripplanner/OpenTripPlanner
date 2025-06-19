@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -24,6 +25,9 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
  * the tests.
  */
 public class StreetModeLinkingTest extends GraphRoutingTest {
+
+  private static final GenericLocation PLACE_1 = GenericLocation.fromCoordinate(47.5015, 19.015);
+  private static final GenericLocation PLACE_2 = GenericLocation.fromCoordinate(47.5025, 19.015);
 
   private Graph graph;
 
@@ -94,13 +98,13 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
 
   @Test
   public void testCarParkLinking() {
-    var setup = (BiFunction<Double, Double, Consumer<RouteRequest>>) (
+    var setup = (BiFunction<Double, Double, Consumer<RouteRequestBuilder>>) (
       Double latitude,
       Double longitude
     ) ->
-      (RouteRequest rr) -> {
-        rr.setFrom(new GenericLocation(latitude, longitude));
-        rr.setTo(new GenericLocation(latitude, longitude));
+      (RouteRequestBuilder rr) -> {
+        rr.withFrom(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.withTo(GenericLocation.fromCoordinate(latitude, longitude));
       };
 
     assertLinking(setup.apply(47.501, 19.00), "A1A2 street", "B1B2 street", StreetMode.CAR_TO_PARK);
@@ -110,8 +114,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
     assertLinking(setup.apply(47.501, 19.04), "E1E2 street", "D1D2 street", StreetMode.CAR_TO_PARK);
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
-        rr.setTo(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
+        rr.withFrom(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
+        rr.withTo(new GenericLocation(null, TimetableRepositoryForTest.id("STOP"), null, null));
       },
       "E1E2 street",
       "D1D2 street",
@@ -150,9 +154,9 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   public void testWheelchairLinking() {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(47.5010, 19.03));
-        rr.setTo(new GenericLocation(47.5010, 19.03));
-        rr.setWheelchair(true);
+        rr.withFrom(GenericLocation.fromCoordinate(47.5010, 19.03));
+        rr.withTo(GenericLocation.fromCoordinate(47.5010, 19.03));
+        rr.withJourney(j -> j.withWheelchair(true));
       },
       "C1C2 street",
       "C1C2 street",
@@ -168,8 +172,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   ) {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(latitude, longitude));
-        rr.setTo(new GenericLocation(latitude, longitude));
+        rr.withFrom(GenericLocation.fromCoordinate(latitude, longitude));
+        rr.withTo(GenericLocation.fromCoordinate(latitude, longitude));
       },
       streetName,
       streetName,
@@ -180,8 +184,8 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   private void assertLinkedFromTo(String stopId, String streetName, StreetMode... streetModes) {
     assertLinking(
       rr -> {
-        rr.setFrom(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
-        rr.setTo(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
+        rr.withFrom(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
+        rr.withTo(new GenericLocation(null, TimetableRepositoryForTest.id(stopId), null, null));
       },
       streetName,
       streetName,
@@ -190,24 +194,26 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
   }
 
   private void assertLinking(
-    Consumer<RouteRequest> consumer,
+    Consumer<RouteRequestBuilder> consumer,
     String fromStreetName,
     String toStreetName,
     StreetMode... streetModes
   ) {
     for (final StreetMode streetMode : streetModes) {
-      var routingRequest = new RouteRequest();
+      var builder = RouteRequest.of();
 
-      consumer.accept(routingRequest);
+      consumer.accept(builder);
 
-      // Remove to, so that origin and destination are different
-      routingRequest.setTo(new GenericLocation(null, null));
+      // Set to, so that origin and destination are different
+      builder.withTo(PLACE_1);
+
+      var request = builder.buildRequest();
 
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          routingRequest.from(),
-          routingRequest.to(),
+          request.from(),
+          request.to(),
           streetMode,
           streetMode
         )
@@ -221,18 +227,19 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
         }
       }
 
-      routingRequest = new RouteRequest();
+      builder = RouteRequest.of();
 
-      consumer.accept(routingRequest);
+      consumer.accept(builder);
 
-      // Remove from, so that origin and destination are different
-      routingRequest.setFrom(new GenericLocation(null, null));
+      // Set from, so that origin and destination are different
+      builder.withFrom(PLACE_2);
+      request = builder.buildRequest();
 
       try (
         var temporaryVertices = new TemporaryVerticesContainer(
           graph,
-          routingRequest.from(),
-          routingRequest.to(),
+          request.from(),
+          request.to(),
           streetMode,
           streetMode
         )

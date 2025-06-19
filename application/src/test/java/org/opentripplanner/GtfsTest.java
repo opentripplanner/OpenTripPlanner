@@ -32,7 +32,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.RealTimeRaptorTransitDataUpdater;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RequestModesBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -52,8 +51,6 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 import org.opentripplanner.updater.alert.gtfs.AlertsUpdateHandler;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
-import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.updater.trip.gtfs.GtfsRealTimeTripUpdateAdapter;
 
@@ -90,53 +87,53 @@ public abstract class GtfsTest {
     }
 
     // Init request
-    RouteRequest routingRequest = new RouteRequest();
+    var builder = RouteRequest.of()
+      .withNumItineraries(1)
+      .withArriveBy(dateTime < 0)
+      .withDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
 
-    routingRequest.setNumItineraries(1);
-
-    routingRequest.setArriveBy(dateTime < 0);
-    routingRequest.setDateTime(Instant.ofEpochSecond(Math.abs(dateTime)));
     if (fromVertex != null && !fromVertex.isEmpty()) {
-      routingRequest.setFrom(
-        LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex)
-      );
+      builder.withFrom(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + fromVertex));
     }
     if (toVertex != null && !toVertex.isEmpty()) {
-      routingRequest.setTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
+      builder.withTo(LocationStringParser.getGenericLocation(null, FEED_ID + ":" + toVertex));
     }
     if (onTripId != null && !onTripId.isEmpty()) {
       // TODO VIA - set different on-board request
       //routingRequest.startingTransitTripId = (new FeedScopedId(FEED_ID, onTripId));
     }
-    routingRequest.setWheelchair(wheelchairAccessible);
+    builder.withJourney(journeyBuilder -> {
+      journeyBuilder.withWheelchair(wheelchairAccessible);
 
-    RequestModesBuilder requestModesBuilder = RequestModes.of()
-      .withDirectMode(NOT_SET)
-      .withAccessMode(WALK)
-      .withTransferMode(WALK)
-      .withEgressMode(WALK);
-    routingRequest.journey().setModes(requestModesBuilder.build());
+      var requestModesBuilder = RequestModes.of()
+        .withDirectMode(NOT_SET)
+        .withAccessMode(WALK)
+        .withTransferMode(WALK)
+        .withEgressMode(WALK);
 
-    var filterRequestBuilder = TransitFilterRequest.of();
-    if (preferredMode != null) {
-      filterRequestBuilder.addSelect(
-        SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
-      );
-    } else {
-      filterRequestBuilder.addSelect(
-        SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
-      );
-    }
+      journeyBuilder.setModes(requestModesBuilder.build());
 
-    if (excludedRoute != null && !excludedRoute.isEmpty()) {
-      List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
-      filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
-    }
+      var filterRequestBuilder = TransitFilterRequest.of();
+      if (preferredMode != null) {
+        filterRequestBuilder.addSelect(
+          SelectRequest.of().addTransportMode(new MainAndSubMode(preferredMode, null)).build()
+        );
+      } else {
+        filterRequestBuilder.addSelect(
+          SelectRequest.of().withTransportModes(MainAndSubMode.all()).build()
+        );
+      }
 
-    routingRequest.journey().transit().setFilters(List.of(filterRequestBuilder.build()));
+      if (excludedRoute != null && !excludedRoute.isEmpty()) {
+        List<FeedScopedId> routeIds = List.of(new FeedScopedId(FEED_ID, excludedRoute));
+        filterRequestBuilder.addNot(SelectRequest.of().withRoutes(routeIds).build());
+      }
+
+      journeyBuilder.withTransit(b -> b.setFilters(List.of(filterRequestBuilder.build())));
+    });
 
     // Init preferences
-    routingRequest.withPreferences(preferences -> {
+    builder.withPreferences(preferences -> {
       preferences.withTransfer(tx -> {
         tx.withSlack(Duration.ZERO);
         tx.withWaitReluctance(1);
@@ -152,7 +149,7 @@ public abstract class GtfsTest {
     });
 
     // Route
-    RoutingResponse res = serverContext.routingService().route(routingRequest);
+    RoutingResponse res = serverContext.routingService().route(builder.buildRequest());
 
     // Assert itineraries
     List<Itinerary> itineraries = res.getTripPlan().itineraries;
@@ -231,7 +228,6 @@ public abstract class GtfsTest {
     tripUpdateAdapter = new GtfsRealTimeTripUpdateAdapter(
       timetableRepository,
       snapshotManager,
-      new TripPatternCache(new TripPatternIdGenerator(), t -> null),
       LocalDate::now
     );
     alertPatchServiceImpl = new TransitAlertServiceImpl(timetableRepository);

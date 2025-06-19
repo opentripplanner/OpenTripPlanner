@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.server;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
-import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.flex.FlexParameters;
@@ -11,6 +10,7 @@ import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.sorlandsbanen.SorlandsbanenNorwayService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.trias.parameters.TriasApiParameters;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
@@ -78,6 +78,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Nullable
   private final TraverseVisitor traverseVisitor;
 
+  private final TriasApiParameters triasApiParameters;
+
   /* Lazy initialized fields */
 
   private RouteRequest defaultRouteRequestWithTimeSet = null;
@@ -100,6 +102,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     StreetLimitationParametersService streetLimitationParametersService,
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
+    TriasApiParameters triasApiParameters,
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
@@ -124,6 +127,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.streetLimitationParametersService = streetLimitationParametersService;
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
+    this.triasApiParameters = triasApiParameters;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
@@ -146,19 +150,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RouteRequest defaultRouteRequest() {
-    // Lazy initialize request-scoped request to avoid doing this when not needed
-    if (defaultRouteRequestWithTimeSet == null) {
-      defaultRouteRequestWithTimeSet = routeRequestDefaults.copyWithDateTimeNow();
-    }
-    return defaultRouteRequestWithTimeSet;
-  }
-
-  /**
-   * Return the default routing request locale(without cloning the request).
-   */
-  @Override
-  public Locale defaultLocale() {
-    return routeRequestDefaults.locale();
+    return routeRequestDefaults;
   }
 
   @Override
@@ -255,6 +247,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public ViaCoordinateTransferFactory viaTransferResolver() {
     return viaTransferResolver;
+  }
+
+  @Override
+  public TriasApiParameters triasApiParameters() {
+    return triasApiParameters;
   }
 
   @Nullable

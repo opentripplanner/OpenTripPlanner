@@ -11,6 +11,7 @@ import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeo
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIParkAndRideApi;
 import static org.opentripplanner.framework.application.OTPFeature.TransmodelGraphQlApi;
+import static org.opentripplanner.framework.application.OTPFeature.TriasApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import org.opentripplanner.ext.debugrastertiles.api.resource.DebugRasterTileReso
 import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
+import org.opentripplanner.ext.trias.trias.TriasResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 
@@ -56,6 +58,7 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
+    addIfEnabled(TriasApi, TriasResource.class);
   }
 
   /**

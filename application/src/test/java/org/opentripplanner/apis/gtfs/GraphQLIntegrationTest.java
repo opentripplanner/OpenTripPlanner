@@ -70,7 +70,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -103,9 +102,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.Entrance;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TimetableRepository;
@@ -117,6 +117,7 @@ class GraphQLIntegrationTest {
 
   private static final TimetableRepositoryForTest TEST_MODEL = TimetableRepositoryForTest.of();
 
+  private static final Station OMEGA = TEST_MODEL.station("Omega").build();
   private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
   private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
   private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
@@ -155,8 +156,6 @@ class GraphQLIntegrationTest {
       .withCurrentFuelPercent(null)
       .build();
 
-  static final Graph GRAPH = new Graph();
-
   static final Instant ALERT_START_TIME = OffsetDateTime.parse(
     "2023-02-15T12:03:28+01:00"
   ).toInstant();
@@ -187,6 +186,7 @@ class GraphQLIntegrationTest {
 
     var siteRepositoryBuilder = TEST_MODEL.siteRepositoryBuilder();
     STOP_LOCATIONS.forEach(siteRepositoryBuilder::withRegularStop);
+    siteRepositoryBuilder.withStation(OMEGA);
     var siteRepository = siteRepositoryBuilder.build();
     var timetableRepository = new TimetableRepository(siteRepository, DEDUPLICATOR);
 
@@ -253,8 +253,13 @@ class GraphQLIntegrationTest {
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    tripTimes2.cancelTrip();
-    timetableSnapshot.update(new RealTimeTripUpdate(pattern, tripTimes2, secondDate));
+    timetableSnapshot.update(
+      new RealTimeTripUpdate(
+        pattern,
+        tripTimes2.createRealTimeFromScheduledTimes().cancelTrip().build(),
+        secondDate
+      )
+    );
 
     var routes = Arrays.stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
@@ -279,8 +284,7 @@ class GraphQLIntegrationTest {
         t,
         TEST_MODEL.stopTimesEvery5Minutes(4, t, "00:00"),
         new Deduplicator()
-      );
-      realTimeTripTimes.setServiceCode(SERVICE_CODE);
+      ).withServiceCode(SERVICE_CODE);
       timetableSnapshot.update(
         new RealTimeTripUpdate(
           TripPattern.of(new FeedScopedId(FEED_ID, "ADDED_TRIP_PATTERN"))
@@ -427,7 +431,7 @@ class GraphQLIntegrationTest {
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_1);
     defaultVehicleRentalService.addVehicleRentalStation(RENTAL_VEHICLE_2);
 
-    var routeRequest = new RouteRequest();
+    var routeRequest = RouteRequest.defaultValue();
     context = new GraphQLRequestContext(
       new TestRoutingService(List.of(i1)),
       transitService,
@@ -465,12 +469,15 @@ class GraphQLIntegrationTest {
       .copyOf()
       .transformTransitLegs(tl -> {
         if (tl instanceof ScheduledTransitLeg stl) {
-          var rtt = (RealTimeTripTimes) stl.tripTimes();
+          TripTimes scheduledTimes = stl.tripTimes();
+          var builder = scheduledTimes.createRealTimeFromScheduledTimes();
 
-          for (var i = 0; i < rtt.getNumStops(); i++) {
-            rtt.updateArrivalTime(i, rtt.getArrivalTime(i) + TEN_MINUTES);
-            rtt.updateDepartureTime(i, rtt.getDepartureTime(i) + TEN_MINUTES);
+          for (var i = 0; i < scheduledTimes.getNumStops(); i++) {
+            builder.withArrivalTime(i, scheduledTimes.getArrivalTime(i) + TEN_MINUTES);
+            builder.withDepartureTime(i, scheduledTimes.getDepartureTime(i) + TEN_MINUTES);
           }
+
+          return stl.copyOf().withTripTimes(builder.build()).build();
         }
         return tl;
       })

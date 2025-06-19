@@ -43,6 +43,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
@@ -559,7 +560,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
   @Test
   void keepRealTimeAccessibleTrip() {
-    RealTimeTripTimes realTimeWheelchairAccessibleTrip = createTestTripTimes(
+    var builder = createTestTripTimes(
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
@@ -568,7 +569,7 @@ class RouteRequestTransitDataProviderFilterTest {
       null,
       Accessibility.NOT_POSSIBLE,
       TripAlteration.PLANNED
-    );
+    ).createRealTimeFromScheduledTimes();
 
     var filter = new RouteRequestTransitDataProviderFilter(
       false,
@@ -581,11 +582,11 @@ class RouteRequestTransitDataProviderFilterTest {
       filterForMode(TransitMode.BUS)
     );
 
-    assertFalse(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip, true));
+    assertFalse(filter.tripTimesPredicate(builder.build(), true));
 
-    realTimeWheelchairAccessibleTrip.updateWheelchairAccessibility(Accessibility.POSSIBLE);
+    builder.withWheelchairAccessibility(Accessibility.POSSIBLE);
 
-    assertTrue(filter.tripTimesPredicate(realTimeWheelchairAccessibleTrip, true));
+    assertTrue(filter.tripTimesPredicate(builder.build(), true));
   }
 
   @Test
@@ -678,8 +679,10 @@ class RouteRequestTransitDataProviderFilterTest {
       null,
       Accessibility.NOT_POSSIBLE,
       TripAlteration.PLANNED
-    );
-    tripTimesWithCancellation.cancelTrip();
+    )
+      .createRealTimeFromScheduledTimes()
+      .cancelTrip()
+      .build();
 
     // Given
     var filter1 = new RouteRequestTransitDataProviderFilter(
@@ -971,7 +974,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
-  private RealTimeTripTimes createTestTripTimes(
+  private ScheduledTripTimes createTestTripTimes(
     FeedScopedId tripId,
     Route route,
     BikeAccess bikeAccess,

@@ -270,6 +270,7 @@ public class ToStringBuilderTest {
       subject().addDateTime("t", time).toString()
     );
     assertEquals("ToStringBuilderTest{}", subject().addDateTime("t", null).toString());
+    assertEquals("ToStringBuilderTest{}", subject().addDateTime("t", time, time).toString());
   }
 
   @Test

@@ -346,7 +346,10 @@ public class DefaultValueInjector extends GraphQLTypeVisitorStub implements Grap
     RouteRequest defaultRouteRequest,
     DefaultMappingBuilder builder
   ) {
-    builder.boolReq("WheelchairPreferencesInput.enabled", defaultRouteRequest.wheelchair());
+    builder.boolReq(
+      "WheelchairPreferencesInput.enabled",
+      defaultRouteRequest.journey().wheelchair()
+    );
   }
 
   private static ArrayValue mapTransitModes(Map<TransitMode, Double> reluctanceForMode) {

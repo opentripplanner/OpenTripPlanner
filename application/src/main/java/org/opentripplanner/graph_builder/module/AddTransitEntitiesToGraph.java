@@ -87,7 +87,7 @@ public class AddTransitEntitiesToGraph {
   private void applyToGraph(TimetableRepository timetableRepository) {
     timetableRepository.mergeSiteRepositories(otpTransitService.siteRepository());
 
-    addStopsToGraphAndGenerateStopVertexes();
+    addStopsToGraphAndGenerateStopVertexes(timetableRepository);
     addEntrancesToGraph();
     addStationCentroidsToGraph();
     addPathwayNodesToGraph();
@@ -109,12 +109,13 @@ public class AddTransitEntitiesToGraph {
     }
   }
 
-  private void addStopsToGraphAndGenerateStopVertexes() {
+  private void addStopsToGraphAndGenerateStopVertexes(TimetableRepository timetableRepository) {
     // Compute the set of modes for each stop based on all the TripPatterns it is part of
     Map<StopLocation, Set<TransitMode>> stopModeMap = new HashMap<>();
 
     for (TripPattern pattern : otpTransitService.getTripPatterns()) {
       TransitMode mode = pattern.getMode();
+      timetableRepository.addTransitMode(mode);
       for (var stop : pattern.getStops()) {
         Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
         set.add(mode);

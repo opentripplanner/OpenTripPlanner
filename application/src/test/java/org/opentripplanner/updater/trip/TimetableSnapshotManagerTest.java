@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.TimetableSnapshotParameters;
 
 class TimetableSnapshotManagerTest {
@@ -39,12 +40,10 @@ class TimetableSnapshotManagerTest {
       )
     )
     .build();
-  private static final RealTimeTripTimes TRIP_TIMES = RealTimeTripTimes.of(
-    ScheduledTripTimes.of()
-      .withArrivalTimes("00:00 00:01")
-      .withTrip(TimetableRepositoryForTest.trip("trip").build())
-      .build()
-  );
+  private static final TripTimes TRIP_TIMES = ScheduledTripTimes.of()
+    .withArrivalTimes("00:00 00:01")
+    .withTrip(TimetableRepositoryForTest.trip("trip").build())
+    .build();
 
   enum SameAssert {
     Same {
