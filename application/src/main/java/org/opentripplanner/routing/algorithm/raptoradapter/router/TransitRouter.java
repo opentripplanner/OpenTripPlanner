@@ -36,7 +36,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Route
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.AccessEgressPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -253,10 +252,10 @@ public class TransitRouter {
     StreetMode mode = streetRequest.mode();
 
     // Prepare access/egress lists
-    RouteRequest accessRequest = request.clone();
+    var accessBuilder = request.copyOf();
 
     if (type.isAccess()) {
-      accessRequest.withPreferences(p -> {
+      accessBuilder.withPreferences(p -> {
         p.withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
         p.withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
         p.withScooter(s -> s.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false))
@@ -264,10 +263,8 @@ public class TransitRouter {
       });
     }
 
-    AccessEgressPreferences accessEgressPreferences = accessRequest
-      .preferences()
-      .street()
-      .accessEgress();
+    var accessRequest = accessBuilder.buildRequest();
+    var accessEgressPreferences = accessRequest.preferences().street().accessEgress();
 
     Duration durationLimit = accessEgressPreferences.maxDuration().valueOf(mode);
     int stopCountLimit = accessEgressPreferences.maxStopCountLimit().limitForMode(mode);

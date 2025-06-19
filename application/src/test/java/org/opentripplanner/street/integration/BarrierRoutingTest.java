@@ -26,7 +26,9 @@ import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
@@ -53,8 +55,8 @@ public class BarrierRoutingTest {
    */
   @Test
   public void shouldWalkForBarriers() {
-    var from = new GenericLocation(48.59384, 8.86848);
-    var to = new GenericLocation(48.59370, 8.87079);
+    var from = GenericLocation.fromCoordinate(48.59384, 8.86848);
+    var to = GenericLocation.fromCoordinate(48.59370, 8.87079);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, BIKE);
@@ -99,8 +101,8 @@ public class BarrierRoutingTest {
    */
   @Test
   public void shouldDriveAroundBarriers() {
-    var from = new GenericLocation(48.59291, 8.87037);
-    var to = new GenericLocation(48.59262, 8.86879);
+    var from = GenericLocation.fromCoordinate(48.59291, 8.87037);
+    var to = GenericLocation.fromCoordinate(48.59262, 8.86879);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, CAR);
@@ -109,8 +111,8 @@ public class BarrierRoutingTest {
 
   @Test
   public void shouldDriveToBarrier() {
-    var from = new GenericLocation(48.59291, 8.87037);
-    var to = new GenericLocation(48.59276, 8.86963);
+    var from = GenericLocation.fromCoordinate(48.59291, 8.87037);
+    var to = GenericLocation.fromCoordinate(48.59276, 8.86963);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, CAR);
@@ -119,8 +121,8 @@ public class BarrierRoutingTest {
 
   @Test
   public void shouldDriveFromBarrier() {
-    var from = new GenericLocation(48.59273, 8.86931);
-    var to = new GenericLocation(48.59291, 8.87037);
+    var from = GenericLocation.fromCoordinate(48.59273, 8.86931);
+    var to = GenericLocation.fromCoordinate(48.59291, 8.87037);
 
     // This takes a detour to avoid walking with the bike
     var polyline1 = computePolyline(graph, from, to, CAR);
@@ -169,20 +171,20 @@ public class BarrierRoutingTest {
     GenericLocation from,
     GenericLocation to,
     StreetMode streetMode,
-    Consumer<RouteRequest> options,
+    Consumer<RouteRequestBuilder> options,
     Function<List<Itinerary>, Stream<Executable>> assertions
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(dateTime);
-    request.setFrom(from);
-    request.setTo(to);
-    request.journey().direct().setMode(streetMode);
+    var builder = RouteRequest.of()
+      .withDateTime(dateTime)
+      .withFrom(from)
+      .withTo(to)
+      .withJourney(jb -> jb.withDirect(new StreetRequest(streetMode)));
 
-    options.accept(request);
+    options.accept(builder);
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode, streetMode);
     var gpf = new GraphPathFinder(null);
-    var paths = gpf.graphPathFinderEntryPoint(request, temporaryVertices);
+    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), temporaryVertices);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,

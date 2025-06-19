@@ -81,12 +81,15 @@ public class RaptorDebugModel implements LauncherRequestDecorator {
 
   @Override
   public RouteRequest intercept(RouteRequest defaultRequest) {
-    var newRequest = defaultRequest.clone();
-    var debug = newRequest.journey().transit().raptorDebugging();
-    debug.withEventTypes(eventTypes);
-    debug.withStops(stops);
-    debug.withPath(path);
-    return newRequest;
+    return defaultRequest
+      .copyOf()
+      .withJourney(jb ->
+        jb.withTransit(tb ->
+          tb.withRaptorDebugging(rd -> rd.withEventTypes(eventTypes).withStops(stops).withPath(path)
+          )
+        )
+      )
+      .buildDefault();
   }
 
   private void save() {

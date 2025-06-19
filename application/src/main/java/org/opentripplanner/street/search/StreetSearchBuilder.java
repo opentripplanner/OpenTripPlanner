@@ -22,7 +22,7 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, StreetSearchBuilder> {
 
   private RouteRequest routeRequest;
-  private StreetRequest streetRequest = new StreetRequest();
+  private StreetRequest streetRequest = StreetRequest.DEFAULT;
   private IntersectionTraversalCalculator intersectionTraversalCalculator;
   private DataOverlayContext dataOverlayContext;
 

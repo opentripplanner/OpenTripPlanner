@@ -27,6 +27,7 @@ public class ExampleConfigTest {
     pattern = {
       "doc/user/examples/**/" + ROUTER_CONFIG_FILENAME,
       "application/src/test/resources/standalone/config/**/" + ROUTER_CONFIG_FILENAME,
+      "application/src/ext-test/resources/**/" + ROUTER_CONFIG_FILENAME,
     }
   )
   @ParameterizedTest(name = "Check validity of {0}")
@@ -38,6 +39,7 @@ public class ExampleConfigTest {
     pattern = {
       "doc/user/examples/**/" + BUILD_CONFIG_FILENAME,
       "application/src/test/resources/standalone/config/**/" + BUILD_CONFIG_FILENAME,
+      "application/src/ext-test/resources/**/" + BUILD_CONFIG_FILENAME,
     }
   )
   @ParameterizedTest(name = "Check validity of {0}")

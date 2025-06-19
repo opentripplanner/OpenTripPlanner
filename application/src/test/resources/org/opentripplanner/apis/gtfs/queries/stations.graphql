@@ -1,0 +1,25 @@
+{
+  stations {
+    gtfsId
+    lat
+    lon
+    name
+    vehicleMode
+    allRoutes: routes {
+      gtfsId
+      longName
+      shortName
+    }
+    routesWithinRange: routes(
+      serviceDates: { start: "2024-09-10", end: "2024-09-10" }
+    ) {
+      gtfsId
+      longName
+      shortName
+    }
+    # The following should always be empty because the pattern list of station is always empty
+    alerts(types: [PATTERNS, ROUTES]) {
+      id
+    }
+  }
+}
