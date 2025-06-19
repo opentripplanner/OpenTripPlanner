@@ -5,7 +5,7 @@ import java.util.Map;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 
-public class ViaSegmentMapper {
+class ViaSegmentMapper {
 
   static JourneyRequest mapViaSegment(RouteRequest defaultRequest, Map<String, Object> viaSegment) {
     var journey = defaultRequest.journey().copyOf();

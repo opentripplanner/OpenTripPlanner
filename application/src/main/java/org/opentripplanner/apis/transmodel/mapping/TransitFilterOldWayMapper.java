@@ -123,7 +123,7 @@ class TransitFilterOldWayMapper {
   }
 
   /**
-   * Finnish building the selectors. Add modes to all existing selectors, or create a new
+   * Finish building the selectors. Add modes to all existing selectors, or create a new
    * selector using the provided modes.
    */
   private static List<SelectRequest> buildFiltersWithModes(

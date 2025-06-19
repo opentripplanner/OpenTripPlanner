@@ -6,7 +6,7 @@ import java.util.Map;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 
-public class TransitFilterNewWayMapper {
+class TransitFilterNewWayMapper {
 
   /** This is a utility class, only static methods */
   private TransitFilterNewWayMapper() {}
