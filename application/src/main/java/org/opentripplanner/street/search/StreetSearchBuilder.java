@@ -7,6 +7,7 @@ import org.opentripplanner.astar.AStarBuilder;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.RemainingWeightHeuristic;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -38,17 +39,19 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   public StreetSearchBuilder setRequest(RouteRequest request) {
     this.routeRequest = request;
     setArriveBy(request.arriveBy());
-    if (!request.vertexService().from().isEmpty()) {
-      setFrom(request.vertexService().from());
-    }
-    if (!request.vertexService().to().isEmpty()) {
-      setTo(request.vertexService().to());
-    }
     return this;
   }
 
   public StreetSearchBuilder setStreetRequest(StreetRequest streetRequest) {
     this.streetRequest = streetRequest;
+    return this;
+  }
+
+  public StreetSearchBuilder setFromToViaVertexRequest(
+    FromToViaVertexRequest fromToViaVertexRequest
+  ) {
+    setFrom(fromToViaVertexRequest.from());
+    setTo(fromToViaVertexRequest.to());
     return this;
   }
 

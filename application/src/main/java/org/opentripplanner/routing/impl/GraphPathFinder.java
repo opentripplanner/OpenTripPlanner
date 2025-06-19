@@ -10,6 +10,7 @@ import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -118,11 +119,14 @@ public class GraphPathFinder {
   /**
    * Try to find N paths through the Graph
    */
-  public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(RouteRequest request) {
+  public List<GraphPath<State, Edge, Vertex>> graphPathFinderEntryPoint(
+    RouteRequest request,
+    FromToViaVertexRequest fromToViaVertexRequest
+  ) {
     return graphPathFinderEntryPoint(
       request,
-      request.vertexService().from(),
-      request.vertexService().to()
+      fromToViaVertexRequest.from(),
+      fromToViaVertexRequest.to()
     );
   }
 

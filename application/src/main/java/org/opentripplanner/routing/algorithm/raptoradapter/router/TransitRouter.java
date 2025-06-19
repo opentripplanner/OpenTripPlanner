@@ -34,6 +34,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -60,6 +61,7 @@ public class TransitRouter {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private final ViaCoordinateTransferFactory viaTransferResolver;
+  private final FromToViaVertexRequest fromToViaVertexRequest;
 
   private TransitRouter(
     RouteRequest request,
@@ -67,7 +69,8 @@ public class TransitRouter {
     TransitGroupPriorityService transitGroupPriorityService,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
-    DebugTimingAggregator debugTimingAggregator
+    DebugTimingAggregator debugTimingAggregator,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     this.request = request;
     this.serverContext = serverContext;
@@ -76,6 +79,7 @@ public class TransitRouter {
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
     this.viaTransferResolver = serverContext.viaTransferResolver();
+    this.fromToViaVertexRequest = fromToViaVertexRequest;
   }
 
   public static TransitRouterResult route(
@@ -84,7 +88,8 @@ public class TransitRouter {
     TransitGroupPriorityService priorityGroupConfigurator,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
-    DebugTimingAggregator debugTimingAggregator
+    DebugTimingAggregator debugTimingAggregator,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     TransitRouter transitRouter = new TransitRouter(
       request,
@@ -92,7 +97,8 @@ public class TransitRouter {
       priorityGroupConfigurator,
       transitSearchTimeZero,
       additionalSearchDays,
-      debugTimingAggregator
+      debugTimingAggregator,
+      fromToViaVertexRequest
     );
 
     return transitRouter.route();
@@ -264,7 +270,8 @@ public class TransitRouter {
       serverContext.dataOverlayContext(accessRequest),
       type,
       durationLimit,
-      stopCountLimit
+      stopCountLimit,
+      fromToViaVertexRequest
     );
     var accessEgresses = AccessEgressMapper.mapNearbyStops(nearbyStops, type);
     accessEgresses = timeshiftRideHailing(streetRequest, type, accessEgresses);
@@ -279,7 +286,8 @@ public class TransitRouter {
         additionalSearchDays,
         serverContext.flexParameters(),
         serverContext.dataOverlayContext(accessRequest),
-        type
+        type,
+        fromToViaVertexRequest
       );
 
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type));

@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -85,6 +85,14 @@ public class StreetGraphFinder implements GraphFinder {
     TraverseVisitor<State, Edge> visitor,
     SkipEdgeStrategy<State, Edge> skipEdgeStrategy
   ) {
+    // Make a normal OTP routing request so we can traverse edges and use GenericAStar
+    // TODO make a function that builds normal routing requests from profile requests
+    // TODO: This is incorrect, the configured defaults are not used.
+    var request = RouteRequest.of()
+      .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
+      .withNumItineraries(1)
+      .buildDefault();
+
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
     try (
@@ -95,24 +103,12 @@ public class StreetGraphFinder implements GraphFinder {
         StreetMode.WALK
       )
     ) {
-      // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-      // TODO make a function that builds normal routing requests from profile requests
-      // TODO: This is incorrect, the configured defaults are not used.
-      var request = RouteRequest.of()
-        .withPreferences(pref -> pref.withWalk(it -> it.withSpeed(1)))
-        .withNumItineraries(1)
-        .withVertexService(
-          new DefaultRequestVertexService(
-            temporaryVertices.getFromVertices(),
-            temporaryVertices.getToVertices()
-          )
-        )
-        .buildDefault();
       StreetSearchBuilder.of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(request)
+        .setFromToViaVertexRequest(new FromToViaVertexRequest(temporaryVertices.getFromVertices()))
         .getShortestPathTree();
     }
   }

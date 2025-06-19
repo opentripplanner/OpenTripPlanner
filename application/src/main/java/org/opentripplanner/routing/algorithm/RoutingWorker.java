@@ -24,7 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -109,24 +109,20 @@ public class RoutingWorker {
         request.journey().direct().mode()
       )
     ) {
-      var requestVertexService = new DefaultRequestVertexService(
+      var requestVertexService = new FromToViaVertexRequest(
         temporaryVertices.getFromVertices(),
-        temporaryVertices.getToVertices()
+        temporaryVertices.getToVertices(),
+        temporaryVertices.getFromStopVertices(),
+        temporaryVertices.getToStopVertices()
       );
-      var requestWithTemporaryVertices = request
-        .copyOf()
-        .withVertexService(requestVertexService)
-        .buildRequest();
+
       if (OTPFeature.ParallelRouting.isOn()) {
         // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
         //       log-trace-parameters-propagation and graceful timeout handling here.
         try {
-          var r1 = CompletableFuture.supplyAsync(() ->
-            routeDirectStreet(requestWithTemporaryVertices)
-          );
-          var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex(requestWithTemporaryVertices)
-          );
-          var r3 = CompletableFuture.supplyAsync(() -> routeTransit(requestWithTemporaryVertices));
+          var r1 = CompletableFuture.supplyAsync(() -> routeDirectStreet(requestVertexService));
+          var r2 = CompletableFuture.supplyAsync(() -> routeDirectFlex(requestVertexService));
+          var r3 = CompletableFuture.supplyAsync(() -> routeTransit(requestVertexService));
 
           result.merge(r1.join(), r2.join(), r3.join());
         } catch (CompletionException e) {
@@ -134,9 +130,9 @@ public class RoutingWorker {
         }
       } else {
         result.merge(
-          routeDirectStreet(requestWithTemporaryVertices),
-          routeDirectFlex(requestWithTemporaryVertices),
-          routeTransit(requestWithTemporaryVertices)
+          routeDirectStreet(requestVertexService),
+          routeDirectFlex(requestVertexService),
+          routeTransit(requestVertexService)
         );
       }
     }
@@ -236,22 +232,22 @@ public class RoutingWorker {
       : Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
   }
 
-  private RoutingResult routeDirectStreet(RouteRequest requestWithTemporaryVertices) {
+  private RoutingResult routeDirectStreet(FromToViaVertexRequest fromToViaVertexRequest) {
     // TODO: Add support for via search to the direct-street search and remove this.
     //       The direct search is used to prune away silly transit results and it
     //       would be nice to also support via as a feature in the direct-street
     //       search.
-    if (requestWithTemporaryVertices.isViaSearch()) {
+    if (request.isViaSearch()) {
       return RoutingResult.empty();
     }
 
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
-      requestWithTemporaryVertices.journey().direct().mode(),
-      requestWithTemporaryVertices.pageCursor() != null
+      request.journey().direct().mode(),
+      request.pageCursor() != null
     );
-    var directBuilder = requestWithTemporaryVertices.copyOf();
+    var directBuilder = request.copyOf();
 
     directBuilder.withJourney(jb ->
       jb.withDirect(new StreetRequest(emptyDirectModeHandler.resolveDirectMode()))
@@ -260,7 +256,11 @@ public class RoutingWorker {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
       return RoutingResult.ok(
-        DirectStreetRouter.route(serverContext, directBuilder.buildRequest()),
+        DirectStreetRouter.route(
+          serverContext,
+          directBuilder.buildRequest(),
+          fromToViaVertexRequest
+        ),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
     } catch (RoutingValidationException e) {
@@ -270,14 +270,14 @@ public class RoutingWorker {
     }
   }
 
-  private RoutingResult routeDirectFlex(RouteRequest requestWithTemporaryVertices) {
+  private RoutingResult routeDirectFlex(FromToViaVertexRequest fromToViaVertexRequest) {
     if (!OTPFeature.FlexRouting.isOn()) {
       return RoutingResult.ok(List.of());
     }
     debugTimingAggregator.startedDirectFlexRouter();
     try {
       return RoutingResult.ok(
-        DirectFlexRouter.route(serverContext, requestWithTemporaryVertices, additionalSearchDays)
+        DirectFlexRouter.route(serverContext, request, additionalSearchDays, fromToViaVertexRequest)
       );
     } catch (RoutingValidationException e) {
       return RoutingResult.failed(e.getRoutingErrors());
@@ -286,16 +286,17 @@ public class RoutingWorker {
     }
   }
 
-  private RoutingResult routeTransit(RouteRequest requestWithTemporaryVertices) {
+  private RoutingResult routeTransit(FromToViaVertexRequest fromToViaVertexRequest) {
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
-        requestWithTemporaryVertices,
+        request,
         serverContext,
         transitGroupPriorityService,
         transitSearchTimeZero,
         additionalSearchDays,
-        debugTimingAggregator
+        debugTimingAggregator,
+        fromToViaVertexRequest
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       return RoutingResult.ok(transitResults.getItineraries());

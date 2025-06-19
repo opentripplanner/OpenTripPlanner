@@ -67,7 +67,6 @@ public class RouteRequest implements Serializable {
   private final RoutingPreferences preferences;
   private final int numItineraries;
   private final boolean defaultRequest;
-  private final RequestVertexService vertexService;
 
   /* CONSTRUCTORS */
 
@@ -87,7 +86,6 @@ public class RouteRequest implements Serializable {
     this.preferences = RoutingPreferences.DEFAULT;
     this.numItineraries = DEFAULT_NUM_ITINERARIES;
     this.defaultRequest = true;
-    this.vertexService = DefaultRequestVertexService.DEFAULT;
   }
 
   RouteRequest(RouteRequestBuilder builder) {
@@ -109,7 +107,6 @@ public class RouteRequest implements Serializable {
     this.preferences = builder.preferences;
     this.numItineraries = builder.numItineraries;
     this.defaultRequest = builder.defaultRequest;
-    this.vertexService = builder.vertexService;
 
     validate();
   }
@@ -402,10 +399,6 @@ public class RouteRequest implements Serializable {
     return numItineraries;
   }
 
-  public RequestVertexService vertexService() {
-    return vertexService;
-  }
-
   boolean isDefaultRequest() {
     return defaultRequest;
   }
@@ -434,8 +427,7 @@ public class RouteRequest implements Serializable {
       Objects.equals(bookingTime, other.bookingTime) &&
       Objects.equals(pageCursor, other.pageCursor) &&
       Objects.equals(journey, other.journey) &&
-      Objects.equals(preferences, other.preferences) &&
-      Objects.equals(vertexService, other.vertexService)
+      Objects.equals(preferences, other.preferences)
     );
   }
 
@@ -454,8 +446,7 @@ public class RouteRequest implements Serializable {
       pageCursor,
       journey,
       preferences,
-      numItineraries,
-      vertexService
+      numItineraries
     );
   }
 
@@ -473,7 +464,6 @@ public class RouteRequest implements Serializable {
       .addNum("numItineraries", numItineraries, DEFAULT_NUM_ITINERARIES)
       .addObj("preferences", preferences, RoutingPreferences.DEFAULT)
       .addObj("journey", journey, JourneyRequest.DEFAULT)
-      .addObj("vertexService", vertexService, DefaultRequestVertexService.DEFAULT)
       .toString();
   }
 

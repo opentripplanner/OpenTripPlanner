@@ -42,7 +42,6 @@ public class RouteRequestBuilder implements Serializable {
   RoutingPreferences preferences;
   int numItineraries;
   boolean defaultRequest;
-  RequestVertexService vertexService;
 
   private final RouteRequest original;
 
@@ -62,7 +61,6 @@ public class RouteRequestBuilder implements Serializable {
     this.preferences = original.preferences();
     this.numItineraries = original.numItineraries();
     this.defaultRequest = original.isDefaultRequest();
-    this.vertexService = original.vertexService();
   }
 
   public RouteRequestBuilder withJourney(JourneyRequest journey) {
@@ -152,11 +150,6 @@ public class RouteRequestBuilder implements Serializable {
 
   public RouteRequestBuilder withNumItineraries(int numItineraries) {
     this.numItineraries = numItineraries;
-    return this;
-  }
-
-  public RouteRequestBuilder withVertexService(RequestVertexService vertexService) {
-    this.vertexService = vertexService;
     return this;
   }
 

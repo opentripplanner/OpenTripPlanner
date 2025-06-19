@@ -8,6 +8,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -25,14 +26,18 @@ import org.opentripplanner.street.search.state.State;
  */
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(OtpServerRequestContext serverContext, RouteRequest request) {
+  public static List<Itinerary> route(
+    OtpServerRequestContext serverContext,
+    RouteRequest request,
+    FromToViaVertexRequest fromToViaVertexRequest
+  ) {
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
     OTPRequestTimeoutException.checkForTimeout();
     try {
       var maxCarSpeed = serverContext.streetLimitationParametersService().getMaxCarSpeed();
-      if (!straightLineDistanceIsWithinLimit(request, maxCarSpeed)) {
+      if (!straightLineDistanceIsWithinLimit(request, maxCarSpeed, fromToViaVertexRequest)) {
         return Collections.emptyList();
       }
 
@@ -42,7 +47,10 @@ public class DirectStreetRouter {
         serverContext.dataOverlayContext(request),
         maxCarSpeed
       );
-      List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(request);
+      List<GraphPath<State, Edge, Vertex>> paths = gpFinder.graphPathFinderEntryPoint(
+        request,
+        fromToViaVertexRequest
+      );
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
@@ -64,13 +72,14 @@ public class DirectStreetRouter {
 
   private static boolean straightLineDistanceIsWithinLimit(
     RouteRequest request,
-    float maxCarSpeed
+    float maxCarSpeed,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     // TODO This currently only calculates the distances between the first fromVertex
     //      and the first toVertex
     double distance = SphericalDistanceLibrary.distance(
-      request.vertexService().from().iterator().next().getCoordinate(),
-      request.vertexService().to().iterator().next().getCoordinate()
+      fromToViaVertexRequest.from().iterator().next().getCoordinate(),
+      fromToViaVertexRequest.to().iterator().next().getCoordinate()
     );
     return distance < calculateDistanceMaxLimit(request, maxCarSpeed);
   }

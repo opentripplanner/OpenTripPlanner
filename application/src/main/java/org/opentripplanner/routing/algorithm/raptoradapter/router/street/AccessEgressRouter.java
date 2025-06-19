@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.module.nearbystops.StreetNearbyStopFinder;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -33,7 +34,8 @@ public class AccessEgressRouter {
     @Nullable DataOverlayContext dataOverlayContext,
     AccessEgressType accessOrEgress,
     Duration durationLimit,
-    int maxStopCount
+    int maxStopCount,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     OTPRequestTimeoutException.checkForTimeout();
 
@@ -43,7 +45,8 @@ public class AccessEgressRouter {
     var zeroDistanceAccessEgress = findAccessEgressWithZeroDistance(
       request,
       streetRequest,
-      accessOrEgress
+      accessOrEgress,
+      fromToViaVertexRequest
     );
 
     // When looking for street accesses/egresses we ignore the already found direct accesses/egresses
@@ -53,8 +56,8 @@ public class AccessEgressRouter {
       .collect(Collectors.toSet());
 
     var originVertices = accessOrEgress.isAccess()
-      ? request.vertexService().from()
-      : request.vertexService().to();
+      ? fromToViaVertexRequest.from()
+      : fromToViaVertexRequest.to();
     var streetAccessEgress = new StreetNearbyStopFinder(
       durationLimit,
       maxStopCount,
@@ -74,11 +77,12 @@ public class AccessEgressRouter {
   private static List<NearbyStop> findAccessEgressWithZeroDistance(
     RouteRequest routeRequest,
     StreetRequest streetRequest,
-    AccessEgressType accessOrEgress
+    AccessEgressType accessOrEgress,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     var transitStopVertices = accessOrEgress.isAccess()
-      ? routeRequest.vertexService().from()
-      : routeRequest.vertexService().to();
+      ? fromToViaVertexRequest.fromStops()
+      : fromToViaVertexRequest.toStops();
 
     return NearbyStop.nearbyStopsForTransitStopVerticesFiltered(
       transitStopVertices,

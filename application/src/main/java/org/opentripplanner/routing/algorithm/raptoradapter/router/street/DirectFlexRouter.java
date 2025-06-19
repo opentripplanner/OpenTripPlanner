@@ -9,6 +9,7 @@ import org.opentripplanner.ext.flex.filter.FilterMapper;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -19,7 +20,8 @@ public class DirectFlexRouter {
   public static List<Itinerary> route(
     OtpServerRequestContext serverContext,
     RouteRequest request,
-    AdditionalSearchDays additionalSearchDays
+    AdditionalSearchDays additionalSearchDays,
+    FromToViaVertexRequest fromToViaVertexRequest
   ) {
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
@@ -32,7 +34,8 @@ public class DirectFlexRouter {
       serverContext.dataOverlayContext(request),
       AccessEgressType.ACCESS,
       serverContext.flexParameters().maxAccessWalkDuration(),
-      0
+      0,
+      fromToViaVertexRequest
     );
     Collection<NearbyStop> egressStops = AccessEgressRouter.findAccessEgresses(
       request,
@@ -40,7 +43,8 @@ public class DirectFlexRouter {
       serverContext.dataOverlayContext(request),
       AccessEgressType.EGRESS,
       serverContext.flexParameters().maxEgressWalkDuration(),
-      0
+      0,
+      fromToViaVertexRequest
     );
 
     var flexRouter = new FlexRouter(

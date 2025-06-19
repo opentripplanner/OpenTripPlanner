@@ -25,7 +25,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.DefaultRequestVertexService;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -185,15 +185,13 @@ public class BarrierRoutingTest {
 
     var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode);
     var gpf = new GraphPathFinder(null);
-    var request = builder
-      .withVertexService(
-        new DefaultRequestVertexService(
-          temporaryVertices.getFromVertices(),
-          temporaryVertices.getToVertices()
-        )
-      )
-      .buildRequest();
-    var paths = gpf.graphPathFinderEntryPoint(request);
+    var fromToViaVertexRequest = new FromToViaVertexRequest(
+      temporaryVertices.getFromVertices(),
+      temporaryVertices.getToVertices(),
+      temporaryVertices.getFromStopVertices(),
+      temporaryVertices.getToStopVertices()
+    );
+    var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), fromToViaVertexRequest);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
       ZoneIds.BERLIN,
