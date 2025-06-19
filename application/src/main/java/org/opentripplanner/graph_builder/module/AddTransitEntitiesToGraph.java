@@ -115,7 +115,6 @@ public class AddTransitEntitiesToGraph {
 
     for (TripPattern pattern : otpTransitService.getTripPatterns()) {
       TransitMode mode = pattern.getMode();
-      timetableRepository.addTransitMode(mode);
       for (var stop : pattern.getStops()) {
         Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
         set.add(mode);
