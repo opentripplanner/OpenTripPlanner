@@ -18,7 +18,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -404,9 +404,9 @@ public class SiriRealTimeTripUpdateAdapter {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
-        newTripTimes.deleteTrip();
-        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
+        final RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
+        builder.deleteTrip();
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, builder.build(), serviceDate));
         success = true;
       }
     }

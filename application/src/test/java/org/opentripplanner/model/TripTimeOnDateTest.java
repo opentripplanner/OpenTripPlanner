@@ -55,8 +55,10 @@ class TripTimeOnDateTest {
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, "11:00");
 
-    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-    tripTimes.setRecorded(1);
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator())
+      .createRealTimeFromScheduledTimes()
+      .withRecorded(1)
+      .build();
 
     var subject = new TripTimeOnDate(tripTimes, 0, pattern);
 
