@@ -383,7 +383,7 @@ public class OsmModuleTest {
 
     loader.buildGraph();
 
-    RouteRequest request = new RouteRequest();
+    RouteRequest request = RouteRequest.defaultValue();
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
     //It tests if it is possible to route over area without visibility calculations

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -117,7 +116,7 @@ public final class TripPatternBuilder
     return this;
   }
 
-  public TripPatternBuilder withOriginalTripPattern(@Nullable TripPattern originalTripPattern) {
+  public TripPatternBuilder withOriginalTripPattern(TripPattern originalTripPattern) {
     this.originalTripPattern = originalTripPattern;
     return this;
   }

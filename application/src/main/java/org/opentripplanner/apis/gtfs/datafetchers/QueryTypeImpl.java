@@ -974,7 +974,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
     RoutingResponse res = context.routingService().route(request);
     return DataFetcherResult.<RoutingResponse>newResult()
       .data(res)
-      .localContext(Map.of("locale", request.locale()))
+      .localContext(Map.of("locale", request.preferences().locale()))
       .build();
   }
 

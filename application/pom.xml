@@ -172,7 +172,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.17.0</version>
+            <version>5.18.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -215,6 +215,12 @@
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <!-- JAXB serialize Jersey response objects to XML. -->
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-jaxb</artifactId>
             <version>${jersey.version}</version>
         </dependency>
         <!-- HK2 dependency injection framework for injecting context -->
@@ -289,7 +295,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>7.0.0</version>
+            <version>7.0.4</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -359,7 +365,7 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.55.3</version>
+            <version>1.55.4</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
@@ -369,13 +375,19 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-identity</artifactId>
-            <version>1.16.1</version>
+            <version>1.16.2</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
             <version>0.28.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>ojp-java-model</artifactId>
+            <version>2.0.1</version>
         </dependency>
 
         <!-- create zip test files-->

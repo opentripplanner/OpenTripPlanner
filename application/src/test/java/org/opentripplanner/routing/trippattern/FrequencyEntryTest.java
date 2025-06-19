@@ -12,14 +12,14 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class FrequencyEntryTest {
 
   private static final int STOP_NUM = 8;
-  private static final TripTimes tripTimes;
+  private static final ScheduledTripTimes tripTimes;
 
   static {
     Trip trip = TimetableRepositoryForTest.trip("testtrip").build();

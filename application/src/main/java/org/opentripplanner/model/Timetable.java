@@ -12,7 +12,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
@@ -27,9 +26,9 @@ public class Timetable implements Serializable {
 
   private final TripPattern pattern;
 
-  private final List<TripTimes> tripTimes;
+  private List<TripTimes> tripTimes;
 
-  private final List<FrequencyEntry> frequencyEntries;
+  private List<FrequencyEntry> frequencyEntries;
 
   @Nullable
   private final LocalDate serviceDate;
@@ -79,14 +78,15 @@ public class Timetable implements Serializable {
   /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
   // TODO maybe put this is a more appropriate place
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
-    for (TripTimes tt : this.tripTimes) {
-      ((RealTimeTripTimes) tt).setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
-    }
+    tripTimes = tripTimes
+      .stream()
+      .map(tt -> tt.withServiceCode(serviceCodes.get(tt.getTrip().getServiceId())))
+      .toList();
     // Repeated code... bad sign...
-    for (FrequencyEntry freq : this.frequencyEntries) {
-      TripTimes tt = freq.tripTimes;
-      ((RealTimeTripTimes) tt).setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
-    }
+    frequencyEntries = frequencyEntries
+      .stream()
+      .map(tt -> tt.withServiceCode(serviceCodes.get(tt.tripTimes.getTrip().getServiceId())))
+      .toList();
   }
 
   /**

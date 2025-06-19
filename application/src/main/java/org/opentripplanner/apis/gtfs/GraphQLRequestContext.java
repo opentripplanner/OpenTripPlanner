@@ -42,6 +42,6 @@ public record GraphQLRequestContext(
    */
   @Override
   public RouteRequest defaultRouteRequest() {
-    return defaultRouteRequest.clone();
+    return defaultRouteRequest;
   }
 }

@@ -219,17 +219,17 @@ public class TimetableSnapshotTest {
     var pattern = patternIndex.get(new FeedScopedId(feedId, "1.1"));
     var trip = pattern.scheduledTripsAsStream().findFirst().orElseThrow();
     var scheduledTimetable = pattern.getScheduledTimetable();
-    var updatedTripTimes = Objects.requireNonNull(
+    var realTimeTripTimesBuilder = Objects.requireNonNull(
       scheduledTimetable.getTripTimes(trip)
-    ).copyScheduledTimes();
-    for (var i = 0; i < updatedTripTimes.getNumStops(); ++i) {
-      updatedTripTimes.updateArrivalDelay(i, 30);
-      updatedTripTimes.updateDepartureDelay(i, 30);
+    ).createRealTimeFromScheduledTimes();
+    for (var i = 0; i < realTimeTripTimesBuilder.numberOfStops(); ++i) {
+      realTimeTripTimesBuilder.withArrivalDelay(i, 30);
+      realTimeTripTimesBuilder.withDepartureDelay(i, 30);
     }
-    updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
+    realTimeTripTimesBuilder.withRealTimeState(RealTimeState.UPDATED);
     var realTimeTripUpdate = new RealTimeTripUpdate(
       pattern,
-      updatedTripTimes,
+      realTimeTripTimesBuilder.build(),
       SERVICE_DATE,
       null,
       false,
