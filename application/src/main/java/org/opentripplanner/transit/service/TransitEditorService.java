@@ -13,8 +13,6 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * Entry point for requests (both read-only and read-write) towards the transit API.
  */
 public interface TransitEditorService extends TransitService {
-  void addRoutes(Route route);
-
   FeedScopedId getOrCreateServiceIdForDate(LocalDate serviceDate);
 
   /**

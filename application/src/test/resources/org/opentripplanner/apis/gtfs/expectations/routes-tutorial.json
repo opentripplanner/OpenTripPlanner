@@ -2,24 +2,14 @@
   "data": {
     "routes": [
       {
-        "longName": "Long name for CARPOOL",
-        "shortName": "RCARPOOL",
-        "gtfsId": "F:CARPOOL",
+        "longName": "Long name for AIRPLANE",
+        "shortName": "RAIRPLANE",
+        "gtfsId": "F:AIRPLANE",
         "agency": {
           "gtfsId": "F:A1",
           "name": "Agency Test"
         },
-        "mode": "CARPOOL"
-      },
-      {
-        "longName": "Long name for SUBWAY",
-        "shortName": "RSUBWAY",
-        "gtfsId": "F:SUBWAY",
-        "agency": {
-          "gtfsId": "F:A1",
-          "name": "Agency Test"
-        },
-        "mode": "SUBWAY"
+        "mode": "AIRPLANE"
       },
       {
         "longName": "Long name for BUS",
@@ -32,14 +22,24 @@
         "mode": "BUS"
       },
       {
-        "longName": "Long name for FERRY",
-        "shortName": "RFERRY",
-        "gtfsId": "F:FERRY",
+        "longName": "Long name for CABLE_CAR",
+        "shortName": "RCABLE_CAR",
+        "gtfsId": "F:CABLE_CAR",
         "agency": {
           "gtfsId": "F:A1",
           "name": "Agency Test"
         },
-        "mode": "FERRY"
+        "mode": "CABLE_CAR"
+      },
+      {
+        "longName": "Long name for CARPOOL",
+        "shortName": "RCARPOOL",
+        "gtfsId": "F:CARPOOL",
+        "agency": {
+          "gtfsId": "F:A1",
+          "name": "Agency Test"
+        },
+        "mode": "CARPOOL"
       },
       {
         "longName": "Long name for COACH",
@@ -52,24 +52,14 @@
         "mode": "COACH"
       },
       {
-        "longName": "Long name for TRAM",
-        "shortName": "RTRAM",
-        "gtfsId": "F:TRAM",
+        "longName": "Long name for FERRY",
+        "shortName": "RFERRY",
+        "gtfsId": "F:FERRY",
         "agency": {
           "gtfsId": "F:A1",
           "name": "Agency Test"
         },
-        "mode": "TRAM"
-      },
-      {
-        "longName": "Long name for CABLE_CAR",
-        "shortName": "RCABLE_CAR",
-        "gtfsId": "F:CABLE_CAR",
-        "agency": {
-          "gtfsId": "F:A1",
-          "name": "Agency Test"
-        },
-        "mode": "CABLE_CAR"
+        "mode": "FERRY"
       },
       {
         "longName": "Long name for FUNICULAR",
@@ -82,14 +72,14 @@
         "mode": "FUNICULAR"
       },
       {
-        "longName": "Long name for RAIL",
-        "shortName": "RRAIL",
-        "gtfsId": "F:RAIL",
+        "longName": "Long name for GONDOLA",
+        "shortName": "RGONDOLA",
+        "gtfsId": "F:GONDOLA",
         "agency": {
           "gtfsId": "F:A1",
           "name": "Agency Test"
         },
-        "mode": "RAIL"
+        "mode": "GONDOLA"
       },
       {
         "longName": "Long name for MONORAIL",
@@ -102,34 +92,24 @@
         "mode": "MONORAIL"
       },
       {
-        "longName": "Long name for GONDOLA",
-        "shortName": "RGONDOLA",
-        "gtfsId": "F:GONDOLA",
+        "longName": "Long name for RAIL",
+        "shortName": "RRAIL",
+        "gtfsId": "F:RAIL",
         "agency": {
           "gtfsId": "F:A1",
           "name": "Agency Test"
         },
-        "mode": "GONDOLA"
+        "mode": "RAIL"
       },
       {
-        "longName": "Long name for TROLLEYBUS",
-        "shortName": "RTROLLEYBUS",
-        "gtfsId": "F:TROLLEYBUS",
+        "longName": "Long name for SUBWAY",
+        "shortName": "RSUBWAY",
+        "gtfsId": "F:SUBWAY",
         "agency": {
           "gtfsId": "F:A1",
           "name": "Agency Test"
         },
-        "mode": "TROLLEYBUS"
-      },
-      {
-        "longName": "Long name for AIRPLANE",
-        "shortName": "RAIRPLANE",
-        "gtfsId": "F:AIRPLANE",
-        "agency": {
-          "gtfsId": "F:A1",
-          "name": "Agency Test"
-        },
-        "mode": "AIRPLANE"
+        "mode": "SUBWAY"
       },
       {
         "longName": "Long name for TAXI",
@@ -140,6 +120,26 @@
           "name": "Agency Test"
         },
         "mode": "TAXI"
+      },
+      {
+        "longName": "Long name for TRAM",
+        "shortName": "RTRAM",
+        "gtfsId": "F:TRAM",
+        "agency": {
+          "gtfsId": "F:A1",
+          "name": "Agency Test"
+        },
+        "mode": "TRAM"
+      },
+      {
+        "longName": "Long name for TROLLEYBUS",
+        "shortName": "RTROLLEYBUS",
+        "gtfsId": "F:TROLLEYBUS",
+        "agency": {
+          "gtfsId": "F:A1",
+          "name": "Agency Test"
+        },
+        "mode": "TROLLEYBUS"
       }
     ]
   }

@@ -30,6 +30,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -271,6 +272,7 @@ class GraphQLIntegrationTest {
           .withBikesAllowed(bikesAllowed(m))
           .build()
       )
+      .sorted(Comparator.comparing(r -> r.getMode().name()))
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
@@ -329,9 +331,12 @@ class GraphQLIntegrationTest {
       public Set<Route> findRoutes(StopLocation stop) {
         return Set.of(ROUTE);
       }
-    };
 
-    routes.forEach(transitService::addRoutes);
+      @Override
+      public Collection<Route> listRoutes() {
+        return routes;
+      }
+    };
 
     var step1 = walkStep("street")
       .withRelativeDirection(RelativeDirection.DEPART)

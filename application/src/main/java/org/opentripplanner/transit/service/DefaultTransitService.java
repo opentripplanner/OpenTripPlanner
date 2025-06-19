@@ -240,15 +240,6 @@ public class DefaultTransitService implements TransitEditorService {
     return listRoutes().stream().filter(matcher::match).toList();
   }
 
-  /**
-   * Add a route to the transit model.
-   * Used only in unit tests.
-   */
-  @Override
-  public void addRoutes(Route route) {
-    this.timetableRepositoryIndex.addRoutes(route);
-  }
-
   @Override
   public Set<Route> findRoutes(StopLocation stop) {
     OTPRequestTimeoutException.checkForTimeout();
