@@ -2,8 +2,8 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.fareProduct;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.groupOfRoutes;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.collect.Multimaps;
@@ -11,21 +11,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.impl._support.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 
-class FreeTransferAcrossNetworksTest implements PlanTestConstants {
+class FreeTransferAcrossNetworksTest implements PlanTestConstants, FareTestConstants {
 
-  private static final GroupOfRoutes NETWORK_A = groupOfRoutes("A").build();
-  private static final GroupOfRoutes NETWORK_B = groupOfRoutes("B").build();
   private static final Route ROUTE_A = TimetableRepositoryForTest.route("A")
     .withGroupOfRoutes(List.of(NETWORK_A))
     .build();
@@ -33,19 +29,8 @@ class FreeTransferAcrossNetworksTest implements PlanTestConstants {
     .withGroupOfRoutes(List.of(NETWORK_B))
     .build();
 
-  private static final FeedScopedId LEG_GROUP_A = id("LG-A");
-  private static final FeedScopedId LEG_GROUP_B = id("LG-B");
-
-  private static final FareProduct REGULAR_A = FareProduct.of(
-    id("rA"),
-    "Regular A",
-    Money.euros(1)
-  ).build();
-  private static final FareProduct REGULAR_B = FareProduct.of(
-    id("rB"),
-    "Regular B",
-    Money.euros(2)
-  ).build();
+  private static final FareProduct REGULAR_A = fareProduct("A");
+  private static final FareProduct REGULAR_B = fareProduct("B");
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(

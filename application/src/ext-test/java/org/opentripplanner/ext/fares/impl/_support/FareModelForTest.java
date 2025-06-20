@@ -8,6 +8,7 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
+import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -121,4 +122,8 @@ public class FareModelForTest implements FareTestConstants {
     .withLongName(I18NString.of("other-feed-route"))
     .withMode(TransitMode.BUS)
     .build();
+
+  public static FareProduct fareProduct(String a) {
+    return FareProduct.of(id("FP:" + a), "Fare product " + a, Money.euros(5)).build();
+  }
 }

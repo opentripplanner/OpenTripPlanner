@@ -2,9 +2,9 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.fareProduct;
 import static org.opentripplanner.ext.fares.model.FareTransferRule.UNLIMITED_TRANSFERS;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.groupOfRoutes;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import com.google.common.collect.Multimaps;
@@ -19,38 +19,27 @@ import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 
 class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstants {
 
-  private static final GroupOfRoutes NETWORK = groupOfRoutes("n1").build();
   private static final Route ROUTE_1 = route("r1");
   private static final Route ROUTE_2 = route("r2");
   private static final Route ROUTE_3 = TimetableRepositoryForTest.route("r3").build();
   private static final FeedScopedId LEG_GROUP = id("leg-group-a");
-  private static final FareProduct ADULT_PRODUCT = FareProduct.of(
-    id("adult"),
-    "adult",
-    Money.euros(10)
-  ).build();
-  private static final FareProduct YOUTH_PRODUCT = FareProduct.of(
-    id("youth"),
-    "youth",
-    Money.euros(5)
-  ).build();
+  private static final FareProduct ADULT_PRODUCT = fareProduct("adult");
+  private static final FareProduct YOUTH_PRODUCT = fareProduct("youth");
 
   private static final GtfsFaresV2Service SERVICE = new GtfsFaresV2Service(
     List.of(
       FareLegRule.of(id("r1"), ADULT_PRODUCT)
         .withLegGroupId(LEG_GROUP)
-        .withNetworkId(NETWORK.getId())
+        .withNetworkId(NETWORK_A.getId())
         .build(),
       FareLegRule.of(id("r2"), YOUTH_PRODUCT)
         .withLegGroupId(LEG_GROUP)
-        .withNetworkId(NETWORK.getId())
+        .withNetworkId(NETWORK_A.getId())
         .build()
     ),
     List.of(
@@ -60,7 +49,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
         LEG_GROUP,
         UNLIMITED_TRANSFERS,
         null,
-        List.of(ONE_EUR_TRANSFER)
+        List.of(TRANSFER_1)
       )
     ),
     Multimaps.forMap(Map.of())
@@ -78,7 +67,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
       FareOffer.of(YOUTH_PRODUCT)
     );
     assertThat(result.offersForLeg(i1.legs().getLast())).containsExactly(
-      FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      FareOffer.of(TRANSFER_1, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
@@ -100,12 +89,12 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
       FareOffer.of(YOUTH_PRODUCT)
     );
     assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
-      FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      FareOffer.of(TRANSFER_1, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
     assertThat(result.offersForLeg(i1.legs().getLast())).containsExactly(
-      FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      FareOffer.of(TRANSFER_1, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
@@ -127,7 +116,7 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
       FareOffer.of(YOUTH_PRODUCT)
     );
     assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
-      FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
+      FareOffer.of(TRANSFER_1, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
@@ -135,6 +124,6 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
   }
 
   private static Route route(String id) {
-    return TimetableRepositoryForTest.route(id).withGroupOfRoutes(List.of(NETWORK)).build();
+    return TimetableRepositoryForTest.route(id).withGroupOfRoutes(List.of(NETWORK_A)).build();
   }
 }

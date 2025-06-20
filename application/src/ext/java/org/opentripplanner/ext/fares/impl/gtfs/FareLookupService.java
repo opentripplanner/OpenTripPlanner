@@ -24,6 +24,7 @@ import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.collection.ListUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +74,19 @@ class FareLookupService implements Serializable {
       .filter(FareTransferRule::unlimitedTransfers)
       .filter(FareTransferRule::isFree)
       .flatMap(r -> findTransferMatches(r, legs).stream())
+      .filter(transferMatch -> appliesToAllLegs(legs, transferMatch))
       .flatMap(transferRule -> transferRule.fromLegRule().fareProducts().stream())
       .collect(Collectors.toUnmodifiableSet());
+  }
+
+  private boolean appliesToAllLegs(List<ScheduledTransitLeg> legs, TransferMatch transferMatch) {
+    return ListUtils.partitionIntoOverlappingPairs(legs)
+      .stream()
+      .allMatch(
+        pair ->
+          legMatchesRule(pair.first(), transferMatch.fromLegRule()) &&
+          legMatchesRule(pair.second(), transferMatch.toLegRule())
+      );
   }
 
   /**
@@ -221,21 +233,6 @@ class FareLookupService implements Serializable {
     );
   }
 
-  private static Set<FeedScopedId> findAreasWithRules(
-    List<FareLegRule> legRules,
-    Function<FareLegRule, FeedScopedId> getArea
-  ) {
-    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
-  }
-
-  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
-    return legRules
-      .stream()
-      .map(FareLegRule::networkId)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toSet());
-  }
-
   private boolean matchesDistance(ScheduledTransitLeg leg, FareLegRule rule) {
     // If no valid distance type is given, do not consider distances in fare computation
     FareDistance distance = rule.fareDistance();
@@ -249,5 +246,20 @@ class FareLookupService implements Serializable {
 
       return legDistance > min.toMeters() && legDistance < max.toMeters();
     } else return true;
+  }
+
+  private static Set<FeedScopedId> findAreasWithRules(
+    List<FareLegRule> legRules,
+    Function<FareLegRule, FeedScopedId> getArea
+  ) {
+    return legRules.stream().map(getArea).filter(Objects::nonNull).collect(Collectors.toSet());
+  }
+
+  private static Set<FeedScopedId> findNetworksWithRules(Collection<FareLegRule> legRules) {
+    return legRules
+      .stream()
+      .map(FareLegRule::networkId)
+      .filter(Objects::nonNull)
+      .collect(Collectors.toSet());
   }
 }
