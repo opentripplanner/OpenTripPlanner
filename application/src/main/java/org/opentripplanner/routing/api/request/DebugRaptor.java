@@ -1,17 +1,14 @@
 package org.opentripplanner.routing.api.request;
 
-import java.io.Serial;
+import static org.opentripplanner.routing.api.request.DebugEventType.DESTINATION_ARRIVALS;
+import static org.opentripplanner.routing.api.request.DebugEventType.STOP_ARRIVALS;
+
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
+import org.opentripplanner.utils.collection.EnumSetUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Use this class to configure Raptor Event Debugging. There are two ways to debug:
@@ -41,25 +38,45 @@ import org.slf4j.LoggerFactory;
  */
 public class DebugRaptor implements Serializable {
 
-  @Serial
-  private static final Logger LOG = LoggerFactory.getLogger(DebugRaptor.class);
-
-  private static final Pattern FIRST_STOP_PATTERN = Pattern.compile("(\\d+)\\*");
   private static final int FIRST_STOP_INDEX = 0;
+  private static final int DEFAULT_DEBUG_PATH_FROM_STOP_INDEX = 0;
+  private static final Set<DebugEventType> DEFAULT_EVENT_TYPES = Set.of(
+    STOP_ARRIVALS,
+    DESTINATION_ARRIVALS
+  );
+  private static final DebugRaptor DEFAULT = new DebugRaptor();
 
-  private List<Integer> stops = List.of();
-  private List<Integer> path = List.of();
-  private int debugPathFromStopIndex = 0;
-  private Set<DebugEventType> eventTypes = EnumSet.noneOf(DebugEventType.class);
+  private final List<Integer> stops;
+  private final List<Integer> path;
+  private final int debugPathFromStopIndex;
+  private final Set<DebugEventType> eventTypes;
 
-  public DebugRaptor() {}
+  DebugRaptor(
+    List<Integer> stops,
+    List<Integer> path,
+    int debugPathFromStopIndex,
+    Set<DebugEventType> eventTypes
+  ) {
+    this.stops = List.copyOf(stops);
+    this.path = List.copyOf(path);
+    this.debugPathFromStopIndex = debugPathFromStopIndex;
+    this.eventTypes = EnumSetUtils.unmodifiableEnumSet(eventTypes, DebugEventType.class);
+  }
 
-  /** Avoid using clone(), use copy-constructor instead (Josh Bloch). */
-  public DebugRaptor(DebugRaptor other) {
-    this.stops = List.copyOf(other.stops);
-    this.path = List.copyOf(other.path);
-    this.debugPathFromStopIndex = other.debugPathFromStopIndex;
-    this.eventTypes = EnumSet.copyOf(other.eventTypes);
+  public DebugRaptor() {
+    this(List.of(), List.of(), DEFAULT_DEBUG_PATH_FROM_STOP_INDEX, DEFAULT_EVENT_TYPES);
+  }
+
+  public static DebugRaptor defaltValue() {
+    return DEFAULT;
+  }
+
+  public static DebugRaptorBuilder of() {
+    return DEFAULT.copyOf();
+  }
+
+  public DebugRaptorBuilder copyOf() {
+    return new DebugRaptorBuilder(this);
   }
 
   public boolean isEnabled() {
@@ -70,26 +87,8 @@ public class DebugRaptor implements Serializable {
     return stops;
   }
 
-  public DebugRaptor withStops(String stops) {
-    if (stops == null) {
-      return this;
-    }
-    this.stops = split(stops);
-    return this;
-  }
-
   public List<Integer> path() {
     return path;
-  }
-
-  public DebugRaptor withPath(String path) {
-    if (path == null) {
-      return this;
-    }
-
-    this.path = split(path);
-    this.debugPathFromStopIndex = firstStopIndexToDebug(this.path, path);
-    return this;
   }
 
   public int debugPathFromStopIndex() {
@@ -97,50 +96,38 @@ public class DebugRaptor implements Serializable {
   }
 
   public Set<DebugEventType> eventTypes() {
-    return Collections.unmodifiableSet(eventTypes);
+    return eventTypes;
   }
 
-  public DebugRaptor withEventTypes(Collection<DebugEventType> eventTypes) {
-    this.eventTypes.clear();
-    this.eventTypes.addAll(eventTypes);
-    return this;
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    DebugRaptor that = (DebugRaptor) o;
+    return (
+      debugPathFromStopIndex == that.debugPathFromStopIndex &&
+      Objects.equals(stops, that.stops) &&
+      Objects.equals(path, that.path) &&
+      Objects.equals(eventTypes, that.eventTypes)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(stops, path, debugPathFromStopIndex, eventTypes);
   }
 
   @Override
   public String toString() {
     return ToStringBuilder.of(DebugRaptor.class)
-      .addObj("stops", toString(stops, FIRST_STOP_INDEX))
-      .addObj("path", toString(path, debugPathFromStopIndex))
-      .addCol("eventType", eventTypes)
+      .addObj("stops", stopsToString(stops, FIRST_STOP_INDEX))
+      .addObj("path", stopsToString(path, debugPathFromStopIndex))
+      .addCol("eventType", eventTypes, DEFAULT_EVENT_TYPES)
       .toString();
   }
 
-  private static List<Integer> split(String stops) {
-    try {
-      if (stops == null) {
-        return List.of();
-      }
-
-      return Arrays.stream(stops.split("[\\s,;_*]+")).map(Integer::parseInt).toList();
-    } catch (NumberFormatException e) {
-      LOG.error(e.getMessage(), e);
-      // Keep going, we do not want to abort a
-      // request because the debug info is wrong.
-      return List.of();
-    }
-  }
-
-  private static int firstStopIndexToDebug(List<Integer> stops, String text) {
-    if (text == null) {
-      return FIRST_STOP_INDEX;
-    }
-
-    var m = FIRST_STOP_PATTERN.matcher(text);
-    Integer stop = m.find() ? Integer.parseInt(m.group(1)) : null;
-    return stop == null ? FIRST_STOP_INDEX : stops.indexOf(stop);
-  }
-
-  private static String toString(List<Integer> stops, int fromStopIndex) {
+  private static String stopsToString(List<Integer> stops, int fromStopIndex) {
     if (stops == null || stops.isEmpty()) {
       return null;
     }

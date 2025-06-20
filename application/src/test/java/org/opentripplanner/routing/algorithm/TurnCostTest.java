@@ -102,15 +102,16 @@ public class TurnCostTest {
     turnRestrictionModule.buildGraph();
 
     // Make a prototype routing request.
-    proto = new RouteRequest();
-    proto.withPreferences(preferences ->
-      preferences
-        .withCar(it -> it.withReluctance(1.0))
-        .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
-        .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
-        .withWalk(walk -> walk.withSpeed(1.0).withStairsReluctance(1.0).withReluctance(1.0))
-        .withStreet(it -> it.withTurnReluctance(1.0))
-    );
+    proto = RouteRequest.of()
+      .withPreferences(preferences ->
+        preferences
+          .withCar(it -> it.withReluctance(1.0))
+          .withBike(bike -> bike.withSpeed(1.0).withReluctance(1.0))
+          .withScooter(scooter -> scooter.withSpeed(1.0).withReluctance(1.0))
+          .withWalk(walk -> walk.withSpeed(1.0).withStairsReluctance(1.0).withReluctance(1.0))
+          .withStreet(it -> it.withTurnReluctance(1.0))
+      )
+      .buildDefault();
 
     // Turn costs are all 0 by default.
     calculator = new ConstantIntersectionTraversalCalculator(0.0);
@@ -156,11 +157,9 @@ public class TurnCostTest {
 
   @Test
   public void testForwardCarNoTurnCosts() {
-    RouteRequest options = proto.clone();
-
     // Without turn costs, this path costs 3x100 + 1x50 = 300.
     GraphPath<State, Edge, Vertex> path = checkForwardRouteDuration(
-      options,
+      proto,
       StreetMode.CAR,
       topRight,
       bottomLeft,

@@ -32,6 +32,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 
@@ -81,26 +82,25 @@ class DefaultTransitServiceTest {
     .build();
 
   private static final int DELAY = 120;
-  private static final RealTimeTripTimes REALTIME_TRIP_TIMES =
-    SCHEDULED_TRIP_TIMES.copyScheduledTimes();
-  private static final RealTimeTripTimes ADDED_TRIP_TIMES = RealTimeTripTimes.of(
-    ScheduledTripTimes.of()
-      .withTrip(ADDED_TRIP)
-      .withArrivalTimes(new int[] { 10, 11 })
-      .withDepartureTimes(new int[] { 10, 11 })
-      .withServiceCode(SERVICE_CODE)
-      .build()
-  );
-
-  static {
-    for (var i = 0; i < REALTIME_TRIP_TIMES.getNumStops(); ++i) {
-      REALTIME_TRIP_TIMES.updateArrivalDelay(i, DefaultTransitServiceTest.DELAY);
-      REALTIME_TRIP_TIMES.updateDepartureDelay(i, DefaultTransitServiceTest.DELAY);
-    }
-  }
+  private static final RealTimeTripTimes REALTIME_TRIP_TIMES = getRealTimeTripTimes();
+  private static final ScheduledTripTimes ADDED_TRIP_TIMES = ScheduledTripTimes.of()
+    .withTrip(ADDED_TRIP)
+    .withArrivalTimes(new int[] { 10, 11 })
+    .withDepartureTimes(new int[] { 10, 11 })
+    .withServiceCode(SERVICE_CODE)
+    .build();
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2024, 1, 1);
   private static final LocalDate NO_SERVICE_DATE = LocalDate.of(2024, 1, 2);
+
+  private static RealTimeTripTimes getRealTimeTripTimes() {
+    var builder = SCHEDULED_TRIP_TIMES.createRealTimeFromScheduledTimes();
+    for (var i = 0; i < SCHEDULED_TRIP_TIMES.getNumStops(); ++i) {
+      builder.withArrivalDelay(i, DefaultTransitServiceTest.DELAY);
+      builder.withDepartureDelay(i, DefaultTransitServiceTest.DELAY);
+    }
+    return builder.build();
+  }
 
   @BeforeAll
   static void setup() {
@@ -113,8 +113,10 @@ class DefaultTransitServiceTest {
     var deduplicator = new Deduplicator();
     var transitModel = new TimetableRepository(siteRepository, deduplicator);
     var canceledStopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, TRIP, "11:30");
-    var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator);
-    canceledTripTimes.cancelTrip();
+    var canceledTripTimes = TripTimesFactory.tripTimes(TRIP, canceledStopTimes, deduplicator)
+      .createRealTimeFromScheduledTimes()
+      .cancelTrip()
+      .build();
     transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
 
     // Crate a calendar (needed for testing cancelled trips)
@@ -139,12 +141,10 @@ class DefaultTransitServiceTest {
     timetableRepository.index();
 
     TimetableSnapshot timetableSnapshot = new TimetableSnapshot();
-    RealTimeTripTimes tripTimes = RealTimeTripTimes.of(
-      ScheduledTripTimes.of()
-        .withTrip(TimetableRepositoryForTest.trip("123").build())
-        .withDepartureTimes(new int[] { 0, 1 })
-        .build()
-    );
+    TripTimes tripTimes = ScheduledTripTimes.of()
+      .withTrip(TimetableRepositoryForTest.trip("123").build())
+      .withDepartureTimes(new int[] { 0, 1 })
+      .build();
     timetableSnapshot.update(new RealTimeTripUpdate(REAL_TIME_PATTERN, tripTimes, firstDate));
     timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, firstDate));
     timetableSnapshot.update(new RealTimeTripUpdate(RAIL_PATTERN, canceledTripTimes, secondDate));

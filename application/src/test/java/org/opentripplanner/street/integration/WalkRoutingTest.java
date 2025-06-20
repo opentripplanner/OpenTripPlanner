@@ -14,7 +14,6 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
@@ -48,16 +47,16 @@ class WalkRoutingTest {
    */
   @Test
   void shouldRouteAroundRoundabout() {
-    var start = new GenericLocation(59.94646, 10.77511);
-    var end = new GenericLocation(59.94641, 10.77522);
+    var start = GenericLocation.fromCoordinate(59.94646, 10.77511);
+    var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     assertDoesNotThrow(() -> route(roundabout, start, end, dateTime, false));
   }
 
   @ParameterizedTest
   @ValueSource(ints = { 0, 200, 400, 499, 500, 501, 600, 700, 800, 900, 999 })
   void pathReversalWorks(int offset) {
-    var start = new GenericLocation(59.94646, 10.77511);
-    var end = new GenericLocation(59.94641, 10.77522);
+    var start = GenericLocation.fromCoordinate(59.94646, 10.77511);
+    var end = GenericLocation.fromCoordinate(59.94641, 10.77522);
     var base = dateTime.truncatedTo(ChronoUnit.SECONDS);
     var time = base.plusMillis(offset);
     var results = route(roundabout, start, end, time, true);
@@ -78,12 +77,12 @@ class WalkRoutingTest {
     Instant instant,
     boolean arriveBy
   ) {
-    RouteRequest request = new RouteRequest();
-    request.setDateTime(instant);
-    request.setFrom(from);
-    request.setTo(to);
-    request.setArriveBy(arriveBy);
-    request.journey().direct().setMode(StreetMode.WALK);
+    RouteRequest request = RouteRequest.of()
+      .withDateTime(instant)
+      .withFrom(from)
+      .withTo(to)
+      .withArriveBy(arriveBy)
+      .buildRequest();
 
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
