@@ -86,7 +86,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     var result = SERVICE.calculateFares(i1);
     assertEquals(
       Set.of(FareOffer.of(DAY_PASS), FareOffer.of(SINGLE)),
-      result.productsForLeg(i1.legs().get(1))
+      result.offersForLeg(i1.legs().get(1))
     );
   }
 
@@ -97,7 +97,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     var result = SERVICE.calculateFares(i1);
     assertEquals(
       Set.of(FareOffer.of(DAY_PASS), FareOffer.of(SINGLE)),
-      result.productsForLeg(i1.legs().get(1))
+      result.offersForLeg(i1.legs().get(1))
     );
   }
 
@@ -106,7 +106,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
     var result = SERVICE.calculateFares(i1);
-    assertEquals(Set.of(FareOffer.of(EXPRESS_PASS)), result.productsForLeg(i1.legs().get(1)));
+    assertEquals(Set.of(FareOffer.of(EXPRESS_PASS)), result.offersForLeg(i1.legs().get(1)));
   }
 
   /**
@@ -124,11 +124,11 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     assertEquals(0, result.itineraryProducts().size());
 
     var localLeg = i1.legs().get(1);
-    var localLegProducts = result.productsForLeg(localLeg);
+    var localLegProducts = result.offersForLeg(localLeg);
     assertEquals(Set.of(FareOffer.of(LOCAL_PASS)), localLegProducts);
 
     var expressLeg = i1.legs().get(2);
-    var expressProducts = result.productsForLeg(expressLeg);
+    var expressProducts = result.offersForLeg(expressLeg);
     assertEquals(Set.of(FareOffer.of(EXPRESS_PASS)), expressProducts);
   }
 }

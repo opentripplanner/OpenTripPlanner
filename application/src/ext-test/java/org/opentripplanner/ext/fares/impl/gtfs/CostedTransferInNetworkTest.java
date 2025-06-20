@@ -73,11 +73,11 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertThat(result.itineraryProducts()).isEmpty();
-    assertThat(result.productsForLeg(i1.legs().getFirst())).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().getFirst())).containsExactly(
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
-    assertThat(result.productsForLeg(i1.legs().getLast())).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().getLast())).containsExactly(
       FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
@@ -95,16 +95,16 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertThat(result.itineraryProducts()).isEmpty();
-    assertThat(result.productsForLeg(i1.legs().getFirst())).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().getFirst())).containsExactly(
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
-    assertThat(result.productsForLeg(i1.legs().get(1))).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
       FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
-    assertThat(result.productsForLeg(i1.legs().getLast())).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().getLast())).containsExactly(
       FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
@@ -122,16 +122,16 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     var result = SERVICE.calculateFares(i1);
 
     assertEquals(Set.of(), result.itineraryProducts());
-    assertThat(result.productsForLeg(i1.legs().getFirst())).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().getFirst())).containsExactly(
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
-    assertThat(result.productsForLeg(i1.legs().get(1))).containsExactly(
+    assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
       FareOffer.of(ONE_EUR_TRANSFER, Set.of(ADULT_PRODUCT, YOUTH_PRODUCT)),
       FareOffer.of(ADULT_PRODUCT),
       FareOffer.of(YOUTH_PRODUCT)
     );
-    assertEquals(Set.of(), result.productsForLeg(i1.legs().getLast()));
+    assertEquals(Set.of(), result.offersForLeg(i1.legs().getLast()));
   }
 
   private static Route route(String id) {

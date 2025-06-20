@@ -66,8 +66,8 @@ class FreeTransferAcrossNetworksTest implements PlanTestConstants {
   void freeTransferAcrossNetwork() {
     var itin = newItinerary(A, 0).bus(ROUTE_A, 1, 0, 10, B).bus(ROUTE_B, 1, 15, 25, B).build();
     var result = service.calculateFares(itin);
-    assertEquals(Set.of(FareOffer.of(REGULAR_A)), result.productsForLeg(itin.legs().getFirst()));
-    assertEquals(Set.of(FareOffer.of(REGULAR_B)), result.productsForLeg(itin.legs().getLast()));
+    assertEquals(Set.of(FareOffer.of(REGULAR_A)), result.offersForLeg(itin.legs().getFirst()));
+    assertEquals(Set.of(FareOffer.of(REGULAR_B)), result.offersForLeg(itin.legs().getLast()));
     assertThat(result.itineraryProducts()).containsExactly(REGULAR_A);
   }
 }
