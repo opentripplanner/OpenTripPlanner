@@ -231,7 +231,7 @@ class RouteRequestTest {
         bookingTime:2025-05-17T11:15:00Z,
         numItineraries:10,
         preferences:RoutingPreferences{transfer:TransferPreferences{maxTransfers:10}},
-        journey:JourneyRequest{access:StreetRequest{mode:BIKE}}
+        journey:(access:(mode:BIKE))
       }
       """,
       subject.toString()
