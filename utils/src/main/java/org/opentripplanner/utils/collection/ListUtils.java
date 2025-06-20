@@ -64,7 +64,7 @@ public class ListUtils {
    * Take a single nullable variable and return an empty list if it is null. Otherwise
    * return a list with one element.
    */
-  public static <T> List<T> ofNullable(T input) {
+  public static <T> List<T> ofNullable(@Nullable T input) {
     if (input == null) {
       return List.of();
     } else {
@@ -108,7 +108,8 @@ public class ListUtils {
   }
 
   /**
-   * Takes a list of items and splits them into "splits". For example, [A,B,C,D] becomes
+   * Takes a list of at least 2 items and partitions them into "splits".
+   * For example, [A,B,C,D] becomes
    *   [
    *     [A,[B,C,D]],
    *     [B,[C,D],

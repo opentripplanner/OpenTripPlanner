@@ -38,13 +38,6 @@ public final class GtfsFaresV2Service implements Serializable {
       legProducts.putAll(leg, products);
     });
 
-    var pairs = ListUtils.partitionIntoOverlappingPairs(scheduledTransitLegs);
-    pairs.forEach(pair ->
-      lookup
-        .findOffersForPair(pair.first(), pair.second())
-        .forEach(transfer -> legProducts.put(pair.second(), transfer))
-    );
-
     if (scheduledTransitLegs.size() > 1) {
       var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
       splits.forEach(split ->
