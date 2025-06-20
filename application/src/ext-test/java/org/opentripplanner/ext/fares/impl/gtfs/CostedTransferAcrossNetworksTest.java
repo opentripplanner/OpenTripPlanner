@@ -56,14 +56,14 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
     var result = service.calculateFares(itin);
 
-    assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
-      FareOffer.of(FARE_PRODUCT_A)
-    );
-    assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(
-      FareOffer.of(FARE_PRODUCT_A)
-    );
-    assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(
-      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+    var first = itin.legs().getFirst();
+    assertThat(result.offersForLeg(first)).containsExactly(FareOffer.of(FARE_PRODUCT_A));
+    var secondLeg = itin.legs().get(1);
+    assertThat(result.offersForLeg(secondLeg)).containsExactly(FareOffer.of(FARE_PRODUCT_A));
+    var last = itin.legs().getLast();
+    assertThat(result.offersForLeg(last)).containsExactly(
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(secondLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(FARE_PRODUCT_B)
     );
     assertThat(result.itineraryProducts()).isEmpty();
@@ -80,14 +80,15 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
     var result = service.calculateFares(itin);
 
-    assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
-      FareOffer.of(FARE_PRODUCT_A)
-    );
+    var firstLeg = itin.legs().getFirst();
+    assertThat(result.offersForLeg(firstLeg)).containsExactly(FareOffer.of(FARE_PRODUCT_A));
     assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(
       FareOffer.of(FARE_PRODUCT_A)
     );
+    var secondLeg = itin.legs().get(1);
     assertThat(result.offersForLeg(itin.legs().get(2))).containsExactly(
-      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(firstLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(secondLeg.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(FARE_PRODUCT_B)
     );
     assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(
@@ -110,15 +111,16 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
 
     var result = service.calculateFares(itin);
 
+    var first = itin.legs().getFirst();
     assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
       FareOffer.of(FARE_PRODUCT_A)
     );
     assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(
-      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(FARE_PRODUCT_B)
     );
     assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(
-      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
       FareOffer.of(FARE_PRODUCT_B)
     );
     assertThat(result.itineraryProducts()).isEmpty();

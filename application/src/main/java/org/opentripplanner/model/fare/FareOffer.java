@@ -14,11 +14,16 @@ import org.opentripplanner.utils.lang.Sandbox;
  */
 @Sandbox
 public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.DependentFareOffer {
-  static FareOffer of(FareProduct product, Collection<FareProduct> dependencies) {
+  static FareOffer of(
+    ZonedDateTime startTime,
+    FareProduct product,
+    Collection<FareProduct> dependencies
+  ) {
     if (dependencies.isEmpty()) {
       return new DefaultFareOffer(product);
     } else {
       return new DependentFareOffer(
+        startTime,
         product,
         dependencies.stream().map(DefaultFareOffer::new).collect(Collectors.toSet())
       );
@@ -29,22 +34,29 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
     return new DefaultFareOffer(product);
   }
 
-  default String uniqueInstanceId(ZonedDateTime zonedDateTime) {
-    return fareProduct().uniqueInstanceId(zonedDateTime);
-  }
+  String uniqueInstanceId(ZonedDateTime zonedDateTime);
 
   FareProduct fareProduct();
 
   /**
    * A fare product that has no dependencies on others and can be purchased on its own.
    */
-  record DefaultFareOffer(FareProduct fareProduct) implements FareOffer {}
+  record DefaultFareOffer(FareProduct fareProduct) implements FareOffer {
+    @Override
+    public String uniqueInstanceId(ZonedDateTime startTime) {
+      return fareProduct().uniqueInstanceId(startTime);
+    }
+  }
 
   /**
    * A fare product that is only valid together when purchased together with any of the products
    * in {@code dependencies}. These dependencies can also have dependencies on their own.
    */
-  record DependentFareOffer(FareProduct fareProduct, Set<FareOffer> dependencies)
+  record DependentFareOffer(
+    ZonedDateTime startTime,
+    FareProduct fareProduct,
+    Set<FareOffer> dependencies
+  )
     implements FareOffer {
     public DependentFareOffer {
       Objects.requireNonNull(fareProduct);
@@ -63,6 +75,11 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
             Objects.equals(fp.fareProduct().medium(), fareProduct.medium())
         )
         .toList();
+    }
+
+    @Override
+    public String uniqueInstanceId(ZonedDateTime ignored) {
+      return fareProduct().uniqueInstanceId(startTime);
     }
   }
 }

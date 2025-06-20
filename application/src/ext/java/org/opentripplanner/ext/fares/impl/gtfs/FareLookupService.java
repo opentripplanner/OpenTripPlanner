@@ -119,7 +119,7 @@ class FareLookupService implements Serializable {
     return multiMap
       .keySet()
       .stream()
-      .map(product -> FareOffer.of(product, multiMap.get(product)))
+      .map(product -> FareOffer.of(from.startTime(), product, multiMap.get(product)))
       .collect(Collectors.toSet());
   }
 
