@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.opentripplanner.utils.collection.ListUtils.partitionIntoOverlappingPairs;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
@@ -80,7 +81,7 @@ class FareLookupService implements Serializable {
   }
 
   private boolean appliesToAllLegs(List<ScheduledTransitLeg> legs, TransferMatch transferMatch) {
-    return ListUtils.partitionIntoOverlappingPairs(legs)
+    return partitionIntoOverlappingPairs(legs)
       .stream()
       .allMatch(
         pair ->
@@ -141,7 +142,7 @@ class FareLookupService implements Serializable {
     FareTransferRule transferRule,
     List<ScheduledTransitLeg> transitLegs
   ) {
-    var pairs = ListUtils.partitionIntoOverlappingPairs(transitLegs);
+    var pairs = partitionIntoOverlappingPairs(transitLegs);
     var fromRules = findFareLegRule(transferRule.fromLegGroup());
     var toRules = findFareLegRule(transferRule.toLegGroup());
 

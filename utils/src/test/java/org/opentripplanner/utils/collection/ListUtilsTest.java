@@ -10,7 +10,6 @@ import static org.opentripplanner.utils.collection.ListUtils.requireAtLeastNElem
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.utils.collection.ListUtils.Pair;
 
 class ListUtilsTest {
 
@@ -109,6 +108,24 @@ class ListUtilsTest {
       var list = List.of();
       var res = ListUtils.partitionIntoOverlappingPairs(list);
       assertEquals(List.of(), res);
+    }
+  }
+
+  @Nested
+  class Split {
+
+    @Test
+    void split() {
+      var list = List.of(1, 2, 3, 4);
+      var res = ListUtils.partitionIntoSplits(list);
+      assertEquals(
+        List.of(
+          new ListUtils.Split<>(1, List.of(2, 3, 4)),
+          new ListUtils.Split<>(2, List.of(3, 4)),
+          new ListUtils.Split<>(3, List.of(4))
+        ),
+        res
+      );
     }
   }
 }

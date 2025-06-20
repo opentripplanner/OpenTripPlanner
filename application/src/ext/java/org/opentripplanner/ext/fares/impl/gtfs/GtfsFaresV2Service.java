@@ -27,26 +27,37 @@ public final class GtfsFaresV2Service implements Serializable {
 
   public FareResult calculateFares(Itinerary itinerary) {
     Multimap<Leg, FareOffer> legProducts = HashMultimap.create();
-    itinerary
-      .listScheduledTransitLegs()
-      .forEach(leg -> {
-        var products = lookup
-          .legRules(leg)
-          .stream()
-          .flatMap(r -> r.fareProducts().stream())
-          .map(FareOffer.DefaultFareOffer::new)
-          .collect(Collectors.toUnmodifiableSet());
-        legProducts.putAll(leg, products);
-      });
+    var scheduledTransitLegs = itinerary.listScheduledTransitLegs();
+    scheduledTransitLegs.forEach(leg -> {
+      var products = lookup
+        .legRules(leg)
+        .stream()
+        .flatMap(r -> r.fareProducts().stream())
+        .map(FareOffer.DefaultFareOffer::new)
+        .collect(Collectors.toUnmodifiableSet());
+      legProducts.putAll(leg, products);
+    });
 
-    var pairs = ListUtils.partitionIntoOverlappingPairs(itinerary.listScheduledTransitLegs());
+    var pairs = ListUtils.partitionIntoOverlappingPairs(scheduledTransitLegs);
     pairs.forEach(pair ->
       lookup
         .findOffersForPair(pair.first(), pair.second())
         .forEach(transfer -> legProducts.put(pair.second(), transfer))
     );
-    var itinProducts = lookup.findTransfersMatchingAllLegs(itinerary.listScheduledTransitLegs());
 
+    if (scheduledTransitLegs.size() > 1) {
+      var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
+      splits.forEach(split ->
+        split
+          .tail()
+          .forEach(leg -> {
+            var offers = lookup.findOffersForPair(split.head(), leg);
+            legProducts.putAll(leg, offers);
+          })
+      );
+    }
+
+    var itinProducts = lookup.findTransfersMatchingAllLegs(scheduledTransitLegs);
     return new FareResult(itinProducts, legProducts);
   }
 

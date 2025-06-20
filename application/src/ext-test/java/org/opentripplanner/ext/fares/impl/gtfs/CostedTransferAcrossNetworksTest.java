@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.fareProduct;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
@@ -15,11 +13,8 @@ import org.opentripplanner.ext.fares.impl._support.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.fare.FareOffer.DependentFareOffer;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 
 class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestConstants {
@@ -31,16 +26,13 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
     .withGroupOfRoutes(List.of(NETWORK_B))
     .build();
 
-  private static final FareProduct REGULAR_A = fareProduct("A");
-  private static final FareProduct REGULAR_B = fareProduct("B");
-
   private final GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      FareLegRule.of(LEG_GROUP_A, REGULAR_A)
+      FareLegRule.of(LEG_GROUP_A, FARE_PRODUCT_A)
         .withLegGroupId(LEG_GROUP_A)
         .withNetworkId(NETWORK_A.getId())
         .build(),
-      FareLegRule.of(LEG_GROUP_B, REGULAR_B)
+      FareLegRule.of(LEG_GROUP_B, FARE_PRODUCT_B)
         .withLegGroupId(LEG_GROUP_B)
         .withNetworkId(NETWORK_B.getId())
         .build()
@@ -65,12 +57,14 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
     var result = service.calculateFares(itin);
 
     assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
-      FareOffer.of(REGULAR_A)
+      FareOffer.of(FARE_PRODUCT_A)
     );
-    assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(FareOffer.of(REGULAR_A));
+    assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(
+      FareOffer.of(FARE_PRODUCT_A)
+    );
     assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(
-      new DependentFareOffer(TRANSFER_1, Set.of(FareOffer.of(REGULAR_A))),
-      FareOffer.of(REGULAR_B)
+      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(FARE_PRODUCT_B)
     );
     assertThat(result.itineraryProducts()).isEmpty();
   }
@@ -87,14 +81,46 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
     var result = service.calculateFares(itin);
 
     assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
-      FareOffer.of(REGULAR_A)
+      FareOffer.of(FARE_PRODUCT_A)
     );
-    assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(FareOffer.of(REGULAR_A));
+    assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(
+      FareOffer.of(FARE_PRODUCT_A)
+    );
     assertThat(result.offersForLeg(itin.legs().get(2))).containsExactly(
-      new DependentFareOffer(TRANSFER_1, Set.of(FareOffer.of(REGULAR_A))),
-      FareOffer.of(REGULAR_B)
+      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(FARE_PRODUCT_B)
     );
-    assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(FareOffer.of(REGULAR_A));
+    assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(
+      FareOffer.of(FARE_PRODUCT_A)
+    );
+    assertThat(result.itineraryProducts()).isEmpty();
+  }
+
+  /**
+   * Taking route A, then transferring to B and then another B should lead to a single
+   * dependent fare product for the second and third leg.
+   */
+  @Test
+  void ABB() {
+    var itin = newItinerary(A, 0)
+      .bus(ROUTE_A, 1, 0, 10, A)
+      .bus(ROUTE_B, 2, 11, 20, A)
+      .bus(ROUTE_B, 3, 21, 25, A)
+      .build();
+
+    var result = service.calculateFares(itin);
+
+    assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
+      FareOffer.of(FARE_PRODUCT_A)
+    );
+    assertThat(result.offersForLeg(itin.legs().get(1))).containsExactly(
+      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(FARE_PRODUCT_B)
+    );
+    assertThat(result.offersForLeg(itin.legs().getLast())).containsExactly(
+      FareOffer.of(TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(FARE_PRODUCT_B)
+    );
     assertThat(result.itineraryProducts()).isEmpty();
   }
 }
