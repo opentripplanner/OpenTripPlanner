@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferencesBuilder;
 
 public class StreetSearchRequestBuilder {
 
@@ -41,7 +42,7 @@ public class StreetSearchRequestBuilder {
     return this;
   }
 
-  public StreetSearchRequestBuilder withPreferences(Consumer<RoutingPreferences.Builder> body) {
+  public StreetSearchRequestBuilder withPreferences(Consumer<RoutingPreferencesBuilder> body) {
     return withPreferences(preferences.copyOf().apply(body).build());
   }
 
@@ -63,6 +64,10 @@ public class StreetSearchRequestBuilder {
   public StreetSearchRequestBuilder withTo(GenericLocation to) {
     this.to = to;
     return this;
+  }
+
+  Instant startTimeOrNow() {
+    return startTime == null ? Instant.now() : startTime;
   }
 
   public StreetSearchRequest build() {

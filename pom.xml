@@ -58,15 +58,15 @@
 
 
     <properties>
-        <otp.serialization.version.id>194</otp.serialization.version.id>
+        <otp.serialization.version.id>195</otp.serialization.version.id>
 
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>33.0</geotools.version>
+        <geotools.version>33.1</geotools.version>
         <google.dagger.version>2.56.2</google.dagger.version>
         <jackson.version>2.19.0</jackson.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
         <jersey.version>3.1.10</jersey.version>
-        <junit.version>5.12.2</junit.version>
+        <junit.version>5.13.1</junit.version>
         <micrometer.version>1.14.1</micrometer.version>
         <netcdf4.version>5.6.0</netcdf4.version>
         <logback.version>1.5.18</logback.version>
@@ -318,6 +318,7 @@
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
                         <entrypoint>/docker-entrypoint.sh</entrypoint>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                         <volumes>
                             <volume>
                                 /var/opentripplanner/
@@ -329,7 +330,7 @@
                         </ports>
                     </container>
                     <from>
-                        <image>eclipse-temurin:21-jre</image>
+                        <image>eclipse-temurin:24-jre</image>
                         <platforms>
                             <platform>
                                 <architecture>amd64</architecture>
@@ -388,7 +389,7 @@
                 <!-- This makes sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.59.0</version>
+                <version>26.62.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -481,7 +482,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>5.17.0</version>
+                <version>5.18.0</version>
             </dependency>
             <dependency>
                 <groupId>io.github.origin-energy</groupId>

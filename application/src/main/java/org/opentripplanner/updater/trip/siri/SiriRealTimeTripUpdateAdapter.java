@@ -18,7 +18,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimesBuilder;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -29,8 +29,6 @@ import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.TimetableSnapshotManager;
-import org.opentripplanner.updater.trip.TripPatternCache;
-import org.opentripplanner.updater.trip.TripPatternIdGenerator;
 import org.opentripplanner.updater.trip.UpdateIncrementality;
 import org.opentripplanner.utils.lang.StringUtils;
 import org.slf4j.Logger;
@@ -49,12 +47,13 @@ public class SiriRealTimeTripUpdateAdapter {
    * Use an id generator to generate TripPattern ids for new TripPatterns created by RealTime
    * updates.
    */
-  private final TripPatternIdGenerator tripPatternIdGenerator = new TripPatternIdGenerator();
+  private final SiriTripPatternIdGenerator tripPatternIdGenerator =
+    new SiriTripPatternIdGenerator();
   /**
    * A synchronized cache of trip patterns that are added to the graph due to GTFS-real-time
    * messages.
    */
-  private final TripPatternCache tripPatternCache;
+  private final SiriTripPatternCache tripPatternCache;
 
   /**
    * Long-lived transit editor service that has access to the timetable snapshot buffer.
@@ -67,15 +66,17 @@ public class SiriRealTimeTripUpdateAdapter {
 
   public SiriRealTimeTripUpdateAdapter(
     TimetableRepository timetableRepository,
-    TimetableSnapshotManager snapshotManager,
-    TripPatternCache tripPatternCache
+    TimetableSnapshotManager snapshotManager
   ) {
     this.snapshotManager = snapshotManager;
     this.transitEditorService = new DefaultTransitService(
       timetableRepository,
       snapshotManager.getTimetableSnapshotBuffer()
     );
-    this.tripPatternCache = tripPatternCache;
+    this.tripPatternCache = new SiriTripPatternCache(
+      tripPatternIdGenerator,
+      transitEditorService::findPattern
+    );
   }
 
   /**
@@ -403,9 +404,9 @@ public class SiriRealTimeTripUpdateAdapter {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
-        newTripTimes.deleteTrip();
-        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, newTripTimes, serviceDate));
+        final RealTimeTripTimesBuilder builder = tripTimes.createRealTimeFromScheduledTimes();
+        builder.deleteTrip();
+        snapshotManager.updateBuffer(new RealTimeTripUpdate(pattern, builder.build(), serviceDate));
         success = true;
       }
     }

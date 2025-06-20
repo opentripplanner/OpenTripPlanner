@@ -39,9 +39,11 @@ public class GtfsTestData {
 
     trip.setId(new AgencyAndId("F", "T1"));
     trip.setRoute(route);
+    trip.setServiceId(new AgencyAndId("F", "SID1"));
 
     trip_2.setId(new AgencyAndId("F", "T2"));
     trip_2.setRoute(route_2);
+    trip_2.setServiceId(new AgencyAndId("F", "SID1"));
 
     stop.setId(new AgencyAndId("F", "S1"));
     stop_2.setId(new AgencyAndId("F", "S2"));
