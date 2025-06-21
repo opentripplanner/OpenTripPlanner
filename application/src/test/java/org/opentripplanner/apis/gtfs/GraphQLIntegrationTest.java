@@ -272,7 +272,6 @@ class GraphQLIntegrationTest {
           .withBikesAllowed(bikesAllowed(m))
           .build()
       )
-      .sorted(Comparator.comparing(r -> r.getMode().name()))
       .toList();
 
     var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
