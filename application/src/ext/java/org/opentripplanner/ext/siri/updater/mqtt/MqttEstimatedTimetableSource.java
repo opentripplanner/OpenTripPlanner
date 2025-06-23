@@ -4,7 +4,6 @@ import jakarta.xml.bind.JAXBException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.Future;
@@ -21,8 +20,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.updater.trip.siri.updater.AsyncEstimatedTimetableSource;
-import org.opentripplanner.utils.text.FileSizeToTextConverter;
-import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.ServiceDelivery;
@@ -149,17 +146,17 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
 
       if (numberOfMessages % 100 == 0) {
-        LOG.debug(
-          "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
-          numberOfMessages,
-          numberOfUpdates,
-          FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-          Duration.between(
-            serviceDelivery.getResponseTimestamp().toInstant(),
-            Instant.now()
-          ).toMillis(),
-          DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
-        );
+//        LOG.debug(
+//          "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
+//          numberOfMessages,
+//          numberOfUpdates,
+//          FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
+//          Duration.between(
+//            serviceDelivery.getResponseTimestamp().toInstant(),
+//            Instant.now()
+//          ).toMillis(),
+//          DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
+//        );
       }
     }
   }
