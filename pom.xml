@@ -267,7 +267,7 @@
                   but we need the Maven project version as well, so we perform substitution. -->
                 <groupId>io.github.git-commit-id</groupId>
                 <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>9.0.1</version>
+                <version>9.0.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.5</version>
+                <version>3.4.6</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
