@@ -483,7 +483,8 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   @Override
   public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairBoarding() {
     return environment -> {
-      var boarding = getValue(environment, StopLocation::getWheelchairAccessibility, station -> null
+      var boarding = getValue(environment, StopLocation::getWheelchairAccessibility, station ->
+        null
       );
       return GraphQLUtils.toGraphQL(boarding);
     };
