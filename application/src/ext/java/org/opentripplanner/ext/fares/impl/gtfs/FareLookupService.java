@@ -25,8 +25,7 @@ import org.opentripplanner.transit.model.basic.Distance;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.utils.collection.CollectionUtils;
-import org.opentripplanner.utils.collection.ListUtils;
+import org.opentripplanner.utils.collection.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +92,7 @@ class FareLookupService implements Serializable {
   /**
    * Find fare offers for a specific pair of legs.
    */
-  Set<FareOffer> findOffersForPair(ScheduledTransitLeg from, ScheduledTransitLeg to) {
+  Set<FareOffer> findOffersForSubLegs(ScheduledTransitLeg head, List<ScheduledTransitLeg> tail) {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
@@ -102,7 +101,15 @@ class FareLookupService implements Serializable {
           if (fromRules.isEmpty() || toRules.isEmpty()) {
             return Stream.of();
           } else {
-            return findTransferMatches(from, to, r, fromRules, toRules);
+            var allPossibleTransfers = tail
+              .stream()
+              .map(to ->
+                findTransferMatches(head, to, r, fromRules, toRules).collect(
+                  Collectors.toUnmodifiableSet()
+                )
+              )
+              .collect(Collectors.toSet());
+            return SetUtils.union(allPossibleTransfers).stream();
           }
         })
         .collect(Collectors.toSet());
@@ -119,7 +126,7 @@ class FareLookupService implements Serializable {
     return multiMap
       .keySet()
       .stream()
-      .map(product -> FareOffer.of(from.startTime(), product, multiMap.get(product)))
+      .map(product -> FareOffer.of(head.startTime(), product, multiMap.get(product)))
       .collect(Collectors.toSet());
   }
 

@@ -42,10 +42,12 @@ public final class GtfsFaresV2Service implements Serializable {
       var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
       splits.forEach(split ->
         split
-          .tail()
-          .forEach(leg -> {
-            var offers = lookup.findOffersForPair(split.head(), leg);
-            legProducts.putAll(leg, offers);
+          .subTails()
+          .forEach(legs -> {
+            var offers = lookup.findOffersForSubLegs(split.head(), legs);
+            legs.forEach(leg -> {
+              legProducts.putAll(leg, offers);
+            });
           })
       );
     }

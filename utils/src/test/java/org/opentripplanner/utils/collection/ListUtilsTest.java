@@ -111,21 +111,17 @@ class ListUtilsTest {
     }
   }
 
-  @Nested
-  class Split {
-
-    @Test
-    void split() {
-      var list = List.of(1, 2, 3, 4);
-      var res = ListUtils.partitionIntoSplits(list);
-      assertEquals(
-        List.of(
-          new ListUtils.Split<>(1, List.of(2, 3, 4)),
-          new ListUtils.Split<>(2, List.of(3, 4)),
-          new ListUtils.Split<>(3, List.of(4))
-        ),
-        res
-      );
-    }
+  @Test
+  void split() {
+    var list = List.of(1, 2, 3, 4);
+    var res = ListUtils.partitionIntoSplits(list);
+    assertEquals(
+      List.of(
+        new Split<>(1, List.of(2, 3, 4)),
+        new Split<>(2, List.of(3, 4)),
+        new Split<>(3, List.of(4))
+      ),
+      res
+    );
   }
 }

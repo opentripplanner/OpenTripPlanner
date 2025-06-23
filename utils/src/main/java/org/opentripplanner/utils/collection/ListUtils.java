@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import javax.annotation.Nullable;
@@ -129,12 +128,5 @@ public class ListUtils {
   private static <T> Split<T> partitionIntoSplit(List<T> list) {
     requireAtLeastNElements(list, 2);
     return new Split<>(list.getFirst(), list.subList(1, list.size()));
-  }
-
-  public record Split<T>(T head, List<T> tail) {
-    public Split {
-      Objects.requireNonNull(head);
-      ListUtils.requireAtLeastNElements(tail, 1);
-    }
   }
 }
