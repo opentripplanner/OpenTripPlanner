@@ -148,8 +148,8 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
       long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
 
-      if (numberOfMessages % 1 == 0) {
-        LOG.info(
+      if (numberOfMessages % 100 == 0) {
+        LOG.debug(
           "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
           numberOfMessages,
           numberOfUpdates,
