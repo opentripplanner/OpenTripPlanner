@@ -135,6 +135,8 @@ public class RoutingWorker {
           routeTransit(requestVertexService)
         );
       }
+    } catch (RoutingValidationException e) {
+      result.merge(RoutingResult.failed(e.getRoutingErrors()));
     }
 
     // Set C2 value for Street and FLEX if transit-group-priority is used
@@ -263,8 +265,6 @@ public class RoutingWorker {
         ),
         emptyDirectModeHandler.removeWalkAllTheWayResults()
       );
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectStreetRouter();
     }
@@ -279,8 +279,6 @@ public class RoutingWorker {
       return RoutingResult.ok(
         DirectFlexRouter.route(serverContext, request, additionalSearchDays, fromToViaVertexRequest)
       );
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
     }
@@ -300,8 +298,6 @@ public class RoutingWorker {
       );
       raptorSearchParamsUsed = transitResults.getSearchParams();
       return RoutingResult.ok(transitResults.getItineraries());
-    } catch (RoutingValidationException e) {
-      return RoutingResult.failed(e.getRoutingErrors());
     } finally {
       debugTimingAggregator.finishedTransitRouter();
     }
