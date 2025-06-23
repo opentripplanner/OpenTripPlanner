@@ -11,7 +11,10 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -63,12 +66,13 @@ public class GtfsGraphQLAPI {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
-    HashMap<String, Object> queryParameters,
+    HashMap<String, Object> jsonParameters,
     @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout,
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
-    @Context HttpHeaders headers
+    @Context HttpHeaders headers,
+    @Context UriInfo uriInfo
   ) {
-    if (queryParameters == null || !queryParameters.containsKey("query")) {
+    if (jsonParameters == null || !jsonParameters.containsKey("query")) {
       LOG.debug("No query found in body");
       return Response.status(Response.Status.BAD_REQUEST)
         .type(MediaType.TEXT_PLAIN_TYPE)
@@ -80,9 +84,9 @@ public class GtfsGraphQLAPI {
       ? headers.getAcceptableLanguages().get(0)
       : serverContext.defaultRouteRequest().preferences().locale();
 
-    String query = (String) queryParameters.get("query");
-    Object queryVariables = queryParameters.getOrDefault("variables", null);
-    String operationName = (String) queryParameters.getOrDefault("operationName", null);
+    String query = (String) jsonParameters.get("query");
+    Object queryVariables = jsonParameters.getOrDefault("variables", null);
+    String operationName = (String) jsonParameters.getOrDefault("operationName", null);
     Map<String, Object> variables;
 
     if (queryVariables instanceof Map) {
@@ -107,7 +111,7 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
+      APIUtils.getTagsFromHeadersOrQueryParameters(tracingHeaderTags, headers, uriInfo.getQueryParameters())
     );
   }
 
@@ -117,7 +121,8 @@ public class GtfsGraphQLAPI {
     String query,
     @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout,
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
-    @Context HttpHeaders headers
+    @Context HttpHeaders headers,
+    @Context UriInfo uriInfo
   ) {
     Locale locale = headers.getAcceptableLanguages().size() > 0
       ? headers.getAcceptableLanguages().get(0)
@@ -130,7 +135,7 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
+      APIUtils.getTagsFromHeadersOrQueryParameters(tracingHeaderTags, headers, uriInfo.getQueryParameters())
     );
   }
 }
