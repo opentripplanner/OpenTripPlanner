@@ -36,7 +36,8 @@ class TimePenaltyTest {
   @Test
   void parsePenaltyTimeCoefficientMustBeAtLeastZeroAndLessThanTen() {
     assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(D2m, -0.01));
-    var ex = assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(Duration.ZERO, 100.1)
+    var ex = assertThrows(IllegalArgumentException.class, () ->
+      TimePenalty.of(Duration.ZERO, 100.1)
     );
     assertEquals("The value is not in range[0.0, 100.0]: 100.1", ex.getMessage());
   }
