@@ -84,7 +84,8 @@ class OjpServiceTest implements RealtimeTestConstants {
   void notFound() {
     var env = envBuilder.addTrip(TRIP_INPUT).build();
     var service = new OjpService(env.getTransitService(), new DirectGraphFinder(e -> List.of()));
-    assertThrows(EntityNotFoundException.class, () -> service.findCallsAtStop(id("unknown"), PARAMS)
+    assertThrows(EntityNotFoundException.class, () ->
+      service.findCallsAtStop(id("unknown"), PARAMS)
     );
   }
 

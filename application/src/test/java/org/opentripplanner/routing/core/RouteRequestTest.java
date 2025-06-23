@@ -171,7 +171,8 @@ class RouteRequestTest {
       .buildDefault();
     assertEquals("RouteRequest{searchWindow: 2h, numItineraries: 10}", subject.toString());
 
-    assertThrows(IllegalStateException.class, () -> RouteRequest.of().withFrom(FROM).buildDefault()
+    assertThrows(IllegalStateException.class, () ->
+      RouteRequest.of().withFrom(FROM).buildDefault()
     );
     assertThrows(IllegalStateException.class, () -> RouteRequest.of().withTo(TO).buildDefault());
     assertThrows(IllegalStateException.class, () ->
