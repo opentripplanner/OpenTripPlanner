@@ -3,7 +3,6 @@ package org.opentripplanner.apis;
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
 

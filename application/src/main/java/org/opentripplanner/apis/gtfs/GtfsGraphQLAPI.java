@@ -14,7 +14,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -111,7 +110,11 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      APIUtils.getTagsFromHeadersOrQueryParameters(tracingHeaderTags, headers, uriInfo.getQueryParameters())
+      APIUtils.getTagsFromHeadersOrQueryParameters(
+        tracingHeaderTags,
+        headers,
+        uriInfo.getQueryParameters()
+      )
     );
   }
 
@@ -135,7 +138,11 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      APIUtils.getTagsFromHeadersOrQueryParameters(tracingHeaderTags, headers, uriInfo.getQueryParameters())
+      APIUtils.getTagsFromHeadersOrQueryParameters(
+        tracingHeaderTags,
+        headers,
+        uriInfo.getQueryParameters()
+      )
     );
   }
 }
