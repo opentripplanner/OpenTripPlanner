@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.configure;
 
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emission.EmissionRepository;
@@ -199,6 +200,10 @@ public class ConstructApplication {
         routerConfig().server().apiDocumentationProfile(),
         routerConfig().transitTuningConfig()
       );
+    }
+
+    if (OTPFeature.GtfsGraphQlApi.isOn()) {
+      GtfsGraphQLAPI.setUp(routerConfig().gtfsApi());
     }
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {

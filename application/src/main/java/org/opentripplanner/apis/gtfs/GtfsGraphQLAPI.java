@@ -13,9 +13,11 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import org.opentripplanner.apis.APIUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +28,22 @@ public class GtfsGraphQLAPI {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphQLAPI.class);
 
+  private static Collection<String> tracingHeaderTags;
+
   private final OtpServerRequestContext serverContext;
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public GtfsGraphQLAPI(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
+  }
+
+  /**
+   * This method should be called BEFORE the Web-Container is started and load new instances of this
+   * class. This is a hack, and it would be better if the configuration was done more explicit and
+   * enforced, not relaying on a "static" setup method to be called.
+   */
+  public static void setUp(GtfsAPIParameters config) {
+    tracingHeaderTags = config.tracingHeaderTags();
   }
 
   /**
@@ -93,7 +106,8 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GraphQLRequestContext.ofServerContext(serverContext)
+      GraphQLRequestContext.ofServerContext(serverContext),
+      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
     );
   }
 
@@ -115,7 +129,8 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GraphQLRequestContext.ofServerContext(serverContext)
+      GraphQLRequestContext.ofServerContext(serverContext),
+      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
     );
   }
 }

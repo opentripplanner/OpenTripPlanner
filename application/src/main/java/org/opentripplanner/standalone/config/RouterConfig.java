@@ -20,6 +20,7 @@ import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.standalone.config.sandbox.GtfsAPIConfig;
 import org.opentripplanner.standalone.config.sandbox.TransmodelAPIConfig;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public class RouterConfig implements Serializable {
   private final RideHailingServicesConfig rideHailingConfig;
   private final FlexConfig flexConfig;
   private final TransmodelAPIConfig transmodelApi;
+  private final GtfsAPIConfig gtfsApi;
   private final VectorTileConfig vectorTileConfig;
   private final TriasApiParameters triasApiParameters;
 
@@ -69,6 +71,7 @@ public class RouterConfig implements Serializable {
 
     this.server = new ServerConfig("server", root);
     this.transmodelApi = new TransmodelAPIConfig("transmodelApi", root);
+    this.gtfsApi = new GtfsAPIConfig("gtfsApi", root);
     var request = mapDefaultRouteRequest("routingDefaults", root);
     this.transitConfig = new TransitRoutingConfig("transit", root, request);
     this.routingRequestDefaults = request
@@ -112,6 +115,10 @@ public class RouterConfig implements Serializable {
 
   public TransmodelAPIConfig transmodelApi() {
     return transmodelApi;
+  }
+
+  public GtfsAPIConfig gtfsApi() {
+    return gtfsApi;
   }
 
   public RouteRequest routingRequestDefaults() {

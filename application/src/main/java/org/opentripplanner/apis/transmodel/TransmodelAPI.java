@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.apis.APIUtils;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -134,7 +135,7 @@ public class TransmodelAPI {
       variables,
       operationName,
       maxNumberOfResultFields,
-      getTagsFromHeaders(headers)
+      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
     );
   }
 
@@ -147,7 +148,7 @@ public class TransmodelAPI {
       null,
       null,
       maxNumberOfResultFields,
-      getTagsFromHeaders(headers)
+      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
     );
   }
 
@@ -156,15 +157,5 @@ public class TransmodelAPI {
   public Response getGraphQLSchema() {
     var text = SCHEMA_DOC_HEADER + new SchemaPrinter().print(schema);
     return Response.ok().encoding("UTF-8").entity(text).build();
-  }
-
-  private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {
-    return tracingHeaderTags
-      .stream()
-      .map(header -> {
-        String value = headers.getHeaderString(header);
-        return Tag.of(header, value == null ? "__UNKNOWN__" : value);
-      })
-      .collect(Collectors.toList());
   }
 }
