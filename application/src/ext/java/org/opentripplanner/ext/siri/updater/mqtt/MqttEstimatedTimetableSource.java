@@ -110,7 +110,7 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     @Override
     public void messageArrived(String topic, MqttMessage message) {
       serviceDelivery(message.getPayload()).ifPresent(serviceDelivery -> {
-//        logMqttMessage(serviceDelivery);
+        // logMqttMessage(serviceDelivery);
         serviceDeliveryConsumer.apply(serviceDelivery);
       });
       primed = true;
