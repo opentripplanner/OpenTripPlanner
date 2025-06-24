@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -40,7 +40,7 @@ class FareMapper {
     );
   }
 
-  private List<ApiFareProduct> toApiLegProducts(Multimap<Leg, FareProductUse> legProducts) {
+  private List<ApiFareProduct> toApiLegProducts(Multimap<Leg, FareOffer> legProducts) {
     if (legProducts.isEmpty()) {
       return null;
     } else {
@@ -67,8 +67,8 @@ class FareMapper {
       .orElse(null);
   }
 
-  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareProductUse> product) {
-    return toApiFareProducts(product.stream().map(u -> u.offer().fareProduct()).toList());
+  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareOffer> product) {
+    return toApiFareProducts(product.stream().map(u -> u.fareProduct()).toList());
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {

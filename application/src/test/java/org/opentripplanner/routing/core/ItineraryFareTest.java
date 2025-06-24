@@ -19,7 +19,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.model.basic.Money;
@@ -49,18 +48,9 @@ class ItineraryFareTest {
     fares.addFareProduct(railLeg, railTicketA);
     fares.addFareProduct(railLeg, railTicketB);
 
-    assertEquals(
-      List.of(new FareProductUse("c8600829-98ab-34d2-9813-2773bf177ecb", busTicket)),
-      fares.getLegProducts().get(busLeg)
-    );
+    assertEquals(List.of(busTicket), fares.getLegProducts().get(busLeg));
 
-    assertEquals(
-      List.of(
-        new FareProductUse("519e9100-0ca6-390d-9fa8-d7760c25fc9a", railTicketA),
-        new FareProductUse("c4b0d5e0-11af-3e85-abf5-681fc891b9f6", railTicketB)
-      ),
-      fares.getLegProducts().get(railLeg)
-    );
+    assertEquals(List.of(railTicketA, railTicketB), fares.getLegProducts().get(railLeg));
   }
 
   @Test

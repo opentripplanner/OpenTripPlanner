@@ -38,7 +38,6 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareOffer;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Itinerary;
@@ -545,7 +544,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Long> endTime();
 
-    public DataFetcher<Iterable<FareProductUse>> fareProducts();
+    public DataFetcher<Iterable<FareOffer>> fareProducts();
 
     public DataFetcher<StopArrival> from();
 

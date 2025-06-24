@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.leg.ElevationProfile;
 import org.opentripplanner.model.plan.leg.LegCallTime;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
@@ -515,10 +515,10 @@ public interface Leg {
   }
 
   /**
-   * Get the {@link FareProductUse} for this leg.
+   * Get the {@link FareOffer}s for this leg.
    */
   @Sandbox
-  List<FareProductUse> fareProducts();
+  List<FareOffer> fareOffers();
 
   private static Stream<FareZone> fareZones(Place place) {
     if (place.stop == null) {

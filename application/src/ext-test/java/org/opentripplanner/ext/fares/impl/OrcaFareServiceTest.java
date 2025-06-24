@@ -38,7 +38,6 @@ import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.model.Cost;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFare;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -99,7 +98,6 @@ public class OrcaFareServiceTest {
 
     var rideCost = legFareProducts
       .stream()
-      .map(FareProductUse::offer)
       .filter(fpl -> {
         var fp = fpl.fareProduct();
         return (
@@ -116,7 +114,6 @@ public class OrcaFareServiceTest {
 
     var transfer = legFareProducts
       .stream()
-      .map(FareProductUse::offer)
       .filter(fpl -> {
         var fp = fpl.fareProduct();
         return (
@@ -545,10 +542,10 @@ public class OrcaFareServiceTest {
 
     var regular = uses
       .stream()
-      .filter(u -> u.offer().fareProduct().category().name().equals("regular"))
+      .filter(u -> u.fareProduct().category().name().equals("regular"))
       .toList()
       .getFirst();
-    assertEquals(Money.usDollars(3.49f), regular.offer().fareProduct().price());
+    assertEquals(Money.usDollars(3.49f), regular.fareProduct().price());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {

@@ -15,7 +15,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.PickDrop;
-import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Emission;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -72,7 +72,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   // Sandbox fields
   private final Float accessibilityScore;
   private final Emission emissionPerPerson;
-  private final List<FareProductUse> fareProducts;
+  private final List<FareOffer> fareOffers;
 
   protected ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
     // TODO - Add requireNonNull for trip-times. Some tests fails when this is done, these tests
@@ -124,7 +124,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     // Sandbox
     this.accessibilityScore = builder.accessibilityScore();
     this.emissionPerPerson = builder.emissionPerPerson();
-    this.fareProducts = List.copyOf(builder.fareProducts());
+    this.fareOffers = List.copyOf(builder.fareOffer());
   }
 
   public ScheduledTransitLegBuilder copyOf() {
@@ -326,7 +326,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public TransitLeg decorateWithFareProducts(List<FareProductUse> fares) {
+  public TransitLeg decorateWithFareOffers(List<FareOffer> fares) {
     return copyOf().withFareProducts(fares).build();
   }
 
@@ -431,8 +431,8 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
-  public List<FareProductUse> fareProducts() {
-    return fareProducts;
+  public List<FareOffer> fareOffers() {
+    return fareOffers;
   }
 
   /**
@@ -463,7 +463,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObj("transferToNextLeg", transferToNextLeg)
       .addColSize("transitAlerts", transitAlerts)
       .addObj("emissionPerPerson", emissionPerPerson)
-      .addColSize("fareProducts", fareProducts)
+      .addColSize("fareProducts", fareOffers)
       .toString();
   }
 }
