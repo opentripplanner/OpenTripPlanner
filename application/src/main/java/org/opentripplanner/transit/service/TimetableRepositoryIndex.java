@@ -50,6 +50,8 @@ class TimetableRepositoryIndex {
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
   private final Multimap<StopLocation, TripPattern> patternsForStop = ArrayListMultimap.create();
 
+  private final Map<StopLocation, LocalDate> endOfServiceDateForStop = new HashMap<>();
+  private final Map<FeedScopedId, LocalDate> endOfServiceDateForService = new HashMap<>();
   private final Map<LocalDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
   private final Map<TripIdAndServiceDate, TripOnServiceDate> tripOnServiceDateForTripAndDay =
     new HashMap<>();
@@ -103,6 +105,7 @@ class TimetableRepositoryIndex {
     }
 
     initalizeServiceCodesForDate(timetableRepository);
+    initializeTheEndOfServiceDateForStop();
 
     if (OTPFeature.FlexRouting.isOn()) {
       flexIndex = new FlexIndex(timetableRepository);
@@ -148,6 +151,14 @@ class TimetableRepositoryIndex {
       .stream()
       .flatMap(TripPattern::scheduledTripsAsStream)
       .collect(Collectors.toList());
+  }
+
+  boolean isStopInService(StopLocation stop) {
+    LocalDate endOfServiceDate = endOfServiceDateForStop.get(stop);
+    return (
+      endOfServiceDate != null &&
+      (endOfServiceDate.isAfter(LocalDate.now()) || endOfServiceDate.isEqual(LocalDate.now()))
+    );
   }
 
   Operator getOperatorForId(FeedScopedId operatorId) {
@@ -222,6 +233,14 @@ class TimetableRepositoryIndex {
       );
       for (LocalDate serviceDate : serviceDatesForService) {
         serviceIdsForServiceDate.put(serviceDate, serviceId);
+
+        // Save the last service date for each service.
+        if (
+          endOfServiceDateForService.get(serviceId) == null ||
+          (serviceDate != null && serviceDate.isAfter(endOfServiceDateForService.get(serviceId)))
+        ) {
+          endOfServiceDateForService.put(serviceId, serviceDate);
+        }
       }
     }
     for (LocalDate serviceDate : serviceIdsForServiceDate.keySet()) {
@@ -230,6 +249,25 @@ class TimetableRepositoryIndex {
         serviceCodesRunning.add(timetableRepository.getServiceCodes().get(serviceId));
       }
       serviceCodesRunningForDate.put(serviceDate, serviceCodesRunning);
+    }
+  }
+
+  private void initializeTheEndOfServiceDateForStop() {
+    for (StopLocation stop : patternsForStop.keySet()) {
+      for (TripPattern pattern : patternsForStop.get(stop)) {
+        pattern
+          .scheduledTripsAsStream()
+          .forEach(trip -> {
+            LocalDate tripEndDate = endOfServiceDateForService.get(trip.getServiceId());
+            LocalDate endOfServiceDate = endOfServiceDateForStop.get(stop);
+            if (
+              tripEndDate != null &&
+              (endOfServiceDate == null || tripEndDate.isAfter(endOfServiceDate))
+            ) {
+              endOfServiceDateForStop.put(stop, tripEndDate);
+            }
+          });
+      }
     }
   }
 

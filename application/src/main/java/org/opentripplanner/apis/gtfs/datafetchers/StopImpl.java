@@ -474,6 +474,18 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
     };
   }
 
+  @Override
+  public DataFetcher<Boolean> hasFutureServices() {
+    return environment -> {
+      TransitService transitService = getTransitService(environment);
+      return getValue(
+        environment,
+        transitService::isStopInService,
+        transitService::isStationInService
+      );
+    };
+  }
+
   @Deprecated
   @Override
   public DataFetcher<Integer> vehicleType() {

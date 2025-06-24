@@ -813,4 +813,19 @@ public class DefaultTransitService implements TransitEditorService {
       }
     }
   }
+
+  @Override
+  public boolean isStopInService(StopLocation stop) {
+    return timetableRepositoryIndex.isStopInService(stop);
+  }
+
+  @Override
+  public boolean isStationInService(Station station) {
+    for (StopLocation stop : station.getChildStops()) {
+      if (isStopInService(stop)) {
+        return true;
+      }
+    }
+    return false;
+  }
 }

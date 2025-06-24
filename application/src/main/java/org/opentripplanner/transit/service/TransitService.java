@@ -418,4 +418,14 @@ public interface TransitService {
    * Returns a list of {@link StopLocation}s that match the filtering defined in the request.
    */
   Collection<StopLocation> findStopLocations(FindStopLocationsRequest request);
+
+  /**
+   * Returns boolean indicating if there are trips scheduled for a stop in the future.
+   */
+  boolean isStopInService(StopLocation stop);
+
+  /**
+   * Returns boolean indicating if there are trips scheduled for any child stop of the station in the future.
+   */
+  boolean isStationInService(Station station);
 }

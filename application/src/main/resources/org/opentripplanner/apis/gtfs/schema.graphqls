@@ -2149,6 +2149,8 @@ type Stop implements Node & PlaceInterface {
   geometries: StopGeometries
   "ÌD of the stop in format `FeedId:StopId`"
   gtfsId: String!
+  "Stop has services running in the future"
+  hasFutureServices: Boolean
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
   id: ID!
   "Latitude of the stop (WGS 84)"
