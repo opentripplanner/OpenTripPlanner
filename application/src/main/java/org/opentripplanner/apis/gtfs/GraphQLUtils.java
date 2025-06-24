@@ -45,7 +45,8 @@ public class GraphQLUtils {
     return switch (inputField) {
       case DATE_TIME -> GraphQLInputField.DATE_TIME;
       case FROM_PLACE -> GraphQLInputField.FROM;
-      case TO_PLACE, INTERMEDIATE_PLACE -> GraphQLInputField.TO;
+      case TO_PLACE -> GraphQLInputField.TO;
+      case INTERMEDIATE_PLACE -> GraphQLInputField.VIA;
     };
   }
 
