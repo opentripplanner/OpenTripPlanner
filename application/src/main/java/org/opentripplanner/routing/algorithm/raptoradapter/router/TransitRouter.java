@@ -139,7 +139,8 @@ public class TransitRouter {
       accessEgresses.getEgresses(),
       serverContext.meterRegistry(),
       viaTransferResolver,
-      this::listStopIndexes
+      this::listStopIndexes,
+      fromToViaVertexRequest
     );
 
     // Route transit

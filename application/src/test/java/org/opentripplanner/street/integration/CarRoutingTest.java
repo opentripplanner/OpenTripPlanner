@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
+import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -134,7 +135,13 @@ public class CarRoutingTest {
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, StreetMode.CAR);
+    var temporaryVertices = new TemporaryVerticesContainer(
+      graph,
+      from,
+      to,
+      List.of(),
+      StreetMode.CAR
+    );
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(
       request,
@@ -142,7 +149,8 @@ public class CarRoutingTest {
         temporaryVertices.getFromVertices(),
         temporaryVertices.getToVertices(),
         temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices()
+        temporaryVertices.getToStopVertices(),
+        temporaryVertices.getVisitViaLocationVertices()
       )
     );
 

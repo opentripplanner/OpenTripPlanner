@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -569,6 +570,7 @@ public class TestHalfEdges {
         graph,
         walking.from(),
         walking.to(),
+        List.of(),
         StreetMode.WALK
       )
     ) {
@@ -582,7 +584,8 @@ public class TestHalfEdges {
             container.getFromVertices(),
             container.getToVertices(),
             container.getFromStopVertices(),
-            container.getToStopVertices()
+            container.getToStopVertices(),
+            container.getVisitViaLocationVertices()
           )
         )
         .getShortestPathTree();

@@ -85,7 +85,15 @@ class WalkRoutingTest {
       .withTo(to)
       .withArriveBy(arriveBy)
       .buildRequest();
-    try (var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, StreetMode.WALK)) {
+    try (
+      var temporaryVertices = new TemporaryVerticesContainer(
+        graph,
+        from,
+        to,
+        List.of(),
+        StreetMode.WALK
+      )
+    ) {
       var gpf = new GraphPathFinder(null);
       return gpf.graphPathFinderEntryPoint(
         request,
@@ -93,7 +101,8 @@ class WalkRoutingTest {
           temporaryVertices.getFromVertices(),
           temporaryVertices.getToVertices(),
           temporaryVertices.getFromStopVertices(),
-          temporaryVertices.getToStopVertices()
+          temporaryVertices.getToStopVertices(),
+          temporaryVertices.getVisitViaLocationVertices()
         )
       );
     }

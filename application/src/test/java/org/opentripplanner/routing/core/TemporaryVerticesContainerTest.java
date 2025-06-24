@@ -59,7 +59,7 @@ public class TemporaryVerticesContainerTest {
   @Test
   public void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, from, to, StreetMode.WALK);
+    subject = new TemporaryVerticesContainer(g, from, to, List.of(), StreetMode.WALK);
 
     // Then:
     originAndDestinationInsertedCorrect();

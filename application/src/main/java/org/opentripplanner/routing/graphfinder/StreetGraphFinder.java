@@ -100,6 +100,7 @@ public class StreetGraphFinder implements GraphFinder {
         graph,
         GenericLocation.fromCoordinate(lat, lon),
         GenericLocation.UNKNOWN,
+        List.of(),
         StreetMode.WALK
       )
     ) {

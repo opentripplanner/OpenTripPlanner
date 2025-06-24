@@ -6,6 +6,7 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -165,7 +166,13 @@ public class SplitEdgeTurnRestrictionsTest {
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, StreetMode.CAR);
+    var temporaryVertices = new TemporaryVerticesContainer(
+      graph,
+      from,
+      to,
+      List.of(),
+      StreetMode.CAR
+    );
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(
       request,
@@ -173,7 +180,8 @@ public class SplitEdgeTurnRestrictionsTest {
         temporaryVertices.getFromVertices(),
         temporaryVertices.getToVertices(),
         temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices()
+        temporaryVertices.getToStopVertices(),
+        temporaryVertices.getVisitViaLocationVertices()
       )
     );
 

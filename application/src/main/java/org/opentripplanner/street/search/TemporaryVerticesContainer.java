@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -16,6 +18,7 @@ import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -24,8 +27,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.SameEdgeAdjuster;
 import org.opentripplanner.routing.linking.VertexLinker;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.LinkingDirection;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -46,26 +51,31 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   private final Set<DisposableEdgeCollection> tempEdges;
   private final Set<Vertex> fromVertices;
   private final Set<Vertex> toVertices;
+  private final Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices;
   private final GenericLocation from;
   private final GenericLocation to;
+  private final List<GenericLocation> visitViaLocations;
   private final VertexLinker vertexLinker;
 
   public TemporaryVerticesContainer(
     Graph graph,
     GenericLocation from,
     GenericLocation to,
+    List<VisitViaLocation> visitViaLocations,
     StreetMode streetMode
   ) {
-    this(graph, from, to, streetMode, streetMode, streetMode);
+    this(graph, from, to, visitViaLocations, streetMode, streetMode, streetMode, streetMode);
   }
 
   public TemporaryVerticesContainer(
     Graph graph,
     GenericLocation from,
     GenericLocation to,
+    List<VisitViaLocation> visitViaLocations,
     StreetMode accessMode,
     StreetMode egressMode,
-    StreetMode directMode
+    StreetMode directMode,
+    StreetMode transferMode
   ) {
     this.tempEdges = new HashSet<>();
 
@@ -73,21 +83,35 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     this.vertexLinker = graph.getLinker();
     this.from = from;
     this.to = to;
+    var visitViaLocationsWithCoordinates = visitViaLocations
+      .stream()
+      .filter(location -> location.coordinateLocation() != null)
+      .toList();
+    this.visitViaLocations = visitViaLocationsWithCoordinates
+      .stream()
+      .map(VisitViaLocation::coordinateLocation)
+      .toList();
     fromVertices = getStreetVerticesForLocation(
       from,
       EnumSet.of(accessMode, directMode),
-      false,
+      LocationType.FROM,
       tempEdges
     );
     toVertices = getStreetVerticesForLocation(
       to,
       EnumSet.of(egressMode, directMode),
-      true,
+      LocationType.TO,
+      tempEdges
+    );
+    visitViaLocationVertices = getStreetVerticesForVisitLocations(
+      visitViaLocationsWithCoordinates,
+      EnumSet.of(accessMode, egressMode, directMode, transferMode),
       tempEdges
     );
 
     checkIfVerticesFound();
 
+    // TODO do we need to adjust via locations?
     for (Vertex fromVertex : fromVertices) {
       for (Vertex toVertex : toVertices) {
         tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
@@ -111,6 +135,10 @@ public class TemporaryVerticesContainer implements AutoCloseable {
 
   public Set<Vertex> getToVertices() {
     return toVertices;
+  }
+
+  public Map<VisitViaLocation, Set<Vertex>> getVisitViaLocationVertices() {
+    return visitViaLocationVertices;
   }
 
   /**
@@ -140,15 +168,38 @@ public class TemporaryVerticesContainer implements AutoCloseable {
   /* PRIVATE METHODS */
 
   /**
+   * Gets a set of vertices for each visit via location based on their coordinate. The given locations
+   * should always have a coordinate specified.
+   */
+  private Map<VisitViaLocation, Set<Vertex>> getStreetVerticesForVisitLocations(
+    List<VisitViaLocation> locations,
+    EnumSet<StreetMode> streetModes,
+    Set<DisposableEdgeCollection> tempEdges
+  ) {
+    return locations
+      .stream()
+      .collect(
+        Collectors.toMap(
+          location -> location,
+          location ->
+            getStreetVerticesForLocation(
+              location.coordinateLocation(),
+              streetModes,
+              LocationType.VISIT_VIA_LOCATION,
+              tempEdges
+            )
+        )
+      );
+  }
+
+  /**
    * Gets a set of vertices corresponding to the location provided. It first tries to match one of
    * the stop or station types by id, and if not successful, it uses the coordinates if provided.
-   *
-   * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
    */
   private Set<Vertex> getStreetVerticesForLocation(
     GenericLocation location,
     EnumSet<StreetMode> streetModes,
-    boolean endVertex,
+    LocationType type,
     Set<DisposableEdgeCollection> tempEdges
   ) {
     if (!location.isSpecified()) {
@@ -158,7 +209,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     // Differentiate between driving and non-driving, as driving is not available from transit stops
     List<TraverseMode> modes = streetModes
       .stream()
-      .map(streetMode -> getTraverseModeForLinker(streetMode, endVertex))
+      .map(streetMode -> getTraverseModeForLinker(streetMode, type))
       .distinct()
       .toList();
 
@@ -192,23 +243,17 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     // Check if coordinate is provided and connect it to graph
     if (location.getCoordinate() != null) {
       results.add(
-        createVertexFromCoordinate(
-          location.getCoordinate(),
-          location.label,
-          modes,
-          endVertex,
-          tempEdges
-        )
+        createVertexFromCoordinate(location.getCoordinate(), location.label, modes, type, tempEdges)
       );
     }
 
     return results;
   }
 
-  private TraverseMode getTraverseModeForLinker(StreetMode streetMode, boolean endVertex) {
+  private TraverseMode getTraverseModeForLinker(StreetMode streetMode, LocationType type) {
     TraverseMode nonTransitMode = TraverseMode.WALK;
     // for park and ride we will start in car mode and walk to the end vertex
-    boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && !endVertex;
+    boolean parkAndRideDepart = streetMode == StreetMode.CAR_TO_PARK && type == LocationType.FROM;
     boolean onlyCarAvailable = streetMode == StreetMode.CAR;
     if (onlyCarAvailable || parkAndRideDepart) {
       nonTransitMode = TraverseMode.CAR;
@@ -220,25 +265,14 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     Coordinate coordinate,
     @Nullable String label,
     List<TraverseMode> modes,
-    boolean endVertex,
+    LocationType type,
     Set<DisposableEdgeCollection> tempEdges
   ) {
-    if (endVertex) {
-      LOG.debug("Creating end vertex for {}", coordinate);
-    } else {
-      LOG.debug("Creating start vertex for {}", coordinate);
-    }
+    LOG.debug("Creating {} vertex for {}", type.description(), coordinate);
 
-    I18NString name;
-    if (label == null || label.isEmpty()) {
-      if (endVertex) {
-        name = new LocalizedString("destination");
-      } else {
-        name = new LocalizedString("origin");
-      }
-    } else {
-      name = new NonLocalizedString(label);
-    }
+    I18NString name = label == null || label.isEmpty()
+      ? new LocalizedString(type.translationKey())
+      : new NonLocalizedString(label);
 
     var temporaryStreetLocation = new TemporaryStreetLocation(coordinate, name);
 
@@ -246,22 +280,8 @@ public class TemporaryVerticesContainer implements AutoCloseable {
       vertexLinker.linkVertexForRequest(
         temporaryStreetLocation,
         new TraverseModeSet(modes),
-        endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
-        endVertex
-          ? (vertex, streetVertex) ->
-            List.of(
-              TemporaryFreeEdge.createTemporaryFreeEdge(
-                streetVertex,
-                (TemporaryStreetLocation) vertex
-              )
-            )
-          : (vertex, streetVertex) ->
-            List.of(
-              TemporaryFreeEdge.createTemporaryFreeEdge(
-                (TemporaryStreetLocation) vertex,
-                streetVertex
-              )
-            )
+        mapDirection(type),
+        (vertex, streetVertex) -> createEdges((TemporaryStreetLocation) vertex, streetVertex, type)
       )
     );
 
@@ -281,17 +301,33 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     List<RoutingError> routingErrors = new ArrayList<>();
 
     // check that vertices where found if from-location was specified
-    if (from.isSpecified() && isDisconnected(fromVertices, true)) {
+    if (from.isSpecified() && isDisconnected(fromVertices, LocationType.FROM)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(from), InputField.FROM_PLACE)
       );
     }
 
     // check that vertices where found if to-location was specified
-    if (to.isSpecified() && isDisconnected(toVertices, false)) {
+    if (to.isSpecified() && isDisconnected(toVertices, LocationType.TO)) {
       routingErrors.add(
         new RoutingError(getRoutingErrorCodeForDisconnected(to), InputField.TO_PLACE)
       );
+    }
+
+    // check that vertices where found if visit via locations with coordinates were specified
+    if (!visitViaLocations.isEmpty()) {
+      var errors = visitViaLocationVertices
+        .entrySet()
+        .stream()
+        .filter(entry -> isDisconnected(entry.getValue(), LocationType.VISIT_VIA_LOCATION))
+        .map(entry ->
+          new RoutingError(
+            getRoutingErrorCodeForDisconnected(entry.getKey().coordinateLocation()),
+            InputField.INTERMEDIATE_PLACE
+          )
+        )
+        .toList();
+      routingErrors.addAll(errors);
     }
 
     // if from and to share any vertices, the user is already at their destination, and the result
@@ -305,7 +341,7 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     }
   }
 
-  private static boolean isDisconnected(Set<Vertex> vertices, boolean isFrom) {
+  private static boolean isDisconnected(Set<Vertex> vertices, LocationType type) {
     // Not connected if linking was not attempted, and vertices were not specified in the request.
     if (vertices.isEmpty()) {
       return true;
@@ -316,8 +352,13 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     Predicate<Vertex> hasNoOutgoing = v -> v.getOutgoing().isEmpty();
 
     // Not connected if linking did not create incoming/outgoing edges depending on the
-    // direction and the end.
-    Predicate<Vertex> isNotConnected = isFrom ? hasNoOutgoing : hasNoIncoming;
+    // location type.
+    Predicate<Vertex> isNotConnected =
+      switch (type) {
+        case FROM -> isNotTransit.and(hasNoOutgoing);
+        case TO -> isNotTransit.and(hasNoIncoming);
+        case VISIT_VIA_LOCATION -> hasNoIncoming.or(hasNoOutgoing);
+      };
 
     return vertices.stream().allMatch(isNotTransit.and(isNotConnected));
   }
@@ -328,5 +369,54 @@ public class TemporaryVerticesContainer implements AutoCloseable {
     return coordinate != null && graph.getConvexHull().disjoint(gf.createPoint(coordinate))
       ? RoutingErrorCode.OUTSIDE_BOUNDS
       : RoutingErrorCode.LOCATION_NOT_FOUND;
+  }
+
+  private LinkingDirection mapDirection(LocationType type) {
+    return switch (type) {
+      case FROM -> LinkingDirection.INCOMING;
+      case TO -> LinkingDirection.OUTGOING;
+      case VISIT_VIA_LOCATION -> LinkingDirection.BIDIRECTIONAL;
+    };
+  }
+
+  private List<Edge> createEdges(
+    TemporaryStreetLocation location,
+    StreetVertex streetVertex,
+    LocationType type
+  ) {
+    return switch (type) {
+      case FROM -> List.of(TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex));
+      case TO -> List.of(TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location));
+      case VISIT_VIA_LOCATION -> List.of(
+        TemporaryFreeEdge.createTemporaryFreeEdge(location, streetVertex),
+        TemporaryFreeEdge.createTemporaryFreeEdge(streetVertex, location)
+      );
+    };
+  }
+
+  private enum LocationType {
+    FROM("origin"),
+    TO("destination"),
+    VISIT_VIA_LOCATION("visit via location", "via_location");
+
+    private final String description;
+    private final String translationKey;
+
+    LocationType(String description) {
+      this(description, description);
+    }
+
+    LocationType(String description, String translationKey) {
+      this.description = description;
+      this.translationKey = translationKey;
+    }
+
+    public String description() {
+      return description;
+    }
+
+    public String translationKey() {
+      return translationKey;
+    }
   }
 }

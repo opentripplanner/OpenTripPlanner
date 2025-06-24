@@ -104,16 +104,19 @@ public class RoutingWorker {
         serverContext.graph(),
         request.from(),
         request.to(),
+        request.getVisitViaLocations(),
         request.journey().access().mode(),
         request.journey().egress().mode(),
-        request.journey().direct().mode()
+        request.journey().direct().mode(),
+        request.journey().transfer().mode()
       )
     ) {
       var requestVertexService = new FromToViaVertexRequest(
         temporaryVertices.getFromVertices(),
         temporaryVertices.getToVertices(),
         temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices()
+        temporaryVertices.getToStopVertices(),
+        temporaryVertices.getVisitViaLocationVertices()
       );
 
       if (OTPFeature.ParallelRouting.isOn()) {

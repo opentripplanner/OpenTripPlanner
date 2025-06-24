@@ -176,6 +176,7 @@ class ScheduledDeviatedTripIntegrationTest {
         serverContext.graph(),
         from,
         to,
+        List.of(),
         StreetMode.WALK
       )
     ) {
@@ -190,7 +191,8 @@ class ScheduledDeviatedTripIntegrationTest {
           temporaryVertices.getFromVertices(),
           temporaryVertices.getToVertices(),
           temporaryVertices.getFromStopVertices(),
-          temporaryVertices.getToStopVertices()
+          temporaryVertices.getToStopVertices(),
+          temporaryVertices.getVisitViaLocationVertices()
         )
       );
 

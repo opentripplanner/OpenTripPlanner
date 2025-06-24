@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assertions;
@@ -25,6 +26,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptorlegacy._data.transit.TestAccessEgress;
 import org.opentripplanner.raptorlegacy._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -32,6 +34,8 @@ import org.opentripplanner.routing.api.request.via.PassThroughViaLocation;
 import org.opentripplanner.routing.api.request.via.VisitViaLocation;
 import org.opentripplanner.routing.via.ViaCoordinateTransferFactory;
 import org.opentripplanner.routing.via.model.ViaCoordinateTransfer;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
+import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -64,6 +68,12 @@ class RaptorRequestMapperTest {
     List.of(),
     10,
     12.0
+  );
+  private static final VisitViaLocation VISIT_VIA_LOCATION_COORDINATE = new VisitViaLocation(
+    "Via coordinate",
+    Duration.ofMinutes(10),
+    List.of(),
+    List.of(VIA_COORDINATE)
   );
 
   private static final CostLinearFunction R1 = CostLinearFunction.of("50 + 1.0x");
@@ -132,13 +142,7 @@ class RaptorRequestMapperTest {
   @Test
   void testViaCoordinate() {
     var req = requestBuilder();
-    Duration minimumWaitTime = Duration.ofMinutes(10);
-
-    req.withViaLocations(
-      List.of(
-        new VisitViaLocation("Via coordinate", minimumWaitTime, List.of(), List.of(VIA_COORDINATE))
-      )
-    );
+    req.withViaLocations(List.of(VISIT_VIA_LOCATION_COORDINATE));
 
     var result = map(req.buildRequest());
 
@@ -269,7 +273,17 @@ class RaptorRequestMapperTest {
       EGRESS,
       null,
       new DummyViaCoordinateTransferFactory(),
-      id -> IntStream.of(STOPS_MAP.get(id).getIndex())
+      id -> IntStream.of(STOPS_MAP.get(id).getIndex()),
+      new FromToViaVertexRequest(
+        Set.of(),
+        Set.of(),
+        Set.of(),
+        Set.of(),
+        Map.of(
+          VISIT_VIA_LOCATION_COORDINATE,
+          Set.of(new LabelledIntersectionVertex("viapoint", 1, 1, false, false))
+        )
+      )
     );
   }
 
@@ -354,7 +368,7 @@ class RaptorRequestMapperTest {
     @Override
     public List<ViaCoordinateTransfer> createViaTransfers(
       RouteRequest request,
-      String ignore,
+      Vertex viaVertex,
       WgsCoordinate coordinate
     ) {
       // Make sure the input is the expected via-coordinate

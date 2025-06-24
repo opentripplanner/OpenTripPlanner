@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -214,6 +215,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           graph,
           request.from(),
           request.to(),
+          List.of(),
           streetMode
         )
       ) {
@@ -239,6 +241,7 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
           graph,
           request.from(),
           request.to(),
+          List.of(),
           streetMode
         )
       ) {

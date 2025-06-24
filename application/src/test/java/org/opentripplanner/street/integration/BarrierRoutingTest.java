@@ -183,13 +183,14 @@ public class BarrierRoutingTest {
 
     options.accept(builder);
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, streetMode);
+    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, List.of(), streetMode);
     var gpf = new GraphPathFinder(null);
     var fromToViaVertexRequest = new FromToViaVertexRequest(
       temporaryVertices.getFromVertices(),
       temporaryVertices.getToVertices(),
       temporaryVertices.getFromStopVertices(),
-      temporaryVertices.getToStopVertices()
+      temporaryVertices.getToStopVertices(),
+      temporaryVertices.getVisitViaLocationVertices()
     );
     var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), fromToViaVertexRequest);
 

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.time.DurationUtils;
 import org.opentripplanner.utils.tostring.ToStringBuilder;
@@ -42,6 +43,20 @@ public class VisitViaLocation extends AbstractViaLocation {
         (label == null ? "" : " Label: " + label)
       );
     }
+  }
+
+  /**
+   * Returns the location's coordinate as a {@link GenericLocation}. {@code null} is returned if the
+   * location has only stop locations.
+   */
+  @Nullable
+  public GenericLocation coordinateLocation() {
+    if (coordinates.isEmpty()) {
+      return null;
+    }
+    // TODO we will remove support for multiple coordinates
+    var coordinate = coordinates.getFirst();
+    return new GenericLocation(label(), null, coordinate.latitude(), coordinate.longitude());
   }
 
   /**
