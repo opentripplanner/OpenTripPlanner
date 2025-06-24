@@ -84,8 +84,9 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).build();
 
     var result = SERVICE.calculateFares(i1);
+    var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
     assertEquals(
-      Set.of(FareOffer.of(DAY_PASS), FareOffer.of(SINGLE)),
+      Set.of(FareOffer.of(startTime, DAY_PASS), FareOffer.of(startTime, SINGLE)),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -95,8 +96,9 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).bus(ID, 0, 50, C).bus(ID, 55, 70, D).build();
 
     var result = SERVICE.calculateFares(i1);
+    var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
     assertEquals(
-      Set.of(FareOffer.of(DAY_PASS), FareOffer.of(SINGLE)),
+      Set.of(FareOffer.of(startTime, DAY_PASS), FareOffer.of(startTime, SINGLE)),
       result.offersForLeg(i1.legs().get(1))
     );
   }
@@ -106,7 +108,11 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     Itinerary i1 = newItinerary(A, 0).walk(20, B).faresV2Rail(ID, 0, 50, C, expressNetwork).build();
 
     var result = SERVICE.calculateFares(i1);
-    assertEquals(Set.of(FareOffer.of(EXPRESS_PASS)), result.offersForLeg(i1.legs().get(1)));
+    var startTime = i1.listScheduledTransitLegs().getFirst().startTime();
+    assertEquals(
+      Set.of(FareOffer.of(startTime, EXPRESS_PASS)),
+      result.offersForLeg(i1.legs().get(1))
+    );
   }
 
   /**
@@ -125,10 +131,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     var localLeg = i1.legs().get(1);
     var localLegProducts = result.offersForLeg(localLeg);
-    assertEquals(Set.of(FareOffer.of(LOCAL_PASS)), localLegProducts);
+    assertEquals(Set.of(FareOffer.of(localLeg.startTime(), LOCAL_PASS)), localLegProducts);
 
     var expressLeg = i1.legs().get(2);
     var expressProducts = result.offersForLeg(expressLeg);
-    assertEquals(Set.of(FareOffer.of(EXPRESS_PASS)), expressProducts);
+    assertEquals(Set.of(FareOffer.of(expressLeg.startTime(), EXPRESS_PASS)), expressProducts);
   }
 }

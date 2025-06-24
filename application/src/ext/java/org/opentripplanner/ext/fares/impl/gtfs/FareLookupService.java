@@ -5,8 +5,9 @@ import static java.util.Objects.nonNull;
 import static org.opentripplanner.utils.collection.ListUtils.partitionIntoOverlappingPairs;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -34,10 +35,11 @@ class FareLookupService implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(FareLookupService.class);
   private final List<FareLegRule> legRules;
   private final List<FareTransferRule> transferRules;
-  private final Multimap<FeedScopedId, FeedScopedId> stopAreas;
+  private final SetMultimap<FeedScopedId, FeedScopedId> stopAreas;
   private final Set<FeedScopedId> networksWithRules;
   private final Set<FeedScopedId> fromAreasWithRules;
   private final Set<FeedScopedId> toAreasWithRules;
+  private List<FareLegRule> fromRules;
 
   FareLookupService(
     List<FareLegRule> legRules,
@@ -49,7 +51,7 @@ class FareLookupService implements Serializable {
     this.networksWithRules = findNetworksWithRules(legRules);
     this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
     this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
-    this.stopAreas = ImmutableMultimap.copyOf(stopAreas);
+    this.stopAreas = ImmutableSetMultimap.copyOf(stopAreas);
   }
 
   /**
@@ -92,42 +94,72 @@ class FareLookupService implements Serializable {
   /**
    * Find fare offers for a specific pair of legs.
    */
-  Set<FareOffer> findOffersForSubLegs(ScheduledTransitLeg head, List<ScheduledTransitLeg> tail) {
+  Set<FareOffer> findTransferOffersForSubLegs(
+    ScheduledTransitLeg head,
+    List<ScheduledTransitLeg> tail
+  ) {
     Set<TransferMatch> rules =
       this.transferRules.stream()
         .flatMap(r -> {
-          var fromRules = findFareLegRule(r.fromLegGroup());
+          fromRules = findFareLegRule(r.fromLegGroup());
           var toRules = findFareLegRule(r.toLegGroup());
           if (fromRules.isEmpty() || toRules.isEmpty()) {
             return Stream.of();
           } else {
-            var allPossibleTransfers = tail
-              .stream()
-              .map(to ->
-                findTransferMatches(head, to, r, fromRules, toRules).collect(
-                  Collectors.toUnmodifiableSet()
-                )
-              )
-              .collect(Collectors.toSet());
-            return SetUtils.union(allPossibleTransfers).stream();
+            var possibleTransfers = findPossibleTransfers(head, tail, r, fromRules, toRules);
+            return SetUtils.union(possibleTransfers).stream();
           }
         })
         .collect(Collectors.toSet());
 
-    Multimap<FareProduct, FareProduct> multiMap = HashMultimap.create();
+    Multimap<FareProduct, FareProduct> dependencies = HashMultimap.create();
 
     rules.forEach(transfer ->
       transfer
         .transferRule()
         .fareProducts()
-        .forEach(p -> multiMap.putAll(p, transfer.fromLegRule().fareProducts()))
+        .forEach(p -> dependencies.putAll(p, transfer.fromLegRule().fareProducts()))
     );
 
-    return multiMap
+    return dependencies
       .keySet()
       .stream()
-      .map(product -> FareOffer.of(head.startTime(), product, multiMap.get(product)))
+      .map(product -> FareOffer.of(head.startTime(), product, dependencies.get(product)))
       .collect(Collectors.toSet());
+  }
+
+  boolean hasFreeTransfer(ScheduledTransitLeg head, List<ScheduledTransitLeg> tail) {
+    return this.transferRules.stream()
+      .anyMatch(r -> {
+        var fromRules = findFareLegRule(r.fromLegGroup());
+        var toRules = findFareLegRule(r.toLegGroup());
+        if (fromRules.isEmpty() || toRules.isEmpty()) {
+          return false;
+        } else {
+          return tail
+            .stream()
+            .allMatch(to ->
+              findTransferMatches(head, to, r, fromRules, toRules).anyMatch(t ->
+                t.transferRule().isFree()
+              )
+            );
+        }
+      });
+  }
+
+  private Set<Set<TransferMatch>> findPossibleTransfers(
+    ScheduledTransitLeg head,
+    List<ScheduledTransitLeg> tail,
+    FareTransferRule r,
+    List<FareLegRule> fromRules,
+    List<FareLegRule> toRules
+  ) {
+    return tail
+      .stream()
+      .map(to ->
+        findTransferMatches(head, to, r, fromRules, toRules).collect(Collectors.toUnmodifiableSet())
+      )
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   private Stream<TransferMatch> findTransferMatches(

@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.FARE_PRODUCT_USE;
+import static org.opentripplanner.ext.fares.impl._support.FareModelForTest.ANY_FARE_PRODUCT_USE;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
 import java.time.LocalDate;
@@ -40,7 +40,7 @@ class ConsolidatedStopLegBuilderTest implements PlanTestConstants {
       .withEndTime(TIME)
       .withServiceDate(TIME.toLocalDate())
       .build();
-  private static final List<FareProductUse> FARES = List.of(FARE_PRODUCT_USE);
+  private static final List<FareProductUse> FARES = List.of(ANY_FARE_PRODUCT_USE);
 
   @Test
   void build() {

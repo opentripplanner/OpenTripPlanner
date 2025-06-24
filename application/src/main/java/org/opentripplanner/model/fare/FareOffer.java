@@ -20,30 +20,30 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
     Collection<FareProduct> dependencies
   ) {
     if (dependencies.isEmpty()) {
-      return new DefaultFareOffer(product);
+      return FareOffer.of(startTime, product);
     } else {
       return new DependentFareOffer(
         startTime,
         product,
-        dependencies.stream().map(DefaultFareOffer::new).collect(Collectors.toSet())
+        dependencies.stream().map(fp -> FareOffer.of(startTime, fp)).collect(Collectors.toSet())
       );
     }
   }
 
-  static FareOffer of(FareProduct product) {
-    return new DefaultFareOffer(product);
+  static FareOffer of(ZonedDateTime startTime, FareProduct product) {
+    return new DefaultFareOffer(startTime, product);
   }
 
-  String uniqueInstanceId(ZonedDateTime zonedDateTime);
+  String uniqueId();
 
   FareProduct fareProduct();
 
   /**
    * A fare product that has no dependencies on others and can be purchased on its own.
    */
-  record DefaultFareOffer(FareProduct fareProduct) implements FareOffer {
+  record DefaultFareOffer(ZonedDateTime startTime, FareProduct fareProduct) implements FareOffer {
     @Override
-    public String uniqueInstanceId(ZonedDateTime startTime) {
+    public String uniqueId() {
       return fareProduct().uniqueInstanceId(startTime);
     }
   }
@@ -78,7 +78,7 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
     }
 
     @Override
-    public String uniqueInstanceId(ZonedDateTime ignored) {
+    public String uniqueId() {
       return fareProduct().uniqueInstanceId(startTime);
     }
   }

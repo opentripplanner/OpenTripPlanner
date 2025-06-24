@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -32,8 +33,10 @@ public final class ItineraryFaresDecorator {
       .getItineraryProducts()
       .stream()
       .map(fp -> {
-        var instanceId = fp.uniqueInstanceId(i.legs().getFirst().startTime());
-        return new FareProductUse(instanceId, new FareOffer.DefaultFareOffer(fp));
+        var startTime = i.legs().getFirst().startTime();
+        var offer = FareOffer.of(startTime, fp);
+        var instanceId = fp.uniqueInstanceId(startTime);
+        return new FareProductUse(instanceId, offer);
       })
       .toList();
   }

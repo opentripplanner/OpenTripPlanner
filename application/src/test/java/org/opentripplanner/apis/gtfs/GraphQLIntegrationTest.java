@@ -53,6 +53,7 @@ import org.opentripplanner.model.RealTimeTripUpdate;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFare;
@@ -390,8 +391,8 @@ class GraphQLIntegrationTest {
     fares.addItineraryProducts(List.of(dayPass));
 
     var singleTicket = fareProduct("single-ticket");
-    fares.addFareProduct(railLeg, new DefaultFareOffer(singleTicket));
-    fares.addFareProduct(busLeg, new DefaultFareOffer(singleTicket));
+    fares.addFareProduct(railLeg, FareOffer.of(railLeg.startTime(), singleTicket));
+    fares.addFareProduct(busLeg, FareOffer.of(busLeg.startTime(), singleTicket));
 
     i1 = ItineraryFaresDecorator.decorateItineraryWithFare(i1, fares);
 

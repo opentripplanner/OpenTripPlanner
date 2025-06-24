@@ -15,7 +15,7 @@ public class FareProductUseImpl implements GraphQLDataFetchers.GraphQLFareProduc
 
   @Override
   public DataFetcher<FareOffer> product() {
-    return env -> getSource(env).product();
+    return env -> getSource(env).offer();
   }
 
   private FareProductUse getSource(DataFetchingEnvironment environment) {

@@ -33,7 +33,7 @@ public final class GtfsFaresV2Service implements Serializable {
         .legRules(leg)
         .stream()
         .flatMap(r -> r.fareProducts().stream())
-        .map(FareOffer.DefaultFareOffer::new)
+        .map(fp -> FareOffer.of(leg.startTime(), fp))
         .collect(Collectors.toUnmodifiableSet());
       legProducts.putAll(leg, products);
     });
@@ -44,10 +44,25 @@ public final class GtfsFaresV2Service implements Serializable {
         split
           .subTails()
           .forEach(legs -> {
-            var offers = lookup.findOffersForSubLegs(split.head(), legs);
-            legs.forEach(leg -> {
-              legProducts.putAll(leg, offers);
-            });
+            var offers = lookup.findTransferOffersForSubLegs(split.head(), legs);
+            legs.forEach(leg -> legProducts.putAll(leg, offers));
+          })
+      );
+    }
+    // multiple legs where there is a free and a non-free transfer
+    if (scheduledTransitLegs.size() > 2) {
+      var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
+      splits.forEach(split ->
+        split
+          .subTails()
+          .forEach(legs -> {
+            var hasFreeTransfer = lookup.hasFreeTransfer(split.head(), legs);
+            if (hasFreeTransfer) {
+              var previousLegsProducts = legProducts.get(split.head());
+              legs.forEach(leg -> {
+                legProducts.putAll(leg, previousLegsProducts);
+              });
+            }
           })
       );
     }

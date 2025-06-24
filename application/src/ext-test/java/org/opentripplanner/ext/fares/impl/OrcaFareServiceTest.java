@@ -99,7 +99,7 @@ public class OrcaFareServiceTest {
 
     var rideCost = legFareProducts
       .stream()
-      .map(FareProductUse::product)
+      .map(FareProductUse::offer)
       .filter(fpl -> {
         var fp = fpl.fareProduct();
         return (
@@ -116,7 +116,7 @@ public class OrcaFareServiceTest {
 
     var transfer = legFareProducts
       .stream()
-      .map(FareProductUse::product)
+      .map(FareProductUse::offer)
       .filter(fpl -> {
         var fp = fpl.fareProduct();
         return (
@@ -545,10 +545,10 @@ public class OrcaFareServiceTest {
 
     var regular = uses
       .stream()
-      .filter(u -> u.product().fareProduct().category().name().equals("regular"))
+      .filter(u -> u.offer().fareProduct().category().name().equals("regular"))
       .toList()
       .getFirst();
-    assertEquals(Money.usDollars(3.49f), regular.product().fareProduct().price());
+    assertEquals(Money.usDollars(3.49f), regular.offer().fareProduct().price());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {

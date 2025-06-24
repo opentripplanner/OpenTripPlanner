@@ -134,7 +134,7 @@ class DistancesTest {
     );
     assertEquals(
       faresV2Service.calculateFares(i1).offersForLeg(i1.legs().getLast()),
-      Set.of(FareOffer.of(twelveStopProduct))
+      Set.of(FareOffer.of(i1.listScheduledTransitLegs().getFirst().startTime(), twelveStopProduct))
     );
   }
 
@@ -155,7 +155,7 @@ class DistancesTest {
     );
     assertEquals(
       faresV2Service.calculateFares(i1).offersForLeg(i1.transitLeg(0)),
-      Set.of(FareOffer.of(threeKmProduct))
+      Set.of(FareOffer.of(i1.listScheduledTransitLegs().getFirst().startTime(), threeKmProduct))
     );
   }
 }

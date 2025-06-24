@@ -85,11 +85,8 @@ public class ItineraryFare {
   /**
    * Add a single fare product for a single leg.
    */
-  public void addFareProduct(Leg leg, FareOffer fareProduct) {
-    this.legProducts.put(
-        leg,
-        new FareProductUse(fareProduct.uniqueInstanceId(leg.startTime()), fareProduct)
-      );
+  public void addFareProduct(Leg leg, FareOffer offer) {
+    this.legProducts.put(leg, new FareProductUse(offer.uniqueId(), offer));
   }
 
   public void addFareProductUses(Multimap<Leg, FareProductUse> fareProducts) {

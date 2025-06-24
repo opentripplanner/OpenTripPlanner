@@ -15,6 +15,7 @@ import org.opentripplanner.ext.fares.impl._support.FareTestConstants;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.transit.model._data.TimetableRepositoryForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -59,14 +60,15 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     assertThat(result.itineraryProducts()).isEmpty();
     var first = i1.legs().getFirst();
+    var last = i1.legs().getLast();
     assertThat(result.offersForLeg(first)).containsExactly(
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(first.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.offersForLeg(i1.legs().getLast())).containsExactly(
+    assertThat(result.offersForLeg(last)).containsExactly(
       FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
+      FareOffer.of(last.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(last.startTime(), FARE_PRODUCT_B)
     );
   }
 
@@ -80,23 +82,25 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
 
     var result = SERVICE.calculateFares(i1);
 
-    assertThat(result.itineraryProducts()).isEmpty();
-    assertThat(result.offersForLeg(i1.legs().getFirst())).containsExactly(
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
-    );
     var first = i1.legs().getFirst();
     var second = i1.legs().get(1);
-    assertThat(result.offersForLeg(i1.legs().get(1))).containsExactly(
-      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
+    var last = i1.legs().getLast();
+
+    assertThat(result.itineraryProducts()).isEmpty();
+    assertThat(result.offersForLeg(first)).containsExactly(
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(first.startTime(), FARE_PRODUCT_B)
     );
-    assertThat(result.offersForLeg(i1.legs().getLast())).containsExactly(
+    assertThat(result.offersForLeg(second)).containsExactly(
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
+      FareOffer.of(second.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(second.startTime(), FARE_PRODUCT_B)
+    );
+    assertThat(result.offersForLeg(last)).containsExactly(
       FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
       FareOffer.of(second.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
+      FareOffer.of(last.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(last.startTime(), FARE_PRODUCT_B)
     );
   }
 
@@ -113,14 +117,14 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     assertEquals(Set.of(), result.itineraryProducts());
     var first = i1.legs().getFirst();
     assertThat(result.offersForLeg(first)).containsExactly(
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(first.startTime(), FARE_PRODUCT_B)
     );
     var secondLeg = i1.legs().get(1);
     assertThat(result.offersForLeg(secondLeg)).containsExactly(
       FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
-      FareOffer.of(FARE_PRODUCT_A),
-      FareOffer.of(FARE_PRODUCT_B)
+      FareOffer.of(secondLeg.startTime(), FARE_PRODUCT_A),
+      FareOffer.of(secondLeg.startTime(), FARE_PRODUCT_B)
     );
     assertEquals(Set.of(), result.offersForLeg(i1.legs().getLast()));
   }

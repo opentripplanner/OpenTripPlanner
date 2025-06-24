@@ -18,6 +18,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -68,7 +69,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
         // plus some properties from the product itself like the id, price, rider category and medium
         new FareProductUse(
           "1d270201-412b-3b86-80f6-92ab144fa2e5",
-          new DefaultFareOffer(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareOffer(itin.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts
@@ -103,7 +104,10 @@ class DefaultFareServiceTest implements PlanTestConstants {
     ).build();
     assertEquals(
       List.of(
-        new FareProductUse("ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6", new DefaultFareOffer(regular))
+        new FareProductUse(
+          "ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6",
+          FareOffer.of(firstLeg.startTime(), regular)
+        )
       ),
       firstProducts
     );
@@ -139,7 +143,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "ccadd1d3-f284-31a4-9d58-0a300198950f",
-          new DefaultFareOffer(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareOffer(firstLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(firstLeg)
@@ -148,7 +152,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "c58974dd-9a2f-3f42-90ec-c62a7b0dfd51",
-          new DefaultFareOffer(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareOffer(secondLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(secondLeg)
@@ -171,7 +175,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fareProducts = List.copyOf(fare.getLegProducts().values());
     assertEquals(1, fareProducts.size());
 
-    var fp = fareProducts.get(0).product();
+    var fp = fareProducts.get(0).offer();
     assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), fp.fareProduct().id());
     assertEquals(TEN_DOLLARS, fp.fareProduct().price());
 
@@ -194,7 +198,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .getLegProducts()
       .values()
       .stream()
-      .map(r -> r.product().fareProduct().id())
+      .map(r -> r.offer().fareProduct().id())
       .toList();
 
     assertEquals(
@@ -208,7 +212,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "1d270201-412b-3b86-80f6-92ab144fa2e5",
-          new DefaultFareOffer(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareOffer(firstBusLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(firstBusLeg)
@@ -218,7 +222,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "678d201c-e839-35c3-ae7b-1bc3834da5e5",
-          new DefaultFareOffer(OTHER_FEED_PRODUCT)
+          new DefaultFareOffer(secondBusLeg.startTime(), OTHER_FEED_PRODUCT)
         )
       ),
       legProducts.get(secondBusLeg)
@@ -248,7 +252,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "5d0d58f4-b97a-38db-921c-8b5fc6392b54",
-          new DefaultFareOffer(OTHER_FEED_PRODUCT)
+          new DefaultFareOffer(firstBusLeg.startTime(), OTHER_FEED_PRODUCT)
         )
       ),
       legProducts.get(firstBusLeg)
@@ -257,7 +261,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "1d270201-412b-3b86-80f6-92ab144fa2e5",
-          new DefaultFareOffer(AIRPORT_TO_CITY_CENTER_PRODUCT)
+          new DefaultFareOffer(secondBusLeg.startTime(), AIRPORT_TO_CITY_CENTER_PRODUCT)
         )
       ),
       legProducts.get(secondBusLeg)
@@ -266,7 +270,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       List.of(
         new FareProductUse(
           "5d0d58f4-b97a-38db-921c-8b5fc6392b54",
-          new DefaultFareOffer(OTHER_FEED_PRODUCT)
+          new DefaultFareOffer(secondBusLeg.startTime(), OTHER_FEED_PRODUCT)
         )
       ),
       legProducts.get(finalBusLeg)
@@ -287,7 +291,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .getLegProducts()
       .values()
       .stream()
-      .map(r -> r.product().fareProduct().id())
+      .map(r -> r.offer().fareProduct().id())
       .toList();
     assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultProductIds);
   }

@@ -3,10 +3,12 @@ package org.opentripplanner.ext.fares.impl._support;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.OTHER_FEED_AGENCY;
 import static org.opentripplanner.transit.model._data.TimetableRepositoryForTest.id;
 
+import java.time.ZonedDateTime;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.fare.FareOffer.DefaultFareOffer;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -86,9 +88,9 @@ public class FareModelForTest implements FareTestConstants {
     .setTransfers(1)
     .setAgency(OTHER_FEED_AGENCY.getId())
     .build();
-  public static final FareProductUse FARE_PRODUCT_USE = new FareProductUse(
+  public static final FareProductUse ANY_FARE_PRODUCT_USE = new FareProductUse(
     "c1a04702-1fb6-32d4-ba02-483bf68111ed",
-    new DefaultFareOffer(FareTestConstants.FARE_PRODUCT)
+    FareOffer.of(ZonedDateTime.parse("2025-06-24T12:16:09+02:00"), FareTestConstants.FARE_PRODUCT)
   );
 
   // Fare rule sets
