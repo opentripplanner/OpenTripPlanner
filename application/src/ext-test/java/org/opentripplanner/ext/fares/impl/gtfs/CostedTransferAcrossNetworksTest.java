@@ -170,4 +170,39 @@ class CostedTransferAcrossNetworksTest implements PlanTestConstants, FareTestCon
     );
     assertThat(result.itineraryProducts()).isEmpty();
   }
+
+  @Test
+  void ABAB() {
+    var itin = newItinerary(A, 0)
+      .bus(ROUTE_A, 1, 0, 10, B)
+      .bus(ROUTE_B, 2, 11, 20, C)
+      .bus(ROUTE_A, 3, 21, 25, D)
+      .bus(ROUTE_B, 4, 25, 30, E)
+      .build();
+
+    var result = service.calculateFares(itin);
+
+    var first = itin.legs().getFirst();
+    var second = itin.legs().get(1);
+    var third = itin.legs().get(2);
+    var fourth = itin.legs().getLast();
+
+    assertThat(result.offersForLeg(itin.legs().getFirst())).containsExactly(
+      FareOffer.of(first.startTime(), FARE_PRODUCT_A)
+    );
+    assertThat(result.offersForLeg(second)).containsExactly(
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(second.startTime(), FARE_PRODUCT_B)
+    );
+    assertThat(result.offersForLeg(third)).containsExactly(
+      FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(second.startTime(), FARE_PRODUCT_B),
+      FareOffer.of(third.startTime(), FARE_PRODUCT_A)
+    );
+    assertThat(result.offersForLeg(fourth)).containsExactly(
+      FareOffer.of(third.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A)),
+      FareOffer.of(fourth.startTime(), FARE_PRODUCT_B)
+    );
+    assertThat(result.itineraryProducts()).isEmpty();
+  }
 }
