@@ -11,6 +11,9 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.ListUtils;
 
+/**
+ * Computes fare offers derived from GTFS Fares V2 data.
+ */
 public final class GtfsFaresV2Service implements Serializable {
 
   private final FareLookupService lookup;
@@ -26,6 +29,7 @@ public final class GtfsFaresV2Service implements Serializable {
   public FareResult calculateFares(Itinerary itinerary) {
     var legOffers = new LegOfferContainer();
     var scheduledTransitLegs = itinerary.listScheduledTransitLegs();
+    // individual legs
     scheduledTransitLegs.forEach(leg -> {
       var products = lookup
         .legRules(leg)
@@ -45,16 +49,6 @@ public final class GtfsFaresV2Service implements Serializable {
           .forEach(legs -> {
             var offers = lookup.findTransferOffersForSubLegs(split.head(), legs);
             legs.forEach(leg -> legOffers.addToLeg(leg, offers));
-          })
-      );
-    }
-    // multiple legs where there is a free and a non-free transfer
-    if (scheduledTransitLegs.size() > 2) {
-      var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
-      splits.forEach(split ->
-        split
-          .subTails()
-          .forEach(legs -> {
             var hasFreeTransfer = lookup.hasFreeTransfer(split.head(), legs);
             if (hasFreeTransfer) {
               legOffers.transferProducts(split.head(), legs);
