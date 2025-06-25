@@ -118,10 +118,6 @@ public class RouterConfig implements Serializable {
     return transmodelApi;
   }
 
-  public GtfsAPIConfig gtfsApi() {
-    return gtfsApi;
-  }
-
   public RouteRequest routingRequestDefaults() {
     return routingRequestDefaults;
   }
