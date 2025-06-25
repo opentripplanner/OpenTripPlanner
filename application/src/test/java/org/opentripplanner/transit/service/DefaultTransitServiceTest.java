@@ -49,7 +49,7 @@ class DefaultTransitServiceTest {
     .build();
   private static final RegularStop STOP_B = TEST_MODEL.stop("B").withParentStation(STATION).build();
   private static final RegularStop STOP_C = TEST_MODEL.stop("C").withVehicleType(BUS).build();
-  private static final RegularStop STOP_ONE = TEST_MODEL.stop("Stop_1") // added automatically to pattern by timetableRepositoryTest (same name)
+  private static final RegularStop STOP_ONE = TEST_MODEL.stop("Stop_1")
     .withVehicleType(TRAM)
     .build();
   private static final FeedScopedId SERVICE_ID = new FeedScopedId("FEED", "SERVICE");

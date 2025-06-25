@@ -153,6 +153,12 @@ class TimetableRepositoryIndex {
       .collect(Collectors.toList());
   }
 
+  /**
+   * Checks if the last scheduled service date for the stop is today or in the future.
+   *
+   * @param stop the stop to check
+   * @return true if the stop is in service today or later, false otherwise
+   */
   boolean isStopInService(StopLocation stop) {
     LocalDate endOfServiceDate = endOfServiceDateForStop.get(stop);
     return (
