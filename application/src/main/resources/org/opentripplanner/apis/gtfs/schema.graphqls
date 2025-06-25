@@ -376,17 +376,17 @@ type CarPark implements Node & PlaceInterface {
 "Cluster is a list of stops grouped by name and proximity"
 type Cluster implements Node {
   "ID of the cluster"
-  gtfsId: String!
+  gtfsId: String! @deprecated(reason : "Not implemented in OTP2")
   "Global object ID provided by Relay. This value can be used to refetch this object using **node** query."
-  id: ID!
+  id: ID! @deprecated(reason : "Not implemented in OTP2")
   "Latitude of the center of this cluster (i.e. average latitude of stops in this cluster)"
-  lat: Float!
+  lat: Float! @deprecated(reason : "Not implemented in OTP2")
   "Longitude of the center of this cluster (i.e. average longitude of stops in this cluster)"
-  lon: Float!
+  lon: Float! @deprecated(reason : "Not implemented in OTP2")
   "Name of the cluster"
-  name: String!
+  name: String! @deprecated(reason : "Not implemented in OTP2")
   "List of stops in the cluster"
-  stops: [Stop!]
+  stops: [Stop!] @deprecated(reason : "Not implemented in OTP2")
 }
 
 "Contact information for booking an on-demand or flexible service."
@@ -1275,9 +1275,9 @@ type QueryType {
     ids: [String]
   ): [CarPark] @deprecated(reason : "carParks is deprecated. Use vehicleParkings instead.")
   "Get a single cluster based on its ID, i.e. value of field `gtfsId`"
-  cluster(id: String!): Cluster
+  cluster(id: String!): Cluster @deprecated(reason : "Not implemented in OTP2.")
   "Get all clusters"
-  clusters: [Cluster]
+  clusters: [Cluster] @deprecated(reason : "Not implemented in OTP2.")
   "Get a single departure row based on its ID (ID format is `FeedId:StopId:PatternId`)"
   departureRow(id: String!): DepartureRow
   "Get all available feeds"
@@ -2121,7 +2121,7 @@ type Stop implements Node & PlaceInterface {
     types: [StopAlertType]
   ): [Alert]
   "The cluster which this stop is part of"
-  cluster: Cluster
+  cluster: Cluster @deprecated(reason : "Not implemented in OTP2")
   "Stop code which is visible at the stop"
   code: String
   "Description of the stop, usually a street name"
