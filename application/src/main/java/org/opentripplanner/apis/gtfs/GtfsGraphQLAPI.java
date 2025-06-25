@@ -99,7 +99,7 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      TracingUtils.getTagsFromHeadersOrQueryParameters(
+      TracingUtils.findTagsInHeadersOrQueryParameters(
         serverContext.gtfsApiParameters().tracingTags(),
         headers,
         uriInfo.getQueryParameters()
@@ -127,7 +127,7 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      TracingUtils.getTagsFromHeadersOrQueryParameters(
+      TracingUtils.findTagsInHeadersOrQueryParameters(
         serverContext.gtfsApiParameters().tracingTags(),
         headers,
         uriInfo.getQueryParameters()

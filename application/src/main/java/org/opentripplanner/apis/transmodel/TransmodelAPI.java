@@ -135,7 +135,7 @@ public class TransmodelAPI {
       variables,
       operationName,
       maxNumberOfResultFields,
-      TracingUtils.getTagsFromHeaders(tracingHeaderTags, headers)
+      TracingUtils.findTagsInHeaders(tracingHeaderTags, headers)
     );
   }
 
@@ -148,7 +148,7 @@ public class TransmodelAPI {
       null,
       null,
       maxNumberOfResultFields,
-      TracingUtils.getTagsFromHeaders(tracingHeaderTags, headers)
+      TracingUtils.findTagsInHeaders(tracingHeaderTags, headers)
     );
   }
 

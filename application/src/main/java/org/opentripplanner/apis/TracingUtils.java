@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public final class TracingUtils {
 
@@ -18,7 +17,7 @@ public final class TracingUtils {
    * @param headers headers from a request
    * @return a list of tracing tags with computed values
    */
-  public static Iterable<Tag> getTagsFromHeaders(
+  public static Iterable<Tag> findTagsInHeaders(
     Collection<String> tracingHeaderTags,
     HttpHeaders headers
   ) {
@@ -41,7 +40,7 @@ public final class TracingUtils {
    * @param queryParameters query parameters from a request
    * @return a list of tracing tags with computed values
    */
-  public static Iterable<Tag> getTagsFromHeadersOrQueryParameters(
+  public static Iterable<Tag> findTagsInHeadersOrQueryParameters(
     Collection<String> tracingTags,
     HttpHeaders headers,
     MultivaluedMap<String, String> queryParameters
