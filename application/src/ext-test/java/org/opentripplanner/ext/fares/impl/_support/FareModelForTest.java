@@ -88,7 +88,7 @@ public class FareModelForTest implements FareTestConstants {
     .build();
   public static final FareOffer ANY_FARE_OFFER = FareOffer.of(
     ZonedDateTime.parse("2025-06-24T12:16:09+02:00"),
-    FareTestConstants.FARE_PRODUCT
+    FareTestConstants.FARE_PRODUCT_A
   );
 
   // Fare rule sets

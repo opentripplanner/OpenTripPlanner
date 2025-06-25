@@ -10,7 +10,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 
 public interface FareTestConstants {
-  FareProduct FARE_PRODUCT = FareProduct.of(id("fp"), "fare product 1", Money.euros(10)).build();
   FareProduct FARE_PRODUCT_A = fareProduct("A");
   FareProduct FARE_PRODUCT_B = fareProduct("B");
   FareProduct TRANSFER_1 = FareProduct.of(id("transfer:1"), "transfer 1", Money.euros(1)).build();

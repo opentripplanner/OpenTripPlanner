@@ -210,7 +210,7 @@ public class ScheduledTransitLegBuilder<B extends ScheduledTransitLegBuilder<B>>
     return instance();
   }
 
-  public List<FareOffer> fareOffer() {
+  public List<FareOffer> fareOffers() {
     return fareOffers;
   }
 

@@ -98,7 +98,6 @@ class CostedTransferInNetworkTest implements PlanTestConstants, FareTestConstant
     );
     assertThat(result.offersForLeg(last)).containsExactly(
       FareOffer.of(first.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
-      FareOffer.of(second.startTime(), TRANSFER_1, Set.of(FARE_PRODUCT_A, FARE_PRODUCT_B)),
       FareOffer.of(last.startTime(), FARE_PRODUCT_A),
       FareOffer.of(last.startTime(), FARE_PRODUCT_B)
     );

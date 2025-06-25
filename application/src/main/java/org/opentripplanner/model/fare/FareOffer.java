@@ -38,6 +38,8 @@ public sealed interface FareOffer permits FareOffer.DefaultFareOffer, FareOffer.
 
   FareProduct fareProduct();
 
+  ZonedDateTime startTime();
+
   /**
    * A fare product that has no dependencies on others and can be purchased on its own.
    */

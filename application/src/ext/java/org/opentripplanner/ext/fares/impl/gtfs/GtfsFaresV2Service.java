@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares.impl.gtfs;
 
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.io.Serializable;
 import java.util.List;
@@ -9,7 +8,6 @@ import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.model.fare.FareOffer;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.utils.collection.ListUtils;
 
@@ -26,7 +24,7 @@ public final class GtfsFaresV2Service implements Serializable {
   }
 
   public FareResult calculateFares(Itinerary itinerary) {
-    Multimap<Leg, FareOffer> legProducts = HashMultimap.create();
+    var legOffers = new LegOfferContainer();
     var scheduledTransitLegs = itinerary.listScheduledTransitLegs();
     scheduledTransitLegs.forEach(leg -> {
       var products = lookup
@@ -35,9 +33,10 @@ public final class GtfsFaresV2Service implements Serializable {
         .flatMap(r -> r.fareProducts().stream())
         .map(fp -> FareOffer.of(leg.startTime(), fp))
         .collect(Collectors.toUnmodifiableSet());
-      legProducts.putAll(leg, products);
+      legOffers.addToLeg(leg, products);
     });
 
+    // add transfers for subsections of the itinerary
     if (scheduledTransitLegs.size() > 1) {
       var splits = ListUtils.partitionIntoSplits(scheduledTransitLegs);
       splits.forEach(split ->
@@ -45,7 +44,7 @@ public final class GtfsFaresV2Service implements Serializable {
           .subTails()
           .forEach(legs -> {
             var offers = lookup.findTransferOffersForSubLegs(split.head(), legs);
-            legs.forEach(leg -> legProducts.putAll(leg, offers));
+            legs.forEach(leg -> legOffers.addToLeg(leg, offers));
           })
       );
     }
@@ -58,17 +57,14 @@ public final class GtfsFaresV2Service implements Serializable {
           .forEach(legs -> {
             var hasFreeTransfer = lookup.hasFreeTransfer(split.head(), legs);
             if (hasFreeTransfer) {
-              var previousLegsProducts = legProducts.get(split.head());
-              legs.forEach(leg -> {
-                legProducts.putAll(leg, previousLegsProducts);
-              });
+              legOffers.transferProducts(split.head(), legs);
             }
           })
       );
     }
 
     var itinProducts = lookup.findTransfersMatchingAllLegs(scheduledTransitLegs);
-    return new FareResult(itinProducts, legProducts);
+    return new FareResult(itinProducts, legOffers.toMultimap());
   }
 
   /**

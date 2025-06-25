@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -50,6 +51,13 @@ import org.opentripplanner.utils.tostring.ToStringBuilder;
 public class ScheduledTransitLeg implements TransitLeg {
 
   private static final int ZERO = 0;
+  /**
+   * A leg's fare offers don't really have any particular order, but it's nice if the order remains
+   * the same for two identical collections.
+   */
+  private static final Comparator<FareOffer> FARE_OFFER_COMPARATOR = Comparator.comparing(
+    (FareOffer o) -> o.fareProduct().id().getId()
+  ).thenComparing(FareOffer::uniqueId);
   private final TripTimes tripTimes;
   private final TripPattern tripPattern;
 
@@ -124,7 +132,7 @@ public class ScheduledTransitLeg implements TransitLeg {
     // Sandbox
     this.accessibilityScore = builder.accessibilityScore();
     this.emissionPerPerson = builder.emissionPerPerson();
-    this.fareOffers = List.copyOf(builder.fareOffer());
+    this.fareOffers = builder.fareOffers().stream().sorted(FARE_OFFER_COMPARATOR).toList();
   }
 
   public ScheduledTransitLegBuilder copyOf() {
