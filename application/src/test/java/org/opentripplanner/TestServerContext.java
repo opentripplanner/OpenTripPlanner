@@ -106,7 +106,7 @@ public class TestServerContext {
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.triasApiParameters(),
-      routerConfig.gtfsAPIParameters(),
+      routerConfig.gtfsApiParameters(),
       routerConfig.vectorTileConfig(),
       createVehicleParkingService(),
       createVehicleRentalService(),

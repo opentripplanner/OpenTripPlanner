@@ -4,7 +4,7 @@ import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.apis.gtfs.GtfsAPIParameters;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -81,7 +81,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final TriasApiParameters triasApiParameters;
 
-  private final GtfsAPIParameters gtfsAPIParameters;
+  private final GtfsApiParameters gtfsApiParameters;
 
   /* Lazy initialized fields */
 
@@ -106,7 +106,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     TransitRoutingConfig transitRoutingConfig,
     TransitService transitService,
     TriasApiParameters triasApiParameters,
-    GtfsAPIParameters gtfsAPIParameters,
+    GtfsApiParameters gtfsApiParameters,
     VectorTileConfig vectorTileConfig,
     VehicleParkingService vehicleParkingService,
     VehicleRentalService vehicleRentalService,
@@ -132,7 +132,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.transitRoutingConfig = transitRoutingConfig;
     this.transitService = transitService;
     this.triasApiParameters = triasApiParameters;
-    this.gtfsAPIParameters = gtfsAPIParameters;
+    this.gtfsApiParameters = gtfsApiParameters;
     this.vectorTileConfig = vectorTileConfig;
     this.vehicleParkingService = vehicleParkingService;
     this.vehicleRentalService = vehicleRentalService;
@@ -260,8 +260,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public GtfsAPIParameters gtfsAPIParameters() {
-    return gtfsAPIParameters;
+  public GtfsApiParameters gtfsApiParameters() {
+    return gtfsApiParameters;
   }
 
   @Nullable

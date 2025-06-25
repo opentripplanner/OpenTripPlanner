@@ -4,17 +4,17 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Collection;
 import java.util.Set;
-import org.opentripplanner.apis.gtfs.GtfsAPIParameters;
+import org.opentripplanner.apis.gtfs.GtfsApiParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
- * @see GtfsAPIParameters for documentation of parameters
+ * @see GtfsApiParameters for documentation of parameters
  */
-public class GtfsAPIConfig implements GtfsAPIParameters {
+public class GtfsApiConfig implements GtfsApiParameters {
 
   private final Collection<String> tracingTags;
 
-  public GtfsAPIConfig(String parameterName, NodeAdapter root) {
+  public GtfsApiConfig(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
       .since(V2_8)

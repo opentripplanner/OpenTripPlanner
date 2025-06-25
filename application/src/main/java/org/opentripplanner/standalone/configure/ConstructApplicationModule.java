@@ -63,7 +63,7 @@ public class ConstructApplicationModule {
 
     var transitRoutingConfig = routerConfig.transitTuningConfig();
     var triasApiParameters = routerConfig.triasApiParameters();
-    var gtfsAPIConfig = routerConfig.gtfsAPIParameters();
+    var gtfsApiConfig = routerConfig.gtfsApiParameters();
     var vectorTileConfig = routerConfig.vectorTileConfig();
     var flexParameters = routerConfig.flexParameters();
 
@@ -81,7 +81,7 @@ public class ConstructApplicationModule {
       transitRoutingConfig,
       transitService,
       triasApiParameters,
-      gtfsAPIConfig,
+      gtfsApiConfig,
       vectorTileConfig,
       vehicleParkingService,
       vehicleRentalService,
