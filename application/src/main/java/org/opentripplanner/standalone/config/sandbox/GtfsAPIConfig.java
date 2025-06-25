@@ -12,7 +12,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class GtfsAPIConfig implements GtfsAPIParameters {
 
-  private final Collection<String> tracingHeaderTags;
+  private final Collection<String> tracingTags;
 
   public GtfsAPIConfig(String parameterName, NodeAdapter root) {
     var c = root
@@ -21,14 +21,14 @@ public class GtfsAPIConfig implements GtfsAPIParameters {
       .summary("Configuration for the GTFS GraphQL API.")
       .asObject();
 
-    tracingHeaderTags = c
-      .of("tracingHeaderTags")
+    tracingTags = c
+      .of("tracingTags")
       .summary("Used to group requests when monitoring OTP.")
       .asStringList(Set.of());
   }
 
   @Override
-  public Collection<String> tracingHeaderTags() {
-    return tracingHeaderTags;
+  public Collection<String> tracingTags() {
+    return tracingTags;
   }
 }

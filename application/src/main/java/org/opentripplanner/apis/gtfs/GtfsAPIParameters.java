@@ -9,9 +9,10 @@ import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
  */
 public interface GtfsAPIParameters {
   /**
-   * Which HTTP headers should be used as tags for performance metering in the Actuator API
+   * Which HTTP headers or query parameters should be used as tags for performance metering in the
+   * Actuator API.
    *
    * @see MicrometerGraphQLInstrumentation
    */
-  Collection<String> tracingHeaderTags();
+  Collection<String> tracingTags();
 }

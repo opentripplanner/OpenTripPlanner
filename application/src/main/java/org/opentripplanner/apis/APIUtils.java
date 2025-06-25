@@ -9,11 +9,12 @@ import java.util.stream.Collectors;
 public final class APIUtils {
 
   /**
-   * TODO
+   * This method tries to find a tracing tag from a request's headers.
+   * If no value is found for a tag, the value is set to "__UNKNOWN__".
    *
-   * @param tracingHeaderTags TODO
-   * @param headers TODO
-   * @return TODO
+   * @param tracingHeaderTags a collection of tag names to match against headers
+   * @param headers headers from a request
+   * @return a list of tracing tags with computed values
    */
   public static Iterable<Tag> getTagsFromHeaders(
     Collection<String> tracingHeaderTags,
@@ -29,19 +30,21 @@ public final class APIUtils {
   }
 
   /**
-   * This method tries to find a tag from either headers or query parameters.
+   * This method tries to find a tracing tag from either a request's headers or query parameters.
    * The value from headers is favored if a value is present in both.
+   * If no value is found for a tag, the value is set to "__UNKNOWN__".
    *
-   * @param tracingHeaderTags TODO
-   * @param queryParameters TODO
-   * @return TODO
+   * @param tracingTags a collection of tag names to match against headers or query parameters
+   * @param headers headers from a request
+   * @param queryParameters query parameters from a request
+   * @return a list of tracing tags with computed values
    */
   public static Iterable<Tag> getTagsFromHeadersOrQueryParameters(
-    Collection<String> tracingHeaderTags,
+    Collection<String> tracingTags,
     HttpHeaders headers,
     MultivaluedMap<String, String> queryParameters
   ) {
-    return tracingHeaderTags
+    return tracingTags
       .stream()
       .map(header -> {
         String headerValue = headers.getHeaderString(header);

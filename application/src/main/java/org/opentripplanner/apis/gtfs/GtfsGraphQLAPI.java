@@ -100,7 +100,7 @@ public class GtfsGraphQLAPI {
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
       APIUtils.getTagsFromHeadersOrQueryParameters(
-        serverContext.gtfsAPIParameters().tracingHeaderTags(),
+        serverContext.gtfsAPIParameters().tracingTags(),
         headers,
         uriInfo.getQueryParameters()
       )
@@ -128,7 +128,7 @@ public class GtfsGraphQLAPI {
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
       APIUtils.getTagsFromHeadersOrQueryParameters(
-        serverContext.gtfsAPIParameters().tracingHeaderTags(),
+        serverContext.gtfsAPIParameters().tracingTags(),
         headers,
         uriInfo.getQueryParameters()
       )
