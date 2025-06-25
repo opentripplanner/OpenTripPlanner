@@ -1,8 +1,7 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import java.util.Collections;
-import java.util.Set;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.algorithm.mapping.StreetModeToRentalTraverseModeMapper;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.RentalFormFactor;
@@ -37,8 +36,7 @@ public class VehicleRentalEdge extends Edge {
       return State.empty();
     }
 
-    var allowedRentalFormFactors = allowedModes(s0.getRequest().mode());
-    if (!allowedRentalFormFactors.isEmpty() && !allowedRentalFormFactors.contains(formFactor)) {
+    if (!isFormFactorAllowed(s0.getRequest().mode(), formFactor)) {
       return State.empty();
     }
 
@@ -146,12 +144,6 @@ public class VehicleRentalEdge extends Edge {
           ) {
             return State.empty();
           }
-          if (
-            !allowedRentalFormFactors.isEmpty() &&
-            Collections.disjoint(allowedRentalFormFactors, formFactors)
-          ) {
-            return State.empty();
-          }
           s1.dropOffRentedVehicleAtStation(formFactor, network, false);
           pickedUp = false;
         }
@@ -190,16 +182,7 @@ public class VehicleRentalEdge extends Edge {
     return rentedNetwork.equals(stationNetwork);
   }
 
-  private static Set<RentalFormFactor> allowedModes(StreetMode streetMode) {
-    return switch (streetMode) {
-      case BIKE_RENTAL -> Set.of(RentalFormFactor.BICYCLE, RentalFormFactor.CARGO_BICYCLE);
-      case SCOOTER_RENTAL -> Set.of(
-        RentalFormFactor.SCOOTER,
-        RentalFormFactor.SCOOTER_SEATED,
-        RentalFormFactor.SCOOTER_STANDING
-      );
-      case CAR_RENTAL -> Set.of(RentalFormFactor.CAR);
-      default -> Set.of();
-    };
+  private static boolean isFormFactorAllowed(StreetMode streetMode, RentalFormFactor formFactor) {
+    return formFactor.traverseMode == StreetModeToRentalTraverseModeMapper.map(streetMode);
   }
 }
