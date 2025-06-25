@@ -5,6 +5,7 @@ import static org.opentripplanner.datastore.api.FileType.EMISSION;
 import static org.opentripplanner.datastore.api.FileType.GTFS;
 import static org.opentripplanner.datastore.api.FileType.NETEX;
 import static org.opentripplanner.datastore.api.FileType.OSM;
+import static org.opentripplanner.datastore.api.FileType.SUBMODE;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -85,6 +86,7 @@ public class GraphBuilderDataSources {
     include(cli.doBuildStreet(), DEM);
     include(cli.doBuildTransit(), GTFS);
     include(cli.doBuildTransit(), NETEX);
+    include(cli.doBuildTransit(), SUBMODE);
 
     selectFilesToImport();
 
@@ -128,6 +130,10 @@ public class GraphBuilderDataSources {
 
   public Iterable<ConfiguredDataSource<EmissionFeedParameters>> getEmissionConfiguredDataSource() {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
+  }
+
+  public Iterable<DataSource> getSubmodeMappingDataSource() {
+    return ofStream(SUBMODE).toList();
   }
 
   /**

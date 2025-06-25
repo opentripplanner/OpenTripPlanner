@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
@@ -36,6 +37,7 @@ import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParamet
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
+import org.opentripplanner.model.impl.SubmodeMappingModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.osm.DefaultOsmProvider;
@@ -296,6 +298,15 @@ public class GraphBuilderModules {
   @Singleton
   static DataImportIssueSummary providesDataImportIssueSummary(DataImportIssueStore issueStore) {
     return new DataImportIssueSummary(issueStore.listIssues());
+  }
+
+  @Provides
+  @Singleton
+  static SubmodeMappingModule provideSubmodeMappingModule(
+    GraphBuilderDataSources graphBuilderDataSources,
+    Graph graph
+  ) {
+    return new SubmodeMappingModule(graphBuilderDataSources, graph);
   }
 
   @Provides

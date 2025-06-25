@@ -7,6 +7,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -143,6 +144,8 @@ public class BuildConfig implements OtpDataStoreConfig {
   private final URI graph;
 
   private final URI buildReportDir;
+
+  private final URI submodeMapping;
 
   /**
    * A custom OSM namer to use.
@@ -375,6 +378,12 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+    submodeMapping = root
+      .of("submodeMapping")
+      .since(V2_8)
+      .summary("CSV file with submode mapping configuration")
+      .description("")
+      .asUri(null);
 
     // Time Zone dependent config
     {
@@ -687,6 +696,11 @@ public class BuildConfig implements OtpDataStoreConfig {
   @Override
   public Pattern demLocalFilePattern() {
     return demLocalFilePattern;
+  }
+
+  @Override
+  public URI submodeMappingFile() {
+    return submodeMapping;
   }
 
   /**

@@ -73,6 +73,11 @@ public interface OtpDataStoreConfig {
   URI stopConsolidation();
 
   /**
+   * The URI to the submode mapping csv file to load.
+   */
+  URI submodeMappingFile();
+
+  /**
    *
    * A pattern to lookup local GTFS files
    */

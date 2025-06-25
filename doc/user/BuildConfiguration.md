@@ -41,6 +41,7 @@ Sections follow that describe particular settings in more depth.
 | staticParkAndRide                                                                         |       `boolean`      | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
 | stopConsolidationFile                                                                     |         `uri`        | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
 | [streetGraph](#streetGraph)                                                               |         `uri`        | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
+| [submodeMapping](#submodeMapping)                                                         |         `uri`        | CSV file with submode mapping configuration                                                                                                                    | *Optional* |                                   |  2.8  |
 | [subwayAccessTime](#subwayAccessTime)                                                     |       `double`       | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
 | [transitModelTimeZone](#transitModelTimeZone)                                             |      `time-zone`     | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
 | [transitServiceEnd](#transitServiceEnd)                                                   |      `duration`      | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
@@ -547,6 +548,13 @@ recalculating them all over again.
 URI to the street graph object file for reading and writing.
 
 The file is created or overwritten if OTP saves the graph to the file
+
+<h3 id="submodeMapping">submodeMapping</h3>
+
+**Since version:** `2.8` ∙ **Type:** `uri` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+CSV file with submode mapping configuration
 
 <h3 id="subwayAccessTime">subwayAccessTime</h3>
 

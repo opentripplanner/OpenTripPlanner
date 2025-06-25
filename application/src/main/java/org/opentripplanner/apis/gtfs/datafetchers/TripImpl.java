@@ -27,6 +27,7 @@ import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
+import org.opentripplanner.model.impl.SubmodeMappingModule;
 import org.opentripplanner.model.impl.SubmodeMappingService;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -264,22 +265,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment -> {
       var submodeMappingService = getSubmodeMappingService(environment);
       var trip = getSource(environment);
-      if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
-        Optional<SubmodeMappingService.SubmodeMappingRow> mapping =
-          submodeMappingService.mapNetexSubmode(trip.getNetexSubMode());
-        if (mapping.isPresent()) {
-          return TransitModeMapper.map(mapping.get().replacementMode());
-        }
-      }
-      var route = getTransitService(environment).findPattern(trip).getRoute();
-      if (route.getGtfsType() != null) {
-        Optional<SubmodeMappingService.SubmodeMappingRow> mapping =
-          submodeMappingService.mapGtfsExtendedType(route.getGtfsType());
-        if (mapping.isPresent()) {
-          return TransitModeMapper.map(mapping.get().replacementMode());
-        }
-      }
-      return null;
+      var mode = submodeMappingService.getReplacementMode(trip);
+      return mode != null ? TransitModeMapper.map(mode) : null;
     };
   }
 

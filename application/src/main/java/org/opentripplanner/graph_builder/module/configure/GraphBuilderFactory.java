@@ -30,6 +30,7 @@ import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
+import org.opentripplanner.model.impl.SubmodeMappingModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -64,6 +65,7 @@ public interface GraphBuilderFactory {
   OsmModule osmModule();
   PruneIslands pruneIslands();
   StreetLinkerModule streetLinkerModule();
+  SubmodeMappingModule submodeMappingModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
 

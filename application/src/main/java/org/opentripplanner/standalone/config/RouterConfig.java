@@ -2,14 +2,12 @@ package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 import static org.opentripplanner.standalone.config.routerequest.RouteRequestConfig.mapDefaultRouteRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.trias.config.TriasApiConfig;
@@ -46,9 +44,6 @@ public class RouterConfig implements Serializable {
   private final NodeAdapter root;
   private final String configVersion;
 
-  @Nullable
-  private final String submodeMappingConfigFile;
-
   private final ServerConfig server;
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
@@ -71,13 +66,6 @@ public class RouterConfig implements Serializable {
       .since(V2_1)
       .summary("Deployment version of the *" + ROUTER_CONFIG_FILENAME + "*.")
       .description(OtpConfig.CONFIG_VERSION_DESCRIPTION)
-      .asString(null);
-
-    this.submodeMappingConfigFile = root
-      .of("submodeMapping")
-      .since(V2_8)
-      .summary("CSV file with submode mapping configuration")
-      .description("")
       .asString(null);
 
     this.server = new ServerConfig("server", root);
@@ -117,11 +105,6 @@ public class RouterConfig implements Serializable {
    */
   public String getConfigVersion() {
     return configVersion;
-  }
-
-  @Nullable
-  public String getSubmodeMapping() {
-    return submodeMappingConfigFile;
   }
 
   public ServerConfig server() {

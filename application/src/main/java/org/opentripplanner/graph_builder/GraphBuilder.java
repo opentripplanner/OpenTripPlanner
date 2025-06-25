@@ -140,6 +140,8 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.turnRestrictionModule());
     }
 
+    graphBuilder.addModule(factory.submodeMappingModule());
+
     // Prune graph connectivity islands after transit stop linking, so that pruning can take into account
     // existence of stops in islands. If an island has a stop, it actually may be a real island and should
     // not be removed quite as easily

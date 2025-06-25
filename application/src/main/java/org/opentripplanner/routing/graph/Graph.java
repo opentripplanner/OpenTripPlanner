@@ -17,6 +17,8 @@ import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBin
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
+import org.opentripplanner.model.impl.SubmodeMappingMatcher;
+import org.opentripplanner.model.impl.SubmodeMappingRow;
 import org.opentripplanner.routing.linking.Scope;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -95,6 +97,8 @@ public class Graph implements Serializable {
 
   /** If this graph contains elevation data, the maximum elevation value. Otherwise null. */
   public Double maxElevation = null;
+
+  public Map<SubmodeMappingMatcher, SubmodeMappingRow> submodeMapping = null;
 
   /**
    * The horizontal distance across the ground between successive elevation samples in
