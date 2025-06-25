@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.util.List;
+import org.opentripplanner.apis.gtfs.GtfsAPIParameters;
 import org.opentripplanner.ext.flex.FlexParameters;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.trias.config.TriasApiConfig;
@@ -147,6 +148,10 @@ public class RouterConfig implements Serializable {
 
   public TriasApiParameters triasApiParameters() {
     return triasApiParameters;
+  }
+
+  public GtfsAPIParameters gtfsAPIParameters() {
+    return gtfsApi;
   }
 
   public NodeAdapter asNodeAdapter() {

@@ -30,22 +30,11 @@ public class GtfsGraphQLAPI {
 
   private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphQLAPI.class);
 
-  private static Collection<String> tracingHeaderTags;
-
   private final OtpServerRequestContext serverContext;
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public GtfsGraphQLAPI(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
-  }
-
-  /**
-   * This method should be called BEFORE the Web-Container is started and load new instances of this
-   * class. This is a hack, and it would be better if the configuration was done more explicit and
-   * enforced, not relaying on a "static" setup method to be called.
-   */
-  public static void setUp(GtfsAPIParameters config) {
-    tracingHeaderTags = config.tracingHeaderTags();
   }
 
   /**
@@ -111,7 +100,7 @@ public class GtfsGraphQLAPI {
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
       APIUtils.getTagsFromHeadersOrQueryParameters(
-        tracingHeaderTags,
+        serverContext.gtfsAPIParameters().tracingHeaderTags(),
         headers,
         uriInfo.getQueryParameters()
       )
@@ -139,7 +128,7 @@ public class GtfsGraphQLAPI {
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
       APIUtils.getTagsFromHeadersOrQueryParameters(
-        tracingHeaderTags,
+        serverContext.gtfsAPIParameters().tracingHeaderTags(),
         headers,
         uriInfo.getQueryParameters()
       )

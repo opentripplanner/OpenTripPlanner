@@ -202,10 +202,6 @@ public class ConstructApplication {
       );
     }
 
-    if (OTPFeature.GtfsGraphQlApi.isOn()) {
-      GtfsGraphQLAPI.setUp(routerConfig().gtfsApi());
-    }
-
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Initializing geocoder");
       // eagerly initialize the geocoder
