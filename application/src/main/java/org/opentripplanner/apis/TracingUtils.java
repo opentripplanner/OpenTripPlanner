@@ -6,7 +6,9 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-public final class APIUtils {
+public final class TracingUtils {
+
+  private static final String UNKNOWN_VALUE = "__UNKNOWN__";
 
   /**
    * This method tries to find a tracing tag from a request's headers.
@@ -24,9 +26,9 @@ public final class APIUtils {
       .stream()
       .map(header -> {
         String value = headers.getHeaderString(header);
-        return Tag.of(header, value == null ? "__UNKNOWN__" : value);
+        return Tag.of(header, value == null ? UNKNOWN_VALUE : value);
       })
-      .collect(Collectors.toList());
+      .toList();
   }
 
   /**
@@ -54,9 +56,9 @@ public final class APIUtils {
         } else if (queryParameterValue != null) {
           return Tag.of(header, queryParameterValue);
         } else {
-          return Tag.of(header, "__UNKNOWN__");
+          return Tag.of(header, UNKNOWN_VALUE);
         }
       })
-      .collect(Collectors.toList());
+      .toList();
   }
 }

@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.apis.APIUtils;
+import org.opentripplanner.apis.TracingUtils;
 import org.opentripplanner.apis.support.graphql.injectdoc.ApiDocumentationProfile;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -135,7 +135,7 @@ public class TransmodelAPI {
       variables,
       operationName,
       maxNumberOfResultFields,
-      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
+      TracingUtils.getTagsFromHeaders(tracingHeaderTags, headers)
     );
   }
 
@@ -148,7 +148,7 @@ public class TransmodelAPI {
       null,
       null,
       maxNumberOfResultFields,
-      APIUtils.getTagsFromHeaders(tracingHeaderTags, headers)
+      TracingUtils.getTagsFromHeaders(tracingHeaderTags, headers)
     );
   }
 

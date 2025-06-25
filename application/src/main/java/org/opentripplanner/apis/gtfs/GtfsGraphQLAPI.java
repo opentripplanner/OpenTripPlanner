@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import org.opentripplanner.apis.APIUtils;
+import org.opentripplanner.apis.TracingUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +99,7 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      APIUtils.getTagsFromHeadersOrQueryParameters(
+      TracingUtils.getTagsFromHeadersOrQueryParameters(
         serverContext.gtfsAPIParameters().tracingTags(),
         headers,
         uriInfo.getQueryParameters()
@@ -127,7 +127,7 @@ public class GtfsGraphQLAPI {
       timeout,
       locale,
       GraphQLRequestContext.ofServerContext(serverContext),
-      APIUtils.getTagsFromHeadersOrQueryParameters(
+      TracingUtils.getTagsFromHeadersOrQueryParameters(
         serverContext.gtfsAPIParameters().tracingTags(),
         headers,
         uriInfo.getQueryParameters()
