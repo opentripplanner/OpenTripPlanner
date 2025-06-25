@@ -6,6 +6,7 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.datastore.api.DataSource;
@@ -23,6 +24,13 @@ public class SubmodeMappingModule implements GraphBuilderModule {
   private static final String GTFS_ROUTE_TYPE = "GTFS route type";
   private static final String NETEX_SUBMODE = "NeTEx submode";
   private static final String REPLACEMENT_MODE = "Replacement mode";
+  private static final String[] ALL = {
+    INPUT_FEED_TYPE,
+    INPUT_LABEL,
+    GTFS_ROUTE_TYPE,
+    NETEX_SUBMODE,
+    REPLACEMENT_MODE,
+  };
 
   private final GraphBuilderDataSources graphBuilderDataSources;
   private final Graph graph;
@@ -43,6 +51,11 @@ public class SubmodeMappingModule implements GraphBuilderModule {
       var reader = new CsvReader(dataSource.asInputStream(), StandardCharsets.UTF_8);
       reader.readHeaders();
       var headers = reader.getHeaders();
+      for (var header : ALL) {
+        if (Arrays.stream(headers).noneMatch(h -> h.equals(header))) {
+          throw new OtpAppException("submode mapping header not found: " + header);
+        }
+      }
       while (reader.readRecord()) {
         var inputFeedType = reader.get(INPUT_FEED_TYPE);
         var inputLabel = reader.get(INPUT_LABEL);
