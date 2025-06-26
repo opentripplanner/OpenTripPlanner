@@ -106,7 +106,7 @@ class TripTimeOnDateTest {
   private static TripTimeOnDate tripTimeOnDate() {
     var trip = TimetableRepositoryForTest.trip("123").build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(5, trip, "11:00");
-    var stops = stopTimes.stream().map(StopTime::getStop).map(RegularStop.class::cast).toList();
+    var stops = stopTimes.stream().map(StopTime::getStop).toList();
     var pattern = TEST_MODEL.pattern(TransitMode.BUS)
       .withStopPattern(TimetableRepositoryForTest.stopPattern(stops))
       .build();
