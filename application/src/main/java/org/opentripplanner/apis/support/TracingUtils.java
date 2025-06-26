@@ -1,4 +1,4 @@
-package org.opentripplanner.apis;
+package org.opentripplanner.apis.support;
 
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.core.HttpHeaders;
