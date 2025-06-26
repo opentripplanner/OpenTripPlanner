@@ -50,6 +50,9 @@ directive @specifiedBy(
     url: String!
   ) on SCALAR
 
+"Add timing data to prometheus, if Actuator API is enabled"
+directive @timingData on FIELD_DEFINITION
+
 "A fare product (a ticket) to be bought by a passenger"
 interface FareProduct {
   "Identifier for the fare product."
@@ -1746,7 +1749,7 @@ type QueryType {
     searchWindow: Duration,
     "The list of points the itinerary is required to pass through."
     via: [PlanViaLocationInput!]
-  ): PlanConnection @async
+  ): PlanConnection @async @timingData
   "Get a single rental vehicle based on its ID, i.e. value of field `vehicleId`"
   rentalVehicle(id: String!): RentalVehicle
   "Get all rental vehicles"
