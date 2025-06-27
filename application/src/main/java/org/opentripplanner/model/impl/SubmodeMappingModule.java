@@ -19,16 +19,10 @@ public class SubmodeMappingModule implements GraphBuilderModule {
 
   private static final String INPUT_FEED_TYPE = "Input feed type";
   private static final String INPUT_LABEL = "Input label";
-  private static final String GTFS_ROUTE_TYPE = "GTFS route type";
   private static final String NETEX_SUBMODE = "NeTEx submode";
   private static final String REPLACEMENT_MODE = "Replacement mode";
-  private static final String[] ALL = {
-    INPUT_FEED_TYPE,
-    INPUT_LABEL,
-    GTFS_ROUTE_TYPE,
-    NETEX_SUBMODE,
-    REPLACEMENT_MODE,
-  };
+  private static final String ORIGINAL_MODE = "Original mode";
+  private static final String[] MANDATORY = { INPUT_FEED_TYPE, INPUT_LABEL };
 
   private final TimetableRepository timetableRepository;
 
@@ -43,13 +37,17 @@ public class SubmodeMappingModule implements GraphBuilderModule {
     this.dataSource = graphBuilderDataSources.getSubmodeMappingDataSource().orElse(null);
   }
 
+  private boolean isEmpty(@Nullable String string) {
+    return string == null || string.isEmpty();
+  }
+
   private Map<SubmodeMappingMatcher, SubmodeMappingRow> read(DataSource dataSource) {
     var map = new HashMap<SubmodeMappingMatcher, SubmodeMappingRow>();
     try {
       var reader = new CsvReader(dataSource.asInputStream(), StandardCharsets.UTF_8);
       reader.readHeaders();
       var headers = reader.getHeaders();
-      for (var header : ALL) {
+      for (var header : MANDATORY) {
         if (Arrays.stream(headers).noneMatch(h -> h.equals(header))) {
           throw new OtpAppException("submode mapping header not found: " + header);
         }
@@ -62,15 +60,15 @@ public class SubmodeMappingModule implements GraphBuilderModule {
           );
         }
         var inputLabel = reader.get(INPUT_LABEL);
-        var gtfsRouteType = reader.get(GTFS_ROUTE_TYPE);
         var netexSubmode = reader.get(NETEX_SUBMODE);
-        var replacementMode = reader.get(REPLACEMENT_MODE);
+        var replacementMode = isEmpty(reader.get(REPLACEMENT_MODE))
+          ? null
+          : TransitMode.valueOf(reader.get(REPLACEMENT_MODE));
+        var originalMode = isEmpty(reader.get(ORIGINAL_MODE))
+          ? null
+          : TransitMode.valueOf(reader.get(ORIGINAL_MODE));
         var matcher = new SubmodeMappingMatcher(inputFeedType, inputLabel);
-        var row = new SubmodeMappingRow(
-          Integer.parseInt(gtfsRouteType),
-          netexSubmode,
-          TransitMode.valueOf(replacementMode)
-        );
+        var row = new SubmodeMappingRow(netexSubmode, replacementMode, originalMode);
         map.put(matcher, row);
       }
     } catch (IOException ioe) {
@@ -83,11 +81,11 @@ public class SubmodeMappingModule implements GraphBuilderModule {
     var map = new HashMap<SubmodeMappingMatcher, SubmodeMappingRow>();
     map.put(
       new SubmodeMappingMatcher(FeedType.GTFS, "714"),
-      new SubmodeMappingRow(714, "railReplacementBus", TransitMode.RAIL)
+      new SubmodeMappingRow("railReplacementBus", null, TransitMode.RAIL)
     );
     map.put(
       new SubmodeMappingMatcher(FeedType.NETEX, "railreplacementBus"),
-      new SubmodeMappingRow(714, "railReplacementBus", TransitMode.RAIL)
+      new SubmodeMappingRow("railReplacementBus", TransitMode.BUS, null)
     );
     return map;
   }
