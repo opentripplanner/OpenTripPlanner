@@ -1,14 +1,9 @@
 package org.opentripplanner.ext.siri.updater.mqtt;
 
 import jakarta.xml.bind.JAXBException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Optional;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.xml.stream.XMLStreamException;
@@ -21,8 +16,6 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.entur.siri21.util.SiriXml;
 import org.opentripplanner.updater.trip.siri.updater.AsyncEstimatedTimetableSource;
-import org.opentripplanner.utils.text.FileSizeToTextConverter;
-import org.opentripplanner.utils.time.DurationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri21.ServiceDelivery;
@@ -55,17 +48,15 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
       MqttConnectOptions connOpts = new MqttConnectOptions();
       connOpts.setCleanSession(true);
       connOpts.setAutomaticReconnect(true);
-      URI parsedUrl = new URI(parameters.url());
-      if (parsedUrl.getUserInfo() != null) {
-        String[] userinfo = parsedUrl.getUserInfo().split(":");
-        connOpts.setUserName(userinfo[0]);
-        connOpts.setPassword(userinfo[1].toCharArray());
+      if (parameters.user() != null && parameters.password() != null) {
+        connOpts.setUserName(parameters.user());
+        connOpts.setPassword(parameters.password().toCharArray());
       }
       client.setCallback(new Callback());
 
       LOG.debug("Connecting to broker: {}", parameters.url());
       client.connect(connOpts);
-    } catch (MqttException | URISyntaxException e) {
+    } catch (MqttException e) {
       LOG.warn("Failed to connect to broker: {}", parameters.url(), e);
     }
   }
@@ -86,16 +77,10 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
 
   private class Callback implements MqttCallbackExtended {
 
-    private final Instant startTime = Instant.now();
-
-    private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
-    private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
-    private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
-
     @Override
     public void connectComplete(boolean reconnect, String serverURI) {
+      LOG.info("Connected to MQTT broker: {}", serverURI);
       try {
-        LOG.info("Connected to MQTT broker: {}", serverURI);
         client.subscribe(parameters.topic(), parameters.qos());
       } catch (MqttException e) {
         LOG.warn("Could not subscribe to: {}", parameters.topic());
@@ -110,7 +95,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
     @Override
     public void messageArrived(String topic, MqttMessage message) {
       serviceDelivery(message.getPayload()).ifPresent(serviceDelivery -> {
-        // logMqttMessage(serviceDelivery);
         serviceDeliveryConsumer.apply(serviceDelivery);
       });
       primed = true;
@@ -128,38 +112,6 @@ public class MqttEstimatedTimetableSource implements AsyncEstimatedTimetableSour
         return Optional.empty();
       }
       return Optional.ofNullable(siri.getServiceDelivery());
-    }
-
-    private void logMqttMessage(ServiceDelivery serviceDelivery) {
-      // ToDo: better track with micrometer
-      int numberOfUpdatedTrips = 0;
-      try {
-        numberOfUpdatedTrips = serviceDelivery
-          .getEstimatedTimetableDeliveries()
-          .getFirst()
-          .getEstimatedJourneyVersionFrames()
-          .getFirst()
-          .getEstimatedVehicleJourneies()
-          .size();
-      } catch (Exception e) {
-        //ignore
-      }
-      long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
-      long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
-
-      if (numberOfMessages % 100 == 0) {
-        LOG.debug(
-          "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
-          numberOfMessages,
-          numberOfUpdates,
-          FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-          Duration.between(
-            serviceDelivery.getResponseTimestamp().toInstant(),
-            Instant.now()
-          ).toMillis(),
-          DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
-        );
-      }
     }
   }
 }

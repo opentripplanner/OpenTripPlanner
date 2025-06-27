@@ -7,6 +7,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
   private final String configRef;
   private final String feedId;
   private final String url;
+  private final String user;
+  private final String password;
   private final String topic;
   private final int qos;
   private final boolean fuzzyTripMatching;
@@ -15,6 +17,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     String configRef,
     String feedId,
     String url,
+    String user,
+    String password,
     String topic,
     int qos,
     boolean fuzzyTripMatching
@@ -22,6 +26,8 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
     this.configRef = configRef;
     this.feedId = feedId;
     this.url = url;
+    this.user = user;
+    this.password = password;
     this.topic = topic;
     this.qos = qos;
     this.fuzzyTripMatching = fuzzyTripMatching;
@@ -52,5 +58,13 @@ public class MqttSiriETUpdaterParameters implements UrlUpdaterParameters {
 
   public boolean fuzzyTripMatching() {
     return fuzzyTripMatching;
+  }
+
+  public String user() {
+    return user;
+  }
+
+  public String password() {
+    return password;
   }
 }

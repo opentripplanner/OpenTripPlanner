@@ -10,6 +10,8 @@ public class SiriETMqttUpdaterConfig {
     String feedId = siriMqttRoot.of("feedId").since(OtpVersion.V2_8).asString();
 
     String url = siriMqttRoot.of("url").since(OtpVersion.V2_8).asString();
+    String user = siriMqttRoot.of("user").since(OtpVersion.V2_8).asString();
+    String password = siriMqttRoot.of("password").since(OtpVersion.V2_8).asString();
 
     String topic = siriMqttRoot.of("topic").since(OtpVersion.V2_8).asString();
 
@@ -20,6 +22,15 @@ public class SiriETMqttUpdaterConfig {
       .since(OtpVersion.V2_8)
       .asBoolean();
 
-    return new MqttSiriETUpdaterParameters(configRef, feedId, url, topic, qos, fuzzyTripMatching);
+    return new MqttSiriETUpdaterParameters(
+      configRef,
+      feedId,
+      url,
+      user,
+      password,
+      topic,
+      qos,
+      fuzzyTripMatching
+    );
   }
 }
