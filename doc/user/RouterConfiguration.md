@@ -36,7 +36,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                                                                                                                                      | *Optional* |               |  2.1  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                                                                                                                                      | *Optional* |               |  2.1  |
 | gtfsApi                                                                                   |        `object`       | Configuration for the GTFS GraphQL API.                                                                                                                                                                              | *Optional* |               |  2.8  |
-|    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests when monitoring OTP.                                                                                                                                                                          | *Optional* |               |   na  |
+|    [tracingTags](#gtfsApi_tracingTags)                                                    |       `string[]`      | Used to group requests based on headers or query parameters when monitoring OTP.                                                                                                                                     | *Optional* |               |   na  |
 | [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                                                                                                                                            | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                                                                                                                                        | *Optional* |               |  2.0  |
 | [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                                                                                                                                     | *Optional* |               |  2.4  |
@@ -106,7 +106,7 @@ Be aware that OTP uses the config embedded in the loaded graph if no new config 
 **Since version:** `na` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /gtfsApi 
 
-Used to group requests when monitoring OTP.
+Used to group requests based on headers or query parameters when monitoring OTP.
 
 <h3 id="server">server</h3>
 
