@@ -145,8 +145,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   private final URI buildReportDir;
 
-  private final URI submodeMapping;
-
   /**
    * A custom OSM namer to use.
    */
@@ -378,13 +376,6 @@ public class BuildConfig implements OtpDataStoreConfig {
         """
       )
       .asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-    submodeMapping = root
-      .of("submodeMapping")
-      .since(V2_8)
-      .summary("CSV file with submode mapping configuration")
-      .description("")
-      .asUri(null);
-
     // Time Zone dependent config
     {
       // We need a time zone for setting transit service start and end. Getting the wrong time-zone
@@ -696,11 +687,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   @Override
   public Pattern demLocalFilePattern() {
     return demLocalFilePattern;
-  }
-
-  @Override
-  public URI submodeMappingFile() {
-    return submodeMapping;
   }
 
   /**

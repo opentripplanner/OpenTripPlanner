@@ -1,3 +1,5 @@
 package org.opentripplanner.model.impl;
 
-public record SubmodeMappingMatcher(String inputFeedType, String inputLabel) {}
+import org.opentripplanner.model.FeedType;
+
+public record SubmodeMappingMatcher(FeedType inputFeedType, String inputLabel) {}

@@ -2,6 +2,8 @@ package org.opentripplanner.model.impl;
 
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
+import org.opentripplanner.model.FeedType;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -16,14 +18,17 @@ public class SubmodeMappingService {
 
   public Optional<SubmodeMappingRow> mapGtfsExtendedType(int extendedType) {
     return Optional.ofNullable(
-      map.get(new SubmodeMappingMatcher("GTFS", Integer.toString(extendedType)))
+      map.get(new SubmodeMappingMatcher(FeedType.GTFS, Integer.toString(extendedType)))
     );
   }
 
   public Optional<SubmodeMappingRow> mapNetexSubmode(SubMode submode) {
-    return Optional.ofNullable(map.get(new SubmodeMappingMatcher("NeTEx", submode.toString())));
+    return Optional.ofNullable(
+      map.get(new SubmodeMappingMatcher(FeedType.NETEX, submode.toString()))
+    );
   }
 
+  @Nullable
   public TransitMode getReplacementMode(Trip trip) {
     if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
       Optional<SubmodeMappingRow> mapping = mapNetexSubmode(trip.getNetexSubMode());

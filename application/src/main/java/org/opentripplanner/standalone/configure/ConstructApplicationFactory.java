@@ -17,7 +17,7 @@ import org.opentripplanner.ext.sorlandsbanen.configure.SorlandsbanenNorwayModule
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
-import org.opentripplanner.model.impl.SubmodeMappingModule;
+import org.opentripplanner.model.impl.SubmodeMappingServiceModule;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -72,7 +72,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     SorlandsbanenNorwayModule.class,
     StopConsolidationServiceModule.class,
     StreetLimitationParametersServiceModule.class,
-    SubmodeMappingModule.class,
+    SubmodeMappingServiceModule.class,
     TransitModule.class,
     TripUpdateModule.class,
     VehicleParkingServiceModule.class,

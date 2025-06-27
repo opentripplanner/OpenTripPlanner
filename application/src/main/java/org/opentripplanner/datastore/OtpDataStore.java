@@ -103,9 +103,7 @@ public class OtpDataStore {
     addAll(findMultipleCompositeSources(config.gtfsFiles(), GTFS));
     addAll(findMultipleCompositeSources(config.netexFiles(), NETEX));
     addAll(findMultipleSources(config.emissionFiles(), EMISSION));
-    if (config.submodeMappingFile() != null) {
-      addAll(findMultipleSources(Collections.singletonList(config.submodeMappingFile()), SUBMODE));
-    }
+    addAll(findMultipleSources(null, SUBMODE));
 
     streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
     graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
@@ -211,7 +209,7 @@ public class OtpDataStore {
     }
   }
 
-  private List<DataSource> findMultipleSources(Collection<URI> uris, FileType type) {
+  private List<DataSource> findMultipleSources(@Nullable Collection<URI> uris, FileType type) {
     if (uris == null || uris.isEmpty()) {
       return localRepository.listExistingSources(type);
     }

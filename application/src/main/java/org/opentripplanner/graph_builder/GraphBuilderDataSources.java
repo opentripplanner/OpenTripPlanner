@@ -132,8 +132,11 @@ public class GraphBuilderDataSources {
     return ofStream(EMISSION).map(this::mapEmissionFeed).toList();
   }
 
-  public Iterable<DataSource> getSubmodeMappingDataSource() {
-    return ofStream(SUBMODE).toList();
+  public Optional<DataSource> getSubmodeMappingDataSource() {
+    var dataSources = inputData.get(SUBMODE);
+    // There is either zero or one datasources of type SUBMODE. The inputData mechanism allows
+    // multiple datasources, because that is useful for the other types.
+    return dataSources.stream().findFirst();
   }
 
   /**

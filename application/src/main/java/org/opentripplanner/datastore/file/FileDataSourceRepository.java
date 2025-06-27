@@ -36,7 +36,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
   private final Pattern GRAPH_PATTERN = Pattern.compile("(?i)(street)?graph.*\\.obj");
   private final Pattern EMISSION_PATTERN = Pattern.compile("(?i)(emission).*\\.(txt|csv)");
-  private final Pattern SUBMODE_PATTERN = Pattern.compile("(?i)(submode).*\\.(txt|csv)");
+  private final String SUBMODE_FILENAME = "submode-mapping.csv";
 
   private final File baseDir;
   private final Pattern gtfsLocalFilePattern;
@@ -194,7 +194,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     if (EMISSION_PATTERN.matcher(name).find()) {
       return EMISSION;
     }
-    if (SUBMODE_PATTERN.matcher(name).find()) {
+    if (SUBMODE_FILENAME.equals(name)) {
       return SUBMODE;
     }
     if (GRAPH_PATTERN.matcher(name).find()) {

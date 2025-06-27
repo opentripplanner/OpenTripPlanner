@@ -1,22 +1,20 @@
 package org.opentripplanner.model.impl;
 
 import com.csvreader.CsvReader;
-import dagger.Module;
-import dagger.Provides;
-import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.model.FeedType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-@Module
 public class SubmodeMappingModule implements GraphBuilderModule {
 
   private static final String INPUT_FEED_TYPE = "Input feed type";
@@ -32,21 +30,18 @@ public class SubmodeMappingModule implements GraphBuilderModule {
     REPLACEMENT_MODE,
   };
 
-  private final GraphBuilderDataSources graphBuilderDataSources;
   private final Graph graph;
 
+  @Nullable
+  private final DataSource dataSource;
+
   public SubmodeMappingModule(GraphBuilderDataSources graphBuilderDataSources, Graph graph) {
-    this.graphBuilderDataSources = graphBuilderDataSources;
     this.graph = graph;
+    this.dataSource = graphBuilderDataSources.getSubmodeMappingDataSource().orElse(null);
   }
 
-  @Provides
-  @Singleton
-  public static SubmodeMappingService submodeMappingService(Graph graph) {
-    return new SubmodeMappingService(graph.submodeMapping);
-  }
-
-  public void read(DataSource dataSource, Map<SubmodeMappingMatcher, SubmodeMappingRow> map) {
+  private Map<SubmodeMappingMatcher, SubmodeMappingRow> read(DataSource dataSource) {
+    var map = new HashMap<SubmodeMappingMatcher, SubmodeMappingRow>();
     try {
       var reader = new CsvReader(dataSource.asInputStream(), StandardCharsets.UTF_8);
       reader.readHeaders();
@@ -57,7 +52,12 @@ public class SubmodeMappingModule implements GraphBuilderModule {
         }
       }
       while (reader.readRecord()) {
-        var inputFeedType = reader.get(INPUT_FEED_TYPE);
+        var inputFeedType = FeedType.of(reader.get(INPUT_FEED_TYPE));
+        if (inputFeedType == null) {
+          throw new OtpAppException(
+            "not a valid submode mapping feed type: " + reader.get(INPUT_FEED_TYPE)
+          );
+        }
         var inputLabel = reader.get(INPUT_LABEL);
         var gtfsRouteType = reader.get(GTFS_ROUTE_TYPE);
         var netexSubmode = reader.get(NETEX_SUBMODE);
@@ -73,31 +73,37 @@ public class SubmodeMappingModule implements GraphBuilderModule {
     } catch (IOException ioe) {
       throw new OtpAppException("cannot read submode mapping config file", ioe);
     }
+    return map;
   }
 
-  public void useDefaultMapping(Map<SubmodeMappingMatcher, SubmodeMappingRow> map) {
+  private Map<SubmodeMappingMatcher, SubmodeMappingRow> useDefaultMapping() {
+    var map = new HashMap<SubmodeMappingMatcher, SubmodeMappingRow>();
     map.put(
-      new SubmodeMappingMatcher("GTFS", "714"),
+      new SubmodeMappingMatcher(FeedType.GTFS, "714"),
       new SubmodeMappingRow(714, "railReplacementBus", TransitMode.RAIL)
     );
     map.put(
-      new SubmodeMappingMatcher("NeTEx", "railreplacementBus"),
+      new SubmodeMappingMatcher(FeedType.NETEX, "railreplacementBus"),
       new SubmodeMappingRow(714, "railReplacementBus", TransitMode.RAIL)
     );
+    return map;
   }
 
   @Override
   public void buildGraph() {
-    var dataSources = graphBuilderDataSources.getSubmodeMappingDataSource();
-    var map = new HashMap<SubmodeMappingMatcher, SubmodeMappingRow>();
-    boolean mapWritten = false;
-    for (var dataSource : dataSources) {
-      read(dataSource, map);
-      mapWritten = true;
+    if (dataSource != null) {
+      graph.submodeMapping = read(dataSource);
+    } else {
+      graph.submodeMapping = useDefaultMapping();
     }
-    if (!mapWritten) {
-      useDefaultMapping(map);
+  }
+
+  @Override
+  public void checkInputs() {
+    if (dataSource != null && !dataSource.exists()) {
+      throw new RuntimeException(
+        "Submode mapping file " + dataSource.path() + " does not exist or cannot be read."
+      );
     }
-    graph.submodeMapping = map;
   }
 }
