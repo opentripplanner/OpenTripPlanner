@@ -126,6 +126,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   @Override
+  @Deprecated
   public DataFetcher<Object> cluster() {
     return environment -> null;
   }
