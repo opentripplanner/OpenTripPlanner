@@ -105,7 +105,7 @@ public class TestServerContext {
       List.of(),
       request,
       createStreetLimitationParametersService(),
-      new SubmodeMappingService(Collections.emptyMap()),
+      createSubmodeMappingService(),
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.triasApiParameters(),
@@ -161,5 +161,9 @@ public class TestServerContext {
     TransitService transitService
   ) {
     return new DefaultViaCoordinateTransferFactory(graph, transitService, Duration.ofMinutes(30));
+  }
+
+  public static SubmodeMappingService createSubmodeMappingService() {
+    return new SubmodeMappingService(Collections.emptyMap());
   }
 }

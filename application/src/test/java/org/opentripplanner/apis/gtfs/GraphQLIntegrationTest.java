@@ -30,7 +30,6 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +39,7 @@ import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.ItineraryFaresDecorator;
@@ -441,7 +441,7 @@ class GraphQLIntegrationTest {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       finder,
       routeRequest,
-      new SubmodeMappingService(Collections.emptyMap())
+      TestServerContext.createSubmodeMappingService()
     );
   }
 

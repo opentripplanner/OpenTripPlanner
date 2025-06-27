@@ -15,7 +15,6 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
@@ -73,7 +73,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
       routeRequest,
-      new SubmodeMappingService(Collections.emptyMap())
+      TestServerContext.createSubmodeMappingService()
     );
   }
 

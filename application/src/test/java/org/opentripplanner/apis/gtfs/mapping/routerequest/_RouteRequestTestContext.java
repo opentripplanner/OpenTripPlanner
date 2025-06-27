@@ -8,12 +8,12 @@ import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.SchemaFactory;
@@ -69,7 +69,7 @@ class _RouteRequestTestContext {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
       routeRequest,
-      new SubmodeMappingService(Collections.emptyMap())
+      TestServerContext.createSubmodeMappingService()
     );
   }
 
