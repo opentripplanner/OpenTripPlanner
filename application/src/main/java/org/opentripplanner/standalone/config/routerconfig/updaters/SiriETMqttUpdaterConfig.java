@@ -10,8 +10,8 @@ public class SiriETMqttUpdaterConfig {
     String feedId = siriMqttRoot.of("feedId").since(OtpVersion.V2_8).asString();
 
     String url = siriMqttRoot.of("url").since(OtpVersion.V2_8).asString();
-    String user = siriMqttRoot.of("user").since(OtpVersion.V2_8).asString();
-    String password = siriMqttRoot.of("password").since(OtpVersion.V2_8).asString();
+    String user = siriMqttRoot.of("user").since(OtpVersion.V2_8).asString(null);
+    String password = siriMqttRoot.of("password").since(OtpVersion.V2_8).asString(null);
 
     String topic = siriMqttRoot.of("topic").since(OtpVersion.V2_8).asString();
 
