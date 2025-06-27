@@ -152,14 +152,27 @@ public class TemporaryVerticesContainerBuilder {
 
   public TemporaryVerticesContainer build() {
     checkIfVerticesFound();
+    addAdjustedEdges();
+    return new TemporaryVerticesContainer(this);
+  }
 
-    // TODO do we need to adjust via locations?
+  private void addAdjustedEdges() {
     for (Vertex fromVertex : fromVertices) {
       for (Vertex toVertex : toVertices) {
         tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, toVertex, graph));
       }
     }
-    return new TemporaryVerticesContainer(this);
+    var viaVertices = visitViaLocationVertices.values().stream().flatMap(Set::stream).toList();
+    for (Vertex fromVertex : fromVertices) {
+      for (Vertex viaVertex : viaVertices) {
+        tempEdges.add(SameEdgeAdjuster.adjust(fromVertex, viaVertex, graph));
+      }
+    }
+    for (Vertex toVertex : toVertices) {
+      for (Vertex viaVertex : viaVertices) {
+        tempEdges.add(SameEdgeAdjuster.adjust(viaVertex, toVertex, graph));
+      }
+    }
   }
 
   /**
