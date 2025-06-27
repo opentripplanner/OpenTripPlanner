@@ -30,6 +30,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -440,7 +441,7 @@ class GraphQLIntegrationTest {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       finder,
       routeRequest,
-      new SubmodeMappingService(null)
+      new SubmodeMappingService(Collections.emptyMap())
     );
   }
 

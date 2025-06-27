@@ -43,7 +43,6 @@ public class RouterConfig implements Serializable {
    */
   private final NodeAdapter root;
   private final String configVersion;
-
   private final ServerConfig server;
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;

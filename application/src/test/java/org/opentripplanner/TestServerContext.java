@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.configure.ConstructApplication.crea
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.emission.internal.DefaultEmissionRepository;
@@ -104,7 +105,7 @@ public class TestServerContext {
       List.of(),
       request,
       createStreetLimitationParametersService(),
-      new SubmodeMappingService(null),
+      new SubmodeMappingService(Collections.emptyMap()),
       routerConfig.transitTuningConfig(),
       transitService,
       routerConfig.triasApiParameters(),

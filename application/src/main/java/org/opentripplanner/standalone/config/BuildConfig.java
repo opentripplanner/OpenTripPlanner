@@ -7,7 +7,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_7;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_8;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;

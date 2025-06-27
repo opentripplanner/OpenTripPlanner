@@ -8,6 +8,7 @@ import static org.opentripplanner.transit.speed_test.support.AssertSpeedTestSetu
 import java.lang.ref.WeakReference;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +127,7 @@ public class SpeedTest {
       List.of(),
       config.request,
       TestServerContext.createStreetLimitationParametersService(),
-      new SubmodeMappingService(null),
+      new SubmodeMappingService(Collections.emptyMap()),
       config.transitRoutingParams,
       new DefaultTransitService(timetableRepository),
       null,

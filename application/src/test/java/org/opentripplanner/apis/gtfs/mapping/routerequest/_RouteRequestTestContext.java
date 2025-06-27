@@ -8,6 +8,7 @@ import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +69,7 @@ class _RouteRequestTestContext {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
       routeRequest,
-      new SubmodeMappingService(null)
+      new SubmodeMappingService(Collections.emptyMap())
     );
   }
 

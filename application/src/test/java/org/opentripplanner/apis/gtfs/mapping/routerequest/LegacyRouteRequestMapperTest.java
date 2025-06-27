@@ -15,6 +15,7 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -72,7 +73,7 @@ class LegacyRouteRequestMapperTest implements PlanTestConstants {
       SchemaFactory.createSchemaWithDefaultInjection(routeRequest),
       GraphFinder.getInstance(graph, transitService::findRegularStopsByBoundingBox),
       routeRequest,
-      new SubmodeMappingService(null)
+      new SubmodeMappingService(Collections.emptyMap())
     );
   }
 
