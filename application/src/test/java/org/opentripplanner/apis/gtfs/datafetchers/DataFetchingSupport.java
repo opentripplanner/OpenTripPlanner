@@ -5,15 +5,24 @@ import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuild
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.Map;
 
 class DataFetchingSupport {
 
   static DataFetchingEnvironment dataFetchingEnvironment(Object source) {
+    return dataFetchingEnvironment(source, Map.of());
+  }
+
+  static DataFetchingEnvironment dataFetchingEnvironment(
+    Object source,
+    Map<String, Object> arguments
+  ) {
     var executionContext = newExecutionContextBuilder()
       .executionId(ExecutionId.from("test"))
       .build();
     return DataFetchingEnvironmentImpl.newDataFetchingEnvironment(executionContext)
       .source(source)
+      .arguments(arguments)
       .build();
   }
 }

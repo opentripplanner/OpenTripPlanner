@@ -2,8 +2,13 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.truth.StreamSubject;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.leg.ScheduledTransitLegBuilder;
@@ -62,9 +67,45 @@ class LegImplTest implements PlanTestConstants {
   private static final LegImpl SUBJECT = new LegImpl();
 
   @Test
-  void intermediateLegs() throws Exception {
+  void intermediateStops() throws Exception {
     var env = DataFetchingSupport.dataFetchingEnvironment(LEG);
     var stops = SUBJECT.intermediateStops().get(env);
     assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
+  }
+
+  @Test
+  void intermediateStopsWithInclude() throws Exception {
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      LEG,
+      Map.of("include", List.of(GraphQLTypes.GraphQLStopType.STOP))
+    );
+    var stops = StreamSupport.stream(
+      SUBJECT.intermediatePlaces().get(env).spliterator(),
+      false
+    ).map(s -> s.place.stop);
+    assertThat(stops).containsExactly(REGULAR_STOP);
+  }
+
+  @Test
+  void intermediatePlaces() throws Exception {
+    var env = DataFetchingSupport.dataFetchingEnvironment(LEG);
+    var stops = StreamSupport.stream(
+      SUBJECT.intermediatePlaces().get(env).spliterator(),
+      false
+    ).map(s -> s.place.stop);
+    assertThat(stops).containsExactly(REGULAR_STOP, AREA_STOP, GROUP_STOP);
+  }
+
+  @Test
+  void intermediatePlacesWithInclude() throws Exception {
+    var env = DataFetchingSupport.dataFetchingEnvironment(
+      LEG,
+      Map.of("include", List.of(GraphQLTypes.GraphQLStopType.STOP))
+    );
+    var stops = StreamSupport.stream(
+      SUBJECT.intermediatePlaces().get(env).spliterator(),
+      false
+    ).map(s -> s.place.stop);
+    assertThat(stops).containsExactly(REGULAR_STOP);
   }
 }
