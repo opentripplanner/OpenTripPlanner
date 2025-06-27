@@ -15,14 +15,6 @@ public class FromToViaVertexRequest {
   private final Set<TransitStopVertex> toStops;
   private final Map<VisitViaLocation, Set<Vertex>> visitViaLocationVertices;
 
-  public FromToViaVertexRequest(Set<Vertex> from) {
-    this.from = from;
-    this.fromStops = Set.of();
-    this.to = Set.of();
-    this.toStops = Set.of();
-    this.visitViaLocationVertices = Map.of();
-  }
-
   public FromToViaVertexRequest(
     Set<Vertex> from,
     Set<Vertex> to,
