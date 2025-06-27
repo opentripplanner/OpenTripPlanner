@@ -12,8 +12,8 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.model.FeedType;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.service.TimetableRepository;
 
 public class SubmodeMappingModule implements GraphBuilderModule {
 
@@ -30,13 +30,16 @@ public class SubmodeMappingModule implements GraphBuilderModule {
     REPLACEMENT_MODE,
   };
 
-  private final Graph graph;
+  private final TimetableRepository timetableRepository;
 
   @Nullable
   private final DataSource dataSource;
 
-  public SubmodeMappingModule(GraphBuilderDataSources graphBuilderDataSources, Graph graph) {
-    this.graph = graph;
+  public SubmodeMappingModule(
+    GraphBuilderDataSources graphBuilderDataSources,
+    TimetableRepository timetableRepository
+  ) {
+    this.timetableRepository = timetableRepository;
     this.dataSource = graphBuilderDataSources.getSubmodeMappingDataSource().orElse(null);
   }
 
@@ -92,9 +95,9 @@ public class SubmodeMappingModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     if (dataSource != null) {
-      graph.submodeMapping = read(dataSource);
+      timetableRepository.setSubmodeMapping(read(dataSource));
     } else {
-      graph.submodeMapping = useDefaultMapping();
+      timetableRepository.setSubmodeMapping(useDefaultMapping());
     }
   }
 

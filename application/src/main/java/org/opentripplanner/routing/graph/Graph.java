@@ -98,8 +98,6 @@ public class Graph implements Serializable {
   /** If this graph contains elevation data, the maximum elevation value. Otherwise null. */
   public Double maxElevation = null;
 
-  public Map<SubmodeMappingMatcher, SubmodeMappingRow> submodeMapping = null;
-
   /**
    * The horizontal distance across the ground between successive elevation samples in
    * CompactElevationProfile.

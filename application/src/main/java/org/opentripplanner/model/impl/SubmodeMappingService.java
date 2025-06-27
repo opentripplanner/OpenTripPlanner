@@ -28,21 +28,20 @@ public class SubmodeMappingService {
     );
   }
 
-  @Nullable
-  public TransitMode getReplacementMode(Trip trip) {
+  public Optional<TransitMode> findReplacementMode(Trip trip) {
     if (trip.getNetexSubMode() != SubMode.UNKNOWN) {
       Optional<SubmodeMappingRow> mapping = mapNetexSubmode(trip.getNetexSubMode());
       if (mapping.isPresent()) {
-        return mapping.get().replacementMode();
+        return Optional.of(mapping.get().replacementMode());
       }
     }
     var route = trip.getRoute();
     if (route.getGtfsType() != null) {
       Optional<SubmodeMappingRow> mapping = mapGtfsExtendedType(route.getGtfsType());
       if (mapping.isPresent()) {
-        return mapping.get().replacementMode();
+        return Optional.of(mapping.get().replacementMode());
       }
     }
-    return null;
+    return Optional.empty();
   }
 }

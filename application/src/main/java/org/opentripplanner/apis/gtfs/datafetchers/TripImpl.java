@@ -265,8 +265,10 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment -> {
       var submodeMappingService = getSubmodeMappingService(environment);
       var trip = getSource(environment);
-      var mode = submodeMappingService.getReplacementMode(trip);
-      return mode != null ? TransitModeMapper.map(mode) : null;
+      return submodeMappingService
+        .findReplacementMode(trip)
+        .map(TransitModeMapper::map)
+        .orElse(null);
     };
   }
 

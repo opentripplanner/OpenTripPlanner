@@ -32,6 +32,8 @@ import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.model.impl.SubmodeMappingMatcher;
+import org.opentripplanner.model.impl.SubmodeMappingRow;
 import org.opentripplanner.model.transfer.DefaultTransferService;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransitData;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -133,6 +135,8 @@ public class TimetableRepository implements Serializable {
   private transient TransitAlertService transitAlertService;
 
   private final Map<FeedScopedId, RegularStop> stopsByScheduledStopPointRefs = new HashMap<>();
+
+  private final Map<SubmodeMappingMatcher, SubmodeMappingRow> submodeMapping = new HashMap<>();
 
   @Inject
   public TimetableRepository(SiteRepository siteRepository, Deduplicator deduplicator) {
@@ -659,5 +663,14 @@ public class TimetableRepository implements Serializable {
         LOG.debug("graph time zone set to {}", timeZone);
       }
     }
+  }
+
+  public Map<SubmodeMappingMatcher, SubmodeMappingRow> getSubmodeMapping() {
+    return submodeMapping;
+  }
+
+  public void setSubmodeMapping(Map<SubmodeMappingMatcher, SubmodeMappingRow> mapping) {
+    submodeMapping.clear();
+    submodeMapping.putAll(mapping);
   }
 }

@@ -303,9 +303,9 @@ public class GraphBuilderModules {
   @Singleton
   static SubmodeMappingModule provideSubmodeMappingModule(
     GraphBuilderDataSources graphBuilderDataSources,
-    Graph graph
+    TimetableRepository timetableRepository
   ) {
-    return new SubmodeMappingModule(graphBuilderDataSources, graph);
+    return new SubmodeMappingModule(graphBuilderDataSources, timetableRepository);
   }
 
   @Provides
