@@ -12,6 +12,8 @@ import org.opentripplanner.transit.model.basic.TransitMode;
  * is implied by Route.type. In NeTEx, Trip.mode contains the originalMode, and replacementMode
  * is implied by Trip.submode. To allow for this, and the possibility of confused input data,
  * everything can be overridden here.
+ *
+ * @see SubmodeMappingService
  */
 public record SubmodeMappingRow(
   @Nullable String netexSubmode,
