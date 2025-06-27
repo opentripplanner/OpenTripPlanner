@@ -7,6 +7,27 @@ import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.timetable.Trip;
 
+/**
+ * Trips can come from both GTFS and NeTEx sources, and to make GTFS Route.type and NeTEx
+ * Trip.submode be reachable in a unified manner, there is an optional configuration file
+ * submode-mapping.csv which contains entries keyed with input feed type (GTFS or NeTEx)
+ * and input label (Route.type in the case of GTFS and Trip.submode in the case of NeTEx),
+ * and the output values of NeTEx submode (not used currently because the transmodel query
+ * api side is not done yet), Replacement mode, and Original mode (both TransitMode, and
+ * optional).
+ * <p>
+ * In GTFS queries Trip.replacementMode (optional) and Trip.originalMode (mandatory) will
+ * be populated by logic in this service.
+ * <p>
+ * An example submode-mapping.csv:
+ * <code>
+ * Input feed type,Input label,NeTEx submode,Replacement mode,Original mode
+ * NeTEx,replacementRailService,railReplacementBus,BUS,
+ * </code>
+ * My NeTEx feed source uses a funny nonstandard submode "replacementRailService" which I
+ * map to a standard one here. BUS will end up in Trip.replacementMode.
+ * Original mode is left unspecified, and will default to Trip.mode in the case of NeTEx.
+ */
 public class SubmodeMappingService {
 
   private final Map<SubmodeMappingMatcher, SubmodeMappingRow> map;
