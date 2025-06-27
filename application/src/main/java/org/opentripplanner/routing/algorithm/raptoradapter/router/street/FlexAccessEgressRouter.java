@@ -9,12 +9,12 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.filter.FilterMapper;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.transit.service.TransitService;
 
 public class FlexAccessEgressRouter {

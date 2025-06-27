@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
@@ -211,19 +210,16 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       var request = builder.buildRequest();
 
       try (
-        var temporaryVertices = new TemporaryVerticesContainer(
-          graph,
-          request.from(),
-          request.to(),
-          List.of(),
-          streetMode
-        )
+        var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+          .withFrom(request.from(), streetMode)
+          .withTo(request.to(), streetMode)
+          .build()
       ) {
         if (fromStreetName != null) {
           assertFromLink(
             fromStreetName,
             streetMode,
-            temporaryVertices.getFromVertices().iterator().next()
+            temporaryVerticesContainer.fromVertices().iterator().next()
           );
         }
       }
@@ -237,19 +233,16 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
       request = builder.buildRequest();
 
       try (
-        var temporaryVertices = new TemporaryVerticesContainer(
-          graph,
-          request.from(),
-          request.to(),
-          List.of(),
-          streetMode
-        )
+        var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+          .withFrom(request.from(), streetMode)
+          .withTo(request.to(), streetMode)
+          .build()
       ) {
         if (toStreetName != null) {
           assertToLink(
             toStreetName,
             streetMode,
-            temporaryVertices.getToVertices().iterator().next()
+            temporaryVerticesContainer.toVertices().iterator().next()
           );
         }
       }

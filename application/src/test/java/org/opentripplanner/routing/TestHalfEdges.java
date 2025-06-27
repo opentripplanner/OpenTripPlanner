@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -566,32 +564,19 @@ public class TestHalfEdges {
       .buildRequest();
 
     try (
-      var container = new TemporaryVerticesContainer(
-        graph,
-        walking.from(),
-        walking.to(),
-        List.of(),
-        StreetMode.WALK
-      )
+      var container = TemporaryVerticesContainer.of(graph)
+        .withFrom(walking.from(), StreetMode.WALK)
+        .withTo(walking.to(), StreetMode.WALK)
+        .build();
     ) {
-      assertFalse(container.getFromVertices().isEmpty());
-      assertFalse(container.getToVertices().isEmpty());
+      assertFalse(container.fromVertices().isEmpty());
+      assertFalse(container.toVertices().isEmpty());
       ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder.of()
         .setHeuristic(new EuclideanRemainingWeightHeuristic())
         .setRequest(walking)
-        .setFromToViaVertexRequest(
-          new FromToViaVertexRequest(
-            container.getFromVertices(),
-            container.getToVertices(),
-            container.getFromStopVertices(),
-            container.getToStopVertices(),
-            container.getVisitViaLocationVertices()
-          )
-        )
+        .setFromToViaVertexRequest(container.createFromToViaVertexRequest())
         .getShortestPathTree();
-      GraphPath<State, Edge, Vertex> path = spt.getPath(
-        container.getToVertices().iterator().next()
-      );
+      GraphPath<State, Edge, Vertex> path = spt.getPath(container.toVertices().iterator().next());
       for (State s : path.states) {
         assertNotSame(s.getBackEdge(), top);
       }

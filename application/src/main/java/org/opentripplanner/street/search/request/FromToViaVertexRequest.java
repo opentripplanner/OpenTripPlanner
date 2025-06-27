@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request;
+package org.opentripplanner.street.search.request;
 
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +41,11 @@ public class FromToViaVertexRequest {
     return from;
   }
 
+  /**
+   * Get the stop vertices that correspond to the from location. If the from location only contains
+   * coordinates, this will return an empty set. If the from location is a station id this will
+   * return the child stops of that station.
+   */
   public Set<TransitStopVertex> fromStops() {
     return fromStops;
   }
@@ -49,6 +54,11 @@ public class FromToViaVertexRequest {
     return to;
   }
 
+  /**
+   * Get the stop vertices that corresponds to the to location. If the to location only contains
+   * coordinates, this will return an empty set. If the to location is a station id this will
+   * return the child stops of that station.
+   */
   public Set<TransitStopVertex> toStops() {
     return toStops;
   }

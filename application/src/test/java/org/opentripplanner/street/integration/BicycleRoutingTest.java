@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -15,7 +14,6 @@ import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -86,23 +84,14 @@ public class BicycleRoutingTest {
       })
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(
-      graph,
-      from,
-      to,
-      List.of(),
-      StreetMode.BIKE
-    );
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+      .withFrom(from, StreetMode.BIKE)
+      .withTo(to, StreetMode.BIKE)
+      .build();
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(
       request,
-      new FromToViaVertexRequest(
-        temporaryVertices.getFromVertices(),
-        temporaryVertices.getToVertices(),
-        temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices(),
-        temporaryVertices.getVisitViaLocationVertices()
-      )
+      temporaryVerticesContainer.createFromToViaVertexRequest()
     );
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
@@ -112,7 +101,7 @@ public class BicycleRoutingTest {
     );
 
     var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-    temporaryVertices.close();
+    temporaryVerticesContainer.close();
 
     // make sure that we only get BICYCLE legs
     itineraries.forEach(i ->

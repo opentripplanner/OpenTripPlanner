@@ -63,7 +63,6 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.DominanceFunction;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
@@ -512,24 +511,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     long t0 = System.currentTimeMillis();
     // TODO: check options properly intialized (AMB)
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        request.from(),
-        request.to(),
-        List.of(),
-        request.journey().direct().mode()
-      )
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+        .withFrom(request.from(), request.journey().direct().mode())
+        .withTo(request.from(), request.journey().direct().mode())
+        .build()
     ) {
-      var fromToViaVertexRequest = new FromToViaVertexRequest(
-        temporaryVertices.getFromVertices(),
-        temporaryVertices.getToVertices(),
-        temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices(),
-        temporaryVertices.getVisitViaLocationVertices()
-      );
       List<GraphPath<State, Edge, Vertex>> paths = finder.graphPathFinderEntryPoint(
         request,
-        fromToViaVertexRequest
+        temporaryVerticesContainer.createFromToViaVertexRequest()
       );
       long dt = System.currentTimeMillis() - t0;
       searchTimeElapsedLabel.setText("search time elapsed: " + dt + "ms");

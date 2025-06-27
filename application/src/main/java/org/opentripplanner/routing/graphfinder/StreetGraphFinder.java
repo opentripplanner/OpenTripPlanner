@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -96,20 +95,16 @@ public class StreetGraphFinder implements GraphFinder {
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        GenericLocation.fromCoordinate(lat, lon),
-        GenericLocation.UNKNOWN,
-        List.of(),
-        StreetMode.WALK
-      )
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+        .withFrom(GenericLocation.fromCoordinate(lat, lon), StreetMode.WALK)
+        .build()
     ) {
       StreetSearchBuilder.of()
         .setSkipEdgeStrategy(skipEdgeStrategy)
         .setTraverseVisitor(visitor)
         .setDominanceFunction(new DominanceFunctions.LeastWalk())
         .setRequest(request)
-        .setFromToViaVertexRequest(new FromToViaVertexRequest(temporaryVertices.getFromVertices()))
+        .setFromToViaVertexRequest(temporaryVerticesContainer.createFromToViaVertexRequest())
         .getShortestPathTree();
     }
   }

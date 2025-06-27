@@ -4,14 +4,12 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GraphRoutingTest;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -255,21 +253,11 @@ class AccessEgressRouterTest extends GraphRoutingTest {
     var request = requestFromTo(from, to);
 
     try (
-      var verticesContainer = new TemporaryVerticesContainer(
-        graph,
-        from,
-        to,
-        List.of(),
-        StreetMode.WALK
-      )
+      var verticesContainer = TemporaryVerticesContainer.of(graph)
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .build()
     ) {
-      var fromToViaVertexRequest = new FromToViaVertexRequest(
-        verticesContainer.getFromVertices(),
-        verticesContainer.getToVertices(),
-        verticesContainer.getFromStopVertices(),
-        verticesContainer.getToStopVertices(),
-        verticesContainer.getVisitViaLocationVertices()
-      );
       return AccessEgressRouter.findAccessEgresses(
         request,
         StreetRequest.DEFAULT,
@@ -277,7 +265,7 @@ class AccessEgressRouterTest extends GraphRoutingTest {
         accessEgress,
         durationLimit,
         maxStopCount,
-        fromToViaVertexRequest
+        verticesContainer.createFromToViaVertexRequest()
       );
     }
   }

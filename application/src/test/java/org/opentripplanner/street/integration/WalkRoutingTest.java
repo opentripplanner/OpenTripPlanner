@@ -13,7 +13,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -86,24 +85,15 @@ class WalkRoutingTest {
       .withArriveBy(arriveBy)
       .buildRequest();
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        graph,
-        from,
-        to,
-        List.of(),
-        StreetMode.WALK
-      )
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .build()
     ) {
       var gpf = new GraphPathFinder(null);
       return gpf.graphPathFinderEntryPoint(
         request,
-        new FromToViaVertexRequest(
-          temporaryVertices.getFromVertices(),
-          temporaryVertices.getToVertices(),
-          temporaryVertices.getFromStopVertices(),
-          temporaryVertices.getToStopVertices(),
-          temporaryVertices.getVisitViaLocationVertices()
-        )
+        temporaryVerticesContainer.createFromToViaVertexRequest()
       );
     }
   }

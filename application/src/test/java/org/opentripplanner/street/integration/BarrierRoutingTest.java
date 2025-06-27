@@ -25,7 +25,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.model.plan.walkstep.WalkStep;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteRequestBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -183,15 +182,12 @@ public class BarrierRoutingTest {
 
     options.accept(builder);
 
-    var temporaryVertices = new TemporaryVerticesContainer(graph, from, to, List.of(), streetMode);
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+      .withFrom(from, streetMode)
+      .withTo(to, streetMode)
+      .build();
     var gpf = new GraphPathFinder(null);
-    var fromToViaVertexRequest = new FromToViaVertexRequest(
-      temporaryVertices.getFromVertices(),
-      temporaryVertices.getToVertices(),
-      temporaryVertices.getFromStopVertices(),
-      temporaryVertices.getToStopVertices(),
-      temporaryVertices.getVisitViaLocationVertices()
-    );
+    var fromToViaVertexRequest = temporaryVerticesContainer.createFromToViaVertexRequest();
     var paths = gpf.graphPathFinderEntryPoint(builder.buildRequest(), fromToViaVertexRequest);
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
@@ -205,7 +201,7 @@ public class BarrierRoutingTest {
     assertAll(assertions.apply(itineraries));
 
     Geometry legGeometry = itineraries.get(0).legs().get(0).legGeometry();
-    temporaryVertices.close();
+    temporaryVerticesContainer.close();
 
     return EncodedPolyline.encode(legGeometry).points();
   }

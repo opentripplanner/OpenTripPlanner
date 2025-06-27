@@ -23,7 +23,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
@@ -172,13 +171,10 @@ class ScheduledDeviatedTripIntegrationTest {
     var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
 
     try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        serverContext.graph(),
-        from,
-        to,
-        List.of(),
-        StreetMode.WALK
-      )
+      var temporaryVerticesContainer = TemporaryVerticesContainer.of(serverContext.graph())
+        .withFrom(from, StreetMode.WALK)
+        .withTo(to, StreetMode.WALK)
+        .build()
     ) {
       var result = TransitRouter.route(
         request,
@@ -187,13 +183,7 @@ class ScheduledDeviatedTripIntegrationTest {
         transitStartOfTime,
         additionalSearchDays,
         new DebugTimingAggregator(),
-        new FromToViaVertexRequest(
-          temporaryVertices.getFromVertices(),
-          temporaryVertices.getToVertices(),
-          temporaryVertices.getFromStopVertices(),
-          temporaryVertices.getToStopVertices(),
-          temporaryVertices.getVisitViaLocationVertices()
-        )
+        temporaryVerticesContainer.createFromToViaVertexRequest()
       );
 
       return result.getItineraries();

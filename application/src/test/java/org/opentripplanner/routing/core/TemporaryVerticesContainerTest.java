@@ -59,7 +59,10 @@ public class TemporaryVerticesContainerTest {
   @Test
   public void temporaryChangesRemovedOnClose() {
     // When - the container is created
-    subject = new TemporaryVerticesContainer(g, from, to, List.of(), StreetMode.WALK);
+    subject = TemporaryVerticesContainer.of(g)
+      .withFrom(from, StreetMode.WALK)
+      .withTo(to, StreetMode.WALK)
+      .build();
 
     // Then:
     originAndDestinationInsertedCorrect();
@@ -101,12 +104,12 @@ public class TemporaryVerticesContainerTest {
 
   private void originAndDestinationInsertedCorrect() {
     // Then - the origin and destination is
-    assertEquals("Origin", subject.getFromVertices().iterator().next().getDefaultName());
-    assertEquals("Destination", subject.getToVertices().iterator().next().getDefaultName());
+    assertEquals("Origin", subject.fromVertices().iterator().next().getDefaultName());
+    assertEquals("Destination", subject.toVertices().iterator().next().getDefaultName());
 
     // And - from the origin
     Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
-      subject.getFromVertices().iterator().next(),
+      subject.fromVertices().iterator().next(),
       true,
       new ArrayList<>()
     );
@@ -120,7 +123,7 @@ public class TemporaryVerticesContainerTest {
 
     // And - from the destination we can backtrack
     Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
-      subject.getToVertices().iterator().next(),
+      subject.toVertices().iterator().next(),
       false,
       new ArrayList<>()
     );

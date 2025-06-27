@@ -6,7 +6,6 @@ import static org.opentripplanner.test.support.PolylineAssert.assertThatPolyline
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ConstantsForTests;
@@ -16,7 +15,6 @@ import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.leg.StreetLeg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -166,23 +164,14 @@ public class SplitEdgeTurnRestrictionsTest {
       .withJourney(jb -> jb.withDirect(new StreetRequest(StreetMode.CAR)))
       .buildRequest();
 
-    var temporaryVertices = new TemporaryVerticesContainer(
-      graph,
-      from,
-      to,
-      List.of(),
-      StreetMode.CAR
-    );
+    var temporaryVerticesContainer = TemporaryVerticesContainer.of(graph)
+      .withFrom(from, StreetMode.CAR)
+      .withTo(to, StreetMode.CAR)
+      .build();
     var gpf = new GraphPathFinder(null);
     var paths = gpf.graphPathFinderEntryPoint(
       request,
-      new FromToViaVertexRequest(
-        temporaryVertices.getFromVertices(),
-        temporaryVertices.getToVertices(),
-        temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices(),
-        temporaryVertices.getVisitViaLocationVertices()
-      )
+      temporaryVerticesContainer.createFromToViaVertexRequest()
     );
 
     GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
@@ -192,7 +181,7 @@ public class SplitEdgeTurnRestrictionsTest {
     );
 
     var itineraries = graphPathToItineraryMapper.mapItineraries(paths);
-    temporaryVertices.close();
+    temporaryVerticesContainer.close();
 
     // make sure that we only get CAR legs
     itineraries.forEach(i ->

@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -24,7 +25,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.api.request.FromToViaVertexRequest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -34,6 +34,7 @@ import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.street.search.request.FromToViaVertexRequest;
 import org.opentripplanner.transit.model.network.grouppriority.TransitGroupPriorityService;
 import org.opentripplanner.utils.time.ServiceDateUtils;
 import org.slf4j.Logger;
@@ -99,25 +100,8 @@ public class RoutingWorker {
 
     var result = RoutingResult.empty();
 
-    try (
-      var temporaryVertices = new TemporaryVerticesContainer(
-        serverContext.graph(),
-        request.from(),
-        request.to(),
-        request.getVisitViaLocations(),
-        request.journey().access().mode(),
-        request.journey().egress().mode(),
-        request.journey().direct().mode(),
-        request.journey().transfer().mode()
-      )
-    ) {
-      var requestVertexService = new FromToViaVertexRequest(
-        temporaryVertices.getFromVertices(),
-        temporaryVertices.getToVertices(),
-        temporaryVertices.getFromStopVertices(),
-        temporaryVertices.getToStopVertices(),
-        temporaryVertices.getVisitViaLocationVertices()
-      );
+    try (var temporaryVerticesContainer = createTemporaryVerticesContainer()) {
+      var requestVertexService = temporaryVerticesContainer.createFromToViaVertexRequest();
 
       if (OTPFeature.ParallelRouting.isOn()) {
         // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
@@ -320,5 +304,27 @@ public class RoutingWorker {
       pageCursorInput,
       itineraries
     );
+  }
+
+  private TemporaryVerticesContainer createTemporaryVerticesContainer() {
+    return TemporaryVerticesContainer.of(serverContext.graph())
+      .withFrom(
+        request.from(),
+        EnumSet.of(request.journey().access().mode(), request.journey().direct().mode())
+      )
+      .withTo(
+        request.to(),
+        EnumSet.of(request.journey().egress().mode(), request.journey().direct().mode())
+      )
+      .withVia(
+        request.getVisitViaLocations(),
+        EnumSet.of(
+          request.journey().access().mode(),
+          request.journey().egress().mode(),
+          request.journey().direct().mode(),
+          request.journey().transfer().mode()
+        )
+      )
+      .build();
   }
 }
