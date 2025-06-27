@@ -23,7 +23,7 @@ public class GtfsApiConfig implements GtfsApiParameters {
 
     tracingTags = c
       .of("tracingTags")
-      .summary("Used to group requests when monitoring OTP.")
+      .summary("Used to group requests based on headers or query parameters when monitoring OTP.")
       .asStringList(Set.of());
   }
 
