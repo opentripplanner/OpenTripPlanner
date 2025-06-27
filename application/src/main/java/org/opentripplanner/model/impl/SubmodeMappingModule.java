@@ -15,6 +15,11 @@ import org.opentripplanner.model.FeedType;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.service.TimetableRepository;
 
+/**
+ * Part of infra to map GTFS and NeTEx Trip.replacementMode similarly.
+ *
+ * @see SubmodeMappingService
+ */
 public class SubmodeMappingModule implements GraphBuilderModule {
 
   private static final String INPUT_FEED_TYPE = "Input feed type";

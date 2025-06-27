@@ -5,6 +5,11 @@ import dagger.Provides;
 import jakarta.inject.Singleton;
 import org.opentripplanner.transit.service.TimetableRepository;
 
+/**
+ * Part of infra to map GTFS and NeTEx Trip.replacementMode similarly.
+ *
+ * @see SubmodeMappingService
+ */
 @Module
 public class SubmodeMappingServiceModule {
 
