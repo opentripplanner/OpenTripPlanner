@@ -12,7 +12,7 @@ import org.opentripplanner.apis.gtfs.mapping.LocalDateMapper;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.apis.gtfs.mapping.PickDropMapper;
 import org.opentripplanner.apis.gtfs.mapping.RealtimeStateMapper;
-import org.opentripplanner.apis.gtfs.support.filter.StopsByTypeFilter;
+import org.opentripplanner.apis.gtfs.support.filter.StopArrivalByTypeFilter;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -137,7 +137,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   public DataFetcher<Iterable<StopArrival>> intermediatePlaces() {
     return env -> {
       var args = new GraphQLTypes.GraphQLLegIntermediatePlacesArgs(env.getArguments());
-      var filter = new StopsByTypeFilter(args.getGraphQLInclude());
+      var filter = new StopArrivalByTypeFilter(args.getGraphQLInclude());
       return filter.filter(getSource(env).listIntermediateStops());
     };
   }
@@ -150,7 +150,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
         return null;
       }
       var args = new GraphQLTypes.GraphQLLegIntermediatePlacesArgs(env.getArguments());
-      var filter = new StopsByTypeFilter(args.getGraphQLInclude());
+      var filter = new StopArrivalByTypeFilter(args.getGraphQLInclude());
       return filter
         .filter(intermediateStops)
         .stream()

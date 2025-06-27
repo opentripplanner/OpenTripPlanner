@@ -8,17 +8,19 @@ import javax.annotation.Nullable;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.model.plan.leg.StopArrival;
 import org.opentripplanner.transit.model.site.StopType;
+import org.opentripplanner.utils.collection.CollectionUtils;
 import org.opentripplanner.utils.collection.EnumSetUtils;
 
 /**
  * A filter for {@link StopArrival} objects based on their {@link StopType}.
  */
-public class StopsByTypeFilter {
+public class StopArrivalByTypeFilter {
 
   @Nullable
   private final Set<StopType> allowedTypes;
 
-  public StopsByTypeFilter(Collection<GraphQLTypes.GraphQLStopType> types) {
+  public StopArrivalByTypeFilter(Collection<GraphQLTypes.GraphQLStopType> types) {
+    CollectionUtils.requireNullOrNonEmpty(types, "Stop types must be non-empty or null");
     allowedTypes = map(types);
   }
 
