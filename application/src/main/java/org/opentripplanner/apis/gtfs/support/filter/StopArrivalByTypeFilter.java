@@ -19,7 +19,7 @@ public class StopArrivalByTypeFilter {
   @Nullable
   private final Set<StopType> allowedTypes;
 
-  public StopArrivalByTypeFilter(Collection<GraphQLTypes.GraphQLStopType> types) {
+  public StopArrivalByTypeFilter(@Nullable Collection<GraphQLTypes.GraphQLStopType> types) {
     CollectionUtils.requireNullOrNonEmpty(types, "Stop types must be non-empty or null");
     allowedTypes = map(types);
   }

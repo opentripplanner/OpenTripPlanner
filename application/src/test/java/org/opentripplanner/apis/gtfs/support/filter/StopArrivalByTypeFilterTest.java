@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.support.filter;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopType.LOCATION;
 import static org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLStopType.LOCATION_GROUP;
@@ -32,6 +33,11 @@ class StopArrivalByTypeFilterTest {
   @Test
   void emptyList() {
     assertThrows(IllegalArgumentException.class, () -> new StopArrivalByTypeFilter(Set.of()));
+  }
+
+  @Test
+  void nullValue() {
+    assertNull(new StopArrivalByTypeFilter(null).filter(null));
   }
 
   private static List<Arguments> filterCases() {
